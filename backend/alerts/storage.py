@@ -8,6 +8,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     ForeignKey,
+    Index,
     LargeBinary,
     Numeric,
     String,
@@ -148,6 +149,7 @@ class Outbox(Base):
 
 class Audit(Base):
     __tablename__ = "audit_events"
+    __table_args__ = (Index("ix_audit_events_kind_at", "kind", "at"),)
     id: Mapped[int] = mapped_column(primary_key=True)
     kind: Mapped[str]
     at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
