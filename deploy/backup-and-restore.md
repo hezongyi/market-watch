@@ -36,3 +36,13 @@ Ubuntu旧生产备份timer已停止禁用，避免与开发.env混用。systemd�
 ## 旧Compose脚本
 
 `deploy/backup.sh` / `deploy/restore-check.sh`依赖原Compose内的PostgreSQL服务，且不生成上述清单，不适用于当前复用外部PG14的生产部署。请使用Unraid备份流程，详见[部署手册](remote-docker.md)。
+
+## 项目配置与源码归档（2026-09-29新增）
+
+每日脚本在数据库导出成功后调用 `deploy/unraid-config-backup.sh`，另存 `config-时间-随机串.tar.gz` 和 `.sha256`。包含本项目 `.env`、实际Compose版本、后端、前端源码、迁移、依赖锁文件与deploy配置；排除node_modules、构建缓存等可重建文件。不包含数据库服务目录、其他appdata、反向代理服务配置或Docker镜像。
+
+目录与归档受限，归档及校验文件权限0600。归档包含API/数据库/ntfy私密配置，不能提交Git或通过网站分发。该归档不能使用数据库的restore-check命令。
+
+恢复时先核对SHA256，解包到权限0700的隔离目录，核对 `.env` 权限0600，使用Compose `config --quiet`检查，禁止输出展开配置。已有一次隔离解包、`.env`逐字节比较和Compose校验通过。不要直接解包覆盖运行中的项目，也不要在测试恢复时启动生产worker。
+
+数据库和配置分别有恢复证据，不代表已经演练全新机器上的整站重建。反向代理域名/证书由现有服务维护，需使用其自身备份。配置归档保存在同一Unraid服务器，尚不提供异机容灾。网页备份状态目前来自数据库备份审计；配置归档失败会令脚本失败并进入cron日志，需要同时检查该日志。

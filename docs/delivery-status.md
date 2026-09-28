@@ -359,3 +359,7 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 ## Unraid cron自然触发验收（2026-09-29）
 
 临时插件cron安排主机06:32自动执行现有固定镜像备份脚本，未手工执行脚本；实际生成alerts-20260928T223202712335Z.dump（17310723字节，16表/795660根K线），日志记录成功。执行后删除临时cron并update_cron，使用crontab -c /etc/cron.d -l确认仅保留原每日03:00项目任务。证明Unraid cron自动调度与脚本链路可用，尚未实际观察03:00时刻及整机重启。备份范围为本项目完整PostgreSQL库，不含appdata中的.env/Compose/镜像；文件保存在appdata下不等于appdata备份。
+
+## 项目配置备份补齐（2026-09-29）
+
+新增unraid-config-backup.sh，归档.env、Compose、应用源码/依赖/迁移与deploy文件，不含其他服务、数据库文件或Docker镜像。实测生成config-20260928T223406Z-FMUGlB.tar.gz，SHA256验证、隔离解包、.env精确比较、Compose config --quiet均通过，归档和恢复.env权限均600；临时解包目录已清理，未启动恢复出的服务。生产每日备份脚本已增加数据库导出后调用配置备份，脚本语法检查通过。更新脚本后再次独立生成配置归档以保存最新备份脚本。网页状态当前只反映DB备份审计，配置归档异常以脚本退出码/cron日志体现。

@@ -40,10 +40,10 @@
 ## 备份
 
 - 备份镜像固定为 `trading-alerts-backup:20260929-pg14`，精确ID见发布清单；这是已实际恢复验证的原镜像，新增标签未重构建。
-- `deploy/unraid-backup.sh` 使用flock防重复，挂载项目backups，凭据从受限.env读取，PG客户端主版本14。
+- `deploy/unraid-backup.sh` 使用flock防重复，挂载项目backups，凭据从受限.env读取，PG客户端主版本14。数据库成功后另行执行 `unraid-config-backup.sh` 保存本项目私密配置及源码归档（0600），不包含其他服务或Docker镜像。
 - Unraid原生cron文件 `/boot/config/plugins/dynamix/trading-alerts.cron`，每日主机时间03:00执行；日志 `backups/latest-run.log`。
 - 安装后运行 `/usr/local/sbin/update_cron`，用 `crontab -c /etc/cron.d -l` 核对Unraid插件任务（普通 `crontab -l` 是另一组任务）。Ubuntu旧备份timer已停止禁用。
-- 已从Unraid生成的备份在随机临时PG库实际恢复，16表计数匹配。自然定时触发及整机重启后的执行尚未实测。
+- 已从Unraid生成的备份在随机临时PG库实际恢复，16表计数匹配。临时cron自动触发原数据库备份已实测；新增配置归档已独立验证解包，整机重启后的执行尚未实测。
 - 备份目前保存在同一服务器，不代表异机容灾。不要将旧PG17客户端生成且未通过PG14恢复的文件视作可用恢复点。
 
 重构建备份镜像时可用 `--build-arg APP_IMAGE=新的固定应用镜像`，发布新的备份标签并重新验证恢复；不要覆盖当前标签。
