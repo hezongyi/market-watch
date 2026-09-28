@@ -1,0 +1,20 @@
+# 192.168.7.33 Docker 部署
+
+使用独立文件 `compose.external-db.yaml`，不是原 compose.yaml 的覆盖文件。此配置只启动网站/API/三个worker及一次性迁移，复用已迁入数据的项目PostgreSQL，不创建新数据库容器或卷。
+
+## 登录后检查
+
+核实Docker/Compose版本、CPU/内存/磁盘、现有容器和网络、选定端口是否空闲。只操作trading-alerts项目，不运行全局prune或重启Docker守护进程。SSH用户名、端口及登录授权尚待用户提供。
+
+## 配置和切换
+
+1. 将代码传至独立目录，排除.env、artifacts、backups、SQLite、.venv及node_modules；受限.env单独传输，权限0600。
+2. 保留已创建项目专用账户的ALERTS_DATABASE_URL，验证容器可达192.168.7.33:5432。不要改为localhost（容器内localhost不是宿主机）。
+3. 确认可用端口后设置ALERTS_WEB_PORT/ALERTS_BIND_ADDRESS和匹配的ALERTS_PUBLIC_URL；LAN HTTP阶段ALERTS_COOKIE_SECURE=false。保持原ntfy topic，OANDA代理也需从容器验证。
+4. 执行 `docker compose -f compose.external-db.yaml config --quiet` 和 `build`。不要输出展开配置，以免泄露凭据。
+5. 停止并禁用开发机API及三个worker，做远端PG最终备份。确认没有活动旧worker后再运行目标Compose；不能两边同时启动行情和通知。
+6. `docker compose -f compose.external-db.yaml up -d`，检查迁移退出0、API健康、网页登录及行情/通知心跳；已确认通知不可重发。
+7. 安排目标机持续备份。当前开发机已有有效PG备份service/timer，目标机备份未验收前保留该备份机制。应用容器当前不包含pg_dump，不能假设在API容器内备份可用。
+8. 在新回调地址进行约定的手机确认测试。移机使用同一PG数据库，通常不需要再次复制行情数据。
+
+回退：先停止目标项目worker，再恢复开发机服务，保留同一PG数据库；不得切回过期SQLite。远端实际部署、端口与容器网络尚未验证，本文件为操作步骤。

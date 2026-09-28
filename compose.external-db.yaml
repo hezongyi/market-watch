@@ -1,0 +1,49 @@
+# Standalone configuration: docker compose -f compose.external-db.yaml ...
+# Uses ALERTS_DATABASE_URL and ALERTS_PUBLIC_URL from the restricted .env.
+name: trading-alerts
+services:
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    env_file: .env
+  api:
+    build: .
+    env_file: .env
+    environment:
+      ALERTS_COOKIE_SECURE: ${ALERTS_COOKIE_SECURE:-false}
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+  market-worker:
+    build: .
+    command: ["python", "-m", "alerts.market"]
+    env_file: .env
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+  import-worker:
+    build: .
+    command: ["python", "-m", "alerts.market", "--imports-only"]
+    env_file: .env
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+  notify-worker:
+    build: .
+    command: ["python", "-m", "alerts.notify"]
+    env_file: .env
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+  web:
+    build: ./web
+    ports: ["${ALERTS_BIND_ADDRESS:-192.168.7.33}:${ALERTS_WEB_PORT:-8080}:80"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
