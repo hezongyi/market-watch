@@ -397,3 +397,7 @@ worker更新后实际容器均running、RestartCount=0，镜像标签匹配新�
 ## 用户确认网页试听（2026-09-29）
 
 用户明确反馈“试听可以听到声音”。网页试听与真实预警共用playAlertTone，结合自动化的新信号/重复/禁用验证，网页声音功能通过；不再将物理听感列为缺失证据。
+
+## 最后实机验证准备（2026-09-29）
+
+复核五容器均running且restart policy为unless-stopped；最新配置归档config-20260928T231246Z-7EaGoE.tar.gz已生成于独立backup目录。整理docs/final-device-checks.md，明确30分钟锁屏测试和整机启动检查步骤。已向用户询问可用窗口；未发送手机通知、未重启Unraid。尚不能将两项列为通过。
