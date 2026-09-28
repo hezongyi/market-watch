@@ -339,3 +339,7 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 日历生成/核心回归17项通过；开发库apply通过。生产只读预检265闭市区间与M1无冲突，影响645聚合行/130重取任务。停止项目API/行情/历史worker后，Unraid备份alerts-20260928T221840469681Z.dump成功（795609根K线），应用oanda-sg-xau-maintenance-20270331-v1并恢复服务。三品种继续receiving、error=false。修复仍在运行，不宣称已全部完成；部署应用镜像版本未变化，配置已改变。
 
 新增web/tests/deployed-readonly.mjs，生产HTTPS真实浏览器验证登录、Secure Cookie、演练页、设置页刷新保持登录、390px无横向溢出；pageErrors/failedResponses均空。脚本不创建预警或发送通知。截图和结果位于artifacts/deployed-{desktop,mobile}.png及deployed-browser-result.json。初始未登录session的401属于预期，认证后仍严格检查错误。浏览器依赖路径为~/.local/share/playwright-deps-jammy/usr/lib/x86_64-linux-gnu。
+
+## Docker API异常恢复（2026-09-29）
+
+确认活动监控0、近期行情错误0后测试本项目API异常退出。容器内向PID1发送SIGKILL未造成退出，因此没有将该步骤算作恢复证据；随后从宿主机向docker inspect取得的该容器主进程PID发送SIGKILL。复查RestartCount由0变1、running=true、health=healthy，HTTPS readyz 200，启动时间2026-09-28T22:23:15.768070239Z。未手工启动API，未停止其他worker或重启宿主机。此证据覆盖API容器异常自动恢复，不代表整机重启验收。
