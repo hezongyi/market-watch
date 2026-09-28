@@ -23,6 +23,10 @@ def test_transfer_rolls_back_when_fingerprint_differs(tmp_path, monkeypatch):
             Base.metadata.tables["preferences"].insert(),
             {"key": "rollback-probe", "value": {"nested": [1, True, None]}},
         )
+        c.execute(
+            Base.metadata.tables["audit_events"].insert(),
+            {"id": 9001, "kind": "transfer_fixture", "at": 1, "details": {}},
+        )
     source.dispose()
     # Manifest verification is independently tested in test_backup; use a tiny fixture here.
     monkeypatch.setattr(transfer_module, "restore_check", lambda path: None)
@@ -55,6 +59,12 @@ def test_transfer_rolls_back_when_fingerprint_differs(tmp_path, monkeypatch):
         monkeypatch.setattr(transfer_module, "fingerprint", original)
         result = transfer_module.transfer(backup, target)
         assert result["tables"]["preferences"]["count"] == 1
+        with target.begin() as c:
+            audit = Base.metadata.tables["audit_events"]
+            new_id = c.scalar(
+                audit.insert().values(kind="after_transfer", at=2, details={}).returning(audit.c.id)
+            )
+            assert new_id == 9002
         with pytest.raises(ValueError, match="refusing overwrite"):
             transfer_module.transfer(backup, target)
     finally:
