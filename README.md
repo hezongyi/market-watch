@@ -2,11 +2,13 @@
 
 个人外汇、黄金和比特币监控网站。当前处于实现与验收中，**尚未达到完整交付状态**。逐项验收见 [交付矩阵](docs/acceptance-matrix.md)，状态见 [交付记录](docs/delivery-status.md)，规格见 [实施方案](docs/implementation-plan.md)。
 
-## 当前开发实例
+## 当前实例
 
-网站：http://192.168.7.232:5173/（同一局域网访问）。外汇/黄金使用 OANDA Practice Bid M1，比特币使用 Binance BTCUSDT 成交价 M1；定时拉取并自行合成其他周期。当前数据库 `oanda-live.db`，旧 `alerts.db` 保留。开发登录凭据保存在本机忽略版本控制的 `artifacts/local-credentials.json`；该目录不通过网站提供。
+生产网站：**https://trade.kookvv.com:8443**，运行于Unraid（192.168.7.33），使用独立PostgreSQL14生产库。外汇/黄金为OANDA Practice Bid M1，比特币为Binance BTCUSDT成交价M1，系统自行聚合其他周期。
 
-新安装默认关闭真实手机通知；当前实例经手机验证后已启用，沿用测试 topic。当前进程尚未安装开机自启，开发地址可访问不代表最终验收完成。
+Ubuntu为开发机，`.env`使用独立开发库，真实手机投递关闭。生产沿用已测试的ntfy.sh主题。凭据存放在受限文件中，不提交Git，也不通过网站提供。
+
+使用方法见[操作指南](docs/operating-guide.md)，版本、升级与回退见[Unraid部署](deploy/remote-docker.md)。
 
 ## 指标预警
 
@@ -14,7 +16,7 @@
 
 ## 本地开发
 
-需要 Python 3.11+、Node 22+。默认 SQLite 供本地验证，部署使用 PostgreSQL。
+需要 Python 3.11+、Node 22+。当前开发与生产使用分离的PostgreSQL库及账户，单元测试可使用SQLite。新安装才使用默认配置；不要覆盖当前开发机.env。
 
 ```bash
 python -m venv .venv
@@ -66,15 +68,11 @@ npm run build
 
 当前实例可运行 `.venv/bin/python -m alerts.backup`，生成私密备份与校验清单。SQLite / PostgreSQL 恢复验证及每日任务见 [备份与恢复](deploy/backup-and-restore.md)。
 
-## 部署草案
+## 生产部署
 
-设置 `.env` 中 HTTPS 的公开域名、密码 hash、随机 URL-safe `POSTGRES_PASSWORD`。反向代理 HTTPS 到 `127.0.0.1:8080`，并支持 SSE 长连接。
+生产使用 `compose.external-db.yaml` 与固定镜像版本文件 `compose.release.yaml`，复用Unraid现有PG14；操作步骤见[部署手册](deploy/remote-docker.md)。不要将原`compose.yaml`与此配置混用。
 
-```bash
-docker compose up -d --build
-```
-
-Compose 尚待实际 Docker 环境验收；不得将配置存在当作已部署。当前按用户确认使用 ntfy.sh 原生应用，配套 APK 开发已停止，自建 ntfy 暂不要求。手机持续响铃、后台与确认效果以原生应用实测为准。
+API异常退出自动恢复、HTTPS浏览器登录及手机确认已验证；长期锁屏/移动网络测试等剩余项见交付矩阵。使用ntfy原生应用，不开发配套APK。
 
 ## 复用项目
 

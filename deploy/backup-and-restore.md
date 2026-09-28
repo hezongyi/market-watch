@@ -1,6 +1,6 @@
 # 备份与隔离恢复
 
-## 当前主机（SQLite）
+## SQLite（旧实例或独立本地验证）
 
 ```bash
 .venv/bin/python -m alerts.backup --directory backups
@@ -23,14 +23,16 @@
 
 恢复检查需要当前连接有 CREATE DATABASE 权限。它新建随机名称 `alerts_restore_<uuid>` 的临时数据库，使用 pg_restore 恢复并核对所有业务表记录数，最后删除自己创建的临时库。不会覆盖源库、不会启动通知/行情进程，也不会发送手机消息。SHA-256 不匹配时拒绝恢复。命令返回非零表示未通过；程序对外只显示错误类别，避免输出连接凭据。
 
-本轮验证工具来自官方 apt.postgresql.org 的 Ubuntu 22.04 软件包，按官方包索引 SHA-256 校验：postgresql-client-17 17.11、libpq5 18.6；仅解压在 `/tmp/trading-pg-client`，没有安装到系统。`/tmp` 目录不可作为正式部署的永久客户端位置。
+生产使用PG14服务端和PG14客户端。已验证的Ubuntu持久客户端包装路径为 `/home/quant/.local/libexec/trading-alerts-pg`；Unraid备份镜像为 `trading-alerts-backup:20260929-pg14`。早期PG17客户端生成的备份无法直接通过PG14恢复检查，不能当作已通过验收的恢复点。
 
-## 每日任务
+## 当前每日任务（Unraid）
 
-`deploy/systemd/trading-alerts-backup.timer` 在北京时间每天 03:00 后随机 0–10 分钟运行，Persistent=true 会补执行关机期间错过的计划。安装过程见同目录 README。定时器尚需实际启用及执行验收。
+`deploy/unraid-backup.sh`使用固定PG14备份镜像，保存到 `/mnt/user/appdata/trading-alerts/backups`。原生cron文件 `/boot/config/plugins/dynamix/trading-alerts.cron` 每日主机时间03:00执行，日志为 `backups/latest-run.log`；已安装并核对crontab。脚本实际备份、随机临时PG数据库恢复和16表计数匹配均已验证；自然定时触发尚未观察。
+
+Ubuntu旧生产备份timer已停止禁用，避免与开发.env混用。systemd目录中的timer供独立部署参考，并非当前生产执行方式。
 
 备份含账户状态和登录会话信息，应限制访问。当前工具不自动删除备份；需要配置异机副本与保留策略时再实施，现阶段同机备份不能防范磁盘损坏。
 
-## 已有 Docker 脚本
+## 旧Compose脚本
 
-`deploy/backup.sh` / `deploy/restore-check.sh` 依赖 Compose 内的 PostgreSQL 客户端，可以在将来的 Docker 部署中使用。它们没有上述 `.json` 清单，不能混用验证命令；当前主机没有 Docker，尚未执行该路径。
+`deploy/backup.sh` / `deploy/restore-check.sh`依赖原Compose内的PostgreSQL服务，且不生成上述清单，不适用于当前复用外部PG14的生产部署。请使用Unraid备份流程，详见[部署手册](remote-docker.md)。
