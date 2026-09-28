@@ -30,9 +30,9 @@
 | 真实策略→ntfy→手机→确认 | 真实价格策略闭环通过 | 用户授权BTCUSDT M1穿越测试，发送1次，手机action回传确认，outbox取消；H4/M5特定规则实机触发及长锁屏另列 |
 | 原生手机锁屏、移动网络 | 本次实机通过；长时间待机未测 | 用户确认关闭Wi-Fi、移动网络锁屏接收与铃声正常；HTTPS action确认已回传。未记录锁屏时长，不宣称长期待机验证 |
 | 夜间静音 | 服务端自动验证通过 | quiet_until/claim边界测试；原生app已开始的本地响铃无法由服务端保证远程停止 |
-| 备份与恢复 | SQLite及独立PG实际通过 | alerts.backup、test_backup.py；0600、hash、事务快照、PG随机临时库恢复全部表计数、失败清理；同机备份不等于异机容灾 |
+| 备份与恢复 | 数据库恢复及配置隔离解包通过 | alerts.backup、test_backup.py；0600、hash、事务快照、PG随机临时库恢复全部表计数、失败清理；配置归档已验证解包/.env一致/Compose有效；备份存于/mnt/user/backup/trading-alerts，同服务器备份不等于异机容灾 |
 | 每日备份 | Unraid备份、恢复及cron自动调度通过 | 每日03:00任务已安装；临时06:32任务由cron自然触发生成PG备份后已删除；PG14恢复16表计数一致；Ubuntu旧timer已停用 |
-| 部署、自动启动、进程异常恢复 | Unraid五个容器已接管；整机启动待验收 | 发布20260929-05eb433，API健康、登录通过、三品种接收；旧Ubuntu服务停止禁用；Docker API真实异常退出后RestartCount=1、healthy，HTTPS恢复200；整机启动未实测 |
+| 部署、自动启动、进程异常恢复 | Unraid五个容器已接管；整机启动待验收 | 发布清单20260929-6fb8f77（仅行情/补数worker更新），API健康、登录通过、三品种接收；旧Ubuntu服务停止禁用；Docker API真实异常退出后RestartCount=1、healthy，HTTPS恢复200；整机启动未实测 |
 | PostgreSQL正式运行路径 | Unraid PG14正式运行，开发/测试隔离通过 | 16表/795435根K线迁移摘要一致；开发/测试账号连接生产库被拒绝；独立测试库4项PG并发、覆盖查询及迁移回归通过 |
 | 版本及凭据管理 | 已检查 | 本地Git基线和增量提交；.env/db/artifacts/backups忽略；提交前扫描未发现当前秘密值 |
 

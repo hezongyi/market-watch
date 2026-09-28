@@ -367,3 +367,9 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 ## 备份迁至独立share（2026-09-29）
 
 按用户要求改为/mnt/user/backup/trading-alerts。原约50MB备份先rsync复制并diff -qr逐字节比较无差异，配置归档原SHA256验证后更新清单路径。脚本挂载/锁/配置输出和Unraid cron日志均改至新路径；实际运行完整脚本在新目录成功生成alerts-20260928T223634198040Z.dump（16表/795678K线）及config-20260928T223638Z-b1fLAT.tar.gz，后者SHA256检查通过。确认成功后删除appdata中的旧backups目录，未留软链接；新目录UID/GID10001:10001、权限700。每日03:00任务保持原时间。
+
+## 日历解析复用与worker更新（2026-09-29）
+
+265区间配置下，聚合分钟循环反复调用closures_from会重复JSON编码；本机7200次调用实测2.625秒，即使解析缓存命中也无法省去编码。改为复用ingest入口已解析的同一不可变tuple，无日历/策略语义变更。开发机35项market/recovery/calendar回归通过；固定worker镜像构建后在--network none、无生产.env的容器中同35项通过（1.25秒）。新镜像trading-alerts-worker:20260929-6fb8f77，ID sha256:c65ddc3658c568a717cab601746f38208c65f469b83e083e2191ce75ab089b8a。发布清单只更新两个worker，其他服务沿用旧镜像，逐服务记录源版本。实际恢复进度需继续检查。
+
+worker更新后实际容器均running、RestartCount=0，镜像标签匹配新发布；三品种receiving/error=false，过期补数租约0。最新631任务完成/50等待。已在独立备份目录生成包含新发布配置的config-20260928T224317Z-3QKbGA.tar.gz。
