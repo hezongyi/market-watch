@@ -289,3 +289,7 @@ K 线信号现保存触发 K 线和前一根 K 线的 OHLC、时间、修订号�
 切换后market worker反复重启，真实stored_coverage只读调用及隔离PG回归均复现NumericValueOutOfRange。根因为JSON毫秒时间戳as_integer生成PostgreSQL INTEGER，超出32位范围；改用显式BIGINT。新增真实PG回归先红后绿，22项market/recovery测试通过，ruff通过；线上相同查询成功返回591个覆盖片段，重启market/imports加载修复后market active、NRestarts=0，BTC/EUR重新更新。黄金抽查处于纽约17点维护时段，需恢复后继续检查。不把维护时段数据年龄直接视为上游故障。
 
 此次缺陷暴露出旧PG测试只覆盖策略/通知/备份，未覆盖带真实毫秒JSON的行情恢复查询；已在该调用点补充回归。
+
+## 远端PG14备份恢复验证（2026-09-29）
+
+PG17客户端生成的备份在PG14目标恢复时失败：pg_restore发送SET transaction_timeout，PG14不支持。通过随机临时数据库两次复现，失败后临时库自动删除，业务库未覆盖。改用Ubuntu apt来源的postgresql-client-14 14.24，解压安装到用户持久目录并更新pg_dump/pg_restore包装路径。重新执行备份service，生成alerts-20260928T212912274542Z.dump；在远端随机临时库实际恢复成功，16张表/795458根K线计数匹配，临时库清理完成。报告artifacts/remote-postgres-restore-acceptance.json。旧PG17格式备份保留但不可作为已通过PG14恢复验收的备份。后续部署必须匹配客户端与服务端主版本。
