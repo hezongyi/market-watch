@@ -1,0 +1,44 @@
+{
+  "release": "v1.0.0",
+  "backup": {
+    "image": "trading-alerts-backup:20260929-pg14",
+    "id": "sha256:c7e79b234ee11d941a194670d985ce313c7c2559c9e9d48f96393dc7c383aa53",
+    "postgres_client_major": 14,
+    "note": "Existing restore-verified image, tagged without rebuilding"
+  },
+  "services": {
+    "migrate": {
+      "image": "trading-alerts-migrate:20260929-05eb433",
+      "id": "sha256:8212a8098b73f251fc23f4db7364f6ae46773ae09f047c0b6abc5be0b7399160",
+      "source_commit": "05eb433bdb667d77f797744ac920b27f809afaf1"
+    },
+    "api": {
+      "image": "trading-alerts-api:20260929-05eb433",
+      "id": "sha256:2c0fe9b317430d6acc96f16634670e3a7f8a5c3229466ba3aec6e876cae4ed43",
+      "source_commit": "05eb433bdb667d77f797744ac920b27f809afaf1"
+    },
+    "web": {
+      "image": "trading-alerts-web:20260929-273c3f5",
+      "id": "sha256:c098872f93780a9b895caceef731033ca764476209571d0f4b7904f6384130c3",
+      "source_commit": "273c3f54a2484716e59ba8c4100301edaab40b37"
+    },
+    "market-worker": {
+      "image": "trading-alerts-worker:20260929-6fb8f77",
+      "id": "sha256:c65ddc3658c568a717cab601746f38208c65f469b83e083e2191ce75ab089b8a",
+      "source_commit": "6fb8f776b0b029031040f512cb7f9911ec258d73"
+    },
+    "import-worker": {
+      "image": "trading-alerts-worker:20260929-6fb8f77",
+      "id": "sha256:c65ddc3658c568a717cab601746f38208c65f469b83e083e2191ce75ab089b8a",
+      "source_commit": "6fb8f776b0b029031040f512cb7f9911ec258d73"
+    },
+    "notify-worker": {
+      "image": "trading-alerts-notify-worker:20260929-05eb433",
+      "id": "sha256:afd382584798570e87335d4b4c1174c7fa6ab0046b341da4ea616c9db1bebf9a",
+      "source_commit": "05eb433bdb667d77f797744ac920b27f809afaf1"
+    }
+  },
+  "notes": "首个正式验收版本。Git标签记录交付源码与文档；生产沿用已验收镜像，各服务实际构建提交见source_commit。版本元数据更新未重新构建或部署生产镜像。",
+  "source_tag": "v1.0.0",
+  "deployment_baseline": "20260929-273c3f5"
+}

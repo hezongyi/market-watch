@@ -1,6 +1,8 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前处于实现与验收中，**尚未达到完整交付状态**。逐项验收见 [交付矩阵](docs/acceptance-matrix.md)，状态见 [交付记录](docs/delivery-status.md)，规格见 [实施方案](docs/implementation-plan.md)。
+个人外汇、黄金和比特币监控网站。当前正式版本 **v1.0.0**，已按用户确认的范围完成验收与交付。逐项验收见 [交付矩阵](docs/acceptance-matrix.md)，状态见 [交付记录](docs/delivery-status.md)，规格见 [实施方案](docs/implementation-plan.md)。
+
+版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。
 
 ## 当前实例
 

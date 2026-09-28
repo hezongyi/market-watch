@@ -1,0 +1,14 @@
+# v1.0.0：沿用已验收的生产镜像，详见同名JSON清单。
+services:
+  migrate:
+    image: trading-alerts-migrate:20260929-05eb433
+  api:
+    image: trading-alerts-api:20260929-05eb433
+  web:
+    image: trading-alerts-web:20260929-273c3f5
+  market-worker:
+    image: trading-alerts-worker:20260929-6fb8f77
+  import-worker:
+    image: trading-alerts-worker:20260929-6fb8f77
+  notify-worker:
+    image: trading-alerts-notify-worker:20260929-05eb433
