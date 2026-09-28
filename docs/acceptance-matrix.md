@@ -24,7 +24,7 @@
 | Python可编辑指标 | 首个插件及接口通过 | TA-Lib SMA交叉、版本/参数快照、warmup/restart/回放一致性；递归/高低价指标扩展边界明确 |
 | 网页登录、图表、策略、预警列表 | 浏览器通过 | web/tests/browser-smoke.mjs、indicator-browser.mjs；390px无横向溢出、无JS错误 |
 | 演练日期/隐藏未来/步进/播放/定位/恢复/导出 | 核心流程通过 | replay-browser.mjs、test_replay_capacity.py；31233根真实M1预热性能已测；推进区间最多20000根，完整预热不截断 |
-| 网页声音 | 已实现，浏览器音频依赖交互 | main.tsx声音开关/新信号提示；手机实测不能替代网页声音实测，最终还需实际信号观察 |
+| 网页声音 | 浏览器音频流程通过，扬声器听感未实测 | sound-browser.mjs：真实AudioContext经点击后running，新信号启动音调，禁用/重复信号不响；浏览器内模拟信号，不证明实际设备音量 |
 | ntfy主动测试接收、响铃、确认 | 手机实测通过 | 用户反馈和服务端确认回传；此前测试链路，不代表真实策略链路已实测 |
 | 策略→outbox→重试→通知确认API | 自动串联验证通过 | test_strategy_retry_and_phone_action_round_trip：只有外部ntfy模拟，真实策略/DB/API；旧尝试凭证仍可确认、幂等、错误凭证拒绝、停止发送 |
 | 真实策略→ntfy→手机→确认 | 未验收 | 需用户约定测试窗口，或用户主动开启的真实机会触发后检查；不创建未约定的响铃测试 |

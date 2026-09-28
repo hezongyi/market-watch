@@ -6,3 +6,10 @@
 .env
 *.db
 artifacts
+backups
+**/*.dump
+**/*.db-wal
+**/*.db-shm
+.pytest_cache
+.ruff_cache
+**/*.egg-info
