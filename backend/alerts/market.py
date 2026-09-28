@@ -207,15 +207,6 @@ def ingest(db, instrument, payload, received_at=None):
                 complete = c.complete and bool(expected) and ms(right) <= received_at - 5000
                 c = Candle(c.start, c.end, c.open, c.high, c.low, c.close, complete)
                 upsert(db, instrument.id, timeframe, c)
-    instrument.last_received = received_at
-    latest = db.scalar(
-        select(Bar.end)
-        .where(Bar.instrument_id == instrument.id, Bar.timeframe == "M1")
-        .order_by(Bar.end.desc())
-        .limit(1)
-    )
-    instrument.quality = "receiving" if latest and received_at - latest < 180_000 else "stale"
-    instrument.error = None
     return len(changed)
 
 
@@ -421,6 +412,25 @@ def once(symbol=None, start=None, end=None):
                                 Decimal(str(raw["bidPrice"])),
                                 Decimal(str(raw["askPrice"])),
                             )
+            if not start:
+                with transaction() as db:
+                    inst = db.get(Instrument, instrument_id)
+                    if inst.error:
+                        db.add(
+                            Audit(
+                                kind="market_recovered",
+                                details={"instrument": instrument_id, "source": source},
+                            )
+                        )
+                    latest = db.scalar(
+                        select(Bar.end)
+                        .where(Bar.instrument_id == instrument_id, Bar.timeframe == "M1")
+                        .order_by(Bar.end.desc())
+                        .limit(1)
+                    )
+                    inst.last_received = now_ms()
+                    inst.quality = "receiving" if latest and now_ms() - latest < 180000 else "stale"
+                    inst.error = None
         except (RuntimeError, ValueError, subprocess.TimeoutExpired, OSError, httpx.HTTPError) as e:
             with transaction() as db:
                 inst = db.get(Instrument, instrument_id)

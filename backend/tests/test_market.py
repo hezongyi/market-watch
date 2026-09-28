@@ -223,3 +223,33 @@ def test_future_quote_cannot_seed_monitor_at_earlier_arm_time(database):
             armed_at=2000,
         )
         assert watch.state == {}
+
+
+def test_historical_ingest_cannot_clear_live_error_and_recovery_is_audited(database, monkeypatch):
+    from alerts import api as api_module
+    from alerts import market
+    from alerts.storage import Audit
+
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        inst.error = "test live connection failure"
+        inst.quality = "error"
+        inst.last_received = 1234
+        market.ingest(
+            db,
+            inst,
+            {"rows": [{"timestamp": 0, "open": 10, "high": 11, "low": 9, "close": 10}]},
+            received_at=305000,
+        )
+        assert inst.error == "test live connection failure" and inst.last_received == 1234
+    monkeypatch.setattr(market, "fetch_source", lambda *a, **k: {"rows": []})
+    market.once("BTCUSDT")
+    market.once("BTCUSDT")
+    with database.begin() as db:
+        assert db.get(Instrument, "BTCUSDT").error is None
+        records = db.scalars(select(Audit).where(Audit.kind == "market_recovered")).all()
+        assert len(records) == 1 and records[0].details["instrument"] == "BTCUSDT"
+    incident = next(
+        x for x in api_module.health()["market_incidents"] if x["instrument"] == "BTCUSDT"
+    )
+    assert not incident["current_error"] and incident["last_recovered_at"] is not None

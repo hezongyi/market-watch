@@ -1,0 +1,164 @@
+{
+  "generated_at": "2026-09-28T17:38:35.409000+00:00",
+  "window_start": "2026-09-28T15:38:35.409000+00:00",
+  "meaning": "Stored complete candle end to latest revision receipt, including catch-up; not phone delivery latency.",
+  "limitations": [
+    "No latency for wholly missing candles; gaps need separate coverage/calendar analysis.",
+    "Historical imports and price corrections can increase measured latency.",
+    "Current quality and recent errors do not prove future availability."
+  ],
+  "instruments": [
+    {
+      "instrument": "BTCUSDT",
+      "source": "binance",
+      "basis": "last",
+      "current_quality": "receiving",
+      "current_error": false,
+      "latest_m1_age_seconds": 35.409,
+      "timeframes": {
+        "M1": {
+          "samples": 120,
+          "p50_seconds": 16.383,
+          "p95_seconds": 26.705,
+          "maximum_seconds": 54.6,
+          "within_30_seconds": 115,
+          "over_180_seconds": 0,
+          "revised_samples": 0
+        },
+        "M5": {
+          "samples": 24,
+          "p50_seconds": 16.403,
+          "p95_seconds": 26.017,
+          "maximum_seconds": 34.504,
+          "within_30_seconds": 23,
+          "over_180_seconds": 0,
+          "revised_samples": 24
+        },
+        "H4": {
+          "samples": 1,
+          "p50_seconds": 6.416,
+          "p95_seconds": 6.416,
+          "maximum_seconds": 6.416,
+          "within_30_seconds": 1,
+          "over_180_seconds": 0,
+          "revised_samples": 1
+        },
+        "D1": {
+          "samples": 0,
+          "p50_seconds": null,
+          "p95_seconds": null,
+          "maximum_seconds": null,
+          "within_30_seconds": 0,
+          "over_180_seconds": 0,
+          "revised_samples": 0
+        }
+      },
+      "errors": {}
+    },
+    {
+      "instrument": "EURUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "current_quality": "receiving",
+      "current_error": false,
+      "latest_m1_age_seconds": 35.409,
+      "timeframes": {
+        "M1": {
+          "samples": 120,
+          "p50_seconds": 16.467,
+          "p95_seconds": 24.332,
+          "maximum_seconds": 47.532,
+          "within_30_seconds": 116,
+          "over_180_seconds": 0,
+          "revised_samples": 0
+        },
+        "M5": {
+          "samples": 24,
+          "p50_seconds": 17.203,
+          "p95_seconds": 23.876,
+          "maximum_seconds": 24.763,
+          "within_30_seconds": 24,
+          "over_180_seconds": 0,
+          "revised_samples": 24
+        },
+        "H4": {
+          "samples": 1,
+          "p50_seconds": 17.18,
+          "p95_seconds": 17.18,
+          "maximum_seconds": 17.18,
+          "within_30_seconds": 1,
+          "over_180_seconds": 0,
+          "revised_samples": 1
+        },
+        "D1": {
+          "samples": 0,
+          "p50_seconds": null,
+          "p95_seconds": null,
+          "maximum_seconds": null,
+          "within_30_seconds": 0,
+          "over_180_seconds": 0,
+          "revised_samples": 0
+        }
+      },
+      "errors": {
+        "HTTP 401": 1
+      }
+    },
+    {
+      "instrument": "XAUUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "current_quality": "receiving",
+      "current_error": false,
+      "latest_m1_age_seconds": 35.409,
+      "timeframes": {
+        "M1": {
+          "samples": 120,
+          "p50_seconds": 17.003,
+          "p95_seconds": 26.763,
+          "maximum_seconds": 49.519,
+          "within_30_seconds": 115,
+          "over_180_seconds": 0,
+          "revised_samples": 0
+        },
+        "M5": {
+          "samples": 24,
+          "p50_seconds": 17.074,
+          "p95_seconds": 27.179,
+          "maximum_seconds": 33.572,
+          "within_30_seconds": 23,
+          "over_180_seconds": 0,
+          "revised_samples": 24
+        },
+        "H4": {
+          "samples": 1,
+          "p50_seconds": 18.781,
+          "p95_seconds": 18.781,
+          "maximum_seconds": 18.781,
+          "within_30_seconds": 1,
+          "over_180_seconds": 0,
+          "revised_samples": 1
+        },
+        "D1": {
+          "samples": 0,
+          "p50_seconds": null,
+          "p95_seconds": null,
+          "maximum_seconds": null,
+          "within_30_seconds": 0,
+          "over_180_seconds": 0,
+          "revised_samples": 0
+        }
+      },
+      "errors": {}
+    }
+  ],
+  "import_tasks": {
+    "complete": 77,
+    "pending": 468
+  },
+  "worker_age_seconds": {
+    "import_heartbeat": 4.653,
+    "market_heartbeat": 13.985,
+    "notify_heartbeat": 54.115
+  }
+}

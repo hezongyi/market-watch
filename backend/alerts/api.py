@@ -562,6 +562,7 @@ def health():
             "time": now_ms(),
             "pending_notifications": pending,
             "backup": backup_health(db),
+            "market_incidents": market_incidents(db),
             "last_notification_test": last_test_result,
             "workers": latest,
             "worker_status": worker_status,
@@ -570,6 +571,33 @@ def health():
             "ntfy_configured": bool(settings.ntfy_topic),
             "mobile_condition": "开启即时投递；不要从最近任务划掉 ntfy。手机送达状态未知。",
         }
+
+
+def market_incidents(db):
+    result = []
+    for instrument in db.scalars(select(Instrument).where(Instrument.enabled.is_(True))):
+        predicate = Audit.details["instrument"].as_string() == instrument.id
+        count = db.scalar(
+            select(func.count())
+            .select_from(Audit)
+            .where(predicate, Audit.kind == "market_error", Audit.at >= now_ms() - 86400000)
+        )
+        last_error = db.scalar(
+            select(func.max(Audit.at)).where(predicate, Audit.kind == "market_error")
+        )
+        last_recovery = db.scalar(
+            select(func.max(Audit.at)).where(predicate, Audit.kind == "market_recovered")
+        )
+        result.append(
+            {
+                "instrument": instrument.id,
+                "errors_24h": count,
+                "last_error_at": last_error,
+                "last_recovered_at": last_recovery,
+                "current_error": bool(instrument.error),
+            }
+        )
+    return result
 
 
 def backup_health(db):
