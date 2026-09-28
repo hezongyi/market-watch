@@ -1,0 +1,9 @@
+FROM postgres:14-bookworm AS pgclient
+FROM trading-alerts-api:latest
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends libpq5 libreadline8 liblz4-1 libzstd1 && rm -rf /var/lib/apt/lists/*
+COPY --from=pgclient /usr/lib/postgresql/14/bin/pg_dump /usr/local/bin/pg_dump
+COPY --from=pgclient /usr/lib/postgresql/14/bin/pg_restore /usr/local/bin/pg_restore
+USER app
+ENV ALERTS_POSTGRES_BIN_DIR=/usr/local/bin
+CMD ["python", "-m", "alerts.backup", "--directory", "/backups"]

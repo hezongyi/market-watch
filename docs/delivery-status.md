@@ -303,3 +303,9 @@ Unraid独立项目目录/mnt/user/appdata/trading-alerts，项目Compose2.29.7�
 ## Ubuntu开发配置隔离（2026-09-29）
 
 Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/token清空、自动180天导入关闭，开发库bootstrap通过。原生产应用服务保持停止禁用。生产备份连接单独保存在0600的~/.config/trading-alerts/production-backup.env，由backup.service专用drop-in载入，避免误备份开发库；更新配置后实际备份service成功。仍待将备份执行迁至Unraid。生产容器内核查BTC/EUR正常接收且无错误，黄金在纽约维护时段仍显示stale，交易状态展示尚需完善。
+
+## Unraid独立备份（2026-09-29）
+
+新增deploy/Dockerfile.backup及unraid-backup.sh，备份容器使用PG14工具，以专用应用账号导出，持久挂载项目backups，flock防重入。Unraid实际生成alerts-20260928T215645976802Z.dump及SHA256/表计数清单，795529根K线、16表，返回成功。该新文件实际恢复尚待检查，之前PG14远端备份恢复已通过。
+
+使用Unraid原生update_cron扫描的/boot/config/plugins/dynamix/trading-alerts.cron安装每日主机时间03:00任务，未修改其他cron条目；crontab核实已载入。Ubuntu生产备份timer停用，开发.env保持开发库。自然定时触发/主机重启后的加载仍待观察。

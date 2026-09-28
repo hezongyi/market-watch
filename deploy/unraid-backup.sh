@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+cd /mnt/user/appdata/trading-alerts
+exec 9>backups/.backup.lock
+flock -n 9 || exit 0
+docker run --rm --name trading-alerts-backup-run \
+  --network trading-alerts_default \
+  --env-file .env \
+  -e ALERTS_POSTGRES_BIN_DIR=/usr/local/bin \
+  -e ALERTS_DELIVERY_ENABLED=false \
+  -v /mnt/user/appdata/trading-alerts/backups:/backups \
+  trading-alerts-backup:pg14
