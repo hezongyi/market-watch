@@ -267,3 +267,11 @@ K 线信号现保存触发 K 线和前一根 K 线的 OHLC、时间、修订号�
 ## 全量历史备份（2026-09-29）
 
 545个历史任务完成后生成在线备份 backups/alerts-20260928T185416596628Z.db，129470464字节，包含794903根K线。SHA-256及清单已保存；restore-check实际返回verified=true，16张业务表计数匹配。此为同机SQLite备份与只读恢复检查，不代表正式PostgreSQL部署或异机容灾通过。systemd复查仍为not-found，自动启动/异常恢复/备份timer实际运行仍待安装后验收。
+
+## 用户授权后的服务与手机验收（2026-09-29）
+
+用户明确授权安装服务、确认OANDA新加坡实体并允许立即手机测试。已执行install-only，四个常驻服务及备份timer启用，Linger=yes。停止原开发API/market/imports/notify后启动systemd对应服务，网站切换至http://192.168.7.232:8080/。API主进程SIGKILL后NRestarts=1、新PID且HTTP200，证明该服务异常自动恢复；尚未整机重启，不能宣称已验证启动全过程。备份service实际Result=success/ExecMainStatus=0，timer active；自然定时触发尚待观察。
+
+通过登录API建立一个真实BTCUSDT M1双向价格穿越预警（阈值83483.67、armed_at=1790628591169），真实后续行情触发。Notification acknowledged、ack_at=1790628644668、Outbox cancelled、attempts=1，完成真实价格策略→发送→手机action确认的闭环。未伪造K线或手工确认；此次证明价格规则链路，不代表H4回落/M5前日突破各自均已实机触发，也不证明长锁屏/切网行为。
+
+用户确认OANDA新加坡，后续依据Asia Pacific适用品种公告核验假日，不假设不同经纪商XAUUSD日历相同。
