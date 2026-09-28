@@ -1,0 +1,68 @@
+// Run only against an isolated acceptance DB with no market/notification workers.
+import { chromium } from '@playwright/test';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const base = process.env.TEST_BASE_URL;
+assert.ok(base && process.env.TEST_ISOLATED_DATABASE === 'yes', 'Explicit isolated database required');
+const browser = await chromium.launch({executablePath:'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome', headless:true, args:['--no-sandbox']});
+const page = await browser.newPage({timezoneId:'UTC',viewport:{width:390,height:844}});
+const errors = [];
+page.on('pageerror', e => errors.push(e.message));
+try {
+  await page.goto(base);
+  await page.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync('../artifacts/local-credentials.json')).password);
+  await page.getByRole('button',{name:'登录工作台'}).click();
+  await page.getByRole('button',{name:'新建预警',exact:true}).click();
+  await page.getByLabel('策略').selectOption('indicator');
+  await page.getByLabel('快均线周期').fill('5');
+  await page.getByLabel('慢均线周期').fill('15');
+  await page.getByLabel('方向').selectOption('sell');
+  await page.getByLabel('使用开启前的历史建立准备状态').uncheck();
+  const name = `指标页面验收 ${Date.now()}`;
+  await page.getByLabel('预警名称').fill(name);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  const pending = page.waitForResponse(r => r.url().endsWith('/api/watches') && r.request().method() === 'POST');
+  await page.getByRole('button',{name:'开启监控',exact:true}).click();
+  const response = await pending;
+  assert.equal(response.status(), 201);
+  const watch = await response.json();
+  assert.deepEqual(watch.rule.indicator_params, {fast:5,slow:15});
+  assert.equal(watch.rule.indicator_version, '1');
+  assert.equal(watch.rule.direction, 'sell');
+  assert.deepEqual(watch.state.indicator_closes, []);
+  const card = page.locator('article').filter({has:page.getByText(name,{exact:true})});
+  await card.getByRole('button',{name:'取消监控'}).click();
+  await card.getByText('已取消',{exact:true}).waitFor();
+  await page.getByRole('link',{name:'历史演练'}).click();
+  await page.locator('.replay-setup select').nth(0).selectOption('BTCUSDT');
+  await page.locator('.replay-setup select').nth(1).selectOption('M5');
+  await page.getByLabel('开始时间（本地）').fill('2026-09-25T00:00');
+  await page.getByLabel('结束时间（本地）').fill('2026-09-25T02:00');
+  await page.getByRole('button',{name:'创建演练',exact:true}).click();
+  await page.getByRole('button',{name:'在此刻开启预警'}).click();
+  await page.getByLabel('策略').selectOption('indicator');
+  await page.getByLabel('快均线周期').fill('2');
+  await page.getByLabel('慢均线周期').fill('3');
+  await page.getByLabel('使用开启前的历史建立准备状态').uncheck();
+  const replayPending = page.waitForResponse(r => /\/api\/replays\/[^/]+\/watches$/.test(r.url()) && r.request().method() === 'POST');
+  await page.getByRole('button',{name:'开启监控',exact:true}).click();
+  const replayResponse = await replayPending;
+  assert.equal(replayResponse.status(), 200);
+  const replay = await replayResponse.json();
+  assert.deepEqual(replay.watches[0].state.indicator_closes, []);
+  assert.deepEqual(replay.watches[0].rule.indicator_params, {fast:2,slow:3});
+  const stepPending = page.waitForResponse(r => r.url().endsWith(`/api/replays/${replay.id}/step`));
+  await page.getByRole('button',{name:'下一根',exact:true}).click();
+  const stepped = await (await stepPending).json();
+  assert.equal(stepped.watches[0].state.indicator_closes.length, 1);
+  assert.equal(stepped.signals.length, 0);
+  const tasks = await (await page.request.get(base + '/api/imports-summary')).json();
+  if (tasks.total) {
+    await page.getByText(/下方最多显示 30 项/).waitFor();
+    const listed = await (await page.request.get(base + '/api/imports')).json();
+    assert.ok(listed.length <= 30 && listed.length <= tasks.total);
+  }
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Replay task list overflows mobile');
+  assert.deepEqual(errors, []);
+  console.log(JSON.stringify({passed:true, checks:['indicator-form','parameters','direction','no-history','cancel','mobile-layout','replay-no-history','replay-step','import-summary','mobile-task-list']}));
+} finally { await browser.close(); }

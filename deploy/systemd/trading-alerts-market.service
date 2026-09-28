@@ -1,0 +1,16 @@
+[Unit]
+Description=Trading alerts market
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/quant/repos/trading-alerts
+ExecStart=/home/quant/repos/trading-alerts/.venv/bin/python -m alerts.market
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

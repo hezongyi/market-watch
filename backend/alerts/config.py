@@ -1,0 +1,31 @@
+from typing import Literal
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="ALERTS_", env_file=".env", extra="ignore")
+    database_url: str = "sqlite:///./alerts.db"
+    public_url: str = "http://localhost:8000"
+    admin_password_hash: str = ""
+    cookie_secure: bool = True
+    ntfy_url: str = "https://ntfy.sh"
+    ntfy_topic: str = ""
+    ntfy_token: str = ""
+    # Network delivery is deliberately explicit. Default local runs cannot ring a phone.
+    delivery_enabled: bool = False
+    adapter_path: str = "adapters/dukascopy/probe.mjs"
+    market_proxy: str = ""
+    binance_proxy: str = ""
+    fx_source: Literal["dukascopy", "oanda"] = "dukascopy"
+    oanda_token: str = ""
+    oanda_account_id: str = ""
+    oanda_proxy: str = ""
+    session_hours: int = 24
+    market_poll_seconds: int = 15
+    import_poll_seconds: int = 30
+    initial_history_days: int = Field(default=180, ge=0, le=366)
+
+
+settings = Settings()
