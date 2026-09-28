@@ -16,6 +16,7 @@ from .domain import (
     previous_session,
     shortened_h4,
 )
+from .replay_history import history_rows
 from .storage import (
     Audit,
     Bar,
@@ -36,13 +37,16 @@ from .storage import (
 )
 
 
-def previous_day(db, instrument, bar):
+def previous_day(db, instrument, bar, *, day_cache=None):
     session_start, session_end = previous_session(
         bar.start,
         Calendar(instrument.calendar),
         gold=instrument.id == "XAUUSD",
         closures=closures_from(instrument.calendar_profile),
     )
+    if day_cache is not None:
+        candidate = day_cache.get((ms(session_start), ms(session_end)))
+        return candidate if candidate and candidate.complete else None
     # An incomplete latest session must not silently fall back to an older complete one.
     row = db.scalar(
         select(Bar)
@@ -93,6 +97,20 @@ def create_watch(db, instrument_id, name, rule_dict, *, armed_at=None, use_histo
         db.add(Audit(kind="watch_created", details={"watch_id": watch.id, "rule": rule_dict}))
         return watch
     if use_history:
+        day_cache = (
+            {
+                (r.start, r.end): r.candle()
+                for r in db.scalars(
+                    select(Bar).where(
+                        Bar.instrument_id == instrument_id,
+                        Bar.timeframe == "D1",
+                        Bar.end <= armed_at,
+                    )
+                )
+            }
+            if rule.kind == "previous_day"
+            else None
+        )
         history = db.scalars(
             select(Bar)
             .where(
@@ -101,7 +119,8 @@ def create_watch(db, instrument_id, name, rule_dict, *, armed_at=None, use_histo
                 Bar.end <= armed_at,
             )
             .order_by(Bar.start)
-        ).all()
+            .execution_options(yield_per=1000)
+        )
         for row in history:
             if shortened_h4(
                 row.candle(), rule.timeframe, closures_from(instrument.calendar_profile)
@@ -126,7 +145,12 @@ def create_watch(db, instrument_id, name, rule_dict, *, armed_at=None, use_histo
             if watch.warmup_start is None:
                 watch.warmup_start = row.start
             advance(
-                rule, state, row.candle(), previous_day=previous_day(db, instrument, row.candle())
+                rule,
+                state,
+                row.candle(),
+                previous_day=previous_day(db, instrument, row.candle(), day_cache=day_cache)
+                if rule.kind == "previous_day"
+                else None,
             )
     watch.state = state_dict(state)
     db.add(watch)
@@ -225,7 +249,7 @@ def add_replay_watch(run, name, rule_dict, calendar, *, use_history=True):
     if rule.timeframe != run.timeframe:
         raise ValueError("Replay watch timeframe must match replay timeframe")
     state = State()
-    for d in run.bars if use_history else []:
+    for d in history_rows(run) if use_history else []:
         if d["end"] > run.cursor:
             break
         if shortened_h4(candle_from(d), rule.timeframe, closures_from(run.calendar_profile)):
@@ -253,7 +277,9 @@ def add_replay_watch(run, name, rule_dict, calendar, *, use_history=True):
                 calendar,
                 gold=run.instrument_id == "XAUUSD",
                 profile=run.calendar_profile,
-            ),
+            )
+            if rule.kind == "previous_day"
+            else None,
         )
     run.watches = [
         *run.watches,

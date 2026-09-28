@@ -8,6 +8,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     ForeignKey,
+    LargeBinary,
     Numeric,
     String,
     UniqueConstraint,
@@ -227,7 +228,9 @@ class Replay(Base):
     start: Mapped[int] = mapped_column(BigInteger)
     end: Mapped[int] = mapped_column(BigInteger)
     cursor: Mapped[int] = mapped_column(BigInteger)
-    # Immutable data snapshot for a modest interactive interval; larger runs can migrate to files.
+    # Warmup is compressed and deferred: stepping does not repeatedly load historical context.
+    warmup_snapshot: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
+    warmup_count: Mapped[int] = mapped_column(default=0, server_default="0")
     bars: Mapped[list] = mapped_column(JSON)
     days: Mapped[list] = mapped_column(JSON)
     watches: Mapped[list] = mapped_column(JSON, default=list)

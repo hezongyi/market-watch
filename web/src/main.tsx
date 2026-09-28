@@ -1012,6 +1012,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
                   {run.instrument_id} · {run.timeframe}
                 </h2>
                 <p>虚拟时间 {date(run.cursor)}</p>
+                {run.chart_history_limited && <p>图表只显示最近 {run.chart_bar_limit} 根以内的可见 K 线；策略使用完整开启前历史，导出保留已走过的数据。</p>}
                 <a className="text-button" href={`/api/replays/${run.id}/export`}>导出演练记录</a>
               </div>
               <button className="secondary" onClick={() => setOpen(true)}>

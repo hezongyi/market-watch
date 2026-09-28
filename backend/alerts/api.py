@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import json
 import secrets
+from collections import deque
 from contextlib import asynccontextmanager
 from typing import Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -18,6 +19,7 @@ from .calendar_profile import closures_from
 from .config import settings
 from .domain import TIMEFRAMES, Calendar, previous_session, scheduled_open
 from .notify import DEFAULTS
+from .replay_history import history_rows, pack_history
 from .service import acknowledge, add_replay_watch, create_watch, replay_step
 from .storage import (
     AckGrant,
@@ -857,7 +859,8 @@ def imports_summary():
         return {"total": sum(counts.values()), "counts": counts, "shown_limit": 30}
 
 
-def replay_dict(run):
+def replay_dict(run, *, full_history=False):
+    visible = [b for b in run.bars if b["end"] <= run.cursor]
     return {
         **{
             k: getattr(run, k)
@@ -872,7 +875,10 @@ def replay_dict(run):
                 "signals",
             ]
         },
-        "bars": [b for b in run.bars if b["end"] <= run.cursor],
+        "bars": list(history_rows(run)) if full_history else visible[-2000:],
+        "chart_bar_limit": 2000,
+        "warmup_bar_count": run.warmup_count or 0,
+        "chart_history_limited": (run.warmup_count or 0) > 500 or len(visible) > 2000,
         "calendar_profile": run.calendar_profile or {},
         "finished": not any(run.cursor < b["end"] <= run.end for b in run.bars),
     }
@@ -905,7 +911,7 @@ def export_replay(run_id: str):
         run = db.get(Replay, run_id)
         if not run:
             raise HTTPException(404, "演练不存在")
-        data = replay_dict(run)
+        data = replay_dict(run, full_history=True)
         data["export_version"] = 1
         data["simulated"] = True
         return Response(
@@ -943,12 +949,18 @@ def new_replay(body: ReplayInput):
                 Bar.timeframe == body.timeframe,
                 Bar.end <= body.start,
             )
-            .order_by(Bar.start.desc())
-            .limit(20001)
-        ).all()[::-1]
-        if len(warmup) > 20000:
-            raise HTTPException(422, "开启前历史超过当前演练容量，不能截断策略准备状态")
-        bars = warmup + bars
+            .order_by(Bar.start)
+            .execution_options(yield_per=1000)
+        )
+        context = deque(maxlen=500)
+
+        def warmup_rows():
+            for row in warmup:
+                snapshot = candle_dict(row.candle())
+                context.append(snapshot)
+                yield snapshot
+
+        warmup_snapshot, warmup_count = pack_history(warmup_rows())
         days = db.scalars(
             select(Bar)
             .where(
@@ -963,7 +975,9 @@ def new_replay(body: ReplayInput):
             start=body.start,
             end=body.end,
             cursor=body.start,
-            bars=[candle_dict(b.candle()) for b in bars],
+            bars=[*context, *[candle_dict(b.candle()) for b in bars]],
+            warmup_snapshot=warmup_snapshot,
+            warmup_count=warmup_count,
             days=[candle_dict(b.candle()) for b in days],
             watches=[],
             signals=[],
@@ -1037,6 +1051,8 @@ def seek(run_id: str, body: SeekInput):
             end=old.end,
             cursor=body.cursor,
             bars=old.bars,
+            warmup_snapshot=old.warmup_snapshot,
+            warmup_count=old.warmup_count,
             days=old.days,
             watches=[],
             signals=[],

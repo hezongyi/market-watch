@@ -59,6 +59,28 @@ def test_postgres_concurrent_trigger_and_outbox_lease(monkeypatch):
             assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
             assert db.scalar(select(func.count()).select_from(Outbox)) == 1
             assert db.get(Watch, ident).status == "triggered"
+        from alerts import api as api_module
+
+        run = api_module.new_replay(
+            api_module.ReplayInput(
+                instrument_id="EURUSD",
+                timeframe="H4",
+                start=28800000,
+                end=43200000,
+            )
+        )
+        assert run["warmup_bar_count"] == 2
+        api_module.replay_watch(
+            run["id"],
+            api_module.WatchInput(
+                instrument_id="EURUSD",
+                name="compressed PG history",
+                kind="pullback",
+                timeframe="H4",
+            ),
+        )
+        simulated = api_module.step(run["id"], api_module.StepInput(count=1))
+        assert len(simulated["signals"]) == 1
         monkeypatch.setattr(notify.settings, "delivery_enabled", True)
         monkeypatch.setattr(notify.settings, "ntfy_topic", "test-only-no-send")
         with ThreadPoolExecutor(max_workers=4) as pool:
