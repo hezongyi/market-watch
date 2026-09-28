@@ -1,11 +1,11 @@
-"""Generate official trading instants for review, not M1 closure profiles.
+"""Generate review schedules or explicit, preflight-required M1 maintenance profiles.
 
 Run with the optional calendar dependency installed. No database or network access.
 """
 
 import argparse
 import json
-from datetime import date, time
+from datetime import UTC, date, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -24,6 +24,46 @@ class OandaSingaporeGold(MarketCalendar):
         "market_open": ((None, time(18, 5), -1),),
         "market_close": ((None, time(16, 59)),),
     }
+
+
+def maintenance_profile(start, end, *, revision, existing=None):
+    """Materialize reviewed maintenance minutes; preserve holiday precedence.
+
+    Dates label the following trading day, as in MarketCalendar.schedule.
+    The final minute before the advertised open can contain provider quotes.
+    Output must pass calendar_admin preflight before it changes any live data.
+    """
+    left, right = date.fromisoformat(start), date.fromisoformat(end)
+    if right < left or (right - left).days > 366:
+        raise ValueError("Choose an ordered range of at most 367 dates")
+    # Imported lazily so the standalone review tool remains usable without the app.
+    from alerts.calendar_profile import closures_from, normalized_profile
+
+    prior = closures_from(existing)
+    closures = list((existing or {}).get("closures", []))
+    for _, row in OandaSingaporeGold().schedule(start, end).iterrows():
+        opened = row.market_open.to_pydatetime().astimezone(ZoneInfo("America/New_York"))
+        begin = opened.replace(hour=17, minute=0, second=0, microsecond=0).astimezone(UTC)
+        finish = (opened - timedelta(minutes=1)).astimezone(UTC)
+        segments = [(begin, finish)]
+        for closure in prior:
+            remaining = []
+            for a, b in segments:
+                if closure.end <= a or closure.start >= b:
+                    remaining.append((a, b))
+                else:
+                    if a < closure.start:
+                        remaining.append((a, closure.start))
+                    if closure.end < b:
+                        remaining.append((closure.end, b))
+            segments = remaining
+        closures.extend({
+            "start": a.isoformat(), "end": b.isoformat(),
+            "kind": "maintenance",
+            "reason": "OANDA SG regular gold maintenance; preserve boundary M1",
+            "source": HOURS,
+        } for a, b in segments)
+    return normalized_profile({"revision": revision, "closures": closures})
 
 
 def generate(start, end, *, include_verified_holidays=True):
@@ -80,6 +120,19 @@ if __name__ == "__main__":
     parser.add_argument("--start", required=True)
     parser.add_argument("--end", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--maintenance-profile", action="store_true")
+    parser.add_argument("--existing", type=Path)
+    parser.add_argument("--revision")
     args = parser.parse_args()
-    result = generate(args.start, args.end)
+    if args.maintenance_profile:
+        if not args.revision:
+            parser.error("--maintenance-profile requires --revision")
+        result = maintenance_profile(
+            args.start, args.end, revision=args.revision,
+            existing=json.loads(args.existing.read_text()) if args.existing else None,
+        )
+    else:
+        if args.existing or args.revision:
+            parser.error("--existing and --revision require --maintenance-profile")
+        result = generate(args.start, args.end)
     args.output.write_text(json.dumps(result, indent=2) + "\n")

@@ -323,3 +323,19 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 ## 开发演练数据准备（2026-09-29）
 
 以只读生产连接复制最近14天三品种行情及品种日历到原本空的trading_alerts_dev，共62156条各周期K线；未复制生产登录、通知、确认令牌、发送队列。开发库已存在行情时本次导入拒绝覆盖。实际在开发库创建BTCUSDT 9月25日M5演练并推进12根，游标推进成功、Notification数量0，真实投递保持关闭。此为开发样本准备，非新的生产数据迁移。
+
+## 独立测试库回归与通知确认复查（2026-09-29）
+
+在Unraid独立trading_alerts_test数据库运行test_postgres.py与test_database_transfer.py，4项通过（1.01秒），覆盖并发、毫秒覆盖查询及迁移保护；未使用生产库运行测试。只读复查新18080通知测试：requested_at=1790633122474，ack_at仍为空。未再次发送通知；已同步验收矩阵中的部署、数据库和备份状态。
+
+## 手机确认与HTTPS域名接入（2026-09-29）
+
+用户点击后只读确认ack_at=1790633534016，对应requested_at=1790633122474，新Unraid回调闭环通过。用户提供trade.kookvv.com:8443，HTTPS证书验证成功、readyz 200。生产PUBLIC_URL改为https://trade.kookvv.com:8443，COOKIE_SECURE=true；重建API/通知worker并重启项目web加载配置，未变更行情worker。HTTPS真实登录及认证品种查询200，Set-Cookie包含Secure，通知worker读取新域名正确。此后使用HTTPS登录；HTTP IP入口不能正常携带Secure登录Cookie。未发送新的响铃消息，移动网络实机确认仍待验收。
+
+日历生成工具新增维护区间输出，复用pandas_market_calendars并保存明确分钟区间；夏令时、报价边界保留、重复合并已检查。尚未应用生产日历，后续需历史冲突预检和持久回归。
+
+## 维护日历应用与HTTPS浏览器验收（2026-09-29）
+
+日历生成/核心回归17项通过；开发库apply通过。生产只读预检265闭市区间与M1无冲突，影响645聚合行/130重取任务。停止项目API/行情/历史worker后，Unraid备份alerts-20260928T221840469681Z.dump成功（795609根K线），应用oanda-sg-xau-maintenance-20270331-v1并恢复服务。三品种继续receiving、error=false。修复仍在运行，不宣称已全部完成；部署应用镜像版本未变化，配置已改变。
+
+新增web/tests/deployed-readonly.mjs，生产HTTPS真实浏览器验证登录、Secure Cookie、演练页、设置页刷新保持登录、390px无横向溢出；pageErrors/failedResponses均空。脚本不创建预警或发送通知。截图和结果位于artifacts/deployed-{desktop,mobile}.png及deployed-browser-result.json。初始未登录session的401属于预期，认证后仍严格检查错误。浏览器依赖路径为~/.local/share/playwright-deps-jammy/usr/lib/x86_64-linux-gnu。
