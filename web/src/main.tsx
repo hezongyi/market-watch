@@ -145,6 +145,17 @@ function App() {
   );
 }
 
+function playAlertTone(context: AudioContext) {
+  const osc = context.createOscillator(), gain = context.createGain();
+  osc.connect(gain);
+  gain.connect(context.destination);
+  gain.gain.value = 0.12;
+  osc.frequency.value = 660;
+  osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+  osc.start();
+  osc.stop(context.currentTime + 0.5);
+}
+
 function Shell({ logout }: { logout: () => void }) {
   const [instruments, setInstruments] = useState<Instrument[]>([]),
     [watches, setWatches] = useState<Watch[]>([]),
@@ -196,14 +207,7 @@ function Shell({ logout }: { logout: () => void }) {
       signals.some((s) => !known.current!.has(s.id)) &&
       audio.current
     ) {
-      const osc = audio.current.createOscillator(),
-        gain = audio.current.createGain();
-      osc.connect(gain);
-      gain.connect(audio.current.destination);
-      gain.gain.value = 0.12;
-      osc.frequency.value = 660;
-      osc.start();
-      osc.stop(audio.current.currentTime + 0.5);
+      playAlertTone(audio.current);
     }
     known.current = ids;
   }, [signals, sound]);
@@ -321,7 +325,12 @@ function Shell({ logout }: { logout: () => void }) {
             />
             <Route
               path="/settings"
-              element={<SettingsPage health={health} />}
+              element={<SettingsPage health={health} previewSound={async () => {
+                audio.current ??= new AudioContext();
+                await audio.current.resume();
+                if (audio.current.state !== "running") throw new Error("浏览器未允许播放声音，请检查站点声音权限。");
+                playAlertTone(audio.current);
+              }} />}
             />
             <Route
               path="*"
@@ -1119,7 +1128,8 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
   );
 }
 
-function SettingsPage({ health }: { health: any }) {
+function SettingsPage({ health, previewSound }: { health: any; previewSound: () => Promise<void> }) {
+  const [audioMessage, setAudioMessage] = useState(""), [audioBusy, setAudioBusy] = useState(false);
   const [config, setConfig] = useState<any>(null),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
@@ -1245,6 +1255,15 @@ function SettingsPage({ health }: { health: any }) {
           )}
         </section>
         <section className="panel settings-card">
+          <h2>网页声音</h2>
+          <p>试听会在当前浏览器播放半秒提示音。接收新信号的声音提醒，请在页面顶部开启网页声音。</p>
+          <button type="button" className="secondary" disabled={audioBusy} onClick={async () => {
+            setAudioBusy(true); setAudioMessage("");
+            try { await previewSound(); setAudioMessage("试听已播放；若未听到，请检查设备音量和站点声音权限。"); }
+            catch (e) { setAudioMessage(String(e)); }
+            finally { setAudioBusy(false); }
+          }}>{audioBusy ? "正在播放…" : "试听网页声音"}</button>
+          {audioMessage && <p role="status">{audioMessage}</p>}
           <Activity size={24} />
           <h2>后台运行状态</h2>
           {health.market_incidents?.map((item:any) => <p key={item.instrument}>{item.instrument}：24 小时内 {item.errors_24h} 次行情异常{item.current_error ? '，当前仍有错误' : ''}{item.last_error_at ? `；最近异常 ${date(item.last_error_at)}` : ''}{item.last_recovered_at ? `；最近恢复 ${date(item.last_recovered_at)}` : ''}</p>)}

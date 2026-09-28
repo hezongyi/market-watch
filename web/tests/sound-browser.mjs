@@ -44,6 +44,14 @@ try{
  signals=[...signals,signal('sound-fixture-c')];await refresh();
  await page.getByRole('heading',{name:'BTCUSDT · 浏览器声音验收'}).nth(2).waitFor();
  assert.equal(await page.evaluate(()=>window.__soundStarts),1);
+ await page.getByRole('link',{name:'提醒与设置'}).click();
+ await page.getByRole('button',{name:'试听网页声音'}).click();
+ await page.waitForFunction(()=>window.__soundStarts===2);
+ await page.getByText('试听已播放；若未听到，请检查设备音量和站点声音权限。',{exact:true}).waitFor();
+ await page.getByRole('button',{name:'开启网页声音',exact:true}).waitFor();
+ await page.setViewportSize({width:390,height:844});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth),false);
+ await page.screenshot({path:'../artifacts/sound-preview-mobile.png',fullPage:true});
  assert.deepEqual(errors,[]);
- console.log(JSON.stringify({passed:true,checks:['disabled-no-tone','user-gesture-audio-running','new-signal-tone','duplicate-no-tone','disabled-again-no-tone'],realNotificationsSent:0}));
+ console.log(JSON.stringify({passed:true,checks:['disabled-no-tone','user-gesture-audio-running','new-signal-tone','duplicate-no-tone','disabled-again-no-tone','preview-tone-without-enabling-alerts','mobile-layout'],realNotificationsSent:0}));
 }finally{await browser.close();}
