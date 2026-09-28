@@ -2,6 +2,19 @@
 
 本文件为待执行步骤，不是已通过的证据。当前部署目标为本机 Ubuntu，开发期允许 IP/HTTP，域名和 HTTPS 按用户决定后补。单机 systemd 路径见 `deploy/systemd/README.md`；以下 Docker/PostgreSQL 路径仍需独立验收。
 
+## 当前 IP/HTTP 阶段
+
+使用 Docker Compose 2.24.4 或以上（支持 `!override`）：
+
+```bash
+docker compose -f compose.yaml -f compose.ip.yaml config --quiet
+docker compose -f compose.yaml -f compose.ip.yaml build
+```
+
+`compose.ip.yaml` 关闭开发 HTTP 环境的 Secure Cookie，将网页端口仅绑定主机 LAN IP，并统一 API/通知回调到 8080。不要把配置展开结果贴到日志或聊天中，因为数据库密码会被展开。
+
+**启动前必须先完成现有 SQLite 业务数据到 PostgreSQL 的迁移和核对，再停止 systemd 应用服务，避免重复 worker 和端口冲突。** Compose 不会自动迁移当前 SQLite 的行情、预警、确认状态及演练。不能直接启动空数据库作为完成迁移。当前主机未安装 Docker，以上命令尚未实机执行。域名/HTTPS启用后移除本覆盖文件并验证安全Cookie及回调。
+
 1. 在独立目录复制应用，按 `.env.example` 配置数据库密码、管理员哈希、公开 HTTPS URL。生产 cookie 保持 Secure。先保持真实通知关闭。
 2. 执行 `docker compose config --quiet` 和 `docker compose build`；执行 `docker compose up -d`。
 3. 检查 `docker compose ps`：迁移成功退出，数据库/API 健康，后台服务运行。`curl --fail http://127.0.0.1:8080/readyz` 应返回 ready。

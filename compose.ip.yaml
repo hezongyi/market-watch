@@ -1,0 +1,14 @@
+# Development LAN deployment, before a domain and HTTPS are available.
+# Usage: docker compose -f compose.yaml -f compose.ip.yaml up -d
+# Stop the systemd application services before binding the same port.
+services:
+  api:
+    environment:
+      ALERTS_COOKIE_SECURE: "false"
+      ALERTS_PUBLIC_URL: http://192.168.7.232:8080
+  notify-worker:
+    environment:
+      ALERTS_PUBLIC_URL: http://192.168.7.232:8080
+  web:
+    ports: !override
+      - "192.168.7.232:8080:80"
