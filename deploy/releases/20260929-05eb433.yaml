@@ -1,0 +1,13 @@
+services:
+  migrate:
+    image: trading-alerts-migrate:20260929-05eb433
+  api:
+    image: trading-alerts-api:20260929-05eb433
+  web:
+    image: trading-alerts-web:20260929-05eb433
+  market-worker:
+    image: trading-alerts-market-worker:20260929-05eb433
+  import-worker:
+    image: trading-alerts-import-worker:20260929-05eb433
+  notify-worker:
+    image: trading-alerts-notify-worker:20260929-05eb433

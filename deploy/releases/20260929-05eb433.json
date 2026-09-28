@@ -1,0 +1,30 @@
+{
+  "release": "20260929-05eb433",
+  "source_commit": "05eb433bdb667d77f797744ac920b27f809afaf1",
+  "services": {
+    "migrate": {
+      "image": "trading-alerts-migrate:20260929-05eb433",
+      "id": "sha256:8212a8098b73f251fc23f4db7364f6ae46773ae09f047c0b6abc5be0b7399160"
+    },
+    "api": {
+      "image": "trading-alerts-api:20260929-05eb433",
+      "id": "sha256:2c0fe9b317430d6acc96f16634670e3a7f8a5c3229466ba3aec6e876cae4ed43"
+    },
+    "web": {
+      "image": "trading-alerts-web:20260929-05eb433",
+      "id": "sha256:5bbae3c49b8f95e20fda7af7bd8064b94de2a0055b1ccb26f9b5fd212ef4e373"
+    },
+    "market-worker": {
+      "image": "trading-alerts-market-worker:20260929-05eb433",
+      "id": "sha256:0ce05ef1df849228b1d3e5dd756980f23e19721dfbbfb9cc86bf8d0184115fe3"
+    },
+    "import-worker": {
+      "image": "trading-alerts-import-worker:20260929-05eb433",
+      "id": "sha256:85efb7fe39d1a16dc0071710a9dba6d602bcedd1f308949e0132b969691d584f"
+    },
+    "notify-worker": {
+      "image": "trading-alerts-notify-worker:20260929-05eb433",
+      "id": "sha256:afd382584798570e87335d4b4c1174c7fa6ab0046b341da4ea616c9db1bebf9a"
+    }
+  }
+}
