@@ -194,7 +194,7 @@ def ingest(db, instrument, payload, received_at=None):
                     t,
                     calendar,
                     gold=instrument.id == "XAUUSD",
-                    closures=closures_from(instrument.calendar_profile),
+                    closures=closures,
                 ):
                     expected.add(t)
                 t += timedelta(minutes=1)
