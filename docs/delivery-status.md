@@ -309,3 +309,7 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 新增deploy/Dockerfile.backup及unraid-backup.sh，备份容器使用PG14工具，以专用应用账号导出，持久挂载项目backups，flock防重入。Unraid实际生成alerts-20260928T215645976802Z.dump及SHA256/表计数清单，795529根K线、16表，返回成功。该新文件实际恢复尚待检查，之前PG14远端备份恢复已通过。
 
 使用Unraid原生update_cron扫描的/boot/config/plugins/dynamix/trading-alerts.cron安装每日主机时间03:00任务，未修改其他cron条目；crontab核实已载入。Ubuntu生产备份timer停用，开发.env保持开发库。自然定时触发/主机重启后的加载仍待观察。
+
+## Unraid生成备份的恢复检查（2026-09-29）
+
+将Unraid生成的alerts-20260928T215645976802Z.dump及清单复制到受限本地备份目录，PG14客户端在远端随机临时库实际恢复：verified=true，16表/795529根K线计数一致，临时库清理完成。报告artifacts/unraid-backup-restore-acceptance.json。BTC/EUR继续接收无错误；黄金抽查仍处纽约维护期。新18080回调实机测试已请求用户安排，本轮未发额外手机消息。
