@@ -385,3 +385,11 @@ worker更新后实际容器均running、RestartCount=0，镜像标签匹配新�
 开发库因先前日历应用留下130个修复任务；以只读生产事务同步开发样本范围内17806条黄金K线，按品种/周期/起点upsert保留开发行ID，日历版本一致才执行。删除的130任务严格限定为该次calendar_profile_changed审计后1秒内创建的优先级0待处理黄金任务，未删除其他任务；未复制生产通知、登录或确认令牌。
 
 开发库真实历史2026-09-21至09-26演练：H4 N=2/3 × buy/sell四监控均triggered，M5前日buy/sell/both三监控均triggered；全部演练推进结束，信号发生时间均晚于开启点。Notification=0、Outbox=0且DELIVERY_ENABLED=false。报告artifacts/dev-gold-replay-acceptance.json，证明更新样本可用于演练，不代表又做了一次真实手机策略测试。
+
+## 最终自动化回归及网页试听（2026-09-29）
+
+在开发环境安装项目calendar可选依赖，今后日历生成无需依赖/tmp评估虚拟环境。使用独立trading_alerts_test连接运行当前完整pytest：110 passed、1 skipped（5.23秒）；跳过的是需要建库权限及PG客户端的自动恢复用例，之前随机临时库实际恢复记录仍有效。完整测试日志artifacts/final-regression-20260929.log权限600。ruff通过。
+
+前端增加“试听网页声音”，复用真实预警660Hz、0.12增益、0.5秒的播放函数，结束后断开音频节点。试听保持自动声音开关原状态，异常通过status反馈，不调用通知API。构建通过；开发库浏览器验证新信号响、重复不响、关闭不响、试听不启用自动声音、390px无横向溢出通过，真实手机发送0。截图artifacts/sound-preview-mobile.png。临时开发API验收后已正常停止。
+
+前端试听已部署为trading-alerts-web:20260929-273c3f5，源273c3f54a2484716e59ba8c4100301edaab40b37。仅重建web容器，API与三个worker保持运行。发布清单逐服务保留实际源版本。生产HTTPS同一声音浏览器脚本通过，真实手机发送0。剩余扬声器听感需要用户设备确认；没有把headless音频流程当作物理扬声器测试。

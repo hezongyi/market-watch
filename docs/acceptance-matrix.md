@@ -24,7 +24,7 @@
 | Python可编辑指标 | 首个插件及接口通过 | TA-Lib SMA交叉、版本/参数快照、warmup/restart/回放一致性；递归/高低价指标扩展边界明确 |
 | 网页登录、图表、策略、预警列表 | 浏览器通过 | browser-smoke/indicator-browser及生产HTTPS deployed-readonly.mjs；390px无横向溢出、无JS错误，登录刷新保持 |
 | 演练日期/隐藏未来/步进/播放/定位/恢复/导出 | 核心流程与更新日历后的真实样本通过 | replay-browser.mjs、test_replay_capacity.py；31233根真实M1预热性能已测；推进区间最多20000根，完整预热不截断；更新黄金日历后H4四个买卖/N值组合和M5三个方向组合在开发库真实样本上触发，真实通知/队列均0 |
-| 网页声音 | 浏览器音频流程通过，扬声器听感未实测 | sound-browser.mjs：真实AudioContext经点击后running，新信号启动音调，禁用/重复信号不响；浏览器内模拟信号，不证明实际设备音量 |
+| 网页声音 | 浏览器音频流程通过，扬声器听感未实测 | sound-browser.mjs：新增试听按钮已在生产HTTPS验证，真实AudioContext经点击后running，新信号启动音调，禁用/重复信号不响；浏览器内模拟信号，不证明实际设备音量 |
 | ntfy主动测试接收、响铃、确认 | 手机实测通过 | 用户反馈和服务端确认回传；此前测试链路，不代表真实策略链路已实测 |
 | 策略→outbox→重试→通知确认API | 自动串联验证通过 | test_strategy_retry_and_phone_action_round_trip：只有外部ntfy模拟，真实策略/DB/API；旧尝试凭证仍可确认、幂等、错误凭证拒绝、停止发送 |
 | 真实策略→ntfy→手机→确认 | 真实价格策略闭环通过 | 用户授权BTCUSDT M1穿越测试，发送1次，手机action回传确认，outbox取消；H4/M5特定规则实机触发及长锁屏另列 |
@@ -32,7 +32,7 @@
 | 夜间静音 | 服务端自动验证通过 | quiet_until/claim边界测试；原生app已开始的本地响铃无法由服务端保证远程停止 |
 | 备份与恢复 | 数据库恢复及配置隔离解包通过 | alerts.backup、test_backup.py；0600、hash、事务快照、PG随机临时库恢复全部表计数、失败清理；配置归档已验证解包/.env一致/Compose有效；备份存于/mnt/user/backup/trading-alerts，同服务器备份不等于异机容灾 |
 | 每日备份 | Unraid备份、恢复及cron自动调度通过 | 每日03:00任务已安装；临时06:32任务由cron自然触发生成PG备份后已删除；PG14恢复16表计数一致；Ubuntu旧timer已停用 |
-| 部署、自动启动、进程异常恢复 | Unraid五个容器已接管；整机启动待验收 | 发布清单20260929-6fb8f77（仅行情/补数worker更新），API健康、登录通过、三品种接收；旧Ubuntu服务停止禁用；Docker API真实异常退出后RestartCount=1、healthy，HTTPS恢复200；整机启动未实测 |
+| 部署、自动启动、进程异常恢复 | Unraid五个容器已接管；整机启动待验收 | 发布清单20260929-273c3f5（前端试听更新，worker保留6fb8f77），API健康、登录通过、三品种接收；旧Ubuntu服务停止禁用；Docker API真实异常退出后RestartCount=1、healthy，HTTPS恢复200；整机启动未实测 |
 | PostgreSQL正式运行路径 | Unraid PG14正式运行，开发/测试隔离通过 | 16表/795435根K线迁移摘要一致；开发/测试账号连接生产库被拒绝；独立测试库4项PG并发、覆盖查询及迁移回归通过 |
 | 版本及凭据管理 | 已检查 | 本地Git基线和增量提交；.env/db/artifacts/backups忽略；提交前扫描未发现当前秘密值 |
 
