@@ -251,3 +251,7 @@ K 线信号现保存触发 K 线和前一根 K 线的 OHLC、时间、修订号�
 补充根构建上下文排除 backups、dump、SQLite WAL/SHM及缓存，前端独立构建上下文排除 node_modules/dist/环境文件；Git也排除数据库旁路文件和dump。git check-ignore验证通过，Docker实际构建仍未执行。
 
 新增sound-browser.mjs：以浏览器内模拟信号和SSE运行真实WebAudio，验证点击解锁AudioContext、禁用不响、新信号启动音调一次、重复刷新不响、再次禁用不响。无真实监控/手机通知，无页面错误。此证据验证音频调用和浏览器状态，不能证明具体扬声器音量或人为听感。
+
+## 部分历史覆盖发现（2026-09-29）
+
+核查已导入约2026-08-27至当前时点的内部M5桶：EURUSD/BTCUSDT没有缺失或不完整桶，XAUUSD有30个无观测桶，集中在2026-09-07 18:30–21:00 UTC。已保存OANDA查询完整覆盖该区间、M1观测为零；不据此自动认定官方休市。发现与处置边界见 historical-coverage-findings.md。此结果明确了待用户提供适用假日公告后的验证日期，不能将全量历史门槛标为通过。
