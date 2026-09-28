@@ -1,0 +1,787 @@
+{
+  "revision": "oanda-sg-official-instants-20260929-v1",
+  "library": "pandas_market_calendars==5.4.0",
+  "instrument": "XAUUSD",
+  "source": "https://www.oanda.com/sg-en/trading/hours-of-operation/",
+  "holiday_source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/",
+  "range": [
+    "2026-04-01",
+    "2026-09-28"
+  ],
+  "purpose": "Official trading instants; NOT an M1 closure profile or NY17 bucket schedule",
+  "limitations": [
+    "Practice M1 observations overlap quoted boundary minutes; do not discard them",
+    "Holiday reopen instants require separate review; rows use regular next-session open",
+    "No claim that every minute has a quote"
+  ],
+  "sessions": [
+    {
+      "session_date": "2026-04-01",
+      "open": "2026-03-31T22:05:00+00:00",
+      "close": "2026-04-01T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-02",
+      "open": "2026-04-01T22:05:00+00:00",
+      "close": "2026-04-02T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-06",
+      "open": "2026-04-05T22:05:00+00:00",
+      "close": "2026-04-06T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-07",
+      "open": "2026-04-06T22:05:00+00:00",
+      "close": "2026-04-07T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-08",
+      "open": "2026-04-07T22:05:00+00:00",
+      "close": "2026-04-08T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-09",
+      "open": "2026-04-08T22:05:00+00:00",
+      "close": "2026-04-09T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-10",
+      "open": "2026-04-09T22:05:00+00:00",
+      "close": "2026-04-10T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-13",
+      "open": "2026-04-12T22:05:00+00:00",
+      "close": "2026-04-13T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-14",
+      "open": "2026-04-13T22:05:00+00:00",
+      "close": "2026-04-14T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-15",
+      "open": "2026-04-14T22:05:00+00:00",
+      "close": "2026-04-15T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-16",
+      "open": "2026-04-15T22:05:00+00:00",
+      "close": "2026-04-16T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-17",
+      "open": "2026-04-16T22:05:00+00:00",
+      "close": "2026-04-17T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-20",
+      "open": "2026-04-19T22:05:00+00:00",
+      "close": "2026-04-20T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-21",
+      "open": "2026-04-20T22:05:00+00:00",
+      "close": "2026-04-21T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-22",
+      "open": "2026-04-21T22:05:00+00:00",
+      "close": "2026-04-22T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-23",
+      "open": "2026-04-22T22:05:00+00:00",
+      "close": "2026-04-23T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-24",
+      "open": "2026-04-23T22:05:00+00:00",
+      "close": "2026-04-24T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-27",
+      "open": "2026-04-26T22:05:00+00:00",
+      "close": "2026-04-27T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-28",
+      "open": "2026-04-27T22:05:00+00:00",
+      "close": "2026-04-28T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-29",
+      "open": "2026-04-28T22:05:00+00:00",
+      "close": "2026-04-29T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-04-30",
+      "open": "2026-04-29T22:05:00+00:00",
+      "close": "2026-04-30T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-01",
+      "open": "2026-04-30T22:05:00+00:00",
+      "close": "2026-05-01T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-04",
+      "open": "2026-05-03T22:05:00+00:00",
+      "close": "2026-05-04T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-05",
+      "open": "2026-05-04T22:05:00+00:00",
+      "close": "2026-05-05T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-06",
+      "open": "2026-05-05T22:05:00+00:00",
+      "close": "2026-05-06T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-07",
+      "open": "2026-05-06T22:05:00+00:00",
+      "close": "2026-05-07T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-08",
+      "open": "2026-05-07T22:05:00+00:00",
+      "close": "2026-05-08T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-11",
+      "open": "2026-05-10T22:05:00+00:00",
+      "close": "2026-05-11T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-12",
+      "open": "2026-05-11T22:05:00+00:00",
+      "close": "2026-05-12T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-13",
+      "open": "2026-05-12T22:05:00+00:00",
+      "close": "2026-05-13T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-14",
+      "open": "2026-05-13T22:05:00+00:00",
+      "close": "2026-05-14T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-15",
+      "open": "2026-05-14T22:05:00+00:00",
+      "close": "2026-05-15T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-18",
+      "open": "2026-05-17T22:05:00+00:00",
+      "close": "2026-05-18T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-19",
+      "open": "2026-05-18T22:05:00+00:00",
+      "close": "2026-05-19T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-20",
+      "open": "2026-05-19T22:05:00+00:00",
+      "close": "2026-05-20T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-21",
+      "open": "2026-05-20T22:05:00+00:00",
+      "close": "2026-05-21T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-22",
+      "open": "2026-05-21T22:05:00+00:00",
+      "close": "2026-05-22T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-25",
+      "open": "2026-05-24T22:05:00+00:00",
+      "close": "2026-05-25T18:29:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/"
+    },
+    {
+      "session_date": "2026-05-26",
+      "open": "2026-05-25T22:05:00+00:00",
+      "close": "2026-05-26T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-27",
+      "open": "2026-05-26T22:05:00+00:00",
+      "close": "2026-05-27T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-28",
+      "open": "2026-05-27T22:05:00+00:00",
+      "close": "2026-05-28T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-05-29",
+      "open": "2026-05-28T22:05:00+00:00",
+      "close": "2026-05-29T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-01",
+      "open": "2026-05-31T22:05:00+00:00",
+      "close": "2026-06-01T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-02",
+      "open": "2026-06-01T22:05:00+00:00",
+      "close": "2026-06-02T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-03",
+      "open": "2026-06-02T22:05:00+00:00",
+      "close": "2026-06-03T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-04",
+      "open": "2026-06-03T22:05:00+00:00",
+      "close": "2026-06-04T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-05",
+      "open": "2026-06-04T22:05:00+00:00",
+      "close": "2026-06-05T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-08",
+      "open": "2026-06-07T22:05:00+00:00",
+      "close": "2026-06-08T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-09",
+      "open": "2026-06-08T22:05:00+00:00",
+      "close": "2026-06-09T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-10",
+      "open": "2026-06-09T22:05:00+00:00",
+      "close": "2026-06-10T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-11",
+      "open": "2026-06-10T22:05:00+00:00",
+      "close": "2026-06-11T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-12",
+      "open": "2026-06-11T22:05:00+00:00",
+      "close": "2026-06-12T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-15",
+      "open": "2026-06-14T22:05:00+00:00",
+      "close": "2026-06-15T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-16",
+      "open": "2026-06-15T22:05:00+00:00",
+      "close": "2026-06-16T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-17",
+      "open": "2026-06-16T22:05:00+00:00",
+      "close": "2026-06-17T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-18",
+      "open": "2026-06-17T22:05:00+00:00",
+      "close": "2026-06-18T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-19",
+      "open": "2026-06-18T22:05:00+00:00",
+      "close": "2026-06-19T16:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/"
+    },
+    {
+      "session_date": "2026-06-22",
+      "open": "2026-06-21T22:05:00+00:00",
+      "close": "2026-06-22T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-23",
+      "open": "2026-06-22T22:05:00+00:00",
+      "close": "2026-06-23T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-24",
+      "open": "2026-06-23T22:05:00+00:00",
+      "close": "2026-06-24T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-25",
+      "open": "2026-06-24T22:05:00+00:00",
+      "close": "2026-06-25T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-26",
+      "open": "2026-06-25T22:05:00+00:00",
+      "close": "2026-06-26T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-29",
+      "open": "2026-06-28T22:05:00+00:00",
+      "close": "2026-06-29T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-06-30",
+      "open": "2026-06-29T22:05:00+00:00",
+      "close": "2026-06-30T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-01",
+      "open": "2026-06-30T22:05:00+00:00",
+      "close": "2026-07-01T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-02",
+      "open": "2026-07-01T22:05:00+00:00",
+      "close": "2026-07-02T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-03",
+      "open": "2026-07-02T22:05:00+00:00",
+      "close": "2026-07-03T16:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/"
+    },
+    {
+      "session_date": "2026-07-06",
+      "open": "2026-07-05T22:05:00+00:00",
+      "close": "2026-07-06T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-07",
+      "open": "2026-07-06T22:05:00+00:00",
+      "close": "2026-07-07T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-08",
+      "open": "2026-07-07T22:05:00+00:00",
+      "close": "2026-07-08T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-09",
+      "open": "2026-07-08T22:05:00+00:00",
+      "close": "2026-07-09T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-10",
+      "open": "2026-07-09T22:05:00+00:00",
+      "close": "2026-07-10T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-13",
+      "open": "2026-07-12T22:05:00+00:00",
+      "close": "2026-07-13T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-14",
+      "open": "2026-07-13T22:05:00+00:00",
+      "close": "2026-07-14T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-15",
+      "open": "2026-07-14T22:05:00+00:00",
+      "close": "2026-07-15T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-16",
+      "open": "2026-07-15T22:05:00+00:00",
+      "close": "2026-07-16T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-17",
+      "open": "2026-07-16T22:05:00+00:00",
+      "close": "2026-07-17T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-20",
+      "open": "2026-07-19T22:05:00+00:00",
+      "close": "2026-07-20T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-21",
+      "open": "2026-07-20T22:05:00+00:00",
+      "close": "2026-07-21T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-22",
+      "open": "2026-07-21T22:05:00+00:00",
+      "close": "2026-07-22T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-23",
+      "open": "2026-07-22T22:05:00+00:00",
+      "close": "2026-07-23T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-24",
+      "open": "2026-07-23T22:05:00+00:00",
+      "close": "2026-07-24T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-27",
+      "open": "2026-07-26T22:05:00+00:00",
+      "close": "2026-07-27T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-28",
+      "open": "2026-07-27T22:05:00+00:00",
+      "close": "2026-07-28T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-29",
+      "open": "2026-07-28T22:05:00+00:00",
+      "close": "2026-07-29T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-30",
+      "open": "2026-07-29T22:05:00+00:00",
+      "close": "2026-07-30T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-07-31",
+      "open": "2026-07-30T22:05:00+00:00",
+      "close": "2026-07-31T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-03",
+      "open": "2026-08-02T22:05:00+00:00",
+      "close": "2026-08-03T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-04",
+      "open": "2026-08-03T22:05:00+00:00",
+      "close": "2026-08-04T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-05",
+      "open": "2026-08-04T22:05:00+00:00",
+      "close": "2026-08-05T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-06",
+      "open": "2026-08-05T22:05:00+00:00",
+      "close": "2026-08-06T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-07",
+      "open": "2026-08-06T22:05:00+00:00",
+      "close": "2026-08-07T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-10",
+      "open": "2026-08-09T22:05:00+00:00",
+      "close": "2026-08-10T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-11",
+      "open": "2026-08-10T22:05:00+00:00",
+      "close": "2026-08-11T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-12",
+      "open": "2026-08-11T22:05:00+00:00",
+      "close": "2026-08-12T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-13",
+      "open": "2026-08-12T22:05:00+00:00",
+      "close": "2026-08-13T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-14",
+      "open": "2026-08-13T22:05:00+00:00",
+      "close": "2026-08-14T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-17",
+      "open": "2026-08-16T22:05:00+00:00",
+      "close": "2026-08-17T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-18",
+      "open": "2026-08-17T22:05:00+00:00",
+      "close": "2026-08-18T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-19",
+      "open": "2026-08-18T22:05:00+00:00",
+      "close": "2026-08-19T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-20",
+      "open": "2026-08-19T22:05:00+00:00",
+      "close": "2026-08-20T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-21",
+      "open": "2026-08-20T22:05:00+00:00",
+      "close": "2026-08-21T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-24",
+      "open": "2026-08-23T22:05:00+00:00",
+      "close": "2026-08-24T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-25",
+      "open": "2026-08-24T22:05:00+00:00",
+      "close": "2026-08-25T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-26",
+      "open": "2026-08-25T22:05:00+00:00",
+      "close": "2026-08-26T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-27",
+      "open": "2026-08-26T22:05:00+00:00",
+      "close": "2026-08-27T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-28",
+      "open": "2026-08-27T22:05:00+00:00",
+      "close": "2026-08-28T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-08-31",
+      "open": "2026-08-30T22:05:00+00:00",
+      "close": "2026-08-31T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-01",
+      "open": "2026-08-31T22:05:00+00:00",
+      "close": "2026-09-01T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-02",
+      "open": "2026-09-01T22:05:00+00:00",
+      "close": "2026-09-02T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-03",
+      "open": "2026-09-02T22:05:00+00:00",
+      "close": "2026-09-03T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-04",
+      "open": "2026-09-03T22:05:00+00:00",
+      "close": "2026-09-04T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-07",
+      "open": "2026-09-06T22:05:00+00:00",
+      "close": "2026-09-07T18:29:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/"
+    },
+    {
+      "session_date": "2026-09-08",
+      "open": "2026-09-07T22:05:00+00:00",
+      "close": "2026-09-08T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-09",
+      "open": "2026-09-08T22:05:00+00:00",
+      "close": "2026-09-09T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-10",
+      "open": "2026-09-09T22:05:00+00:00",
+      "close": "2026-09-10T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-11",
+      "open": "2026-09-10T22:05:00+00:00",
+      "close": "2026-09-11T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-14",
+      "open": "2026-09-13T22:05:00+00:00",
+      "close": "2026-09-14T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-15",
+      "open": "2026-09-14T22:05:00+00:00",
+      "close": "2026-09-15T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-16",
+      "open": "2026-09-15T22:05:00+00:00",
+      "close": "2026-09-16T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-17",
+      "open": "2026-09-16T22:05:00+00:00",
+      "close": "2026-09-17T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-18",
+      "open": "2026-09-17T22:05:00+00:00",
+      "close": "2026-09-18T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-21",
+      "open": "2026-09-20T22:05:00+00:00",
+      "close": "2026-09-21T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-22",
+      "open": "2026-09-21T22:05:00+00:00",
+      "close": "2026-09-22T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-23",
+      "open": "2026-09-22T22:05:00+00:00",
+      "close": "2026-09-23T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-24",
+      "open": "2026-09-23T22:05:00+00:00",
+      "close": "2026-09-24T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-25",
+      "open": "2026-09-24T22:05:00+00:00",
+      "close": "2026-09-25T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    },
+    {
+      "session_date": "2026-09-28",
+      "open": "2026-09-27T22:05:00+00:00",
+      "close": "2026-09-28T20:59:00+00:00",
+      "close_source": "https://www.oanda.com/sg-en/trading/hours-of-operation/"
+    }
+  ]
+}

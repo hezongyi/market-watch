@@ -1,5 +1,15 @@
 # 开源日历库接入验证
 
+## 可执行生成工具
+
+`scripts/oanda_schedule.py` 使用可选依赖 `.[calendar]`，生成审核用的官方交易时刻表。执行：
+
+```bash
+python scripts/oanda_schedule.py --start 2026-04-01 --end 2026-09-28 --output docs/sources/oanda-sg-gold-schedule-2026.json
+```
+
+已生成并保存上述时段文件；验证Good Friday排除、7月3日/5月25日提前收市和3月夏令时边界，ruff通过。工具不读取业务库、不调用行情、不修改演练。此输出不是M1闭市配置；假日重开时刻尚需单独复核，不能直接作为生产完整日历。可选依赖尚未安装到生产环境。
+
 2026-09-29：在 /tmp/trading-calendar-eval 独立虚拟环境安装 pandas_market_calendars 5.4.0，未修改生产依赖。原始注册表没有 OANDA 专属日历；自定义 MarketCalendar 可设置纽约时区、前一日18:05开市及当日16:59收市。实际 schedule 输出3月6日开市23:05 UTC，3月9日开市22:05 UTC，跨夏令时换算正确。自定义类会自动加入进程内注册表，因此查询内置日历必须在注册自定义类前执行。
 
 ## 行情边界核对
