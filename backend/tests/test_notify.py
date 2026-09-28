@@ -149,3 +149,62 @@ def test_manual_retry_only_blocked_and_never_acknowledged(database):
     with pytest.raises(HTTPException) as error:
         retry_notification(ident)
     assert error.value.status_code == 409
+
+
+def test_strategy_retry_and_phone_action_round_trip(database, monkeypatch):
+    """Actual strategy/outbox/API path; only the external ntfy HTTP service is simulated."""
+    import json
+    from urllib.parse import urlsplit
+
+    from alerts import api as api_module
+    from alerts.storage import SignalRow, Watch
+    from fastapi.testclient import TestClient
+
+    note_id = pending(database)
+    configure(monkeypatch)
+    bodies = []
+
+    def transport(request):
+        bodies.append(json.loads(request.content))
+        if len(bodies) == 1:
+            # ntfy may have accepted this message before its response was lost.
+            raise httpx.ReadTimeout("accepted but response lost", request=request)
+        return httpx.Response(200, json={"id": "retried-message"})
+
+    client = httpx.Client(transport=httpx.MockTransport(transport))
+    assert notify.deliver_once(client)
+    with database.begin() as db:
+        task = db.scalar(select(Outbox))
+        assert task.status == "pending"
+        task.next_at = 0
+        # Simulate a worker dying after claiming a retry; expiry must permit takeover.
+        task.status = "sending"
+        task.lease_until = 0
+    assert notify.deliver_once(client)
+    action = bodies[0]["actions"][0]
+    assert action["method"] == "POST" and action["clear"] is True
+    path = urlsplit(action["url"]).path
+    with TestClient(api_module.app) as website:
+        assert website.post(path).status_code == 403
+        assert website.post(path, headers={"Authorization": "Bearer invalid"}).status_code == 403
+        assert (
+            website.post(
+                path.replace(note_id, "different-notification"), headers=action["headers"]
+            ).status_code
+            == 403
+        )
+        assert website.post(path, headers=action["headers"]).json()["status"] == "acknowledged"
+        assert website.post(path, headers=action["headers"]).json()["status"] == "acknowledged"
+        second = bodies[1]["actions"][0]
+        assert (
+            website.post(urlsplit(second["url"]).path, headers=second["headers"]).status_code == 200
+        )
+    with database.begin() as db:
+        assert db.get(Notification, note_id).ack_at is not None
+        assert db.scalar(select(Outbox)).status == "cancelled"
+        assert len(db.scalars(select(SignalRow)).all()) == 1
+        watch = db.scalar(select(Watch))
+        assert watch.status == "triggered" and evaluate_watch(db, watch.id) is None
+        assert len(db.scalars(select(DeliveryAttempt)).all()) == 2
+    assert not notify.deliver_once(client)
+    assert len(bodies) == 2
