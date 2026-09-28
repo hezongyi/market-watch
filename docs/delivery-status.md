@@ -373,3 +373,7 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 265区间配置下，聚合分钟循环反复调用closures_from会重复JSON编码；本机7200次调用实测2.625秒，即使解析缓存命中也无法省去编码。改为复用ingest入口已解析的同一不可变tuple，无日历/策略语义变更。开发机35项market/recovery/calendar回归通过；固定worker镜像构建后在--network none、无生产.env的容器中同35项通过（1.25秒）。新镜像trading-alerts-worker:20260929-6fb8f77，ID sha256:c65ddc3658c568a717cab601746f38208c65f469b83e083e2191ce75ab089b8a。发布清单只更新两个worker，其他服务沿用旧镜像，逐服务记录源版本。实际恢复进度需继续检查。
 
 worker更新后实际容器均running、RestartCount=0，镜像标签匹配新发布；三品种receiving/error=false，过期补数租约0。最新631任务完成/50等待。已在独立备份目录生成包含新发布配置的config-20260928T224317Z-3QKbGA.tar.gz。
+
+## Unraid最近30分钟行情证据（2026-09-29）
+
+只读报告docs/production-runtime-report-20260929.json：BTC/EUR/XAU分别30/29/30根完整M1样本，P95收盘至入库延迟23.178/23.790/23.341秒，所有观测样本均30秒内，窗口内无market_error。报告含样本时间窗与局限：没有记录的分钟不包含在延迟统计，不能将入库延迟称作手机投递延迟，也不能证明未来行情持续可用。worker心跳均在31.1秒以内。
