@@ -27,7 +27,7 @@
 
 ## 当前每日任务（Unraid）
 
-`deploy/unraid-backup.sh`使用固定PG14备份镜像，保存到 `/mnt/user/appdata/trading-alerts/backups`。原生cron文件 `/boot/config/plugins/dynamix/trading-alerts.cron` 每日主机时间03:00执行，日志为 `backups/latest-run.log`；已安装并核对crontab。脚本实际备份、随机临时PG数据库恢复和16表计数匹配均已验证；自然定时触发尚未观察。
+`deploy/unraid-backup.sh`使用固定PG14备份镜像，保存到 `/mnt/user/backup/trading-alerts`。原生cron文件 `/boot/config/plugins/dynamix/trading-alerts.cron` 每日主机时间03:00执行，日志为 `/mnt/user/backup/trading-alerts/latest-run.log`；已安装并核对crontab。脚本实际备份、随机临时PG数据库恢复和16表计数匹配均已验证；临时cron自动调度已通过，原每日03:00时刻尚未观察。
 
 Ubuntu旧生产备份timer已停止禁用，避免与开发.env混用。systemd目录中的timer供独立部署参考，并非当前生产执行方式。
 
@@ -46,3 +46,5 @@ Ubuntu旧生产备份timer已停止禁用，避免与开发.env混用。systemd�
 恢复时先核对SHA256，解包到权限0700的隔离目录，核对 `.env` 权限0600，使用Compose `config --quiet`检查，禁止输出展开配置。已有一次隔离解包、`.env`逐字节比较和Compose校验通过。不要直接解包覆盖运行中的项目，也不要在测试恢复时启动生产worker。
 
 数据库和配置分别有恢复证据，不代表已经演练全新机器上的整站重建。反向代理域名/证书由现有服务维护，需使用其自身备份。配置归档保存在同一Unraid服务器，尚不提供异机容灾。网页备份状态目前来自数据库备份审计；配置归档失败会令脚本失败并进入cron日志，需要同时检查该日志。
+
+备份目录按用户要求独立放在 `/mnt/user/backup/trading-alerts`，与appdata分离。新部署先创建该目录，目录所有者设为容器应用UID/GID 10001:10001、权限0700；不要创建指向旧appdata备份目录的软链接。现有文件已按字节比较迁移，配置归档SHA256清单中的文件路径也已更新。

@@ -3,9 +3,10 @@
 set -eu
 umask 077
 cd /mnt/user/appdata/trading-alerts
-exec 8>backups/.configuration-backup.lock
+backup_dir=/mnt/user/backup/trading-alerts
+exec 8>"$backup_dir/.configuration-backup.lock"
 flock -n 8 || exit 0
-archive_tmp=$(mktemp "backups/config-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX.tar.gz.tmp")
+archive_tmp=$(mktemp "$backup_dir/config-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX.tar.gz.tmp")
 trap 'rm -f "$archive_tmp"' EXIT
 tar --exclude=node_modules --exclude=__pycache__ --exclude=.pytest_cache \
   --exclude=.ruff_cache --exclude=dist --exclude=test-results \

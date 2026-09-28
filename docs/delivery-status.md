@@ -363,3 +363,7 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 ## 项目配置备份补齐（2026-09-29）
 
 新增unraid-config-backup.sh，归档.env、Compose、应用源码/依赖/迁移与deploy文件，不含其他服务、数据库文件或Docker镜像。实测生成config-20260928T223406Z-FMUGlB.tar.gz，SHA256验证、隔离解包、.env精确比较、Compose config --quiet均通过，归档和恢复.env权限均600；临时解包目录已清理，未启动恢复出的服务。生产每日备份脚本已增加数据库导出后调用配置备份，脚本语法检查通过。更新脚本后再次独立生成配置归档以保存最新备份脚本。网页状态当前只反映DB备份审计，配置归档异常以脚本退出码/cron日志体现。
+
+## 备份迁至独立share（2026-09-29）
+
+按用户要求改为/mnt/user/backup/trading-alerts。原约50MB备份先rsync复制并diff -qr逐字节比较无差异，配置归档原SHA256验证后更新清单路径。脚本挂载/锁/配置输出和Unraid cron日志均改至新路径；实际运行完整脚本在新目录成功生成alerts-20260928T223634198040Z.dump（16表/795678K线）及config-20260928T223638Z-b1fLAT.tar.gz，后者SHA256检查通过。确认成功后删除appdata中的旧backups目录，未留软链接；新目录UID/GID10001:10001、权限700。每日03:00任务保持原时间。
