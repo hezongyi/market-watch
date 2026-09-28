@@ -1,0 +1,11 @@
+[Unit]
+Description=Back up trading alerts every day
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 Asia/Shanghai
+Persistent=true
+RandomizedDelaySec=10min
+Unit=trading-alerts-backup.service
+
+[Install]
+WantedBy=timers.target

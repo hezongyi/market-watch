@@ -62,6 +62,10 @@ cd web
 npm run build
 ```
 
+## 备份
+
+当前实例可运行 `.venv/bin/python -m alerts.backup`，生成私密备份与校验清单。SQLite / PostgreSQL 恢复验证及每日任务见 [备份与恢复](deploy/backup-and-restore.md)。
+
 ## 部署草案
 
 设置 `.env` 中 HTTPS 的公开域名、密码 hash、随机 URL-safe `POSTGRES_PASSWORD`。反向代理 HTTPS 到 `127.0.0.1:8080`，并支持 SSE 长连接。

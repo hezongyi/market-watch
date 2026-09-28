@@ -559,6 +559,7 @@ def health():
         return {
             "time": now_ms(),
             "pending_notifications": pending,
+            "backup": backup_health(db),
             "last_notification_test": last_test_result,
             "workers": latest,
             "worker_status": worker_status,
@@ -567,6 +568,26 @@ def health():
             "ntfy_configured": bool(settings.ntfy_topic),
             "mobile_condition": "开启即时投递；不要从最近任务划掉 ntfy。手机送达状态未知。",
         }
+
+
+def backup_health(db):
+    latest = db.scalar(
+        select(Audit)
+        .where(Audit.kind.in_(["backup_completed", "backup_failed"]))
+        .order_by(Audit.at.desc(), Audit.id.desc())
+        .limit(1)
+    )
+    if not latest:
+        return {"status": "unknown", "at": None}
+    return {
+        "status": "failed"
+        if latest.kind == "backup_failed"
+        else "stale"
+        if now_ms() - latest.at > 36 * 3600000
+        else "recent",
+        "at": latest.at,
+        "bytes": latest.details.get("bytes"),
+    }
 
 
 @app.get("/api/events", dependencies=[Depends(authenticated)])

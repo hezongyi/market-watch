@@ -1,0 +1,10 @@
+[Unit]
+Description=Trading alerts daily verified backup
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/quant/repos/trading-alerts
+ExecStart=/home/quant/repos/trading-alerts/.venv/bin/python -m alerts.backup --directory backups
+UMask=0077
+NoNewPrivileges=true
+TimeoutStartSec=20min

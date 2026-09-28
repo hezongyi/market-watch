@@ -1247,6 +1247,8 @@ function SettingsPage({ health }: { health: any }) {
           <Activity size={24} />
           <h2>后台运行状态</h2>
           <dl>
+            <dt>数据库备份</dt><dd>{health.backup?.status === 'recent' ? '最近一次备份成功' : health.backup?.status === 'failed' ? '最近一次备份失败，请检查服务' : health.backup?.status === 'stale' ? '超过 36 小时未成功备份' : '尚无定时备份记录'}</dd>
+            <dt>备份最近执行时间</dt><dd>{health.backup?.at ? date(health.backup.at) : '尚未执行'}</dd>
             <dt>行情后台状态</dt><dd>{health.worker_status?.market_heartbeat === "running" ? "运行中" : health.worker_status?.market_heartbeat === "stale" ? "心跳过期，请检查服务" : "尚未收到心跳"}</dd>
             <dt>行情 worker 最近心跳</dt>
             <dd>

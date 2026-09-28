@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     market_poll_seconds: int = 15
     import_poll_seconds: int = 30
     initial_history_days: int = Field(default=180, ge=0, le=366)
+    postgres_bin_dir: str = ""
 
 
 settings = Settings()
