@@ -131,7 +131,9 @@ def shortened_h4(bar: Candle, timeframe: str, closures: tuple[Closure, ...] = ()
     """A holiday-truncated H4 cannot stand in for an ordinary four-hour event."""
     return timeframe == "H4" and (
         bar.end - bar.start != timedelta(hours=4)
-        or any(c.start < bar.end and c.end > bar.start for c in closures)
+        or any(
+            c.kind == "holiday" and c.start < bar.end and c.end > bar.start for c in closures
+        )
     )
 
 

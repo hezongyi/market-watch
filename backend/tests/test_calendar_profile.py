@@ -248,3 +248,24 @@ def test_replay_api_copies_calendar_when_created_and_branched(database):
         db.get(Instrument, "BTCUSDT").calendar_profile = {}
     branch = api_module.seek(run["id"], api_module.SeekInput(cursor=ms(start)))
     assert branch["calendar_profile"] == run["calendar_profile"] == profile()
+
+
+def test_maintenance_explains_gap_without_shortening_h4():
+    p = profile("2026-07-06T21:00:00+00:00", "2026-07-06T22:04:00+00:00")
+    legacy = normalized_profile(p)
+    bar = Candle(
+        dt("2026-07-06T21:00:00+00:00"),
+        dt("2026-07-07T01:00:00+00:00"),
+        D("10"),
+        D("12"),
+        D("9"),
+        D("11"),
+    )
+    assert shortened_h4(bar, "H4", closures_from(legacy))
+    p["closures"][0]["kind"] = "maintenance"
+    normalized = normalized_profile(p)
+    assert normalized["closures"][0]["kind"] == "maintenance"
+    closures = closures_from(normalized)
+    assert not shortened_h4(bar, "H4", closures)
+    assert not has_trading_gap(closures[0].start, closures[0].end, Calendar.NY17, closures=closures)
+    assert normalized_profile(legacy) == legacy

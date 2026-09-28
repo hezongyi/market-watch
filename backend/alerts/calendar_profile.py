@@ -3,6 +3,7 @@
 import json
 from datetime import UTC, datetime
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -13,6 +14,7 @@ class Closure(BaseModel):
     end: datetime
     reason: str = Field(min_length=1, max_length=200)
     source: str = Field(min_length=1, max_length=1000)
+    kind: Literal["holiday", "maintenance"] = "holiday"
 
     @model_validator(mode="after")
     def valid(self):
@@ -60,6 +62,7 @@ def normalized_profile(value: dict) -> dict:
                 "end": c.end.astimezone(UTC).isoformat(),
                 "reason": c.reason,
                 "source": c.source,
+                **({"kind": c.kind} if c.kind != "holiday" else {}),
             }
             for c in profile.closures
         ],
