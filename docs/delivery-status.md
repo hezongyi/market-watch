@@ -279,3 +279,7 @@ K 线信号现保存触发 K 线和前一根 K 线的 OHLC、时间、修订号�
 ## 黄金假日配置应用（2026-09-29）
 
 依据已获取的新加坡官方公告，核对五个假日边界M1：收市标注分钟仍有K线，故保留整根收市M1，从其结束到NY17设置明确休市内部区间；Good Friday覆盖完整日session。未推断重开分钟，未改变NY17分桶。预检无活动监控、无M1冲突，影响8个聚合记录/5个重取区间。停止API/market/imports后在线备份alerts-20260928T210309176910Z.db（795393根K线），应用oanda-sg-xau-2026-holidays-v1并恢复服务。5个优先重取任务需继续验收，旧演练快照不变。
+
+## 远端PostgreSQL切换（2026-09-29）
+
+用户授权使用192.168.7.33现有PG14.10，创建独立trading_alerts库及非超级用户专用账户，未改动其他库。停API/三个worker/备份timer后生成最终备份alerts-20260928T211828460258Z.db；迁入795435根K线及16张业务表，逐表摘要校验一致。迁移报告artifacts/remote-postgres-transfer-acceptance.json，凭据受限保存未提交。切换.env后恢复systemd服务，readyz HTTP200，已确认通知状态保留。安装已校验来源的PG17客户端至用户持久目录（可导出PG14），配置备份路径；systemd备份实际Result=success。行情追赶及远端备份恢复仍需继续验收，不以就绪检查代替。
