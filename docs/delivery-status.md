@@ -313,3 +313,9 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 ## Unraid生成备份的恢复检查（2026-09-29）
 
 将Unraid生成的alerts-20260928T215645976802Z.dump及清单复制到受限本地备份目录，PG14客户端在远端随机临时库实际恢复：verified=true，16表/795529根K线计数一致，临时库清理完成。报告artifacts/unraid-backup-restore-acceptance.json。BTC/EUR继续接收无错误；黄金抽查仍处纽约维护期。新18080回调实机测试已请求用户安排，本轮未发额外手机消息。
+
+## Unraid黄金开市恢复（2026-09-29）
+
+观察纽约18:00至18:05开市边界，market容器持续运行且RestartCount=0，无手工重启。黄金在纽约18:05对应UTC22:05收盘分钟恢复入库，随后三品种均receiving/error=false，最新M1距检查30秒。此为本次维护后自动恢复证据，不代表未来上游永不故障。
+
+用户明确允许测试后，于UTC2026-09-28 22:05:22经新网站18080发送一条notification-tests消息，HTTP200；本次复查尚无对应ack_at，未重复发送。不能把此前旧8080确认记录替代本次新地址确认验收。
