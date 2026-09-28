@@ -1,6 +1,12 @@
 {
   "release": "20260929-05eb433",
   "source_commit": "05eb433bdb667d77f797744ac920b27f809afaf1",
+  "backup": {
+    "image": "trading-alerts-backup:20260929-pg14",
+    "id": "sha256:c7e79b234ee11d941a194670d985ce313c7c2559c9e9d48f96393dc7c383aa53",
+    "postgres_client_major": 14,
+    "note": "Existing restore-verified image, tagged without rebuilding"
+  },
   "services": {
     "migrate": {
       "image": "trading-alerts-migrate:20260929-05eb433",

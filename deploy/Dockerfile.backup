@@ -1,5 +1,6 @@
+ARG APP_IMAGE=trading-alerts-api:20260929-05eb433
 FROM postgres:14-bookworm AS pgclient
-FROM trading-alerts-api:latest
+FROM ${APP_IMAGE}
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends libpq5 libreadline8 liblz4-1 libzstd1 && rm -rf /var/lib/apt/lists/*
 COPY --from=pgclient /usr/lib/postgresql/14/bin/pg_dump /usr/local/bin/pg_dump

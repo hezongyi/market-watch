@@ -343,3 +343,7 @@ Ubuntu仓库.env已切换trading_alerts_dev，真实投递false、正式topic/to
 ## Docker API异常恢复（2026-09-29）
 
 确认活动监控0、近期行情错误0后测试本项目API异常退出。容器内向PID1发送SIGKILL未造成退出，因此没有将该步骤算作恢复证据；随后从宿主机向docker inspect取得的该容器主进程PID发送SIGKILL。复查RestartCount由0变1、running=true、health=healthy，HTTPS readyz 200，启动时间2026-09-28T22:23:15.768070239Z。未手工启动API，未停止其他worker或重启宿主机。此证据覆盖API容器异常自动恢复，不代表整机重启验收。
+
+## 备份版本固定与部署手册整理（2026-09-29）
+
+将已恢复验证的备份镜像固定为trading-alerts-backup:20260929-pg14，ID为sha256:c7e79b234ee11d941a194670d985ce313c7c2559c9e9d48f96393dc7c383aa53；未重新构建。Unraid备份脚本已更新，sh -n通过，固定镜像pg_dump实际版本14.24。发布清单记录备份镜像，已复制服务器。后续Dockerfile备份构建默认基于固定应用版本，可显式指定APP_IMAGE。部署手册已纠正旧的“SSH待授权/尚未部署”描述，记录当前HTTPS、开发隔离、发布/回退和备份路径。

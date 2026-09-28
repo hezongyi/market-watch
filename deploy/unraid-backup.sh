@@ -9,4 +9,4 @@ docker run --rm --name trading-alerts-backup-run \
   -e ALERTS_POSTGRES_BIN_DIR=/usr/local/bin \
   -e ALERTS_DELIVERY_ENABLED=false \
   -v /mnt/user/appdata/trading-alerts/backups:/backups \
-  trading-alerts-backup:pg14
+  trading-alerts-backup:20260929-pg14
