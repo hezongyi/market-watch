@@ -293,3 +293,9 @@ K 线信号现保存触发 K 线和前一根 K 线的 OHLC、时间、修订号�
 ## 远端PG14备份恢复验证（2026-09-29）
 
 PG17客户端生成的备份在PG14目标恢复时失败：pg_restore发送SET transaction_timeout，PG14不支持。通过随机临时数据库两次复现，失败后临时库自动删除，业务库未覆盖。改用Ubuntu apt来源的postgresql-client-14 14.24，解压安装到用户持久目录并更新pg_dump/pg_restore包装路径。重新执行备份service，生成alerts-20260928T212912274542Z.dump；在远端随机临时库实际恢复成功，16张表/795458根K线计数匹配，临时库清理完成。报告artifacts/remote-postgres-restore-acceptance.json。旧PG17格式备份保留但不可作为已通过PG14恢复验收的备份。后续部署必须匹配客户端与服务端主版本。
+
+## Unraid应用接管与开发数据库（2026-09-29）
+
+Unraid创建trading_alerts_dev/test独立数据库及账号，同版本迁移完成；各账号禁止超级用户/建库/建角色，连接上限8、statement_timeout60秒，两者实际连接生产库均被拒绝。受限凭据存于开发机artifacts，尚未将开发机.env改成开发库。
+
+Unraid独立项目目录/mnt/user/appdata/trading-alerts，项目Compose2.29.7已安装（官方SHA256校验），复用PG14，LAN端口18080。镜像构建成功，容器内真实查询生产PG通过。停止Ubuntu四个生产服务后启动Compose，迁移退出0、API healthy、web和三个worker启动；外部readyz/login/watches均HTTP200。禁用Ubuntu四个生产服务开机启动，避免双worker。生产备份暂仍由Ubuntu现有timer执行，后续需迁至Unraid并隔离开发.env。新地址http://192.168.7.33:18080；持续行情及新通知回调仍待验收。
