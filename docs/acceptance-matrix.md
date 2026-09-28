@@ -20,7 +20,7 @@
 | 节假日和维护 | 机制通过，真实日期未完成 | calendar_profile/admin、calendar-maintenance.md；全日跳过、部分交易日保留、缩短H4跳过、旧演练快照测试；还需账户适用官方公告 |
 | 免费实时行情与延迟 | 有活跃时段证据，长期仍观察 | market-runtime-report.json：2小时、各120根M1；P95约24–27秒；欧元1次401已恢复，根因未确认；不代表全年稳定 |
 | 断线、窗口内部缺口、重试恢复 | 自动验证通过 | test_recovery.py、test_market.py；缺口排队、租约接管、非空但不完整响应不得完成；完全无观测未知区间保守暂停 |
-| 初始180天历史 | 正在执行 | ImportJob持久化游标/优先级；最新抽查273完成、272等待、无失败；全量完整性尚未验收 |
+| 初始180天历史 | 545个任务全部完成，覆盖仍有缺口 | history-full-coverage-report.json：内部M5/H4/D1检查，BTC无缺桶；EUR缺1个M5；黄金缺432个M5、8个H4、1个D1；需核验假日日历，不能认定全部数据完整 |
 | Python可编辑指标 | 首个插件及接口通过 | TA-Lib SMA交叉、版本/参数快照、warmup/restart/回放一致性；递归/高低价指标扩展边界明确 |
 | 网页登录、图表、策略、预警列表 | 浏览器通过 | web/tests/browser-smoke.mjs、indicator-browser.mjs；390px无横向溢出、无JS错误 |
 | 演练日期/隐藏未来/步进/播放/定位/恢复/导出 | 核心流程通过 | replay-browser.mjs、test_replay_capacity.py；31233根真实M1预热性能已测；推进区间最多20000根，完整预热不截断 |
