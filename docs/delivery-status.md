@@ -377,3 +377,11 @@ worker更新后实际容器均running、RestartCount=0，镜像标签匹配新�
 ## Unraid最近30分钟行情证据（2026-09-29）
 
 只读报告docs/production-runtime-report-20260929.json：BTC/EUR/XAU分别30/29/30根完整M1样本，P95收盘至入库延迟23.178/23.790/23.341秒，所有观测样本均30秒内，窗口内无market_error。报告含样本时间窗与局限：没有记录的分钟不包含在延迟统计，不能将入库延迟称作手机投递延迟，也不能证明未来行情持续可用。worker心跳均在31.1秒以内。
+
+## 黄金修复完成及开发演练复核（2026-09-29）
+
+原监测进程按20次上限正常结束后，仅重新启动只读观察，不重启或重建导入任务；随后全部681任务complete。scripts/calendar_acceptance.py全覆盖检查见docs/calendar-coverage-acceptance-20260929.json：黄金/BTC五周期内部incomplete与missing_open均0；欧元仅保留既有上游无观测M5。黄金剩余5个不完整聚合均为检查时未收盘桶。
+
+开发库因先前日历应用留下130个修复任务；以只读生产事务同步开发样本范围内17806条黄金K线，按品种/周期/起点upsert保留开发行ID，日历版本一致才执行。删除的130任务严格限定为该次calendar_profile_changed审计后1秒内创建的优先级0待处理黄金任务，未删除其他任务；未复制生产通知、登录或确认令牌。
+
+开发库真实历史2026-09-21至09-26演练：H4 N=2/3 × buy/sell四监控均triggered，M5前日buy/sell/both三监控均triggered；全部演练推进结束，信号发生时间均晚于开启点。Notification=0、Outbox=0且DELIVERY_ENABLED=false。报告artifacts/dev-gold-replay-acceptance.json，证明更新样本可用于演练，不代表又做了一次真实手机策略测试。

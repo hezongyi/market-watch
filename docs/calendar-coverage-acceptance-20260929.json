@@ -1,0 +1,152 @@
+[
+  {
+    "checked_at": "2026-09-28T22:56:12.515978+00:00",
+    "meaning": "Full stored M1 span; excludes partial boundary buckets; missing closed buckets are expected",
+    "limitations": "Does not prove every expected M1 quote was published by the provider or validate OHLC prices",
+    "result": {
+      "instrument": "EURUSD",
+      "calendar_revision": null,
+      "first_m1": "2026-04-01T16:57:00+00:00",
+      "last_m1_end": "2026-09-28T22:55:00+00:00",
+      "timeframes": {
+        "M5": {
+          "complete": 36934,
+          "incomplete": 0,
+          "missing_open": 1,
+          "missing_closed": 14976,
+          "examples_first_20": [
+            {
+              "start": "2026-07-12T21:40:00+00:00",
+              "end": "2026-07-12T21:45:00+00:00",
+              "status": "missing_open"
+            }
+          ]
+        },
+        "M15": {
+          "complete": 12311,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 4992,
+          "examples_first_20": []
+        },
+        "H1": {
+          "complete": 3077,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 1248,
+          "examples_first_20": []
+        },
+        "H4": {
+          "complete": 769,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 312,
+          "examples_first_20": []
+        },
+        "D1": {
+          "complete": 128,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 52,
+          "examples_first_20": []
+        }
+      }
+    }
+  },
+  {
+    "checked_at": "2026-09-28T22:58:43.059984+00:00",
+    "meaning": "Full stored M1 span; excludes partial boundary buckets; missing closed buckets are expected",
+    "limitations": "Does not prove every expected M1 quote was published by the provider or validate OHLC prices",
+    "result": {
+      "instrument": "XAUUSD",
+      "calendar_revision": "oanda-sg-xau-maintenance-20270331-v1",
+      "first_m1": "2026-03-31T22:04:00+00:00",
+      "last_m1_end": "2026-09-28T22:57:00+00:00",
+      "timeframes": {
+        "M5": {
+          "complete": 35182,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 16956,
+          "examples_first_20": []
+        },
+        "M15": {
+          "complete": 11726,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 5652,
+          "examples_first_20": []
+        },
+        "H1": {
+          "complete": 2931,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 1412,
+          "examples_first_20": []
+        },
+        "H4": {
+          "complete": 765,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 320,
+          "examples_first_20": []
+        },
+        "D1": {
+          "complete": 127,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 53,
+          "examples_first_20": []
+        }
+      }
+    }
+  },
+  {
+    "checked_at": "2026-09-28T22:56:11.828346+00:00",
+    "meaning": "Full stored M1 span; excludes partial boundary buckets; missing closed buckets are expected",
+    "limitations": "Does not prove every expected M1 quote was published by the provider or validate OHLC prices",
+    "result": {
+      "instrument": "BTCUSDT",
+      "calendar_revision": null,
+      "first_m1": "2026-04-01T16:57:00+00:00",
+      "last_m1_end": "2026-09-28T22:56:00+00:00",
+      "timeframes": {
+        "M5": {
+          "complete": 51911,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 0,
+          "examples_first_20": []
+        },
+        "M15": {
+          "complete": 17303,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 0,
+          "examples_first_20": []
+        },
+        "H1": {
+          "complete": 4325,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 0,
+          "examples_first_20": []
+        },
+        "H4": {
+          "complete": 1080,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 0,
+          "examples_first_20": []
+        },
+        "D1": {
+          "complete": 179,
+          "incomplete": 0,
+          "missing_open": 0,
+          "missing_closed": 0,
+          "examples_first_20": []
+        }
+      }
+    }
+  }
+]
