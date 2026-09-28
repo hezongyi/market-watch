@@ -283,3 +283,9 @@ K 线信号现保存触发 K 线和前一根 K 线的 OHLC、时间、修订号�
 ## 远端PostgreSQL切换（2026-09-29）
 
 用户授权使用192.168.7.33现有PG14.10，创建独立trading_alerts库及非超级用户专用账户，未改动其他库。停API/三个worker/备份timer后生成最终备份alerts-20260928T211828460258Z.db；迁入795435根K线及16张业务表，逐表摘要校验一致。迁移报告artifacts/remote-postgres-transfer-acceptance.json，凭据受限保存未提交。切换.env后恢复systemd服务，readyz HTTP200，已确认通知状态保留。安装已校验来源的PG17客户端至用户持久目录（可导出PG14），配置备份路径；systemd备份实际Result=success。行情追赶及远端备份恢复仍需继续验收，不以就绪检查代替。
+
+## PostgreSQL覆盖查询溢出修复（2026-09-29）
+
+切换后market worker反复重启，真实stored_coverage只读调用及隔离PG回归均复现NumericValueOutOfRange。根因为JSON毫秒时间戳as_integer生成PostgreSQL INTEGER，超出32位范围；改用显式BIGINT。新增真实PG回归先红后绿，22项market/recovery测试通过，ruff通过；线上相同查询成功返回591个覆盖片段，重启market/imports加载修复后market active、NRestarts=0，BTC/EUR重新更新。黄金抽查处于纽约17点维护时段，需恢复后继续检查。不把维护时段数据年龄直接视为上游故障。
+
+此次缺陷暴露出旧PG测试只覆盖策略/通知/备份，未覆盖带真实毫秒JSON的行情恢复查询；已在该调用点补充回归。

@@ -144,3 +144,51 @@ def test_postgres_oanda_coverage_query_and_sparse_aggregation():
         with engine.begin() as c:
             c.execute(text(f"DROP SCHEMA {schema} CASCADE"))
         engine.dispose()
+
+
+def test_coverage_millisecond_json_uses_bigint():
+    from alerts.market import stored_coverage
+    from alerts.storage import Audit, Instrument
+
+    engine = create_engine(URL)
+    import uuid
+
+    schema = "coverage_" + uuid.uuid4().hex
+    with engine.begin() as c:
+        c.execute(text(f"CREATE SCHEMA {schema}"))
+    isolated = create_engine(URL, connect_args={"options": f"-csearch_path={schema}"})
+    try:
+        storage.Base.metadata.create_all(isolated)
+        factory = sessionmaker(isolated)
+        with factory.begin() as db:
+            inst = Instrument(
+                id="EURUSD",
+                label="Euro",
+                source="oanda",
+                symbol="EUR_USD",
+                basis="bid",
+                calendar="ny17",
+                precision=5,
+            )
+            db.add(inst)
+            db.add(
+                Audit(
+                    kind="provider_query_coverage",
+                    details={
+                        "instrument": "EURUSD",
+                        "basis": "bid",
+                        "range_start": 1790623380000,
+                        "range_end": 1790630520000,
+                        "received_at": 1790630580000,
+                        "ranges": [{"start": 1790623380000, "end": 1790630520000}],
+                    },
+                )
+            )
+            assert stored_coverage(db, inst, 1790623400000, 1790630500000) == [
+                {"start": 1790623380000, "end": 1790630520000}
+            ]
+    finally:
+        isolated.dispose()
+        with engine.begin() as c:
+            c.execute(text(f"DROP SCHEMA {schema} CASCADE"))
+        engine.dispose()

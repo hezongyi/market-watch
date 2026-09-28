@@ -9,7 +9,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import httpx
-from sqlalchemy import or_, select
+from sqlalchemy import BigInteger, or_, select
 
 from .calendar_profile import closures_from
 from .config import settings
@@ -101,9 +101,9 @@ def stored_coverage(db, instrument, left, right):
                 Audit.kind == "provider_query_coverage",
                 Audit.details["instrument"].as_string() == instrument.id,
                 or_(
-                    Audit.details["range_start"].as_integer().is_(None),
-                    (Audit.details["range_start"].as_integer() < right)
-                    & (Audit.details["range_end"].as_integer() > left),
+                    Audit.details["range_start"].as_string().cast(BigInteger).is_(None),
+                    (Audit.details["range_start"].as_string().cast(BigInteger) < right)
+                    & (Audit.details["range_end"].as_string().cast(BigInteger) > left),
                 ),
             )
         ):
