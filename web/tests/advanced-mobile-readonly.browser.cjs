@@ -9,7 +9,8 @@ const fs = require("fs");
       : {}),
   });
   const page = await browser.newPage({
-    viewport: { width: 915, height: 412 },
+    viewport: process.env.MARKET_WATCH_PORTRAIT
+      ? { width: 412, height: 915 } : { width: 915, height: 412 },
     isMobile: true,
     hasTouch: true,
   });
@@ -23,6 +24,7 @@ const fs = require("fs");
     if (m.type() === "error") console.log("CONSOLE", m.text().slice(0, 700));
   });
   page.on("response", async (r) => {
+    if (r.status() >= 400) console.log("HTTP_FAILURE", r.status(), new URL(r.url()).pathname);
     if (
       r.url().includes("/api/charts/data") ||
       r.url().includes("/api/market-data/history")
@@ -53,8 +55,10 @@ const fs = require("fs");
         ),
       ).password,
     );
+  const loginResponse = page.waitForResponse(r => r.url().endsWith("/api/login") && r.request().method() === "POST");
   await page.getByRole("button", { name: "登录工作台" }).click();
-  await page.waitForTimeout(1000);
+  require("node:assert/strict").equal((await loginResponse).status(), 200);
+  await page.waitForFunction(async () => (await fetch("/api/session")).ok);
   const draftId = await page.evaluate(async () => {
     const rows = await (await fetch("/api/advanced-charts/workspaces")).json();
     localStorage.setItem("mw-tv-draft:" + rows[0].id, "preserve-desktop-draft");
@@ -63,6 +67,11 @@ const fs = require("fs");
   await page.goto("http://127.0.0.1:5188/advanced-charts");
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  if (!frame) {
+    console.log("MOBILE_FAILED_PAGE", page.url(), await page.locator("body").innerText());
+    await page.screenshot({path:"/tmp/mw-mobile-login-failure.png"});
+    throw Error("Chart iframe did not initialize");
+  }
   await frame.evaluate(
     () =>
       new Promise((resolve) => widget.chart(0).setResolution("15", resolve)),
@@ -108,7 +117,7 @@ const fs = require("fs");
       range: widget.chart(0).getVisibleRange(),
     })),
   );
-  await page.screenshot({ path: "/tmp/mw-demand.png" });
+  await page.screenshot({ path: process.env.MARKET_WATCH_PORTRAIT ? "/tmp/mw-mobile-portrait.png" : "/tmp/mw-mobile-landscape.png" });
   console.log({ errors });
   require("node:assert/strict").deepEqual(errors, []);
   await browser.close();
