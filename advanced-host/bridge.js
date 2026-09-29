@@ -208,7 +208,7 @@ const feed = {
       if (status.status === "error")
         throw Error(status.error || "历史拉取失败");
       if (status.status === "pending")
-        pendingHistory.set(symbol + "|" + res, args);
+        pendingHistory.set(JSON.stringify(args), args);
       if (!status.bars.length && status.status === "pending")
         throw Error("历史数据正在后台拉取，完成后自动加载");
       if (!status.bars.length && status.status === "empty_interval")
@@ -269,6 +269,18 @@ const feed = {
   unsubscribeBars: (id) => subscriptions.delete(id),
 };
 let polling = false;
+function hasHistoryViewer(args) {
+  if (!ready) return true;
+  for (let i = 0; i < widget.chartsCount(); i++) {
+    const chart = widget.chart(i);
+    if (
+      chart.symbol() === args.instrument &&
+      frames[chart.resolution()] === args.timeframe
+    )
+      return true;
+  }
+  return false;
+}
 function reloadHistory(symbol, res) {
   for (const sub of subscriptions.values()) {
     if (decode(sub.symbol).symbol === symbol && sub.res === res) sub.reset();
@@ -284,8 +296,28 @@ async function tick() {
   if (polling) return;
   polling = true;
   try {
-    for (const [key, args] of pendingHistory) {
-      const state = await request({ op: "history", args }, "market");
+    for (const [key, args] of [...pendingHistory]) {
+      if (!hasHistoryViewer(args)) {
+        pendingHistory.delete(key);
+        continue;
+      }
+      let state;
+      try {
+        state = await request({ op: "history", args }, "market");
+      } catch (e) {
+        send({ type: "error", error: String(e) });
+        continue;
+      }
+      if (pendingHistory.get(key) !== args) continue;
+      if (!hasHistoryViewer(args)) {
+        pendingHistory.delete(key);
+        continue;
+      }
+      if (state.status === "error") {
+        pendingHistory.delete(key);
+        send({ type: "error", error: state.error || "历史拉取失败" });
+        continue;
+      }
       if (state.status === "ready" || state.status === "empty_interval") {
         pendingHistory.delete(key);
         const res = Object.keys(frames).find(

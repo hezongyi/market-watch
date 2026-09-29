@@ -59,6 +59,32 @@ tick();`,
     context,
   );
   assert.deepEqual(events, ["cache:5", "chart:0"]);
+  events.length = 0;
+  await vm.runInContext(
+    `
+subscriptions.clear();
+pendingHistory.set('old',{instrument:'XAUUSD',timeframe:'M5'});
+request = async()=>{events.push('unexpected-request');return {status:'pending'}};
+tick();`,
+    context,
+  );
+  assert.deepEqual(events, []);
+  assert.equal(vm.runInContext("pendingHistory.size", context), 0);
+  await vm.runInContext(
+    `
+pendingHistory.set('same',{instrument:'EURUSD',timeframe:'M5',before:1});
+request = async()=>{
+  pendingHistory.set('same',{instrument:'EURUSD',timeframe:'M5',before:2});
+  return {status:'ready'};
+};
+tick();`,
+    context,
+  );
+  assert.equal(
+    vm.runInContext("pendingHistory.get('same')?.before", context),
+    2,
+  );
+  assert.deepEqual(events, []);
   console.log(
     "Historical reload invalidates matching cache before resetting only matching panes",
   );
