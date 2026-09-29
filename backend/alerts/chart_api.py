@@ -1,0 +1,410 @@
+"""Authenticated chart APIs with optimistic concurrency and bounded input."""
+
+import copy
+import hashlib
+import json
+import math
+import threading
+import time
+from collections import OrderedDict
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
+from sqlalchemy import delete, func, select, update
+
+from .calendar_profile import closures_from
+from .chart_data import FRAMES, chart_rows, future_grid
+from .chart_indicators import CATALOG, calculate, validate
+from .domain import Calendar, has_trading_gap
+from .storage import (
+    Bar,
+    ChartTemplate,
+    ChartWorkspace,
+    Instrument,
+    instant,
+    now_ms,
+    transaction,
+    uid,
+)
+
+
+class Create(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+
+
+class Save(Create):
+    revision: int = Field(ge=1)
+    document: dict
+
+
+class Revision(BaseModel):
+    revision: int = Field(ge=1)
+
+
+class Template(Create):
+    indicators: list[dict] = Field(max_length=12)
+
+
+class DataQuery(BaseModel):
+    instrument: str
+    timeframe: str
+    before: int | None = Field(default=None, gt=0)
+    limit: int = Field(default=500, ge=1, le=2000)
+    indicators: list[dict] = Field(default_factory=list, max_length=12)
+
+
+def checked(document):
+    if len(json.dumps(document, allow_nan=False)) > 2_000_000:
+        raise ValueError("工作区过大")
+    if document.get("schemaVersion") != 1:
+        raise ValueError("不支持的工作区格式")
+    if document.get("layout") not in ("1", "2h", "2v", "3top", "3bottom", "4"):
+        raise ValueError("未知布局")
+    panels = document.get("panels", [])
+    if not isinstance(panels, list) or not all(isinstance(p, dict) for p in panels):
+        raise ValueError("无效图表列表")
+    for axis in ("splitX", "splitY"):
+        v = document.get(axis, 0.5)
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or not 0.2 <= v <= 0.8:
+            raise ValueError("分屏比例无效")
+    if (
+        not {"1": 1, "2h": 2, "2v": 2, "3top": 3, "3bottom": 3, "4": 4}[document["layout"]]
+        <= len(panels)
+        <= 4
+    ):
+        raise ValueError("图表数量无效")
+    if len({p.get("id") for p in panels}) != len(panels):
+        raise ValueError("图表ID重复")
+    for p in panels:
+        if not isinstance(p.get("id"), str) or not p["id"]:
+            raise ValueError("缺少图表ID")
+        try:
+            if p.get("timezone", "native") != "native":
+                ZoneInfo(p["timezone"])
+        except (ZoneInfoNotFoundError, KeyError, TypeError) as exc:
+            raise ValueError("未知显示时区") from exc
+        view = p.get("range")
+        if view and (
+            not isinstance(view, dict)
+            or not all(
+                isinstance(view.get(k), (int, float)) and math.isfinite(view[k])
+                for k in ("from", "to")
+            )
+            or view["from"] >= view["to"]
+        ):
+            raise ValueError("无效时间视区")
+        if p.get("instrument") not in ("EURUSD", "XAUUSD", "BTCUSDT"):
+            raise ValueError("未知品种")
+        if p.get("timeframe") not in FRAMES:
+            raise ValueError("未知周期")
+        if len(p.get("indicators", [])) > 12:
+            raise ValueError("每图最多12个指标")
+        for i in p.get("indicators", []):
+            validate(i)
+    drawings = document.get("drawings", {})
+    if not isinstance(drawings, dict) or sum(len(v) for v in drawings.values()) > 1000:
+        raise ValueError("画线数量超出限制")
+    for symbol, objects in drawings.items():
+        if (
+            symbol not in ("EURUSD", "XAUUSD", "BTCUSDT")
+            or not isinstance(objects, list)
+            or not all(isinstance(o, dict) for o in objects)
+        ):
+            raise ValueError("无效画线品种")
+        if len({o.get("id") for o in objects}) != len(objects):
+            raise ValueError("画线ID重复")
+        for obj in objects:
+            if not isinstance(obj.get("id"), str) or not isinstance(obj.get("options", {}), dict):
+                raise ValueError("无效画线对象")
+            for point in obj.get("points", []):
+                if not all(
+                    isinstance(point.get(k), (int, float))
+                    and math.isfinite(point[k])
+                    and point[k] > 0
+                    for k in ("timestamp", "price")
+                ):
+                    raise ValueError("无效画线坐标")
+            if obj.get("toolType") not in (
+                "HorizontalLine",
+                "TrendLine",
+                "Ray",
+                "Rectangle",
+                "FibRetracement",
+                "Text",
+                "ParallelChannel",
+                "LongShortPosition",
+            ):
+                raise ValueError("未知画线类型")
+            required = {
+                "HorizontalLine": 1,
+                "Text": 1,
+                "ParallelChannel": 3,
+                "LongShortPosition": 3,
+            }.get(obj["toolType"], 2)
+            if len(obj.get("points", [])) != required:
+                raise ValueError("画线锚点数量无效")
+            if obj["toolType"] == "LongShortPosition":
+                entry, stop, target = (p["price"] for p in obj["points"])
+                if (stop - entry) * (target - entry) >= 0:
+                    raise ValueError("止损与止盈必须分居入场价两侧")
+    return document
+
+
+def serialized(row):
+    return {
+        "id": row.id,
+        "name": row.name,
+        "document": row.document,
+        "revision": row.revision,
+        "updated_at": row.updated_at,
+    }
+
+
+_CACHE = OrderedDict()
+_CACHE_LOCK = threading.Lock()
+_RESULT_CACHE = OrderedDict()
+
+
+def router(authenticated):
+    r = APIRouter(prefix="/api/charts", dependencies=[Depends(authenticated)])
+
+    @r.get("/catalog")
+    def catalog():
+        return {"frames": FRAMES, "indicators": CATALOG}
+
+    @r.get("/workspaces")
+    def listing():
+        with transaction() as db:
+            return [
+                serialized(x)
+                for x in db.scalars(
+                    select(ChartWorkspace).order_by(ChartWorkspace.updated_at.desc())
+                )
+            ]
+
+    @r.post("/workspaces")
+    def create(body: Create):
+        with transaction() as db:
+            row = ChartWorkspace(
+                name=body.name,
+                document={
+                    "schemaVersion": 1,
+                    "layout": "1",
+                    "sync": True,
+                    "drawings": {},
+                    "panels": [
+                        {
+                            "id": uid(),
+                            "instrument": "XAUUSD",
+                            "timeframe": "H4",
+                            "indicators": [],
+                            "timezone": "native",
+                            "follow": True,
+                        }
+                    ],
+                },
+            )
+            db.add(row)
+            db.flush()
+            return serialized(row)
+
+    @r.post("/workspaces/{id}/save")
+    def save(id: str, body: Save):
+        try:
+            checked(body.document)
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            raise HTTPException(422, str(e)) from e
+        with transaction() as db:
+            if not db.get(ChartWorkspace, id):
+                raise HTTPException(404, "工作区不存在")
+            res = db.execute(
+                update(ChartWorkspace)
+                .where(ChartWorkspace.id == id, ChartWorkspace.revision == body.revision)
+                .values(
+                    name=body.name,
+                    document=body.document,
+                    revision=body.revision + 1,
+                    updated_at=now_ms(),
+                )
+            )
+            if res.rowcount != 1:
+                raise HTTPException(409, "工作区已在其他窗口修改，请重新加载或另存副本")
+            db.expire_all()
+            return serialized(db.get(ChartWorkspace, id))
+
+    @r.post("/workspaces/{id}/copy")
+    def duplicate(id: str, body: Save):
+        try:
+            document = copy.deepcopy(checked(body.document))
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            raise HTTPException(422, str(e)) from e
+        for objects in document.get("drawings", {}).values():
+            for obj in objects:
+                obj["id"] = uid()
+        with transaction() as db:
+            row = ChartWorkspace(name=body.name, document=document)
+            db.add(row)
+            db.flush()
+            return serialized(row)
+
+    @r.post("/workspaces/{id}/delete")
+    def remove(id: str, body: Revision):
+        with transaction() as db:
+            res = db.execute(
+                delete(ChartWorkspace).where(
+                    ChartWorkspace.id == id, ChartWorkspace.revision == body.revision
+                )
+            )
+            if res.rowcount != 1:
+                raise HTTPException(409, "工作区已变更，请刷新列表")
+        return {"ok": True}
+
+    @r.get("/templates")
+    def templates():
+        with transaction() as db:
+            return [
+                {"id": x.id, "name": x.name, "indicators": x.indicators}
+                for x in db.scalars(select(ChartTemplate))
+            ]
+
+    @r.post("/templates")
+    def add_template(body: Template):
+        try:
+            for spec in body.indicators:
+                validate(spec)
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            raise HTTPException(422, str(e)) from e
+        with transaction() as db:
+            row = ChartTemplate(name=body.name, indicators=body.indicators)
+            db.add(row)
+            db.flush()
+            return {"id": row.id}
+
+    @r.post("/templates/{id}/delete")
+    def remove_template(id: str):
+        with transaction() as db:
+            db.execute(delete(ChartTemplate).where(ChartTemplate.id == id))
+        return {"ok": True}
+
+    @r.post("/data")
+    def data(body: DataQuery):
+        try:
+            for spec in body.indicators:
+                validate(spec)
+            with transaction() as db:
+                inst = db.get(Instrument, body.instrument)
+                if not inst:
+                    raise HTTPException(404, "品种不存在")
+                before = body.before or now_ms() + 1
+                # All persisted source history is the common recursive indicator prefix.
+                # New bars never move its origin; backfill/revisions deliberately invalidate it.
+                source = (
+                    "M15"
+                    if body.timeframe == "M30"
+                    else "D1"
+                    if body.timeframe in ("W1", "MN")
+                    else body.timeframe
+                )
+                stamp = db.execute(
+                    select(
+                        func.count(Bar.id),
+                        func.max(Bar.received_at),
+                        func.sum(Bar.revision),
+                        func.min(Bar.start),
+                        func.max(Bar.start),
+                    ).where(Bar.instrument_id == inst.id, Bar.timeframe == source)
+                ).one()
+                key = (
+                    str(db.get_bind().url),
+                    inst.id,
+                    body.timeframe,
+                    tuple(stamp),
+                    json.dumps(inst.calendar_profile, sort_keys=True),
+                )
+                with _CACHE_LOCK:
+                    cached = _CACHE.get(key)
+                if cached and time.monotonic() - cached[0] < 15:
+                    all_rows = cached[1]
+                else:
+                    all_rows = chart_rows(
+                        db, inst, body.timeframe, now_ms() + 1, max(1, stamp[0]), now_ms()
+                    )
+                    closures = closures_from(inst.calendar_profile)
+                    for prev, row in zip(all_rows, all_rows[1:]):
+                        if prev["end"] < row["start"]:
+                            row["gap_before"] = has_trading_gap(
+                                instant(prev["end"]),
+                                instant(row["start"]),
+                                Calendar(inst.calendar),
+                                gold=inst.id == "XAUUSD",
+                                closures=closures,
+                            )
+                    with _CACHE_LOCK:
+                        _CACHE[key] = (time.monotonic(), all_rows)
+                        while len(_CACHE) > 16 or sum(len(v[1]) for v in _CACHE.values()) > 200_000:
+                            _CACHE.popitem(last=False)
+                visible = [x for x in all_rows if x["start"] < before][-body.limit :]
+                start = visible[0]["start"] if visible else before
+                end = visible[-1]["start"] if visible else before
+                indicators = []
+                for spec in body.indicators:
+                    name, params = validate(spec)
+                    result_key = (
+                        key,
+                        name,
+                        spec.get("version", "1"),
+                        json.dumps(params, sort_keys=True),
+                    )
+                    with _CACHE_LOCK:
+                        cached_result = _RESULT_CACHE.get(result_key)
+                    if cached_result and time.monotonic() - cached_result[0] < 15:
+                        result = cached_result[1]
+                    else:
+                        result = calculate(all_rows, spec)
+                        weight = sum(len(series["values"]) for series in result["series"])
+                        with _CACHE_LOCK:
+                            _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)
+                            while (
+                                len(_RESULT_CACHE) > 64
+                                or sum(v[2] for v in _RESULT_CACHE.values()) > 250_000
+                            ):
+                                _RESULT_CACHE.popitem(last=False)
+                    indicators.append(
+                        {
+                            **result,
+                            "id": spec.get("id", spec["name"]),
+                            "series": [
+                                {
+                                    **series,
+                                    "values": [
+                                        v for v in series["values"] if start <= v["time"] <= end
+                                    ],
+                                }
+                                for series in result["series"]
+                            ],
+                        }
+                    )
+                return {
+                    "history_revision": hashlib.sha256(
+                        json.dumps(
+                            [stamp[0], stamp[2], stamp[3], inst.calendar_profile], sort_keys=True
+                        ).encode()
+                    ).hexdigest(),
+                    "bars": visible,
+                    "indicators": indicators,
+                    "has_more": bool(visible and any(x["start"] < start for x in all_rows)),
+                    "origin": all_rows[0]["start"] if all_rows else None,
+                    "bounded_history": False,
+                    "future": future_grid(inst, body.timeframe, all_rows[-1]["end"])
+                    if all_rows
+                    else [],
+                    "basis": inst.basis,
+                    "calendar": inst.calendar,
+                    "precision": inst.precision,
+                    "as_of": now_ms(),
+                }
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            raise HTTPException(422, str(e)) from e
+
+    return r

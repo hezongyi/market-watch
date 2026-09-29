@@ -1088,3 +1088,9 @@ def seek(run_id: str, body: SeekInput):
         db.add(run)
         db.flush()
         return replay_dict(run)
+
+
+# Standalone chart module: same authentication, no strategy API changes.
+from .chart_api import router as chart_router  # noqa: E402
+
+app.include_router(chart_router(authenticated))

@@ -349,3 +349,19 @@ def rule_from(d):
         return Rule(**{**d, "level": Decimal(d["level"]) if d.get("level") is not None else None})
     except InvalidOperation:
         raise ValueError("价格格式不正确")
+
+
+class ChartWorkspace(Base):
+    __tablename__ = "chart_workspaces"
+    id: Mapped[str] = mapped_column(String(40), primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(100))
+    document: Mapped[dict] = mapped_column(JSON, default=dict)
+    revision: Mapped[int] = mapped_column(default=1)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class ChartTemplate(Base):
+    __tablename__ = "chart_indicator_templates"
+    id: Mapped[str] = mapped_column(String(40), primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(100))
+    indicators: Mapped[list] = mapped_column(JSON, default=list)

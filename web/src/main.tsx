@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import {
   BrowserRouter,
@@ -50,9 +50,11 @@ const statusNames: Record<string, string> = {
   cancelled: "已取消",
   paused: "数据暂停",
 };
+const ChartWorkspacePage = lazy(() => import("./charts/Workspace"));
 const frames = ["M1", "M5", "M15", "H1", "H4", "D1"];
 
 function App() {
+  const appLocation = useLocation();
   const [ready, setReady] = useState(false),
     [logged, setLogged] = useState(false),
     [error, setError] = useState("");
@@ -134,6 +136,14 @@ function App() {
           </form>
         </section>
       </main>
+    );
+  if (appLocation.pathname.startsWith("/chart-workspaces"))
+    return (
+      <Suspense fallback={<div className="loading">正在加载图表工作区…</div>}>
+        <Routes>
+          <Route path="/chart-workspaces/:id?" element={<ChartWorkspacePage />} />
+        </Routes>
+      </Suspense>
     );
   return (
     <Shell
@@ -233,6 +243,7 @@ function Shell({ logout }: { logout: () => void }) {
         <nav>
           {[
             ["/", "行情与监控", Activity],
+            ["/chart-workspaces", "图表工作区", Square],
             ["/signals", "信号中心", Bell],
             ["/replay", "历史演练", Clock3],
             ["/settings", "提醒与设置", Settings2],

@@ -81,3 +81,9 @@ API异常退出自动恢复、HTTPS浏览器登录及手机确认已验证；锁
 ## 复用项目
 
 TA-Lib Python（BSD-2-Clause）、NumPy（BSD-3-Clause）、FastAPI（MIT）、React（MIT）、Lightweight Charts（Apache-2.0，图表保留官方 attribution）、dukascopy-node（MIT）、ntfy。图表由 [TradingView Lightweight Charts](https://www.tradingview.com/lightweight-charts/) 提供。锁文件固定实际安装依赖。
+
+## 专业图表工作区（v1.1.0）
+
+从工作台导航进入独立图表页面，支持多工作区、多图同步、八种画线和Python指标。
+[操作与维护](docs/chart-workspace-implementation.md) · [验收记录](docs/chart-workspace-acceptance.md)。
+本地版本与生产部署分开管理；本次图表模块尚未部署Unraid。
