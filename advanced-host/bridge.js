@@ -606,7 +606,11 @@ function boot(
     interval: doc.interval || "240",
     locale: "zh",
     autosize: true,
-    theme: doc.theme || "Dark",
+    theme:
+      preferences.find((p) => p.kind === "setting" && p.name === "mw.theme")
+        ?.content.value ||
+      doc.theme ||
+      "Dark",
     saved_data: chartState,
     saved_data_meta_info: workspace
       ? { uid: workspace.id, name: workspace.name, description: workspace.name }
@@ -657,6 +661,15 @@ function boot(
     }
     ready = true;
     loading = false;
+    widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
+      if (readonly || !standard || onlyActive) return;
+      const theme = String(name).toLowerCase() === "light" ? "Light" : "Dark";
+      prefs
+        .savePreference("setting", "mw.theme", theme)
+        .catch((e) =>
+          send({ type: "error", error: "主题保存失败：" + String(e) }),
+        );
+    });
     nativeWatchlists(
       widget,
       preferences.find(

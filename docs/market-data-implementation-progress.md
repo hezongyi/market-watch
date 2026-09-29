@@ -259,3 +259,10 @@
 - iframe增加allow-downloads；保留独立来源与原网络CSP。浏览器点击原生“生成快照→下载图片”，收到PNG文件70484字节，页面无异常。
 - 保存开发浏览器脚本web/tests/advanced-screenshot.browser.cjs，增加PNG文件头断言；前端构建通过。
 - 多图/深浅色截图、剪贴板权限和真实手机下载仍待验收；本次仅证明桌面单图原生下载可用。
+
+### 全局主题刷新恢复
+
+- 真实库changeTheme Light后保存/刷新复现恢复dark；原因是初始化始终使用旧document.theme。
+- 订阅公开chart_theme_changed，对标准全局主题保存用户级mw.theme偏好；初始化优先读取偏好，手机不写入。单图局部/非标准主题不改全局偏好。
+- 同场景重跑最终getTheme为light、图表有效范围非零且无页面异常。保存开发回归web/tests/advanced-theme.browser.cjs；偏好和自动保存JS测试通过。
+- 实際鼠标主题菜单、跨工作区样式例外与多窗口冲突仍需验收，开发用户主题当前为Light。
