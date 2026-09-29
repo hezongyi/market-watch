@@ -513,6 +513,11 @@ function boot(
     container: "chart",
     library_path: "/charting_library/",
     datafeed: feed,
+    compare_symbols: [
+      { symbol: "EURUSD", title: "EUR/USD" },
+      { symbol: "XAUUSD", title: "黄金 / 美元" },
+      { symbol: "BTCUSDT", title: "BTC/USDT" },
+    ],
     symbol: doc.symbol || "XAUUSD",
     interval: doc.interval || "240",
     locale: "zh",
@@ -532,11 +537,9 @@ function boot(
     disabled_features: [
       "use_localstorage_for_settings",
       "header_screenshot",
-      "header_compare",
       "trading_account_manager",
       "order_panel",
       "broker_button",
-      "show_object_tree",
       "create_volume_indicator_by_default",
       ...(readonly
         ? [

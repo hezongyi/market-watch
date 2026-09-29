@@ -138,3 +138,9 @@
 - 使用真实服务器保存A，创建独立B，通过库loadChartFromServer加载B并保存，再加载A并保存；B版本1→2，A版本3→4，最终库布局名称回到A，两个ID不同，无页面异常。
 - 验证等待最终图表可见范围非零，避免将loadChartFromServer返回时短暂空范围当作行情已完成；最终行情已加载、可见错误为空。
 - 保存可重复脚本web/tests/advanced-workspace-switch.browser.cjs（开发服务，创建两个验收工作区，浏览器/凭据参数同其他浏览器脚本）。此次走公开原生加载接口与真实API，未用mock；不等同于鼠标操作原生加载/另存/删除对话框已全面验收。
+
+### 恢复原生比较与对象树入口
+
+- 移除验证阶段禁用header_compare和show_object_tree的配置，保留库原生呈现。
+- 使用公开compare_symbols配置现有EURUSD、XAUUSD、BTCUSDT候选；实际浏览器比较弹窗显示三品种及Datafeed解析出的来源、价格口径，对象树显示当前主图，无页面异常。
+- 自动保存和历史刷新JS回归通过。此证据仅证明入口/候选解析可用；叠加后的异步历史补齐、跨session对齐、保存恢复仍需验证，尚未宣称比较功能完整验收。
