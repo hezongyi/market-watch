@@ -196,8 +196,15 @@ const fs = require("fs");
       widget.dateRangeSync().setValue(false);
       const chart = widget.chart(1);
       await chart.setVisibleRange(target, { rejectByTimeout: 20000 });
+      const immediate = chart.getVisibleRange();
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const settled = chart.getVisibleRange();
+      widget.dateRangeSync().setValue(true);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       return {
-        range: chart.getVisibleRange(),
+        immediate,
+        range: settled,
+        resynchronized: chart.getVisibleRange(),
       };
     }, target);
     console.log("GOLD_DIRECT_RANGE", JSON.stringify(direct));
