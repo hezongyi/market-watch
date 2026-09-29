@@ -142,6 +142,28 @@ export default function AdvancedWorkspace() {
         }
         try {
           await queue.current;
+          if (
+            blocked.current &&
+            (q.op === "load" || (q.op === "save" && q.args?.id))
+          )
+            throw Error("存在未保存草稿，请先复制恢复为独立工作区");
+          const draftId = q.op === "save" ? q.args?.id : null;
+          const draft = draftId
+            ? JSON.stringify({
+                engine: "tv31",
+                schemaVersion: 1,
+                state: JSON.parse(q.args.content),
+                symbol: q.args.symbol,
+                interval: q.args.resolution,
+              })
+            : null;
+          if (draftId && draft) {
+            try {
+              localStorage.setItem("mw-tv-draft:" + draftId, draft);
+            } catch {
+              setError("本地草稿空间不足，请勿关闭页面，等待服务器保存完成");
+            }
+          }
           let result;
           if (q.op === "list")
             result = await api("/advanced-charts/native-charts");
@@ -155,6 +177,11 @@ export default function AdvancedWorkspace() {
               { revision: q.args.revision },
             );
           if (q.op === "save" || q.op === "load") {
+            if (
+              draftId &&
+              localStorage.getItem("mw-tv-draft:" + draftId) === draft
+            )
+              localStorage.removeItem("mw-tv-draft:" + draftId);
             current.current = {
               id: result.id,
               name: result.name,
@@ -169,6 +196,14 @@ export default function AdvancedWorkspace() {
           }
           reply({ type: "result", id: m.id, result });
         } catch (e) {
+          if (
+            q.op === "save" &&
+            q.args?.id &&
+            localStorage.getItem("mw-tv-draft:" + q.args.id)
+          ) {
+            blocked.current = true;
+            setStatus("保存已暂停 · 草稿已保留，请复制恢复");
+          }
           setError(String(e));
           reply({ type: "result", id: m.id, error: String(e) });
         }
@@ -505,6 +540,7 @@ export default function AdvancedWorkspace() {
           title="专业图表工作区"
           src={`${origin}/?parent=${encodeURIComponent(location.origin)}`}
           sandbox="allow-scripts allow-same-origin allow-downloads"
+          allowFullScreen
           referrerPolicy="no-referrer"
         />
       ) : (
