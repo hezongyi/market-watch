@@ -252,3 +252,10 @@
 
 - 真实隔离iframe调用库公开takeClientScreenshot()成功生成1214×897 PNG，读取canvas尺寸及PNG data URL均有效；不需要第三方snapshot_url或外部上传。
 - 当前截图入口仍被验证阶段配置禁用，尚未接线；未增加外层仿制按钮。原生入口如何使用本地下载仍需验证，不能将客户端接口成功等同于用户可用。
+
+### 原生截图菜单下载
+
+- 恢复header_screenshot入口，实际菜单已自带“下载图片/复制图片”，无需自制按钮或截图上传接口。
+- iframe增加allow-downloads；保留独立来源与原网络CSP。浏览器点击原生“生成快照→下载图片”，收到PNG文件70484字节，页面无异常。
+- 保存开发浏览器脚本web/tests/advanced-screenshot.browser.cjs，增加PNG文件头断言；前端构建通过。
+- 多图/深浅色截图、剪贴板权限和真实手机下载仍待验收；本次仅证明桌面单图原生下载可用。

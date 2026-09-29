@@ -504,7 +504,7 @@ export default function AdvancedWorkspace() {
           ref={frame}
           title="专业图表工作区"
           src={`${origin}/?parent=${encodeURIComponent(location.origin)}`}
-          sandbox="allow-scripts allow-same-origin"
+          sandbox="allow-scripts allow-same-origin allow-downloads"
           referrerPolicy="no-referrer"
         />
       ) : (

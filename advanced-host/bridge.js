@@ -620,7 +620,6 @@ function boot(
     ],
     disabled_features: [
       "use_localstorage_for_settings",
-      "header_screenshot",
       "trading_account_manager",
       "order_panel",
       "broker_button",
