@@ -581,6 +581,15 @@ function boot(
     container: "chart",
     library_path: "/charting_library/",
     datafeed: feed,
+    widgetbar: {
+      watchlist: true,
+      details: true,
+      datawindow: true,
+      watchlist_settings: {
+        default_symbols: ["EURUSD", "XAUUSD", "BTCUSDT"],
+        readonly,
+      },
+    },
     compare_symbols: [
       { symbol: "EURUSD", title: "EUR/USD" },
       { symbol: "XAUUSD", title: "黄金 / 美元" },

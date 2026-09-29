@@ -190,3 +190,10 @@
 - 返回as_of、basis、resolution供后续质量展示；原生Datafeed getQuotes/subscribeQuotes/unsubscribeQuotes通过父桥白名单调用，订阅合并后分批轮询。
 - 行情专项9项通过（新增报价口径、缺失价格及重复品种测试），历史刷新JS测试和前端构建通过。
 - 尚未启用右栏UI；日涨跌/过期休市状态、自选需求租约及用户级列表保存仍需完成。当前只是本地报价适配基础，不宣称自选功能已交付。
+
+### 原生右栏接线验证
+
+- 已启用widgetbar watchlist/details/datawindow及手机自选readonly；开发API重启后加载Quotes接口。实际详情显示M1口径描述及最新本地价格。
+- 授权包未将default_symbols自动填入初始空列表。浏览器通过公开watchList.createList/setActiveList创建验收列表，原生右栏显示EURUSD/XAUUSD/BTCUSDT和真实缓存报价，无页面异常。
+- createList后立即getAllLists仍返回旧列表，说明列表更新存在异步时序；持久化初始化须结合公开事件处理，不能在每次启动覆盖空列表。
+- 列表持久化、默认列表初始化、报价日变化/过期状态和自选后台续租未完成。原生“开市”当前依赖库session配置，尚未证明节假日准确性。数据窗口数值仍待逐项验收。
