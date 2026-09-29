@@ -511,7 +511,7 @@ def once(symbol=None, start=None, end=None):
         db.add(Audit(kind="market_heartbeat", details={}))
 
 
-def import_once(*, chart_only=False):
+def import_once(*, chart_only=False, fetcher=None):
     """One daily slice per iteration. Durable cursor and lease permit safe restart."""
     with transaction() as db:
         job = db.scalar(
@@ -556,7 +556,7 @@ def import_once(*, chart_only=False):
     started = time.monotonic()
     fetch_finished = None
     try:
-        payload = fetch_source(
+        payload = (fetcher or fetch_source)(
             source, symbol, instant(left).isoformat(), instant(right).isoformat()
         )
         fetch_finished = time.monotonic()

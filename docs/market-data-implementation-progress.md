@@ -579,3 +579,9 @@
 - `/tmp/mw-gold-timed.log` session6316在60秒预算失败，未通过黄金跳转验收。
 - ingest对已确认完整覆盖的桶直接使用实际观测时间集合，不再先逐分钟运行scheduled_open再覆盖结果；未覆盖桶仍按日历验证。删除的计算不影响最终expected集合，仍不造平价K线。
 - market+market_data 29项测试通过。尚未在真实worker运行新优化并测量提速，不宣称5.250秒已降低。
+
+### 图表worker连接复用
+
+- 代码确认每页fetch_oanda/fetch_binance原先自行创建并关闭httpx.Client。图表worker现使用ExitStack持有各来源独立客户端，fetch_page注入import_once；普通采集调用默认fetch_source不变，代理配置沿用原来源设置。
+- market+market_data 29项通过；开发worker重启为1985819，同时加载覆盖聚合优化。退出作用域时关闭连接池，未增加下载并发。
+- 黄金M5真实验证 `/tmp/mw-gold-pooled.log` exec session91362最后确认运行中，尚未取得终态。未将连接复用当作已证明的吞吐改进，需继续收取阶段日志和最终视区。
