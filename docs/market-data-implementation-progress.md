@@ -565,3 +565,10 @@
 - 正常取消仍调用库的error回调结束旧请求，但不发送新工作区的全局错误提示；新增回归模拟请求期间epoch变化，验证取消且无全局error。
 - pending提示加入规划接口真实completed_ms/total_ms折算分钟，明确为当前区间，避免页尚未返回时始终只显示0根。不是整个历史下载百分比。
 - 分页、重载、去重回归通过，diff检查通过。黄金M5延长诊断已启动 `/tmp/mw-history-gold-extended.log`，exec session62176最后确认运行中，结果待收取；默认60秒验收预算未改。
+
+### 黄金长等待仍失败，补充阶段计时
+
+- session62176终态退出1；`/tmp/mw-history-gold-extended.log` 在180秒预算超时。补数页从533根增长到1274根，但目标视区未验收通过。
+- 开发库只读检查：图表任务running1/pending11，运行XAUUSD页剩余1300分钟、attempts0；当次pg_stat_activity未发现其他非idle数据库会话。不能据此确定瓶颈，但持续到期的小实时任务也在等待单worker。
+- import_once增加图表页阶段计时：下载耗时/行数/分钟范围，以及页总耗时和下载后处理耗时。worker开启INFO，httpx保持WARNING以避免输出账户请求URL。未记录请求头或凭据。
+- 新计时尚未重启worker启用；需取得真实阶段数据后决定调度/批量优化，不通过增大前端超时掩盖该问题。

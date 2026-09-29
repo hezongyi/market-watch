@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import logging
 import os
 import subprocess
 import time
@@ -552,10 +553,16 @@ def import_once(*, chart_only=False):
             if chart_only
             else min(job.end, ((job.cursor // 86400_000) + 1) * 86400_000),
         )
+    started = time.monotonic()
+    fetch_finished = None
     try:
         payload = fetch_source(
             source, symbol, instant(left).isoformat(), instant(right).isoformat()
         )
+        fetch_finished = time.monotonic()
+        if chart_only:
+            logging.info("chart_history_fetch source=%s symbol=%s minutes=%d rows=%d seconds=%.3f",
+                         source, symbol, (right-left)//60000, len(payload["rows"]), fetch_finished-started)
         with transaction() as db:
             job = db.scalar(select(ImportJob).where(ImportJob.id == ident).with_for_update())
             if job.status != "running" or job.lease_until != lease or job.cursor != left:
@@ -641,6 +648,12 @@ def import_once(*, chart_only=False):
             job.status = "failed" if job.attempts >= 5 else "pending"
             job.lease_until = None
             job.next_at = now_ms() + min(600, 30 * 2**job.attempts) * 1000
+    finally:
+        if chart_only:
+            finished = time.monotonic()
+            logging.info("chart_history_page source=%s symbol=%s total_seconds=%.3f ingest_seconds=%s",
+                         source, symbol, finished-started,
+                         round(finished-fetch_finished, 3) if fetch_finished is not None else "not_started")
     return True
 
 

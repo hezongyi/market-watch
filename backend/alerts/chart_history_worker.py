@@ -22,6 +22,9 @@ def maintain_active():
 
 
 def main():
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    # Provider URLs contain account paths; keep transport request logs quiet.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
     refreshed = 0
     maintained = 0
     while True:
