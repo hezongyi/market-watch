@@ -1097,3 +1097,6 @@ app.include_router(chart_router(authenticated))
 
 from .advanced_api import router as advanced_router  # noqa: E402
 app.include_router(advanced_router(authenticated))
+
+from .market_data import router as market_data_router  # noqa: E402
+app.include_router(market_data_router(authenticated))

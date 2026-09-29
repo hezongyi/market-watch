@@ -20,10 +20,11 @@ const frames = new Set([
   "W1",
   "MN",
 ]);
-const symbols = new Set(["EURUSD", "XAUUSD", "BTCUSDT"]);
+
 export default function AdvancedWorkspace() {
   const [rows, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
+  const [feedError, setFeedError] = useState("");
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
   const frame = useRef<HTMLIFrameElement>(null),
@@ -114,8 +115,46 @@ export default function AdvancedWorkspace() {
           setError(String(e));
         }
       } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
-      else if (m.type === "error") setError(String(m.error).slice(0, 500));
-      else if (m.type === "data") {
+      else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
+      else if (m.type === "market") {
+        const q = m.query;
+        const endpoints: Record<string, string> = {
+          search: "/market-data/catalog",
+          resolve: "/market-data/resolve",
+          history: "/market-data/history",
+          activity: "/market-data/activity",
+        };
+        if (
+          !q ||
+          !Object.hasOwn(endpoints, q.op) ||
+          JSON.stringify(q).length > 4000 ||
+          inflight.current >= 8
+        ) {
+          reply({ type: "result", id: m.id, error: "无效行情请求" });
+          return;
+        }
+        inflight.current++;
+        try {
+          reply({
+            type: "result",
+            id: m.id,
+            result: await api(
+              endpoints[q.op] +
+                (q.op === "search"
+                  ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
+                  : ""),
+              q.op === "search" ? undefined : q.args,
+            ),
+          });
+        } catch (e) {
+          reply({ type: "result", id: m.id, error: String(e) });
+        } finally {
+          inflight.current--;
+        }
+      } else if (m.type === "status") {
+        setStatus(String(m.text).slice(0, 200));
+        if (m.text === "行情已加载") setFeedError("");
+      } else if (m.type === "data") {
         const q = m.query;
         if (
           !q ||
@@ -123,7 +162,8 @@ export default function AdvancedWorkspace() {
             (!Array.isArray(q.indicators) ||
               q.indicators.length > 1 ||
               JSON.stringify(q.indicators).length > 2000)) ||
-          !symbols.has(q.instrument) ||
+          typeof q.instrument !== "string" ||
+          q.instrument.length > 80 ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
@@ -354,9 +394,9 @@ export default function AdvancedWorkspace() {
         </button>
         <span role="status">{status}</span>
       </header>
-      {error && (
+      {(error || feedError) && (
         <div role="alert" className="advanced-error">
-          {error}
+          {error || feedError}
           <button onClick={() => location.reload()}>重新加载</button>
         </div>
       )}

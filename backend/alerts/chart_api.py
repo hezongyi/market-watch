@@ -306,6 +306,34 @@ def router(authenticated):
                     if body.timeframe in ("W1", "MN")
                     else body.timeframe
                 )
+                if not body.indicators:
+                    # Ordinary chart pagination must not materialize all available history.
+                    page = chart_rows(db, inst, body.timeframe, before, body.limit + 1, now_ms())
+                    visible = page[-body.limit :]
+                    revision_at = db.scalar(
+                        select(func.max(Bar.received_at)).where(
+                            Bar.instrument_id == inst.id, Bar.timeframe == source
+                        )
+                    )
+                    return {
+                        "history_revision": str(revision_at or 0),
+                        "bars": visible,
+                        "indicators": [],
+                        "has_more": len(page) > body.limit,
+                        "origin": db.scalar(
+                            select(func.min(Bar.start)).where(
+                                Bar.instrument_id == inst.id, Bar.timeframe == source
+                            )
+                        ),
+                        "bounded_history": False,
+                        "future": future_grid(inst, body.timeframe, visible[-1]["end"])
+                        if visible
+                        else [],
+                        "basis": inst.basis,
+                        "calendar": inst.calendar,
+                        "precision": inst.precision,
+                        "as_of": now_ms(),
+                    }
                 stamp = db.execute(
                     select(
                         func.count(Bar.id),

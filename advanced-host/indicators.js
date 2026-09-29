@@ -50,7 +50,7 @@ function pythonStudies(PineJS, catalog) {
       },
       constructor: function () {
         this.init = function (ctx, input) {
-          const symbol = PineJS.Std.ticker(ctx).replace(/^.*:/, "");
+          const symbol = PineJS.Std.ticker(ctx).replace(/^Market Watch:/, "");
           const spec = {
             name,
             params: Object.fromEntries(keys.map((k, i) => [k, input(i)])),

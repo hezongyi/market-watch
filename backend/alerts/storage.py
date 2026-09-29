@@ -61,7 +61,10 @@ class Instrument(Base):
 
 class Bar(Base):
     __tablename__ = "candles"
-    __table_args__ = (UniqueConstraint("instrument_id", "timeframe", "start"),)
+    __table_args__ = (
+        UniqueConstraint("instrument_id", "timeframe", "start"),
+        Index("ix_candles_revision_lookup", "instrument_id", "timeframe", "received_at"),
+    )
     id: Mapped[int] = mapped_column(primary_key=True)
     instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), index=True)
     timeframe: Mapped[str] = mapped_column(String(8))
@@ -373,4 +376,41 @@ class AdvancedWorkspace(Base):
     name: Mapped[str] = mapped_column(String(100))
     document: Mapped[dict] = mapped_column(JSON, default=dict)
     revision: Mapped[int] = mapped_column(default=1)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class MarketCoverage(Base):
+    __tablename__ = "market_data_coverage"
+    __table_args__ = (
+        UniqueConstraint("instrument_id", "source", "basis", "start", "end"),
+        Index("ix_market_coverage_interval", "instrument_id", "start", "end"),
+    )
+    id: Mapped[str] = mapped_column(String(40), primary_key=True, default=uid)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"))
+    source: Mapped[str] = mapped_column(String(32))
+    basis: Mapped[str] = mapped_column(String(16))
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    observed: Mapped[int] = mapped_column(default=0)
+    queried_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class MarketCatalog(Base):
+    __tablename__ = "market_instrument_catalog"
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    source: Mapped[str] = mapped_column(String(32))
+    symbol: Mapped[str] = mapped_column(String(64))
+    label: Mapped[str] = mapped_column(String(200))
+    asset_type: Mapped[str] = mapped_column(String(32))
+    precision: Mapped[int]
+    calendar: Mapped[str | None] = mapped_column(String(32))
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    available: Mapped[bool] = mapped_column(default=True)
+
+
+class MarketDemand(Base):
+    __tablename__ = "market_data_demand"
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), index=True)
+    expires: Mapped[int] = mapped_column(BigInteger, index=True)
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)

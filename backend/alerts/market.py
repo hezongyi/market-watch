@@ -11,6 +11,7 @@ from decimal import Decimal
 import httpx
 from sqlalchemy import BigInteger, or_, select
 
+from .bar_batch import write_bars
 from .calendar_profile import closures_from
 from .config import settings
 from .coverage import covers_interval
@@ -22,6 +23,7 @@ from .storage import (
     Bar,
     ImportJob,
     Instrument,
+    MarketCoverage,
     Preference,
     Watch,
     bootstrap,
@@ -116,10 +118,22 @@ def stored_coverage(db, instrument, left, right):
             final_cutoff = ((details["received_at"] - 5000) // 60000) * 60000
             for span in details["ranges"]:
                 coverage.append({"start": span["start"], "end": min(span["end"], final_cutoff)})
+    for span in db.scalars(
+        select(MarketCoverage).where(
+            MarketCoverage.instrument_id == instrument.id,
+            MarketCoverage.source == instrument.source,
+            MarketCoverage.basis == instrument.basis,
+            MarketCoverage.start < right,
+            MarketCoverage.end > left,
+        )
+    ):
+        coverage.append({"start": span.start, "end": span.end})
     return coverage
 
 
 def ingest(db, instrument, payload, received_at=None):
+    # Serialize bounded writes for one instrument across live and history workers.
+    db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
     if payload.get("source") and payload["source"] != instrument.source:
         raise ValueError("行情来源不匹配，拒绝混合数据")
     if payload.get("basis") and payload["basis"] != instrument.basis:
@@ -146,7 +160,38 @@ def ingest(db, instrument, payload, received_at=None):
                 },
             )
         )
+    # Commit coverage in the same transaction as bars; source empty observations are
+    # not a claim of holiday or of the provider's oldest historical boundary.
+    for span in payload.get("coverage", []):
+        end = min(span["end"], (received_at - 5000) // 60000 * 60000)
+        if end <= span["start"]:
+            continue
+        existing = db.scalar(
+            select(MarketCoverage).where(
+                MarketCoverage.instrument_id == instrument.id,
+                MarketCoverage.source == instrument.source,
+                MarketCoverage.basis == instrument.basis,
+                MarketCoverage.start == span["start"],
+                MarketCoverage.end == end,
+            )
+        )
+        if existing:
+            existing.queried_at = received_at
+            existing.observed = span.get("returned", 0)
+        else:
+            db.add(
+                MarketCoverage(
+                    instrument_id=instrument.id,
+                    source=instrument.source,
+                    basis=instrument.basis,
+                    start=span["start"],
+                    end=end,
+                    observed=span.get("returned", 0),
+                    queried_at=received_at,
+                )
+            )
     changed = []
+    minute_candles = []
     for raw in payload["rows"]:
         start = instant(int(raw["timestamp"]))
         if start.second or start.microsecond:
@@ -156,8 +201,9 @@ def ingest(db, instrument, payload, received_at=None):
         if ms(end) > received_at - 5000:
             continue
         c = Candle(start, end, *(Decimal(str(raw[k])) for k in ["open", "high", "low", "close"]))
-        upsert(db, instrument.id, "M1", c)
+        minute_candles.append(c)
         changed.append(start)
+    write_bars(db, instrument.id, "M1", minute_candles)
     touched = set(changed)
     if instrument.source == "oanda":
         for span in payload.get("coverage", []):
@@ -172,21 +218,28 @@ def ingest(db, instrument, payload, received_at=None):
     earliest = ms(bucket_bounds(min(touched), "D1", calendar)[0])
     latest_boundary = ms(bucket_bounds(max(touched), "D1", calendar)[1])
     coverage = stored_coverage(db, instrument, earliest, latest_boundary)
-    # Include all minute rows in touched buckets, including older bars already stored.
+    # Read each touched day once rather than issuing one query per aggregate bar.
+    minute_rows = db.scalars(
+        select(Bar)
+        .where(
+            Bar.instrument_id == instrument.id,
+            Bar.timeframe == "M1",
+            Bar.start >= earliest,
+            Bar.start < latest_boundary,
+        )
+        .order_by(Bar.start)
+    ).all()
     calendar = Calendar(instrument.calendar)
     for timeframe in ["M5", "M15", "H1", "H4", "D1"]:
         bounds = {bucket_bounds(t, timeframe, calendar) for t in touched}
+        grouped = {}
+        for row in minute_rows:
+            pair = bucket_bounds(instant(row.start), timeframe, calendar)
+            if pair in bounds:
+                grouped.setdefault(pair, []).append(row)
+        outputs = []
         for left, right in sorted(bounds):
-            rows = db.scalars(
-                select(Bar)
-                .where(
-                    Bar.instrument_id == instrument.id,
-                    Bar.timeframe == "M1",
-                    Bar.start >= ms(left),
-                    Bar.start < ms(right),
-                )
-                .order_by(Bar.start)
-            ).all()
+            rows = grouped.get((left, right), [])
             expected = set()
             t = left
             while t < right:
@@ -206,7 +259,8 @@ def ingest(db, instrument, payload, received_at=None):
             if c:
                 complete = c.complete and bool(expected) and ms(right) <= received_at - 5000
                 c = Candle(c.start, c.end, c.open, c.high, c.low, c.close, complete)
-                upsert(db, instrument.id, timeframe, c)
+                outputs.append(c)
+        write_bars(db, instrument.id, timeframe, outputs)
     return len(changed)
 
 
@@ -456,13 +510,14 @@ def once(symbol=None, start=None, end=None):
         db.add(Audit(kind="market_heartbeat", details={}))
 
 
-def import_once():
+def import_once(*, chart_only=False):
     """One daily slice per iteration. Durable cursor and lease permit safe restart."""
     with transaction() as db:
         job = db.scalar(
             select(ImportJob)
             .where(
                 ImportJob.next_at <= now_ms(),
+                ImportJob.priority >= 100 if chart_only else ImportJob.priority < 100,
                 or_(
                     ImportJob.status == "pending",
                     (ImportJob.status == "running") & (ImportJob.lease_until < now_ms()),
@@ -487,7 +542,9 @@ def import_once():
             job.id,
             db.get(Instrument, job.instrument_id).symbol,
             job.cursor,
-            min(job.end, ((job.cursor // 86400_000) + 1) * 86400_000),
+            min(job.end, job.cursor + 4000 * 60000)
+            if chart_only
+            else min(job.end, ((job.cursor // 86400_000) + 1) * 86400_000),
         )
     try:
         payload = fetch_source(

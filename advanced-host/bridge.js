@@ -25,10 +25,13 @@ const frames = {
   "1M": "MN",
 };
 const subscriptions = new Map();
+const lastHistory = new Map();
+const pendingHistory = new Map();
+const clientId = crypto.randomUUID();
 const requests = [];
 function drain() {
   while (pending.size < 4 && requests.length) {
-    const { query, resolve, reject } = requests.shift();
+    const { query, type, resolve, reject } = requests.shift();
     const id = ++seq;
     const timer = setTimeout(() => {
       pending.delete(id);
@@ -36,13 +39,13 @@ function drain() {
       drain();
     }, 30000);
     pending.set(id, { resolve, reject, timer });
-    send({ type: "data", id, query });
+    send({ type, id, query });
   }
 }
-function request(query) {
+function request(query, type = "data") {
   return new Promise((resolve, reject) => {
     if (requests.length >= 64) return reject(Error("图表请求过多，请减少指标"));
-    requests.push({ query, resolve, reject });
+    requests.push({ query, type, resolve, reject });
     drain();
   });
 }
@@ -126,39 +129,44 @@ const feed = {
         }),
       0,
     ),
-  searchSymbols: (input, exchange, type, cb) =>
-    cb(
-      ["EURUSD", "XAUUSD", "BTCUSDT"]
-        .filter((s) => s.includes(input.toUpperCase()))
-        .map((s) => ({
-          symbol: s,
-          ticker: s,
-          description: s,
-          exchange: "Market Watch",
-          type: s === "BTCUSDT" ? "crypto" : "forex",
+  searchSymbols: async (input, exchange, type, cb) => {
+    try {
+      const rows = await request(
+        { op: "search", args: { query: input } },
+        "market",
+      );
+      cb(
+        rows.map((s) => ({
+          symbol: s.id,
+          ticker: s.id,
+          description: s.label + (s.supported ? "" : " · 日历待接入"),
+          exchange: s.source.toUpperCase(),
+          type: s.asset_type === "CRYPTO" ? "crypto" : "forex",
         })),
-    ),
-  resolveSymbol: (ticker, cb, err) =>
-    setTimeout(() => {
-      let symbol;
-      try {
-        symbol = decode(ticker).symbol;
-      } catch (e) {
-        return err("unknown_symbol");
-      }
-      if (!["EURUSD", "XAUUSD", "BTCUSDT"].includes(symbol))
-        return err("unknown_symbol");
+      );
+    } catch (e) {
+      cb([]);
+      send({ type: "error", error: String(e) });
+    }
+  },
+  resolveSymbol: async (ticker, cb, err) => {
+    try {
+      const symbol = decode(ticker).symbol;
+      const meta = await request(
+        { op: "resolve", args: { instrument: symbol, timeframe: "M1" } },
+        "market",
+      );
       cb({
         name: ticker,
         ticker,
-        description: symbol + (symbol === "BTCUSDT" ? " · Last" : " · Bid"),
-        exchange: "Market Watch",
-        listed_exchange: "Market Watch",
-        type: symbol === "BTCUSDT" ? "crypto" : "forex",
-        session: symbol === "BTCUSDT" ? "24x7" : "1700-1700:23456",
-        timezone: symbol === "BTCUSDT" ? "Etc/UTC" : "America/New_York",
+        description: meta.name + " · " + meta.basis,
+        exchange: meta.source.toUpperCase(),
+        listed_exchange: meta.source.toUpperCase(),
+        type: meta.calendar === "utc0" ? "crypto" : "forex",
+        session: meta.calendar === "utc0" ? "24x7" : "1700-1700:23456",
+        timezone: meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York",
         minmov: 1,
-        pricescale: symbol === "EURUSD" ? 100000 : 100,
+        pricescale: 10 ** meta.precision,
         has_intraday: true,
         intraday_multipliers: ["1", "5", "15", "30", "60", "240"],
         has_daily: true,
@@ -171,10 +179,44 @@ const feed = {
         data_status: "streaming",
         has_empty_bars: false,
       });
-    }, 0),
+    } catch (e) {
+      err(String(e));
+      send({ type: "error", error: String(e) });
+    }
+  },
   getBars: async (s, res, p, cb, err) => {
     try {
       if (!frames[res]) throw Error("不支持的周期");
+      const symbol = decode(s.ticker).symbol;
+      const args = {
+        instrument: symbol,
+        timeframe: frames[res],
+        before:
+          p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0),
+        limit: Math.min(p.countBack, 2000),
+      };
+      let status = await request({ op: "history", args }, "market");
+      const started = Date.now();
+      while (status.status === "pending" && Date.now() - started < 12000) {
+        send({ type: "status", text: "正在拉取历史数据 · " + symbol });
+        await new Promise((r) => setTimeout(r, 1500));
+        status = await request({ op: "history", args }, "market");
+      }
+      if (status.status === "error")
+        throw Error(status.error || "历史拉取失败");
+      if (status.status === "pending")
+        pendingHistory.set(symbol + "|" + res, args);
+      if (!status.bars.length && status.status === "pending")
+        throw Error("历史数据正在后台拉取，完成后自动加载");
+      if (!status.bars.length && status.status === "empty_interval")
+        throw Error("该区间未返回行情，尚未确认历史起点");
+      send({
+        type: "status",
+        text:
+          status.status === "pending"
+            ? "历史数据部分可用，继续拉取中"
+            : "行情已加载",
+      });
       let before =
           p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0),
         all = [],
@@ -198,7 +240,15 @@ const feed = {
       const unique = [...new Map(all.map((b) => [b.time, b])).values()].sort(
         (a, b) => a.time - b.time,
       );
-      cb(unique, { noData: unique.length === 0 && !more });
+      if (unique.length)
+        lastHistory.set(
+          s.ticker + "|" + res,
+          Math.max(
+            lastHistory.get(s.ticker + "|" + res) || 0,
+            unique.at(-1).time,
+          ),
+        );
+      cb(unique, { noData: false });
     } catch (e) {
       err(String(e));
       send({ type: "error", error: String(e) });
@@ -210,7 +260,7 @@ const feed = {
       res,
       cb,
       reset,
-      last: 0,
+      last: lastHistory.get(s.ticker + "|" + res) || 0,
       revision: null,
     }),
   unsubscribeBars: (id) => subscriptions.delete(id),
@@ -220,6 +270,17 @@ async function tick() {
   if (polling) return;
   polling = true;
   try {
+    for (const [key, args] of pendingHistory) {
+      const state = await request({ op: "history", args }, "market");
+      if (state.status === "ready" || state.status === "empty_interval") {
+        pendingHistory.delete(key);
+        if (ready)
+          for (let i = 0; i < widget.chartsCount(); i++) {
+            const c = widget.chart(i);
+            if (c.symbol() === args.instrument) c.resetData();
+          }
+      }
+    }
     const groups = new Map();
     for (const sub of subscriptions.values()) {
       let key = sub.symbol + sub.res;
@@ -228,15 +289,33 @@ async function tick() {
     }
     for (const group of groups.values()) {
       const first = group[0];
+      await request(
+        {
+          op: "activity",
+          args: { client: clientId, instrument: decode(first.symbol).symbol },
+        },
+        "market",
+      );
       try {
         const result = await query(first.symbol, first.res, { limit: 3 });
         const bars = barsOf(result, first.res, first.symbol);
         for (const sub of group) {
           if (sub.revision && sub.revision !== result.history_revision) {
             sub.reset();
-            sub.last = 0;
+            // Historical changes require a reload, never older bars in the realtime callback.
+            for (let i = 0; i < widget.chartsCount(); i++) {
+              const c = widget.chart(i);
+              if (
+                c.symbol() === decode(sub.symbol).symbol &&
+                c.resolution() === sub.res
+              )
+                c.resetData();
+            }
+            sub.revision = result.history_revision;
+            continue;
           }
           sub.revision = result.history_revision;
+          if (!sub.last && bars.length) sub.last = bars.at(-1).time;
           for (const bar of bars)
             if (bar.time >= sub.last) {
               sub.cb({ ...bar });
@@ -290,8 +369,8 @@ function boot(doc, readonly = false, catalog = {}) {
     container: "chart",
     library_path: "/charting_library/",
     datafeed: feed,
-    symbol: "XAUUSD",
-    interval: "240",
+    symbol: doc.symbol || "XAUUSD",
+    interval: doc.interval || "240",
     locale: "zh",
     autosize: true,
     theme: doc.theme || "Dark",

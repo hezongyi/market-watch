@@ -74,6 +74,13 @@ def fetch_binance(symbol="BTCUSDT", start=None, end=None, mode="live", client=No
             "rows": rows,
             "window_start": left,
             "window_end": right,
+            "coverage": [
+                {
+                    "start": left,
+                    "end": min(right, (now_ms() - 5000) // 60000 * 60000),
+                    "returned": len(rows),
+                }
+            ],
         }
     finally:
         if owns:
@@ -82,8 +89,10 @@ def fetch_binance(symbol="BTCUSDT", start=None, end=None, mode="live", client=No
 
 def fetch_oanda(symbol, start=None, end=None, mode="live", client=None):
     """Read-only practice API; aggregate only source M1 locally."""
-    if symbol not in {"EUR_USD", "XAU_USD"}:
-        raise ValueError("Unsupported OANDA instrument")
+    import re
+
+    if not re.fullmatch(r"[A-Z0-9]+(?:_[A-Z0-9]+)+", symbol):
+        raise ValueError("Invalid OANDA instrument")
     if not settings.oanda_token:
         raise ValueError("OANDA token is not configured")
     owns = client is None
@@ -198,6 +207,22 @@ def fetch_oanda(symbol, start=None, end=None, mode="live", client=None):
             "window_start": left,
             "window_end": right,
         }
+    finally:
+        if owns:
+            client.close()
+
+
+def fetch_oanda_catalog(client=None):
+    """Account-specific tradable metadata. Never exposes credentials to clients."""
+    owns = client is None
+    client = client or httpx.Client(timeout=15, proxy=settings.oanda_proxy or None, trust_env=False)
+    try:
+        response = client.get(
+            f"https://api-fxpractice.oanda.com/v3/accounts/{settings.oanda_account_id}/instruments",
+            headers={"Authorization": "Bearer " + settings.oanda_token},
+        )
+        response.raise_for_status()
+        return response.json()["instruments"]
     finally:
         if owns:
             client.close()
