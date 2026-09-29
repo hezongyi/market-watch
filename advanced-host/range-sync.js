@@ -31,6 +31,7 @@ function rangeSyncLoadingGuard(widget) {
     for (const [chart, callback] of bindings) {
       if (charts.has(chart)) continue;
       chart.onSymbolChanged().unsubscribe(null, callback);
+      chart.onIntervalChanged().unsubscribe(null, callback);
       bindings.delete(chart);
       pending.delete(chart);
     }
@@ -48,6 +49,7 @@ function rangeSyncLoadingGuard(widget) {
       };
       bindings.set(chart, callback);
       chart.onSymbolChanged().subscribe(null, callback);
+      chart.onIntervalChanged().subscribe(null, callback);
     }
     restore();
   }
@@ -59,8 +61,10 @@ function rangeSyncLoadingGuard(widget) {
     dispose() {
       disposed = true;
       toggle.unsubscribe(changed);
-      for (const [chart, callback] of bindings)
+      for (const [chart, callback] of bindings) {
         chart.onSymbolChanged().unsubscribe(null, callback);
+        chart.onIntervalChanged().unsubscribe(null, callback);
+      }
       bindings.clear();
       pending.clear();
     },

@@ -31,9 +31,12 @@ const toggle = {
 };
 function chart() {
   const symbols = event(),
+    intervals = event(),
     callbacks = [];
   return {
     onSymbolChanged: () => symbols,
+    onIntervalChanged: () => intervals,
+    intervals,
     dataReady: (cb) => callbacks.push(cb),
     symbols,
     callbacks,
@@ -47,6 +50,10 @@ const guard = context.rangeSyncLoadingGuard({
   chartsCount: () => charts.length,
   chart: (i) => charts[i],
 });
+a.intervals.emit();
+assert.equal(value, false);
+a.callbacks.shift()();
+assert.equal(value, true);
 a.symbols.emit();
 b.symbols.emit();
 assert.equal(value, false);
