@@ -558,3 +558,10 @@
 - `/tmp/mw-python-pagination.log`，session28103退出0：真实库中Python SMA/MACD/STOCH/BBANDS均加载后端序列，保存刷新恢复参数，未因普通行情复用history响应而绕过指标计算。
 - 日期跳转用例新增MARKET_WATCH_HISTORY_SYMBOL/RESOLUTION参数，默认EURUSD/M1不变；分钟周期按自身K线长度检查两端误差，输出具体case。
 - XAUUSD/M5 `/tmp/mw-history-gold.log` session90802退出1：60秒预算内持续pending，最后本页可用数量由905增加到1740，仍未完成目标跳转。该场景缺失历史较多，尚不能以EURUSD缓存成功覆盖黄金验收。未提高默认性能预算或标记黄金通过。
+
+### 冷加载进度与迟到响应取消
+
+- getBars在规划请求返回、每次pending轮询返回、Python指标请求返回后重新核验工作区epoch与观看品种/周期，避免等待期间切换后迟到响应继续回填。
+- 正常取消仍调用库的error回调结束旧请求，但不发送新工作区的全局错误提示；新增回归模拟请求期间epoch变化，验证取消且无全局error。
+- pending提示加入规划接口真实completed_ms/total_ms折算分钟，明确为当前区间，避免页尚未返回时始终只显示0根。不是整个历史下载百分比。
+- 分页、重载、去重回归通过，diff检查通过。黄金M5延长诊断已启动 `/tmp/mw-history-gold-extended.log`，exec session62176最后确认运行中，结果待收取；默认60秒验收预算未改。

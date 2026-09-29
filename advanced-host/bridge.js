@@ -268,16 +268,22 @@ const feed = {
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
       const epoch = workspaceEpoch;
+      const checkActive = () => {
+        if (
+          epoch !== workspaceEpoch ||
+          !hasHistoryViewer({ instrument: symbol, timeframe: frames[res] })
+        ) {
+          const error = Error("已取消旧图表的历史加载");
+          error.code = "HISTORY_CANCELLED";
+          throw error;
+        }
+      };
       let before =
         p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0);
       let all = [],
         earliest = Infinity;
       while (all.length < requested) {
-        if (
-          epoch !== workspaceEpoch ||
-          !hasHistoryViewer({ instrument: symbol, timeframe: frames[res] })
-        )
-          throw Error("已取消旧图表的历史加载");
+        checkActive();
         const args = {
           instrument: symbol,
           timeframe: frames[res],
@@ -285,15 +291,20 @@ const feed = {
           limit: Math.min(2000, requested - all.length),
         };
         let status = await historyQuery(args);
+        checkActive();
         while (status.status === "pending") {
           send({
             type: "status",
-            text: `正在拉取历史数据 · ${symbol} · 已读取 ${all.length} 根`,
+            text:
+              `正在拉取历史数据 · ${symbol} · 已读取 ${all.length} 根` +
+              (status.progress
+                ? ` · 当前区间已处理 ${Math.floor(status.progress.completed_ms / 60000)} / ${Math.ceil(status.progress.total_ms / 60000)} 分钟`
+                : ""),
           });
           await new Promise((r) => setTimeout(r, 1500));
-          if (epoch !== workspaceEpoch || !hasHistoryViewer(args))
-            throw Error("已取消旧图表的历史加载");
+          checkActive();
           status = await historyQuery(args);
+          checkActive();
         }
         if (status.status === "error") {
           rememberHistoryFailure(args, status);
@@ -307,6 +318,7 @@ const feed = {
         const result = decode(s.ticker).spec
           ? await query(s.ticker, res, { before, limit: args.limit })
           : status;
+        checkActive();
         // Never stitch cached islands across an interval not checked by the planner.
         const covered = {
           ...result,
@@ -353,7 +365,8 @@ const feed = {
       cb(unique, { noData: false });
     } catch (e) {
       err(String(e));
-      send({ type: "error", error: String(e) });
+      if (e.code !== "HISTORY_CANCELLED")
+        send({ type: "error", error: String(e) });
     }
   },
   subscribeBars: (s, res, cb, id, reset) =>

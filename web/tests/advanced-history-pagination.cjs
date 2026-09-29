@@ -70,6 +70,31 @@ query = async () => { throw Error("ordinary OHLC must reuse planning response");
     ),
     (error) => String(error).includes("历史分页未推进"),
   );
+  vm.runInContext(
+    `
+    const notices = [];
+    parent.postMessage = (message) => notices.push(message);
+    historyQuery = async (args) => {
+      workspaceEpoch++;
+      return {status:"ready", bars:(await makePage(args)).bars,
+        requested_start:args.before-args.limit*60000};
+    };
+  `,
+    context,
+  );
+  await assert.rejects(
+    vm.runInContext(
+      `new Promise((resolve,reject) =>
+    feed.getBars({ticker:"EURUSD"}, "1", {to:2000000,countBack:300}, resolve,reject))`,
+      context,
+    ),
+    (error) => String(error).includes("已取消"),
+  );
+  assert.equal(
+    vm.runInContext('notices.filter(n => n.type === "error").length', context),
+    0,
+    "cancelled old workspace must not show an error over the new workspace",
+  );
   console.log(
     "Large countBack traverses planned pages without truncation or duplicate bars",
   );
