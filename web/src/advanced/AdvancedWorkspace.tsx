@@ -24,6 +24,7 @@ const frames = new Set([
 export default function AdvancedWorkspace() {
   const [rows, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
+  const [frameKey, setFrameKey] = useState(0);
   const [feedError, setFeedError] = useState("");
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
@@ -67,6 +68,7 @@ export default function AdvancedWorkspace() {
     current.current = row;
     blocked.current = !!localStorage.getItem("mw-tv-draft:" + row.id);
     setActive(row);
+    setFrameKey((key) => key + 1);
     setError(
       blocked.current
         ? "存在未保存草稿，请点击复制恢复为独立工作区；原工作区自动保存已暂停"
@@ -214,6 +216,9 @@ export default function AdvancedWorkspace() {
               revision: result.revision,
               document: result.document,
             };
+            // Native loads happen inside the existing widget. Reflect their
+            // identity without recreating the iframe or discarding chart state.
+            setActive(current.current);
             setRows((p) =>
               p.some((x) => x.id === result.id)
                 ? p.map((x) => (x.id === result.id ? current.current! : x))
@@ -561,7 +566,7 @@ export default function AdvancedWorkspace() {
       )}
       {active ? (
         <iframe
-          key={active.id}
+          key={frameKey}
           ref={frame}
           title="专业图表工作区"
           src={`${origin}/?parent=${encodeURIComponent(location.origin)}`}

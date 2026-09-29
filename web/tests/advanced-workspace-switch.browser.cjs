@@ -146,6 +146,15 @@ const fs = require("fs");
   console.log("SWITCH", result);
   const assert = require("node:assert/strict");
   assert.notEqual(result.a, result.b);
+  assert.equal(
+    await page.getByLabel("工作区", { exact: true }).inputValue(),
+    result.a,
+  );
+  assert.equal(
+    frame.isDetached(),
+    false,
+    "native switching must keep the iframe alive",
+  );
   assert.ok(result.bRevAfter > result.bRevBefore);
   assert.ok(result.aRevAfter > result.aRevBefore);
   await frame.waitForFunction(
