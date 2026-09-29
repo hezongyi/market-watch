@@ -156,6 +156,17 @@ const fs = require("fs");
     ),
     specs,
   );
+  const restoredRanges = await reloaded.evaluate(() =>
+    Array.from({ length: widget.chartsCount() }, (_, i) =>
+      widget.chart(i).getVisibleRange(),
+    ),
+  );
+  console.log("RESTORED_VIEWPORTS", JSON.stringify(restoredRanges));
+  assert.deepEqual(
+    restoredRanges,
+    state.map((pane) => pane.range),
+    "Every pane must restore its saved viewport",
+  );
   phase = "disable-sync-change-period";
   await reloaded.evaluate(async () => {
     widget.dateRangeSync().setValue(false);

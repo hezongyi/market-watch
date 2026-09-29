@@ -596,6 +596,7 @@ function boot(
   workspace = null,
 ) {
   // save_load_adapter content is a layout envelope; saved_data expects its chart state.
+  const storedViewports = doc.state?._mwViewports;
   let chartState = doc.state;
   if (
     chartState &&
@@ -609,6 +610,30 @@ function boot(
       return;
     }
   }
+  let pendingViewports = storedViewports || chartState?._mwViewports;
+  if (chartState) {
+    chartState = { ...chartState };
+    delete chartState._mwViewports;
+  }
+  let viewportRestoring = false;
+  const restoreViewports = async () => {
+    const viewports = pendingViewports;
+    pendingViewports = undefined;
+    if (!viewports) return;
+    const epoch = workspaceEpoch;
+    viewportRestoring = true;
+    try {
+      await restoreChartViewports(
+        widget,
+        viewports,
+        () => epoch === workspaceEpoch,
+      );
+    } catch (e) {
+      send({ type: "error", error: "视区恢复失败：" + String(e) });
+    } finally {
+      if (epoch === workspaceEpoch) viewportRestoring = false;
+    }
+  };
   savedDoc = doc;
   savedDoc.nativeName = workspace?.name || "我的图表";
   nativeMode = true;
@@ -627,15 +652,20 @@ function boot(
   const loadContent = layouts.getChartContent;
   const saveLayout = layouts.saveChart;
   layouts.saveChart = (data) => {
-    if (rangeGuard?.busy()) {
+    if (viewportRestoring || rangeGuard?.busy()) {
       dirty = true;
       return Promise.reject(Error("图表正在切换，数据就绪后自动保存"));
     }
-    return saveLayout(data);
+    const state = JSON.parse(data.content);
+    state._mwViewports = captureChartViewports(widget);
+    return saveLayout({ ...data, content: JSON.stringify(state) });
   };
   layouts.getChartContent = async (id) => {
     try {
-      return await loadContent(id);
+      const state = JSON.parse(await loadContent(id));
+      pendingViewports = state._mwViewports;
+      delete state._mwViewports;
+      return JSON.stringify(state);
     } catch (e) {
       loading = false;
       send({ type: "error", error: String(e) });
@@ -768,6 +798,7 @@ function boot(
           send({ type: "error", error: "工作区入口加载失败：" + String(e) }),
         );
     }
+    await restoreViewports();
     ready = true;
     loading = false;
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
@@ -794,10 +825,12 @@ function boot(
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
+      viewportRestoring = false;
       loading = true;
       dirty = false;
     });
-    widget.subscribe("chart_loaded", () => {
+    widget.subscribe("chart_loaded", async () => {
+      await restoreViewports();
       loading = false;
       rangeGuard?.dispose();
       rangeGuard = rangeSyncLoadingGuard(widget);

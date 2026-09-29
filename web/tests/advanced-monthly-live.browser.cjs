@@ -187,7 +187,14 @@ const fs = require("fs");
   if (process.env.MARKET_WATCH_REAPPLY_RANGE === "1")
     await frame.evaluate(
       async (range) => widget.chart(0).setVisibleRange(range),
-      before.range,
+      {
+        from:
+          before.range.from -
+          Number(process.env.MARKET_WATCH_RANGE_SHIFT_DAYS || 0) * 86400,
+        to:
+          before.range.to -
+          Number(process.env.MARKET_WATCH_RANGE_SHIFT_DAYS || 0) * 86400,
+      },
     );
   await page.waitForTimeout(2000);
   const savedRange = await frame.evaluate(() =>
