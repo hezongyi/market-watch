@@ -676,6 +676,9 @@ function boot(
     ],
     symbol: doc.symbol || "XAUUSD",
     interval: doc.interval || "240",
+    ...(!chartState && ["1D", "1W", "1M"].includes(doc.interval)
+      ? { timeframe: "3M" }
+      : {}),
     locale: "zh",
     autosize: true,
     theme:
@@ -690,6 +693,7 @@ function boot(
     auto_save_delay: 2,
     enabled_features: [
       "support_multicharts",
+      "determine_first_data_request_size_using_visible_range",
       "header_layouttoggle",
       "disable_resolution_rebuild",
       "study_templates",

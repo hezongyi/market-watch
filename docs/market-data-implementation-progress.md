@@ -647,3 +647,9 @@
 - session82820已退出0，各日志核对：空列表页可创建独立工作区；手机浏览无advanced-charts写入、保留桌面草稿、errors为空。
 - `/tmp/mw-backend-regression.log` session98859退出0：146 passed、5 skipped。跳过项未计入完成。
 - 新delivery-gaps清单明确剩余范围。发现高周期首次300根可能驱动多年M1补数，与按需体验目标不符，列为优先缺口；未凭聚合单测将D1/W1/MN真实加载认定通过。
+
+### 高周期新工作区首屏请求约束实验通过
+
+- 公开determine_first_data_request_size_using_visible_range启用；没有已保存chartState且初始周期为D1/W1/MN时设timeframe=3M。已有保存视区不覆盖，仍保留全部支持周期和向左加载能力。
+- 新advanced-high-period-request.browser.cjs在真实库中创建MN工作区，拦截history HTTP返回测试错误，避免触发多年M1下载。`/tmp/mw-high-period.log` session86704退出0：两次初始请求limit均为3，而非默认300。
+- 此为请求契约验收，不是MN真实数据展示/数值/向左拖动验收。切换周期、已有工作区超大范围、多图情况下的高周期策略仍待实现/验证。
