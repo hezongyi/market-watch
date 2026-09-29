@@ -209,12 +209,23 @@ const fs = require("fs");
           await loaded;
         };
       });
-    await frame.evaluate((resolution) => {
-      widget
-        .chart(0)
-        .setResolution(resolution)
-        .catch(() => {});
-    }, process.env.MARKET_WATCH_TEST_RESOLUTION || "1M");
+    if (process.env.MARKET_WATCH_RAPID_HIGH_PERIOD) {
+      for (const period of ["1D", "1W", "1M", "1D", "1M"]) {
+        await frame.evaluate((period) => {
+          widget
+            .chart(0)
+            .setResolution(period)
+            .catch(() => {});
+        }, period);
+        await page.waitForTimeout(100);
+      }
+    } else
+      await frame.evaluate((resolution) => {
+        widget
+          .chart(0)
+          .setResolution(resolution)
+          .catch(() => {});
+      }, process.env.MARKET_WATCH_TEST_RESOLUTION || "1M");
     await page.waitForTimeout(3000);
     if (process.env.MARKET_WATCH_RELOAD_BUDGET_PROBE === "1") {
       console.log("BEFORE_RELOAD_REQUESTS", JSON.stringify(captured));
@@ -235,9 +246,10 @@ const fs = require("fs");
   const limits = { "1D": 100, "1W": 16, "1M": 4 };
   const frames = { "1D": "D1", "1W": "W1", "1M": "MN" };
   require("node:assert/strict").ok(
-    captured.every(
-      (q) =>
-        q.timeframe === frames[resolution] && q.limit <= limits[resolution],
+    captured.every((q) =>
+      process.env.MARKET_WATCH_RAPID_HIGH_PERIOD
+        ? q.limit <= ({ D1: 100, W1: 16, MN: 4 }[q.timeframe] || 0)
+        : q.timeframe === frames[resolution] && q.limit <= limits[resolution],
     ),
   );
   require("node:assert/strict").deepEqual(errors, []);

@@ -305,3 +305,9 @@
 - advanced-monthly-live增加MARKET_WATCH_RAPID_PERIOD_CHECK：真实EURUSD从M5经M15/M30/H1/M5/M15/M5，每次间隔100ms，不等待前次加载完成；预先创建水平线。
 - /tmp/mw-rapid-period-live.log退出0，最后M5数据就绪且rangeGuard无待处理状态，等待额外3秒后周期仍为M5、工作区epoch不变、画线1条、视区有效且页面异常为空。
 - 该用例覆盖日内周期快速替换，尚不覆盖高周期与日期范围同时切换、冷数据量性能或全部原生菜单鼠标操作，继续保持对应边界待验收。
+
+### 高周期快速切换预算缺口
+
+- 请求预算测试新增MARKET_WATCH_RAPID_HIGH_PERIOD=1：M5加载后以100ms间隔切D1/W1/MN/D1/MN，高周期HTTP全部拦截，避免验证触发多年M1下载。
+- /tmp/mw-rapid-high-budget.log退出1，捕获D1=90、W1=90、MN=90；后一周期数据尚未就绪时沿用前次90根预算，超出周/月初始目标。现有recordPeriodChange在!chart.dataReady时跳过，单次切换通过不足以证明快速切换通过。
+- 保留失败用例，下一步需要实现加载中周期切换的请求预算处理，且继续保证撤销历史、最终周期、画线与明确日期范围意图。不通过扩大预算阈值或忽略中间请求关闭该问题。
