@@ -537,3 +537,10 @@
 - 工作区epoch或当前品种/周期观看者变化时停止旧任务轮询；页游标不推进时报错。未覆盖供应商永久pending、同品种快速连续拖动取消、空历史边界等完整情况。
 - 新advanced-history-pagination.cjs验证4500根请求按2000/2000/500连续读取、不重复、记录原始最早时间，另验证不推进游标时报错；history-dedup通过。
 - 真实日期跳转 `/tmp/mw-history-paginated.log` 已连续读取多页，缺失页pending→ready后继续，但setVisibleRange在测试60秒预算处超时，退出1。不得称日期跳转修复通过；需继续优化长等待/恢复，并完成冷/热缓存对照。开发API仍需重启以应用上一提交revision_after后端改动。
+
+### 完整链路复跑与长等待诊断
+
+- 开发API从1566646重启为1945819，工作目录确认advanced工作树，配置数据库trading_alerts_dev、delivery=false；加载revision_after实现。未操作生产服务。
+- 首次启动窗口内测试登录失败；服务就绪后 `/tmp/mw-history-full-chain-ready.log` 正常规划读取，但仍在60秒setVisibleRange预算处超时。不能以缓存逐步升温替代冷加载验收。
+- 日期跳转测试增加可选MARKET_WATCH_HISTORY_TIMEOUT_MS，默认仍60000并记录实际预算；180000诊断 `/tmp/mw-history-extended.log` 已启动，exec session30431最后确认仍在运行，尚无结论。
+- history-reload适配回归新增边界扩大只更新基准、相同边界内修订仍重载，测试通过。

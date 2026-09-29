@@ -62,6 +62,25 @@ tick();`,
   events.length = 0;
   await vm.runInContext(
     `
+query = async()=>({bars:[],history_check:{before:200,after:10,next_before:200,revision:'expanded',next_revision:'expanded'}});
+tick();`,
+    context,
+  );
+  assert.deepEqual(events, [], "expanded history establishes a new baseline");
+  await vm.runInContext(
+    `
+query = async()=>({bars:[],history_check:{before:200,after:10,next_before:200,revision:'corrected',next_revision:'corrected'}});
+tick();`,
+    context,
+  );
+  assert.deepEqual(
+    events,
+    ["cache:5", "chart:0"],
+    "correction inside unchanged bounds reloads",
+  );
+  events.length = 0;
+  await vm.runInContext(
+    `
 subscriptions.clear();
 pendingHistory.set('old',{instrument:'XAUUSD',timeframe:'M5'});
 request = async()=>{events.push('unexpected-request');return {status:'pending'}};

@@ -92,11 +92,20 @@ const fs = require("fs");
     await new Promise((resolve) => widget.chart(0).dataReady(resolve));
   });
   const started = Date.now();
-  const target = { from: Date.parse("2026-08-12T08:00:00Z") / 1000,
-                   to: Date.parse("2026-08-12T14:00:00Z") / 1000 };
-  await frame.evaluate(async (target) => {
-    await widget.chart(0).setVisibleRange(target, { rejectByTimeout: 60000 });
-  }, target);
+  const target = {
+    from: Date.parse("2026-08-12T08:00:00Z") / 1000,
+    to: Date.parse("2026-08-12T14:00:00Z") / 1000,
+  };
+  const timeout = Number(process.env.MARKET_WATCH_HISTORY_TIMEOUT_MS || 60000);
+  console.log("JUMP_BUDGET_MS", timeout);
+  await frame.evaluate(
+    async ({ target, timeout }) => {
+      await widget
+        .chart(0)
+        .setVisibleRange(target, { rejectByTimeout: timeout });
+    },
+    { target, timeout },
+  );
   console.log("JUMP_MS", Date.now() - started);
   await page.waitForTimeout(20000);
   const result = await frame.evaluate(() => ({
@@ -105,8 +114,10 @@ const fs = require("fs");
     failed: [...failedHistory.values()],
   }));
   console.log("HISTORY_RESULT", JSON.stringify(result));
-  assert.ok(Math.abs(result.range.to - target.to) <= 60,
-    "historical date jump must retain the requested right boundary after history loads");
+  assert.ok(
+    Math.abs(result.range.to - target.to) <= 60,
+    "historical date jump must retain the requested right boundary after history loads",
+  );
   assert.equal(result.pending.length, 0);
   assert.equal(result.failed.length, 0);
   assert.deepEqual(errors, []);
