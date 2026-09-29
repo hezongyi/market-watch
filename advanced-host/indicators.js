@@ -16,7 +16,18 @@ function pythonStudies(PineJS, catalog) {
         isCustomIndicator: true,
         format: { type: "price", precision: 5 },
         plots: series.map((s, i) => ({ id: "plot" + i, type: "line" })),
+        bands: (meta.levels || []).map((value, i) => ({
+          id: "level" + i,
+          name: String(value),
+        })),
         defaults: {
+          bands: (meta.levels || []).map((value) => ({
+            color: "#787b86",
+            linestyle: 2,
+            linewidth: 1,
+            value,
+            visible: true,
+          })),
           styles: Object.fromEntries(
             series.map((s, i) => [
               "plot" + i,

@@ -161,6 +161,18 @@ const fs = require("fs");
       spec.name + " must restore all parameters",
     );
   }
+  const bands = await restoredFrame.evaluate(() => {
+    const chart = widget.chart(0);
+    const study = chart
+      .getAllStudies()
+      .find((s) => s.name === "守望 Python STOCH");
+    return chart.getStudyById(study.id).getStyleValues().bands;
+  });
+  assert.deepEqual(
+    bands.map((b) => b.value),
+    [20, 80],
+  );
+  assert.ok(bands.every((b) => b.visible));
   assert.deepEqual(errors, []);
   console.log(
     "Python SMA/MACD/STOCH/BBANDS loaded all backend series and restored all parameters",

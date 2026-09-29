@@ -333,3 +333,9 @@
 - Datafeed的初次getBars、短轮询和后台pending检查统一调用historyQuery；同品种/周期/before/count的在途请求共用Promise，完成或失败立即移除。不缓存已完成结果，下一轮仍能观察到补数进展。
 - 新advanced-history-dedup测试覆盖参数键顺序无关、同请求共用、不同周期隔离、成功后刷新、失败后重试和映射清理；历史刷新回归通过。
 - 真实SMA/MACD/STOCH/BBANDS创建取数、保存恢复再次通过，无pageerror。尚未量化8图请求减少比例，不作性能幅度承诺。
+
+### Python振荡指标原生参考线
+
+- 依照分发包公开StudyBandInfo/StudyBandDefaultStyle接口，将插件metadata.levels映射到原生bands及defaults.bands；RSI使用30/70，STOCH使用20/80，无需自制绘图对象。
+- 真实四类Python指标浏览器用例再次通过；新增断言确认保存刷新后STOCH原生getStyleValues的bands为20/80且visible=true。适配单元回归及diff检查通过。
+- 现有工作区中已保存旧样式的指标是否自动补入新默认值，仍需独立验证；本次证明新创建指标的原生参考线状态与持久化。
