@@ -166,7 +166,7 @@ export default function AdvancedWorkspace() {
           const draft = draftId
             ? JSON.stringify({
                 ...(current.current?.id === draftId
-                  ? current.current.document
+                  ? current.current?.document
                   : {}),
                 engine: "tv31",
                 schemaVersion: 1,
