@@ -1,12 +1,15 @@
 /* Revisions stay pinned until explicit load/save; listing cannot authorize overwrite. */
 function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
   const revisions = new Map();
+  const deleted = new Set();
   if (initial?.id) revisions.set(String(initial.id), initial.revision);
   let writes = Promise.resolve();
   let unsaved = false;
   return {
     getAllCharts: async () => {
-      const rows = await rpc("list", {});
+      const rows = (await rpc("list", {})).filter(
+        (row) => !deleted.has(String(row.id)),
+      );
       for (const row of rows)
         if (!revisions.has(String(row.id)))
           revisions.set(String(row.id), row.revision);
@@ -28,6 +31,8 @@ function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
       if (readonly) return Promise.reject(Error("手机只读，不保存修改"));
       const task = writes.then(async () => {
         const id = data.id == null ? null : String(data.id);
+        if (id && deleted.has(id))
+          throw Error("工作区已删除，请另存为新工作区");
         if (id && !revisions.has(id)) throw Error("请先加载工作区再保存");
         const row = await rpc("save", {
           id,
@@ -53,6 +58,7 @@ function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
         id = String(id);
         if (!revisions.has(id)) throw Error("请刷新工作区列表");
         await rpc("delete", { id, revision: revisions.get(id) });
+        deleted.add(id);
         revisions.delete(id);
       });
       writes = task.catch(() => {});

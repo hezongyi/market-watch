@@ -108,6 +108,31 @@ vm.runInContext(
   refuse = false;
   await protectedAdapter.saveChart({ name: "copy", content: "draft" });
   await protectedAdapter.getChartContent("b");
+  let finishList;
+  const deletedAdapter = context.nativeWorkspaces(
+    { id: "deleted", revision: 1 },
+    (op) =>
+      op === "list"
+        ? new Promise((resolve) => {
+            finishList = resolve;
+          })
+        : Promise.resolve({ ok: true }),
+    false,
+    () => {},
+    () => {},
+  );
+  const staleList = deletedAdapter.getAllCharts();
+  await deletedAdapter.removeChart("deleted");
+  finishList([{ id: "deleted", revision: 1, name: "stale" }]);
+  assert.equal(
+    (await staleList).length,
+    0,
+    "inflight old listing must not revive deleted workspaces",
+  );
+  await assert.rejects(
+    deletedAdapter.saveChart({ id: "deleted", content: "{}" }),
+    /已删除/,
+  );
   console.log(
     "native workspace adapter: conflict, serialized saves and readonly passed",
   );
