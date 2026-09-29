@@ -1,8 +1,10 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前正式版本 **v1.0.0**，已按用户确认的范围完成验收与交付。逐项验收见 [交付矩阵](docs/acceptance-matrix.md)，状态见 [交付记录](docs/delivery-status.md)，规格见 [实施方案](docs/implementation-plan.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.0.1**，已按用户确认的范围完成验收与交付。逐项验收见 [交付矩阵](docs/acceptance-matrix.md)，状态见 [交付记录](docs/delivery-status.md)，规格见 [实施方案](docs/implementation-plan.md)。
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。
+
+项目目录：`/home/quant/repos/market-watch`。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。v1.0.1为本地改名版本，尚未部署；生产仍使用v1.0.0对应镜像。
 
 ## 当前实例
 
@@ -74,7 +76,7 @@ npm run build
 
 生产使用 `compose.external-db.yaml` 与固定镜像版本文件 `compose.release.yaml`，复用Unraid现有PG14；操作步骤见[部署手册](deploy/remote-docker.md)。不要将原`compose.yaml`与此配置混用。
 
-API异常退出自动恢复、HTTPS浏览器登录及手机确认已验证；长期锁屏/移动网络测试等剩余项见交付矩阵。使用ntfy原生应用，不开发配套APK。
+API异常退出自动恢复、HTTPS浏览器登录及手机确认已验证；锁屏验收由用户确认通过，整机重启测试按用户要求取消，详见交付矩阵。使用ntfy原生应用，不开发配套APK。
 
 ## 复用项目
 

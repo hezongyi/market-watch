@@ -6,8 +6,8 @@ if [[ "${1:-}" != "--install-only" || "$#" != 1 ]]; then
   exit 2
 fi
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-if [[ "$repo_dir" != /home/quant/repos/trading-alerts ]]; then
-  printf '%s\n' 'Service paths are specific to /home/quant/repos/trading-alerts; review units before installing elsewhere.' >&2
+if [[ "$repo_dir" != /home/quant/repos/market-watch ]]; then
+  printf '%s\n' 'Service paths are specific to /home/quant/repos/market-watch; review units before installing elsewhere.' >&2
   exit 1
 fi
 unit_dir="$HOME/.config/systemd/user"

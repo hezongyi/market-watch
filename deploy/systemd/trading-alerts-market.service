@@ -4,8 +4,8 @@ After=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/quant/repos/trading-alerts
-ExecStart=/home/quant/repos/trading-alerts/.venv/bin/python -m alerts.market
+WorkingDirectory=/home/quant/repos/market-watch
+ExecStart=/home/quant/repos/market-watch/.venv/bin/python -m alerts.market
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30

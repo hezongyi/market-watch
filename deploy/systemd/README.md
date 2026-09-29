@@ -1,13 +1,13 @@
 # 本机后台进程守护
 
-这些服务文件针对 `/home/quant/repos/trading-alerts`，使用当前 `.env`。API和构建后的网站统一监听8080。部署前在web目录执行npm ci与npm run build；局域网HTTP阶段使用非Secure cookie，公开URL必须对应实际访问地址。
+这些服务文件针对 `/home/quant/repos/market-watch`，使用当前 `.env`。API和构建后的网站统一监听8080。部署前在web目录执行npm ci与npm run build；局域网HTTP阶段使用非Secure cookie，公开URL必须对应实际访问地址。
 
 ## 安装步骤
 
 当前环境只允许代理写入仓库和 `/tmp`，无法写入 `~/.config/systemd/user`。安装脚本已经准备好，需要在本机 quant 用户自己的终端执行：
 
 ```bash
-bash /home/quant/repos/trading-alerts/deploy/systemd/install.sh --install-only
+bash /home/quant/repos/market-watch/deploy/systemd/install.sh --install-only
 ```
 
 该步骤保存已有同名服务文件的备份、安装四个运行服务及每日备份定时器，并设置开机启用，**不会启动/停止现有进程**。完成后先核对安装结果，再安排将开发进程切换至 systemd，避免重复 worker。不要在切换完成前重启主机。当前查询 `Linger=yes`；启用与 lingering 并不能替代重启后实测。

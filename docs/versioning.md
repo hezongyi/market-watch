@@ -26,3 +26,11 @@
 `.env`、artifacts中的凭据、数据库及备份不提交Git；`.env.example`只保留示例。新增秘密文件也需排除。公开仓库前必须单独检查整个历史中的敏感信息。
 
 生产配置与数据库备份保存在`/mnt/user/backup/trading-alerts`；凭据与数据恢复按备份指南处理，不依赖源码仓库。
+
+## v1.0.1 项目改名
+
+项目名为`market-watch`，网站继续显示“守望 · Market Watch”，本地目录为`/home/quant/repos/market-watch`。Python发行包名为`market-watch`，内部导入仍为`alerts`。现有`ALERTS_*`配置、生产数据库、Docker服务和部署/备份目录均保留原标识。
+
+v1.0.1仅发布本地源码标签，未部署；生产镜像仍以`deploy/releases/v1.0.0.json`为准。本版本没有新的生产镜像清单，后续部署时再生成真实镜像映射。远端由用户自行配置和推送。
+
+本地目录迁移同时更新虚拟环境脚本中的绝对路径并重新安装可编辑包；其他开发机首次检出应按README新建虚拟环境。历史验收记录及旧标签保持原样。
