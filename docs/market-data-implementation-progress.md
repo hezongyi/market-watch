@@ -430,3 +430,9 @@
 - 首次混合8图（EURUSD/XAUUSD/BTCUSDT/NZDUSD，M5/M15/M30）最终品种周期和范围均有效，但pageerror包含undefined、Value is null、Value is undefined，因此失败，不将范围有效认定通过。
 - 按公开d.ts要求将批量setSymbol/setResolution改为Promise接口并指定doNotActivateChart:true；重跑空值异常未再出现，但仍有两条undefined且stack为空，pageerror断言仍失败。不能据一次重跑确认因果或宣布修复。
 - 失败复现保留web/tests/advanced-mixed-panes.browser.cjs；本地日志/tmp/mw-mixed-panes.log及/tmp/mw-mixed-panes-recheck.log。下一步捕获unhandledrejection具体来源，区分库同步/历史刷新竞争。
+
+### 混合多图异常阶段定位
+
+- 对同一失败用例增加临时unhandledrejection记录及阶段标记。布局从1切8前后pageerror均为0；切换第0窗格EURUSD后，切换第1窗格XAUUSD期间出现两次blob库iframe的Promise拒绝，reason与stack均undefined。其他窗格仍完成切换。
+- 证据将排查范围收敛至不同品种切换/原生视区同步过程；未证明具体根因。下一步双图最小复现并对照时间范围同步设置。
+- 临时探针留/tmp/mw-mixed-instrumented.cjs，日志/tmp/mw-mixed-instrumented.log；仓库测试中的临时DEBUG标记已去除，未隐藏pageerror断言。
