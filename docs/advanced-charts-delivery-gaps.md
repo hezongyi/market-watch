@@ -243,3 +243,10 @@
 - backend/alerts/chart_export.py实现行情页+Python指标结果编码：UTC原始起止时间与毫秒值、价格口径、日历、OHLC原始精度、可用volume、complete/revision，指标按K线时间对齐，预热空值及缺失volume留空。输出UTF-8 BOM；拒绝重复/乱序行情，避免电子表格解释用户文本为公式。
 - backend/tests/test_chart_export.py通过，ruff检查通过。当前仅完成编码层，尚未API/界面接入；不把可用缓存等同指定区间完整数据。接入前必须复用历史覆盖检查/补数流程、限制导出范围和处理失败。
 - 原生内置指标导出限制尚未由用户确认接受，仍保留缺口；Python结果通路可复用现有计算，不重写指标算法。
+
+### 替代导出API与覆盖门槛
+
+- 新增认证POST /api/charts/export，指定instrument/timeframe/start/end和Python指标；时间范围按K线start落入半开区间筛选。使用现有品种resolve、queue_history/covers_interval，向完整桶边界规划原始历史覆盖，末端不超过已可获取分钟。
+- 覆盖不足返回202 pending及任务ID，失败返回409及失败任务ID；不会返回CSV伪装完整下载。覆盖完成后复用charts data指标计算结果并CSV编码，no-store及attachment响应。
+- 初始单次2000根/366天界限明确返回413/422，不静默截断。跨页大导出和下载界面仍需接入/完善；CSV模块没有供应库依赖。
+- 新增认证、已有K线但覆盖不足、覆盖完成CSV内容、非法范围验收；test_chart_export.py与test_chart_workspace.py合计21 passed（/tmp/mw-export-api-tests.log），ruff检查通过。测试覆盖门槛使用可控覆盖返回，真实补数到下载的浏览器整链路尚未验证。

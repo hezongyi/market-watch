@@ -10,6 +10,7 @@ from collections import OrderedDict
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import delete, func, select, update
 
@@ -55,6 +56,14 @@ class DataQuery(BaseModel):
     track_history: bool = False
     revision_before: int | None = Field(default=None, gt=0)
     revision_after: int | None = Field(default=None, ge=0)
+
+
+class ExportQuery(BaseModel):
+    instrument: str = Field(max_length=80)
+    timeframe: str
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    indicators: list[dict] = Field(default_factory=list, max_length=12)
 
 
 def history_check(db, inst, source, visible, body):
@@ -205,6 +214,72 @@ def router(authenticated):
     @r.get("/catalog")
     def catalog():
         return {"frames": FRAMES, "indicators": CATALOG}
+
+    @r.post("/export")
+    def export(body: ExportQuery):
+        from .chart_data import bounds
+        from .chart_export import chart_csv
+        from .coverage import covers_interval
+        from .domain import bucket_bounds
+        from .market_data import queue_history, resolve
+        from .storage import ms
+
+        if body.timeframe not in FRAMES or not 0 < body.end - body.start <= 366 * 86400000:
+            raise HTTPException(422, "请选择有效周期及不超过366天的导出范围")
+        try:
+            for spec in body.indicators:
+                validate(spec)
+        except (ValueError, TypeError, KeyError, AttributeError) as error:
+            raise HTTPException(422, str(error)) from error
+        with transaction() as db:
+            inst = resolve(db, body.instrument)
+            calendar = Calendar(inst.calendar)
+            boundary = bounds if body.timeframe in ("M30", "W1", "MN") else bucket_bounds
+            left = ms(boundary(instant(body.start), body.timeframe, calendar)[0])
+            right = min(
+                ms(boundary(instant(body.end - 1), body.timeframe, calendar)[1]),
+                (now_ms() - 5000) // 60000 * 60000,
+            )
+            if left >= right:
+                raise HTTPException(422, "导出范围尚无可获取的行情")
+            jobs, coverage = queue_history(db, inst, left, right)
+            if not covers_interval(coverage, left, right):
+                failed = [job for job in jobs if job.status == "failed"]
+                return JSONResponse(
+                    status_code=409 if failed else 202,
+                    content={
+                        "status": "error" if failed else "pending",
+                        "task_ids": [
+                            job.id for job in jobs if job.status in ("pending", "running")
+                        ],
+                        "failed_task_ids": [job.id for job in failed],
+                        "retry_after": 2,
+                        "message": "历史补数失败，请重试"
+                        if failed
+                        else "正在补齐导出范围内的历史行情",
+                    },
+                )
+            instrument = inst.id
+        page = data(
+            DataQuery(
+                instrument=instrument,
+                timeframe=body.timeframe,
+                before=body.end,
+                limit=2000,
+                indicators=body.indicators,
+            )
+        )
+        if len(page["bars"]) == 2000 and page["bars"][0]["start"] > body.start:
+            raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
+        page["bars"] = [bar for bar in page["bars"] if body.start <= bar["start"] < body.end]
+        return Response(
+            chart_csv(page, instrument=instrument, timeframe=body.timeframe),
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": 'attachment; filename="market-watch.csv"',
+                "Cache-Control": "no-store",
+            },
+        )
 
     @r.get("/workspaces")
     def listing():
