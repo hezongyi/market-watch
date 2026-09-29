@@ -37,6 +37,28 @@ tick();
     context,
   );
   assert.deepEqual(events, ["cache:5", "chart:0"]);
+  events.length = 0;
+  await vm.runInContext(
+    `
+subscriptions.delete('hour');
+query = async()=>({bars:[],history_check:{before:100,next_before:100,revision:'a',next_revision:'a'}});
+tick();`,
+    context,
+  );
+  await vm.runInContext(
+    `
+query = async()=>({bars:[],history_check:{before:100,next_before:200,revision:'a',next_revision:'b'}});
+tick();`,
+    context,
+  );
+  assert.deepEqual(events, []);
+  await vm.runInContext(
+    `
+query = async()=>({bars:[],history_check:{before:200,next_before:200,revision:'changed',next_revision:'changed'}});
+tick();`,
+    context,
+  );
+  assert.deepEqual(events, ["cache:5", "chart:0"]);
   console.log(
     "Historical reload invalidates matching cache before resetting only matching panes",
   );

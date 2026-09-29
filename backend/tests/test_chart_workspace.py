@@ -400,3 +400,59 @@ def test_invalid_position_and_layout(database):
     }
     with pytest.raises(ValueError, match="止损"):
         checked(document)
+
+
+@pytest.mark.parametrize("indicators", [[], [{"name": "EMA", "params": {"period": 2}}]])
+def test_live_history_check_ignores_tail_but_detects_older_changes(database, indicators):
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with database.begin() as db:
+            for i in range(1, 5):
+                db.add(
+                    Bar(
+                        instrument_id="BTCUSDT",
+                        timeframe="M1",
+                        start=i * 60000,
+                        end=(i + 1) * 60000,
+                        open=100,
+                        high=100,
+                        low=100,
+                        close=100,
+                        complete=True,
+                    )
+                )
+        with TestClient(api_module.app) as client:
+            args = {"instrument": "BTCUSDT", "timeframe": "M1", "limit": 3, "track_history": True}
+            initial = client.post("/api/charts/data", json=args).json()["history_check"]
+            with database.begin() as db:
+                tail = db.query(Bar).filter_by(start=240000).one()
+                tail.close = 101
+                tail.high = 101
+                tail.revision += 1
+                tail.received_at += 1
+                db.add(
+                    Bar(
+                        instrument_id="BTCUSDT",
+                        timeframe="M1",
+                        start=300000,
+                        end=360000,
+                        open=101,
+                        high=101,
+                        low=101,
+                        close=101,
+                        complete=True,
+                    )
+                )
+            args["revision_before"] = initial["next_before"]
+            current = client.post("/api/charts/data", json=args).json()["history_check"]
+            assert current["revision"] == initial["next_revision"]
+            assert current["next_before"] == 300000
+            with database.begin() as db:
+                old = db.query(Bar).filter_by(start=60000).one()
+                old.close = 99
+                old.low = 99
+                old.revision += 1
+            revised = client.post("/api/charts/data", json=args).json()["history_check"]
+            assert revised["revision"] != initial["next_revision"]
+    finally:
+        api_module.app.dependency_overrides.clear()

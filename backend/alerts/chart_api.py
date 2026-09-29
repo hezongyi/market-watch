@@ -52,6 +52,34 @@ class DataQuery(BaseModel):
     before: int | None = Field(default=None, gt=0)
     limit: int = Field(default=500, ge=1, le=2000)
     indicators: list[dict] = Field(default_factory=list, max_length=12)
+    track_history: bool = False
+    revision_before: int | None = Field(default=None, gt=0)
+
+
+def history_check(db, inst, source, visible, body):
+    """Compare a stable prefix, excluding the last streamed candle and new appends."""
+    if not body.track_history or not visible:
+        return None
+    next_before = visible[-1]["start"]
+    before = body.revision_before or next_before
+
+    def fingerprint(boundary):
+        stamp = db.execute(
+            select(func.count(Bar.id), func.sum(Bar.revision), func.max(Bar.received_at)).where(
+                Bar.instrument_id == inst.id, Bar.timeframe == source, Bar.start < boundary
+            )
+        ).one()
+        return hashlib.sha256(
+            json.dumps([list(stamp), inst.calendar_profile], sort_keys=True).encode()
+        ).hexdigest()
+
+    revision = fingerprint(before)
+    return {
+        "before": before,
+        "revision": revision,
+        "next_before": next_before,
+        "next_revision": revision if next_before == before else fingerprint(next_before),
+    }
 
 
 def checked(document):
@@ -316,6 +344,7 @@ def router(authenticated):
                         )
                     )
                     return {
+                        "history_check": history_check(db, inst, source, visible, body),
                         "history_revision": str(revision_at or 0),
                         "bars": visible,
                         "indicators": [],
@@ -414,6 +443,7 @@ def router(authenticated):
                         }
                     )
                 return {
+                    "history_check": history_check(db, inst, source, visible, body),
                     "history_revision": hashlib.sha256(
                         json.dumps(
                             [stamp[0], stamp[2], stamp[3], inst.calendar_profile], sort_keys=True

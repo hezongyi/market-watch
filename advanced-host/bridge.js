@@ -310,24 +310,30 @@ async function tick() {
         "market",
       );
       try {
-        const result = await query(first.symbol, first.res, { limit: 3 });
+        const result = await query(first.symbol, first.res, {
+          limit: 3,
+          track_history: true,
+          ...(first.historyBefore
+            ? { revision_before: first.historyBefore }
+            : {}),
+        });
         const bars = barsOf(result, first.res, first.symbol);
+        const check = result.history_check;
+        let needsReload = false;
         for (const sub of group) {
-          if (sub.revision && sub.revision !== result.history_revision) {
-            sub.reset();
-            // Historical changes require a reload, never older bars in the realtime callback.
-            for (let i = 0; i < widget.chartsCount(); i++) {
-              const c = widget.chart(i);
-              if (
-                c.symbol() === decode(sub.symbol).symbol &&
-                c.resolution() === sub.res
-              )
-                c.resetData();
-            }
-            sub.revision = result.history_revision;
+          const changed =
+            check &&
+            sub.historyBefore === check.before &&
+            sub.historyRevision &&
+            sub.historyRevision !== check.revision;
+          if (check) {
+            sub.historyBefore = check.next_before;
+            sub.historyRevision = check.next_revision;
+          }
+          if (changed) {
+            needsReload = true;
             continue;
           }
-          sub.revision = result.history_revision;
           if (!sub.last && bars.length) sub.last = bars.at(-1).time;
           for (const bar of bars)
             if (bar.time >= sub.last) {
@@ -335,6 +341,7 @@ async function tick() {
               sub.last = bar.time;
             }
         }
+        if (needsReload) reloadHistory(decode(first.symbol).symbol, first.res);
       } catch (e) {
         send({ type: "error", error: String(e) });
       }

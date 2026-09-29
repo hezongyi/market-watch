@@ -255,6 +255,9 @@ export default function AdvancedWorkspace() {
           q.limit > 2000 ||
           (q.before !== undefined &&
             (!Number.isSafeInteger(q.before) || q.before <= 0)) ||
+          (q.revision_before !== undefined &&
+            (!Number.isSafeInteger(q.revision_before) ||
+              q.revision_before <= 0)) ||
           inflight.current >= 8
         ) {
           reply({ type: "result", id: m.id, error: "请求不在允许范围内" });
@@ -271,6 +274,10 @@ export default function AdvancedWorkspace() {
               limit: q.limit,
               indicators: q.indicators || [],
               ...(q.before ? { before: q.before } : {}),
+              track_history: q.track_history === true,
+              ...(q.revision_before
+                ? { revision_before: q.revision_before }
+                : {}),
             }),
           });
         } catch (e) {
