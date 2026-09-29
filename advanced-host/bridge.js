@@ -308,13 +308,29 @@ const feed = {
   unsubscribeBars: (id) => subscriptions.delete(id),
 };
 let polling = false;
+function chartUsesSymbol(chart, symbol, res) {
+  if (chart.resolution() !== res) return false;
+  if (chart.symbol() === symbol) return true;
+  for (const study of chart.getAllStudies?.() || []) {
+    try {
+      const inputs = chart.getStudyById(study.id).getInputValues();
+      if (
+        inputs.some((input) => input.id === "symbol" && input.value === symbol)
+      )
+        return true;
+    } catch {
+      // A study can disappear while its outstanding request completes.
+    }
+  }
+  return false;
+}
 function hasHistoryViewer(args) {
   if (!ready) return true;
   for (let i = 0; i < widget.chartsCount(); i++) {
     const chart = widget.chart(i);
     if (
-      chart.symbol() === args.instrument &&
-      frames[chart.resolution()] === args.timeframe
+      frames[chart.resolution()] === args.timeframe &&
+      chartUsesSymbol(chart, args.instrument, chart.resolution())
     )
       return true;
   }
@@ -327,8 +343,7 @@ function reloadHistory(symbol, res) {
   if (!ready) return;
   for (let i = 0; i < widget.chartsCount(); i++) {
     const chart = widget.chart(i);
-    if (chart.symbol() === symbol && chart.resolution() === res)
-      chart.resetData();
+    if (chartUsesSymbol(chart, symbol, res)) chart.resetData();
   }
 }
 async function tick() {

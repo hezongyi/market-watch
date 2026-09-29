@@ -144,3 +144,10 @@
 - 移除验证阶段禁用header_compare和show_object_tree的配置，保留库原生呈现。
 - 使用公开compare_symbols配置现有EURUSD、XAUUSD、BTCUSDT候选；实际浏览器比较弹窗显示三品种及Datafeed解析出的来源、价格口径，对象树显示当前主图，无页面异常。
 - 自动保存和历史刷新JS回归通过。此证据仅证明入口/候选解析可用；叠加后的异步历史补齐、跨session对齐、保存恢复仍需验证，尚未宣称比较功能完整验收。
+
+### 比较品种补数需求识别
+
+- 回归复现比较品种不是主图品种时，被hasHistoryViewer误判无使用者而取消等待。现使用公开getAllStudies/getStudyById/getInputValues识别symbol输入；刷新同样覆盖真正使用该品种的图表。
+- JS测试确认比较品种继续轮询且完成后重载对应图表，自动保存回归仍通过。
+- 真实浏览器在NZD/USD M5添加原生Compare EURUSD，实际输入symbol=EURUSD、tracked=true；历史请求pending301→ready301，随后charts/data返回301根，无页面异常或可见错误。
+- 跨session数值对齐与比较对象保存恢复仍待验收；此次未修改库内部实现。

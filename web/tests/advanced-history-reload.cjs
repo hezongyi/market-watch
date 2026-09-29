@@ -99,6 +99,20 @@ retryCallback(true);`,
   );
   assert.deepEqual(events, ["dialog", "retry:job"]);
   assert.equal(vm.runInContext("pendingHistory.size", context), 1);
+  events.length = 0;
+  await vm.runInContext(
+    `
+pendingHistory.clear();
+widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
+  getAllStudies:()=>[{id:'comparison',name:'Compare'}],
+  getStudyById:()=>({getInputValues:()=>[{id:'symbol',value:'XAUUSD'}]}),
+  resetData:()=>events.push('comparison-chart')})};
+pendingHistory.set('compare',{instrument:'XAUUSD',timeframe:'M5'});
+request=async()=>{events.push('history');return {status:'ready'}};
+tick();`,
+    context,
+  );
+  assert.deepEqual(events, ["history", "comparison-chart"]);
   console.log(
     "Historical reload invalidates matching cache before resetting only matching panes",
   );
