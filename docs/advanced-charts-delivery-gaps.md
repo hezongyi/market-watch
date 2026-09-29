@@ -265,3 +265,10 @@
 - /tmp/mw-export-retry-cancel.log退出0：受控失败→点击重试→pending→CSV下载；再次pending时Escape关闭，跨过轮询间隔后请求数不增加、下载总数仍为1。前端构建通过（/tmp/mw-export-retry-build.log）。
 - 开发API原PID2212692使用.env配置；先由同环境Settings确认数据库trading_alerts_dev且delivery_enabled=false，再有序重启为PID2496024加载导出接口。未改生产环境。
 - 真实认证HTTP导出EURUSD M5 2026-09-28 12:00..13:00 UTC返回200，CSV12行、时间半开边界及EMA(20)非空值检查通过，文件/tmp/mw-real-export.csv。该区间已有覆盖，仅证明真实缓存命中API链路，不代表冷加载补数/指标独立数值对照已完成。
+
+### 真实冷历史到CSV验收
+
+- 在trading_alerts_dev只读检查stored_coverage：EURUSD 2025-06-03 12:00..13:00 UTC无覆盖，未删除或篡改既有数据来制造冷缓存。开发chart_history_worker PID1985819实际运行。
+- 真实认证POST /api/charts/export请求该小时M1，不拦截接口：首次202，2.0秒后200（/tmp/mw-export-cold-live.log退出0）。worker拉取后的CSV严格60行，start_ms为请求小时每分钟连续序列，全部complete=true，文件/tmp/mw-cold-export.csv。
+- 新增scripts/verify_csv_export.py：固定本地开发API，密码从环境指定的凭据文件读取；--require-pending要求观察真实pending，普通模式验证缓存命中。已缓存区间复测退出0（/tmp/mw-export-script-warm.log），ruff通过。用户选择的日期应为完整交易小时；休市不应期待60根。
+- 该证据关闭小范围真实补数→覆盖完成→CSV响应链路的不确定性；网页到真实接口的下载、多个周期/指标参数及大范围性能仍独立验收，不能把M1一小时推广为全部导出场景。
