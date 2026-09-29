@@ -424,3 +424,9 @@
 - 当前后端完整测试集142 passed / 5 skipped，耗时6.04秒；有一条FastAPI TestClient依赖弃用警告。跳过项涉及需专用PostgreSQL测试连接/环境的测试，不能据此认定这些集成门禁通过。
 - 原生工作区、自动保存、历史去重、历史刷新、偏好、自选列表和Python适配七个JS回归脚本均通过。
 - 该轮用于核查近期变更影响，不代表历史拖动/高周期性能、8图同步或最终原生UI已经完成验收。
+
+### 混合8图未通过与诊断进展
+
+- 首次混合8图（EURUSD/XAUUSD/BTCUSDT/NZDUSD，M5/M15/M30）最终品种周期和范围均有效，但pageerror包含undefined、Value is null、Value is undefined，因此失败，不将范围有效认定通过。
+- 按公开d.ts要求将批量setSymbol/setResolution改为Promise接口并指定doNotActivateChart:true；重跑空值异常未再出现，但仍有两条undefined且stack为空，pageerror断言仍失败。不能据一次重跑确认因果或宣布修复。
+- 失败复现保留web/tests/advanced-mixed-panes.browser.cjs；本地日志/tmp/mw-mixed-panes.log及/tmp/mw-mixed-panes-recheck.log。下一步捕获unhandledrejection具体来源，区分库同步/历史刷新竞争。
