@@ -117,7 +117,8 @@ const fs = require("fs");
   await page.getByRole("button", { name: "新建工作区", exact: true }).click();
   await page.locator('iframe[title="专业图表工作区"]').waitFor();
   await page.waitForFunction(
-    () => document.querySelector("iframe[data-workspace-id]")?.dataset.workspaceId,
+    () =>
+      document.querySelector("iframe[data-workspace-id]")?.dataset.workspaceId,
   );
   const id = await page
     .locator("iframe[data-workspace-id]")

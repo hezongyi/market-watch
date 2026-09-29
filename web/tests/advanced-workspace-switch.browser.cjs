@@ -168,8 +168,13 @@ const fs = require("fs");
     result,
   );
   assert.equal(
-    await page.evaluate(async (id) =>
-      (await (await fetch("/api/advanced-charts/workspaces")).json()).some(row => row.id === id), result.b),
+    await page.evaluate(
+      async (id) =>
+        (await (await fetch("/api/advanced-charts/workspaces")).json()).some(
+          (row) => row.id === id,
+        ),
+      result.b,
+    ),
     false,
   );
   assert.equal(

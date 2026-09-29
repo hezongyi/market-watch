@@ -635,3 +635,9 @@
 - iframe增加data-workspace-id反映父页面当前实际工作区；删除/切换/空状态回归不再依赖已移除的外层select，列表删除检查改读服务端记录。
 - 原生复制/重命名核验库layoutName和API身份；`/tmp/mw-native-rename-clean.log` session54372退出0，同UUID重命名及刷新恢复通过。
 - 前端build退出0。其余迁移后的删除/切换/空状态/复制测试尚未重跑，不能把静态迁移视为这些流程已复验。
+
+### 原生工作区回归通过
+
+- 移除外层工具栏后的实际浏览器复跑：`/tmp/mw-copy-clean.log` 原生复制新UUID并刷新恢复通过；`/tmp/mw-switch-clean.log` A/B切换、版本递增、删除非活动工作区、iframe保持通过且errors为空；`/tmp/mw-delete-clean.log` 删除活动工作区后加载另一工作区并保存成功。顺序执行session19959已退出0，各日志成功结尾已核对。
+- backend/test_advanced_workspace.py三项通过。
+- 空列表与手机只读回归已顺序启动，日志 `/tmp/mw-empty-clean.log`、`/tmp/mw-mobile-clean.log`，session82820最后确认仍运行；不得提前记为通过。
