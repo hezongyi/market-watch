@@ -312,3 +312,26 @@ def test_quotes_preserve_basis_and_do_not_invent_missing_prices(database):
             assert result[1]["s"] == "error" and "lp" not in result[1]["v"]
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_quote_subscription_renews_deduplicated_demand(database):
+    from alerts.storage import MarketDemand, now_ms
+
+    with database.begin() as db:
+        db.get(Instrument, "EURUSD").source = "oanda"
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            for _ in range(2):
+                response = client.post(
+                    "/api/market-data/quotes",
+                    json={"symbols": ["EURUSD", "EURUSD", "UNKNOWN"], "client": "quote-test"},
+                )
+                assert response.status_code == 200
+            with database.begin() as db:
+                leases = list(db.scalars(select(MarketDemand)))
+                assert len(leases) == 1
+                assert leases[0].instrument_id == "EURUSD"
+                assert now_ms() < leases[0].expires <= now_ms() + 120000
+    finally:
+        api_module.app.dependency_overrides.clear()

@@ -374,7 +374,7 @@ async function tick() {
             ...(await request(
               {
                 op: "quotes",
-                args: { symbols: quoteSymbols.slice(i, i + 100) },
+                args: { symbols: quoteSymbols.slice(i, i + 100), client: clientId },
               },
               "market",
             )),

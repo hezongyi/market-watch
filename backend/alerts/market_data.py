@@ -140,6 +140,19 @@ class Activity(BaseModel):
 
 class QuoteQuery(BaseModel):
     symbols: list[str] = Field(min_length=1, max_length=100)
+    client: str | None = Field(default=None, min_length=1, max_length=40)
+
+
+def renew_demand(db, client, inst):
+    import hashlib
+
+    ident = hashlib.sha256((client + "|" + inst.id).encode()).hexdigest()[:40]
+    demand = db.get(MarketDemand, ident)
+    if not demand:
+        demand = MarketDemand(id=ident, instrument_id=inst.id)
+        db.add(demand)
+    demand.expires = now_ms() + 120000
+    demand.updated_at = now_ms()
 
 
 def router(authenticated):
@@ -153,6 +166,15 @@ def router(authenticated):
                 if len(ident) > 80:
                     raise HTTPException(422, "无效品种")
                 inst = db.get(Instrument, ident)
+                if body.client:
+                    try:
+                        inst = resolve(db, ident)
+                    except HTTPException:
+                        result.append(
+                            {"s": "error", "n": ident, "v": {"description": "品种暂不可用"}}
+                        )
+                        continue
+                    renew_demand(db, body.client, inst)
                 bar = (
                     db.scalar(
                         select(Bar)
@@ -246,16 +268,7 @@ def router(authenticated):
     def activity(body: Activity):
         with transaction() as db:
             inst = resolve(db, body.instrument)
-            # IDs belong to one client+instrument, so eight charts cannot extend a different lease.
-            import hashlib
-
-            ident = hashlib.sha256((body.client + "|" + inst.id).encode()).hexdigest()[:40]
-            demand = db.get(MarketDemand, ident)
-            if not demand:
-                demand = MarketDemand(id=ident, instrument_id=inst.id)
-                db.add(demand)
-            demand.expires = now_ms() + 120000
-            demand.updated_at = now_ms()
+            renew_demand(db, body.client, inst)
         return {"ok": True}
 
     @r.post("/history")
