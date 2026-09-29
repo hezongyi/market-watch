@@ -219,3 +219,35 @@ def test_export_cold_windows_advance_without_treating_empty_time_as_bars(databas
             assert len(queued) == 3, "complete cached coverage must not schedule again"
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_export_reuses_pending_window_and_reports_failed_job(database):
+    from alerts import api as api_module
+    from alerts.storage import ImportJob
+    from fastapi.testclient import TestClient
+    from sqlalchemy import select
+
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            body = dict(instrument="BTCUSDT", timeframe="M1", start=0, end=365 * 86400000)
+            first = client.post("/api/charts/export", json=body)
+            second = client.post("/api/charts/export", json=body)
+            assert first.status_code == second.status_code == 202
+            assert first.json()["task_ids"] == second.json()["task_ids"]
+            assert len(first.json()["task_ids"]) == 1
+            ident = first.json()["task_ids"][0]
+            with database.begin() as db:
+                jobs = db.scalars(select(ImportJob)).all()
+                assert len(jobs) == 1
+                assert jobs[0].start == body["end"] - 4000 * 60000
+                jobs[0].status = "failed"
+                jobs[0].error = "test provider unavailable"
+            failed = client.post("/api/charts/export", json=body)
+            assert failed.status_code == 409
+            assert failed.json()["failed_task_ids"] == [ident]
+            assert failed.json()["task_ids"] == []
+            with database() as db:
+                assert len(db.scalars(select(ImportJob)).all()) == 1
+    finally:
+        api_module.app.dependency_overrides.clear()
