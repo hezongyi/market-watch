@@ -84,24 +84,71 @@ const fs = require("fs");
   await page.goto("http://127.0.0.1:5188/advanced-charts");
   await page.waitForTimeout(15000);
   let frame = page.frames().find((f) => f.url().includes(":5187/?"));
-  const drawn = await frame.evaluate(async () => {
-    const c = widget.chart(0),
-      r = c.getVisibleRange();
-    await c.createShape(
-      { time: r.to - 3600, price: 0.565 },
-      { shape: "horizontal_line" },
+  let drawn;
+  if (process.env.MARKET_WATCH_MOUSE_DRAWING === "1") {
+    const ui = frame.childFrames()[0];
+    const pane = await ui.locator(".chart-container").first().boundingBox();
+    require("node:assert/strict").ok(pane && pane.width > 0);
+    await frame.evaluate(() => widget.selectLineTool("trend_line"));
+    await page.mouse.click(
+      pane.x + pane.width * 0.3,
+      pane.y + pane.height * 0.6,
     );
-    await c.createMultipointShape(
-      [
-        { time: r.to - 7200, price: 0.563 },
-        { time: r.to - 3600, price: 0.566 },
-      ],
-      { shape: "trend_line" },
+    await page.mouse.move(
+      pane.x + pane.width * 0.65,
+      pane.y + pane.height * 0.35,
+      { steps: 12 },
     );
-    return c
-      .getAllShapes()
-      .map((x) => ({ name: x.name, points: c.getShapeById(x.id).getPoints() }));
-  });
+    await page.mouse.click(
+      pane.x + pane.width * 0.65,
+      pane.y + pane.height * 0.35,
+    );
+    await page.keyboard.press("Escape");
+    await frame.waitForFunction(
+      () => widget.chart(0).getAllShapes().length === 1,
+    );
+    drawn = await frame.evaluate(() => {
+      const c = widget.chart(0);
+      return c
+        .getAllShapes()
+        .map((shape) => ({
+          name: shape.name,
+          points: c.getShapeById(shape.id).getPoints(),
+        }));
+    });
+    require("node:assert/strict").equal(drawn[0].name, "trend_line");
+    require("node:assert/strict").equal(drawn[0].points.length, 2);
+    require("node:assert/strict").notEqual(
+      drawn[0].points[0].time,
+      drawn[0].points[1].time,
+    );
+    require("node:assert/strict").notEqual(
+      drawn[0].points[0].price,
+      drawn[0].points[1].price,
+    );
+    await page.screenshot({ path: "/tmp/mw-mouse-trendline.png" });
+  } else
+    drawn = await frame.evaluate(async () => {
+      const c = widget.chart(0),
+        r = c.getVisibleRange();
+      await c.createShape(
+        { time: r.to - 3600, price: 0.565 },
+        { shape: "horizontal_line" },
+      );
+      await c.createMultipointShape(
+        [
+          { time: r.to - 7200, price: 0.563 },
+          { time: r.to - 3600, price: 0.566 },
+        ],
+        { shape: "trend_line" },
+      );
+      return c
+        .getAllShapes()
+        .map((x) => ({
+          name: x.name,
+          points: c.getShapeById(x.id).getPoints(),
+        }));
+    });
   console.log("DRAWN", JSON.stringify(drawn));
   await page.waitForTimeout(10000);
   await frame.evaluate(
@@ -182,6 +229,7 @@ const fs = require("fs");
   );
   await page.screenshot({ path: "/tmp/mw-demand.png" });
   console.log({ errors });
+  require("node:assert/strict").deepEqual(errors, []);
   await browser.close();
 })().catch((e) => {
   console.error(e);

@@ -93,3 +93,10 @@
 - 扩展advanced-drawing-sync.browser.cjs：NZDUSD的M5/M15同工作区水平线新增、修改、删除同步；切换其中一图到XAUUSD后该画线不可见，切回NZDUSD恢复对应价格，通过（/tmp/mw-drawing-symbol-isolation.log）。
 - 创建并保存原工作区水平线0.569后，通过原生顶栏按钮新建B，B切到相同NZDUSD仍无画线；通过原生加载接口切回原工作区，两图均恢复0.569水平线，页面异常为空（/tmp/mw-drawing-workspace-isolation.log）。
 - 该证据使用公开绘图API创建对象，证明共享/隔离/持久化，不代替工具栏鼠标实际绘制或所有绘图工具的数值验证。
+
+### 实际鼠标绘制趋势线
+
+- advanced-drawings.browser.cjs增加MARKET_WATCH_MOUSE_DRAWING=1：通过公开selectLineTool选择原生趋势线工具，然后真实鼠标点击两个不同位置创建线段；未调用createShape/createMultipointShape来替代鼠标定位。
+- 截图/tmp/mw-mouse-trendline.png已人工检查，端点及线段正常显示。刷新后两端点时间/价格完全一致，M5→M15按对应K线时间定位，切回M5还原原始端点。
+- 首轮断言日志完成但进程exit143，未计为完整通过；复跑/tmp/mw-mouse-drawing-confirmed.log退出0，页面异常为空，整轮通过。
+- 该证据覆盖趋势线鼠标落点、保存及跨周期恢复；工具选择本身调用公开API，尚不证明所有原生工具菜单点击路径。盈亏比数值和其余工具交互继续独立验收。
