@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Market Watch 图表</title>
+    <style>
+      html,
+      body,
+      #chart {
+        margin: 0;
+        height: 100%;
+        background: #0f0f0f;
+      }
+      #error {
+        color: #f88;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="error" role="alert"></div>
+    <div id="chart"></div>
+    <script src="/charting_library/charting_library.js"></script>
+    <script src="/indicators.js"></script>
+    <script src="/bridge.js"></script>
+  </body>
+</html>

@@ -365,3 +365,12 @@ class ChartTemplate(Base):
     id: Mapped[str] = mapped_column(String(40), primary_key=True, default=uid)
     name: Mapped[str] = mapped_column(String(100))
     indicators: Mapped[list] = mapped_column(JSON, default=list)
+
+
+class AdvancedWorkspace(Base):
+    __tablename__ = "advanced_chart_workspaces"
+    id: Mapped[str] = mapped_column(String(40), primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(100))
+    document: Mapped[dict] = mapped_column(JSON, default=dict)
+    revision: Mapped[int] = mapped_column(default=1)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)

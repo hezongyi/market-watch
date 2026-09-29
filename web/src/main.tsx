@@ -51,6 +51,7 @@ const statusNames: Record<string, string> = {
   paused: "数据暂停",
 };
 const ChartWorkspacePage = lazy(() => import("./charts/Workspace"));
+const AdvancedWorkspacePage = lazy(() => import("./advanced/AdvancedWorkspace"));
 const frames = ["M1", "M5", "M15", "H1", "H4", "D1"];
 
 function App() {
@@ -137,6 +138,8 @@ function App() {
         </section>
       </main>
     );
+  if (appLocation.pathname === "/advanced-charts")
+    return <Suspense fallback={<div className="loading">正在加载专业图表…</div>}><AdvancedWorkspacePage /></Suspense>;
   if (appLocation.pathname.startsWith("/chart-workspaces"))
     return (
       <Suspense fallback={<div className="loading">正在加载图表工作区…</div>}>
@@ -244,6 +247,7 @@ function Shell({ logout }: { logout: () => void }) {
           {[
             ["/", "行情与监控", Activity],
             ["/chart-workspaces", "图表工作区", Square],
+            ["/advanced-charts", "专业图表（验证版）", Square],
             ["/signals", "信号中心", Bell],
             ["/replay", "历史演练", Clock3],
             ["/settings", "提醒与设置", Settings2],

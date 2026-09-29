@@ -1094,3 +1094,6 @@ def seek(run_id: str, body: SeekInput):
 from .chart_api import router as chart_router  # noqa: E402
 
 app.include_router(chart_router(authenticated))
+
+from .advanced_api import router as advanced_router  # noqa: E402
+app.include_router(advanced_router(authenticated))
