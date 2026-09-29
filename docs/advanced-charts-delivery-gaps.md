@@ -155,3 +155,10 @@
 - 双图测试首次失败位于新增图表的setSymbol，原生模型尚未初始化（Value is null），发生在目标周期切换之前。测试增加公开chartsCount/dataReady就绪等待，未改产品逻辑。
 - 真实EURUSD M5→MN及M5→W1双图验收分别退出0（/tmp/mw-high-period-neighbor-ready.log、/tmp/mw-week-neighbor-ready.log）：旁图XAUUSD/M15的品种、周期、时间范围严格保持，水平线保留、时间范围同步关闭状态保留；目标图水平线保留，保存刷新目标视区一致，无页面异常。
 - 以上使用已有开发数据，尚不能关闭冷加载、连续切换、显式日期范围及撤销栈影响等缺口。周线可视区是否应自动靠近最新K线仍需单独检查；目前最新K线可见断言仅覆盖月线。
+
+### 高周期原生撤销能力：实际操作验收失败
+
+- 扩展advanced-monthly-live.browser.cjs，最新K线可见断言覆盖全部D1/W1/MN，真实M5→W1通过（/tmp/mw-period-undo.log，退出0）；日志记录公开undoRedoState，单凭enableUndo=true不能证明旧操作仍可撤销。
+- MARKET_WATCH_EXERCISE_UNDO=1逐步调用公开executeActionById("undo")，要求能撤销切周期前创建的水平线。/tmp/mw-period-undo-actions.log退出1：切换前最后操作为创建水平线，切换后6个撤销项全部是date range lock，全部撤销后水平线仍存在。
+- 这证明现有widget.load重建预算方案破坏旧撤销历史，恢复同步产生的新操作掩盖了问题。该问题是交付缺口，不能以按钮可用或画线保留代替通过；须调整高周期请求量控制方案或找到公开支持的状态保留路径。供应库不修改。
+- 此测试分支故意保持失败并在实际绘图撤销成功前不宣称高周期收口。该分支不执行后续保存恢复验收，常规分支仍独立验证保存恢复。

@@ -173,6 +173,7 @@ const fs = require("fs");
         { time: chart.getVisibleRange().to - 3600, price: 1.13 },
         { shape: "horizontal_line" },
       );
+      window.periodUndoBefore = widget.undoRedoState();
       chart.setResolution(resolution).catch(() => {});
     }, resolution);
     await frame.waitForFunction(
@@ -212,17 +213,54 @@ const fs = require("fs");
         false,
       );
     }
-    const visible = await frame.evaluate(() => ({
-      range: widget.chart(0).getVisibleRange(),
-      last: lastHistory.get("EURUSD|1M"),
+    const undo = await frame.evaluate(() => ({
+      before: window.periodUndoBefore,
+      after: widget.undoRedoState(),
     }));
-    console.log("SWITCH_VISIBLE", JSON.stringify(visible));
-    if (resolution === "1M")
+    console.log("PERIOD_UNDO", JSON.stringify(undo));
+    if (process.env.MARKET_WATCH_REQUIRE_UNDO)
       require("node:assert/strict").ok(
-        visible.range.from <= visible.last / 1000 &&
-          visible.range.to >= visible.last / 1000,
-        "Latest monthly candle must be visible after switching",
+        undo.before.enableUndo && undo.after.enableUndo,
+        "Period switch must preserve available undo history",
       );
+    const visible = await frame.evaluate(
+      (resolution) => ({
+        range: widget.chart(0).getVisibleRange(),
+        last: lastHistory.get(`EURUSD|${resolution}`),
+      }),
+      resolution,
+    );
+    console.log("SWITCH_VISIBLE", JSON.stringify(visible));
+    require("node:assert/strict").ok(
+      visible.range.from <= visible.last / 1000 &&
+        visible.range.to >= visible.last / 1000,
+      "Latest candle must be visible after switching",
+    );
+    if (process.env.MARKET_WATCH_EXERCISE_UNDO) {
+      for (let step = 0; step < 10; step++) {
+        const state = await frame.evaluate(() => ({
+          undo: widget.undoRedoState(),
+          shapes: widget.chart(0).getAllShapes().length,
+          resolution: widget.chart(0).resolution(),
+        }));
+        console.log("PERIOD_UNDO_STEP", step, JSON.stringify(state));
+        if (!state.shapes) break;
+        require("node:assert/strict").ok(state.undo.enableUndo);
+        await frame.evaluate(() => widget.chart(0).executeActionById("undo"));
+        await frame.waitForFunction(
+          () => !loading && widget.chart(0).dataReady(),
+        );
+        await page.waitForTimeout(300);
+      }
+      require("node:assert/strict").equal(
+        await frame.evaluate(() => widget.chart(0).getAllShapes().length),
+        0,
+        "Undo must reach drawing creation from before the period switch",
+      );
+      require("node:assert/strict").deepEqual(errors, []);
+      await browser.close();
+      return;
+    }
   }
   console.log("MONTH_READY_MS", Date.now() - started);
   const before = await frame.evaluate(() => ({
