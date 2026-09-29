@@ -278,3 +278,11 @@
 - MARKET_WATCH_EXPORT_LIVE_CHECK=1通过真实原生header按钮打开表单、选择UTC小时、包含Python EMA，不拦截任何下载响应。/tmp/mw-export-browser-real.log退出0：实际浏览器下载12行EURUSD M5，每行时间戳精确匹配指定小时、EMA列存在且有数值、页面异常为空。此例使用已有覆盖；真实冷补数另见前节。
 - 使用已有remote-postgres-test凭据且断言dbname=trading_alerts_test，匹配PG14包装器执行test_postgres_dump_restore_of_signal_and_outbox。/tmp/mw-backup-isolated-restore.log为1 failed：测试账号CREATE DATABASE权限不足，创建backup_source_<uuid>时即失败，尚未执行dump/restore。
 - 不再将恢复专项描述为客户端缺失；当前限制是隔离数据库创建权限。未提升权限、未修改生产库、未创建临时库成功。下一步寻找独立临时PG实例或已有获授权隔离恢复通路，不把权限失败计为通过。
+
+### PostgreSQL真实隔离恢复通过
+
+- Ubuntu官方PG14.24包仅下载并解压到/tmp/mw-pg-restore-tools，不安装系统服务，匹配已有PG14.24客户端。
+- 使用mkdtemp创建独立临时PG集群。首轮Unix socket URL被备份工具的连接选项白名单拒绝（/tmp/mw-pg-local-restore-test.log），未调整产品接口或共享PG权限；改为仅127.0.0.1:55439监听后重测。
+- test_postgres_dump_restore_of_signal_and_outbox真实执行通过，1 passed in 1.06s（/tmp/mw-pg-local-restore-test2.log）：临时源库内生成信号/通知outbox，pg_dump归档、pg_restore到独立随机恢复库、所有业务表记录数核对以及临时恢复库删除验证。
+- 测试后pg_ctl正常停止，确认postmaster.pid不存在并删除本次mkdtemp数据目录；原共享数据库权限和生产服务未变更。
+- 此结果关闭备份工具本地PG14恢复专项，不等同已演练生产整站容器/TLS/配置恢复，后者仍按交付清单继续。
