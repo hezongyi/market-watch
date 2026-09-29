@@ -98,6 +98,20 @@ const fs = require("fs");
   await page.goto("http://127.0.0.1:5188/advanced-charts");
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  if (process.env.MARKET_WATCH_GOLD_SESSION_PROBE)
+    await frame.evaluate(() => {
+      const resolve = feed.resolveSymbol;
+      feed.resolveSymbol = (ticker, callback, error) =>
+        resolve(
+          ticker,
+          (info) => {
+            if (decode(ticker).symbol === "XAUUSD")
+              info.session = "1800-1700:23456";
+            callback(info);
+          },
+          error,
+        );
+    });
   phase = "expand-layout";
   await frame.evaluate(() => widget.setLayout("8"));
   await page.waitForTimeout(10000);
