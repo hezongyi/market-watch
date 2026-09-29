@@ -485,3 +485,8 @@
 - 新advanced-host/Dockerfile/nginx.conf/.dockerignore：白名单构建上下文，显式复制所有适配脚本和供应商目录，沿用开发CSP与响应头，不带API代理。
 - deploy/advanced-chart-origin.md记录构建、回退、独立来源与TLS配置要求。脚本检查index引用均存在并被COPY覆盖，diff检查通过。
 - 当前Ubuntu无docker/nginx命令，未执行镜像构建或nginx语法/运行验收；未借用生产Unraid构建、未部署。该限制不阻塞其他开发任务，镜像仍属于待验收配置。
+
+### 主站镜像隔离来源构建参数
+
+- web/Dockerfile声明VITE_ADVANCED_CHART_ORIGIN构建参数并传递给Vite，部署文档补主站build-arg用法。默认compose尚未设置，发布时需要对应覆盖配置。
+- 使用示例HTTPS地址在开发机执行前端构建成功，直接检查产物包含指定来源；未执行Docker构建、未配置真实域名或生产部署。web/dist当前为示例地址验收产物，不可发布。
