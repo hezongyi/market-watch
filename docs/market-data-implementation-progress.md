@@ -151,3 +151,10 @@
 - JS测试确认比较品种继续轮询且完成后重载对应图表，自动保存回归仍通过。
 - 真实浏览器在NZD/USD M5添加原生Compare EURUSD，实际输入symbol=EURUSD、tracked=true；历史请求pending301→ready301，随后charts/data返回301根，无页面异常或可见错误。
 - 跨session数值对齐与比较对象保存恢复仍待验收；此次未修改库内部实现。
+
+### 页面刷新恢复原生布局格式修复
+
+- 真实比较保存→刷新复现库底栏getResizerDetacher异常，图表无法完成初始化。服务器state保存的是原生适配器布局信封（含字符串content），而saved_data需要内部charts/layout对象。
+- boot仅为saved_data解析信封内content；服务器原始布局信封保留，继续满足原生loadChartFromServer协议，并兼容旧版直接保存的charts对象。
+- 原场景重跑通过：刷新后恢复Compare及symbol=EURUSD，主图与比较行情均返回300根，图表可见范围非零，无页面异常和可见错误。
+- 新增可重复浏览器回归web/tests/advanced-comparison-restore.browser.cjs，创建开发验收工作区并走真实保存/刷新流程。自动保存、工作区和历史刷新JS回归仍通过。

@@ -485,6 +485,20 @@ function boot(
   preferences = [],
   workspace = null,
 ) {
+  // save_load_adapter content is a layout envelope; saved_data expects its chart state.
+  let chartState = doc.state;
+  if (
+    chartState &&
+    !chartState.charts &&
+    typeof chartState.content === "string"
+  ) {
+    try {
+      chartState = JSON.parse(chartState.content);
+    } catch (e) {
+      send({ type: "error", error: "工作区内容无法解析：" + String(e) });
+      return;
+    }
+  }
   savedDoc = doc;
   savedDoc.nativeName = workspace?.name || "我的图表";
   nativeMode = true;
@@ -538,7 +552,7 @@ function boot(
     locale: "zh",
     autosize: true,
     theme: doc.theme || "Dark",
-    saved_data: doc.state,
+    saved_data: chartState,
     saved_data_meta_info: workspace
       ? { uid: workspace.id, name: workspace.name, description: workspace.name }
       : undefined,
