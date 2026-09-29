@@ -241,21 +241,21 @@ def ingest(db, instrument, payload, received_at=None):
         outputs = []
         for left, right in sorted(bounds):
             rows = grouped.get((left, right), [])
-            expected = set()
-            t = left
-            while t < right:
-                if scheduled_open(
-                    t,
-                    calendar,
-                    gold=instrument.id == "XAUUSD",
-                    closures=closures,
-                ):
-                    expected.add(t)
-                t += timedelta(minutes=1)
             if coverage and covers_interval(coverage, ms(left), ms(right)):
-                # Sparse upstream observations are valid only within a fully queried interval.
-                # No synthetic flat candles or prices are inserted.
-                expected = {r.candle().start for r in rows}
+                # Fully queried sparse observations need no calendar enumeration.
+                expected = {instant(r.start) for r in rows}
+            else:
+                expected = set()
+                t = left
+                while t < right:
+                    if scheduled_open(
+                        t,
+                        calendar,
+                        gold=instrument.id == "XAUUSD",
+                        closures=closures,
+                    ):
+                        expected.add(t)
+                    t += timedelta(minutes=1)
             c = aggregate([r.candle() for r in rows], left, right, expected_starts=expected)
             if c:
                 complete = c.complete and bool(expected) and ms(right) <= received_at - 5000
