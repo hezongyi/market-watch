@@ -128,6 +128,51 @@ const fs = require("fs");
     { timeout: 180000 },
   );
   if (process.env.MARKET_WATCH_START_M5) {
+    if (process.env.MARKET_WATCH_PARTIAL_HISTORY_PROBE) {
+      await frame.evaluate(async () => {
+        prepareHistoryViewport = undefined;
+        window.partialRequests = [];
+        const chart = widget.chart(0);
+        await chart.createShape(
+          { time: chart.getVisibleRange().to - 3600, price: 1.13 },
+          { shape: "horizontal_line" },
+        );
+        const original = feed.getBars;
+        feed.getBars = (symbol, resolution, period, callback, error) => {
+          if (resolution !== "1M")
+            return original(symbol, resolution, period, callback, error);
+          partialRequests.push({ ...period });
+          if (partialRequests.length > 1) return; // Hold further requests for observation only.
+          const scale = chart.getTimeScale();
+          scale.setBarSpacing(scale.width() / 3);
+          return original(
+            symbol,
+            resolution,
+            { ...period, countBack: 4 },
+            callback,
+            error,
+          );
+        };
+        chart.setResolution("1M").catch(() => {});
+      });
+      await page.waitForTimeout(10000);
+      console.log(
+        "PARTIAL_HISTORY_PROBE",
+        JSON.stringify(
+          await frame.evaluate(() => ({
+            requests: partialRequests,
+            ready: widget.chart(0).dataReady(),
+            range: widget.chart(0).getVisibleRange(),
+            undo: widget.undoRedoState(),
+            shapes: widget.chart(0).getAllShapes().length,
+          })),
+        ),
+      );
+      await page.screenshot({ path: "/tmp/mw-partial-history.png" });
+      require("node:assert/strict").deepEqual(errors, []);
+      await browser.close();
+      return;
+    }
     let neighbor;
     if (process.env.MARKET_WATCH_TWO_PANES) {
       await frame.evaluate(async () => {
@@ -167,6 +212,23 @@ const fs = require("fs");
       });
     }
     const epoch = await frame.evaluate(() => workspaceEpoch);
+    if (process.env.MARKET_WATCH_RESET_BEFORE_PERIOD_PROBE) {
+      await frame.evaluate(async () => {
+        prepareHistoryViewport = undefined;
+        const chart = widget.chart(0);
+        await chart.createShape(
+          { time: chart.getVisibleRange().to - 3600, price: 1.12 },
+          { shape: "horizontal_line" },
+        );
+        const scale = chart.getTimeScale();
+        scale.setBarSpacing(scale.width() / 3);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        widget.resetCache();
+        chart.resetData();
+      });
+      await page.waitForTimeout(2000);
+      await frame.waitForFunction(() => widget.chart(0).dataReady());
+    }
     await frame.evaluate(async (resolution) => {
       const chart = widget.chart(0);
       await chart.createShape(
@@ -177,18 +239,22 @@ const fs = require("fs");
       chart.setResolution(resolution).catch(() => {});
     }, resolution);
     await frame.waitForFunction(
-      ({ epoch, resolution }) =>
-        workspaceEpoch > epoch &&
+      ({ epoch, resolution, resetProbe }) =>
+        (resetProbe || workspaceEpoch > epoch) &&
         ready &&
         !loading &&
         widget.chart(0).resolution() === resolution &&
         widget.chart(0).dataReady(),
-      { epoch, resolution },
+      {
+        epoch,
+        resolution,
+        resetProbe: !!process.env.MARKET_WATCH_RESET_BEFORE_PERIOD_PROBE,
+      },
       { timeout: 180000 },
     );
     require("node:assert/strict").equal(
       await frame.evaluate(() => widget.chart(0).getAllShapes().length),
-      1,
+      process.env.MARKET_WATCH_RESET_BEFORE_PERIOD_PROBE ? 2 : 1,
     );
     if (neighbor) {
       const after = await frame.evaluate(() => {

@@ -169,3 +169,11 @@
 - /tmp/mw-reset-budget.log进程退出1，重置后的MN请求limit=100，超过4根预算；resetData无法直接代替widget.load满足近期首屏目标。此探针未接入产品。
 - 只读供应库公开方法实现确认resetData调用mainSeries.rerequestData，按视区确定首次数量的featureset在模型创建路径执行；未修改供应代码。
 - 下一步对照渐进返回完整覆盖的近期数据与原生后续请求行为，要求同时满足真实可见、完整历史可继续加载、撤销历史不丢失，不能伪造noData或以无声截断请求冒充完成。
+
+### 部分返回与切换前重置对照
+
+- MARKET_WATCH_PARTIAL_HISTORY_PROBE测试仅返回已完整覆盖的4根近期月线，meta仍noData=false，挂起后续请求以观察呈现。/tmp/mw-partial-history.log退出0仅代表探针完成：原生继续请求184根，dataReady=false、视区0/0；截图/tmp/mw-partial-history.png仍是旧M5画面。因此部分回调不能证明渐进月线显示，未接入产品。
+- 公开featureset request_only_visible_range_on_reset和只读实现说明重置时可按当前可见根数重新请求。改变时序：M5仍有数据时设置3根间距，resetCache/resetData，等待M5就绪，再切MN。
+- MARKET_WATCH_RESET_BEFORE_PERIOD_PROBE=1请求预算对照/tmp/mw-reset-before-period.log退出0：M5重置请求3根，后续MN请求3根；高周期HTTP拦截未下载远期历史。
+- 同模式真实EURUSD月线+MARKET_WATCH_EXERCISE_UNDO=1验证/tmp/mw-reset-before-period-live.log退出0：最新月K可见，重置前及重置后创建的两条水平线均能通过公开undo实际撤销，未重载widget。同期同步guard产生多余date range lock撤销项，仍需处理。
+- 尚未产品化：原生周期按钮不能假定会先执行预备重置，需验证公开事件时序或另一公开适配机制；不能把测试提前准备步骤当成原生操作已修复。当前产品原widget.load路径的撤销缺口仍开放。

@@ -124,6 +124,19 @@ const fs = require("fs");
     await frame.waitForFunction(() => ready && !loading, null, {
       timeout: 60000,
     });
+    if (process.env.MARKET_WATCH_RESET_BEFORE_PERIOD_PROBE === "1") {
+      await frame.evaluate(async () => {
+        prepareHistoryViewport = undefined;
+        const chart = widget.chart(0);
+        const scale = chart.getTimeScale();
+        scale.setBarSpacing(scale.width() / 3);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        widget.resetCache();
+        chart.resetData();
+      });
+      await page.waitForTimeout(3000);
+      await frame.waitForFunction(() => widget.chart(0).dataReady());
+    }
     if (process.env.MARKET_WATCH_RESET_BUDGET_PROBE === "1")
       await frame.evaluate(() => {
         prepareHistoryViewport = undefined;
