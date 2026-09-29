@@ -1,5 +1,5 @@
 /* Public chart APIs only. The caller refreshes bindings after layout changes. */
-function rangeSyncLoadingGuard(widget) {
+function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
   const toggle = widget.dateRangeSync();
   const bindings = new Map();
   const pending = new Map();
@@ -37,7 +37,9 @@ function rangeSyncLoadingGuard(widget) {
     }
     for (const chart of charts) {
       if (bindings.has(chart)) continue;
-      const callback = () => {
+      const callback = (interval, parameters) => {
+        if (typeof interval === "string")
+          onIntervalChange(chart, interval, parameters);
         const token = {};
         pending.set(chart, token);
         if (toggle.value()) set(false);

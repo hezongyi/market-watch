@@ -140,3 +140,11 @@
 - 两轮均只捕获4根MN后端请求（/tmp/mw-feed-budget-probe.log、/tmp/mw-feed-budget-events.log）；后者增加页面异常断言，退出0、异常为空。捕获的旧请求firstDataRequest=true，countBack188/195，ready=true、loading=false。
 - 事件记录确认onIntervalChanged先于该getBars，普通下拉切换的parameters为空；后续正式接入可记录明确timeframe意图，避免覆盖用户日期选择。
 - 此代码仅为测试内诊断包装，尚未接入产品；下一步用显式“旧请求被替代”取消语义接入，不能仅等待workspaceEpoch变化（重载事件异步，旧请求可能在其之前继续发出）。必须继续验证实际数据、工作区身份、多图和撤销状态。
+
+### 普通高周期切换预算正式接入（仍需多图边界验证）
+
+- datafeed getBars入口记录普通高周期切换意图；仅首次、超出初始预算的请求重建原生状态，并明确取消被替代请求。显式timeframe及后续向左分页不走此分支；默认D1/W1/MN初始预算90/13/3（原生会多取边界K线）。供应库未修改。
+- 正式路径请求拦截验收通过：M5→MN只向后端发4根请求，无旧188/195请求（/tmp/mw-budget-product.log）。
+- 真实EURUSD M5→MN，水平线保留、最新月K可见、保存刷新视区严格一致，页面异常为空（/tmp/mw-budget-live-lifecycle.log）。已有缓存，非冷加载性能证明。
+- 公开widget.load与菜单loadChartFromServer事件路径不同，重载显式推进workspaceEpoch，完成后恢复同步、范围订阅及保存状态；旧请求在重载完成前明确取消，避免等待循环。
+- 尚需验证多图不同品种/周期的旁图状态、连续切换、显式日期范围、周/日切换与撤销栈影响。当前仅单图真实月线通过，不能据此关闭全部高周期缺口。

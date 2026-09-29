@@ -16,7 +16,7 @@ let seq = 0,
   nativeSaving = false,
   workspaceEpoch = 0,
   nativeReadonly = false;
-let rangeGuard;
+let rangeGuard, prepareHistoryViewport;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
   1: "M1",
@@ -268,6 +268,14 @@ const feed = {
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
       const epoch = workspaceEpoch;
+      if (
+        prepareHistoryViewport &&
+        (await prepareHistoryViewport(symbol, res, p))
+      ) {
+        const error = Error("已按高周期视区重新加载");
+        error.code = "HISTORY_CANCELLED";
+        throw error;
+      }
       const checkActive = () => {
         if (
           epoch !== workspaceEpoch ||
@@ -652,10 +660,97 @@ function boot(
       savedDoc = { ...row.document, nativeName: row.name };
     },
   );
+  const periodChanges = new Map();
+  let budgetReload = null;
+  let restoreSync;
+  const recordPeriodChange = (chart, resolution, parameters) => {
+    periodChanges.delete(chart);
+    if (
+      !loading &&
+      !budgetReload &&
+      ["1D", "1W", "1M"].includes(resolution) &&
+      !parameters?.timeframe
+    )
+      periodChanges.set(chart, { resolution, epoch: workspaceEpoch });
+  };
+  prepareHistoryViewport = async (symbol, resolution, period) => {
+    if (!period.firstDataRequest) return false;
+    if (budgetReload) {
+      await budgetReload;
+      return true;
+    }
+    const targets = [...periodChanges].filter(
+      ([chart, change]) =>
+        change.epoch === workspaceEpoch &&
+        change.resolution === resolution &&
+        chart.symbol() === symbol,
+    );
+    if (!targets.length) return false;
+    const count = { "1D": 90, "1W": 13, "1M": 3 }[resolution];
+    for (const [chart] of targets) periodChanges.delete(chart);
+    if (period.countBack <= count + 1) return false;
+    const epoch = workspaceEpoch;
+    budgetReload = (async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      if (epoch !== workspaceEpoch) return;
+      const views = captureChartViewports(widget);
+      const targetCharts = new Set(targets.map(([chart]) => chart));
+      for (const chart of targetCharts) {
+        const scale = chart.getTimeScale();
+        scale.setBarSpacing(scale.width() / count);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      if (epoch !== workspaceEpoch) return;
+      const state = await new Promise((resolve) => widget.save(resolve));
+      pendingViewports = views.map((view, i) =>
+        targetCharts.has(widget.chart(i)) ? null : view,
+      );
+      restoreSync = rangeGuard?.desired() ?? widget.dateRangeSync().value();
+      send({ type: "status", text: "正在加载高周期视区" });
+      const identity = {
+        uid: currentNativeWorkspace.id,
+        name: savedDoc.nativeName,
+        description: savedDoc.nativeName,
+      };
+      budgetReload = null;
+      workspaceEpoch++;
+      const reloadEpoch = workspaceEpoch;
+      loading = true;
+      rangeGuard?.dispose();
+      rangeGuard = undefined;
+      widget
+        .load(state, identity)
+        .then(async () => {
+          if (workspaceEpoch !== reloadEpoch) return;
+          await restoreViewports();
+          if (workspaceEpoch !== reloadEpoch) return;
+          if (restoreSync !== undefined)
+            widget.dateRangeSync().setValue(restoreSync);
+          restoreSync = undefined;
+          loading = false;
+          rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
+          bindViewports();
+          dirty = !readonly;
+        })
+        .catch((error) => {
+          if (workspaceEpoch === reloadEpoch) loading = false;
+          send({
+            type: "error",
+            error: "高周期视区加载失败：" + String(error),
+          });
+        });
+    })();
+    try {
+      await budgetReload;
+    } finally {
+      budgetReload = null;
+    }
+    return true;
+  };
   const loadContent = layouts.getChartContent;
   const saveLayout = layouts.saveChart;
   layouts.saveChart = (data) => {
-    if (viewportRestoring || rangeGuard?.busy()) {
+    if (budgetReload || viewportRestoring || rangeGuard?.busy()) {
       dirty = true;
       return Promise.reject(Error("图表正在切换，数据就绪后自动保存"));
     }
@@ -677,6 +772,7 @@ function boot(
           !ready ||
           loading ||
           viewportRestoring ||
+          budgetReload ||
           rangeGuard?.busy() ||
           epoch !== workspaceEpoch ||
           !currentNativeWorkspace?.id
@@ -901,12 +997,16 @@ function boot(
     });
     widget.subscribe("chart_loaded", async () => {
       await restoreViewports();
+      if (restoreSync !== undefined) {
+        widget.dateRangeSync().setValue(restoreSync);
+        restoreSync = undefined;
+      }
       loading = false;
       rangeGuard?.dispose();
-      rangeGuard = rangeSyncLoadingGuard(widget);
+      rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
       bindViewports();
     });
-    rangeGuard = rangeSyncLoadingGuard(widget);
+    rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
     bindViewports();
     widget.subscribe("layout_changed", () => {
       rangeGuard?.refresh();

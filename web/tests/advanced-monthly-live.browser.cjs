@@ -83,37 +83,40 @@ const fs = require("fs");
   await page.getByRole("button", { name: "登录工作台" }).click();
   await page.waitForTimeout(1000);
   console.log(
-    await page.evaluate(async (resolution) => {
-      const session = await (await fetch("/api/session")).json();
-      async function post(path, body) {
-        let r = await fetch("/api" + path, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-Token": session.csrf,
-          },
-          body: JSON.stringify(body),
+    await page.evaluate(
+      async (resolution) => {
+        const session = await (await fetch("/api/session")).json();
+        async function post(path, body) {
+          let r = await fetch("/api" + path, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": session.csrf,
+            },
+            body: JSON.stringify(body),
+          });
+          return r.json();
+        }
+        const row = await post("/advanced-charts/workspaces", {
+          name: `真实高周期加载验收 EURUSD ${resolution}`,
         });
-        return r.json();
-      }
-      const row = await post("/advanced-charts/workspaces", {
-        name: `真实高周期加载验收 EURUSD ${resolution}`,
-      });
-      await post("/advanced-charts/workspaces/" + row.id + "/save", {
-        name: row.name,
-        revision: row.revision,
-        document: {
-          engine: "tv31",
-          schemaVersion: 1,
-          symbol: "EURUSD",
-          interval: resolution,
-        },
-      });
-      const catalog = await (
-        await fetch("/api/market-data/catalog?query=NZD_USD")
-      ).json();
-      return catalog;
-    }, resolution),
+        await post("/advanced-charts/workspaces/" + row.id + "/save", {
+          name: row.name,
+          revision: row.revision,
+          document: {
+            engine: "tv31",
+            schemaVersion: 1,
+            symbol: "EURUSD",
+            interval: resolution,
+          },
+        });
+        const catalog = await (
+          await fetch("/api/market-data/catalog?query=NZD_USD")
+        ).json();
+        return catalog;
+      },
+      process.env.MARKET_WATCH_START_M5 ? "5" : resolution,
+    ),
   );
   const started = Date.now();
   await page.goto("http://127.0.0.1:5188/advanced-charts");
@@ -124,6 +127,42 @@ const fs = require("fs");
     null,
     { timeout: 180000 },
   );
+  if (process.env.MARKET_WATCH_START_M5) {
+    const epoch = await frame.evaluate(() => workspaceEpoch);
+    await frame.evaluate(async (resolution) => {
+      const chart = widget.chart(0);
+      await chart.createShape(
+        { time: chart.getVisibleRange().to - 3600, price: 1.13 },
+        { shape: "horizontal_line" },
+      );
+      chart.setResolution(resolution).catch(() => {});
+    }, resolution);
+    await frame.waitForFunction(
+      ({ epoch, resolution }) =>
+        workspaceEpoch > epoch &&
+        ready &&
+        !loading &&
+        widget.chart(0).resolution() === resolution &&
+        widget.chart(0).dataReady(),
+      { epoch, resolution },
+      { timeout: 180000 },
+    );
+    require("node:assert/strict").equal(
+      await frame.evaluate(() => widget.chart(0).getAllShapes().length),
+      1,
+    );
+    const visible = await frame.evaluate(() => ({
+      range: widget.chart(0).getVisibleRange(),
+      last: lastHistory.get("EURUSD|1M"),
+    }));
+    console.log("SWITCH_VISIBLE", JSON.stringify(visible));
+    if (resolution === "1M")
+      require("node:assert/strict").ok(
+        visible.range.from <= visible.last / 1000 &&
+          visible.range.to >= visible.last / 1000,
+        "Latest monthly candle must be visible after switching",
+      );
+  }
   console.log("MONTH_READY_MS", Date.now() - started);
   const before = await frame.evaluate(() => ({
     resolution: widget.chart(0).resolution(),
