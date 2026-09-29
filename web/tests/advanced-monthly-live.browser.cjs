@@ -128,6 +128,44 @@ const fs = require("fs");
     { timeout: 180000 },
   );
   if (process.env.MARKET_WATCH_START_M5) {
+    let neighbor;
+    if (process.env.MARKET_WATCH_TWO_PANES) {
+      await frame.evaluate(async () => {
+        await widget.setLayout("2h");
+        widget.dateRangeSync().setValue(false);
+        widget.timeSync().setValue(false);
+      });
+      await frame.waitForFunction(
+        () => {
+          try {
+            return widget.chartsCount() === 2 && widget.chart(1).dataReady();
+          } catch {
+            return false;
+          }
+        },
+        null,
+        { timeout: 180000 },
+      );
+      await frame.evaluate(async () => {
+        await widget.chart(1).setSymbol("XAUUSD", { doNotActivateChart: true });
+        await widget.chart(1).setResolution("15", { doNotActivateChart: true });
+      });
+      await frame.waitForFunction(
+        () => !rangeGuard.busy() && widget.chart(1).dataReady(),
+      );
+      neighbor = await frame.evaluate(async () => {
+        const c = widget.chart(1);
+        await c.createShape(
+          { time: c.getVisibleRange().to - 3600, price: 4100 },
+          { shape: "horizontal_line" },
+        );
+        return {
+          symbol: c.symbol(),
+          resolution: c.resolution(),
+          range: c.getVisibleRange(),
+        };
+      });
+    }
     const epoch = await frame.evaluate(() => workspaceEpoch);
     await frame.evaluate(async (resolution) => {
       const chart = widget.chart(0);
@@ -151,6 +189,29 @@ const fs = require("fs");
       await frame.evaluate(() => widget.chart(0).getAllShapes().length),
       1,
     );
+    if (neighbor) {
+      const after = await frame.evaluate(() => {
+        const c = widget.chart(1);
+        return {
+          symbol: c.symbol(),
+          resolution: c.resolution(),
+          range: c.getVisibleRange(),
+        };
+      });
+      require("node:assert/strict").deepEqual(
+        after,
+        neighbor,
+        "Unchanged neighboring pane must retain symbol, period and viewport",
+      );
+      require("node:assert/strict").equal(
+        await frame.evaluate(() => widget.chart(1).getAllShapes().length),
+        1,
+      );
+      require("node:assert/strict").equal(
+        await frame.evaluate(() => widget.dateRangeSync().value()),
+        false,
+      );
+    }
     const visible = await frame.evaluate(() => ({
       range: widget.chart(0).getVisibleRange(),
       last: lastHistory.get("EURUSD|1M"),
