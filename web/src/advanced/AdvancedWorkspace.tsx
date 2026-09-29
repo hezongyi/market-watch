@@ -230,6 +230,22 @@ export default function AdvancedWorkspace() {
               previous.filter((row) => row.id !== q.args.id),
             );
           reply({ type: "result", id: m.id, result });
+          if (q.op === "delete" && current.current?.id === q.args.id) {
+            // Do not leave a widget bound to a record which no longer exists.
+            // Deletion is already committed; a refresh failure must not revive it.
+            current.current = null;
+            unsaved.current = false;
+            blocked.current = false;
+            setActive(null);
+            setError("");
+            setStatus("工作区已删除");
+            try {
+              const remaining = await refresh();
+              if (remaining[0]) select(remaining[0]);
+            } catch (e) {
+              setError("工作区已删除，列表加载失败：" + String(e));
+            }
+          }
         } catch (e) {
           if (
             q.op === "save" &&
