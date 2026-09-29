@@ -538,16 +538,29 @@ function boot(
         : []),
     ],
   });
-  widget.onChartReady(() => {
-    ready = true;
-    loading = false;
+  widget.onChartReady(async () => {
     if (!doc.state) {
       widget.crosshairSync().setValue(true);
       widget.timeSync().setValue(true);
       widget.dateRangeSync().setValue(true);
       widget.intervalSync().setValue(false);
       widget.symbolSync().setValue(false);
+      if (workspace) {
+        try {
+          const state = await new Promise((resolve) => widget.save(resolve));
+          await widget.load(state, {
+            uid: workspace.id,
+            name: workspace.name,
+            description: workspace.name,
+          });
+        } catch (e) {
+          send({ type: "error", error: "工作区初始化失败：" + String(e) });
+          return;
+        }
+      }
     }
+    ready = true;
+    loading = false;
     widget.subscribe("chart_load_requested", () => {
       workspaceEpoch++;
       loading = true;
