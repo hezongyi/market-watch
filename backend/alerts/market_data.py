@@ -108,6 +108,7 @@ def queue_history(db, inst, left, right):
             select(ImportJob).where(
                 ImportJob.instrument_id == inst.id,
                 ImportJob.start < right,
+                ImportJob.cursor < right,
                 ImportJob.end > left,
                 ImportJob.status.in_(["pending", "running", "failed"]),
             )
@@ -376,9 +377,9 @@ def router(authenticated):
             complete = covers_interval(coverage, left, right)
             status = (
                 "error"
-                if errors
+                if errors and not complete
                 else "pending"
-                if pending or not complete
+                if not complete
                 else "ready"
                 if rows
                 else "empty_interval"

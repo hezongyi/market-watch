@@ -600,3 +600,19 @@ def test_chart_pages_yield_to_waiting_history_requests(database, monkeypatch, in
         jobs = db.scalars(select(ImportJob)).all()
         assert all(j.cursor == j.start + 4000 * 60000 for j in jobs)
         assert all(j.status == "pending" for j in jobs)
+
+
+def test_covered_range_does_not_wait_for_job_remaining_outside_it(database):
+    from alerts.storage import MarketCoverage
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        inst.source = "oanda"
+        db.add(MarketCoverage(instrument_id=inst.id, source=inst.source, basis=inst.basis,
+                              start=60000, end=600000))
+        db.add(ImportJob(instrument_id=inst.id, start=60000, end=1200000,
+                         cursor=600000, status="pending", priority=100))
+        db.flush()
+        jobs, coverage = queue_history(db, inst, 60000, 600000)
+        assert jobs == []
+        from alerts.coverage import covers_interval
+        assert covers_interval(coverage, 60000, 600000)
