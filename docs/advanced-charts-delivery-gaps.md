@@ -9,7 +9,7 @@
 - 手机临时周期/视区操作不产生advanced-charts写入，桌面草稿不被删除：浏览器通过。
 - EURUSD M1、XAUUSD M5、BTCUSDT M5指定历史日期跳转完成后视区稳定；单次缓存速度约5.1秒/未单测/1.24秒。冷加载速度不保证，BTC一次补齐117.6秒。
 - Python SMA/MACD/STOCH/BBANDS参数保存恢复及后端序列，内置八类指标创建，九类画线持久化已有专项证据。
-- 后端全套：/tmp/mw-backend-regression.log，146 passed、5 skipped；跳过项不算通过。
+- 最新后端全套146 passed、5 skipped；另在独立PostgreSQL测试库补跑4 passed，累计150项通过。备份恢复专项仍未执行，详见末尾运行环境记录。
 
 ## 本轮补充证据（2026-09-30）
 
@@ -34,14 +34,14 @@
 ## 失败恢复与新发现（2026-09-30）
 
 - `MARKET_WATCH_HISTORY_FAILURE=1 MARKET_WATCH_TEST_RESOLUTION=1D`运行`advanced-monthly-live.browser.cjs`：真实前端M30规划响应注入error后，切回D1、同步状态恢复、保存及刷新成功，视区严格一致，无页面异常（/tmp/mw-history-failure-without-range.log）。仅覆盖错误响应和切周期恢复，不覆盖任务重试按钮。
-- **未解决：D1指定视区后保存恢复偏移**。在上述用例额外设置`MARKET_WATCH_REAPPLY_RANGE=1`，调用公开setVisibleRange后保存，刷新左右边界发生变化（/tmp/mw-history-failure-stable.log）。保存前等待2秒也复现；去掉setVisibleRange操作后通过。因此不能把此问题归因为失败恢复卡死，也不能把日线任意视区保存声明为已通过。下一步独立复现正常日线setVisibleRange/鼠标缩放保存，检查原生barSpacing/rightOffset及保存状态。
+- **当时发现：D1指定视区后保存恢复偏移（后续修复及证据见下文）**。在上述用例额外设置`MARKET_WATCH_REAPPLY_RANGE=1`，调用公开setVisibleRange后保存，刷新左右边界发生变化（/tmp/mw-history-failure-stable.log）。保存前等待2秒也复现；去掉setVisibleRange操作后通过。因此不能把此问题归因为失败恢复卡死，也不能把日线任意视区保存声明为已通过。下一步独立复现正常日线setVisibleRange/鼠标缩放保存，检查原生barSpacing/rightOffset及保存状态。
 
 ### 日线视区偏移定位结果
 
 - 无需模拟行情失败，单独`MARKET_WATCH_REAPPLY_RANGE=1 MARKET_WATCH_TEST_RESOLUTION=1D`也能复现；测试参数已移到失败分支之外。
 - 保存前barSpacing=14.7012987012987、rightOffset=9、width=1132；恢复后间距和宽度相同，rightOffset=10。原生widget.save返回timeScale.m_rightOffset=10。
 - 只读检查供应包发现普通state保存defaultRightOffset，而非实时rightOffset。临时通过公开API把默认偏移设为9后，刷新视区完全一致（/tmp/mw-daily-default-offset-probe.log）。该探针已删除，没有修改供应包或将改变用户默认留白的处理写入产品。
-- 下一步应在适配层保存当前视区并用公开API恢复，覆盖原生加载、刷新、8图以及历史位置；不能把更改默认留白当成完整修复。复现仍保留失败，交付缺口仍开放。
+- 当时确定的修复方向是适配层保存当前视区并用公开API恢复，避免更改默认留白。后续实施及验证见下一节。
 
 ### 视区修复实施与当前证据
 
@@ -81,3 +81,9 @@
 - 当前完整后端回归146 passed、5 skipped（/tmp/mw-backend-final-regression.log），前端TypeScript/Vite生产构建成功（/tmp/mw-web-final-build.log）。
 - 补跑独立trading_alerts_test库的PostgreSQL专项：test_postgres.py及test_database_transfer.py共4 passed（/tmp/mw-postgres-final-regression.log），覆盖并发触发/outbox租约、覆盖区间处理、失败迁移回滚；每项使用自建临时schema并清理。
 - 因此此次累计150项后端用例通过；剩余未执行的是要求匹配pg_dump/pg_restore工具和隔离服务的备份恢复专项，仍不得计为通过。镜像部署/TLS及间歇原生异常依旧未收口。
+
+### 多图鼠标操作后的自动保存与刷新
+
+- 新自动保存通路启用后，真实鼠标8图十字线/滚轮/拖动回归通过（/tmp/mw-mouse-autosave-regression.log）。
+- 扩展同一浏览器验收：操作后不调用手动保存，等待服务器工作区中8个_mwViewports与最终各图视区严格一致；随后直接刷新，等待恢复完成，逐图时间边界严格一致，关闭同步的状态保持，无页面异常（/tmp/mw-mouse-autosave-restore.log）。
+- 脚本为web/tests/advanced-mixed-viewport.browser.cjs，环境MARKET_WATCH_MOUSE_CHECK=1、MARKET_WATCH_VIEWPORT_HOURS=3。证据覆盖本次混合M5/M15/M30和对应历史范围，不推广为全部行情故障与加载竞态均通过。

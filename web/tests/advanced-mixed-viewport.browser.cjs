@@ -304,6 +304,51 @@ const fs = require("fs");
     unsynced.slice(1),
     moved.slice(1).map((p) => p.range),
   );
+  phase = "verify-viewport-autosave";
+  const activeId = await page
+    .locator("iframe[data-workspace-id]")
+    .getAttribute("data-workspace-id");
+  await page.waitForFunction(
+    async ({ id, ranges }) => {
+      const rows = await (
+        await fetch("/api/advanced-charts/workspaces")
+      ).json();
+      const saved = rows.find((row) => row.id === id)?.document.state
+        ?._mwViewports;
+      return (
+        saved?.length === ranges.length &&
+        saved.every(
+          (pane, i) =>
+            pane.range.from === ranges[i].from &&
+            pane.range.to === ranges[i].to,
+        )
+      );
+    },
+    { id: activeId, ranges: unsynced },
+    { timeout: 20000 },
+  );
+  phase = "reload-final-viewport";
+  await page.reload();
+  await page.locator('iframe[title="专业图表工作区"]').waitFor();
+  await page.waitForTimeout(1000);
+  const restoredFrame = page.frames().find((f) => f.url().includes(":5187/?"));
+  await restoredFrame.waitForFunction(() => ready && !loading, null, {
+    timeout: 60000,
+  });
+  const restoredRanges = await restoredFrame.evaluate(() =>
+    Array.from({ length: widget.chartsCount() }, (_, i) =>
+      widget.chart(i).getVisibleRange(),
+    ),
+  );
+  assert.deepEqual(
+    restoredRanges,
+    unsynced,
+    "Autosaved final mouse/viewport state must survive reload",
+  );
+  assert.equal(
+    await restoredFrame.evaluate(() => widget.dateRangeSync().value()),
+    false,
+  );
   assert.deepEqual(errors, []);
   console.log(
     "Mixed-period viewport movement and disabled synchronization passed",
