@@ -585,3 +585,10 @@
 - 代码确认每页fetch_oanda/fetch_binance原先自行创建并关闭httpx.Client。图表worker现使用ExitStack持有各来源独立客户端，fetch_page注入import_once；普通采集调用默认fetch_source不变，代理配置沿用原来源设置。
 - market+market_data 29项通过；开发worker重启为1985819，同时加载覆盖聚合优化。退出作用域时关闭连接池，未增加下载并发。
 - 黄金M5真实验证 `/tmp/mw-gold-pooled.log` exec session91362最后确认运行中，尚未取得终态。未将连接复用当作已证明的吞吐改进，需继续收取阶段日志和最终视区。
+
+### 黄金通过、比特币仍待收口
+
+- `/tmp/mw-gold-pooled.log` session91362退出0：XAUUSD/M5跳转32387ms，24次history请求（17 pending/7 ready），20秒后范围1786521600–1786543200准确，无pending/failed/pageerror。此前已补部分数据，不能外推纯冷加载。
+- 启用优化后4000分钟黄金页日志：3048行下载4.699秒/入库2.524秒；1816行4.425/1.613秒；3808行8.277/2.926秒。数据量和网络不同，非严格基准对照。
+- `/tmp/mw-history-btc.log` session84148退出1：BTCUSDT/M5在60秒预算处仍pending，尚未通过。
+- 任务公平调度测试扩展为默认fetch_source和worker注入fetcher两种路径，market_data16项通过，确认连接池接入未绕过分页让出队列的行为。

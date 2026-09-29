@@ -1,3 +1,4 @@
+import pytest
 from datetime import UTC, datetime
 from decimal import Decimal
 
@@ -559,7 +560,8 @@ def test_quote_quality_distinguishes_open_stale_from_weekend(database, monkeypat
         api_module.app.dependency_overrides.clear()
 
 
-def test_chart_pages_yield_to_waiting_history_requests(database, monkeypatch):
+@pytest.mark.parametrize("injected", [False, True])
+def test_chart_pages_yield_to_waiting_history_requests(database, monkeypatch, injected):
     from alerts import market
 
     clock = [ms(datetime(2026, 9, 1, tzinfo=UTC))]
@@ -590,9 +592,9 @@ def test_chart_pages_yield_to_waiting_history_requests(database, monkeypatch):
     monkeypatch.setattr(market, "fetch_source", fetch)
     # Coverage is the upstream query result; ingestion is orthogonal to scheduling.
     monkeypatch.setattr(market, "ingest", lambda *args: None)
-    assert market.import_once(chart_only=True)
+    assert market.import_once(chart_only=True, fetcher=fetch if injected else None)
     clock[0] += 2000
-    assert market.import_once(chart_only=True)
+    assert market.import_once(chart_only=True, fetcher=fetch if injected else None)
     assert set(fetched) == set(starts), "both requests must get a page before either gets two"
     with database.begin() as db:
         jobs = db.scalars(select(ImportJob)).all()
