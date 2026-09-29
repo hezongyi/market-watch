@@ -110,13 +110,43 @@ export default function AdvancedWorkspace() {
             document: current.current?.document || {},
             readonly: mobile,
             catalog: await api("/advanced-charts/catalog"),
+            preferences: await api("/advanced-charts/preferences"),
           });
         } catch (e) {
           setError(String(e));
         }
       } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
       else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
-      else if (m.type === "market") {
+      else if (m.type === "preferences") {
+        const q = m.query;
+        if (
+          mobile ||
+          !q ||
+          !["save", "delete"].includes(q.op) ||
+          JSON.stringify(q).length > 1_100_000
+        ) {
+          reply({ type: "result", id: m.id, error: "设置请求不允许" });
+          return;
+        }
+        if (q.op === "delete" && !/^[a-f0-9]{64}$/.test(q.args?.id || "")) {
+          reply({ type: "result", id: m.id, error: "无效设置标识" });
+          return;
+        }
+        try {
+          reply({
+            type: "result",
+            id: m.id,
+            result: await api(
+              q.op === "save"
+                ? "/advanced-charts/preferences/save"
+                : "/advanced-charts/preferences/" + q.args.id + "/delete",
+              q.args,
+            ),
+          });
+        } catch (e) {
+          reply({ type: "result", id: m.id, error: String(e) });
+        }
+      } else if (m.type === "market") {
         const q = m.query;
         const endpoints: Record<string, string> = {
           search: "/market-data/catalog",

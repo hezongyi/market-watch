@@ -345,25 +345,20 @@ function snapshot() {
     }),
   );
 }
-function boot(doc, readonly = false, catalog = {}) {
+function boot(doc, readonly = false, catalog = {}, preferences = []) {
+  const prefs = nativePreferences(
+    preferences,
+    (op, args) => request({ op, args }, "preferences"),
+    readonly,
+    (e) => send({ type: "error", error: String(e) }),
+  );
   savedDoc = doc;
   savedDoc.templates ||= {};
   loading = true;
   ready = false;
   widget = new TradingView.widget({
-    save_load_adapter: {
-      getAllStudyTemplates: async () =>
-        Object.keys(savedDoc.templates).map((name) => ({ name })),
-      getStudyTemplateContent: async ({ name }) => savedDoc.templates[name],
-      saveStudyTemplate: async ({ name, content }) => {
-        savedDoc.templates[name] = content;
-        snapshot();
-      },
-      removeStudyTemplate: async ({ name }) => {
-        delete savedDoc.templates[name];
-        snapshot();
-      },
-    },
+    save_load_adapter: prefs.templates,
+    settings_adapter: prefs.settings,
     custom_indicators_getter: (PineJS) =>
       Promise.resolve(pythonStudies(PineJS, catalog)),
     container: "chart",
@@ -440,7 +435,7 @@ addEventListener("message", async (e) => {
     m.error ? p.reject(Error(m.error)) : p.resolve(m.result);
     drain();
   } else if (m.type === "init" && !widget)
-    boot(m.document, m.readonly, m.catalog);
+    boot(m.document, m.readonly, m.catalog, m.preferences);
   else if (m.type === "save") snapshot();
   else if (m.type === "theme" && ready) {
     savedDoc.theme = m.theme;

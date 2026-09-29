@@ -414,3 +414,14 @@ class MarketDemand(Base):
     instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), index=True)
     expires: Mapped[int] = mapped_column(BigInteger, index=True)
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class AdvancedPreference(Base):
+    __tablename__ = "advanced_chart_preferences"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    kind: Mapped[str] = mapped_column(String(20), index=True)
+    name: Mapped[str] = mapped_column(String(250))
+    tool: Mapped[str] = mapped_column(String(100), default="")
+    content: Mapped[dict] = mapped_column(JSON)
+    revision: Mapped[int] = mapped_column(default=1)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)

@@ -1,17 +1,96 @@
 """Separate storage: opaque vendor documents never enter legacy workspaces."""
 
+import hashlib
 import json
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
 from sqlalchemy import delete, select, update
 
 from .chart_api import Create, Revision, Save, serialized
 from .chart_indicators import CATALOG, calculate
-from .storage import AdvancedWorkspace, now_ms, transaction
+from .storage import AdvancedPreference, AdvancedWorkspace, now_ms, transaction
+
+
+class PreferenceWrite(BaseModel):
+    kind: Literal["study", "drawing", "chart", "setting"]
+    name: str = Field(min_length=1, max_length=250)
+    tool: str = Field(default="", max_length=100)
+    content: dict
+    revision: int = Field(default=0, ge=0)
+
+
+def preference_id(kind, name, tool):
+    return hashlib.sha256(json.dumps([kind, name, tool]).encode()).hexdigest()
+
+
+def preference_json(row):
+    return {
+        "id": row.id,
+        "kind": row.kind,
+        "name": row.name,
+        "tool": row.tool,
+        "content": row.content,
+        "revision": row.revision,
+    }
 
 
 def router(authenticated):
     r = APIRouter(prefix="/api/advanced-charts", dependencies=[Depends(authenticated)])
+
+    @r.get("/preferences")
+    def preferences():
+        with transaction() as db:
+            return [preference_json(row) for row in db.scalars(select(AdvancedPreference))]
+
+    @r.post("/preferences/save")
+    def save_preference(body: PreferenceWrite):
+        try:
+            if len(json.dumps(body.content, allow_nan=False)) > 1_000_000:
+                raise ValueError()
+        except (ValueError, TypeError):
+            raise HTTPException(422, "设置内容无效或过大")
+        ident = preference_id(body.kind, body.name, body.tool)
+        with transaction() as db:
+            # Serialize catalog mutations, including concurrent first-time inserts.
+            if db.get_bind().dialect.name == "postgresql":
+                from sqlalchemy import text
+
+                db.execute(text("SELECT pg_advisory_xact_lock(8675318)"))
+            row = db.get(AdvancedPreference, ident)
+            if row is None:
+                if body.revision != 0:
+                    raise HTTPException(409, "模板已删除，请重新加载")
+                row = AdvancedPreference(
+                    id=ident, kind=body.kind, name=body.name, tool=body.tool, content=body.content
+                )
+                db.add(row)
+            else:
+                result = db.execute(
+                    update(AdvancedPreference)
+                    .where(
+                        AdvancedPreference.id == ident, AdvancedPreference.revision == body.revision
+                    )
+                    .values(content=body.content, revision=body.revision + 1, updated_at=now_ms())
+                )
+                if result.rowcount != 1:
+                    raise HTTPException(409, "模板或偏好已在其他窗口修改，请重新加载")
+                db.expire(row)
+            db.flush()
+            return preference_json(row)
+
+    @r.post("/preferences/{ident}/delete")
+    def delete_preference(ident: str, body: Revision):
+        with transaction() as db:
+            result = db.execute(
+                delete(AdvancedPreference).where(
+                    AdvancedPreference.id == ident, AdvancedPreference.revision == body.revision
+                )
+            )
+            if result.rowcount != 1:
+                raise HTTPException(409, "模板或偏好已变更，请重新加载")
+        return {"ok": True}
 
     @r.get("/catalog")
     def catalog():
