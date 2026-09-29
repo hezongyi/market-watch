@@ -442,3 +442,80 @@ def test_quote_previous_close_crosses_weekend_but_not_missing_weekday(database):
             assert "ch" not in result
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_quote_previous_close_handles_ny_dst_and_gold_holiday(database):
+    from alerts.storage import instant
+
+    cases = [
+        ("EURUSD", "2026-03-06T22:00:00+00:00", "2026-03-08T21:00:00+00:00", None),
+        (
+            "XAUUSD",
+            "2026-12-24T22:00:00+00:00",
+            "2026-12-27T23:00:00+00:00",
+            {
+                "revision": "quote-test",
+                "closures": [
+                    {
+                        "start": "2026-12-24T22:00:00Z",
+                        "end": "2026-12-25T22:00:00Z",
+                        "reason": "test holiday",
+                        "source": "https://example.com/calendar",
+                        "kind": "holiday",
+                    }
+                ],
+            },
+        ),
+    ]
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            for ident, previous_end, latest, profile in cases:
+                end = ms(datetime.fromisoformat(previous_end))
+                start = ms(datetime.fromisoformat(latest))
+                with database.begin() as db:
+                    if profile:
+                        db.get(Instrument, ident).calendar_profile = profile
+                    write_bars(
+                        db,
+                        ident,
+                        "D1",
+                        [
+                            Candle(
+                                instant(end - 86400000),
+                                instant(end),
+                                Decimal("100"),
+                                Decimal("100"),
+                                Decimal("100"),
+                                Decimal("100"),
+                            )
+                        ],
+                    )
+                    write_bars(
+                        db,
+                        ident,
+                        "M1",
+                        [
+                            Candle(
+                                instant(start),
+                                instant(start + 60000),
+                                Decimal("105"),
+                                Decimal("105"),
+                                Decimal("105"),
+                                Decimal("105"),
+                            )
+                        ],
+                    )
+                values = client.post("/api/market-data/quotes", json={"symbols": [ident]}).json()[
+                    0
+                ]["v"]
+                assert values["chp"] == 5
+                if profile:
+                    with database.begin() as db:
+                        db.get(Instrument, ident).calendar_profile = {}
+                    values = client.post(
+                        "/api/market-data/quotes", json={"symbols": [ident]}
+                    ).json()[0]["v"]
+                    assert "chp" not in values
+    finally:
+        api_module.app.dependency_overrides.clear()
