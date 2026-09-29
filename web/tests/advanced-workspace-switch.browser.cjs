@@ -157,6 +157,28 @@ const fs = require("fs");
   );
   assert.ok(result.bRevAfter > result.bRevBefore);
   assert.ok(result.aRevAfter > result.aRevBefore);
+  await frame.evaluate(
+    async (result) =>
+      request(
+        { op: "delete", args: { id: result.b, revision: result.bRevAfter } },
+        "workspace",
+      ),
+    result,
+  );
+  assert.equal(
+    await page
+      .locator('select[aria-label="工作区"] option')
+      .evaluateAll(
+        (options, id) => options.some((o) => o.value === id),
+        result.b,
+      ),
+    false,
+  );
+  assert.equal(
+    await page.getByLabel("工作区", { exact: true }).inputValue(),
+    result.a,
+  );
+
   await frame.waitForFunction(
     () => widget.chart(0).getVisibleRange().from > 0,
     {},

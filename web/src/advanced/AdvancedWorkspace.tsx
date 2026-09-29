@@ -225,6 +225,10 @@ export default function AdvancedWorkspace() {
                 : [current.current!, ...p],
             );
           }
+          if (q.op === "delete")
+            setRows((previous) =>
+              previous.filter((row) => row.id !== q.args.id),
+            );
           reply({ type: "result", id: m.id, result });
         } catch (e) {
           if (
