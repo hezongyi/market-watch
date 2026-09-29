@@ -493,7 +493,12 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace">
-      <div className="advanced-status" role="status" aria-live="polite">
+      <div
+        className="advanced-status"
+        role="status"
+        aria-live="polite"
+        data-idle={/^(行情已加载|已加载|已保存|已另存)/.test(status)}
+      >
         {status}
       </div>
       {(error || feedError) && (

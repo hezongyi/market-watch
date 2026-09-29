@@ -46,8 +46,9 @@
 
 .advanced-status {
   position: absolute;
-  left: 64px;
-  bottom: 4px;
+  left: 50%;
+  top: 76px;
+  transform: translateX(-50%);
   z-index: 2;
   max-width: calc(100% - 100px);
   padding: 2px 6px;
@@ -55,4 +56,13 @@
   color: #ddd;
   font-size: 11px;
   pointer-events: none;
+}
+
+.advanced-status[data-idle="true"] {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
