@@ -11,7 +11,10 @@ let seq = 0,
   loading = false,
   poll,
   savedDoc = {},
-  dirty = false;
+  dirty = false,
+  nativeMode = false,
+  nativeSaving = false,
+  nativeReadonly = false;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
   1: "M1",
@@ -332,6 +335,23 @@ async function tick() {
 }
 function snapshot() {
   if (!ready || loading) return;
+  if (nativeMode) {
+    if (nativeReadonly || nativeSaving) return;
+    nativeSaving = true;
+    widget.saveChartToServer(
+      () => {
+        nativeSaving = false;
+        dirty = false;
+        send({ type: "native-saved" });
+      },
+      (e) => {
+        nativeSaving = false;
+        send({ type: "error", error: String(e?.message || "工作区保存失败") });
+      },
+      { defaultChartName: savedDoc.nativeName || "我的图表" },
+    );
+    return;
+  }
   widget.save((state) =>
     send({
       type: "snapshot",
@@ -345,7 +365,28 @@ function snapshot() {
     }),
   );
 }
-function boot(doc, readonly = false, catalog = {}, preferences = []) {
+function boot(
+  doc,
+  readonly = false,
+  catalog = {},
+  preferences = [],
+  workspace = null,
+) {
+  savedDoc = doc;
+  savedDoc.nativeName = workspace?.name || "我的图表";
+  nativeMode = true;
+  nativeReadonly = readonly;
+  const layouts = nativeWorkspaces(
+    workspace,
+    (op, args) => request({ op, args }, "workspace"),
+    readonly,
+    (row) => {
+      savedDoc = { ...row.document, nativeName: row.name };
+    },
+    (row) => {
+      savedDoc = { ...row.document, nativeName: row.name };
+    },
+  );
   const prefs = nativePreferences(
     preferences,
     (op, args) => request({ op, args }, "preferences"),
@@ -357,7 +398,7 @@ function boot(doc, readonly = false, catalog = {}, preferences = []) {
   loading = true;
   ready = false;
   widget = new TradingView.widget({
-    save_load_adapter: prefs.templates,
+    save_load_adapter: { ...prefs.templates, ...layouts },
     settings_adapter: prefs.settings,
     custom_indicators_getter: (PineJS) =>
       Promise.resolve(pythonStudies(PineJS, catalog)),
@@ -370,6 +411,9 @@ function boot(doc, readonly = false, catalog = {}, preferences = []) {
     autosize: true,
     theme: doc.theme || "Dark",
     saved_data: doc.state,
+    saved_data_meta_info: workspace
+      ? { uid: workspace.id, name: workspace.name, description: workspace.name }
+      : undefined,
     auto_save_delay: 2,
     enabled_features: [
       "support_multicharts",
@@ -379,7 +423,6 @@ function boot(doc, readonly = false, catalog = {}, preferences = []) {
     ],
     disabled_features: [
       "use_localstorage_for_settings",
-      "header_saveload",
       "header_screenshot",
       "header_compare",
       "trading_account_manager",
@@ -407,6 +450,13 @@ function boot(doc, readonly = false, catalog = {}, preferences = []) {
       widget.intervalSync().setValue(false);
       widget.symbolSync().setValue(false);
     }
+    widget.subscribe("chart_load_requested", () => {
+      loading = true;
+      dirty = false;
+    });
+    widget.subscribe("chart_loaded", () => {
+      loading = false;
+    });
     widget.drawOnAllChartsEnabled().setValue(true);
     widget.subscribe("onAutoSaveNeeded", () => {
       dirty = true;
@@ -415,7 +465,7 @@ function boot(doc, readonly = false, catalog = {}, preferences = []) {
     send({ type: "ready" });
     poll = setInterval(() => {
       tick();
-      snapshot();
+      if (dirty) snapshot();
     }, 15000);
   });
 }
@@ -435,7 +485,7 @@ addEventListener("message", async (e) => {
     m.error ? p.reject(Error(m.error)) : p.resolve(m.result);
     drain();
   } else if (m.type === "init" && !widget)
-    boot(m.document, m.readonly, m.catalog, m.preferences);
+    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace);
   else if (m.type === "save") snapshot();
   else if (m.type === "theme" && ready) {
     savedDoc.theme = m.theme;

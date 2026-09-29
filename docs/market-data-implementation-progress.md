@@ -43,3 +43,10 @@
 - 原生适配器实现getAllCharts/getChartContent/saveChart/removeChart，列表查询不会替已加载文档更新revision；写入串行、手机拒绝修改。
 - 后台工作区/偏好测试5项通过；JS适配器冲突、并发保存与只读测试通过。
 - 适配器尚未接入页面（保留当前入口），需继续完成父页面消息桥及原生菜单浏览器验证，不能将接口测试当作UI交付。
+
+### 原生保存菜单接线
+
+- 官方save_load_adapter现已组合原生工作区与模板适配器，header_saveload恢复；父页面通过白名单消息路由代理保存/读取，手机拒绝写操作。
+- 自动保存改走库saveChartToServer，chart_load_requested/chart_loaded期间禁止保存。
+- 浏览器验证发现无初始state的工作区会忽略元数据名称，补defaultChartName后实际原生保存成功（layoutName=原生验收），图表仍有行情且无pageerror。
+- 尚需移除外层验证工具栏、处理首次绑定ID与加载/删除活动布局的完整生命周期，并验证原生对话框。当前不视为最终可交付状态。

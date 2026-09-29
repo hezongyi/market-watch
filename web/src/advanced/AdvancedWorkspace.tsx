@@ -109,6 +109,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "init",
             document: current.current?.document || {},
+            workspace: current.current,
             readonly: mobile,
             catalog: await api("/advanced-charts/catalog"),
             preferences: await api("/advanced-charts/preferences"),
@@ -118,7 +119,60 @@ export default function AdvancedWorkspace() {
         }
       } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
       else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
-      else if (m.type === "preferences") {
+      else if (m.type === "native-saved") {
+        setStatus("已保存");
+        flushWaiters.current.splice(0).forEach((w) => w.resolve());
+      } else if (m.type === "workspace") {
+        const q = m.query;
+        if (
+          !q ||
+          !["list", "load", "save", "delete"].includes(q.op) ||
+          JSON.stringify(q).length > 4_100_000 ||
+          (mobile && ["save", "delete"].includes(q.op))
+        ) {
+          reply({ type: "result", id: m.id, error: "工作区操作不允许" });
+          return;
+        }
+        if (
+          ["load", "delete"].includes(q.op) &&
+          !/^[a-zA-Z0-9-]{1,40}$/.test(q.args?.id || "")
+        ) {
+          reply({ type: "result", id: m.id, error: "无效工作区标识" });
+          return;
+        }
+        try {
+          await queue.current;
+          let result;
+          if (q.op === "list")
+            result = await api("/advanced-charts/native-charts");
+          else if (q.op === "load")
+            result = await api("/advanced-charts/native-charts/" + q.args.id);
+          else if (q.op === "save")
+            result = await api("/advanced-charts/native-charts/save", q.args);
+          else
+            result = await api(
+              "/advanced-charts/workspaces/" + q.args.id + "/delete",
+              { revision: q.args.revision },
+            );
+          if (q.op === "save" || q.op === "load") {
+            current.current = {
+              id: result.id,
+              name: result.name,
+              revision: result.revision,
+              document: result.document,
+            };
+            setRows((p) =>
+              p.some((x) => x.id === result.id)
+                ? p.map((x) => (x.id === result.id ? current.current! : x))
+                : [current.current!, ...p],
+            );
+          }
+          reply({ type: "result", id: m.id, result });
+        } catch (e) {
+          setError(String(e));
+          reply({ type: "result", id: m.id, error: String(e) });
+        }
+      } else if (m.type === "preferences") {
         const q = m.query;
         if (
           mobile ||
