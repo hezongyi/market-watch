@@ -479,3 +479,9 @@
 - 接入保护后真实A/B工作区切换、保存版本递增及删除非活动工作区回归通过，图表范围有效，无pageerror。
 - 自动保存用例新增busy guard断言：延后保存保持dirty且不进入nativeSaving，通过。
 - 发布路径审查发现advanced-host当前仅有开发serve.py，没有独立生产静态镜像/部署配置；新增脚本开发可加载不等于生产打包完成，该项纳入发布收口。
+
+### 隔离静态来源生产打包准备
+
+- 新advanced-host/Dockerfile/nginx.conf/.dockerignore：白名单构建上下文，显式复制所有适配脚本和供应商目录，沿用开发CSP与响应头，不带API代理。
+- deploy/advanced-chart-origin.md记录构建、回退、独立来源与TLS配置要求。脚本检查index引用均存在并被COPY覆盖，diff检查通过。
+- 当前Ubuntu无docker/nginx命令，未执行镜像构建或nginx语法/运行验收；未借用生产Unraid构建、未部署。该限制不阻塞其他开发任务，镜像仍属于待验收配置。
