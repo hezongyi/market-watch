@@ -136,12 +136,14 @@ const fs = require("fs");
   );
   assert.equal(await frame.evaluate(() => rangeGuard.busy()), false);
   phase = "move-mixed-viewport";
-  const target = await frame.evaluate(async () => {
+  const windowHours = Number(process.env.MARKET_WATCH_VIEWPORT_HOURS || 24);
+  assert.ok(Number.isFinite(windowHours) && windowHours > 0);
+  const target = await frame.evaluate(async (windowHours) => {
     const r = widget.chart(0).getVisibleRange();
-    const target = { from: r.to - 2 * 86400, to: r.to - 86400 };
+    const target = { from: r.to - 86400 - windowHours * 3600, to: r.to - 86400 };
     await widget.chart(0).setVisibleRange(target, { rejectByTimeout: 20000 });
     return target;
-  });
+  }, windowHours);
   await page.waitForTimeout(5000);
   const moved = await frame.evaluate(() =>
     Array.from({ length: widget.chartsCount() }, (_, i) => ({

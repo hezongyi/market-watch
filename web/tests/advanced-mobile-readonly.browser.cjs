@@ -65,10 +65,12 @@ const fs = require("fs");
     return rows[0].id;
   });
   await page.goto("http://127.0.0.1:5188/advanced-charts");
+  await page.locator('iframe[title="专业图表工作区"]').waitFor({timeout:30000});
+  await page.waitForFunction(() => document.querySelector('iframe[title="专业图表工作区"]')?.contentWindow, null, {timeout:30000});
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
   if (!frame) {
-    console.log("MOBILE_FAILED_PAGE", page.url(), await page.locator("body").innerText());
+    console.log("MOBILE_FAILED_PAGE", page.url(), await page.locator("body").innerText(), page.frames().map(f=>f.url()));
     await page.screenshot({path:"/tmp/mw-mobile-login-failure.png"});
     throw Error("Chart iframe did not initialize");
   }
