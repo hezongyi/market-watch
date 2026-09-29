@@ -466,3 +466,10 @@
 - 真实库暴露WatchedValue.subscribe(callback)而非图表事件subscribe(owner,callback)，首次模块加载失败；已修正toggle订阅/退订签名与单元模拟。
 - 通过测试开关注入range-sync模块后，原混合8图场景通过：8个品种/周期组合正确、范围有效、无pageerror，最终dateRangeSync为true且guard无pending。默认不注入的失败复现仍保留。
 - 此为真实模块实验，尚未正式接入bridge；自动保存临时状态、工作区/布局切换生命周期及加载期间用户偏好仍需收口。
+
+### 同步保护正式桥接初步通过
+
+- index加载range-sync模块，bridge在chart ready建立保护、layout_changed刷新绑定、chart_load_requested销毁旧订阅、chart_loaded重新绑定。
+- snapshot在保护busy时保持dirty延后；原生直接save适配也拒绝加载期快照并提示就绪后自动保存，避免将临时关闭同步状态写入工作区。
+- 不注入测试模块的原混合8图回归首次通过：品种/周期/范围正确且无pageerror。自动保存与保护单元测试通过。
+- 尚需加载期保存重试、跨工作区、用户同步开关交互和部署静态资源打包验证；不能以一次8图通过宣称全部同步体验完成。

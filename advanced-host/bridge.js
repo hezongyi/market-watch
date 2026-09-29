@@ -16,6 +16,7 @@ let seq = 0,
   nativeSaving = false,
   workspaceEpoch = 0,
   nativeReadonly = false;
+let rangeGuard;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
   1: "M1",
@@ -505,6 +506,10 @@ async function tick() {
 }
 function snapshot() {
   if (!ready || loading) return;
+  if (rangeGuard?.busy()) {
+    dirty = true;
+    return;
+  }
   if (nativeMode) {
     if (nativeReadonly || nativeSaving) return;
     send({ type: "native-saving" });
@@ -581,6 +586,14 @@ function boot(
     },
   );
   const loadContent = layouts.getChartContent;
+  const saveLayout = layouts.saveChart;
+  layouts.saveChart = (data) => {
+    if (rangeGuard?.busy()) {
+      dirty = true;
+      return Promise.reject(Error("图表正在切换，数据就绪后自动保存"));
+    }
+    return saveLayout(data);
+  };
   layouts.getChartContent = async (id) => {
     try {
       return await loadContent(id);
@@ -702,13 +715,19 @@ function boot(
       send({ type: "error", error: "自选列表初始化失败：" + String(e) }),
     );
     widget.subscribe("chart_load_requested", () => {
+      rangeGuard?.dispose();
+      rangeGuard = undefined;
       workspaceEpoch++;
       loading = true;
       dirty = false;
     });
     widget.subscribe("chart_loaded", () => {
       loading = false;
+      rangeGuard?.dispose();
+      rangeGuard = rangeSyncLoadingGuard(widget);
     });
+    rangeGuard = rangeSyncLoadingGuard(widget);
+    widget.subscribe("layout_changed", () => rangeGuard?.refresh());
     widget.drawOnAllChartsEnabled().setValue(true);
     widget.subscribe("onAutoSaveNeeded", () => {
       dirty = true;
