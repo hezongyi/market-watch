@@ -10,7 +10,7 @@ from sqlalchemy import delete, select, update
 
 from .chart_api import Create, Revision, Save, serialized
 from .chart_indicators import CATALOG, calculate
-from .storage import AdvancedPreference, AdvancedWorkspace, now_ms, transaction
+from .storage import AdvancedPreference, AdvancedWorkspace, Preference, now_ms, transaction
 
 
 class PreferenceWrite(BaseModel):
@@ -36,8 +36,52 @@ def preference_json(row):
     }
 
 
+def migrate_legacy_templates(db):
+    """Copy preview study templates once, preserving conflicts and source documents."""
+    if db.get_bind().dialect.name == "postgresql":
+        from sqlalchemy import text
+
+        db.execute(text("SELECT pg_advisory_xact_lock(8675318)"))
+    marker = "advanced:legacy-study-templates:v1"
+    if db.get(Preference, marker):
+        return
+    for workspace in db.scalars(select(AdvancedWorkspace).order_by(AdvancedWorkspace.id)):
+        templates = workspace.document.get("templates", {})
+        if not isinstance(templates, dict):
+            continue
+        for original, value in templates.items():
+            name = str(original)[:250]
+            ident = preference_id("study", name, "")
+            existing = db.get(AdvancedPreference, ident)
+            if existing and existing.content.get("value") == value:
+                continue
+            if existing:
+                suffix = " · " + workspace.id
+                name = name[: 250 - len(suffix)] + suffix
+                ident = preference_id("study", name, "")
+                serial = 1
+                while db.get(AdvancedPreference, ident):
+                    tail = suffix + "-" + str(serial)
+                    name = str(original)[: 250 - len(tail)] + tail
+                    ident = preference_id("study", name, "")
+                    serial += 1
+            db.add(
+                AdvancedPreference(
+                    id=ident, kind="study", name=name, tool="", content={"value": value}
+                )
+            )
+            db.flush()
+    db.add(Preference(key=marker, value={"complete": True, "at": now_ms()}))
+
+
 def router(authenticated):
     r = APIRouter(prefix="/api/advanced-charts", dependencies=[Depends(authenticated)])
+
+    @r.post("/preferences/migrate")
+    def migrate_preferences():
+        with transaction() as db:
+            migrate_legacy_templates(db)
+        return {"ok": True}
 
     @r.get("/preferences")
     def preferences():

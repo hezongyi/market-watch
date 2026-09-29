@@ -105,6 +105,7 @@ export default function AdvancedWorkspace() {
         source.postMessage({ channel, ...value }, origin);
       if (m.type === "loaded") {
         try {
+          if (!mobile) await api("/advanced-charts/preferences/migrate", {});
           reply({
             type: "init",
             document: current.current?.document || {},

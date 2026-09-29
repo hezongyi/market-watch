@@ -54,3 +54,29 @@ def test_shared_templates_revision_and_namespace(database):
             assert client.get("/api/charts/templates").json() == []
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_legacy_migration_preserves_conflicts_and_does_not_resurrect(database):
+    from alerts.advanced_api import migrate_legacy_templates
+    from alerts.storage import AdvancedPreference, AdvancedWorkspace
+    from sqlalchemy import select
+
+    with database.begin() as db:
+        db.add_all(
+            [
+                AdvancedWorkspace(id="a", name="A", document={"templates": {"EMA": "first"}}),
+                AdvancedWorkspace(id="b", name="B", document={"templates": {"EMA": "second"}}),
+                AdvancedWorkspace(id="c", name="C", document={"templates": {"EMA": "first"}}),
+            ]
+        )
+    with database.begin() as db:
+        migrate_legacy_templates(db)
+        rows = list(db.scalars(select(AdvancedPreference)))
+        assert len(rows) == 2
+        assert {r.content["value"] for r in rows} == {"first", "second"}
+        assert db.get(AdvancedWorkspace, "a").document == {"templates": {"EMA": "first"}}
+        for row in rows:
+            db.delete(row)
+    with database.begin() as db:
+        migrate_legacy_templates(db)
+        assert list(db.scalars(select(AdvancedPreference))) == []
