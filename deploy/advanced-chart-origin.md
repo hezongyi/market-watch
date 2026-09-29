@@ -37,3 +37,17 @@ curl -I http://127.0.0.1:15187/range-sync.js
 该配置沿用已验证开发服务的CSP：禁止网络连接，允许同源脚本、样式和blob图表iframe；不增加供应商外联权限。公开访问控制、外部TLS地址和反向代理配置在部署前另行验收。未完整供应商包的缺失资源不会被此镜像补齐。
 
 回退时同时回退主站构建、适配脚本和对应供应商包镜像；保留旧图表入口及数据库备份。具体compose服务和生产域名尚未配置。
+
+## 外置数据库 Compose 覆盖文件
+
+现提供 `compose.advanced.yaml`，与 `compose.external-db.yaml` 组合；仅准备，尚未执行部署。
+
+```sh
+docker compose -f compose.external-db.yaml -f compose.advanced.yaml config --quiet
+```
+
+设置 `VITE_ADVANCED_CHART_ORIGIN` 为与主站不同的公开HTTPS origin（无路径）。`CHART_ORIGIN_BIND` 默认127.0.0.1、`CHART_ORIGIN_PORT` 默认15187；反向代理在另一容器/机器时需按真实网络调整绑定。默认绑定不会直接暴露到公网。
+
+覆盖文件包含隔离静态服务、主站构建参数、单独低并发图表补数worker。图表worker使用外置库配置并显式禁用通知发送；原有通知worker保持原配置。本覆盖文件专用于外置库基础文件，不能直接用于内置PostgreSQL配置。
+
+开发机尚无Docker，未验证Compose合并和镜像运行；上述config检查及隔离环境构建仍是发布前必需项。不要在日志输出完整config，因为基础env_file可能包含敏感值。

@@ -1,0 +1,22 @@
+# Overlay for compose.external-db.yaml; paths resolve against the repository root.
+# Prepared for review; applying this file is a separate deployment step.
+services:
+  web:
+    build:
+      context: ./web
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: ${VITE_ADVANCED_CHART_ORIGIN:?Set the public isolated HTTPS chart origin}
+  chart-origin:
+    build: ./advanced-host
+    ports:
+      - "${CHART_ORIGIN_BIND:-127.0.0.1}:${CHART_ORIGIN_PORT:-15187}:80"
+    restart: unless-stopped
+  chart-history-worker:
+    build: .
+    command: ["python", "-m", "alerts.chart_history_worker"]
+    env_file: .env
+    environment:
+      ALERTS_DELIVERY_ENABLED: "false"
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped

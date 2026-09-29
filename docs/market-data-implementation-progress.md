@@ -653,3 +653,9 @@
 - 公开determine_first_data_request_size_using_visible_range启用；没有已保存chartState且初始周期为D1/W1/MN时设timeframe=3M。已有保存视区不覆盖，仍保留全部支持周期和向左加载能力。
 - 新advanced-high-period-request.browser.cjs在真实库中创建MN工作区，拦截history HTTP返回测试错误，避免触发多年M1下载。`/tmp/mw-high-period.log` session86704退出0：两次初始请求limit均为3，而非默认300。
 - 此为请求契约验收，不是MN真实数据展示/数值/向左拖动验收。切换周期、已有工作区超大范围、多图情况下的高周期策略仍待实现/验证。
+
+### 日周月首屏请求与Compose准备
+
+- session10148退出0：拦截下载测试D1 limit91、W1 limit13；此前MN limit3。只验证新工作区初始范围契约，不证明真实高周期显示。
+- 新compose.advanced.yaml补外置库部署覆盖：web隔离来源build arg、chart-origin静态服务、chart-history-worker禁用通知。文档记录仅限external-db基础配置及待验收限制。
+- 当前无docker/podman，未执行config合并/镜像构建/生产部署，不记为发布验证通过。

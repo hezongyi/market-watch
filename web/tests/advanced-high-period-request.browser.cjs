@@ -65,7 +65,7 @@ const fs = require("fs");
   await page.getByRole("button", { name: "登录工作台" }).click();
   await page.waitForTimeout(1000);
   console.log(
-    await page.evaluate(async () => {
+    await page.evaluate(async (resolution) => {
       const session = await (await fetch("/api/session")).json();
       async function post(path, body) {
         let r = await fetch("/api" + path, {
@@ -88,14 +88,14 @@ const fs = require("fs");
           engine: "tv31",
           schemaVersion: 1,
           symbol: "OANDA:NZD_USD",
-          interval: "1M",
+          interval: resolution,
         },
       });
       const catalog = await (
         await fetch("/api/market-data/catalog?query=NZD_USD")
       ).json();
       return catalog;
-    }),
+    }, process.env.MARKET_WATCH_TEST_RESOLUTION || "1M"),
   );
   const captured = [];
   await page.route("**/api/market-data/history", async (route) => {
@@ -113,7 +113,11 @@ const fs = require("fs");
   await page.waitForTimeout(15000);
   console.log("HIGH_PERIOD_REQUESTS", JSON.stringify(captured));
   require("node:assert/strict").ok(captured.length);
-  require("node:assert/strict").ok(captured.every((q) => q.limit < 30));
+  const resolution = process.env.MARKET_WATCH_TEST_RESOLUTION || "1M";
+  const limits = {"1D":100,"1W":16,"1M":4};
+  const frames = {"1D":"D1","1W":"W1","1M":"MN"};
+  require("node:assert/strict").ok(captured.every((q) =>
+    q.timeframe === frames[resolution] && q.limit <= limits[resolution]));
   await browser.close();
 })().catch((e) => {
   console.error(e);
