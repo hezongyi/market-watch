@@ -147,7 +147,9 @@ const fs = require("fs");
   const assert = require("node:assert/strict");
   assert.notEqual(result.a, result.b);
   assert.equal(
-    await page.getByLabel("工作区", { exact: true }).inputValue(),
+    await page
+      .locator("iframe[data-workspace-id]")
+      .getAttribute("data-workspace-id"),
     result.a,
   );
   assert.equal(
@@ -166,16 +168,14 @@ const fs = require("fs");
     result,
   );
   assert.equal(
-    await page
-      .locator('select[aria-label="工作区"] option')
-      .evaluateAll(
-        (options, id) => options.some((o) => o.value === id),
-        result.b,
-      ),
+    await page.evaluate(async (id) =>
+      (await (await fetch("/api/advanced-charts/workspaces")).json()).some(row => row.id === id), result.b),
     false,
   );
   assert.equal(
-    await page.getByLabel("工作区", { exact: true }).inputValue(),
+    await page
+      .locator("iframe[data-workspace-id]")
+      .getAttribute("data-workspace-id"),
     result.a,
   );
 

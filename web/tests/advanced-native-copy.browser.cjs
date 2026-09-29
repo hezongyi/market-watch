@@ -87,7 +87,10 @@ const fs = require("fs");
   await page.waitForTimeout(1000);
   const assert = require("node:assert/strict");
   const ui = page.frames().find((f) => f.url().startsWith("blob:"));
-  const id = await page.getByLabel("工作区", { exact: true }).inputValue();
+  const id = await page.evaluate(
+    async () =>
+      (await (await fetch("/api/advanced-charts/workspaces")).json())[0].id,
+  );
   await ui.getByRole("button", { name: "管理布局", exact: true }).click();
   await ui.getByText("复制…", { exact: true }).click();
   await ui.getByRole("textbox").fill("原生菜单复制验收");
@@ -106,8 +109,8 @@ const fs = require("fs");
   assert.notEqual(copy.id, id);
   assert.ok(rows.some((r) => r.id === id && r.name !== copy.name));
   assert.equal(
-    await page.getByLabel("工作区", { exact: true }).inputValue(),
-    copy.id,
+    await frame.evaluate(() => widget.layoutName()),
+    "原生菜单复制验收",
   );
   await page.reload();
   await page.waitForTimeout(15000);

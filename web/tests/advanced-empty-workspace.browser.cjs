@@ -90,8 +90,8 @@ const fs = require("fs");
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
   const deletedId = await page
-    .getByLabel("工作区", { exact: true })
-    .inputValue();
+    .locator("iframe[data-workspace-id]")
+    .getAttribute("data-workspace-id");
   await page.route("**/api/advanced-charts/workspaces", async (route) => {
     if (route.request().method() === "GET")
       await route.fulfill({
@@ -117,9 +117,11 @@ const fs = require("fs");
   await page.getByRole("button", { name: "新建工作区", exact: true }).click();
   await page.locator('iframe[title="专业图表工作区"]').waitFor();
   await page.waitForFunction(
-    () => document.querySelector('select[aria-label="工作区"]')?.value,
+    () => document.querySelector("iframe[data-workspace-id]")?.dataset.workspaceId,
   );
-  const id = await page.getByLabel("工作区", { exact: true }).inputValue();
+  const id = await page
+    .locator("iframe[data-workspace-id]")
+    .getAttribute("data-workspace-id");
   assert.notEqual(id, deletedId);
   const rows = await page.evaluate(
     async () => await (await fetch("/api/advanced-charts/workspaces")).json(),

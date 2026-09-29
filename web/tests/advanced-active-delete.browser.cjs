@@ -90,14 +90,15 @@ const fs = require("fs");
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
   const deletedId = await page
-    .getByLabel("工作区", { exact: true })
-    .inputValue();
+    .locator("iframe[data-workspace-id]")
+    .getAttribute("data-workspace-id");
   await frame.evaluate((id) => {
     widget.removeChartFromServer(id, () => {});
   }, deletedId);
   await page.waitForFunction((id) => {
-    const select = document.querySelector('select[aria-label="工作区"]');
-    return select && select.value && select.value !== id;
+    const active = document.querySelector("iframe[data-workspace-id]")?.dataset
+      .workspaceId;
+    return active && active !== id;
   }, deletedId);
   await page.locator('iframe[title="专业图表工作区"]').waitFor();
   let nextFrame;
@@ -110,8 +111,8 @@ const fs = require("fs");
     () => ready && widget.chart(0).getVisibleRange().from > 0,
   );
   const activeId = await page
-    .getByLabel("工作区", { exact: true })
-    .inputValue();
+    .locator("iframe[data-workspace-id]")
+    .getAttribute("data-workspace-id");
   await nextFrame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );

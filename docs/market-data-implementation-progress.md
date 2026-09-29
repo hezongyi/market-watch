@@ -629,3 +629,9 @@
 - `/tmp/mw-create-stack.log` session93027退出0：真实原生顶栏新建、独立ID、名称、单图、无外层header断言通过，本轮无pageerror。此前undefined is not iterable未复现，未据此关闭间歇异常。
 - `/tmp/mw-recovery-native-ui.log` session11157退出0：注入409、保留草稿、刷新、点击异常区“复制恢复草稿”，恢复独立工作区和文档内容成功；冲突409为预期注入。
 - 清理已移除header的CSS。部分历史测试仍引用外层工作区select，后续需改为原生保存事件或API身份核验，不作为当前UI可用的证据。
+
+### 原生界面回归身份检查迁移
+
+- iframe增加data-workspace-id反映父页面当前实际工作区；删除/切换/空状态回归不再依赖已移除的外层select，列表删除检查改读服务端记录。
+- 原生复制/重命名核验库layoutName和API身份；`/tmp/mw-native-rename-clean.log` session54372退出0，同UUID重命名及刷新恢复通过。
+- 前端build退出0。其余迁移后的删除/切换/空状态/复制测试尚未重跑，不能把静态迁移视为这些流程已复验。

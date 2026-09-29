@@ -510,6 +510,7 @@ export default function AdvancedWorkspace() {
           key={frameKey}
           ref={frame}
           title="专业图表工作区"
+          data-workspace-id={active.id}
           src={`${origin}/?parent=${encodeURIComponent(location.origin)}`}
           sandbox="allow-scripts allow-same-origin allow-downloads"
           allowFullScreen
