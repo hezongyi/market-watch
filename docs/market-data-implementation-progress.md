@@ -671,3 +671,15 @@
 - 增加阶段/堆栈后 `/tmp/mw-monthly-stack.log` session73333退出1：initial阶段同时出现ensureExtendedTo读sds_1和_getActive undefined iterable，复现此前新建间歇错误；热加载3799ms仍出现，不能解释为仅下载慢。
 - 单变量临时跳过onChartReady内widget.load，`/tmp/mw-monthly-no-init-load.log` session63335不再记录这两个页面异常，但saveChartToServer失败（身份未绑定），不能直接采用该跳过。已恢复产品bridge原代码。
 - 后续应调整首次身份绑定生命周期，既保留native保存身份又避免ready回调中立即重载；供应商文件未改，错误断言未过滤。
+
+### 首次绑定等待dataReady原型
+
+- onChartReady首次绑定前等待activeChart.dataReady，再让出一个事件循环后save/load；公开接口，无供应商改动。
+- `/tmp/mw-monthly-binding-ready.log` session56906最后确认运行：首次5313ms，未记录原sds_1/iterable错误，原生保存回调成功；刷新后仍在补数，尚不能判整个用例通过。
+- 开发库只读核对刷新期间EURUSD待处理任务范围最早2026-02-28，超出初始3个月。新增月线测试请求参数与恢复视区日志，继续排查保存状态范围，不能把首次无异常当完成。
+
+### 月线保存范围继续核对
+
+- session56906再次确认仍在运行，刷新阶段pending月份继续推进，未重启测试。
+- 只读检查最新保存布局：chart.timeScale为m_barSpacing≈80.857、m_rightOffset=10；charts没有直接的可见日期字段。该证据提示原生几何恢复可能扩大范围，但不是根因结论；不能擅改供应商布局字段或裁剪用户保存视区。
+- bridge首次绑定等待dataReady并让出事件循环的改动继续保留，语法检查通过；完整月线保存恢复验收仍未完成。

@@ -30,6 +30,12 @@ const fs = require("fs");
       r.url().includes("/api/market-data/history")
     ) {
       const j = await r.json().catch(() => ({}));
+      if (r.url().includes("/api/market-data/history"))
+        console.log(
+          "MONTH_REQUEST",
+          phase,
+          JSON.stringify(r.request().postDataJSON()),
+        );
       if (r.url().includes("/api/market-data/history")) {
         historyMetrics.requests++;
         if (j.status === "pending") historyMetrics.pending++;
@@ -48,7 +54,10 @@ const fs = require("fs");
       );
     }
   });
-  page.on("pageerror", (e) => {errors.push(e.message); console.log("MONTH_ERROR", phase, e.stack);});
+  page.on("pageerror", (e) => {
+    errors.push(e.message);
+    console.log("MONTH_ERROR", phase, e.stack);
+  });
   await page.goto("http://127.0.0.1:5188/");
   await page
     .getByLabel("管理员密码")
@@ -129,6 +138,12 @@ const fs = require("fs");
   require("node:assert/strict").equal(
     await restored.evaluate(() => widget.chart(0).resolution()),
     "1M",
+  );
+  console.log(
+    "MONTH_RESTORED_RANGE",
+    JSON.stringify(
+      await restored.evaluate(() => widget.chart(0).getVisibleRange()),
+    ),
   );
   require("node:assert/strict").deepEqual(errors, []);
   console.log("Monthly real history initialized and saved workspace restored");

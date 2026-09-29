@@ -723,6 +723,11 @@ function boot(
       widget.symbolSync().setValue(false);
       if (workspace) {
         try {
+          await new Promise((resolve) =>
+            widget.activeChart().dataReady(resolve),
+          );
+          // Leave the library's initial ready dispatch before replacing its layout.
+          await new Promise((resolve) => setTimeout(resolve, 0));
           const state = await new Promise((resolve) => widget.save(resolve));
           await widget.load(state, {
             uid: workspace.id,
