@@ -24,7 +24,7 @@
 2. **多图稳定性**：混合8图、窄时间范围及真实鼠标十字线/滚轮/拖动已验证；仍需检查加载中切换同步及错误恢复；首次原生布局绑定已改为等待dataReady，之后月线及8图通过；其他路径仍保留异常断言。
 3. **绘图与指标体验**：跨工作区/品种隔离，盈亏比显示数值，鼠标实际绘制，Python长历史数值/预热验证。对象API创建通过不等于这些全部通过。
 4. **原生界面视觉检查**：去掉外层工具栏后桌面深浅主题截图、手机阅读、底部状态提示遮挡、未接入入口说明；已有功能清单旧表必须结合状态校正阅读。
-5. **运行及交付**：开发API需加载5ee44d6覆盖等待修正；生产静态镜像运行/跨来源TLS与compose、备份迁移回退验证未完成。缺失CSV导出和hammer资源仍需明确处理。
+5. **运行及交付**：开发API已重启加载5ee44d6覆盖等待修正；生产静态镜像运行/跨来源TLS与compose、备份迁移回退验证未完成。缺失CSV导出和hammer资源仍需明确处理。
 6. **原功能回归与交付包**：预警/演练/ntfy原有行为按实际改动面核验；整理版本、验收与已知限制，不把pytest跳过项计入完成。
 
 用户接受慢请求显示加载状态，不要求一次十年M1；不能把内部测试60秒超时当成用户硬性SLA，也不能以延长测试超时替代可用的加载反馈和取消。
@@ -74,3 +74,10 @@
 - 断言冲突草稿包含rightOffset=4、原草稿在另存后仍保留、刷新后可复制恢复、工作区元数据保留、恢复副本内容等于冲突草稿。
 - 首轮上述内容断言通过，但捕获`undefined is not iterable`，整轮失败（/tmp/mw-viewport-conflict-recovery.log）。加入阶段及堆栈日志后连续两轮通过（/tmp/mw-viewport-conflict-stack.log、/tmp/mw-viewport-conflict-repeat.log），未复现异常；没有修改产品代码或屏蔽异常。
 - 冲突恢复的功能路径已有证据，间歇异常原因仍未确定，保留页面异常断言及诊断，不能声明此异常已经修复。后续结合多图/恢复压力场景继续定位。
+
+### 开发运行环境及完整回归更新
+
+- 2026-09-30开发API已从PID1945819重启为2212692，使用原进程环境和同一代码目录；启动前以实际Settings确认数据库为trading_alerts_dev、delivery_enabled=false。/healthz返回200。没有重启Unraid服务或部署生产。
+- 当前完整后端回归146 passed、5 skipped（/tmp/mw-backend-final-regression.log），前端TypeScript/Vite生产构建成功（/tmp/mw-web-final-build.log）。
+- 补跑独立trading_alerts_test库的PostgreSQL专项：test_postgres.py及test_database_transfer.py共4 passed（/tmp/mw-postgres-final-regression.log），覆盖并发触发/outbox租约、覆盖区间处理、失败迁移回滚；每项使用自建临时schema并清理。
+- 因此此次累计150项后端用例通过；剩余未执行的是要求匹配pg_dump/pg_restore工具和隔离服务的备份恢复专项，仍不得计为通过。镜像部署/TLS及间歇原生异常依旧未收口。
