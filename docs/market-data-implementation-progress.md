@@ -322,3 +322,8 @@
 
 - 新增advanced-python-study.browser.cjs，真实库创建“守望 Python SMA”周期20；观察到合成品种请求触发后端/charts/data返回SMA且有有限数值，原生保存后刷新仍存在该指标及period=20，无pageerror。
 - 此次证明创建→Python取数→原生工作区保存恢复链路；没有用“后端有值”代替图上数值逐点一致性证明，多曲线及递归指标性能仍待继续验收。
+
+### Python多曲线原生接入验证
+
+- 扩展真实浏览器指标用例，一张NZDUSD M5图添加SMA、MACD、STOCH、BBANDS；各指标返回预期series key且每条曲线存在有限值，保存刷新后四类指标及全部参数一致，无pageerror。
+- 观察到多曲线合成品种分别发出history查询；charts/data在相同参数下已有短缓存共享，但历史规划请求仍有重复，属于后续请求去重优化点。此用例不代表逐点渲染数值已核对。

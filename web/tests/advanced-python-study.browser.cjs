@@ -92,28 +92,47 @@ const fs = require("fs");
     const data = await response.json().catch(() => null);
     if (data?.indicators?.length) calculated.push(data);
   });
-  const study = await frame.evaluate(async () => {
-    const id = await widget
-      .chart(0)
-      .createStudy("守望 Python SMA", false, false, { period: 20 });
-    return { id, inputs: widget.chart(0).getStudyById(id).getInputValues() };
-  });
-  assert.ok(study.id);
-  for (let i = 0; i < 30 && !calculated.length; i++)
-    await page.waitForTimeout(1000);
-  assert.ok(
-    calculated.length,
-    "Python study must request backend indicator values",
-  );
-  const sma = calculated.find((d) =>
-    d.indicators.some((s) => s.name === "SMA"),
-  );
-  assert.ok(sma);
-  assert.ok(
-    sma.indicators
-      .find((s) => s.name === "SMA")
-      .series[0].values.some((v) => Number.isFinite(v.value)),
-  );
+  const specs = [
+    { name: "SMA", params: { period: 20 }, keys: ["value"] },
+    {
+      name: "MACD",
+      params: { fast: 12, slow: 26, signal: 9 },
+      keys: ["macd", "signal", "histogram"],
+    },
+    { name: "STOCH", params: { k: 14, smooth: 3, d: 3 }, keys: ["k", "d"] },
+    {
+      name: "BBANDS",
+      params: { period: 20, deviation: 2 },
+      keys: ["upper", "middle", "lower"],
+    },
+  ];
+  for (const spec of specs) {
+    const id = await frame.evaluate(
+      async (spec) =>
+        widget
+          .chart(0)
+          .createStudy("守望 Python " + spec.name, false, false, spec.params),
+      spec,
+    );
+    assert.ok(id);
+    const found = () =>
+      calculated
+        .flatMap((d) => d.indicators)
+        .find(
+          (s) =>
+            s.name === spec.name &&
+            s.series.every((line) =>
+              line.values.some((v) => Number.isFinite(v.value)),
+            ),
+        );
+    for (let i = 0; i < 30 && !found(); i++) await page.waitForTimeout(1000);
+    const result = found();
+    assert.ok(result, spec.name + " must return populated backend series");
+    assert.deepEqual(
+      result.series.map((s) => s.key).sort(),
+      [...spec.keys].sort(),
+    );
+  }
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
@@ -130,16 +149,21 @@ const fs = require("fs");
       })),
   );
   console.log("PYTHON_STUDIES", JSON.stringify(restored));
-  assert.ok(
-    restored.some(
-      (s) =>
-        s.name.includes("Python SMA") &&
-        s.inputs.some((i) => i.id === "period" && i.value === 20),
-    ),
-  );
+  for (const spec of specs) {
+    assert.ok(
+      restored.some(
+        (s) =>
+          s.name === "守望 Python " + spec.name &&
+          Object.entries(spec.params).every(([key, value]) =>
+            s.inputs.some((i) => i.id === key && i.value === value),
+          ),
+      ),
+      spec.name + " must restore all parameters",
+    );
+  }
   assert.deepEqual(errors, []);
   console.log(
-    "Python SMA created, backend returned finite values, study and period restored after reload",
+    "Python SMA/MACD/STOCH/BBANDS loaded all backend series and restored all parameters",
   );
   await browser.close();
 })().catch((e) => {
