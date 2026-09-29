@@ -387,3 +387,58 @@ def test_quote_change_uses_complete_adjacent_session(database):
             assert "ch" not in values
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_quote_previous_close_crosses_weekend_but_not_missing_weekday(database):
+    from alerts.storage import instant
+
+    friday = ms(datetime(2026, 9, 25, 21, tzinfo=UTC))
+    sunday = ms(datetime(2026, 9, 27, 21, tzinfo=UTC))
+    with database.begin() as db:
+        write_bars(
+            db,
+            "EURUSD",
+            "D1",
+            [
+                Candle(
+                    instant(friday - 86400000),
+                    instant(friday),
+                    Decimal("1"),
+                    Decimal("1"),
+                    Decimal("1"),
+                    Decimal("1"),
+                )
+            ],
+        )
+        write_bars(
+            db,
+            "EURUSD",
+            "M1",
+            [
+                Candle(
+                    instant(sunday),
+                    instant(sunday + 60000),
+                    Decimal("1.1"),
+                    Decimal("1.1"),
+                    Decimal("1.1"),
+                    Decimal("1.1"),
+                )
+            ],
+        )
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            result = client.post("/api/market-data/quotes", json={"symbols": ["EURUSD"]}).json()[0][
+                "v"
+            ]
+            assert result["chp"] == 10
+            with database.begin() as db:
+                tail = db.scalar(select(Bar).where(Bar.timeframe == "M1"))
+                tail.start += 86400000
+                tail.end += 86400000
+            result = client.post("/api/market-data/quotes", json={"symbols": ["EURUSD"]}).json()[0][
+                "v"
+            ]
+            assert "ch" not in result
+    finally:
+        api_module.app.dependency_overrides.clear()

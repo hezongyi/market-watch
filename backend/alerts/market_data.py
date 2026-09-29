@@ -4,9 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 
+from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
 from .coverage import covers_interval
-from .domain import Calendar, bucket_bounds, session_bounds
+from .domain import Calendar, bucket_bounds, has_trading_gap, session_bounds
 from .market import stored_coverage
 from .providers import fetch_oanda_catalog
 from .storage import (
@@ -208,9 +209,20 @@ def router(authenticated):
                     .order_by(Bar.end.desc())
                     .limit(1)
                 )
-                # Use only an adjacent complete daily bucket. Across closures or
-                # missing days, omit change until calendar-aware continuity is proven.
-                if previous and previous.end == session_start and previous.close != 0:
+                # Bound calendar scanning for old caches; a missing trading minute
+                # invalidates the previous-close reference, a scheduled closure does not.
+                if (
+                    previous
+                    and previous.close != 0
+                    and session_start - previous.end <= 14 * DAY
+                    and not has_trading_gap(
+                        instant(previous.end),
+                        instant(session_start),
+                        Calendar(inst.calendar),
+                        gold=inst.id == "XAUUSD",
+                        closures=closures_from(inst.calendar_profile),
+                    )
+                ):
                     delta = bar.close - previous.close
                     values.update(
                         ch=float(delta),
