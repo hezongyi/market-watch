@@ -339,3 +339,9 @@
 - 依照分发包公开StudyBandInfo/StudyBandDefaultStyle接口，将插件metadata.levels映射到原生bands及defaults.bands；RSI使用30/70，STOCH使用20/80，无需自制绘图对象。
 - 真实四类Python指标浏览器用例再次通过；新增断言确认保存刷新后STOCH原生getStyleValues的bands为20/80且visible=true。适配单元回归及diff检查通过。
 - 现有工作区中已保存旧样式的指标是否自动补入新默认值，仍需独立验证；本次证明新创建指标的原生参考线状态与持久化。
+
+### 八类原生内置指标可用性
+
+- 使用真实widget.getStudiesList核对并逐项createStudy/removeEntity：Moving Average、Moving Average Exponential、Moving Average Weighted、Bollinger Bands、Relative Strength Index、MACD、Average True Range、Stochastic全部存在且创建成功，无pageerror。
+- 新脚本advanced-native-indicators.browser.cjs保留断言；这是内置指标路径的直接证据，与Python同名实现分开验证。不声称已完成参数口径及逐点数值对照。
+- Python参考线旧工作区迁移兼容性仍待验证，本次没有修改已有指标标识或算法。
