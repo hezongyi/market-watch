@@ -299,6 +299,12 @@ const fs = require("fs");
       after: widget.undoRedoState(),
     }));
     console.log("PERIOD_UNDO", JSON.stringify(undo));
+    if (!neighbor && !process.env.MARKET_WATCH_RESET_BEFORE_PERIOD_PROBE)
+      require("node:assert/strict").equal(
+        undo.after.originalUndoText,
+        "change resolution",
+        "Single-pane period switch must not add internal sync commands to undo",
+      );
     if (process.env.MARKET_WATCH_REQUIRE_UNDO)
       require("node:assert/strict").ok(
         undo.before.enableUndo && undo.after.enableUndo,

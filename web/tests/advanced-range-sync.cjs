@@ -17,12 +17,14 @@ function event() {
 }
 const changes = event();
 let value = true;
+let writes = 0;
 const toggle = {
   ...changes,
   subscribe: (fn) => changes.subscribe(null, fn),
   unsubscribe: (fn) => changes.unsubscribe(null, fn),
   value: () => value,
   setValue: (v) => {
+    writes++;
     if (v !== value) {
       value = v;
       changes.emit(v);
@@ -50,6 +52,13 @@ const guard = context.rangeSyncLoadingGuard({
   chartsCount: () => charts.length,
   chart: (i) => charts[i],
 });
+assert.equal(
+  writes,
+  0,
+  "initial binding must not write an unchanged native preference",
+);
+guard.refresh();
+assert.equal(writes, 0, "refresh must not add redundant native undo commands");
 a.intervals.emit();
 assert.equal(value, false);
 a.callbacks.shift()();
@@ -81,9 +90,14 @@ assert.equal(b.symbols.listeners.size, 0);
 b.callbacks.shift()();
 assert.equal(value, true);
 a.symbols.emit();
+assert.equal(
+  value,
+  true,
+  "single pane has no peer to synchronize during loading",
+);
 guard.dispose();
 a.callbacks.shift()();
-assert.equal(value, false, "disposed callback cannot restore old workspace");
+assert.equal(value, true, "disposed callback cannot change old workspace");
 assert.equal(a.symbols.listeners.size, 0);
 console.log(
   "Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed",

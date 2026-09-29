@@ -7,6 +7,8 @@ function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
     internal = false,
     disposed = false;
   function set(value) {
+    // The native setter records an undo action even for an unchanged value.
+    if (toggle.value() === value) return;
     internal = true;
     try {
       toggle.setValue(value);
@@ -20,7 +22,7 @@ function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
   function changed(value) {
     if (internal || disposed) return;
     desired = value;
-    if (pending.size && value) set(false);
+    if (pending.size && value && widget.chartsCount() > 1) set(false);
   }
   toggle.subscribe(changed);
   function refresh() {
@@ -42,7 +44,7 @@ function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
           onIntervalChange(chart, interval, parameters);
         const token = {};
         pending.set(chart, token);
-        if (toggle.value()) set(false);
+        if (toggle.value() && widget.chartsCount() > 1) set(false);
         chart.dataReady(() => {
           if (disposed || pending.get(chart) !== token) return;
           pending.delete(chart);
