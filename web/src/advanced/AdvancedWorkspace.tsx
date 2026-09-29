@@ -32,7 +32,7 @@ export default function AdvancedWorkspace() {
   const flushWaiters = useRef<
     { resolve: () => void; reject: (e: Error) => void }[]
   >([]);
-  const mobile = matchMedia("(max-width:700px)").matches;
+  const mobile = matchMedia("(max-width:700px), (pointer:coarse)").matches;
   const queue = useRef<Promise<void>>(Promise.resolve()),
     blocked = useRef(false),
     inflight = useRef(0);
