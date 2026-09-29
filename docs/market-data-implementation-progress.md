@@ -454,3 +454,9 @@
 - 临时探针订阅公开onSymbolChanged，在加载期间暂缓dateRangeSync，dataReady后恢复；EURUSD/XAUUSD双图切换无pageerror。
 - 第二轮增加dateRangeSync.value()===true断言，随后移动第一图视区；两图返回相同范围1790668500–1790694900，未出现原异常。
 - 原型尚未并入产品：需处理多图同时加载、用户关闭同步、工作区加载/布局变化订阅清理及自动保存中间状态，不能直接复制实验代码。正式默认同步未改；日志/tmp/mw-two-pane-guard-restored.log。
+
+### 加载期同步保护模块初步实现
+
+- 新range-sync.js封装公开API保护，按chart对象跟踪并发加载token，旧回调不提前恢复；refresh解除已移除窗格订阅，dispose后旧回调失效，保留原先关闭同步的偏好。
+- advanced-range-sync.cjs覆盖双图同时加载、同图重复切换、旧回调、关闭偏好、移除窗格与销毁，通过。
+- 尚未接入bridge/index：自动保存不能记录临时false状态、布局变化需绑定refresh、加载期间用户关闭已临时关闭的原生开关是否产生通知仍需确定。因此当前模块为待集成实现，不能称8图异常已修复。
