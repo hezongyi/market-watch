@@ -311,3 +311,9 @@
 - 请求预算测试新增MARKET_WATCH_RAPID_HIGH_PERIOD=1：M5加载后以100ms间隔切D1/W1/MN/D1/MN，高周期HTTP全部拦截，避免验证触发多年M1下载。
 - /tmp/mw-rapid-high-budget.log退出1，捕获D1=90、W1=90、MN=90；后一周期数据尚未就绪时沿用前次90根预算，超出周/月初始目标。现有recordPeriodChange在!chart.dataReady时跳过，单次切换通过不足以证明快速切换通过。
 - 保留失败用例，下一步需要实现加载中周期切换的请求预算处理，且继续保证撤销历史、最终周期、画线与明确日期范围意图。不通过扩大预算阈值或忽略中间请求关闭该问题。
+
+### 加载中放开预算重置条件的否定验证
+
+- advanced-high-period-request新增仅测试使用的MARKET_WATCH_LOADING_BUDGET_PROBE路由替换：只去除recordPeriodChange的!chart.dataReady条件，不改供应库或产品脚本；仍拦截全部高周期历史HTTP。
+- /tmp/mw-loading-budget-probe.log退出1：快速D1/W1/MN/D1/MN捕获请求量90/91/90/90/90。说明简单允许加载中setBarSpacing+resetData不能重建请求预算，不能将删除保护条件作为修复提交。
+- 下一步需要验证加载期间原生时间轴保留旧可见柱范围的行为，以及公开API对切换请求串行化/时机控制的支持；保留撤销、绘图、最终周期和显式日期范围不变的要求。

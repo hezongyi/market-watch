@@ -102,6 +102,15 @@ const fs = require("fs");
         : process.env.MARKET_WATCH_TEST_RESOLUTION || "1M",
     ),
   );
+  if (process.env.MARKET_WATCH_LOADING_BUDGET_PROBE === "1") {
+    await page.route("**/bridge.js*", async (route) => {
+      const response = await route.fetch();
+      const source = await response.text();
+      const condition = " || !chart.dataReady()";
+      require("node:assert/strict").ok(source.includes(condition));
+      await route.fulfill({ response, body: source.replace(condition, "") });
+    });
+  }
   const captured = [];
   await page.route("**/api/market-data/history", async (route) => {
     const query = route.request().postDataJSON();
