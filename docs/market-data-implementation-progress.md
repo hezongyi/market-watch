@@ -327,3 +327,9 @@
 
 - 扩展真实浏览器指标用例，一张NZDUSD M5图添加SMA、MACD、STOCH、BBANDS；各指标返回预期series key且每条曲线存在有限值，保存刷新后四类指标及全部参数一致，无pageerror。
 - 观察到多曲线合成品种分别发出history查询；charts/data在相同参数下已有短缓存共享，但历史规划请求仍有重复，属于后续请求去重优化点。此用例不代表逐点渲染数值已核对。
+
+### 相同历史规划并发请求去重
+
+- Datafeed的初次getBars、短轮询和后台pending检查统一调用historyQuery；同品种/周期/before/count的在途请求共用Promise，完成或失败立即移除。不缓存已完成结果，下一轮仍能观察到补数进展。
+- 新advanced-history-dedup测试覆盖参数键顺序无关、同请求共用、不同周期隔离、成功后刷新、失败后重试和映射清理；历史刷新回归通过。
+- 真实SMA/MACD/STOCH/BBANDS创建取数、保存恢复再次通过，无pageerror。尚未量化8图请求减少比例，不作性能幅度承诺。

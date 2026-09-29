@@ -158,6 +158,25 @@ function query(ticker, res, args) {
   if (cache.size > 64) cache.delete(cache.keys().next().value);
   return promise;
 }
+// Share only in-flight planning reads; completed results must be polled fresh.
+const historyRequests = new Map();
+function historyQuery(args) {
+  const key = JSON.stringify([
+    args.instrument,
+    args.timeframe,
+    args.before,
+    args.limit,
+  ]);
+  const existing = historyRequests.get(key);
+  if (existing) return existing;
+  const promise = request({ op: "history", args }, "market");
+  historyRequests.set(key, promise);
+  const remove = () => {
+    if (historyRequests.get(key) === promise) historyRequests.delete(key);
+  };
+  promise.then(remove, remove);
+  return promise;
+}
 const feed = {
   getQuotes: (symbols, cb, err) => {
     if (!symbols.length) {
@@ -251,12 +270,12 @@ const feed = {
           p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0),
         limit: Math.min(p.countBack, 2000),
       };
-      let status = await request({ op: "history", args }, "market");
+      let status = await historyQuery(args);
       const started = Date.now();
       while (status.status === "pending" && Date.now() - started < 12000) {
         send({ type: "status", text: "正在拉取历史数据 · " + symbol });
         await new Promise((r) => setTimeout(r, 1500));
-        status = await request({ op: "history", args }, "market");
+        status = await historyQuery(args);
       }
       if (status.status === "error") {
         rememberHistoryFailure(args, status);
@@ -403,7 +422,7 @@ async function tick() {
       }
       let state;
       try {
-        state = await request({ op: "history", args }, "market");
+        state = await historyQuery(args);
       } catch (e) {
         send({ type: "error", error: String(e) });
         continue;
