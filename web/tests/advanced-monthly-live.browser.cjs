@@ -229,15 +229,30 @@ const fs = require("fs");
       await page.waitForTimeout(2000);
       await frame.waitForFunction(() => widget.chart(0).dataReady());
     }
-    await frame.evaluate(async (resolution) => {
-      const chart = widget.chart(0);
-      await chart.createShape(
-        { time: chart.getVisibleRange().to - 3600, price: 1.13 },
-        { shape: "horizontal_line" },
-      );
-      window.periodUndoBefore = widget.undoRedoState();
-      chart.setResolution(resolution).catch(() => {});
-    }, resolution);
+    await frame.evaluate(
+      async ({ resolution, nativeClick }) => {
+        const chart = widget.chart(0);
+        await chart.createShape(
+          { time: chart.getVisibleRange().to - 3600, price: 1.13 },
+          { shape: "horizontal_line" },
+        );
+        window.periodUndoBefore = widget.undoRedoState();
+        if (!nativeClick) chart.setResolution(resolution).catch(() => {});
+      },
+      {
+        resolution,
+        nativeClick: !!process.env.MARKET_WATCH_NATIVE_PERIOD_CLICK,
+      },
+    );
+    if (process.env.MARKET_WATCH_NATIVE_PERIOD_CLICK) {
+      const native = frame.childFrames()[0];
+      await native.getByRole("button", { name: "5 分钟", exact: true }).click();
+      await native
+        .getByText({ "1D": "1 日", "1W": "1 周", "1M": "1 月" }[resolution], {
+          exact: true,
+        })
+        .click();
+    }
     await frame.waitForFunction(
       ({ epoch, resolution }) =>
         workspaceEpoch === epoch &&

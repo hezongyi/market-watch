@@ -185,3 +185,11 @@
 - 正式请求量测试/tmp/mw-event-reset-budget.log退出0，仅MN 3根请求。真实M5→MN并逐步undo至画线消失通过（/tmp/mw-event-reset-undo.log退出0），workspaceEpoch不变；不会重载工作区清空撤销历史。
 - 双图EURUSD M5→MN、XAUUSD M15旁图品种/周期/视区/画线保留及保存刷新通过（/tmp/mw-event-reset-neighbor.log退出0），无页面异常。
 - 分页、range-sync和viewports专项均通过，前端build通过（/tmp/mw-event-reset-build.log）。同步guard额外产生date range lock撤销项仍存在；连续切换、明确日期范围、冷加载和实际原生按钮点击路径尚须验证，不能由公开setResolution测试扩张为全部完成。
+
+### 原生周期菜单真实点击验收
+
+- advanced-monthly-live.browser.cjs新增MARKET_WATCH_NATIVE_PERIOD_CLICK=1，通过供应库内层iframe的可访问按钮“5 分钟”打开周期菜单，点击“1 月/1 周”；不调用setResolution代替用户切换。
+- 原生月线菜单点击后最新K线可见，公开undo实际逐步撤销到切换前水平线消失，无页面异常，/tmp/mw-native-period-undo.log退出0。
+- 原生周线菜单点击后最新K线可见，画线保留、保存刷新时间视区严格一致，无页面异常，/tmp/mw-native-week-restore.log退出0。
+- 最初定位探针因iframe URL假设和按钮文字/可访问名称不同失败，按实际DOM修正；最终使用角色及准确可访问名称，无坐标硬编码，临时DOM输出已删除。
+- 连续快速切换、显式日期范围、冷加载和同步操作撤销污染仍需独立收口。本次只扩大原生菜单实际操作覆盖范围，不宣称整个模块交付完成。
