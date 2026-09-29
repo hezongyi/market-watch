@@ -515,3 +515,11 @@
 - 同时关闭原生dateRangeSync与timeSync后，仅移动第一图，其他七图范围保持不变。全程无pageerror。
 - 此测试使用公开API，不是鼠标拖动验收；也不证明冷缓存补取完成。所选目标跨周末，实际左边界被压到开市，BTC也随外汇主图边界移动，未将目标完整返回作为通过项。
 - 更窄约3小时视区探针仍表现为M15/M30右边界偏移，宽范围通过不能覆盖此问题；需继续区分原生缩放约束与适配问题。此前间歇undefined异常也未关闭。
+
+### 历史日期跳转真实失败：分页缺口与重载
+
+- 新增真实失败验收 `advanced-history-date-jump.browser.cjs`：EURUSD M1跳转2026-08-12 08:00–14:00 UTC，等待后台更新后断言右边界仍为目标日期。当前不通过，不作为已完成项。
+- `/tmp/mw-history-cold.log`：后台pending→ready返回361根，但20秒后视区回到近期；`/tmp/mw-history-ready-trace.log` 在等待dataReady后仍失败，排除只因测试未等初始数据。
+- `/tmp/mw-history-contract.log`公开getBars追踪：第一次请求from=1786521600,to=1790680020,countBack=49505；适配层返回2000根，首尾1790559480000–1790679960000。随后请求目标附近361根，视区变为1786500060–1790559540，横跨非请求窗口。当前2000根截断和稀疏本地缓存不能支持该大跨度跳转。
+- 另一次记录显示补旧历史触发history_check变化→reloadHistory→resetData，视区回到最新。backend/chart_api.py fingerprint扫描边界前所有历史，旧日期新入库也改变指纹，需与可见/已加载范围修订区分。
+- 下一步应实现有界连续分页/覆盖契约及适当的历史刷新范围；不能靠把目标日期反复setVisibleRange或隐藏错误通过验收。此次尚未修改产品逻辑。
