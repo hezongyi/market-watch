@@ -659,3 +659,8 @@
 - session10148退出0：拦截下载测试D1 limit91、W1 limit13；此前MN limit3。只验证新工作区初始范围契约，不证明真实高周期显示。
 - 新compose.advanced.yaml补外置库部署覆盖：web隔离来源build arg、chart-origin静态服务、chart-history-worker禁用通知。文档记录仅限external-db基础配置及待验收限制。
 - 当前无docker/podman，未执行config合并/镜像构建/生产部署，不记为发布验证通过。
+
+### 真实月线初始化验证启动
+
+- 新advanced-monthly-live.browser.cjs：EURUSD/MN真实Datafeed初始化，检查有效范围、保存并刷新恢复周期，无HTTP下载模拟。默认180秒等待记录为诊断预算，不替代性能目标。
+- `/tmp/mw-monthly-live.log` exec session77000最后确认仍运行：首批已有2根月线，后续更早页缺失数据补取中。尚未取得初始化/刷新结论，不能记为高周期实际显示通过。
