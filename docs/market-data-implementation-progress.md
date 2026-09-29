@@ -442,3 +442,9 @@
 - 将失败复现缩小为2h布局EURUSD/XAUUSD M5，仍使用doNotActivateChart。关闭dateRangeSync的开发探针退出0、两窗格范围有效且无pageerror；仅将该开关改true的对照退出1，再现undefined页面异常。
 - 该对照支持跨品种切换与原生日期范围同步交互为触发条件；尚未证明根因在库还是Datafeed时间/历史契约。正式代码默认同步不变，不能用关闭刚需同步作为修复。
 - 探针/tmp/mw-two-pane-probe.cjs与/tmp/mw-two-pane-on.cjs，日志分别mw-two-pane-off.log/on.log。探针沿用8图脚本输出文案，实际断言窗格数为2，不能将其结果记为8图通过。
+
+### 原生视区同步拒绝位置
+
+- 临时Promise探针捕获undefined拒绝堆栈：H_.gotoTimeRange（library bundle第654行）→_chartWidgetGotoTimeRange（第761行）。只读检查分发包：新非内部goto请求先执行_lastGotoTimeRange?.deferred.reject()；时间刻度尚无minIndex时缓存新的deferred。
+- 这解释了跨品种加载期间重复视区请求取消旧等待产生无reason拒绝的来源；尚未形成满足同步需求的公开接口修复。未修改vendor或吞掉全局异常。
+- 开发探针/tmp/mw-two-pane-reject.cjs、日志/tmp/mw-two-pane-reject-origin.log；调试协议直接暂停未捕获该位置，Promise探针才获得证据。下一步针对加载期同步调度做公开接口实验。
