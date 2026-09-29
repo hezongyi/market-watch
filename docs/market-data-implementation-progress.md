@@ -641,3 +641,9 @@
 - 移除外层工具栏后的实际浏览器复跑：`/tmp/mw-copy-clean.log` 原生复制新UUID并刷新恢复通过；`/tmp/mw-switch-clean.log` A/B切换、版本递增、删除非活动工作区、iframe保持通过且errors为空；`/tmp/mw-delete-clean.log` 删除活动工作区后加载另一工作区并保存成功。顺序执行session19959已退出0，各日志成功结尾已核对。
 - backend/test_advanced_workspace.py三项通过。
 - 空列表与手机只读回归已顺序启动，日志 `/tmp/mw-empty-clean.log`、`/tmp/mw-mobile-clean.log`，session82820最后确认仍运行；不得提前记为通过。
+
+### 空状态、手机与后端完整回归
+
+- session82820已退出0，各日志核对：空列表页可创建独立工作区；手机浏览无advanced-charts写入、保留桌面草稿、errors为空。
+- `/tmp/mw-backend-regression.log` session98859退出0：146 passed、5 skipped。跳过项未计入完成。
+- 新delivery-gaps清单明确剩余范围。发现高周期首次300根可能驱动多年M1补数，与按需体验目标不符，列为优先缺口；未凭聚合单测将D1/W1/MN真实加载认定通过。
