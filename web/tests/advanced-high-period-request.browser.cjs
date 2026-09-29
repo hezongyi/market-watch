@@ -124,6 +124,24 @@ const fs = require("fs");
     await frame.waitForFunction(() => ready && !loading, null, {
       timeout: 60000,
     });
+    if (process.env.MARKET_WATCH_RESET_BUDGET_PROBE === "1")
+      await frame.evaluate(() => {
+        prepareHistoryViewport = undefined;
+        const original = feed.getBars;
+        let reset = false;
+        feed.getBars = async (symbol, resolution, period, callback, error) => {
+          if (resolution !== "1M" || reset || period.countBack <= 4)
+            return original(symbol, resolution, period, callback, error);
+          reset = true;
+          const chart = widget.chart(0);
+          const scale = chart.getTimeScale();
+          scale.setBarSpacing(scale.width() / 3);
+          error("Superseded by public data reset probe");
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          widget.resetCache();
+          chart.resetData();
+        };
+      });
     if (process.env.MARKET_WATCH_FEED_BUDGET_PROBE === "1")
       await frame.evaluate(() => {
         widget

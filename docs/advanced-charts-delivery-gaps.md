@@ -162,3 +162,10 @@
 - MARKET_WATCH_EXERCISE_UNDO=1逐步调用公开executeActionById("undo")，要求能撤销切周期前创建的水平线。/tmp/mw-period-undo-actions.log退出1：切换前最后操作为创建水平线，切换后6个撤销项全部是date range lock，全部撤销后水平线仍存在。
 - 这证明现有widget.load重建预算方案破坏旧撤销历史，恢复同步产生的新操作掩盖了问题。该问题是交付缺口，不能以按钮可用或画线保留代替通过；须调整高周期请求量控制方案或找到公开支持的状态保留路径。供应库不修改。
 - 此测试分支故意保持失败并在实际绘图撤销成功前不宣称高周期收口。该分支不执行后续保存恢复验收，常规分支仍独立验证保存恢复。
+
+### 保留模型的公开缓存重置对照
+
+- 新增测试侧MARKET_WATCH_RESET_BUDGET_PROBE=1，禁用产品重载回调，仅拦截第一次过大的MN请求，设置3根视区间距，明确取消旧请求，再调用公开widget.resetCache/chart.resetData。后端历史HTTP始终被拦截，不下载大范围历史。
+- /tmp/mw-reset-budget.log进程退出1，重置后的MN请求limit=100，超过4根预算；resetData无法直接代替widget.load满足近期首屏目标。此探针未接入产品。
+- 只读供应库公开方法实现确认resetData调用mainSeries.rerequestData，按视区确定首次数量的featureset在模型创建路径执行；未修改供应代码。
+- 下一步对照渐进返回完整覆盖的近期数据与原生后续请求行为，要求同时满足真实可见、完整历史可继续加载、撤销历史不丢失，不能伪造noData或以无声截断请求冒充完成。
