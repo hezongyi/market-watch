@@ -270,7 +270,18 @@ def router(authenticated):
             )
         )
         if len(page["bars"]) == 2000 and page["bars"][0]["start"] > body.start:
-            raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
+            # A leading market closure can leave exactly 2000 bars after start.
+            # Probe one predecessor instead of treating empty time as an extra bar.
+            previous = data(
+                DataQuery(
+                    instrument=instrument,
+                    timeframe=body.timeframe,
+                    before=page["bars"][0]["start"],
+                    limit=1,
+                )
+            )
+            if previous["bars"] and previous["bars"][-1]["start"] >= body.start:
+                raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
         page["bars"] = [bar for bar in page["bars"] if body.start <= bar["start"] < body.end]
         return Response(
             chart_csv(page, instrument=instrument, timeframe=body.timeframe),

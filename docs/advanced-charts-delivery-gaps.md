@@ -286,3 +286,9 @@
 - test_postgres_dump_restore_of_signal_and_outbox真实执行通过，1 passed in 1.06s（/tmp/mw-pg-local-restore-test2.log）：临时源库内生成信号/通知outbox，pg_dump归档、pg_restore到独立随机恢复库、所有业务表记录数核对以及临时恢复库删除验证。
 - 测试后pg_ctl正常停止，确认postmaster.pid不存在并删除本次mkdtemp数据目录；原共享数据库权限和生产服务未变更。
 - 此结果关闭备份工具本地PG14恢复专项，不等同已演练生产整站容器/TLS/配置恢复，后者仍按交付清单继续。
+
+### 导出2000根边界误判修复
+
+- 新增test_export_exact_limit_after_empty_leading_interval，在已覆盖但起点无K线的范围内构造恰好2000根，原接口误报413（/tmp/mw-export-limit-before.log，1 failed/2 passed）。
+- 修复为复用数据接口查一根前驱K线，仅前驱仍位于导出范围时判定超过2000；空白时间和休市不能当作额外K线。超过2000仍明确拒绝，不截断文件。
+- 新测试同时验证2000根返回200且CSV行数正确、2001根返回413。导出与图表工作区相关22项通过（/tmp/mw-export-limit-after.log），ruff通过。

@@ -95,3 +95,46 @@ def test_export_api_waits_for_coverage_and_preserves_auth(database, monkeypatch)
             )
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_export_exact_limit_after_empty_leading_interval(database, monkeypatch):
+    from alerts import api as api_module
+    from alerts import market_data
+    from alerts.storage import Bar
+    from fastapi.testclient import TestClient
+
+    with database.begin() as db:
+        db.add_all(
+            [
+                Bar(
+                    instrument_id="BTCUSDT",
+                    timeframe="M1",
+                    start=i * 60000,
+                    end=(i + 1) * 60000,
+                    open=1,
+                    high=2,
+                    low=1,
+                    close=2,
+                    complete=True,
+                )
+                for i in range(1, 2002)
+            ]
+        )
+    monkeypatch.setattr(
+        market_data,
+        "queue_history",
+        lambda db, inst, left, right: ([], [{"start": left, "end": right}]),
+    )
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            body = dict(instrument="BTCUSDT", timeframe="M1", start=0, end=2001 * 60000)
+            response = client.post("/api/charts/export", json=body)
+            assert response.status_code == 200, response.text
+            assert (
+                len(list(csv.DictReader(io.StringIO(response.content.decode("utf-8-sig"))))) == 2000
+            )
+            overflow = client.post("/api/charts/export", json={**body, "end": 2002 * 60000})
+            assert overflow.status_code == 413
+    finally:
+        api_module.app.dependency_overrides.clear()
