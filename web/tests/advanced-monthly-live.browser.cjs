@@ -131,6 +131,69 @@ const fs = require("fs");
   }));
   console.log("MONTH_RANGE", JSON.stringify(before));
   require("node:assert/strict").equal(before.resolution, resolution);
+  if (process.env.MARKET_WATCH_HISTORY_FAILURE === "1") {
+    phase = "injected-history-failure";
+    let injected = 0;
+    await page.route("**/api/market-data/history", async (route) => {
+      const body = route.request().postDataJSON();
+      if (body.timeframe === "M30") {
+        injected++;
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            status: "error",
+            error: "验收模拟行情暂时不可用",
+            bars: [],
+          }),
+        });
+      } else await route.continue();
+    });
+    await frame.evaluate(() => {
+      window.switchAttempt = widget
+        .chart(0)
+        .setResolution("30")
+        .catch(() => {});
+    });
+    await page.waitForTimeout(5000);
+    require("node:assert/strict").ok(
+      injected > 0,
+      "Failure route must be exercised",
+    );
+    console.log(
+      "FAILED_LOAD_SYNC",
+      await frame.evaluate(() => ({
+        busy: rangeGuard.busy(),
+        desired: rangeGuard.desired(),
+        actual: widget.dateRangeSync().value(),
+      })),
+    );
+    await page.unroute("**/api/market-data/history");
+    phase = "recover-after-history-failure";
+    await frame.evaluate(async (resolution) => {
+      await widget.chart(0).setResolution(resolution);
+    }, resolution);
+    await frame.waitForFunction(
+      () => !rangeGuard.busy() && widget.chart(0).dataReady(),
+      null,
+      { timeout: 30000 },
+    );
+    require("node:assert/strict").equal(
+      await frame.evaluate(() => widget.dateRangeSync().value()),
+      true,
+    );
+    console.log("HISTORY_FAILURE_RECOVERED");
+    if (process.env.MARKET_WATCH_REAPPLY_RANGE === "1")
+      await frame.evaluate(
+        async (range) => widget.chart(0).setVisibleRange(range),
+        before.range,
+      );
+  }
+  await page.waitForTimeout(2000);
+  const savedRange = await frame.evaluate(() =>
+    widget.chart(0).getVisibleRange(),
+  );
+  console.log("SAVED_RANGE", JSON.stringify(savedRange));
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
@@ -151,7 +214,7 @@ const fs = require("fs");
     widget.chart(0).getVisibleRange(),
   );
   console.log("MONTH_RESTORED_RANGE", JSON.stringify(restoredRange));
-  require("node:assert/strict").deepEqual(restoredRange, before.range);
+  require("node:assert/strict").deepEqual(restoredRange, savedRange);
   require("node:assert/strict").deepEqual(errors, []);
   console.log(
     `${resolution} real history initialized and saved workspace restored`,
