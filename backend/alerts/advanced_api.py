@@ -21,6 +21,26 @@ class PreferenceWrite(BaseModel):
     revision: int = Field(default=0, ge=0)
 
 
+class NativeChartWrite(BaseModel):
+    id: str | None = Field(default=None, max_length=40)
+    name: str = Field(min_length=1, max_length=100)
+    symbol: str = Field(max_length=80)
+    resolution: str = Field(max_length=12)
+    content: str = Field(max_length=4_000_000)
+    revision: int = Field(default=0, ge=0)
+
+
+def native_metadata(row):
+    return {
+        "id": row.id,
+        "name": row.name,
+        "symbol": row.document.get("symbol", "XAUUSD"),
+        "resolution": row.document.get("interval", "240"),
+        "timestamp": row.updated_at // 1000,
+        "revision": row.revision,
+    }
+
+
 def preference_id(kind, name, tool):
     return hashlib.sha256(json.dumps([kind, name, tool]).encode()).hexdigest()
 
@@ -148,6 +168,81 @@ def router(authenticated):
             }
             for name, meta in CATALOG.items()
         }
+
+    @r.get("/native-charts")
+    def native_charts():
+        with transaction() as db:
+            return [
+                native_metadata(row)
+                for row in db.scalars(
+                    select(AdvancedWorkspace).order_by(AdvancedWorkspace.updated_at.desc())
+                )
+            ]
+
+    @r.get("/native-charts/{ident}")
+    def native_content(ident: str):
+        with transaction() as db:
+            row = db.get(AdvancedWorkspace, ident)
+            if not row:
+                raise HTTPException(404, "工作区不存在")
+            return {
+                **native_metadata(row),
+                "content": json.dumps(row.document.get("state", {})),
+                "document": row.document,
+            }
+
+    @r.post("/native-charts/save")
+    def native_save(body: NativeChartWrite):
+        try:
+            state = json.loads(
+                body.content, parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value))
+            )
+            if not isinstance(state, dict):
+                raise ValueError()
+        except (ValueError, TypeError):
+            raise HTTPException(422, "图表内容必须是有效JSON对象")
+        with transaction() as db:
+            if body.id is None:
+                if body.revision != 0:
+                    raise HTTPException(409, "新工作区版本无效")
+                row = AdvancedWorkspace(
+                    name=body.name,
+                    document={
+                        "engine": "tv31",
+                        "schemaVersion": 1,
+                        "state": state,
+                        "symbol": body.symbol,
+                        "interval": body.resolution,
+                    },
+                )
+                db.add(row)
+                db.flush()
+            else:
+                row = db.get(AdvancedWorkspace, body.id)
+                if not row:
+                    raise HTTPException(404, "工作区不存在")
+                document = {
+                    **row.document,
+                    "state": state,
+                    "symbol": body.symbol,
+                    "interval": body.resolution,
+                }
+                result = db.execute(
+                    update(AdvancedWorkspace)
+                    .where(
+                        AdvancedWorkspace.id == body.id, AdvancedWorkspace.revision == body.revision
+                    )
+                    .values(
+                        name=body.name,
+                        document=document,
+                        revision=body.revision + 1,
+                        updated_at=now_ms(),
+                    )
+                )
+                if result.rowcount != 1:
+                    raise HTTPException(409, "工作区已在其他窗口修改，未覆盖；请另存副本")
+                db.expire(row)
+            return {**native_metadata(row), "document": row.document}
 
     @r.get("/workspaces")
     def listing():
