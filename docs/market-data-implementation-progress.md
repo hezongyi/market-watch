@@ -403,3 +403,8 @@
 
 - 鼠标点击管理布局→重命名，填写原生文本框并点击重命名；确认native-charts/save返回200，数据库同一UUID名称更新，刷新widget.layoutName保持新名称，无pageerror。
 - 新advanced-native-rename.browser.cjs通过。本项为原生UI操作验收，不仅是接口调用；外层重命名入口可在工具栏统一移除时删除。
+
+### 原生复制菜单实际操作
+
+- 点击管理布局→复制…，填写新名称并点击原生“复制”确认；native-charts/save返回200，服务器生成独立UUID、旧UUID名称保持，父页面同步新身份，刷新后恢复副本名称，无pageerror。
+- 新advanced-native-copy.browser.cjs通过。首轮错误使用“保存”按钮导致脚本超时，修正为实际“复制”确认入口后通过，未修改供应商UI。
