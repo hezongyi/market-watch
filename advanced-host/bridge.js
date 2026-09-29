@@ -269,6 +269,17 @@ const feed = {
   unsubscribeBars: (id) => subscriptions.delete(id),
 };
 let polling = false;
+function reloadHistory(symbol, res) {
+  for (const sub of subscriptions.values()) {
+    if (decode(sub.symbol).symbol === symbol && sub.res === res) sub.reset();
+  }
+  if (!ready) return;
+  for (let i = 0; i < widget.chartsCount(); i++) {
+    const chart = widget.chart(i);
+    if (chart.symbol() === symbol && chart.resolution() === res)
+      chart.resetData();
+  }
+}
 async function tick() {
   if (polling) return;
   polling = true;
@@ -277,11 +288,10 @@ async function tick() {
       const state = await request({ op: "history", args }, "market");
       if (state.status === "ready" || state.status === "empty_interval") {
         pendingHistory.delete(key);
-        if (ready)
-          for (let i = 0; i < widget.chartsCount(); i++) {
-            const c = widget.chart(i);
-            if (c.symbol() === args.instrument) c.resetData();
-          }
+        const res = Object.keys(frames).find(
+          (value) => frames[value] === args.timeframe,
+        );
+        if (res) reloadHistory(args.instrument, res);
       }
     }
     const groups = new Map();
