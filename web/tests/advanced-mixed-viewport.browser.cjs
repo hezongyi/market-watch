@@ -140,7 +140,10 @@ const fs = require("fs");
   assert.ok(Number.isFinite(windowHours) && windowHours > 0);
   const target = await frame.evaluate(async (windowHours) => {
     const r = widget.chart(0).getVisibleRange();
-    const target = { from: r.to - 86400 - windowHours * 3600, to: r.to - 86400 };
+    const target = {
+      from: r.to - 86400 - windowHours * 3600,
+      to: r.to - 86400,
+    };
     await widget.chart(0).setVisibleRange(target, { rejectByTimeout: 20000 });
     return target;
   }, windowHours);
@@ -157,26 +160,154 @@ const fs = require("fs");
   for (const pane of moved) {
     const reference = moved.find((other) => other.symbol === pane.symbol);
     const tolerance = Number(pane.resolution) * 60;
-    assert.ok(Math.abs(pane.range.from - reference.range.from) <= tolerance,
-      `${pane.symbol} ${pane.resolution}: left boundary did not synchronize`);
-    assert.ok(Math.abs(pane.range.to - target.to) <= tolerance,
-      `${pane.symbol} ${pane.resolution}: right boundary did not synchronize`);
+    assert.ok(
+      Math.abs(pane.range.from - reference.range.from) <= tolerance,
+      `${pane.symbol} ${pane.resolution}: left boundary did not synchronize`,
+    );
+    assert.ok(
+      Math.abs(pane.range.to - target.to) <= tolerance,
+      `${pane.symbol} ${pane.resolution}: right boundary did not synchronize`,
+    );
+  }
+  if (process.env.MARKET_WATCH_MOUSE_CHECK === "1") {
+    phase = "mouse-crosshair";
+    await frame.evaluate(() => {
+      window.mouseCrosshairEvents = [];
+      for (let i = 0; i < widget.chartsCount(); i++) {
+        widget
+          .chart(i)
+          .crossHairMoved()
+          .subscribe(null, (event) => {
+            window.mouseCrosshairEvents.push({
+              pane: i,
+              time: event.time,
+              price: event.price,
+            });
+          });
+      }
+    });
+    const library = frame.childFrames()[0];
+    assert.ok(library, "Native chart iframe missing");
+    console.log(
+      "MOUSE_PANE_DOM",
+      await library.locator(".chart-container").count(),
+    );
+    const pane = library.locator(".chart-container").first();
+    const box = await pane.boundingBox();
+    assert.ok(box && box.width > 0 && box.height > 0);
+    const x = box.x + box.width * 0.55,
+      y = box.y + box.height * 0.45;
+    await page.mouse.move(x, y, { steps: 12 });
+    await page.waitForTimeout(1000);
+    const crosshair = await frame.evaluate(() => window.mouseCrosshairEvents);
+    console.log("MOUSE_CROSSHAIR", crosshair);
+    const lastEvents = specs.map((_, i) =>
+      crosshair.filter((event) => event.pane === i).at(-1),
+    );
+    assert.ok(
+      lastEvents.every((event) => event && Number.isFinite(event.time)),
+      "Every pane must receive mouse crosshair time",
+    );
+    for (let i = 0; i < lastEvents.length; i++) {
+      assert.ok(
+        Math.abs(lastEvents[i].time - lastEvents[0].time) <
+          Number(specs[i][1]) * 60,
+        `Crosshair time must match within the destination candle: pane ${i}`,
+      );
+    }
+    await page.screenshot({ path: "/tmp/mw-mouse-crosshair.png" });
+    const beforeZoom = await frame.evaluate(() =>
+      Array.from({ length: widget.chartsCount() }, (_, i) =>
+        widget.chart(i).getVisibleRange(),
+      ),
+    );
+    await page.mouse.wheel(0, -180);
+    await page.waitForTimeout(3000);
+    const afterZoom = await frame.evaluate(() =>
+      Array.from({ length: widget.chartsCount() }, (_, i) =>
+        widget.chart(i).getVisibleRange(),
+      ),
+    );
+    console.log("MOUSE_ZOOM", JSON.stringify({ beforeZoom, afterZoom }));
+    assert.notDeepEqual(
+      afterZoom[0],
+      beforeZoom[0],
+      "Mouse wheel did not change visible range",
+    );
+    for (let i = 0; i < afterZoom.length; i++) {
+      const tolerance = Number(specs[i][1]) * 60;
+      assert.ok(
+        Math.abs(afterZoom[i].from - afterZoom[0].from) <= tolerance,
+        `Mouse zoom left boundary pane ${i}`,
+      );
+      assert.ok(
+        Math.abs(afterZoom[i].to - afterZoom[0].to) <= tolerance,
+        `Mouse zoom right boundary pane ${i}`,
+      );
+    }
+    phase = "mouse-drag";
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 45, y, { steps: 15 });
+    await page.mouse.up();
+    await page.waitForTimeout(3000);
+    const afterDrag = await frame.evaluate(() =>
+      Array.from({ length: widget.chartsCount() }, (_, i) =>
+        widget.chart(i).getVisibleRange(),
+      ),
+    );
+    console.log("MOUSE_DRAG", JSON.stringify(afterDrag));
+    assert.notDeepEqual(
+      afterDrag[0],
+      afterZoom[0],
+      "Mouse drag did not move visible range",
+    );
+    for (let i = 0; i < afterDrag.length; i++) {
+      const tolerance = Number(specs[i][1]) * 60;
+      assert.ok(
+        Math.abs(afterDrag[i].from - afterDrag[0].from) <= tolerance,
+        `Mouse drag left boundary pane ${i}`,
+      );
+      assert.ok(
+        Math.abs(afterDrag[i].to - afterDrag[0].to) <= tolerance,
+        `Mouse drag right boundary pane ${i}`,
+      );
+    }
+    // Restore reference ranges for the disabled-sync assertions below.
+    await frame.evaluate(
+      async (target) =>
+        widget.chart(0).setVisibleRange(target, { rejectByTimeout: 20000 }),
+      target,
+    );
+    await page.waitForTimeout(2000);
   }
   phase = "move-with-sync-disabled";
   await frame.evaluate(async () => {
     widget.dateRangeSync().setValue(false);
     widget.timeSync().setValue(false);
     const r = widget.chart(0).getVisibleRange();
-    await widget.chart(0).setVisibleRange(
-      { from: r.from - 3600, to: r.to - 3600 }, { rejectByTimeout: 20000 });
+    await widget
+      .chart(0)
+      .setVisibleRange(
+        { from: r.from - 3600, to: r.to - 3600 },
+        { rejectByTimeout: 20000 },
+      );
   });
   await page.waitForTimeout(2000);
   const unsynced = await frame.evaluate(() =>
-    Array.from({ length: widget.chartsCount() }, (_, i) => widget.chart(i).getVisibleRange()));
+    Array.from({ length: widget.chartsCount() }, (_, i) =>
+      widget.chart(i).getVisibleRange(),
+    ),
+  );
   assert.notDeepEqual(unsynced[0], moved[0].range);
-  assert.deepEqual(unsynced.slice(1), moved.slice(1).map((p) => p.range));
+  assert.deepEqual(
+    unsynced.slice(1),
+    moved.slice(1).map((p) => p.range),
+  );
   assert.deepEqual(errors, []);
-  console.log("Mixed-period viewport movement and disabled synchronization passed");
+  console.log(
+    "Mixed-period viewport movement and disabled synchronization passed",
+  );
   await browser.close();
 })().catch((e) => {
   console.error(e);

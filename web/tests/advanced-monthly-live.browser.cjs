@@ -1,8 +1,10 @@
-// Real monthly data initialization and workspace restoration; downloads missing development history.
+// Real D1/W1/MN initialization and workspace restoration; downloads missing development history.
 // Creates an unsaved-state monthly workspace; requires development ports 5188/5187.
 const { chromium } = require("playwright");
 const fs = require("fs");
 (async () => {
+  const resolution = process.env.MARKET_WATCH_TEST_RESOLUTION || "1M";
+  require("node:assert/strict").ok(["1D", "1W", "1M"].includes(resolution));
   const browser = await chromium.launch({
     headless: true,
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
@@ -95,7 +97,7 @@ const fs = require("fs");
         return r.json();
       }
       const row = await post("/advanced-charts/workspaces", {
-        name: "真实月线加载验收 EURUSD",
+        name: `真实高周期加载验收 EURUSD ${resolution}`,
       });
       await post("/advanced-charts/workspaces/" + row.id + "/save", {
         name: row.name,
@@ -111,7 +113,7 @@ const fs = require("fs");
         await fetch("/api/market-data/catalog?query=NZD_USD")
       ).json();
       return catalog;
-    }, process.env.MARKET_WATCH_TEST_RESOLUTION || "1M"),
+    }, resolution),
   );
   const started = Date.now();
   await page.goto("http://127.0.0.1:5188/advanced-charts");
@@ -128,7 +130,7 @@ const fs = require("fs");
     range: widget.chart(0).getVisibleRange(),
   }));
   console.log("MONTH_RANGE", JSON.stringify(before));
-  require("node:assert/strict").equal(before.resolution, "1M");
+  require("node:assert/strict").equal(before.resolution, resolution);
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
@@ -143,7 +145,7 @@ const fs = require("fs");
   );
   require("node:assert/strict").equal(
     await restored.evaluate(() => widget.chart(0).resolution()),
-    "1M",
+    resolution,
   );
   const restoredRange = await restored.evaluate(() =>
     widget.chart(0).getVisibleRange(),
@@ -151,7 +153,9 @@ const fs = require("fs");
   console.log("MONTH_RESTORED_RANGE", JSON.stringify(restoredRange));
   require("node:assert/strict").deepEqual(restoredRange, before.range);
   require("node:assert/strict").deepEqual(errors, []);
-  console.log("Monthly real history initialized and saved workspace restored");
+  console.log(
+    `${resolution} real history initialized and saved workspace restored`,
+  );
   await browser.close();
 })().catch((e) => {
   console.error(e);
