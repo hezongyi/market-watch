@@ -183,17 +183,28 @@ const fs = require("fs");
       true,
     );
     console.log("HISTORY_FAILURE_RECOVERED");
-    if (process.env.MARKET_WATCH_REAPPLY_RANGE === "1")
-      await frame.evaluate(
-        async (range) => widget.chart(0).setVisibleRange(range),
-        before.range,
-      );
   }
+  if (process.env.MARKET_WATCH_REAPPLY_RANGE === "1")
+    await frame.evaluate(
+      async (range) => widget.chart(0).setVisibleRange(range),
+      before.range,
+    );
   await page.waitForTimeout(2000);
   const savedRange = await frame.evaluate(() =>
     widget.chart(0).getVisibleRange(),
   );
   console.log("SAVED_RANGE", JSON.stringify(savedRange));
+  console.log(
+    "SAVED_SCALE",
+    await frame.evaluate(() => {
+      const scale = widget.chart(0).getTimeScale();
+      return {
+        spacing: scale.barSpacing(),
+        offset: scale.rightOffset(),
+        width: scale.width(),
+      };
+    }),
+  );
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
@@ -214,6 +225,17 @@ const fs = require("fs");
     widget.chart(0).getVisibleRange(),
   );
   console.log("MONTH_RESTORED_RANGE", JSON.stringify(restoredRange));
+  console.log(
+    "RESTORED_SCALE",
+    await restored.evaluate(() => {
+      const scale = widget.chart(0).getTimeScale();
+      return {
+        spacing: scale.barSpacing(),
+        offset: scale.rightOffset(),
+        width: scale.width(),
+      };
+    }),
+  );
   require("node:assert/strict").deepEqual(restoredRange, savedRange);
   require("node:assert/strict").deepEqual(errors, []);
   console.log(
