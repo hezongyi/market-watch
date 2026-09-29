@@ -121,3 +121,9 @@
 - 切MN首个请求limit=188（/tmp/mw-switch-month-request.log），新建月线工作区3个月初始范围并未覆盖周期切换路径。
 - 尝试公开onIntervalChanged的timeframe参数：time-range（切换前日期范围扩为90天）仍请求195根；period-back=3M仍188根（/tmp/mw-switch-periodback.log）。已移除这两种无效候选和全部临时产品日志，保留原稳定实现。
 - 下一步必须解决首个请求预算或明确采用可渐进展示的加载方式，保持数据完整性；不能截断countBack、伪造noData，或把扩大测试超时当作解决。此验收用例目前预期失败，交付缺口保持开放。
+
+### 高周期切换进一步定位
+
+- 只读检查供应包：determine_first_data_request_size_using_visible_range在模型初始化时计算初始请求；普通周期切换没有重走这段初始化逻辑。未修改供应包。
+- 三个独立公开API对照均未解决：周期事件内setBarSpacing、widget.setTimeFrame({val:"3M",res:"1M"})、切换前先设置barSpacing并等待100ms，首个MN请求仍为195根（/tmp/mw-switch-spacing-probe.log、/tmp/mw-switch-settimeframe.log、/tmp/mw-switch-spacing-before.log）。
+- 所有临时探针已移除，产品及正式失败用例恢复到此前状态。下一步需要验证原生重新加载图表状态是否重建请求预算，或采用经过真实渲染验证的渐进加载；重复调timeframe参数无证据支持继续尝试。
