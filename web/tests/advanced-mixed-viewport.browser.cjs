@@ -139,7 +139,15 @@ const fs = require("fs");
       await c.setResolution(specs[i][1], { doNotActivateChart: true });
     }
   }, specs);
-  await page.waitForTimeout(15000);
+  await frame.waitForFunction(
+    () =>
+      !rangeGuard.busy() &&
+      Array.from({ length: widget.chartsCount() }, (_, i) =>
+        widget.chart(i),
+      ).every((chart) => chart.dataReady() && chart.getVisibleRange().from > 0),
+    null,
+    { timeout: 180000 },
+  );
   const state = await frame.evaluate(() =>
     Array.from({ length: widget.chartsCount() }, (_, i) => ({
       symbol: widget.chart(i).symbol(),
@@ -183,6 +191,25 @@ const fs = require("fs");
     })),
   );
   console.log("MOVED_RANGES", JSON.stringify({ target, moved }));
+  if (process.env.MARKET_WATCH_GOLD_DIRECT_RANGE_PROBE) {
+    const direct = await frame.evaluate(async (target) => {
+      widget.dateRangeSync().setValue(false);
+      const chart = widget.chart(1);
+      await chart.setVisibleRange(target, { rejectByTimeout: 20000 });
+      return {
+        range: chart.getVisibleRange(),
+      };
+    }, target);
+    console.log("GOLD_DIRECT_RANGE", JSON.stringify(direct));
+    assert.deepEqual(
+      direct.range,
+      moved[1].range,
+      "Synchronized gold range must match direct native range setting",
+    );
+    assert.deepEqual(errors, []);
+    await browser.close();
+    return;
+  }
   // Compare same-symbol panes: different instruments can have different sessions.
   for (const pane of moved) {
     const reference = moved.find((other) => other.symbol === pane.symbol);
