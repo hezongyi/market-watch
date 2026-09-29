@@ -664,3 +664,10 @@
 
 - 新advanced-monthly-live.browser.cjs：EURUSD/MN真实Datafeed初始化，检查有效范围、保存并刷新恢复周期，无HTTP下载模拟。默认180秒等待记录为诊断预算，不替代性能目标。
 - `/tmp/mw-monthly-live.log` exec session77000最后确认仍运行：首批已有2根月线，后续更早页缺失数据补取中。尚未取得初始化/刷新结论，不能记为高周期实际显示通过。
+
+### 月线初始化异常已定位阶段
+
+- session77000退出1：真实月线约60052ms显示，保存刷新恢复周期，但出现sds_1页面异常。
+- 增加阶段/堆栈后 `/tmp/mw-monthly-stack.log` session73333退出1：initial阶段同时出现ensureExtendedTo读sds_1和_getActive undefined iterable，复现此前新建间歇错误；热加载3799ms仍出现，不能解释为仅下载慢。
+- 单变量临时跳过onChartReady内widget.load，`/tmp/mw-monthly-no-init-load.log` session63335不再记录这两个页面异常，但saveChartToServer失败（身份未绑定），不能直接采用该跳过。已恢复产品bridge原代码。
+- 后续应调整首次身份绑定生命周期，既保留native保存身份又避免ready回调中立即重载；供应商文件未改，错误断言未过滤。

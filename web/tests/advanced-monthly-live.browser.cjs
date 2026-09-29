@@ -13,6 +13,7 @@ const fs = require("fs");
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
+  let phase = "initial";
   const historyMetrics = {
     requests: 0,
     pending: 0,
@@ -47,7 +48,7 @@ const fs = require("fs");
       );
     }
   });
-  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("pageerror", (e) => {errors.push(e.message); console.log("MONTH_ERROR", phase, e.stack);});
   await page.goto("http://127.0.0.1:5188/");
   await page
     .getByLabel("管理员密码")
@@ -116,6 +117,7 @@ const fs = require("fs");
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
+  phase = "reload";
   await page.reload();
   await page.waitForTimeout(3000);
   const restored = page.frames().find((f) => f.url().includes(":5187/?"));
