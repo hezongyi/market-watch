@@ -114,3 +114,10 @@
 - 再追加200根后续K线，过去页面全部指标值保持不变；EMA前499根明确返回null，第500根种子值正确。测试不复用被测calculate/TA-Lib生成期望值。
 - 初次测试原始浮点输入超出数据库Numeric(24,10)精度，导致RSI误差略超阈值；改用8位小数可持久化输入后通过，没有放宽数值阈值或修改产品算法。
 - test_chart_workspace.py共19 passed，ruff检查通过（/tmp/mw-indicator-long-history.log）。该证据覆盖两类递归指标，不等于十年M1全部指标性能已达标；自定义插件仍需其作者提供对应数值测试。
+
+### 高周期切换请求预算：未解决
+
+- 扩展advanced-high-period-request.browser.cjs，MARKET_WATCH_SWITCH_PERIOD=1先真实加载M5，再切目标高周期；高周期history请求在浏览器拦截，避免验证本身启动十多年M1补数。
+- 切MN首个请求limit=188（/tmp/mw-switch-month-request.log），新建月线工作区3个月初始范围并未覆盖周期切换路径。
+- 尝试公开onIntervalChanged的timeframe参数：time-range（切换前日期范围扩为90天）仍请求195根；period-back=3M仍188根（/tmp/mw-switch-periodback.log）。已移除这两种无效候选和全部临时产品日志，保留原稳定实现。
+- 下一步必须解决首个请求预算或明确采用可渐进展示的加载方式，保持数据完整性；不能截断countBack、伪造noData，或把扩大测试超时当作解决。此验收用例目前预期失败，交付缺口保持开放。
