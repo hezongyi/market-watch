@@ -127,6 +127,58 @@ const fs = require("fs");
     null,
     { timeout: 180000 },
   );
+  if (process.env.MARKET_WATCH_EXPORT_UI_CHECK) {
+    await frame.evaluate(() =>
+      widget
+        .chart(0)
+        .createStudy("守望 Python EMA", false, false, { period: 20 }),
+    );
+    let requests = 0;
+    await page.route("**/api/charts/export", async (route) => {
+      const body = route.request().postDataJSON();
+      require("node:assert/strict").equal(body.instrument, "EURUSD");
+      require("node:assert/strict").ok(body.end > body.start);
+      require("node:assert/strict").equal(body.indicators[0].name, "EMA");
+      requests++;
+      if (requests === 1)
+        return route.fulfill({ status: 202, json: { status: "pending" } });
+      await route.fulfill({
+        status: 200,
+        contentType: "text/csv",
+        body: "start_ms,close\r\n60000,1.2345\r\n",
+      });
+    });
+    const native = frame.childFrames()[0];
+    await native
+      .locator("button:visible")
+      .filter({ hasText: "导出 CSV" })
+      .click();
+    await page.getByLabel("开始时间（含）").fill("2026-09-28T12:00");
+    await page.getByLabel("结束时间（不含）").fill("2026-09-28T13:00");
+    const download = page.waitForEvent("download");
+    await page.getByRole("button", { name: "下载 CSV", exact: true }).click();
+    await page.getByText("正在补齐历史行情", { exact: false }).waitFor();
+    const file = await download;
+    require("node:assert/strict").equal(
+      fs.readFileSync(await file.path(), "utf8"),
+      "start_ms,close\r\n60000,1.2345\r\n",
+    );
+    require("node:assert/strict").equal(requests, 2);
+    await page.screenshot({ path: "/tmp/mw-export-dialog.png" });
+    await page.getByRole("button", { name: "关闭", exact: true }).click();
+    await native
+      .locator("button:visible")
+      .filter({ hasText: "导出 CSV" })
+      .click();
+    await page.keyboard.press("Escape");
+    await page.getByRole("dialog").waitFor({ state: "detached" });
+    require("node:assert/strict").deepEqual(errors, []);
+    await browser.close();
+    console.log(
+      "Export dialog pending, download bytes and Escape close passed",
+    );
+    return;
+  }
   if (process.env.MARKET_WATCH_START_M5) {
     if (process.env.MARKET_WATCH_PARTIAL_HISTORY_PROBE) {
       await frame.evaluate(async () => {

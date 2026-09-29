@@ -1,4 +1,11 @@
 let csrf = "";
+export function apiResponse(path: string, body: unknown, signal?: AbortSignal) {
+  return fetch(`/api${path}`, {
+    method: "POST", credentials: "same-origin", signal,
+    headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf },
+    body: JSON.stringify(body),
+  });
+}
 export function setCsrf(value: string) {
   csrf = value;
 }

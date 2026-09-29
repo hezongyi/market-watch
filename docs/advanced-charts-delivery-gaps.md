@@ -250,3 +250,11 @@
 - 覆盖不足返回202 pending及任务ID，失败返回409及失败任务ID；不会返回CSV伪装完整下载。覆盖完成后复用charts data指标计算结果并CSV编码，no-store及attachment响应。
 - 初始单次2000根/366天界限明确返回413/422，不静默截断。跨页大导出和下载界面仍需接入/完善；CSV模块没有供应库依赖。
 - 新增认证、已有K线但覆盖不足、覆盖完成CSV内容、非法范围验收；test_chart_export.py与test_chart_workspace.py合计21 passed（/tmp/mw-export-api-tests.log），ruff检查通过。测试覆盖门槛使用可控覆盖返回，真实补数到下载的浏览器整链路尚未验证。
+
+### 替代导出网页入口与受控交互验收
+
+- 原生header扩展按钮“导出CSV”发送当前活动图品种/周期/主题与Python研究参数；保留原生供应库菜单，不修改供应代码。Python研究通过公开getAllStudies/getInputValues提取，与现有catalog匹配，不误把内部合成symbol当公开输入。
+- 新增ExportDialog原生dialog：UTC起止选择、Python指标复选框、覆盖pending轮询、下载、失败提示、关闭/Escape取消前端等待；凭据仍由同源apiResponse持有。说明当前不含原生内置指标、未收盘数据可能变化、2000根及366天限制。
+- /tmp/mw-export-ui-python.log退出0：真实按钮点击、选择日期、Python EMA规格传递、受控202后200响应、下载字节校验、关闭后重开及Escape关闭通过。前端构建通过（/tmp/mw-export-ui-build2.log）。响应在测试中拦截，不等于真实补数到CSV整链路已通过；运行API仍需加载新代码。
+- 明暗主题使用widget.getTheme，浅色截图/tmp/mw-export-dialog.png已检查并修正说明文字对比度、全局checkbox尺寸污染。暗色与手机视图仍需进一步检查。
+- 仍需失败任务重试入口、真实后端下载、指标参数和数值一致性、取消后无额外下载验收。原生指标导出限制未获得用户确认，不关闭该缺口。

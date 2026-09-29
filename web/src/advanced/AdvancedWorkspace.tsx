@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import "./advanced.css";
+import { ExportDialog, type ExportSelection } from "./ExportDialog";
 
 type Workspace = {
   id: string;
@@ -25,6 +26,8 @@ export default function AdvancedWorkspace() {
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
   const [frameKey, setFrameKey] = useState(0);
+  const [exportSelection, setExportSelection] =
+    useState<ExportSelection | null>(null);
   const [feedError, setFeedError] = useState("");
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
@@ -131,6 +134,18 @@ export default function AdvancedWorkspace() {
         } catch (e) {
           setError(String(e));
         }
+      } else if (m.type === "export-selection") {
+        const value = m.selection;
+        if (
+          value &&
+          typeof value.instrument === "string" &&
+          value.instrument.length <= 80 &&
+          frames.has(value.timeframe) &&
+          Array.isArray(value.indicators) &&
+          value.indicators.length <= 12 &&
+          JSON.stringify(value).length < 20000
+        )
+          setExportSelection(value);
       } else if (m.type === "workspace-action") {
         if (m.action === "home") location.assign("/");
         else if (!mobile && m.action === "create") await create();
@@ -493,6 +508,12 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace">
+      {exportSelection && (
+        <ExportDialog
+          selection={exportSelection}
+          onClose={() => setExportSelection(null)}
+        />
+      )}
       <div
         className="advanced-status"
         role="status"

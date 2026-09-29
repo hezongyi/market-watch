@@ -858,6 +858,44 @@ function boot(
         widget.createButton({
           align: "right",
           useTradingViewStyle: true,
+          text: "导出 CSV",
+          title: "导出行情及当前 Python 指标",
+          onClick: () => {
+            const chart = widget.activeChart();
+            const instrument = decode(chart.symbol()).symbol;
+            const indicators = [];
+            for (const study of chart.getAllStudies()) {
+              const name = Object.keys(catalog).find(
+                (name) => study.name === "守望 Python " + name,
+              );
+              if (!name) continue;
+              const inputs = chart.getStudyById(study.id).getInputValues();
+              indicators.push({
+                name,
+                id: study.id,
+                params: Object.fromEntries(
+                  Object.keys(catalog[name].params).map((key) => [
+                    key,
+                    inputs.find((input) => input.id === key)?.value ??
+                      catalog[name].params[key],
+                  ]),
+                ),
+              });
+            }
+            send({
+              type: "export-selection",
+              selection: {
+                instrument,
+                theme: widget.getTheme(),
+                timeframe: frames[chart.resolution()],
+                indicators,
+              },
+            });
+          },
+        });
+        widget.createButton({
+          align: "right",
+          useTradingViewStyle: true,
           text: "返回守望",
           title: "返回守望工作台",
           onClick: () => send({ type: "workspace-action", action: "home" }),
