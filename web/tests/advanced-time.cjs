@@ -2,6 +2,7 @@ const fs = require("node:fs"),
   vm = require("node:vm"),
   assert = require("node:assert/strict");
 const ctx = vm.createContext({
+  crypto: require("node:crypto").webcrypto,
   URL,
   URLSearchParams,
   Intl,

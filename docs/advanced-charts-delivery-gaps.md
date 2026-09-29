@@ -292,3 +292,10 @@
 - 新增test_export_exact_limit_after_empty_leading_interval，在已覆盖但起点无K线的范围内构造恰好2000根，原接口误报413（/tmp/mw-export-limit-before.log，1 failed/2 passed）。
 - 修复为复用数据接口查一根前驱K线，仅前驱仍位于导出范围时判定超过2000；空白时间和休市不能当作额外K线。超过2000仍明确拒绝，不截断文件。
 - 新测试同时验证2000根返回200且CSV行数正确、2001根返回413。导出与图表工作区相关22项通过（/tmp/mw-export-limit-after.log），ruff通过。
+
+### 当前完整后端与适配脚本回归
+
+- 当前后端完整运行150 passed/5 skipped（/tmp/mw-backend-current-regression.log）。其中四项PG专项使用trading_alerts_test补跑4 passed（/tmp/mw-postgres-current-regression.log）；剩余备份恢复专项已于上一节独立PG14实例通过。不同执行环境的证据分别保留，不宣称单次全绿。
+- Advanced Charts非浏览器JS专项共11个全部通过（/tmp/mw-advanced-js-regression.log），覆盖时间转换、工作区、偏好、自选、自动保存、历史分页/去重/重置、同步保护及视区恢复。
+- 发现advanced-time测试VM遗漏crypto，全文件初始化即报ReferenceError；补入Node webcrypto后原时间转换断言正常执行通过，未修改产品时间算法。初次批量选择误包含advanced-browser.cjs，随后明确排除所有browser脚本；上述11个通过不包含浏览器验收。
+- 部署配置检查确认Dockerfile/.dockerignore包含所有当前适配脚本；镜像构建运行、HTTPS反向代理与生产切换仍未执行，此静态检查不替代部署验收。
