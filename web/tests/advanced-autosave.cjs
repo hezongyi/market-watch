@@ -63,4 +63,7 @@ vm.runInContext(
 );
 assert.equal(vm.runInContext("nativeSaving", context), false);
 assert.equal(vm.runInContext("dirty", context), true);
+vm.runInContext("rangeGuard={busy:()=>true};dirty=false;snapshot()",context);
+assert.equal(vm.runInContext("dirty",context),true,"loading guard defers save without clearing pending edits");
+assert.equal(vm.runInContext("nativeSaving",context),false);
 console.log("Autosave preserves in-flight edits and failed-save retry state");
