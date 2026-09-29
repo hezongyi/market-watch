@@ -345,3 +345,9 @@
 - 使用真实widget.getStudiesList核对并逐项createStudy/removeEntity：Moving Average、Moving Average Exponential、Moving Average Weighted、Bollinger Bands、Relative Strength Index、MACD、Average True Range、Stochastic全部存在且创建成功，无pageerror。
 - 新脚本advanced-native-indicators.browser.cjs保留断言；这是内置指标路径的直接证据，与Python同名实现分开验证。不声称已完成参数口径及逐点数值对照。
 - Python参考线旧工作区迁移兼容性仍待验证，本次没有修改已有指标标识或算法。
+
+### 全部约定画线类型的保存恢复
+
+- 真实浏览器同图创建水平线、趋势线、射线、矩形、斐波那契回撤、平行通道、多仓、空仓及文字，共9对象；保存刷新后名称及锚点一致（水平线只比较价格，其时间锚点由原生库移动）。无pageerror。
+- 多空仓位单点createShape失败，改为公开createMultipointShape两点创建成功；未改供应商代码。此为测试接入方法修正，不代表原生鼠标工具此前损坏。
+- 新advanced-all-drawings.browser.cjs保留回归。尚需检查文字内容、斐波那契级别/样式以及仓位止损止盈和盈亏比属性，锚点通过不等于这些属性已经验收。
