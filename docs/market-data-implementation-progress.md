@@ -436,3 +436,9 @@
 - 对同一失败用例增加临时unhandledrejection记录及阶段标记。布局从1切8前后pageerror均为0；切换第0窗格EURUSD后，切换第1窗格XAUUSD期间出现两次blob库iframe的Promise拒绝，reason与stack均undefined。其他窗格仍完成切换。
 - 证据将排查范围收敛至不同品种切换/原生视区同步过程；未证明具体根因。下一步双图最小复现并对照时间范围同步设置。
 - 临时探针留/tmp/mw-mixed-instrumented.cjs，日志/tmp/mw-mixed-instrumented.log；仓库测试中的临时DEBUG标记已去除，未隐藏pageerror断言。
+
+### 双图同步对照实验
+
+- 将失败复现缩小为2h布局EURUSD/XAUUSD M5，仍使用doNotActivateChart。关闭dateRangeSync的开发探针退出0、两窗格范围有效且无pageerror；仅将该开关改true的对照退出1，再现undefined页面异常。
+- 该对照支持跨品种切换与原生日期范围同步交互为触发条件；尚未证明根因在库还是Datafeed时间/历史契约。正式代码默认同步不变，不能用关闭刚需同步作为修复。
+- 探针/tmp/mw-two-pane-probe.cjs与/tmp/mw-two-pane-on.cjs，日志分别mw-two-pane-off.log/on.log。探针沿用8图脚本输出文案，实际断言窗格数为2，不能将其结果记为8图通过。
