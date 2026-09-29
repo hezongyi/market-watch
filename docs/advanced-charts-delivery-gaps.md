@@ -177,3 +177,11 @@
 - MARKET_WATCH_RESET_BEFORE_PERIOD_PROBE=1请求预算对照/tmp/mw-reset-before-period.log退出0：M5重置请求3根，后续MN请求3根；高周期HTTP拦截未下载远期历史。
 - 同模式真实EURUSD月线+MARKET_WATCH_EXERCISE_UNDO=1验证/tmp/mw-reset-before-period-live.log退出0：最新月K可见，重置前及重置后创建的两条水平线均能通过公开undo实际撤销，未重载widget。同期同步guard产生多余date range lock撤销项，仍需处理。
 - 尚未产品化：原生周期按钮不能假定会先执行预备重置，需验证公开事件时序或另一公开适配机制；不能把测试提前准备步骤当成原生操作已修复。当前产品原widget.load路径的撤销缺口仍开放。
+
+### 公开周期事件内重置正式替代widget重载
+
+- MARKET_WATCH_INTERVAL_RESET_PROBE对照确认onIntervalChanged触发时chart.dataReady=true，旧视区仍可用；同步设置间距后resetCache/resetData使首次MN请求3根（/tmp/mw-interval-reset.log退出0）。此前getBars阶段再重置已太晚。
+- 产品recordPeriodChange使用上述公开API；去除widget.save/load重建预算、workspaceEpoch推进、异步恢复分支及对应临时状态。明确timeframe意图、正在加载或旧数据尚未就绪时不调整。供应库未修改。
+- 正式请求量测试/tmp/mw-event-reset-budget.log退出0，仅MN 3根请求。真实M5→MN并逐步undo至画线消失通过（/tmp/mw-event-reset-undo.log退出0），workspaceEpoch不变；不会重载工作区清空撤销历史。
+- 双图EURUSD M5→MN、XAUUSD M15旁图品种/周期/视区/画线保留及保存刷新通过（/tmp/mw-event-reset-neighbor.log退出0），无页面异常。
+- 分页、range-sync和viewports专项均通过，前端build通过（/tmp/mw-event-reset-build.log）。同步guard额外产生date range lock撤销项仍存在；连续切换、明确日期范围、冷加载和实际原生按钮点击路径尚须验证，不能由公开setResolution测试扩张为全部完成。

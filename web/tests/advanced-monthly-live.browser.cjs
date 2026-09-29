@@ -239,8 +239,9 @@ const fs = require("fs");
       chart.setResolution(resolution).catch(() => {});
     }, resolution);
     await frame.waitForFunction(
-      ({ epoch, resolution, resetProbe }) =>
-        (resetProbe || workspaceEpoch > epoch) &&
+      ({ epoch, resolution }) =>
+        workspaceEpoch === epoch &&
+        !rangeGuard?.busy() &&
         ready &&
         !loading &&
         widget.chart(0).resolution() === resolution &&
@@ -248,7 +249,6 @@ const fs = require("fs");
       {
         epoch,
         resolution,
-        resetProbe: !!process.env.MARKET_WATCH_RESET_BEFORE_PERIOD_PROBE,
       },
       { timeout: 180000 },
     );
