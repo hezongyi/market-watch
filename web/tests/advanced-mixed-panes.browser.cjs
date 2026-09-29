@@ -93,6 +93,20 @@ const fs = require("fs");
     await frame.evaluate(() => widget.chartsCount()),
     8,
   );
+  if (process.env.MARKET_WATCH_TEST_SYNC_GUARD === "1") {
+    await frame.addScriptTag({
+      content: fs.readFileSync(
+        require("node:path").resolve(
+          __dirname,
+          "../../advanced-host/range-sync.js",
+        ),
+        "utf8",
+      ),
+    });
+    await frame.evaluate(() => {
+      window.testRangeGuard = rangeSyncLoadingGuard(widget);
+    });
+  }
   const specs = [
     ["EURUSD", "5"],
     ["XAUUSD", "5"],
@@ -127,6 +141,16 @@ const fs = require("fs");
     specs,
   );
   assert.ok(state.every((s) => s.range.to > s.range.from && s.range.from > 0));
+  if (process.env.MARKET_WATCH_TEST_SYNC_GUARD === "1") {
+    assert.equal(
+      await frame.evaluate(() => widget.dateRangeSync().value()),
+      true,
+    );
+    assert.equal(
+      await frame.evaluate(() => window.testRangeGuard.busy()),
+      false,
+    );
+  }
   assert.deepEqual(errors, []);
   console.log("Eight mixed symbol/resolution panes loaded with valid ranges");
   await browser.close();

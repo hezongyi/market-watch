@@ -22,7 +22,7 @@ function rangeSyncLoadingGuard(widget) {
     desired = value;
     if (pending.size && value) set(false);
   }
-  toggle.subscribe(null, changed);
+  toggle.subscribe(changed);
   function refresh() {
     if (disposed) return;
     const charts = new Set(
@@ -58,7 +58,7 @@ function rangeSyncLoadingGuard(widget) {
     desired: () => desired,
     dispose() {
       disposed = true;
-      toggle.unsubscribe(null, changed);
+      toggle.unsubscribe(changed);
       for (const [chart, callback] of bindings)
         chart.onSymbolChanged().unsubscribe(null, callback);
       bindings.clear();

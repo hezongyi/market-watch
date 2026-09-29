@@ -460,3 +460,9 @@
 - 新range-sync.js封装公开API保护，按chart对象跟踪并发加载token，旧回调不提前恢复；refresh解除已移除窗格订阅，dispose后旧回调失效，保留原先关闭同步的偏好。
 - advanced-range-sync.cjs覆盖双图同时加载、同图重复切换、旧回调、关闭偏好、移除窗格与销毁，通过。
 - 尚未接入bridge/index：自动保存不能记录临时false状态、布局变化需绑定refresh、加载期间用户关闭已临时关闭的原生开关是否产生通知仍需确定。因此当前模块为待集成实现，不能称8图异常已修复。
+
+### 独立同步保护模块真实8图实验
+
+- 真实库暴露WatchedValue.subscribe(callback)而非图表事件subscribe(owner,callback)，首次模块加载失败；已修正toggle订阅/退订签名与单元模拟。
+- 通过测试开关注入range-sync模块后，原混合8图场景通过：8个品种/周期组合正确、范围有效、无pageerror，最终dateRangeSync为true且guard无pending。默认不注入的失败复现仍保留。
+- 此为真实模块实验，尚未正式接入bridge；自动保存临时状态、工作区/布局切换生命周期及加载期间用户偏好仍需收口。

@@ -19,6 +19,8 @@ const changes = event();
 let value = true;
 const toggle = {
   ...changes,
+  subscribe: (fn) => changes.subscribe(null, fn),
+  unsubscribe: (fn) => changes.unsubscribe(null, fn),
   value: () => value,
   setValue: (v) => {
     if (v !== value) {
