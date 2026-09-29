@@ -461,24 +461,6 @@ export default function AdvancedWorkspace() {
       setError(String(e));
     }
   }
-  async function rename() {
-    const row = current.current;
-    if (!row) return;
-    const name = prompt("工作区名称", row.name);
-    if (!name?.trim()) return;
-    try {
-      await flush();
-      const updated = await api<Workspace>(
-        `/advanced-charts/workspaces/${row.id}/save`,
-        { ...current.current, name: name.trim() },
-      );
-      current.current = updated;
-      setRows((p) => p.map((x) => (x.id === row.id ? updated : x)));
-      setActive(updated);
-    } catch (e) {
-      setError(String(e));
-    }
-  }
   async function copy() {
     try {
       if (!blocked.current) await flush();
@@ -550,9 +532,6 @@ export default function AdvancedWorkspace() {
         </select>
         <button disabled={mobile} onClick={create}>
           新建
-        </button>
-        <button disabled={!active || mobile} onClick={rename}>
-          重命名
         </button>
         <button disabled={!active || mobile} onClick={copy}>
           复制
