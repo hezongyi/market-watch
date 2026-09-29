@@ -34,7 +34,7 @@ const fs = require("fs");
         console.log(
           "MONTH_REQUEST",
           phase,
-          JSON.stringify(r.request().postDataJSON()),
+          JSON.stringify({query:r.request().postDataJSON(),status:j.status,coverageStart:j.requested_start,cursor:j.next_cursor,starts:j.bars?.map(b=>b.start)}),
         );
       if (r.url().includes("/api/market-data/history")) {
         historyMetrics.requests++;
