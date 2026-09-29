@@ -133,7 +133,18 @@ const fs = require("fs");
         .chart(0)
         .createStudy("守望 Python EMA", false, false, { period: 20 }),
     );
-    let requests = 0;
+    let requests = 0,
+      retried = 0,
+      cancelledPhase = false,
+      downloads = 0;
+    page.on("download", () => downloads++);
+    await page.route(
+      "**/api/market-data/retry/11111111-1111-1111-1111-111111111111",
+      async (route) => {
+        retried++;
+        await route.fulfill({ json: { ok: true } });
+      },
+    );
     await page.route("**/api/charts/export", async (route) => {
       const body = route.request().postDataJSON();
       require("node:assert/strict").equal(body.instrument, "EURUSD");
@@ -141,6 +152,14 @@ const fs = require("fs");
       require("node:assert/strict").equal(body.indicators[0].name, "EMA");
       requests++;
       if (requests === 1)
+        return route.fulfill({
+          status: 409,
+          json: {
+            message: "测试补数失败",
+            failed_task_ids: ["11111111-1111-1111-1111-111111111111"],
+          },
+        });
+      if (requests === 2 || cancelledPhase)
         return route.fulfill({ status: 202, json: { status: "pending" } });
       await route.fulfill({
         status: 200,
@@ -157,21 +176,32 @@ const fs = require("fs");
     await page.getByLabel("结束时间（不含）").fill("2026-09-28T13:00");
     const download = page.waitForEvent("download");
     await page.getByRole("button", { name: "下载 CSV", exact: true }).click();
+    await page
+      .getByRole("button", { name: "重试历史补数", exact: true })
+      .click();
     await page.getByText("正在补齐历史行情", { exact: false }).waitFor();
     const file = await download;
     require("node:assert/strict").equal(
       fs.readFileSync(await file.path(), "utf8"),
       "start_ms,close\r\n60000,1.2345\r\n",
     );
-    require("node:assert/strict").equal(requests, 2);
+    require("node:assert/strict").equal(requests, 3);
+    require("node:assert/strict").equal(retried, 1);
     await page.screenshot({ path: "/tmp/mw-export-dialog.png" });
     await page.getByRole("button", { name: "关闭", exact: true }).click();
     await native
       .locator("button:visible")
       .filter({ hasText: "导出 CSV" })
       .click();
+    cancelledPhase = true;
+    await page.getByRole("button", { name: "下载 CSV", exact: true }).click();
+    await page.getByText("正在补齐历史行情", { exact: false }).waitFor();
+    const beforeCancel = requests;
     await page.keyboard.press("Escape");
     await page.getByRole("dialog").waitFor({ state: "detached" });
+    await page.waitForTimeout(2500);
+    require("node:assert/strict").equal(requests, beforeCancel);
+    require("node:assert/strict").equal(downloads, 1);
     require("node:assert/strict").deepEqual(errors, []);
     await browser.close();
     console.log(

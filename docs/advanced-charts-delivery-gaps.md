@@ -258,3 +258,10 @@
 - /tmp/mw-export-ui-python.log退出0：真实按钮点击、选择日期、Python EMA规格传递、受控202后200响应、下载字节校验、关闭后重开及Escape关闭通过。前端构建通过（/tmp/mw-export-ui-build2.log）。响应在测试中拦截，不等于真实补数到CSV整链路已通过；运行API仍需加载新代码。
 - 明暗主题使用widget.getTheme，浅色截图/tmp/mw-export-dialog.png已检查并修正说明文字对比度、全局checkbox尺寸污染。暗色与手机视图仍需进一步检查。
 - 仍需失败任务重试入口、真实后端下载、指标参数和数值一致性、取消后无额外下载验收。原生指标导出限制未获得用户确认，不关闭该缺口。
+
+### 导出失败重试、关闭取消与真实API
+
+- ExportDialog根据409中的合法UUID任务显示“重试历史补数”，复用market-data/retry后继续导出；错误时清除旧加载提示，非CSV成功响应拒绝下载。读取blob后再次检查abort，防止关闭窗口后下载。
+- /tmp/mw-export-retry-cancel.log退出0：受控失败→点击重试→pending→CSV下载；再次pending时Escape关闭，跨过轮询间隔后请求数不增加、下载总数仍为1。前端构建通过（/tmp/mw-export-retry-build.log）。
+- 开发API原PID2212692使用.env配置；先由同环境Settings确认数据库trading_alerts_dev且delivery_enabled=false，再有序重启为PID2496024加载导出接口。未改生产环境。
+- 真实认证HTTP导出EURUSD M5 2026-09-28 12:00..13:00 UTC返回200，CSV12行、时间半开边界及EMA(20)非空值检查通过，文件/tmp/mw-real-export.csv。该区间已有覆盖，仅证明真实缓存命中API链路，不代表冷加载补数/指标独立数值对照已完成。

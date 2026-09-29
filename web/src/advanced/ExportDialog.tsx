@@ -23,11 +23,13 @@ export function ExportDialog({
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [failedTasks, setFailedTasks] = useState<string[]>([]);
   useEffect(() => {
     dialog.current?.showModal();
     return () => abort.current?.abort();
   }, []);
-  async function download() {
+  async function download(retryFailed = false) {
+    if (busy) return;
     const left = Date.parse(start + "Z"),
       right = Date.parse(end + "Z");
     if (!Number.isFinite(left) || !Number.isFinite(right) || left >= right) {
@@ -46,6 +48,17 @@ export function ExportDialog({
       indicators: include ? selection.indicators : [],
     };
     try {
+      if (retryFailed) {
+        for (const id of failedTasks) {
+          const response = await apiResponse(
+            `/market-data/retry/${encodeURIComponent(id)}`,
+            {},
+            controller.signal,
+          );
+          if (!response.ok) throw Error("历史任务重试失败，请稍后重试");
+        }
+        setFailedTasks([]);
+      }
       while (!controller.signal.aborted) {
         const response = await apiResponse(
           "/charts/export",
@@ -69,6 +82,17 @@ export function ExportDialog({
         }
         if (!response.ok) {
           const result = await response.json();
+          setFailedTasks(
+            Array.isArray(result.failed_task_ids)
+              ? result.failed_task_ids.filter(
+                  (id: unknown): id is string =>
+                    typeof id === "string" &&
+                    /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(
+                      id,
+                    ),
+                )
+              : [],
+          );
           throw Error(
             result.message ||
               (typeof result.detail === "string"
@@ -76,7 +100,10 @@ export function ExportDialog({
                 : "导出失败，请检查日期范围"),
           );
         }
+        if (!response.headers.get("content-type")?.includes("text/csv"))
+          throw Error("服务器未返回 CSV 文件，请稍后重试");
         const blob = await response.blob();
+        if (controller.signal.aborted) return;
         const url = URL.createObjectURL(blob),
           link = document.createElement("a");
         link.href = url;
@@ -87,7 +114,10 @@ export function ExportDialog({
         break;
       }
     } catch (e) {
-      if (!controller.signal.aborted) setError(String(e));
+      if (!controller.signal.aborted) {
+        setStatus("");
+        setError(String(e));
+      }
     } finally {
       if (!controller.signal.aborted) setBusy(false);
     }
@@ -151,6 +181,15 @@ export function ExportDialog({
         <div role="status">{status}</div>
         {error && <p role="alert">{error}</p>}
         <footer>
+          {!!failedTasks.length && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void download(true)}
+            >
+              重试历史补数
+            </button>
+          )}
           <button type="button" onClick={onClose}>
             关闭
           </button>
