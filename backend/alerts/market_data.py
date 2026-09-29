@@ -7,7 +7,7 @@ from sqlalchemy import select
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
 from .coverage import covers_interval
-from .domain import Calendar, bucket_bounds, has_trading_gap, session_bounds
+from .domain import Calendar, bucket_bounds, has_trading_gap, scheduled_open, session_bounds
 from .market import stored_coverage
 from .providers import fetch_oanda_catalog
 from .storage import (
@@ -197,6 +197,23 @@ def router(authenticated):
                 }
                 if inst.basis == "bid":
                     values["bid"] = float(bar.close)
+                observed_now = now_ms()
+                age = max(0, observed_now - bar.end)
+                is_open = scheduled_open(
+                    instant(observed_now),
+                    Calendar(inst.calendar),
+                    gold=inst.id == "XAUUSD",
+                    closures=closures_from(inst.calendar_profile),
+                )
+                quality = "fresh" if age <= 180000 else "stale" if is_open else "closed"
+                label = {
+                    "fresh": "最近更新",
+                    "stale": "报价待更新",
+                    "closed": "按日历休市，最后报价",
+                }[quality]
+                values["description"] += (
+                    " · " + label + " · " + instant(bar.end).strftime("%Y-%m-%d %H:%M UTC")
+                )
                 session_start = ms(session_bounds(instant(bar.start), Calendar(inst.calendar))[0])
                 previous = db.scalar(
                     select(Bar)
@@ -237,6 +254,8 @@ def router(authenticated):
                         "as_of": bar.end,
                         "basis": inst.basis,
                         "resolution": "M1",
+                        "quality": quality,
+                        "age_ms": age,
                     }
                 )
         return result

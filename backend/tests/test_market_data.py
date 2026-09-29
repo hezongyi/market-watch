@@ -519,3 +519,41 @@ def test_quote_previous_close_handles_ny_dst_and_gold_holiday(database):
                     assert "chp" not in values
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_quote_quality_distinguishes_open_stale_from_weekend(database, monkeypatch):
+    from alerts import market_data
+    from alerts.storage import instant
+
+    friday = ms(datetime(2026, 9, 25, 21, tzinfo=UTC))
+    with database.begin() as db:
+        write_bars(
+            db,
+            "EURUSD",
+            "M1",
+            [
+                Candle(
+                    instant(friday - 60000),
+                    instant(friday),
+                    Decimal("1"),
+                    Decimal("1"),
+                    Decimal("1"),
+                    Decimal("1"),
+                )
+            ],
+        )
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            for offset, quality in [
+                (60000, "fresh"),
+                (86400000, "closed"),
+                (3 * 86400000, "stale"),
+            ]:
+                monkeypatch.setattr(market_data, "now_ms", lambda: friday + offset)
+                row = client.post("/api/market-data/quotes", json={"symbols": ["EURUSD"]}).json()[0]
+                assert row["quality"] == quality
+                assert row["age_ms"] == offset
+                assert "2026-09-25 21:00 UTC" in row["v"]["description"]
+    finally:
+        api_module.app.dependency_overrides.clear()
