@@ -448,3 +448,9 @@
 - 临时Promise探针捕获undefined拒绝堆栈：H_.gotoTimeRange（library bundle第654行）→_chartWidgetGotoTimeRange（第761行）。只读检查分发包：新非内部goto请求先执行_lastGotoTimeRange?.deferred.reject()；时间刻度尚无minIndex时缓存新的deferred。
 - 这解释了跨品种加载期间重复视区请求取消旧等待产生无reason拒绝的来源；尚未形成满足同步需求的公开接口修复。未修改vendor或吞掉全局异常。
 - 开发探针/tmp/mw-two-pane-reject.cjs、日志/tmp/mw-two-pane-reject-origin.log；调试协议直接暂停未捕获该位置，Promise探针才获得证据。下一步针对加载期同步调度做公开接口实验。
+
+### 加载期同步保护原型通过双图实验
+
+- 临时探针订阅公开onSymbolChanged，在加载期间暂缓dateRangeSync，dataReady后恢复；EURUSD/XAUUSD双图切换无pageerror。
+- 第二轮增加dateRangeSync.value()===true断言，随后移动第一图视区；两图返回相同范围1790668500–1790694900，未出现原异常。
+- 原型尚未并入产品：需处理多图同时加载、用户关闭同步、工作区加载/布局变化订阅清理及自动保存中间状态，不能直接复制实验代码。正式默认同步未改；日志/tmp/mw-two-pane-guard-restored.log。
