@@ -13,6 +13,13 @@ const fs = require("fs");
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
+  const historyMetrics = {
+    requests: 0,
+    pending: 0,
+    ready: 0,
+    dataPages: 0,
+    returnedBars: 0,
+  };
   page.on("console", (m) => {
     if (m.type() === "error") console.log("CONSOLE", m.text().slice(0, 700));
   });
@@ -22,6 +29,14 @@ const fs = require("fs");
       r.url().includes("/api/market-data/history")
     ) {
       const j = await r.json().catch(() => ({}));
+      if (r.url().includes("/api/market-data/history")) {
+        historyMetrics.requests++;
+        if (j.status === "pending") historyMetrics.pending++;
+        if (j.status === "ready") historyMetrics.ready++;
+      } else {
+        historyMetrics.dataPages++;
+        historyMetrics.returnedBars += j.bars?.length || 0;
+      }
       console.log(
         "RESPONSE",
         r.status(),
@@ -91,6 +106,7 @@ const fs = require("fs");
     await widget.chart(0).setResolution("1");
     await new Promise((resolve) => widget.chart(0).dataReady(resolve));
   });
+  for (const key of Object.keys(historyMetrics)) historyMetrics[key] = 0;
   const started = Date.now();
   const target = {
     from: Date.parse("2026-08-12T08:00:00Z") / 1000,
@@ -107,6 +123,7 @@ const fs = require("fs");
     { target, timeout },
   );
   console.log("JUMP_MS", Date.now() - started);
+  console.log("JUMP_METRICS", JSON.stringify(historyMetrics));
   await page.waitForTimeout(20000);
   const result = await frame.evaluate(() => ({
     range: widget.chart(0).getVisibleRange(),
@@ -117,6 +134,10 @@ const fs = require("fs");
   assert.ok(
     Math.abs(result.range.to - target.to) <= 60,
     "historical date jump must retain the requested right boundary after history loads",
+  );
+  assert.ok(
+    Math.abs(result.range.from - target.from) <= 60,
+    "historical date jump must retain the requested left boundary",
   );
   assert.equal(result.pending.length, 0);
   assert.equal(result.failed.length, 0);

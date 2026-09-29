@@ -25,13 +25,14 @@ const planning = [];
 historyQuery = async (args) => {
   planning.push({...args});
   return { status: "ready", requested_start: args.before - args.limit * 60000,
-    next_cursor: args.before - args.limit * 60000 };
+    next_cursor: args.before - args.limit * 60000, bars: (await makePage(args)).bars };
 };
-query = async (symbol, res, args) => ({bars: Array.from({length: args.limit}, (_, i) => ({
+const makePage = async (args) => ({bars: Array.from({length: args.limit}, (_, i) => ({
   start: args.before - (args.limit - i) * 60000,
   end: args.before - (args.limit - i - 1) * 60000,
   open: 1, high: 1, low: 1, close: 1,
 })), has_more: true});
+query = async () => { throw Error("ordinary OHLC must reuse planning response"); };
 `,
   context,
 );
@@ -57,8 +58,7 @@ query = async (symbol, res, args) => ({bars: Array.from({length: args.limit}, (_
   );
   vm.runInContext(
     `
-    query = async (symbol, res, args) => ({bars: [], has_more: false});
-    historyQuery = async (args) => ({status:"ready", requested_start:args.before, next_cursor:args.before});
+    historyQuery = async (args) => ({status:"ready", bars:[], requested_start:args.before, next_cursor:args.before});
   `,
     context,
   );

@@ -302,10 +302,11 @@ const feed = {
         }
         if (status.status === "empty_interval")
           throw Error("该区间未返回行情，尚未确认历史起点");
-        const result = await query(s.ticker, res, {
-          before,
-          limit: args.limit,
-        });
+        // The planning response already includes the ordinary OHLC page.
+        // Python synthetic symbols additionally require indicator calculation.
+        const result = decode(s.ticker).spec
+          ? await query(s.ticker, res, { before, limit: args.limit })
+          : status;
         // Never stitch cached islands across an interval not checked by the planner.
         const covered = {
           ...result,

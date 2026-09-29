@@ -544,3 +544,11 @@
 - 首次启动窗口内测试登录失败；服务就绪后 `/tmp/mw-history-full-chain-ready.log` 正常规划读取，但仍在60秒setVisibleRange预算处超时。不能以缓存逐步升温替代冷加载验收。
 - 日期跳转测试增加可选MARKET_WATCH_HISTORY_TIMEOUT_MS，默认仍60000并记录实际预算；180000诊断 `/tmp/mw-history-extended.log` 已启动，exec session30431最后确认仍在运行，尚无结论。
 - history-reload适配回归新增边界扩大只更新基准、相同边界内修订仍重载，测试通过。
+
+### 历史跳转通过与重复读取优化
+
+- session30431已退出0；`/tmp/mw-history-extended.log` 跳转52837ms，等待20秒后视区仍为1786521600–1786543200（2026-08-12 08:00–14:00 UTC），无pending/failed/pageerror。此前多轮已预热部分缓存，不属于纯冷加载性能。
+- 默认60秒预算再次运行 `/tmp/mw-history-warm.log` 退出0，跳转9291ms，新增左右边界均须准确的断言通过。
+- 普通getBars复用history规划接口已经返回的OHLC，去除每页重复charts/data请求；Python合成品种保留指标计算请求。分页回归禁止普通行情调用第二次query，验证4500根完整读取通过。
+- 优化后 `/tmp/mw-history-single-read.log` 退出0：跳转5142ms，37次history ready、0次pending；期间3次charts/data只返回9根实时K线。20秒后两端范围仍准确，无页面错误。相比前一轮9.3秒明显减少，但仅为同机单次对照，不能宣称所有品种/周期达到该速度。
+- backend市场数据+图表工作区33项、前端分页/修订重载/去重通过。日期跳转用例增加请求统计，保留默认60秒预算。冷加载上限、多图并发、Python历史指标、取消/失败仍待专项收口。
