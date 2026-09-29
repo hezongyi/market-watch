@@ -240,12 +240,16 @@ def router(authenticated):
             rows = chart_rows(
                 db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
             )
-            # A fully queried empty weekend is not the provider's history boundary.
+            # A fully queried short/empty window does not satisfy countBack.
             # Expand deterministically from the original request, so repeated polls
             # finish missing pages without walking backwards forever. Stop as soon
             # as a page needs fetching; the next poll will reconsider its result.
             for _ in range(3):
-                if rows or not covers_interval(coverage, left, right) or left <= 0:
+                if (
+                    len(rows) >= body.limit
+                    or not covers_interval(coverage, left, right)
+                    or left <= 0
+                ):
                     break
                 candidate = max(0, left - span)
                 if body.timeframe in ("M30", "W1", "MN"):

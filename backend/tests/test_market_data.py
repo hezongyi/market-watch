@@ -190,3 +190,50 @@ def test_empty_covered_window_probes_earlier_but_is_bounded(database):
             assert result["requested_start"] >= right - 10 * DAY
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_partial_countback_requests_more_history(database):
+    from alerts.market_data import DAY
+    from alerts.storage import MarketCoverage, instant
+
+    right = ms(datetime(2026, 1, 12, tzinfo=UTC))
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        inst.source = "oanda"
+        db.add(
+            MarketCoverage(
+                instrument_id=inst.id,
+                source=inst.source,
+                basis=inst.basis,
+                start=right - 3 * DAY,
+                end=right,
+            )
+        )
+        write_bars(
+            db,
+            inst.id,
+            "M1",
+            [
+                Candle(
+                    instant(right - 60000),
+                    instant(right),
+                    Decimal("1.2"),
+                    Decimal("1.2"),
+                    Decimal("1.2"),
+                    Decimal("1.2"),
+                )
+            ],
+        )
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            result = client.post(
+                "/api/market-data/history",
+                json={"instrument": "EURUSD", "timeframe": "M1", "before": right, "limit": 300},
+            ).json()
+            assert len(result["bars"]) == 1
+            assert result["status"] == "pending"
+            assert result["task_ids"]
+            assert result["requested_start"] < right - 3 * DAY
+    finally:
+        api_module.app.dependency_overrides.clear()
