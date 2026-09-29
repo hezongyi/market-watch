@@ -66,7 +66,8 @@ export default function AdvancedWorkspace() {
   const select = (row: Workspace) => {
     unsaved.current = false;
     current.current = row;
-    blocked.current = !!localStorage.getItem("mw-tv-draft:" + row.id);
+    blocked.current =
+      !mobile && !!localStorage.getItem("mw-tv-draft:" + row.id);
     setActive(row);
     setFrameKey((key) => key + 1);
     setError(

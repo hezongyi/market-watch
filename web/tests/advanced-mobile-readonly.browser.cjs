@@ -55,6 +55,11 @@ const fs = require("fs");
     );
   await page.getByRole("button", { name: "登录工作台" }).click();
   await page.waitForTimeout(1000);
+  const draftId = await page.evaluate(async () => {
+    const rows = await (await fetch("/api/advanced-charts/workspaces")).json();
+    localStorage.setItem("mw-tv-draft:" + rows[0].id, "preserve-desktop-draft");
+    return rows[0].id;
+  });
   await page.goto("http://127.0.0.1:5188/advanced-charts");
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
@@ -70,6 +75,17 @@ const fs = require("fs");
     snapshot();
   });
   await page.waitForTimeout(5000);
+  require("node:assert/strict").equal(
+    await page.evaluate(
+      (id) => localStorage.getItem("mw-tv-draft:" + id),
+      draftId,
+    ),
+    "preserve-desktop-draft",
+  );
+  require("node:assert/strict").equal(
+    await page.getByRole("alert").filter({ hasText: "存在未保存草稿" }).count(),
+    0,
+  );
   console.log("MOBILE_WRITES", writes);
   require("node:assert/strict").deepEqual(writes, []);
   console.log("MOBILE_READONLY", await frame.evaluate(() => nativeReadonly));
