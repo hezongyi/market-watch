@@ -83,7 +83,7 @@ const fs = require("fs");
   );
   await page.goto("http://127.0.0.1:5188/advanced-charts");
   await page.waitForTimeout(15000);
-  const frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  let frame = page.frames().find((f) => f.url().includes(":5187/?"));
   await frame.evaluate(() => widget.setLayout("2h"));
   await page.waitForTimeout(5000);
   await frame.evaluate(
@@ -128,11 +128,108 @@ const fs = require("fs");
     return c.getShapeById(c.getAllShapes()[0].id).getPoints()[0].price;
   });
   require("node:assert/strict").equal(changed, 0.567);
+  await frame.evaluate(async () => {
+    await widget.chart(1).setSymbol("XAUUSD", { doNotActivateChart: true });
+  });
+  await page.waitForTimeout(1000);
+  require("node:assert/strict").equal(
+    await frame.evaluate(() => widget.chart(1).getAllShapes().length),
+    0,
+    "A different symbol must not receive NZDUSD drawings",
+  );
+  await frame.evaluate(async () => {
+    await widget
+      .chart(1)
+      .setSymbol("OANDA:NZD_USD", { doNotActivateChart: true });
+  });
+  await page.waitForTimeout(1000);
+  require("node:assert/strict").equal(
+    await frame.evaluate(() => {
+      const c = widget.chart(1);
+      return c.getShapeById(c.getAllShapes()[0].id).getPoints()[0].price;
+    }),
+    0.567,
+    "Returning to the symbol must restore its shared drawing",
+  );
   await frame.evaluate((id) => widget.chart(0).removeEntity(id), id);
   await page.waitForTimeout(1000);
   require("node:assert/strict").equal(
     await frame.evaluate(() => widget.chart(1).getAllShapes().length),
     0,
+  );
+  await frame.evaluate(async () => {
+    const c = widget.chart(0);
+    await c.createShape(
+      { time: c.getVisibleRange().to - 3600, price: 0.569 },
+      { shape: "horizontal_line" },
+    );
+    await new Promise((ok, fail) => widget.saveChartToServer(ok, fail));
+  });
+  const originalId = await page
+    .locator("iframe[data-workspace-id]")
+    .getAttribute("data-workspace-id");
+  const original = await page.evaluate(
+    async (id) =>
+      (await (await fetch("/api/advanced-charts/native-charts")).json()).find(
+        (row) => row.id === id,
+      ),
+    originalId,
+  );
+  const ui = page.frames().find((f) => f.url().startsWith("blob:"));
+  page.once("dialog", (dialog) => dialog.accept("画线隔离验收 B"));
+  await ui
+    .getByRole("button", {
+      name: "保存当前工作区并新建空白工作区",
+      exact: true,
+    })
+    .click();
+  await page.waitForFunction(
+    (id) =>
+      document
+        .querySelector("iframe[data-workspace-id]")
+        ?.getAttribute("data-workspace-id") !== id,
+    originalId,
+  );
+  await page.waitForTimeout(1000);
+  frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  await frame.waitForFunction(() => ready && !loading, null, {
+    timeout: 60000,
+  });
+  await frame.evaluate(async () => widget.chart(0).setSymbol("OANDA:NZD_USD"));
+  require("node:assert/strict").equal(
+    await frame.evaluate(() => widget.chart(0).getAllShapes().length),
+    0,
+    "Fresh workspace must not inherit same-symbol drawings",
+  );
+  await frame.evaluate(
+    async (row) =>
+      widget.loadChartFromServer({
+        id: row.id,
+        name: row.name,
+        image_url: "",
+        modified_iso: row.timestamp,
+        short_symbol: row.symbol,
+        interval: row.resolution,
+      }),
+    original,
+  );
+  await frame.waitForFunction(
+    () => !loading && widget.chartsCount() === 2,
+    null,
+    { timeout: 60000 },
+  );
+  const restoredPrices = await frame.evaluate(() =>
+    [0, 1].map((i) => {
+      const c = widget.chart(i);
+      return c
+        .getAllShapes()
+        .map((shape) => c.getShapeById(shape.id).getPoints()[0].price);
+    }),
+  );
+  require("node:assert/strict").deepEqual(
+    restoredPrices,
+    [[0.569], [0.569]],
+    "Original workspace drawings must survive another workspace using the same symbol",
   );
   console.log("DRAWING_SYNC_PASSED");
   console.log(
