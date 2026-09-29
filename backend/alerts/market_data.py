@@ -277,6 +277,9 @@ def router(authenticated):
                 "status": status,
                 "bars": rows,
                 "task_ids": [j.id for j in pending],
+                "failed_task_ids": [
+                    j.id for j in jobs if j.status == "failed" and j.priority >= 100
+                ],
                 "error": errors[0] if errors else None,
                 "retry_after": 2,
                 "requested_start": left,

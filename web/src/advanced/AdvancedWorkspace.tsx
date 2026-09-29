@@ -208,11 +208,14 @@ export default function AdvancedWorkspace() {
           resolve: "/market-data/resolve",
           history: "/market-data/history",
           activity: "/market-data/activity",
+          retry: "/market-data/retry",
         };
         if (
           !q ||
           !Object.hasOwn(endpoints, q.op) ||
           JSON.stringify(q).length > 4000 ||
+          (q.op === "retry" &&
+            !/^[a-zA-Z0-9-]{1,40}$/.test(String(q.args?.id || ""))) ||
           inflight.current >= 8
         ) {
           reply({ type: "result", id: m.id, error: "无效行情请求" });
@@ -227,7 +230,9 @@ export default function AdvancedWorkspace() {
               endpoints[q.op] +
                 (q.op === "search"
                   ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
-                  : ""),
+                  : q.op === "retry"
+                    ? "/" + encodeURIComponent(q.args.id)
+                    : ""),
               q.op === "search" ? undefined : q.args,
             ),
           });

@@ -237,3 +237,42 @@ def test_partial_countback_requests_more_history(database):
             assert result["requested_start"] < right - 3 * DAY
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_failed_history_exposes_retryable_jobs(database):
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        inst.source = "oanda"
+        job = ImportJob(
+            instrument_id=inst.id,
+            start=1699000000000,
+            end=1700000000000,
+            cursor=1699000000000,
+            priority=100,
+            status="failed",
+            error="network failure",
+            attempts=5,
+        )
+        db.add(job)
+        db.flush()
+        ident = job.id
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            result = client.post(
+                "/api/market-data/history",
+                json={
+                    "instrument": "EURUSD",
+                    "timeframe": "M1",
+                    "before": 1700000000000,
+                    "limit": 300,
+                },
+            ).json()
+            assert result["status"] == "error"
+            assert result["failed_task_ids"] == [ident]
+            assert client.post("/api/market-data/retry/" + ident).status_code == 200
+            with database.begin() as db:
+                job = db.get(ImportJob, ident)
+                assert job.status == "pending" and job.attempts == 0 and job.error is None
+    finally:
+        api_module.app.dependency_overrides.clear()

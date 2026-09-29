@@ -30,6 +30,41 @@ const frames = {
 const subscriptions = new Map();
 const lastHistory = new Map();
 const pendingHistory = new Map();
+const failedHistory = new Map();
+let retryDialogOpen = false;
+function rememberHistoryFailure(args, state) {
+  if (state.failed_task_ids?.length)
+    failedHistory.set(JSON.stringify(args), {
+      args,
+      ids: state.failed_task_ids,
+    });
+}
+function offerHistoryRetry() {
+  if (!ready || retryDialogOpen) return;
+  for (const [key, entry] of failedHistory) {
+    failedHistory.delete(key);
+    if (!hasHistoryViewer(entry.args)) continue;
+    retryDialogOpen = true;
+    widget.showConfirmDialog({
+      title: "历史行情拉取失败",
+      body: entry.args.instrument + " 的历史任务已停止。是否重新尝试？",
+      callback: async (confirmed) => {
+        try {
+          if (!confirmed || !hasHistoryViewer(entry.args)) return;
+          for (const id of new Set(entry.ids))
+            await request({ op: "retry", args: { id } }, "market");
+          pendingHistory.set(key, entry.args);
+          send({ type: "status", text: "已重新安排历史拉取" });
+        } catch (e) {
+          send({ type: "error", error: String(e) });
+        } finally {
+          retryDialogOpen = false;
+        }
+      },
+    });
+    break;
+  }
+}
 const clientId = crypto.randomUUID();
 const requests = [];
 function drain() {
@@ -205,8 +240,11 @@ const feed = {
         await new Promise((r) => setTimeout(r, 1500));
         status = await request({ op: "history", args }, "market");
       }
-      if (status.status === "error")
+      if (status.status === "error") {
+        rememberHistoryFailure(args, status);
+        offerHistoryRetry();
         throw Error(status.error || "历史拉取失败");
+      }
       if (status.status === "pending")
         pendingHistory.set(JSON.stringify(args), args);
       if (!status.bars.length && status.status === "pending")
@@ -315,6 +353,7 @@ async function tick() {
       }
       if (state.status === "error") {
         pendingHistory.delete(key);
+        rememberHistoryFailure(args, state);
         send({ type: "error", error: state.error || "历史拉取失败" });
         continue;
       }
@@ -380,6 +419,7 @@ async function tick() {
     }
   } finally {
     polling = false;
+    offerHistoryRetry();
   }
 }
 function snapshot() {

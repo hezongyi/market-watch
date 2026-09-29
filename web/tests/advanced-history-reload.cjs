@@ -85,6 +85,20 @@ tick();`,
     2,
   );
   assert.deepEqual(events, []);
+  events.length = 0;
+  await vm.runInContext(
+    `
+pendingHistory.clear();
+let retryCallback;
+widget.showConfirmDialog = (options)=>{retryCallback=options.callback;events.push('dialog')};
+rememberHistoryFailure({instrument:'EURUSD',timeframe:'M5'}, {failed_task_ids:['job','job']});
+offerHistoryRetry();
+request = async(q)=>{events.push(q.op+':'+q.args.id);return {ok:true}};
+retryCallback(true);`,
+    context,
+  );
+  assert.deepEqual(events, ["dialog", "retry:job"]);
+  assert.equal(vm.runInContext("pendingHistory.size", context), 1);
   console.log(
     "Historical reload invalidates matching cache before resetting only matching panes",
   );
