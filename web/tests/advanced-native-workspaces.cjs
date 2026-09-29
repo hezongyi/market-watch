@@ -20,7 +20,7 @@ vm.runInContext(
     }
     return { ok: true };
   }
-  const adapter = context.nativeWorkspaces(
+  let adapter = context.nativeWorkspaces(
     row,
     rpc,
     false,
@@ -34,6 +34,15 @@ vm.runInContext(
     /conflict/,
   );
   assert.equal(saved, 0);
+  await assert.rejects(adapter.getChartContent("a"), /未保存/);
+  // A fresh page/session can explicitly reload server state.
+  adapter = context.nativeWorkspaces(
+    row,
+    rpc,
+    false,
+    () => loaded++,
+    () => saved++,
+  );
   await adapter.getChartContent("a");
   await adapter.saveChart({ id: "a", name: "B", content: "{}" });
   assert.equal(saved, 1);
@@ -80,6 +89,25 @@ vm.runInContext(
   finish();
   await Promise.all([saving, loading]);
   assert.deepEqual(order, ["saved", "onSaved", "loaded", "onLoaded"]);
+  let refuse = true;
+  const protectedAdapter = context.nativeWorkspaces(
+    { id: "a", revision: 1 },
+    async (op, args) => {
+      if (op === "save" && refuse) throw Error("conflict");
+      return { id: args.id || "copy", revision: 1, content: "{}" };
+    },
+    false,
+    () => {},
+    () => {},
+  );
+  await assert.rejects(
+    protectedAdapter.saveChart({ id: "a", content: "draft" }),
+    /conflict/,
+  );
+  await assert.rejects(protectedAdapter.getChartContent("b"), /未保存/);
+  refuse = false;
+  await protectedAdapter.saveChart({ name: "copy", content: "draft" });
+  await protectedAdapter.getChartContent("b");
   console.log(
     "native workspace adapter: conflict, serialized saves and readonly passed",
   );

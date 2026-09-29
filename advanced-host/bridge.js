@@ -485,6 +485,16 @@ function boot(
       savedDoc = { ...row.document, nativeName: row.name };
     },
   );
+  const loadContent = layouts.getChartContent;
+  layouts.getChartContent = async (id) => {
+    try {
+      return await loadContent(id);
+    } catch (e) {
+      loading = false;
+      send({ type: "error", error: String(e) });
+      throw e;
+    }
+  };
   const prefs = nativePreferences(
     preferences,
     (op, args) => request({ op, args }, "preferences"),

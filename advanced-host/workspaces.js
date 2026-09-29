@@ -3,6 +3,7 @@ function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
   const revisions = new Map();
   if (initial?.id) revisions.set(String(initial.id), initial.revision);
   let writes = Promise.resolve();
+  let unsaved = false;
   return {
     getAllCharts: async () => {
       const rows = await rpc("list", {});
@@ -13,6 +14,8 @@ function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
     },
     getChartContent: (id) => {
       const task = writes.then(async () => {
+        if (unsaved)
+          throw Error("当前修改未保存，请重试保存或另存副本后再加载");
         const row = await rpc("load", { id: String(id) });
         revisions.set(String(id), row.revision);
         onLoaded(row);
@@ -35,10 +38,13 @@ function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
           revision: id ? revisions.get(id) : 0,
         });
         revisions.set(String(row.id), row.revision);
+        unsaved = false;
         onSaved(row);
         return row.id;
       });
-      writes = task.catch(() => {});
+      writes = task.catch(() => {
+        unsaved = true;
+      });
       return task;
     },
     removeChart: (id) => {
