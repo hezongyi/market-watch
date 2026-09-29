@@ -557,3 +557,44 @@ def test_quote_quality_distinguishes_open_stale_from_weekend(database, monkeypat
                 assert "2026-09-25 21:00 UTC" in row["v"]["description"]
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_chart_pages_yield_to_waiting_history_requests(database, monkeypatch):
+    from alerts import market
+
+    clock = [ms(datetime(2026, 9, 1, tzinfo=UTC))]
+    monkeypatch.setattr(market, "now_ms", lambda: clock[0])
+    starts = [ms(datetime(2026, 8, 1, tzinfo=UTC)), ms(datetime(2026, 7, 1, tzinfo=UTC))]
+    with database.begin() as db:
+        db.get(Instrument, "EURUSD").source = "oanda"
+        for start in starts:
+            db.add(
+                ImportJob(
+                    instrument_id="EURUSD",
+                    start=start,
+                    end=start + 10 * 86400000,
+                    cursor=start,
+                    priority=100,
+                    next_at=clock[0],
+                    created_at=start,
+                )
+            )
+    fetched = []
+
+    def fetch(source, symbol, left, right):
+        start = ms(datetime.fromisoformat(left))
+        end = ms(datetime.fromisoformat(right))
+        fetched.append(start)
+        return {"rows": [], "coverage": [{"start": start, "end": end}]}
+
+    monkeypatch.setattr(market, "fetch_source", fetch)
+    # Coverage is the upstream query result; ingestion is orthogonal to scheduling.
+    monkeypatch.setattr(market, "ingest", lambda *args: None)
+    assert market.import_once(chart_only=True)
+    clock[0] += 2000
+    assert market.import_once(chart_only=True)
+    assert set(fetched) == set(starts), "both requests must get a page before either gets two"
+    with database.begin() as db:
+        jobs = db.scalars(select(ImportJob)).all()
+        assert all(j.cursor == j.start + 4000 * 60000 for j in jobs)
+        assert all(j.status == "pending" for j in jobs)

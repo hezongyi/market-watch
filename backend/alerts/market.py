@@ -523,7 +523,13 @@ def import_once(*, chart_only=False):
                     (ImportJob.status == "running") & (ImportJob.lease_until < now_ms()),
                 ),
             )
-            .order_by(ImportJob.priority, ImportJob.start.desc(), ImportJob.created_at)
+            .order_by(
+                ImportJob.priority,
+                # Each chart page advances next_at. Serve the oldest eligible
+                # request before returning to a large, more recent import.
+                ImportJob.next_at if chart_only else ImportJob.start.desc(),
+                ImportJob.created_at,
+            )
             .with_for_update(skip_locked=True)
             .limit(1)
         )
