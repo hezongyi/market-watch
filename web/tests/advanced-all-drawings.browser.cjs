@@ -128,11 +128,24 @@ const fs = require("fs");
       { time: r.to - 3600, price: 0.565 },
       { shape: "text", text: "画线恢复验收" },
     );
-    return c
-      .getAllShapes()
-      .map((x) => ({ name: x.name, points: c.getShapeById(x.id).getPoints() }));
+    for (const shape of c.getAllShapes()) {
+      if (["long_position", "short_position"].includes(shape.name))
+        c.getShapeById(shape.id).setProperties({
+          stopLevel: 100,
+          profitLevel: 250,
+          alwaysShowStats: true,
+        });
+    }
+    return c.getAllShapes().map((x) => ({
+      name: x.name,
+      points: c.getShapeById(x.id).getPoints(),
+      properties: c.getShapeById(x.id).getProperties(),
+    }));
   });
-  console.log("DRAWN", JSON.stringify(drawn));
+  console.log(
+    "DRAWN",
+    drawn.map((s) => s.name),
+  );
   await page.waitForTimeout(10000);
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
@@ -142,14 +155,20 @@ const fs = require("fs");
   frame = page.frames().find((f) => f.url().includes(":5187/?"));
   const restored = await frame.evaluate(() => {
     const c = widget.chart(0);
-    return c
-      .getAllShapes()
-      .map((x) => ({ name: x.name, points: c.getShapeById(x.id).getPoints() }));
+    return c.getAllShapes().map((x) => ({
+      name: x.name,
+      points: c.getShapeById(x.id).getPoints(),
+      properties: c.getShapeById(x.id).getProperties(),
+    }));
   });
-  console.log("RESTORED_DRAWINGS", JSON.stringify(restored));
+  console.log(
+    "RESTORED_DRAWINGS",
+    restored.map((s) => s.name),
+  );
   const normalize = (shapes) =>
     shapes.map((s) => ({
       name: s.name,
+      properties: s.properties,
       points: s.points.map((p) =>
         s.name === "horizontal_line" ? { price: p.price } : p,
       ),
@@ -159,6 +178,18 @@ const fs = require("fs");
     normalize(drawn),
   );
   require("node:assert/strict").equal(restored.length, 9);
+  for (const shape of restored.filter((s) =>
+    ["long_position", "short_position"].includes(s.name),
+  )) {
+    require("node:assert/strict").equal(shape.properties.stopLevel, 100);
+    require("node:assert/strict").equal(shape.properties.profitLevel, 250);
+    require("node:assert/strict").equal(shape.properties.alwaysShowStats, true);
+  }
+  require("node:assert/strict").equal(
+    restored.find((s) => s.name === "text").properties.text,
+    "画线恢复验收",
+  );
+
   require("node:assert/strict").deepEqual(errors, []);
   console.log("All requested drawing families restored their anchor points");
   await browser.close();
