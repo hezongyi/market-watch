@@ -240,6 +240,23 @@ def router(authenticated):
             rows = chart_rows(
                 db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
             )
+            # A fully queried empty weekend is not the provider's history boundary.
+            # Expand deterministically from the original request, so repeated polls
+            # finish missing pages without walking backwards forever. Stop as soon
+            # as a page needs fetching; the next poll will reconsider its result.
+            for _ in range(3):
+                if rows or not covers_interval(coverage, left, right) or left <= 0:
+                    break
+                candidate = max(0, left - span)
+                if body.timeframe in ("M30", "W1", "MN"):
+                    left = ms(bounds(instant(candidate), body.timeframe, calendar)[0])
+                else:
+                    left = ms(bucket_bounds(instant(candidate), body.timeframe, calendar)[0])
+                left = max(0, left)
+                jobs, coverage = queue_history(db, inst, left, right)
+                rows = chart_rows(
+                    db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
+                )
             errors = [j.error for j in jobs if j.status == "failed"]
             pending = [j for j in jobs if j.status in ("pending", "running")]
             complete = covers_interval(coverage, left, right)

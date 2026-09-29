@@ -120,3 +120,73 @@ def test_worker_completion_between_cache_and_coverage_is_visible(database, monke
             assert result["status"] == "ready" and len(result["bars"]) == 1
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_empty_covered_window_probes_earlier_but_is_bounded(database):
+    from alerts.market_data import DAY
+    from alerts.storage import MarketCoverage
+
+    # A Monday request whose initial lookback contains only a closed weekend.
+    right = ms(datetime(2026, 1, 12, 0, tzinfo=UTC))
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        inst.source = "oanda"
+        db.add(
+            MarketCoverage(
+                instrument_id=inst.id,
+                source=inst.source,
+                basis=inst.basis,
+                start=right - 3 * DAY,
+                end=right,
+            )
+        )
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            payload = {"instrument": "EURUSD", "timeframe": "M1", "before": right, "limit": 300}
+            result = client.post("/api/market-data/history", json=payload).json()
+            assert result["status"] == "pending"
+            assert result["requested_start"] < right - 3 * DAY
+            with database.begin() as db:
+                for job in db.scalars(select(ImportJob)):
+                    db.delete(job)
+                db.add(
+                    MarketCoverage(
+                        instrument_id="EURUSD",
+                        source="oanda",
+                        basis=inst.basis,
+                        start=right - 40 * DAY,
+                        end=right,
+                    )
+                )
+                from alerts.storage import instant
+
+                earlier = right - 4 * DAY
+                write_bars(
+                    db,
+                    "EURUSD",
+                    "M1",
+                    [
+                        Candle(
+                            instant(earlier),
+                            instant(earlier + 60000),
+                            Decimal("1.2"),
+                            Decimal("1.2"),
+                            Decimal("1.2"),
+                            Decimal("1.2"),
+                        )
+                    ],
+                )
+            loaded = client.post("/api/market-data/history", json=payload).json()
+            assert loaded["status"] == "ready"
+            assert loaded["bars"][0]["start"] == earlier
+            with database.begin() as db:
+                for bar in db.scalars(select(Bar)):
+                    db.delete(bar)
+            result = client.post("/api/market-data/history", json=payload).json()
+            assert result["status"] == "empty_interval"
+            assert result["remote_boundary"] == "unknown"
+            assert result["task_ids"] == []
+            assert result["requested_start"] >= right - 10 * DAY
+    finally:
+        api_module.app.dependency_overrides.clear()
