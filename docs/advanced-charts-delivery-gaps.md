@@ -272,3 +272,9 @@
 - 真实认证POST /api/charts/export请求该小时M1，不拦截接口：首次202，2.0秒后200（/tmp/mw-export-cold-live.log退出0）。worker拉取后的CSV严格60行，start_ms为请求小时每分钟连续序列，全部complete=true，文件/tmp/mw-cold-export.csv。
 - 新增scripts/verify_csv_export.py：固定本地开发API，密码从环境指定的凭据文件读取；--require-pending要求观察真实pending，普通模式验证缓存命中。已缓存区间复测退出0（/tmp/mw-export-script-warm.log），ruff通过。用户选择的日期应为完整交易小时；休市不应期待60根。
 - 该证据关闭小范围真实补数→覆盖完成→CSV响应链路的不确定性；网页到真实接口的下载、多个周期/指标参数及大范围性能仍独立验收，不能把M1一小时推广为全部导出场景。
+
+### 网页真实CSV下载与隔离恢复执行结果
+
+- MARKET_WATCH_EXPORT_LIVE_CHECK=1通过真实原生header按钮打开表单、选择UTC小时、包含Python EMA，不拦截任何下载响应。/tmp/mw-export-browser-real.log退出0：实际浏览器下载12行EURUSD M5，每行时间戳精确匹配指定小时、EMA列存在且有数值、页面异常为空。此例使用已有覆盖；真实冷补数另见前节。
+- 使用已有remote-postgres-test凭据且断言dbname=trading_alerts_test，匹配PG14包装器执行test_postgres_dump_restore_of_signal_and_outbox。/tmp/mw-backup-isolated-restore.log为1 failed：测试账号CREATE DATABASE权限不足，创建backup_source_<uuid>时即失败，尚未执行dump/restore。
+- 不再将恢复专项描述为客户端缺失；当前限制是隔离数据库创建权限。未提升权限、未修改生产库、未创建临时库成功。下一步寻找独立临时PG实例或已有获授权隔离恢复通路，不把权限失败计为通过。

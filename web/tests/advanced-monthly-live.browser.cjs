@@ -127,6 +127,56 @@ const fs = require("fs");
     null,
     { timeout: 180000 },
   );
+  if (process.env.MARKET_WATCH_EXPORT_LIVE_CHECK) {
+    const assert = require("node:assert/strict");
+    await frame.evaluate(() =>
+      widget
+        .chart(0)
+        .createStudy("守望 Python EMA", false, false, { period: 20 }),
+    );
+    const native = frame.childFrames()[0];
+    await native
+      .locator("button:visible")
+      .filter({ hasText: "导出 CSV" })
+      .click();
+    await page.getByLabel("开始时间（含）").fill("2026-09-28T12:00");
+    await page.getByLabel("结束时间（不含）").fill("2026-09-28T13:00");
+    await page.getByLabel("附带当前图表的 Python 指标").check();
+    const downloaded = page.waitForEvent("download", { timeout: 120000 });
+    await page.getByRole("button", { name: "下载 CSV", exact: true }).click();
+    const file = await downloaded;
+    const content = fs
+      .readFileSync(await file.path(), "utf8")
+      .replace(/^\uFEFF/, "");
+    const lines = content
+      .trim()
+      .split(/\r?\n/)
+      .map((line) => line.split(","));
+    const header = lines.shift(),
+      index = (name) => header.indexOf(name);
+    assert.equal(lines.length, 12);
+    const indicator = header.findIndex(
+      (name) => name.startsWith("python:") && name.endsWith(":value"),
+    );
+    assert.ok(indicator >= 0);
+    for (const [i, row] of lines.entries()) {
+      assert.equal(row[index("instrument")], "EURUSD");
+      assert.equal(row[index("timeframe")], "M5");
+      assert.equal(
+        Number(row[index("start_ms")]),
+        Date.parse("2026-09-28T12:00:00Z") + i * 300000,
+      );
+      assert.ok(
+        Number.isFinite(Number(row[indicator])) && row[indicator] !== "",
+      );
+    }
+    assert.deepEqual(errors, []);
+    await browser.close();
+    console.log(
+      "PASS: actual header export -> authenticated backend -> CSV download with 12 M5 bars and EMA",
+    );
+    return;
+  }
   if (process.env.MARKET_WATCH_EXPORT_UI_CHECK) {
     await frame.evaluate(() =>
       widget
