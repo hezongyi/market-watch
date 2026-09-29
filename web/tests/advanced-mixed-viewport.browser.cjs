@@ -12,6 +12,16 @@ const fs = require("fs");
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
+  if (process.env.MARKET_WATCH_RANGE_GUARD_SOURCE)
+    await page.route("**/range-sync.js*", (route) =>
+      route.fulfill({
+        contentType: "application/javascript",
+        body: fs.readFileSync(
+          process.env.MARKET_WATCH_RANGE_GUARD_SOURCE,
+          "utf8",
+        ),
+      }),
+    );
   let phase = "initial-load";
   page.on("console", (m) => {
     if (m.type() === "error") console.log("CONSOLE", m.text().slice(0, 700));
@@ -138,15 +148,18 @@ const fs = require("fs");
   phase = "move-mixed-viewport";
   const windowHours = Number(process.env.MARKET_WATCH_VIEWPORT_HOURS || 24);
   assert.ok(Number.isFinite(windowHours) && windowHours > 0);
-  const target = await frame.evaluate(async (windowHours) => {
-    const r = widget.chart(0).getVisibleRange();
-    const target = {
-      from: r.to - 86400 - windowHours * 3600,
-      to: r.to - 86400,
-    };
-    await widget.chart(0).setVisibleRange(target, { rejectByTimeout: 20000 });
-    return target;
-  }, windowHours);
+  const target = await frame.evaluate(
+    async ({ windowHours, end }) => {
+      const r = widget.chart(0).getVisibleRange();
+      const target = {
+        from: (end || r.to - 86400) - windowHours * 3600,
+        to: end || r.to - 86400,
+      };
+      await widget.chart(0).setVisibleRange(target, { rejectByTimeout: 20000 });
+      return target;
+    },
+    { windowHours, end: Number(process.env.MARKET_WATCH_VIEWPORT_END || 0) },
+  );
   await page.waitForTimeout(5000);
   const moved = await frame.evaluate(() =>
     Array.from({ length: widget.chartsCount() }, (_, i) => ({

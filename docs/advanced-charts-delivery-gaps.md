@@ -200,3 +200,11 @@
 - 新增原生setter调用计数测试，改前初始化重复写入断言失败，改后通过。仅去重不足以消除实际undo污染；跳过单图同步开关后，/tmp/mw-single-undo-clean.log退出0：首次undo恢复M5，第二次undo删除水平线，只有change resolution/create LineToolHorzLine两个操作。
 - 浏览器用例新增单图originalUndoText必须为change resolution断言，避免以后退化为仅enableUndo=true的弱验证。
 - 八图鼠标回归/tmp/mw-sync-guard-eight-regression.log退出1，尚未进入全部鼠标/保存阶段：目标视区1790619900..1790630700，黄金M5右边界1790632800（相差2100秒），黄金M15亦延长，其他品种在周期容差内。需要对照原版本及交易时段，不能宣称多图回归通过。当前候选修复未部署。
+
+### 黄金休市边界对照定位
+
+- mixed-viewport验收增加MARKET_WATCH_VIEWPORT_END固定UTC秒时间与MARKET_WATCH_RANGE_GUARD_SOURCE测试侧脚本替换，避免随当前行情漂移而比较不同时间窗口；不修改产品供应库。
+- 使用585178c的旧range-sync（/tmp/mw-range-sync-before-single-fix.js），固定1790619900..1790630700重现同一失败（/tmp/mw-gold-gap-baseline.log退出1）：XAUUSD M5/M15右端1790632800。新旧逻辑结果完全相同，排除本次单图撤销改动为该边界偏移的原因。
+- 目标结束2026-09-28 21:25 UTC=纽约17:25，黄金实际右端22:00 UTC=纽约18:00；后台scheduled_open明确排除黄金纽约17点整小时。前端resolveSymbol当前所有NY17品种均声明1700-1700:23456，尚未表达黄金休市，这是待验证的日历元数据缺口，不能直接断言改session即解决。
+- 固定共同交易窗口2026-09-28 16:00..19:00 UTC，现产品八图鼠标十字线、缩放、拖动、关闭同步、自动保存及刷新恢复整轮通过（MARKET_WATCH_MOUSE_CHECK=1，/tmp/mw-fixed-open-eight.log退出0）。未放宽原边界断言，休市范围仍保留失败用例。
+- 跨休市段同步语义及前端session与后台分桶一致性仍开放，不能以共同开市时段通过替代休市边界验收。
