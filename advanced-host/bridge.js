@@ -731,6 +731,22 @@ function boot(
         }
       }
     }
+    if (!readonly) {
+      widget
+        .headerReady()
+        .then(() => {
+          widget.createButton({
+            align: "right",
+            useTradingViewStyle: true,
+            text: "新建工作区",
+            title: "保存当前工作区并新建空白工作区",
+            onClick: () => send({ type: "workspace-action", action: "create" }),
+          });
+        })
+        .catch((e) =>
+          send({ type: "error", error: "工作区入口加载失败：" + String(e) }),
+        );
+    }
     ready = true;
     loading = false;
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {

@@ -131,6 +131,8 @@ export default function AdvancedWorkspace() {
         } catch (e) {
           setError(String(e));
         }
+      } else if (m.type === "workspace-action") {
+        if (!mobile && m.action === "create") await create();
       } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
       else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
       else if (m.type === "native-saving") {
@@ -352,7 +354,8 @@ export default function AdvancedWorkspace() {
             (!Number.isSafeInteger(q.revision_before) ||
               q.revision_before <= 0)) ||
           (q.revision_after !== undefined &&
-            (!Number.isSafeInteger(q.revision_after) || q.revision_after < 0)) ||
+            (!Number.isSafeInteger(q.revision_after) ||
+              q.revision_after < 0)) ||
           inflight.current >= 8
         ) {
           reply({ type: "result", id: m.id, error: "请求不在允许范围内" });

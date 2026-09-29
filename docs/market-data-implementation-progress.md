@@ -604,3 +604,10 @@
 - `/tmp/mw-btc-extended.log` session68049退出0：BTCUSDT/M5首次补齐耗时117556ms，77次history请求（69 pending/8 ready），补齐后视区仍为1786521600–1786543200，pending/failed为空，无页面错误。首次加载明显偏慢，不能算性能达标。
 - 同一区间缓存复查 `/tmp/mw-btc-warm.log`：JUMP_MS 1239，最终范围一致，pending/failed为空。说明历史持久化后正常访问速度已恢复；冷加载受Binance每页1000根和上游延迟影响，仍需显示进度并允许后台继续。
 - 三个主品种历史跳转已有证据：EURUSD M1约5.1秒（预热）、XAUUSD M5约32.4秒（部分预热）、BTCUSDT M5约117.6秒（首次补齐）；均验证视区两端保持。不能把这些单次数据推广为所有周期性能保证。
+
+### 原生顶栏新建工作区接线
+
+- 使用headerReady/createButton公开接口增加原生样式“新建工作区”，经隔离消息通知父页面；父页面复用先保存再新建逻辑，手机不创建入口且拒绝该操作。未修改vendor DOM或布局。
+- 构建通过；真实点击定位应按库产生的可访问名称“保存当前工作区并新建空白工作区”，同文字含响应式副本不能直接getByText。
+- 点击后新工作区ID已改变，但默认XAUUSD H4补数尚未就绪时layoutName为undefined，固定8秒测试失败。改为等待ready和目标名称，当前 `/tmp/mw-native-create-ready.log` session69394运行中，尚无验收结论。
+- 外层工具栏仍保留，待新建与恢复入口验证后再移除；本提交只完成原生新增入口接线。
