@@ -84,12 +84,39 @@ const fs = require("fs");
   await page.goto("http://127.0.0.1:5188/advanced-charts");
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
-  const result = await frame.evaluate(async () => {
-    const save = () =>
-      new Promise((ok, fail) => widget.saveChartToServer(ok, fail));
+  const activeId = await page
+    .locator("iframe[data-workspace-id]")
+    .getAttribute("data-workspace-id");
+  const result = await frame.evaluate(async (activeId) => {
+    const settle = async () => {
+      for (
+        let i = 0;
+        i < 1500 && (loading || nativeSaving || rangeGuard?.busy());
+        i++
+      )
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      if (loading || nativeSaving || rangeGuard?.busy())
+        throw Error("Workspace did not finish loading");
+    };
+    await settle();
+    const save = async () => {
+      await settle();
+      return new Promise((ok, fail) =>
+        widget.saveChartToServer(ok, (error) =>
+          fail(Error(JSON.stringify(error))),
+        ),
+      );
+    };
+    const scaleA = widget.chart(0).getTimeScale();
+    scaleA.setRightOffset(4);
+    for (let i = 0; i < 50 && scaleA.rightOffset() !== 4; i++)
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    if (scaleA.rightOffset() !== 4) throw Error("A margin did not settle");
     await save();
+    const rangeA = widget.chart(0).getVisibleRange();
     const all = await request({ op: "list", args: {} }, "workspace");
-    const a = all[0];
+    const a = all.find((row) => row.id === activeId);
+    if (!a) throw Error("Active native layout is absent from workspace list");
     const content = await request(
       { op: "load", args: { id: a.id } },
       "workspace",
@@ -115,7 +142,15 @@ const fs = require("fs");
       short_symbol: b.symbol,
       interval: b.resolution,
     });
+    await settle();
+    const bLoadedRange = widget.chart(0).getVisibleRange();
+    const scaleB = widget.chart(0).getTimeScale();
+    scaleB.setRightOffset(14);
+    for (let i = 0; i < 50 && scaleB.rightOffset() !== 14; i++)
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    if (scaleB.rightOffset() !== 14) throw Error("B margin did not settle");
     await save();
+    const rangeB = widget.chart(0).getVisibleRange();
     const bAfter = await request(
       { op: "load", args: { id: b.id } },
       "workspace",
@@ -128,12 +163,18 @@ const fs = require("fs");
       short_symbol: a.symbol,
       interval: a.resolution,
     });
+    await settle();
+    const aLoadedRange = widget.chart(0).getVisibleRange();
     await save();
     const aAfter = await request(
       { op: "load", args: { id: a.id } },
       "workspace",
     );
     return {
+      rangeA,
+      rangeB,
+      bLoadedRange,
+      aLoadedRange,
       a: a.id,
       b: b.id,
       bRevBefore: b.revision,
@@ -142,10 +183,25 @@ const fs = require("fs");
       aRevAfter: aAfter.revision,
       name: widget.layoutName(),
     };
-  });
+  }, activeId);
   console.log("SWITCH", result);
   const assert = require("node:assert/strict");
   assert.notEqual(result.a, result.b);
+  assert.deepEqual(
+    result.bLoadedRange,
+    result.rangeA,
+    "Copied workspace must restore original viewport",
+  );
+  assert.notDeepEqual(
+    result.rangeA,
+    result.rangeB,
+    "Fixtures must have distinct viewports",
+  );
+  assert.deepEqual(
+    result.aLoadedRange,
+    result.rangeA,
+    "Switching back must restore A rather than retain B viewport",
+  );
   assert.equal(
     await page
       .locator("iframe[data-workspace-id]")
