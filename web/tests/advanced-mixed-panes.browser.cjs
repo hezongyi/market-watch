@@ -12,6 +12,7 @@ const fs = require("fs");
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
+  let phase = "initial-load";
   page.on("console", (m) => {
     if (m.type() === "error") console.log("CONSOLE", m.text().slice(0, 700));
   });
@@ -33,7 +34,7 @@ const fs = require("fs");
   });
   page.on("pageerror", (e) => {
     errors.push(e.message);
-    console.log("MIXED_ERROR_STACK", e.stack);
+    console.log("MIXED_ERROR_STACK", phase, e.stack);
   });
   await page.goto("http://127.0.0.1:5188/");
   await page
@@ -87,6 +88,7 @@ const fs = require("fs");
   await page.goto("http://127.0.0.1:5188/advanced-charts");
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  phase = "expand-layout";
   await frame.evaluate(() => widget.setLayout("8"));
   await page.waitForTimeout(10000);
   require("node:assert/strict").equal(
@@ -103,6 +105,7 @@ const fs = require("fs");
     ["EURUSD", "30"],
     ["OANDA:NZD_USD", "5"],
   ];
+  phase = "configure-panes";
   await frame.evaluate(async (specs) => {
     widget.symbolSync().setValue(false);
     widget.intervalSync().setValue(false);
@@ -135,6 +138,7 @@ const fs = require("fs");
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
+  phase = "reload-synchronized";
   await page.reload();
   await page.waitForTimeout(15000);
   const reloaded = page.frames().find((f) => f.url().includes(":5187/?"));
@@ -151,6 +155,28 @@ const fs = require("fs");
       ]),
     ),
     specs,
+  );
+  phase = "disable-sync-change-period";
+  await reloaded.evaluate(async () => {
+    widget.dateRangeSync().setValue(false);
+    await widget.chart(0).setResolution("15", { doNotActivateChart: true });
+  });
+  await page.waitForTimeout(3000);
+  assert.equal(
+    await reloaded.evaluate(() => widget.dateRangeSync().value()),
+    false,
+  );
+  assert.equal(await reloaded.evaluate(() => rangeGuard.busy()), false);
+  await reloaded.evaluate(
+    () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
+  );
+  phase = "reload-unsynchronized";
+  await page.reload();
+  await page.waitForTimeout(15000);
+  const disabledFrame = page.frames().find((f) => f.url().includes(":5187/?"));
+  assert.equal(
+    await disabledFrame.evaluate(() => widget.dateRangeSync().value()),
+    false,
   );
   assert.deepEqual(errors, []);
   console.log("Eight mixed symbol/resolution panes loaded with valid ranges");
