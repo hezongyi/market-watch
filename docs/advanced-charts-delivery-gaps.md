@@ -317,3 +317,10 @@
 - advanced-high-period-request新增仅测试使用的MARKET_WATCH_LOADING_BUDGET_PROBE路由替换：只去除recordPeriodChange的!chart.dataReady条件，不改供应库或产品脚本；仍拦截全部高周期历史HTTP。
 - /tmp/mw-loading-budget-probe.log退出1：快速D1/W1/MN/D1/MN捕获请求量90/91/90/90/90。说明简单允许加载中setBarSpacing+resetData不能重建请求预算，不能将删除保护条件作为修复提交。
 - 下一步需要验证加载期间原生时间轴保留旧可见柱范围的行为，以及公开API对切换请求串行化/时机控制的支持；保留撤销、绘图、最终周期和显式日期范围不变的要求。
+
+### 快速切换期间公开日期范围与延迟重置对照
+
+- 快速切换场景仅测试替换recordPeriodChange，通过onIntervalChanged parameters.timeframe指定time-range；/tmp/mw-interval-range-probe.log退出1，D1/W1/MN均请求195根。与此前单次切换的无效timeframe实验一致，不再将该方向当作未经验证的新候选。
+- 另一独立对照：同步reset后下一animation frame再次reset，且只处理仍为该周期的图；/tmp/mw-deferred-reset-probe.log退出1，请求90/100/100/90/90。延迟一次绘制仍不能获得正确周/月预算。
+- 只读检查分发库：force reset的根数来源为timeScale.visibleBarsStrictRange().count()，不是公开barSpacing的直接倒数；加载中旧范围/空范围可使间距调整不能生效。未修改供应库，也未访问内部对象实施修复。
+- 两个临时路由探针已从测试脚本移除，保留现有失败回归与日志。下一步应验证原生加载期间是否可通过公开交互时序避免继承旧范围；若做不到，需要明确产品级请求调度方案，不应继续重复间距/timeframe变体，也不能静默截断countBack或用noData掩盖。
