@@ -265,62 +265,70 @@ const feed = {
     try {
       if (!frames[res]) throw Error("不支持的周期");
       const symbol = decode(s.ticker).symbol;
-      const args = {
-        instrument: symbol,
-        timeframe: frames[res],
-        before:
-          p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0),
-        limit: Math.min(p.countBack, 2000),
-      };
-      let status = await historyQuery(args);
-      const started = Date.now();
-      while (status.status === "pending" && Date.now() - started < 12000) {
-        send({ type: "status", text: "正在拉取历史数据 · " + symbol });
-        await new Promise((r) => setTimeout(r, 1500));
-        status = await historyQuery(args);
-      }
-      if (status.status === "error") {
-        rememberHistoryFailure(args, status);
-        offerHistoryRetry();
-        throw Error(status.error || "历史拉取失败");
-      }
-      if (status.status === "pending")
-        pendingHistory.set(JSON.stringify(args), args);
-      if (!status.bars.length && status.status === "pending")
-        throw Error("历史数据正在后台拉取，完成后自动加载");
-      if (!status.bars.length && status.status === "empty_interval")
-        throw Error("该区间未返回行情，尚未确认历史起点");
-      send({
-        type: "status",
-        text:
-          status.status === "pending"
-            ? "历史数据部分可用，继续拉取中"
-            : "行情已加载",
-      });
+      const requested = Math.max(1, Math.ceil(p.countBack));
+      if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
+      const epoch = workspaceEpoch;
       let before =
-          p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0),
-        all = [],
-        earliest = Infinity,
-        more = true;
-      for (
-        let page = 0;
-        page < 8 && more && all.length < Math.min(p.countBack, 2000);
-        page++
-      ) {
+        p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0);
+      let all = [],
+        earliest = Infinity;
+      while (all.length < requested) {
+        if (
+          epoch !== workspaceEpoch ||
+          !hasHistoryViewer({ instrument: symbol, timeframe: frames[res] })
+        )
+          throw Error("已取消旧图表的历史加载");
+        const args = {
+          instrument: symbol,
+          timeframe: frames[res],
+          before,
+          limit: Math.min(2000, requested - all.length),
+        };
+        let status = await historyQuery(args);
+        while (status.status === "pending") {
+          send({
+            type: "status",
+            text: `正在拉取历史数据 · ${symbol} · 已读取 ${all.length} 根`,
+          });
+          await new Promise((r) => setTimeout(r, 1500));
+          if (epoch !== workspaceEpoch || !hasHistoryViewer(args))
+            throw Error("已取消旧图表的历史加载");
+          status = await historyQuery(args);
+        }
+        if (status.status === "error") {
+          rememberHistoryFailure(args, status);
+          offerHistoryRetry();
+          throw Error(status.error || "历史拉取失败");
+        }
+        if (status.status === "empty_interval")
+          throw Error("该区间未返回行情，尚未确认历史起点");
         const result = await query(s.ticker, res, {
           before,
-          limit: Math.min(2000, Math.max(300, p.countBack)),
+          limit: args.limit,
         });
-        for (const bar of result.bars)
-          if (stamp(bar, res, decode(s.ticker).symbol) < p.to * 1000)
+        // Never stitch cached islands across an interval not checked by the planner.
+        const covered = {
+          ...result,
+          bars: result.bars.filter(
+            (bar) => bar.start >= status.requested_start,
+          ),
+        };
+        for (const bar of covered.bars)
+          if (stamp(bar, res, symbol) < p.to * 1000)
             earliest = Math.min(earliest, bar.start);
-        all = barsOf(result, res, s.ticker)
-          .filter((b) => b.time < p.to * 1000)
+        all = barsOf(covered, res, s.ticker)
+          .filter((bar) => bar.time < p.to * 1000)
           .concat(all);
-        more = result.has_more;
-        if (!result.bars.length) break;
-        before = result.bars[0].start;
+        const next = covered.bars[0]?.start ?? status.next_cursor;
+        if (!(next < before)) throw Error("历史分页未推进，请重试");
+        before = next;
+        if (all.length < requested)
+          send({
+            type: "status",
+            text: `正在读取历史数据 · ${symbol} · 已读取 ${all.length} / ${requested} 根`,
+          });
       }
+      send({ type: "status", text: "行情已加载" });
       const unique = [...new Map(all.map((b) => [b.time, b])).values()].sort(
         (a, b) => a.time - b.time,
       );
