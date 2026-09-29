@@ -209,6 +209,7 @@ export default function AdvancedWorkspace() {
           history: "/market-data/history",
           activity: "/market-data/activity",
           retry: "/market-data/retry",
+          quotes: "/market-data/quotes",
         };
         if (
           !q ||

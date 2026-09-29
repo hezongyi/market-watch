@@ -183,3 +183,10 @@
 - Playwright横屏触摸模拟915×412，读取最新已保存工作区，切至M15、调整时间视区并调用保存检查；全程POST /api/advanced-charts/*请求数为0，nativeReadonly=true。
 - 图表仍可查看有效时间范围，页面异常及可见错误为空。仅行情读取/按需补数可继续，不写回桌面工作区或个人设置。
 - 保存开发脚本web/tests/advanced-mobile-readonly.browser.cjs；只读最新已保存工作区，不创建验收工作区。该证据来自浏览器移动模拟与公开API操作，不等同于真实OPPO上的拖动、捏合和锁屏验收。
+
+### Quotes基础接口
+
+- 新增鉴权market-data/quotes批量接口（最多100品种，去重），返回最新本地M1收盘价、Bid口径时的bid及来源描述；无记录返回error，不伪造成零，不生成不存在的ask/涨跌幅。
+- 返回as_of、basis、resolution供后续质量展示；原生Datafeed getQuotes/subscribeQuotes/unsubscribeQuotes通过父桥白名单调用，订阅合并后分批轮询。
+- 行情专项9项通过（新增报价口径、缺失价格及重复品种测试），历史刷新JS测试和前端构建通过。
+- 尚未启用右栏UI；日涨跌/过期休市状态、自选需求租约及用户级列表保存仍需完成。当前只是本地报价适配基础，不宣称自选功能已交付。

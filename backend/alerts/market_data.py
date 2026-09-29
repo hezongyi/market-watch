@@ -138,8 +138,53 @@ class Activity(BaseModel):
     instrument: str = Field(max_length=80)
 
 
+class QuoteQuery(BaseModel):
+    symbols: list[str] = Field(min_length=1, max_length=100)
+
+
 def router(authenticated):
     r = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
+
+    @r.post("/quotes")
+    def quotes(body: QuoteQuery):
+        result = []
+        with transaction() as db:
+            for ident in dict.fromkeys(body.symbols):
+                if len(ident) > 80:
+                    raise HTTPException(422, "无效品种")
+                inst = db.get(Instrument, ident)
+                bar = (
+                    db.scalar(
+                        select(Bar)
+                        .where(Bar.instrument_id == ident, Bar.timeframe == "M1")
+                        .order_by(Bar.start.desc())
+                        .limit(1)
+                    )
+                    if inst
+                    else None
+                )
+                if not bar:
+                    result.append({"s": "error", "n": ident, "v": {"description": "暂无本地报价"}})
+                    continue
+                values = {
+                    "lp": float(bar.close),
+                    "short_name": inst.symbol,
+                    "description": inst.label + " · " + inst.basis + " · M1",
+                    "exchange": inst.source.upper(),
+                }
+                if inst.basis == "bid":
+                    values["bid"] = float(bar.close)
+                result.append(
+                    {
+                        "s": "ok",
+                        "n": ident,
+                        "v": values,
+                        "as_of": bar.end,
+                        "basis": inst.basis,
+                        "resolution": "M1",
+                    }
+                )
+        return result
 
     @r.get("/catalog")
     def catalog(query: str = ""):

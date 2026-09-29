@@ -29,6 +29,7 @@ const frames = {
   "1M": "MN",
 };
 const subscriptions = new Map();
+const quoteSubscriptions = new Map();
 const lastHistory = new Map();
 const pendingHistory = new Map();
 const failedHistory = new Map();
@@ -158,6 +159,18 @@ function query(ticker, res, args) {
   return promise;
 }
 const feed = {
+  getQuotes: (symbols, cb, err) => {
+    request({ op: "quotes", args: { symbols } }, "market")
+      .then((rows) => cb(rows.map(({ s, n, v }) => ({ s, n, v }))))
+      .catch((e) => err(String(e)));
+  },
+  subscribeQuotes: (symbols, fastSymbols, cb, id) => {
+    quoteSubscriptions.set(id, {
+      symbols: [...new Set([...symbols, ...fastSymbols])],
+      cb,
+    });
+  },
+  unsubscribeQuotes: (id) => quoteSubscriptions.delete(id),
   onReady: (cb) =>
     setTimeout(
       () =>
@@ -350,6 +363,32 @@ async function tick() {
   if (polling) return;
   polling = true;
   try {
+    const quoteSymbols = [
+      ...new Set([...quoteSubscriptions.values()].flatMap((s) => s.symbols)),
+    ];
+    if (quoteSymbols.length) {
+      try {
+        const rows = [];
+        for (let i = 0; i < quoteSymbols.length; i += 100)
+          rows.push(
+            ...(await request(
+              {
+                op: "quotes",
+                args: { symbols: quoteSymbols.slice(i, i + 100) },
+              },
+              "market",
+            )),
+          );
+        for (const sub of quoteSubscriptions.values())
+          sub.cb(
+            rows
+              .filter((r) => sub.symbols.includes(r.n))
+              .map(({ s, n, v }) => ({ s, n, v })),
+          );
+      } catch (e) {
+        send({ type: "error", error: String(e) });
+      }
+    }
     for (const [key, args] of [...pendingHistory]) {
       if (!hasHistoryViewer(args)) {
         pendingHistory.delete(key);

@@ -276,3 +276,39 @@ def test_failed_history_exposes_retryable_jobs(database):
                 assert job.status == "pending" and job.attempts == 0 and job.error is None
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_quotes_preserve_basis_and_do_not_invent_missing_prices(database):
+    from alerts.storage import instant
+
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        inst.basis = "bid"
+        write_bars(
+            db,
+            inst.id,
+            "M1",
+            [
+                Candle(
+                    instant(60000),
+                    instant(120000),
+                    Decimal("1.2"),
+                    Decimal("1.2"),
+                    Decimal("1.2"),
+                    Decimal("1.2"),
+                )
+            ],
+        )
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            result = client.post(
+                "/api/market-data/quotes", json={"symbols": ["EURUSD", "EURUSD", "UNKNOWN"]}
+            ).json()
+            assert len(result) == 2
+            assert result[0]["v"]["lp"] == result[0]["v"]["bid"] == 1.2
+            assert "ask" not in result[0]["v"] and "ch" not in result[0]["v"]
+            assert result[0]["as_of"] == 120000
+            assert result[1]["s"] == "error" and "lp" not in result[1]["v"]
+    finally:
+        api_module.app.dependency_overrides.clear()
