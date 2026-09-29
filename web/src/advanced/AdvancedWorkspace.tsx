@@ -177,6 +177,14 @@ export default function AdvancedWorkspace() {
               { revision: q.args.revision },
             );
           if (q.op === "save" || q.op === "load") {
+            // A successful native Save As binds a new independent workspace.
+            // Keep any older failed draft available under its original ID.
+            if (q.op === "save" && !q.args?.id) {
+              blocked.current = false;
+              setError("");
+              setFeedError("");
+              setStatus("已另存为独立工作区");
+            }
             if (
               draftId &&
               localStorage.getItem("mw-tv-draft:" + draftId) === draft

@@ -129,6 +129,64 @@ const fs = require("fs");
       failed.id,
     ),
   );
+  await page.unroute("**/api/advanced-charts/native-charts/save");
+  const copied = await frame.evaluate(async (failed) => {
+    const copy = await request(
+      {
+        op: "save",
+        args: {
+          name: "原生另存恢复",
+          symbol: "OANDA:NZD_USD",
+          resolution: "5",
+          content: failed.content,
+          revision: 0,
+        },
+      },
+      "workspace",
+    );
+    const saved = await request(
+      {
+        op: "save",
+        args: {
+          id: copy.id,
+          name: copy.name,
+          symbol: "OANDA:NZD_USD",
+          resolution: "5",
+          content: failed.content,
+          revision: copy.revision,
+        },
+      },
+      "workspace",
+    );
+    return saved;
+  }, failed);
+  assert.equal(copied.revision, 2);
+  assert.ok(
+    await page.evaluate(
+      (id) => localStorage.getItem("mw-tv-draft:" + id),
+      failed.id,
+    ),
+    "Save As must retain original recovery draft",
+  );
+  // Make original latest again to exercise reload recovery from its retained draft.
+  await page.evaluate(async (id) => {
+    const session = await (await fetch("/api/session")).json();
+    const rows = await (await fetch("/api/advanced-charts/workspaces")).json();
+    const row = rows.find((r) => r.id === id);
+    const r = await fetch("/api/advanced-charts/workspaces/" + id + "/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": session.csrf,
+      },
+      body: JSON.stringify({
+        name: row.name,
+        revision: row.revision,
+        document: row.document,
+      }),
+    });
+    if (!r.ok) throw Error("fixture update failed");
+  }, failed.id);
   await page.reload();
   await page.getByRole("alert").filter({ hasText: "存在未保存草稿" }).waitFor();
   await page.getByRole("button", { name: "复制", exact: true }).click();
