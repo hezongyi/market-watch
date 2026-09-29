@@ -40,9 +40,12 @@ function nativePreferences(initial, rpc, readonly, report) {
     return task;
   }
   return {
+    savePreference: save,
     settings: {
       initialSettings: Object.fromEntries(
-        list("setting").map((r) => [r.name, r.content.value]),
+        list("setting")
+          .filter((r) => !r.name.startsWith("mw."))
+          .map((r) => [r.name, r.content.value]),
       ),
       setValue: (name, value) => {
         if (!readonly) save("setting", name, value).catch(report);

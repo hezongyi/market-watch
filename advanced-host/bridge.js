@@ -160,6 +160,10 @@ function query(ticker, res, args) {
 }
 const feed = {
   getQuotes: (symbols, cb, err) => {
+    if (!symbols.length) {
+      queueMicrotask(() => cb([]));
+      return;
+    }
     request({ op: "quotes", args: { symbols } }, "market")
       .then((rows) => cb(rows.map(({ s, n, v }) => ({ s, n, v }))))
       .catch((e) => err(String(e)));
@@ -374,7 +378,10 @@ async function tick() {
             ...(await request(
               {
                 op: "quotes",
-                args: { symbols: quoteSymbols.slice(i, i + 100), client: clientId },
+                args: {
+                  symbols: quoteSymbols.slice(i, i + 100),
+                  client: clientId,
+                },
               },
               "market",
             )),
@@ -651,6 +658,17 @@ function boot(
     }
     ready = true;
     loading = false;
+    nativeWatchlists(
+      widget,
+      preferences.find(
+        (p) => p.kind === "setting" && p.name === "mw.watchlists.v1",
+      )?.content.value,
+      readonly,
+      (value) => prefs.savePreference("setting", "mw.watchlists.v1", value),
+      (e) => send({ type: "error", error: "自选列表保存失败：" + String(e) }),
+    ).catch((e) =>
+      send({ type: "error", error: "自选列表初始化失败：" + String(e) }),
+    );
     widget.subscribe("chart_load_requested", () => {
       workspaceEpoch++;
       loading = true;
