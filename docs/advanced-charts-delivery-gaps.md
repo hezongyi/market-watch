@@ -133,3 +133,10 @@
 - 公开API对照成功：先切月线（大请求仅拦截，不下载），设置barSpacing=width/3，再widget.save/widget.load，重新加载后的首个MN请求为4根（/tmp/mw-month-reload-budget.log，退出0）。以MARKET_WATCH_RELOAD_BUDGET_PROBE=1保留该诊断路径；此模式只验证重载后请求，不能视为完整切换验收。
 - 尝试在onIntervalChanged安排重载，并在高周期getBars前让出事件循环/等待重载，仍会先发出188/195根旧请求，然后才是4根新请求（/tmp/mw-month-budget-all-gated.log）。因此没有把候选接入当成修复，产品bridge和range-sync已恢复原版本。
 - 下一步需在datafeed入口、发给后端之前识别被周期切换替代的旧请求；同时验证重载不会丢失工作区身份、其他分屏、画线及撤销行为。只有后续小请求成功不足以证明旧的大补数已被阻止。
+
+### Datafeed入口前移对照通过
+
+- MARKET_WATCH_FEED_BUDGET_PROBE=1在浏览器测试内包装feed.getBars：拦住首次大MN请求，再通过公开缩放/save/load重建，明确向旧请求返回被替代错误，不将旧请求交给后端。
+- 两轮均只捕获4根MN后端请求（/tmp/mw-feed-budget-probe.log、/tmp/mw-feed-budget-events.log）；后者增加页面异常断言，退出0、异常为空。捕获的旧请求firstDataRequest=true，countBack188/195，ready=true、loading=false。
+- 事件记录确认onIntervalChanged先于该getBars，普通下拉切换的parameters为空；后续正式接入可记录明确timeframe意图，避免覆盖用户日期选择。
+- 此代码仅为测试内诊断包装，尚未接入产品；下一步用显式“旧请求被替代”取消语义接入，不能仅等待workspaceEpoch变化（重载事件异步，旧请求可能在其之前继续发出）。必须继续验证实际数据、工作区身份、多图和撤销状态。

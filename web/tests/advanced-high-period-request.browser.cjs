@@ -124,6 +124,41 @@ const fs = require("fs");
     await frame.waitForFunction(() => ready && !loading, null, {
       timeout: 60000,
     });
+    if (process.env.MARKET_WATCH_FEED_BUDGET_PROBE === "1")
+      await frame.evaluate(() => {
+        widget
+          .chart(0)
+          .onIntervalChanged()
+          .subscribe(null, (resolution, parameters) => {
+            console.error(
+              "BUDGET_PROBE_INTERVAL",
+              JSON.stringify({ resolution, parameters }),
+            );
+          });
+        const original = feed.getBars;
+        let rebuilt = false;
+        feed.getBars = async (symbol, resolution, period, callback, error) => {
+          if (resolution !== "1M" || rebuilt || period.countBack <= 4)
+            return original(symbol, resolution, period, callback, error);
+          rebuilt = true;
+          console.error(
+            "BUDGET_PROBE_OLD_REQUEST",
+            JSON.stringify({
+              period,
+              chartResolution: widget.chart(0).resolution(),
+              ready,
+              loading,
+            }),
+          );
+          const scale = widget.chart(0).getTimeScale();
+          scale.setBarSpacing(scale.width() / 3);
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          const state = await new Promise((resolve) => widget.save(resolve));
+          const loaded = widget.load(state);
+          error("Superseded by bounded viewport reload");
+          await loaded;
+        };
+      });
     await frame.evaluate((resolution) => {
       widget
         .chart(0)
@@ -136,9 +171,9 @@ const fs = require("fs");
       captured.length = 0;
       await frame.evaluate(async () => {
         const scale = widget.chart(0).getTimeScale();
-        scale.setBarSpacing(scale.width()/3);
-        await new Promise(resolve => setTimeout(resolve, 100));
-        const state = await new Promise(resolve => widget.save(resolve));
+        scale.setBarSpacing(scale.width() / 3);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        const state = await new Promise((resolve) => widget.save(resolve));
         await widget.load(state);
       });
       await page.waitForTimeout(3000);
@@ -155,6 +190,7 @@ const fs = require("fs");
         q.timeframe === frames[resolution] && q.limit <= limits[resolution],
     ),
   );
+  require("node:assert/strict").deepEqual(errors, []);
   await browser.close();
 })().catch((e) => {
   console.error(e);
