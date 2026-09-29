@@ -107,3 +107,10 @@
 - 通过测试侧拦截canvas.fillText读取实际渲染文本（不改产品或供应库）：风险/回报比2.5、停止距离0.00100/0.177%、目标距离0.00250/0.442%均与独立算式一致；截图/tmp/mw-risk-tools.png人工确认多空方向及入场/止盈/止损价格位置正确。
 - 保存刷新后两类工具均保留入场0.565、stopLevel100、profitLevel250、alwaysShowStats=true，页面异常为空；/tmp/mw-risk-tools-asserted.log退出0。
 - 这是图表分析工具验收，不代表接入了下单、账户持仓或真实交易收益计算。鼠标拖动止损/止盈手柄及其他品种精度仍可在后续交互验收中覆盖。
+
+### Python长历史指标数值与分页
+
+- 新增长历史API测试test_long_history_indicator_warmup_and_future_append：6000根连续M1输入，EMA(500)/RSI(14)与独立递推公式逐点比较（绝对误差1e-9），每页1200根且300根重叠区间严格一致。
+- 再追加200根后续K线，过去页面全部指标值保持不变；EMA前499根明确返回null，第500根种子值正确。测试不复用被测calculate/TA-Lib生成期望值。
+- 初次测试原始浮点输入超出数据库Numeric(24,10)精度，导致RSI误差略超阈值；改用8位小数可持久化输入后通过，没有放宽数值阈值或修改产品算法。
+- test_chart_workspace.py共19 passed，ruff检查通过（/tmp/mw-indicator-long-history.log）。该证据覆盖两类递归指标，不等于十年M1全部指标性能已达标；自定义插件仍需其作者提供对应数值测试。

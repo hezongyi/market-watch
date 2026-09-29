@@ -404,7 +404,9 @@ def test_invalid_position_and_layout(database):
 
 @pytest.mark.parametrize("indicators", [[], [{"name": "EMA", "params": {"period": 2}}]])
 @pytest.mark.parametrize("revision_after", [None, 120000])
-def test_live_history_check_ignores_tail_but_detects_older_changes(database, indicators, revision_after):
+def test_live_history_check_ignores_tail_but_detects_older_changes(
+    database, indicators, revision_after
+):
     api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
     try:
         with database.begin() as db:
@@ -465,5 +467,104 @@ def test_live_history_check_ignores_tail_but_detects_older_changes(database, ind
                     inside.revision += 1
                 changed = client.post("/api/charts/data", json=args).json()["history_check"]
                 assert changed["revision"] != initial["next_revision"]
+    finally:
+        api_module.app.dependency_overrides.clear()
+
+
+def test_long_history_indicator_warmup_and_future_append(database):
+    """API pages must use the full prefix, checked against independent recurrences."""
+    import math
+
+    closes = [round(100 + i / 1000 + math.sin(i / 11) * 7, 8) for i in range(6200)]
+    with database.begin() as db:
+        db.add_all(
+            [
+                Bar(
+                    instrument_id="BTCUSDT",
+                    timeframe="M1",
+                    start=(i + 1) * 60000,
+                    end=(i + 2) * 60000,
+                    open=value,
+                    high=value + 1,
+                    low=value - 1,
+                    close=value,
+                    complete=True,
+                )
+                for i, value in enumerate(closes[:6000])
+            ]
+        )
+    # Independent EMA(500) and Wilder RSI(14), without calling chart calculate/TA-Lib.
+    ema = [None] * len(closes)
+    ema[499] = sum(closes[:500]) / 500
+    alpha = 2 / 501
+    for i in range(500, len(closes)):
+        ema[i] = ema[i - 1] + alpha * (closes[i] - ema[i - 1])
+    rsi = [None] * len(closes)
+    changes = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
+    gain = sum(max(v, 0) for v in changes[:14]) / 14
+    loss = sum(max(-v, 0) for v in changes[:14]) / 14
+    rsi[14] = 100 * gain / (gain + loss)
+    for i in range(15, len(closes)):
+        gain = (13 * gain + max(changes[i - 1], 0)) / 14
+        loss = (13 * loss + max(-changes[i - 1], 0)) / 14
+        rsi[i] = 100 * gain / (gain + loss)
+    query = {
+        "instrument": "BTCUSDT",
+        "timeframe": "M1",
+        "limit": 1200,
+        "before": 5001 * 60000,
+        "indicators": [
+            {"name": "EMA", "params": {"period": 500}},
+            {"name": "RSI", "params": {"period": 14}},
+        ],
+    }
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+
+            def read(args):
+                response = client.post("/api/charts/data", json=args)
+                assert response.status_code == 200
+                return response.json()
+
+            page = read(query)
+            assert len(page["bars"]) == 1200
+            for indicator, reference in zip(page["indicators"], (ema, rsi)):
+                values = indicator["series"][0]["values"]
+                assert len(values) == 1200
+                for point in values:
+                    index = point["time"] // 60000 - 1
+                    assert point["value"] == pytest.approx(reference[index], rel=0, abs=1e-9)
+            earlier = read({**query, "before": 4101 * 60000})
+            for left, right in zip(earlier["indicators"], page["indicators"]):
+                indexed = {p["time"]: p["value"] for p in left["series"][0]["values"]}
+                overlap = [p for p in right["series"][0]["values"] if p["time"] in indexed]
+                assert len(overlap) == 300
+                assert all(p["value"] == indexed[p["time"]] for p in overlap)
+            with database.begin() as db:
+                db.add_all(
+                    [
+                        Bar(
+                            instrument_id="BTCUSDT",
+                            timeframe="M1",
+                            start=(i + 1) * 60000,
+                            end=(i + 2) * 60000,
+                            open=closes[i],
+                            high=closes[i] + 1,
+                            low=closes[i] - 1,
+                            close=closes[i],
+                            complete=True,
+                        )
+                        for i in range(6000, 6200)
+                    ]
+                )
+            appended = read(query)
+            assert appended["indicators"] == page["indicators"], (
+                "Future bars must not change historical indicators"
+            )
+            first = read({**query, "before": 520 * 60000, "limit": 519})
+            warmup = first["indicators"][0]["series"][0]["values"]
+            assert all(p["value"] is None for p in warmup[:499])
+            assert warmup[499]["value"] == pytest.approx(ema[499], rel=0, abs=1e-9)
     finally:
         api_module.app.dependency_overrides.clear()
