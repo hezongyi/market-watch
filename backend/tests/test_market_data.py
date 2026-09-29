@@ -335,3 +335,55 @@ def test_quote_subscription_renews_deduplicated_demand(database):
                 assert now_ms() < leases[0].expires <= now_ms() + 120000
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_quote_change_uses_complete_adjacent_session(database):
+    from alerts.storage import instant
+
+    with database.begin() as db:
+        write_bars(
+            db,
+            "BTCUSDT",
+            "D1",
+            [
+                Candle(
+                    instant(86400000),
+                    instant(172800000),
+                    Decimal("100"),
+                    Decimal("100"),
+                    Decimal("100"),
+                    Decimal("100"),
+                )
+            ],
+        )
+        write_bars(
+            db,
+            "BTCUSDT",
+            "M1",
+            [
+                Candle(
+                    instant(172800000),
+                    instant(172860000),
+                    Decimal("110"),
+                    Decimal("110"),
+                    Decimal("110"),
+                    Decimal("110"),
+                )
+            ],
+        )
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            values = client.post("/api/market-data/quotes", json={"symbols": ["BTCUSDT"]}).json()[
+                0
+            ]["v"]
+            assert values["ch"] == 10 and values["chp"] == 10 and values["prev_close_price"] == 100
+            with database.begin() as db:
+                daily = db.scalar(select(Bar).where(Bar.timeframe == "D1"))
+                daily.complete = False
+            values = client.post("/api/market-data/quotes", json={"symbols": ["BTCUSDT"]}).json()[
+                0
+            ]["v"]
+            assert "ch" not in values
+    finally:
+        api_module.app.dependency_overrides.clear()

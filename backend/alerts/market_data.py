@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from .chart_data import FRAMES, bounds, chart_rows
 from .coverage import covers_interval
-from .domain import Calendar, bucket_bounds
+from .domain import Calendar, bucket_bounds, session_bounds
 from .market import stored_coverage
 from .providers import fetch_oanda_catalog
 from .storage import (
@@ -196,6 +196,27 @@ def router(authenticated):
                 }
                 if inst.basis == "bid":
                     values["bid"] = float(bar.close)
+                session_start = ms(session_bounds(instant(bar.start), Calendar(inst.calendar))[0])
+                previous = db.scalar(
+                    select(Bar)
+                    .where(
+                        Bar.instrument_id == ident,
+                        Bar.timeframe == "D1",
+                        Bar.complete.is_(True),
+                        Bar.end <= session_start,
+                    )
+                    .order_by(Bar.end.desc())
+                    .limit(1)
+                )
+                # Use only an adjacent complete daily bucket. Across closures or
+                # missing days, omit change until calendar-aware continuity is proven.
+                if previous and previous.end == session_start and previous.close != 0:
+                    delta = bar.close - previous.close
+                    values.update(
+                        ch=float(delta),
+                        chp=float(delta / previous.close * 100),
+                        prev_close_price=float(previous.close),
+                    )
                 result.append(
                     {
                         "s": "ok",
