@@ -27,6 +27,7 @@ dirty=true;snapshot();`,
   context,
 );
 assert.equal(callbacks.length, 1);
+assert.equal(messages.filter((m) => m.type === "native-saving").length, 1);
 callbacks[0].ok();
 assert.equal(
   callbacks.length,
@@ -39,6 +40,7 @@ assert.equal(
   "do not acknowledge unsaved edits",
 );
 callbacks[1].ok();
+assert.equal(messages.filter((m) => m.type === "native-saving").length, 2);
 assert.equal(messages.filter((m) => m.type === "native-saved").length, 1);
 vm.runInContext("dirty=true;snapshot()", context);
 callbacks[2].fail(new Error("offline"));

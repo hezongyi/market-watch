@@ -29,6 +29,7 @@ export default function AdvancedWorkspace() {
     [error, setError] = useState("");
   const frame = useRef<HTMLIFrameElement>(null),
     current = useRef<Workspace | null>(null);
+  const unsaved = useRef(false);
   const flushWaiters = useRef<
     { resolve: () => void; reject: (e: Error) => void }[]
   >([]);
@@ -62,6 +63,7 @@ export default function AdvancedWorkspace() {
       }, 15000);
     });
   const select = (row: Workspace) => {
+    unsaved.current = false;
     current.current = row;
     blocked.current = !!localStorage.getItem("mw-tv-draft:" + row.id);
     setActive(row);
@@ -77,6 +79,15 @@ export default function AdvancedWorkspace() {
     setRows(list);
     return list;
   }
+  useEffect(() => {
+    const protect = (event: BeforeUnloadEvent) => {
+      if (mobile || !unsaved.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    addEventListener("beforeunload", protect);
+    return () => removeEventListener("beforeunload", protect);
+  }, [mobile]);
   useEffect(() => {
     let cancelled = false;
     refresh()
@@ -119,7 +130,11 @@ export default function AdvancedWorkspace() {
         }
       } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
       else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
-      else if (m.type === "native-saved") {
+      else if (m.type === "native-saving") {
+        if (!mobile) unsaved.current = true;
+        setStatus("正在保存");
+      } else if (m.type === "native-saved") {
+        unsaved.current = false;
         setStatus("已保存");
         flushWaiters.current.splice(0).forEach((w) => w.resolve());
       } else if (m.type === "workspace") {

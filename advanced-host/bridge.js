@@ -488,6 +488,7 @@ function snapshot() {
   if (!ready || loading) return;
   if (nativeMode) {
     if (nativeReadonly || nativeSaving) return;
+    send({ type: "native-saving" });
     nativeSaving = true;
     dirty = false;
     const epoch = workspaceEpoch;
