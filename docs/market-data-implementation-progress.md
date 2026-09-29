@@ -317,3 +317,8 @@
 - 检查现有barsOf与pythonStudies：传输层用合成volume标记值是否存在，绘图适配将无值转为NaN，合法零值保留，未发现将预热画成零线的问题。
 - 新增advanced-python-indicators.cjs回归，覆盖乱序时间值映射、正确series key、null/缺值预热、真实零值、负值、adopt时间对齐参数及主品种上下文恢复。测试通过；未改数值算法。
 - 此证据为适配协议单元验证；真实库内Python多曲线数值对照与长历史性能仍需验收。
+
+### 原生Python SMA浏览器链路
+
+- 新增advanced-python-study.browser.cjs，真实库创建“守望 Python SMA”周期20；观察到合成品种请求触发后端/charts/data返回SMA且有有限数值，原生保存后刷新仍存在该指标及period=20，无pageerror。
+- 此次证明创建→Python取数→原生工作区保存恢复链路；没有用“后端有值”代替图上数值逐点一致性证明，多曲线及递归指标性能仍待继续验收。
