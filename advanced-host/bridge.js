@@ -638,14 +638,17 @@ function boot(
   savedDoc.nativeName = workspace?.name || "我的图表";
   nativeMode = true;
   nativeReadonly = readonly;
+  let currentNativeWorkspace = workspace;
   const layouts = nativeWorkspaces(
     workspace,
     (op, args) => request({ op, args }, "workspace"),
     readonly,
     (row) => {
+      currentNativeWorkspace = row;
       savedDoc = { ...row.document, nativeName: row.name };
     },
     (row) => {
+      currentNativeWorkspace = row;
       savedDoc = { ...row.document, nativeName: row.name };
     },
   );
@@ -660,8 +663,75 @@ function boot(
     state._mwViewports = captureChartViewports(widget);
     return saveLayout({ ...data, content: JSON.stringify(state) });
   };
+  let viewportTimer,
+    viewportWrite = Promise.resolve();
+  const viewportBindings = new Map();
+  const persistViewport = () => {
+    clearTimeout(viewportTimer);
+    const epoch = workspaceEpoch;
+    viewportWrite = viewportWrite
+      .catch(() => {})
+      .then(async () => {
+        if (
+          readonly ||
+          !ready ||
+          loading ||
+          viewportRestoring ||
+          rangeGuard?.busy() ||
+          epoch !== workspaceEpoch ||
+          !currentNativeWorkspace?.id
+        )
+          return;
+        const viewports = captureChartViewports(widget);
+        if (
+          JSON.stringify(savedDoc.state?._mwViewports) ===
+          JSON.stringify(viewports)
+        )
+          return;
+        const raw = await new Promise((resolve) => widget.save(resolve));
+        if (epoch !== workspaceEpoch) return;
+        const state =
+          typeof savedDoc.state?.content === "string"
+            ? { ...savedDoc.state, content: JSON.stringify(raw) }
+            : raw;
+        state._mwViewports = viewports;
+        send({ type: "native-saving" });
+        await saveLayout({
+          id: currentNativeWorkspace.id,
+          name: savedDoc.nativeName,
+          symbol: widget.chart(0).symbol(),
+          resolution: widget.chart(0).resolution(),
+          content: JSON.stringify(state),
+        });
+        send({ type: "native-saved" });
+      });
+    return viewportWrite;
+  };
+  const bindViewports = () => {
+    for (const [chart, changed] of viewportBindings)
+      chart.onVisibleRangeChanged().unsubscribe(null, changed);
+    viewportBindings.clear();
+    if (readonly) return;
+    for (let i = 0; i < widget.chartsCount(); i++) {
+      const chart = widget.chart(i);
+      const changed = () => {
+        if (!ready || loading || viewportRestoring) return;
+        clearTimeout(viewportTimer);
+        viewportTimer = setTimeout(
+          () =>
+            persistViewport().catch((e) =>
+              send({ type: "error", error: "视区保存失败：" + String(e) }),
+            ),
+          400,
+        );
+      };
+      viewportBindings.set(chart, changed);
+      chart.onVisibleRangeChanged().subscribe(null, changed);
+    }
+  };
   layouts.getChartContent = async (id) => {
     try {
+      await persistViewport();
       const state = JSON.parse(await loadContent(id));
       pendingViewports = state._mwViewports;
       delete state._mwViewports;
@@ -834,9 +904,14 @@ function boot(
       loading = false;
       rangeGuard?.dispose();
       rangeGuard = rangeSyncLoadingGuard(widget);
+      bindViewports();
     });
     rangeGuard = rangeSyncLoadingGuard(widget);
-    widget.subscribe("layout_changed", () => rangeGuard?.refresh());
+    bindViewports();
+    widget.subscribe("layout_changed", () => {
+      rangeGuard?.refresh();
+      bindViewports();
+    });
     widget.drawOnAllChartsEnabled().setValue(true);
     widget.subscribe("onAutoSaveNeeded", () => {
       dirty = true;

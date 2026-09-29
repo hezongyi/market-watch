@@ -112,6 +112,7 @@ const fs = require("fs");
     for (let i = 0; i < 50 && scaleA.rightOffset() !== 4; i++)
       await new Promise((resolve) => setTimeout(resolve, 20));
     if (scaleA.rightOffset() !== 4) throw Error("A margin did not settle");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await save();
     const rangeA = widget.chart(0).getVisibleRange();
     const all = await request({ op: "list", args: {} }, "workspace");
@@ -149,6 +150,7 @@ const fs = require("fs");
     for (let i = 0; i < 50 && scaleB.rightOffset() !== 14; i++)
       await new Promise((resolve) => setTimeout(resolve, 20));
     if (scaleB.rightOffset() !== 14) throw Error("B margin did not settle");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await save();
     const rangeB = widget.chart(0).getVisibleRange();
     const bAfter = await request(
@@ -171,6 +173,8 @@ const fs = require("fs");
       "workspace",
     );
     return {
+      storedA: JSON.parse(content.content)._mwViewports,
+      storedB: JSON.parse(bAfter.content)._mwViewports,
       rangeA,
       rangeB,
       bLoadedRange,
@@ -187,6 +191,8 @@ const fs = require("fs");
   console.log("SWITCH", result);
   const assert = require("node:assert/strict");
   assert.notEqual(result.a, result.b);
+  assert.equal(result.storedA[0].offset, 4);
+  assert.equal(result.storedB[0].offset, 14);
   assert.deepEqual(
     result.bLoadedRange,
     result.rangeA,
