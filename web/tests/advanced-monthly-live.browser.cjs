@@ -259,6 +259,50 @@ const fs = require("fs");
     );
     return;
   }
+  if (process.env.MARKET_WATCH_RAPID_PERIOD_CHECK) {
+    const assert = require("node:assert/strict");
+    const epoch = await frame.evaluate(async () => {
+      const chart = widget.chart(0);
+      await chart.createShape(
+        { time: chart.getVisibleRange().to - 3600, price: 1.13 },
+        { shape: "horizontal_line" },
+      );
+      return workspaceEpoch;
+    });
+    for (const period of ["15", "30", "60", "5", "15", "5"]) {
+      await frame.evaluate((period) => {
+        widget
+          .chart(0)
+          .setResolution(period)
+          .catch(() => {});
+      }, period);
+      await page.waitForTimeout(100);
+    }
+    await frame.waitForFunction(
+      () =>
+        !loading &&
+        !rangeGuard.busy() &&
+        widget.chart(0).resolution() === "5" &&
+        widget.chart(0).dataReady(),
+      null,
+      { timeout: 180000 },
+    );
+    await page.waitForTimeout(3000);
+    const state = await frame.evaluate(() => ({
+      epoch: workspaceEpoch,
+      resolution: widget.chart(0).resolution(),
+      shapes: widget.chart(0).getAllShapes().length,
+      range: widget.chart(0).getVisibleRange(),
+    }));
+    assert.equal(state.epoch, epoch);
+    assert.equal(state.resolution, "5");
+    assert.equal(state.shapes, 1);
+    assert.ok(state.range.to > state.range.from && state.range.from > 0);
+    assert.deepEqual(errors, []);
+    console.log("RAPID_PERIOD_RESULT", JSON.stringify(state));
+    await browser.close();
+    return;
+  }
   if (process.env.MARKET_WATCH_START_M5) {
     if (process.env.MARKET_WATCH_PARTIAL_HISTORY_PROBE) {
       await frame.evaluate(async () => {

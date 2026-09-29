@@ -299,3 +299,9 @@
 - Advanced Charts非浏览器JS专项共11个全部通过（/tmp/mw-advanced-js-regression.log），覆盖时间转换、工作区、偏好、自选、自动保存、历史分页/去重/重置、同步保护及视区恢复。
 - 发现advanced-time测试VM遗漏crypto，全文件初始化即报ReferenceError；补入Node webcrypto后原时间转换断言正常执行通过，未修改产品时间算法。初次批量选择误包含advanced-browser.cjs，随后明确排除所有browser脚本；上述11个通过不包含浏览器验收。
 - 部署配置检查确认Dockerfile/.dockerignore包含所有当前适配脚本；镜像构建运行、HTTPS反向代理与生产切换仍未执行，此静态检查不替代部署验收。
+
+### 连续日内周期切换验收
+
+- advanced-monthly-live增加MARKET_WATCH_RAPID_PERIOD_CHECK：真实EURUSD从M5经M15/M30/H1/M5/M15/M5，每次间隔100ms，不等待前次加载完成；预先创建水平线。
+- /tmp/mw-rapid-period-live.log退出0，最后M5数据就绪且rangeGuard无待处理状态，等待额外3秒后周期仍为M5、工作区epoch不变、画线1条、视区有效且页面异常为空。
+- 该用例覆盖日内周期快速替换，尚不覆盖高周期与日期范围同时切换、冷数据量性能或全部原生菜单鼠标操作，继续保持对应边界待验收。
