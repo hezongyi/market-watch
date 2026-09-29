@@ -229,3 +229,10 @@
 - 这仅证明公开直接设置能稳定保留休市前边界，并不证明可直接加入自动修正；仍须验证活动图、连续鼠标拖动及反馈循环，再决定统一定位实现。
 - 原始/home/quant/repos/research/TV_v31.1.0_0430.zip只含export-data.08f805e72958605fab59.js和export-data.48adcc30df9b6625a837.js，不含当前运行runtime引用的export-data.bb1bdc415916b47fed24.js，也无20866模块文件。不能把其他hash重命名冒充兼容模块。
 - 已异步请求用户向分发方索取当前版本匹配完整包，列明两个缺失文件；未因该资源缺口停止其他工作，未改供应代码。
+
+### 同步开关组合与原生日线回归
+
+- MARKET_WATCH_RANGE_SYNC_ONLY=1在固定休市窗口关闭timeSync，保留dateRangeSync；/tmp/mw-range-only-gap.log退出1，同步右端18:00、直接设置16:55的差异不变，排除双同步开关叠加为根因。
+- 已异步请求用户明确休市段口径：保留原生相邻有效K线边界，或要求所有图精确同一时钟范围。未收到答复前不按默认选项视为批准，不关闭休市边界缺口；其他工作继续。
+- 原生M5→1日菜单点击、最新日K可见、画线保留及保存刷新视区严格一致，通过（/tmp/mw-native-day-final.log退出0）。
+- 核对deploy/backup-and-restore.md与实际文件，发现/home/quant/.local/libexec/trading-alerts-pg提供PG14客户端包装器。此前因未找到工具而保留的备份恢复测试应重新核查执行条件，不能继续当作工具缺失阻塞。

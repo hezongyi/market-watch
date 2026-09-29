@@ -168,6 +168,8 @@ const fs = require("fs");
   );
   assert.equal(await frame.evaluate(() => rangeGuard.busy()), false);
   phase = "move-mixed-viewport";
+  if (process.env.MARKET_WATCH_RANGE_SYNC_ONLY)
+    await frame.evaluate(() => widget.timeSync().setValue(false));
   const windowHours = Number(process.env.MARKET_WATCH_VIEWPORT_HOURS || 24);
   assert.ok(Number.isFinite(windowHours) && windowHours > 0);
   const target = await frame.evaluate(
