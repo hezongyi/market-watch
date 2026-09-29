@@ -54,6 +54,7 @@ class DataQuery(BaseModel):
     indicators: list[dict] = Field(default_factory=list, max_length=12)
     track_history: bool = False
     revision_before: int | None = Field(default=None, gt=0)
+    revision_after: int | None = Field(default=None, ge=0)
 
 
 def history_check(db, inst, source, visible, body):
@@ -66,7 +67,10 @@ def history_check(db, inst, source, visible, body):
     def fingerprint(boundary):
         stamp = db.execute(
             select(func.count(Bar.id), func.sum(Bar.revision), func.max(Bar.received_at)).where(
-                Bar.instrument_id == inst.id, Bar.timeframe == source, Bar.start < boundary
+                Bar.instrument_id == inst.id,
+                Bar.timeframe == source,
+                Bar.start < boundary,
+                Bar.start >= (body.revision_after or 0),
             )
         ).one()
         return hashlib.sha256(
@@ -76,6 +80,7 @@ def history_check(db, inst, source, visible, body):
     revision = fingerprint(before)
     return {
         "before": before,
+        "after": body.revision_after,
         "revision": revision,
         "next_before": next_before,
         "next_revision": revision if next_before == before else fingerprint(next_before),

@@ -32,6 +32,7 @@ const frames = {
 const subscriptions = new Map();
 const quoteSubscriptions = new Map();
 const lastHistory = new Map();
+const firstHistory = new Map();
 const pendingHistory = new Map();
 const failedHistory = new Map();
 let retryDialogOpen = false;
@@ -299,6 +300,7 @@ const feed = {
       let before =
           p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0),
         all = [],
+        earliest = Infinity,
         more = true;
       for (
         let page = 0;
@@ -309,6 +311,9 @@ const feed = {
           before,
           limit: Math.min(2000, Math.max(300, p.countBack)),
         });
+        for (const bar of result.bars)
+          if (stamp(bar, res, decode(s.ticker).symbol) < p.to * 1000)
+            earliest = Math.min(earliest, bar.start);
         all = barsOf(result, res, s.ticker)
           .filter((b) => b.time < p.to * 1000)
           .concat(all);
@@ -319,6 +324,15 @@ const feed = {
       const unique = [...new Map(all.map((b) => [b.time, b])).values()].sort(
         (a, b) => a.time - b.time,
       );
+      if (unique.length && Number.isFinite(earliest)) {
+        const key = s.ticker + "|" + res;
+        firstHistory.set(
+          key,
+          p.firstDataRequest
+            ? earliest
+            : Math.min(firstHistory.get(key) ?? earliest, earliest),
+        );
+      }
       if (unique.length)
         lastHistory.set(
           s.ticker + "|" + res,
@@ -466,6 +480,7 @@ async function tick() {
         const result = await query(first.symbol, first.res, {
           limit: 3,
           track_history: true,
+          revision_after: firstHistory.get(first.symbol + "|" + first.res),
           ...(first.historyBefore
             ? { revision_before: first.historyBefore }
             : {}),
@@ -477,10 +492,12 @@ async function tick() {
           const changed =
             check &&
             sub.historyBefore === check.before &&
+            sub.historyAfter === check.after &&
             sub.historyRevision &&
             sub.historyRevision !== check.revision;
           if (check) {
             sub.historyBefore = check.next_before;
+            sub.historyAfter = check.after;
             sub.historyRevision = check.next_revision;
           }
           if (changed) {

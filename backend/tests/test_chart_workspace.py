@@ -403,7 +403,8 @@ def test_invalid_position_and_layout(database):
 
 
 @pytest.mark.parametrize("indicators", [[], [{"name": "EMA", "params": {"period": 2}}]])
-def test_live_history_check_ignores_tail_but_detects_older_changes(database, indicators):
+@pytest.mark.parametrize("revision_after", [None, 120000])
+def test_live_history_check_ignores_tail_but_detects_older_changes(database, indicators, revision_after):
     api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
     try:
         with database.begin() as db:
@@ -423,6 +424,7 @@ def test_live_history_check_ignores_tail_but_detects_older_changes(database, ind
                 )
         with TestClient(api_module.app) as client:
             args = {"instrument": "BTCUSDT", "timeframe": "M1", "limit": 3, "track_history": True}
+            args["revision_after"] = revision_after
             initial = client.post("/api/charts/data", json=args).json()["history_check"]
             with database.begin() as db:
                 tail = db.query(Bar).filter_by(start=240000).one()
@@ -453,6 +455,15 @@ def test_live_history_check_ignores_tail_but_detects_older_changes(database, ind
                 old.low = 99
                 old.revision += 1
             revised = client.post("/api/charts/data", json=args).json()["history_check"]
-            assert revised["revision"] != initial["next_revision"]
+            if revision_after is None:
+                assert revised["revision"] != initial["next_revision"]
+            else:
+                assert revised["revision"] == initial["next_revision"]
+                assert revised["after"] == revision_after
+                with database.begin() as db:
+                    inside = db.query(Bar).filter_by(start=120000).one()
+                    inside.revision += 1
+                changed = client.post("/api/charts/data", json=args).json()["history_check"]
+                assert changed["revision"] != initial["next_revision"]
     finally:
         api_module.app.dependency_overrides.clear()
