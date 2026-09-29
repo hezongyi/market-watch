@@ -190,7 +190,7 @@ const fs = require("fs");
   }, failed.id);
   await page.reload();
   await page.getByRole("alert").filter({ hasText: "存在未保存草稿" }).waitFor();
-  await page.getByRole("button", { name: "复制", exact: true }).click();
+  await page.getByRole("button", { name: "复制恢复草稿", exact: true }).click();
   await page.waitForFunction(
     (id) => !localStorage.getItem("mw-tv-draft:" + id),
     failed.id,

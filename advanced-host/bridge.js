@@ -731,6 +731,18 @@ function boot(
         }
       }
     }
+    widget
+      .headerReady()
+      .then(() => {
+        widget.createButton({
+          align: "right",
+          useTradingViewStyle: true,
+          text: "返回守望",
+          title: "返回守望工作台",
+          onClick: () => send({ type: "workspace-action", action: "home" }),
+        });
+      })
+      .catch((e) => send({ type: "error", error: String(e) }));
     if (!readonly) {
       widget
         .headerReady()

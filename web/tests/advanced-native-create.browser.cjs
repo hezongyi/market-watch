@@ -31,7 +31,10 @@ const fs = require("fs");
       );
     }
   });
-  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("pageerror", (e) => {
+    errors.push(e.message);
+    console.log("CREATE_ERROR", e.stack);
+  });
   await page.goto("http://127.0.0.1:5188/");
   await page
     .getByLabel("管理员密码")
@@ -84,7 +87,10 @@ const fs = require("fs");
   await page.goto("http://127.0.0.1:5188/advanced-charts");
   await page.waitForTimeout(15000);
   const assert = require("node:assert/strict");
-  const before = await page.getByLabel("工作区", { exact: true }).inputValue();
+  const before = await page.evaluate(
+    async () =>
+      (await (await fetch("/api/advanced-charts/workspaces")).json())[0].id,
+  );
   const ui = page.frames().find((f) => f.url().startsWith("blob:"));
   page.once("dialog", (d) => d.accept("原生顶栏新建验收"));
   await ui
@@ -94,8 +100,12 @@ const fs = require("fs");
     })
     .click();
   await page.waitForTimeout(8000);
-  const after = await page.getByLabel("工作区", { exact: true }).inputValue();
+  const after = await page.evaluate(
+    async () =>
+      (await (await fetch("/api/advanced-charts/workspaces")).json())[0].id,
+  );
   assert.notEqual(after, before);
+  assert.equal(await page.locator(".advanced-workspace > header").count(), 0);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
   await frame.waitForFunction(
     () => ready && widget.layoutName() === "原生顶栏新建验收",

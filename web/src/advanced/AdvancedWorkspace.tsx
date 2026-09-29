@@ -22,7 +22,7 @@ const frames = new Set([
 ]);
 
 export default function AdvancedWorkspace() {
-  const [rows, setRows] = useState<Workspace[]>([]),
+  const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
   const [frameKey, setFrameKey] = useState(0);
   const [feedError, setFeedError] = useState("");
@@ -132,7 +132,8 @@ export default function AdvancedWorkspace() {
           setError(String(e));
         }
       } else if (m.type === "workspace-action") {
-        if (!mobile && m.action === "create") await create();
+        if (m.action === "home") location.assign("/");
+        else if (!mobile && m.action === "create") await create();
       } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
       else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
       else if (m.type === "native-saving") {
@@ -490,85 +491,17 @@ export default function AdvancedWorkspace() {
       setError(String(e));
     }
   }
-  async function remove() {
-    const row = current.current;
-    if (!row || !confirm("删除工作区 " + row.name + "？")) return;
-    try {
-      await flush();
-      await api(`/advanced-charts/workspaces/${row.id}/delete`, {
-        revision: current.current!.revision,
-      });
-      const list = await refresh();
-      if (list[0]) select(list[0]);
-      else {
-        current.current = null;
-        setActive(null);
-        setStatus("新建工作区开始使用");
-      }
-    } catch (e) {
-      setError(String(e));
-    }
-  }
   return (
     <main className="advanced-workspace">
-      <header>
-        <a href="/">守望</a>
-        <a href="/chart-workspaces">原图表夹</a>
-        <select
-          aria-label="工作区"
-          value={active?.id || ""}
-          onChange={async (e) => {
-            const id = e.target.value;
-            try {
-              await flush();
-              const list = await refresh();
-              const row = list.find((r) => r.id === id);
-              if (row) select(row);
-            } catch (e) {
-              setError(String(e));
-            }
-          }}
-        >
-          <option value="" disabled>
-            选择工作区
-          </option>
-          {rows.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-            </option>
-          ))}
-        </select>
-        <button disabled={mobile} onClick={create}>
-          新建
-        </button>
-        <button disabled={!active || mobile} onClick={copy}>
-          复制
-        </button>
-        <button disabled={!active || mobile} onClick={remove}>
-          删除
-        </button>
-        <button
-          disabled={!active || mobile}
-          onClick={() => post({ type: "save" })}
-        >
-          立即保存
-        </button>
-        <button
-          onClick={() =>
-            post({
-              type: "theme",
-              theme:
-                current.current?.document.theme === "Light" ? "Dark" : "Light",
-            })
-          }
-        >
-          深色 / 浅色
-        </button>
-        <span role="status">{status}</span>
-      </header>
+      <div className="advanced-status" role="status" aria-live="polite">
+        {status}
+      </div>
       {(error || feedError) && (
         <div role="alert" className="advanced-error">
           {error || feedError}
+          {!mobile && blocked.current && (
+            <button onClick={copy}>复制恢复草稿</button>
+          )}
           <button onClick={() => location.reload()}>重新加载</button>
         </div>
       )}
@@ -584,6 +517,7 @@ export default function AdvancedWorkspace() {
         />
       ) : (
         <section>
+          <a href="/">返回守望</a>
           <h1>专业图表夹</h1>
           <p>独立工作区，沿用守望行情。</p>
           <button disabled={mobile} onClick={create}>
