@@ -73,6 +73,13 @@
 - 通过原生showConfirmDialog询问重试，经父页面白名单接口校验任务ID后重排失败任务；相同ID去重，恢复后台等待，切换后无使用者不提示。弹窗一次只显示一个，不修改库的UI布局。
 - 行情专项8项通过，JS实际bridge测试验证确认后调用retry并重新登记等待，前端构建通过。实际浏览器原生弹窗和断网恢复仍待验收，API需要重启后才包含新增字段。
 
+### 原生重试弹窗浏览器验证
+
+- 浏览器实际加载授权库并显示“历史行情拉取失败”原生弹窗及“是/否”按钮，无页面异常。
+- 注入一个失败任务，点击原生“是”，父页面发出且仅发出一次对应retry请求，收到成功响应后pendingHistory登记1个等待项，界面显示“已重新安排历史拉取”。
+- 本轮仅对该retry HTTP响应使用Playwright mock，未制造供应商故障，不能据此宣称真实断网到恢复全链路已验收；后台任务从failed到pending由已有API数据库测试覆盖。
+- 保存脚本web/tests/advanced-retry.browser.cjs，开发环境及凭据参数同视区验收脚本；脚本明确标注模拟边界。截图为/tmp/mw-retry-dialog.png（后一次运行会覆盖）。
+
 ## 原生模板与偏好适配进展
 
 - 新增用户级advanced_chart_preferences表（h9迁移，仅开发库），分别存study/drawing/chart/setting；绘图模板按tool命名空间隔离。
