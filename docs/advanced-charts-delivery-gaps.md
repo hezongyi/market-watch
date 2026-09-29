@@ -127,3 +127,9 @@
 - 只读检查供应包：determine_first_data_request_size_using_visible_range在模型初始化时计算初始请求；普通周期切换没有重走这段初始化逻辑。未修改供应包。
 - 三个独立公开API对照均未解决：周期事件内setBarSpacing、widget.setTimeFrame({val:"3M",res:"1M"})、切换前先设置barSpacing并等待100ms，首个MN请求仍为195根（/tmp/mw-switch-spacing-probe.log、/tmp/mw-switch-settimeframe.log、/tmp/mw-switch-spacing-before.log）。
 - 所有临时探针已移除，产品及正式失败用例恢复到此前状态。下一步需要验证原生重新加载图表状态是否重建请求预算，或采用经过真实渲染验证的渐进加载；重复调timeframe参数无证据支持继续尝试。
+
+### 请求预算重建对照与未通过的接入
+
+- 公开API对照成功：先切月线（大请求仅拦截，不下载），设置barSpacing=width/3，再widget.save/widget.load，重新加载后的首个MN请求为4根（/tmp/mw-month-reload-budget.log，退出0）。以MARKET_WATCH_RELOAD_BUDGET_PROBE=1保留该诊断路径；此模式只验证重载后请求，不能视为完整切换验收。
+- 尝试在onIntervalChanged安排重载，并在高周期getBars前让出事件循环/等待重载，仍会先发出188/195根旧请求，然后才是4根新请求（/tmp/mw-month-budget-all-gated.log）。因此没有把候选接入当成修复，产品bridge和range-sync已恢复原版本。
+- 下一步需在datafeed入口、发给后端之前识别被周期切换替代的旧请求；同时验证重载不会丢失工作区身份、其他分屏、画线及撤销行为。只有后续小请求成功不足以证明旧的大补数已被阻止。

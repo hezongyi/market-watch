@@ -131,6 +131,18 @@ const fs = require("fs");
         .catch(() => {});
     }, process.env.MARKET_WATCH_TEST_RESOLUTION || "1M");
     await page.waitForTimeout(3000);
+    if (process.env.MARKET_WATCH_RELOAD_BUDGET_PROBE === "1") {
+      console.log("BEFORE_RELOAD_REQUESTS", JSON.stringify(captured));
+      captured.length = 0;
+      await frame.evaluate(async () => {
+        const scale = widget.chart(0).getTimeScale();
+        scale.setBarSpacing(scale.width()/3);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const state = await new Promise(resolve => widget.save(resolve));
+        await widget.load(state);
+      });
+      await page.waitForTimeout(3000);
+    }
   }
   console.log("HIGH_PERIOD_REQUESTS", JSON.stringify(captured));
   require("node:assert/strict").ok(captured.length);
