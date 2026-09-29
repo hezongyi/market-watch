@@ -221,7 +221,13 @@ def router(authenticated):
         from .chart_export import chart_csv
         from .coverage import covers_interval
         from .domain import bucket_bounds
-        from .market_data import queue_history, resolve
+        from .market_data import (
+            FRAME_MS,
+            missing_intervals,
+            queue_history,
+            resolve,
+            stored_coverage,
+        )
         from .storage import ms
 
         if body.timeframe not in FRAMES or not 0 < body.end - body.start <= 366 * 86400000:
@@ -242,7 +248,23 @@ def router(authenticated):
             )
             if left >= right:
                 raise HTTPException(422, "导出范围尚无可获取的行情")
-            jobs, coverage = queue_history(db, inst, left, right)
+            # Reject known oversized exports before creating any download jobs.
+            # Count actual candles, not elapsed minutes: closures may leave a
+            # long interval with very few bars.
+            if (body.end - body.start) // FRAME_MS[body.timeframe] >= 2000:
+                existing = chart_rows(db, inst, body.timeframe, body.end, 2001, now_ms())
+                if len(existing) > 2000 and existing[0]["start"] >= body.start:
+                    raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
+            coverage = stored_coverage(db, inst, left, right)
+            missing = list(missing_intervals(coverage, left, right))
+            jobs = []
+            if missing:
+                # Discover cold history in bounded windows. The next poll checks
+                # the row limit again before scheduling further backfill.
+                a, b = missing[-1]
+                span = max(4000 * 60000, min(31 * 86400000, 2001 * FRAME_MS[body.timeframe]))
+                jobs, planned_coverage = queue_history(db, inst, max(a, b - span), b)
+                coverage = coverage + planned_coverage
             if not covers_interval(coverage, left, right):
                 failed = [job for job in jobs if job.status == "failed"]
                 return JSONResponse(
