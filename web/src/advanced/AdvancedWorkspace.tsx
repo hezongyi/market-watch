@@ -165,6 +165,9 @@ export default function AdvancedWorkspace() {
           const draftId = q.op === "save" ? q.args?.id : null;
           const draft = draftId
             ? JSON.stringify({
+                ...(current.current?.id === draftId
+                  ? current.current.document
+                  : {}),
                 engine: "tv31",
                 schemaVersion: 1,
                 state: JSON.parse(q.args.content),

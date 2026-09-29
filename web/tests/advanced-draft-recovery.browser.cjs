@@ -71,6 +71,7 @@ const fs = require("fs");
         document: {
           engine: "tv31",
           schemaVersion: 1,
+          recoveryMetadata: { marker: "preserve-workspace-metadata" },
           symbol: "OANDA:NZD_USD",
           interval: "5",
         },
@@ -199,6 +200,10 @@ const fs = require("fs");
       (await (await fetch("/api/advanced-charts/workspaces")).json())[0],
   );
   assert.notEqual(restored.id, failed.id);
+  assert.equal(
+    restored.document.recoveryMetadata.marker,
+    "preserve-workspace-metadata",
+  );
   assert.deepEqual(restored.document.state, JSON.parse(failed.content));
   await page.waitForTimeout(3000);
   const recoveredFrame = page.frames().find((f) => f.url().includes(":5187/?"));
