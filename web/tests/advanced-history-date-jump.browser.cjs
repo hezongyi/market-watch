@@ -1,4 +1,4 @@
-// Development acceptance: real history date jump. Currently exposes lost viewport after sparse history loading.
+// Development acceptance: real history date jump and viewport retention.
 // Creates a workspace and requests EURUSD M1 around 2026-08-12; requires local ports 5188/5187.
 const { chromium } = require("playwright");
 const fs = require("fs");
@@ -101,11 +101,17 @@ const fs = require("fs");
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
   const assert = require("node:assert/strict");
-  await frame.evaluate(async () => {
-    await widget.chart(0).setSymbol("EURUSD");
-    await widget.chart(0).setResolution("1");
-    await new Promise((resolve) => widget.chart(0).dataReady(resolve));
-  });
+  const symbol = process.env.MARKET_WATCH_HISTORY_SYMBOL || "EURUSD";
+  const resolution = process.env.MARKET_WATCH_HISTORY_RESOLUTION || "1";
+  await frame.evaluate(
+    async ({ symbol, resolution }) => {
+      await widget.chart(0).setSymbol(symbol);
+      await widget.chart(0).setResolution(resolution);
+      await new Promise((resolve) => widget.chart(0).dataReady(resolve));
+    },
+    { symbol, resolution },
+  );
+  console.log("HISTORY_CASE", JSON.stringify({ symbol, resolution }));
   for (const key of Object.keys(historyMetrics)) historyMetrics[key] = 0;
   const started = Date.now();
   const target = {
@@ -131,12 +137,17 @@ const fs = require("fs");
     failed: [...failedHistory.values()],
   }));
   console.log("HISTORY_RESULT", JSON.stringify(result));
+  const tolerance = Number(resolution) * 60;
   assert.ok(
-    Math.abs(result.range.to - target.to) <= 60,
+    Number.isFinite(tolerance),
+    "this intraday case needs a minute resolution",
+  );
+  assert.ok(
+    Math.abs(result.range.to - target.to) <= tolerance,
     "historical date jump must retain the requested right boundary after history loads",
   );
   assert.ok(
-    Math.abs(result.range.from - target.from) <= 60,
+    Math.abs(result.range.from - target.from) <= tolerance,
     "historical date jump must retain the requested left boundary",
   );
   assert.equal(result.pending.length, 0);

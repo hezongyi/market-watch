@@ -552,3 +552,9 @@
 - 普通getBars复用history规划接口已经返回的OHLC，去除每页重复charts/data请求；Python合成品种保留指标计算请求。分页回归禁止普通行情调用第二次query，验证4500根完整读取通过。
 - 优化后 `/tmp/mw-history-single-read.log` 退出0：跳转5142ms，37次history ready、0次pending；期间3次charts/data只返回9根实时K线。20秒后两端范围仍准确，无页面错误。相比前一轮9.3秒明显减少，但仅为同机单次对照，不能宣称所有品种/周期达到该速度。
 - backend市场数据+图表工作区33项、前端分页/修订重载/去重通过。日期跳转用例增加请求统计，保留默认60秒预算。冷加载上限、多图并发、Python历史指标、取消/失败仍待专项收口。
+
+### Python兼容回归与黄金历史验证
+
+- `/tmp/mw-python-pagination.log`，session28103退出0：真实库中Python SMA/MACD/STOCH/BBANDS均加载后端序列，保存刷新恢复参数，未因普通行情复用history响应而绕过指标计算。
+- 日期跳转用例新增MARKET_WATCH_HISTORY_SYMBOL/RESOLUTION参数，默认EURUSD/M1不变；分钟周期按自身K线长度检查两端误差，输出具体case。
+- XAUUSD/M5 `/tmp/mw-history-gold.log` session90802退出1：60秒预算内持续pending，最后本页可用数量由905增加到1740，仍未完成目标跳转。该场景缺失历史较多，尚不能以EURUSD缓存成功覆盖黄金验收。未提高默认性能预算或标记黄金通过。
