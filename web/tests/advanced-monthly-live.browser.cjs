@@ -34,7 +34,13 @@ const fs = require("fs");
         console.log(
           "MONTH_REQUEST",
           phase,
-          JSON.stringify({query:r.request().postDataJSON(),status:j.status,coverageStart:j.requested_start,cursor:j.next_cursor,starts:j.bars?.map(b=>b.start)}),
+          JSON.stringify({
+            query: r.request().postDataJSON(),
+            status: j.status,
+            coverageStart: j.requested_start,
+            cursor: j.next_cursor,
+            starts: j.bars?.map((b) => b.start),
+          }),
         );
       if (r.url().includes("/api/market-data/history")) {
         historyMetrics.requests++;
@@ -139,12 +145,11 @@ const fs = require("fs");
     await restored.evaluate(() => widget.chart(0).resolution()),
     "1M",
   );
-  console.log(
-    "MONTH_RESTORED_RANGE",
-    JSON.stringify(
-      await restored.evaluate(() => widget.chart(0).getVisibleRange()),
-    ),
+  const restoredRange = await restored.evaluate(() =>
+    widget.chart(0).getVisibleRange(),
   );
+  console.log("MONTH_RESTORED_RANGE", JSON.stringify(restoredRange));
+  require("node:assert/strict").deepEqual(restoredRange, before.range);
   require("node:assert/strict").deepEqual(errors, []);
   console.log("Monthly real history initialized and saved workspace restored");
   await browser.close();
