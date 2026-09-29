@@ -77,9 +77,10 @@ def test_batch_idempotent_and_revision(database):
 
 
 def test_worker_completion_between_cache_and_coverage_is_visible(database, monkeypatch):
+    from datetime import timedelta
+
     from alerts import market_data
     from alerts.storage import instant
-    from datetime import timedelta
 
     with database.begin() as db:
         db.get(Instrument, "EURUSD").source = "oanda"
