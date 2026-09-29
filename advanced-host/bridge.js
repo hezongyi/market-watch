@@ -14,6 +14,7 @@ let seq = 0,
   dirty = false,
   nativeMode = false,
   nativeSaving = false,
+  workspaceEpoch = 0,
   nativeReadonly = false;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
@@ -427,18 +428,26 @@ function snapshot() {
   if (nativeMode) {
     if (nativeReadonly || nativeSaving) return;
     nativeSaving = true;
-    widget.saveChartToServer(
-      () => {
-        nativeSaving = false;
-        dirty = false;
-        send({ type: "native-saved" });
-      },
-      (e) => {
-        nativeSaving = false;
-        send({ type: "error", error: String(e?.message || "工作区保存失败") });
-      },
-      { defaultChartName: savedDoc.nativeName || "我的图表" },
-    );
+    dirty = false;
+    const epoch = workspaceEpoch;
+    const failed = (e) => {
+      nativeSaving = false;
+      if (epoch === workspaceEpoch) dirty = true;
+      send({ type: "error", error: String(e?.message || "工作区保存失败") });
+    };
+    try {
+      widget.saveChartToServer(
+        () => {
+          nativeSaving = false;
+          if (dirty) snapshot();
+          else if (epoch === workspaceEpoch) send({ type: "native-saved" });
+        },
+        failed,
+        { defaultChartName: savedDoc.nativeName || "我的图表" },
+      );
+    } catch (e) {
+      failed(e);
+    }
     return;
   }
   widget.save((state) =>
@@ -540,6 +549,7 @@ function boot(
       widget.symbolSync().setValue(false);
     }
     widget.subscribe("chart_load_requested", () => {
+      workspaceEpoch++;
       loading = true;
       dirty = false;
     });
