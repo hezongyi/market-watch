@@ -53,6 +53,33 @@ vm.runInContext(
   );
   await assert.rejects(mobile.removeChart("a"), /只读/);
   await assert.rejects(mobile.saveChart({ id: "a" }), /只读/);
+  const order = [];
+  let finish;
+  const delayed = context.nativeWorkspaces(
+    { id: "a", revision: 1 },
+    async (op, args) => {
+      if (op === "save") {
+        await new Promise((resolve) => {
+          finish = resolve;
+        });
+        order.push("saved");
+        return { id: "a", revision: 2, content: "{}" };
+      }
+      order.push("loaded");
+      return { id: args.id, revision: 1, content: "{}" };
+    },
+    false,
+    () => order.push("onLoaded"),
+    () => order.push("onSaved"),
+  );
+  const saving = delayed.saveChart({ id: "a", content: "{}" });
+  await Promise.resolve();
+  const loading = delayed.getChartContent("b");
+  await Promise.resolve();
+  assert.deepEqual(order, [], "load must wait for the earlier save");
+  finish();
+  await Promise.all([saving, loading]);
+  assert.deepEqual(order, ["saved", "onSaved", "loaded", "onLoaded"]);
   console.log(
     "native workspace adapter: conflict, serialized saves and readonly passed",
   );

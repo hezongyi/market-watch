@@ -11,11 +11,15 @@ function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
           revisions.set(String(row.id), row.revision);
       return rows.map(({ revision, ...meta }) => meta);
     },
-    getChartContent: async (id) => {
-      const row = await rpc("load", { id: String(id) });
-      revisions.set(String(id), row.revision);
-      onLoaded(row);
-      return row.content;
+    getChartContent: (id) => {
+      const task = writes.then(async () => {
+        const row = await rpc("load", { id: String(id) });
+        revisions.set(String(id), row.revision);
+        onLoaded(row);
+        return row.content;
+      });
+      writes = task.catch(() => {});
+      return task;
     },
     saveChart: (data) => {
       if (readonly) return Promise.reject(Error("手机只读，不保存修改"));
