@@ -1,4 +1,4 @@
-// Development native fullscreen permissions regression.
+// Development native and viewport autosave conflict recovery regression.
 const { chromium } = require("playwright");
 const fs = require("fs");
 (async () => {
@@ -12,6 +12,7 @@ const fs = require("fs");
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
+  let phase = "initial";
   page.on("console", (m) => {
     if (m.type() === "error") console.log("CONSOLE", m.text().slice(0, 700));
   });
@@ -31,7 +32,10 @@ const fs = require("fs");
       );
     }
   });
-  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("pageerror", (e) => {
+    errors.push(e.message);
+    console.log("RECOVERY_PAGE_ERROR", phase, e.stack);
+  });
   await page.goto("http://127.0.0.1:5188/");
   await page
     .getByLabel("管理员密码")
@@ -90,6 +94,7 @@ const fs = require("fs");
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
   );
+  phase = "inject-conflict";
   await page.route("**/api/advanced-charts/native-charts/save", (route) =>
     route.fulfill({
       status: 409,
@@ -97,32 +102,59 @@ const fs = require("fs");
       body: JSON.stringify({ detail: "acceptance conflict" }),
     }),
   );
-  const failed = await frame.evaluate(async () => {
-    const rows = await request({ op: "list", args: {} }, "workspace");
-    const row = rows[0];
-    const original = await request(
-      { op: "load", args: { id: row.id } },
-      "workspace",
+  let failed;
+  if (process.env.MARKET_WATCH_VIEWPORT_CONFLICT === "1") {
+    const id = await page
+      .locator("iframe[data-workspace-id]")
+      .getAttribute("data-workspace-id");
+    const conflict = page.waitForResponse(
+      (r) => r.url().endsWith("/native-charts/save") && r.status() === 409,
     );
-    try {
-      await request(
-        {
-          op: "save",
-          args: {
-            id: row.id,
-            name: "恢复验收",
-            symbol: row.symbol,
-            resolution: row.resolution,
-            content: original.content,
-            revision: row.revision,
-          },
-        },
+    await frame.evaluate(() =>
+      widget.chart(0).getTimeScale().setRightOffset(4),
+    );
+    await conflict;
+    await page
+      .getByRole("alert")
+      .filter({ hasText: "acceptance conflict" })
+      .waitFor();
+    const draft = await page.evaluate(
+      (id) => JSON.parse(localStorage.getItem("mw-tv-draft:" + id)),
+      id,
+    );
+    assert.equal(
+      draft.state._mwViewports[0].offset,
+      4,
+      "Conflict draft must contain changed viewport",
+    );
+    failed = { id, content: JSON.stringify(draft.state) };
+  } else
+    failed = await frame.evaluate(async () => {
+      const rows = await request({ op: "list", args: {} }, "workspace");
+      const row = rows[0];
+      const original = await request(
+        { op: "load", args: { id: row.id } },
         "workspace",
       );
-    } catch {
-      return { id: row.id, content: original.content };
-    }
-  });
+      try {
+        await request(
+          {
+            op: "save",
+            args: {
+              id: row.id,
+              name: "恢复验收",
+              symbol: row.symbol,
+              resolution: row.resolution,
+              content: original.content,
+              revision: row.revision,
+            },
+          },
+          "workspace",
+        );
+      } catch {
+        return { id: row.id, content: original.content };
+      }
+    });
   assert.ok(failed);
   assert.ok(
     await page.evaluate(
@@ -131,6 +163,7 @@ const fs = require("fs");
     ),
   );
   await page.unroute("**/api/advanced-charts/native-charts/save");
+  phase = "save-copy";
   const copied = await frame.evaluate(async (failed) => {
     const copy = await request(
       {
@@ -188,8 +221,10 @@ const fs = require("fs");
     });
     if (!r.ok) throw Error("fixture update failed");
   }, failed.id);
+  phase = "reload-draft";
   await page.reload();
   await page.getByRole("alert").filter({ hasText: "存在未保存草稿" }).waitFor();
+  phase = "recover-copy";
   await page.getByRole("button", { name: "复制恢复草稿", exact: true }).click();
   await page.waitForFunction(
     (id) => !localStorage.getItem("mw-tv-draft:" + id),
@@ -211,6 +246,7 @@ const fs = require("fs");
     () => ready && widget.chart(0).symbol() === "OANDA:NZD_USD",
   );
   assert.equal(await recoveredFrame.evaluate(() => widget.chartsCount()), 1);
+  assert.deepEqual(errors, []);
   console.log(
     "Native save conflict: durable draft survived reload and recovered into separate workspace",
   );
