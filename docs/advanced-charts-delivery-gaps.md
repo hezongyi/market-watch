@@ -641,3 +641,10 @@
 - 固定2026-09-24 15:00–18:00 UTC交易时段运行候选，/tmp/mw-gap-fixed-open.log退出0，八图鼠标十字线/滚轮/拖动、关闭同步独立操作、自动保存及刷新恢复通过。
 - 保留黄金修复：peer范围变化也安排检查，目标始终为activeChart；历史负rightOffset不再被排除。单测覆盖历史视区及迟到peer，原版失败/候选通过；真实黄金同步与单独设置等价证据见/tmp/mw-gold-peer-settled.log。
 - 未修改供应商包，未造休市K线；全休市窗口直接调用原生setVisibleRange会拒绝，后续日期定位体验应避免把该底层调用失败描述为行情丢失。
+
+### Ubuntu 用户态容器实测与环境依赖
+
+- 通过apt-get download从Ubuntu源下载Podman3.4.4/conmon/crun和依赖，在/tmp/mw-container-tools解包；未安装系统服务。普通rootless因缺少newuidmap失败。
+- unshare -Ur可启动Podman，配置vfs、独立/tmp存储、禁用事件日志；通过授权代理成功拉取docker.io/library/nginx:1.28-alpine，镜像ID dc73b49f5124cf2ee538dfbdfbd121f0b4ccdcb20fea30f3a81bd477c02e2bb5。
+- 镜像实际build执行FROM及所有COPY成功；RUN步骤OCI运行时失败devpts Invalid argument（/tmp/mw-chart-image-build.log）。改为chroot隔离后失败supplemental groups operation not permitted（/tmp/mw-chart-image-build-chroot.log）。不是完成镜像构建/运行证据，不修改Dockerfile绕过RUN校验。
+- sudo -n确认需要密码；已异步请求用户在Ubuntu准备Docker Engine+Compose及quant访问权限，或提供独立测试机。不使用Unraid生产服务进行演练；其余功能验收仍可推进，整体目标未阻塞终止。
