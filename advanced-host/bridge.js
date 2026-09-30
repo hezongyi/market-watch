@@ -293,7 +293,9 @@ const feed = {
       let before =
         p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0);
       let all = [],
-        earliest = Infinity;
+        earliest = Infinity,
+        localBoundary = false,
+        cacheOnly = false;
       while (all.length < requested) {
         checkActive();
         const args = {
@@ -308,12 +310,16 @@ const feed = {
           send({
             type: "status",
             text:
-              `正在拉取历史数据 · ${symbol} · 已读取 ${all.length} 根` +
+              (status.queue_class === "background"
+                ? `周线历史尚未就绪，已加入后台队列 · ${symbol} · 预计耗时暂无法估算`
+                : `正在拉取历史数据 · ${symbol} · 已读取 ${all.length} 根`) +
               (status.progress
                 ? ` · 当前区间已处理 ${Math.floor(status.progress.completed_ms / 60000)} / ${Math.ceil(status.progress.total_ms / 60000)} 分钟`
                 : ""),
           });
-          await new Promise((r) => setTimeout(r, 1500));
+          await new Promise((r) =>
+            setTimeout(r, status.queue_class === "background" ? 5000 : 1500),
+          );
           checkActive();
           status = await historyQuery(args);
           checkActive();
@@ -323,7 +329,8 @@ const feed = {
           offerHistoryRetry();
           throw Error(status.error || "历史拉取失败");
         }
-        if (status.status === "empty_interval")
+        cacheOnly = status.local_only === true;
+        if (status.status === "empty_interval" && !cacheOnly)
           throw Error("该区间未返回行情，尚未确认历史起点");
         // The planning response already includes the ordinary OHLC page.
         // Python synthetic symbols additionally require indicator calculation.
@@ -344,6 +351,8 @@ const feed = {
         all = barsOf(covered, res, s.ticker)
           .filter((bar) => bar.time < p.to * 1000)
           .concat(all);
+        localBoundary = cacheOnly && result.bars.length < args.limit;
+        if (localBoundary) break;
         const next = covered.bars[0]?.start ?? status.next_cursor;
         if (!(next < before)) throw Error("历史分页未推进，请重试");
         before = next;
@@ -353,7 +362,14 @@ const feed = {
             text: `正在读取历史数据 · ${symbol} · 已读取 ${all.length} / ${requested} 根`,
           });
       }
-      send({ type: "status", text: "行情已加载" });
+      send({
+        type: "status",
+        text: cacheOnly
+          ? all.length
+            ? "月线由本地已有日线生成，缺失历史不自动补数"
+            : "暂无本地月线数据；日线积累后可生成，未安排专门补数"
+          : "行情已加载",
+      });
       const unique = [...new Map(all.map((b) => [b.time, b])).values()].sort(
         (a, b) => a.time - b.time,
       );
@@ -374,7 +390,9 @@ const feed = {
             unique.at(-1).time,
           ),
         );
-      cb(unique, { noData: false });
+      // For monthly cache-only views, noData denotes the local dataset boundary.
+      // It makes no claim about the provider's remote history.
+      cb(unique, { noData: localBoundary });
     } catch (e) {
       err(String(e));
       if (e.code !== "HISTORY_CANCELLED")

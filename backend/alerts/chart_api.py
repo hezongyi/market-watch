@@ -255,32 +255,33 @@ def router(authenticated):
                 existing = chart_rows(db, inst, body.timeframe, body.end, 2001, now_ms())
                 if len(existing) > 2000 and existing[0]["start"] >= body.start:
                     raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
-            coverage = stored_coverage(db, inst, left, right)
-            missing = list(missing_intervals(coverage, left, right))
-            jobs = []
-            if missing:
-                # Discover cold history in bounded windows. The next poll checks
-                # the row limit again before scheduling further backfill.
-                a, b = missing[-1]
-                span = max(4000 * 60000, min(31 * 86400000, 2001 * FRAME_MS[body.timeframe]))
-                jobs, planned_coverage = queue_history(db, inst, max(a, b - span), b)
-                coverage = coverage + planned_coverage
-            if not covers_interval(coverage, left, right):
-                failed = [job for job in jobs if job.status == "failed"]
-                return JSONResponse(
-                    status_code=409 if failed else 202,
-                    content={
-                        "status": "error" if failed else "pending",
-                        "task_ids": [
-                            job.id for job in jobs if job.status in ("pending", "running")
-                        ],
-                        "failed_task_ids": [job.id for job in failed],
-                        "retry_after": 2,
-                        "message": "历史补数失败，请重试"
-                        if failed
-                        else "正在补齐导出范围内的历史行情",
-                    },
-                )
+            if body.timeframe != "MN":
+                coverage = stored_coverage(db, inst, left, right)
+                missing = list(missing_intervals(coverage, left, right))
+                jobs = []
+                if missing:
+                    # Discover cold history in bounded windows. The next poll checks
+                    # the row limit again before scheduling further backfill.
+                    a, b = missing[-1]
+                    span = max(4000 * 60000, min(31 * 86400000, 2001 * FRAME_MS[body.timeframe]))
+                    jobs, planned_coverage = queue_history(db, inst, max(a, b - span), b)
+                    coverage = coverage + planned_coverage
+                if not covers_interval(coverage, left, right):
+                    failed = [job for job in jobs if job.status == "failed"]
+                    return JSONResponse(
+                        status_code=409 if failed else 202,
+                        content={
+                            "status": "error" if failed else "pending",
+                            "task_ids": [
+                                job.id for job in jobs if job.status in ("pending", "running")
+                            ],
+                            "failed_task_ids": [job.id for job in failed],
+                            "retry_after": 2,
+                            "message": "历史补数失败，请重试"
+                            if failed
+                            else "正在补齐导出范围内的历史行情",
+                        },
+                    )
             instrument = inst.id
         page = data(
             DataQuery(

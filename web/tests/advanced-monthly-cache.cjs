@@ -1,0 +1,61 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const vm = require("node:vm");
+const context = vm.createContext({
+  URL,
+  URLSearchParams,
+  Map,
+  Promise,
+  Date,
+  Intl,
+  Error,
+  location: { search: "?parent=http://localhost" },
+  parent: { postMessage() {} },
+  crypto: { randomUUID: () => "test" },
+  addEventListener() {},
+  setTimeout,
+  clearTimeout,
+});
+vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
+vm.runInContext(
+  `
+let localBars = [], calls = 0;
+historyQuery = async (args) => {
+  calls++;
+  const bars = localBars.filter(b=>b.start < args.before).slice(-args.limit);
+  return {status:bars.length?'ready':'empty_interval',bars,local_only:true,
+    requested_start:0,next_cursor:bars[0]?.start || 0};
+};
+function monthly(count) {
+  return new Promise((resolve,reject)=>feed.getBars({ticker:'BTCUSDT'},'1M',
+    {to:Date.UTC(2200,9,1)/1000,countBack:count,firstDataRequest:true},
+    (bars,meta)=>resolve({bars,meta}),reject));
+}
+function seed(count) {
+  localBars=Array.from({length:count},(_,i)=>({start:Date.UTC(1970,i,1),
+    end:Date.UTC(1970,i+1,1),open:1,high:2,low:1,close:2}));
+  calls=0;
+}
+`,
+  context,
+);
+(async () => {
+  let result = await vm.runInContext("seed(0);monthly(90)", context);
+  assert.equal(result.bars.length, 0);
+  assert.equal(result.meta.noData, true);
+  result = await vm.runInContext("seed(3);monthly(90)", context);
+  assert.equal(result.bars.length, 3);
+  assert.equal(result.meta.noData, true);
+  assert.equal(vm.runInContext("calls", context), 1);
+  result = await vm.runInContext("seed(2101);monthly(2100)", context);
+  assert.equal(result.bars.length, 2100);
+  assert.equal(result.meta.noData, false);
+  assert.equal(vm.runInContext("calls", context), 2);
+  assert.equal(new Set(result.bars.map((b) => b.time)).size, 2100);
+  console.log(
+    "Monthly local-only history: empty, partial and multi-page cached data passed",
+  );
+})().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
+});

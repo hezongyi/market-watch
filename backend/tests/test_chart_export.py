@@ -251,3 +251,44 @@ def test_export_reuses_pending_window_and_reports_failed_job(database):
                 assert len(db.scalars(select(ImportJob)).all()) == 1
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_monthly_export_does_not_request_missing_history(database, monkeypatch):
+    from alerts import api as api_module
+    from alerts import market_data
+    from alerts.storage import Bar
+    from fastapi.testclient import TestClient
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("monthly exports must remain local-only")
+
+    monkeypatch.setattr(market_data, "queue_history", forbidden)
+    with database.begin() as db:
+        db.add(
+            Bar(
+                instrument_id="BTCUSDT",
+                timeframe="D1",
+                start=1698796800000,
+                end=1698883200000,
+                open=1,
+                high=2,
+                low=1,
+                close=2,
+                complete=True,
+            )
+        )
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            response = client.post(
+                "/api/charts/export",
+                json=dict(
+                    instrument="BTCUSDT", timeframe="MN", start=1698796800000, end=1700000000000
+                ),
+            )
+            assert response.status_code == 200
+            rows = list(csv.DictReader(io.StringIO(response.content.decode("utf-8-sig"))))
+            assert len(rows) == 1
+            assert rows[0]["complete"] == "false"
+    finally:
+        api_module.app.dependency_overrides.clear()

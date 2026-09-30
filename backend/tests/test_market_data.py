@@ -1,7 +1,7 @@
-import pytest
 from datetime import UTC, datetime
 from decimal import Decimal
 
+import pytest
 from alerts import api as api_module
 from alerts.bar_batch import write_bars
 from alerts.domain import Candle
@@ -604,15 +604,111 @@ def test_chart_pages_yield_to_waiting_history_requests(database, monkeypatch, in
 
 def test_covered_range_does_not_wait_for_job_remaining_outside_it(database):
     from alerts.storage import MarketCoverage
+
     with database.begin() as db:
         inst = db.get(Instrument, "EURUSD")
         inst.source = "oanda"
-        db.add(MarketCoverage(instrument_id=inst.id, source=inst.source, basis=inst.basis,
-                              start=60000, end=600000))
-        db.add(ImportJob(instrument_id=inst.id, start=60000, end=1200000,
-                         cursor=600000, status="pending", priority=100))
+        db.add(
+            MarketCoverage(
+                instrument_id=inst.id, source=inst.source, basis=inst.basis, start=60000, end=600000
+            )
+        )
+        db.add(
+            ImportJob(
+                instrument_id=inst.id,
+                start=60000,
+                end=1200000,
+                cursor=600000,
+                status="pending",
+                priority=100,
+            )
+        )
         db.flush()
         jobs, coverage = queue_history(db, inst, 60000, 600000)
         assert jobs == []
         from alerts.coverage import covers_interval
+
         assert covers_interval(coverage, 60000, 600000)
+
+
+def test_background_history_is_promoted_by_foreground_demand(database):
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        jobs, _ = queue_history(db, inst, 60000, 600000, priority=200)
+        ident = jobs[0].id
+        assert jobs[0].priority == 200
+        shared, _ = queue_history(db, inst, 60000, 600000)
+        assert len(shared) == 1 and shared[0].id == ident
+        assert shared[0].priority == 100
+        shared, _ = queue_history(db, inst, 60000, 600000, priority=200)
+        assert shared[0].priority == 100
+        assert db.scalar(select(func.count()).select_from(ImportJob)) == 1
+
+
+@pytest.mark.parametrize("timeframe", ["W1"])
+def test_high_period_missing_history_uses_background_queue(database, timeframe):
+    with database.begin() as db:
+        db.get(Instrument, "EURUSD").source = "oanda"
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            response = client.post(
+                "/api/market-data/history",
+                json={
+                    "instrument": "EURUSD",
+                    "timeframe": timeframe,
+                    "before": 1700000000000,
+                    "limit": 90,
+                },
+            )
+            assert response.status_code == 200
+            result = response.json()
+            assert result["status"] == "pending"
+            assert result["queue_class"] == "background"
+            assert result["estimated_seconds"] is None
+            with database() as db:
+                jobs = db.scalars(select(ImportJob)).all()
+                assert jobs and all(job.priority == 200 for job in jobs)
+    finally:
+        api_module.app.dependency_overrides.clear()
+
+
+def test_monthly_history_never_queues_downloads(database, monkeypatch):
+    from alerts import market_data
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("monthly view must not schedule backfill")
+
+    monkeypatch.setattr(market_data, "queue_history", forbidden)
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            body = dict(instrument="BTCUSDT", timeframe="MN", before=1700000000000, limit=2000)
+            empty = client.post("/api/market-data/history", json=body)
+            assert empty.status_code == 200
+            assert empty.json()["local_only"] is True
+            assert empty.json()["bars"] == []
+            with database.begin() as db:
+                db.add(
+                    Bar(
+                        instrument_id="BTCUSDT",
+                        timeframe="D1",
+                        start=1698796800000,
+                        end=1698883200000,
+                        open=1,
+                        high=2,
+                        low=1,
+                        close=2,
+                        complete=True,
+                    )
+                )
+            ready = client.post("/api/market-data/history", json=body)
+            assert ready.status_code == 200
+            assert ready.json()["status"] == "ready"
+            assert len(ready.json()["bars"]) == 1
+            assert ready.json()["queue_class"] == "cache_only"
+            assert ready.json()["task_ids"] == []
+            with database() as db:
+                assert db.scalar(select(func.count()).select_from(ImportJob)) == 0
+    finally:
+        api_module.app.dependency_overrides.clear()

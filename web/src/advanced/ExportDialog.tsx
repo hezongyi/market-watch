@@ -144,6 +144,9 @@ export function ExportDialog({
           按 K 线开始时间选择，以下时间均为 UTC。最多 2000 根，日期跨度不超过
           366 天。
         </p>
+        {selection.timeframe === "MN" && (
+          <p>月线仅导出本地已有日线生成的数据，不补齐缺失历史。</p>
+        )}
         <label>
           开始时间（含）
           <input

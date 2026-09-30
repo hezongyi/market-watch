@@ -99,7 +99,7 @@ def missing_intervals(coverage, left, right):
         yield cursor, right
 
 
-def queue_history(db, inst, left, right):
+def queue_history(db, inst, left, right, *, priority=100):
     # Serialize planning per instrument; compatible with worker row locks.
     db.scalar(select(Instrument).where(Instrument.id == inst.id).with_for_update())
     coverage = stored_coverage(db, inst, left, right)
@@ -114,13 +114,20 @@ def queue_history(db, inst, left, right):
             )
         )
     )
+    for job in jobs:
+        # Shared foreground demand promotes background work; later background
+        # readers must never demote work required by a visible intraday chart.
+        if job.priority >= 100:
+            job.priority = min(job.priority, priority)
     reserved = coverage + [{"start": j.cursor, "end": j.end} for j in jobs]
     for a, b in missing_intervals(reserved, left, right):
         # Newest pages first. Cursor persistence makes every page restartable.
         end = b
         while end > a:
             start = max(a, end - 4000 * 60000)
-            job = ImportJob(instrument_id=inst.id, start=start, end=end, cursor=start, priority=100)
+            job = ImportJob(
+                instrument_id=inst.id, start=start, end=end, cursor=start, priority=priority
+            )
             db.add(job)
             jobs.append(job)
             end = start
@@ -335,6 +342,25 @@ def router(authenticated):
         with transaction() as db:
             inst = resolve(db, body.instrument)
             calendar = Calendar(inst.calendar)
+            if body.timeframe == "MN":
+                # Monthly charts are an explicit cache-only view. Opening one
+                # must not plan dedicated M1 downloads, even for a large countBack.
+                rows = chart_rows(db, inst, "MN", body.before or now_ms() + 1, body.limit, now_ms())
+                return {
+                    "status": "ready" if rows else "empty_interval",
+                    "bars": rows,
+                    "task_ids": [],
+                    "failed_task_ids": [],
+                    "error": None,
+                    "retry_after": 0,
+                    "queue_class": "cache_only",
+                    "local_only": True,
+                    "estimated_seconds": None,
+                    "requested_start": 0,
+                    "requested_end": right,
+                    "next_cursor": rows[0]["start"] if rows else 0,
+                    "remote_boundary": "unknown",
+                }
             if body.timeframe in ("M30", "W1", "MN"):
                 left = ms(bounds(instant(left), body.timeframe, calendar)[0])
             else:
@@ -345,7 +371,9 @@ def router(authenticated):
             # A cached range satisfies the request only when upstream query coverage is known.
             if len(rows) >= body.limit:
                 left = max(left, rows[0]["start"])
-            jobs, coverage = queue_history(db, inst, left, right)
+            background = body.timeframe == "W1"
+            scheduling = {"priority": 200} if background else {}
+            jobs, coverage = queue_history(db, inst, left, right, **scheduling)
             # Coverage and bars must be observed in this order: a worker may commit
             # between the preliminary cache lookup and acquiring the planner lock.
             rows = chart_rows(
@@ -368,7 +396,7 @@ def router(authenticated):
                 else:
                     left = ms(bucket_bounds(instant(candidate), body.timeframe, calendar)[0])
                 left = max(0, left)
-                jobs, coverage = queue_history(db, inst, left, right)
+                jobs, coverage = queue_history(db, inst, left, right, **scheduling)
                 rows = chart_rows(
                     db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
                 )
@@ -392,7 +420,9 @@ def router(authenticated):
                     j.id for j in jobs if j.status == "failed" and j.priority >= 100
                 ],
                 "error": errors[0] if errors else None,
-                "retry_after": 2,
+                "retry_after": 5 if background else 2,
+                "queue_class": "background" if background else "foreground",
+                "estimated_seconds": None,
                 "requested_start": left,
                 "requested_end": right,
                 "next_cursor": left,
