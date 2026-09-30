@@ -361,3 +361,11 @@
 - W1接口返回background及5秒轮询建议，前端提示后台排队、暂无法估算耗时；其他周期保留前台路径。可靠耗时估算、周线长等待时对保存/同步的影响及整段后台需求持续性仍需进一步收口，不能将此基础优先级改动视为全部完成。
 - /tmp/mw-tiered-history-export-tests.log：27 passed；新增monthly-cache JS覆盖空缓存、少量月份及超过单页上限的本地历史读取，原分页与请求取消测试通过；/tmp/mw-tiered-build.log前端构建通过，ruff检查通过。
 - 真实浏览器脚本advanced-monthly-local.browser.cjs已准备。本次新开发API 8002启动失败：PostgreSQL开发账号连接数已达限制；浏览器未取得功能验收结论。未提高生产数据库限制或终止其他连接，未把连接失败算作功能通过。实际API未完成更新验收，生产未部署。
+
+### 开发连接数耗尽定位与连接池预算
+
+- 只读数据库观测确认开发角色连接上限8，8条连接均来自Ubuntu 192.168.7.232；其中5条idle且无事务超过1小时。仅终止预先核对的这5个开发库/开发角色/开发IP会话，并在执行时重新检查idle、无事务及空闲时间；未调整共享PostgreSQL限额或生产账号。
+- 应用PostgreSQL连接池改为每进程默认2连接、overflow=0、等待15秒，启用pre_ping并设置application_name；通过环境变量可独立配置。SQLite原路径保留。新验收API8003 application_name=market-watch-dev-acceptance。
+- 连接池实际耗尽/释放复用回归通过；与行情/导出测试合计28 passed（/tmp/mw-pool-tiered-regression.log）。运行数据库再次检查：旧进程3条idle，新验收API2条idle，总计5条，恢复余量。
+- 通过Vite5189直接代理8003完成真实月线首次加载及绘图；快速W1/MN/W1/MN后月线dataReady=false且范围0/0，/tmp/mw-monthly-local-direct.log失败。月线请求返回local_only且无任务，周线响应error；最终月线未重新向后端发请求。需继续定位原生缓存/取消回调，不以月线接口无补数代替完整切换通过。
+- 浏览器测试取消了route.fetch全API转发，改用真实Vite代理，避免SSE/events请求无法完成导致测试转发超时。当前留下最终月线等待失败断言及请求轨迹。

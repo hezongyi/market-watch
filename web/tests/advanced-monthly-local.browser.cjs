@@ -14,20 +14,15 @@ const fs = require("node:fs");
     const errors = [],
       responses = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.route("**/api/**", async (route) => {
-      const url = new URL(route.request().url());
-      url.port = "8002";
-      const response = await route.fetch({ url: url.href }).catch(() => {
-        throw Error("Development API request failed");
-      });
-      if (url.pathname === "/api/market-data/history") {
-        const q = route.request().postDataJSON(),
-          value = await response.json();
-        if (q.timeframe === "MN") responses.push({ q, value });
-      }
-      await route.fulfill({ response });
+    page.on("response", async response => {
+      if (new URL(response.url()).pathname !== "/api/market-data/history") return;
+      try {
+        const q=response.request().postDataJSON(), value=await response.json();
+        responses.push({q,value});
+      } catch { /* response may be cancelled when leaving the page */ }
     });
-    await page.goto("http://127.0.0.1:5188/");
+    const base = process.env.MARKET_WATCH_TEST_URL || "http://127.0.0.1:5189";
+    await page.goto(base + "/");
     await page
       .getByLabel("管理员密码")
       .fill(
@@ -71,7 +66,7 @@ const fs = require("node:fs");
         },
       });
     });
-    await page.goto("http://127.0.0.1:5188/advanced-charts");
+    await page.goto(base + "/advanced-charts");
     await page.waitForTimeout(1500);
     const frame = page.frames().find((f) => f.url().includes(":5187/?"));
     assert.ok(frame);
@@ -104,7 +99,12 @@ const fs = require("node:fs");
         widget.chart(0).resolution() === "1M" && widget.chart(0).dataReady(),
       null,
       { timeout: 60000 },
-    );
+    ).catch(async error => {
+      console.log("MONTHLY_WAIT_STATE",JSON.stringify(await frame.evaluate(()=>({resolution:widget.chart(0).resolution(),dataReady:widget.chart(0).dataReady(),range:widget.chart(0).getVisibleRange(),loading,ready,guard:rangeGuard?.busy()}))));
+      console.log("HISTORY_TRACE",JSON.stringify(responses.map(({q,value})=>({q,status:value.status,local:value.local_only,bars:value.bars?.length}))));
+      console.log("PAGE_ERRORS",JSON.stringify(errors));
+      throw error;
+    });
     const after = await frame.evaluate(() => ({
       epoch: workspaceEpoch,
       resolution: widget.chart(0).resolution(),
@@ -114,8 +114,9 @@ const fs = require("node:fs");
     assert.equal(after.epoch, before.epoch);
     assert.equal(after.shapes, 1);
     assert.ok(after.range.to > after.range.from);
-    assert.ok(responses.length);
-    for (const { value } of responses) {
+    assert.ok(responses.some(r=>r.q.timeframe === "MN"));
+    for (const { q, value } of responses) {
+      if(q.timeframe !== "MN") continue;
       assert.equal(value.local_only, true);
       assert.deepEqual(value.task_ids, []);
     }

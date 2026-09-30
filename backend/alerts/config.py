@@ -7,6 +7,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="ALERTS_", env_file=".env", extra="ignore")
     database_url: str = "sqlite:///./alerts.db"
+    database_pool_size: int = Field(default=2, ge=1, le=20)
+    database_max_overflow: int = Field(default=0, ge=0, le=20)
+    database_pool_timeout: int = Field(default=15, ge=1, le=120)
+    database_application_name: str = "market-watch"
     public_url: str = "http://localhost:8000"
     admin_password_hash: str = ""
     cookie_secure: bool = True

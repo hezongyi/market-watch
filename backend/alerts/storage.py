@@ -244,9 +244,17 @@ class Replay(Base):
 
 
 def make_engine(url):
-    engine = create_engine(
-        url, connect_args={"check_same_thread": False} if url.startswith("sqlite") else {}
-    )
+    if url.startswith("sqlite"):
+        engine = create_engine(url, connect_args={"check_same_thread": False})
+    else:
+        engine = create_engine(
+            url,
+            pool_size=settings.database_pool_size,
+            max_overflow=settings.database_max_overflow,
+            pool_timeout=settings.database_pool_timeout,
+            pool_pre_ping=True,
+            connect_args={"application_name": settings.database_application_name},
+        )
     if url.startswith("sqlite"):
 
         @event.listens_for(engine, "connect")
