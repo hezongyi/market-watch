@@ -1,0 +1,20 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const context=vm.createContext({Map,Promise,Date,JSON});
+vm.runInContext(fs.readFileSync('../advanced-host/progressive-history.js','utf8'),context);
+(async()=>{
+ let reads=0,active=true,bars=[],updates=0,busy=false;
+ const cache=context.progressiveHistory(async()=>{reads++;return {bars:[...bars]}},()=>active,async()=>{if(busy)return false;updates++},e=>{throw e});
+ const args={instrument:'XAUUSD',timeframe:'D1',before:100,limit:200};
+ const [a,b]=await Promise.all([cache.get(args),cache.get(args)]);
+ assert.equal(reads,1);assert.deepEqual(a,b);
+ await cache.get(args);assert.equal(reads,1);
+ await cache.poll();assert.equal(updates,0);
+ bars=[{start:10,close:12}];await cache.poll();assert.equal(updates,1);
+ await cache.poll();assert.equal(updates,1);
+ bars=[{start:10,close:13}];await cache.poll();assert.equal(updates,2);
+ busy=true;bars=[{start:10,close:14}];await cache.poll();assert.equal(updates,2);
+ busy=false;await cache.poll();assert.equal(updates,3,'busy chart must retry the same revision');
+ active=false;const count=reads;await cache.poll();assert.equal(reads,count);
+ cache.dispose();active=true;await cache.poll();assert.equal(reads,count);
+ console.log('Progressive cache deduplicates, returns warm data, refreshes revisions and stops hidden polling');
+})().catch(e=>{console.error(e);process.exit(1)});

@@ -227,8 +227,23 @@ def read_cached_history(body: HistoryQuery):
             row["start"] < cutoff < row["end"]
             and covers_interval(coverage, row["start"], cutoff)
         )]
+        # Return a contiguous observed suffix. Do not join cached islands across
+        # a trading interval whose provider coverage has not been established.
+        contiguous = []
+        calendar = Calendar(inst.calendar)
+        closures = closures_from(inst.calendar_profile)
+        for row in reversed(usable):
+            if contiguous:
+                right = contiguous[-1]["start"]
+                gaps = missing_intervals(coverage, row["end"], right)
+                if any(has_trading_gap(instant(a), instant(b), calendar,
+                                       gold=inst.id == "XAUUSD", closures=closures)
+                       for a, b in gaps):
+                    break
+            contiguous.append(row)
+        contiguous.reverse()
         return {
-            "bars": usable,
+            "bars": contiguous,
             "coverage": coverage,
             "local_only": True,
             "remote_boundary": "unknown",

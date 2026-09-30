@@ -16,7 +16,7 @@ let seq = 0,
   nativeSaving = false,
   workspaceEpoch = 0,
   nativeReadonly = false;
-let rangeGuard, edgeGuard, demandReporter;
+let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
   1: "M1",
@@ -317,6 +317,25 @@ const feed = {
           throw error;
         }
       };
+      if (progressivePages && !["1W", "1M"].includes(res) && !decode(s.ticker).spec) {
+        const args = {instrument:symbol,timeframe:frames[res],
+          before:p.to*1000+(res === "1D" ? 2*86400000 : 0),limit:Math.min(2000,requested)};
+        const page = await progressivePages.get(args);
+        checkActive();
+        const bars = barsOf(page,res,s.ticker).filter(bar=>bar.time < p.to*1000);
+        if (bars.length) {
+          lastHistory.set(s.ticker+"|"+res,bars.at(-1).time);
+          firstHistory.set(s.ticker+"|"+res,page.bars[0].start);
+        }
+        // Short local history is a temporary dataset boundary. A subsequent
+        // revision invalidates this native cache and restores the viewport.
+        cb(bars,{noData:bars.length < args.limit});
+        if (!bars.length) finishTerminal();
+        send({type:"status",text:bars.length < args.limit
+          ? `${symbol} ${frames[res]} · 已显示 ${bars.length} 根，历史后台准备中`
+          : "行情已加载"});
+        return;
+      }
       let before =
         p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0);
       let all = [],
@@ -882,6 +901,24 @@ function boot(
   savedDoc.templates ||= {};
   loading = true;
   ready = false;
+  progressivePages?.dispose();
+  progressivePages = progressiveHistory(
+    args => request({op:"historyCache",args},"market",()=>hasHistoryViewer(args)),
+    args => hasHistoryViewer(args),
+    async args => {
+      if (!ready || loading || rangeGuard?.busy() || edgeGuard?.busy()) return false;
+      const epoch = workspaceEpoch;
+      for (let i=0;i<widget.chartsCount();i++) {
+        const chart = widget.chart(i);
+        if (chart.symbol() !== args.instrument || frames[chart.resolution()] !== args.timeframe) continue;
+        const symbol=chart.symbol(), resolution=chart.resolution();
+        await refreshChartHistory(widget,chart,()=> {
+          for (const sub of subscriptions.values())
+            if(sub.symbol===symbol && sub.res===resolution) sub.reset();
+        },()=>epoch===workspaceEpoch && chart.symbol()===symbol && chart.resolution()===resolution);
+      }
+    },
+    error => send({type:"feed-poll-state",key:"@progressive-history",error:String(error)}));
   widget = new TradingView.widget({
     save_load_adapter: { ...prefs.templates, ...layouts },
     settings_adapter: prefs.settings,
@@ -1168,6 +1205,8 @@ function boot(
       snapshot();
     });
     send({ type: "ready" });
+    clearInterval(progressivePoll);
+    progressivePoll = setInterval(()=>progressivePages?.poll(),2000);
     demandReporter?.dispose();
     demandReporter = chartDemandReporter(widget, clientId,
       async args => {

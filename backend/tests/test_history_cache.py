@@ -71,3 +71,17 @@ def test_cache_endpoint_uses_existing_authentication(database):
             assert response.json()['bars'] == []
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_cache_does_not_bridge_unqueried_trading_gap(database, monkeypatch):
+    start = datetime(2026, 9, 21, tzinfo=UTC)
+    price = Decimal('1.2')
+    with database.begin() as db:
+        db.get(Instrument, 'EURUSD').source = 'oanda'
+        write_bars(db, 'EURUSD', 'H1', [Candle(
+            start+timedelta(hours=i), start+timedelta(hours=i+1),
+            price, price, price, price, True) for i in (0, 2, 3)])
+    monkeypatch.setattr(market_data, 'now_ms', lambda: ms(start+timedelta(days=1)))
+    page = market_data.read_cached_history(market_data.HistoryQuery(
+        instrument='EURUSD', timeframe='H1'))
+    assert [b['start'] for b in page['bars']] == [ms(start+timedelta(hours=i)) for i in (2,3)]
