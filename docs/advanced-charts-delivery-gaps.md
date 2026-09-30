@@ -592,3 +592,11 @@
 - /imports-summary附加最多30条周线需求，待核查优先；工作台显示截止日期、剩余根数、状态及空历史说明。原导入任务priority100/200标注分别修正为图表历史/周线后台。
 - /tmp/mw-weekly-boundary-status-tests.log：31 passed，包含ready但无可用条目、empty_interval两种停止条件及需求状态响应；/tmp/mw-weekly-status-web-build.log生产构建通过。
 - 当前修改尚未重启开发API/worker加载，页面实际渲染及空区间运行态仍待验证；不把构建通过视为页面验收完成。
+
+### 周线状态页面与迁移补齐
+
+- 已重启Ubuntu开发API（session95267）及worker（session12863）加载空历史边界，未操作生产服务。
+- 新增weekly-demand-status.browser.cjs，真实工作台/replay读取开发库complete需求，随后仅HTTP响应注入needs_review，验证剩余13根及尚未确认历史起点文案；/tmp/mw-weekly-status-browser.log退出0、无页面异常。
+- /tmp/mw-weekly-status-review.png已查看，状态和原因文字完整显示，无遮挡。注入只作用于浏览器响应，不写入数据库。
+- 部署核对发现新增需求表缺少Alembic迁移，已补i10_weekly_history_requests（父版本h9）；临时SQLite完整upgrade head、downgrade h9、再upgrade head均成功，逐步断言表存在/不存在。日志/tmp/mw-weekly-migration.log。PostgreSQL正式迁移专项仍待验证。
+- 当前Ubuntu没有docker/podman/nginx命令，镜像运行与TLS隔离演练仍未完成，不以配置静态核对代替发布验收。
