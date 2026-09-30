@@ -5,25 +5,12 @@ import time
 from contextlib import ExitStack
 
 import httpx
-from sqlalchemy import select
 
 from .chart_history_plan import advance_pending_plans
 from .config import settings
 from .market import import_once
-from .market_data import advance_weekly_request, queue_history, refresh_catalog
+from .market_data import advance_weekly_request, refresh_catalog
 from .providers import fetch_binance, fetch_oanda
-from .storage import Instrument, MarketDemand, now_ms, transaction
-
-
-def maintain_active():
-    end = (now_ms() - 5000) // 60000 * 60000
-    with transaction() as db:
-        ids = set(
-            db.scalars(select(MarketDemand.instrument_id).where(MarketDemand.expires > now_ms()))
-        )
-        for ident in ids:
-            inst = db.get(Instrument, ident)
-            queue_history(db, inst, end - 120 * 60000, end)
 
 
 def main():
@@ -58,7 +45,6 @@ def run(fetch_page):
                     logging.warning("catalog refresh failed: %s",type(exc).__name__)
                     refreshed = time.monotonic()-86400+300
             if time.monotonic() - maintained > 15:
-                maintain_active()
                 advance_weekly_request()
                 advance_pending_plans()
                 maintained = time.monotonic()

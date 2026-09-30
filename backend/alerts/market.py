@@ -413,12 +413,20 @@ def queue_initial_history(db, *, end=None):
     return count
 
 
-def once(symbol=None, start=None, end=None):
+def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=None):
+    fetch = fetcher or fetch_source
     with transaction() as db:
+        viewers = set()
+        if include_viewers:
+            from .storage import ChartViewportDemand, MarketDemand
+            viewers.update(db.scalars(select(MarketDemand.instrument_id).where(
+                MarketDemand.expires > now_ms())))
+            viewers.update(db.scalars(select(ChartViewportDemand.instrument_id).where(
+                ChartViewportDemand.expires > now_ms())))
         instruments = [
             (i.id, i.symbol, i.source)
-            for i in db.scalars(select(Instrument))
-            if (i.id == symbol if symbol else i.enabled)
+            for i in db.scalars(select(Instrument).order_by(Instrument.enabled.desc(), Instrument.id))
+            if (i.id == symbol if symbol else i.enabled or i.id in viewers)
         ]
     for instrument_id, provider_symbol, source in instruments:
         with transaction() as db:
@@ -426,7 +434,7 @@ def once(symbol=None, start=None, end=None):
             if backoff and backoff.value.get("until", 0) > now_ms():
                 continue
         try:
-            payload = fetch_source(source, provider_symbol, start, end)
+            payload = fetch(source, provider_symbol, start, end)
             with transaction() as db:
                 inst = db.get(Instrument, instrument_id)
                 if not start:
@@ -456,7 +464,7 @@ def once(symbol=None, start=None, end=None):
                         )
                     )
                 if needs_quotes:
-                    quotes = fetch_source(source, provider_symbol, mode="quote")
+                    quotes = fetch(source, provider_symbol, mode="quote")
                     with transaction() as db:
                         inst = db.get(Instrument, instrument_id)
                         for raw in quotes["rows"]:

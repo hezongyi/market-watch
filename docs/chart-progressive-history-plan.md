@@ -103,3 +103,12 @@
 - 首次容器验收暴露长日历扫描占用API单连接，优化为检查每小时周历变更点和精确closure结束点；NY规则仍来自现有scheduled_open/zoneinfo，不自写DST日期。与原逐分钟扫描的等价用例、既有计划用例合计6 passed。
 - 重新构建/启动API及worker后，advanced-bar-spacing真实HTTPS容器测试通过D1/H1/H4/D1/M5全部6px，日志/tmp/mw-progressive-second-container.log。worker日志确认4000分钟分段OANDA下载和入库开始工作。
 - 待验收仍包括真实新品种从空到日线、用户操作竞争、跨周期快速缓存、多图、实时独立资源、聚合优先级、任务界面和完整版本收口。当前运行版为开发候选，非交付版本。
+
+### 实时维护独立执行通道（Ubuntu候选运行）
+
+- 新增realtime_worker，独立进程和HTTP连接池，复用market.once的入库、恢复任务和预警计算，不复制预警算法。维护品种先执行，再处理有活动需求的临时品种；关闭后需求到期不再轮询临时品种。
+- market.once增加可注入fetcher及include_viewers可选参数，默认原有行为不变；移除chart_history_worker内近期行情维护，历史循环只规划/下载历史。
+- 本机compose增加realtime-worker；API/历史worker/实时worker使用progressive-live-dev镜像49f6b2e045cb，通知仍禁用，未操作Unraid。
+- 实时选择/关闭行为测试通过；原market/recovery和新增实时回归23 passed；market_data/计划42 passed。ruff通过。
+- 初步运行：17:25:21实时循环3.423s完成；并行历史页4000分钟拉取2.127s、含入库5.192s。这里只证明独立执行已运行，不能作为长期延迟/实时绝对优先验收。
+- 仍需：历史入库锁切小、资源竞争时让步、持续延迟监测，聚合周期优先级和完整冷启动/八图/性能收口。
