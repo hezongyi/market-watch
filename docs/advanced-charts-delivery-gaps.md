@@ -968,3 +968,9 @@
 - 适配层使用公开showNoticeDialog补充“图表正在切换，数据就绪后自动保存”，同一次忙碌阶段只提示一次；保留dirty，后续正常保存重置提示标志。不修改供应库。
 - /tmp/mw-busy-save-notice.log退出0：菜单提示可见并确认关闭、公开回调保留中文、解除busy后无需手动重试就将新画线保存入服务器、errors=[]。advanced-autosave.cjs回归通过。
 - 当前本机图表镜像acceptance-save-notice；API/worker和网页镜像未变化。忙碌条件为测试注入，验证适配与原生界面通路，不宣称模拟了所有上游时序。
+
+### 指标分离、合并、隐藏与刷新恢复
+
+- advanced-study-panes.browser.cjs在本机HTTPS创建MA21，公开API unmergeDown使窗格1→2且指标索引1；mergeUp回主图使窗格2→1，随后再分离并隐藏。
+- 保存刷新后唯一指标仍在索引1、visible=false、length=21；重新显示成功，/tmp/mw-study-panes.log退出0、errors=[]。
+- 此项验证真实库公开API与工作区持久化，未逐个点击全部指标菜单，也不替代其他指标算法验收。
