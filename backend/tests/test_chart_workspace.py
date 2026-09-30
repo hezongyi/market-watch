@@ -568,3 +568,52 @@ def test_long_history_indicator_warmup_and_future_append(database):
             assert warmup[499]["value"] == pytest.approx(ema[499], rel=0, abs=1e-9)
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_indicator_cpu_work_releases_database_connection(database, monkeypatch):
+    from alerts import chart_api
+    from sqlalchemy import event
+
+    with database.begin() as db:
+        engine = db.get_bind()
+        for index in (1, 3):
+            db.add(Bar(instrument_id='BTCUSDT', timeframe='M1', start=index*60000,
+                       end=(index+1)*60000, open=10, high=11, low=9, close=10,
+                       complete=True))
+    chart_api._CACHE.clear()
+    chart_api._RESULT_CACHE.clear()
+    checked_out = 0
+    probes = []
+
+    def checkout(*args):
+        nonlocal checked_out
+        checked_out += 1
+
+    def checkin(*args):
+        nonlocal checked_out
+        checked_out -= 1
+
+    for name in ('bucket_has_trading', 'calculate', 'future_grid'):
+        original = getattr(chart_api, name)
+
+        def wrapped(*args, _name=name, _original=original, **kwargs):
+            assert checked_out == 0, f'{_name} retained the database connection'
+            probes.append(_name)
+            return _original(*args, **kwargs)
+
+        monkeypatch.setattr(chart_api, name, wrapped)
+    event.listen(engine, 'checkout', checkout)
+    event.listen(engine, 'checkin', checkin)
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+    try:
+        with TestClient(api_module.app) as client:
+            result = client.post('/api/charts/data', json={
+                'instrument': 'BTCUSDT', 'timeframe': 'M1', 'track_history': True,
+                'indicators': [{'name': 'SMA', 'params': {'period': 2}}]})
+            assert result.status_code == 200
+            assert result.json()['history_check']
+        assert set(probes) == {'bucket_has_trading', 'calculate', 'future_grid'}
+    finally:
+        event.remove(engine, 'checkout', checkout)
+        event.remove(engine, 'checkin', checkin)
+        api_module.app.dependency_overrides.clear()

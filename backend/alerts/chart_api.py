@@ -496,87 +496,93 @@ def router(authenticated):
                 )
                 with _CACHE_LOCK:
                     cached = _CACHE.get(key)
-                if cached and time.monotonic() - cached[0] < 15:
+                cache_hit = bool(cached and time.monotonic() - cached[0] < 15)
+                if cache_hit:
                     all_rows = cached[1]
                 else:
                     all_rows = chart_rows(
                         db, inst, body.timeframe, now_ms() + 1, max(1, stamp[0]), now_ms()
                     )
-                    closures = closures_from(inst.calendar_profile)
-                    for prev, row in zip(all_rows, all_rows[1:]):
-                        if prev["end"] < row["start"]:
-                            row["gap_before"] = bucket_has_trading(
-                                instant(prev["end"]),
-                                instant(row["start"]),
-                                Calendar(inst.calendar),
-                                gold=inst.id == "XAUUSD",
-                                closures=closures,
-                            )
-                    with _CACHE_LOCK:
-                        _CACHE[key] = (time.monotonic(), all_rows)
-                        while len(_CACHE) > 16 or sum(len(v[1]) for v in _CACHE.values()) > 200_000:
-                            _CACHE.popitem(last=False)
                 visible = [x for x in all_rows if x["start"] < before][-body.limit :]
-                start = visible[0]["start"] if visible else before
-                end = visible[-1]["start"] if visible else before
-                indicators = []
-                for spec in body.indicators:
-                    name, params = validate(spec)
-                    result_key = (
-                        key,
-                        name,
-                        spec.get("version", "1"),
-                        json.dumps(params, sort_keys=True),
-                    )
+                history_snapshot = history_check(db, inst, source, visible, body)
+                # No lazy ORM reads during CPU work after returning the connection.
+                db.expunge(inst)
+            if not cache_hit:
+                closures = closures_from(inst.calendar_profile)
+                for prev, row in zip(all_rows, all_rows[1:]):
+                    if prev["end"] < row["start"]:
+                        row["gap_before"] = bucket_has_trading(
+                            instant(prev["end"]),
+                            instant(row["start"]),
+                            Calendar(inst.calendar),
+                            gold=inst.id == "XAUUSD",
+                            closures=closures,
+                        )
+                with _CACHE_LOCK:
+                    _CACHE[key] = (time.monotonic(), all_rows)
+                    while len(_CACHE) > 16 or sum(len(v[1]) for v in _CACHE.values()) > 200_000:
+                        _CACHE.popitem(last=False)
+            visible = [x for x in all_rows if x["start"] < before][-body.limit :]
+            start = visible[0]["start"] if visible else before
+            end = visible[-1]["start"] if visible else before
+            indicators = []
+            for spec in body.indicators:
+                name, params = validate(spec)
+                result_key = (
+                    key,
+                    name,
+                    spec.get("version", "1"),
+                    json.dumps(params, sort_keys=True),
+                )
+                with _CACHE_LOCK:
+                    cached_result = _RESULT_CACHE.get(result_key)
+                if cached_result and time.monotonic() - cached_result[0] < 15:
+                    result = cached_result[1]
+                else:
+                    result = calculate(all_rows, spec)
+                    weight = sum(len(series["values"]) for series in result["series"])
                     with _CACHE_LOCK:
-                        cached_result = _RESULT_CACHE.get(result_key)
-                    if cached_result and time.monotonic() - cached_result[0] < 15:
-                        result = cached_result[1]
-                    else:
-                        result = calculate(all_rows, spec)
-                        weight = sum(len(series["values"]) for series in result["series"])
-                        with _CACHE_LOCK:
-                            _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)
-                            while (
-                                len(_RESULT_CACHE) > 64
-                                or sum(v[2] for v in _RESULT_CACHE.values()) > 250_000
-                            ):
-                                _RESULT_CACHE.popitem(last=False)
-                    indicators.append(
-                        {
-                            **result,
-                            "id": spec.get("id", spec["name"]),
-                            "series": [
-                                {
-                                    **series,
-                                    "values": [
-                                        v for v in series["values"] if start <= v["time"] <= end
-                                    ],
-                                }
-                                for series in result["series"]
-                            ],
-                        }
-                    )
-                return {
-                    "history_check": history_check(db, inst, source, visible, body),
-                    "history_revision": hashlib.sha256(
-                        json.dumps(
-                            [stamp[0], stamp[2], stamp[3], inst.calendar_profile], sort_keys=True
-                        ).encode()
-                    ).hexdigest(),
-                    "bars": visible,
-                    "indicators": indicators,
-                    "has_more": bool(visible and any(x["start"] < start for x in all_rows)),
-                    "origin": all_rows[0]["start"] if all_rows else None,
-                    "bounded_history": False,
-                    "future": future_grid(inst, body.timeframe, all_rows[-1]["end"])
-                    if all_rows
-                    else [],
-                    "basis": inst.basis,
-                    "calendar": inst.calendar,
-                    "precision": inst.precision,
-                    "as_of": now_ms(),
-                }
+                        _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)
+                        while (
+                            len(_RESULT_CACHE) > 64
+                            or sum(v[2] for v in _RESULT_CACHE.values()) > 250_000
+                        ):
+                            _RESULT_CACHE.popitem(last=False)
+                indicators.append(
+                    {
+                        **result,
+                        "id": spec.get("id", spec["name"]),
+                        "series": [
+                            {
+                                **series,
+                                "values": [
+                                    v for v in series["values"] if start <= v["time"] <= end
+                                ],
+                            }
+                            for series in result["series"]
+                        ],
+                    }
+                )
+            return {
+                "history_check": history_snapshot,
+                "history_revision": hashlib.sha256(
+                    json.dumps(
+                        [stamp[0], stamp[2], stamp[3], inst.calendar_profile], sort_keys=True
+                    ).encode()
+                ).hexdigest(),
+                "bars": visible,
+                "indicators": indicators,
+                "has_more": bool(visible and any(x["start"] < start for x in all_rows)),
+                "origin": all_rows[0]["start"] if all_rows else None,
+                "bounded_history": False,
+                "future": future_grid(inst, body.timeframe, all_rows[-1]["end"])
+                if all_rows
+                else [],
+                "basis": inst.basis,
+                "calendar": inst.calendar,
+                "precision": inst.precision,
+                "as_of": now_ms(),
+            }
         except (ValueError, TypeError, KeyError, AttributeError) as e:
             raise HTTPException(422, str(e)) from e
 

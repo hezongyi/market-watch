@@ -200,3 +200,10 @@
 - 新增春季/秋季DST、UTC0/NY17、黄金/外汇、非整点恢复交易的差分验证；计划测试12 passed，原chart_workspace19 passed，ruff通过。
 - Ubuntu api已更新indicator-gap-fix镜像，web/chart和两个worker仍progressive-a257803；镜像与源代码仅import排序差异，最终交付仍需统一构建记录。
 - 原失败浏览器用例重跑成功：PYTHON_PROGRESSIVE bars=100 elapsed=1385ms planners=0，日志/tmp/mw-python-progressive-fixed.log。证明真实页面桥接下已有H1历史的Python SMA可返回有效值且不走旧规划等待。不能代替冷数据逐批曲线刷新、多图压力或M1大历史性能验收。
+
+### 指标CPU处理归还连接与柱距回归
+
+- 原生浏览器advanced-bar-spacing.browser.cjs在当前本机容器通过：D1/H1/H4/D1/M5均保持6px。日志/tmp/mw-spacing-current.log。
+- 指标接口在读取行情、元数据与history_check后结束数据库事务，expunge品种对象；缺口判断、指标计算、结果裁剪和future_grid均在事务外完成。计算使用同一份读取快照，不在CPU阶段追加ORM查询。
+- 新增连接checkout/checkin断言，验证三种CPU阶段没有持有数据库连接，且track_history正常返回；test_chart_workspace.py 20 passed，ruff已修正导入顺序。
+- 本次源代码候选尚未部署；多图并发、M1大规模历史与异步优先聚合仍待验收/实施，不能由单连接释放断言推定全部性能达标。
