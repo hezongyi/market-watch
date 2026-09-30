@@ -544,3 +544,26 @@
 - session52222退出1（/tmp/mw-mobile-series-debug.log）。仅测试CDP在异常处读取原生setVisibleTimeRange调用状态：series=sds_8、interval=15、symbolResolved=false；外部dataReady仍true。因此不能将dataReady视为该异常下完整系列就绪证据。
 - 调试器不修改供应商代码，读取字段不含账户/凭据。下一步仅测试公开resetData重建系列能否恢复，日志/tmp/mw-mobile-reset-probe.log，尚未产品化。
 - 上一轮单分钟EURUSD失败任务重排后已验证complete、cursor=end、attempts=0，当前worker重试恢复成立；不代表其余失败任务已自动恢复。
+
+### 手机公开resetData恢复候选
+
+- session20943退出0（/tmp/mw-mobile-reset-probe.log）：切周期后公开resetData，再操作视区，手机单图、零写入、草稿和errors=[]断言通过。该原型包含诊断等待，不直接作为产品方案。
+- 手机只读recordPeriodChange下一事件循环立即resetData候选session36319退出1，说明调用时点仍过早。改为一次onDataLoaded后再调用公开resetData，使用workspace epoch、每图token、当前图成员及周期核对取消旧操作。
+- session97087运行中（/tmp/mw-mobile-data-loaded-recovery.log），候选尚未确认，产品改动暂未提交。桌面路径未应用该候选。
+
+- session97087最终退出1，onDataLoaded候选仍未消除异常，已撤回候选产品改动。保留公开resetData原型成功这一有限证据，需进一步核对有效调用时点。
+
+### 手机系列事件轨迹与单图重建候选
+
+- session89992退出1：onIntervalChanged在M15/dataReady=true状态发出，约58ms后onDataLoaded，随后视区API仍取不到symbolInfo（/tmp/mw-mobile-event-trace.log）。该事件序列不足以证明系列可操作。
+- 新候选仅手机首次从多图转单图后，通过公开widget.save/load在内存重建单图实例状态，不修改原始服务器布局；session19598运行中（/tmp/mw-mobile-single-reload.log）。产品候选暂未提交，需同时验证保存隔离、画线指标保留及工作区后续切换。
+
+### 手机默认单图重建与工作区切换（2026-09-30）
+
+- 用户明确手机默认单图，不要求八图；桌面最多八图及手机只读隔离仍保留，D08已更新。
+- 通过公开setLayout/save/load在内存重建单图，首次加载和后续chart_loaded均使用同一流程；以workspaceEpoch取消过期恢复，最终单图事件负责绑定视区守卫。供应商文件未修改，服务器原始多图文档未转换。
+- /tmp/mw-mobile-single-confirm.log退出0，证明真实八图工作区输入可在手机单图切周期/平移，无页面异常。
+- 扩展测试先通过原生适配器切换不同工作区再切回，再加载含水平线、趋势线和原生Moving Average的内存多图文档；/tmp/mw-mobile-workspace-switch-final.log退出0：保持一图、水平线价格保留、趋势线两个时间/价格端点完全一致、指标输入参数一致、周期切换及平移成功、errors=[]。
+- 水平线附带时间坐标会被原生重载重定位；该工具检查有效价格位置，趋势线严格检查时间及价格，不用水平线时间变化推断所有画线均丢失或均正确。
+- 测试同时直接比较操作前后服务器工作区列表完整JSON相等、桌面草稿保留、advanced-charts POST请求为空；测试创建的分析对象仅在内存，不修改保存文档。
+- native workspace adapter及edge range synchronization专项退出0。此项不代替其余绘图工具交互、周线持久补数生命周期、部署演练与整体验收。

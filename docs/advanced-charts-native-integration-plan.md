@@ -85,7 +85,7 @@
 | D05 | 图表样式模板 | getAllChartTemplates/getChartTemplateContent/saveChartTemplate/removeChartTemplate；保存原生主题模板内容 |
 | D06 | 用户设置 | settings_adapter.initialSettings/setValue/removeValue；收藏、常用周期、默认样式、主题等由服务器持久化，避免仅依赖浏览器localStorage |
 | D07 | 绘图存储 | 以workspace+symbol隔离实际绘图；必要时采用saveLineToolsAndGroups/loadLineToolsAndGroups，正确序列化Map、删除标记、组、owner和共享模式；不随意改黑盒内容 |
-| D08 | 手机 | 沿用原生响应式界面，查看已保存内容；不提供完整手机绘图与保存修改。查看临时调整不应覆盖桌面布局或全局偏好 |
+| D08 | 手机 | 沿用原生响应式界面，默认单图查看已保存内容，不要求手机显示八图；桌面最多八图。允许临时切换品种、周期和缩放，不提供完整手机绘图与保存修改，不覆盖桌面布局、草稿或全局偏好；由桌面多图转为手机单图时须验证所显示图表的画线、指标保留 |
 | D09 | 兼容迁移 | 已有tv31验证版工作区可迁移，保留原文档备份；Lightweight Charts工作区不改写；升级库保留版本标记和回退能力 |
 
 ### E. 暂不接入

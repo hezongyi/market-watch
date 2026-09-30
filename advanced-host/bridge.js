@@ -686,6 +686,29 @@ function boot(
       if (epoch === workspaceEpoch) viewportRestoring = false;
     }
   };
+  // Rebuild via public APIs: merely hiding extra panes leaves the vendor's
+  // period-switch series metadata unresolved. This snapshot never leaves memory.
+  const rebuildMobileSingleChart = async () => {
+    if (!readonly || widget.chartsCount() <= 1) return false;
+    const epoch = workspaceEpoch;
+    widget.setLayout("s");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    if (epoch !== workspaceEpoch) return true;
+    const single = await new Promise((resolve) => widget.save(resolve));
+    if (epoch !== workspaceEpoch) return true;
+    const current = currentNativeWorkspace;
+    await widget.load(
+      single,
+      current
+        ? {
+            uid: current.id,
+            name: current.name,
+            description: current.name,
+          }
+        : undefined,
+    );
+    return true;
+  };
   savedDoc = doc;
   savedDoc.nativeName = workspace?.name || "我的图表";
   nativeMode = true;
@@ -974,7 +997,7 @@ function boot(
     // Mobile is a temporary single-chart view of the saved desktop workspace.
     // Read-only adapters keep the original multi-chart document untouched.
     await restoreViewports();
-    if (readonly && widget.chartsCount() > 1) widget.setLayout("s");
+    await rebuildMobileSingleChart();
     ready = true;
     loading = false;
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
@@ -1017,8 +1040,13 @@ function boot(
       dirty = false;
     });
     widget.subscribe("chart_loaded", async () => {
+      const epoch = workspaceEpoch;
       await restoreViewports();
-      if (readonly && widget.chartsCount() > 1) widget.setLayout("s");
+      if (epoch !== workspaceEpoch) return;
+      // load() emits chart_loaded again for the rebuilt single chart. Only that
+      // final event may rebind guards and release the loading state.
+      if (await rebuildMobileSingleChart()) return;
+      if (epoch !== workspaceEpoch) return;
       loading = false;
       rangeGuard?.dispose();
       rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
