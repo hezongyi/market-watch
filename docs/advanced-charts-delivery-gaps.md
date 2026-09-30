@@ -902,3 +902,10 @@
 - 更新advanced-unload.browser.cjs到当前HTTPS验收容器；暂停原生保存请求期间刷新触发beforeunload，取消离开后释放请求，实际服务器保存完成；再次刷新不出现未保存提示。
 - 返回主站后额外观察17秒（超过15秒轮询周期），图表history/charts-data请求数不再增加，errors=[]。/tmp/mw-unload-fixed-history.log退出0。
 - 首轮未限定日期触发最新历史error，主动停止该测试；随后固定已缓存截止时间验证离开行为，不改行情响应。该测试不证明任意未保存操作都会自动完成保存，也不替代冷补数故障验收。
+
+### 最新历史错误定位与开发库重试恢复
+
+- 不限定旧截止时间请求XAUUSD H4/200根，复现status=error，关联8个failed_task_ids；原错误文本为空。同期本机worker日志OANDA拉取/入库持续成功，排除把该状态直接归因于当前连接断开。
+- 通过已鉴权/api/market-data/retry/{id}逐一重试这8个开发库任务，全部200；worker随后真实补回缺口。/tmp/mw-latest-history-after-retry.log显示失败列表清空，仅新一分钟待处理。
+- 固定刚请求过的截止1790765100000再次检查：/tmp/mw-latest-history-ready.log为ready，pending/failed任务均空，覆盖2684700000/2684700000毫秒，error=null。此处固定的是本次当前请求边界，未回避旧失败区间。
+- 只操作Ubuntu验收API和开发库任务，未操作Unraid生产服务。临时诊断脚本已删除；没有改供数算法。原生失败重试提示及供数服务可恢复，空错误文本的可读性仍可进一步改善。
