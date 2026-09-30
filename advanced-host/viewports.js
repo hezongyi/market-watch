@@ -63,7 +63,7 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
   }
 }
 
-// Correct native synchronization retaining per-pane margins at the data edge.
+// Correct native range differences at data edges and historical session gaps.
 function edgeRangeSync(widget, blocked, onError) {
   const bindings = new Map();
   const range = widget.dateRangeSync(),
@@ -119,7 +119,6 @@ function edgeRangeSync(widget, blocked, onError) {
         minutes > 0 &&
         Number.isFinite(minutes) &&
         peer.dataReady() &&
-        peer.getTimeScale().rightOffset() > 0 &&
         Math.abs(peer.getVisibleRange().to - target.to) > minutes * 60
       );
     });
@@ -161,16 +160,9 @@ function edgeRangeSync(widget, blocked, onError) {
       chart.onSymbolChanged().subscribe(null, changed);
       chart.onIntervalChanged().subscribe(null, changed);
       const callback = () => {
-        if (
-          disposed ||
-          applying ||
-          blocked() ||
-          !range.value() ||
-          widget.activeChart() !== chart
-        )
-          return;
+        if (disposed || applying || blocked() || !range.value()) return;
         clearTimeout(timer);
-        timer = setTimeout(() => align(chart), 150);
+        timer = setTimeout(() => align(widget.activeChart()), 150);
       };
       bindings.set(chart, { callback, changed });
       chart.onVisibleRangeChanged().subscribe(null, callback);

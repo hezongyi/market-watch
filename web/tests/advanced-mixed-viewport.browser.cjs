@@ -35,6 +35,11 @@ const fs = require("fs");
         "\nedgeRangeSync = () => ({busy:()=>false,refresh(){},dispose(){}});"});
     });
   }
+  if (process.env.MARKET_WATCH_VIEWPORT_SOURCE)
+    await page.route("**/viewports.js*", route => route.fulfill({
+      contentType:"application/javascript",
+      body:fs.readFileSync(process.env.MARKET_WATCH_VIEWPORT_SOURCE,"utf8"),
+    }));
   const errors = [];
   if (process.env.MARKET_WATCH_RANGE_GUARD_SOURCE)
     await page.route("**/range-sync.js*", (route) =>

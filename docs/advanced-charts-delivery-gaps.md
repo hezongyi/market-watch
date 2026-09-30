@@ -626,3 +626,18 @@
 - 黄金休市真实历史对照：target=1790274600..1790285400（2026-09-24 18:30..21:30 UTC），八图同步后XAU M5/M15右边界1790287200（22:00），单独公开setVisibleRange后XAU M5右边界1790283300（20:55），/tmp/mw-gold-session-direct.log退出1。证明同步与单独设置不同，不以休市为由直接豁免。
 - 假设按顺序：原生同步缺口取整、session描述、现有edgeRangeSync仅覆盖正rightOffset。已启动仅session覆盖对照/tmp/mw-gold-session-override.log（session84330），尚未有结果，不修改产品。
 - session84330退出1，显式黄金session覆盖仍是同样22:00对20:55差异；该对照不支持仅修改session就能修复。下一步验证历史休市空档是否需要公开范围校正，仍不得伪造休市K线。
+
+### 黄金历史空档校正候选（未收口）
+
+- 去掉peer正rightOffset限制，增加历史视区单测：旧HEAD失败3700!=1000，候选通过。但仅此修改真实黄金仍失败（/tmp/mw-gold-historical-confirm.log）。
+- 临时事件追踪/tmp/mw-gold-sync-events.log显示活动图先更新、其他图异步完成native范围更新；只监听活动图导致错过最终同伴范围。诊断代码已删除。
+- 候选改为任何图范围事件安排检查，以当前activeChart为唯一目标；/tmp/mw-gold-peer-settled.log退出0，黄金同步与直接setVisibleRange都落到20:55真实末根，未伪造休市数据。新增late peer单测通过。
+- 正常八图鼠标回归/tmp/mw-gap-normal-mouse-regression.log退出1，setVisibleRange抛Invalid visible range，尚未确定与候选是否因果相关；当前产品改动保持未提交，不能宣布黄金修复完成。后续先固定非休市目标范围并对照旧版，检查加载/校正竞态。
+
+### 黄金空档校正收口与回归归因
+
+- /tmp/mw-gap-normal-mouse-regression.log失败请求经读取MIXED_PANES还原为2026-09-27 16:45–19:45 UTC，全部在周日外汇开盘前。不是普通交易时段样例。
+- 新增仅测试侧MARKET_WATCH_VIEWPORT_SOURCE，用原HEAD公开适配脚本对照相同请求，/tmp/mw-gap-baseline-weekend.log退出1，同样Invalid visible range。证明此拒绝行为原先存在，不能将它归因为候选引入的回归；也不将其称为已修复。
+- 固定2026-09-24 15:00–18:00 UTC交易时段运行候选，/tmp/mw-gap-fixed-open.log退出0，八图鼠标十字线/滚轮/拖动、关闭同步独立操作、自动保存及刷新恢复通过。
+- 保留黄金修复：peer范围变化也安排检查，目标始终为activeChart；历史负rightOffset不再被排除。单测覆盖历史视区及迟到peer，原版失败/候选通过；真实黄金同步与单独设置等价证据见/tmp/mw-gold-peer-settled.log。
+- 未修改供应商包，未造休市K线；全休市窗口直接调用原生setVisibleRange会拒绝，后续日期定位体验应避免把该底层调用失败描述为行情丢失。
