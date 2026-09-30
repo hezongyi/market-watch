@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from .calendar_profile import closures_from
 from .domain import NY, Calendar, Candle, scheduled_open, session_bounds
-from .storage import Bar, candle_dict, instant, ms
+from .storage import Bar, ChartAggregationJob, candle_dict, instant, ms
 
 FRAMES = ("M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN")
 
@@ -56,6 +56,23 @@ def expected_days(left, right, calendar, gold, closures):
 
 
 def chart_rows(db, instrument, frame, before, limit, now):
+    rows = _chart_rows(db, instrument, frame, before, limit, now)
+    if not rows or frame == "M1":
+        return rows
+    source = "M15" if frame == "M30" else "D1" if frame in ("W1", "MN") else frame
+    pending = list(db.scalars(select(ChartAggregationJob).where(
+        ChartAggregationJob.instrument_id == instrument.id,
+        ChartAggregationJob.timeframe == source,
+        ChartAggregationJob.start < rows[-1]["end"],
+        ChartAggregationJob.end > rows[0]["start"])))
+    for row in rows:
+        if any(job.start < row["end"] and job.end > row["start"] for job in pending):
+            row["complete"] = False
+            row["pending_aggregation"] = True
+    return rows
+
+
+def _chart_rows(db, instrument, frame, before, limit, now):
     if frame not in FRAMES:
         raise ValueError("未知图表周期")
     if frame not in ("M30", "W1", "MN"):

@@ -73,3 +73,43 @@ def test_failed_calculation_rolls_back_partial_bars(database, monkeypatch):
         assert db.scalar(select(func.count()).select_from(ChartAggregationJob)) == 5
         assert db.scalar(select(ChartAggregationJob.error).where(
             ChartAggregationJob.attempts == 1)) == 'ValueError'
+
+
+def test_deferred_ingestion_hides_old_bars_until_rebuilt(database, monkeypatch):
+    from datetime import UTC, datetime
+
+    from alerts import market, market_data, storage
+    from alerts.chart_data import chart_rows
+    from alerts.storage import Bar, ms
+
+    start = ms(datetime(2026, 9, 21, tzinfo=UTC))
+    now = start+10*60000+5000
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    monkeypatch.setattr(market_data, 'now_ms', lambda: now)
+    payload = {'source': 'oanda', 'basis': 'mid',
+               'rows': [dict(timestamp=start+i*60000, open=10, high=11, low=9, close=10)
+                        for i in range(10)],
+               'coverage': [{'start': start, 'end': start+10*60000}]}
+    with database.begin() as db:
+        inst = db.get(Instrument, 'EURUSD')
+        inst.source, inst.basis = 'oanda', 'mid'
+        market.ingest(db, inst, payload, received_at=now)
+    payload['rows'][0]['high'] = 15
+    with database.begin() as db:
+        inst = db.get(Instrument, 'EURUSD')
+        market.ingest(db, inst, payload, received_at=now, defer_aggregation=True)
+        assert db.scalar(select(func.count()).select_from(ChartAggregationJob)) == 5
+        assert not db.scalar(select(Bar.complete).where(Bar.timeframe == 'M5').limit(1))
+        assert chart_rows(db, inst, 'M5', now, 20, now)[0]['pending_aggregation']
+    # Coverage exists, but neither a stale closed bar nor a forming H1 is usable.
+    for frame in ('M5', 'H1'):
+        assert market_data.read_cached_history(market_data.HistoryQuery(
+            instrument='EURUSD', timeframe=frame))['bars'] == []
+    for _ in range(5):
+        assert aggregate_once()
+    assert not aggregate_once()
+    page = market_data.read_cached_history(market_data.HistoryQuery(
+        instrument='EURUSD', timeframe='M5'))
+    assert len(page['bars']) == 2
+    assert float(page['bars'][0]['high']) == 15
+    assert all(row['complete'] for row in page['bars'])

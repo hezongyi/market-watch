@@ -230,10 +230,10 @@ def read_cached_history(body: HistoryQuery):
         rows = chart_rows(db, inst, body.timeframe, before, body.limit, now)
         left = rows[0]["start"] if rows else before
         coverage = stored_coverage(db, inst, left, max(before, cutoff)) if rows else []
-        usable = [row for row in rows if row["complete"] or (
+        usable = [row for row in rows if not row.get("pending_aggregation") and (row["complete"] or (
             row["start"] < cutoff < row["end"]
             and covers_interval(coverage, row["start"], cutoff)
-        )]
+        ))]
         # Return a contiguous observed suffix. Do not join cached islands across
         # a trading interval whose provider coverage has not been established.
         contiguous = []

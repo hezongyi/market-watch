@@ -10,7 +10,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import httpx
-from sqlalchemy import BigInteger, or_, select
+from sqlalchemy import BigInteger, or_, select, update
 
 from .bar_batch import write_bars
 from .calendar_profile import closures_from
@@ -132,7 +132,7 @@ def stored_coverage(db, instrument, left, right):
     return coverage
 
 
-def ingest(db, instrument, payload, received_at=None):
+def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False):
     # Serialize bounded writes for one instrument across live and history workers.
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
     if payload.get("source") and payload["source"] != instrument.source:
@@ -215,7 +215,19 @@ def ingest(db, instrument, payload, received_at=None):
                 cursor += 60000
     if not touched:
         return 0
-    aggregate_touched(db, instrument, touched, received_at=received_at)
+    if defer_aggregation:
+        from .chart_aggregation import PERIODS, enqueue_aggregation
+
+        left, right = ms(min(touched)), ms(max(touched)) + 60000
+        enqueue_aggregation(db, instrument.id, left, right, received_at)
+        # Persist invalidation with the new M1 and queue. Strategy readers must
+        # not accept an older aggregate as final while rebuilding is pending.
+        db.execute(update(Bar).where(
+            Bar.instrument_id == instrument.id, Bar.timeframe.in_(PERIODS),
+            Bar.start < right, Bar.end > left).values(
+                complete=False, revision=Bar.revision+1, received_at=received_at))
+    else:
+        aggregate_touched(db, instrument, touched, received_at=received_at)
     return len(changed)
 
 
