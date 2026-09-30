@@ -1110,3 +1110,11 @@
 - advanced-comparison-axes.browser.cjs在BTCUSDT H1主图添加原生Compare/XAUUSD，使用new-left轴。真实加载后黄金轴4093.72–4398.85、BTC轴82090.84–87985.88，比较symbol被hasHistoryViewer纳入供数。
 - 两侧均切换百分比mode2，原生保存、刷新后BTC/H1、XAUUSD比较输入、两侧[2,2]和供数跟踪均恢复。/tmp/mw-comparison-axes.log退出0、errors=[]。两张截图分别为/tmp/mw-compare-independent-axes.png和/tmp/mw-compare-percent-restored.png；后者已目视显示左右百分比轴、BTC蜡烛、黄金比较线与图例。
 - 截图覆盖周末：原生比较线在黄金休市区间连接前后交易点，这是库的显示行为，不是行情后台生成休市价格。已写入使用说明。验证范围为实际不同session品种的比较、轴分离、百分比及持久化，不声称所有内置比较算法逐值审计。
+
+### 报价与需求续期断线恢复收尾
+
+- advanced-quote-recovery.browser.cjs真实阻断/api/market-data/quotes，恢复200且有效lp后旧Failed to fetch仍在；修复前/tmp/mw-quote-recovery.log以旧错误未消失超时。bridge报价轮询改用独立feed-poll-state/@quotes，成功仅清除报价错误，停止报价订阅亦释放该错误。
+- 修复后/tmp/mw-quote-recovery-fixed.log退出0：blocked=1、alerts=[]、errors=[]；额外注入保存失败及独立EURUSD K线失败，成功报价不误清理两者。
+- 发现/activity需求续期位于分组try之外；新增单测修复前实际抛出activity unavailable，移动至分组try内后错误上报且polling释放，恢复续期后查询继续。advanced-history-reload.cjs通过。
+- advanced-activity-recovery.browser.cjs在本机真实阻断/activity并解除，/tmp/mw-activity-recovery.log退出0：blocked=1、alerts=[]、errors=[]，独立保存/其他K线错误隔离通过。
+- 当前图表镜像acceptance-quote-recovery；API/worker/web仍acceptance-closed-session。只操作Ubuntu验收容器。结合既有K线断线恢复、八图连续运行无积压、后台fresh/closed/stale状态边界测试及原生报价描述真实展示，行情工作组主要恢复路径已有证据；最终交付审计仍需对照条目，不能把本项扩大为任意网络故障保证。

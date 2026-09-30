@@ -507,9 +507,12 @@ async function tick() {
               .filter((r) => sub.symbols.includes(r.n))
               .map(({ s, n, v }) => ({ s, n, v })),
           );
+        send({ type: "feed-poll-state", key: "@quotes", error: "" });
       } catch (e) {
-        send({ type: "error", error: String(e) });
+        send({ type: "feed-poll-state", key: "@quotes", error: "报价更新失败：" + String(e) });
       }
+    } else {
+      send({ type: "feed-poll-state", key: "@quotes", error: "" });
     }
     for (const [key, args] of [...pendingHistory]) {
       if (!hasHistoryViewer(args)) {
@@ -561,14 +564,14 @@ async function tick() {
         reloadHistory(symbol, first.res);
         continue;
       }
-      await request(
-        {
-          op: "activity",
-          args: { client: clientId, instrument: decode(first.symbol).symbol },
-        },
-        "market",
-      );
       try {
+        await request(
+          {
+            op: "activity",
+            args: { client: clientId, instrument: decode(first.symbol).symbol },
+          },
+          "market",
+        );
         const result = await query(first.symbol, first.res, {
           limit: 3,
           track_history: true,

@@ -202,6 +202,16 @@ widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
 await tick();
 })()`, context);
   assert.deepEqual(events, ['query'], "Visible comparison must keep its own polling demand");
+  events.length = 0;
+  await vm.runInContext(`(async()=>{
+request=async()=>{throw Error('activity unavailable')};
+await tick();
+})()`, context);
+  assert.equal(vm.runInContext("polling",context),false);
+  assert.deepEqual(events,['error:Error: activity unavailable']);
+  events.length=0;
+  await vm.runInContext(`(async()=>{request=async()=>({ok:true});await tick()})()`,context);
+  assert.deepEqual(events,['query'],'polling must recover after activity renewal failure');
   console.log("Grouped polling recovers after failure and prevents overlapping requests");
   console.log(
     "Historical reload invalidates matching cache before resetting only matching panes",
