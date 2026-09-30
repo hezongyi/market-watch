@@ -648,6 +648,25 @@ def import_once(*, chart_only=False, fetcher=None):
             job.status = "failed" if job.attempts >= 5 else "pending"
             job.lease_until = None
             job.next_at = now_ms() + min(600, 30 * 2**job.attempts) * 1000
+            if isinstance(e, httpx.HTTPStatusError) and e.response.status_code == 429:
+                from email.utils import parsedate_to_datetime
+
+                retry_after = e.response.headers.get("Retry-After", "")
+                until = now_ms() + 300_000
+                try:
+                    until = max(until, now_ms() + int(retry_after) * 1000)
+                except ValueError:
+                    try:
+                        until = max(until, int(parsedate_to_datetime(retry_after).timestamp() * 1000))
+                    except (ValueError, TypeError, OverflowError):
+                        pass
+                delay = db.get(Preference, f"market_backoff:{source}")
+                if delay:
+                    until = max(until, delay.value.get("until", 0))
+                    delay.value = {"until": until}
+                else:
+                    db.add(Preference(key=f"market_backoff:{source}", value={"until": until}))
+                job.next_at = max(job.next_at, until)
             if chart_only:
                 # Exception messages may contain account URLs; log the class only.
                 logging.warning(

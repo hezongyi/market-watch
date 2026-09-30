@@ -737,3 +737,34 @@ def test_chart_timeout_preserves_failure_type_and_cursor(database, caplog):
         assert job.status == "pending"
         assert job.cursor == 60000
         assert job.attempts == 1
+
+
+@pytest.mark.parametrize("retry_after,expected", [
+    ("600", 1_600_000), ("", 1_300_000),
+    ("Thu, 01 Jan 1970 00:30:00 GMT", 1_800_000),
+])
+def test_chart_rate_limit_defers_other_jobs_for_same_source(database, monkeypatch, retry_after, expected):
+    import httpx
+    from alerts import market
+    from alerts.storage import Preference
+
+    monkeypatch.setattr(market, "now_ms", lambda: 1_000_000)
+    with database.begin() as db:
+        for ident in ("EURUSD", "XAUUSD"):
+            db.get(Instrument, ident).source = "oanda"
+            db.add(ImportJob(instrument_id=ident, start=60000, end=120000,
+                             cursor=60000, priority=100, next_at=0))
+    calls = []
+
+    def limited(*args):
+        calls.append(args[1])
+        response = httpx.Response(429, headers={"Retry-After": retry_after},
+                                 request=httpx.Request("GET", "https://example.test/candles"))
+        response.raise_for_status()
+
+    assert market.import_once(chart_only=True, fetcher=limited)
+    assert not market.import_once(chart_only=True, fetcher=limited)
+    assert len(calls) == 1
+    with database.begin() as db:
+        assert db.get(Preference, "market_backoff:oanda").value["until"] == expected
+        assert all(j.cursor == 60000 for j in db.scalars(select(ImportJob)))

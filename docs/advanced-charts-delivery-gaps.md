@@ -477,3 +477,10 @@
 - 已核对旧API8004 session60593和Vite5190 session1730均exit143，随后恢复同端口开发服务：API session84407、Vite session16809；静态5187始终返回200。未操作生产服务。
 - session14528退出0（/tmp/mw-mobile-restored-portrait.log）：手机竖屏单图切周期/视区后MOBILE_WRITES=[]、nativeReadonly=true、桌面草稿保留、errors=[]。该轮使用固定真实历史，不替代实时补数验收。
 - 手机脚本进一步将切周期后的固定等待改成明确dataReady/有效范围等待，后续避免数据未就绪即设置范围；这一等待改动在上述运行启动之后完成，需后续用新脚本复验。
+
+### 图表补数429限流退避修正
+
+- 实际import_once回归证明：EURUSD返回429后，下一XAUUSD任务仍向同一OANDA源发请求。旧代码回归失败，说明原market实时轮询退避未覆盖图表任务失败。
+- 图表/历史任务收到明确HTTP429时写入既有market_backoff源级记录，后续同源任务延后且游标保持；采用至少300秒退避，尊重更长Retry-After秒数/HTTP日期及已有退避，不通过异常字符串判断429。
+- 新回归覆盖秒数、日期、无header回退，行情专项24 passed（/tmp/mw-rate-limit-tests.log）。未修改供应商包或生产服务。旧常驻worker尚未加载此改动。
+- 通过异步问题请求用户停止Ubuntu宿主上的旧开发chart_history_worker；当前受限终端无法读取其进程，已核对主机身份的SSH仍publickey认证失败。等待协助期间其他实施继续，不标记整个目标blocked。
