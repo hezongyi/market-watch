@@ -1061,3 +1061,9 @@
 - /tmp/mw-feed-recovery-fixed.log与/tmp/mw-feed-recovery-isolated.log退出0：阻断真实最新行情请求→可见错误→解除阻断后200且非空bars、polling=false/pending=0、旧网络错误消失、errors=[]。
 - 隔离检查注入另一品种错误及通用保存错误，当前品种成功消息不会清掉它们；随后测试显式释放通用提示并验证另一品种错误保留、对应成功才清除。此验证针对新增轮询通道，不声称重写了所有历史错误通路。
 - 前端构建、advanced-history-reload.cjs通过；Ubuntu网页/图表镜像均acceptance-poll-state。尚须核对行情稳定性工作组的其他异常/休市及持续运行边界，不提前关闭整个工作组。
+
+### 完全休市窗口同步：新增未通过证据
+
+- 本机HTTPS三图（原生布局3s），BTCUSDT/XAUUSD/EURUSD均M5，以BTC为活动图、开启dateRangeSync，定位2026-09-26周六12:00–15:00 UTC。advanced-closed-window.browser.cjs保留诊断复现。
+- 连续两次实际运行：BTC范围1790424000–1790434800；黄金及EUR范围1790598600–1790624700，仍在周一。三个dataReady均true、rangeGuard与edgeGuard均非busy；浏览器出现message=undefined/空stack异常。不是加载锁死，但休市窗口同步未满足。
+- /tmp/mw-closed-window.log与/tmp/mw-closed-window.png为本机证据。已增加各图右边界对齐断言，测试当前应失败；尚未定位原生库与适配层各自影响，不能提前认定根因。不修改供应库，不操作Unraid。
