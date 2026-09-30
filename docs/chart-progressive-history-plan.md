@@ -381,3 +381,18 @@
 - `/tmp/mw-eight-forming-deployed.log` 已完成原生八图、三个品种、实时日期的两分钟采样及收起/展开断言，最终 errors=[]，latestRequests=29；未覆盖历史修订实际补入及所有同步场景，不能据此宣布整体交付。
 - 历史下载原先将所有失败聚合计入全局60任务阈值，可能使单品种失败阻断其他品种。候选改为正常聚合工作保持全局60阈值；每品种含失败任务仍限制60，选择下载任务时跳过该品种。失败任务保留并按原退避重试，实时通道不受该阈值影响。
 - 新回归构造EURUSD积压60失败任务且优先级高于XAUUSD，验证仍选择XAUUSD下载、EURUSD未领取、原失败任务未丢失。聚合与历史缓存11项通过，ruff通过。此队列修复尚未部署容器。
+
+### 队列隔离部署与切换性能未达标证据
+
+- 本地提交6eb362b，构建market-watch-api:queue-isolation-local，已仅更新Ubuntu acceptance的api、realtime-worker、chart-history-worker、chart-aggregation-worker并重启本地tls。后端完整隔离PG测试213 passed，18.81秒。
+- 新增advanced-switch-timing.browser.cjs：真实XAUUSD、当前日期、不替换数据响应，记录setResolution完成、dataReady及两帧requestAnimationFrame机会；后者并非GPU实际绘制完成证明。
+- 首轮实测/tmp/mw-switch-timing.log及json，第二遍M1–D1两帧机会约511–1887ms，超过200ms体验目标；不能把已有缓存/接口回调测试视为顺滑验收通过。柱距保持6。
+- 用已保存实测JSON断言200ms明确失败；浏览器脚本已补充同一阈值断言。下一步区分缓存复用条件、RPC/DB等待、原生视区恢复耗时，尚未据猜测调整实现。
+
+### 最新快照缓存边界修复及浏览器性能对照
+
+- 诊断日志/tmp/mw-switch-trace-instrumented.log显示原生请求before为秒级（例如1790797141000），预热before为分钟级（1790797140000），缓存仅差1秒也不能复用；读请求约0.3–1.7秒，对应切换等待。带200ms断言的真实浏览器基线退出1。
+- 最新首屏（firstDataRequest且截止距当前不超过2分钟）及相应预热统一使用before:null，服务端已有语义为当前最新。最新快照先返回已有数据，活动轮询与订阅继续更新；指定历史截止时间仍严格匹配且保留15秒有效期。缓存仍有64条上限。
+- 新advanced-latest-cache.cjs先复现失败，再验证超15秒的最新快照立即复用、不同数量复用、异步变化通知、历史请求隔离；连同原prewarm/progressive缓存测试均通过。诊断脚本注入已清除。
+- 候选market-watch-chart-origin:latest-cache-local已部署Ubuntu。真实浏览器不替换响应、不修改日期，两轮M1/M5/M15/M30/H1/H4/D1共14次达到两帧绘制机会约21.8–36ms（第二轮21.8–30.8ms），200ms断言通过；柱距始终6。日志/tmp/mw-switch-latest-cache.log，截图/tmp/mw-switch-timing.png已人工查看为正常D1图。该指标不是GPU绘制完成测量，不证明冷品种首屏及八图压力。
+- 尚需候选的历史回看、渐进新增/修订、Python指标与八图回归，不能据单图暖缓存性能宣告完整交付。

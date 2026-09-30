@@ -33,13 +33,17 @@ function progressiveHistory(read, needed, changed, onError, maxEntries = 64) {
     async get(args) {
       const key = keyOf(args);
       const old = pages.get(key);
-      if (old && Date.now()-old.at < 15000) return old.page;
+      // Latest snapshots are stale-while-revalidate: the active poll and live
+      // subscription refresh them without blocking a period switch.
+      if (old && (args.before == null || Date.now()-old.at < 15000)) return old.page;
       // Native countBack and end timestamps vary slightly between requests.
       // Reuse only pages that actually contain enough bars before that boundary.
       for (const entry of [...pages.values()].reverse()) {
-        if (Date.now()-entry.at>=15000 || entry.args.instrument!==args.instrument ||
-            entry.args.timeframe!==args.timeframe || entry.args.before<args.before) continue;
-        const bars=entry.page.bars.filter(bar=>bar.start<args.before).slice(-args.limit);
+        const latest = args.before == null && entry.args.before == null;
+        if ((!latest && Date.now()-entry.at>=15000) || entry.args.instrument!==args.instrument ||
+            entry.args.timeframe!==args.timeframe ||
+            (!latest && (args.before == null || entry.args.before == null || entry.args.before<args.before))) continue;
+        const bars=entry.page.bars.filter(bar=>latest || bar.start<args.before).slice(-args.limit);
         if (bars.length===args.limit) {
           const page={...entry.page,bars};
           remember(args,page);

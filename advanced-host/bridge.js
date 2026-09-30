@@ -324,7 +324,8 @@ const feed = {
       };
       if (progressivePages && !["1W", "1M"].includes(res)) {
         const args = {instrument:symbol,timeframe:frames[res],
-          before:p.to*1000+(res === "1D" ? 2*86400000 : 0),limit:Math.min(2000,requested)};
+          before:p.firstDataRequest && p.to*1000 >= Date.now()-120000
+            ? null : p.to*1000+(res === "1D" ? 2*86400000 : 0),limit:Math.min(2000,requested)};
         const rawPage = await progressivePages.get(args);
         checkActive();
         const page = decode(s.ticker).spec
@@ -1262,7 +1263,8 @@ function boot(
               if (epoch!==workspaceEpoch || !ready || widget.activeChart().symbol()!==args.instrument) break;
               if (timeframe===args.timeframe) continue;
               await progressivePages.warm({instrument:args.instrument,timeframe,
-                before:Math.floor(args.end/60000)*60000+60000+(timeframe==="D1"?2*86400000:0),
+                before:args.end >= Date.now()-120000 ? null
+                  : Math.floor(args.end/60000)*60000+60000+(timeframe==="D1"?2*86400000:0),
                 limit:Math.min(2000,args.visible*3)});
             }
             send({type:"feed-poll-state",key:"@prewarm",error:""});

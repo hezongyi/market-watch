@@ -1,0 +1,22 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+let now=1000;
+const context=vm.createContext({Map,Promise,Date:{now:()=>now},JSON});
+vm.runInContext(fs.readFileSync('../advanced-host/progressive-history.js','utf8'),context);
+(async()=>{
+ let calls=0,updates=0;
+ let bars=Array.from({length:10},(_,i)=>({start:i+1,close:i}));
+ const cache=context.progressiveHistory(async()=>{calls++;return {bars:[...bars]}},()=>true,()=>{updates++},e=>{throw e});
+ const args={instrument:'XAUUSD',timeframe:'H1',before:null,limit:10};
+ await cache.warm(args);
+ now+=30000;
+ const page=await cache.get({...args,limit:5});
+ assert.equal(calls,1,'latest snapshot must render without waiting on a reread');
+ assert.deepEqual([...page.bars.map(b=>b.start)],[6,7,8,9,10]);
+ bars.push({start:11,close:11});
+ await cache.poll();
+ assert.ok(updates>0,'latest snapshots must still refresh asynchronously');
+ const before=calls;
+ await cache.get({...args,before:8,limit:5});
+ assert.equal(calls,before+1,'historical reads must not reuse a latest page');
+ console.log('Latest snapshot immediate reuse and asynchronous refresh passed');
+})().catch(e=>{console.error(e);process.exit(1)});
