@@ -2,7 +2,7 @@
 
 日期：2026-09-29
 基线：feature/advanced-charts / d5d3bea，授权 TT v31.1.0。
-状态：需求已按用户五项答复确认；本轮更新方案，未实施下列改动，未切换生产。
+状态：需求已确认，正在独立开发与本机 Docker 验收；本文件定义范围，不表示所有条目已完成。当前证据见 advanced-charts-capability-inventory.md 与 advanced-charts-delivery-gaps.md；未切换生产。
 
 ## 1. 已确定的方向
 

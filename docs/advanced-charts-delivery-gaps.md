@@ -673,3 +673,11 @@
 - 从git2e35aa7静态适配文件+原授权包构建独立回退镜像，Compose替换chart-origin并重启TLS，HTTP返回viewports.js与2e35aa7逐字节一致；/tmp/mw-container-rollback-browser.log退出0。
 - 再恢复412703c镜像，HTTP脚本与当前代码逐字节一致；/tmp/mw-container-forward-browser.log退出0。两轮登录、图表加载、M15切换/保存、无页面异常及无跨来源凭据断言通过。
 - 演练限图表静态版本切换，未回退开发数据库；原行情/通知worker不在此Compose，不能宣称整个生产服务栈已部署验收。原生产Compose仅config合并验证，生产域名/证书配置仍待发布阶段。
+
+### 原生指标模板跨工作区与刷新验收
+
+- 新增 `web/tests/advanced-native-study-template.browser.cjs`，在本机 Compose HTTPS 环境使用真实开发 API；创建独立工作区，通过公开 API 创建 MA(21)，随后真实点击原生“指标模板 → 保存指标模板”并提交名称。
+- 读取服务器 preferences 确认 study 模板内容为库原生字符串；另建工作区并刷新，断言工作区 ID 不同且没有指标，再从原生模板菜单选择刚保存的模板。
+- 应用后 MA 参数为 length=21/source=close/offset=0，原生保存工作区、刷新后完整输入参数相等；页面异常为空。`/tmp/mw-native-study-template-reload.log` 退出0。
+- 此测试证明指标模板原生保存、跨工作区读取/应用和应用结果刷新恢复；尚不证明模板覆盖/删除、绘图样式模板和图表样式模板的完整生命周期。测试使用现有历史数据截点，不作为实时性能验收。
+- 已更新能力盘点首段，清除“worker未恢复、容器未验收、手机八图待验”等过期摘要。原始能力表仍明确标记为历史盘点，不将其当作当前完成清单。
