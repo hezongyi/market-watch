@@ -1,4 +1,4 @@
-// Development native fullscreen permissions regression.
+// Pending native save protects navigation; completed save permits HTTPS reload.
 const { chromium } = require("playwright");
 const fs = require("fs");
 (async () => {
@@ -9,6 +9,7 @@ const fs = require("fs");
       : {}),
   });
   const page = await browser.newPage({
+    ignoreHTTPSErrors: true,
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
@@ -32,7 +33,16 @@ const fs = require("fs");
     }
   });
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("http://127.0.0.1:5188/");
+  await page.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
+    const body = route.request().postDataJSON();
+    return route.continue({
+      postData: JSON.stringify({
+        ...body,
+        before: Math.min(body.before || 1790622000000, 1790622000000),
+      }),
+    });
+  });
+  await page.goto("https://localhost:15443/");
   await page
     .getByLabel("管理员密码")
     .fill(
@@ -71,8 +81,8 @@ const fs = require("fs");
         document: {
           engine: "tv31",
           schemaVersion: 1,
-          symbol: "OANDA:NZD_USD",
-          interval: "5",
+          symbol: "XAUUSD",
+          interval: "240",
         },
       });
       const catalog = await (
@@ -81,9 +91,11 @@ const fs = require("fs");
       return catalog;
     }),
   );
-  await page.goto("http://127.0.0.1:5188/advanced-charts");
+  await page.goto("https://localhost:15443/advanced-charts");
   await page.waitForTimeout(15000);
-  const frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  const frame = page
+    .frames()
+    .find((f) => f.url().startsWith("https://127.0.0.1:15444/"));
   await page.waitForTimeout(1000);
   const assert = require("node:assert/strict");
   await page.mouse.click(10, 10);
@@ -102,6 +114,11 @@ const fs = require("fs");
       await gate;
       await route.continue();
     },
+  );
+  await frame.waitForFunction(
+    () => ready && !loading && !nativeSaving && !rangeGuard?.busy(),
+    null,
+    { timeout: 60000 },
   );
   await frame.evaluate(() => snapshot());
   await pendingSave;
@@ -122,6 +139,20 @@ const fs = require("fs");
   });
   await page.reload();
   assert.equal(unexpectedDialog, false);
+  let historyRequests = 0;
+  page.on("request", (r) => {
+    if (/\/api\/(charts\/data|market-data\/history)$/.test(r.url()))
+      historyRequests++;
+  });
+  await page.goto("https://localhost:15443/");
+  const afterExit = historyRequests;
+  await page.waitForTimeout(17000);
+  assert.equal(
+    historyRequests,
+    afterExit,
+    "Chart history polling must stop after leaving module",
+  );
+  assert.deepEqual(errors, []);
   console.log(
     "UNLOAD_GUARD_PASSED: pending save prompts; successful save permits reload",
   );

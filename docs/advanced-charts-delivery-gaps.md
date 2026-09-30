@@ -896,3 +896,9 @@
 - 五组JS单测advanced-history-reload、advanced-python-indicators、advanced-preferences、advanced-native-workspaces、advanced-chart-style全部通过，覆盖轮询故障恢复、指标缺失值、偏好命名空间、工作区并发/只读与样式白名单。
 - 后端advanced_preferences、advanced_workspace、chart_export、backup组合16 passed、1 skipped。跳过项为未配置独立PG服务的真实恢复；此前隔离PG14完整backup测试5 passed仍有效，不把此次skip当作通过。单条Starlette/httpx弃用提醒。
 - 更新当前清单的基线和下一步顺序，移除对已完成模板/收藏/新增表恢复重复验收的过时安排。没有修改生产服务或升级验收容器镜像。
+
+### HTTPS离开保护与停止轮询
+
+- 更新advanced-unload.browser.cjs到当前HTTPS验收容器；暂停原生保存请求期间刷新触发beforeunload，取消离开后释放请求，实际服务器保存完成；再次刷新不出现未保存提示。
+- 返回主站后额外观察17秒（超过15秒轮询周期），图表history/charts-data请求数不再增加，errors=[]。/tmp/mw-unload-fixed-history.log退出0。
+- 首轮未限定日期触发最新历史error，主动停止该测试；随后固定已缓存截止时间验证离开行为，不改行情响应。该测试不证明任意未保存操作都会自动完成保存，也不替代冷补数故障验收。
