@@ -444,3 +444,26 @@ class AdvancedPreference(Base):
     content: Mapped[dict] = mapped_column(JSON)
     revision: Mapped[int] = mapped_column(default=1)
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class ChartHistoryPlan(Base):
+    """One durable, expanding M1 acquisition envelope per instrument."""
+    __tablename__ = "chart_history_plans"
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
+    target_start: Mapped[int] = mapped_column(BigInteger)
+    target_end: Mapped[int] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class ChartViewportDemand(Base):
+    """Expiring interaction priority; expiry never deletes the durable plan."""
+    __tablename__ = "chart_viewport_demands"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), index=True)
+    timeframe: Mapped[str] = mapped_column(String(8))
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    warm_start: Mapped[int] = mapped_column(BigInteger)
+    focused: Mapped[bool] = mapped_column(Boolean)
+    expires: Mapped[int] = mapped_column(BigInteger, index=True)
