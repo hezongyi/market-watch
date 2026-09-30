@@ -1048,3 +1048,9 @@
 - advanced-quote-details.browser.cjs读取真实XAUUSD报价，原生详情全文匹配description（bid/M1/时间/质量）及两位价格；ask/volume/market_cap未提供，界面无NaN/undefined/null，/tmp/mw-quote-details-verified.log退出0。
 - 目视/tmp/mw-quote-details.png：空自选列表有明确添加引导，详情缺失字段未显示虚假0；初次探查显示“报价待更新”，后续真实更新显示“最近更新”。两者与开市标记并列，行情新鲜度和交易时段为不同状态。
 - 图表查询固定历史截止而报价为当前M1，所以图上历史收盘与详情当前价不同属本测试设置，不作相等断言。六项报价后端测试与真实界面共同覆盖报价口径/空字段要求；不宣称接入ask点差或成交量。报价展示工作组闭合。
+
+### 行情网络恢复发现状态提示残留
+
+- advanced-feed-recovery.browser.cjs在本机真实图表初始化后阻断/api/charts/data，实际一次最新K线查询失败；解除阻断后下一tick获得200且bars非空，polling=false、pending=0、pageErrors=[]。
+- /tmp/mw-feed-recovery.log仍显示alerts=[Error: TypeError: Failed to fetch重新加载]，恢复成功后旧错误未清除。测试新增恢复后无此旧提示断言，作为待修复要求。不能将首轮网络通路恢复计为整个断线恢复验收通过。
+- 下一步应隔离行情错误与其他保存/设置错误，只在对应行情真正恢复后清除，避免任意成功请求掩盖其他未解决错误。产品尚未修改。
