@@ -47,15 +47,18 @@ def history_start(inst, timeframe, end, count):
     raise ValueError("No sufficient scheduled trading history")
 
 
-def update_demand(db, *, ident, instrument, timeframe, end, visible, focused, now):
+def update_demand(db, *, ident, instrument, timeframe, end, visible, focused, now, required=None):
     if timeframe not in FRAMES or not 1 <= visible <= 2000:
         raise ValueError("Invalid viewport demand")
     # Calendar scanning is CPU work and must happen before the writer lock.
     inst = db.get(Instrument, instrument)
     if inst is None:
         raise ValueError("Instrument must be resolved before demand registration")
-    start = history_start(inst, timeframe, end, visible)
-    warm = history_start(inst, timeframe, end, visible * 3)
+    required = max(visible, required or visible)
+    if required > 6000:
+        raise ValueError("单次指标历史需求超过6000根，请缩小计算窗口")
+    start = history_start(inst, timeframe, end, required)
+    warm = history_start(inst, timeframe, end, max(required, visible * 3))
     daily = history_start(inst, "D1", end, visible * 3)
     target = min(warm, daily)
     # Serialize the brief target merge, not calendar calculation or network I/O.

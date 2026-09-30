@@ -35,6 +35,7 @@ const quoteSubscriptions = new Map();
 const lastHistory = new Map();
 const firstHistory = new Map();
 const pendingHistory = new Map();
+const indicatorHistoryNeeds = new Map();
 const failedHistory = new Map();
 let retryDialogOpen = false;
 function rememberHistoryFailure(args, state) {
@@ -298,6 +299,9 @@ const feed = {
       const symbol = decode(s.ticker).symbol;
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
+      const historyKey=decode(s.ticker).symbol+"|"+res;
+      indicatorHistoryNeeds.set(historyKey, Math.max(indicatorHistoryNeeds.get(historyKey)||0,requested));
+      if (indicatorHistoryNeeds.size>64) indicatorHistoryNeeds.delete(indicatorHistoryNeeds.keys().next().value);
       const epoch = workspaceEpoch;
       const completeTerminal = rangeGuard?.captureTerminalCompletion(
         (chart) => chart.symbol() === s.ticker && chart.resolution() === res,
@@ -1185,6 +1189,7 @@ function boot(
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
+      indicatorHistoryNeeds.clear();
       viewportRestoring = false;
       loading = true;
       dirty = false;
@@ -1230,7 +1235,12 @@ function boot(
         send({type:"history-views",keys:Array.from({length:widget.chartsCount()},(_,i)=> {
           const chart=widget.chart(i);return chart.symbol()+"|"+chart.resolution();
         })});
-        const result = await request({op: "historyDemand", args}, "market");
+        const res=Object.keys(frames).find(key=>frames[key]===args.timeframe);
+        const required=indicatorHistoryNeeds.get(args.instrument+"|"+res);
+        if (required>6000) send({type:"feed-poll-state",key:"@indicator-history",
+          error:"指标请求超过6000根历史，请缩小指标计算窗口"});
+        const result = await request({op: "historyDemand", args:{...args,
+          required:Math.min(6000,Math.max(args.visible,required||0))}}, "market");
         send({type: "feed-poll-state", key: "@history-demand", error: ""});
         // At most one sequential cache-only prewarm chain. Never schedules
         // provider downloads; the durable D1 envelope already covers demand.

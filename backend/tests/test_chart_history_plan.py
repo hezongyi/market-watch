@@ -181,3 +181,16 @@ def test_new_foreground_displaces_deep_queue_without_losing_target(database):
         assert sum(j.status=='superseded' for j in jobs)==1
         assert any(j.priority==100 and j.status=='pending' for j in jobs)
         assert plan.target_start==target
+
+
+def test_indicator_warmup_extends_current_period_without_inflating_daily_target(database):
+    from alerts.chart_history_plan import history_start
+    from alerts.storage import ChartViewportDemand
+    end = ms(datetime(2026, 9, 28, 12, tzinfo=UTC))
+    with database.begin() as db:
+        inst=db.get(Instrument,'EURUSD')
+        plan=update_demand(db,ident='pane',instrument='EURUSD',timeframe='H1',
+            end=end,visible=20,required=200,focused=True,now=end)
+        demand=db.get(ChartViewportDemand,'pane')
+        assert demand.start==history_start(inst,'H1',end,200)
+        assert plan.target_start==history_start(inst,'D1',end,60)

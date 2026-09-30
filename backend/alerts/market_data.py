@@ -156,6 +156,7 @@ class ViewportDemandQuery(BaseModel):
     end: int = Field(gt=0)
     visible: int = Field(ge=1, le=2000)
     focused: bool = True
+    required: int | None = Field(default=None, ge=1, le=6000)
 
 
 class ViewportQuery(BaseModel):
@@ -629,7 +630,7 @@ def router(authenticated):
             try:
                 plan = update_demand(db, ident=body.id, instrument=body.instrument,
                     timeframe=body.timeframe, end=min(body.end, (now - 5000) // 60000 * 60000),
-                    visible=body.visible, focused=body.focused, now=now)
+                    visible=body.visible, focused=body.focused, now=now, required=body.required)
             except ValueError as error:
                 raise HTTPException(422, str(error)) from error
             return {"target_start": plan.target_start, "target_end": plan.target_end,
