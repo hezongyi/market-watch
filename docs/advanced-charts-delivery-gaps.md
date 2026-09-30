@@ -1104,3 +1104,9 @@
 - 新增advanced-crosshair-price.browser.cjs：EURUSD/XAUUSD/BTCUSDT三列M5，原生crosshairSync开启。仅在验收工作区通过公开override把十字线设为鲜明紫色，鼠标移入EURUSD，用canvas像素区分竖向时间线与横向价格线。
 - /tmp/mw-crosshair-price-asserted.log实际退出0：三个主画布竖列紫色像素均841，活动EURUSD横行314像素；XAU/BTC横行最多2像素（竖线宽度），断言非活动异品种无水平价格线通过。三个价格轴range鼠标前后逐值一致。/tmp/mw-crosshair-price-isolation.png已目视，三图时间标签均2026-09-28 18:10。
 - 旧crossHairMoved消息携带相同price不能用来判定视觉价格联动：本次真实渲染和价格轴证据覆盖首发三品种正常价格范围，不宣称任意新增品种价格区间重叠时库都会按symbol屏蔽横线。产品代码未改动，errors=[]。
+
+### 比较图、独立价格轴及百分比保存
+
+- advanced-comparison-axes.browser.cjs在BTCUSDT H1主图添加原生Compare/XAUUSD，使用new-left轴。真实加载后黄金轴4093.72–4398.85、BTC轴82090.84–87985.88，比较symbol被hasHistoryViewer纳入供数。
+- 两侧均切换百分比mode2，原生保存、刷新后BTC/H1、XAUUSD比较输入、两侧[2,2]和供数跟踪均恢复。/tmp/mw-comparison-axes.log退出0、errors=[]。两张截图分别为/tmp/mw-compare-independent-axes.png和/tmp/mw-compare-percent-restored.png；后者已目视显示左右百分比轴、BTC蜡烛、黄金比较线与图例。
+- 截图覆盖周末：原生比较线在黄金休市区间连接前后交易点，这是库的显示行为，不是行情后台生成休市价格。已写入使用说明。验证范围为实际不同session品种的比较、轴分离、百分比及持久化，不声称所有内置比较算法逐值审计。
