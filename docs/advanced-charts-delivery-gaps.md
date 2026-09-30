@@ -855,3 +855,9 @@
 - 扩展advanced-drawing-management.browser.cjs：为目标水平线设置鲜明颜色与宽4，通过公开价格轴接口固定4200–4400范围，读取图表canvas像素作对照。原生属性里小时关闭→开启→关闭，目标颜色像素增加后回落；保持分钟开启切换M15，绘制像素再次增加。
 - /tmp/mw-drawing-visibility-periods.log退出0，H4计数5109→10222→5109，M15为10537，errors=[]。这里使用增量断言，因为其他线可能继承相同默认色，背景计数不一定为0；前轮单独H4测试计数0→5113→0。
 - 原有服务器保存、刷新恢复、层级相对顺序断言同时通过。未用配置字段冒充实际绘制证据，也未修改canvas或供应库。范围为同一XAUUSD水平线在H4/M15上的代表性交互。
+
+### 原生截图四图/八图与双主题
+
+- advanced-screenshot-matrix.browser.cjs在本机HTTPS容器中切换4、8布局，逐图dataReady后切换Light/Dark，通过原生生成快照→下载图片完成四次下载；验证PNG签名、尺寸及无pageerror，并恢复初始主题。
+- /tmp/mw-screenshot-matrix-final.log退出0、errors=[]。逐张查看导出图片，四/八窗格均有K线、价格轴、时间轴；浅底深字/深底浅字正确，无空白窗格或整体裁切。八图窄窗格标题按原生省略显示。
+- 图片留存docs/evidence/native-screenshots/{4,8}-{light,dark}.png。样例为XAUUSD H4，证据针对布局及主题的导出能力，不扩展为所有品种/指标截图验证。
