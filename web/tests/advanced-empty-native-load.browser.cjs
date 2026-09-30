@@ -121,6 +121,138 @@ const assert = require("node:assert/strict");
     await fresh.evaluate(() => widget.activeChart().getAllStudies().length),
     0,
   );
+  await fresh.evaluate(async (id) => {
+    const rows = await new Promise((ok) => widget.getSavedCharts(ok));
+    await widget.loadChartFromServer(rows.find((r) => String(r.id) === id));
+  }, originalWorkspace);
+  await fresh.waitForFunction(
+    () => ready && !loading && widget.activeChart().dataReady(),
+    null,
+    { timeout: 30000 },
+  );
+  const restoredAnalysis = await fresh.evaluate(() => {
+    const c = widget.activeChart(),
+      shapes = c.getAllShapes(),
+      studies = c.getAllStudies();
+    return {
+      shapes: shapes.length,
+      price: c.getShapeById(shapes[0].id).getPoints()[0].price,
+      studies: studies.length,
+      inputs: c.getStudyById(studies[0].id).getInputValues(),
+    };
+  });
+  assert.equal(restoredAnalysis.shapes, 1);
+  assert.equal(restoredAnalysis.price, 4300);
+  assert.equal(restoredAnalysis.studies, 1);
+  assert.ok(
+    restoredAnalysis.inputs.some(
+      (input) => input.id === "length" && input.value === 21,
+    ),
+  );
+  assert.equal(
+    await page
+      .locator("iframe[data-workspace-id]")
+      .getAttribute("data-workspace-id"),
+    originalWorkspace,
+  );
+  const mobileBlank = await page.evaluate(async () => {
+    const session = await (await fetch("/api/session")).json();
+    const r = await fetch("/api/advanced-charts/workspaces", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": session.csrf,
+      },
+      body: JSON.stringify({ name: "手机空白切换验收" }),
+    });
+    if (!r.ok) throw Error("create " + r.status);
+    return r.json();
+  });
+  const mobile = await browser.newPage({
+    ignoreHTTPSErrors: true,
+    viewport: { width: 412, height: 915 },
+    isMobile: true,
+    hasTouch: true,
+    storageState: await page.context().storageState(),
+  });
+  await page.close();
+  await mobile.goto("https://localhost:15443/");
+  const serverBefore = await mobile.evaluate(async () =>
+    (await fetch("/api/advanced-charts/workspaces")).json(),
+  );
+  const writes = [];
+  mobile.on("pageerror", (e) => errors.push(e.message));
+  mobile.on("request", (r) => {
+    if (r.method() === "POST" && r.url().includes("/api/advanced-charts/"))
+      writes.push(new URL(r.url()).pathname);
+  });
+  await mobile.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
+    const q = route.request().postDataJSON();
+    return route.continue({
+      postData: JSON.stringify({
+        ...q,
+        before: Math.min(q.before || 1790622000000, 1790622000000),
+      }),
+    });
+  });
+  await mobile.goto("https://localhost:15443/advanced-charts");
+  await mobile.waitForTimeout(15000);
+  let mf = mobile
+    .frames()
+    .find((f) => f.url().startsWith("https://127.0.0.1:15444/"));
+  await mf.waitForFunction(
+    () => ready && !loading && widget.activeChart().dataReady(),
+    null,
+    { timeout: 30000 },
+  );
+  await mf.evaluate(async (id) => {
+    const rows = await new Promise((ok) => widget.getSavedCharts(ok));
+    await widget.loadChartFromServer(rows.find((r) => String(r.id) === id));
+  }, originalWorkspace);
+  await mf.waitForFunction(
+    () => ready && !loading && widget.activeChart().dataReady(),
+    null,
+    { timeout: 30000 },
+  );
+  assert.equal(
+    await mf.evaluate(() => widget.activeChart().getAllShapes().length),
+    1,
+  );
+  await mf.evaluate(async (id) => {
+    const rows = await new Promise((ok) => widget.getSavedCharts(ok));
+    void widget.loadChartFromServer(rows.find((r) => String(r.id) === id));
+  }, mobileBlank.id);
+  await mobile.waitForFunction(
+    (id) =>
+      document.querySelector("iframe[data-workspace-id]")?.dataset
+        .workspaceId === id,
+    mobileBlank.id,
+  );
+  await mobile.waitForTimeout(15000);
+  mf = mobile
+    .frames()
+    .find((f) => f.url().startsWith("https://127.0.0.1:15444/"));
+  await mf.waitForFunction(
+    () => ready && !loading && widget.activeChart().dataReady(),
+    null,
+    { timeout: 30000 },
+  );
+  assert.deepEqual(
+    await mf.evaluate(() => ({
+      count: widget.chartsCount(),
+      shapes: widget.activeChart().getAllShapes().length,
+      studies: widget.activeChart().getAllStudies().length,
+    })),
+    { count: 1, shapes: 0, studies: 0 },
+  );
+  assert.deepEqual(writes, []);
+  assert.deepEqual(
+    await mobile.evaluate(async () =>
+      (await fetch("/api/advanced-charts/workspaces")).json(),
+    ),
+    serverBefore,
+  );
+  await mobile.close();
   assert.deepEqual(errors, []);
   console.log("EMPTY_NATIVE_WORKSPACE_LOAD_PASSED");
   await browser.close();

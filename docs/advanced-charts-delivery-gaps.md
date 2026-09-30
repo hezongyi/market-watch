@@ -755,3 +755,9 @@
 - 父页面读取到缺失或空state的工作区时，使用现有select路径重新初始化独立widget，复用该工作区ID/配置；不构造供应商私有空快照、不复制当前图的指标或画线。已有state继续原生加载。
 - 原web Dockerfile构建acceptance-empty-load并更新本机验收Compose；/tmp/mw-empty-native-fixed.log退出0，目标ID正确、图表dataReady、画线/指标均为0、errors=[]。
 - 手机空白切换和返回旧工作区保存内容仍需补验；此次通过不覆盖它们。unraid未操作。
+
+### 空白工作区往返及手机只读收口
+
+- 桌面从含4300水平线与MA(21)的已存工作区进入空白，再原生加载回原工作区：ID、线条价格及MA参数全部保留，/tmp/mw-empty-return.log退出0。
+- 同一专项新增独立手机context：已存分析→无state空白工作区，最终一图、零画线/指标；advanced-charts POST为空，服务器工作区完整列表前后相等，errors=[]。/tmp/mw-empty-mobile-isolated.log退出0。
+- 首轮比较被尚开着的桌面页自动保存改变排序/版本干扰；手机POST记录仍为空。测试改为关闭桌面页再取服务器基线，不放宽相等断言，不修改产品。
