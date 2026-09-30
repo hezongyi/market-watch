@@ -320,3 +320,9 @@
 - MARKET_WATCH_MIXED_SOAK=1运行当前异步容器，黄金/欧元/比特币八图加原生均线，两分钟24次最新行情请求，3订阅/3组，无pendingHistory，内存增长门槛及收起/恢复轮询断言通过。
 - 最终页面错误断言失败：捕获11次Value is undefined。日志/tmp/mw-eight-mixed.log。不能声明混合八图通过，必须定位并修复。
 - 增强同一复现脚本记录pageerror堆栈和initialization/mixed-symbols-and-studies/polling-soak/collapse/expand阶段，未删除或放宽原错误断言；下一轮重跑获取定位证据。
+
+### 混合八图错误堆栈定位
+
+- 加阶段/堆栈后重跑仍失败，日志/tmp/mw-eight-mixed-stacks.log。错误发生在collapse阶段（八图→单图），此前polling-soak采样未记录pageerror。
+- 堆栈为原生nearestIndex→gotoTimeRange→seriesCompleted，位于公开setLayout触发的异步数据完成期间。说明需要检查布局变化与历史刷新/视区恢复的竞争；尚不能仅凭堆栈认定库缺陷或具体自有代码根因。
+- 保留失败用例。下一步应缩小为混合图布局收起/恢复，分别控制渐进轮询和日期同步，验证旧pane刷新生命周期取消，不修改vendor私有代码。
