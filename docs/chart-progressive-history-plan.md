@@ -314,3 +314,9 @@
 - 当前异步容器运行advanced-eight-chart-soak.browser.cjs通过：两分钟8次采样，8图同品种同周期共用1组/1订阅；最新数据请求8次，无pendingHistory，RPC pending样本0至4。
 - 两分钟JS堆增长未超过测试64MiB限制；收起到单图只查询1组，恢复八图仍1组，页面错误[]。日志/tmp/mw-eight-progressive.log。
 - 测试复用已有历史，且旧history/data接口带固定历史截止，不是八图同时冷补数/混合周期性能验收。混合品种与跨周期时间同步仍待本轮验证。
+
+### 混合八图发现原生异常，验收未通过
+
+- MARKET_WATCH_MIXED_SOAK=1运行当前异步容器，黄金/欧元/比特币八图加原生均线，两分钟24次最新行情请求，3订阅/3组，无pendingHistory，内存增长门槛及收起/恢复轮询断言通过。
+- 最终页面错误断言失败：捕获11次Value is undefined。日志/tmp/mw-eight-mixed.log。不能声明混合八图通过，必须定位并修复。
+- 增强同一复现脚本记录pageerror堆栈和initialization/mixed-symbols-and-studies/polling-soak/collapse/expand阶段，未删除或放宽原错误断言；下一轮重跑获取定位证据。

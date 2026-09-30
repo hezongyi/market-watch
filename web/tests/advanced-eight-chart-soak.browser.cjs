@@ -13,7 +13,11 @@ const assert = require("node:assert/strict");
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
-  page.on("pageerror", (e) => errors.push(e.message));
+  let phase = "initialization";
+  page.on("pageerror", (e) => {
+    errors.push(e.message);
+    console.log("EIGHT_CHART_ERROR", JSON.stringify({phase, message:e.message, stack:e.stack}));
+  });
   await page.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
     const body = route.request().postDataJSON();
     return route.continue({
@@ -80,6 +84,7 @@ const assert = require("node:assert/strict");
   );
   const mixed = process.env.MARKET_WATCH_MIXED_SOAK === "1";
   if (mixed) {
+    phase = "mixed-symbols-and-studies";
     await frame.evaluate(async () => {
       widget.symbolSync().setValue(false);
       const symbols = ["XAUUSD", "EURUSD", "BTCUSDT"];
@@ -108,6 +113,7 @@ const assert = require("node:assert/strict");
       latestRequests++;
   });
   const samples = [];
+  phase = "polling-soak";
   for (let i = 0; i < 8; i++) {
     await page.waitForTimeout(15000);
     const sample = await frame.evaluate(() => ({
@@ -151,6 +157,7 @@ const assert = require("node:assert/strict");
   await frame.evaluate(() => clearInterval(poll));
   await frame.waitForFunction(() => !polling);
   await page.waitForTimeout(1100);
+  phase = "collapse";
   await frame.evaluate(() => widget.setLayout("s"));
   await frame.waitForFunction(() => widget.chartsCount() === 1);
   await frame.waitForFunction(() => !polling);
@@ -158,6 +165,7 @@ const assert = require("node:assert/strict");
   await frame.evaluate(() => tick());
   assert.equal(latestRequests - singleStart, 1,
     "Hidden subscriptions must not issue extra queries");
+  phase = "expand";
   await frame.evaluate(() => widget.setLayout("8"));
   await frame.waitForFunction(() => widget.chartsCount() === 8);
   await frame.waitForFunction(() => !polling);
