@@ -244,3 +244,31 @@ def test_boundary_gap_scan_matches_reference_across_both_dst_changes():
                     end = start+timedelta(hours=hours)
                     assert bucket_has_trading(start, end, calendar, gold, (closure,)) == (
                         has_trading_gap(start, end, calendar, gold=gold, closures=(closure,)))
+
+
+def test_plan_waits_for_aggregation_and_retry_resets_backoff(database, monkeypatch):
+    from alerts import market
+    from alerts.chart_history_plan import advance_plan, control_plan, plan_status
+    from alerts.storage import ChartAggregationJob
+
+    end = ms(datetime(2026, 9, 28, 12, tzinfo=UTC))
+    with database.begin() as db:
+        plan = update_demand(db, ident='pane', instrument='EURUSD', timeframe='H1',
+                             end=end, visible=5, focused=True, now=end)
+        monkeypatch.setattr(market, 'stored_coverage', lambda *args: [
+            {'start': plan.target_start, 'end': plan.target_end}])
+        task = ChartAggregationJob(instrument_id='EURUSD', timeframe='H1',
+            start=end-60000, end=end, attempts=3, next_at=end+300000, error='ValueError')
+        db.add(task)
+        db.flush()
+        assert not advance_plan(db, plan, end)
+        assert plan.status == 'pending'
+        status = plan_status(db, plan, end)
+        assert status['aggregation_pending'] == status['aggregation_failed'] == 1
+        assert status['covered_ms'] == status['total_ms']
+        control_plan(db, 'EURUSD', 'retry', end)
+        assert task.next_at == end and task.error is None and task.attempts == 0
+        db.delete(task)
+        db.flush()
+        assert not advance_plan(db, plan, end)
+        assert plan.status == 'complete'

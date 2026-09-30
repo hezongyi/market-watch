@@ -6,7 +6,14 @@ from sqlalchemy import select
 from .calendar_profile import closures_from
 from .chart_data import bounds
 from .domain import Calendar, bucket_bounds, scheduled_open
-from .storage import ChartHistoryPlan, ChartViewportDemand, Instrument, instant, ms
+from .storage import (
+    ChartAggregationJob,
+    ChartHistoryPlan,
+    ChartViewportDemand,
+    Instrument,
+    instant,
+    ms,
+)
 
 FRAMES = {"M1", "M5", "M15", "M30", "H1", "H4", "D1"}
 
@@ -124,7 +131,12 @@ def advance_plan(db, plan, now):
             job.priority = min((priority for left, right, priority in regions
                                 if job.cursor < right and job.end > left), default=300)
     if covers_interval(coverage, plan.target_start, plan.target_end):
-        plan.status = "complete"
+        pending_aggregation = db.scalar(select(ChartAggregationJob.id).where(
+            ChartAggregationJob.instrument_id == inst.id,
+            ChartAggregationJob.start < plan.target_end,
+            ChartAggregationJob.end > plan.target_start).limit(1))
+        if pending_aggregation is None:
+            plan.status = "complete"
         return False
     reserved = coverage + [{"start": job.cursor, "end": job.end} for job in jobs]
     for left, right, priority in regions:
@@ -179,7 +191,14 @@ def plan_status(db, plan, now):
     jobs = list(db.scalars(select(ImportJob).where(
         ImportJob.instrument_id == plan.instrument_id, ImportJob.chart_plan.is_(True),
         ImportJob.status.in_(['pending','running','failed']))))
-    return dict(instrument=plan.instrument_id, status=plan.status,
+    aggregation = list(db.scalars(select(ChartAggregationJob).where(
+        ChartAggregationJob.instrument_id == plan.instrument_id,
+        ChartAggregationJob.start < plan.target_end,
+        ChartAggregationJob.end > plan.target_start)))
+    status = 'pending' if aggregation and plan.status == 'complete' else plan.status
+    return dict(instrument=plan.instrument_id, status=status,
+                aggregation_pending=len(aggregation),
+                aggregation_failed=sum(job.error is not None for job in aggregation),
                 start=plan.target_start, end=plan.target_end,
                 covered_ms=total-missing, total_ms=total,
                 priority=priority_regions(db,plan,now)[0][2],
@@ -223,6 +242,13 @@ def control_plan(db, instrument, action, now):
             job.next_at = now
             job.error = None
             job.lease_until = None
+    if action == 'retry':
+        for aggregate_job in db.scalars(select(ChartAggregationJob).where(
+                ChartAggregationJob.instrument_id == instrument,
+                ChartAggregationJob.error.is_not(None))):
+            aggregate_job.next_at = now
+            aggregate_job.error = None
+            aggregate_job.attempts = 0
     plan.updated_at=now
     db.flush()
     return plan
