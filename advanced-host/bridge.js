@@ -604,8 +604,9 @@ async function tick() {
             }
         }
         if (needsReload) reloadHistory(decode(first.symbol).symbol, first.res);
+        send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: "" });
       } catch (e) {
-        send({ type: "error", error: String(e) });
+        send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: String(e) });
       }
     }
   } finally {

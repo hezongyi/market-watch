@@ -1054,3 +1054,10 @@
 - advanced-feed-recovery.browser.cjs在本机真实图表初始化后阻断/api/charts/data，实际一次最新K线查询失败；解除阻断后下一tick获得200且bars非空，polling=false、pending=0、pageErrors=[]。
 - /tmp/mw-feed-recovery.log仍显示alerts=[Error: TypeError: Failed to fetch重新加载]，恢复成功后旧错误未清除。测试新增恢复后无此旧提示断言，作为待修复要求。不能将首轮网络通路恢复计为整个断线恢复验收通过。
 - 下一步应隔离行情错误与其他保存/设置错误，只在对应行情真正恢复后清除，避免任意成功请求掩盖其他未解决错误。产品尚未修改。
+
+### 最新K线轮询恢复提示修复
+
+- bridge对每个symbol|resolution发送feed-poll-state，主站单独保存轮询错误映射；同组查询成功仅清除该组错误，工作区切换清空该映射。通用保存/设置错误仍走原通路。
+- /tmp/mw-feed-recovery-fixed.log与/tmp/mw-feed-recovery-isolated.log退出0：阻断真实最新行情请求→可见错误→解除阻断后200且非空bars、polling=false/pending=0、旧网络错误消失、errors=[]。
+- 隔离检查注入另一品种错误及通用保存错误，当前品种成功消息不会清掉它们；随后测试显式释放通用提示并验证另一品种错误保留、对应成功才清除。此验证针对新增轮询通道，不声称重写了所有历史错误通路。
+- 前端构建、advanced-history-reload.cjs通过；Ubuntu网页/图表镜像均acceptance-poll-state。尚须核对行情稳定性工作组的其他异常/休市及持续运行边界，不提前关闭整个工作组。

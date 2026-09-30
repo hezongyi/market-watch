@@ -88,6 +88,16 @@ const assert = require("node:assert/strict");
   assert.equal(await frame.evaluate(()=>polling),false);
   assert.equal(await frame.evaluate(()=>pending.size),0);
   await page.waitForFunction(()=>![...document.querySelectorAll('[role="alert"]')].some(el=>el.textContent.includes('Failed to fetch')),null,{timeout:5000});
+  await frame.evaluate(()=>{
+    send({type:'error',error:'验收：保存失败，请重试'});
+    send({type:'feed-poll-state',key:'EURUSD|5',error:'验收：另一品种仍断线'});
+    send({type:'feed-poll-state',key:'XAUUSD|240',error:''});
+  });
+  await page.getByRole('alert').filter({hasText:'验收：保存失败，请重试'}).waitFor();
+  await frame.evaluate(()=>send({type:'status',text:'行情已加载'}));
+  await page.getByRole('alert').filter({hasText:'验收：另一品种仍断线'}).waitFor();
+  await frame.evaluate(()=>send({type:'feed-poll-state',key:'EURUSD|5',error:''}));
+  await page.waitForFunction(()=>document.querySelectorAll('[role="alert"]').length===0);
   assert.deepEqual(errors,[]);
   console.log('FEED_NETWORK_RECOVERED',{blocked,alerts:await alert.allTextContents(),errors});
   await browser.close();

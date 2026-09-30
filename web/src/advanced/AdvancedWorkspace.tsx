@@ -29,6 +29,7 @@ export default function AdvancedWorkspace() {
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
   const [feedError, setFeedError] = useState("");
+  const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
   const frame = useRef<HTMLIFrameElement>(null),
@@ -67,6 +68,7 @@ export default function AdvancedWorkspace() {
       }, 15000);
     });
   const select = (row: Workspace) => {
+    setPollErrors({});
     unsaved.current = false;
     current.current = row;
     blocked.current =
@@ -150,6 +152,15 @@ export default function AdvancedWorkspace() {
         if (m.action === "home") location.assign("/");
         else if (!mobile && m.action === "create") await create();
       } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
+      else if (m.type === "feed-poll-state") {
+        if (typeof m.key !== "string" || m.key.length > 2000) return;
+        setPollErrors(previous => {
+          const next = { ...previous };
+          if (m.error) next[m.key] = String(m.error).slice(0, 500);
+          else delete next[m.key];
+          return next;
+        });
+      }
       else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
       else if (m.type === "native-saving") {
         if (!mobile) unsaved.current = true;
@@ -548,9 +559,9 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
-      {(error || feedError) && (
+      {(error || feedError || Object.keys(pollErrors).length > 0) && (
         <div role="alert" className="advanced-error">
-          {error || feedError}
+          {error || feedError || Object.values(pollErrors).join("；")}
           {!mobile && blocked.current && (
             <button onClick={copy}>复制恢复草稿</button>
           )}

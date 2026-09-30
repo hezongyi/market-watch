@@ -11,7 +11,7 @@ const context = vm.createContext({
   Intl,
   Error,
   location: { search: "?parent=http://localhost" },
-  parent: { postMessage(message) { if (message.type === "error") events.push("error:" + message.error); } },
+  parent: { postMessage(message) { if (message.type === "error" || (message.type === "feed-poll-state" && message.error)) events.push("error:" + message.error); } },
   crypto: { randomUUID: () => "test" },
   addEventListener() {},
   setTimeout,
