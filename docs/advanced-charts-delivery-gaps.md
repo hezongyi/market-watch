@@ -619,3 +619,10 @@
 - /tmp/mw-resizer-sync-state.log退出0：timeSync=true、rangeSync=true，两图实际视区均from=1790592300、to=1790624700。此前截图标签密度不同不足以证明范围失步，未复现该推测，不修改同步产品逻辑。
 - 将鼠标拖动后（保存前）及刷新后的两侧边界差不超过一根M5纳入断言；/tmp/mw-resizer-sync-asserted.log退出0，宽度654/414恢复、视区边界完全一致、页面异常为空。
 - 该结论覆盖此次2h双图同品种M5分隔线操作；不扩张为黄金跨session、多品种各周期、所有复杂布局分隔线均已验收。
+
+### 绘图分组与黄金休市复现
+
+- advanced-drawing-groups.browser.cjs验证水平线+趋势线分组，组名/成员/Locked/Invisible原生保存刷新完全一致；解锁显示，点击原生对象树看到分组，删除趋势线后undo恢复同组成员、redo删除、再次undo恢复。/tmp/mw-drawing-group-undo-fixed.log退出0、无页面异常；对象树截图已查看。若面板已打开不重复切换关闭，修复的是测试前置状态。
+- 黄金休市真实历史对照：target=1790274600..1790285400（2026-09-24 18:30..21:30 UTC），八图同步后XAU M5/M15右边界1790287200（22:00），单独公开setVisibleRange后XAU M5右边界1790283300（20:55），/tmp/mw-gold-session-direct.log退出1。证明同步与单独设置不同，不以休市为由直接豁免。
+- 假设按顺序：原生同步缺口取整、session描述、现有edgeRangeSync仅覆盖正rightOffset。已启动仅session覆盖对照/tmp/mw-gold-session-override.log（session84330），尚未有结果，不修改产品。
+- session84330退出1，显式黄金session覆盖仍是同样22:00对20:55差异；该对照不支持仅修改session就能修复。下一步验证历史休市空档是否需要公开范围校正，仍不得伪造休市K线。
