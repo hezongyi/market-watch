@@ -995,3 +995,18 @@
 - 此次后端回归不替代原监控网页交互、实际通知投递或所有浏览器验收；未接触生产环境。
 
 - 指标模板删除截图/tmp/mw-study-remove-dialog.png确认：库弹出英文“Delete this template?”，按钮为Delete而非“是”。已按实际按钮补点击并移除诊断；/tmp/mw-async-verified-*.log顺序复核仍在运行。该原生局部英文提示是授权包现状，不修改供应商文件。
+
+### 异步等待修正后的有效复核结果
+
+- /tmp/mw-async-verified-native-study-template.log退出0：原生Delete确认后真正等到服务端删除，已应用MA34及参数仍保留、errors=[]。加上已通过图表样式、绘图模板，三类模板生命周期复核闭合。
+- /tmp/mw-async-verified-mixed-viewport.log退出0：本机HTTPS八图混合品种/周期，固定2026-09-25 15:00–18:00 UTC交易窗口；真实鼠标十字线/缩放/拖动、关闭同步、服务端逐图视区一致后刷新恢复全部通过。此轮使用waitForAsync确认保存完成；不是全休市窗口验收。
+
+### 七项PostgreSQL回归补齐
+
+- Ubuntu临时目录mw-final-pg-*启动独立PostgreSQL14，随机回环端口、UTF8；仅向子进程传入独立TEST_POSTGRES_URL及匹配客户端路径。运行test_postgres五项、数据库传输一项、真实dump/restore一项。
+- /tmp/mw-final-postgres-regression.log：7passed，6.66秒；执行器退出0，finally停止实例并删除临时目录。没有连接Unraid测试库或生产库。
+- 与本轮普通回归172passed合计，179项后端用例均已执行通过（分两次运行）。不将此结果扩展为全部网页操作或生产发布完成。
+
+- /tmp/mw-async-verified-mobile-readonly.log退出0：默认单图、MOBILE_WRITES=[]、MOBILE_READONLY=true、errors=[]；保存前后工作区与偏好比对通过。
+- /tmp/mw-async-verified-weekly-background.log退出0：注入pending规划响应，状态明确后台排队/无法估算耗时，随后切回M5正常、errors=[]。本轮未启用WEEKLY_COMPLETE，不据此宣称真实后台补数完成。
+- 至此八份异步等待受影响浏览器用例均已修正并复核通过：自选分组、忙碌保存、图表样式模板、绘图模板、指标模板、混合视区、手机、周线。该复核工作组闭合，其他验收工作组保持未完成。
