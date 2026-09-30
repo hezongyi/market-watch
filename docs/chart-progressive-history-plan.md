@@ -396,3 +396,9 @@
 - 新advanced-latest-cache.cjs先复现失败，再验证超15秒的最新快照立即复用、不同数量复用、异步变化通知、历史请求隔离；连同原prewarm/progressive缓存测试均通过。诊断脚本注入已清除。
 - 候选market-watch-chart-origin:latest-cache-local已部署Ubuntu。真实浏览器不替换响应、不修改日期，两轮M1/M5/M15/M30/H1/H4/D1共14次达到两帧绘制机会约21.8–36ms（第二轮21.8–30.8ms），200ms断言通过；柱距始终6。日志/tmp/mw-switch-latest-cache.log，截图/tmp/mw-switch-timing.png已人工查看为正常D1图。该指标不是GPU绘制完成测量，不证明冷品种首屏及八图压力。
 - 尚需候选的历史回看、渐进新增/修订、Python指标与八图回归，不能据单图暖缓存性能宣告完整交付。
+
+### 最新快照与Python指标协议兼容修正
+
+- 实际Python指标回归发现before:null被父页面指标RPC正整数校验拒绝（/tmp/mw-indicators-latest-cache.log）。修正bridge调用指标计算时省略最新查询的before，保留历史查询的数字截止时间，不放宽父页面校验。
+- 本机重新构建/部署latest-cache-local后同一真实浏览器用例通过：100根SMA，1801.7ms，旧阻塞规划器调用0；同时会话请求58/706/1623ms且均HTTP200。证据/tmp/mw-indicators-latest-fixed.log。Python计算耗时与原生内置指标/纯K线缓存切换指标分开报告。
+- 新候选八图三品种实时两分钟回归已启动，日志/tmp/mw-eight-latest-cache.log，结果待核验。

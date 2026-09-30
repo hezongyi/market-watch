@@ -330,7 +330,7 @@ const feed = {
         checkActive();
         const page = decode(s.ticker).spec
           ? await progressiveIndicatorPage(rawPage, () => query(s.ticker,res,
-              {before:args.before,limit:args.limit}))
+              {...(args.before == null ? {} : {before:args.before}),limit:args.limit}))
           : rawPage;
         checkActive();
         const bars = barsOf(page,res,s.ticker).filter(bar=>bar.time < p.to*1000);
