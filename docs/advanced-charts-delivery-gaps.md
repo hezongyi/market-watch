@@ -921,3 +921,10 @@
 - 由当前Dockerfile构建market-watch-api:acceptance-2bc223f，镜像73edb117ea78；Ubuntu market-watch-acceptance API/历史worker已切换此镜像。API健康检查通过，5个服务运行。网页和TLS代理重启刷新容器地址；静态图表镜像未改。
 - advanced-container-https.browser.cjs通过，/tmp/mw-https-api-2bc223f.log退出0，errors=[]，credentialsSentToChart=0；验证登录、独立来源、使用说明、周期切换及原生保存。
 - 原API镜像保留可回退。未操作Unraid生产、未推送Git远端。上一节“本地代码尚未进入验收镜像”的状态由本记录更新。
+
+### 绘图复制粘贴与原生默认样式
+
+- advanced-drawing-copy.browser.cjs通过真实Ctrl+C/Ctrl+V复制选中水平线，新增独立ID，副本颜色/宽度保留；移动副本到4250后原线仍4300，errors=[]。
+- 原生属性→样式里实际切换价格标签复选框并确认；新工作区最初没有旧画线，新建水平线自动沿用所选showPrice值。/tmp/mw-copy-native-default.log退出0。
+- 初次仅用API setProperties再打开对话框确认，新工作区仍用旧默认色；这不是用户编辑默认样式的等价操作。改为真正触发原生样式控件后保存恢复通过。当前默认样式断言针对showPrice，不泛化为每个样式字段。
+- 临时探查脚本已删除；未改产品代码和供应库。
