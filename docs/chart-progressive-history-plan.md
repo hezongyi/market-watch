@@ -133,3 +133,12 @@
 - 预热读取的有效性以品种仍可见为准，不要求该周期当前可见；普通读图仍按具体周期取消旧请求。
 - progressiveHistory加入warm接口与覆盖范围复用：相同品种/周期、足够历史根数且时间右界被覆盖的15秒内页可直接满足请求；跨周期不复用、超出右界重新读取、64页容量淘汰。
 - advanced-prewarm-cache、progressive-cache、history-demand测试通过。尚未验证浏览器100–200ms性能目标，也未覆盖全部指标warmup，不能关闭预热验收项。
+
+### 真新品种冷启动初验
+
+- Ubuntu全栈更新为progressive-check镜像（含任务面板/预热/交互让步），通知关闭。
+- 测试前数据库确认OANDA:EUR_AUD尚未注册Instrument；新增advanced-cold-acquisition.browser.cjs使用真实API、真实OANDA，不拦截历史。
+- 原生历史任务按钮实际点击并打开父页面dialog通过；首轮文本选择器撞到原生响应式隐藏副本，改用按钮可访问名称定位。
+- EUR/AUD空H1切D1/M5/H1公开setResolution耗时30/28/9ms；约15秒后缓存返回2根H1、119根M1、24根M5、8根M15、4根M30、1根H4，D1尚空。截图/tmp/mw-cold-history.png确认H1柱显示，测试退出0，日志/tmp/mw-cold-acquisition.log。
+- 此结果仅证明空图可切及首批数据出现；不是首屏补满、暖缓存绘制耗时、D1渐进补入或鼠标响应的完整证据，仍需后续验收。
+- 检查任务取消与入库并发，统一历史入库提交的锁顺序为instrument->job，避免与规划/控制的instrument->job形成反向等待。market/recovery/plan回归29 passed；此后端小改动尚未部署。

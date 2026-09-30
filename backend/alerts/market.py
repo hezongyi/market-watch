@@ -584,6 +584,10 @@ def import_once(*, chart_only=False, fetcher=None):
             logging.info("chart_history_fetch source=%s symbol=%s minutes=%d rows=%d seconds=%.3f",
                          source, symbol, (right-left)//60000, len(payload["rows"]), fetch_finished-started)
         with transaction() as db:
+            # Planner/control paths lock the instrument before updating jobs.
+            # Match that order to avoid a job->instrument / instrument->job cycle.
+            instrument_id = db.scalar(select(ImportJob.instrument_id).where(ImportJob.id == ident))
+            db.scalar(select(Instrument).where(Instrument.id == instrument_id).with_for_update())
             job = db.scalar(select(ImportJob).where(ImportJob.id == ident).with_for_update())
             if job.status != "running" or job.lease_until != lease or job.cursor != left:
                 return True
@@ -660,6 +664,10 @@ def import_once(*, chart_only=False, fetcher=None):
                 evaluate_watch(db, watch_id)
     except (RuntimeError, ValueError, subprocess.TimeoutExpired, OSError, httpx.HTTPError) as e:
         with transaction() as db:
+            # Planner/control paths lock the instrument before updating jobs.
+            # Match that order to avoid a job->instrument / instrument->job cycle.
+            instrument_id = db.scalar(select(ImportJob.instrument_id).where(ImportJob.id == ident))
+            db.scalar(select(Instrument).where(Instrument.id == instrument_id).with_for_update())
             job = db.scalar(select(ImportJob).where(ImportJob.id == ident).with_for_update())
             if job.status != "running" or job.lease_until != lease or job.cursor != left:
                 return True
