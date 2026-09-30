@@ -490,3 +490,9 @@
 - 新回归创建20个处于源级退避的OANDA任务和一个可执行其他源任务，旧import_once只推迟第一条并返回false，回归失败。任务选择现整体排除退避源，仍保留领取后的退避复查，避免逐个任务消耗worker循环。
 - 另以实际import_once验证较新的priority100前台任务优先于更早priority200周线任务；周线游标及attempts不变。此为调度执行测试，不仅检查数据库priority字段。
 - 行情及导入专项27 passed（/tmp/mw-source-isolation.log）。运行worker尚未加载新代码，实时调度表现仍待验证；用户停止旧开发worker的协助请求仍待答复。
+
+### 当前后端完整回归与PostgreSQL专项
+
+- session77921退出0：当前完整backend/tests为164 passed、5 skipped（/tmp/mw-backend-current-full.log）。覆盖本轮源级退避、导入调度及既有预警/通知逻辑；不发送真实ntfy通知。
+- session52421退出0：独立trading_alerts_test库内临时schema执行并清理，PostgreSQL并发触发/outbox租约及数据库迁移回滚专项4 passed（/tmp/mw-current-postgres-tests.log）。剩余备份恢复专项本轮未重跑，沿用此前单独隔离PG14恢复证据，不能称本轮全套无跳过。
+- 能力盘点新增当前验收摘要，避免早期“外层工具栏待移除”等描述被误读为现状；完整原生工具菜单、周线后台持续补数、常驻worker及部署验证仍待完成。
