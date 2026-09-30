@@ -913,8 +913,15 @@ function boot(
         if (chart.symbol() !== args.instrument || frames[chart.resolution()] !== args.timeframe) continue;
         const symbol=chart.symbol(), resolution=chart.resolution();
         await refreshChartHistory(widget,chart,()=> {
-          for (const sub of subscriptions.values())
-            if(sub.symbol===symbol && sub.res===resolution) sub.reset();
+          let invalidated = false;
+          for (const sub of subscriptions.values()) {
+            if(sub.symbol===symbol && sub.res===resolution) {
+              sub.reset(); invalidated = true;
+            }
+          }
+          // Empty series may not have subscribed yet. Native noData is cached
+          // even then, so invalidate explicitly before its first populated page.
+          if (!invalidated) widget.resetCache();
         },()=>epoch===workspaceEpoch && chart.symbol()===symbol && chart.resolution()===resolution);
       }
     },

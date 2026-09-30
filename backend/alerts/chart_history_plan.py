@@ -5,10 +5,24 @@ from sqlalchemy import select
 
 from .calendar_profile import closures_from
 from .chart_data import bounds
-from .domain import Calendar, bucket_bounds, has_trading_gap
+from .domain import Calendar, bucket_bounds, scheduled_open
 from .storage import ChartHistoryPlan, ChartViewportDemand, Instrument, instant, ms
 
 FRAMES = {"M1", "M5", "M15", "M30", "H1", "H4", "D1"}
+
+
+def bucket_has_trading(left, right, calendar, gold, closures):
+    # Weekly NY schedule transitions occur on whole hours; explicit closures
+    # can end at arbitrary minutes. Probe every possible closed->open boundary
+    # instead of scanning thousands of minutes against all closure records.
+    candidates = [left]
+    hour = left.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+    while hour < right:
+        candidates.append(hour)
+        hour += timedelta(hours=1)
+    candidates.extend(c.end for c in closures if left < c.end < right)
+    return any(scheduled_open(at, calendar, gold=gold, closures=closures)
+               for at in candidates if at < right)
 
 
 def history_start(inst, timeframe, end, count):
@@ -24,8 +38,8 @@ def history_start(inst, timeframe, end, count):
         probe = cursor - timedelta(microseconds=1)
         left, right = (bounds(probe, timeframe, calendar) if timeframe == "M30"
                        else bucket_bounds(probe, timeframe, calendar))
-        if has_trading_gap(left, min(right, cursor), calendar,
-                           gold=inst.id == "XAUUSD", closures=closures):
+        if bucket_has_trading(left, min(right, cursor), calendar,
+                              gold=inst.id == "XAUUSD", closures=closures):
             remaining -= 1
         cursor = left
         if remaining == 0:

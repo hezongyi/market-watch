@@ -92,3 +92,20 @@ def test_completed_coverage_finishes_plan_and_cancelled_plan_does_not_queue(data
         plan.status = 'cancelled'
         monkeypatch.setattr(market, 'stored_coverage', lambda *args: [])
         assert not advance_plan(db, plan, end)
+
+
+def test_calendar_boundary_scan_matches_minute_scan():
+    from datetime import timedelta
+
+    from alerts.calendar_profile import Closure
+    from alerts.chart_history_plan import bucket_has_trading
+    from alerts.domain import Calendar, has_trading_gap
+
+    start = datetime(2026, 3, 5, 22, tzinfo=UTC)
+    closures = (Closure(start=start, end=start+timedelta(hours=23,minutes=17),
+                        reason='test',source='https://example.com/calendar'),)
+    for hours in (1, 6, 24, 48, 96):
+        right = start+timedelta(hours=hours)
+        for gold in (False, True):
+            assert bucket_has_trading(start,right,Calendar.NY17,gold,closures) == has_trading_gap(
+                start,right,Calendar.NY17,gold=gold,closures=closures)
