@@ -796,3 +796,9 @@
 - 数据窗口专项在同一根真实XAUUSD H4上切换Etc/UTC、Asia/Singapore、America/New_York，鼠标回到相同位置后十字线时间戳完全相同，四个OHLC显示值均继续与后台bar一致。
 - 数据窗口“时间”逐一对照Intl.DateTimeFormat按选中时间戳及目标时区生成的HH:mm；三个时区均一致。/tmp/mw-timezone-ohlc.log退出0，errors=[]。
 - 该证据证明此日内样例的显示时区转换不改价格/时间戳，不替代D/W/M交易日标签及夏令时边界专项。
+
+### 数据窗口原生均线独立数值对照
+
+- 数据窗口测试新增原生Moving Average(length=5, source=close)，按十字线选中时间从真实后台响应排序取当前及前四根close，独立求和除5并按两位显示精度对照窗口Plot。
+- /tmp/mw-data-window-sma-verified.log退出0，MA显示4343.02与独立计算一致，原有OHLC/三个显示时区断言同时通过，errors=[]。未调用原生指标计算结果作为预期值。
+- 此轮单品种H4/SMA(5)样例不能替代所有内置指标算法审计；缺失值/预热显示仍待针对性验证。

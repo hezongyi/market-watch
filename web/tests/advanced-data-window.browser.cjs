@@ -92,6 +92,11 @@ const assert = require("node:assert/strict");
       .subscribe(null, (e) => (window.selectedBarTime = e.time));
   });
   await frame.waitForFunction(() => widget.activeChart().dataReady());
+  await frame.evaluate(() =>
+    widget
+      .activeChart()
+      .createStudy("Moving Average", false, false, { length: 5 }),
+  );
   const button = ui.getByRole("button", { name: /数据窗口/ });
   if ((await button.getAttribute("aria-pressed")) !== "true")
     await button.click();
@@ -169,6 +174,24 @@ const assert = require("node:assert/strict");
       timezone,
     );
   }
+  const previous = [...history.values()]
+    .filter((b) => Number(b.start) <= selected * 1000)
+    .sort((a, b) => Number(a.start) - Number(b.start))
+    .slice(-5);
+  assert.equal(previous.length, 5);
+  const expectedSma = previous.reduce((sum, b) => sum + Number(b.close), 0) / 5;
+  const indicatorLines = (await ui.locator("body").innerText())
+    .split("\n")
+    .map((s) => s.trim());
+  const plotIndex = indicatorLines.lastIndexOf("Plot");
+  assert.ok(plotIndex >= 0, "Native MA plot must be present in data window");
+  const actualSma = Number(indicatorLines[plotIndex + 1].replaceAll(",", ""));
+  assert.equal(
+    actualSma,
+    Number(expectedSma.toFixed(2)),
+    "Native MA(5) versus independent backend-close average",
+  );
+
   assert.deepEqual(errors, []);
   console.log("DATA_WINDOW_OHLC_VISIBLE", {
     selected,
