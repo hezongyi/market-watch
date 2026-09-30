@@ -282,3 +282,9 @@
 - advanced-registered-quotes.browser.cjs真实容器通过，有效品种响应一致、价格有效且原生无错误文案。
 - 依据公开DatafeedQuoteValues可选字段进行原生受控实验：s=ok，仅short_name/description/exchange，省略lp/bid/ask等；截图/tmp/mw-empty-quote.png确认详情显示“报价准备中”，价格为空，无0价格或无效品种。测试advanced-empty-quote.browser.cjs通过（行情正常，仅拦截报价响应）。
 - 后端已知Instrument暂无M1返回quality=pending与上述元数据；未知品种仍error。新增API断言禁止虚构价格/涨跌字段，候选尚未部署。
+
+### 后端整体回归与进度提示残留
+
+- backend/tests整体205 passed、7 skipped。跳过项为隔离PostgreSQL上的备份恢复、数据库迁移搬运及5项PostgreSQL测试，需要专用隔离库/对应dump工具；不能将跳过项视为验收通过。日志/tmp/mw-backend-full-skips.log。
+- 修正history-views只随historyDemand发送的遗漏：所有窗口切W1/MN后不会有日内需求，旧日内提示可能残留。现在每2秒可见图表轮询独立上报，工作区加载时跳过；已通过JS语法检查，尚需浏览器切换验收/部署。
+- 全量后端回归通过不等于端到端性能、八图同步、备份恢复和完整交付通过。

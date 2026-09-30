@@ -1229,7 +1229,15 @@ function boot(
     });
     send({ type: "ready" });
     clearInterval(progressivePoll);
-    progressivePoll = setInterval(()=>progressivePages?.poll(),2000);
+    progressivePoll = setInterval(()=> {
+      if (!ready || loading) return;
+      // Visibility changes must clear old intraday progress even when every
+      // pane switches to W1/MN and no longer submits a daily warmup demand.
+      send({type:"history-views",keys:Array.from({length:widget.chartsCount()},(_,i)=> {
+        const chart=widget.chart(i);return chart.symbol()+"|"+chart.resolution();
+      })});
+      progressivePages?.poll();
+    },2000);
     widget.headerReady().then(()=>widget.createButton({
       align:"right",useTradingViewStyle:true,text:"历史任务",title:"查看后台补数进度",
       onClick:()=>send({type:"history-plans-open"}),
@@ -1237,9 +1245,6 @@ function boot(
     demandReporter?.dispose();
     demandReporter = chartDemandReporter(widget, clientId,
       async args => {
-        send({type:"history-views",keys:Array.from({length:widget.chartsCount()},(_,i)=> {
-          const chart=widget.chart(i);return chart.symbol()+"|"+chart.resolution();
-        })});
         const res=Object.keys(frames).find(key=>frames[key]===args.timeframe);
         const required=indicatorHistoryNeeds.get(args.instrument+"|"+res);
         if (required>6000) send({type:"feed-poll-state",key:"@indicator-history",
