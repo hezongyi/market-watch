@@ -761,3 +761,10 @@
 - 桌面从含4300水平线与MA(21)的已存工作区进入空白，再原生加载回原工作区：ID、线条价格及MA参数全部保留，/tmp/mw-empty-return.log退出0。
 - 同一专项新增独立手机context：已存分析→无state空白工作区，最终一图、零画线/指标；advanced-charts POST为空，服务器工作区完整列表前后相等，errors=[]。/tmp/mw-empty-mobile-isolated.log退出0。
 - 首轮比较被尚开着的桌面页自动保存改变排序/版本干扰；手机POST记录仍为空。测试改为关闭桌面页再取服务器基线，不放宽相等断言，不修改产品。
+
+### 原生收藏入口补齐与周期收藏持久化
+
+- 核对供应库公开Favorites类型说明：用户添加/移除收藏需要items_favoriting开关。此前未启用，原生周期菜单无星标；仅启用该开关的浏览器对照出现“添加到收藏”。现已正式启用，自有settings_adapter保持不变。
+- 新增advanced-favorites.browser.cjs：真实展开周期菜单、切换M15收藏状态，服务器setting键IntervalWidget.quicks存在，刷新后星标状态一致，再恢复原状态；/tmp/mw-favorites-final.log退出0，errors=[]。
+- 开启收藏后header使用radio快捷项及“图表周期”展开按钮，测试使用公开可访问控件定位，不将快捷项误当展开按钮。首轮保存已发生但刷新后旧定位失败，后续按当前真实初始状态进行双向切换。
+- 本机静态镜像acceptance-favorites已运行；未修改供应文件。指标/绘图收藏与跨工作区仍需分别核对，单一周期收藏不覆盖全部D06。

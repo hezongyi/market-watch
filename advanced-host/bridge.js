@@ -892,6 +892,7 @@ function boot(
       "header_layouttoggle",
       "disable_resolution_rebuild",
       "study_templates",
+      "items_favoriting",
       "chart_template_storage",
     ],
     disabled_features: [
