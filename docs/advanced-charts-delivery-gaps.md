@@ -1030,3 +1030,8 @@
 - 界定证据范围：实际原生图表为普通交易日；春秋DST、假日/短日由后台规则及适配标签测试覆盖，不宣称全部特殊日期都做过浏览器截图。与已有H4跨显示时区对照共同确认显示时区不重分桶。
 - 实际API容器zoneinfo.TZPATH读取/usr/share/zoneinfo/tzdata.zi，版本2026b。新增deploy/timezone-maintenance.md说明IANA来源、Debian基础镜像更新/重建、回归和历史影响演练；没有自行编码夏令时日期表。
 - 日历分桶工作组按上述明确证据范围闭合。全休市视区操作仍属于同步/比较工作组，不因本项通过而宣称其已完成。
+
+### 原工作台网页回归及手机待修复观察
+
+- browser-smoke.mjs增加测试HTTPS、凭据与截图目录参数，本机/tmp/mw-original-ui-regression.log退出0：登录、新建及取消测试预警、演练页入口、设置保存通过；pageErrors=[]、mobileOverflow=false。通知投递在验收环境关闭。
+- 实际查看/tmp/dashboard-mobile.png发现390px宽六导航项被挤为竖排；CSS mobile nav flex:1使新增入口压缩文字。截图中的旧行情图为空，截图没有等待数据就绪，尚不能判断加载失败或抓图过早。原功能网页工作组保持未关闭，下一步修正导航并加入图表就绪断言。
