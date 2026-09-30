@@ -190,6 +190,44 @@ def renew_demand(db, client, inst):
     demand.updated_at = now_ms()
 
 
+def read_cached_history(body: HistoryQuery):
+    """Read observations without planning jobs or taking the instrument writer lock.
+
+    Empty/short pages describe local availability, never provider exhaustion.
+    Historical partial candles are excluded; a forming candle is usable only
+    when its observed prefix is covered from the bucket's actual start.
+    """
+    if body.timeframe not in FRAMES:
+        raise HTTPException(422, "不支持的周期")
+    now = now_ms()
+    before = min(body.before or now + 1, now + 1)
+    cutoff = (now - 5000) // 60000 * 60000
+    with transaction() as db:
+        # Resolution/registration is a separate operation. Reads never create
+        # instruments, so a truly cold symbol can return immediately.
+        inst = db.get(Instrument, body.instrument)
+        if inst is None:
+            return {"bars": [], "coverage": [], "local_only": True,
+                    "remote_boundary": "unknown", "next_cursor": None}
+        if inst.source not in ("oanda", "binance"):
+            raise HTTPException(422, "此品种尚未接入按需行情服务")
+        rows = chart_rows(db, inst, body.timeframe, before, body.limit, now)
+        left = rows[0]["start"] if rows else before
+        coverage = stored_coverage(db, inst, left, max(before, cutoff)) if rows else []
+        usable = [row for row in rows if row["complete"] or (
+            row["start"] < cutoff < row["end"]
+            and covers_interval(coverage, row["start"], cutoff)
+        )]
+        return {
+            "bars": usable,
+            "coverage": coverage,
+            "local_only": True,
+            "remote_boundary": "unknown",
+            # Advance across rejected partial rows without claiming no history.
+            "next_cursor": rows[0]["start"] if rows else None,
+        }
+
+
 def plan_history(body: HistoryQuery):
     if body.timeframe not in FRAMES:
         raise HTTPException(422, "不支持的周期")
@@ -533,6 +571,10 @@ def router(authenticated):
             inst = resolve(db, body.instrument)
             renew_demand(db, body.client, inst)
         return {"ok": True}
+
+    @r.post("/history/cache")
+    def cached_history(body: HistoryQuery):
+        return read_cached_history(body)
 
     @r.post("/history")
     def history(body: HistoryQuery):
