@@ -556,10 +556,14 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False):
         from .storage import ChartAggregationJob
 
         # One history downloader feeds the independent aggregation executor.
-        # Bound queued CPU work without throttling live M1 ingestion.
+        # Bound ready CPU work without throttling live M1 ingestion. Failed
+        # slices retain their durable retry state but must not exhaust capacity
+        # for unrelated symbols. Also bound each symbol including failed work.
         if defer_aggregation and db.scalar(select(func.count()).select_from(
-                ChartAggregationJob)) >= 60:
+                ChartAggregationJob).where(ChartAggregationJob.error.is_(None))) >= 60:
             return False
+        saturated_symbols = select(ChartAggregationJob.instrument_id).group_by(
+            ChartAggregationJob.instrument_id).having(func.count() >= 60)
         # Skip all jobs of a cooling-down source in the selection query, rather
         # than spending one worker iteration deferring each of its queued jobs.
         cooling_sources = [
@@ -572,6 +576,7 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False):
         job = db.scalar(
             select(ImportJob)
             .where(
+                ImportJob.instrument_id.not_in(saturated_symbols) if defer_aggregation else True,
                 ImportJob.instrument_id.in_(
                     select(Instrument.id).where(Instrument.source.not_in(cooling_sources))
                 ),

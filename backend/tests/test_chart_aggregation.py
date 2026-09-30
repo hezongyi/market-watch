@@ -130,3 +130,34 @@ def test_download_backpressure_skips_provider_when_aggregation_is_full(database)
     with database.begin() as db:
         job = db.scalar(select(ImportJob))
         assert job.status == 'pending' and job.cursor == 0
+
+
+def test_failed_symbol_backlog_does_not_block_other_symbol(database):
+    from alerts.market import import_once
+    from alerts.storage import ImportJob
+
+    with database.begin() as db:
+        for index in range(12):
+            enqueue_aggregation(db, 'EURUSD', index*60000, (index+1)*60000, 0)
+        for task in db.scalars(select(ChartAggregationJob)):
+            task.error = 'RuntimeError'
+            task.attempts = 1
+        db.add_all([
+            ImportJob(instrument_id='EURUSD', start=0, end=60000, cursor=0,
+                      priority=100, next_at=0),
+            ImportJob(instrument_id='XAUUSD', start=0, end=60000, cursor=0,
+                      priority=110, next_at=0),
+        ])
+    calls = []
+    def fetch(source, symbol, start, end):
+        calls.append(symbol)
+        # Selection is what this regression exercises; retain normal retry state.
+        raise RuntimeError('provider unavailable')
+    assert import_once(chart_only=True, defer_aggregation=True, fetcher=fetch)
+    with database.begin() as db:
+        assert calls == [db.get(Instrument, 'XAUUSD').symbol]
+        blocked = db.scalar(select(ImportJob).where(ImportJob.instrument_id == 'EURUSD'))
+        selected = db.scalar(select(ImportJob).where(ImportJob.instrument_id == 'XAUUSD'))
+        assert blocked.status == 'pending' and blocked.attempts == 0
+        assert selected.attempts == 1
+        assert db.scalar(select(func.count()).select_from(ChartAggregationJob)) == 60
