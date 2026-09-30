@@ -288,3 +288,10 @@
 - backend/tests整体205 passed、7 skipped。跳过项为隔离PostgreSQL上的备份恢复、数据库迁移搬运及5项PostgreSQL测试，需要专用隔离库/对应dump工具；不能将跳过项视为验收通过。日志/tmp/mw-backend-full-skips.log。
 - 修正history-views只随historyDemand发送的遗漏：所有窗口切W1/MN后不会有日内需求，旧日内提示可能残留。现在每2秒可见图表轮询独立上报，工作区加载时跳过；已通过JS语法检查，尚需浏览器切换验收/部署。
 - 全量后端回归通过不等于端到端性能、八图同步、备份恢复和完整交付通过。
+
+### 独立PostgreSQL运行验收环境
+
+- Docker Hub拉取postgres:16-alpine超时，备用public.ecr.aws/docker/library/postgres:16-alpine拉取成功，digest sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea。
+- Ubuntu新建market-watch-postgres-isolated，绑定127.0.0.1:15432、512MB/1CPU，数据库market_watch_isolated，仅验收用途，未连接共享开发/生产库。
+- 原跳过的test_postgres.py五项及test_database_transfer.py一项使用该隔离库全部通过：6 passed in6.38s。日志/tmp/mw-isolated-postgres-tests.log。
+- 备份dump/restore测试仍需同版本客户端工具；此容器保持运行供后续验收。不能把这6项通过推定备份恢复已通过。
