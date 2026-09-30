@@ -774,3 +774,8 @@
 - 新增advanced-data-window.browser.cjs，标准蜡烛图下通过真实鼠标移动十字线，原生数据窗口显示开盘/最高/最低/收盘及选中历史时间，errors=[]；/tmp/mw-data-window-ohlc2.log退出0。
 - 数据窗口展开状态为用户偏好，测试先检查aria-pressed，避免把已展开面板关闭；此前HLC类型本身无开盘显示，不能据此认定OHLC供数丢失。
 - 当前仅证明字段出现与十字线历史时间有效；尚未做逐值后台对照、指标值及缺失值语义，不关闭A12完整验收项。
+
+### 数据窗口OHLC与真实后台响应对照
+
+- advanced-data-window.browser.cjs收集实际history/charts-data响应，以十字线公开事件选中时间精确匹配bar.start；按XAUUSD两位显示精度，分别断言原生数据窗口开盘/最高/最低/收盘等于后台对应字段。
+- /tmp/mw-data-window-values.log退出0、errors=[]；未拦截伪造行情响应。该轮覆盖XAUUSD H4单根历史K线四字段，不代表三品种九周期、指标输出或空值都已对照。

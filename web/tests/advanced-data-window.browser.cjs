@@ -13,6 +13,21 @@ const assert = require("node:assert/strict");
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
+  const history = new Map(),
+    responses = [];
+  page.on("response", (response) => {
+    if (!/\/api\/(market-data\/history|charts\/data)$/.test(response.url()))
+      return;
+    responses.push(
+      response
+        .json()
+        .then((data) => {
+          for (const bar of data.bars || [])
+            history.set(Number(bar.start), bar);
+        })
+        .catch(() => {}),
+    );
+  });
   page.on("pageerror", (e) => errors.push(e.message));
   await page.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
     const body = route.request().postDataJSON();
@@ -91,6 +106,25 @@ const assert = require("node:assert/strict");
     assert.ok(body.includes(label), label);
   const selected = await frame.evaluate(() => window.selectedBarTime);
   assert.ok(selected > 0);
+  await Promise.all(responses);
+  const bar = history.get(selected * 1000);
+  assert.ok(
+    bar,
+    "Selected crosshair candle must exist in actual backend responses",
+  );
+  const lines = body.split("\n").map((s) => s.trim());
+  for (const [label, field] of [
+    ["开盘价", "open"],
+    ["最高价", "high"],
+    ["最低价", "low"],
+    ["收盘价", "close"],
+  ]) {
+    const index = lines.lastIndexOf(label);
+    const actual = Number(
+      lines[index + 1].replaceAll(",", "").replaceAll("−", "-"),
+    );
+    assert.equal(actual, Number(Number(bar[field]).toFixed(2)), label);
+  }
   assert.deepEqual(errors, []);
   console.log("DATA_WINDOW_OHLC_VISIBLE", {
     selected,
