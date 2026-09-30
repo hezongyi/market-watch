@@ -576,3 +576,12 @@
 - 后端抽取plan_history共用规划逻辑，新增weekly_history_requests持久保存请求范围、剩余根数和游标；worker每轮维护推进一个到期需求，底层ImportJob仍为200优先级，失败导入不自动重试。完整需求不依赖网页继续请求。
 - 隔离SQLite专项28 passed（/tmp/mw-weekly-durable-tests.log），覆盖无浏览器三页推进、重复需求去重、完成停止及真实规划后台优先级。当前代码尚未重启开发API/worker或应用到生产；PostgreSQL并发/实际多窗口持续推进、完成自动重载和空历史范围边界仍待验收。
 - 本轮完整后端回归166 passed、5 skipped（/tmp/mw-weekly-full-tests.log）；跳过项不计为通过。新增表的开发运行环境验证尚未完成。
+
+### 周线 PostgreSQL 与开发常驻流程验收
+
+- /tmp/mw-weekly-postgres.log：4 passed。新增隔离schema验收覆盖两个客户端并发记录同一需求只生成一行、首worker规划期间第二worker不能重复领取、随后新Session从持久游标继续至complete；最终游标更新增加行锁，防止过期领取结果并发覆盖。测试schema已清理。
+- 仅对trading_alerts_dev执行bootstrap，确认delivery_enabled=false；核对/proc命令与cwd后重启Ubuntu开发API（session48487，8004）和worker（session7353）。没有重启Unraid服务。新增表只在开发库与隔离测试schema初始化。
+- 开发库独立登记EURUSD、before=1790622000000、13根周线需求10774894514f7a5d60e25c1341a9afbb3a9864de，浏览器未续发该请求；常驻worker观察pending/remaining=2，随后complete/remaining=0。已有缓存参与，不能据此宣称13周全部冷下载速度。
+- /tmp/mw-weekly-real-reload-confirm.log退出0：注入一次W1 pending后恢复真实后端，tick触发原生缓存失效及重载，firstHistory记录形成，再切回M5并平移，errors=[]、零工作区写入。此前同名不带confirm的运行未执行新增分支，不作为自动完成证据。
+- worker启动目录刷新曾出现一次HTTPStatusError；随后直接fetch_oanda_catalog成功返回127项，历史EURUSD下载正常。异常状态码未在首次日志保留，根因未确认，不声明已修复。
+- 仍需空历史/上市起点导致持久需求无限向前扩张的边界策略、需求状态展示，以及总体工具验收/部署演练；不能将本轮成功等同整体验收。

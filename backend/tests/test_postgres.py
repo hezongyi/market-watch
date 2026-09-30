@@ -192,3 +192,58 @@ def test_coverage_millisecond_json_uses_bigint():
         with engine.begin() as c:
             c.execute(text(f"DROP SCHEMA {schema} CASCADE"))
         engine.dispose()
+
+
+def test_postgres_weekly_demand_dedup_and_concurrent_claim(monkeypatch):
+    import uuid
+    from threading import Event
+    from alerts import market_data
+    from alerts.storage import WeeklyHistoryRequest
+
+    engine = create_engine(URL, pool_size=2, max_overflow=0)
+    schema = "acceptance_" + uuid.uuid4().hex
+    with engine.begin() as c:
+        c.execute(text(f"CREATE SCHEMA {schema}"))
+    isolated = create_engine(URL, pool_size=2, max_overflow=0,
+                             connect_args={"options": f"-csearch_path={schema}"})
+    try:
+        storage.bootstrap(isolated)
+        factory = sessionmaker(isolated, expire_on_commit=False)
+        monkeypatch.setattr(storage, "Session", factory)
+        end = 1700000000000
+        query = market_data.HistoryQuery(instrument="EURUSD", timeframe="W1", before=end, limit=2)
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            list(pool.map(lambda _: market_data.remember_weekly_request(query, end), range(2)))
+        with factory() as db:
+            assert db.scalar(select(func.count()).select_from(WeeklyHistoryRequest)) == 1
+        entered, release = Event(), Event()
+        def plan(body):
+            entered.set()
+            assert release.wait(10)
+            return {"status":"ready", "requested_start":body.before-200,
+                    "next_cursor":body.before-200, "bars":[{"start":body.before-100}]}
+        monkeypatch.setattr(market_data, "plan_history", plan)
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            first = pool.submit(market_data.advance_weekly_request)
+            try:
+                assert entered.wait(10)
+                # First worker released its DB connection while planning, but
+                # its persisted lease prevents a second claim of the same page.
+                assert pool.submit(market_data.advance_weekly_request).result(timeout=10) is False
+            finally:
+                release.set()
+            assert first.result(timeout=10)
+        with factory.begin() as db:
+            row = db.scalar(select(WeeklyHistoryRequest))
+            assert row.cursor == end-100 and row.remaining == 1
+            row.next_at = 0
+        # New Session reads the persisted cursor, as a restarted worker would.
+        assert market_data.advance_weekly_request()
+        with factory() as db:
+            row = db.scalar(select(WeeklyHistoryRequest))
+            assert row.status == "complete" and row.remaining == 0
+    finally:
+        isolated.dispose()
+        with engine.begin() as c:
+            c.execute(text(f"DROP SCHEMA {schema} CASCADE"))
+        engine.dispose()

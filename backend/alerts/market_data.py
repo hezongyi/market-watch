@@ -307,7 +307,7 @@ def advance_weekly_request():
         row.next_at = now_ms() + 30000
     result = plan_history(query)
     with transaction() as db:
-        row = db.get(WeeklyHistoryRequest, ident)
+        row = db.get(WeeklyHistoryRequest, ident, with_for_update=True)
         if row.cursor != cursor or row.remaining != remaining:
             return True
         if result["status"] in ("ready", "empty_interval"):

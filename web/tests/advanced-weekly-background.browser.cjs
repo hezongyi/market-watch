@@ -159,9 +159,10 @@ const fs = require("fs");
     1,
   );
   let pendingReplies = 0;
+  let injectPending = true;
   await page.route("**/api/market-data/history", async (route) => {
     const body = route.request().postDataJSON();
-    if (body.timeframe !== "W1") return route.continue();
+    if (body.timeframe !== "W1" || !injectPending) return route.fallback();
     pendingReplies++;
     await route.fulfill({
       json: {
@@ -182,6 +183,15 @@ const fs = require("fs");
   require("node:assert/strict").ok(pendingReplies > 0);
   const statusText = await page.locator("[role=status]").textContent();
   require("node:assert/strict").match(statusText, /后台队列/);
+  if (process.env.MARKET_WATCH_WEEKLY_COMPLETE) {
+    injectPending = false;
+    await frame.evaluate(() => tick());
+    await frame.waitForFunction(() => pendingHistory.size === 0
+      && widget.activeChart().resolution() === "1W"
+      && widget.activeChart().dataReady()
+      && firstHistory.has("EURUSD|1W"), null, {timeout:180000});
+    console.log("WEEKLY_REAL_COMPLETION_RELOADED");
+  }
   await frame.evaluate(() => widget.activeChart().setResolution("5"));
   await frame.waitForFunction(
     () =>
