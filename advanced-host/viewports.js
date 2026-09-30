@@ -62,3 +62,138 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
     if (isCurrent()) sync.setValue(desired);
   }
 }
+
+// Correct native synchronization retaining per-pane margins at the data edge.
+function edgeRangeSync(widget, blocked, onError) {
+  const bindings = new Map();
+  const range = widget.dateRangeSync(),
+    time = widget.timeSync();
+  let timer,
+    applying = false,
+    disposed = false,
+    internal = false;
+  let desiredRange = range.value(),
+    desiredTime = time.value(),
+    generation = 0;
+  function set(toggle, value) {
+    if (toggle.value() === value) return;
+    internal = true;
+    try {
+      toggle.setValue(value);
+    } finally {
+      internal = false;
+    }
+  }
+  function rangeChanged(value) {
+    if (internal) return;
+    desiredRange = value;
+    generation++;
+  }
+  function timeChanged(value) {
+    if (internal) return;
+    desiredTime = value;
+    generation++;
+  }
+  range.subscribe(rangeChanged);
+  time.subscribe(timeChanged);
+  function restore() {
+    set(range, desiredRange);
+    set(time, desiredTime);
+  }
+  async function align(chart) {
+    timer = undefined;
+    if (
+      disposed ||
+      applying ||
+      blocked() ||
+      !range.value() ||
+      widget.activeChart() !== chart
+    )
+      return;
+    const target = chart.getVisibleRange();
+    if (!(target?.to > target?.from)) return;
+    const peers = [...bindings.keys()].filter((peer) => {
+      const minutes = Number(peer.resolution());
+      return (
+        peer !== chart &&
+        minutes > 0 &&
+        Number.isFinite(minutes) &&
+        peer.dataReady() &&
+        peer.getTimeScale().rightOffset() > 0 &&
+        Math.abs(peer.getVisibleRange().to - target.to) > minutes * 60
+      );
+    });
+    if (!peers.length) return;
+    const current = ++generation;
+    applying = true;
+    desiredRange = range.value();
+    desiredTime = time.value();
+    set(range, false);
+    set(time, false);
+    try {
+      for (const peer of peers) {
+        if (disposed || current !== generation || blocked()) break;
+        await peer.setVisibleRange(target, { rejectByTimeout: 20000 });
+      }
+    } catch (error) {
+      if (!disposed) onError(error);
+    } finally {
+      if (!disposed) restore();
+      applying = false;
+    }
+  }
+  function refresh() {
+    generation++;
+    clearTimeout(timer);
+    timer = undefined;
+    for (const [chart, binding] of bindings) {
+      chart.onVisibleRangeChanged().unsubscribe(null, binding.callback);
+      chart.onSymbolChanged().unsubscribe(null, binding.changed);
+      chart.onIntervalChanged().unsubscribe(null, binding.changed);
+    }
+    bindings.clear();
+    if (disposed) return;
+    for (let i = 0; i < widget.chartsCount(); i++) {
+      const chart = widget.chart(i);
+      const changed = () => {
+        generation++;
+      };
+      chart.onSymbolChanged().subscribe(null, changed);
+      chart.onIntervalChanged().subscribe(null, changed);
+      const callback = () => {
+        if (
+          disposed ||
+          applying ||
+          blocked() ||
+          !range.value() ||
+          widget.activeChart() !== chart
+        )
+          return;
+        clearTimeout(timer);
+        timer = setTimeout(() => align(chart), 150);
+      };
+      bindings.set(chart, { callback, changed });
+      chart.onVisibleRangeChanged().subscribe(null, callback);
+    }
+  }
+  refresh();
+  return {
+    refresh,
+    busy: () => applying || timer !== undefined,
+    dispose() {
+      disposed = true;
+      generation++;
+      clearTimeout(timer);
+      timer = undefined;
+      if (applying) restore();
+      range.unsubscribe(rangeChanged);
+      time.unsubscribe(timeChanged);
+      for (const [chart, binding] of bindings) {
+        chart.onVisibleRangeChanged().unsubscribe(null, binding.callback);
+        chart.onSymbolChanged().unsubscribe(null, binding.changed);
+        chart.onIntervalChanged().unsubscribe(null, binding.changed);
+      }
+      bindings.clear();
+    },
+  };
+}

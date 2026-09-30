@@ -17,11 +17,14 @@ const fs = require("fs");
   if (cutoff) {
     if (!Number.isSafeInteger(cutoff) || cutoff <= 0)
       throw Error("Invalid historical cutoff");
-    await page.route(/\/api\/(market-data\/history|charts\/data)$/, route => {
+    await page.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
       const q = route.request().postDataJSON();
-      return route.continue({postData: JSON.stringify({
-        ...q, before: Math.min(q.before || cutoff, cutoff),
-      })});
+      return route.continue({
+        postData: JSON.stringify({
+          ...q,
+          before: Math.min(q.before || cutoff, cutoff),
+        }),
+      });
     });
     console.log("HISTORICAL_ACCEPTANCE_CUTOFF", cutoff);
   }
@@ -209,18 +212,35 @@ const fs = require("fs");
   );
   console.log("MOVED_RANGES", JSON.stringify({ target, moved }));
   if (process.env.MARKET_WATCH_EDGE_RANGE_PROBE) {
-    console.log("EDGE_DIRECT_RANGES", JSON.stringify(await frame.evaluate(async target => {
-      widget.dateRangeSync().setValue(false);
-      widget.timeSync().setValue(false);
-      const results = [];
-      for (let i=0;i<widget.chartsCount();i++) {
-        const chart=widget.chart(i);
-        await chart.setVisibleRange(target, {rejectByTimeout:20000});
-        results.push({symbol:chart.symbol(),resolution:chart.resolution(),
-          range:chart.getVisibleRange(),offset:chart.getTimeScale().rightOffset()});
-      }
-      return results;
-    }, target)));
+    console.log(
+      "EDGE_DIRECT_RANGES",
+      JSON.stringify(
+        await frame.evaluate(async (target) => {
+          widget.dateRangeSync().setValue(false);
+          widget.timeSync().setValue(false);
+          const results = [];
+          for (let i = 0; i < widget.chartsCount(); i++) {
+            const chart = widget.chart(i);
+            await chart.setVisibleRange(target, { rejectByTimeout: 20000 });
+            results.push({
+              symbol: chart.symbol(),
+              resolution: chart.resolution(),
+              range: chart.getVisibleRange(),
+              offset: chart.getTimeScale().rightOffset(),
+            });
+          }
+          widget.dateRangeSync().setValue(true);
+          widget.timeSync().setValue(true);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return {
+            direct: results,
+            restored: Array.from({ length: widget.chartsCount() }, (_, i) =>
+              widget.chart(i).getVisibleRange(),
+            ),
+          };
+        }, target),
+      ),
+    );
     await browser.close();
     return;
   }

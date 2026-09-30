@@ -426,3 +426,20 @@
 - session89120退出0（/tmp/mw-eight-fixed-interior.log）：真实历史上四品种八图M5/M15/M30就绪；三小时内部视区边界同步、鼠标十字线/滚轮/拖动、关闭同步保持其他七图不动全部通过。
 - 脚本实际等待服务器保存八个_mwViewports与操作后范围逐一相等，再刷新并断言八图范围严格一致、同步关闭状态保持、errors为空。该结论仅覆盖固定历史区间，未覆盖实时补数及数据末端留白。
 - 针对末端增加仅测试诊断开关MARKET_WATCH_EDGE_RANGE_PROBE：关闭两种同步后逐图通过公开setVisibleRange应用相同区间，输出实际范围/offset，区分原生同步行为与单图范围能力。session23943运行中，日志/tmp/mw-edge-direct-range.log；诊断输出不视为验收通过。
+
+### 数据末端右侧留白对照结果
+
+- session23943及69237均退出0。关闭原生同步后，逐图公开setVisibleRange得到八图相同边界与rightOffset=1；重新打开dateRangeSync/timeSync后仍保持相同边界。日志/tmp/mw-edge-direct-range.log、/tmp/mw-edge-sync-restore.log。证明单图公开接口支持该目标，差异出现在原生联动路径。
+- 新增仅测试开关MARKET_WATCH_EDGE_SYNC_PROTOTYPE，监听活动图范围变化，仅对右侧有留白且偏差超过目标周期一根K线的图进行公开范围设置；session91208运行中（/tmp/mw-edge-sync-prototype.log）。候选尚未接入产品，尚需生命周期、用户关闭同步、保存及加载期间取消等验证，不能直接作为修复交付。
+
+### 末端同步适配实施中
+
+- session91208原型退出0：末端八图范围、鼠标十字线/缩放/拖动、关闭同步及自动保存刷新恢复通过（/tmp/mw-edge-sync-prototype.log）。已删除测试内嵌原型，保留诊断开关。
+- 正式候选edgeRangeSync放入viewports.js，使用公开范围API；增加加载保护、工作区/布局生命周期、用户开关变更取消、错误提示及保存期间busy保护。新advanced-edge-sync.cjs验证对齐、加载跳过、用户关闭、销毁取消；既有range-sync/monthly-cache/autosave/viewports专项通过。
+- 正式浏览器session58522已退出1（/tmp/mw-edge-product.log），initial-load已记录原生_getActive undefined iterable异常，不能算通过。尚未证明与新适配因果关系，保持页面错误断言。此候选尚未完成交付验证。
+
+### 末端对齐加载取消回归
+
+- 审查候选发现：异步对齐第一图期间切换品种/周期，若快速完成加载，后续图仍可能应用旧视区。新增回归先失败（cWrites=1），再订阅品种/周期变化使当前对齐generation失效，修复后通过；销毁和布局重新绑定清理全部订阅。
+- edge-sync/viewports/range-sync/autosave/weekly-error/monthly-cache六项专项通过，源文件格式化并通过diff检查。
+- session58522上一轮末端范围/鼠标/保存刷新断言执行到末尾，最终因initial-load原生undefined iterable异常失败，不能宣称整轮通过。新session45217运行同一末端场景，日志/tmp/mw-edge-product-recheck.log；初始化异常仍保留为待核实项，没有过滤。

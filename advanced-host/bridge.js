@@ -16,7 +16,7 @@ let seq = 0,
   nativeSaving = false,
   workspaceEpoch = 0,
   nativeReadonly = false;
-let rangeGuard;
+let rangeGuard, edgeGuard;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
   1: "M1",
@@ -280,8 +280,8 @@ const feed = {
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
       const epoch = workspaceEpoch;
-      const completeTerminal = rangeGuard?.captureTerminalCompletion((chart) =>
-        chart.symbol() === s.ticker && chart.resolution() === res,
+      const completeTerminal = rangeGuard?.captureTerminalCompletion(
+        (chart) => chart.symbol() === s.ticker && chart.resolution() === res,
       );
       const finishTerminal = () => {
         // Let the native callback finish processing before restoring sync.
@@ -597,7 +597,7 @@ async function tick() {
 }
 function snapshot() {
   if (!ready || loading) return;
-  if (rangeGuard?.busy()) {
+  if (rangeGuard?.busy() || edgeGuard?.busy()) {
     dirty = true;
     return;
   }
@@ -719,7 +719,7 @@ function boot(
   const loadContent = layouts.getChartContent;
   const saveLayout = layouts.saveChart;
   layouts.saveChart = (data) => {
-    if (viewportRestoring || rangeGuard?.busy()) {
+    if (viewportRestoring || rangeGuard?.busy() || edgeGuard?.busy()) {
       dirty = true;
       return Promise.reject(Error("图表正在切换，数据就绪后自动保存"));
     }
@@ -742,6 +742,7 @@ function boot(
           loading ||
           viewportRestoring ||
           rangeGuard?.busy() ||
+          edgeGuard?.busy() ||
           epoch !== workspaceEpoch ||
           !currentNativeWorkspace?.id
         )
@@ -993,7 +994,18 @@ function boot(
     ).catch((e) =>
       send({ type: "error", error: "自选列表初始化失败：" + String(e) }),
     );
+    const bindEdgeSync = () => {
+      edgeGuard?.dispose();
+      edgeGuard = edgeRangeSync(
+        widget,
+        () => loading || viewportRestoring || !!rangeGuard?.busy(),
+        (error) =>
+          send({ type: "error", error: "时间范围同步失败：" + String(error) }),
+      );
+    };
     widget.subscribe("chart_load_requested", () => {
+      edgeGuard?.dispose();
+      edgeGuard = undefined;
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
@@ -1006,12 +1018,15 @@ function boot(
       loading = false;
       rangeGuard?.dispose();
       rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
+      bindEdgeSync();
       bindViewports();
     });
     rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
+    bindEdgeSync();
     bindViewports();
     widget.subscribe("layout_changed", () => {
       rangeGuard?.refresh();
+      edgeGuard?.refresh();
       bindViewports();
     });
     widget.drawOnAllChartsEnabled().setValue(true);
