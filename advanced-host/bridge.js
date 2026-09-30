@@ -326,9 +326,16 @@ const feed = {
                 ? ` · 当前区间已处理 ${Math.floor(status.progress.completed_ms / 60000)} / ${Math.ceil(status.progress.total_ms / 60000)} 分钟`
                 : ""),
           });
-          await new Promise((r) =>
-            setTimeout(r, status.queue_class === "background" ? 5000 : 1500),
-          );
+          if (frames[res] === "W1" && status.queue_class === "background") {
+            // Yield this native request immediately. tick() polls only while
+            // viewed, then invalidates the native cache when history is ready.
+            // Queued server jobs continue independently of this chart callback.
+            pendingHistory.set(JSON.stringify(args), args);
+            cb([], { noData: true });
+            finishTerminal();
+            return;
+          }
+          await new Promise((r) => setTimeout(r, 1500));
           checkActive();
           status = await historyQuery(args);
           checkActive();

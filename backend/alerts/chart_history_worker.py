@@ -11,7 +11,7 @@ from sqlalchemy import select
 from .config import settings
 from .market import import_once
 from .providers import fetch_oanda, fetch_binance
-from .market_data import queue_history, refresh_catalog
+from .market_data import advance_weekly_request, queue_history, refresh_catalog
 from .storage import Instrument, MarketDemand, now_ms, transaction
 
 
@@ -59,6 +59,7 @@ def run(fetch_page):
                     refreshed = time.monotonic()-86400+300
             if time.monotonic() - maintained > 15:
                 maintain_active()
+                advance_weekly_request()
                 maintained = time.monotonic()
             worked = import_once(chart_only=True, fetcher=fetch_page)
             time.sleep(0.2 if worked else 1)

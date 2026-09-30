@@ -16,6 +16,7 @@ from .storage import (
     Instrument,
     MarketCatalog,
     MarketDemand,
+    WeeklyHistoryRequest,
     instant,
     ms,
     now_ms,
@@ -162,6 +163,168 @@ def renew_demand(db, client, inst):
         db.add(demand)
     demand.expires = now_ms() + 120000
     demand.updated_at = now_ms()
+
+
+def plan_history(body: HistoryQuery):
+    if body.timeframe not in FRAMES:
+        raise HTTPException(422, "不支持的周期")
+    right = min(body.before or now_ms(), (now_ms() - 5000) // 60000 * 60000)
+    # Count is a preference, not a reason to eagerly download decades of M1.
+    span = min(31 * DAY, max(2 * DAY, int(FRAME_MS[body.timeframe] * body.limit * 1.5)))
+    left = max(0, right - span)
+    with transaction() as db:
+        inst = resolve(db, body.instrument)
+        calendar = Calendar(inst.calendar)
+        if body.timeframe == "MN":
+            # Monthly charts are an explicit cache-only view. Opening one
+            # must not plan dedicated M1 downloads, even for a large countBack.
+            rows = chart_rows(db, inst, "MN", body.before or now_ms() + 1, body.limit, now_ms())
+            return {
+                "status": "ready" if rows else "empty_interval",
+                "bars": rows,
+                "task_ids": [],
+                "failed_task_ids": [],
+                "error": None,
+                "retry_after": 0,
+                "queue_class": "cache_only",
+                "local_only": True,
+                "estimated_seconds": None,
+                "requested_start": 0,
+                "requested_end": right,
+                "next_cursor": rows[0]["start"] if rows else 0,
+                "remote_boundary": "unknown",
+            }
+        if body.timeframe in ("M30", "W1", "MN"):
+            left = ms(bounds(instant(left), body.timeframe, calendar)[0])
+        else:
+            left = ms(bucket_bounds(instant(left), body.timeframe, calendar)[0])
+        rows = chart_rows(
+            db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
+        )
+        # A cached range satisfies the request only when upstream query coverage is known.
+        if len(rows) >= body.limit:
+            left = max(left, rows[0]["start"])
+        background = body.timeframe == "W1"
+        scheduling = {"priority": 200} if background else {}
+        jobs, coverage = queue_history(db, inst, left, right, **scheduling)
+        # Coverage and bars must be observed in this order: a worker may commit
+        # between the preliminary cache lookup and acquiring the planner lock.
+        rows = chart_rows(
+            db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
+        )
+        # A fully queried short/empty window does not satisfy countBack.
+        # Expand deterministically from the original request, so repeated polls
+        # finish missing pages without walking backwards forever. Stop as soon
+        # as a page needs fetching; the next poll will reconsider its result.
+        for _ in range(3):
+            if (
+                len(rows) >= body.limit
+                or not covers_interval(coverage, left, right)
+                or left <= 0
+            ):
+                break
+            candidate = max(0, left - span)
+            if body.timeframe in ("M30", "W1", "MN"):
+                left = ms(bounds(instant(candidate), body.timeframe, calendar)[0])
+            else:
+                left = ms(bucket_bounds(instant(candidate), body.timeframe, calendar)[0])
+            left = max(0, left)
+            jobs, coverage = queue_history(db, inst, left, right, **scheduling)
+            rows = chart_rows(
+                db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
+            )
+        errors = [j.error for j in jobs if j.status == "failed"]
+        pending = [j for j in jobs if j.status in ("pending", "running")]
+        complete = covers_interval(coverage, left, right)
+        status = (
+            "error"
+            if errors and not complete
+            else "pending"
+            if not complete
+            else "ready"
+            if rows
+            else "empty_interval"
+        )
+        return {
+            "status": status,
+            "bars": rows,
+            "task_ids": [j.id for j in pending],
+            "failed_task_ids": [
+                j.id for j in jobs if j.status == "failed" and j.priority >= 100
+            ],
+            "error": errors[0] if errors else None,
+            "retry_after": 5 if background else 2,
+            "queue_class": "background" if background else "foreground",
+            "estimated_seconds": None,
+            "requested_start": left,
+            "requested_end": right,
+            "next_cursor": left,
+            "remote_boundary": "unknown",
+            "has_more_local": bool(
+                rows
+                and db.scalar(
+                    select(Bar.id)
+                    .where(
+                        Bar.instrument_id == inst.id,
+                        Bar.timeframe == "M1",
+                        Bar.start < rows[0]["start"],
+                    )
+                    .limit(1)
+                )
+            ),
+            "progress": {
+                "completed_ms": sum(b - a for a, b in missing_intervals([], left, right))
+                - sum(b - a for a, b in missing_intervals(coverage, left, right)),
+                "total_ms": right - left,
+            },
+        }
+
+
+def remember_weekly_request(body, end):
+    """Persist the requested count and cursor, not just the first planning window."""
+    import hashlib
+
+    ident = hashlib.sha256(f"{body.instrument}|{end}|{body.limit}".encode()).hexdigest()[:40]
+    with transaction() as db:
+        # Match the instrument lock used by queue_history to serialize duplicate tabs.
+        db.scalar(select(Instrument).where(Instrument.id == body.instrument).with_for_update())
+        if not db.get(WeeklyHistoryRequest, ident):
+            db.add(WeeklyHistoryRequest(id=ident, instrument_id=body.instrument,
+                before=end, cursor=end, remaining=body.limit, next_at=now_ms()))
+
+
+def advance_weekly_request():
+    """Advance one durable request per maintenance cycle; imports stay priority 200."""
+    with transaction() as db:
+        row = db.scalar(select(WeeklyHistoryRequest)
+            .where(WeeklyHistoryRequest.status == "pending", WeeklyHistoryRequest.next_at <= now_ms())
+            .order_by(WeeklyHistoryRequest.next_at, WeeklyHistoryRequest.id)
+            .with_for_update(skip_locked=True).limit(1))
+        if not row:
+            return False
+        ident, cursor, remaining = row.id, row.cursor, row.remaining
+        query = HistoryQuery(instrument=row.instrument_id, timeframe="W1", before=cursor, limit=remaining)
+        row.next_at = now_ms() + 30000
+    result = plan_history(query)
+    with transaction() as db:
+        row = db.get(WeeklyHistoryRequest, ident)
+        if row.cursor != cursor or row.remaining != remaining:
+            return True
+        if result["status"] in ("ready", "empty_interval"):
+            bars = [bar for bar in result["bars"]
+                    if result["requested_start"] <= bar["start"] < cursor]
+            row.remaining = max(0, remaining - len(bars))
+            next_cursor = min((bar["start"] for bar in bars), default=result["next_cursor"])
+            if row.remaining == 0:
+                row.status = "complete"
+            elif next_cursor < cursor and next_cursor > 0:
+                row.cursor = next_cursor
+            else:
+                # No invented upstream exhaustion; retain an inspectable failure.
+                row.status = "failed"
+        # A failed ImportJob remains reserved. Periodic reconsideration resumes
+        # only after an explicit retry fixes it, without creating duplicate work.
+    return True
 
 
 def router(authenticated):
@@ -333,118 +496,10 @@ def router(authenticated):
 
     @r.post("/history")
     def history(body: HistoryQuery):
-        if body.timeframe not in FRAMES:
-            raise HTTPException(422, "不支持的周期")
-        right = min(body.before or now_ms(), (now_ms() - 5000) // 60000 * 60000)
-        # Count is a preference, not a reason to eagerly download decades of M1.
-        span = min(31 * DAY, max(2 * DAY, int(FRAME_MS[body.timeframe] * body.limit * 1.5)))
-        left = max(0, right - span)
-        with transaction() as db:
-            inst = resolve(db, body.instrument)
-            calendar = Calendar(inst.calendar)
-            if body.timeframe == "MN":
-                # Monthly charts are an explicit cache-only view. Opening one
-                # must not plan dedicated M1 downloads, even for a large countBack.
-                rows = chart_rows(db, inst, "MN", body.before or now_ms() + 1, body.limit, now_ms())
-                return {
-                    "status": "ready" if rows else "empty_interval",
-                    "bars": rows,
-                    "task_ids": [],
-                    "failed_task_ids": [],
-                    "error": None,
-                    "retry_after": 0,
-                    "queue_class": "cache_only",
-                    "local_only": True,
-                    "estimated_seconds": None,
-                    "requested_start": 0,
-                    "requested_end": right,
-                    "next_cursor": rows[0]["start"] if rows else 0,
-                    "remote_boundary": "unknown",
-                }
-            if body.timeframe in ("M30", "W1", "MN"):
-                left = ms(bounds(instant(left), body.timeframe, calendar)[0])
-            else:
-                left = ms(bucket_bounds(instant(left), body.timeframe, calendar)[0])
-            rows = chart_rows(
-                db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
-            )
-            # A cached range satisfies the request only when upstream query coverage is known.
-            if len(rows) >= body.limit:
-                left = max(left, rows[0]["start"])
-            background = body.timeframe == "W1"
-            scheduling = {"priority": 200} if background else {}
-            jobs, coverage = queue_history(db, inst, left, right, **scheduling)
-            # Coverage and bars must be observed in this order: a worker may commit
-            # between the preliminary cache lookup and acquiring the planner lock.
-            rows = chart_rows(
-                db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
-            )
-            # A fully queried short/empty window does not satisfy countBack.
-            # Expand deterministically from the original request, so repeated polls
-            # finish missing pages without walking backwards forever. Stop as soon
-            # as a page needs fetching; the next poll will reconsider its result.
-            for _ in range(3):
-                if (
-                    len(rows) >= body.limit
-                    or not covers_interval(coverage, left, right)
-                    or left <= 0
-                ):
-                    break
-                candidate = max(0, left - span)
-                if body.timeframe in ("M30", "W1", "MN"):
-                    left = ms(bounds(instant(candidate), body.timeframe, calendar)[0])
-                else:
-                    left = ms(bucket_bounds(instant(candidate), body.timeframe, calendar)[0])
-                left = max(0, left)
-                jobs, coverage = queue_history(db, inst, left, right, **scheduling)
-                rows = chart_rows(
-                    db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
-                )
-            errors = [j.error for j in jobs if j.status == "failed"]
-            pending = [j for j in jobs if j.status in ("pending", "running")]
-            complete = covers_interval(coverage, left, right)
-            status = (
-                "error"
-                if errors and not complete
-                else "pending"
-                if not complete
-                else "ready"
-                if rows
-                else "empty_interval"
-            )
-            return {
-                "status": status,
-                "bars": rows,
-                "task_ids": [j.id for j in pending],
-                "failed_task_ids": [
-                    j.id for j in jobs if j.status == "failed" and j.priority >= 100
-                ],
-                "error": errors[0] if errors else None,
-                "retry_after": 5 if background else 2,
-                "queue_class": "background" if background else "foreground",
-                "estimated_seconds": None,
-                "requested_start": left,
-                "requested_end": right,
-                "next_cursor": left,
-                "remote_boundary": "unknown",
-                "has_more_local": bool(
-                    rows
-                    and db.scalar(
-                        select(Bar.id)
-                        .where(
-                            Bar.instrument_id == inst.id,
-                            Bar.timeframe == "M1",
-                            Bar.start < rows[0]["start"],
-                        )
-                        .limit(1)
-                    )
-                ),
-                "progress": {
-                    "completed_ms": sum(b - a for a, b in missing_intervals([], left, right))
-                    - sum(b - a for a, b in missing_intervals(coverage, left, right)),
-                    "total_ms": right - left,
-                },
-            }
+        result = plan_history(body)
+        if body.timeframe == "W1" and result["status"] == "pending":
+            remember_weekly_request(body, result["requested_end"])
+        return result
 
     @r.post("/retry/{ident}")
     def retry(ident: str):

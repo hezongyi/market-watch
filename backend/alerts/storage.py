@@ -424,6 +424,17 @@ class MarketDemand(Base):
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
 
 
+class WeeklyHistoryRequest(Base):
+    __tablename__ = "weekly_history_requests"
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), index=True)
+    before: Mapped[int] = mapped_column(BigInteger)
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    remaining: Mapped[int]
+    status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
+    next_at: Mapped[int] = mapped_column(BigInteger, index=True)
+
+
 class AdvancedPreference(Base):
     __tablename__ = "advanced_chart_preferences"
     id: Mapped[str] = mapped_column(String(64), primary_key=True)

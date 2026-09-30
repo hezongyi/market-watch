@@ -567,3 +567,12 @@
 - 水平线附带时间坐标会被原生重载重定位；该工具检查有效价格位置，趋势线严格检查时间及价格，不用水平线时间变化推断所有画线均丢失或均正确。
 - 测试同时直接比较操作前后服务器工作区列表完整JSON相等、桌面草稿保留、advanced-charts POST请求为空；测试创建的分析对象仅在内存，不修改保存文档。
 - native workspace adapter及edge range synchronization专项退出0。此项不代替其余绘图工具交互、周线持久补数生命周期、部署演练与整体验收。
+
+### 周线排队释放前端与持久需求候选
+
+- 周线pending立即完成原生回调并登记pendingHistory；tick在仍查看时检查完成并清缓存重载，离开时停止前端轮询。普通周期等待和月线只读缓存策略保持。
+- 新增advanced-weekly-background.cjs验证立即回调、守卫释放、完成重载及离开取消轮询；历史分页和重载专项均通过。
+- 原生浏览器注入W1 pending后切回真实M5、移动视区通过，errors=[]、零工作区写入（/tmp/mw-weekly-background-switch.log）。这是原生切换兼容证据，不是实际长周线下载完成证据。
+- 后端抽取plan_history共用规划逻辑，新增weekly_history_requests持久保存请求范围、剩余根数和游标；worker每轮维护推进一个到期需求，底层ImportJob仍为200优先级，失败导入不自动重试。完整需求不依赖网页继续请求。
+- 隔离SQLite专项28 passed（/tmp/mw-weekly-durable-tests.log），覆盖无浏览器三页推进、重复需求去重、完成停止及真实规划后台优先级。当前代码尚未重启开发API/worker或应用到生产；PostgreSQL并发/实际多窗口持续推进、完成自动重载和空历史范围边界仍待验收。
+- 本轮完整后端回归166 passed、5 skipped（/tmp/mw-weekly-full-tests.log）；跳过项不计为通过。新增表的开发运行环境验证尚未完成。

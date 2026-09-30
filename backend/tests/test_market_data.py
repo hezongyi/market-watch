@@ -815,3 +815,48 @@ def test_foreground_history_is_dispatched_before_older_weekly_job(database, monk
     with database.begin() as db:
         weekly = db.scalar(select(ImportJob).where(ImportJob.priority == 200))
         assert weekly.attempts == 0 and weekly.cursor == 60000
+
+
+def test_weekly_request_continues_without_browser(database, monkeypatch):
+    from alerts import market_data
+    from alerts.storage import WeeklyHistoryRequest
+
+    end = 1700000000000
+    query = market_data.HistoryQuery(instrument="EURUSD", timeframe="W1", before=end, limit=3)
+    market_data.remember_weekly_request(query, end)
+    market_data.remember_weekly_request(query, end)
+    with database() as db:
+        assert db.scalar(select(func.count()).select_from(WeeklyHistoryRequest)) == 1
+    calls = []
+    def page(body):
+        calls.append((body.before, body.limit))
+        return {"status":"ready", "requested_start":body.before-200,
+                "next_cursor":body.before-200,
+                "bars":[{"start":body.before-100}]}
+    monkeypatch.setattr(market_data, "plan_history", page)
+    for _ in range(3):
+        with database.begin() as db:
+            row = db.scalar(select(WeeklyHistoryRequest))
+            row.next_at = 0
+        assert market_data.advance_weekly_request()
+    assert calls == [(end,3),(end-100,2),(end-200,1)]
+    with database() as db:
+        row = db.scalar(select(WeeklyHistoryRequest))
+        assert row.status == "complete" and row.remaining == 0
+    assert not market_data.advance_weekly_request()
+
+
+def test_weekly_durable_planner_keeps_background_priority(database):
+    from alerts import market_data
+    from alerts.storage import WeeklyHistoryRequest
+
+    with database.begin() as db:
+        db.get(Instrument,"EURUSD").source = "oanda"
+    query = market_data.HistoryQuery(instrument="EURUSD", timeframe="W1", before=1700000000000, limit=13)
+    market_data.remember_weekly_request(query, query.before)
+    assert market_data.advance_weekly_request()
+    with database() as db:
+        jobs = db.scalars(select(ImportJob)).all()
+        assert jobs and all(job.priority == 200 for job in jobs)
+        row = db.scalar(select(WeeklyHistoryRequest))
+        assert row.status == "pending" and row.remaining == 13
