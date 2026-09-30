@@ -759,11 +759,22 @@ function boot(
   };
   const loadContent = layouts.getChartContent;
   const saveLayout = layouts.saveChart;
+  let busySaveNoticeShown = false;
   layouts.saveChart = (data) => {
     if (viewportRestoring || rangeGuard?.busy() || edgeGuard?.busy()) {
       dirty = true;
-      return Promise.reject(Error("图表正在切换，数据就绪后自动保存"));
+      if (!busySaveNoticeShown) {
+        busySaveNoticeShown = true;
+        widget.showNoticeDialog({
+          title: "等待图表就绪",
+          body: "图表正在切换，数据就绪后自动保存",
+          callback: () => {},
+        });
+      }
+      // Native save callbacks serialize rejection values; Error becomes {}.
+      return Promise.reject("图表正在切换，数据就绪后自动保存");
     }
+    busySaveNoticeShown = false;
     const state = JSON.parse(data.content);
     state._mwViewports = captureChartViewports(widget);
     return saveLayout({ ...data, content: JSON.stringify(state) });

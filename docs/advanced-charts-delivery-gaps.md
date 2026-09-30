@@ -961,3 +961,10 @@
 - Ubuntu Compose down移除五容器及独立网络，再up -d --wait --wait-timeout 90全部重建；保留受限开发配置、开发数据库和已构建镜像。前后466工作区摘要ded7e42ab502269961c0a2f39771f88d199a4a6ebe83f946a49634b9e66c1473、48偏好摘要8d6d223a549cb13c0ff4aadd26ecbc23eaea264e1249b0bb38a39e0603e0a834一致，两次命令退出0。
 - 重建后advanced-container-https.browser.cjs通过，/tmp/mw-recreate-https.log退出0，errors=[]、credentialsSentToChart=0；验证登录、图表加载、M15、说明入口及保存。
 - 验证图表栈容器与网络可重建且保存数据不丢；不是从零安装主机，不包含原行情/通知worker整站发布。未操作Unraid、未推送远端。
+
+### 忙碌期间手动保存提示与自动恢复
+
+- 新增advanced-busy-save.browser.cjs，在真实HTTPS原生图表中控制视区busy条件，创建真实画线并点击“保存布局”。原实现Error被库回调序列化为{}，更改为字符串后回调可读，但原生菜单仍无原因提示。
+- 适配层使用公开showNoticeDialog补充“图表正在切换，数据就绪后自动保存”，同一次忙碌阶段只提示一次；保留dirty，后续正常保存重置提示标志。不修改供应库。
+- /tmp/mw-busy-save-notice.log退出0：菜单提示可见并确认关闭、公开回调保留中文、解除busy后无需手动重试就将新画线保存入服务器、errors=[]。advanced-autosave.cjs回归通过。
+- 当前本机图表镜像acceptance-save-notice；API/worker和网页镜像未变化。忙碌条件为测试注入，验证适配与原生界面通路，不宣称模拟了所有上游时序。

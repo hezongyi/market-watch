@@ -15,7 +15,7 @@
 
 - `market-watch-api:acceptance-2bc223f`
 - `market-watch-web:acceptance-empty-load`：构建参数VITE_ADVANCED_CHART_ORIGIN=https://127.0.0.1:15444
-- `market-watch-chart-origin:acceptance-visible-poll`
+- `market-watch-chart-origin:acceptance-save-notice`
 - 回退样本：`market-watch-chart-origin:acceptance-2e35aa7`
 
 镜像由原Dockerfile构建；供应商包仍不提交Git。DockerHub直连超时的本机通过已授权代理获取基础镜像，再docker load导入；没有修改系统Docker代理配置。
@@ -27,7 +27,7 @@
 ```bash
 export MW_API_IMAGE=market-watch-api:acceptance-2bc223f
 export MW_WEB_IMAGE=market-watch-web:acceptance-empty-load
-export MW_CHART_IMAGE=market-watch-chart-origin:acceptance-visible-poll
+export MW_CHART_IMAGE=market-watch-chart-origin:acceptance-save-notice
 export MW_ACCEPTANCE_ENV=/tmp/mw-docker-acceptance/api.env
 export MW_ACCEPTANCE_DIR=/tmp/mw-docker-acceptance
 
