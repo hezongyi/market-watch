@@ -808,3 +808,10 @@
 - 扩展advanced-data-window.browser.cjs：完成OHLC、三时区和SMA(5)独立数值对照后，移除指标并添加原生SMA(10000)，通过鼠标重新选中历史K线。窗口Plot显示∅，缺失结果未被显示为0。
 - /tmp/mw-data-window-warmup.log退出0，errors=[]；本机Compose实测，未修改供应库、行情响应或生产环境。
 - 本条证明原生均线的预热缺失展示；Python指标输出仍需单独对照，不将本测试扩大为所有指标的缺口验证。
+
+### Python指标数据窗口端到端数值对照
+
+- advanced-data-window.browser.cjs新增Python SMA(5)：真实/api/charts/data响应按时间取值，对照五根后台close独立平均；原生数据窗口value按适配器五位精度对照选中的实际K线。
+- 首轮暴露测试的两个错误前提：主图dataReady不表示Python辅助序列完成；添加指标后同一鼠标坐标可能对应另一个时间。修正为等待实际显示值，并重新读取crossHairMoved时间，未改动产品算法或供应库。
+- /tmp/mw-data-window-python-ready.log退出0，选中1789333200，独立预期及窗口均为4356.702；OHLC、三时区、原生SMA和预热∅断言同时通过，errors=[]。
+- node tests/advanced-python-indicators.cjs通过：覆盖适配层的缺失值、真实零值、负值、输出键及时间映射；它不是Python缺失值的浏览器展示验收，不扩大证据范围。

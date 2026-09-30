@@ -15,6 +15,7 @@ const assert = require("node:assert/strict");
   const errors = [];
   const history = new Map(),
     responses = [];
+  const pythonResults = [];
   page.on("response", (response) => {
     if (!/\/api\/(market-data\/history|charts\/data)$/.test(response.url()))
       return;
@@ -22,6 +23,7 @@ const assert = require("node:assert/strict");
       response
         .json()
         .then((data) => {
+          pythonResults.push(...(data.indicators || []));
           for (const bar of data.bars || [])
             history.set(Number(bar.start), bar);
         })
@@ -192,6 +194,77 @@ const assert = require("node:assert/strict");
     "Native MA(5) versus independent backend-close average",
   );
 
+  await frame.evaluate(() => {
+    widget.activeChart().removeAllStudies();
+    return widget.activeChart().createStudy("守望 Python SMA", false, false, {
+      period: 5,
+    });
+  });
+  const pythonValue = () =>
+    pythonResults
+      .filter((i) => i.name === "SMA")
+      .flatMap((i) => i.series)
+      .filter((line) => line.key === "value")
+      .flatMap((line) => line.values)
+      .find(
+        (v) => Number(v.time) === selected * 1000 && Number.isFinite(v.value),
+      );
+  for (let attempt = 0; attempt < 30 && !pythonValue(); attempt++)
+    await page.waitForTimeout(1000);
+  assert.ok(pythonValue(), "Python SMA must return selected candle's value");
+  assert.ok(
+    Math.abs(pythonValue().value - expectedSma) < 1e-7,
+    "Python backend SMA versus independent average",
+  );
+  // dataReady() describes the main series; Python secondary series can still
+  // be loading. Read the displayed plot and its current crosshair together.
+  let pythonSelected, pythonExpected, pythonDisplayed;
+  for (let attempt = 0; attempt < 30; attempt++) {
+    await page.mouse.move(
+      box.x + box.width * 0.55 + 2,
+      box.y + box.height * 0.45,
+    );
+    await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.45);
+    await page.waitForTimeout(500);
+    pythonSelected = await frame.evaluate(() => window.selectedBarTime);
+    const pythonLines = (await ui.locator("body").innerText())
+      .split("\n")
+      .map((s) => s.trim());
+    const pythonIndex = pythonLines.lastIndexOf("value");
+    pythonDisplayed =
+      pythonIndex < 0
+        ? NaN
+        : Number(pythonLines[pythonIndex + 1].replaceAll(",", ""));
+    if (Number.isFinite(pythonDisplayed)) break;
+    await page.waitForTimeout(500);
+  }
+  assert.ok(
+    Number.isFinite(pythonDisplayed),
+    "Python plot must finish loading",
+  );
+  await Promise.all(responses);
+  assert.ok(
+    history.has(pythonSelected * 1000),
+    "Selected Python candle exists",
+  );
+  const pythonPrevious = [...history.values()]
+    .filter((b) => Number(b.start) <= pythonSelected * 1000)
+    .sort((a, b) => Number(a.start) - Number(b.start))
+    .slice(-5);
+  assert.equal(pythonPrevious.length, 5);
+  pythonExpected =
+    pythonPrevious.reduce((sum, b) => sum + Number(b.close), 0) / 5;
+  assert.equal(
+    pythonDisplayed,
+    Number(pythonExpected.toFixed(5)),
+    "Python data-window value must retain the adapter's five-digit precision",
+  );
+  console.log("PYTHON_WINDOW_SMA", {
+    pythonSelected,
+    pythonExpected,
+    pythonDisplayed,
+  });
+
   // A period longer than the available history must yield a missing value,
   // never a fabricated zero in the native data window.
   await frame.evaluate(() => {
@@ -201,17 +274,27 @@ const assert = require("node:assert/strict");
     });
   });
   await page.waitForTimeout(1500);
-  await page.mouse.move(box.x + box.width * 0.55 + 2, box.y + box.height * 0.45);
+  await page.mouse.move(
+    box.x + box.width * 0.55 + 2,
+    box.y + box.height * 0.45,
+  );
   await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.45);
   await page.waitForTimeout(500);
   const warmupLines = (await ui.locator("body").innerText())
-    .split("\n").map((s) => s.trim());
+    .split("\n")
+    .map((s) => s.trim());
   const warmupIndex = warmupLines.lastIndexOf("Plot");
-  assert.ok(warmupIndex >= 0, "Warmup study must remain visible in data window");
+  assert.ok(
+    warmupIndex >= 0,
+    "Warmup study must remain visible in data window",
+  );
   const warmupValue = warmupLines[warmupIndex + 1];
   console.log("WARMUP_DISPLAY", { warmupValue });
-  assert.ok(["∅", "—", "n/a", "N/A"].includes(warmupValue),
-    "Insufficient-history indicator must display a missing value: " + warmupValue);
+  assert.ok(
+    ["∅", "—", "n/a", "N/A"].includes(warmupValue),
+    "Insufficient-history indicator must display a missing value: " +
+      warmupValue,
+  );
   assert.deepEqual(errors, []);
   console.log("DATA_WINDOW_OHLC_VISIBLE", {
     selected,
