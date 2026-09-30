@@ -2,6 +2,8 @@
 
 2026-09-29。依据本地 TT v31.1.0 类型声明、bridge.js、indicators.js 与上一轮实际测试。原始能力分析；当前接入进度见下方更新说明及实施记录。接口存在不等于当前包所有功能均能运行；已知 export-data.bb1bdc415916b47fed24.js 缺失。
 
+最新按需求编号核对见 [当前交付核对](advanced-charts-current-acceptance.md)。
+
 ## 当前验收摘要（2026-09-30）
 
 下方能力表保留初次盘点时的描述，**属于历史分析，不是当前待办或验收结果**。当前证据以本摘要及 [交付缺口记录](advanced-charts-delivery-gaps.md) 为准。
