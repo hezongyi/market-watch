@@ -86,7 +86,25 @@ function drain() {
       reject(Error("行情请求超时"));
       drain();
     }, 30000);
-    pending.set(id, { resolve, reject, timer });
+    const entry = { resolve, reject, timer, cancellationTimer: null };
+    pending.set(id, entry);
+    if (isCurrent) {
+      const check = () => {
+        if (!pending.has(id)) return;
+        if (isCurrent()) {
+          entry.cancellationTimer = setTimeout(check, 100);
+          return;
+        }
+        pending.delete(id);
+        clearTimeout(timer);
+        send({ type: "cancel-request", id });
+        const error = Error("已取消旧图表的历史加载");
+        error.code = "HISTORY_CANCELLED";
+        reject(error);
+        drain();
+      };
+      entry.cancellationTimer = setTimeout(check, 100);
+    }
     send({ type, id, query });
   }
 }
@@ -1169,6 +1187,7 @@ addEventListener("message", async (e) => {
     if (!p) return;
     pending.delete(m.id);
     clearTimeout(p.timer);
+    clearTimeout(p.cancellationTimer);
     m.error ? p.reject(Error(m.error)) : p.resolve(m.result);
     drain();
   } else if (m.type === "init" && !widget)

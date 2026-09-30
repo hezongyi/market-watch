@@ -9,9 +9,10 @@ export function apiResponse(path: string, body: unknown, signal?: AbortSignal) {
 export function setCsrf(value: string) {
   csrf = value;
 }
-export async function api<T = any>(path: string, body?: unknown): Promise<T> {
+export async function api<T = any>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`/api${path}`, {
     method: body === undefined ? "GET" : "POST",
+    signal,
     credentials: "same-origin",
     headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),

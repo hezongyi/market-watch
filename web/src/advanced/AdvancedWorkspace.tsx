@@ -113,6 +113,7 @@ export default function AdvancedWorkspace() {
     };
   }, []);
   useEffect(() => {
+    const marketRequests = new Map<Window, Map<number, AbortController>>();
     const listener = async (e: MessageEvent) => {
       if (
         e.source !== frame.current?.contentWindow ||
@@ -124,6 +125,10 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if (m.type === "cancel-request") {
+        marketRequests.get(source)?.get(m.id)?.abort();
+        return;
+      }
       if (m.type === "loaded") {
         try {
           if (!mobile) await api("/advanced-charts/preferences/migrate", {});
@@ -377,6 +382,10 @@ export default function AdvancedWorkspace() {
           reply({ type: "result", id: m.id, error: "无效行情请求" });
           return;
         }
+        const controller = new AbortController();
+        if (!marketRequests.has(source)) marketRequests.set(source, new Map());
+        const sourceRequests = marketRequests.get(source)!;
+        sourceRequests.set(m.id, controller);
         inflight.current++;
         try {
           reply({
@@ -390,11 +399,14 @@ export default function AdvancedWorkspace() {
                     ? "/" + encodeURIComponent(q.args.id)
                     : ""),
               q.op === "search" ? undefined : q.args,
+              controller.signal,
             ),
           });
         } catch (e) {
           reply({ type: "result", id: m.id, error: String(e) });
         } finally {
+          sourceRequests.delete(m.id);
+          if (!sourceRequests.size) marketRequests.delete(source);
           inflight.current--;
         }
       } else if (m.type === "status") {
@@ -519,7 +531,11 @@ export default function AdvancedWorkspace() {
       }
     };
     addEventListener("message", listener);
-    return () => removeEventListener("message", listener);
+    return () => {
+      removeEventListener("message", listener);
+      for (const requests of marketRequests.values())
+        for (const controller of requests.values()) controller.abort();
+    };
   }, [origin]);
   async function create() {
     const name = prompt("工作区名称", "我的图表");
