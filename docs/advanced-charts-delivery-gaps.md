@@ -954,3 +954,10 @@
 - advanced-magnet.browser.cjs通过公开magnetEnabled/magnetMode启用强吸附，使用实际鼠标绘制趋势线，再以后台返回的H4行情逐个核对端点时间与OHLC价格。/tmp/mw-magnet-away.log退出0、errors=[]；端点1788224400/4456.75及1789722000/4398.01均匹配实际K线。
 - 初次测试第二落点在原生首次使用提示区域，Escape取消未完成线；记录发现第一点击已创建临时趋势线。测试关闭提示并使用未遮挡位置后完成，不属于产品绘图故障。selectLineTool公开Promise也等待就绪。
 - 未改供应库；验证范围为强吸附代表性趋势线，不宣称弱吸附距离算法或全部绘图工具吸附审计。已移除临时点击状态与截图诊断。
+
+### 本机图表栈整体容器重建
+
+- 新增advanced-recreate-storage.browser.cjs：MW_SNAPSHOT_MODE=before通过认证API读取完整工作区document/revision及偏好，在/tmp仅保存SHA256和数量；正常模式比较。对象键及顶层记录排序，文档内部数组顺序保留，避免掩盖布局/绘图顺序变化。
+- Ubuntu Compose down移除五容器及独立网络，再up -d --wait --wait-timeout 90全部重建；保留受限开发配置、开发数据库和已构建镜像。前后466工作区摘要ded7e42ab502269961c0a2f39771f88d199a4a6ebe83f946a49634b9e66c1473、48偏好摘要8d6d223a549cb13c0ff4aadd26ecbc23eaea264e1249b0bb38a39e0603e0a834一致，两次命令退出0。
+- 重建后advanced-container-https.browser.cjs通过，/tmp/mw-recreate-https.log退出0，errors=[]、credentialsSentToChart=0；验证登录、图表加载、M15、说明入口及保存。
+- 验证图表栈容器与网络可重建且保存数据不丢；不是从零安装主机，不包含原行情/通知worker整站发布。未操作Unraid、未推送远端。

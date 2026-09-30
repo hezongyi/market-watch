@@ -68,3 +68,9 @@ docker compose -f compose.acceptance.yaml restart web tls
 等待API健康后运行HTTPS浏览器检查。恢复当前版本时改回acceptance-2bc223f，执行相同命令。网页/TLS重启用于刷新上游容器地址；本次保持开发数据库不变，不还原旧备份覆盖现有数据。
 
 数据库恢复与应用回退是不同操作：真实恢复应使用随机隔离数据库，并核对工作区、偏好与周线队列内容。涉及结构降级时先在独立数据库验证旧程序兼容性；本次同结构回退不能作为其他版本的通用兼容证明。
+
+## 图表栈整体重建核对
+
+2026-09-30已在本机执行本项目down后up --wait，五容器和网络全部重新创建。重建前在web目录运行`MW_SNAPSHOT_MODE=before node tests/advanced-recreate-storage.browser.cjs`，重建后运行同一脚本（不带before），比较完整工作区/偏好摘要；浏览器依赖环境与其他验收测试相同。不要在两次快照之间编辑工作区或并行运行其他浏览器测试。
+
+随后运行advanced-container-https.browser.cjs验证加载与保存。此流程保留开发数据库、配置和镜像；不等于数据库恢复或从零配置整台主机。466个工作区和48项偏好内容比对及HTTPS检查已通过。
