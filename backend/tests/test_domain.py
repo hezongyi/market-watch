@@ -111,6 +111,15 @@ def test_dst_and_end_exclusivity():
     assert session_bounds(right, Calendar.NY17)[0] == right
 
 
+def test_autumn_dst_session_has_25_hours_and_exclusive_end():
+    before = datetime(2026, 11, 1, 6, tzinfo=UTC)
+    left, right = session_bounds(before, Calendar.NY17)
+    assert left == datetime(2026, 10, 31, 21, tzinfo=UTC)
+    assert right == datetime(2026, 11, 1, 22, tzinfo=UTC)
+    assert right - left == timedelta(hours=25)
+    assert session_bounds(right, Calendar.NY17)[0] == right
+
+
 def test_aggregate_missing_minute_not_complete():
     expected = {START + timedelta(minutes=i) for i in range(5)}
     rows = [

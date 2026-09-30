@@ -90,4 +90,9 @@ check(
   "XAUUSD",
   "2026-03-08T21:00:00.000Z",
 );
-console.log("9 calendar label cases passed; intraday timestamp unchanged");
+// Autumn NY17 boundary and a holiday-shortened trading session keep trading-date labels.
+check("2026-11-01T22:00Z", "2026-11-02T22:00Z", "1D", "XAUUSD", "2026-11-02T00:00:00.000Z");
+check("2026-10-25T21:00Z", "2026-11-01T22:00Z", "1W", "EURUSD", "2026-10-26T00:00:00.000Z");
+check("2026-11-26T22:00Z", "2026-11-27T18:45Z", "1D", "XAUUSD", "2026-11-27T00:00:00.000Z");
+check("2026-11-01T22:00Z", "2026-11-02T02:00Z", "240", "XAUUSD", "2026-11-01T22:00:00.000Z");
+console.log("13 calendar label cases passed; intraday timestamp unchanged");
