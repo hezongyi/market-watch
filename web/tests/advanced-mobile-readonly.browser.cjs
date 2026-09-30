@@ -10,10 +10,23 @@ const fs = require("fs");
   });
   const page = await browser.newPage({
     viewport: process.env.MARKET_WATCH_PORTRAIT
-      ? { width: 412, height: 915 } : { width: 915, height: 412 },
+      ? { width: 412, height: 915 }
+      : { width: 915, height: 412 },
     isMobile: true,
     hasTouch: true,
   });
+  const base = process.env.MARKET_WATCH_TEST_URL || "http://127.0.0.1:5188";
+  const cutoff = Number(process.env.MARKET_WATCH_HISTORY_BEFORE || 0);
+  if (cutoff)
+    await page.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
+      const q = route.request().postDataJSON();
+      return route.continue({
+        postData: JSON.stringify({
+          ...q,
+          before: Math.min(q.before || cutoff, cutoff),
+        }),
+      });
+    });
   const errors = [],
     writes = [];
   page.on("request", (r) => {
@@ -24,7 +37,8 @@ const fs = require("fs");
     if (m.type() === "error") console.log("CONSOLE", m.text().slice(0, 700));
   });
   page.on("response", async (r) => {
-    if (r.status() >= 400) console.log("HTTP_FAILURE", r.status(), new URL(r.url()).pathname);
+    if (r.status() >= 400)
+      console.log("HTTP_FAILURE", r.status(), new URL(r.url()).pathname);
     if (
       r.url().includes("/api/charts/data") ||
       r.url().includes("/api/market-data/history")
@@ -41,7 +55,7 @@ const fs = require("fs");
     }
   });
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("http://127.0.0.1:5188/");
+  await page.goto(base + "/");
   await page
     .getByLabel("管理员密码")
     .fill(
@@ -55,7 +69,9 @@ const fs = require("fs");
         ),
       ).password,
     );
-  const loginResponse = page.waitForResponse(r => r.url().endsWith("/api/login") && r.request().method() === "POST");
+  const loginResponse = page.waitForResponse(
+    (r) => r.url().endsWith("/api/login") && r.request().method() === "POST",
+  );
   await page.getByRole("button", { name: "登录工作台" }).click();
   require("node:assert/strict").equal((await loginResponse).status(), 200);
   await page.waitForFunction(async () => (await fetch("/api/session")).ok);
@@ -64,25 +80,37 @@ const fs = require("fs");
     localStorage.setItem("mw-tv-draft:" + rows[0].id, "preserve-desktop-draft");
     return rows[0].id;
   });
-  await page.goto("http://127.0.0.1:5188/advanced-charts");
-  await page.locator('iframe[title="专业图表工作区"]').waitFor({timeout:30000});
-  await page.waitForFunction(() => document.querySelector('iframe[title="专业图表工作区"]')?.contentWindow, null, {timeout:30000});
+  await page.goto(base + "/advanced-charts");
+  await page
+    .locator('iframe[title="专业图表工作区"]')
+    .waitFor({ timeout: 30000 });
+  await page.waitForFunction(
+    () =>
+      document.querySelector('iframe[title="专业图表工作区"]')?.contentWindow,
+    null,
+    { timeout: 30000 },
+  );
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
   if (!frame) {
-    console.log("MOBILE_FAILED_PAGE", page.url(), await page.locator("body").innerText(), page.frames().map(f=>f.url()));
-    await page.screenshot({path:"/tmp/mw-mobile-login-failure.png"});
+    console.log(
+      "MOBILE_FAILED_PAGE",
+      page.url(),
+      await page.locator("body").innerText(),
+      page.frames().map((f) => f.url()),
+    );
+    await page.screenshot({ path: "/tmp/mw-mobile-login-failure.png" });
     throw Error("Chart iframe did not initialize");
   }
-  await frame.evaluate(
-    () =>
-      new Promise((resolve) => widget.chart(0).setResolution("15", resolve)),
-  );
+  await frame.evaluate(() => widget.chart(0).setResolution("15"));
   await page.waitForTimeout(5000);
   await frame.evaluate(async () => {
     const c = widget.chart(0),
       r = c.getVisibleRange();
-    await c.setVisibleRange({ from: r.from - 3600, to: r.to - 3600 });
+    await c.setVisibleRange(
+      { from: r.from - 3600, to: r.to - 3600 },
+      { rejectByTimeout: 20000 },
+    );
     snapshot();
   });
   await page.waitForTimeout(5000);
@@ -119,7 +147,11 @@ const fs = require("fs");
       range: widget.chart(0).getVisibleRange(),
     })),
   );
-  await page.screenshot({ path: process.env.MARKET_WATCH_PORTRAIT ? "/tmp/mw-mobile-portrait.png" : "/tmp/mw-mobile-landscape.png" });
+  await page.screenshot({
+    path: process.env.MARKET_WATCH_PORTRAIT
+      ? "/tmp/mw-mobile-portrait.png"
+      : "/tmp/mw-mobile-landscape.png",
+  });
   console.log({ errors });
   require("node:assert/strict").deepEqual(errors, []);
   await browser.close();

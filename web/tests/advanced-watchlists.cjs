@@ -53,15 +53,25 @@ vm.runInContext(
   await delay(150);
   assert.equal(calls, 2, "failed snapshot must be retried on the next event");
   const remove = api.deleteList;
-  api.deleteList = id => {
+  api.deleteList = (id) => {
     remove(id);
-    assert.ok(Object.keys(lists).length, "native active-list reader must never see zero lists during restore");
+    assert.ok(
+      Object.keys(lists).length,
+      "native active-list reader must never see zero lists during restore",
+    );
   };
-  await context.nativeWatchlists({watchList:async()=>api},
-    {lists:[{id:'restored',title:'Saved',symbols:['XAUUSD']}],active:'restored'},
-    true,async()=>{},()=>{});
-  assert.equal(active,'restored');
-  assert.deepEqual(Object.keys(lists),['restored']);
+  await context.nativeWatchlists(
+    { watchList: async () => api },
+    {
+      lists: [{ id: "restored", title: "Saved", symbols: ["XAUUSD"] }],
+      active: "restored",
+    },
+    true,
+    async () => {},
+    () => {},
+  );
+  assert.equal(active, "restored");
+  assert.deepEqual(Object.keys(lists), ["restored"]);
   api.deleteList = remove;
   const count = handlers.length;
   await context.nativeWatchlists(
@@ -79,8 +89,14 @@ vm.runInContext(
     1,
     "native UI retains one empty container for an empty saved collection",
   );
-  assert.equal(api.getList(active).length,0,"empty preferences must not receive default symbols");
-  console.log("Watchlist restore avoids empty native collection; retry and readonly passed");
+  assert.equal(
+    api.getList(active).length,
+    0,
+    "empty preferences must not receive default symbols",
+  );
+  console.log(
+    "Watchlist restore avoids empty native collection; retry and readonly passed",
+  );
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;

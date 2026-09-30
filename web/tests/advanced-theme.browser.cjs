@@ -11,6 +11,18 @@ const fs = require("fs");
   const page = await browser.newPage({
     viewport: { width: 1600, height: 950 },
   });
+  const base = process.env.MARKET_WATCH_TEST_URL || "http://127.0.0.1:5188";
+  const cutoff = Number(process.env.MARKET_WATCH_HISTORY_BEFORE || 0);
+  if (cutoff)
+    await page.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
+      const q = route.request().postDataJSON();
+      return route.continue({
+        postData: JSON.stringify({
+          ...q,
+          before: Math.min(q.before || cutoff, cutoff),
+        }),
+      });
+    });
   const errors = [];
   page.on("console", (m) => {
     if (m.type() === "error") console.log("CONSOLE", m.text().slice(0, 700));
@@ -32,7 +44,7 @@ const fs = require("fs");
     }
   });
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("http://127.0.0.1:5188/");
+  await page.goto(base + "/");
   await page
     .getByLabel("管理员密码")
     .fill(
@@ -81,10 +93,11 @@ const fs = require("fs");
       return catalog;
     }),
   );
-  await page.goto("http://127.0.0.1:5188/advanced-charts");
+  await page.goto(base + "/advanced-charts");
   await page.waitForTimeout(15000);
   let frame = page.frames().find((f) => f.url().includes(":5187/?"));
-  await frame.evaluate(() => widget.changeTheme("Light"));
+  const theme = process.env.MARKET_WATCH_TEST_THEME || "Light";
+  await frame.evaluate((theme) => widget.changeTheme(theme), theme);
   await page.waitForTimeout(10000);
   await frame.evaluate(
     () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
@@ -95,7 +108,7 @@ const fs = require("fs");
   console.log("RESTORED_THEME", await frame.evaluate(() => widget.getTheme()));
   require("node:assert/strict").equal(
     (await frame.evaluate(() => widget.getTheme())).toLowerCase(),
-    "light",
+    theme.toLowerCase(),
   );
   console.log(
     "status",
@@ -112,7 +125,8 @@ const fs = require("fs");
       range: widget.chart(0).getVisibleRange(),
     })),
   );
-  await page.screenshot({ path: "/tmp/mw-demand.png" });
+  await page.screenshot({ path: `/tmp/mw-theme-${theme.toLowerCase()}.png` });
+  require("node:assert/strict").deepEqual(errors, []);
   console.log({ errors });
   await browser.close();
 })().catch((e) => {
