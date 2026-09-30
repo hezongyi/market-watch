@@ -697,3 +697,10 @@
 - 当前替代入口绕过缺失保存弹窗；原生“保存为”仍受供应文件缺失限制，没有宣称修复黑盒弹窗。后续需补用户可见说明、原生菜单应用/删除与覆盖/跨工作区及手机验收。
 - 本机web/静态库原Dockerfile构建成功，验收Compose更新至acceptance-style-fallback；未改API镜像或生产服务。前端tsc/Vite构建及模板适配、样式提取测试通过。
 - advanced-native-chart-template.browser.cjs真实点击替代保存入口、实际服务器存储、刷新后通过公开loadChartTemplate应用成功；背景恢复#123456，原有symbol/resolution/study IDs/drawing IDs保持一致，errors=[]。/tmp/mw-style-fallback.log退出0。此轮同工作区刷新，不冒充跨工作区完整生命周期证据。
+
+### 样式模板跨工作区原生应用与删除
+
+- advanced-native-chart-template.browser.cjs扩展：保存独立样式模板后另建工作区，断言workspace ID不同；在新工作区加入MA(21)及水平线，修改背景为对照色，通过真实原生“设置 → 模板 → 模板名 → 确认”应用。
+- 背景恢复#123456；品种、周期、指标ID、画线ID均与应用前一致。再打开原生模板菜单，悬停测试模板并点击“移除”，确认后真实preferences API不再返回该模板。/tmp/mw-style-delete.log退出0，errors=[]。
+- 首轮定位“设置”同时匹配图表/指标按钮，已限定header-toolbar-properties；属于测试定位修正，不宣称产品缺陷修复。
+- 此证据补齐跨工作区及原生应用/删除；同名覆盖、删除后的重新会话列表和手机只读仍需补验。原生“保存为”缺件仍使用独立“保存样式”入口替代。

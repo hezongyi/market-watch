@@ -1,4 +1,4 @@
-// Native study template UI → real development API → different workspace → reload.
+// Independent style save → real API → different workspace → native template menu.
 // Requires the local acceptance Compose stack; self-signed TLS is test-only.
 const { chromium } = require("playwright");
 const fs = require("node:fs");
@@ -98,6 +98,18 @@ const assert = require("node:assert/strict");
     "#123456",
   );
   assert.equal(stored.content.value.mainSourceProperties.symbol, undefined);
+  await page.evaluate(async () => {
+    const session = await (await fetch("/api/session")).json();
+    const response = await fetch("/api/advanced-charts/workspaces", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": session.csrf,
+      },
+      body: JSON.stringify({ name: "样式跨工作区验收" }),
+    });
+    if (!response.ok) throw Error("create " + response.status);
+  });
   await page.reload();
   await page.waitForTimeout(15000);
   const restored = page
@@ -107,6 +119,12 @@ const assert = require("node:assert/strict");
     () => ready && !loading && widget.activeChart().dataReady(),
     null,
     { timeout: 60000 },
+  );
+  assert.notEqual(
+    await page
+      .locator("iframe[data-workspace-id]")
+      .getAttribute("data-workspace-id"),
+    originalWorkspace,
   );
   const before = await restored.evaluate(async () => {
     widget.applyOverrides({ "paneProperties.background": "#654321" });
@@ -123,10 +141,11 @@ const assert = require("node:assert/strict");
       shapes: c.getAllShapes(),
     };
   });
-  await restored.evaluate(
-    (name) => widget.activeChart().loadChartTemplate(name),
-    name,
-  );
+  const restoredUI = restored.childFrames()[0];
+  await restoredUI.locator("#header-toolbar-properties").click();
+  await restoredUI.getByText("模板", { exact: true }).click();
+  await restoredUI.getByText(name, { exact: true }).click();
+  await restoredUI.getByRole("button", { name: "确认", exact: true }).click();
   const after = await restored.evaluate(async () => {
     const c = widget.activeChart();
     const state = await new Promise((ok) => widget.save(ok));
@@ -141,8 +160,23 @@ const assert = require("node:assert/strict");
   assert.equal(after.background, "#123456");
   delete after.background;
   assert.deepEqual(after, before);
+  await restoredUI.locator("#header-toolbar-properties").click();
+  await restoredUI.getByText("模板", { exact: true }).click();
+  const item = restoredUI
+    .locator("[data-series-theme-item-theme-name]")
+    .filter({ hasText: name });
+  await item.hover();
+  await item.getByRole("button", { name: "移除", exact: true }).click();
+  await restoredUI.getByRole("button", { name: "是", exact: true }).click();
+  await page.waitForFunction(
+    async (name) =>
+      !(await (await fetch("/api/advanced-charts/preferences")).json()).some(
+        (r) => r.kind === "chart" && r.name === name,
+      ),
+    name,
+  );
   assert.deepEqual(errors, []);
-  console.log("STYLE_FALLBACK_SAVE_RELOAD_APPLY_PASSED", {
+  console.log("STYLE_CROSS_WORKSPACE_NATIVE_APPLY_DELETE_PASSED", {
     preserved: after,
     errors,
   });
