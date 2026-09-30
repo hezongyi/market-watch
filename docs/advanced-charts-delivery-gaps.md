@@ -1098,3 +1098,9 @@
 - /tmp/mw-three-layout-observe.log及/tmp/mw-three-layout-final.log退出0，三图尺寸从530×841/530×406/530×405变为630×841/430×475/430×336，刷新逐项相同，errors=[]。截图/tmp/mw-three-layout-resize.png已目视，无空图或面板遮挡。
 - 首轮数据ready后立即读取高度偏小46px，后续两次恢复一致。测试增加等待保存的宽高在2px误差内恢复，覆盖原生布局晚于dataReady的完成时序；未放宽尺寸断言。产品未修改。复杂布局以这个含两方向嵌套分隔线的代表性案例闭合，结合既有42布局切换、八图保存、双图拖动证据，不声称42种均做了逐条鼠标拖动。
 - 不同品种十字线价格位置仍待核验：已有crossHairMoved事件包含相同price，但事件值本身不能证明价格轴或水平线实际被错误联动，需要单独检查画面与价格轴范围。
+
+### 首发三品种十字线价格位置验证
+
+- 新增advanced-crosshair-price.browser.cjs：EURUSD/XAUUSD/BTCUSDT三列M5，原生crosshairSync开启。仅在验收工作区通过公开override把十字线设为鲜明紫色，鼠标移入EURUSD，用canvas像素区分竖向时间线与横向价格线。
+- /tmp/mw-crosshair-price-asserted.log实际退出0：三个主画布竖列紫色像素均841，活动EURUSD横行314像素；XAU/BTC横行最多2像素（竖线宽度），断言非活动异品种无水平价格线通过。三个价格轴range鼠标前后逐值一致。/tmp/mw-crosshair-price-isolation.png已目视，三图时间标签均2026-09-28 18:10。
+- 旧crossHairMoved消息携带相同price不能用来判定视觉价格联动：本次真实渲染和价格轴证据覆盖首发三品种正常价格范围，不宣称任意新增品种价格区间重叠时库都会按symbol屏蔽横线。产品代码未改动，errors=[]。
