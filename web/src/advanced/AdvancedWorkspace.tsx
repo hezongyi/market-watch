@@ -30,6 +30,7 @@ export default function AdvancedWorkspace() {
   const [frameKey, setFrameKey] = useState(0);
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
+  const [historyProgress,setHistoryProgress] = useState<Record<string,string>>({});
   const [feedError, setFeedError] = useState("");
   const [syncNotices, setSyncNotices] = useState<Record<string, string>>({});
   const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
@@ -72,6 +73,7 @@ export default function AdvancedWorkspace() {
     });
   const select = (row: Workspace) => {
     setPollErrors({});
+    setHistoryProgress({});
     setSyncNotices({});
     unsaved.current = false;
     current.current = row;
@@ -127,6 +129,20 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if (m.type === "history-progress") {
+        const key=String(m.key).slice(0,100),text=String(m.text).slice(0,200);
+        setHistoryProgress(previous=> {
+          const next={...previous};
+          if(text)next[key]=text;else delete next[key];
+          return next;
+        });
+        return;
+      }
+      if (m.type === "history-views" && Array.isArray(m.keys)) {
+        const keys=new Set(m.keys.slice(0,8));
+        setHistoryProgress(previous=>Object.fromEntries(Object.entries(previous).filter(([key])=>keys.has(key))));
+        return;
+      }
       if (m.type === "history-plans-open") {
         setHistoryPlansOpen(true); return;
       }
@@ -596,6 +612,9 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
+      {Object.keys(historyProgress).length>0 && <div className="history-progress" role="status" aria-live="polite">
+        {Object.entries(historyProgress).map(([key,text])=><div key={key}>{text}</div>)}
+      </div>}
       {Object.keys(syncNotices).length > 0 && (
         <div role="status" className="advanced-error" data-testid="viewport-notice">
           {Object.values(syncNotices).join("；")}

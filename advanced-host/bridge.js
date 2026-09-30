@@ -332,9 +332,9 @@ const feed = {
         // revision invalidates this native cache and restores the viewport.
         cb(bars,{noData:bars.length < args.limit});
         if (!bars.length) finishTerminal();
-        send({type:"status",text:bars.length < args.limit
+        send({type:"history-progress",key:symbol+"|"+res,text:bars.length < args.limit
           ? `${symbol} ${frames[res]} · 已显示 ${bars.length} 根，历史后台准备中`
-          : "行情已加载"});
+          : ""});
         return;
       }
       let before =
@@ -1227,6 +1227,9 @@ function boot(
     demandReporter?.dispose();
     demandReporter = chartDemandReporter(widget, clientId,
       async args => {
+        send({type:"history-views",keys:Array.from({length:widget.chartsCount()},(_,i)=> {
+          const chart=widget.chart(i);return chart.symbol()+"|"+chart.resolution();
+        })});
         const result = await request({op: "historyDemand", args}, "market");
         send({type: "feed-poll-state", key: "@history-demand", error: ""});
         // At most one sequential cache-only prewarm chain. Never schedules

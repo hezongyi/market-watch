@@ -107,3 +107,5 @@
 .history-plans-dialog th,.history-plans-dialog td { padding:12px; text-align:left; border-bottom:1px solid #78849a55; white-space:nowrap; }
 .history-plans-dialog button { min-height:36px; margin:3px; cursor:pointer; }
 .history-plans-dialog button:focus-visible { outline:2px solid #2962ff; outline-offset:2px; }
+
+.history-progress { position:absolute; z-index:3; left:64px; bottom:78px; max-width:calc(100% - 100px); padding:4px 8px; background:#202020e8; color:#ddd; font-size:11px; pointer-events:none; }
