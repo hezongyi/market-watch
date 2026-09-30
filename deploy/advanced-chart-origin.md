@@ -1,6 +1,6 @@
 # 隔离图表静态来源部署准备
 
-当前仅准备配置，尚未生产部署或完成镜像验收。
+本机已完成原Dockerfile构建、隔离容器及HTTPS联调；尚未生产部署。当前复现步骤见[本机容器验收](local-container-acceptance.md)。
 
 ## 构建
 
@@ -20,7 +20,7 @@ docker build --build-arg VITE_ADVANCED_CHART_ORIGIN=https://charts.example.com -
 
 示例域名需替换为实际配置。此参数是公开地址，不可传入token或密码。现有compose默认构建未设置该参数，正式配置需要通过构建覆盖文件传入，不能直接沿用默认开发端口。
 
-## 本机验收（待执行）
+## 静态镜像基础验收
 
 ```sh
 docker run --rm -p 127.0.0.1:15187:80 --name market-watch-chart-origin-check market-watch-chart-origin:VERSION
@@ -50,4 +50,4 @@ docker compose -f compose.external-db.yaml -f compose.advanced.yaml config --qui
 
 覆盖文件包含隔离静态服务、主站构建参数、单独低并发图表补数worker。图表worker使用外置库配置并显式禁用通知发送；原有通知worker保持原配置。本覆盖文件专用于外置库基础文件，不能直接用于内置PostgreSQL配置。
 
-开发机尚无Docker，未验证Compose合并和镜像运行；上述config检查及隔离环境构建仍是发布前必需项。不要在日志输出完整config，因为基础env_file可能包含敏感值。
+开发机已安装Docker，生产配置合并检查及本机独立验收配置已验证；外置库生产配置尚未在生产启动。不要在日志输出完整config，因为基础env_file可能包含敏感值。

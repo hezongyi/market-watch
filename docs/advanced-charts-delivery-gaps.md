@@ -664,3 +664,12 @@
 - 首轮因并行旧开发API触及dev角色8连接限制而超时；已核对PID/cwd停止Ubuntu8004旧API3055378，日志确认正常退出。不调高数据库权限、不重启Unraid。当前Vite5190的8004后端暂未恢复，容器验收入口为https://localhost:15443。
 - /tmp/mw-container-browser-retry.log退出0：实际Docker主站+API+静态库+TLS，登录、创建开发验收工作区、图表加载、M15切换、原生保存成功；errors=[]，图表来源未观察到Cookie/Authorization。截图/tmp/mw-container-https.png已生成。测试忽略本机自签证书错误，不代表公网证书链验证完成。
 - 尚未执行容器版本回退、完整Compose启动/worker以及公网正式地址配置；单次联调通过不等于生产已发布。
+
+### 独立 Compose、容器worker与静态版本回退
+
+- 新增compose.acceptance.yaml与deploy/local-container-acceptance.md，可复现本机新增图表栈。API/worker各1连接、通知强制关闭、env_file raw、TLS仅挂证书文件，端口只绑定127.0.0.1。
+- 停止已核对的Ubuntu旧chart_history_worker PID3055418及四个手动验收容器，再启动独立Compose，/tmp/mw-compose-up.log完成；/tmp/mw-compose-browser.log退出0，HTTPS联调通过。
+- 容器worker日志实际记录XAU_USD两分钟2行下载2.075秒、总入库2.475秒；证明容器内供应商连接与入库链路，不将仅进程Running当作功能通过。
+- 从git2e35aa7静态适配文件+原授权包构建独立回退镜像，Compose替换chart-origin并重启TLS，HTTP返回viewports.js与2e35aa7逐字节一致；/tmp/mw-container-rollback-browser.log退出0。
+- 再恢复412703c镜像，HTTP脚本与当前代码逐字节一致；/tmp/mw-container-forward-browser.log退出0。两轮登录、图表加载、M15切换/保存、无页面异常及无跨来源凭据断言通过。
+- 演练限图表静态版本切换，未回退开发数据库；原行情/通知worker不在此Compose，不能宣称整个生产服务栈已部署验收。原生产Compose仅config合并验证，生产域名/证书配置仍待发布阶段。

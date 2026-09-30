@@ -1,0 +1,50 @@
+# Local Ubuntu acceptance only. Images must already be built for the tested commit.
+name: market-watch-acceptance
+x-service: &service
+  restart: "no"
+  labels:
+    market-watch.purpose: acceptance
+  mem_limit: 512m
+  cpus: 1
+x-api: &api
+  <<: *service
+  image: ${MW_API_IMAGE:?Set the tested API image}
+  env_file:
+    - path: ${MW_ACCEPTANCE_ENV:?Set a restricted development-only env file}
+      format: raw
+  environment:
+    ALERTS_DELIVERY_ENABLED: "false"
+    ALERTS_DATABASE_POOL_SIZE: "1"
+    ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    ALERTS_DATABASE_APPLICATION_NAME: market-watch-compose-acceptance
+services:
+  api:
+    <<: *api
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+  chart-history-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.chart_history_worker"]
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    <<: *service
+    image: ${MW_WEB_IMAGE:?Set the tested web image}
+    depends_on:
+      api: {condition: service_healthy}
+  chart-origin:
+    <<: *service
+    image: ${MW_CHART_IMAGE:?Set the tested chart image}
+    ports: ["127.0.0.1:15187:80"]
+  tls:
+    <<: *service
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:15443:443", "127.0.0.1:15444:444"]
+    volumes:
+      - ${MW_ACCEPTANCE_DIR:?Set local TLS fixture directory}/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${MW_ACCEPTANCE_DIR}/cert.pem:/certs/cert.pem:ro
+      - ${MW_ACCEPTANCE_DIR}/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
