@@ -922,11 +922,16 @@ function boot(
     async args => {
       if (!ready || loading || rangeGuard?.busy() || edgeGuard?.busy()) return false;
       const epoch = workspaceEpoch;
+      let cacheInvalidated = false;
       for (let i=0;i<widget.chartsCount();i++) {
         const chart = widget.chart(i);
         if (chart.symbol() !== args.instrument || frames[chart.resolution()] !== args.timeframe) continue;
         const symbol=chart.symbol(), resolution=chart.resolution();
         const restored = await refreshChartHistory(widget,chart,()=> {
+          // Native panes share the symbol/resolution cache. Invalidating it
+          // again for each pane can clear a sibling's in-flight barset.
+          if (cacheInvalidated) return;
+          cacheInvalidated = true;
           let invalidated = false;
           for (const sub of subscriptions.values()) {
             if(decode(sub.symbol).symbol===symbol && sub.res===resolution) {

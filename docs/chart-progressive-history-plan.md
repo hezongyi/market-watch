@@ -402,3 +402,20 @@
 - 实际Python指标回归发现before:null被父页面指标RPC正整数校验拒绝（/tmp/mw-indicators-latest-cache.log）。修正bridge调用指标计算时省略最新查询的before，保留历史查询的数字截止时间，不放宽父页面校验。
 - 本机重新构建/部署latest-cache-local后同一真实浏览器用例通过：100根SMA，1801.7ms，旧阻塞规划器调用0；同时会话请求58/706/1623ms且均HTTP200。证据/tmp/mw-indicators-latest-fixed.log。Python计算耗时与原生内置指标/纯K线缓存切换指标分开报告。
 - 新候选八图三品种实时两分钟回归已启动，日志/tmp/mw-eight-latest-cache.log，结果待核验。
+
+### 最新快照八图回归未通过
+
+- /tmp/mw-eight-latest-cache.log：八图三品种持续采样后，collapse阶段再次出现原生nearestIndex/gotoTimeRange/seriesCompleted的Value is undefined异常，最终errors断言失败。不能沿用397f387此前单轮通过作为新缓存候选的兼容证明。
+- 已启动相同实时用例的渐进刷新差异追踪，/tmp/mw-eight-latest-trace.log；需要区分最新滚动页成员变化引起的重复reset与布局切换竞争。保持功能和原生代码不变，先收集差异证据。
+
+### 八图异常复现范围进一步收窄
+
+- 上轮追踪进程已退出0，/tmp/mw-eight-latest-trace.log最终errors=[]、latestRequests=29，且无HISTORY_REFRESH_TRACE事件。说明原生异常是间歇问题，不能宣称已修复，也不能将上轮失败直接归因于所有历史刷新。
+- 新增advanced-revision-layout.browser.cjs候选：通过浏览器响应替换模拟已收盘bar修订，不写数据库；在公开refreshChartHistory实际进入后立即收起/展开布局，验证刷新与布局变更重叠。最新用例去除旧固定日期路由，避免历史/最新数据混用；当前运行日志/tmp/mw-revision-layout-overlap.log待核验。
+
+### 多图共享缓存重复失效修复候选
+
+- 重叠复现基线/tmp/mw-revision-layout-overlap.log中expand-0/expand-1触发原生_createBarsetForRange的Value is null。测试仅改浏览器返回的已收盘bar高价/revision，并断言真实refreshChartHistory已进入；未写行情库。其错误栈与此前nearestIndex异常不同，仍需原始两分钟用例复验。
+- 原changed回调每刷新同品种/周期的一个窗格都会再次调用所有共享订阅reset，可能在另一个窗格加载中清除共享barset。候选将缓存失效限制为该批一次，窗格仍逐个通过公开接口刷新。
+- 相同重叠用例仅替换候选bridge，通过三次历史修订/收起/展开，errors=[]、退出0（/tmp/mw-revision-layout-once.log）。响应拦截测试补充关闭页面时的异常处理，避免Playwright输出请求头。
+- 正在部署Ubuntu chart-origin:shared-reset-local，随后复验原始实时八图；尚不能据这一个候选测试宣布八图问题已完全解决。

@@ -1,5 +1,5 @@
 // Development acceptance: real history date jump and viewport retention.
-// Creates a workspace and requests EURUSD M1 around 2026-08-12; requires local ports 5188/5187.
+// Creates a workspace and requests EURUSD M1 around 2026-08-12; requires the local acceptance Compose stack.
 const { chromium } = require("playwright");
 const fs = require("fs");
 (async () => {
@@ -9,7 +9,10 @@ const fs = require("fs");
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE }
       : {}),
   });
+  const baseURL = process.env.MARKET_WATCH_TEST_URL || "https://localhost:15443";
+  const chartOrigin = process.env.MARKET_WATCH_CHART_ORIGIN || "https://127.0.0.1:15444/";
   const page = await browser.newPage({
+    ignoreHTTPSErrors: process.env.MARKET_WATCH_TEST_SELF_SIGNED === "1",
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
@@ -48,7 +51,7 @@ const fs = require("fs");
     }
   });
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("http://127.0.0.1:5188/");
+  await page.goto(baseURL + "/");
   await page
     .getByLabel("管理员密码")
     .fill(
@@ -97,9 +100,9 @@ const fs = require("fs");
       return catalog;
     }),
   );
-  await page.goto("http://127.0.0.1:5188/advanced-charts");
+  await page.goto(baseURL + "/advanced-charts");
   await page.waitForTimeout(15000);
-  const frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  const frame = page.frames().find((f) => f.url().startsWith(chartOrigin));
   const assert = require("node:assert/strict");
   const symbol = process.env.MARKET_WATCH_HISTORY_SYMBOL || "EURUSD";
   const resolution = process.env.MARKET_WATCH_HISTORY_RESOLUTION || "1";
