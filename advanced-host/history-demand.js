@@ -13,6 +13,7 @@ async function historicalNavigationPage(submit, read, checkActive, progress,
     const page = await read(window.window_end);
     checkActive();
     if (page.bars.length && page.bars[0].start <= window.window_start) return page;
+    if (window.window_error) throw Error(window.window_error);
     progress(page.bars.length);
     await pause();
   }

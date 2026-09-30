@@ -486,3 +486,8 @@
 - /tmp/mw-switch-navigation.log两轮14次M1–D1切换退出0，第二轮两帧绘制机会22.4–34.7ms，首轮25.1–63.2ms；柱距始终6。只是已有缓存单图指标。
 - 新增真实FastAPI history/demand回归：40天跨度anchor请求只将目标附近600根M1列为priority100首屏，持久化总目标仍保留。chart_history_plan共15项通过，ruff及diff检查通过。
 - 新版本原始八图实时回归/tmp/mw-eight-navigation.log运行中。候选待验收仍包括冷日期下载、同周期新导航替代旧导航、失败退出/重试、手机与其他范围审计。
+
+### 导航失败等待退出
+
+- history/demand仅对导航目标区间查询失败ImportJob及同周期聚合连续失败（>=5），返回通用window_error，不泄露上游异常。helper先尝试可用缓存，再根据window_error退出等待并引导历史任务重试，避免已可用数据被陈旧失败任务阻断。
+- 实际FastAPI目标优先测试增加失败job后续请求断言；15项chart_history_plan及前端navigation-page测试通过，ruff通过。此失败退出候选尚未构建部署；不将单元/接口测试等同于浏览器失败恢复验收。

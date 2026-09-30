@@ -309,5 +309,14 @@ def test_navigation_demand_prioritizes_target_window(database):
                 assert plan.target_start <= anchor
                 regions = priority_regions(db, plan, 0)
                 assert regions[0] == (anchor, anchor+600*60000, 100)
+                from alerts.storage import ImportJob
+                db.add(ImportJob(instrument_id='EURUSD',start=anchor,end=anchor+60000,
+                                 cursor=anchor,status='failed',priority=100))
+            failed_response=client.post('/api/market-data/history/demand',json={
+                'id':'historical-navigation','instrument':'EURUSD','timeframe':'M1',
+                'end':anchor+40*86400000,'anchor_start':anchor,'visible':200,'focused':True,
+            })
+            assert failed_response.status_code == 200
+            assert '历史任务' in failed_response.json()['window_error']
     finally:
         api_module.app.dependency_overrides.clear()

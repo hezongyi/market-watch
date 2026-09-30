@@ -639,6 +639,7 @@ def router(authenticated):
     @r.post("/history/demand")
     def viewport_demand(body: ViewportDemandQuery):
         from .chart_history_plan import history_end, history_start, update_demand
+        from .storage import ChartAggregationJob
 
         now = now_ms()
         with transaction() as db:
@@ -657,9 +658,22 @@ def router(authenticated):
                     visible=body.visible, focused=body.focused, now=now, required=required)
             except ValueError as error:
                 raise HTTPException(422, str(error)) from error
+            window_start = history_start(inst, body.timeframe, end, required or body.visible)
+            window_error = None
+            if body.anchor_start is not None:
+                failed = db.scalar(select(ImportJob.id).where(
+                    ImportJob.instrument_id == inst.id, ImportJob.status == 'failed',
+                    ImportJob.cursor < end, ImportJob.end > window_start).limit(1))
+                aggregate_failed = db.scalar(select(ChartAggregationJob.id).where(
+                    ChartAggregationJob.instrument_id == inst.id,
+                    ChartAggregationJob.timeframe == ('M15' if body.timeframe == 'M30' else body.timeframe),
+                    ChartAggregationJob.attempts >= 5,
+                    ChartAggregationJob.start < end, ChartAggregationJob.end > window_start).limit(1))
+                if failed or aggregate_failed:
+                    window_error = '目标日期数据处理失败，请在历史任务中重试'
             return {"target_start": plan.target_start, "target_end": plan.target_end,
                     "status": plan.status, "window_end": end,
-                    "window_start": history_start(inst, body.timeframe, end, required or body.visible)}
+                    "window_start": window_start, "window_error": window_error}
 
     @r.post("/history/cache")
     def cached_history(body: HistoryQuery):

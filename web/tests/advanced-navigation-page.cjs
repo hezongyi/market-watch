@@ -12,5 +12,6 @@ vm.runInContext(fs.readFileSync('../advanced-host/history-demand.js','utf8'),con
  await assert.rejects(context.historicalNavigationPage(submit,async()=>({bars:[]}),check,()=>{},async()=>{active=false}),/cancelled/);
  active=true;
  await assert.rejects(context.historicalNavigationPage(async()=>({status:'cancelled'}),()=>{throw Error('must not read')},check,()=>{}),/已取消/);
+ await assert.rejects(context.historicalNavigationPage(async()=>({window_start:1,window_end:2,window_error:'retry history'}),async()=>({bars:[]}),check,()=>{}),/retry history/);
  console.log('Historical navigation waits for target coverage and yields to cancellation');
 })().catch(e=>{console.error(e);process.exit(1)});
