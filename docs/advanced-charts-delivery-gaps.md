@@ -889,3 +889,10 @@
 - 扩展web/tests/advanced-history-reload.cjs：8个同品种/周期订阅使用一次分组查询；第一次query抛出临时上游异常时发送一个错误、polling最终复位且不丢订阅。下一次query成功后同一根bar更新全部8个订阅。
 - 同一分组查询尚未完成时再次tick不会并发发起第二个请求；释放原请求后polling恢复false。原有历史修订、范围扩展、失败重试和比较品种重载断言同时通过。
 - 在web目录运行node tests/advanced-history-reload.cjs：两条通过消息，退出0。此为bridge虚拟边界测试，不替代真实代理断线/行情源恢复测试；未修改产品实现。
+
+### b875934后收口回归
+
+- npm run build通过TypeScript/Vite构建。
+- 五组JS单测advanced-history-reload、advanced-python-indicators、advanced-preferences、advanced-native-workspaces、advanced-chart-style全部通过，覆盖轮询故障恢复、指标缺失值、偏好命名空间、工作区并发/只读与样式白名单。
+- 后端advanced_preferences、advanced_workspace、chart_export、backup组合16 passed、1 skipped。跳过项为未配置独立PG服务的真实恢复；此前隔离PG14完整backup测试5 passed仍有效，不把此次skip当作通过。单条Starlette/httpx弃用提醒。
+- 更新当前清单的基线和下一步顺序，移除对已完成模板/收藏/新增表恢复重复验收的过时安排。没有修改生产服务或升级验收容器镜像。
