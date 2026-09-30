@@ -1084,3 +1084,10 @@
 - 八图回归首次在临时关闭dateRangeSync时读开关失败，测试原先仅等rangeGuard；已加入edgeGuard空闲等待，复验进行中，不计为通过。
 
 - 八图复验/tmp/mw-closed-eight-final.log现已退出0：混合M5/M15/M30视区、鼠标平移缩放/十字线、关闭同步、保存刷新恢复通过。新增等待仅等真实edgeGuard工作完成，未放宽时间范围/同步状态断言。休市专项与普通八图同步回归均已通过。
+
+### 原生测量、自动缩放及视图重置验收
+
+- 新增advanced-native-measure.browser.cjs，在本机HTTPS真实XAUUSD H1上把价格轴手动设为1–2，点击原生底部“自动”，公开API确认isAutoScale=true且范围回到4082.39–4434.76附近。
+- 选择原生measure并实际鼠标拖动，/tmp/mw-native-measure.png目视可见测量区域及−4.50（−0.10%）、8根K线、9小时。该工具以canvas绘制，记录为实际截图检查，不冒充所有测量算法的逐值审计。
+- 点击原生log两次，getMode分别为1、0；人为把rightOffset设−50且价格范围设1–2，实际右键菜单点击“重置图表视图”后rightOffset>=0、自动缩放开启、价格轴恢复。
+- /tmp/mw-native-interactions-final.log退出0，pageErrors=[]；原生菜单需要异步渲染，已等待后再取菜单内容/截图。产品代码未改动。当前结果覆盖测量、自动缩放、对数按钮及代表性右键重置，不代表所有菜单项全部实现。
