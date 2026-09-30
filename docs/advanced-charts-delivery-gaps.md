@@ -724,3 +724,10 @@
 - 本机chart-origin镜像acceptance-layout-envelope构建并更新成功；/tmp/mw-mobile-envelope-fixed.log退出0：同一组工作区A→B→A、单图恢复、切周期/视区、保留画线指标测试通过；MOBILE_WRITES=[]、nativeReadonly=true、工作区与preferences前后完全相同、桌面草稿未改、无保存样式按钮、errors=[]。
 - 浏览器控制台记录库尝试加载analytics.js被现有CSP阻止，未开放外连。未改供应库或unraid生产服务。
 - 此修复覆盖raw和native包装，空state工作区切换及其他模板验收仍需独立核对，不将本轮手机通过等同完整交付。
+
+### 绘图模板原生保存、跨工作区应用及刷新
+
+- 新增advanced-native-drawing-template.browser.cjs：公开API创建4300水平线并设红色#ff1234/线宽3，通过真实原生属性窗口“模板 → 保存为”保存到服务器drawing模板。
+- 另建工作区并断言ID不同、画线数为0；新增价格4200的蓝色细线，经原生属性模板菜单应用已存样式。颜色/线宽变成#ff1234/3，价格保持4200，仍仅一根线，证明样式复用而非复制原实际画线。
+- 原生保存工作区、刷新，断言线条数量、颜色、线宽、价格全部保留。/tmp/mw-drawing-template-refresh.log退出0，errors=[]。
+- 此证据覆盖水平线的模板保存/读取/应用及持久化；绘图模板覆盖/删除和其他工具命名空间仍需核对，不能据此宣称全部绘图工具均已验收。
