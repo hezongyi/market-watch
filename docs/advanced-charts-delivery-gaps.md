@@ -600,3 +600,10 @@
 - /tmp/mw-weekly-status-review.png已查看，状态和原因文字完整显示，无遮挡。注入只作用于浏览器响应，不写入数据库。
 - 部署核对发现新增需求表缺少Alembic迁移，已补i10_weekly_history_requests（父版本h9）；临时SQLite完整upgrade head、downgrade h9、再upgrade head均成功，逐步断言表存在/不存在。日志/tmp/mw-weekly-migration.log。PostgreSQL正式迁移专项仍待验证。
 - 当前Ubuntu没有docker/podman/nginx命令，镜像运行与TLS隔离演练仍未完成，不以配置静态核对代替发布验收。
+
+### PostgreSQL 迁移与原生布局矩阵
+
+- 新增test_postgres_weekly_migration_roundtrip：实际Alembic从空独立schema升级head、回退h9、再升级head；逐步检查表存在性，并比较ORM字段集、nullable与索引。/tmp/mw-weekly-pg-migration.log：1 passed，4 deselected。测试schema清理完成，不使用bootstrap替代迁移。
+- 新增advanced-layout-matrix.browser.cjs，读取供应商d.ts的MultipleChartsLayoutType，加单图共42种布局逐项setLayout，等待各图dataReady且宽度>0，检查1–8图，多图maximize/restore，最终8v原生保存刷新恢复；/tmp/mw-layout-matrix.log退出0，LAYOUT_MATRIX_PASSED 42，页面异常为空。
+- 此矩阵证明公开API布局切换和最大化链路，不证明全部菜单鼠标路径、拖动分隔线或每一种布局单独保存恢复。只最后8v在本轮执行保存刷新，既有其他布局证据另见对应专项。
+- Ubuntu无需sudo即可创建用户namespace，但没有Docker/Podman及newuidmap等rootless工具；当前仍无实际镜像运行证据。

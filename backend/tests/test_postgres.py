@@ -247,3 +247,45 @@ def test_postgres_weekly_demand_dedup_and_concurrent_claim(monkeypatch):
         with engine.begin() as c:
             c.execute(text(f"DROP SCHEMA {schema} CASCADE"))
         engine.dispose()
+
+
+def test_postgres_weekly_migration_roundtrip():
+    """Exercise actual Alembic scripts, without bootstrap creating the new table."""
+    import subprocess
+    import uuid
+    from pathlib import Path
+    from sqlalchemy import inspect
+    from sqlalchemy.engine import make_url
+
+    engine = create_engine(URL, pool_size=1, max_overflow=0)
+    schema = "acceptance_" + uuid.uuid4().hex
+    root = Path(__file__).resolve().parents[2]
+    with engine.begin() as connection:
+        connection.execute(text(f"CREATE SCHEMA {schema}"))
+    isolated = create_engine(URL, pool_size=1, max_overflow=0,
+        connect_args={"options":f"-csearch_path={schema}"})
+    try:
+        env = os.environ.copy()
+        env["ALERTS_DATABASE_URL"] = make_url(URL).update_query_dict(
+            {"options":f"-csearch_path={schema}"}).render_as_string(hide_password=False)
+        env["PYTHONPATH"] = str(root / "backend")
+        for action, target in [("upgrade","head"),("downgrade","h9_chart_preferences"),("upgrade","head")]:
+            result = subprocess.run([str(root / ".venv/bin/alembic"),action,target],
+                cwd=root,env=env,capture_output=True,text=True,timeout=60)
+            # Do not print the captured output: connection failures may include credentials.
+            assert result.returncode == 0, f"Alembic {action} failed (output withheld)"
+            inspector = inspect(isolated)
+            assert inspector.has_table("weekly_history_requests") == (action == "upgrade")
+            if action == "upgrade":
+                columns = {column["name"]:column for column in inspector.get_columns("weekly_history_requests")}
+                expected = storage.WeeklyHistoryRequest.__table__
+                assert set(columns) == set(expected.columns.keys())
+                for column in expected.columns:
+                    assert columns[column.name]["nullable"] == column.nullable
+                assert {i["name"] for i in inspector.get_indexes("weekly_history_requests")} == {
+                    index.name for index in expected.indexes}
+    finally:
+        isolated.dispose()
+        with engine.begin() as connection:
+            connection.execute(text(f"DROP SCHEMA {schema} CASCADE"))
+        engine.dispose()
