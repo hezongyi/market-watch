@@ -215,6 +215,25 @@ def ingest(db, instrument, payload, received_at=None):
                 cursor += 60000
     if not touched:
         return 0
+    aggregate_touched(db, instrument, touched, received_at=received_at)
+    return len(changed)
+
+
+def aggregate_touched(db, instrument, touched, *, received_at=None,
+                      timeframes=("M5", "M15", "H1", "H4", "D1")):
+    """Rebuild selected periods from persisted M1, without fetching or altering M1.
+
+    Callers may process one period in a short independent transaction. The
+    instrument lock serializes revisions with live ingestion of the same bars.
+    """
+    timeframes = tuple(dict.fromkeys(timeframes))
+    if any(frame not in {"M5", "M15", "H1", "H4", "D1"} for frame in timeframes):
+        raise ValueError("Unsupported persisted aggregate timeframe")
+    if not touched or not timeframes:
+        return
+    db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
+    received_at = received_at or now_ms()
+    closures = closures_from(instrument.calendar_profile)
     calendar = Calendar(instrument.calendar)
     earliest = ms(bucket_bounds(min(touched), "D1", calendar)[0])
     latest_boundary = ms(bucket_bounds(max(touched), "D1", calendar)[1])
@@ -231,7 +250,7 @@ def ingest(db, instrument, payload, received_at=None):
         .order_by(Bar.start)
     ).all()
     calendar = Calendar(instrument.calendar)
-    for timeframe in ["M5", "M15", "H1", "H4", "D1"]:
+    for timeframe in timeframes:
         bounds = {bucket_bounds(t, timeframe, calendar) for t in touched}
         grouped = {}
         for row in minute_rows:
@@ -262,7 +281,7 @@ def ingest(db, instrument, payload, received_at=None):
                 c = Candle(c.start, c.end, c.open, c.high, c.low, c.close, complete)
                 outputs.append(c)
         write_bars(db, instrument.id, timeframe, outputs)
-    return len(changed)
+
 
 
 def enqueue_repair(db, instrument, left, right):

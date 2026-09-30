@@ -253,3 +253,46 @@ def test_historical_ingest_cannot_clear_live_error_and_recovery_is_audited(datab
         x for x in api_module.health()["market_incidents"] if x["instrument"] == "BTCUSDT"
     )
     assert not incident["current_error"] and incident["last_recovered_at"] is not None
+
+
+def test_selected_period_rebuild_matches_ingestion_across_transactions(database):
+    from datetime import timedelta
+
+    from alerts.market import aggregate_touched
+    from alerts.storage import ms
+    from sqlalchemy import delete
+
+    start = datetime(2026, 3, 9, 21, tzinfo=UTC)
+    stamp = ms(start)
+    payload = {'source': 'oanda', 'basis': 'mid',
+               'rows': [{'timestamp': stamp+i*60000, 'open': 10+i, 'high': 12+i,
+                         'low': 9+i, 'close': 11+i} for i in (0, 1, 5, 60, 61)],
+               'coverage': [{'start': stamp, 'end': stamp+120*60000}]}
+    received = stamp+120*60000+5000
+
+    def snapshot(db):
+        return [(r.timeframe, r.start, r.end, r.open, r.high, r.low, r.close, r.complete)
+                for r in db.scalars(select(Bar).where(Bar.instrument_id == 'XAUUSD')
+                                    .order_by(Bar.timeframe, Bar.start))]
+
+    with database.begin() as db:
+        inst = db.get(Instrument, 'XAUUSD')
+        inst.source = 'oanda'
+        inst.basis = 'mid'
+        ingest(db, inst, payload, received_at=received)
+        expected = snapshot(db)
+        db.execute(delete(Bar).where(Bar.instrument_id == inst.id, Bar.timeframe != 'M1'))
+    touched = {start+timedelta(minutes=i) for i in range(120)}
+    # D1 can be selected first; other periods rebuild in separate transactions.
+    for frame in ('D1', 'H4', 'H1', 'M15', 'M5'):
+        with database.begin() as db:
+            aggregate_touched(db, db.get(Instrument, 'XAUUSD'), touched,
+                              received_at=received, timeframes=(frame,))
+            present = {r.timeframe for r in db.scalars(select(Bar))}
+            assert frame in present
+    with database.begin() as db:
+        assert snapshot(db) == expected
+        revisions = list(db.scalars(select(Bar.revision)))
+        aggregate_touched(db, db.get(Instrument, 'XAUUSD'), touched,
+                          received_at=received, timeframes=('D1',))
+        assert list(db.scalars(select(Bar.revision))) == revisions
