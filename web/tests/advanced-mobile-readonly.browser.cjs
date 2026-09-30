@@ -126,6 +126,7 @@ const fs = require("fs");
     await frame.waitForFunction(()=>widget.activeChart().isMaximized()
       && widget.activeChart().getTimeScale().width()>250);
   }
+  if (!process.env.MARKET_WATCH_MOBILE_SKIP_PERIOD_PROBE) {
   await frame.evaluate(async () => {
     await widget.activeChart().setResolution("15");
     await new Promise(resolve=>setTimeout(resolve,0));
@@ -133,6 +134,9 @@ const fs = require("fs");
   await frame.waitForFunction(() => widget.activeChart().resolution() === "15"
     && widget.activeChart().dataReady() && widget.activeChart().getVisibleRange().from > 0,
     null, {timeout:60000});
+  }
+  if(process.env.MARKET_WATCH_MOBILE_SETTLE_PROBE)
+    await page.waitForTimeout(2000);
   console.log("MOBILE_BEFORE_RANGE", await frame.evaluate(()=>({
     active:widget.activeChart().symbol(),sync:widget.dateRangeSync().value(),
     guard:rangeGuard?.busy(),panes:Array.from({length:widget.chartsCount()},(_,i)=>({

@@ -508,3 +508,8 @@
 - session30516活动图修正后仍退出1，不能将先前问题归结为隐藏chart(0)。session35239关闭同步对照也退出1；错误前active EURUSD/M15、dataReady=true、width350、max=true，rangeGuard=false，其他图已就绪。
 - 原生堆栈在setVisibleTimeRange读取series interval/symbolInfo的ensureNotNull失败；尚不确定原生周期完成Promise与内部系列状态时序，未改供应商包或过滤异常。
 - session3384已退出1；增加第二次最大化后尺寸就绪等待、setResolution后让出事件循环，再复验原始流程（/tmp/mw-mobile-eight-layout-ready.log）。仍出现同一Value is null，不能关闭手机多图阅读验收。
+
+### 手机八图不切周期对照通过
+
+- session41027退出0（/tmp/mw-mobile-eight-no-period.log），只跳过切周期，保留八图最大化/恢复、视区移动、零写入及桌面草稿断言，errors=[]。证据将失败缩小到最大化后周期切换路径，不是最大化或八图阅读本身全部不可用。
+- 新周期切换等待对照，新增仅诊断切周期后2秒等待，日志/tmp/mw-mobile-eight-settle.log；不把延时视为产品修复，不放宽异常断言。
