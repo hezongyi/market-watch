@@ -123,11 +123,26 @@ const fs = require("fs");
     await frame.evaluate(()=>widget.activeChart().restoreChart());
     await frame.waitForFunction(()=>!widget.activeChart().isMaximized());
     await frame.evaluate(()=>widget.activeChart().maximizeChart());
+    await frame.waitForFunction(()=>widget.activeChart().isMaximized()
+      && widget.activeChart().getTimeScale().width()>250);
   }
-  await frame.evaluate(() => widget.activeChart().setResolution("15"));
+  await frame.evaluate(async () => {
+    await widget.activeChart().setResolution("15");
+    await new Promise(resolve=>setTimeout(resolve,0));
+  });
   await frame.waitForFunction(() => widget.activeChart().resolution() === "15"
     && widget.activeChart().dataReady() && widget.activeChart().getVisibleRange().from > 0,
     null, {timeout:60000});
+  console.log("MOBILE_BEFORE_RANGE", await frame.evaluate(()=>({
+    active:widget.activeChart().symbol(),sync:widget.dateRangeSync().value(),
+    guard:rangeGuard?.busy(),panes:Array.from({length:widget.chartsCount()},(_,i)=>({
+      symbol:widget.chart(i).symbol(),res:widget.chart(i).resolution(),
+      ready:widget.chart(i).dataReady(),range:widget.chart(i).getVisibleRange(),
+      width:widget.chart(i).getTimeScale().width(),max:widget.chart(i).isMaximized()
+    }))
+  })));
+  if(process.env.MARKET_WATCH_MOBILE_NO_SYNC_PROBE)
+    await frame.evaluate(()=>{widget.dateRangeSync().setValue(false);widget.timeSync().setValue(false)});
   await frame.evaluate(async () => {
     const c = widget.activeChart(),
       r = c.getVisibleRange();
