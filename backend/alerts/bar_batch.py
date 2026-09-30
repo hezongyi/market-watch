@@ -54,7 +54,10 @@ def write_bars(db, instrument_id, timeframe, candles):
                     "received_at": stamp,
                 }
             )
-        statement = insert(Bar).values(values)
+        # Reuse one parameterized statement instead of recompiling a SQL
+        # expression with thousands of per-row bind parameters for every batch.
+        # Core execution preserves our explicit audit/identity expiry semantics.
+        statement = insert(Bar.__table__)
         statement = statement.on_conflict_do_update(
             index_elements=[Bar.instrument_id, Bar.timeframe, Bar.start],
             set_={
@@ -65,7 +68,7 @@ def write_bars(db, instrument_id, timeframe, candles):
             },
             where=or_(*(getattr(Bar, k) != getattr(statement.excluded, k) for k in keys)),
         )
-        db.execute(statement)
+        db.execute(statement, values)
         # ORM callers in this transaction must not see stale revision/value state.
         for row in old.values():
             db.expire(row)

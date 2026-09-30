@@ -931,3 +931,28 @@ def test_viewport_uses_confirmed_holiday_profile(database):
         assert result["end"] == ms(datetime(2026, 9, 25, 12, tzinfo=UTC))
         # A window containing any trading time is not labelled entirely closed.
         assert viewport_session(inst, start - 2 * 3600000, start + 3600000) == {"closed": False}
+
+
+def test_batch_crosses_page_boundary_and_preserves_revision_audit(database):
+    from datetime import timedelta
+
+    from alerts.storage import Audit
+
+    left = datetime(2026, 1, 5, tzinfo=UTC)
+    candles = [Candle(left+timedelta(minutes=i), left+timedelta(minutes=i+1),
+                      Decimal('10'), Decimal('11'), Decimal('9'), Decimal('10.5'))
+               for i in range(1001)]
+    with database.begin() as db:
+        write_bars(db, 'EURUSD', 'M1', candles)
+        write_bars(db, 'EURUSD', 'M1', candles)
+        assert db.scalar(select(func.count()).select_from(Bar)) == 1001
+        assert db.scalar(select(func.max(Bar.revision))) == 1
+        tracked = db.scalar(select(Bar).where(Bar.start == ms(candles[500].start)))
+        revised = Candle(candles[500].start, candles[500].end,
+                         Decimal('10'), Decimal('12'), Decimal('9'), Decimal('11'))
+        # Duplicate timestamp's last occurrence wins even across batch boundaries.
+        write_bars(db, 'EURUSD', 'M1', [*candles, revised])
+        assert tracked.high == 12 and tracked.revision == 2
+        assert db.scalar(select(func.count()).select_from(Audit).where(
+            Audit.kind == 'candle_revision')) == 1
+        assert db.scalar(select(func.count()).select_from(Bar)) == 1001
