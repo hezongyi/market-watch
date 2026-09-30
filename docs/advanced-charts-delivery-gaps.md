@@ -934,3 +934,9 @@
 - Ubuntu验收API和历史worker从acceptance-2bc223f回退acceptance-412703c，保留开发数据库；健康检查及advanced-container-https浏览器通过，/tmp/mw-api-rollback-412703c.log退出0、errors=[]。
 - 恢复acceptance-2bc223f并重启web/tls刷新地址，再次浏览器通过，/tmp/mw-api-forward-2bc223f.log退出0、errors=[]；5服务运行，API healthy。未操作Unraid。
 - 更新local-container-acceptance.md实际镜像标签与同结构回退命令；backup-and-restore.md将固定16表表述改为当前模型全部表。此次没有数据库迁移，不能推论任意旧镜像与未来结构兼容，也不等于全新整站重建演练。
+
+### 混合八图发现隐藏订阅继续保留
+
+- advanced-eight-chart-soak.browser.cjs新增MARKET_WATCH_MIXED_SOAK=1：8图分配XAUUSD/EURUSD/BTCUSDT，每图原生MA21。两分钟运行3订阅/3分组、24次轮询、pending为0；但收尾切单图后订阅数量未降至1，测试失败，不能计为混合负载整体验收通过。
+- /tmp/mw-mixed-soak-final.log记录30秒释放等待超时。缩短复现/tmp/mw-mixed-teardown-probe.log：layout=s、chartsCount=1、可见XAUUSD，subscriptions仍含XAUUSD/EURUSD/BTCUSDT。说明原生保留隐藏窗格订阅，当前轮询会继续处理它们。
+- 已保留混合模式失败断言作为待修复回归；临时缩短探查脚本删除。后续应在公开可见图表/比较/Python需求范围内抑制无可见需求的轮询，同时避免破坏再展开布局。未把此缺陷隐去或降低单图验收要求。

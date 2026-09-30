@@ -78,6 +78,26 @@ const assert = require("node:assert/strict");
     null,
     { timeout: 60000 },
   );
+  const mixed = process.env.MARKET_WATCH_MIXED_SOAK === "1";
+  if (mixed) {
+    await frame.evaluate(async () => {
+      widget.symbolSync().setValue(false);
+      const symbols = ["XAUUSD", "EURUSD", "BTCUSDT"];
+      for (let i = 0; i < 8; i++) {
+        const c = widget.chart(i);
+        await new Promise((ok) => c.setSymbol(symbols[i % 3], ok));
+        await c.createStudy("Moving Average", false, false, { length: 21 });
+      }
+    });
+    await frame.waitForFunction(
+      () =>
+        Array.from({ length: 8 }, (_, i) => widget.chart(i)).every(
+          (c) => c.dataReady() && c.getAllStudies().length === 1,
+        ),
+      null,
+      { timeout: 90000 },
+    );
+  }
   let latestRequests = 0;
   page.on("request", (r) => {
     if (
@@ -105,7 +125,7 @@ const assert = require("node:assert/strict");
     assert.equal(sample.charts, 8);
     assert.equal(
       sample.groups,
-      1,
+      mixed ? 3 : 1,
       "Same symbol/resolution must share a polling group",
     );
     assert.ok(sample.subscriptions <= 8);
@@ -118,7 +138,7 @@ const assert = require("node:assert/strict");
     console.log("EIGHT_CHART_SAMPLE", sample);
   }
   assert.ok(
-    latestRequests >= 4 && latestRequests <= 12,
+    latestRequests >= (mixed ? 12 : 4) && latestRequests <= (mixed ? 36 : 12),
     "Two minutes must poll once per group, not eight times per interval: " +
       latestRequests,
   );
