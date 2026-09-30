@@ -338,3 +338,10 @@
 - 原soak脚本新增MARKET_WATCH_CANDIDATE_VIEWPORTS，仅route替换自有viewports.js，其他运行代码不变。
 - 候选完整运行仍失败，日志/tmp/mw-eight-candidate.log：expand阶段nearestIndex/gotoTimeRange Value is undefined；恢复八图最终tick仅2组HTTP请求，预期3组。不能关闭该卡点。
 - 候选对旧刷新让位仍有单位测试价值，但当前证据否定其足以修复原生异常。下一步缩小布局循环，独立控制dateRangeSync与progressivePoll，检查恢复期间订阅/数据完成状态。
+
+### 布局短复现尚未复现完整soak异常
+
+- 新增advanced-layout-race.browser.cjs，从相同八图混合品种+均线初始化开始，连续3次单图/八图切换；baseline运行errors=[]。
+- 加回原流程clearInterval(poll)、等待polling完成、缓存过期及手动tick后仍errors=[]，日志/tmp/mw-layout-manual-tick.log。
+- 因此短布局循环不是当前异常的充分触发条件，不能据此宣称修复，也不应直接改日期同步。两分钟状态积累/历史修订仍是待验证条件。原完整失败soak保留。
+- 探针支持no-sync/no-progressive用于后续单变量实验，但本次只运行baseline；未对未运行模式宣称结果。
