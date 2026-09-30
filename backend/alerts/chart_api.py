@@ -16,8 +16,9 @@ from sqlalchemy import delete, func, select, update
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, chart_rows, future_grid
+from .chart_history_plan import bucket_has_trading
 from .chart_indicators import CATALOG, calculate, validate
-from .domain import Calendar, has_trading_gap
+from .domain import Calendar
 from .storage import (
     Bar,
     ChartTemplate,
@@ -504,7 +505,7 @@ def router(authenticated):
                     closures = closures_from(inst.calendar_profile)
                     for prev, row in zip(all_rows, all_rows[1:]):
                         if prev["end"] < row["start"]:
-                            row["gap_before"] = has_trading_gap(
+                            row["gap_before"] = bucket_has_trading(
                                 instant(prev["end"]),
                                 instant(row["start"]),
                                 Calendar(inst.calendar),

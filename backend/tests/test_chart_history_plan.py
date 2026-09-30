@@ -224,3 +224,23 @@ def test_resume_bounds_legacy_queue_and_prioritizes_current_view(database):
         # Repeated resume must not revive the deferred slices.
         control_plan(db, 'EURUSD', 'resume', end+1)
         assert sum(job.status == 'pending' for job in jobs) == 2
+
+
+def test_boundary_gap_scan_matches_reference_across_both_dst_changes():
+    from datetime import timedelta
+
+    from alerts.calendar_profile import Closure
+    from alerts.chart_history_plan import bucket_has_trading
+    from alerts.domain import Calendar, has_trading_gap
+
+    for start in (datetime(2026, 3, 6, 21, tzinfo=UTC),
+                  datetime(2026, 10, 30, 21, tzinfo=UTC)):
+        closure = Closure(start=start+timedelta(days=2),
+                          end=start+timedelta(days=3, minutes=17),
+                          reason='irregular reopen', source='https://example.com/calendar')
+        for calendar in (Calendar.NY17, Calendar.UTC0):
+            for gold in (False, True):
+                for hours in (48, 72, 96):
+                    end = start+timedelta(hours=hours)
+                    assert bucket_has_trading(start, end, calendar, gold, (closure,)) == (
+                        has_trading_gap(start, end, calendar, gold=gold, closures=(closure,)))

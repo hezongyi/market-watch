@@ -192,3 +192,11 @@
 - 新增advanced-progressive-indicators.browser.cjs，登录真实页面并调用合成SMA数据通路，断言不访问旧补数规划器且返回有效计算值。
 - 首次运行失败：frame.evaluate报告“行情请求超时”，日志/tmp/mw-python-progressive-browser.log。API同时出现QueuePool size1 overflow0、15秒连接等待超时，发生于authenticated读取会话。该证据表明候选不能交付，需要定位占用连接的请求及缩短事务，而非扩大已约定连接上限。
 - 并发运行日志出现历史入库1.041至6.081秒、实时循环3.252至9.126秒；不是稳定性能SLO证据。此前临时表批量写入优化不代表整条链路性能通过。
+
+### Python指标超时根因与修复验收
+
+- 只读开发库实测XAUUSD H1为13499根。cProfile读取约0.49秒，逐分钟has_trading_gap扫描588个间断耗时56.67秒，SMA计算0.019秒；主要成本是每分钟反复检查约260条闭市记录，长事务占据API唯一连接。
+- chart_api复用已验证的bucket_has_trading边界扫描，仍使用ZoneInfo和原scheduled_open日历，不自定义DST规则。同数据缺口扫描1.07秒，总计1.60秒（含profiler开销）。
+- 新增春季/秋季DST、UTC0/NY17、黄金/外汇、非整点恢复交易的差分验证；计划测试12 passed，原chart_workspace19 passed，ruff通过。
+- Ubuntu api已更新indicator-gap-fix镜像，web/chart和两个worker仍progressive-a257803；镜像与源代码仅import排序差异，最终交付仍需统一构建记录。
+- 原失败浏览器用例重跑成功：PYTHON_PROGRESSIVE bars=100 elapsed=1385ms planners=0，日志/tmp/mw-python-progressive-fixed.log。证明真实页面桥接下已有H1历史的Python SMA可返回有效值且不走旧规划等待。不能代替冷数据逐批曲线刷新、多图压力或M1大历史性能验收。
