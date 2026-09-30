@@ -883,3 +883,9 @@
 - /tmp/mw-eight-chart-soak.log退出0：两分钟8次最新行情请求；每次1订阅/1分组，pending RPC及pendingHistory均0，errors=[]。切回单图后chartsCount=1且subscriptions<=1。
 - Chromium图表帧performance.memory.usedJSHeapSize首样33073064字节，尾样33884371，途中约35MB后回落。此指标不是整个浏览器进程内存；无GC强制干预，不宣称两分钟证明长期无泄漏。
 - 此轮证明同品种同周期八图未按八倍放大轮询，暖数据无明显积压；多品种/多指标、冷历史及更长运行仍不由此单一场景覆盖。
+
+### 行情轮询失败恢复与重叠tick保护
+
+- 扩展web/tests/advanced-history-reload.cjs：8个同品种/周期订阅使用一次分组查询；第一次query抛出临时上游异常时发送一个错误、polling最终复位且不丢订阅。下一次query成功后同一根bar更新全部8个订阅。
+- 同一分组查询尚未完成时再次tick不会并发发起第二个请求；释放原请求后polling恢复false。原有历史修订、范围扩展、失败重试和比较品种重载断言同时通过。
+- 在web目录运行node tests/advanced-history-reload.cjs：两条通过消息，退出0。此为bridge虚拟边界测试，不替代真实代理断线/行情源恢复测试；未修改产品实现。

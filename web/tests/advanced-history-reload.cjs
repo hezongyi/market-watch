@@ -11,7 +11,7 @@ const context = vm.createContext({
   Intl,
   Error,
   location: { search: "?parent=http://localhost" },
-  parent: { postMessage() {} },
+  parent: { postMessage(message) { if (message.type === "error") events.push("error:" + message.error); } },
   crypto: { randomUUID: () => "test" },
   addEventListener() {},
   setTimeout,
@@ -132,6 +132,47 @@ tick();`,
     context,
   );
   assert.deepEqual(events, ["history", "comparison-chart"]);
+  events.length = 0;
+  await vm.runInContext(`(async()=>{
+pendingHistory.clear();
+subscriptions.clear();
+request = async()=>({ok:true});
+for (let i=0;i<8;i++) subscriptions.set('pane-'+i,{
+  symbol:'EURUSD',res:'5',last:0,
+  cb:bar=>events.push('bar:'+i+':'+bar.close),reset:()=>{}
+});
+globalThis.queryCalls=0;
+query=async()=>{queryCalls++;throw Error('simulated temporary upstream failure')};
+await tick();
+})()`, context);
+  assert.equal(vm.runInContext("polling", context), false);
+  assert.equal(vm.runInContext("queryCalls", context), 1);
+  assert.equal(events.length, 1);
+  assert.match(events[0], /temporary upstream failure/);
+  events.length = 0;
+  await vm.runInContext(`(async()=>{
+query=async()=>{queryCalls++;return {bars:[{start:300000,open:1,high:2,low:1,close:1.5}]}};
+await tick();
+})()`, context);
+  assert.equal(vm.runInContext("queryCalls", context), 2);
+  assert.equal(events.length, 8, "Recovered grouped query updates all eight subscribers");
+  assert.ok(events.every(event => event.endsWith(":1.5")));
+  assert.equal(vm.runInContext("subscriptions.size", context), 8);
+  assert.equal(vm.runInContext("polling", context), false);
+  events.length = 0;
+  await vm.runInContext(`(async()=>{
+let releaseQuery;
+query=()=>{queryCalls++;return new Promise(resolve=>{releaseQuery=resolve})};
+const runningTick=tick();
+await Promise.resolve();
+await tick();
+releaseQuery({bars:[]});
+await runningTick;
+})()`, context);
+  assert.equal(vm.runInContext("queryCalls", context), 3,
+    "An overlapping timer tick must not issue a second request");
+  assert.equal(vm.runInContext("polling", context), false);
+  console.log("Grouped polling recovers after failure and prevents overlapping requests");
   console.log(
     "Historical reload invalidates matching cache before resetting only matching panes",
   );
