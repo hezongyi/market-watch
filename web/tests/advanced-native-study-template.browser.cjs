@@ -76,7 +76,7 @@ const assert = require("node:assert/strict");
   await ui.getByRole("button", { name: "指标模板", exact: true }).click();
 
   await ui.getByText("保存指标模板", { exact: false }).click();
-  const templateName = "验收MA21-" + Date.now();
+  const templateName = "验收MA覆盖-" + Date.now();
   await ui.locator('input[maxlength="64"]').fill(templateName);
   await ui.locator('input[maxlength="64"]').press("Enter");
   await page.waitForFunction(
@@ -94,6 +94,39 @@ const assert = require("node:assert/strict");
     templateName,
   );
   assert.equal(typeof stored.content.value, "string");
+  await frame.evaluate(() => {
+    const chart = widget.activeChart();
+    chart
+      .getStudyById(chart.getAllStudies()[0].id)
+      .setInputValues([{ id: "length", value: 34 }]);
+  });
+  await ui.getByRole("button", { name: "指标模板", exact: true }).click();
+  await ui.getByText("保存指标模板", { exact: false }).click();
+  await ui.locator('input[maxlength="64"]').fill(templateName);
+  await ui.getByRole("button", { name: "保存", exact: true }).last().click();
+  let overwritten = [];
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const confirmation = ui.getByRole("button", { name: "是", exact: true });
+    if (await confirmation.isVisible()) await confirmation.click();
+    overwritten = await page.evaluate(
+      async (name) =>
+        (await (await fetch("/api/advanced-charts/preferences")).json()).filter(
+          (r) => r.kind === "study" && r.name === name,
+        ),
+      templateName,
+    );
+    if (overwritten[0]?.revision > stored.revision) break;
+    await page.waitForTimeout(500);
+  }
+  assert.equal(
+    overwritten.length,
+    1,
+    "Overwrite must not duplicate the template",
+  );
+  assert.equal(overwritten[0].id, stored.id);
+  assert.equal(overwritten[0].revision, stored.revision + 1);
+  assert.notEqual(overwritten[0].content.value, stored.content.value);
+
   await page.evaluate(async () => {
     const session = await (await fetch("/api/session")).json();
     const r = await fetch("/api/advanced-charts/workspaces", {
@@ -137,7 +170,7 @@ const assert = require("node:assert/strict");
     return c.getStudyById(c.getAllStudies()[0].id).getInputValues();
   });
   assert.ok(
-    applied.some((x) => x.id === "length" && x.value === 21),
+    applied.some((x) => x.id === "length" && x.value === 34),
     JSON.stringify(applied),
   );
   await page.waitForTimeout(2500);

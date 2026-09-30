@@ -815,3 +815,10 @@
 - 首轮暴露测试的两个错误前提：主图dataReady不表示Python辅助序列完成；添加指标后同一鼠标坐标可能对应另一个时间。修正为等待实际显示值，并重新读取crossHairMoved时间，未改动产品算法或供应库。
 - /tmp/mw-data-window-python-ready.log退出0，选中1789333200，独立预期及窗口均为4356.702；OHLC、三时区、原生SMA和预热∅断言同时通过，errors=[]。
 - node tests/advanced-python-indicators.cjs通过：覆盖适配层的缺失值、真实零值、负值、输出键及时间映射；它不是Python缺失值的浏览器展示验收，不扩大证据范围。
+
+### 原生指标模板同名覆盖闭环
+
+- advanced-native-study-template.browser.cjs先保存MA(21)，修改为MA(34)后用同名在原生对话框点击保存。服务器只保留一条study记录，ID不变，revision由1变2，模板内容更新。
+- 新建工作区应用该模板得到length=34；原生保存后刷新仍一致；删除模板后当前已应用MA(34)保持不变。/tmp/mw-study-overwrite-click.log退出0、errors=[]。
+- 首轮使用Enter提交同名模板未触发保存，改为实际保存按钮后通过；未修改产品代码或供应库。使用明确的服务器版本轮询等待持久化，不把对话框关闭当作成功依据。
+- 清除了临时窗口全文日志，保留版本、唯一性、内容变化和跨工作区结果断言。
