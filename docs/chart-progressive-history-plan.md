@@ -332,3 +332,9 @@
 - refreshChartHistory监听公开layout_about_to_be_changed，与鼠标/焦点变化一样使旧刷新不再恢复视区；current还检查图表对象仍占据原可见索引，避免索引被另一pane复用。
 - advanced-refresh-interaction.cjs新增布局变更期间onDataLoaded完成后不恢复旧视区、移除所有事件监听断言，通过。
 - 这是已确认生命周期遗漏的候选修正，尚未部署或重跑混合八图；不能认定其解决nearestIndex异常。下一步用同一失败浏览器流程验证，必要时继续隔离日期同步路径。
+
+### 布局保护候选未解决混合八图
+
+- 原soak脚本新增MARKET_WATCH_CANDIDATE_VIEWPORTS，仅route替换自有viewports.js，其他运行代码不变。
+- 候选完整运行仍失败，日志/tmp/mw-eight-candidate.log：expand阶段nearestIndex/gotoTimeRange Value is undefined；恢复八图最终tick仅2组HTTP请求，预期3组。不能关闭该卡点。
+- 候选对旧刷新让位仍有单位测试价值，但当前证据否定其足以修复原生异常。下一步缩小布局循环，独立控制dateRangeSync与progressivePoll，检查恢复期间订阅/数据完成状态。

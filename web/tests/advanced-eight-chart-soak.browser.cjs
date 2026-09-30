@@ -12,6 +12,10 @@ const assert = require("node:assert/strict");
     ignoreHTTPSErrors: true,
     viewport: { width: 1600, height: 950 },
   });
+  if (process.env.MARKET_WATCH_CANDIDATE_VIEWPORTS === "1")
+    await page.route('**/viewports.js', route => route.fulfill({
+      path: '../advanced-host/viewports.js', contentType: 'application/javascript',
+    }));
   const errors = [];
   let phase = "initialization";
   page.on("pageerror", (e) => {
