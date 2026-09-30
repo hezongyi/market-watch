@@ -909,3 +909,9 @@
 - 通过已鉴权/api/market-data/retry/{id}逐一重试这8个开发库任务，全部200；worker随后真实补回缺口。/tmp/mw-latest-history-after-retry.log显示失败列表清空，仅新一分钟待处理。
 - 固定刚请求过的截止1790765100000再次检查：/tmp/mw-latest-history-ready.log为ready，pending/failed任务均空，覆盖2684700000/2684700000毫秒，error=null。此处固定的是本次当前请求边界，未回避旧失败区间。
 - 只操作Ubuntu验收API和开发库任务，未操作Unraid生产服务。临时诊断脚本已删除；没有改供数算法。原生失败重试提示及供数服务可恢复，空错误文本的可读性仍可进一步改善。
+
+### 失败任务空错误提示修复
+
+- 最新历史诊断发现旧failed任务error为空。扩展test_failed_history_exposes_retryable_jobs覆盖具体文本、空字符串、None与纯空白；修复前3失败1通过，复现接口返回空错误。
+- market_data.history归一化失败消息，缺少具体原因时返回“历史补数任务失败，未记录具体原因；请重试”；保留已有具体错误和failed_task_ids，不改变任务重试/覆盖判断。
+- backend/tests/test_market_data.py全套34 passed，ruff与diff检查通过。当前只更新本地代码，验收容器仍用原API镜像，后续镜像更新需包含此修复；未操作生产。

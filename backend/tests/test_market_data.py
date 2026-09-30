@@ -240,7 +240,8 @@ def test_partial_countback_requests_more_history(database):
         api_module.app.dependency_overrides.clear()
 
 
-def test_failed_history_exposes_retryable_jobs(database):
+@pytest.mark.parametrize("failure_text", ["network failure", "", None, "   "])
+def test_failed_history_exposes_retryable_jobs(database, failure_text):
     with database.begin() as db:
         inst = db.get(Instrument, "EURUSD")
         inst.source = "oanda"
@@ -251,7 +252,7 @@ def test_failed_history_exposes_retryable_jobs(database):
             cursor=1699000000000,
             priority=100,
             status="failed",
-            error="network failure",
+            error=failure_text,
             attempts=5,
         )
         db.add(job)
@@ -271,6 +272,9 @@ def test_failed_history_exposes_retryable_jobs(database):
             ).json()
             assert result["status"] == "error"
             assert result["failed_task_ids"] == [ident]
+            assert result["error"] == (
+                (failure_text or "").strip() or "历史补数任务失败，未记录具体原因；请重试"
+            )
             assert client.post("/api/market-data/retry/" + ident).status_code == 200
             with database.begin() as db:
                 job = db.get(ImportJob, ident)

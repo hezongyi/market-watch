@@ -233,7 +233,10 @@ def plan_history(body: HistoryQuery):
             rows = chart_rows(
                 db, inst, body.timeframe, body.before or now_ms() + 1, body.limit, now_ms()
             )
-        errors = [j.error for j in jobs if j.status == "failed"]
+        errors = [
+            (j.error or "").strip() or "历史补数任务失败，未记录具体原因；请重试"
+            for j in jobs if j.status == "failed"
+        ]
         pending = [j for j in jobs if j.status in ("pending", "running")]
         complete = covers_interval(coverage, left, right)
         status = (
