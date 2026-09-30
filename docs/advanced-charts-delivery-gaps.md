@@ -836,3 +836,9 @@
 - 新增advanced-indicator-favorites.browser.cjs：通过原生指标目录悬停并点击星标，服务器chart.favoriteLibraryIndicators内容实际变化；新建工作区后刷新，工作区ID不同，原指标星标保持，再恢复初始收藏状态。
 - /tmp/mw-indicator-favorites-cross.log退出0、errors=[]；前置同工作区刷新测试/tmp/mw-indicator-favorites-hover.log也通过。样例为52周高点/低点，此处验证收藏，不验证该指标计算。
 - 复用已有settings_adapter，不修改供应库、不新增收藏存储。临时探查脚本已删除。绘图工具收藏仍需单独验收。
+
+### 原生绘图收藏跨工作区
+
+- advanced-drawing-favorites.browser.cjs真实展开左侧趋势线工具组，悬停水平线条目并点击星标。服务器chart.favoriteDrawings内容变化；新建工作区并刷新，工作区ID不同，水平线星标保持。最后恢复初始星标。
+- /tmp/mw-drawing-favorites-final.log退出0、errors=[]。首轮失败为脚本假定两层父节点包含星标，改为定位最近包含收藏按钮的祖先条目；未改产品DOM或供应库。
+- 该证据覆盖代表性绘图收藏的持久化与工作区共享，不代表已完成所有绘图工具交互。临时探查脚本已删除。
