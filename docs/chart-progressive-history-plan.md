@@ -419,3 +419,13 @@
 - 原changed回调每刷新同品种/周期的一个窗格都会再次调用所有共享订阅reset，可能在另一个窗格加载中清除共享barset。候选将缓存失效限制为该批一次，窗格仍逐个通过公开接口刷新。
 - 相同重叠用例仅替换候选bridge，通过三次历史修订/收起/展开，errors=[]、退出0（/tmp/mw-revision-layout-once.log）。响应拦截测试补充关闭页面时的异常处理，避免Playwright输出请求头。
 - 正在部署Ubuntu chart-origin:shared-reset-local，随后复验原始实时八图；尚不能据这一个候选测试宣布八图问题已完全解决。
+
+### 共享失效候选原始八图复验通过
+
+- 已部署shared-reset-local后原始实时八图/三品种两分钟用例退出0，/tmp/mw-eight-shared-reset.log最终latestRequests=29、errors=[]，包括collapse/expand后的轮询分组断言。结合修订重叠测试，当前证据支持这次修复；不替代冷品种及其他验收项。
+- 已开始本机真实EURUSD M1历史日期跳转，日志/tmp/mw-history-jump-shared-reset.log，未使用固定行情响应。
+
+### 历史日期跳转发现未满足要求
+
+- /tmp/mw-history-jump-shared-reset.log真实EURUSD M1请求2026-08-12 08:00–14:00 UTC，setVisibleRange约155ms返回，但20秒后range变为1790781960–1790782020，未保留目标日期。pending/failed均为空不能证明历史目标满足，右边界断言失败。
+- 需定位原生历史getBars需求是否进入持久化计划、空页边界与视区回退后的意图保存；当前仅视区上报可能丢失未加载日期。此项未解决，仍未交付。
