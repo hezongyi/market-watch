@@ -768,3 +768,50 @@ def test_chart_rate_limit_defers_other_jobs_for_same_source(database, monkeypatc
     with database.begin() as db:
         assert db.get(Preference, "market_backoff:oanda").value["until"] == expected
         assert all(j.cursor == 60000 for j in db.scalars(select(ImportJob)))
+
+
+def test_rate_limited_source_does_not_hold_other_source_in_queue(database, monkeypatch):
+    from alerts import market
+    from alerts.storage import Preference
+
+    monkeypatch.setattr(market, "now_ms", lambda: 1_000_000)
+    with database.begin() as db:
+        db.get(Instrument, "EURUSD").source = "oanda"
+        db.add(Preference(key="market_backoff:oanda", value={"until": 2_000_000}))
+        for index in range(20):
+            db.add(ImportJob(instrument_id="EURUSD", start=60000, end=120000,
+                             cursor=60000, priority=100, next_at=index))
+        db.add(Instrument(id="TEST_OTHER", label="Test", symbol="TEST", source="other",
+                          basis="mid", calendar="utc0", precision=2))
+        db.add(ImportJob(instrument_id="TEST_OTHER", start=60000, end=120000,
+                         cursor=60000, priority=100, next_at=100))
+    fetched = []
+
+    def fetch(source, *args):
+        fetched.append(source)
+        raise ValueError("test stops after dispatch")
+
+    assert market.import_once(chart_only=True, fetcher=fetch)
+    assert fetched == ["other"]
+
+
+def test_foreground_history_is_dispatched_before_older_weekly_job(database, monkeypatch):
+    from alerts import market
+
+    monkeypatch.setattr(market, "now_ms", lambda: 1_000_000)
+    with database.begin() as db:
+        db.add(ImportJob(instrument_id="EURUSD", start=60000, end=120000,
+                         cursor=60000, priority=200, next_at=0, created_at=0))
+        db.add(ImportJob(instrument_id="XAUUSD", start=60000, end=120000,
+                         cursor=60000, priority=100, next_at=100, created_at=100))
+    fetched = []
+
+    def fetch(source, symbol, *args):
+        fetched.append(symbol)
+        raise ValueError("test stops after dispatch")
+
+    assert market.import_once(chart_only=True, fetcher=fetch)
+    assert fetched == ["xauusd"]
+    with database.begin() as db:
+        weekly = db.scalar(select(ImportJob).where(ImportJob.priority == 200))
+        assert weekly.attempts == 0 and weekly.cursor == 60000

@@ -514,9 +514,21 @@ def once(symbol=None, start=None, end=None):
 def import_once(*, chart_only=False, fetcher=None):
     """One daily slice per iteration. Durable cursor and lease permit safe restart."""
     with transaction() as db:
+        # Skip all jobs of a cooling-down source in the selection query, rather
+        # than spending one worker iteration deferring each of its queued jobs.
+        cooling_sources = [
+            preference.key.removeprefix("market_backoff:")
+            for preference in db.scalars(
+                select(Preference).where(Preference.key.like("market_backoff:%"))
+            )
+            if preference.value.get("until", 0) > now_ms()
+        ]
         job = db.scalar(
             select(ImportJob)
             .where(
+                ImportJob.instrument_id.in_(
+                    select(Instrument.id).where(Instrument.source.not_in(cooling_sources))
+                ),
                 ImportJob.next_at <= now_ms(),
                 ImportJob.priority >= 100 if chart_only else ImportJob.priority < 100,
                 or_(

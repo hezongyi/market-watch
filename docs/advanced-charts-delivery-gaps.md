@@ -484,3 +484,9 @@
 - 图表/历史任务收到明确HTTP429时写入既有market_backoff源级记录，后续同源任务延后且游标保持；采用至少300秒退避，尊重更长Retry-After秒数/HTTP日期及已有退避，不通过异常字符串判断429。
 - 新回归覆盖秒数、日期、无header回退，行情专项24 passed（/tmp/mw-rate-limit-tests.log）。未修改供应商包或生产服务。旧常驻worker尚未加载此改动。
 - 通过异步问题请求用户停止Ubuntu宿主上的旧开发chart_history_worker；当前受限终端无法读取其进程，已核对主机身份的SSH仍publickey认证失败。等待协助期间其他实施继续，不标记整个目标blocked。
+
+### 数据源退避隔离及周线让位验证
+
+- 新回归创建20个处于源级退避的OANDA任务和一个可执行其他源任务，旧import_once只推迟第一条并返回false，回归失败。任务选择现整体排除退避源，仍保留领取后的退避复查，避免逐个任务消耗worker循环。
+- 另以实际import_once验证较新的priority100前台任务优先于更早priority200周线任务；周线游标及attempts不变。此为调度执行测试，不仅检查数据库priority字段。
+- 行情及导入专项27 passed（/tmp/mw-source-isolation.log）。运行worker尚未加载新代码，实时调度表现仍待验证；用户停止旧开发worker的协助请求仍待答复。
