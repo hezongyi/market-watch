@@ -414,3 +414,9 @@
 - 核对原启动记录：旧chart worker由后台Popen启动并写/tmp/mw-advanced-chart-worker.log，非当前可轮询的exec session；当前进程命名空间无法读取该后台进程信息。本轮未凭日志停止增长推断退出，也未重复启动常驻worker。
 - 增加启动日志：实际模块路径、OANDA/Binance是否启用代理（布尔值）；失败日志记录source/symbol/异常类/attempt/status，不输出异常文本、账户URL或凭据。用于下次正常加载新代码时区分配置与连接故障。
 - 新失败日志回归先失败后通过，行情专项21 passed（/tmp/mw-worker-diagnostics-tests.log）。旧worker尚未加载本轮改动，不能声称运行问题已解决。
+
+### 固定历史八图回归开始
+
+- 八图脚本增加显式MARKET_WATCH_HISTORY_BEFORE，仅测试请求固定before上界，仍通过真实API读取数据库；不会模拟行情响应。该模式不能证明实时或冷补数性能。初始品种统一EURUSD，保留第八图NZDUSD。
+- session70373退出1：四品种八图均ready，初次历史请求不再pending；目标右端恰好位于固定数据截止点时，同步后其他图右端保留不同周期的未来留白，严格右边界断言失败（/tmp/mw-eight-fixed-history.log）。尚不能判为所有历史位置同步失败。
+- 对照session89120将目标视区移到数据截止前4小时，其余配置不变，日志/tmp/mw-eight-fixed-interior.log；仍在运行，未计为通过。末端留白问题保持待处理。

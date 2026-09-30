@@ -11,6 +11,20 @@ const fs = require("fs");
   const page = await browser.newPage({
     viewport: { width: 1600, height: 950 },
   });
+  // Fixed historical acceptance still reads real backend data. It does not
+  // verify live ingestion or cold-history performance.
+  const cutoff = Number(process.env.MARKET_WATCH_HISTORY_BEFORE || 0);
+  if (cutoff) {
+    if (!Number.isSafeInteger(cutoff) || cutoff <= 0)
+      throw Error("Invalid historical cutoff");
+    await page.route(/\/api\/(market-data\/history|charts\/data)$/, route => {
+      const q = route.request().postDataJSON();
+      return route.continue({postData: JSON.stringify({
+        ...q, before: Math.min(q.before || cutoff, cutoff),
+      })});
+    });
+    console.log("HISTORICAL_ACCEPTANCE_CUTOFF", cutoff);
+  }
   const errors = [];
   if (process.env.MARKET_WATCH_RANGE_GUARD_SOURCE)
     await page.route("**/range-sync.js*", (route) =>
@@ -78,7 +92,7 @@ const fs = require("fs");
         return r.json();
       }
       const row = await post("/advanced-charts/workspaces", {
-        name: "按需历史验收 NZDUSD",
+        name: "八图历史视区验收",
       });
       await post("/advanced-charts/workspaces/" + row.id + "/save", {
         name: row.name,
@@ -86,12 +100,12 @@ const fs = require("fs");
         document: {
           engine: "tv31",
           schemaVersion: 1,
-          symbol: "OANDA:NZD_USD",
+          symbol: "EURUSD",
           interval: "5",
         },
       });
       const catalog = await (
-        await fetch("/api/market-data/catalog?query=NZD_USD")
+        await fetch("/api/market-data/catalog?query=EURUSD")
       ).json();
       return catalog;
     }),
