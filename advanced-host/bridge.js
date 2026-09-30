@@ -971,9 +971,9 @@ function boot(
           send({ type: "error", error: "工作区入口加载失败：" + String(e) }),
         );
     }
-    await restoreViewports();
     // Mobile is a temporary single-chart view of the saved desktop workspace.
     // Read-only adapters keep the original multi-chart document untouched.
+    await restoreViewports();
     if (readonly && widget.chartsCount() > 1) widget.setLayout("s");
     ready = true;
     loading = false;

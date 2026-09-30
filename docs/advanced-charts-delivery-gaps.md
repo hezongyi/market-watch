@@ -519,3 +519,16 @@
 - 用户明确手机不要求八图，默认单图即可。bridge在初始恢复及工作区加载后，通过公开setLayout('s')将手机只读实例设为单图，不写回桌面工作区。
 - 手机脚本仍选真实八图保存文档作为输入，改为断言渲染只有一图，随后测试临时周期/视区与零写入。session51168退出1：单图断言通过，但周期后setVisibleRange仍Value is null（/tmp/mw-mobile-single-from-eight.log）。这一遗留桌面布局读取场景仍属必需修复，不因手机八图要求取消而豁免。
 - 用户授权停止旧开发worker后，已在Ubuntu核对PID1985819工作目录/命令，发送SIGTERM并确认退出；未操作unraid生产。当前尚未启动新常驻worker。
+
+### 当前开发worker恢复执行
+
+- 在用户授权停止旧Ubuntu开发worker并确认PID1985819退出后，启动当前代码常驻worker session1714，日志/tmp/mw-current-chart-worker.log，application_name=market-watch-chart-dev。
+- 启动日志确认模块来自advanced仓库且oanda_proxy=True；NZD_USD/XAU_USD/EUR_USD多个页面真实下载及入库成功，下载约0.439–1.646秒，旧46秒超时未在该观察窗口复现。证明当前连接恢复，尚不证明全部失败任务已恢复或长时间稳定性。
+- 手机单图候选调整为先setLayout('s')再restoreViewports；正式八图文档输入、切周期及零写入复验session97671运行中（/tmp/mw-mobile-single-layout-first.log）。前一运行错误地使用跳过周期诊断参数，不作为通过证据。
+
+- session97671已退出1，先布局后视区候选仍出现Value is null，已撤回该无效时序改动。
+
+### 手机周期切换轮询对照
+
+- session49635关闭poll并替换tick为空函数后仍退出1（/tmp/mw-mobile-no-poll.log），相同setVisibleRange Value is null；本轮证据不支持实时轮询触发此异常。临时no-poll诊断开关已删除。
+- 当前worker日志继续记录OANDA真实下载/入库成功，约0.4–1.3秒，未再次观察到旧进程持续46秒超时。
