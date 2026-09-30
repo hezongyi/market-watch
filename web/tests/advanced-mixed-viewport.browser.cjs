@@ -208,6 +208,23 @@ const fs = require("fs");
     })),
   );
   console.log("MOVED_RANGES", JSON.stringify({ target, moved }));
+  if (process.env.MARKET_WATCH_EDGE_RANGE_PROBE) {
+    console.log("EDGE_DIRECT_RANGES", JSON.stringify(await frame.evaluate(async target => {
+      widget.dateRangeSync().setValue(false);
+      widget.timeSync().setValue(false);
+      const results = [];
+      for (let i=0;i<widget.chartsCount();i++) {
+        const chart=widget.chart(i);
+        await chart.setVisibleRange(target, {rejectByTimeout:20000});
+        results.push({symbol:chart.symbol(),resolution:chart.resolution(),
+          range:chart.getVisibleRange(),offset:chart.getTimeScale().rightOffset()});
+      }
+      return results;
+    }, target)));
+    await browser.close();
+    return;
+  }
+
   if (process.env.MARKET_WATCH_GOLD_DIRECT_RANGE_PROBE) {
     const direct = await frame.evaluate(async (target) => {
       widget.dateRangeSync().setValue(false);

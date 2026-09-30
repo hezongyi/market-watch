@@ -420,3 +420,9 @@
 - 八图脚本增加显式MARKET_WATCH_HISTORY_BEFORE，仅测试请求固定before上界，仍通过真实API读取数据库；不会模拟行情响应。该模式不能证明实时或冷补数性能。初始品种统一EURUSD，保留第八图NZDUSD。
 - session70373退出1：四品种八图均ready，初次历史请求不再pending；目标右端恰好位于固定数据截止点时，同步后其他图右端保留不同周期的未来留白，严格右边界断言失败（/tmp/mw-eight-fixed-history.log）。尚不能判为所有历史位置同步失败。
 - 对照session89120将目标视区移到数据截止前4小时，其余配置不变，日志/tmp/mw-eight-fixed-interior.log；仍在运行，未计为通过。末端留白问题保持待处理。
+
+### 数据内部八图严格验收通过
+
+- session89120退出0（/tmp/mw-eight-fixed-interior.log）：真实历史上四品种八图M5/M15/M30就绪；三小时内部视区边界同步、鼠标十字线/滚轮/拖动、关闭同步保持其他七图不动全部通过。
+- 脚本实际等待服务器保存八个_mwViewports与操作后范围逐一相等，再刷新并断言八图范围严格一致、同步关闭状态保持、errors为空。该结论仅覆盖固定历史区间，未覆盖实时补数及数据末端留白。
+- 针对末端增加仅测试诊断开关MARKET_WATCH_EDGE_RANGE_PROBE：关闭两种同步后逐图通过公开setVisibleRange应用相同区间，输出实际范围/offset，区分原生同步行为与单图范围能力。session23943运行中，日志/tmp/mw-edge-direct-range.log；诊断输出不视为验收通过。
