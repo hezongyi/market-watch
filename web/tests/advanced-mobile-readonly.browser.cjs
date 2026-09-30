@@ -115,17 +115,8 @@ const fs = require("fs");
   }
   await frame.waitForFunction(() => ready && !loading && widget.activeChart().dataReady(),
     null, {timeout:60000});
-  if (process.env.MARKET_WATCH_MOBILE_EIGHT) {
-    require("node:assert/strict").equal(await frame.evaluate(()=>widget.chartsCount()),8);
-    await frame.evaluate(()=>widget.activeChart().maximizeChart());
-    await frame.waitForFunction(()=>widget.activeChart().isMaximized());
-    await page.screenshot({path:"/tmp/mw-mobile-eight-maximized.png"});
-    await frame.evaluate(()=>widget.activeChart().restoreChart());
-    await frame.waitForFunction(()=>!widget.activeChart().isMaximized());
-    await frame.evaluate(()=>widget.activeChart().maximizeChart());
-    await frame.waitForFunction(()=>widget.activeChart().isMaximized()
-      && widget.activeChart().getTimeScale().width()>250);
-  }
+  await frame.waitForFunction(()=>widget.chartsCount()===1,null,{timeout:30000});
+  require("node:assert/strict").equal(await frame.evaluate(()=>widget.chartsCount()),1);
   if (!process.env.MARKET_WATCH_MOBILE_SKIP_PERIOD_PROBE) {
   await frame.evaluate(async () => {
     await widget.activeChart().setResolution("15");

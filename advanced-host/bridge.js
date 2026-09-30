@@ -972,6 +972,9 @@ function boot(
         );
     }
     await restoreViewports();
+    // Mobile is a temporary single-chart view of the saved desktop workspace.
+    // Read-only adapters keep the original multi-chart document untouched.
+    if (readonly && widget.chartsCount() > 1) widget.setLayout("s");
     ready = true;
     loading = false;
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
@@ -1015,6 +1018,7 @@ function boot(
     });
     widget.subscribe("chart_loaded", async () => {
       await restoreViewports();
+      if (readonly && widget.chartsCount() > 1) widget.setLayout("s");
       loading = false;
       rangeGuard?.dispose();
       rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
