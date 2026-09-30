@@ -22,6 +22,7 @@ const assert = require("node:assert/strict");
     errors.push(e.message);
     console.log("EIGHT_CHART_ERROR", JSON.stringify({phase, message:e.message, stack:e.stack}));
   });
+  if (process.env.MARKET_WATCH_LIVE_SOAK !== "1")
   await page.route(/\/api\/(market-data\/history(?:\/cache)?|charts\/data)$/, (route) => {
     const body = route.request().postDataJSON();
     return route.continue({

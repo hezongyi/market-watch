@@ -351,3 +351,9 @@
 - 发现旧soak仅拦截/history与/charts/data到固定历史日期，新/history/cache仍返回现在的数据，造成同一原生序列混用新缓存与过去轮询数据。仅将cache加入相同截止拦截，未更改运行代码，也未加载候选viewports。
 - 完整两分钟混合八图测试通过：3组订阅、无pendingHistory、收起恢复请求断言通过、页面errors=[]，日志/tmp/mw-eight-aligned.log。此前nearestIndex失败不能作为正常数据路径已证实的产品缺陷；候选布局保护也不能冒领修复功劳。
 - 保留所有错误断言。下一步不固定历史日期的实际实时soak验证，以及其他固定日期用例是否遗漏cache通路的核查。
+
+### 无固定日期实时混合八图仍失败
+
+- 新增MARKET_WATCH_LIVE_SOAK=1完全绕过历史日期route，以真实当前cache/history/data运行完整混合八图。
+- 运行在collapse阶段再次出现nearestIndex/gotoTimeRange Value is undefined；单图tick网络请求0，原断言预期1失败。日志/tmp/mw-eight-live.log。
+- 修正上一条证据边界：统一历史时间的通过只证明该历史场景，不能把所有原生异常归因于测试日期混用。实时修订/重载与布局切换竞争仍是实际待解决项，未交付。
