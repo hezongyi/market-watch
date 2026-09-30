@@ -876,3 +876,10 @@
 - Ubuntu临时PG14.24集群仅监听127.0.0.1随机端口，使用匹配14版客户端及UTF8编码。pytest -q backend/tests/test_backup.py：5 passed in 1.68s，ISOLATED_RESTORE_EXIT 0，ISOLATED_CLUSTER_REMOVED True。
 - 初次尝试客户端libpq路径缺失；补齐LD_LIBRARY_PATH后发现无locale默认SQL_ASCII导致驱动返回bytes。明确initdb --encoding=UTF8后通过，两次失败的临时目录均清理。没有修改共享数据库、生产服务或产品备份实现。
 - 本条关闭“新增表是否进入备份恢复”的疑问；不代表整站容器/TLS/配置恢复与版本回退已经验收。
+
+### 八图轮询与短时资源采样
+
+- 新增advanced-eight-chart-soak.browser.cjs，真实本机HTTPS容器、已有历史的XAUUSD H4八图，15秒采样一次共8次；观察实际/api/charts/data limit=3网络请求，不伪造响应。
+- /tmp/mw-eight-chart-soak.log退出0：两分钟8次最新行情请求；每次1订阅/1分组，pending RPC及pendingHistory均0，errors=[]。切回单图后chartsCount=1且subscriptions<=1。
+- Chromium图表帧performance.memory.usedJSHeapSize首样33073064字节，尾样33884371，途中约35MB后回落。此指标不是整个浏览器进程内存；无GC强制干预，不宣称两分钟证明长期无泄漏。
+- 此轮证明同品种同周期八图未按八倍放大轮询，暖数据无明显积压；多品种/多指标、冷历史及更长运行仍不由此单一场景覆盖。
