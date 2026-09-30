@@ -185,3 +185,10 @@
 - 原始页更新时通过decode匹配并重置该品种的合成指标订阅，避免价格已补齐但指标仍持有旧历史。
 - 新增advanced-progressive-indicators.cjs，验证空页不调用计算、计算结果中的不完整/孤岛行不泄漏、历史扩展可见；原渐进缓存、预热缓存、旧请求取消测试通过。后端test_chart_workspace.py 19 passed，含指标分页共同起点和修订缓存失效。
 - 尚未部署/进行Python指标真实浏览器渐进曲线验收；后端计算仍可能读取较大历史，性能与大countBack分页仍待处理。此项不作为指标端到端完成证据。
+
+### 统一候选部署与Python指标真实请求失败证据
+
+- Ubuntu本机api/realtime-worker/chart-history-worker/web/chart-origin统一更新到progressive-a257803镜像；api健康，TLS已重启。未操作生产服务。
+- 新增advanced-progressive-indicators.browser.cjs，登录真实页面并调用合成SMA数据通路，断言不访问旧补数规划器且返回有效计算值。
+- 首次运行失败：frame.evaluate报告“行情请求超时”，日志/tmp/mw-python-progressive-browser.log。API同时出现QueuePool size1 overflow0、15秒连接等待超时，发生于authenticated读取会话。该证据表明候选不能交付，需要定位占用连接的请求及缩短事务，而非扩大已约定连接上限。
+- 并发运行日志出现历史入库1.041至6.081秒、实时循环3.252至9.126秒；不是稳定性能SLO证据。此前临时表批量写入优化不代表整条链路性能通过。
