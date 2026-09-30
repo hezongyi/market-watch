@@ -479,3 +479,6 @@ class ChartAggregationJob(Base):
     start: Mapped[int] = mapped_column(BigInteger)
     end: Mapped[int] = mapped_column(BigInteger)
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    attempts: Mapped[int] = mapped_column(default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(200))

@@ -16,6 +16,9 @@ def upgrade():
         sa.Column('start', sa.BigInteger(), nullable=False),
         sa.Column('end', sa.BigInteger(), nullable=False),
         sa.Column('created_at', sa.BigInteger(), nullable=False),
+        sa.Column('attempts', sa.Integer(), nullable=False),
+        sa.Column('next_at', sa.BigInteger(), nullable=False),
+        sa.Column('error', sa.String(200), nullable=True),
         sa.UniqueConstraint('instrument_id', 'timeframe', 'start', 'end'))
 
 

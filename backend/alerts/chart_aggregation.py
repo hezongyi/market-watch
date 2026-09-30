@@ -44,7 +44,7 @@ def aggregate_once():
         now = now_ms()
         demands = list(db.scalars(select(ChartViewportDemand).where(
             ChartViewportDemand.expires > now)))
-        jobs = list(db.scalars(select(ChartAggregationJob)))
+        jobs = list(db.scalars(select(ChartAggregationJob).where(ChartAggregationJob.next_at <= now)))
         if not jobs:
             return False
         job = min(jobs, key=lambda item: aggregation_priority(item, demands))
@@ -54,9 +54,19 @@ def aggregate_once():
             Instrument.id == job.instrument_id).with_for_update())
         job = db.scalar(select(ChartAggregationJob).where(
             ChartAggregationJob.id == job.id).with_for_update().execution_options(populate_existing=True))
-        if job is None:
+        if job is None or job.next_at > now:
             return True
         touched = {instant(at) for at in range(job.start, job.end, 60000)}
-        aggregate_touched(db, inst, touched, received_at=now, timeframes=(job.timeframe,))
-        db.delete(job)
+        try:
+            # A failed calculation/write must not publish any partial aggregate.
+            # Keep the outer transaction usable to persist retry state.
+            with db.begin_nested():
+                aggregate_touched(db, inst, touched, received_at=now, timeframes=(job.timeframe,))
+                db.delete(job)
+                db.flush()
+        except Exception as error:
+            job.attempts += 1
+            job.next_at = now + min(300_000, 1000 * 2 ** min(job.attempts, 9))
+            job.error = type(error).__name__
+
     return True
