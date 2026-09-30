@@ -90,6 +90,16 @@ const assert = require("node:assert/strict");
     );
   }
   await frame.evaluate(() => {
+    widget.applyOverrides({
+      "paneProperties.backgroundType":"solid",
+      "paneProperties.background":"#182736",
+      "paneProperties.vertGridProperties.color":"#334455",
+      "paneProperties.horzGridProperties.color":"#445566",
+      "paneProperties.legendProperties.showSeriesOHLC":false,
+      "scalesProperties.fontSize":14,
+      "scalesProperties.textColor":"#ddeeff",
+      "mainSeriesProperties.candleStyle.upColor":"#22aa88",
+    });
     const c = widget.activeChart();
     c.getTimezoneApi().setTimezone("Asia/Singapore");
     c.getPanes()[0].getMainSourcePriceScale().setMode(1);
@@ -127,6 +137,19 @@ const assert = require("node:assert/strict");
     inverted: true,
     timezone: "Asia/Singapore",
   });
+  const saved = await restored.evaluate(()=>new Promise(ok=>widget.save(state=>ok(state))));
+  const props=saved.charts[0].chartProperties;
+  assert.equal(props.paneProperties.background,'#182736');
+  assert.equal(props.paneProperties.vertGridProperties.color,'#334455');
+  assert.equal(props.paneProperties.horzGridProperties.color,'#445566');
+  assert.equal(props.paneProperties.legendProperties.showSeriesOHLC,false);
+  assert.equal(props.scalesProperties.fontSize,14);
+  assert.equal(props.scalesProperties.textColor,'#ddeeff');
+  const main=saved.charts[0].panes.flatMap(p=>p.sources).find(s=>s.type==='MainSeries');
+  assert.equal(main.state.candleStyle.upColor,'#22aa88');
+  const nativeUI=restored.childFrames()[0];
+  assert.ok(!/开=|高=|低=|收=/.test(await nativeUI.locator('body').innerText()),'OHLC legend must be visibly hidden');
+  await page.screenshot({path:'/tmp/mw-display-settings-final.png'});
   assert.deepEqual(errors, []);
   console.log("DISPLAY_SETTINGS_RELOAD_PASSED", actual);
   await browser.close();

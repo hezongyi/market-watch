@@ -1125,3 +1125,14 @@
 - 使用说明补充“账户管理器入口保留，交易暂未接入；展开为空不代表已连接账户”。没有添加Broker接口、演示账户或交易数据。无Broker依赖时订单/经纪商按钮仍可能由库本身不显示，不能宣称全部交易UI已呈现。
 - advanced-unavailable-entries.browser.cjs实际点击公开header使用说明，断言保存样式/导出CSV/原生指标不导出/交易未接入/额外数据限制文字；原生账户管理器折叠、展开通过。/tmp/mw-unavailable-entries-final.log退出0，errors=[]。/tmp/mw-entry-collapsed.png已目视，入口在原生底栏、展开空白是明确记录的未接入状态。
 - 图表镜像acceptance-visible-entries，API/worker/web仍acceptance-closed-session；Ubuntu本机验收，无Unraid操作。原生缺件导出/样式保存继续用既有自研公开header入口，未修改供应库。
+
+### 最终代码回归与文档审计（进行中）
+
+- d3ca07b代码基线：完整backend/tests运行175 passed/7 skipped；随后在Ubuntu随机临时目录、回环随机端口的隔离PG14运行7项数据库/备份/迁移测试，7 passed。实例已fast停止并清理，未连接Unraid。合计182测试通过，不能将两个运行伪称同一次无跳过运行。
+- 18个非浏览器适配器测试脚本全部退出0；日志归档docs/evidence/release-20260930/{backend,adapters,postgres}.txt。包含分页、并发、历史修订、周/月策略、保存、偏好、Python桥、时区及同步边界。
+- 最后桌面入口配置更改后的手机竖屏回归/tmp/mw-release-mobile.log退出0：单图、MOBILE_WRITES=[]、MOBILE_READONLY=true、errors=[]。
+- delivery-status.md旧顶层摘要与当前环境冲突，已添加明确历史分界并指向原系统验收矩阵和本轮图表核对表。九周期/自定义周期未接入及冷热数据边界补充到使用说明。
+- 仍在核对显示设置剩余属性保存；随后才形成版本/镜像清单与最终交付说明，当前不打完成标签。
+
+- 显示设置扩展验收/tmp/mw-release-display.log退出0：背景色、横/竖网格色、14px字体和文字色、蜡烛涨色、showSeriesOHLC=false均在保存刷新后逐值相同；原生UI无开=/高=/低=/收=图例，截图已目视。原有对数/反转/Asia-Singapore恢复同时通过。曾尝试文档示例showLegend只存储不改变主图图例，测试已改用类型声明的明确showSeriesOHLC并检查真实UI，不把未知字段持久化算显示验收。
+- 当前功能核对表的未闭合交互项已补齐；剩余为本地版本、镜像清单、回退及交付文档，尚未打最终标签。

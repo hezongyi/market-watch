@@ -1,0 +1,38 @@
+TEST tests/advanced-autosave.cjs
+Autosave preserves in-flight edits and failed-save retry state
+TEST tests/advanced-chart-style.cjs
+style extraction: presentation whitelist, no workspace objects, detached copy passed
+TEST tests/advanced-edge-sync.cjs
+Edge range synchronization: alignment, loading, user toggle and disposal passed
+TEST tests/advanced-history-dedup.cjs
+Concurrent history reads share requests, distinct periods isolate, completion and failure clear entries
+TEST tests/advanced-history-pagination.cjs
+Large countBack traverses planned pages without truncation or duplicate bars
+TEST tests/advanced-history-reload.cjs
+Grouped polling recovers after failure and prevents overlapping requests
+Historical reload invalidates matching cache before resetting only matching panes
+TEST tests/advanced-monthly-cache.cjs
+Monthly local-only history: empty, partial and multi-page cached data passed
+TEST tests/advanced-native-workspaces.cjs
+native workspace adapter: conflict, serialized saves and readonly passed
+TEST tests/advanced-preferences.cjs
+native adapters: queued writes, namespaces, reload, conflict and readonly passed
+TEST tests/advanced-python-indicators.cjs
+Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed
+TEST tests/advanced-range-sync.cjs
+Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed
+TEST tests/advanced-request-cancellation.cjs
+Queued stale history and old workspace requests cancel; current viewers proceed
+TEST tests/advanced-time.cjs
+13 calendar label cases passed; intraday timestamp unchanged
+TEST tests/advanced-viewports.cjs
+Viewport restoration preserves preferences and checks symbol identity
+TEST tests/advanced-watchlists.cjs
+Watchlist restore avoids empty native collection; retry and readonly passed
+TEST tests/advanced-weekly-background.cjs
+Weekly pending callback yields, releases guard, reloads on completion, and stops polling on departure
+TEST tests/advanced-weekly-error.cjs
+Weekly failure, explicit retry and completion cache refresh passed
+TEST tests/wait-for-async.test.cjs
+Async polling waits for truth, times out, and propagates browser failures
+ALL_PASSED 18
