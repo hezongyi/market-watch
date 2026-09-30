@@ -1,10 +1,10 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.0.1**，已按用户确认的范围完成验收与交付。逐项验收见 [交付矩阵](docs/acceptance-matrix.md)，状态见 [交付记录](docs/delivery-status.md)，规格见 [实施方案](docs/implementation-plan.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.2.0**，新增独立 Advanced Charts 工作台。本轮在Ubuntu本机Docker验收；不代表Unraid已升级。图表验收见[交付核对](docs/advanced-charts-current-acceptance.md)，操作及限制见[图表使用说明](docs/advanced-charts-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。
 
-项目目录：`/home/quant/repos/market-watch`。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。v1.0.1为本地改名版本，尚未部署；生产仍使用v1.0.0对应镜像。
+本轮源码目录：`/home/quant/repos/market-watch-advanced`；原目录`/home/quant/repos/market-watch`保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。v1.0.1为本地改名版本，尚未部署；生产仍使用v1.0.0对应镜像。
 
 ## 当前实例
 
