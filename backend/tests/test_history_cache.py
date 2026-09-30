@@ -45,6 +45,9 @@ def test_forming_bar_requires_covered_prefix(database, monkeypatch):
         db.get(Instrument, 'EURUSD').source = 'oanda'
         write_bars(db, 'EURUSD', 'H1', [Candle(
             start, start + timedelta(hours=1), price, price, price, price, False)])
+        write_bars(db, 'EURUSD', 'M1', [Candle(
+            start+timedelta(minutes=30), start+timedelta(minutes=31),
+            price, price, price, price, True)])
     now = ms(start + timedelta(minutes=31, seconds=5))
     monkeypatch.setattr(market_data, 'now_ms', lambda: now)
     spans = []
@@ -54,6 +57,13 @@ def test_forming_bar_requires_covered_prefix(database, monkeypatch):
     spans.append({'start': ms(start), 'end': now - 5000})
     page = market_data.read_cached_history(query)
     assert len(page['bars']) == 1 and not page['bars'][0]['complete']
+    # Provider has not delivered another minute yet; time passing must not make
+    # the last valid forming snapshot disappear and reset the chart repeatedly.
+    monkeypatch.setattr(market_data, 'now_ms', lambda: now+120000)
+    assert len(market_data.read_cached_history(query)['bars']) == 1
+    spans.clear()
+    spans.append({'start': ms(start+timedelta(minutes=1)), 'end': now-5000})
+    assert market_data.read_cached_history(query)['bars'] == []
 
 
 def test_cache_endpoint_uses_existing_authentication(database):

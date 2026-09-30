@@ -20,6 +20,19 @@ const assert = require("node:assert/strict");
     await page.route('**/progressive-history.js', route => route.fulfill({
       path: '../advanced-host/progressive-history.js', contentType: 'application/javascript',
     }));
+  if (process.env.MARKET_WATCH_TRACE_PROGRESSIVE === "1") {
+    page.on('console', message => {
+      if(message.text().startsWith('HISTORY_REFRESH_TRACE')) console.log(message.text());
+    });
+    await page.route('**/progressive-history.js', route => {
+      const source=fs.readFileSync('../advanced-host/progressive-history.js','utf8');
+      return route.fulfill({contentType:'application/javascript',body:source.replace(
+        'const differs = signature !== entry.signature;',
+        `const differs = signature !== entry.signature;
+         if(differs) console.log('HISTORY_REFRESH_TRACE',JSON.stringify({args:entry.args,
+           before:JSON.parse(entry.signature),after:JSON.parse(signature)}));`)});
+    });
+  }
   const errors = [];
   let phase = "initialization";
   page.on("pageerror", (e) => {

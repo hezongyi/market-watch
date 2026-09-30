@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
@@ -230,9 +230,16 @@ def read_cached_history(body: HistoryQuery):
         rows = chart_rows(db, inst, body.timeframe, before, body.limit, now)
         left = rows[0]["start"] if rows else before
         coverage = stored_coverage(db, inst, left, max(before, cutoff)) if rows else []
+        # A forming candle represents the latest persisted observation, not
+        # a promise that the provider has delivered through this wall-clock minute.
+        # Advancing time alone must not remove/reinsert its native series point.
+        observed_end = db.scalar(select(func.max(Bar.end)).where(
+            Bar.instrument_id == inst.id, Bar.timeframe == "M1",
+            Bar.complete.is_(True), Bar.end <= cutoff)) if any(
+                not row["complete"] for row in rows) else None
         usable = [row for row in rows if not row.get("pending_aggregation") and (row["complete"] or (
-            row["start"] < cutoff < row["end"]
-            and covers_interval(coverage, row["start"], cutoff)
+            observed_end is not None and row["start"] < observed_end <= cutoff < row["end"]
+            and covers_interval(coverage, row["start"], observed_end)
         ))]
         # Return a contiguous observed suffix. Do not join cached islands across
         # a trading interval whose provider coverage has not been established.

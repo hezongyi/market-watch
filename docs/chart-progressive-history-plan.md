@@ -369,3 +369,9 @@
 - MARKET_WATCH_CANDIDATE_PROGRESSIVE=1仅route替换progressive-history.js，MARKET_WATCH_LIVE_SOAK=1与MIXED_SOAK=1，保留渐进轮询运行。
 - 完整soak最终仍在collapse阶段nearestIndex/gotoTimeRange Value is undefined，错误断言失败，日志/tmp/mw-eight-forming-fix.log。候选只能减少常规形成中价格变化触发，尚不能证明解决布局异常。
 - 后续需记录实际触发changed的页面/原因（历史扩展、完成态、已收盘修订、元数据）以及刷新时图表集合；保留原失败断言，不通过关闭渐进补数缩小需求。
+
+### 刷新追踪确认形成中bar反复消失
+
+- 测试路由注入HISTORY_REFRESH_TRACE，比较前后指纹；XAUUSD H4同一start1790787600000/end1790802000000 complete=false在198→197→198反复删除/加入，其他共同bar字段无变化。日志/tmp/mw-eight-refresh-trace.log；最终布局错误仍复现。
+- read_cached_history此前要求形成中bar覆盖到墙钟cutoff，新分钟到来但M1轮询未完成时会删掉上次有效bar。候选改为要求从桶起点覆盖到最后已持久化完整M1的end，且桶仍未收盘；待重算bar仍排除，完整性不伪造为true。
+- 扩展测试验证时间推进但无新M1仍保留形成中快照，真实前缀缺口仍拒绝；缓存+聚合10 passed，ruff通过。需部署并复跑实时八图，不能仅凭因果候选认定原生异常解决。
