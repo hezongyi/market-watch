@@ -163,17 +163,45 @@ const assert = require("node:assert/strict");
   );
   const persisted = await restored.evaluate(() => {
     const c = widget.activeChart();
-    return c
-      .getAllShapes()
-      .map((x) => ({
-        properties: c.getShapeById(x.id).getProperties(),
-        points: c.getShapeById(x.id).getPoints(),
-      }));
+    return c.getAllShapes().map((x) => ({
+      properties: c.getShapeById(x.id).getProperties(),
+      points: c.getShapeById(x.id).getPoints(),
+    }));
   });
   assert.equal(persisted.length, 1);
   assert.equal(persisted[0].properties.linecolor, "#ff1234");
   assert.equal(persisted[0].properties.linewidth, 3);
   assert.equal(persisted[0].points[0].price, 4200);
+  await restored.evaluate(() => {
+    const c = widget.activeChart();
+    c.showPropertiesDialog(c.getAllShapes()[0].id);
+  });
+  const restoredUI = restored.childFrames()[0];
+  await restoredUI.getByText("模板", { exact: true }).click();
+  await restoredUI.getByText(name, { exact: true }).hover();
+  const menuItem = restoredUI
+    .getByText(name, { exact: true })
+    .locator("..")
+    .locator("..");
+  await menuItem.locator('[data-name="remove-button"]').click();
+  await page.waitForFunction(
+    async (name) =>
+      !(await (await fetch("/api/advanced-charts/preferences")).json()).some(
+        (r) => r.kind === "drawing" && r.name === name,
+      ),
+    name,
+  );
+  const retained = await restored.evaluate(() => {
+    const c = widget.activeChart();
+    return c.getAllShapes().map((s) => ({
+      props: c.getShapeById(s.id).getProperties(),
+      points: c.getShapeById(s.id).getPoints(),
+    }));
+  });
+  assert.equal(retained.length, 1);
+  assert.equal(retained[0].props.linecolor, "#ff1234");
+  assert.equal(retained[0].props.linewidth, 3);
+  assert.equal(retained[0].points[0].price, 4200);
   assert.deepEqual(errors, []);
   console.log("DRAWING_TEMPLATE_CROSS_WORKSPACE_PASSED", {
     color: shape.properties.linecolor,
