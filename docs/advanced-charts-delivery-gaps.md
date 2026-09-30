@@ -462,3 +462,12 @@
 - session40738退出0（/tmp/mw-watchlist-restore-eight.log），使用正式末端同步适配且无测试原型替换。四品种八图末端三小时视区、十字线、滚轮/拖动、关闭同步、服务器自动保存、刷新逐图严格恢复全部通过，最终errors=[]。
 - 此轮首次完整消除先前连续出现的_getActive异常，支持自选列表恢复空窗这一原因；不外推为所有原生菜单路径已经验收。
 - 主题/手机脚本增加开发URL与固定历史上界参数；主题脚本补页面异常断言及按主题独立截图（此前仅打印errors不足以判定通过）。浅色主题session5115运行中，日志/tmp/mw-theme-light-current.log，尚未记为通过。
+
+### 深浅主题保存恢复及视觉复核
+
+- 浅色session5115、深色session60745均退出0；/tmp/mw-theme-light-current.log及/tmp/mw-theme-dark-current.log记录刷新主题正确、errors=[]。测试使用真实数据固定历史上界，不证明实时更新。
+- 已人工查看/tmp/mw-theme-light.png、/tmp/mw-theme-dark.png：单图、原生上下左右工具栏、自选/详情在两主题正常显示，完成状态未覆盖底部按钮。截图行情与右侧报价时间不同，属于固定历史测试与当前报价并存；不作为报价实时性通过证据。
+- 手机竖屏只读session70924运行中（/tmp/mw-mobile-current-portrait.log）；当前最新工作区为主题测试单图，本轮不宣称覆盖八图最大化阅读。
+
+- 手机session70924退出1：日志出现5190反复ERR_CONNECTION_REFUSED，之后尚未就绪的图表setVisibleRange抛Value is null。当前不能计手机验收通过，需恢复/核对开发服务再验证，不直接归因于手机功能。
+- 当前前端构建通过（/tmp/mw-current-web-build.log）。
