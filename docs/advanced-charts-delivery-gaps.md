@@ -779,3 +779,9 @@
 
 - advanced-data-window.browser.cjs收集实际history/charts-data响应，以十字线公开事件选中时间精确匹配bar.start；按XAUUSD两位显示精度，分别断言原生数据窗口开盘/最高/最低/收盘等于后台对应字段。
 - /tmp/mw-data-window-values.log退出0、errors=[]；未拦截伪造行情响应。该轮覆盖XAUUSD H4单根历史K线四字段，不代表三品种九周期、指标输出或空值都已对照。
+
+### 当前改动面回归（c17af07）
+
+- npm run build：TypeScript及Vite通过。PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_advanced_preferences.py backend/tests/test_advanced_workspace.py backend/tests/test_chart_export.py：12 passed；单条Starlette/httpx弃用提醒，不是运行失败。
+- native-workspaces、preferences、chart-style、edge-sync四个JS专项通过，覆盖近期工作区包装/模板样式及同步守卫。
+- 当前验收Compose运行advanced-container-https.browser.cjs，/tmp/mw-current-https.log退出0：使用说明、M15切换及原生保存正常，errors=[]，未观察到图表来源携带凭据。不是全量后端/所有浏览器功能重新验收。
