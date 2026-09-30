@@ -86,14 +86,14 @@ a.callbacks.shift()();
 assert.equal(value, true);
 a.symbols.emit();
 b.symbols.emit();
-const emptyA = guard.captureEmptyCompletion((chart) => chart === a);
+const emptyA = guard.captureTerminalCompletion((chart) => chart === a);
 emptyA();
 assert.equal(guard.busy(), true, "empty pane must not unlock another loading pane");
 b.callbacks.shift()();
 assert.equal(guard.busy(), false);
 a.callbacks.shift()();
 a.symbols.emit();
-const staleEmpty = guard.captureEmptyCompletion(() => true);
+const staleEmpty = guard.captureTerminalCompletion(() => true);
 a.symbols.emit();
 staleEmpty();
 assert.equal(guard.busy(), true, "old empty result must not release a newer load");
@@ -118,7 +118,7 @@ assert.equal(
   true,
   "single pane has no peer to synchronize during loading",
 );
-const disposedEmpty = guard.captureEmptyCompletion(() => true);
+const disposedEmpty = guard.captureTerminalCompletion(() => true);
 guard.dispose();
 disposedEmpty();
 a.callbacks.shift()();

@@ -400,3 +400,11 @@
 - 相同开发目录配置通过192.168.7.33:7890访问OANDA返回200（约0.59秒）；直接连接ConnectError。调用实际fetch_oanda读取worker涉及的2026-09-30 03:47–03:48 UTC EUR_USD区间，1根、0.62秒。此证据指向运行worker与新调用之间的配置/连接状态差异，尚未确认具体根因，不能宣称上游整体慢或重启已解决。
 - 发现空消息httpx异常被存成空字符串，新增ReadTimeout回归先失败后修复：空消息保留异常类名，不改变游标和退避。行情专项21 passed（/tmp/mw-history-error-regression.log）。
 - 周线失败提示改为明确失败及可重试，不再声称已排队；对应前端回归先失败后通过，历史重载专项也通过。此改动不代表周线noData缓存及真实重试闭环已验收。
+
+### 周/月切换与原生错误回调对照
+
+- 主动结束session69680（exit130），原因是已确认worker OANDA失败持续阻碍八图功能验收，不计为八图通过。未清除数据库任务。
+- 移除固定超时后的真实周/月连续切换验收session43781退出0：/tmp/mw-monthly-explicit-completion.log记录7次请求、最终月线有效视区、1条画线、errors为空；所有月线响应local_only且无任务。
+- 单独对照仅将周线失败的空结果改为原生error回调；session95942退出1，最终月线dataReady=false/range0/guard=true，周线error后没有新月线HTTP。日志/tmp/mw-monthly-weekly-native-error.log。因此撤回该候选，保留经过验证的兼容空结果。
+- 新周线专项实际运行bridge的失败、确认重试、pendingHistory完成和reloadHistory路径，验证重试后先清匹配缓存、再重载对应图表。此为适配层回归，尚不替代真实UI重试与原生缓存验收。
+- 当前配置使用实际import_once执行三个有限开发补数页面，分别0.72/0.64/0.84秒完成；进程退出并释放连接，没有启动另一常驻worker。既有worker的配置/连接差异仍待定位。

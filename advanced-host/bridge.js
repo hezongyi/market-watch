@@ -280,13 +280,13 @@ const feed = {
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
       const epoch = workspaceEpoch;
-      const completeEmpty = rangeGuard?.captureEmptyCompletion((chart) =>
+      const completeTerminal = rangeGuard?.captureTerminalCompletion((chart) =>
         chart.symbol() === s.ticker && chart.resolution() === res,
       );
-      const finishEmpty = () => {
+      const finishTerminal = () => {
         // Let the native callback finish processing before restoring sync.
         setTimeout(() => {
-          if (epoch === workspaceEpoch) completeEmpty?.();
+          if (epoch === workspaceEpoch) completeTerminal?.();
         }, 0);
       };
       const checkActive = () => {
@@ -337,15 +337,15 @@ const feed = {
           rememberHistoryFailure(args, status);
           offerHistoryRetry();
           if (frames[res] === "W1") {
-            // A missing weekly page is a background task outcome. Complete the
-            // native request with an explicit empty boundary so a later period
-            // switch is not held in the failed weekly series state.
+            // Native error callbacks can strand a subsequent monthly switch.
+            // Complete this unavailable weekly view; an explicit retry clears
+            // its cache before reloading (see pendingHistory in tick).
             send({
               type: "status",
               text: `${symbol} 周线历史拉取失败，未完成补数；可重试或切换周期`,
             });
             cb([], { noData: true });
-            finishEmpty();
+            finishTerminal();
             return;
           }
           throw Error(status.error || "历史拉取失败");
@@ -414,7 +414,7 @@ const feed = {
       // For monthly cache-only views, noData denotes the local dataset boundary.
       // It makes no claim about the provider's remote history.
       cb(unique, { noData: localBoundary });
-      if (!unique.length && localBoundary) finishEmpty();
+      if (!unique.length && localBoundary) finishTerminal();
     } catch (e) {
       err(String(e));
       if (e.code !== "HISTORY_CANCELLED")

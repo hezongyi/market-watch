@@ -36,7 +36,30 @@ vm.runInContext(
   );
   assert.ok(!sent.some(m => m.text?.includes("已加入后台队列")),
     "failed work must not be reported as queued");
-  console.log("Weekly failure is reported honestly, with native empty completion");
+  await vm.runInContext(`(async()=>{
+    const recoveryEvents = globalThis.recoveryEvents = [];
+    let retry;
+    ready = true;
+    widget = {
+      chartsCount:()=>1,
+      chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '1W',
+        resetData:()=>recoveryEvents.push('reload')}),
+      showConfirmDialog: options => { retry = options.callback; }
+    };
+    subscriptions.set('weekly', {symbol:'EURUSD',res:'1W',
+      reset:()=>recoveryEvents.push('cache-reset')});
+    rememberHistoryFailure({instrument:'EURUSD',timeframe:'W1'},
+      {failed_task_ids:['failed-week']});
+    offerHistoryRetry();
+    request=async(q)=>{ if(q.op==='retry') recoveryEvents.push('retry'); return {}; };
+    await retry(true);
+    historyQuery=async()=>({status:'ready',bars:[]});
+    query=async()=>({bars:[]});
+    await tick();
+  })()`, context);
+  assert.deepEqual(Array.from(vm.runInContext('recoveryEvents', context)),
+    ['retry', 'cache-reset', 'reload']);
+  console.log("Weekly failure, explicit retry and completion cache refresh passed");
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;

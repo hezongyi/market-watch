@@ -63,8 +63,8 @@ function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
   return {
     refresh,
     // Capture load identities before an asynchronous datafeed request. Only an
-    // explicit empty result may finish these loads without native dataReady.
-    captureEmptyCompletion(matches) {
+    // explicit empty or failed result may finish without native dataReady.
+    captureTerminalCompletion(matches) {
       const loads = [...pending].filter(([chart]) => matches(chart));
       return () => {
         for (const [chart, token] of loads) {

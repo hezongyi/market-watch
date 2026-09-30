@@ -20,7 +20,7 @@ vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 vm.runInContext(
   `
 let localBars = [], calls = 0, emptyCompletions = 0;
-rangeGuard = { captureEmptyCompletion(matches) {
+rangeGuard = { captureTerminalCompletion(matches) {
   if (!matches({symbol:()=> 'BTCUSDT',resolution:()=> '1M'}))
     throw Error('matching monthly pane was missed');
   if (matches({symbol:()=> 'EURUSD',resolution:()=> '1M'}))
