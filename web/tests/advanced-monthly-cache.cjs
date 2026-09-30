@@ -19,7 +19,14 @@ const context = vm.createContext({
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 vm.runInContext(
   `
-let localBars = [], calls = 0;
+let localBars = [], calls = 0, emptyCompletions = 0;
+rangeGuard = { captureEmptyCompletion(matches) {
+  if (!matches({symbol:()=> 'BTCUSDT',resolution:()=> '1M'}))
+    throw Error('matching monthly pane was missed');
+  if (matches({symbol:()=> 'EURUSD',resolution:()=> '1M'}))
+    throw Error('unrelated pane matched');
+  return () => emptyCompletions++;
+}};
 historyQuery = async (args) => {
   calls++;
   const bars = localBars.filter(b=>b.start < args.before).slice(-args.limit);
@@ -43,6 +50,8 @@ function seed(count) {
   let result = await vm.runInContext("seed(0);monthly(90)", context);
   assert.equal(result.bars.length, 0);
   assert.equal(result.meta.noData, true);
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(vm.runInContext("emptyCompletions", context), 1);
   result = await vm.runInContext("seed(3);monthly(90)", context);
   assert.equal(result.bars.length, 3);
   assert.equal(result.meta.noData, true);
@@ -52,6 +61,9 @@ function seed(count) {
   assert.equal(result.meta.noData, false);
   assert.equal(vm.runInContext("calls", context), 2);
   assert.equal(new Set(result.bars.map((b) => b.time)).size, 2100);
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(vm.runInContext("emptyCompletions", context), 1,
+    "nonempty results must wait for native dataReady");
   console.log(
     "Monthly local-only history: empty, partial and multi-page cached data passed",
   );

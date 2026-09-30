@@ -48,14 +48,10 @@ function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
         const finish = () => {
           if (disposed || pending.get(chart) !== token) return;
           pending.delete(chart);
-          clearTimeout(token.timer);
           restore();
         };
+        token.finish = finish;
         chart.dataReady(finish);
-        // The native library does not emit dataReady for an explicit empty
-        // boundary. Do not let that boundary lock synchronization forever;
-        // a later period switch must remain usable.
-        token.timer = setTimeout(finish, 2500);
       };
       bindings.set(chart, callback);
       chart.onSymbolChanged().subscribe(null, callback);
@@ -66,6 +62,16 @@ function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
   refresh();
   return {
     refresh,
+    // Capture load identities before an asynchronous datafeed request. Only an
+    // explicit empty result may finish these loads without native dataReady.
+    captureEmptyCompletion(matches) {
+      const loads = [...pending].filter(([chart]) => matches(chart));
+      return () => {
+        for (const [chart, token] of loads) {
+          if (!disposed && pending.get(chart) === token) token.finish();
+        }
+      };
+    },
     busy: () => pending.size > 0,
     desired: () => desired,
     dispose() {

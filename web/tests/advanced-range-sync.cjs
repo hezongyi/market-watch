@@ -1,7 +1,12 @@
 const assert = require("node:assert/strict"),
   fs = require("node:fs"),
   vm = require("node:vm");
-const context = vm.createContext({ Map, Set, Array, setTimeout, clearTimeout });
+const timers = new Map();
+let timerId = 0;
+const context = vm.createContext({ Map, Set, Array,
+  setTimeout: (fn) => { timers.set(++timerId, fn); return timerId; },
+  clearTimeout: (id) => timers.delete(id),
+});
 vm.runInContext(
   fs.readFileSync("../advanced-host/range-sync.js", "utf8"),
   context,
@@ -61,6 +66,8 @@ guard.refresh();
 assert.equal(writes, 0, "refresh must not add redundant native undo commands");
 a.intervals.emit();
 assert.equal(value, false);
+for (const fn of [...timers.values()]) fn();
+assert.equal(guard.busy(), true, "elapsed time alone must not release a slow history load");
 a.callbacks.shift()();
 assert.equal(value, true);
 a.symbols.emit();
@@ -77,6 +84,22 @@ a.callbacks.shift()();
 assert.equal(guard.busy(), true);
 a.callbacks.shift()();
 assert.equal(value, true);
+a.symbols.emit();
+b.symbols.emit();
+const emptyA = guard.captureEmptyCompletion((chart) => chart === a);
+emptyA();
+assert.equal(guard.busy(), true, "empty pane must not unlock another loading pane");
+b.callbacks.shift()();
+assert.equal(guard.busy(), false);
+a.callbacks.shift()();
+a.symbols.emit();
+const staleEmpty = guard.captureEmptyCompletion(() => true);
+a.symbols.emit();
+staleEmpty();
+assert.equal(guard.busy(), true, "old empty result must not release a newer load");
+a.callbacks.shift()();
+a.callbacks.shift()();
+assert.equal(guard.busy(), false);
 toggle.setValue(false);
 a.symbols.emit();
 a.callbacks.shift()();
@@ -95,7 +118,9 @@ assert.equal(
   true,
   "single pane has no peer to synchronize during loading",
 );
+const disposedEmpty = guard.captureEmptyCompletion(() => true);
 guard.dispose();
+disposedEmpty();
 a.callbacks.shift()();
 assert.equal(value, true, "disposed callback cannot change old workspace");
 assert.equal(a.symbols.listeners.size, 0);

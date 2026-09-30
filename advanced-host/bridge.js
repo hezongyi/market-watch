@@ -280,6 +280,15 @@ const feed = {
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
       const epoch = workspaceEpoch;
+      const completeEmpty = rangeGuard?.captureEmptyCompletion((chart) =>
+        chart.symbol() === s.ticker && chart.resolution() === res,
+      );
+      const finishEmpty = () => {
+        // Let the native callback finish processing before restoring sync.
+        setTimeout(() => {
+          if (epoch === workspaceEpoch) completeEmpty?.();
+        }, 0);
+      };
       const checkActive = () => {
         if (
           epoch !== workspaceEpoch ||
@@ -336,6 +345,7 @@ const feed = {
               text: `${symbol} 周线暂时没有可用数据，已加入后台队列，预计耗时暂无法估算`,
             });
             cb([], { noData: true });
+            finishEmpty();
             return;
           }
           throw Error(status.error || "历史拉取失败");
@@ -404,6 +414,7 @@ const feed = {
       // For monthly cache-only views, noData denotes the local dataset boundary.
       // It makes no claim about the provider's remote history.
       cb(unique, { noData: localBoundary });
+      if (!unique.length && localBoundary) finishEmpty();
     } catch (e) {
       err(String(e));
       if (e.code !== "HISTORY_CANCELLED")
