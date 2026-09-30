@@ -830,3 +830,9 @@
 - 新工作区应用覆盖后的水平线样式：颜色/线宽正确，价格仍4200；保存刷新一致，删除模板后实际画线保留。/tmp/mw-drawing-tools-final.log退出0，errors=[]。
 - 更正此前删除行为的概括：本轮删除垂直线模板出现“您真的要删除绘图模板”确认框，需点击“是”；后续水平线删除路径仍未出现确认。不能从单次操作推断供应库所有删除均无需确认。
 - node tests/advanced-preferences.cjs通过队列写入、工具命名空间、刷新、冲突与只读检查。未修改产品代码及供应库。
+
+### 原生指标收藏跨工作区
+
+- 新增advanced-indicator-favorites.browser.cjs：通过原生指标目录悬停并点击星标，服务器chart.favoriteLibraryIndicators内容实际变化；新建工作区后刷新，工作区ID不同，原指标星标保持，再恢复初始收藏状态。
+- /tmp/mw-indicator-favorites-cross.log退出0、errors=[]；前置同工作区刷新测试/tmp/mw-indicator-favorites-hover.log也通过。样例为52周高点/低点，此处验证收藏，不验证该指标计算。
+- 复用已有settings_adapter，不修改供应库、不新增收藏存储。临时探查脚本已删除。绘图工具收藏仍需单独验收。
