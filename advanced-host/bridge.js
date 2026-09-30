@@ -980,6 +980,18 @@ function boot(
         widget.createButton({
           align: "right",
           useTradingViewStyle: true,
+          text: "使用说明",
+          title: "图表功能与替代入口说明",
+          onClick: () =>
+            widget.showNoticeDialog({
+              title: "图表功能说明",
+              body: "保存图表样式请使用顶部“保存样式”，同名会覆盖；应用和删除在“设置 → 模板”。原生模板菜单的“保存为…”暂不可用。导出请使用顶部“导出 CSV”，包含行情及所选 Python 指标，不包含原生内置指标值。原生数据导出暂不可用。手机只读，临时操作不会保存到电脑工作区。行情按 M1 更新，并非逐笔报价；成交量、盘口、新闻、交易执行和图上预警暂未接入。",
+              callback: () => {},
+            }),
+        });
+        widget.createButton({
+          align: "right",
+          useTradingViewStyle: true,
           text: "返回守望",
           title: "返回守望工作台",
           onClick: () => send({ type: "workspace-action", action: "home" }),

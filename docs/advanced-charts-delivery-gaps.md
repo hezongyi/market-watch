@@ -737,3 +737,9 @@
 - 扩展绘图模板浏览器验收：刷新后的水平线属性窗口打开模板菜单，悬停本轮创建模板并点击原生remove-button，真实preferences中该drawing记录消失。
 - 删除后画线仍仅一根，价格4200、颜色#ff1234、线宽3保持不变，证明删除模板没有连带删除或重置已应用样式的对象。/tmp/mw-drawing-delete-final.log退出0，errors=[]。
 - 原生绘图模板删除控件为role=img的可点击span，且直接删除，无图表样式模板的确认对话框；首轮按钮定位超时已按实际界面修正，未改产品或供应库DOM。
+
+### 缺件功能替代入口说明
+
+- 原生header扩展“使用说明”，通过公开showNoticeDialog展示：顶部保存样式及同名覆盖、原生设置模板应用/删除、原生保存为缺件；CSV包含行情/Python但不含内置指标；手机只读、M1报价口径及未接入的额外服务。保留原生入口，不注入供应库DOM。
+- Ubuntu静态镜像acceptance-help构建运行，advanced-container-https.browser.cjs真实点击说明入口并断言两项缺件/替代文案，关闭后M15切换及原生保存正常；/tmp/mw-help-browser.log退出0，errors=[]。
+- 说明入口解决可见替代指引，不宣称拦截无公开接口的原生点击或修复缺失组件。
