@@ -449,3 +449,10 @@
 - session45217已退出1：范围、鼠标、自动保存刷新断言执行到最后，仍因initial-load原生_getActive异常失败（/tmp/mw-edge-product-recheck.log）。
 - 增加仅测试MARKET_WATCH_DISABLE_EDGE_PROBE，将edgeRangeSync替换为空适配器；session53466正在运行内部历史区间，已同样记录initial-load undefined iterable。证据表明新增末端对齐函数不是该异常的必要条件；尚不能据此断定真正根因。没有过滤异常或将此轮计为通过。
 - 为查旧worker，核对Ubuntu SSH主机公钥与本地/etc/ssh公钥一致后尝试本机SSH，认证返回Permission denied(publickey)。未绕过主机验证或修改授权；仍无法读取旧worker的宿主进程环境，未创建第二个常驻worker。
+
+### 初始化异常定位至自选列表恢复空窗
+
+- 关闭末端适配session53466最终退出1；headerReady等待单变量对照session6126也退出1，均保留原_getActive异常，等待工具栏不能解决。headerReady诊断分支已移除。
+- 只读检查原生堆栈：_getActive直接解构Object.entries(this._lists)[0]；自有watchlists恢复先delete全部、await，再save列表，制造空集合。新增真实适配器回归在delete时模拟原生读者，旧代码失败。
+- 改为先保存目标列表、激活有效目标，再移除过时列表。已保存空集合恢复为一个零品种原生容器，不注入默认品种；手机readonly仍不注册保存事件。自选回归通过。
+- session40738正在运行正式八图末端/鼠标/自动保存刷新验收，日志/tmp/mw-watchlist-restore-eight.log；尚无最终结论，不能仅凭单测关闭初始化异常。

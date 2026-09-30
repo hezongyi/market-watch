@@ -5,13 +5,18 @@ async function nativeWatchlists(widget, initial, readonly, save, report) {
   const later = () => new Promise((resolve) => setTimeout(resolve, 0));
   const stored = initial && Array.isArray(initial.lists) ? initial : null;
   if (stored) {
+    // Native getActive destructures the first list even when no active ID is
+    // available. Install replacements before removing obsolete lists.
+    const lists = stored.lists.length ? stored.lists : [{
+      id: "mw-empty-watchlist", title: "自选列表", symbols: [],
+    }];
+    for (const list of lists) api.saveList(list);
+    await later();
+    const ids = new Set(lists.map(list => list.id));
+    api.setActiveList(ids.has(stored.active) ? stored.active : lists[0].id);
     for (const list of Object.values(api.getAllLists() || {}))
-      api.deleteList(list.id);
+      if (!ids.has(list.id)) api.deleteList(list.id);
     await later();
-    for (const list of stored.lists) api.saveList(list);
-    await later();
-    if (stored.active && api.getAllLists()?.[stored.active])
-      api.setActiveList(stored.active);
   } else {
     const id = api.getActiveListId();
     if (id && !(api.getList(id) || []).length)
