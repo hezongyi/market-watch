@@ -152,6 +152,9 @@ def test_postgres_dump_restore_of_signal_and_outbox(tmp_path, monkeypatch):
                         next_at=80000,
                     )
                 )
+                db.add(storage.ChartAggregationJob(id="restore-aggregation",
+                    instrument_id="EURUSD", timeframe="D1", start=60000, end=120000,
+                    attempts=3, next_at=180000, error="ValueError"))
             # Validate contents through the actual restored connection before
             # restore_check drops its disposable database; counts alone miss
             # damaged JSON or lost queue progress.
@@ -199,6 +202,13 @@ def test_postgres_dump_restore_of_signal_and_outbox(tmp_path, monkeypatch):
                         weekly["status"],
                         weekly["next_at"],
                     ) == (90000, 13, "pending", 80000)
+                    aggregation = connection.execute(select(
+                        storage.ChartAggregationJob.__table__).where(
+                        storage.ChartAggregationJob.id == "restore-aggregation")).mappings().one()
+                    assert (aggregation["instrument_id"], aggregation["timeframe"],
+                            aggregation["start"], aggregation["end"], aggregation["attempts"],
+                            aggregation["next_at"], aggregation["error"]) == (
+                                "EURUSD", "D1", 60000, 120000, 3, 180000, "ValueError")
                     restored_payloads_checked.append(True)
                 return original_counts(connection)
 

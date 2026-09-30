@@ -295,3 +295,10 @@
 - Ubuntu新建market-watch-postgres-isolated，绑定127.0.0.1:15432、512MB/1CPU，数据库market_watch_isolated，仅验收用途，未连接共享开发/生产库。
 - 原跳过的test_postgres.py五项及test_database_transfer.py一项使用该隔离库全部通过：6 passed in6.38s。日志/tmp/mw-isolated-postgres-tests.log。
 - 备份dump/restore测试仍需同版本客户端工具；此容器保持运行供后续验收。不能把这6项通过推定备份恢复已通过。
+
+### PostgreSQL真实备份恢复与无跳过回归
+
+- 使用隔离PG16容器内真实pg_dump/pg_restore，通过/tmp/mw-pg16-tools包装器传递环境变量并复制临时dump；无模拟数据库工具，不接共享库。备份5项通过。
+- 扩展备份样本包含ChartAggregationJob，恢复连接检查instrument/timeframe/start/end/attempts/next_at/error全部一致，确保队列失败退避状态真实恢复。
+- 设置TEST_POSTGRES_URL及TEST_POSTGRES_BIN_DIR后运行全部backend/tests：212 passed、0 skipped、1条Starlette弃用警告，17.91秒。日志/tmp/mw-full-isolated.log，ruff通过。
+- 该结果覆盖后端现有自动测试，不等于前端八图/手机、渐进D1、真实实时延迟、上游边界及交付清单已完成。运行镜像尚有未部署候选。
