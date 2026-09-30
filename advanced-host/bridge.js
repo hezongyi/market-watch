@@ -322,10 +322,15 @@ const feed = {
           throw error;
         }
       };
-      if (progressivePages && !["1W", "1M"].includes(res) && !decode(s.ticker).spec) {
+      if (progressivePages && !["1W", "1M"].includes(res)) {
         const args = {instrument:symbol,timeframe:frames[res],
           before:p.to*1000+(res === "1D" ? 2*86400000 : 0),limit:Math.min(2000,requested)};
-        const page = await progressivePages.get(args);
+        const rawPage = await progressivePages.get(args);
+        checkActive();
+        const page = decode(s.ticker).spec
+          ? await progressiveIndicatorPage(rawPage, () => query(s.ticker,res,
+              {before:args.before,limit:args.limit}))
+          : rawPage;
         checkActive();
         const bars = barsOf(page,res,s.ticker).filter(bar=>bar.time < p.to*1000);
         if (bars.length) {
@@ -923,7 +928,7 @@ function boot(
         const restored = await refreshChartHistory(widget,chart,()=> {
           let invalidated = false;
           for (const sub of subscriptions.values()) {
-            if(sub.symbol===symbol && sub.res===resolution) {
+            if(decode(sub.symbol).symbol===symbol && sub.res===resolution) {
               sub.reset(); invalidated = true;
             }
           }

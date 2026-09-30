@@ -66,3 +66,12 @@ function progressiveHistory(read, needed, changed, onError, maxEntries = 64) {
     dispose() {disposed=true;pages.clear();},
   };
 }
+
+// Synthetic studies share the raw observation boundary. Indicator calculation
+// may see more persisted rows; never expose those outside the usable page.
+async function progressiveIndicatorPage(page, calculate) {
+  if (!page.bars.length) return {...page, indicators: []};
+  const result = await calculate();
+  const starts = new Set(page.bars.map(bar => bar.start));
+  return {...result, bars: result.bars.filter(bar => starts.has(bar.start))};
+}
