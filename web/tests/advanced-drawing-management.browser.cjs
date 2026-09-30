@@ -162,6 +162,86 @@ const assert = require("node:assert/strict");
   assert.equal(await restoredCheckboxes.nth(1).isChecked(), false);
   assert.equal(await restoredCheckboxes.nth(0).isChecked(), true);
   assert.equal(await restoredCheckboxes.nth(2).isChecked(), true);
+  await ru.getByRole("button", { name: "确认", exact: true }).click();
+  await restored.evaluate((id) => {
+    const c = widget.activeChart();
+    c.getShapeById(id).setProperties({ linecolor: "#ff00ff", linewidth: 4 });
+    const scale = c.getPanes()[0].getMainSourcePriceScale();
+    scale.setMode(0);
+    scale.setAutoScale(false);
+    scale.setVisiblePriceRange({ from: 4200, to: 4400 });
+  }, ids[0]);
+  async function magentaPixels() {
+    await page.waitForTimeout(400);
+    return ru.locator(".chart-container canvas").evaluateAll((canvases) => {
+      let count = 0;
+      for (const canvas of canvases) {
+        const ctx = canvas.getContext("2d");
+        if (!ctx) continue;
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        for (let i = 0; i < pixels.length; i += 4)
+          if (
+            pixels[i] > 220 &&
+            pixels[i + 1] < 40 &&
+            pixels[i + 2] > 220 &&
+            pixels[i + 3] > 200
+          )
+            count++;
+      }
+      return count;
+    });
+  }
+  const hiddenPixels = await magentaPixels();
+  await restored.evaluate(
+    (id) => widget.activeChart().showPropertiesDialog(id),
+    ids[0],
+  );
+  await ru.getByText("可见范围", { exact: true }).click();
+  await restoredCheckboxes.nth(1).check();
+  await ru.getByRole("button", { name: "确认", exact: true }).click();
+  const shownPixels = await magentaPixels();
+  assert.ok(
+    shownPixels > hiddenPixels + 500,
+    `Enabling hours must render horizontal line: hidden=${hiddenPixels}, shown=${shownPixels}`,
+  );
+  await restored.evaluate(
+    (id) => widget.activeChart().showPropertiesDialog(id),
+    ids[0],
+  );
+  await ru.getByText("可见范围", { exact: true }).click();
+  await restoredCheckboxes.nth(1).uncheck();
+  await ru.getByRole("button", { name: "确认", exact: true }).click();
+  const hiddenAgainPixels = await magentaPixels();
+  assert.ok(
+    hiddenAgainPixels < shownPixels - 500,
+    "Disabling hours must remove rendered line",
+  );
+  console.log("H4_VISIBILITY_PIXELS", {
+    hiddenPixels,
+    shownPixels,
+    hiddenAgainPixels,
+  });
+  await restored.evaluate(
+    () => new Promise((ok) => widget.activeChart().setResolution("15", ok)),
+  );
+  await restored.waitForFunction(
+    () =>
+      widget.activeChart().resolution() === "15" &&
+      widget.activeChart().dataReady(),
+    null,
+    { timeout: 60000 },
+  );
+  await restored.evaluate(() => {
+    const scale = widget.activeChart().getPanes()[0].getMainSourcePriceScale();
+    scale.setAutoScale(false);
+    scale.setVisiblePriceRange({ from: 4200, to: 4400 });
+  });
+  const minutesPixels = await magentaPixels();
+  assert.ok(
+    minutesPixels > hiddenAgainPixels + 500,
+    "Same drawing must render on M15 when minutes are enabled and hours disabled",
+  );
+  console.log("M15_VISIBILITY_PIXELS", { minutesPixels });
   assert.deepEqual(errors, []);
   console.log("DRAWING_VISIBILITY_LAYER_PERSISTED", { visibility, errors });
   await browser.close();
