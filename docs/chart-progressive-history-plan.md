@@ -308,3 +308,9 @@
 - advanced-mobile-readonly.browser.cjs以412×915触屏模拟器运行当前HTTPS工作台，显式设置MARKET_WATCH_CHART_ORIGIN=https://127.0.0.1:15444/后通过。首次运行遗漏该参数，脚本查找旧5187而失败，不是图表初始化缺陷。
 - 单图断言、临时周期切换、服务端工作区和偏好不变、无advanced-charts写请求、readonly=true、页面错误为空均通过。截图/tmp/mw-mobile-portrait.png人工查看确认EUR/CAD M15价格与指标可见，单图占满手机主区域；日志/tmp/mw-mobile-progressive.log。
 - 这是Chromium触屏模拟验收，不是新增OPPO真机测试；手机只看图/不保存需求在此路径有证据。桌面八图压力和同步仍需当前版本验收。
+
+### 八图同品种持续轮询回归
+
+- 当前异步容器运行advanced-eight-chart-soak.browser.cjs通过：两分钟8次采样，8图同品种同周期共用1组/1订阅；最新数据请求8次，无pendingHistory，RPC pending样本0至4。
+- 两分钟JS堆增长未超过测试64MiB限制；收起到单图只查询1组，恢复八图仍1组，页面错误[]。日志/tmp/mw-eight-progressive.log。
+- 测试复用已有历史，且旧history/data接口带固定历史截止，不是八图同时冷补数/混合周期性能验收。混合品种与跨周期时间同步仍待本轮验证。
