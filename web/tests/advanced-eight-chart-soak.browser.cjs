@@ -22,7 +22,7 @@ const assert = require("node:assert/strict");
     errors.push(e.message);
     console.log("EIGHT_CHART_ERROR", JSON.stringify({phase, message:e.message, stack:e.stack}));
   });
-  await page.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
+  await page.route(/\/api\/(market-data\/history(?:\/cache)?|charts\/data)$/, (route) => {
     const body = route.request().postDataJSON();
     return route.continue({
       postData: JSON.stringify({

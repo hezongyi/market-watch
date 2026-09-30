@@ -345,3 +345,9 @@
 - 加回原流程clearInterval(poll)、等待polling完成、缓存过期及手动tick后仍errors=[]，日志/tmp/mw-layout-manual-tick.log。
 - 因此短布局循环不是当前异常的充分触发条件，不能据此宣称修复，也不应直接改日期同步。两分钟状态积累/历史修订仍是待验证条件。原完整失败soak保留。
 - 探针支持no-sync/no-progressive用于后续单变量实验，但本次只运行baseline；未对未运行模式宣称结果。
+
+### 混合八图测试时间轴不一致确认
+
+- 发现旧soak仅拦截/history与/charts/data到固定历史日期，新/history/cache仍返回现在的数据，造成同一原生序列混用新缓存与过去轮询数据。仅将cache加入相同截止拦截，未更改运行代码，也未加载候选viewports。
+- 完整两分钟混合八图测试通过：3组订阅、无pendingHistory、收起恢复请求断言通过、页面errors=[]，日志/tmp/mw-eight-aligned.log。此前nearestIndex失败不能作为正常数据路径已证实的产品缺陷；候选布局保护也不能冒领修复功劳。
+- 保留所有错误断言。下一步不固定历史日期的实际实时soak验证，以及其他固定日期用例是否遗漏cache通路的核查。
