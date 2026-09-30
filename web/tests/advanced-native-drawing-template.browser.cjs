@@ -89,6 +89,114 @@ const assert = require("node:assert/strict");
       ),
     name,
   );
+  const stored = await page.evaluate(
+    async (name) =>
+      (await (await fetch("/api/advanced-charts/preferences")).json()).find(
+        (r) => r.kind === "drawing" && r.name === name,
+      ),
+    name,
+  );
+  assert.ok(stored);
+  await ui.getByRole("button", { name: "确认", exact: true }).click();
+  await frame.evaluate(() => {
+    const c = widget.activeChart();
+    const id = c.getAllShapes()[0].id;
+    c.getShapeById(id).setProperties({ linecolor: "#12ab34", linewidth: 4 });
+    c.showPropertiesDialog(id);
+  });
+  await ui.getByText("模板", { exact: true }).click();
+  await ui.getByText(/保存为/).click();
+  await ui.locator("input[maxlength]").fill(name);
+  const suggestion = ui.locator("li").filter({ hasText: name });
+  if (await suggestion.count()) await suggestion.click();
+  await ui.getByRole("button", { name: "保存", exact: true }).last().click();
+  let overwritten = [];
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const yes = ui.getByRole("button", { name: "是", exact: true });
+    if (await yes.isVisible()) await yes.click();
+    overwritten = await page.evaluate(
+      async (name) =>
+        (await (await fetch("/api/advanced-charts/preferences")).json()).filter(
+          (r) => r.kind === "drawing" && r.name === name,
+        ),
+      name,
+    );
+    if (overwritten[0]?.revision > stored.revision) break;
+    await page.waitForTimeout(500);
+  }
+  assert.equal(overwritten.length, 1);
+  assert.equal(overwritten[0].id, stored.id);
+  assert.equal(overwritten[0].revision, stored.revision + 1);
+  assert.notDeepEqual(overwritten[0].content, stored.content);
+  await ui.getByRole("button", { name: "确认", exact: true }).click();
+  await frame.evaluate(async () => {
+    const c = widget.activeChart();
+    const id = await c.createShape(
+      { time: 1790323200, price: 4300 },
+      { shape: "vertical_line" },
+    );
+    c.getShapeById(id).setProperties({ linecolor: "#ab1234", linewidth: 2 });
+    c.showPropertiesDialog(id);
+  });
+  await ui.getByText("模板", { exact: true }).click();
+  assert.equal(
+    await ui.getByText(name, { exact: true }).count(),
+    0,
+    "Horizontal-line template must not appear for a vertical line",
+  );
+  await ui.getByText(/保存为/).click();
+  await ui.locator("input[maxlength]").fill(name);
+  await ui.getByRole("button", { name: "保存", exact: true }).last().click();
+  let both = [];
+  for (let attempt = 0; attempt < 30; attempt++) {
+    both = await page.evaluate(
+      async (name) =>
+        (await (await fetch("/api/advanced-charts/preferences")).json()).filter(
+          (r) => r.kind === "drawing" && r.name === name,
+        ),
+      name,
+    );
+    if (both.length === 2) break;
+    await page.waitForTimeout(500);
+  }
+  assert.equal(
+    both.length,
+    2,
+    "Different tools may save the same template name",
+  );
+  assert.equal(new Set(both.map((r) => r.tool)).size, 2);
+  assert.deepEqual(
+    both.find((r) => r.id === stored.id),
+    overwritten[0],
+    "Saving the vertical template must leave the horizontal template unchanged",
+  );
+  await ui.getByText("模板", { exact: true }).click();
+  const verticalLabel = ui.getByText(name, { exact: true });
+  await verticalLabel.hover();
+  await verticalLabel
+    .locator("..")
+    .locator("..")
+    .locator('[data-name="remove-button"]')
+    .click();
+  await ui.getByRole("button", { name: "是", exact: true }).click();
+  let remaining = [];
+  for (let attempt = 0; attempt < 30; attempt++) {
+    remaining = await page.evaluate(
+      async (name) =>
+        (await (await fetch("/api/advanced-charts/preferences")).json()).filter(
+          (r) => r.kind === "drawing" && r.name === name,
+        ),
+      name,
+    );
+    if (remaining.length === 1) break;
+    await page.waitForTimeout(500);
+  }
+  assert.deepEqual(
+    remaining,
+    [overwritten[0]],
+    "Deleting one tool's template must preserve the other tool's same-name template",
+  );
+
   await page.evaluate(async () => {
     const session = await (await fetch("/api/session")).json();
     const r = await fetch("/api/advanced-charts/workspaces", {
@@ -139,8 +247,8 @@ const assert = require("node:assert/strict");
     const s = widget.activeChart().getShapeById(id);
     return { properties: s.getProperties(), points: s.getPoints() };
   }, id);
-  assert.equal(shape.properties.linecolor, "#ff1234");
-  assert.equal(shape.properties.linewidth, 3);
+  assert.equal(shape.properties.linecolor, "#12ab34");
+  assert.equal(shape.properties.linewidth, 4);
   assert.equal(shape.points[0].price, 4200);
   assert.equal(
     await second.evaluate(() => widget.activeChart().getAllShapes().length),
@@ -169,8 +277,8 @@ const assert = require("node:assert/strict");
     }));
   });
   assert.equal(persisted.length, 1);
-  assert.equal(persisted[0].properties.linecolor, "#ff1234");
-  assert.equal(persisted[0].properties.linewidth, 3);
+  assert.equal(persisted[0].properties.linecolor, "#12ab34");
+  assert.equal(persisted[0].properties.linewidth, 4);
   assert.equal(persisted[0].points[0].price, 4200);
   await restored.evaluate(() => {
     const c = widget.activeChart();
@@ -199,8 +307,8 @@ const assert = require("node:assert/strict");
     }));
   });
   assert.equal(retained.length, 1);
-  assert.equal(retained[0].props.linecolor, "#ff1234");
-  assert.equal(retained[0].props.linewidth, 3);
+  assert.equal(retained[0].props.linecolor, "#12ab34");
+  assert.equal(retained[0].props.linewidth, 4);
   assert.equal(retained[0].points[0].price, 4200);
   assert.deepEqual(errors, []);
   console.log("DRAWING_TEMPLATE_CROSS_WORKSPACE_PASSED", {
