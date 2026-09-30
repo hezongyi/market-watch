@@ -654,7 +654,8 @@ async function tick() {
         // Refill bars missed while the native pane retained a hidden subscription.
         if (await reloadHistory(symbol, first.res))
           for (const sub of group) sub.pausedForLayout = false;
-        continue;
+        // A busy viewport may defer its historical reset; visible realtime
+        // polling must still resume instead of waiting for that reset to finish.
       }
       try {
         await request(

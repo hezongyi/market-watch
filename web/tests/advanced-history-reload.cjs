@@ -23,8 +23,12 @@ vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
   await vm.runInContext(
     `
 ready = true;
-widget = {chartsCount:()=>2, chart:(i)=>({
+refreshChartHistory=async(widget,chart,invalidate,current)=>{
+ if(!current())return false;invalidate();chart.resetData();return true;
+};
+widget = {resetCache:()=>{},chartsCount:()=>2, chart:(i)=>({
   symbol:()=> 'EURUSD', resolution:()=>i ? '60' : '5',
+  getTimeScale:()=>({rightOffset:()=>0}),
   resetData:()=>events.push('chart:'+i)
 })};
 subscriptions.set('five', {symbol:'EURUSD',res:'5', reset:()=>events.push('cache:5')});
@@ -122,9 +126,10 @@ retryCallback(true);`,
   await vm.runInContext(
     `
 pendingHistory.clear();
-widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
+widget={resetCache:()=>{},chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
   getAllStudies:()=>[{id:'comparison',name:'Compare'}],
   getStudyById:()=>({getInputValues:()=>[{id:'symbol',value:'XAUUSD'}]}),
+  getTimeScale:()=>({rightOffset:()=>0}),
   resetData:()=>events.push('comparison-chart')})};
 pendingHistory.set('compare',{instrument:'XAUUSD',timeframe:'M5'});
 request=async()=>{events.push('history');return {status:'ready'}};
@@ -175,7 +180,8 @@ await runningTick;
   events.length = 0;
   await vm.runInContext(`(async()=>{
 subscriptions.clear();
-widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
+widget={resetCache:()=>{},chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
+  getTimeScale:()=>({rightOffset:()=>0}),
   resetData:()=>events.push('visible-reset')})};
 subscriptions.set('hidden',{symbol:'XAUUSD',res:'5',last:0,
   reset:()=>events.push('hidden-cache-reset'),cb:()=>events.push('hidden-bar')});
@@ -185,18 +191,19 @@ await tick();
   assert.deepEqual(events, [], "Hidden pane must not fetch latest bars");
   assert.equal(vm.runInContext("subscriptions.get('hidden').pausedForLayout", context), true);
   await vm.runInContext(`(async()=>{
-widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'XAUUSD',resolution:()=> '5',
+widget={resetCache:()=>{},chartsCount:()=>1,chart:()=>({symbol:()=> 'XAUUSD',resolution:()=> '5',
+  getTimeScale:()=>({rightOffset:()=>0}),
   resetData:()=>events.push('visible-reset')})};
 await tick();
 })()`, context);
-  assert.deepEqual(events, ['hidden-cache-reset', 'visible-reset'],
-    "Reopening must refill history before resuming latest-bar polling");
+  assert.deepEqual(events, ['hidden-cache-reset', 'visible-reset', 'query'],
+    "Reopening must restore history and resume latest-bar polling");
   events.length = 0;
   await vm.runInContext("tick()", context);
   assert.deepEqual(events, ['query']);
   events.length = 0;
   await vm.runInContext(`(async()=>{
-widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
+widget={resetCache:()=>{},chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
   getAllStudies:()=>[{id:'comparison'}],
   getStudyById:()=>({getInputValues:()=>[{id:'symbol',value:'XAUUSD'}]})})};
 await tick();

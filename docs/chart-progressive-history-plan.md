@@ -491,3 +491,9 @@
 
 - history/demand仅对导航目标区间查询失败ImportJob及同周期聚合连续失败（>=5），返回通用window_error，不泄露上游异常。helper先尝试可用缓存，再根据window_error退出等待并引导历史任务重试，避免已可用数据被陈旧失败任务阻断。
 - 实际FastAPI目标优先测试增加失败job后续请求断言；15项chart_history_plan及前端navigation-page测试通过，ruff通过。此失败退出候选尚未构建部署；不将单元/接口测试等同于浏览器失败恢复验收。
+
+### 布局展开轮询恢复回归修复
+
+- /tmp/mw-eight-navigation.log退出1：无EIGHT_CHART_ERROR，但展开后轮询仅1组、预期3组。统一reloadHistory会因同步guard忙返回false，pausedForLayout分支仍continue，阻断可见实时请求。
+- 移除该continue，历史恢复待重试同时继续实时查询；新增advanced-layout-poll-resume.cjs通过busy guard下仍查询、paused状态保留的断言。既有advanced-history-reload.cjs适配公开刷新helper测试替身与新恢复语义后通过，仍验证订阅分组、历史revision、失败恢复、隐藏图不轮询。
+- 失败退出补丁及轮询修复已部署本机api:nav-errors-cf21767/chart-origin:nav-errors-local；原八图复验/tmp/mw-eight-resume-poll.log仍在运行。
