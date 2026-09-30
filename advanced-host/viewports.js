@@ -132,10 +132,12 @@ function edgeRangeSync(widget, blocked, onError) {
     try {
       for (const peer of peers) {
         if (disposed || current !== generation || blocked()) break;
-        await peer.setVisibleRange(target, { rejectByTimeout: 20000 });
+        try {
+          await peer.setVisibleRange(target, { rejectByTimeout: 20000 });
+        } catch (error) {
+          if (!disposed) onError(error);
+        }
       }
-    } catch (error) {
-      if (!disposed) onError(error);
     } finally {
       if (!disposed) restore();
       applying = false;

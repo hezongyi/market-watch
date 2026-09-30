@@ -69,6 +69,7 @@ function pane(to, offset = 10) {
     a = pane(1000),
     b = pane(3700, -100),
     c = pane(3700);
+  const failures = [];
   let blocked = false,
     finish;
   const widget = {
@@ -81,9 +82,7 @@ function pane(to, offset = 10) {
   const guard = context.edgeRangeSync(
     widget,
     () => blocked,
-    (e) => {
-      throw e;
-    },
+    (e) => failures.push(e),
   );
   async function flush() {
     const f = [...timers.values()];
@@ -107,6 +106,20 @@ function pane(to, offset = 10) {
     1000,
     "late peer update follows the active chart",
   );
+  // An unavailable range on one peer must not prevent later peers aligning.
+  const setB = b.setVisibleRange;
+  await b.setVisibleRange({from:100,to:3700});
+  await c.setVisibleRange({from:100,to:3700});
+  b.setVisibleRange = async () => { throw Error('Invalid visible range'); };
+  a.fire();
+  await flush();
+  assert.equal(c.getVisibleRange().to, 1000, 'failed peer must not block later peers');
+  assert.equal(failures.length, 1);
+  assert.match(String(failures[0]), /Invalid visible range/);
+  assert.equal(guard.busy(), false);
+  assert.equal(range.value(), true);
+  assert.equal(time.value(), true);
+  b.setVisibleRange = setB;
   range.setValue(false);
   a.fire();
   assert.equal(timers.size, 0);
