@@ -98,6 +98,35 @@ const assert = require("node:assert/strict");
     "#123456",
   );
   assert.equal(stored.content.value.mainSourceProperties.symbol, undefined);
+  await ui.getByRole("button", { name: "确认", exact: true }).click();
+  await frame.evaluate(() =>
+    widget.applyOverrides({ "paneProperties.background": "#234567" }),
+  );
+  page.once("dialog", (dialog) => dialog.accept(name));
+  await ui
+    .getByRole("button", { name: "保存图表样式模板", exact: true })
+    .click();
+  await page.waitForFunction(
+    async ({ name, revision }) =>
+      (await (await fetch("/api/advanced-charts/preferences")).json()).some(
+        (r) =>
+          r.kind === "chart" && r.name === name && r.revision === revision + 1,
+      ),
+    { name, revision: stored.revision },
+  );
+  const overwritten = await page.evaluate(
+    async (name) =>
+      (await (await fetch("/api/advanced-charts/preferences")).json()).filter(
+        (r) => r.kind === "chart" && r.name === name,
+      ),
+    name,
+  );
+  assert.equal(overwritten.length, 1);
+  assert.equal(overwritten[0].id, stored.id);
+  assert.equal(
+    overwritten[0].content.value.chartProperties.paneProperties.background,
+    "#234567",
+  );
   await page.evaluate(async () => {
     const session = await (await fetch("/api/session")).json();
     const response = await fetch("/api/advanced-charts/workspaces", {
@@ -157,7 +186,7 @@ const assert = require("node:assert/strict");
       background: state.charts[0].chartProperties.paneProperties.background,
     };
   });
-  assert.equal(after.background, "#123456");
+  assert.equal(after.background, "#234567");
   delete after.background;
   assert.deepEqual(after, before);
   await restoredUI.locator("#header-toolbar-properties").click();
@@ -175,6 +204,20 @@ const assert = require("node:assert/strict");
       ),
     name,
   );
+  await page.reload();
+  await page.waitForTimeout(15000);
+  const fresh = page
+    .frames()
+    .find((f) => f.url().startsWith("https://127.0.0.1:15444/"));
+  await fresh.waitForFunction(
+    () => ready && !loading && widget.activeChart().dataReady(),
+    null,
+    { timeout: 60000 },
+  );
+  const freshUI = fresh.childFrames()[0];
+  await freshUI.locator("#header-toolbar-properties").click();
+  await freshUI.getByText("模板", { exact: true }).click();
+  assert.equal(await freshUI.getByText(name, { exact: true }).count(), 0);
   assert.deepEqual(errors, []);
   console.log("STYLE_CROSS_WORKSPACE_NATIVE_APPLY_DELETE_PASSED", {
     preserved: after,
