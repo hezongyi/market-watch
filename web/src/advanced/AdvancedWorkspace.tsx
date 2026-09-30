@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import "./advanced.css";
+import { HistoryPlansDialog } from "./HistoryPlansDialog";
 import { ExportDialog, type ExportSelection } from "./ExportDialog";
 
 type Workspace = {
@@ -25,6 +26,7 @@ const frames = new Set([
 export default function AdvancedWorkspace() {
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
+  const [historyPlansOpen,setHistoryPlansOpen] = useState(false);
   const [frameKey, setFrameKey] = useState(0);
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
@@ -125,6 +127,9 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if (m.type === "history-plans-open") {
+        setHistoryPlansOpen(true); return;
+      }
       if (m.type === "cancel-request") {
         marketRequests.get(source)?.get(m.id)?.abort();
         return;
@@ -576,6 +581,7 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace">
+      {historyPlansOpen && <HistoryPlansDialog onClose={()=>setHistoryPlansOpen(false)} readonly={mobile}/> }
       {exportSelection && (
         <ExportDialog
           selection={exportSelection}

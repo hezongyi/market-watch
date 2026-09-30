@@ -1214,6 +1214,10 @@ function boot(
     send({ type: "ready" });
     clearInterval(progressivePoll);
     progressivePoll = setInterval(()=>progressivePages?.poll(),2000);
+    widget.headerReady().then(()=>widget.createButton({
+      align:"right",useTradingViewStyle:true,text:"历史任务",title:"查看后台补数进度",
+      onClick:()=>send({type:"history-plans-open"}),
+    }));
     demandReporter?.dispose();
     demandReporter = chartDemandReporter(widget, clientId,
       async args => {

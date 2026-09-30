@@ -152,3 +152,54 @@ def advance_pending_plans():
             if plan:
                 queued += int(advance_plan(db, plan, now_ms()))
     return queued
+
+
+def plan_status(db, plan, now):
+    from .market import stored_coverage
+    from .market_data import missing_intervals
+    from .storage import ImportJob
+
+    inst = db.get(Instrument, plan.instrument_id)
+    spans = stored_coverage(db, inst, plan.target_start, plan.target_end)
+    total = plan.target_end - plan.target_start
+    missing = sum(b-a for a,b in missing_intervals(spans,plan.target_start,plan.target_end))
+    jobs = list(db.scalars(select(ImportJob).where(
+        ImportJob.instrument_id == plan.instrument_id, ImportJob.chart_plan.is_(True),
+        ImportJob.status.in_(['pending','running','failed']))))
+    return dict(instrument=plan.instrument_id, status=plan.status,
+                start=plan.target_start, end=plan.target_end,
+                covered_ms=total-missing, total_ms=total,
+                priority=priority_regions(db,plan,now)[0][2],
+                pending=sum(job.status=='pending' for job in jobs),
+                running=sum(job.status=='running' for job in jobs),
+                failed=sum(job.status=='failed' for job in jobs))
+
+
+def control_plan(db, instrument, action, now):
+    from .storage import ImportJob
+
+    if action not in ('cancel','resume','retry'):
+        raise ValueError('Unknown plan action')
+    db.scalar(select(Instrument).where(Instrument.id==instrument).with_for_update())
+    plan = db.get(ChartHistoryPlan,instrument)
+    if plan is None:
+        raise ValueError('History plan not found')
+    jobs = list(db.scalars(select(ImportJob).where(
+        ImportJob.instrument_id==instrument, ImportJob.chart_plan.is_(True),
+        ImportJob.status.in_(['pending','running','failed','cancelled']))))
+    if action=='cancel':
+        plan.status='cancelled'
+        for job in jobs:
+            job.status='cancelled'
+            job.lease_until=None
+    else:
+        plan.status='pending'
+        for job in jobs:
+            if job.status=='cancelled' or (action=='retry' and job.status=='failed'):
+                job.status='pending'
+                job.next_at=now
+                job.error=None
+                job.lease_until=None
+    plan.updated_at=now
+    db.flush()
+    return plan

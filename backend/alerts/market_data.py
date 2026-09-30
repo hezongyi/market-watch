@@ -12,6 +12,7 @@ from .market import stored_coverage
 from .providers import fetch_oanda_catalog
 from .storage import (
     Bar,
+    ChartHistoryPlan,
     ImportJob,
     Instrument,
     MarketCatalog,
@@ -141,6 +142,11 @@ class HistoryQuery(BaseModel):
     timeframe: str
     before: int | None = Field(default=None, gt=0)
     limit: int = Field(default=300, ge=1, le=2000)
+
+
+class PlanControlQuery(BaseModel):
+    instrument: str = Field(max_length=40)
+    action: str
 
 
 class ViewportDemandQuery(BaseModel):
@@ -595,6 +601,23 @@ def router(authenticated):
             inst = resolve(db, body.instrument)
             renew_demand(db, body.client, inst)
         return {"ok": True}
+
+    @r.get("/history/plans")
+    def history_plans():
+        from .chart_history_plan import plan_status
+        with transaction() as db:
+            return [plan_status(db, plan, now_ms()) for plan in db.scalars(
+                select(ChartHistoryPlan).order_by(ChartHistoryPlan.updated_at.desc()).limit(100))]
+
+    @r.post("/history/plans/control")
+    def history_plan_control(body: PlanControlQuery):
+        from .chart_history_plan import control_plan
+        with transaction() as db:
+            try:
+                plan = control_plan(db,body.instrument,body.action,now_ms())
+            except ValueError as error:
+                raise HTTPException(422,str(error)) from error
+            return {"status":plan.status}
 
     @r.post("/history/demand")
     def viewport_demand(body: ViewportDemandQuery):

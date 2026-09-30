@@ -99,3 +99,11 @@
 .chart-export-dialog[data-theme="light"] [role="alert"] { color: #b71c1c; }
 .chart-export-dialog label:has(input[type="checkbox"]) { display: flex; align-items: center; gap: 8px; }
 .chart-export-dialog input[type="checkbox"] { display: inline-block; width: 18px; height: 18px; min-height: 18px; margin: 0; padding: 0; flex: 0 0 18px; }
+.history-plans-dialog { width:min(900px,92vw); max-height:85vh; border:1px solid #78849a; border-radius:8px; padding:20px; color:inherit; background:#202020; }
+.history-plans-dialog::backdrop { background:#0006; }
+.history-plans-dialog header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.history-plans-dialog h2 { margin:0; }
+.history-plans-scroll { overflow:auto; }
+.history-plans-dialog th,.history-plans-dialog td { padding:12px; text-align:left; border-bottom:1px solid #78849a55; white-space:nowrap; }
+.history-plans-dialog button { min-height:36px; margin:3px; cursor:pointer; }
+.history-plans-dialog button:focus-visible { outline:2px solid #2962ff; outline-offset:2px; }

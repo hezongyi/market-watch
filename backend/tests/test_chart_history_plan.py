@@ -109,3 +109,28 @@ def test_calendar_boundary_scan_matches_minute_scan():
         for gold in (False, True):
             assert bucket_has_trading(start,right,Calendar.NY17,gold,closures) == has_trading_gap(
                 start,right,Calendar.NY17,gold=gold,closures=closures)
+
+
+def test_plan_control_preserves_data_and_other_jobs(database):
+    from alerts.chart_history_plan import advance_plan, control_plan, plan_status
+    from alerts.storage import ImportJob
+    from sqlalchemy import select
+
+    end = ms(datetime(2026, 9, 28, 12, tzinfo=UTC))
+    with database.begin() as db:
+        plan = update_demand(db, ident='pane', instrument='EURUSD', timeframe='H1',
+                             end=end, visible=5, focused=True, now=end)
+        advance_plan(db,plan,end)
+        owned = db.scalar(select(ImportJob).where(ImportJob.chart_plan.is_(True)))
+        repair = ImportJob(instrument_id='EURUSD',start=1,end=2,cursor=1,priority=0)
+        db.add(repair);db.flush()
+        before = (plan.target_start,plan.target_end,owned.cursor)
+        control_plan(db,'EURUSD','cancel',end)
+        assert owned.status=='cancelled' and repair.status=='pending'
+        assert plan_status(db,plan,end)['status']=='cancelled'
+        control_plan(db,'EURUSD','resume',end+1)
+        assert owned.status=='pending'
+        assert before==(plan.target_start,plan.target_end,owned.cursor)
+        owned.status='failed';owned.error='network'
+        control_plan(db,'EURUSD','retry',end+2)
+        assert owned.status=='pending' and owned.error is None
