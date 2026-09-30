@@ -462,7 +462,15 @@ def router(authenticated):
                     else None
                 )
                 if not bar:
-                    result.append({"s": "error", "n": ident, "v": {"description": "暂无本地报价"}})
+                    if inst:
+                        result.append({"s": "ok", "n": ident, "quality": "pending", "v": {
+                            "short_name": inst.symbol,
+                            "description": inst.label + " · 报价准备中",
+                            "exchange": inst.source.upper(),
+                        }})
+                    else:
+                        result.append({"s": "error", "n": ident,
+                                       "v": {"description": "未知品种"}})
                     continue
                 values = {
                     "lp": float(bar.close),

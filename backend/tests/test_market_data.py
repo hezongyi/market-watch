@@ -956,3 +956,17 @@ def test_batch_crosses_page_boundary_and_preserves_revision_audit(database):
         assert db.scalar(select(func.count()).select_from(Audit).where(
             Audit.kind == 'candle_revision')) == 1
         assert db.scalar(select(func.count()).select_from(Bar)) == 1001
+
+
+def test_known_empty_quote_is_pending_without_invented_price(database):
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+    try:
+        with TestClient(api_module.app) as client:
+            rows = client.post('/api/market-data/quotes', json={
+                'symbols': ['EURUSD', 'UNKNOWN']}).json()
+            assert rows[0]['s'] == 'ok' and rows[0]['quality'] == 'pending'
+            assert '报价准备中' in rows[0]['v']['description']
+            assert not {'lp', 'bid', 'ask', 'ch', 'chp'} & rows[0]['v'].keys()
+            assert rows[1]['s'] == 'error'
+    finally:
+        api_module.app.dependency_overrides.clear()

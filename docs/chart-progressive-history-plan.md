@@ -276,3 +276,9 @@
 - 冷启动没有M1时现接口返回s=error，原生详情将其显示为“无效商品代码”。尚需针对已知品种暂无报价设计状态，不能伪造lp=0；成熟数据详情通路已证实正常。
 - 冷启动测试关闭后重新打开，H1返回189根，D1已有72根，支持后台继续补齐的证据；这不是最终全部目标完成验证。
 - 整理advanced-registered-quotes.browser.cjs用于注册品种报价一致性/有效价格/错误文案消失断言；此前诊断运行通过，新增断言尚需后续执行。未修改运行代码。
+
+### 冷启动报价准备状态
+
+- advanced-registered-quotes.browser.cjs真实容器通过，有效品种响应一致、价格有效且原生无错误文案。
+- 依据公开DatafeedQuoteValues可选字段进行原生受控实验：s=ok，仅short_name/description/exchange，省略lp/bid/ask等；截图/tmp/mw-empty-quote.png确认详情显示“报价准备中”，价格为空，无0价格或无效品种。测试advanced-empty-quote.browser.cjs通过（行情正常，仅拦截报价响应）。
+- 后端已知Instrument暂无M1返回quality=pending与上述元数据；未知品种仍error。新增API断言禁止虚构价格/涨跌字段，候选尚未部署。
