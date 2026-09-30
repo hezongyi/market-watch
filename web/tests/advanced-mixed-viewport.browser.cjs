@@ -1,3 +1,4 @@
+const waitForAsync = require("./wait-for-async.cjs");
 // Manual development-only acceptance: creates a test workspace; requires local ports 5188/5187.
 const { chromium } = require("playwright");
 const fs = require("fs");
@@ -10,6 +11,7 @@ const fs = require("fs");
   });
   const page = await browser.newPage({
     viewport: { width: 1600, height: 950 },
+    ignoreHTTPSErrors: process.env.MARKET_WATCH_TEST_SELF_SIGNED === "1",
   });
   // Fixed historical acceptance still reads real backend data. It does not
   // verify live ingestion or cold-history performance.
@@ -127,7 +129,7 @@ const fs = require("fs");
   );
   await page.goto(base + "/advanced-charts");
   await page.waitForTimeout(15000);
-  const frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  const frame = page.frames().find((f) => f.url().startsWith(process.env.MARKET_WATCH_CHART_ORIGIN || "http://127.0.0.1:5187/"));
   if (process.env.MARKET_WATCH_GOLD_SESSION_PROBE)
     await frame.evaluate(() => {
       const resolve = feed.resolveSymbol;
@@ -435,8 +437,7 @@ const fs = require("fs");
   const activeId = await page
     .locator("iframe[data-workspace-id]")
     .getAttribute("data-workspace-id");
-  await page.waitForFunction(
-    async ({ id, ranges }) => {
+  await waitForAsync(page, async ({ id, ranges }) => {
       const rows = await (
         await fetch("/api/advanced-charts/workspaces")
       ).json();
@@ -458,7 +459,7 @@ const fs = require("fs");
   await page.reload();
   await page.locator('iframe[title="专业图表工作区"]').waitFor();
   await page.waitForTimeout(1000);
-  const restoredFrame = page.frames().find((f) => f.url().includes(":5187/?"));
+  const restoredFrame = page.frames().find((f) => f.url().startsWith(process.env.MARKET_WATCH_CHART_ORIGIN || "http://127.0.0.1:5187/"));
   await restoredFrame.waitForFunction(() => ready && !loading, null, {
     timeout: 60000,
   });

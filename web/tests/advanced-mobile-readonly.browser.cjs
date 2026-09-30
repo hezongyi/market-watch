@@ -1,3 +1,4 @@
+const waitForAsync = require("./wait-for-async.cjs");
 // Development mobile landscape read-only check; uses latest saved workspace, no workspace creation.
 const { chromium } = require("playwright");
 const fs = require("fs");
@@ -100,7 +101,7 @@ const fs = require("fs");
   );
   await page.getByRole("button", { name: "登录工作台" }).click();
   require("node:assert/strict").equal((await loginResponse).status(), 200);
-  await page.waitForFunction(async () => (await fetch("/api/session")).ok);
+  await waitForAsync(page, async () => (await fetch("/api/session")).ok);
   if (process.env.MARKET_WATCH_MOBILE_EIGHT) {
     // Select an existing real eight-pane workspace without mutating its content.
     await page.route("**/api/advanced-charts/workspaces", async (route) => {

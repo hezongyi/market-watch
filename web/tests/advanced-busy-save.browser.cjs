@@ -1,3 +1,4 @@
+const waitForAsync = require("./wait-for-async.cjs");
 // Native manual-save rejection must remain readable and pending edits must auto-save.
 // Requires the local acceptance Compose stack; self-signed TLS is test-only.
 const { chromium } = require("playwright");
@@ -85,7 +86,7 @@ const assert = require("node:assert/strict");
   assert.match(failure,/图表正在切换/);
   assert.equal(await frame.evaluate(()=>dirty),true);
   await frame.evaluate(()=>{rangeGuard.busy=originalBusy;});
-  await page.waitForFunction(async(id)=>{
+  await waitForAsync(page, async(id)=>{
     const rows=await(await fetch('/api/advanced-charts/workspaces')).json();
     return rows.some(r=>JSON.stringify(r.document).includes(id));
   },id,{timeout:30000});

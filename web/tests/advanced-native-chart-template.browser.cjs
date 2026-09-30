@@ -1,3 +1,4 @@
+const waitForAsync = require("./wait-for-async.cjs");
 // Independent style save → real API → different workspace → native template menu.
 // Requires the local acceptance Compose stack; self-signed TLS is test-only.
 const { chromium } = require("playwright");
@@ -79,8 +80,7 @@ const assert = require("node:assert/strict");
   await ui
     .getByRole("button", { name: "保存图表样式模板", exact: true })
     .click();
-  await page.waitForFunction(
-    async (name) =>
+  await waitForAsync(page, async (name) =>
       (await (await fetch("/api/advanced-charts/preferences")).json()).some(
         (r) => r.kind === "chart" && r.name === name,
       ),
@@ -106,8 +106,7 @@ const assert = require("node:assert/strict");
   await ui
     .getByRole("button", { name: "保存图表样式模板", exact: true })
     .click();
-  await page.waitForFunction(
-    async ({ name, revision }) =>
+  await waitForAsync(page, async ({ name, revision }) =>
       (await (await fetch("/api/advanced-charts/preferences")).json()).some(
         (r) =>
           r.kind === "chart" && r.name === name && r.revision === revision + 1,
@@ -197,8 +196,7 @@ const assert = require("node:assert/strict");
   await item.hover();
   await item.getByRole("button", { name: "移除", exact: true }).click();
   await restoredUI.getByRole("button", { name: "是", exact: true }).click();
-  await page.waitForFunction(
-    async (name) =>
+  await waitForAsync(page, async (name) =>
       !(await (await fetch("/api/advanced-charts/preferences")).json()).some(
         (r) => r.kind === "chart" && r.name === name,
       ),

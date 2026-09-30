@@ -974,3 +974,24 @@
 - advanced-study-panes.browser.cjs在本机HTTPS创建MA21，公开API unmergeDown使窗格1→2且指标索引1；mergeUp回主图使窗格2→1，随后再分离并隐藏。
 - 保存刷新后唯一指标仍在索引1、visible=false、length=21；重新显示成功，/tmp/mw-study-panes.log退出0、errors=[]。
 - 此项验证真实库公开API与工作区持久化，未逐个点击全部指标菜单，也不替代其他指标算法验收。
+
+### 异步浏览器等待修正及自选分组复核
+
+- 自选测试最初刷新后分组缺失；追踪显示mw.watchlists.v1无写请求、revision仍11，纠正之前“服务器已保存后丢失”的判断。根因是测试的waitForFunction(async...)直接返回Promise，当前Playwright coreBundle.js中predicate()未await，其Promise真值使等待提前完成，100ms自选防抖保存尚未触发就刷新。
+- 新增wait-for-async.cjs，显式await每次evaluate结果；验证false/false/true需要三次求值，永远false能超时。替换8份测试中的异步waitForFunction，保留同步predicate原实现。
+- 自选分组修正后/tmp/mw-watchlist-await.log退出0：两个中文分组标题、三品种顺序保存后刷新一致，原生侧栏标题可见，删除入库，errors=[]。此次没有修改产品自选实现。
+- 六项报价后端测试通过（PYTHONPATH=backend，-k quote），watchlists.cjs失败重试/只读单测通过；使用说明新增报价口径、时间与缺失字段边界。
+- 原受影响忙碌保存、模板、视区等待证据待修正后的用例复核；不将尚未复跑的旧记录视为充分证据。当前批次/tmp/mw-async-recheck-*.log正在顺序运行，不能提前宣称通过。
+
+- 复核进展：busy-save及native-chart-template修正等待后退出0，日志/tmp/mw-async-recheck-{busy-save,native-chart-template}.log。绘图模板先在最终删除等待超时，原脚本漏点“是”确认；已补实际确认操作，正在重跑。模板创建、覆盖及刷新前各强断言已执行，不将删除失败计为整体通过。
+- mixed-viewport和weekly-background增加测试用HTTPS/图表origin环境参数，以在当前本机容器复核，不需要重启旧开发端口。
+
+- 绘图模板补齐最终删除确认后/tmp/mw-async-confirmed-native-drawing-template.log退出0。指标模板最终删除仍未通过；其确认界面与绘图模板不同，不能直接套用“是”按钮，正在读取实际原生界面。视区/手机/周线顺序批次因此尚未运行。
+
+### 后端完整回归（2026-09-30）
+
+- `PYTHONPATH=backend .venv/bin/python -m pytest backend/tests -q`：172passed、7skipped，9.01秒，/tmp/mw-backend-final-regression.log。覆盖策略/通知/演练、行情供数/日历/分桶、工作区/偏好/导出等现有后端用例。
+- 179项已收集；跳过为5项test_postgres、1项PostgreSQL备份恢复、1项数据库迁移传输，均要求独立TEST_POSTGRES_URL（备份另需客户端路径）。先前隔离PostgreSQL验收证据单列，不将此次跳过写作通过。只出现Starlette/httpx弃用警告。
+- 此次后端回归不替代原监控网页交互、实际通知投递或所有浏览器验收；未接触生产环境。
+
+- 指标模板删除截图/tmp/mw-study-remove-dialog.png确认：库弹出英文“Delete this template?”，按钮为Delete而非“是”。已按实际按钮补点击并移除诊断；/tmp/mw-async-verified-*.log顺序复核仍在运行。该原生局部英文提示是授权包现状，不修改供应商文件。

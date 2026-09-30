@@ -1,3 +1,4 @@
+const waitForAsync = require("./wait-for-async.cjs");
 // Native study template UI → real development API → different workspace → reload.
 // Requires the local acceptance Compose stack; self-signed TLS is test-only.
 const { chromium } = require("playwright");
@@ -79,8 +80,7 @@ const assert = require("node:assert/strict");
   const templateName = "验收MA覆盖-" + Date.now();
   await ui.locator('input[maxlength="64"]').fill(templateName);
   await ui.locator('input[maxlength="64"]').press("Enter");
-  await page.waitForFunction(
-    async (name) =>
+  await waitForAsync(page, async (name) =>
       (await (await fetch("/api/advanced-charts/preferences")).json()).some(
         (r) => r.kind === "study" && r.name === name,
       ),
@@ -204,8 +204,8 @@ const assert = require("node:assert/strict");
     .locator("..")
     .getByRole("button", { name: "移除", exact: true })
     .click();
-  await page.waitForFunction(
-    async (name) =>
+  await restoredUI.getByRole("button", { name: "Delete", exact: true }).click();
+  await waitForAsync(page, async (name) =>
       !(await (await fetch("/api/advanced-charts/preferences")).json()).some(
         (r) => r.kind === "study" && r.name === name,
       ),

@@ -1,3 +1,4 @@
+const waitForAsync = require("./wait-for-async.cjs");
 // Native drawing template save and cross-workspace application; actual drawings stay local.
 // Requires the local acceptance Compose stack; self-signed TLS is test-only.
 const { chromium } = require("playwright");
@@ -82,8 +83,7 @@ const assert = require("node:assert/strict");
   const name = "绘图模板验收-" + Date.now();
   await ui.locator("input[maxlength]").fill(name);
   await ui.locator("input[maxlength]").press("Enter");
-  await page.waitForFunction(
-    async (name) =>
+  await waitForAsync(page, async (name) =>
       (await (await fetch("/api/advanced-charts/preferences")).json()).some(
         (r) => r.kind === "drawing" && r.name === name,
       ),
@@ -292,8 +292,8 @@ const assert = require("node:assert/strict");
     .locator("..")
     .locator("..");
   await menuItem.locator('[data-name="remove-button"]').click();
-  await page.waitForFunction(
-    async (name) =>
+  await restoredUI.getByRole("button", { name: "是", exact: true }).click();
+  await waitForAsync(page, async (name) =>
       !(await (await fetch("/api/advanced-charts/preferences")).json()).some(
         (r) => r.kind === "drawing" && r.name === name,
       ),
