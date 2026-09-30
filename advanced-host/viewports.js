@@ -214,7 +214,9 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
   const interaction = () => { interacted = true; };
   widget.subscribe("mouse_down", interaction);
   widget.subscribe("activeChartChanged", interaction);
-  const current = () => isCurrent() && !interacted;
+  widget.subscribe("layout_about_to_be_changed", interaction);
+  const current = () => isCurrent() && !interacted &&
+    index < widget.chartsCount() && widget.chart(index) === chart;
   const completion = new Promise((resolve, reject) => {
     loaded = () => resolve();
     chart.onDataLoaded().subscribe(null, loaded);
@@ -235,6 +237,7 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
   } finally {
     widget.unsubscribe("mouse_down", interaction);
     widget.unsubscribe("activeChartChanged", interaction);
+    widget.unsubscribe("layout_about_to_be_changed", interaction);
     clearTimeout(timeout);
     chart.onDataLoaded().unsubscribe(null, loaded);
   }

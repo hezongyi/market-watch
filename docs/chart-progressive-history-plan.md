@@ -326,3 +326,9 @@
 - 加阶段/堆栈后重跑仍失败，日志/tmp/mw-eight-mixed-stacks.log。错误发生在collapse阶段（八图→单图），此前polling-soak采样未记录pageerror。
 - 堆栈为原生nearestIndex→gotoTimeRange→seriesCompleted，位于公开setLayout触发的异步数据完成期间。说明需要检查布局变化与历史刷新/视区恢复的竞争；尚不能仅凭堆栈认定库缺陷或具体自有代码根因。
 - 保留失败用例。下一步应缩小为混合图布局收起/恢复，分别控制渐进轮询和日期同步，验证旧pane刷新生命周期取消，不修改vendor私有代码。
+
+### 历史视区刷新对布局变化让位
+
+- refreshChartHistory监听公开layout_about_to_be_changed，与鼠标/焦点变化一样使旧刷新不再恢复视区；current还检查图表对象仍占据原可见索引，避免索引被另一pane复用。
+- advanced-refresh-interaction.cjs新增布局变更期间onDataLoaded完成后不恢复旧视区、移除所有事件监听断言，通过。
+- 这是已确认生命周期遗漏的候选修正，尚未部署或重跑混合八图；不能认定其解决nearestIndex异常。下一步用同一失败浏览器流程验证，必要时继续隔离日期同步路径。

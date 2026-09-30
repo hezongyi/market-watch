@@ -17,6 +17,10 @@ vm.runInContext(fs.readFileSync('../advanced-host/viewports.js','utf8'),context)
  assert.equal(events.size,0);
  job=context.refreshChartHistory(widget,chart,()=>{},()=>true);
  spacing=8;assert.equal(await job,false);assert.equal(restores,0);
+ job=context.refreshChartHistory(widget,chart,()=>{},()=>true);
+ events.get('layout_about_to_be_changed')('s');
+ assert.equal(await job,false);assert.equal(restores,0);
+ assert.equal(events.size,0);
  assert.equal(await context.refreshChartHistory(widget,chart,()=>{},()=>true),true);
  assert.equal(restores,1);assert.equal(events.size,0);
  console.log('History refresh yields to new mouse/focus/zoom intent and removes listeners');
