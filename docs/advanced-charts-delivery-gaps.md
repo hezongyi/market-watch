@@ -1118,3 +1118,10 @@
 - 发现/activity需求续期位于分组try之外；新增单测修复前实际抛出activity unavailable，移动至分组try内后错误上报且polling释放，恢复续期后查询继续。advanced-history-reload.cjs通过。
 - advanced-activity-recovery.browser.cjs在本机真实阻断/activity并解除，/tmp/mw-activity-recovery.log退出0：blocked=1、alerts=[]、errors=[]，独立保存/其他K线错误隔离通过。
 - 当前图表镜像acceptance-quote-recovery；API/worker/web仍acceptance-closed-session。只操作Ubuntu验收容器。结合既有K线断线恢复、八图连续运行无积压、后台fresh/closed/stale状态边界测试及原生报价描述真实展示，行情工作组主要恢复路径已有证据；最终交付审计仍需对照条目，不能把本项扩大为任意网络故障保证。
+
+### 未接入入口核对与交易入口可见性修正
+
+- 审计发现桌面曾显式禁用trading_account_manager/order_panel/broker_button，与用户要求保留可见入口不一致。浏览器临时移除开关实测可显示原生账户管理器；无broker_factory时面板为空。现正式删除桌面三个禁用开关，只禁用open_account_manager（不主动展开；已有原生偏好仍可恢复），手机保留原有三项禁用。
+- 使用说明补充“账户管理器入口保留，交易暂未接入；展开为空不代表已连接账户”。没有添加Broker接口、演示账户或交易数据。无Broker依赖时订单/经纪商按钮仍可能由库本身不显示，不能宣称全部交易UI已呈现。
+- advanced-unavailable-entries.browser.cjs实际点击公开header使用说明，断言保存样式/导出CSV/原生指标不导出/交易未接入/额外数据限制文字；原生账户管理器折叠、展开通过。/tmp/mw-unavailable-entries-final.log退出0，errors=[]。/tmp/mw-entry-collapsed.png已目视，入口在原生底栏、展开空白是明确记录的未接入状态。
+- 图表镜像acceptance-visible-entries，API/worker/web仍acceptance-closed-session；Ubuntu本机验收，无Unraid操作。原生缺件导出/样式保存继续用既有自研公开header入口，未修改供应库。
