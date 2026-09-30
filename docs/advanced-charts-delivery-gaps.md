@@ -915,3 +915,9 @@
 - 最新历史诊断发现旧failed任务error为空。扩展test_failed_history_exposes_retryable_jobs覆盖具体文本、空字符串、None与纯空白；修复前3失败1通过，复现接口返回空错误。
 - market_data.history归一化失败消息，缺少具体原因时返回“历史补数任务失败，未记录具体原因；请重试”；保留已有具体错误和failed_task_ids，不改变任务重试/覆盖判断。
 - backend/tests/test_market_data.py全套34 passed，ruff与diff检查通过。当前只更新本地代码，验收容器仍用原API镜像，后续镜像更新需包含此修复；未操作生产。
+
+### 空错误提示修复进入本机验收镜像
+
+- 由当前Dockerfile构建market-watch-api:acceptance-2bc223f，镜像73edb117ea78；Ubuntu market-watch-acceptance API/历史worker已切换此镜像。API健康检查通过，5个服务运行。网页和TLS代理重启刷新容器地址；静态图表镜像未改。
+- advanced-container-https.browser.cjs通过，/tmp/mw-https-api-2bc223f.log退出0，errors=[]，credentialsSentToChart=0；验证登录、独立来源、使用说明、周期切换及原生保存。
+- 原API镜像保留可回退。未操作Unraid生产、未推送Git远端。上一节“本地代码尚未进入验收镜像”的状态由本记录更新。

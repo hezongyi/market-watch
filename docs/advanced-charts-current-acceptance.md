@@ -50,4 +50,4 @@
 
 ## 当前验收环境
 
-Ubuntu Compose `market-watch-acceptance`；主站 `https://localhost:15443`，独立图表 `https://127.0.0.1:15444`。API镜像acceptance-412703c、网页acceptance-empty-load、图表acceptance-favorites。使用开发库，通知投递关闭，端口仅回环绑定。自签证书仅用于本机测试；未验证公网发布。
+Ubuntu Compose `market-watch-acceptance`；主站 `https://localhost:15443`，独立图表 `https://127.0.0.1:15444`。API/worker镜像acceptance-2bc223f、网页acceptance-empty-load、图表acceptance-favorites。使用开发库，通知投递关闭，端口仅回环绑定。自签证书仅用于本机测试；未验证公网发布。
