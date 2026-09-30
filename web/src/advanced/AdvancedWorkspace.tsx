@@ -367,6 +367,8 @@ export default function AdvancedWorkspace() {
           resolve: "/market-data/resolve",
           viewport: "/market-data/viewport-session",
           history: "/market-data/history",
+          historyCache: "/market-data/history/cache",
+          historyDemand: "/market-data/history/demand",
           activity: "/market-data/activity",
           retry: "/market-data/retry",
           quotes: "/market-data/quotes",

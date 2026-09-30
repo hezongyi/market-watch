@@ -16,7 +16,7 @@ let seq = 0,
   nativeSaving = false,
   workspaceEpoch = 0,
   nativeReadonly = false;
-let rangeGuard, edgeGuard;
+let rangeGuard, edgeGuard, demandReporter;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
   1: "M1",
@@ -1168,8 +1168,18 @@ function boot(
       snapshot();
     });
     send({ type: "ready" });
+    demandReporter?.dispose();
+    demandReporter = chartDemandReporter(widget, clientId,
+      async args => {
+        const result = await request({op: "historyDemand", args}, "market");
+        send({type: "feed-poll-state", key: "@history-demand", error: ""});
+        return result;
+      },
+      error => send({type: "feed-poll-state", key: "@history-demand", error: String(error)}));
+    demandReporter.tick();
     poll = setInterval(() => {
       tick();
+      demandReporter?.tick();
       if (dirty) snapshot();
     }, 15000);
   });
