@@ -532,3 +532,15 @@
 
 - session49635关闭poll并替换tick为空函数后仍退出1（/tmp/mw-mobile-no-poll.log），相同setVisibleRange Value is null；本轮证据不支持实时轮询触发此异常。临时no-poll诊断开关已删除。
 - 当前worker日志继续记录OANDA真实下载/入库成功，约0.4–1.3秒，未再次观察到旧进程持续46秒超时。
+
+### 手机激活对照与运行队列恢复
+
+- session39520仅使用setResolution的doNotActivateChart选项仍退出1（/tmp/mw-mobile-no-activate.log），不能用该选项修复手机周期后Value is null。诊断参数已撤回。
+- 开发数据库当前队列观察1432 complete、20 failed，无pending/running；说明新worker已排空待执行任务，但不代表旧失败任务全部恢复。
+- 仅重新排队旧空异常的一分钟EURUSD开发任务fe96ecdb-3115-4753-b3f4-b241998d1309，保留历史游标，验证当前worker重试链路；未批量重试多年历史或操作生产。
+
+### 手机系列异常调试器直接证据
+
+- session52222退出1（/tmp/mw-mobile-series-debug.log）。仅测试CDP在异常处读取原生setVisibleTimeRange调用状态：series=sds_8、interval=15、symbolResolved=false；外部dataReady仍true。因此不能将dataReady视为该异常下完整系列就绪证据。
+- 调试器不修改供应商代码，读取字段不含账户/凭据。下一步仅测试公开resetData重建系列能否恢复，日志/tmp/mw-mobile-reset-probe.log，尚未产品化。
+- 上一轮单分钟EURUSD失败任务重排后已验证complete、cursor=end、attempts=0，当前worker重试恢复成立；不代表其余失败任务已自动恢复。

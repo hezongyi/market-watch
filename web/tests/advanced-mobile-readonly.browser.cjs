@@ -27,6 +27,23 @@ const fs = require("fs");
         }),
       });
     });
+  if(process.env.MARKET_WATCH_MOBILE_DEBUG_SERIES) {
+    const cdp=await page.context().newCDPSession(page);
+    await cdp.send("Debugger.enable");
+    await cdp.send("Debugger.setPauseOnExceptions",{state:"all"});
+    cdp.on("Debugger.paused",async event=>{
+      try {
+        const frame=event.callFrames.find(f=>f.functionName==="setVisibleTimeRange");
+        if(frame) {
+          const result=await cdp.send("Debugger.evaluateOnCallFrame",{
+            callFrameId:frame.callFrameId,
+            expression:"JSON.stringify({session:e,series:t,interval:this._studyEngine.getSeriesInterval(e,t),symbolResolved:!!this._studyEngine.getSeriesSymbolInfo(e,t)})",
+            returnByValue:true,silent:true});
+          console.log("SERIES_EXCEPTION_STATE",result.result.value);
+        }
+      } finally {await cdp.send("Debugger.resume").catch(()=>{});}
+    });
+  }
   const errors = [],
     writes = [];
   page.on("request", (r) => {
@@ -128,6 +145,11 @@ const fs = require("fs");
   }
   if(process.env.MARKET_WATCH_MOBILE_SETTLE_PROBE)
     await page.waitForTimeout(2000);
+  if(process.env.MARKET_WATCH_MOBILE_RESET_PROBE) {
+    await frame.evaluate(()=>widget.activeChart().resetData());
+    await page.waitForTimeout(3000);
+    await frame.waitForFunction(()=>widget.activeChart().dataReady(),null,{timeout:30000});
+  }
   console.log("MOBILE_BEFORE_RANGE", await frame.evaluate(()=>({
     active:widget.activeChart().symbol(),sync:widget.dateRangeSync().value(),
     guard:rangeGuard?.busy(),panes:Array.from({length:widget.chartsCount()},(_,i)=>({
