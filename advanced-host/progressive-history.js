@@ -4,7 +4,11 @@ function progressiveHistory(read, needed, changed, onError, maxEntries = 64) {
   const inflight = new Map();
   let disposed = false, polling = false;
   const keyOf = args => JSON.stringify([args.instrument,args.timeframe,args.before,args.limit]);
-  const fingerprint = page => JSON.stringify(page.bars);
+  // Forming OHLC/revision updates already arrive via subscribeBars. Resetting
+  // the whole series for each tick races native layout/range restoration.
+  // Retain its identity so an empty chart can still acquire its first bar.
+  const fingerprint = page => JSON.stringify(page.bars.map(bar => bar.complete === false
+    ? {start:bar.start,end:bar.end,complete:false} : bar));
   async function fetchPage(args, warm = false) {
     const key = keyOf(args);
     if (inflight.has(key)) return inflight.get(key);

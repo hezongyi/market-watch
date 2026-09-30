@@ -14,6 +14,12 @@ vm.runInContext(fs.readFileSync('../advanced-host/progressive-history.js','utf8'
  bars=[{start:10,close:13}];await cache.poll();assert.equal(updates,2);
  busy=true;bars=[{start:10,close:14}];await cache.poll();assert.equal(updates,2);
  busy=false;await cache.poll();assert.equal(updates,3,'busy chart must retry the same revision');
+ bars=[{start:10,end:20,close:14,complete:false}];
+ await cache.poll();const formingUpdates=updates;
+ bars=[{start:10,end:20,close:15,high:16,revision:2,complete:false}];
+ await cache.poll();assert.equal(updates,formingUpdates,'forming ticks use realtime subscription');
+ bars=[{start:10,end:20,close:15,high:16,revision:3,complete:true}];
+ await cache.poll();assert.equal(updates,formingUpdates+1,'finalization must refresh historical completeness');
  active=false;const count=reads;await cache.poll();assert.equal(reads,count);
  cache.dispose();active=true;await cache.poll();assert.equal(reads,count);
  console.log('Progressive cache deduplicates, returns warm data, refreshes revisions and stops hidden polling');

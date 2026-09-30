@@ -357,3 +357,9 @@
 - 新增MARKET_WATCH_LIVE_SOAK=1完全绕过历史日期route，以真实当前cache/history/data运行完整混合八图。
 - 运行在collapse阶段再次出现nearestIndex/gotoTimeRange Value is undefined；单图tick网络请求0，原断言预期1失败。日志/tmp/mw-eight-live.log。
 - 修正上一条证据边界：统一历史时间的通过只证明该历史场景，不能把所有原生异常归因于测试日期混用。实时修订/重载与布局切换竞争仍是实际待解决项，未交付。
+
+### 渐进刷新与实时形成中bar隔离候选
+
+- 实时混合八图仅关闭progressivePoll完整通过：24次采样期行情请求、收起恢复断言通过、errors=[]。日志/tmp/mw-eight-no-progressive.log。定位到渐进历史轮询参与竞争，关闭仅诊断，不作为产品方案。
+- progressiveHistory原fingerprint包含形成中bar价格与revision，每次最新M1更新可能触发整图resetData，与subscribeBars重复。候选对complete=false仅比较start/end/complete身份，仍保留空图首次形成中bar、新历史、收盘转换、已完成bar修订的刷新。
+- 单位测试验证形成中价格/revision变化不整图刷新，变complete=true仍刷新；渐进缓存和预热测试通过。尚未真实浏览器候选复测，不能据此关闭八图问题。

@@ -108,6 +108,8 @@ const assert = require("node:assert/strict");
       { timeout: 90000 },
     );
   }
+  if (process.env.MARKET_WATCH_DISABLE_PROGRESSIVE === "1")
+    await frame.evaluate(()=>clearInterval(progressivePoll));
   let latestRequests = 0;
   page.on("request", (r) => {
     if (
