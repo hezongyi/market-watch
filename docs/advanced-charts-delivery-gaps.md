@@ -1143,3 +1143,13 @@
 - 当前四应用容器运行1.2.0-local；最终HTTPS浏览器检查退出0、errors=[]、credentialsSentToChart=0，日志已归档container.txt。镜像ID及运行容器market_data.py/bridge.js/viewports.js SHA256均与清单及本地源码一致。
 - 本地交付说明、非秘密镜像选择env、版本号、CHANGELOG及当前验收清单已完成；历史状态文档明确分界。回退基线仍保留，版本整理未增加数据库迁移。
 - 交付范围是Ubuntu本机的独立模块及源码/镜像；没有切换Unraid、改生产数据库或推送远端。功能边界在使用说明和交付说明中列明，非逐项供应商算法审计。
+
+
+### 2026-09-30：XAUUSD 切 D1 柱宽放大修复
+
+- 用户反馈：日内周期柱宽正常，切到 D1 变大，再切回仍偏大。浏览器回归复现将间距设为 6px 后切 D1 得到 12.422222px，断言失败。
+- 原因：`recordPeriodChange` 在 D1/W1/MN 切换时按 90/13/3 根重设 barSpacing 并 resetData。这是旧加载预算策略残留；已有的周线后台/月线本地策略取代了该需求。
+- 修复：移除周期切换时的柱宽和缓存重置干预，让原生图表保留用户间距；保留新建高周期工作区首次默认时间范围、多图同步及服务器补数策略。
+- 本机真实 HTTPS 容器回归 `web/tests/advanced-bar-spacing.browser.cjs`：XAUUSD H1 设为 6px，依次 D1/H1/H4/D1/M5 均为 6px，退出 0。月线本地缓存、range-sync、周线后台与错误恢复适配测试均通过。
+- 本机 chart-origin 镜像更新为 `market-watch-chart-origin:bar-spacing-fix-local`（3419c54fd235）；API/web 仍为 1.2.0-local。未更改 v1.2.0 标签，未操作 Unraid，未推送远端。
+- 已被旧版本保存的放大间距不会自动猜测恢复；刷新后手动调回喜欢的宽度即可继续保留。多图开启时间范围同步时，仍以共同时间视区为准。

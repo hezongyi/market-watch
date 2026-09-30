@@ -749,18 +749,9 @@ function boot(
       savedDoc = { ...row.document, nativeName: row.name };
     },
   );
-  const recordPeriodChange = (chart, resolution, parameters) => {
-    const count = { "1D": 90, "1W": 13, "1M": 3 }[resolution];
-    if (loading || !count || parameters?.timeframe || !chart.dataReady())
-      return;
-    // This public event runs before the old series is cleared. Reset while its
-    // visible range still exists so the native request inherits the new budget.
-    // Reloading the widget here would discard the user's undo history.
-    const scale = chart.getTimeScale();
-    scale.setBarSpacing(scale.width() / count);
-    widget.resetCache();
-    chart.resetData();
-  };
+  // Preserve native/user bar spacing across interval changes. History load
+  // policy belongs to the planner (D1 foreground, W1 background, MN local),
+  // not to viewport resizing or cache resets on a period switch.
   const loadContent = layouts.getChartContent;
   const saveLayout = layouts.saveChart;
   let busySaveNoticeShown = false;
@@ -1140,11 +1131,11 @@ function boot(
       if (epoch !== workspaceEpoch) return;
       loading = false;
       rangeGuard?.dispose();
-      rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
+      rangeGuard = rangeSyncLoadingGuard(widget);
       bindEdgeSync();
       bindViewports();
     });
-    rangeGuard = rangeSyncLoadingGuard(widget, recordPeriodChange);
+    rangeGuard = rangeSyncLoadingGuard(widget);
     bindEdgeSync();
     bindViewports();
     widget.subscribe("layout_changed", () => {
