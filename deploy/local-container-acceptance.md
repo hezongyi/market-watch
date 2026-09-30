@@ -14,7 +14,7 @@
 ## 当前已构建镜像
 
 - `market-watch-api:acceptance-2bc223f`
-- `market-watch-web:acceptance-empty-load`：构建参数VITE_ADVANCED_CHART_ORIGIN=https://127.0.0.1:15444
+- `market-watch-web:acceptance-mobile-nav`：构建参数VITE_ADVANCED_CHART_ORIGIN=https://127.0.0.1:15444
 - `market-watch-chart-origin:acceptance-save-notice`
 - 回退样本：`market-watch-chart-origin:acceptance-2e35aa7`
 
@@ -26,7 +26,7 @@
 
 ```bash
 export MW_API_IMAGE=market-watch-api:acceptance-2bc223f
-export MW_WEB_IMAGE=market-watch-web:acceptance-empty-load
+export MW_WEB_IMAGE=market-watch-web:acceptance-mobile-nav
 export MW_CHART_IMAGE=market-watch-chart-origin:acceptance-save-notice
 export MW_ACCEPTANCE_ENV=/tmp/mw-docker-acceptance/api.env
 export MW_ACCEPTANCE_DIR=/tmp/mw-docker-acceptance

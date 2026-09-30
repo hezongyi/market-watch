@@ -26,6 +26,8 @@ await page.getByRole('button',{name:'保存提醒设置'}).click();
 await page.getByText('提醒设置已保存',{exact:true}).waitFor();
 await page.setViewportSize({width:390,height:844});
 await page.getByRole('link',{name:'行情与监控'}).click();
+await page.locator('.chart canvas').first().waitFor({state:'visible',timeout:30000});
+await page.waitForTimeout(500);
 await page.screenshot({path:(process.env.TEST_ARTIFACT_DIR || '../artifacts')+'/dashboard-mobile.png',fullPage:true});
 const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth);
 await browser.close();

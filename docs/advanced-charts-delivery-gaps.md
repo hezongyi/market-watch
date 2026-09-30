@@ -1035,3 +1035,10 @@
 
 - browser-smoke.mjs增加测试HTTPS、凭据与截图目录参数，本机/tmp/mw-original-ui-regression.log退出0：登录、新建及取消测试预警、演练页入口、设置保存通过；pageErrors=[]、mobileOverflow=false。通知投递在验收环境关闭。
 - 实际查看/tmp/dashboard-mobile.png发现390px宽六导航项被挤为竖排；CSS mobile nav flex:1使新增入口压缩文字。截图中的旧行情图为空，截图没有等待数据就绪，尚不能判断加载失败或抓图过早。原功能网页工作组保持未关闭，下一步修正导航并加入图表就绪断言。
+
+### 原工作台手机布局修复与回归
+
+- 手机侧栏导航从六项强制等宽改为两列网格，保留44px点击高度及8px间距、文字不折为竖排。仅改移动端CSS。
+- browser-smoke截图前等待旧行情chart canvas可见，避免路由返回立即截图误报空图。本机新网页镜像acceptance-mobile-nav构建成功；/tmp/mw-mobile-nav-regression.log退出0，pageErrors=[]、mobileOverflow=false。
+- 目视/tmp/dashboard-mobile.png：390px宽导航文字正常，黄金蜡烛、价格轴和前日高低线正常显示。登录、创建/取消预警、演练页、提醒设置保存再次通过；通知发送保持关闭，不重复手机锁屏验收。
+- 结合179项后端已通过记录，原功能回归工作组闭合；新增秋季边界测试另在日历34项专项通过。未操作Unraid。

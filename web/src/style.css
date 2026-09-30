@@ -1027,14 +1027,15 @@ dd {
     height: 26px;
   }
   .sidebar nav {
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
-    justify-content: space-between;
-    gap: 2px;
+    gap: 8px;
     padding: 8px 0;
   }
   .sidebar nav > a {
-    font-size: 11px;
+    white-space: nowrap;
+    font-size: 12px;
     gap: 5px;
     padding: 8px;
     min-height: 44px;
