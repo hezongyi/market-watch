@@ -35,6 +35,11 @@ services:
     command: ["python", "-m", "alerts.chart_history_worker"]
     depends_on:
       api: {condition: service_healthy}
+  chart-aggregation-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.chart_aggregation_worker"]
+    depends_on:
+      api: {condition: service_healthy}
   web:
     <<: *service
     image: ${MW_WEB_IMAGE:?Set the tested web image}

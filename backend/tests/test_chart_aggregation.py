@@ -113,3 +113,20 @@ def test_deferred_ingestion_hides_old_bars_until_rebuilt(database, monkeypatch):
     assert len(page['bars']) == 2
     assert float(page['bars'][0]['high']) == 15
     assert all(row['complete'] for row in page['bars'])
+
+
+def test_download_backpressure_skips_provider_when_aggregation_is_full(database):
+    from alerts.market import import_once
+    from alerts.storage import ImportJob
+
+    with database.begin() as db:
+        for index in range(12):
+            enqueue_aggregation(db, 'EURUSD', index*60000, (index+1)*60000, 0)
+        db.add(ImportJob(instrument_id='EURUSD', start=0, end=60000, cursor=0,
+                         priority=100, next_at=0))
+    def forbidden(*args, **kwargs):
+        raise AssertionError('download must wait for aggregation capacity')
+    assert not import_once(chart_only=True, defer_aggregation=True, fetcher=forbidden)
+    with database.begin() as db:
+        job = db.scalar(select(ImportJob))
+        assert job.status == 'pending' and job.cursor == 0

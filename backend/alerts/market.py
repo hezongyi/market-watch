@@ -10,7 +10,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import httpx
-from sqlalchemy import BigInteger, or_, select, update
+from sqlalchemy import BigInteger, func, or_, select, update
 
 from .bar_batch import write_bars
 from .calendar_profile import closures_from
@@ -550,9 +550,16 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
         db.add(Audit(kind="market_heartbeat", details={}))
 
 
-def import_once(*, chart_only=False, fetcher=None):
+def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False):
     """One daily slice per iteration. Durable cursor and lease permit safe restart."""
     with transaction() as db:
+        from .storage import ChartAggregationJob
+
+        # One history downloader feeds the independent aggregation executor.
+        # Bound queued CPU work without throttling live M1 ingestion.
+        if defer_aggregation and db.scalar(select(func.count()).select_from(
+                ChartAggregationJob)) >= 60:
+            return False
         # Skip all jobs of a cooling-down source in the selection query, rather
         # than spending one worker iteration deferring each of its queued jobs.
         cooling_sources = [
@@ -644,7 +651,7 @@ def import_once(*, chart_only=False, fetcher=None):
                         raise ValueError("交易时段返回空数据，保留补数游标等待重试")
                     t += timedelta(minutes=1)
             inst = db.get(Instrument, job.instrument_id)
-            ingest(db, inst, payload)
+            ingest(db, inst, payload, defer_aggregation=defer_aggregation)
             if not fully_queried_oanda:
                 # A nonempty response is not proof that the requested slice is complete.
                 present = set(

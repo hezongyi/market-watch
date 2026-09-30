@@ -50,7 +50,7 @@ def run(fetch_page):
             # Reevaluate after every completed page; do not idle for the
             # maintenance timer while a foreground window is still incomplete.
             advance_pending_plans()
-            worked = import_once(chart_only=True, fetcher=fetch_page)
+            worked = import_once(chart_only=True, fetcher=fetch_page, defer_aggregation=True)
             time.sleep(0.2 if worked else 1)
         except Exception as exc:
             logging.warning("chart history cycle failed: %s", type(exc).__name__)
