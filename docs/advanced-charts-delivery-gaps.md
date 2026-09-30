@@ -471,3 +471,9 @@
 
 - 手机session70924退出1：日志出现5190反复ERR_CONNECTION_REFUSED，之后尚未就绪的图表setVisibleRange抛Value is null。当前不能计手机验收通过，需恢复/核对开发服务再验证，不直接归因于手机功能。
 - 当前前端构建通过（/tmp/mw-current-web-build.log）。
+
+### 恢复开发服务后手机竖屏通过
+
+- 已核对旧API8004 session60593和Vite5190 session1730均exit143，随后恢复同端口开发服务：API session84407、Vite session16809；静态5187始终返回200。未操作生产服务。
+- session14528退出0（/tmp/mw-mobile-restored-portrait.log）：手机竖屏单图切周期/视区后MOBILE_WRITES=[]、nativeReadonly=true、桌面草稿保留、errors=[]。该轮使用固定真实历史，不替代实时补数验收。
+- 手机脚本进一步将切周期后的固定等待改成明确dataReady/有效范围等待，后续避免数据未就绪即设置范围；这一等待改动在上述运行启动之后完成，需后续用新脚本复验。

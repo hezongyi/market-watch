@@ -102,8 +102,12 @@ const fs = require("fs");
     await page.screenshot({ path: "/tmp/mw-mobile-login-failure.png" });
     throw Error("Chart iframe did not initialize");
   }
+  await frame.waitForFunction(() => ready && !loading && widget.chart(0).dataReady(),
+    null, {timeout:60000});
   await frame.evaluate(() => widget.chart(0).setResolution("15"));
-  await page.waitForTimeout(5000);
+  await frame.waitForFunction(() => widget.chart(0).resolution() === "15"
+    && widget.chart(0).dataReady() && widget.chart(0).getVisibleRange().from > 0,
+    null, {timeout:60000});
   await frame.evaluate(async () => {
     const c = widget.chart(0),
       r = c.getVisibleRange();
