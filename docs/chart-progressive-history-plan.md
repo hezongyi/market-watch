@@ -497,3 +497,17 @@
 - /tmp/mw-eight-navigation.log退出1：无EIGHT_CHART_ERROR，但展开后轮询仅1组、预期3组。统一reloadHistory会因同步guard忙返回false，pausedForLayout分支仍continue，阻断可见实时请求。
 - 移除该continue，历史恢复待重试同时继续实时查询；新增advanced-layout-poll-resume.cjs通过busy guard下仍查询、paused状态保留的断言。既有advanced-history-reload.cjs适配公开刷新helper测试替身与新恢复语义后通过，仍验证订阅分组、历史revision、失败恢复、隐藏图不轮询。
 - 失败退出补丁及轮询修复已部署本机api:nav-errors-cf21767/chart-origin:nav-errors-local；原八图复验/tmp/mw-eight-resume-poll.log仍在运行。
+
+### 八图与真实缺失日期导航验收
+
+- /tmp/mw-eight-resume-poll.log最终退出0，latestRequests=30、errors=[]，恢复后三组轮询符合断言。
+- 导航前只读开发库查询EURUSD/2018-08-16 08:00–14:00 UTC M1数量为0（2022/2023已有360根，未选作冷数据）。用原始数据feed及实际OANDA请求跳转，/tmp/mw-navigation-cold-2018.log记录2742ms完成，20秒最终range=1534406400–1534428000准确、pending/failed为空，退出0。
+- 这是单个远日期M1窗口实测，不代表全新品种D1整屏或所有时段相同速度；后台依照已批准策略继续低优先完成持久化目标。
+- 新advanced-navigation-cancel.browser.cjs在历史目标cache返回空页的条件下，验证切回已预热M5及原导航取消，日志/tmp/mw-navigation-cancel.log正在运行。
+
+### 导航取消、手机只读及后端回归
+
+- /tmp/mw-navigation-cancel.log退出0，目标cache空页保持等待后切回M5约15ms就绪，旧feed回调明确HISTORY_CANCELLED；是浏览器集成故障注入，不是普通函数模拟。
+- /tmp/mw-mobile-final.log当前本机候选竖屏412x915回归通过，单图、服务器工作区/个人偏好不变、MOBILE_WRITES=[]、errors=[]；不新增用户已豁免的实际锁屏验收。
+- 完整隔离PG后端测试215 passed、0 skipped、20.45秒，/tmp/mw-backend-current.log。
+- 不同品种/周期视区同步及重载恢复浏览器用例/tmp/mw-mixed-current.log已启动，待核验。

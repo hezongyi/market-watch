@@ -145,8 +145,8 @@ const fs = require("fs");
   for (const key of Object.keys(historyMetrics)) historyMetrics[key] = 0;
   const started = Date.now();
   const target = {
-    from: Date.parse("2026-08-12T08:00:00Z") / 1000,
-    to: Date.parse("2026-08-12T14:00:00Z") / 1000,
+    from: Date.parse(process.env.MARKET_WATCH_HISTORY_FROM || "2026-08-12T08:00:00Z") / 1000,
+    to: Date.parse(process.env.MARKET_WATCH_HISTORY_TO || "2026-08-12T14:00:00Z") / 1000,
   };
   if(process.env.MARKET_WATCH_NAVIGATION_PROBE==='1') {
     await frame.evaluate(target=>{
