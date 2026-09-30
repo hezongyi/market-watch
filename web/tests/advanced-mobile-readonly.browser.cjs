@@ -59,7 +59,8 @@ const fs = require("fs");
       writes.push(r.url());
   });
   page.on("console", (m) => {
-    if (m.type() === "error") console.log("CONSOLE", m.text().slice(0, 700));
+    if (m.type() === "error" || m.text().startsWith("MOBILE_LOAD_FORMAT"))
+      console.log("CONSOLE", m.text().slice(0, 1200));
   });
   page.on("response", async (r) => {
     if (r.status() >= 400)

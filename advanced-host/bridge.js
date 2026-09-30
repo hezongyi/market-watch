@@ -830,7 +830,7 @@ function boot(
       const state = JSON.parse(await loadContent(id));
       pendingViewports = state._mwViewports;
       delete state._mwViewports;
-      return JSON.stringify(state);
+      return JSON.stringify(nativeLayoutContent(state, currentNativeWorkspace));
     } catch (e) {
       loading = false;
       send({ type: "error", error: String(e) });

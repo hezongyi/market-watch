@@ -716,3 +716,11 @@
 - 手机回归脚本支持本机HTTPS来源，新增preferences前后完整相等及无“保存样式”按钮断言。
 - /tmp/mw-mobile-style-readonly.log退出1，尚未走到新增只读断言；切换第二工作区时供应库JSON.parse(undefined)，最终“Second workspace did not settle to one chart”。本轮不能记作手机通过，也未证明由样式改动引入。
 - 下一步从实际native-charts/load返回的state包装格式定位；脚本增加仅输出ID/名称/结构键的诊断，不输出完整用户数据。需核对空白、raw snapshot和native content包装的兼容加载，不跳过异常工作区冒充通过。
+
+### 原始快照的原生加载兼容修复及手机回归
+
+- 实际服务器内容证明：最新工作区含content包装，第二个工作区则为widget.save原始charts/layout快照。供应库loadChartFromServer读取e.content并JSON.parse；此前切换路径直接返回raw，触发JSON.parse(undefined)。初始saved_data路径支持raw，因此首次打开成功不足以证明切换正常。
+- 新增nativeLayoutContent：仅对含charts数组的原始快照加原生content及工作区元信息包装；已有包装保持原样，不修改数据库原数据。getChartContent保留视区提取后执行规范化。单测覆盖raw、保留原对象、已有包装不重复包裹。
+- 本机chart-origin镜像acceptance-layout-envelope构建并更新成功；/tmp/mw-mobile-envelope-fixed.log退出0：同一组工作区A→B→A、单图恢复、切周期/视区、保留画线指标测试通过；MOBILE_WRITES=[]、nativeReadonly=true、工作区与preferences前后完全相同、桌面草稿未改、无保存样式按钮、errors=[]。
+- 浏览器控制台记录库尝试加载analytics.js被现有CSP阻止，未开放外连。未改供应库或unraid生产服务。
+- 此修复覆盖raw和native包装，空state工作区切换及其他模板验收仍需独立核对，不将本轮手机通过等同完整交付。

@@ -140,3 +140,24 @@ vm.runInContext(
   console.error(e);
   process.exit(1);
 });
+
+const raw = {
+  charts: [
+    {
+      panes: [
+        { sources: [{ type: "MainSeries", state: { symbol: "EURUSD" } }] },
+      ],
+    },
+  ],
+  layout: "s",
+};
+const wrapped = context.nativeLayoutContent(raw, {
+  id: "legacy",
+  name: "Legacy",
+  symbol: "EURUSD",
+  resolution: "5",
+});
+assert.equal(wrapped.id, "legacy");
+assert.deepEqual(JSON.parse(wrapped.content), raw);
+assert.equal(raw.content, undefined);
+assert.equal(context.nativeLayoutContent(wrapped, {}), wrapped);

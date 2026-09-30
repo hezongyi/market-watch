@@ -66,3 +66,15 @@ function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
     },
   };
 }
+
+// Native loadChartFromServer expects an envelope; widget.save returns raw charts.
+function nativeLayoutContent(state, metadata) {
+  if (!Array.isArray(state?.charts)) return state;
+  return {
+    id: metadata.id,
+    name: metadata.name,
+    symbol: metadata.symbol || metadata.document?.symbol,
+    resolution: metadata.resolution || metadata.document?.interval,
+    content: JSON.stringify(state),
+  };
+}
