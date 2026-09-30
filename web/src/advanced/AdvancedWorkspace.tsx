@@ -215,6 +215,22 @@ export default function AdvancedWorkspace() {
               "/advanced-charts/workspaces/" + q.args.id + "/delete",
               { revision: q.args.revision },
             );
+          if (
+            q.op === "load" &&
+            (!result.document?.state ||
+              Object.keys(result.document.state).length === 0)
+          ) {
+            // A never-saved workspace has no vendor layout envelope. Initialize
+            // a fresh widget instead of loading {} or copying the current chart.
+            select({
+              id: result.id,
+              name: result.name,
+              revision: result.revision,
+              document: result.document,
+            });
+            setFeedError("");
+            return;
+          }
           if (q.op === "save" || q.op === "load") {
             // A successful native Save As binds a new independent workspace.
             // Keep any older failed draft available under its original ID.

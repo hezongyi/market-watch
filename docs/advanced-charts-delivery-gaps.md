@@ -748,3 +748,10 @@
 
 - 新增advanced-display-settings.browser.cjs：通过公开价格轴API依次切换普通/对数/百分比/指数100，逐次读取模式一致；设置Asia/Singapore显示时区、对数及反转轴，经原生保存工作区并刷新，三项设置完整恢复，品种XAUUSD、周期240不变。
 - /tmp/mw-display-settings.log退出0，errors=[]。此轮为公开API和持久化行为验收，不等同原生菜单鼠标操作、不同品种全部组合或后台OHLC数值对照；后台分桶不变仍需在数据对照中证明。
+
+### 原生列表加载未保存的空白工作区
+
+- 新增advanced-empty-native-load.browser.cjs：先在当前图创建均线及水平线并原生保存，再从原生getSavedCharts/loadChartFromServer加载刚创建、没有state的另一工作区。原版/tmp/mw-empty-native-load.log在30秒dataReady等待超时，证明不是初次打开空白列表的既有测试所覆盖。
+- 父页面读取到缺失或空state的工作区时，使用现有select路径重新初始化独立widget，复用该工作区ID/配置；不构造供应商私有空快照、不复制当前图的指标或画线。已有state继续原生加载。
+- 原web Dockerfile构建acceptance-empty-load并更新本机验收Compose；/tmp/mw-empty-native-fixed.log退出0，目标ID正确、图表dataReady、画线/指标均为0、errors=[]。
+- 手机空白切换和返回旧工作区保存内容仍需补验；此次通过不覆盖它们。unraid未操作。
