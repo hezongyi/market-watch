@@ -261,3 +261,11 @@
 - PostgreSQL已授权开发库使用单连接独立mw_k12_acceptance schema，仅建测试instruments与队列表；k12 upgrade→downgrade→upgrade成功，核对9个字段/唯一约束/外键。整个事务回滚，未改变public运行结构。脚本/tmp/mw-k12-postgres-migration.py。
 - 新增自动迁移往返回归test_chart_aggregation_migration.py，1 passed，ruff通过。PostgreSQL测试仅覆盖k12，不代表全历史迁移链均已在PostgreSQL空库验证。
 - 运行库尚在j11；独立聚合进程未启动。后续需要连接占用确认及本机实际部署、冷启动端到端验收。
+
+### 本机异步聚合部署与真冷启动
+
+- 核查并停止Ubuntu旧验收API PID2777442(port8002)、2801664(port8003)，cwd均为本仓库；保留8001和Docker。开发库运行容器连接4个，未提高8连接限制。
+- 断言数据库trading_alerts_dev、账号trading_alerts_dev_app及旧版本j11后升级k12并验证。API/实时/历史/聚合worker运行aggregation-907bd84，web同标签；chart-origin仍progressive-a257803（静态代码无新增变化）。TLS重启，API healthy。
+- 浏览器选品前确认OANDA:EUR_CAD instruments=0,candles=0。实际OANDA冷启动快速D1/M5/H1切换35/32/10ms（仅setResolution回调，非绘制时间）。约5.081秒内H1缓存返回19→43根；截图/tmp/mw-cold-history.png人工查看确认K线与角落进度可见，日志/tmp/mw-cold-aggregation.log。
+- 独立聚合进程日志显示任务在执行，样本单片0.058–0.083秒；不能推定所有品种/日历或满负荷延迟。
+- 截图发现右侧EUR_CAD详情“无效的商品代码”，须修复别名/报价通路；当前不满足完整图表分析接入验收。整屏补齐、D1渐进、多图竞争、关闭后台、失败恢复、最终回归仍未完成。
