@@ -17,6 +17,7 @@ let seq = 0,
   workspaceEpoch = 0,
   nativeReadonly = false;
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll;
+let prewarming = false;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
   1: "M1",
@@ -903,7 +904,10 @@ function boot(
   ready = false;
   progressivePages?.dispose();
   progressivePages = progressiveHistory(
-    args => request({op:"historyCache",args},"market",()=>hasHistoryViewer(args)),
+    (args,warm) => request({op:"historyCache",args},"market",()=>warm
+      ? ready && Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i))
+          .some(chart=>chart.symbol()===args.instrument)
+      : hasHistoryViewer(args)),
     args => hasHistoryViewer(args),
     async args => {
       if (!ready || loading || rangeGuard?.busy() || edgeGuard?.busy()) return false;
@@ -1225,6 +1229,24 @@ function boot(
       async args => {
         const result = await request({op: "historyDemand", args}, "market");
         send({type: "feed-poll-state", key: "@history-demand", error: ""});
+        // At most one sequential cache-only prewarm chain. Never schedules
+        // provider downloads; the durable D1 envelope already covers demand.
+        if (args.focused && !prewarming) {
+          prewarming=true;
+          (async()=> {
+            const epoch=workspaceEpoch;
+            for (const timeframe of ["M1","M5","M15","M30","H1","H4","D1"]) {
+              if (epoch!==workspaceEpoch || !ready || widget.activeChart().symbol()!==args.instrument) break;
+              if (timeframe===args.timeframe) continue;
+              await progressivePages.warm({instrument:args.instrument,timeframe,
+                before:Math.floor(args.end/60000)*60000+60000+(timeframe==="D1"?2*86400000:0),
+                limit:Math.min(2000,args.visible*3)});
+            }
+            send({type:"feed-poll-state",key:"@prewarm",error:""});
+          })().catch(error=> {
+            if(error.code!=="HISTORY_CANCELLED") send({type:"feed-poll-state",key:"@prewarm",error:String(error)});
+          }).finally(()=>{prewarming=false;});
+        }
         return result;
       },
       error => send({type: "feed-poll-state", key: "@history-demand", error: String(error)}));

@@ -126,3 +126,10 @@
 - bridge传播未完成恢复的false结果，渐进缓存保留待重试修订。需求上报监听activeChartChanged，焦点变化250ms防抖后上报，不再只等15秒心跳。
 - 新advanced-refresh-interaction测试覆盖鼠标让步、柱距变化、正常恢复和监听清理；已有viewports、history-demand回归通过。
 - 真实浏览器progressive-native（受控连续日线、公开接口、使用当前候选helper）退出0，日志/tmp/mw-progressive-interaction-browser.log。这不替代真实鼠标滚轮八图交互验收。
+
+### 跨周期首屏缓存预热（候选未部署）
+
+- 焦点需求上报成功后，顺序读取M1/M5/M15/M30/H1/H4/D1中其他周期的已有三倍窗口；只有一条预热链，品种/工作区切换时退出，不创建额外下载计划。
+- 预热读取的有效性以品种仍可见为准，不要求该周期当前可见；普通读图仍按具体周期取消旧请求。
+- progressiveHistory加入warm接口与覆盖范围复用：相同品种/周期、足够历史根数且时间右界被覆盖的15秒内页可直接满足请求；跨周期不复用、超出右界重新读取、64页容量淘汰。
+- advanced-prewarm-cache、progressive-cache、history-demand测试通过。尚未验证浏览器100–200ms性能目标，也未覆盖全部指标warmup，不能关闭预热验收项。

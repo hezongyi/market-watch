@@ -5,24 +5,45 @@ function progressiveHistory(read, needed, changed, onError, maxEntries = 64) {
   let disposed = false, polling = false;
   const keyOf = args => JSON.stringify([args.instrument,args.timeframe,args.before,args.limit]);
   const fingerprint = page => JSON.stringify(page.bars);
-  async function fetchPage(args) {
+  async function fetchPage(args, warm = false) {
     const key = keyOf(args);
     if (inflight.has(key)) return inflight.get(key);
-    const promise = read(args).finally(()=>inflight.delete(key));
+    const promise = read(args, warm).finally(()=>inflight.delete(key));
     inflight.set(key,promise);
     return promise;
   }
+  function remember(args,page) {
+    const key=keyOf(args);
+    pages.delete(key);
+    pages.set(key,{args,page,signature:fingerprint(page),at:Date.now()});
+    while(pages.size>maxEntries) pages.delete(pages.keys().next().value);
+  }
   return {
+    async warm(args) {
+      if (disposed) return;
+      const old=pages.get(keyOf(args));
+      if (old && Date.now()-old.at<15000) return;
+      const page=await fetchPage(args,true);
+      if (!disposed) remember(args,page);
+    },
     async get(args) {
       const key = keyOf(args);
       const old = pages.get(key);
-      if (old && Date.now()-old.at < 2000) return old.page;
-      const page = await fetchPage(args);
-      if (!disposed && needed(args)) {
-        pages.delete(key);
-        pages.set(key,{args,page,signature:fingerprint(page),at:Date.now()});
-        while(pages.size>maxEntries) pages.delete(pages.keys().next().value);
+      if (old && Date.now()-old.at < 15000) return old.page;
+      // Native countBack and end timestamps vary slightly between requests.
+      // Reuse only pages that actually contain enough bars before that boundary.
+      for (const entry of [...pages.values()].reverse()) {
+        if (Date.now()-entry.at>=15000 || entry.args.instrument!==args.instrument ||
+            entry.args.timeframe!==args.timeframe || entry.args.before<args.before) continue;
+        const bars=entry.page.bars.filter(bar=>bar.start<args.before).slice(-args.limit);
+        if (bars.length===args.limit) {
+          const page={...entry.page,bars};
+          remember(args,page);
+          return page;
+        }
       }
+      const page = await fetchPage(args);
+      if (!disposed && needed(args)) remember(args,page);
       return page;
     },
     async poll() {
