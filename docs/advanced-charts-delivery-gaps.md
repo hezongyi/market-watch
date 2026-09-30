@@ -1010,3 +1010,10 @@
 - /tmp/mw-async-verified-mobile-readonly.log退出0：默认单图、MOBILE_WRITES=[]、MOBILE_READONLY=true、errors=[]；保存前后工作区与偏好比对通过。
 - /tmp/mw-async-verified-weekly-background.log退出0：注入pending规划响应，状态明确后台排队/无法估算耗时，随后切回M5正常、errors=[]。本轮未启用WEEKLY_COMPLETE，不据此宣称真实后台补数完成。
 - 至此八份异步等待受影响浏览器用例均已修正并复核通过：自选分组、忙碌保存、图表样式模板、绘图模板、指标模板、混合视区、手机、周线。该复核工作组闭合，其他验收工作组保持未完成。
+
+### 画线存储工作组复核
+
+- advanced-drawing-lifecycle.browser.cjs：当前本机HTTPS XAUUSD H4/M15共享水平线，新增可见、改价4333.21同步；第二图切EURUSD无画线，切回黄金恢复；删除同步，保存刷新两图均0对象，再切H1仍0。/tmp/mw-drawing-lifecycle.log退出0、errors=[]。
+- advanced-native-workspaces.cjs给旧raw快照增加带坐标/颜色/宽度的画线对象，包装后完整JSON相等、原始对象未变；同时迟到列表不恢复已删工作区、删除后保存被拒绝等既有断言通过。
+- 产品不单独拆分存储原生画线删除标记；以原生工作区快照为准。区分工作区级deleted防复活与库内部绘图状态，不自行解释或改写供应商内部字段。旧轻量图表独立表继续保留，不冒充跨引擎自动绘图迁移。
+- 同工作区生命周期、异品种隔离、删除持久化及旧格式兼容补齐；不同工作区隔离结合此前新增空工作区/往返保存专项，画线存储工作组闭合。

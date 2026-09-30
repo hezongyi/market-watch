@@ -145,7 +145,13 @@ const raw = {
   charts: [
     {
       panes: [
-        { sources: [{ type: "MainSeries", state: { symbol: "EURUSD" } }] },
+        { sources: [
+          { type: "MainSeries", state: { symbol: "EURUSD" } },
+          { id: "legacy-line", type: "LineToolHorzLine", state: {
+            points: [{ time_t: 1790323200, price: 1.12 }],
+            linecolor: "#12ab34", linewidth: 3,
+          } },
+        ] },
       ],
     },
   ],
