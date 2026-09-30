@@ -46,7 +46,8 @@ const fs = require("fs");
     errors.push(e.message);
     console.log("MIXED_ERROR_STACK", phase, e.stack);
   });
-  await page.goto("http://127.0.0.1:5188/");
+  const base = process.env.MARKET_WATCH_TEST_URL || "http://127.0.0.1:5188";
+  await page.goto(base + "/");
   await page
     .getByLabel("管理员密码")
     .fill(
@@ -95,7 +96,7 @@ const fs = require("fs");
       return catalog;
     }),
   );
-  await page.goto("http://127.0.0.1:5188/advanced-charts");
+  await page.goto(base + "/advanced-charts");
   await page.waitForTimeout(15000);
   const frame = page.frames().find((f) => f.url().includes(":5187/?"));
   if (process.env.MARKET_WATCH_GOLD_SESSION_PROBE)
