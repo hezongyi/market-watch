@@ -802,3 +802,9 @@
 - 数据窗口测试新增原生Moving Average(length=5, source=close)，按十字线选中时间从真实后台响应排序取当前及前四根close，独立求和除5并按两位显示精度对照窗口Plot。
 - /tmp/mw-data-window-sma-verified.log退出0，MA显示4343.02与独立计算一致，原有OHLC/三个显示时区断言同时通过，errors=[]。未调用原生指标计算结果作为预期值。
 - 此轮单品种H4/SMA(5)样例不能替代所有内置指标算法审计；缺失值/预热显示仍待针对性验证。
+
+### 数据窗口预热不足显示
+
+- 扩展advanced-data-window.browser.cjs：完成OHLC、三时区和SMA(5)独立数值对照后，移除指标并添加原生SMA(10000)，通过鼠标重新选中历史K线。窗口Plot显示∅，缺失结果未被显示为0。
+- /tmp/mw-data-window-warmup.log退出0，errors=[]；本机Compose实测，未修改供应库、行情响应或生产环境。
+- 本条证明原生均线的预热缺失展示；Python指标输出仍需单独对照，不将本测试扩大为所有指标的缺口验证。

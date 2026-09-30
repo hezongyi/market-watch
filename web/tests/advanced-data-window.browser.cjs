@@ -1,4 +1,4 @@
-// Native study template UI → real development API → different workspace → reload.
+// Real backend OHLC, native SMA values, display timezones and warmup gaps.
 // Requires the local acceptance Compose stack; self-signed TLS is test-only.
 const { chromium } = require("playwright");
 const fs = require("node:fs");
@@ -192,6 +192,26 @@ const assert = require("node:assert/strict");
     "Native MA(5) versus independent backend-close average",
   );
 
+  // A period longer than the available history must yield a missing value,
+  // never a fabricated zero in the native data window.
+  await frame.evaluate(() => {
+    widget.activeChart().removeAllStudies();
+    return widget.activeChart().createStudy("Moving Average", false, false, {
+      length: 10000,
+    });
+  });
+  await page.waitForTimeout(1500);
+  await page.mouse.move(box.x + box.width * 0.55 + 2, box.y + box.height * 0.45);
+  await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.45);
+  await page.waitForTimeout(500);
+  const warmupLines = (await ui.locator("body").innerText())
+    .split("\n").map((s) => s.trim());
+  const warmupIndex = warmupLines.lastIndexOf("Plot");
+  assert.ok(warmupIndex >= 0, "Warmup study must remain visible in data window");
+  const warmupValue = warmupLines[warmupIndex + 1];
+  console.log("WARMUP_DISPLAY", { warmupValue });
+  assert.ok(["∅", "—", "n/a", "N/A"].includes(warmupValue),
+    "Insufficient-history indicator must display a missing value: " + warmupValue);
   assert.deepEqual(errors, []);
   console.log("DATA_WINDOW_OHLC_VISIBLE", {
     selected,
