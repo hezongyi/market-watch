@@ -96,32 +96,96 @@ const fs = require("fs");
   await page.goto(base + "/advanced-charts");
   await page.waitForTimeout(15000);
   let frame = page.frames().find((f) => f.url().includes(":5187/?"));
-  await frame.evaluate(()=>widget.setLayout("2h"));
-  await frame.waitForFunction(()=>widget.chartsCount()===2&&widget.chart(1).dataReady());
-  const assert=require("node:assert/strict");
-  const native=page.frames().find(candidate=>candidate.url().startsWith("blob:"));
-  const handle=native.locator('[class*="chart-widget-collection-border--"]').first();
-  const box=await handle.boundingBox();
+  await frame.evaluate(() => widget.setLayout("2h"));
+  await frame.waitForFunction(
+    () => widget.chartsCount() === 2 && widget.chart(1).dataReady(),
+  );
+  const assert = require("node:assert/strict");
+  const native = page
+    .frames()
+    .find((candidate) => candidate.url().startsWith("blob:"));
+  const handle = native
+    .locator('[class*="chart-widget-collection-border--"]')
+    .first();
+  const box = await handle.boundingBox();
   assert.ok(box);
-  const before=await frame.evaluate(()=>widget.chart(0).getTimeScale().width());
-  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+  const before = await frame.evaluate(() =>
+    widget.chart(0).getTimeScale().width(),
+  );
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.mouse.move(box.x+box.width/2+120,box.y+box.height/2,{steps:12});
+  await page.mouse.move(box.x + box.width / 2 + 120, box.y + box.height / 2, {
+    steps: 12,
+  });
   await page.mouse.up();
-  await frame.waitForFunction(before=>widget.chart(0).getTimeScale().width()>before+90,before);
-  const resized=await frame.evaluate(()=>[0,1].map(i=>widget.chart(i).getTimeScale().width()));
+  await frame.waitForFunction(
+    (before) => widget.chart(0).getTimeScale().width() > before + 90,
+    before,
+  );
+  const resized = await frame.evaluate(() =>
+    [0, 1].map((i) => widget.chart(i).getTimeScale().width()),
+  );
   await page.waitForTimeout(1500);
-  await frame.waitForFunction(()=>!loading&&!nativeSaving&&!rangeGuard?.busy());
-  await frame.evaluate(()=>new Promise((resolve,reject)=>widget.saveChartToServer(resolve,error=>reject(Error(JSON.stringify(error))))));
+  await frame.waitForFunction(
+    () => !loading && !nativeSaving && !rangeGuard?.busy(),
+  );
+  await frame.waitForFunction(
+    () => {
+      const a = widget.chart(0).getVisibleRange(),
+        b = widget.chart(1).getVisibleRange();
+      return Math.abs(a.from - b.from) <= 300 && Math.abs(a.to - b.to) <= 300;
+    },
+    null,
+    { timeout: 10000 },
+  );
+  await frame.evaluate(
+    () =>
+      new Promise((resolve, reject) =>
+        widget.saveChartToServer(resolve, (error) =>
+          reject(Error(JSON.stringify(error))),
+        ),
+      ),
+  );
   await page.reload();
   await page.waitForTimeout(15000);
-  frame=page.frames().find(candidate=>candidate.url().includes(":5187/?"));
-  await frame.waitForFunction(()=>ready&&!loading&&widget.chartsCount()===2&&widget.chart(1).dataReady());
-  const restored=await frame.evaluate(()=>[0,1].map(i=>widget.chart(i).getTimeScale().width()));
-  for(let i=0;i<2;i++)assert.ok(Math.abs(restored[i]-resized[i])<=2,JSON.stringify({resized,restored}));
-  assert.deepEqual(errors,[]);
-  await page.screenshot({path:"/tmp/mw-layout-resized.png"});
-  console.log("MOUSE_RESIZE_RESTORED",{before,resized,restored});
-  console.log("RESIZED_SYNC_STATE",await frame.evaluate(()=>({timeSync:widget.timeSync().value(),rangeSync:widget.dateRangeSync().value(),ranges:[0,1].map(i=>widget.chart(i).getVisibleRange())})));
+  frame = page
+    .frames()
+    .find((candidate) => candidate.url().includes(":5187/?"));
+  await frame.waitForFunction(
+    () =>
+      ready &&
+      !loading &&
+      widget.chartsCount() === 2 &&
+      widget.chart(1).dataReady(),
+  );
+  const restored = await frame.evaluate(() =>
+    [0, 1].map((i) => widget.chart(i).getTimeScale().width()),
+  );
+  for (let i = 0; i < 2; i++)
+    assert.ok(
+      Math.abs(restored[i] - resized[i]) <= 2,
+      JSON.stringify({ resized, restored }),
+    );
+  const sync = await frame.evaluate(() => ({
+    enabled: widget.dateRangeSync().value(),
+    ranges: [0, 1].map((i) => widget.chart(i).getVisibleRange()),
+  }));
+  assert.equal(sync.enabled, true);
+  assert.ok(Math.abs(sync.ranges[0].from - sync.ranges[1].from) <= 300);
+  assert.ok(Math.abs(sync.ranges[0].to - sync.ranges[1].to) <= 300);
+  assert.deepEqual(errors, []);
+  await page.screenshot({ path: "/tmp/mw-layout-resized.png" });
+  console.log("MOUSE_RESIZE_RESTORED", { before, resized, restored });
+  console.log(
+    "RESIZED_SYNC_STATE",
+    await frame.evaluate(() => ({
+      timeSync: widget.timeSync().value(),
+      rangeSync: widget.dateRangeSync().value(),
+      ranges: [0, 1].map((i) => widget.chart(i).getVisibleRange()),
+    })),
+  );
   await browser.close();
-})().catch(error=>{console.error(error);process.exit(1)});
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
