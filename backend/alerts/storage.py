@@ -468,3 +468,14 @@ class ChartViewportDemand(Base):
     warm_start: Mapped[int] = mapped_column(BigInteger)
     focused: Mapped[bool] = mapped_column(Boolean)
     expires: Mapped[int] = mapped_column(BigInteger, index=True)
+
+
+class ChartAggregationJob(Base):
+    __tablename__ = 'chart_aggregation_jobs'
+    __table_args__ = (UniqueConstraint('instrument_id', 'timeframe', 'start', 'end'),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    instrument_id: Mapped[str] = mapped_column(String(40), ForeignKey('instruments.id'))
+    timeframe: Mapped[str] = mapped_column(String(8))
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
