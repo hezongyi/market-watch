@@ -868,3 +868,11 @@
 - 明确原生导出/样式保存缺件的自研替代，CSV不含原生指标、无Pine运行环境、成交量/深度/新闻/交易等边界；记录交易账户/订单/经纪商入口的实际关闭配置。
 - 修正原实施方案P3及第7节仍写“等待完整包”的过时内容；按用户已确认的自行开发决定执行，不再请求补包或把补包当作交付前置。
 - 本轮为文档及边界核对，不改变运行服务，不以此宣称整体验收通过。
+
+### 最新图表数据纳入真实PostgreSQL恢复演练
+
+- 扩展backend/tests/test_backup.py既有真实pg_dump/pg_restore专项，源库加入advanced_chart_workspaces一条、advanced_chart_preferences四类各一条、weekly_history_requests一条。原有信号与outbox仍验证。
+- 归档清单验证新增表非空；在restore_check真实恢复连接关闭前，额外断言工作区布局/版本、模板和设置JSON中文内容/版本/工具命名空间、周线cursor/remaining/status/next_at，不只比较记录数。
+- Ubuntu临时PG14.24集群仅监听127.0.0.1随机端口，使用匹配14版客户端及UTF8编码。pytest -q backend/tests/test_backup.py：5 passed in 1.68s，ISOLATED_RESTORE_EXIT 0，ISOLATED_CLUSTER_REMOVED True。
+- 初次尝试客户端libpq路径缺失；补齐LD_LIBRARY_PATH后发现无locale默认SQL_ASCII导致驱动返回bytes。明确initdb --encoding=UTF8后通过，两次失败的临时目录均清理。没有修改共享数据库、生产服务或产品备份实现。
+- 本条关闭“新增表是否进入备份恢复”的疑问；不代表整站容器/TLS/配置恢复与版本回退已经验收。

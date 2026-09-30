@@ -7,7 +7,7 @@ from decimal import Decimal
 import pytest
 from alerts import api as api_module
 from alerts import backup, storage
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, select, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
 
@@ -119,6 +119,91 @@ def test_postgres_dump_restore_of_signal_and_outbox(tmp_path, monkeypatch):
                     db, "EURUSD", "restore-check", {"kind": "pullback"}, armed_at=28800000
                 )
                 assert evaluate_watch(db, watch.id)
+                db.add(
+                    storage.AdvancedWorkspace(
+                        id="restore-workspace",
+                        name="恢复演练",
+                        document={
+                            "engine": "tv31",
+                            "state": {"charts": [{"panes": []}], "layout": "4"},
+                        },
+                        revision=7,
+                    )
+                )
+                for kind in ("study", "drawing", "chart", "setting"):
+                    db.add(
+                        storage.AdvancedPreference(
+                            id="restore-" + kind,
+                            kind=kind,
+                            name="恢复-" + kind,
+                            tool="LineToolHorzLine" if kind == "drawing" else "",
+                            content={"value": {"marker": kind, "unicode": "参数"}},
+                            revision=3,
+                        )
+                    )
+                db.add(
+                    storage.WeeklyHistoryRequest(
+                        id="restore-weekly",
+                        instrument_id="EURUSD",
+                        before=100000,
+                        cursor=90000,
+                        remaining=13,
+                        status="pending",
+                        next_at=80000,
+                    )
+                )
+            # Validate contents through the actual restored connection before
+            # restore_check drops its disposable database; counts alone miss
+            # damaged JSON or lost queue progress.
+            original_counts = backup.sql_counts
+            restored_payloads_checked = []
+
+            def check_contents(connection):
+                if connection.engine.url.database.startswith("alerts_restore_"):
+                    workspace = (
+                        connection.execute(
+                            select(storage.AdvancedWorkspace.__table__).where(
+                                storage.AdvancedWorkspace.id == "restore-workspace"
+                            )
+                        )
+                        .mappings()
+                        .one()
+                    )
+                    assert workspace["revision"] == 7
+                    assert workspace["document"]["state"]["layout"] == "4"
+                    for kind in ("study", "drawing", "chart", "setting"):
+                        pref = (
+                            connection.execute(
+                                select(storage.AdvancedPreference.__table__).where(
+                                    storage.AdvancedPreference.id == "restore-" + kind
+                                )
+                            )
+                            .mappings()
+                            .one()
+                        )
+                        assert pref["revision"] == 3
+                        assert pref["content"] == {"value": {"marker": kind, "unicode": "参数"}}
+                        assert pref["tool"] == ("LineToolHorzLine" if kind == "drawing" else "")
+                    weekly = (
+                        connection.execute(
+                            select(storage.WeeklyHistoryRequest.__table__).where(
+                                storage.WeeklyHistoryRequest.id == "restore-weekly"
+                            )
+                        )
+                        .mappings()
+                        .one()
+                    )
+                    assert (
+                        weekly["cursor"],
+                        weekly["remaining"],
+                        weekly["status"],
+                        weekly["next_at"],
+                    ) == (90000, 13, "pending", 80000)
+                    restored_payloads_checked.append(True)
+                return original_counts(connection)
+
+            monkeypatch.setattr(backup, "sql_counts", check_contents)
+
             monkeypatch.setattr(
                 backup.settings, "database_url", source_url.render_as_string(hide_password=False)
             )
@@ -128,7 +213,11 @@ def test_postgres_dump_restore_of_signal_and_outbox(tmp_path, monkeypatch):
             destination = tmp_path / "postgres.dump"
             report = backup.backup(destination)
             assert report["counts"]["signals"] == report["counts"]["outbox"] == 1
+            assert report["counts"]["advanced_chart_workspaces"] == 1
+            assert report["counts"]["advanced_chart_preferences"] == 4
+            assert report["counts"]["weekly_history_requests"] == 1
             restored = backup.restore_check(destination)
+            assert restored_payloads_checked == [True]
             assert restored["verified"] and restored["counts"] == report["counts"]
             with admin.connect() as c:
                 assert not c.execute(
