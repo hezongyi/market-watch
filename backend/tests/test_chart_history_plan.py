@@ -194,3 +194,33 @@ def test_indicator_warmup_extends_current_period_without_inflating_daily_target(
         demand=db.get(ChartViewportDemand,'pane')
         assert demand.start==history_start(inst,'H1',end,200)
         assert plan.target_start==history_start(inst,'D1',end,60)
+
+
+def test_resume_bounds_legacy_queue_and_prioritizes_current_view(database):
+    from alerts.chart_history_plan import control_plan
+    from alerts.storage import ImportJob
+
+    end = ms(datetime(2026, 9, 28, 12, tzinfo=UTC))
+    with database.begin() as db:
+        plan = update_demand(db, ident='pane', instrument='EURUSD', timeframe='H1',
+                             end=end, visible=5, focused=True, now=end)
+        target = (plan.target_start, plan.target_end)
+        jobs = []
+        for offset in (20000, 16000, 12000, 4000):
+            start = end - offset * 60000
+            job = ImportJob(instrument_id='EURUSD', start=start, end=start+4000*60000,
+                            cursor=start+60000, priority=300, chart_plan=True,
+                            status='cancelled', next_at=end)
+            db.add(job)
+            jobs.append(job)
+        db.flush()
+        cursors = [job.cursor for job in jobs]
+        control_plan(db, 'EURUSD', 'resume', end)
+        assert sum(job.status == 'pending' for job in jobs) == 2
+        assert jobs[-1].status == 'pending' and jobs[-1].priority == 100
+        assert sum(job.status == 'superseded' for job in jobs) == 2
+        assert [job.cursor for job in jobs] == cursors
+        assert (plan.target_start, plan.target_end) == target
+        # Repeated resume must not revive the deferred slices.
+        control_plan(db, 'EURUSD', 'resume', end+1)
+        assert sum(job.status == 'pending' for job in jobs) == 2

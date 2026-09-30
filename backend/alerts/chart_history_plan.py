@@ -207,12 +207,22 @@ def control_plan(db, instrument, action, now):
             job.lease_until=None
     else:
         plan.status='pending'
-        for job in jobs:
-            if job.status=='cancelled' or (action=='retry' and job.status=='failed'):
-                job.status='pending'
-                job.next_at=now
-                job.error=None
-                job.lease_until=None
+        regions = priority_regions(db, plan, now)
+        available = max(0, 2 - sum(job.status in ('pending', 'running') for job in jobs))
+        candidates = [job for job in jobs if job.status == 'cancelled'
+                      or (action == 'retry' and job.status == 'failed')]
+        for job in candidates:
+            job.priority = min((priority for left, right, priority in regions
+                                if job.cursor < right and job.end > left), default=300)
+        # Resume only a bounded batch, choosing the currently viewed range first.
+        # The durable plan retains all remaining holes and requeues them later;
+        # committed coverage and each old cursor remain untouched.
+        candidates.sort(key=lambda job: (job.priority, -job.end, job.id))
+        for index, job in enumerate(candidates):
+            job.status = 'pending' if index < available else 'superseded'
+            job.next_at = now
+            job.error = None
+            job.lease_until = None
     plan.updated_at=now
     db.flush()
     return plan
