@@ -254,3 +254,10 @@
 - 历史下载在聚合积压>=60时暂缓；最多一个下载批次增加15个任务，因此单下载进程下积压约限于74。不会使实时once等待该限制。失败任务仍计入积压，后续需验收多品种持续失败对全局吞吐影响。
 - 新测试达到60个任务时不调用行情方且不改变下载游标/状态。聚合、调度节奏、行情及恢复29 passed，ruff通过。
 - 尚未部署k12及新worker。启动前须检查开发账号8连接上限并清理已确认闲置的本机旧开发进程，不能扩容或操作生产服务。还需迁移、真实冷数据连续聚合、优先级切换和并发压力验收。
+
+### k12迁移往返验收
+
+- SQLite独立/tmp/mw-k12-migration-acceptance.db运行完整alembic upgrade head→downgrade j11→upgrade head成功。
+- PostgreSQL已授权开发库使用单连接独立mw_k12_acceptance schema，仅建测试instruments与队列表；k12 upgrade→downgrade→upgrade成功，核对9个字段/唯一约束/外键。整个事务回滚，未改变public运行结构。脚本/tmp/mw-k12-postgres-migration.py。
+- 新增自动迁移往返回归test_chart_aggregation_migration.py，1 passed，ruff通过。PostgreSQL测试仅覆盖k12，不代表全历史迁移链均已在PostgreSQL空库验证。
+- 运行库尚在j11；独立聚合进程未启动。后续需要连接占用确认及本机实际部署、冷启动端到端验收。
