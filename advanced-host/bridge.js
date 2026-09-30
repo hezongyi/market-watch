@@ -327,6 +327,17 @@ const feed = {
         if (status.status === "error") {
           rememberHistoryFailure(args, status);
           offerHistoryRetry();
+          if (frames[res] === "W1") {
+            // A missing weekly page is a background task outcome. Complete the
+            // native request with an explicit empty boundary so a later period
+            // switch is not held in the failed weekly series state.
+            send({
+              type: "status",
+              text: `${symbol} 周线暂时没有可用数据，已加入后台队列，预计耗时暂无法估算`,
+            });
+            cb([], { noData: true });
+            return;
+          }
           throw Error(status.error || "历史拉取失败");
         }
         cacheOnly = status.local_only === true;

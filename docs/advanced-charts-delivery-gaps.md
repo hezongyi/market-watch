@@ -369,3 +369,8 @@
 - 连接池实际耗尽/释放复用回归通过；与行情/导出测试合计28 passed（/tmp/mw-pool-tiered-regression.log）。运行数据库再次检查：旧进程3条idle，新验收API2条idle，总计5条，恢复余量。
 - 通过Vite5189直接代理8003完成真实月线首次加载及绘图；快速W1/MN/W1/MN后月线dataReady=false且范围0/0，/tmp/mw-monthly-local-direct.log失败。月线请求返回local_only且无任务，周线响应error；最终月线未重新向后端发请求。需继续定位原生缓存/取消回调，不以月线接口无补数代替完整切换通过。
 - 浏览器测试取消了route.fetch全API转发，改用真实Vite代理，避免SSE/events请求无法完成导致测试转发超时。当前留下最终月线等待失败断言及请求轨迹。
+
+### 周线失败回调不再阻塞后续周期
+
+- W1后台补数返回失败时，Datafeed原先调用原生error，导致原生周线模型保持失败/未完成状态；快速随后切MN时月线停在dataReady=false、range=0/0。现改为对W1完成空数据边界（noData=true），同时保留失败任务、重试入口和后台提示，允许后续周期继续切换。
+- `advanced-weekly-error.cjs`、分页和请求取消专项通过。真实连续W1/MN浏览器场景仍在验证，上一轮缓存静态源记录的旧行为仍失败，需用最新桥接重跑。
