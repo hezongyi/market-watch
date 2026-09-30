@@ -710,3 +710,9 @@
 - 同一浏览器真实点击“保存样式”两次，同名模板背景从#123456改为#234567；服务器仅有一行、ID不变、revision恰好加1，验证实际覆盖而非生成同名副本。
 - 另一工作区通过原生模板菜单应用覆盖后的#234567，品种/周期/指标/画线ID保持一致。原生删除后重新加载页面，再打开模板菜单，模板名不存在。
 - /tmp/mw-style-overwrite.log退出0，errors=[]；验收脚本已固化上述断言。尚未将此证据扩张为手机或所有模板类型的生命周期验收。
+
+### 手机模板只读回归暴露原生加载异常（未解决）
+
+- 手机回归脚本支持本机HTTPS来源，新增preferences前后完整相等及无“保存样式”按钮断言。
+- /tmp/mw-mobile-style-readonly.log退出1，尚未走到新增只读断言；切换第二工作区时供应库JSON.parse(undefined)，最终“Second workspace did not settle to one chart”。本轮不能记作手机通过，也未证明由样式改动引入。
+- 下一步从实际native-charts/load返回的state包装格式定位；脚本增加仅输出ID/名称/结构键的诊断，不输出完整用户数据。需核对空白、raw snapshot和native content包装的兼容加载，不跳过异常工作区冒充通过。

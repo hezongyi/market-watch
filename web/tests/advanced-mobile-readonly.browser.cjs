@@ -12,6 +12,7 @@ const fs = require("fs");
     viewport: process.env.MARKET_WATCH_PORTRAIT
       ? { width: 412, height: 915 }
       : { width: 915, height: 412 },
+    ignoreHTTPSErrors: process.env.MARKET_WATCH_TEST_SELF_SIGNED === "1",
     isMobile: true,
     hasTouch: true,
   });
@@ -120,6 +121,9 @@ const fs = require("fs");
     localStorage.setItem("mw-tv-draft:" + rows[0].id, "preserve-desktop-draft");
     return rows[0].id;
   });
+  const preferencesBefore = await page.evaluate(async () =>
+    (await fetch("/api/advanced-charts/preferences")).json(),
+  );
   const serverBefore = await page.evaluate(async () =>
     (await fetch("/api/advanced-charts/workspaces")).json(),
   );
@@ -134,7 +138,15 @@ const fs = require("fs");
     { timeout: 30000 },
   );
   await page.waitForTimeout(15000);
-  const frame = page.frames().find((f) => f.url().includes(":5187/?"));
+  const frame = page
+    .frames()
+    .find((f) =>
+      f
+        .url()
+        .startsWith(
+          process.env.MARKET_WATCH_CHART_ORIGIN || "http://127.0.0.1:5187/",
+        ),
+    );
   if (!frame) {
     console.log(
       "MOBILE_FAILED_PAGE",
@@ -170,6 +182,23 @@ const fs = require("fs");
     );
     if (!other)
       throw Error("Second intraday workspace required for switch acceptance");
+    for (const candidate of [row, other]) {
+      const loaded = await request(
+        { op: "load", args: { id: String(candidate.id) } },
+        "workspace",
+      );
+      const state = JSON.parse(loaded.content);
+      console.log(
+        "MOBILE_LOAD_FORMAT",
+        JSON.stringify({
+          id: candidate.id,
+          name: candidate.name,
+          keys: Object.keys(state),
+          contentType: typeof state.content,
+          charts: Array.isArray(state.charts),
+        }),
+      );
+    }
     await widget.loadChartFromServer(other);
     const deadline = Date.now() + 60000;
     while (
@@ -354,6 +383,17 @@ const fs = require("fs");
     (await fetch("/api/advanced-charts/workspaces")).json(),
   );
   require("node:assert/strict").deepEqual(serverAfter, serverBefore);
+  const preferencesAfter = await page.evaluate(async () =>
+    (await fetch("/api/advanced-charts/preferences")).json(),
+  );
+  require("node:assert/strict").deepEqual(preferencesAfter, preferencesBefore);
+  require("node:assert/strict").equal(
+    await frame
+      .childFrames()[0]
+      .getByRole("button", { name: "保存图表样式模板", exact: true })
+      .count(),
+    0,
+  );
   console.log("MOBILE_WRITES", writes);
   require("node:assert/strict").deepEqual(writes, []);
   console.log("MOBILE_READONLY", await frame.evaluate(() => nativeReadonly));
