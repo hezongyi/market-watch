@@ -648,3 +648,19 @@
 - unshare -Ur可启动Podman，配置vfs、独立/tmp存储、禁用事件日志；通过授权代理成功拉取docker.io/library/nginx:1.28-alpine，镜像ID dc73b49f5124cf2ee538dfbdfbd121f0b4ccdcb20fea30f3a81bd477c02e2bb5。
 - 镜像实际build执行FROM及所有COPY成功；RUN步骤OCI运行时失败devpts Invalid argument（/tmp/mw-chart-image-build.log）。改为chroot隔离后失败supplemental groups operation not permitted（/tmp/mw-chart-image-build-chroot.log）。不是完成镜像构建/运行证据，不修改Dockerfile绕过RUN校验。
 - sudo -n确认需要密码；已异步请求用户在Ubuntu准备Docker Engine+Compose及quant访问权限，或提供独立测试机。不使用Unraid生产服务进行演练；其余功能验收仍可推进，整体目标未阻塞终止。
+
+### 原功能回归、图表类型与 Docker 环境推进
+
+- /tmp/mw-latest-full-regression.log：169 passed、7 skipped；包括预警/演练/通知处理的既有后端用例，未重新发送外部手机通知。跳过的独立环境项不计为通过。
+- advanced-chart-types.browser.cjs读取供应商ChartStyle枚举：除缺少实际volume输入的VolCandle外，17种类型切换及dataReady通过，最终HLCBars保存刷新恢复；/tmp/mw-chart-types.log退出0，无页面异常。不替代每种合成类型数值算法审计。
+- 用户已安装本机Docker29.1.3/Compose2.40.3并授权quant组访问；当前执行会话通过sg docker使用，无需sudo。DockerHub直连超时，用已授权代理下载基础镜像并通过docker load导入，无全局Docker配置修改。
+- 图表静态镜像market-watch-chart-origin:acceptance-412703c构建成功，容器mw-chart-origin-acceptance绑定127.0.0.1:15187；首页/bridge/viewports/vendor主脚本200、缺失资源404，CSP connect-src none/nosniff/no-store均确认。
+- 主站镜像构建成功，隔离图表构建地址https://127.0.0.1:15444；Compose外置库+advanced覆盖config --quiet通过。API镜像仍在构建（session33123，/tmp/mw-docker-api-build.log），尚未形成完整容器HTTPS验收。
+
+### 本机 Docker HTTPS 联调通过
+
+- 图表、主站、API镜像均通过原Dockerfile构建；API日志/tmp/mw-docker-api-build.log完成，主站隔离地址最终为https://127.0.0.1:15444。未修改Docker守护进程代理，基础镜像通过skopeo代理下载、docker load导入。
+- 独立网络mw-acceptance及mw-api-acceptance/mw-web-acceptance/mw-chart-origin-acceptance/mw-tls-acceptance，仅TLS15443/15444与静态15187绑定127.0.0.1；TLS仅挂载证书/密钥文件。API使用权限600的临时env连接trading_alerts_dev，delivery_enabled=false。
+- 首轮因并行旧开发API触及dev角色8连接限制而超时；已核对PID/cwd停止Ubuntu8004旧API3055378，日志确认正常退出。不调高数据库权限、不重启Unraid。当前Vite5190的8004后端暂未恢复，容器验收入口为https://localhost:15443。
+- /tmp/mw-container-browser-retry.log退出0：实际Docker主站+API+静态库+TLS，登录、创建开发验收工作区、图表加载、M15切换、原生保存成功；errors=[]，图表来源未观察到Cookie/Authorization。截图/tmp/mw-container-https.png已生成。测试忽略本机自签证书错误，不代表公网证书链验证完成。
+- 尚未执行容器版本回退、完整Compose启动/worker以及公网正式地址配置；单次联调通过不等于生产已发布。
