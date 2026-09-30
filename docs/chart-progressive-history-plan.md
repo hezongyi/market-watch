@@ -207,3 +207,9 @@
 - 指标接口在读取行情、元数据与history_check后结束数据库事务，expunge品种对象；缺口判断、指标计算、结果裁剪和future_grid均在事务外完成。计算使用同一份读取快照，不在CPU阶段追加ORM查询。
 - 新增连接checkout/checkin断言，验证三种CPU阶段没有持有数据库连接，且track_history正常返回；test_chart_workspace.py 20 passed，ruff已修正导入顺序。
 - 本次源代码候选尚未部署；多图并发、M1大规模历史与异步优先聚合仍待验收/实施，不能由单连接释放断言推定全部性能达标。
+
+### 单连接容器下指标与并发会话请求
+
+- Ubuntu API部署indicator-conn-fix（image 04730caaf231，源代码a955ce4），TLS重启；worker/web/chart保持此前镜像，未操作生产。
+- 浏览器用例增加指标请求期间每250ms发起一个串行会话请求，断言HTTP200且单次<5秒。真实页面返回100根SMA，2.676秒，旧规划器调用0；同期三次会话响应1.321/0.117/0.507秒，均200。日志/tmp/mw-indicator-concurrent.log。
+- 仅证明该轮H1指标请求没有占满连接导致15秒超时；不是100–200ms切换目标或八图压力通过。实时worker同期周期日志2.781至6.118秒，仍需端到端M1新bar/预警延迟观测。

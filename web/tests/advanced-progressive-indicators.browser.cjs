@@ -61,6 +61,19 @@ const assert = require("node:assert/strict");
   await frame.waitForFunction(()=>widget.activeChart().dataReady());
   let planners=0;
   page.on('request',r=>{if(r.url().endsWith('/market-data/history')) planners++;});
+  await page.evaluate(() => {
+    window.indicatorProbe = {running:true, samples:[]};
+    const probe = window.indicatorProbe;
+    probe.done = (async()=>{
+      while(probe.running) {
+        const started=performance.now();
+        const response=await fetch('/api/session');
+        await response.json();
+        probe.samples.push({ms:performance.now()-started,status:response.status});
+        await new Promise(resolve=>setTimeout(resolve,250));
+      }
+    })();
+  });
   const result=await frame.evaluate(async()=>{
     const symbol=widget.activeChart().symbol();
     const ticker='MWPY_'+btoa(JSON.stringify({symbol,spec:{name:'SMA',params:{period:20}},key:'value'}));
@@ -70,6 +83,15 @@ const assert = require("node:assert/strict");
       (bars,meta)=>resolve({bars,meta}),reject));
     return {...value,elapsed:performance.now()-started};
   });
+  const probes=await page.evaluate(async()=>{
+    window.indicatorProbe.running=false;
+    await window.indicatorProbe.done;
+    return window.indicatorProbe.samples;
+  });
+  assert.ok(probes.length>0);
+  assert.ok(probes.every(p=>p.status===200 && p.ms<5000),
+    'session requests must remain responsive during indicator computation: '+JSON.stringify(probes));
+  console.log('CONCURRENT_SESSION',JSON.stringify(probes));
   assert.equal(planners,0,'Python M1-D1 requests must not enter blocking planner');
   assert.ok(result.bars.length>0,'real local history must supply study bars');
   assert.ok(result.bars.some(b=>b.volume===1),'SMA must have computed values');
