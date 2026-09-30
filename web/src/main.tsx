@@ -1021,7 +1021,16 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
           <button type="button" className="secondary" disabled={busy||!start||!end} onClick={importHistory}>补齐所选历史</button>
         </form>
       </section>
-      {jobs.length>0&&<section className="panel"><div className="panel-heading"><h2>历史数据任务</h2><small>后台分日获取，可在重启后继续</small></div>{jobSummary&&<p>共 {jobSummary.total} 项：已完成 {jobSummary.counts.complete||0}，等待 {jobSummary.counts.pending||0}，获取中 {jobSummary.counts.running||0}，失败 {jobSummary.counts.failed||0}。下方最多显示 30 项，失败任务优先。</p>}{jobs.map(j=><div className="watch-row" key={j.id}><strong>{j.instrument_id}</strong><small>{j.priority===0?"断档修复":j.priority===50?"初始历史":"手动导入"} · {date(j.start)} — {date(j.end)}</small><span className="status">{{pending:'等待获取',running:'获取中',complete:'已完成',failed:'失败'}[j.status as string]||j.status}</span><span>{Math.round((j.cursor-j.start)/(j.end-j.start)*100)}%</span>{j.status==='failed'&&<button className="secondary" onClick={()=>retryImport(j.id)}>从断点重试</button>}{j.error&&<small className="warning">{j.error.includes('429')?'上游限流，等待重试':j.error}</small>}</div>)}</section>}
+      {jobSummary?.weekly_requests?.length>0&&<section className="panel">
+        <div className="panel-heading"><h2>周线后台需求</h2><small>优先保障日线及以下周期，最多显示 30 项</small></div>
+        {jobSummary.weekly_requests.map((request:any)=><div className="watch-row" key={request.id}>
+          <strong>{request.instrument_id}</strong><small>截止 {date(request.before)}</small>
+          <span className="status">{{pending:'排队或补数中',complete:'已完成',needs_review:'待核查',failed:'未完成'}[request.status as string]||request.status}</span>
+          <span>尚需 {request.remaining} 根周线</span>
+          {request.status==='needs_review'&&<small className="warning">已查询区间没有可用周线，已停止自动向前补数；尚未确认历史起点，请检查品种与日期范围。</small>}
+        </div>)}
+      </section>}
+      {jobs.length>0&&<section className="panel"><div className="panel-heading"><h2>历史数据任务</h2><small>后台分日获取，可在重启后继续</small></div>{jobSummary&&<p>共 {jobSummary.total} 项：已完成 {jobSummary.counts.complete||0}，等待 {jobSummary.counts.pending||0}，获取中 {jobSummary.counts.running||0}，失败 {jobSummary.counts.failed||0}。下方最多显示 30 项，失败任务优先。</p>}{jobs.map(j=><div className="watch-row" key={j.id}><strong>{j.instrument_id}</strong><small>{j.priority===0?"断档修复":j.priority===50?"初始历史":j.priority===100?"图表历史":j.priority===200?"周线后台":"手动导入"} · {date(j.start)} — {date(j.end)}</small><span className="status">{{pending:'等待获取',running:'获取中',complete:'已完成',failed:'失败'}[j.status as string]||j.status}</span><span>{Math.round((j.cursor-j.start)/(j.end-j.start)*100)}%</span>{j.status==='failed'&&<button className="secondary" onClick={()=>retryImport(j.id)}>从断点重试</button>}{j.error&&<small className="warning">{j.error.includes('429')?'上游限流，等待重试':j.error}</small>}</div>)}</section>}
       {error && (
         <p className="error" role="alert">
           {error}

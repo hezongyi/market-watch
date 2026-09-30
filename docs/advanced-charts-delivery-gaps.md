@@ -585,3 +585,10 @@
 - /tmp/mw-weekly-real-reload-confirm.log退出0：注入一次W1 pending后恢复真实后端，tick触发原生缓存失效及重载，firstHistory记录形成，再切回M5并平移，errors=[]、零工作区写入。此前同名不带confirm的运行未执行新增分支，不作为自动完成证据。
 - worker启动目录刷新曾出现一次HTTPStatusError；随后直接fetch_oanda_catalog成功返回127项，历史EURUSD下载正常。异常状态码未在首次日志保留，根因未确认，不声明已修复。
 - 仍需空历史/上市起点导致持久需求无限向前扩张的边界策略、需求状态展示，以及总体工具验收/部署演练；不能将本轮成功等同整体验收。
+
+### 周线空区间边界与需求状态
+
+- 持久请求的完整规划区间（含有限扩展）查询完成但没有可用周线时，置needs_review并保留游标/剩余根数，不再自动领取；不将其宣称为上游历史起点。pending/失败导入不触发此空区间判断。
+- /imports-summary附加最多30条周线需求，待核查优先；工作台显示截止日期、剩余根数、状态及空历史说明。原导入任务priority100/200标注分别修正为图表历史/周线后台。
+- /tmp/mw-weekly-boundary-status-tests.log：31 passed，包含ready但无可用条目、empty_interval两种停止条件及需求状态响应；/tmp/mw-weekly-status-web-build.log生产构建通过。
+- 当前修改尚未重启开发API/worker加载，页面实际渲染及空区间运行态仍待验证；不把构建通过视为页面验收完成。

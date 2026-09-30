@@ -313,6 +313,13 @@ def advance_weekly_request():
         if result["status"] in ("ready", "empty_interval"):
             bars = [bar for bar in result["bars"]
                     if result["requested_start"] <= bar["start"] < cursor]
+            if not bars:
+                # A fully queried planning window (including bounded expansion)
+                # with no usable weeks is not proof of the provider's inception.
+                # Stop this durable request for inspection rather than sweeping
+                # indefinitely back to 1970 while the user is away.
+                row.status = "needs_review"
+                return True
             row.remaining = max(0, remaining - len(bars))
             next_cursor = min((bar["start"] for bar in bars), default=result["next_cursor"])
             if row.remaining == 0:

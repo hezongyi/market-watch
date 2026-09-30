@@ -860,3 +860,33 @@ def test_weekly_durable_planner_keeps_background_priority(database):
         assert jobs and all(job.priority == 200 for job in jobs)
         row = db.scalar(select(WeeklyHistoryRequest))
         assert row.status == "pending" and row.remaining == 13
+
+
+@pytest.mark.parametrize("status", ["ready", "empty_interval"])
+def test_weekly_empty_covered_window_stops_without_claiming_exhaustion(database, monkeypatch, status):
+    from alerts import market_data
+    from alerts.storage import WeeklyHistoryRequest
+
+    end = 1700000000000
+    query = market_data.HistoryQuery(instrument="EURUSD", timeframe="W1", before=end, limit=13)
+    market_data.remember_weekly_request(query, end)
+    monkeypatch.setattr(market_data, "plan_history", lambda body: {
+        "status":status, "requested_start":end-124*market_data.DAY,
+        "next_cursor":end-124*market_data.DAY, "bars":[], "remote_boundary":"unknown"})
+    assert market_data.advance_weekly_request()
+    with database.begin() as db:
+        row = db.scalar(select(WeeklyHistoryRequest))
+        assert row.status == "needs_review"
+        assert row.cursor == end and row.remaining == 13
+        row.next_at = 0
+    assert not market_data.advance_weekly_request()
+
+
+def test_import_summary_includes_weekly_review_status(database):
+    from alerts.storage import WeeklyHistoryRequest
+    with database.begin() as db:
+        db.add(WeeklyHistoryRequest(id="review",instrument_id="EURUSD",before=1700000000000,
+            cursor=1700000000000,remaining=13,status="needs_review",next_at=0))
+    result = api_module.imports_summary()
+    assert result["weekly_requests"] == [{"id":"review", "instrument_id":"EURUSD",
+        "before":1700000000000,"cursor":1700000000000,"remaining":13,"status":"needs_review"}]

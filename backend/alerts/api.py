@@ -28,6 +28,7 @@ from .storage import (
     Device,
     DeviceReceipt,
     ImportJob,
+    WeeklyHistoryRequest,
     Instrument,
     LoginSession,
     Notification,
@@ -884,7 +885,15 @@ def imports_summary():
         counts = dict(
             db.execute(select(ImportJob.status, func.count()).group_by(ImportJob.status)).all()
         )
-        return {"total": sum(counts.values()), "counts": counts, "shown_limit": 30}
+        weekly = db.scalars(select(WeeklyHistoryRequest).order_by(
+            (WeeklyHistoryRequest.status == "needs_review").desc(),
+            (WeeklyHistoryRequest.status != "complete").desc(),
+            WeeklyHistoryRequest.before.desc(),
+        ).limit(30)).all()
+        return {"total": sum(counts.values()), "counts": counts, "shown_limit": 30,
+                "weekly_requests": [{key: getattr(row, key) for key in
+                    ("id", "instrument_id", "before", "cursor", "remaining", "status")}
+                    for row in weekly]}
 
 
 def replay_dict(run, *, full_history=False):
