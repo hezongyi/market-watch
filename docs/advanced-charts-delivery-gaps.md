@@ -928,3 +928,9 @@
 - 原生属性→样式里实际切换价格标签复选框并确认；新工作区最初没有旧画线，新建水平线自动沿用所选showPrice值。/tmp/mw-copy-native-default.log退出0。
 - 初次仅用API setProperties再打开对话框确认，新工作区仍用旧默认色；这不是用户编辑默认样式的等价操作。改为真正触发原生样式控件后保存恢复通过。当前默认样式断言针对showPrice，不泛化为每个样式字段。
 - 临时探查脚本已删除；未改产品代码和供应库。
+
+### API/worker同结构回退及恢复
+
+- Ubuntu验收API和历史worker从acceptance-2bc223f回退acceptance-412703c，保留开发数据库；健康检查及advanced-container-https浏览器通过，/tmp/mw-api-rollback-412703c.log退出0、errors=[]。
+- 恢复acceptance-2bc223f并重启web/tls刷新地址，再次浏览器通过，/tmp/mw-api-forward-2bc223f.log退出0、errors=[]；5服务运行，API healthy。未操作Unraid。
+- 更新local-container-acceptance.md实际镜像标签与同结构回退命令；backup-and-restore.md将固定16表表述改为当前模型全部表。此次没有数据库迁移，不能推论任意旧镜像与未来结构兼容，也不等于全新整站重建演练。
