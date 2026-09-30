@@ -408,3 +408,9 @@
 - 单独对照仅将周线失败的空结果改为原生error回调；session95942退出1，最终月线dataReady=false/range0/guard=true，周线error后没有新月线HTTP。日志/tmp/mw-monthly-weekly-native-error.log。因此撤回该候选，保留经过验证的兼容空结果。
 - 新周线专项实际运行bridge的失败、确认重试、pendingHistory完成和reloadHistory路径，验证重试后先清匹配缓存、再重载对应图表。此为适配层回归，尚不替代真实UI重试与原生缓存验收。
 - 当前配置使用实际import_once执行三个有限开发补数页面，分别0.72/0.64/0.84秒完成；进程退出并释放连接，没有启动另一常驻worker。既有worker的配置/连接差异仍待定位。
+
+### 常驻worker诊断可观测性
+
+- 核对原启动记录：旧chart worker由后台Popen启动并写/tmp/mw-advanced-chart-worker.log，非当前可轮询的exec session；当前进程命名空间无法读取该后台进程信息。本轮未凭日志停止增长推断退出，也未重复启动常驻worker。
+- 增加启动日志：实际模块路径、OANDA/Binance是否启用代理（布尔值）；失败日志记录source/symbol/异常类/attempt/status，不输出异常文本、账户URL或凭据。用于下次正常加载新代码时区分配置与连接故障。
+- 新失败日志回归先失败后通过，行情专项21 passed（/tmp/mw-worker-diagnostics-tests.log）。旧worker尚未加载本轮改动，不能声称运行问题已解决。

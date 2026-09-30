@@ -648,6 +648,12 @@ def import_once(*, chart_only=False, fetcher=None):
             job.status = "failed" if job.attempts >= 5 else "pending"
             job.lease_until = None
             job.next_at = now_ms() + min(600, 30 * 2**job.attempts) * 1000
+            if chart_only:
+                # Exception messages may contain account URLs; log the class only.
+                logging.warning(
+                    "chart_history_failure source=%s symbol=%s error_type=%s attempt=%d status=%s",
+                    source, symbol, type(e).__name__, job.attempts, job.status,
+                )
     finally:
         if chart_only:
             finished = time.monotonic()

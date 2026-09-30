@@ -30,6 +30,10 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     # Provider URLs contain account paths; keep transport request logs quiet.
     logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.info(
+        "chart_history_start module=%s oanda_proxy=%s binance_proxy=%s",
+        __file__, bool(settings.oanda_proxy), bool(settings.binance_proxy),
+    )
     with ExitStack() as stack:
         clients = {
             "oanda": stack.enter_context(httpx.Client(timeout=15, proxy=settings.oanda_proxy or None, trust_env=False)),

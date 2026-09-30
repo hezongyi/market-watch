@@ -714,7 +714,7 @@ def test_monthly_history_never_queues_downloads(database, monkeypatch):
         api_module.app.dependency_overrides.clear()
 
 
-def test_chart_timeout_preserves_failure_type_and_cursor(database):
+def test_chart_timeout_preserves_failure_type_and_cursor(database, caplog):
     import httpx
     from alerts import market
 
@@ -729,6 +729,8 @@ def test_chart_timeout_preserves_failure_type_and_cursor(database):
         raise httpx.ReadTimeout("")
 
     assert market.import_once(chart_only=True, fetcher=fail)
+    assert "error_type=ReadTimeout" in caplog.text
+    assert "attempt=1" in caplog.text
     with database.begin() as db:
         job = db.get(ImportJob, ident)
         assert job.error == "ReadTimeout"
