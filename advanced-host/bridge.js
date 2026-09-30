@@ -73,7 +73,13 @@ const clientId = crypto.randomUUID();
 const requests = [];
 function drain() {
   while (pending.size < 4 && requests.length) {
-    const { query, type, resolve, reject } = requests.shift();
+    const { query, type, resolve, reject, isCurrent } = requests.shift();
+    if (isCurrent && !isCurrent()) {
+      const error = Error("已取消旧图表的历史加载");
+      error.code = "HISTORY_CANCELLED";
+      reject(error);
+      continue;
+    }
     const id = ++seq;
     const timer = setTimeout(() => {
       pending.delete(id);
@@ -84,10 +90,10 @@ function drain() {
     send({ type, id, query });
   }
 }
-function request(query, type = "data") {
+function request(query, type = "data", isCurrent) {
   return new Promise((resolve, reject) => {
     if (requests.length >= 64) return reject(Error("图表请求过多，请减少指标"));
-    requests.push({ query, type, resolve, reject });
+    requests.push({ query, type, resolve, reject, isCurrent });
     drain();
   });
 }
@@ -163,7 +169,9 @@ function query(ticker, res, args) {
 // Share only in-flight planning reads; completed results must be polled fresh.
 const historyRequests = new Map();
 function historyQuery(args) {
+  const epoch = workspaceEpoch;
   const key = JSON.stringify([
+    epoch,
     args.instrument,
     args.timeframe,
     args.before,
@@ -171,7 +179,11 @@ function historyQuery(args) {
   ]);
   const existing = historyRequests.get(key);
   if (existing) return existing;
-  const promise = request({ op: "history", args }, "market");
+  const promise = request(
+    { op: "history", args },
+    "market",
+    () => epoch === workspaceEpoch && hasHistoryViewer(args),
+  );
   historyRequests.set(key, promise);
   const remove = () => {
     if (historyRequests.get(key) === promise) historyRequests.delete(key);

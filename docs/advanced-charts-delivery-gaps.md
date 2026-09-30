@@ -338,3 +338,10 @@
 - 新增export接口测试，不替换queue_history或stored_coverage，使用隔离SQLite业务表真实执行任务规划。
 - 一年M1连续两次导出请求均202，返回同一任务ID，数据库仅1条4000分钟任务；将该任务置为failed模拟上游失败后，第三次请求409并返回准确failed_task_ids，不继续创建更早窗口任务。
 - /tmp/mw-export-real-queue-tests.log：6 passed，ruff通过。此证据覆盖实际任务规划代码的重复轮询和失败边界；不替代远程行情worker及PostgreSQL并发验收。
+
+### 前端队列发送前取消过时历史请求
+
+- 请求等待四路桥接并发空位时，周期/品种/工作区可能已变化。drain现在发送前重新核对历史请求的工作区epoch与仍使用对应symbol/resolution的图表；过时请求返回HISTORY_CANCELLED，不发往后台创建补数任务。
+- historyQuery去重键包含workspaceEpoch，避免新工作区的相同查询复用待取消旧请求；同一工作区当前图表和比较指标的共享需求继续复用。
+- advanced-request-cancellation实际运行bridge队列，覆盖旧周期取消、新工作区相同查询重新发送和当前查询正常完成；history-dedup/pagination/reload相关专项全部通过。
+- /tmp/mw-rapid-high-current.log本轮未到达切换断言：NZD_USD的M5首次历史响应持续pending，data-ready等待超时。只读数据库观察到chart worker仍有有效租约的running任务；未据此重启或另起worker。该结果不作为高周期预算通过/失败证据，也不关闭最终周期继承旧预算问题。
