@@ -607,3 +607,9 @@
 - 新增advanced-layout-matrix.browser.cjs，读取供应商d.ts的MultipleChartsLayoutType，加单图共42种布局逐项setLayout，等待各图dataReady且宽度>0，检查1–8图，多图maximize/restore，最终8v原生保存刷新恢复；/tmp/mw-layout-matrix.log退出0，LAYOUT_MATRIX_PASSED 42，页面异常为空。
 - 此矩阵证明公开API布局切换和最大化链路，不证明全部菜单鼠标路径、拖动分隔线或每一种布局单独保存恢复。只最后8v在本轮执行保存刷新，既有其他布局证据另见对应专项。
 - Ubuntu无需sudo即可创建用户namespace，但没有Docker/Podman及newuidmap等rootless工具；当前仍无实际镜像运行证据。
+
+### 原生分隔线鼠标拖动
+
+- advanced-layout-resize.browser.cjs通过实际鼠标在原生分隔线拖动120px；2h两图时间轴宽度从均分改变为654/414，原生保存刷新后仍为654/414。/tmp/mw-resizer-restore-detail.log退出0，无页面异常。
+- 首轮立即手动保存返回原生错误对象；第二轮等待1500ms及保存/视区守卫空闲后成功。未修改产品代码，不将首轮错误宣称为已确定根因或已修复。
+- 已查看/tmp/mw-layout-resized.png，布局尺寸恢复正确；同时可见两图左右时间范围不同，需读取同步开关/实际视区进一步判定是否为同步缺口。已增加RESIZED_SYNC_STATE日志，尚未执行新增诊断分支。不据此宣布全部布局行为完成。
