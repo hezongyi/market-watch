@@ -1067,3 +1067,10 @@
 - 本机HTTPS三图（原生布局3s），BTCUSDT/XAUUSD/EURUSD均M5，以BTC为活动图、开启dateRangeSync，定位2026-09-26周六12:00–15:00 UTC。advanced-closed-window.browser.cjs保留诊断复现。
 - 连续两次实际运行：BTC范围1790424000–1790434800；黄金及EUR范围1790598600–1790624700，仍在周一。三个dataReady均true、rangeGuard与edgeGuard均非busy；浏览器出现message=undefined/空stack异常。不是加载锁死，但休市窗口同步未满足。
 - /tmp/mw-closed-window.log与/tmp/mw-closed-window.png为本机证据。已增加各图右边界对齐断言，测试当前应失败；尚未定位原生库与适配层各自影响，不能提前认定根因。不修改供应库，不操作Unraid。
+
+### 休市窗口根因隔离及局部修复
+
+- advanced-closed-window.browser.cjs新增MW_CLOSED_DIAG=1诊断：关闭额外edgeGuard及原生dateRange/timeSync后逐图调用公开setVisibleRange。BTC纯周末成功；XAU/EUR直接返回Invalid visible range；周五窗口三者成功；周五至周末窗口XAU/EUR被截至1790369700。/tmp/mw-closed-direct.log已实际退出0（诊断记录，不代表需求验收通过）。
+- MW_INACTIVITY_GAPS=1以浏览器route临时启用公开inactivity_gaps并打开各图inactivityGaps，结果相同，/tmp/mw-closed-gaps.log。未改生产配置及供应库；该选项不能解决当前纯休市窗口。
+- 发现edgeRangeSync把所有peer放在同一catch内，首个peer拒绝后后续peer不会执行。新增回归在修复前实际失败3700!==1000；逐peer捕获后advanced-edge-sync、advanced-viewports、advanced-range-sync三组均通过。提交627abf5。当前修复仅源代码，尚未构建到验收容器，不宣称纯周末同步已解决。
+- 仍需确定原生压缩休市时间轴下的合理呈现并消除undefined浏览器异常；现有精确边界验收保持未通过，不能靠放宽断言交付。

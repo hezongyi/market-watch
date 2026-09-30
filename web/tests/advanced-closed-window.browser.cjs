@@ -24,6 +24,11 @@ const assert = require("node:assert/strict");
       }),
     });
   });
+  if (process.env.MW_INACTIVITY_GAPS) await page.route('**/bridge.js', async route => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace('enabled_features: [', 'enabled_features: ["inactivity_gaps",');
+    await route.fulfill({response, body});
+  });
   await page.goto("https://localhost:15443/");
   await page
     .getByLabel("管理员密码")
@@ -80,6 +85,26 @@ const assert = require("node:assert/strict");
   });
   await frame.waitForFunction(()=>[0,1,2].every(i=>widget.chart(i).dataReady()));
   await frame.evaluate(()=>{widget.setActiveChart(0);widget.dateRangeSync().setValue(true);});
+  if (process.env.MW_CLOSED_DIAG) {
+    if(process.env.MW_INACTIVITY_GAPS) await frame.evaluate(()=>[0,1,2].forEach(i=>widget.chart(i).inactivityGaps().setValue(true)));
+    console.log('DIRECT_RANGE_DIAG', JSON.stringify(await frame.evaluate(async()=>{
+      edgeGuard.dispose();
+      widget.dateRangeSync().setValue(false);
+      widget.timeSync().setValue(false);
+      const results=[];
+      for(const target of [{from:1790424000,to:1790434800},{from:1790337600,to:1790348400},{from:1790337600,to:1790434800}]) {
+        for(const index of [0,1,2]) {
+          const chart=widget.chart(index);
+          try {await chart.setVisibleRange(target,{rejectByTimeout:10000});results.push({index,target,range:chart.getVisibleRange(),ok:true});}
+          catch(e){results.push({index,target,range:chart.getVisibleRange(),error:String(e)});}
+        }
+      }
+      return results;
+    })));
+    console.log('DIAG_ERRORS',JSON.stringify(errors));
+    await browser.close();
+    return;
+  }
   const outcome=await frame.evaluate(async()=>{
     const target={from:1790424000,to:1790434800};
     try {await widget.chart(0).setVisibleRange(target,{rejectByTimeout:10000});return {target,ok:true};}
