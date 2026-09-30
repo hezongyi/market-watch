@@ -125,6 +125,50 @@ const assert = require("node:assert/strict");
     );
     assert.equal(actual, Number(Number(bar[field]).toFixed(2)), label);
   }
+  for (const timezone of ["Etc/UTC", "Asia/Singapore", "America/New_York"]) {
+    await frame.evaluate(
+      (zone) => widget.activeChart().getTimezoneApi().setTimezone(zone),
+      timezone,
+    );
+    await page.mouse.move(
+      box.x + box.width * 0.55 + 2,
+      box.y + box.height * 0.45,
+    );
+    await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.45);
+    await page.waitForTimeout(300);
+    assert.equal(await frame.evaluate(() => window.selectedBarTime), selected);
+    const displayed = (await ui.locator("body").innerText())
+      .split("\n")
+      .map((s) => s.trim());
+    for (const [label, field] of [
+      ["开盘价", "open"],
+      ["最高价", "high"],
+      ["最低价", "low"],
+      ["收盘价", "close"],
+    ]) {
+      const value = Number(
+        displayed[displayed.lastIndexOf(label) + 1]
+          .replaceAll(",", "")
+          .replaceAll("−", "-"),
+      );
+      assert.equal(
+        value,
+        Number(Number(bar[field]).toFixed(2)),
+        timezone + " " + label,
+      );
+    }
+    const expectedTime = new Intl.DateTimeFormat("en-GB", {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date(selected * 1000));
+    assert.equal(
+      displayed[displayed.lastIndexOf("时间") + 1],
+      expectedTime,
+      timezone,
+    );
+  }
   assert.deepEqual(errors, []);
   console.log("DATA_WINDOW_OHLC_VISIBLE", {
     selected,

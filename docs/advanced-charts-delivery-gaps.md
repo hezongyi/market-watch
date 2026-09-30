@@ -790,3 +790,9 @@
 
 - advanced-native-study-template.browser.cjs扩展原生模板菜单：悬停MA(21)模板并点击remove-button，服务器study偏好记录消失；当前图表中已应用的MA(21)仍保留，输入参数完整一致。
 - /tmp/mw-study-delete-final.log退出0，errors=[]。与绘图模板一样，供应库对该删除操作不弹二次确认；测试不假设不存在的确认按钮。
+
+### 显示时区与OHLC不变性
+
+- 数据窗口专项在同一根真实XAUUSD H4上切换Etc/UTC、Asia/Singapore、America/New_York，鼠标回到相同位置后十字线时间戳完全相同，四个OHLC显示值均继续与后台bar一致。
+- 数据窗口“时间”逐一对照Intl.DateTimeFormat按选中时间戳及目标时区生成的HH:mm；三个时区均一致。/tmp/mw-timezone-ohlc.log退出0，errors=[]。
+- 该证据证明此日内样例的显示时区转换不改价格/时间戳，不替代D/W/M交易日标签及夏令时边界专项。
