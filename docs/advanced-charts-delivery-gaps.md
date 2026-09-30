@@ -743,3 +743,8 @@
 - 原生header扩展“使用说明”，通过公开showNoticeDialog展示：顶部保存样式及同名覆盖、原生设置模板应用/删除、原生保存为缺件；CSV包含行情/Python但不含内置指标；手机只读、M1报价口径及未接入的额外服务。保留原生入口，不注入供应库DOM。
 - Ubuntu静态镜像acceptance-help构建运行，advanced-container-https.browser.cjs真实点击说明入口并断言两项缺件/替代文案，关闭后M15切换及原生保存正常；/tmp/mw-help-browser.log退出0，errors=[]。
 - 说明入口解决可见替代指引，不宣称拦截无公开接口的原生点击或修复缺失组件。
+
+### 价格轴模式与显示时区保存恢复
+
+- 新增advanced-display-settings.browser.cjs：通过公开价格轴API依次切换普通/对数/百分比/指数100，逐次读取模式一致；设置Asia/Singapore显示时区、对数及反转轴，经原生保存工作区并刷新，三项设置完整恢复，品种XAUUSD、周期240不变。
+- /tmp/mw-display-settings.log退出0，errors=[]。此轮为公开API和持久化行为验收，不等同原生菜单鼠标操作、不同品种全部组合或后台OHLC数值对照；后台分桶不变仍需在数据对照中证明。
