@@ -1,0 +1,37 @@
+{
+  "version": "1.2.0",
+  "scope": "Ubuntu local acceptance only; not deployed to Unraid",
+  "source_commit": "3602f27b8ca68f0bb4029b0cac6cea6c43ce9254",
+  "compose": "compose.acceptance.yaml",
+  "chart_origin": "https://127.0.0.1:15444",
+  "images": {
+    "api": {
+      "tag": "market-watch-api:1.2.0-local",
+      "id": "sha256:3e62a46ae60b73018b3cb2608a4c592ecf5478c56f282242c07c90073285b638"
+    },
+    "web": {
+      "tag": "market-watch-web:1.2.0-local",
+      "id": "sha256:a082e4e1fc5825459c9aee5da16a98975d3710cc76e85a6446e22aa9b261bfa2"
+    },
+    "chart-origin": {
+      "tag": "market-watch-chart-origin:1.2.0-local",
+      "id": "sha256:ac7209a693abab69456d2795c04c017e8d1b8db7c6c720cf08b3422883ee4753"
+    },
+    "tls": {
+      "tag": "nginx:1.28-alpine",
+      "id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592"
+    }
+  },
+  "worker_uses": "api",
+  "rollback": {
+    "api": "market-watch-api:acceptance-closed-session",
+    "web": "market-watch-web:acceptance-closed-session",
+    "chart-origin": "market-watch-chart-origin:acceptance-visible-entries"
+  },
+  "notes": [
+    "No database migration since the final tested acceptance baseline.",
+    "Web/chart Docker builds produced identical static image IDs to the final tested candidates.",
+    "Runtime credentials and licensed vendor artifacts are not included in this manifest.",
+    "Local web image has a loopback chart origin; rebuild with production chart origin before any future production deployment."
+  ]
+}

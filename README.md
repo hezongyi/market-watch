@@ -4,7 +4,7 @@
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。
 
-本轮源码目录：`/home/quant/repos/market-watch-advanced`；原目录`/home/quant/repos/market-watch`保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。v1.0.1为本地改名版本，尚未部署；生产仍使用v1.0.0对应镜像。
+本轮源码目录：`/home/quant/repos/market-watch-advanced`；原目录`/home/quant/repos/market-watch`保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。本轮v1.2.0仅本地交付，生产仍按既有发布清单运行；[本地交付及回退说明](docs/advanced-charts-v1.2.0-delivery.md)。
 
 ## 当前实例
 

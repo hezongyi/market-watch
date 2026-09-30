@@ -1136,3 +1136,10 @@
 
 - 显示设置扩展验收/tmp/mw-release-display.log退出0：背景色、横/竖网格色、14px字体和文字色、蜡烛涨色、showSeriesOHLC=false均在保存刷新后逐值相同；原生UI无开=/高=/低=/收=图例，截图已目视。原有对数/反转/Asia-Singapore恢复同时通过。曾尝试文档示例showLegend只存储不改变主图图例，测试已改用类型声明的明确showSeriesOHLC并检查真实UI，不把未知字段持久化算显示验收。
 - 当前功能核对表的未闭合交互项已补齐；剩余为本地版本、镜像清单、回退及交付文档，尚未打最终标签。
+
+### v1.2.0本地交付收口
+
+- 构建源码3602f27，三个1.2.0-local镜像构建成功；API包metadata=1.2.0。网页/图表构建内容与最终候选一致，所以Docker内容ID相同，未冒称额外功能差异。清单deploy/releases/v1.2.0-local.json记录实际ID。
+- 当前四应用容器运行1.2.0-local；最终HTTPS浏览器检查退出0、errors=[]、credentialsSentToChart=0，日志已归档container.txt。镜像ID及运行容器market_data.py/bridge.js/viewports.js SHA256均与清单及本地源码一致。
+- 本地交付说明、非秘密镜像选择env、版本号、CHANGELOG及当前验收清单已完成；历史状态文档明确分界。回退基线仍保留，版本整理未增加数据库迁移。
+- 交付范围是Ubuntu本机的独立模块及源码/镜像；没有切换Unraid、改生产数据库或推送远端。功能边界在使用说明和交付说明中列明，非逐项供应商算法审计。
