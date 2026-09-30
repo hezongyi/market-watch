@@ -66,13 +66,27 @@ function progressiveHistory(read, needed, changed, onError, maxEntries = 64) {
             const signature = fingerprint(page);
             const differs = signature !== entry.signature;
             Object.assign(entry,{page,at:Date.now()});
-            if (!differs || await changed(entry.args) !== false) entry.signature = signature;
+            if (!differs || await changed(entry.args,JSON.parse(entry.signature),JSON.parse(signature)) !== false)
+              entry.signature = signature;
           } catch(error) { if (!disposed && needed(entry.args)) onError(error); }
         }
       } finally { polling=false; }
     },
     dispose() {disposed=true;pages.clear();},
   };
+}
+
+function historyChangeIntersects(before, after, range) {
+  if (!before.length || !(range?.to > range?.from)) return true;
+  const previous = new Map(before.map(bar=>[bar.start,bar]));
+  const current = new Map(after.map(bar=>[bar.start,bar]));
+  for (const start of new Set([...previous.keys(),...current.keys()])) {
+    const a=previous.get(start), b=current.get(start);
+    if (JSON.stringify(a)===JSON.stringify(b)) continue;
+    const row=b||a;
+    if (row.start <= range.to*1000 && (row.end ?? row.start+1)>range.from*1000) return true;
+  }
+  return false;
 }
 
 // Synthetic studies share the raw observation boundary. Indicator calculation

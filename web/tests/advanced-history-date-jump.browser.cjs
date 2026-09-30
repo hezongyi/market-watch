@@ -115,12 +115,55 @@ const fs = require("fs");
     { symbol, resolution },
   );
   console.log("HISTORY_CASE", JSON.stringify({ symbol, resolution }));
+  if(process.env.MARKET_WATCH_TRACE_JUMP==='1') {
+    page.on('console',m=>{if(m.text().startsWith('JUMP_TRACE'))console.log(m.text());});
+    page.on('request',r=>{
+      if(r.url().endsWith('/market-data/history/demand'))console.log('JUMP_DEMAND',JSON.stringify(r.postDataJSON()));
+    });
+    await frame.evaluate(()=>{
+      widget.activeChart().onVisibleRangeChanged().subscribe(null,range=>
+        console.log('JUMP_TRACE visible',JSON.stringify(range)));
+      const originalRefresh=refreshChartHistory;
+      refreshChartHistory=async(...args)=>{
+        console.log('JUMP_TRACE refresh-before',JSON.stringify(captureChartViewports(widget)));
+        let result;
+        try {result=await originalRefresh(...args);} catch(e){console.log('JUMP_TRACE refresh-error',e.stack||String(e));throw e;}
+        console.log('JUMP_TRACE refresh-after',JSON.stringify({result,views:captureChartViewports(widget)}));
+        return result;
+      };
+      const original=feed.getBars;
+      feed.getBars=(s,r,p,cb,err)=>{
+        console.log('JUMP_TRACE request',JSON.stringify({ticker:s.ticker,r,p}));
+        return original(s,r,p,(bars,meta)=>{
+          console.log('JUMP_TRACE response',JSON.stringify({r,p,count:bars.length,first:bars[0]?.time,last:bars.at(-1)?.time,meta}));
+          cb(bars,meta);
+        },err);
+      };
+    });
+  }
+
   for (const key of Object.keys(historyMetrics)) historyMetrics[key] = 0;
   const started = Date.now();
   const target = {
     from: Date.parse("2026-08-12T08:00:00Z") / 1000,
     to: Date.parse("2026-08-12T14:00:00Z") / 1000,
   };
+  if(process.env.MARKET_WATCH_NAVIGATION_PROBE==='1') {
+    await frame.evaluate(target=>{
+      clearInterval(progressivePoll);
+      const original=feed.getBars;
+      feed.getBars=(symbol,res,p,callback,error)=>{
+        if(res==='1' && !p.firstDataRequest && p.from<=target.from && p.to>target.to) {
+          const bars=Array.from({length:720},(_,i)=>({
+            time:(target.from+i*60)*1000,open:1.1,high:1.1002,low:1.0998,close:1.1001,
+          })).filter(bar=>bar.time<p.to*1000);
+          setTimeout(()=>callback(bars,{noData:false}),1000);
+          return;
+        }
+        return original(symbol,res,p,callback,error);
+      };
+    },target);
+  }
   const timeout = Number(process.env.MARKET_WATCH_HISTORY_TIMEOUT_MS || 60000);
   console.log("JUMP_BUDGET_MS", timeout);
   await frame.evaluate(

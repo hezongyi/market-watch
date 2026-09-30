@@ -272,3 +272,42 @@ def test_plan_waits_for_aggregation_and_retry_resets_backoff(database, monkeypat
         db.flush()
         assert not advance_plan(db, plan, end)
         assert plan.status == 'complete'
+
+
+def test_forward_navigation_window_respects_weekend_and_dst(database):
+    from alerts.chart_history_plan import history_end
+    with database.begin() as db:
+        inst = db.get(Instrument, 'XAUUSD')
+        start = ms(datetime(2026, 3, 5, 22, tzinfo=UTC))
+        assert history_end(inst, 'D1', start, 2) == ms(datetime(2026, 3, 9, 21, tzinfo=UTC))
+        end = history_end(inst, 'M1', start, 600)
+        # Gold's NY17 daily maintenance hour is excluded from minute counts.
+        assert history_start(inst, 'M1', end, 600) == start + 3600000
+
+
+def test_navigation_demand_prioritizes_target_window(database):
+    from alerts import api as api_module
+    from alerts.chart_history_plan import priority_regions
+    from fastapi.testclient import TestClient
+    anchor = ms(datetime(2026, 8, 12, 8, tzinfo=UTC))
+    with database.begin() as db:
+        db.get(Instrument, 'EURUSD').source = 'oanda'
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+    try:
+        with TestClient(api_module.app) as client:
+            response = client.post('/api/market-data/history/demand', json={
+                'id': 'historical-navigation', 'instrument': 'EURUSD', 'timeframe': 'M1',
+                'end': anchor+40*86400000, 'anchor_start': anchor,
+                'visible': 200, 'focused': True,
+            })
+            assert response.status_code == 200
+            page = response.json()
+            assert page['window_start'] == anchor
+            assert page['window_end'] == anchor+600*60000
+            with database.begin() as db:
+                plan = db.get(ChartHistoryPlan, 'EURUSD')
+                assert plan.target_start <= anchor
+                regions = priority_regions(db, plan, 0)
+                assert regions[0] == (anchor, anchor+600*60000, 100)
+    finally:
+        api_module.app.dependency_overrides.clear()

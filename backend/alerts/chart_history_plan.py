@@ -54,6 +54,25 @@ def history_start(inst, timeframe, end, count):
     raise ValueError("No sufficient scheduled trading history")
 
 
+def history_end(inst, timeframe, start, count):
+    """Forward counterpart for bounded pages near a historical navigation target."""
+    if timeframe not in FRAMES or not 1 <= count <= 2000:
+        raise ValueError("Unsupported navigation window")
+    calendar = Calendar(inst.calendar)
+    closures = closures_from(inst.calendar_profile)
+    cursor = instant(start)
+    for _ in range(count * 16 + 10000):
+        left, right = (bounds(cursor, timeframe, calendar) if timeframe == "M30"
+                       else bucket_bounds(cursor, timeframe, calendar))
+        if bucket_has_trading(max(left, cursor), right, calendar,
+                              gold=inst.id == "XAUUSD", closures=closures):
+            count -= 1
+        cursor = right
+        if count == 0:
+            return ms(right)
+    raise ValueError("No sufficient scheduled trading history")
+
+
 def update_demand(db, *, ident, instrument, timeframe, end, visible, focused, now, required=None):
     if timeframe not in FRAMES or not 1 <= visible <= 2000:
         raise ValueError("Invalid viewport demand")

@@ -49,7 +49,19 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
         continue;
       if (state.offset < 0) {
         // Historical positions need actual dates; the latest data can advance between visits.
-        await chart.setVisibleRange(state.range, { rejectByTimeout: 30000 });
+        chart.getTimeScale().setRightOffset(0);
+        // resetData can emit data-ready before the native series metadata is
+        // reattached. Retry only that observed transient public-API failure.
+        for (let attempt=0;;attempt++) {
+          if (!isCurrent()) return;
+          try {
+            await chart.setVisibleRange(state.range, { rejectByTimeout: 30000 });
+            break;
+          } catch(error) {
+            if (error?.message !== 'Value is null' || attempt >= 20) throw error;
+            await new Promise(resolve=>setTimeout(resolve,100));
+          }
+        }
       } else {
         // Native save stores the default margin. Restore the actual margin without changing preferences.
         const scale = chart.getTimeScale();
@@ -212,6 +224,11 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
   const selected = state.map((value, i) => i === index ? value : null);
   let loaded, timeout, interacted = false;
   const interaction = () => { interacted = true; };
+  const wheelDocuments = typeof document === 'undefined' ? [] : [document,
+    ...Array.from(document.querySelectorAll('iframe'), frame => {
+      try { return frame.contentDocument; } catch { return null; }
+    }).filter(Boolean)];
+  for (const target of wheelDocuments) target.addEventListener('wheel', interaction, {capture:true,passive:true});
   widget.subscribe("mouse_down", interaction);
   widget.subscribe("activeChartChanged", interaction);
   widget.subscribe("layout_about_to_be_changed", interaction);
@@ -229,12 +246,12 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
     // Native scale geometry settles on the render cycle after data dispatch.
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     if (!current()) return false;
-    // Wheel zoom changes spacing without mouse_down. Native history insertion
-    // retains spacing; a changed spacing belongs to a newer user intention.
-    if (chart.getTimeScale().barSpacing() !== state[index].spacing) return false;
+    // Native reload can change spacing itself. Only actual user interaction
+    // supersedes restoration; a numeric spacing difference is not evidence of it.
     await restoreChartViewports(widget, selected, current);
     return current();
   } finally {
+    for (const target of wheelDocuments) target.removeEventListener('wheel', interaction, true);
     widget.unsubscribe("mouse_down", interaction);
     widget.unsubscribe("activeChartChanged", interaction);
     widget.unsubscribe("layout_about_to_be_changed", interaction);

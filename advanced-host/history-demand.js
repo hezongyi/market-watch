@@ -1,4 +1,23 @@
 /* Viewport intent is independent of getBars' native paging/countBack requests. */
+async function historicalNavigationPage(submit, read, checkActive, progress,
+  pause = () => new Promise(resolve => setTimeout(resolve, 2000)), clock = () => Date.now()) {
+  let window, renewed = -Infinity;
+  for (;;) {
+    checkActive();
+    if (!window || clock() - renewed >= 15000) {
+      window = await submit();
+      renewed = clock();
+      checkActive();
+    }
+    if (window.status === 'cancelled') throw Error('历史补数计划已取消');
+    const page = await read(window.window_end);
+    checkActive();
+    if (page.bars.length && page.bars[0].start <= window.window_start) return page;
+    progress(page.bars.length);
+    await pause();
+  }
+}
+
 function chartDemandReporter(widget, client, submit, onError, clock = () => Date.now()) {
   const sent = new Map();
   const inFlight = new Set();

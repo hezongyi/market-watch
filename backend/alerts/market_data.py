@@ -157,6 +157,7 @@ class ViewportDemandQuery(BaseModel):
     visible: int = Field(ge=1, le=2000)
     focused: bool = True
     required: int | None = Field(default=None, ge=1, le=6000)
+    anchor_start: int | None = Field(default=None, gt=0)
 
 
 class ViewportQuery(BaseModel):
@@ -637,19 +638,28 @@ def router(authenticated):
 
     @r.post("/history/demand")
     def viewport_demand(body: ViewportDemandQuery):
-        from .chart_history_plan import update_demand
+        from .chart_history_plan import history_end, history_start, update_demand
 
         now = now_ms()
         with transaction() as db:
-            resolve(db, body.instrument)
+            inst = resolve(db, body.instrument)
             try:
+                end = body.end
+                required = body.required
+                if body.anchor_start is not None:
+                    if body.anchor_start >= body.end:
+                        raise ValueError("Invalid historical navigation interval")
+                    required = min(2000, body.visible * 3)
+                    end = min(end, history_end(inst, body.timeframe, body.anchor_start, required))
+                end = min(end, (now - 5000) // 60000 * 60000)
                 plan = update_demand(db, ident=body.id, instrument=body.instrument,
-                    timeframe=body.timeframe, end=min(body.end, (now - 5000) // 60000 * 60000),
-                    visible=body.visible, focused=body.focused, now=now, required=body.required)
+                    timeframe=body.timeframe, end=end,
+                    visible=body.visible, focused=body.focused, now=now, required=required)
             except ValueError as error:
                 raise HTTPException(422, str(error)) from error
             return {"target_start": plan.target_start, "target_end": plan.target_end,
-                    "status": plan.status}
+                    "status": plan.status, "window_end": end,
+                    "window_start": history_start(inst, body.timeframe, end, required or body.visible)}
 
     @r.post("/history/cache")
     def cached_history(body: HistoryQuery):

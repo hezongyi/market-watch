@@ -1,0 +1,12 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const context=vm.createContext({});
+vm.runInContext(fs.readFileSync('../advanced-host/progressive-history.js','utf8'),context);
+const intersects=context.historyChangeIntersects;
+const old=[{start:10000,end:20000,close:1}];
+const changed=[{start:10000,end:20000,close:2}];
+assert.equal(intersects(old,changed,{from:1,to:5}),false);
+assert.equal(intersects(old,changed,{from:12,to:15}),true);
+assert.equal(intersects(old,[],{from:12,to:15}),true);
+assert.equal(intersects([],changed,{from:1,to:5}),true,'empty chart must acquire its first data');
+assert.equal(intersects(old,old,{from:12,to:15}),false);
+console.log('Historical views ignore remote latest revisions; visible revisions and initial data still refresh');

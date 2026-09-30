@@ -429,3 +429,60 @@
 
 - /tmp/mw-history-jump-shared-reset.log真实EURUSD M1请求2026-08-12 08:00–14:00 UTC，setVisibleRange约155ms返回，但20秒后range变为1790781960–1790782020，未保留目标日期。pending/failed均为空不能证明历史目标满足，右边界断言失败。
 - 需定位原生历史getBars需求是否进入持久化计划、空页边界与视区回退后的意图保存；当前仅视区上报可能丢失未加载日期。此项未解决，仍未交付。
+
+### 历史跳转根因追踪
+
+- /tmp/mw-history-jump-trace.log与/tmp/mw-history-jump-visible-trace.log重复复现：native getBars(from=1786521600,to≈1790787180,countBack≈50781,firstDataRequest=false)，适配层仅返回近期连续87根并noData=true。
+- 原始from是2026-08-12目标，to是已加载近期数据左边界；countBack是跨越历史间隔所需数量，不能当作指标回看窗口。当前indicatorHistoryNeeds误将其提升至6000，而实际historyDemand.end仍为近期。
+- onVisibleRangeChanged没有先发出目标日期，只在getBars回调后报告已回退的近期区间。因此仅靠该事件保存目标不足，必须在历史getBars入口处理原始意图；不能用猜测目标右边界强行恢复。
+- 后续修复需保留原生未完成历史导航请求，优先准备目标from附近可用数据并异步完成回调；可切换周期取消旧导航，不能把暂缺页声明为上游历史耗尽，也不能强制下载整个五万根M1间隔后才允许交互。需要通过原生测试验证少量目标数据可完成其原始导航，再连接持久化计划。
+
+### 目标附近有限历史页原生可行性与接入候选
+
+- /tmp/mw-jump-target-window.log：仅浏览器getBars替换目标附近720根M1（1秒延迟、noData=false），原生远距离setVisibleRange约1067ms完成，20秒后精确保留1786521600–1786543200；无需先提供中间约5万根M1。该可行性测试不是实际行情验收。
+- 候选新增history_end按现有日历正向计算目标附近有限窗口；history/demand可携带anchor_start，返回window_start/window_end，与现有持久化计划合并。getBars远距离/缺页导航按实际视图三倍（最多1998根）请求目标附近，保留原生异步回调至窗口可用；每15秒续需求，2秒读取，无阻塞遮罩。周期离开用既有checkActive取消等待。
+- 历史分页countBack不再加入indicatorHistoryNeeds；首屏及Python指标自身需求仍保留。新增前端导航窗口与取消测试通过，原viewport demand测试通过；后端黄金NY17维护小时与DST正向窗口测试通过后再部署。
+- 仍需处理长期失败/同周期新导航取代旧导航、真实响应与稀疏交易边界、实际跳转及拖动回归。候选未部署，未宣告历史跳转修复完成。
+
+### 真实导航候选部署与自动刷新回退
+
+- navigation-local API及chart、三个worker已部署Ubuntu。完整隔离数据库后端测试214 passed（/tmp/mw-navigation-backend.log）。
+- /tmp/mw-navigation-real.log：真实目标页561根已返回，首次跳转566ms，原始6小时视区准确；随后progressive resetData按当前时间重新加载，返回近期短页noData=true，导致目标丢失。
+- 尝试所有非空短页noData=false使新工作区首屏触发连续历史等待，实测未进入正式跳转阶段，已主动停止该探针并撤回该尝试，不能以此牺牲首屏交互。
+- 新候选在公开刷新调用期间记录被刷新的历史视区，firstDataRequest按原历史右边界读取，finally清理标记；正常首屏仍保留原渐进短页行为。已部署并启动/tmp/mw-navigation-preserve-range.log真实跳转复验，结果待核验。
+
+### 历史刷新入口尚未统一
+
+- /tmp/mw-navigation-wheel-guard.log及/tmp/mw-navigation-visible-only.log均未通过历史视区保持。实际滚轮事件替代柱距数值判断有独立测试支撑，但不是本次回退唯一根因。
+- 新historyChangeIntersects候选使不在视区内的变化不触发渐进reset，空数据首批仍刷新；相应测试及progressive cache测试通过。最新空页例外为本地新增，尚未打入navigation-local镜像。
+- 检查发现tick历史revision/布局恢复路径仍调用reloadHistory，直接chart.resetData()且不保存视区，绕过refreshChartHistory。需要统一所有历史重载入口，再复验，不继续只在progressive回调局部修补。当前真实日期跳转尚未验收通过。
+
+### 所有历史重载串行化候选
+
+- reloadHistory改为异步公共入口，实时revision、隐藏窗格恢复、旧pending计划和progressive均经过refreshChartHistory；同批共享缓存仅失效一次，全局串行防止两个通道交叠。未成功恢复保留needsHistoryReload/paused状态，下轮重试，避免吞掉修订。
+- /tmp/mw-navigation-unified.log仅统一入口仍失败，目标626ms首次成功但20秒后回退。新候选同时在历史重载期间传递原视区右边界、提供三倍首屏，恢复前将原生旧rightOffset归零再应用绝对日期范围。此修改需要实际浏览器证明，不能由单元测试推定正确。
+- viewports/refresh-interaction/navigation-page/history-change-range/progressive-cache测试通过。新本机实际浏览器日志/tmp/mw-navigation-offset.log运行中。
+
+### 原生重载偏移继续核验
+
+- /tmp/mw-navigation-offset.log旧日期在恢复调用后短暂正确，随后实时新bar将范围伸展至最新。历史首屏重载仅返回旧页会改变原生序列尾部，不宜用此方式代替日期导航。
+- 撤回刷新时强制旧页before覆盖，改仅在恢复上下文允许原生继续请求短页之后历史，候选已部署；/tmp/mw-navigation-native-range.log仍失败，不能宣告修复。
+- 新追踪/tmp/mw-navigation-state-trace.log记录公开captureChartViewports在每次refresh前后状态及返回值，核实历史视区的offset是否确为负数。此处需从状态证据定位，避免继续把日期与原生相对偏移混为一谈。
+
+### 历史边界回退与实时乱序修复候选
+
+- 状态追踪确认刷新前历史视区offset=-386，先前“偏移可能非负”假设被证据否定。/tmp/mw-navigation-state-trace.log另抓到实时putToCacheNewBar时间逆序：历史getBars覆盖lastHistory，旧bar再次推入已含更新bar的native缓存。
+- progressive历史边界改为lastHistory取max、firstHistory取min；tick推送前与最近已返回history尾部对齐，避免重载后的旧订阅last落后。advanced-history-boundaries.cjs真实feed.getBars路径验证最新→旧页→更新页仍保留两端边界。
+- /tmp/mw-navigation-order.log无time violation，但refresh-error明确Value is null，历史保持仍失败。正在/tmp/mw-navigation-restore-stack.log记录恢复接口准确调用栈，尚未宣布修复。
+
+### 历史日期导航与刷新保持真实通过
+
+- /tmp/mw-navigation-restore-stack.log明确setVisibleRange→native setVisibleTimeRange读取series interval/symbol info时Value is null；dataReady并不保证这些元数据已挂回。现恢复只针对该错误最多20次100ms重试，每次检查当前意图；其他异常直接失败。
+- /tmp/mw-navigation-retry.log真实EURUSD M1目标2026-08-12 08:00–14:00，首次564ms；至少两次refresh前后都精确保留1786521600–1786543200；20秒最终断言通过、退出0，无pending/failed。此为已有目标数据的真实恢复验证，不是新冷日期下载计时。
+- viewports新增两次瞬态失败后成功的公开接口模拟断言，通过；刷新交互测试、历史时间边界等已有测试均通过。周期切换性能回归/tmp/mw-switch-navigation.log正在运行，之后仍需八图/真实冷日期及取消验收。
+
+### 导航候选性能与目标优先接口回归
+
+- /tmp/mw-switch-navigation.log两轮14次M1–D1切换退出0，第二轮两帧绘制机会22.4–34.7ms，首轮25.1–63.2ms；柱距始终6。只是已有缓存单图指标。
+- 新增真实FastAPI history/demand回归：40天跨度anchor请求只将目标附近600根M1列为priority100首屏，持久化总目标仍保留。chart_history_plan共15项通过，ruff及diff检查通过。
+- 新版本原始八图实时回归/tmp/mw-eight-navigation.log运行中。候选待验收仍包括冷日期下载、同周期新导航替代旧导航、失败退出/重试、手机与其他范围审计。

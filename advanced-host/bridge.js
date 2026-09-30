@@ -34,6 +34,7 @@ const subscriptions = new Map();
 const quoteSubscriptions = new Map();
 const lastHistory = new Map();
 const firstHistory = new Map();
+const refreshingHistoryRanges = new Map();
 const pendingHistory = new Map();
 const indicatorHistoryNeeds = new Map();
 const failedHistory = new Map();
@@ -300,7 +301,8 @@ const feed = {
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
       const historyKey=decode(s.ticker).symbol+"|"+res;
-      indicatorHistoryNeeds.set(historyKey, Math.max(indicatorHistoryNeeds.get(historyKey)||0,requested));
+      if (p.firstDataRequest || decode(s.ticker).spec)
+        indicatorHistoryNeeds.set(historyKey, Math.max(indicatorHistoryNeeds.get(historyKey)||0,requested));
       if (indicatorHistoryNeeds.size>64) indicatorHistoryNeeds.delete(indicatorHistoryNeeds.keys().next().value);
       const epoch = workspaceEpoch;
       const completeTerminal = rangeGuard?.captureTerminalCompletion(
@@ -326,8 +328,29 @@ const feed = {
         const args = {instrument:symbol,timeframe:frames[res],
           before:p.firstDataRequest && p.to*1000 >= Date.now()-120000
             ? null : p.to*1000+(res === "1D" ? 2*86400000 : 0),limit:Math.min(2000,requested)};
-        const rawPage = await progressivePages.get(args);
+        const restoreRange=refreshingHistoryRanges.get(historyKey);
+        let navigated = false;
+        let rawPage = await progressivePages.get(args);
         checkActive();
+        if (!p.firstDataRequest && Number.isFinite(p.from) && p.from > 0 && p.from < p.to &&
+            (requested > 2000 || rawPage.bars.length < args.limit)) {
+          const chart = widget.activeChart(), scale = chart.getTimeScale();
+          const visible = Math.min(666, Math.max(1, Math.ceil(scale.width()/scale.barSpacing())));
+          const demand = {id:crypto.randomUUID(),instrument:symbol,timeframe:frames[res],
+            end:p.to*1000,anchor_start:p.from*1000,visible,focused:true};
+          rawPage = await historicalNavigationPage(
+            () => request({op:'historyDemand',args:demand},'market',()=>hasHistoryViewer(args)),
+            before => {
+              args.before = before;
+              args.limit = Math.min(2000,visible*3);
+              return request({op:'historyCache',args},'market',()=>hasHistoryViewer(args));
+            },
+            checkActive,
+            count => send({type:'history-progress',key:symbol+'|'+res,
+              text:`${symbol} ${frames[res]} · 正在准备目标日期附近数据，已有 ${count} 根`}));
+          checkActive();
+          navigated = true;
+        }
         const page = decode(s.ticker).spec
           ? await progressiveIndicatorPage(rawPage, () => query(s.ticker,res,
               {...(args.before == null ? {} : {before:args.before}),limit:args.limit}))
@@ -335,12 +358,13 @@ const feed = {
         checkActive();
         const bars = barsOf(page,res,s.ticker).filter(bar=>bar.time < p.to*1000);
         if (bars.length) {
-          lastHistory.set(s.ticker+"|"+res,bars.at(-1).time);
-          firstHistory.set(s.ticker+"|"+res,page.bars[0].start);
+          const key=s.ticker+'|'+res;
+          lastHistory.set(key,Math.max(lastHistory.get(key)||0,bars.at(-1).time));
+          firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,page.bars[0].start));
         }
         // Short local history is a temporary dataset boundary. A subsequent
         // revision invalidates this native cache and restores the viewport.
-        cb(bars,{noData:bars.length < args.limit});
+        cb(bars,{noData:!navigated && !restoreRange && bars.length < args.limit});
         if (!bars.length) finishTerminal();
         send({type:"history-progress",key:symbol+"|"+res,text:bars.length < args.limit
           ? `${symbol} ${frames[res]} · 已显示 ${bars.length} 根，历史后台准备中`
@@ -516,15 +540,36 @@ function hasHistoryViewer(args) {
   }
   return false;
 }
-function reloadHistory(symbol, res) {
-  for (const sub of subscriptions.values()) {
-    if (decode(sub.symbol).symbol === symbol && sub.res === res) sub.reset();
-  }
-  if (!ready) return;
-  for (let i = 0; i < widget.chartsCount(); i++) {
-    const chart = widget.chart(i);
-    if (chartUsesSymbol(chart, symbol, res)) chart.resetData();
-  }
+let historyReloading = false;
+async function reloadHistory(symbol, res, relevant = () => true) {
+  if (!ready || loading || historyReloading || rangeGuard?.busy() || edgeGuard?.busy()) return false;
+  historyReloading = true;
+  const epoch = workspaceEpoch;
+  let invalidated = false;
+  try {
+    for (let i=0;i<widget.chartsCount();i++) {
+      const chart=widget.chart(i);
+      if (!chartUsesSymbol(chart,symbol,res) || !relevant(chart)) continue;
+      const rangeKey=symbol+'|'+res;
+      if (chart.getTimeScale().rightOffset()<0)
+        refreshingHistoryRanges.set(rangeKey,chart.getVisibleRange());
+      let restored;
+      try { restored=await refreshChartHistory(widget,chart,()=>{
+        if (invalidated) return;
+        invalidated=true;
+        let notified=false;
+        for (const sub of subscriptions.values()) {
+          if (decode(sub.symbol).symbol===symbol && sub.res===res) {
+            sub.reset();notified=true;
+          }
+        }
+        if (!notified) widget.resetCache();
+      },()=>epoch===workspaceEpoch && chartUsesSymbol(chart,symbol,res));
+      } finally { refreshingHistoryRanges.delete(rangeKey); }
+      if (!restored) return false;
+    }
+    return true;
+  } finally { historyReloading=false; }
 }
 async function tick() {
   if (polling) return;
@@ -586,11 +631,10 @@ async function tick() {
         continue;
       }
       if (state.status === "ready" || state.status === "empty_interval") {
-        pendingHistory.delete(key);
         const res = Object.keys(frames).find(
           (value) => frames[value] === args.timeframe,
         );
-        if (res) reloadHistory(args.instrument, res);
+        if (!res || await reloadHistory(args.instrument, res)) pendingHistory.delete(key);
       }
     }
     const groups = new Map();
@@ -607,9 +651,9 @@ async function tick() {
         continue;
       }
       if (group.some((sub) => sub.pausedForLayout)) {
-        for (const sub of group) sub.pausedForLayout = false;
         // Refill bars missed while the native pane retained a hidden subscription.
-        reloadHistory(symbol, first.res);
+        if (await reloadHistory(symbol, first.res))
+          for (const sub of group) sub.pausedForLayout = false;
         continue;
       }
       try {
@@ -630,7 +674,7 @@ async function tick() {
         });
         const bars = barsOf(result, first.res, first.symbol);
         const check = result.history_check;
-        let needsReload = false;
+        let needsReload = group.some(sub=>sub.needsHistoryReload);
         for (const sub of group) {
           const changed =
             check &&
@@ -645,16 +689,19 @@ async function tick() {
           }
           if (changed) {
             needsReload = true;
+            sub.needsHistoryReload = true;
             continue;
           }
           if (!sub.last && bars.length) sub.last = bars.at(-1).time;
+          sub.last=Math.max(sub.last||0,lastHistory.get(first.symbol+'|'+first.res)||0);
           for (const bar of bars)
             if (bar.time >= sub.last) {
               sub.cb({ ...bar });
               sub.last = bar.time;
             }
         }
-        if (needsReload) reloadHistory(decode(first.symbol).symbol, first.res);
+        if (needsReload && await reloadHistory(decode(first.symbol).symbol, first.res))
+          for (const sub of group) sub.needsHistoryReload = false;
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: "" });
       } catch (e) {
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: String(e) });
@@ -919,32 +966,10 @@ function boot(
           .some(chart=>chart.symbol()===args.instrument)
       : hasHistoryViewer(args)),
     args => hasHistoryViewer(args),
-    async args => {
-      if (!ready || loading || rangeGuard?.busy() || edgeGuard?.busy()) return false;
-      const epoch = workspaceEpoch;
-      let cacheInvalidated = false;
-      for (let i=0;i<widget.chartsCount();i++) {
-        const chart = widget.chart(i);
-        if (chart.symbol() !== args.instrument || frames[chart.resolution()] !== args.timeframe) continue;
-        const symbol=chart.symbol(), resolution=chart.resolution();
-        const restored = await refreshChartHistory(widget,chart,()=> {
-          // Native panes share the symbol/resolution cache. Invalidating it
-          // again for each pane can clear a sibling's in-flight barset.
-          if (cacheInvalidated) return;
-          cacheInvalidated = true;
-          let invalidated = false;
-          for (const sub of subscriptions.values()) {
-            if(decode(sub.symbol).symbol===symbol && sub.res===resolution) {
-              sub.reset(); invalidated = true;
-            }
-          }
-          // Empty series may not have subscribed yet. Native noData is cached
-          // even then, so invalidate explicitly before its first populated page.
-          if (!invalidated) widget.resetCache();
-        },()=>epoch===workspaceEpoch && chart.symbol()===symbol && chart.resolution()===resolution);
-        if (!restored) return false;
-      }
-      return true;
+    async (args,before,after) => {
+      const res=Object.keys(frames).find(key=>frames[key]===args.timeframe);
+      return reloadHistory(args.instrument,res,
+        chart=>historyChangeIntersects(before,after,chart.getVisibleRange()));
     },
     error => send({type:"feed-poll-state",key:"@progressive-history",error:String(error)}));
   widget = new TradingView.widget({

@@ -46,9 +46,17 @@ vm.runInContext(
   saved[0].offset = -20;
   await context.restoreChartViewports(widget, saved, () => true);
   assert.equal(ranges.length, 1, "historical position must restore dates");
+  let attempts=0;
+  chart.setVisibleRange=async range=>{
+    if(++attempts<3) throw Error('Value is null');
+    ranges.push(range);
+  };
+  await context.restoreChartViewports(widget,saved,()=>true);
+  assert.equal(attempts,3,'native metadata readiness must retry bounded transient failures');
+  const restoredCount=ranges.length;
   saved[0].symbol = "XAUUSD";
   await context.restoreChartViewports(widget, saved, () => true);
-  assert.equal(ranges.length, 1, "must not apply to a different symbol");
+  assert.equal(ranges.length, restoredCount, "must not apply to a different symbol");
   saved[0].symbol = "EURUSD";
   chart.setVisibleRange = async () => {
     throw Error("history failed");
