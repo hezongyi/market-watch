@@ -374,3 +374,9 @@
 
 - W1后台补数返回失败时，Datafeed原先调用原生error，导致原生周线模型保持失败/未完成状态；快速随后切MN时月线停在dataReady=false、range=0/0。现改为对W1完成空数据边界（noData=true），同时保留失败任务、重试入口和后台提示，允许后续周期继续切换。
 - `advanced-weekly-error.cjs`、分页和请求取消专项通过。真实连续W1/MN浏览器场景仍在验证，上一轮缓存静态源记录的旧行为仍失败，需用最新桥接重跑。
+
+### 连续周/月切换真实验收通过
+
+- 原生库对空数据边界不会触发dataReady，range-sync因此会永久保留加载锁。新增2.5秒空边界收尾：正常dataReady会提前完成，明确无数据时也会恢复同步和后续操作；计时器在正常回调时清理。
+- `advanced-monthly-local.browser.cjs`使用最新bridge、Vite5190和重启后的API8004真实运行，连续W1/MN/W1/MN后通过：`/tmp/mw-monthly-latest2.log`记录最终1M、有效视区、画线1条、无页面异常；7次月线请求均local_only且无任务。
+- range-sync、周线错误、历史分页及请求取消专项通过。该证据覆盖用户确认的月线本地策略和快速切换空数据边界；仍需整体验收其他周期、多图及部署项。

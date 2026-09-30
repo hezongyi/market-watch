@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict"),
   fs = require("node:fs"),
   vm = require("node:vm");
-const context = vm.createContext({ Map, Set, Array });
+const context = vm.createContext({ Map, Set, Array, setTimeout, clearTimeout });
 vm.runInContext(
   fs.readFileSync("../advanced-host/range-sync.js", "utf8"),
   context,

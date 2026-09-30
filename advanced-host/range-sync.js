@@ -45,11 +45,17 @@ function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
         const token = {};
         pending.set(chart, token);
         if (toggle.value() && widget.chartsCount() > 1) set(false);
-        chart.dataReady(() => {
+        const finish = () => {
           if (disposed || pending.get(chart) !== token) return;
           pending.delete(chart);
+          clearTimeout(token.timer);
           restore();
-        });
+        };
+        chart.dataReady(finish);
+        // The native library does not emit dataReady for an explicit empty
+        // boundary. Do not let that boundary lock synchronization forever;
+        // a later period switch must remain usable.
+        token.timer = setTimeout(finish, 2500);
       };
       bindings.set(chart, callback);
       chart.onSymbolChanged().subscribe(null, callback);
