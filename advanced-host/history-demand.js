@@ -9,6 +9,7 @@ function chartDemandReporter(widget, client, submit, onError, clock = () => Date
     clearTimeout(debounce);
     debounce = setTimeout(() => reporter.tick(), 250);
   };
+  widget.subscribe?.("activeChartChanged", changed);
   const frames = {1:'M1',5:'M5',15:'M15',30:'M30',60:'H1',240:'H4','1D':'D1'};
   const reporter = {
     async tick() {
@@ -59,6 +60,7 @@ function chartDemandReporter(widget, client, submit, onError, clock = () => Date
       for (const events of bindings.values())
         for (const event of events) event.unsubscribe(null, changed);
       bindings.clear();
+      widget.unsubscribe?.("activeChartChanged", changed);
     },
   };
   return reporter;

@@ -912,7 +912,7 @@ function boot(
         const chart = widget.chart(i);
         if (chart.symbol() !== args.instrument || frames[chart.resolution()] !== args.timeframe) continue;
         const symbol=chart.symbol(), resolution=chart.resolution();
-        await refreshChartHistory(widget,chart,()=> {
+        const restored = await refreshChartHistory(widget,chart,()=> {
           let invalidated = false;
           for (const sub of subscriptions.values()) {
             if(sub.symbol===symbol && sub.res===resolution) {
@@ -923,7 +923,9 @@ function boot(
           // even then, so invalidate explicitly before its first populated page.
           if (!invalidated) widget.resetCache();
         },()=>epoch===workspaceEpoch && chart.symbol()===symbol && chart.resolution()===resolution);
+        if (!restored) return false;
       }
+      return true;
     },
     error => send({type:"feed-poll-state",key:"@progressive-history",error:String(error)}));
   widget = new TradingView.widget({

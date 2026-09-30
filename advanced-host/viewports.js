@@ -210,7 +210,11 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
   const index = Array.from({ length: widget.chartsCount() }, (_, i) => widget.chart(i)).indexOf(chart);
   if (index < 0) return false;
   const selected = state.map((value, i) => i === index ? value : null);
-  let loaded, timeout;
+  let loaded, timeout, interacted = false;
+  const interaction = () => { interacted = true; };
+  widget.subscribe("mouse_down", interaction);
+  widget.subscribe("activeChartChanged", interaction);
+  const current = () => isCurrent() && !interacted;
   const completion = new Promise((resolve, reject) => {
     loaded = () => resolve();
     chart.onDataLoaded().subscribe(null, loaded);
@@ -222,10 +226,15 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
     await completion;
     // Native scale geometry settles on the render cycle after data dispatch.
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    if (!isCurrent()) return false;
-    await restoreChartViewports(widget, selected, isCurrent);
-    return isCurrent();
+    if (!current()) return false;
+    // Wheel zoom changes spacing without mouse_down. Native history insertion
+    // retains spacing; a changed spacing belongs to a newer user intention.
+    if (chart.getTimeScale().barSpacing() !== state[index].spacing) return false;
+    await restoreChartViewports(widget, selected, current);
+    return current();
   } finally {
+    widget.unsubscribe("mouse_down", interaction);
+    widget.unsubscribe("activeChartChanged", interaction);
     clearTimeout(timeout);
     chart.onDataLoaded().unsubscribe(null, loaded);
   }

@@ -119,3 +119,10 @@
 - cancel只取消本计划所属任务并撤销其租约，不删行情、不改其他修复任务；resume保留游标继续，retry重置失败任务。计划控制回归通过（计划测试合计7 passed）。
 - 原生header增加历史任务入口，父页面原生dialog展示列表并每5秒刷新；支持取消/继续/重试，手机只读。TypeScript/Vite构建通过，视觉与浏览器交互尚待验收。
 - 实时连续初步日志五轮约3.0–6.6秒，仍非压力性能通过证据。完整目标保持未完成。
+
+### 渐进刷新与交互竞争
+
+- refreshChartHistory订阅公开mouse_down/activeChartChanged；加载期间发生新操作时不恢复旧视区。绘制后柱间距变化视为新的缩放意图，同样让步；完成/失败均移除临时事件监听。
+- bridge传播未完成恢复的false结果，渐进缓存保留待重试修订。需求上报监听activeChartChanged，焦点变化250ms防抖后上报，不再只等15秒心跳。
+- 新advanced-refresh-interaction测试覆盖鼠标让步、柱距变化、正常恢复和监听清理；已有viewports、history-demand回归通过。
+- 真实浏览器progressive-native（受控连续日线、公开接口、使用当前候选helper）退出0，日志/tmp/mw-progressive-interaction-browser.log。这不替代真实鼠标滚轮八图交互验收。
