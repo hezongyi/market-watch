@@ -496,3 +496,9 @@
 - session77921退出0：当前完整backend/tests为164 passed、5 skipped（/tmp/mw-backend-current-full.log）。覆盖本轮源级退避、导入调度及既有预警/通知逻辑；不发送真实ntfy通知。
 - session52421退出0：独立trading_alerts_test库内临时schema执行并清理，PostgreSQL并发触发/outbox租约及数据库迁移回滚专项4 passed（/tmp/mw-current-postgres-tests.log）。剩余备份恢复专项本轮未重跑，沿用此前单独隔离PG14恢复证据，不能称本轮全套无跳过。
 - 能力盘点新增当前验收摘要，避免早期“外层工具栏待移除”等描述被误读为现状；完整原生工具菜单、周线后台持续补数、常驻worker及部署验证仍待完成。
+
+### 手机八图最大化阅读验收启动
+
+- 手机脚本MARKET_WATCH_MOBILE_EIGHT从真实已保存工作区中选择八图（仅测试GET列表排序，不改后端文档），验证活动图maximizeChart/restoreChart，然后临时切周期/视区并检查零写入和桌面草稿。
+- session71924退出1，最大化/恢复断言通过，后续setVisibleRange Value is null。审查发现测试最大化activeChart却后续操作chart(0)，可能操作了隐藏图；已统一使用activeChart，未修改产品。
+- session30516正在复验，日志/tmp/mw-mobile-eight-active.log；尚未计八图手机完整通过。
