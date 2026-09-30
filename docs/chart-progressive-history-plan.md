@@ -302,3 +302,9 @@
 - 扩展备份样本包含ChartAggregationJob，恢复连接检查instrument/timeframe/start/end/attempts/next_at/error全部一致，确保队列失败退避状态真实恢复。
 - 设置TEST_POSTGRES_URL及TEST_POSTGRES_BIN_DIR后运行全部backend/tests：212 passed、0 skipped、1条Starlette弃用警告，17.91秒。日志/tmp/mw-full-isolated.log，ruff通过。
 - 该结果覆盖后端现有自动测试，不等于前端八图/手机、渐进D1、真实实时延迟、上游边界及交付清单已完成。运行镜像尚有未部署候选。
+
+### 当前异步容器的手机竖屏只读回归
+
+- advanced-mobile-readonly.browser.cjs以412×915触屏模拟器运行当前HTTPS工作台，显式设置MARKET_WATCH_CHART_ORIGIN=https://127.0.0.1:15444/后通过。首次运行遗漏该参数，脚本查找旧5187而失败，不是图表初始化缺陷。
+- 单图断言、临时周期切换、服务端工作区和偏好不变、无advanced-charts写请求、readonly=true、页面错误为空均通过。截图/tmp/mw-mobile-portrait.png人工查看确认EUR/CAD M15价格与指标可见，单图占满手机主区域；日志/tmp/mw-mobile-progressive.log。
+- 这是Chromium触屏模拟验收，不是新增OPPO真机测试；手机只看图/不保存需求在此路径有证据。桌面八图压力和同步仍需当前版本验收。
