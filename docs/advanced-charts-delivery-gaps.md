@@ -785,3 +785,8 @@
 - npm run build：TypeScript及Vite通过。PYTHONPATH=backend .venv/bin/pytest -q backend/tests/test_advanced_preferences.py backend/tests/test_advanced_workspace.py backend/tests/test_chart_export.py：12 passed；单条Starlette/httpx弃用提醒，不是运行失败。
 - native-workspaces、preferences、chart-style、edge-sync四个JS专项通过，覆盖近期工作区包装/模板样式及同步守卫。
 - 当前验收Compose运行advanced-container-https.browser.cjs，/tmp/mw-current-https.log退出0：使用说明、M15切换及原生保存正常，errors=[]，未观察到图表来源携带凭据。不是全量后端/所有浏览器功能重新验收。
+
+### 指标模板删除不影响已应用指标
+
+- advanced-native-study-template.browser.cjs扩展原生模板菜单：悬停MA(21)模板并点击remove-button，服务器study偏好记录消失；当前图表中已应用的MA(21)仍保留，输入参数完整一致。
+- /tmp/mw-study-delete-final.log退出0，errors=[]。与绘图模板一样，供应库对该删除操作不弹二次确认；测试不假设不存在的确认按钮。

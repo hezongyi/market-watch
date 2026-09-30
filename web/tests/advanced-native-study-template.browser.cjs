@@ -160,6 +160,30 @@ const assert = require("node:assert/strict");
     return c.getStudyById(c.getAllStudies()[0].id).getInputValues();
   });
   assert.deepEqual(restoredInputs, applied);
+  const restoredUI = restored.childFrames()[0];
+  await restoredUI
+    .getByRole("button", { name: "指标模板", exact: true })
+    .click();
+  const label = restoredUI.getByText(templateName, { exact: true });
+  await label.hover();
+  await label
+    .locator("..")
+    .locator("..")
+    .getByRole("button", { name: "移除", exact: true })
+    .click();
+  await page.waitForFunction(
+    async (name) =>
+      !(await (await fetch("/api/advanced-charts/preferences")).json()).some(
+        (r) => r.kind === "study" && r.name === name,
+      ),
+    templateName,
+  );
+  const retained = await restored.evaluate(() => {
+    const c = widget.activeChart();
+    return c.getAllStudies().map((s) => c.getStudyById(s.id).getInputValues());
+  });
+  assert.equal(retained.length, 1);
+  assert.deepEqual(retained[0], applied);
   assert.deepEqual(errors, []);
   console.log("NATIVE_STUDY_TEMPLATE_CROSS_WORKSPACE_PASSED", {
     inputs: applied,
