@@ -443,3 +443,9 @@
 - 审查候选发现：异步对齐第一图期间切换品种/周期，若快速完成加载，后续图仍可能应用旧视区。新增回归先失败（cWrites=1），再订阅品种/周期变化使当前对齐generation失效，修复后通过；销毁和布局重新绑定清理全部订阅。
 - edge-sync/viewports/range-sync/autosave/weekly-error/monthly-cache六项专项通过，源文件格式化并通过diff检查。
 - session58522上一轮末端范围/鼠标/保存刷新断言执行到末尾，最终因initial-load原生undefined iterable异常失败，不能宣称整轮通过。新session45217运行同一末端场景，日志/tmp/mw-edge-product-recheck.log；初始化异常仍保留为待核实项，没有过滤。
+
+### 初始化异常与末端适配对照
+
+- session45217已退出1：范围、鼠标、自动保存刷新断言执行到最后，仍因initial-load原生_getActive异常失败（/tmp/mw-edge-product-recheck.log）。
+- 增加仅测试MARKET_WATCH_DISABLE_EDGE_PROBE，将edgeRangeSync替换为空适配器；session53466正在运行内部历史区间，已同样记录initial-load undefined iterable。证据表明新增末端对齐函数不是该异常的必要条件；尚不能据此断定真正根因。没有过滤异常或将此轮计为通过。
+- 为查旧worker，核对Ubuntu SSH主机公钥与本地/etc/ssh公钥一致后尝试本机SSH，认证返回Permission denied(publickey)。未绕过主机验证或修改授权；仍无法读取旧worker的宿主进程环境，未创建第二个常驻worker。

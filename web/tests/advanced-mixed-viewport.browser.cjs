@@ -28,6 +28,13 @@ const fs = require("fs");
     });
     console.log("HISTORICAL_ACCEPTANCE_CUTOFF", cutoff);
   }
+  if (process.env.MARKET_WATCH_DISABLE_EDGE_PROBE) {
+    await page.route("**/viewports.js*", async route => {
+      const source = fs.readFileSync("../advanced-host/viewports.js", "utf8");
+      await route.fulfill({contentType:"application/javascript", body:source +
+        "\nedgeRangeSync = () => ({busy:()=>false,refresh(){},dispose(){}});"});
+    });
+  }
   const errors = [];
   if (process.env.MARKET_WATCH_RANGE_GUARD_SOURCE)
     await page.route("**/range-sync.js*", (route) =>
