@@ -345,3 +345,10 @@
 - historyQuery去重键包含workspaceEpoch，避免新工作区的相同查询复用待取消旧请求；同一工作区当前图表和比较指标的共享需求继续复用。
 - advanced-request-cancellation实际运行bridge队列，覆盖旧周期取消、新工作区相同查询重新发送和当前查询正常完成；history-dedup/pagination/reload相关专项全部通过。
 - /tmp/mw-rapid-high-current.log本轮未到达切换断言：NZD_USD的M5首次历史响应持续pending，data-ready等待超时。只读数据库观察到chart worker仍有有效租约的running任务；未据此重启或另起worker。该结果不作为高周期预算通过/失败证据，也不关闭最终周期继承旧预算问题。
+
+### 快速高周期切换的缓存恢复调度候选
+
+- 请求量验收脚本支持指定品种及M5缓存截止点，用实际本地EURUSD M5数据规避实时未完成覆盖；高周期请求始终拦截。/tmp/mw-rapid-eur-frozen.log复现D1/W1/MN均90根，确认失败来自连续切换而非NZD_USD冷数据等待。
+- 独立测试路由替换候选：加载中再切周期时，通过公开setResolution恢复已知缓存M5，再切用户最后选中周期。没有widget.load，也没有截断countBack或修改供应库。
+- /tmp/mw-period-scheduler-probe.log退出0，请求D1/W1/MN/D1/MN为91/13/3/90/3根，首次找到连续切换满足预算的候选。M5由真实缓存API供给，高周期响应为受控error；这只证明预算约束，不证明最终高周期数据就绪、撤销历史、多图、显式日期意图或原生菜单点击。
+- 原型保留在/tmp/mw-period-scheduler-probe.js，固定M5恢复不能直接作为产品修复；临时产品路由已移除。下一步按各图最后就绪周期记录并处理工作区/品种取消，完成真实数据与撤销验收后才能接入产品。

@@ -66,7 +66,7 @@ const fs = require("fs");
   await page.waitForTimeout(1000);
   console.log(
     await page.evaluate(
-      async (resolution) => {
+      async ({ resolution, symbol }) => {
         const session = await (await fetch("/api/session")).json();
         async function post(path, body) {
           let r = await fetch("/api" + path, {
@@ -88,7 +88,7 @@ const fs = require("fs");
           document: {
             engine: "tv31",
             schemaVersion: 1,
-            symbol: "OANDA:NZD_USD",
+            symbol,
             interval: resolution,
           },
         });
@@ -97,9 +97,12 @@ const fs = require("fs");
         ).json();
         return catalog;
       },
-      process.env.MARKET_WATCH_SWITCH_PERIOD
-        ? "5"
-        : process.env.MARKET_WATCH_TEST_RESOLUTION || "1M",
+      {
+        resolution: process.env.MARKET_WATCH_SWITCH_PERIOD
+          ? "5"
+          : process.env.MARKET_WATCH_TEST_RESOLUTION || "1M",
+        symbol: process.env.MARKET_WATCH_TEST_SYMBOL || "OANDA:NZD_USD",
+      },
     ),
   );
   if (process.env.MARKET_WATCH_LOADING_BUDGET_PROBE === "1") {
@@ -114,8 +117,18 @@ const fs = require("fs");
   const captured = [];
   await page.route("**/api/market-data/history", async (route) => {
     const query = route.request().postDataJSON();
-    if (process.env.MARKET_WATCH_SWITCH_PERIOD && query.timeframe === "M5")
+    if (process.env.MARKET_WATCH_SWITCH_PERIOD && query.timeframe === "M5") {
+      if (process.env.MARKET_WATCH_HISTORY_BEFORE) {
+        const response = await route.fetch({
+          postData: JSON.stringify({
+            ...query,
+            before: Number(process.env.MARKET_WATCH_HISTORY_BEFORE),
+          }),
+        });
+        return route.fulfill({ response });
+      }
       return route.continue();
+    }
     captured.push(query);
     await route.fulfill({
       json: {
