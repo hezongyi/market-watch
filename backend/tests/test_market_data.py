@@ -894,3 +894,40 @@ def test_import_summary_includes_weekly_review_status(database):
     result = api_module.imports_summary()
     assert result["weekly_requests"] == [{"id":"review", "instrument_id":"EURUSD",
         "before":1700000000000,"cursor":1700000000000,"remaining":13,"status":"needs_review"}]
+
+
+def test_viewport_calendar_closure_and_missing_data(database):
+    from alerts.market_data import viewport_session
+    with database.begin() as db:
+        gold = db.get(Instrument, "XAUUSD")
+        eur = db.get(Instrument, "EURUSD")
+        btc = db.get(Instrument, "BTCUSDT")
+        left = ms(datetime(2026, 9, 26, 12, tzinfo=UTC))
+        right = left + 3 * 3600000
+        for inst in (gold, eur):
+            result = viewport_session(inst, left, right)
+            assert result["closed"] is True
+            assert result["end"] == ms(datetime(2026, 9, 25, 21, tzinfo=UTC))
+            assert result["end"] - result["start"] == right - left
+            # No stored candles are needed to distinguish trading time from closure.
+            assert viewport_session(inst, left - 86400000, right - 86400000) == {"closed": False}
+        assert viewport_session(btc, left, right) == {"closed": False}
+        # Winter NY17 resolves to UTC22 through ZoneInfo.
+        winter = ms(datetime(2026, 11, 7, 12, tzinfo=UTC))
+        assert viewport_session(eur, winter, winter + 3600000)["end"] == ms(datetime(2026, 11, 6, 22, tzinfo=UTC))
+
+
+def test_viewport_uses_confirmed_holiday_profile(database):
+    from alerts.market_data import viewport_session
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        inst.calendar_profile = {"revision": "test", "closures": [{
+            "start": "2026-09-25T12:00:00Z", "end": "2026-09-25T16:00:00Z",
+            "reason": "test closure", "source": "https://example.com/calendar"
+        }]}
+        start = ms(datetime(2026, 9, 25, 13, tzinfo=UTC))
+        result = viewport_session(inst, start, start + 3600000)
+        assert result["closed"] is True
+        assert result["end"] == ms(datetime(2026, 9, 25, 12, tzinfo=UTC))
+        # A window containing any trading time is not labelled entirely closed.
+        assert viewport_session(inst, start - 2 * 3600000, start + 3600000) == {"closed": False}

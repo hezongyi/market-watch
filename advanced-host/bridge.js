@@ -1099,9 +1099,24 @@ function boot(
         () => loading || viewportRestoring || !!rangeGuard?.busy(),
         (error) =>
           send({ type: "error", error: "时间范围同步失败：" + String(error) }),
+        async (chart, target) => {
+          const symbol = decode(chart.symbol()).symbol;
+          if (target.to - target.from > 31 * 86400) return target;
+          const result = await request({op: "viewport", args: {
+            instrument: symbol, start: Math.floor(target.from * 1000), end: Math.ceil(target.to * 1000),
+          }}, "market");
+          const label = value => new Date(value * 1000).toISOString().slice(0, 16).replace("T", " ");
+          const text = result.closed
+            ? `${symbol}：目标区间休市，当前显示休市前行情（目标 ${label(target.from)} 至 ${label(target.to)} UTC）`
+            : "";
+          const step = Number(chart.resolution()) * 60;
+          return result.closed ? {from: Math.min(result.start / 1000, result.end / 1000 - 2 * step), to: result.end / 1000 - step, notice: text} : {...target, notice: ""};
+        },
+        (chart, text) => send({type: "viewport-notice", key: String(Array.from({length: widget.chartsCount()}, (_, i) => widget.chart(i)).indexOf(chart)), text}),
       );
     };
     widget.subscribe("chart_load_requested", () => {
+      send({type: "viewport-notice", key: "*", text: ""});
       edgeGuard?.dispose();
       edgeGuard = undefined;
       rangeGuard?.dispose();
@@ -1129,6 +1144,7 @@ function boot(
     bindEdgeSync();
     bindViewports();
     widget.subscribe("layout_changed", () => {
+      send({type: "viewport-notice", key: "*", text: ""});
       rangeGuard?.refresh();
       edgeGuard?.refresh();
       bindViewports();

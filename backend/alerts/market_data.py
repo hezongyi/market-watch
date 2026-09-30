@@ -143,6 +143,31 @@ class HistoryQuery(BaseModel):
     limit: int = Field(default=300, ge=1, le=2000)
 
 
+class ViewportQuery(BaseModel):
+    instrument: str = Field(max_length=80)
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+
+
+def viewport_session(inst, start, end):
+    """Distinguish a scheduled closure from missing price history, using canonical calendar."""
+    if not 0 < end - start <= 31 * DAY:
+        raise HTTPException(422, "视区范围必须在31天以内")
+    calendar = Calendar(inst.calendar)
+    closures = closures_from(inst.calendar_profile)
+    options = dict(gold=inst.id == "XAUUSD", closures=closures)
+    if has_trading_gap(instant(start), instant(end), calendar, **options):
+        return {"closed": False}
+    # M1 is the finest supported chart granularity. Bound the backwards search.
+    cursor = start // 60000 * 60000 - 60000
+    for _ in range(31 * 24 * 60):
+        if scheduled_open(instant(cursor), calendar, **options):
+            return {"closed": True, "start": cursor + 60000 - (end - start),
+                    "end": cursor + 60000}
+        cursor -= 60000
+    raise HTTPException(422, "未找到休市前交易时段")
+
+
 class Activity(BaseModel):
     client: str = Field(min_length=1, max_length=40)
     instrument: str = Field(max_length=80)
@@ -496,6 +521,11 @@ def router(authenticated):
                 "calendar": inst.calendar,
                 "frames": FRAMES,
             }
+
+    @r.post("/viewport-session")
+    def viewport(body: ViewportQuery):
+        with transaction() as db:
+            return viewport_session(resolve(db, body.instrument), body.start, body.end)
 
     @r.post("/activity")
     def activity(body: Activity):

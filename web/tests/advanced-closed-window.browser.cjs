@@ -1,5 +1,5 @@
 // Diagnostic: active BTC weekend viewport synchronized to closed FX/gold peers.
-// Currently reproduces a remaining acceptance failure; not a passing regression.
+// Closed peers show the last trading window with an explicit notice; reopening clears it.
 // Requires the local acceptance Compose stack; self-signed TLS is test-only.
 const { chromium } = require("playwright");
 const fs = require("node:fs");
@@ -14,7 +14,8 @@ const assert = require("node:assert/strict");
     viewport: { width: 1600, height: 950 },
   });
   const errors = [];
-  page.on("pageerror", (e) => errors.push({message:e.message, stack:e.stack}));
+  let phase = "initialization";
+  page.on("pageerror", (e) => errors.push({phase,message:e.message, stack:e.stack}));
   await page.route(/\/api\/(market-data\/history|charts\/data)$/, (route) => {
     const body = route.request().postDataJSON();
     return route.continue({
@@ -74,8 +75,11 @@ const assert = require("node:assert/strict");
     .getAttribute("data-workspace-id");
   const ui = frame.childFrames()[0];
   assert.ok(ui);
+  await frame.evaluate(()=>{widget.dateRangeSync().setValue(false);widget.timeSync().setValue(false);});
+  phase = 'layout';
   await frame.evaluate(()=>widget.setLayout('3s'));
-  await frame.waitForFunction(()=>widget.chartsCount()===3);
+  await frame.waitForFunction(()=>widget.chartsCount()===3 && [0,1,2].every(i=>widget.chart(i).dataReady()));
+  phase = 'symbols';
   await frame.evaluate(async()=>{
     widget.symbolSync().setValue(false);
     for(const [i,symbol] of ['BTCUSDT','XAUUSD','EURUSD'].entries()) {
@@ -84,6 +88,7 @@ const assert = require("node:assert/strict");
     }
   });
   await frame.waitForFunction(()=>[0,1,2].every(i=>widget.chart(i).dataReady()));
+  phase = 'activate-sync';
   await frame.evaluate(()=>{widget.setActiveChart(0);widget.dateRangeSync().setValue(true);});
   if (process.env.MW_CLOSED_DIAG) {
     if(process.env.MW_INACTIVITY_GAPS) await frame.evaluate(()=>[0,1,2].forEach(i=>widget.chart(i).inactivityGaps().setValue(true)));
@@ -105,22 +110,36 @@ const assert = require("node:assert/strict");
     await browser.close();
     return;
   }
+  phase = 'weekend-range';
   const outcome=await frame.evaluate(async()=>{
     const target={from:1790424000,to:1790434800};
     try {await widget.chart(0).setVisibleRange(target,{rejectByTimeout:10000});return {target,ok:true};}
     catch(e){return {target,error:String(e)};}
   });
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(5000);
   const state = await frame.evaluate(()=>({busy:rangeGuard?.busy(),edge:edgeGuard?.busy(),charts:[0,1,2].map(i=>({symbol:widget.chart(i).symbol(),range:widget.chart(i).getVisibleRange(),ready:widget.chart(i).dataReady()}))}));
   console.log('CLOSED_WINDOW_STATE',JSON.stringify({outcome,state,errors}));
   await page.screenshot({path:'/tmp/mw-closed-window.png'});
-  await browser.close();
   assert.equal(state.busy, false);
   assert.equal(state.edge, false);
-  for (const chart of state.charts) {
+  assert.equal(state.charts[0].range.to, outcome.target.to);
+  for (const chart of state.charts.slice(1)) {
     assert.ok(chart.ready, chart.symbol + ' must finish loading');
-    assert.ok(Math.abs(chart.range.to - outcome.target.to) <= 300,
-      chart.symbol + ' must align to the active weekend viewport');
+    assert.equal(chart.range.to, 1790369700, 'closed peer must show Friday final M5 bar');
   }
+  const notice = page.getByTestId('viewport-notice');
+  await notice.waitFor();
+  assert.match(await notice.innerText(), /XAUUSD.*目标区间休市/);
+  assert.match(await notice.innerText(), /EURUSD.*目标区间休市/);
+  phase = 'return-trading-window';
+  await frame.evaluate(()=>widget.chart(0).setVisibleRange({from:1790337600,to:1790348400},{rejectByTimeout:10000}));
+  await frame.waitForFunction(()=>[0,1,2].every(i=>Math.abs(widget.chart(i).getVisibleRange().to-1790348400)<=300) && !edgeGuard.busy());
+  await notice.waitFor({state:'hidden'});
+  await frame.evaluate(()=>widget.chart(0).setVisibleRange({from:1790424000,to:1790434800},{rejectByTimeout:10000}));
+  await notice.waitFor();
+  await frame.evaluate(()=>widget.dateRangeSync().setValue(false));
+  await notice.waitFor({state:'hidden'});
   assert.deepEqual(errors,[]);
+  console.log('CLOSED_WINDOW_RECOVERY_PASS');
+  await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});

@@ -1074,3 +1074,11 @@
 - MW_INACTIVITY_GAPS=1以浏览器route临时启用公开inactivity_gaps并打开各图inactivityGaps，结果相同，/tmp/mw-closed-gaps.log。未改生产配置及供应库；该选项不能解决当前纯休市窗口。
 - 发现edgeRangeSync把所有peer放在同一catch内，首个peer拒绝后后续peer不会执行。新增回归在修复前实际失败3700!==1000；逐peer捕获后advanced-edge-sync、advanced-viewports、advanced-range-sync三组均通过。提交627abf5。当前修复仅源代码，尚未构建到验收容器，不宣称纯周末同步已解决。
 - 仍需确定原生压缩休市时间轴下的合理呈现并消除undefined浏览器异常；现有精确边界验收保持未通过，不能靠放宽断言交付。
+
+### 用户确认的休市同步行为已接入
+
+- 用户认可休市图显示休市前最近交易窗口并明确提示；交易时段恢复同步。新增认证viewport-session接口复用scheduled_open、closures_from与ZoneInfo，限制31天范围，不读价格判定休市、不创建补数任务。前端提示独立于保存/行情状态；同步关闭、品种/布局/工作区切换清理。
+- 本机API/worker/web/chart-origin均acceptance-closed-session。/tmp/mw-closed-session.log及/tmp/mw-closed-session-final.log退出0：BTC周六12–15UTC，XAU/EUR周五18–20:55UTC；提示含两品种；返回周五共同交易窗口三图对齐且提示消失；最后再进入休市并关闭同步清除提示。errors=[]，两guard均非busy。截图已人工查看，未伪造休市K线。
+- 原undefined异常发生在测试配置品种阶段；测试配置前关闭同步并等三图dataReady，最终两次运行无异常。不宣称已证明原生库所有竞态消失。
+- test_market_data.py 36通过（含夏冬UTC边界、已确认假日、无本地数据不等同休市）；三组同步/视区单测通过，前端构建及三镜像构建通过。
+- 八图回归首次在临时关闭dateRangeSync时读开关失败，测试原先仅等rangeGuard；已加入edgeGuard空闲等待，复验进行中，不计为通过。

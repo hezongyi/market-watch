@@ -140,6 +140,7 @@ function pane(to, offset = 10) {
   };
   a.fire();
   const pending = flush();
+  await Promise.resolve();
   range.setValue(false);
   finish();
   await pending;
@@ -148,6 +149,7 @@ function pane(to, offset = 10) {
   range.setValue(true);
   a.fire();
   const switched = flush();
+  await Promise.resolve();
   a.change();
   finish();
   await switched;
@@ -158,6 +160,7 @@ function pane(to, offset = 10) {
   );
   a.fire();
   const old = flush();
+  await Promise.resolve();
   guard.dispose();
   finish();
   await old;

@@ -173,7 +173,7 @@ const fs = require("fs");
   }, specs);
   await frame.waitForFunction(
     () =>
-      !rangeGuard.busy() &&
+      !rangeGuard.busy() && !edgeGuard.busy() &&
       Array.from({ length: widget.chartsCount() }, (_, i) =>
         widget.chart(i),
       ).every((chart) => chart.dataReady() && chart.getVisibleRange().from > 0),

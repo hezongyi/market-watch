@@ -64,7 +64,7 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
 }
 
 // Correct native range differences at data edges and historical session gaps.
-function edgeRangeSync(widget, blocked, onError) {
+function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => target, notice = () => {}) {
   const bindings = new Map();
   const range = widget.dateRangeSync(),
     time = widget.timeSync();
@@ -87,6 +87,7 @@ function edgeRangeSync(widget, blocked, onError) {
   function rangeChanged(value) {
     if (internal) return;
     desiredRange = value;
+    if (!value) for (const peer of bindings.keys()) notice(peer, "");
     generation++;
   }
   function timeChanged(value) {
@@ -122,6 +123,9 @@ function edgeRangeSync(widget, blocked, onError) {
         Math.abs(peer.getVisibleRange().to - target.to) > minutes * 60
       );
     });
+    for (const peer of bindings.keys()) {
+      if (!peers.includes(peer)) notice(peer, "");
+    }
     if (!peers.length) return;
     const current = ++generation;
     applying = true;
@@ -133,7 +137,10 @@ function edgeRangeSync(widget, blocked, onError) {
       for (const peer of peers) {
         if (disposed || current !== generation || blocked()) break;
         try {
-          await peer.setVisibleRange(target, { rejectByTimeout: 20000 });
+          const adjusted = await prepare(peer, target);
+          if (disposed || current !== generation || blocked()) break;
+          await peer.setVisibleRange({from: adjusted.from, to: adjusted.to}, { rejectByTimeout: 20000 });
+          if (!disposed && current === generation) notice(peer, adjusted.notice || "");
         } catch (error) {
           if (!disposed) onError(error);
         }
@@ -148,6 +155,7 @@ function edgeRangeSync(widget, blocked, onError) {
     clearTimeout(timer);
     timer = undefined;
     for (const [chart, binding] of bindings) {
+      notice(chart, "");
       chart.onVisibleRangeChanged().unsubscribe(null, binding.callback);
       chart.onSymbolChanged().unsubscribe(null, binding.changed);
       chart.onIntervalChanged().unsubscribe(null, binding.changed);
@@ -157,6 +165,7 @@ function edgeRangeSync(widget, blocked, onError) {
     for (let i = 0; i < widget.chartsCount(); i++) {
       const chart = widget.chart(i);
       const changed = () => {
+        notice(chart, "");
         generation++;
       };
       chart.onSymbolChanged().subscribe(null, changed);

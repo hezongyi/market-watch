@@ -29,6 +29,7 @@ export default function AdvancedWorkspace() {
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
   const [feedError, setFeedError] = useState("");
+  const [syncNotices, setSyncNotices] = useState<Record<string, string>>({});
   const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
@@ -69,6 +70,7 @@ export default function AdvancedWorkspace() {
     });
   const select = (row: Workspace) => {
     setPollErrors({});
+    setSyncNotices({});
     unsaved.current = false;
     current.current = row;
     blocked.current =
@@ -152,6 +154,16 @@ export default function AdvancedWorkspace() {
         if (m.action === "home") location.assign("/");
         else if (!mobile && m.action === "create") await create();
       } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
+      else if (m.type === "viewport-notice") {
+        if (typeof m.key !== "string" || m.key.length > 200) return;
+        setSyncNotices(previous => {
+          if (m.key === "*") return {};
+          const next = {...previous};
+          if (m.text) next[m.key] = String(m.text).slice(0, 500);
+          else delete next[m.key];
+          return next;
+        });
+      }
       else if (m.type === "feed-poll-state") {
         if (typeof m.key !== "string" || m.key.length > 2000) return;
         setPollErrors(previous => {
@@ -348,6 +360,7 @@ export default function AdvancedWorkspace() {
         const endpoints: Record<string, string> = {
           search: "/market-data/catalog",
           resolve: "/market-data/resolve",
+          viewport: "/market-data/viewport-session",
           history: "/market-data/history",
           activity: "/market-data/activity",
           retry: "/market-data/retry",
@@ -559,6 +572,11 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
+      {Object.keys(syncNotices).length > 0 && (
+        <div role="status" className="advanced-error" data-testid="viewport-notice">
+          {Object.values(syncNotices).join("；")}
+        </div>
+      )}
       {(error || feedError || Object.keys(pollErrors).length > 0) && (
         <div role="alert" className="advanced-error">
           {error || feedError || Object.values(pollErrors).join("；")}
