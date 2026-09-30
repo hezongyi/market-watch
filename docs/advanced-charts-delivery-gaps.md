@@ -842,3 +842,10 @@
 - advanced-drawing-favorites.browser.cjs真实展开左侧趋势线工具组，悬停水平线条目并点击星标。服务器chart.favoriteDrawings内容变化；新建工作区并刷新，工作区ID不同，水平线星标保持。最后恢复初始星标。
 - /tmp/mw-drawing-favorites-final.log退出0、errors=[]。首轮失败为脚本假定两层父节点包含星标，改为定位最近包含收藏按钮的祖先条目；未改产品DOM或供应库。
 - 该证据覆盖代表性绘图收藏的持久化与工作区共享，不代表已完成所有绘图工具交互。临时探查脚本已删除。
+
+### 绘图周期可见范围与层级持久化
+
+- 新增advanced-drawing-management.browser.cjs：原生水平线属性→可见范围中关闭小时，分钟/日仍开启；widget.save公开快照记录intervalsVisibilities.hours=false。
+- 通过公开bringToFront/sendToBack操作，以快照zorder与另一条水平线比较，分别断言置顶与置底；保存到服务器并刷新后两条线仍在，相对层级及完整周期可见配置保持。再次打开原生属性，小时未勾选、分钟及日仍勾选。
+- /tmp/mw-drawing-management-state.log退出0、errors=[]。getProperties默认结果不包含本例的intervalsVisibilities，测试改从公开保存快照读取，并以刷新后原生控件状态交叉核对；未修改产品代码或供应库。
+- 本项证明周期设置/层级保存恢复，不把配置值直接当作所有周期渲染可见性的证明。复制粘贴、吸附等仍单列待验收。临时探查脚本已移除。
