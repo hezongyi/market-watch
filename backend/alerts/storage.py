@@ -215,6 +215,7 @@ class ImportJob(Base):
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
     # Lower values run first: recovery=0, manual=10, initial history=50.
     priority: Mapped[int] = mapped_column(default=10, server_default="10")
+    chart_plan: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
 
 class LoginSession(Base):

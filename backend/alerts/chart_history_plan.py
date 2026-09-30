@@ -79,3 +79,62 @@ def priority_regions(db, plan, now):
     regions += [(d.warm_start, d.end, 130 if d.focused else 150) for d in active]
     regions.append((plan.target_start, plan.target_end, 170 if active else 300))
     return sorted(regions, key=lambda region: region[2])
+
+
+def advance_plan(db, plan, now):
+    """Queue at most one bounded missing segment; existing jobs share reservations.
+
+    Only jobs owned by this plan may be demoted. Ordinary repair/manual/weekly
+    jobs retain their own lifecycle. The import worker keeps the actual lease.
+    """
+    from .coverage import covers_interval
+    from .market import stored_coverage
+    from .market_data import missing_intervals
+    from .storage import ImportJob
+
+    if plan.status != "pending":
+        return False
+    inst = db.scalar(select(Instrument).where(
+        Instrument.id == plan.instrument_id).with_for_update())
+    regions = priority_regions(db, plan, now)
+    coverage = stored_coverage(db, inst, plan.target_start, plan.target_end)
+    jobs = list(db.scalars(select(ImportJob).where(
+        ImportJob.instrument_id == inst.id,
+        ImportJob.status.in_(["pending", "running", "failed"]),
+        ImportJob.end > plan.target_start, ImportJob.cursor < plan.target_end)))
+    for job in jobs:
+        if job.chart_plan and job.status == "pending":
+            job.priority = min((priority for left, right, priority in regions
+                                if job.cursor < right and job.end > left), default=300)
+    if covers_interval(coverage, plan.target_start, plan.target_end):
+        plan.status = "complete"
+        return False
+    reserved = coverage + [{"start": job.cursor, "end": job.end} for job in jobs]
+    for left, right, priority in regions:
+        missing = list(missing_intervals(reserved, left, right))
+        if not missing:
+            continue
+        start, end = missing[-1]
+        start = max(start, end - 4000 * 60000)
+        db.add(ImportJob(instrument_id=inst.id, start=start, end=end, cursor=start,
+                         priority=priority, chart_plan=True, next_at=now))
+        db.flush()
+        return True
+    return False
+
+
+def advance_pending_plans():
+    """One scheduling pass; each plan contributes at most one download page."""
+    from .storage import now_ms, transaction
+
+    with transaction() as db:
+        ids = list(db.scalars(select(ChartHistoryPlan.instrument_id).where(
+            ChartHistoryPlan.status == "pending").order_by(ChartHistoryPlan.updated_at)))
+    queued = 0
+    for ident in ids:
+        # Release each instrument lock before moving to another plan.
+        with transaction() as db:
+            plan = db.get(ChartHistoryPlan, ident)
+            if plan:
+                queued += int(advance_plan(db, plan, now_ms()))
+    return queued

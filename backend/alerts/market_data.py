@@ -143,6 +143,15 @@ class HistoryQuery(BaseModel):
     limit: int = Field(default=300, ge=1, le=2000)
 
 
+class ViewportDemandQuery(BaseModel):
+    id: str = Field(min_length=1, max_length=64, pattern=r"^[a-zA-Z0-9:_-]+$")
+    instrument: str = Field(max_length=40)
+    timeframe: str
+    end: int = Field(gt=0)
+    visible: int = Field(ge=1, le=2000)
+    focused: bool = True
+
+
 class ViewportQuery(BaseModel):
     instrument: str = Field(max_length=80)
     start: int = Field(ge=0)
@@ -571,6 +580,22 @@ def router(authenticated):
             inst = resolve(db, body.instrument)
             renew_demand(db, body.client, inst)
         return {"ok": True}
+
+    @r.post("/history/demand")
+    def viewport_demand(body: ViewportDemandQuery):
+        from .chart_history_plan import update_demand
+
+        now = now_ms()
+        with transaction() as db:
+            resolve(db, body.instrument)
+            try:
+                plan = update_demand(db, ident=body.id, instrument=body.instrument,
+                    timeframe=body.timeframe, end=min(body.end, (now - 5000) // 60000 * 60000),
+                    visible=body.visible, focused=body.focused, now=now)
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+            return {"target_start": plan.target_start, "target_end": plan.target_end,
+                    "status": plan.status}
 
     @r.post("/history/cache")
     def cached_history(body: HistoryQuery):

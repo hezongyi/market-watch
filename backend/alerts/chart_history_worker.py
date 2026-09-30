@@ -5,13 +5,13 @@ import time
 from contextlib import ExitStack
 
 import httpx
-
 from sqlalchemy import select
 
+from .chart_history_plan import advance_pending_plans
 from .config import settings
 from .market import import_once
-from .providers import fetch_oanda, fetch_binance
 from .market_data import advance_weekly_request, queue_history, refresh_catalog
+from .providers import fetch_binance, fetch_oanda
 from .storage import Instrument, MarketDemand, now_ms, transaction
 
 
@@ -60,6 +60,7 @@ def run(fetch_page):
             if time.monotonic() - maintained > 15:
                 maintain_active()
                 advance_weekly_request()
+                advance_pending_plans()
                 maintained = time.monotonic()
             worked = import_once(chart_only=True, fetcher=fetch_page)
             time.sleep(0.2 if worked else 1)

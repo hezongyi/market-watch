@@ -9,6 +9,7 @@ depends_on = None
 
 
 def upgrade():
+    op.add_column("import_jobs", sa.Column("chart_plan", sa.Boolean(), nullable=False, server_default=sa.false()))
     op.create_table("chart_history_plans",
         sa.Column("instrument_id", sa.String(40), sa.ForeignKey("instruments.id"), primary_key=True),
         sa.Column("target_start", sa.BigInteger(), nullable=False),
@@ -29,5 +30,6 @@ def upgrade():
 
 
 def downgrade():
+    op.drop_column("import_jobs", "chart_plan")
     op.drop_table("chart_viewport_demands")
     op.drop_table("chart_history_plans")
