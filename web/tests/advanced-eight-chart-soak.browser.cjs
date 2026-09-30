@@ -16,6 +16,10 @@ const assert = require("node:assert/strict");
     await page.route('**/viewports.js', route => route.fulfill({
       path: '../advanced-host/viewports.js', contentType: 'application/javascript',
     }));
+  if (process.env.MARKET_WATCH_CANDIDATE_PROGRESSIVE === "1")
+    await page.route('**/progressive-history.js', route => route.fulfill({
+      path: '../advanced-host/progressive-history.js', contentType: 'application/javascript',
+    }));
   const errors = [];
   let phase = "initialization";
   page.on("pageerror", (e) => {

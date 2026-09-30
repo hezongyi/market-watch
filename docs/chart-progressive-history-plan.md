@@ -363,3 +363,9 @@
 - 实时混合八图仅关闭progressivePoll完整通过：24次采样期行情请求、收起恢复断言通过、errors=[]。日志/tmp/mw-eight-no-progressive.log。定位到渐进历史轮询参与竞争，关闭仅诊断，不作为产品方案。
 - progressiveHistory原fingerprint包含形成中bar价格与revision，每次最新M1更新可能触发整图resetData，与subscribeBars重复。候选对complete=false仅比较start/end/complete身份，仍保留空图首次形成中bar、新历史、收盘转换、已完成bar修订的刷新。
 - 单位测试验证形成中价格/revision变化不整图刷新，变complete=true仍刷新；渐进缓存和预热测试通过。尚未真实浏览器候选复测，不能据此关闭八图问题。
+
+### 形成中bar判定候选真实复测未通过
+
+- MARKET_WATCH_CANDIDATE_PROGRESSIVE=1仅route替换progressive-history.js，MARKET_WATCH_LIVE_SOAK=1与MIXED_SOAK=1，保留渐进轮询运行。
+- 完整soak最终仍在collapse阶段nearestIndex/gotoTimeRange Value is undefined，错误断言失败，日志/tmp/mw-eight-forming-fix.log。候选只能减少常规形成中价格变化触发，尚不能证明解决布局异常。
+- 后续需记录实际触发changed的页面/原因（历史扩展、完成态、已收盘修订、元数据）以及刷新时图表集合；保留原失败断言，不通过关闭渐进补数缩小需求。
