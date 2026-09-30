@@ -172,6 +172,36 @@ await runningTick;
   assert.equal(vm.runInContext("queryCalls", context), 3,
     "An overlapping timer tick must not issue a second request");
   assert.equal(vm.runInContext("polling", context), false);
+  events.length = 0;
+  await vm.runInContext(`(async()=>{
+subscriptions.clear();
+widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
+  resetData:()=>events.push('visible-reset')})};
+subscriptions.set('hidden',{symbol:'XAUUSD',res:'5',last:0,
+  reset:()=>events.push('hidden-cache-reset'),cb:()=>events.push('hidden-bar')});
+query=async()=>{events.push('query');return {bars:[]}};
+await tick();
+})()`, context);
+  assert.deepEqual(events, [], "Hidden pane must not fetch latest bars");
+  assert.equal(vm.runInContext("subscriptions.get('hidden').pausedForLayout", context), true);
+  await vm.runInContext(`(async()=>{
+widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'XAUUSD',resolution:()=> '5',
+  resetData:()=>events.push('visible-reset')})};
+await tick();
+})()`, context);
+  assert.deepEqual(events, ['hidden-cache-reset', 'visible-reset'],
+    "Reopening must refill history before resuming latest-bar polling");
+  events.length = 0;
+  await vm.runInContext("tick()", context);
+  assert.deepEqual(events, ['query']);
+  events.length = 0;
+  await vm.runInContext(`(async()=>{
+widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',
+  getAllStudies:()=>[{id:'comparison'}],
+  getStudyById:()=>({getInputValues:()=>[{id:'symbol',value:'XAUUSD'}]})})};
+await tick();
+})()`, context);
+  assert.deepEqual(events, ['query'], "Visible comparison must keep its own polling demand");
   console.log("Grouped polling recovers after failure and prevents overlapping requests");
   console.log(
     "Historical reload invalidates matching cache before resetting only matching panes",

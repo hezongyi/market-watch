@@ -550,6 +550,17 @@ async function tick() {
     }
     for (const group of groups.values()) {
       const first = group[0];
+      const symbol = decode(first.symbol).symbol;
+      if (!hasHistoryViewer({ instrument: symbol, timeframe: frames[first.res] })) {
+        for (const sub of group) sub.pausedForLayout = true;
+        continue;
+      }
+      if (group.some((sub) => sub.pausedForLayout)) {
+        for (const sub of group) sub.pausedForLayout = false;
+        // Refill bars missed while the native pane retained a hidden subscription.
+        reloadHistory(symbol, first.res);
+        continue;
+      }
       await request(
         {
           op: "activity",

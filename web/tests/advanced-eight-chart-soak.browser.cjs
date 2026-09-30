@@ -147,12 +147,29 @@ const assert = require("node:assert/strict");
       samples.at(-1).heap - samples[0].heap < 64 * 1024 * 1024,
       "Chart-frame JS heap must not grow more than 64 MiB during the sample",
     );
+  // Control the timer and expire the one-second request cache before counting network calls.
+  await frame.evaluate(() => clearInterval(poll));
+  await frame.waitForFunction(() => !polling);
+  await page.waitForTimeout(1100);
   await frame.evaluate(() => widget.setLayout("s"));
-  await frame.waitForFunction(
-    () => widget.chartsCount() === 1 && subscriptions.size <= 1,
-    null,
-    { timeout: 30000 },
-  );
+  await frame.waitForFunction(() => widget.chartsCount() === 1);
+  await frame.waitForFunction(() => !polling);
+  const singleStart = latestRequests;
+  await frame.evaluate(() => tick());
+  assert.equal(latestRequests - singleStart, 1,
+    "Hidden subscriptions must not issue extra queries");
+  await frame.evaluate(() => widget.setLayout("8"));
+  await frame.waitForFunction(() => widget.chartsCount() === 8);
+  await frame.waitForFunction(() => !polling);
+  await frame.evaluate(() => tick());
+  await frame.waitForFunction(() => Array.from({length:8},(_,i)=>widget.chart(i))
+    .every(c=>c.dataReady()),null,{timeout:60000});
+  await frame.waitForFunction(() => !polling);
+  await page.waitForTimeout(1100);
+  const expandedStart = latestRequests;
+  await frame.evaluate(() => tick());
+  assert.equal(latestRequests-expandedStart,mixed ? 3 : 1,
+    "Expanded panes must resume visible polling groups");
   assert.deepEqual(errors, []);
   console.log("EIGHT_CHART_POLLING_BOUNDED", {
     samples,
