@@ -57,3 +57,10 @@
 - 接口尚未接入生产 Datafeed，未部署新API镜像；后续应根据覆盖区间避免拼接历史孤岛，并与统一需求上报分离。
 - 新增 `advanced-progressive-native.browser.cjs`，使用受控连续日线经公开 getBars/resetCache/resetData 验证空数据 -> 20 -> 80 根，6px柱距和右侧时间不变，再切M5可用。这不是OANDA冷启动验收，不能替代黄金交易日历/多图/指标验收。
 - 扩展到历史浏览位置后复现失败：8月1日至21日视区在补到120根后跳到9月7日至8日。最新边缘测试通过不代表历史视区通过。保留失败断言，下一步需要公开API捕获/恢复视区并处理原生异步重置与用户同时缩放的竞争，不能直接接入resetData刷新。
+
+### 公开接口渐进刷新可行性进一步验证
+
+- 修正受控Datafeed的边界：返回足额countBack时不能标记noData=true；此前测试导致原生误以为历史结束，阻止恢复视区时追加分页。现按本地实际短页标记边界。
+- 新增 `refreshChartHistory` 候选辅助函数：保存指定图表视区，订阅公开onDataLoaded后resetData，等待原生绘制周期，再通过既有restoreChartViewports恢复。仅复用dataReady或仅等待一次setTimeout(0)均复现Value is null；onDataLoaded加两个animation frame的候选通过。
+- 浏览器受控连续日线：空 ->20->80根保持6px柱宽；右端容许一个D1标签偏移，尚不等于严格视觉不动；查看2026-08-01至08-21，再补到120根后范围完全一致，切M5可用。日志`/tmp/mw-native-progressive-helper2.log`。
+- `advanced-viewports.cjs` 原有恢复回归通过。函数尚未接入实际补数刷新路径，需继续验证用户操作竞争、黄金交易间断、多图同步、画线/指标及真实冷数据。

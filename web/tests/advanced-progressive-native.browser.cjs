@@ -21,6 +21,9 @@ const assert = require("node:assert/strict");
       }),
     });
   });
+  await page.route('**/viewports.js', route => route.fulfill({
+    contentType:'application/javascript',body:fs.readFileSync('../advanced-host/viewports.js','utf8')
+  }));
   await page.goto("https://localhost:15443/");
   await page
     .getByLabel("管理员密码")
@@ -66,24 +69,26 @@ const assert = require("node:assert/strict");
     widget.dateRangeSync().setValue(false);
     await widget.activeChart().setSymbol('BTCUSDT');
     window.progressiveBars = [];
+    window.progressiveDelivered = 0;
+    window.progressiveRequests = [];
     const original = feed.getBars;
     feed.getBars = (symbol,res,period,callback,error) => {
       if(res !== '1D') return original(symbol,res,period,callback,error);
       const bars = window.progressiveBars.filter(b=>b.time < period.to*1000).slice(-period.countBack);
-      setTimeout(()=>callback(bars,{noData:true}),0);
+      window.progressiveRequests.push({period,bars:bars.length,first:bars[0]?.time,last:bars.at(-1)?.time});
+      setTimeout(()=>{callback(bars,{noData:bars.length < period.countBack});window.progressiveDelivered++;},0);
     };
     await widget.activeChart().setResolution('1D');
   });
   await page.waitForTimeout(500);
   assert.equal(await frame.evaluate(()=>widget.activeChart().resolution()),'1D');
   async function supply(count) {
-    await frame.evaluate(count=>{
+    await frame.evaluate(async count=>{
       const end = Date.UTC(2026,8,28);
       window.progressiveBars = Array.from({length:count},(_,i)=>({
         time:end-(count-i)*86400000,open:4300+i,high:4305+i,low:4295+i,close:4301+i
       }));
-      widget.resetCache();
-      widget.activeChart().resetData();
+      await refreshChartHistory(widget, widget.activeChart(), () => widget.resetCache(), () => true);
     },count);
     await frame.waitForFunction(()=>widget.activeChart().dataReady(),null,{timeout:10000});
     await page.waitForTimeout(500);
@@ -102,7 +107,7 @@ const assert = require("node:assert/strict");
   const historical=await frame.evaluate(()=>widget.activeChart().getVisibleRange());
   await supply(120);
   const historicalAfter=await frame.evaluate(()=>widget.activeChart().getVisibleRange());
-  console.log('HISTORICAL_GROWTH',JSON.stringify({historical,historicalAfter}));
+  console.log('HISTORICAL_GROWTH',JSON.stringify({historical,historicalAfter,requests:await frame.evaluate(()=>window.progressiveRequests)}));
   assert.deepEqual(historicalAfter,historical,'history addition must retain browsed dates');
   await frame.evaluate(()=>widget.activeChart().setResolution('5'));
   await frame.waitForFunction(()=>widget.activeChart().resolution()==='5' && widget.activeChart().dataReady(),null,{timeout:20000});

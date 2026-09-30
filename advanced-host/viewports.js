@@ -200,3 +200,33 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
     },
   };
 }
+
+// Reset one series only after capturing its viewport. dataReady() may still
+// describe the old series immediately after resetData(); wait for onDataLoaded.
+// The caller invalidates the datafeed cache and owns cancellation on user input.
+async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
+  if (!isCurrent()) return false;
+  const state = captureChartViewports(widget);
+  const index = Array.from({ length: widget.chartsCount() }, (_, i) => widget.chart(i)).indexOf(chart);
+  if (index < 0) return false;
+  const selected = state.map((value, i) => i === index ? value : null);
+  let loaded, timeout;
+  const completion = new Promise((resolve, reject) => {
+    loaded = () => resolve();
+    chart.onDataLoaded().subscribe(null, loaded);
+    timeout = setTimeout(() => reject(Error("历史刷新等待超时")), 15000);
+  });
+  try {
+    invalidate();
+    chart.resetData();
+    await completion;
+    // Native scale geometry settles on the render cycle after data dispatch.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    if (!isCurrent()) return false;
+    await restoreChartViewports(widget, selected, isCurrent);
+    return isCurrent();
+  } finally {
+    clearTimeout(timeout);
+    chart.onDataLoaded().unsubscribe(null, loaded);
+  }
+}
