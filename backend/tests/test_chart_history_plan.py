@@ -123,7 +123,8 @@ def test_plan_control_preserves_data_and_other_jobs(database):
         advance_plan(db,plan,end)
         owned = db.scalar(select(ImportJob).where(ImportJob.chart_plan.is_(True)))
         repair = ImportJob(instrument_id='EURUSD',start=1,end=2,cursor=1,priority=0)
-        db.add(repair);db.flush()
+        db.add(repair)
+        db.flush()
         before = (plan.target_start,plan.target_end,owned.cursor)
         control_plan(db,'EURUSD','cancel',end)
         assert owned.status=='cancelled' and repair.status=='pending'
@@ -131,6 +132,52 @@ def test_plan_control_preserves_data_and_other_jobs(database):
         control_plan(db,'EURUSD','resume',end+1)
         assert owned.status=='pending'
         assert before==(plan.target_start,plan.target_end,owned.cursor)
-        owned.status='failed';owned.error='network'
+        owned.status='failed'
+        owned.error='network'
         control_plan(db,'EURUSD','retry',end+2)
         assert owned.status=='pending' and owned.error is None
+
+
+def test_plan_queue_is_bounded_while_scheduler_runs_each_page(database):
+    from alerts.chart_history_plan import advance_plan
+    from alerts.storage import ImportJob
+    from sqlalchemy import func, select
+
+    end = ms(datetime(2026, 9, 28, 12, tzinfo=UTC))
+    with database.begin() as db:
+        plan = update_demand(db, ident='pane', instrument='EURUSD', timeframe='D1',
+                             end=end, visible=20, focused=True, now=end)
+        assert advance_plan(db,plan,end)
+        assert advance_plan(db,plan,end)
+        for _ in range(5):
+            assert not advance_plan(db,plan,end)
+        assert db.scalar(select(func.count()).select_from(ImportJob).where(
+            ImportJob.chart_plan.is_(True),ImportJob.status=='pending'))==2
+        job=db.scalar(select(ImportJob).where(ImportJob.chart_plan.is_(True)))
+        job.status='complete'
+        job.cursor=job.end
+        assert advance_plan(db,plan,end+1)
+
+
+def test_new_foreground_displaces_deep_queue_without_losing_target(database):
+    from alerts.chart_history_plan import advance_plan
+    from alerts.storage import ImportJob
+    from sqlalchemy import select
+
+    end = ms(datetime(2026, 9, 28, 12, tzinfo=UTC))
+    with database.begin() as db:
+        plan = update_demand(db,ident='pane',instrument='EURUSD',timeframe='H1',
+                             end=end,visible=5,focused=True,now=end)
+        # Expire foreground and queue two deep pages away from the latest view.
+        for i in range(2):
+            left=plan.target_start+i*4000*60000
+            db.add(ImportJob(instrument_id='EURUSD',start=left,end=left+4000*60000,
+                cursor=left,priority=300,chart_plan=True,next_at=end))
+        db.flush()
+        target=plan.target_start
+        assert advance_plan(db,plan,end)
+        jobs=list(db.scalars(select(ImportJob).where(ImportJob.chart_plan.is_(True))))
+        assert sum(j.status=='pending' for j in jobs)==2
+        assert sum(j.status=='superseded' for j in jobs)==1
+        assert any(j.priority==100 and j.status=='pending' for j in jobs)
+        assert plan.target_start==target

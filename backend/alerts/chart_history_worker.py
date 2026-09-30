@@ -46,8 +46,10 @@ def run(fetch_page):
                     refreshed = time.monotonic()-86400+300
             if time.monotonic() - maintained > 15:
                 advance_weekly_request()
-                advance_pending_plans()
                 maintained = time.monotonic()
+            # Reevaluate after every completed page; do not idle for the
+            # maintenance timer while a foreground window is still incomplete.
+            advance_pending_plans()
             worked = import_once(chart_only=True, fetcher=fetch_page)
             time.sleep(0.2 if worked else 1)
         except Exception as exc:

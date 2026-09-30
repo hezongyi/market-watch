@@ -128,6 +128,16 @@ def advance_plan(db, plan, now):
         missing = list(missing_intervals(reserved, left, right))
         if not missing:
             continue
+        active_jobs = [job for job in jobs if job.chart_plan and
+                       job.status in ("pending", "running")]
+        if len(active_jobs) >= 2:
+            # A newly viewed range can displace queued deep prewarm. Its
+            # durable envelope remains, so the cancelled slice is planned later.
+            replaceable = [job for job in active_jobs if job.status == "pending"
+                           and job.priority > priority]
+            if not replaceable:
+                return False
+            max(replaceable, key=lambda job: job.priority).status = "superseded"
         start, end = missing[-1]
         start = max(start, end - 4000 * 60000)
         db.add(ImportJob(instrument_id=inst.id, start=start, end=end, cursor=start,
