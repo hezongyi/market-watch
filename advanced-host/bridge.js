@@ -892,6 +892,7 @@ function boot(
       "header_layouttoggle",
       "disable_resolution_rebuild",
       "study_templates",
+      "chart_template_storage",
     ],
     disabled_features: [
       "use_localstorage_for_settings",
@@ -989,6 +990,34 @@ function boot(
       widget
         .headerReady()
         .then(() => {
+          widget.createButton({
+            align: "right",
+            useTradingViewStyle: true,
+            text: "保存样式",
+            title: "保存图表样式模板",
+            onClick: async () => {
+              try {
+                const epoch = workspaceEpoch;
+                const index = widget.activeChartIndex();
+                const state = await new Promise((resolve) =>
+                  widget.save(resolve),
+                );
+                const content = chartStyleTemplate(state, index);
+                const name = await request({}, "style-template-name");
+                if (!name) return;
+                if (epoch !== workspaceEpoch)
+                  throw Error("工作区已切换，请重新保存样式");
+                await prefs.templates.saveChartTemplate(name, content);
+                widget.showNoticeDialog({
+                  title: "样式已保存",
+                  body: "在图表设置 → 模板中选择应用。",
+                  callback: () => {},
+                });
+              } catch (error) {
+                send({ type: "error", error: String(error) });
+              }
+            },
+          });
           widget.createButton({
             align: "right",
             useTradingViewStyle: true,

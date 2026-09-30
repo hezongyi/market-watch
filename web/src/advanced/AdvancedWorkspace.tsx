@@ -277,6 +277,16 @@ export default function AdvancedWorkspace() {
           setError(String(e));
           reply({ type: "result", id: m.id, error: String(e) });
         }
+      } else if (m.type === "style-template-name") {
+        const name = mobile
+          ? null
+          : prompt("图表样式模板名称（同名将覆盖）", "我的样式");
+        const value = name?.trim() || "";
+        reply(
+          value.length > 128
+            ? { type: "result", id: m.id, error: "模板名称不能超过128字" }
+            : { type: "result", id: m.id, result: value },
+        );
       } else if (m.type === "preferences") {
         const q = m.query;
         if (
