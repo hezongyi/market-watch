@@ -31,10 +31,12 @@ vm.runInContext(
   assert.equal(result.meta.noData, true);
   assert.ok(
     sent.some(
-      (m) => m.type === "status" && m.text.includes("周线暂时没有可用数据"),
+      (m) => m.type === "status" && m.text.includes("周线历史拉取失败"),
     ),
   );
-  console.log("Weekly background error completes native empty boundary");
+  assert.ok(!sent.some(m => m.text?.includes("已加入后台队列")),
+    "failed work must not be reported as queued");
+  console.log("Weekly failure is reported honestly, with native empty completion");
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;

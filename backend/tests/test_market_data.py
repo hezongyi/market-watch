@@ -712,3 +712,26 @@ def test_monthly_history_never_queues_downloads(database, monkeypatch):
                 assert db.scalar(select(func.count()).select_from(ImportJob)) == 0
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_chart_timeout_preserves_failure_type_and_cursor(database):
+    import httpx
+    from alerts import market
+
+    with database.begin() as db:
+        job = ImportJob(instrument_id="EURUSD", start=60000, end=120000,
+                        cursor=60000, priority=100, next_at=0)
+        db.add(job)
+        db.flush()
+        ident = job.id
+
+    def fail(*args):
+        raise httpx.ReadTimeout("")
+
+    assert market.import_once(chart_only=True, fetcher=fail)
+    with database.begin() as db:
+        job = db.get(ImportJob, ident)
+        assert job.error == "ReadTimeout"
+        assert job.status == "pending"
+        assert job.cursor == 60000
+        assert job.attempts == 1

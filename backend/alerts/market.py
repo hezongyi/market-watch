@@ -643,7 +643,7 @@ def import_once(*, chart_only=False, fetcher=None):
             job = db.scalar(select(ImportJob).where(ImportJob.id == ident).with_for_update())
             if job.status != "running" or job.lease_until != lease or job.cursor != left:
                 return True
-            job.error = str(e)[-600:]
+            job.error = str(e)[-600:] or type(e).__name__
             job.attempts += 1
             job.status = "failed" if job.attempts >= 5 else "pending"
             job.lease_until = None

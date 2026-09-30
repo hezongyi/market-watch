@@ -342,7 +342,7 @@ const feed = {
             // switch is not held in the failed weekly series state.
             send({
               type: "status",
-              text: `${symbol} 周线暂时没有可用数据，已加入后台队列，预计耗时暂无法估算`,
+              text: `${symbol} 周线历史拉取失败，未完成补数；可重试或切换周期`,
             });
             cb([], { noData: true });
             finishEmpty();
