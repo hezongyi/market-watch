@@ -768,3 +768,9 @@
 - 新增advanced-favorites.browser.cjs：真实展开周期菜单、切换M15收藏状态，服务器setting键IntervalWidget.quicks存在，刷新后星标状态一致，再恢复原状态；/tmp/mw-favorites-final.log退出0，errors=[]。
 - 开启收藏后header使用radio快捷项及“图表周期”展开按钮，测试使用公开可访问控件定位，不将快捷项误当展开按钮。首轮保存已发生但刷新后旧定位失败，后续按当前真实初始状态进行双向切换。
 - 本机静态镜像acceptance-favorites已运行；未修改供应文件。指标/绘图收藏与跨工作区仍需分别核对，单一周期收藏不覆盖全部D06。
+
+### 原生数据窗口显示验收起点
+
+- 新增advanced-data-window.browser.cjs，标准蜡烛图下通过真实鼠标移动十字线，原生数据窗口显示开盘/最高/最低/收盘及选中历史时间，errors=[]；/tmp/mw-data-window-ohlc2.log退出0。
+- 数据窗口展开状态为用户偏好，测试先检查aria-pressed，避免把已展开面板关闭；此前HLC类型本身无开盘显示，不能据此认定OHLC供数丢失。
+- 当前仅证明字段出现与十字线历史时间有效；尚未做逐值后台对照、指标值及缺失值语义，不关闭A12完整验收项。
