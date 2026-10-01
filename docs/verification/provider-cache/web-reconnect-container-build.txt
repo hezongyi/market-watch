@@ -1,0 +1,55 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  880.6kB
+Step 1/11 : FROM node:22-bookworm-slim AS build
+ ---> 89b30bf5b6a8
+Step 2/11 : WORKDIR /web
+ ---> Using cache
+ ---> a7ede49715e0
+Step 3/11 : COPY package*.json ./
+ ---> Using cache
+ ---> bfe4ce6e3ca3
+Step 4/11 : RUN npm ci
+ ---> Using cache
+ ---> 89dd8ef1cdd8
+Step 5/11 : COPY . .
+ ---> d2f65012d78b
+Step 6/11 : ARG VITE_ADVANCED_CHART_ORIGIN
+ ---> Running in 111fb2409d8c
+ ---> Removed intermediate container 111fb2409d8c
+ ---> e54fe092648f
+Step 7/11 : ENV VITE_ADVANCED_CHART_ORIGIN=${VITE_ADVANCED_CHART_ORIGIN}
+ ---> Running in cca099b21682
+ ---> Removed intermediate container cca099b21682
+ ---> 1df5c001cafb
+Step 8/11 : RUN npm run build
+ ---> Running in eb2529824506
+
+> market-watch-web@1.2.0 build
+> tsc -b && vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 1611 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                               0.41 kB │ gzip:   0.31 kB
+dist/assets/AdvancedWorkspace-6kd79zjX.css    3.36 kB │ gzip:   1.10 kB
+dist/assets/Workspace-DlAjmeUN.css            9.11 kB │ gzip:   2.47 kB
+dist/assets/index-DyINBaDY.css               16.03 kB │ gzip:   4.25 kB
+dist/assets/AdvancedWorkspace-Dn_4YhFQ.js    25.70 kB │ gzip:   9.57 kB
+dist/assets/Workspace-Ct5Q4Gi5.js           188.02 kB │ gzip:  51.15 kB
+dist/assets/index-CGXqiwtn.js               496.02 kB │ gzip: 158.30 kB
+✓ built in 3.54s
+ ---> Removed intermediate container eb2529824506
+ ---> 3eafa502e207
+Step 9/11 : FROM nginx:1.28-alpine
+ ---> 201aafcbd9cd
+Step 10/11 : COPY --from=build /web/dist /usr/share/nginx/html
+ ---> fd950af68577
+Step 11/11 : COPY nginx.conf /etc/nginx/conf.d/default.conf
+ ---> 897ed1943cf8
+Successfully built 897ed1943cf8
+Successfully tagged market-watch-web:provider-cache-wip-20261001

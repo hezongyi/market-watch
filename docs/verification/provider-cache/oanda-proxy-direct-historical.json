@@ -1,0 +1,364 @@
+{
+  "records": [
+    {
+      "round": 0,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 1.11,
+        "http11.send_request_headers": 0.17,
+        "http11.send_request_body": 0.04,
+        "http11.receive_response_headers": 373.58,
+        "proxy.start_tls": 658.15,
+        "http11.receive_response_body": 1.57,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1036.88,
+      "new_connection": true
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 1,
+      "phases_ms": {
+        "http11.send_request_headers": 0.24,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 559.92,
+        "http11.receive_response_body": 0.2,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 561.32,
+      "new_connection": false
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 4053.26
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4053.89,
+      "new_connection": true
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 1,
+      "phases_ms": {
+        "connection.connect_tcp": 4004.81
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4005.25,
+      "new_connection": true
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 4004.88
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4005.47,
+      "new_connection": true
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 1,
+      "phases_ms": {
+        "connection.connect_tcp": 4004.79
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4005.21,
+      "new_connection": true
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 0.37,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.04,
+        "http11.receive_response_headers": 477.69,
+        "proxy.start_tls": 3039.56,
+        "http11.receive_response_body": 0.22,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 3519.76,
+      "new_connection": true
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 1,
+      "phases_ms": {
+        "http11.send_request_headers": 0.12,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 414.84,
+        "http11.receive_response_body": 0.21,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 416.22,
+      "new_connection": false
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 0.4,
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 292.64,
+        "proxy.start_tls": 663.32,
+        "http11.receive_response_body": 6.64,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 964.92,
+      "new_connection": true
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 1,
+      "phases_ms": {
+        "http11.send_request_headers": 0.12,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 295.58,
+        "http11.receive_response_body": 0.21,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 296.79,
+      "new_connection": false
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 4002.28
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4002.83,
+      "new_connection": true
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 1,
+      "phases_ms": {
+        "connection.connect_tcp": 4003.17
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4003.56,
+      "new_connection": true
+    },
+    {
+      "round": 3,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 4001.03
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4001.54,
+      "new_connection": true
+    },
+    {
+      "round": 3,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 1,
+      "phases_ms": {
+        "connection.connect_tcp": 4004.72
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4005.12,
+      "new_connection": true
+    },
+    {
+      "round": 3,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 0.41,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 325.28,
+        "proxy.start_tls": 628.78,
+        "http11.receive_response_body": 0.21,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 957.2,
+      "new_connection": true
+    },
+    {
+      "round": 3,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 1,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 782.44,
+        "http11.receive_response_body": 0.2,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 783.72,
+      "new_connection": false
+    },
+    {
+      "round": 4,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 0.42,
+        "http11.send_request_headers": 0.15,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 400.43,
+        "proxy.start_tls": 656.58,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1059.37,
+      "new_connection": true
+    },
+    {
+      "round": 4,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 1,
+      "phases_ms": {
+        "http11.send_request_headers": 0.1,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 523.06,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 524.17,
+      "new_connection": false
+    },
+    {
+      "round": 4,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 4004.45
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4005.01,
+      "new_connection": true
+    },
+    {
+      "round": 4,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 1,
+      "phases_ms": {
+        "connection.connect_tcp": 4003.35
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4003.74,
+      "new_connection": true
+    },
+    {
+      "round": 5,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 4002.76
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4003.29,
+      "new_connection": true
+    },
+    {
+      "round": 5,
+      "source": "oanda",
+      "scheme": "direct",
+      "repeat": 1,
+      "phases_ms": {
+        "connection.connect_tcp": 4004.0
+      },
+      "error_type": "ConnectError",
+      "elapsed_ms": 4004.41,
+      "new_connection": true
+    },
+    {
+      "round": 5,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 0,
+      "phases_ms": {
+        "connection.connect_tcp": 0.46,
+        "http11.send_request_headers": 0.12,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 387.56,
+        "proxy.start_tls": 619.6,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1010.27,
+      "new_connection": true
+    },
+    {
+      "round": 5,
+      "source": "oanda",
+      "scheme": "http",
+      "repeat": 1,
+      "phases_ms": {
+        "http11.send_request_headers": 0.11,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 547.71,
+        "http11.receive_response_body": 0.2,
+        "http11.response_closed": 0.01
+      },
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 548.85,
+      "new_connection": false
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body,#chart{height:100%;margin:0}</style></head><body><div id="chart"></div>
+<script src="/charting_library/charting_library.js"></script>
+<script>
+// Standalone public-API probe: no app bridge, backend, login, persistence or provider.
+const DAY=86400000, END=Date.UTC(2026,8,29);
+const options=new URLSearchParams(location.search);
+const log=[]; let count=Number(options.get("initialCount")||0),version=0;
+const subscriptions=new Map();
+const record=(kind,value)=>log.push({kind,value,at:performance.now()});
+const series=(n,step)=>Array.from({length:n},(_,i)=>{
+  const time=END-(n-i)*step, value=100+Math.sin(time/step)*2;
+  return {time,open:value,high:value+2,low:value-2,close:value+1};
+});
+const all=series(1000,DAY), minute=series(1500,300000);
+const feed={
+ onReady:cb=>setTimeout(()=>cb({supported_resolutions:['5','1D'],supports_time:true}),0),
+ getServerTime:cb=>cb(END/1000),
+ searchSymbols:(_,__,___,cb)=>cb([]),
+ resolveSymbol:(name,cb)=>setTimeout(()=>cb({name,ticker:name,description:'Controlled history',type:'crypto',
+  session:'24x7',timezone:'Etc/UTC',exchange:'TEST',listed_exchange:'TEST',minmov:1,pricescale:100,
+  has_intraday:true,has_daily:true,intraday_multipliers:['5'],daily_multipliers:['1'],
+  supported_resolutions:['5','1D'],volume_precision:0,format:'price',data_status:'streaming'}),0),
+ getBars:(s,r,p,cb,error)=>{
+  const available=r==='1D'?all.slice(all.length-count):minute;
+  const bars=available.filter(b=>b.time<p.to*1000).slice(-p.countBack);
+  const short=bars.length<p.countBack;
+  const mode=options.get('mode')||'boundary';
+  let meta={noData:short};
+  if(mode==='nextTime' && available.length) meta=bars.length?{noData:false}:{nextTime:available[0].time/1000};
+  if(['open','error'].includes(mode) && available.length) meta={noData:bars.length===0};
+  if(mode==='error' && available.length && !bars.length){record('request',{r,p,version,count:0,error:'pending'});setTimeout(()=>error('History pending'),0);return;}
+  record('request',{r,p,version,count:bars.length,first:bars[0]?.time,last:bars.at(-1)?.time,...meta});
+  setTimeout(()=>cb(bars.map(b=>({...b})),meta),0);
+ },
+ subscribeBars:(s,r,cb,id,reset)=>{subscriptions.set(id,{r,cb,reset});record('subscribe',{r,id});},
+ unsubscribeBars:id=>{subscriptions.delete(id);record('unsubscribe',{id});}
+};
+const widget=new TradingView.widget({container:'chart',library_path:'/charting_library/',datafeed:feed,
+ symbol:'TEST',interval:options.has('intervalHook')?'5':'1D',locale:'zh',timezone:'Etc/UTC',autosize:true,
+ ...(options.has('initialTimeframe')?{timeframe:{from:END/1000-10*86400,to:END/1000-86400}}:{}),
+ disabled_features:['use_localstorage_for_settings','header_saveload','create_volume_indicator_by_default','open_account_manager'],
+ enabled_features:[...(options.has('visibleReset')?['request_only_visible_range_on_reset']:[]),
+ ...(options.has('visibleCount')?['determine_first_data_request_size_using_visible_range']:[])],
+ overrides:{'timeScale.barSpacing':6},load_last_chart:false});
+let ready=false;
+widget.onChartReady(()=>{
+ const c=widget.activeChart();
+ c.onVisibleRangeChanged().subscribe(null,r=>record('range',r));
+ c.onIntervalChanged().subscribe(null,(r,t)=>{
+  record('interval',{r,t:JSON.parse(JSON.stringify(t))});
+  if(options.has('intervalHook') && r==='1D' && t.timeframe===undefined){
+   t.timeframe={from:END/1000-10*86400,to:END/1000-86400,type:'time-range'};
+   record('interval-override',{r,t:JSON.parse(JSON.stringify(t))});
+  }
+ });
+ c.onDataLoaded().subscribe(null,()=>record('loaded',snapshot()));
+ ready=true;
+});
+function snapshot(){const c=widget.activeChart(),s=c.getTimeScale();return {
+ r:c.resolution(),ready:c.dataReady(),range:c.getVisibleRange(),bars:c.getVisibleBarsRange(),
+ spacing:s.barSpacing(),offset:s.rightOffset(),version,count};}
+const rendered=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+async function supply(n,preserve=true){
+ const c=widget.activeChart(),before=snapshot();count=n;version++;
+ const loaded=new Promise((resolve,reject)=>{
+  const done=()=>{clearTimeout(timer);c.onDataLoaded().unsubscribe(null,done);resolve();};
+  const timer=setTimeout(()=>{c.onDataLoaded().unsubscribe(null,done);reject(Error('native reset timeout'));},5000);
+  c.onDataLoaded().subscribe(null,done);
+ });
+ widget.resetCache();c.resetData();await loaded;await rendered();
+ if(preserve && before.bars){
+  if(before.offset<0) await c.setVisibleRange(before.range,{rejectByTimeout:2000});
+  else {c.getTimeScale().setBarSpacing(before.spacing);c.getTimeScale().setRightOffset(before.offset);}
+  await rendered();
+ }
+ return {before,after:snapshot()};
+}
+window.probe={log,snapshot,supply,widget,end:END,day:DAY,subscriptions};
+</script></body></html>

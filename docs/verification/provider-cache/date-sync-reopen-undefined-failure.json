@@ -1,0 +1,107 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'undefined'\n+ ]\n- []\n",
+  "samples": [
+    {
+      "phase": "date-sync",
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "range": {
+            "from": 1790847000,
+            "to": 1790857800
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_GBP",
+          "resolution": "5",
+          "range": {
+            "from": 1790847000,
+            "to": 1790857800
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790847000,
+            "to": 1790857800
+          },
+          "spacing": 14.162162162162161
+        },
+        {
+          "symbol": "OANDA:EUR_CHF",
+          "resolution": "5",
+          "range": {
+            "from": 1790847000,
+            "to": 1790857800
+          },
+          "spacing": 14.432432432432432
+        }
+      ]
+    },
+    {
+      "phase": "rapid-final",
+      "range": {
+        "from": 1790850600,
+        "to": 1790861400
+      }
+    }
+  ],
+  "errors": [
+    "undefined"
+  ],
+  "stacks": [
+    {
+      "phase": "reopen",
+      "stack": "",
+      "message": "undefined"
+    }
+  ],
+  "observed": {
+    "loading": false,
+    "rangeBusy": false,
+    "edgeBusy": false,
+    "pending": 1,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790850600,
+          "to": 1790861400
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_GBP",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790850600,
+          "to": 1790861100
+        }
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790850600,
+          "to": 1790861400
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_CHF",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790850600,
+          "to": 1790861100
+        }
+      }
+    ]
+  }
+}

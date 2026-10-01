@@ -1,0 +1,131 @@
+{
+  "passed": true,
+  "registrations": [
+    {
+      "phase": "initial",
+      "status": 200,
+      "body": {
+        "client": "1601c5ae-1812-44b4-80eb-aaca2b7a5989",
+        "listener": "dfd8dc67-175a-4c9a-b481-2c0d4f33796e",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790855400000,
+        "revision": 33,
+        "observed_at": 1790855551920,
+        "indicators": []
+      }
+    },
+    {
+      "phase": "initial",
+      "status": 200,
+      "body": {
+        "client": "1601c5ae-1812-44b4-80eb-aaca2b7a5989",
+        "listener": "dfd8dc67-175a-4c9a-b481-2c0d4f33796e",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790855400000,
+        "revision": 33,
+        "observed_at": 1790855551920,
+        "indicators": []
+      }
+    },
+    {
+      "phase": "restart",
+      "status": 200,
+      "body": {
+        "client": "1601c5ae-1812-44b4-80eb-aaca2b7a5989",
+        "listener": "dfd8dc67-175a-4c9a-b481-2c0d4f33796e",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790855400000,
+        "revision": 34,
+        "observed_at": 1790855571243,
+        "indicators": []
+      }
+    }
+  ],
+  "errors": [],
+  "before": {
+    "count": 200,
+    "first": 1790752200000,
+    "last": 1790811900000,
+    "as_of": 1790855571243
+  },
+  "view_before": {
+    "range": {
+      "from": 1790802600,
+      "to": 1790858400
+    },
+    "spacing": 6
+  },
+  "restart_ms": 14477,
+  "persisted_request_ms": 55,
+  "resumed_ms": 15540,
+  "events": [
+    {
+      "type": "bars",
+      "cursor": 1790855400000,
+      "revision": 34,
+      "as_of": 1790855571243,
+      "count": 1
+    },
+    {
+      "type": "bars",
+      "cursor": 1790855400000,
+      "revision": 35,
+      "as_of": 1790855587354,
+      "count": 1
+    }
+  ],
+  "view_after": {
+    "range": {
+      "from": 1790802600,
+      "to": 1790858400
+    },
+    "spacing": 6,
+    "ready": true,
+    "pending": 0
+  },
+  "streams": [
+    {
+      "url": "/api/charts/provider/events?client=1601c5ae-1812-44b4-80eb-aaca2b7a5989",
+      "events": [
+        {
+          "type": "open",
+          "at": 1790855554620,
+          "state": 1
+        },
+        {
+          "type": "error",
+          "at": 1790855583257,
+          "state": 0
+        },
+        {
+          "type": "error",
+          "at": 1790855586260,
+          "state": 2
+        }
+      ]
+    },
+    {
+      "url": "/api/charts/provider/events?client=1601c5ae-1812-44b4-80eb-aaca2b7a5989",
+      "events": [
+        {
+          "type": "error",
+          "at": 1790855587263,
+          "state": 2
+        }
+      ]
+    },
+    {
+      "url": "/api/charts/provider/events?client=1601c5ae-1812-44b4-80eb-aaca2b7a5989",
+      "events": [
+        {
+          "type": "open",
+          "at": 1790855588270,
+          "state": 1
+        }
+      ]
+    }
+  ]
+}

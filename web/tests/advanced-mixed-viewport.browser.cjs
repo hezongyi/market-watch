@@ -43,6 +43,16 @@ const fs = require("fs");
       body:fs.readFileSync(process.env.MARKET_WATCH_VIEWPORT_SOURCE,"utf8"),
     }));
   const errors = [];
+  if (process.env.MARKET_WATCH_PROGRESSIVE_SOURCE)
+    await page.route("**/progressive-history.js*", route => route.fulfill({
+      contentType: "application/javascript",
+      body: fs.readFileSync(process.env.MARKET_WATCH_PROGRESSIVE_SOURCE, "utf8"),
+    }));
+  if (process.env.MARKET_WATCH_BRIDGE_SOURCE)
+    await page.route("**/bridge.js*", route => route.fulfill({
+      contentType: "application/javascript",
+      body: fs.readFileSync(process.env.MARKET_WATCH_BRIDGE_SOURCE, "utf8"),
+    }));
   if (process.env.MARKET_WATCH_RANGE_GUARD_SOURCE)
     await page.route("**/range-sync.js*", (route) =>
       route.fulfill({
@@ -162,6 +172,12 @@ const fs = require("fs");
     ["OANDA:NZD_USD", "5"],
   ];
   phase = "configure-panes";
+  if(process.env.MARKET_WATCH_TRACE_MIXED==='1') {
+    page.on('request',r=>{
+      if(r.url().endsWith('/market-data/history/demand'))
+        console.log('MIXED_DEMAND',JSON.stringify(r.postDataJSON()));
+    });
+  }
   await frame.evaluate(async (specs) => {
     widget.symbolSync().setValue(false);
     widget.intervalSync().setValue(false);
@@ -173,7 +189,7 @@ const fs = require("fs");
   }, specs);
   await frame.waitForFunction(
     () =>
-      !rangeGuard.busy() && !edgeGuard.busy() &&
+      ready && !loading && rangeGuard && edgeGuard && !rangeGuard.busy() && !edgeGuard.busy() &&
       Array.from({ length: widget.chartsCount() }, (_, i) =>
         widget.chart(i),
       ).every((chart) => chart.dataReady() && chart.getVisibleRange().from > 0),
@@ -200,6 +216,35 @@ const fs = require("fs");
   );
   assert.equal(await frame.evaluate(() => rangeGuard.busy()), false);
   phase = "move-mixed-viewport";
+  if(process.env.MARKET_WATCH_TRACE_MIXED==='1') {
+    page.on('console',m=>{if(m.text().startsWith('MIXED_TRACE'))console.log(m.text());});
+    await frame.evaluate(()=>{
+      const rpc = request;
+      request = async (...args) => {
+        const start = performance.now();
+        const waiting = requests.length;
+        try { return await rpc(...args); }
+        finally {
+          if (['historyCache','viewport'].includes(args[0]?.op))
+            console.log('MIXED_TRACE rpc',JSON.stringify({op:args[0].op,args:args[0].args,
+              waiting,elapsed:performance.now()-start}));
+        }
+      };
+      const original=feed.getBars;
+      feed.getBars=(s,r,p,cb,err)=>{
+        console.log('MIXED_TRACE request',JSON.stringify({symbol:s.ticker,r,p}));
+        return original(s,r,p,(bars,meta)=>{
+          console.log('MIXED_TRACE response',JSON.stringify({symbol:s.ticker,r,p,count:bars.length,first:bars[0]?.time,last:bars.at(-1)?.time,meta}));cb(bars,meta);
+        },err);
+      };
+      const refresh=refreshChartHistory;
+      refreshChartHistory=async(...args)=>{
+        console.log('MIXED_TRACE refresh',JSON.stringify({symbol:args[1].symbol(),resolution:args[1].resolution(),range:args[1].getVisibleRange()}));
+        return refresh(...args);
+      };
+    });
+  }
+
   if (process.env.MARKET_WATCH_RANGE_SYNC_ONLY)
     await frame.evaluate(() => widget.timeSync().setValue(false));
   const windowHours = Number(process.env.MARKET_WATCH_VIEWPORT_HOURS || 24);
@@ -386,15 +431,55 @@ const fs = require("fs");
       ),
     );
     console.log("MOUSE_DRAG", JSON.stringify(afterDrag));
+    if (process.env.MARKET_WATCH_DRAG_DIRECT_PROBE) {
+      console.log('DRAG_DIRECT',JSON.stringify(await frame.evaluate(async target=>{
+        edgeGuard.dispose();
+        widget.dateRangeSync().setValue(false);
+        widget.timeSync().setValue(false);
+        const chart=widget.chart(4);
+        const before=chart.getVisibleRange();
+        await chart.setVisibleRange(target,{rejectByTimeout:20000});
+        const immediate=chart.getVisibleRange();
+        await new Promise(resolve=>setTimeout(resolve,1000));
+        return {target,before,immediate,settled:chart.getVisibleRange()};
+      },afterDrag[0])));
+      await browser.close();
+      return;
+    }
+    if (process.env.MARKET_WATCH_TRACE_MIXED === '1')
+      console.log('DRAG_CONTROLLERS',JSON.stringify(await frame.evaluate(()=>({
+        historyReloading,loading,rangeBusy:rangeGuard?.busy(),edgeBusy:edgeGuard?.busy(),
+        rangeSync:widget.dateRangeSync().value(),timeSync:widget.timeSync().value(),
+        pending:pending.size,queued:requests.map(r=>({op:r.query.op,background:r.query.background})),
+        dataReady:Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i).dataReady()),
+      }))));
     assert.notDeepEqual(
       afterDrag[0],
       afterZoom[0],
       "Mouse drag did not move visible range",
     );
+    // Native ranges snap left to the next actual candle. Across a scheduled
+    // gold closure that can be more than one resolution after the target.
+    const observedLeft = await frame.evaluate(async ({specs,target}) => {
+      return Promise.all(specs.map(async ([symbol,res]) => {
+        const result=await request({op:'historyCache',args:{instrument:decode(symbol).symbol,
+          timeframe:frames[res],before:(target.from+3*3600)*1000,limit:200}},'market');
+        const next=result.bars.find(bar=>bar.start>=target.from*1000);
+        return next ? next.start/1000 : null;
+      }));
+    },{specs,target:afterDrag[0]});
     for (let i = 0; i < afterDrag.length; i++) {
       const tolerance = Number(specs[i][1]) * 60;
+      const nextBucket=Math.ceil(afterDrag[0].from/tolerance)*tolerance;
+      const nyHour=value=>Number(new Intl.DateTimeFormat('en-US',{
+        timeZone:'America/New_York',hour:'2-digit',hourCycle:'h23',
+      }).format(new Date(value*1000)));
+      const goldClosure=specs[i][0]==='XAUUSD' && nyHour(nextBucket)===17 &&
+        observedLeft[i]!==null && nyHour(observedLeft[i])===18 &&
+        observedLeft[i]-nextBucket<=3600;
       assert.ok(
-        Math.abs(afterDrag[i].from - afterDrag[0].from) <= tolerance,
+        Math.abs(afterDrag[i].from - afterDrag[0].from) <= tolerance ||
+          (goldClosure && afterDrag[i].from === observedLeft[i]),
         `Mouse drag left boundary pane ${i}`,
       );
       assert.ok(
@@ -411,9 +496,10 @@ const fs = require("fs");
     await page.waitForTimeout(2000);
   }
   phase = "move-with-sync-disabled";
-  await frame.evaluate(async () => {
+  const beforeDisabledMove = await frame.evaluate(async () => {
     widget.dateRangeSync().setValue(false);
     widget.timeSync().setValue(false);
+    const before = Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i).getVisibleRange());
     const r = widget.chart(0).getVisibleRange();
     await widget
       .chart(0)
@@ -421,6 +507,7 @@ const fs = require("fs");
         { from: r.from - 3600, to: r.to - 3600 },
         { rejectByTimeout: 20000 },
       );
+    return before;
   });
   await page.waitForTimeout(2000);
   const unsynced = await frame.evaluate(() =>
@@ -428,10 +515,10 @@ const fs = require("fs");
       widget.chart(i).getVisibleRange(),
     ),
   );
-  assert.notDeepEqual(unsynced[0], moved[0].range);
+  assert.notDeepEqual(unsynced[0], beforeDisabledMove[0]);
   assert.deepEqual(
     unsynced.slice(1),
-    moved.slice(1).map((p) => p.range),
+    beforeDisabledMove.slice(1),
   );
   phase = "verify-viewport-autosave";
   const activeId = await page

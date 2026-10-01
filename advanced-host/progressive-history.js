@@ -61,7 +61,7 @@ function progressiveHistory(read, needed, changed, onError, maxEntries = 64) {
         for (const [key,entry] of [...pages]) {
           if (!needed(entry.args)) continue;
           try {
-            const page = await fetchPage(entry.args);
+            const page = await fetchPage(entry.args,true);
             if (disposed || !needed(entry.args) || pages.get(key)!==entry) continue;
             const signature = fingerprint(page);
             const differs = signature !== entry.signature;

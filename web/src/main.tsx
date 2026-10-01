@@ -37,6 +37,7 @@ import {
   type Signal,
 } from "./api";
 import "./style.css";
+import AdvancedWorkspacePage from "./advanced/AdvancedWorkspace";
 
 const names: Record<string, string> = {
   pullback: "回落 / 反弹结束",
@@ -51,7 +52,6 @@ const statusNames: Record<string, string> = {
   paused: "数据暂停",
 };
 const ChartWorkspacePage = lazy(() => import("./charts/Workspace"));
-const AdvancedWorkspacePage = lazy(() => import("./advanced/AdvancedWorkspace"));
 const frames = ["M1", "M5", "M15", "H1", "H4", "D1"];
 
 function App() {

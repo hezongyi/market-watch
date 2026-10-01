@@ -16,7 +16,7 @@ let seq = 0,
   nativeSaving = false,
   workspaceEpoch = 0,
   nativeReadonly = false;
-let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll;
+let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
 let prewarming = false;
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
@@ -33,7 +33,9 @@ const frames = {
 const subscriptions = new Map();
 const quoteSubscriptions = new Map();
 const lastHistory = new Map();
+const providerHistoryState = new Map();
 const firstHistory = new Map();
+const coldHistory = new Set();
 const refreshingHistoryRanges = new Map();
 const pendingHistory = new Map();
 const indicatorHistoryNeeds = new Map();
@@ -74,9 +76,22 @@ function offerHistoryRetry() {
 }
 const clientId = crypto.randomUUID();
 const requests = [];
+let initialHistoryGate;
 function drain() {
   while (pending.size < 4 && requests.length) {
-    const { query, type, resolve, reject, isCurrent } = requests.shift();
+    // Pointer-driven viewport checks must not sit behind queued prewarming.
+    // Keep the same four in-flight limit and leave ongoing reads untouched.
+    const quoteBusy = [...pending.values()].some(entry => entry.quote);
+    const eligible = entry => entry.query.op !== 'quotes' || !quoteBusy;
+    let interaction = requests.findIndex(entry => entry.query.op === "viewport");
+    if (interaction < 0) interaction = requests.findIndex(entry =>
+      entry.query.op === "historyCache" && !entry.query.background);
+    if (interaction < 0) interaction = requests.findIndex(entry => !entry.query.op);
+    if (interaction < 0) interaction = requests.findIndex(entry => entry.type === 'workspace');
+    if (interaction < 0) interaction = requests.findIndex(eligible);
+    if (interaction < 0) break;
+    const { query, type, resolve, reject, isCurrent } =
+      requests.splice(interaction, 1)[0];
     if (isCurrent && !isCurrent()) {
       const error = Error("已取消旧图表的历史加载");
       error.code = "HISTORY_CANCELLED";
@@ -89,7 +104,7 @@ function drain() {
       reject(Error("行情请求超时"));
       drain();
     }, 30000);
-    const entry = { resolve, reject, timer, cancellationTimer: null };
+    const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes' };
     pending.set(id, entry);
     if (isCurrent) {
       const check = () => {
@@ -140,14 +155,13 @@ function stamp(bar, res, symbol) {
   return Date.parse(date + "T00:00:00Z");
 }
 function decode(symbol) {
-  if (!symbol.startsWith("MWPY_")) return { symbol };
-  return JSON.parse(atob(symbol.slice(5)));
+  return MWSeries.decode(symbol);
 }
 function barsOf(result, res, ticker) {
   const { symbol, spec, key } = decode(ticker);
   if (!spec)
     return result.bars.map((b) => ({
-      time: stamp(b, res, symbol),
+      time: b.chart_time ?? stamp(b, res, symbol),
       open: Number(b.open),
       high: Number(b.high),
       low: Number(b.low),
@@ -161,7 +175,7 @@ function barsOf(result, res, ticker) {
   return result.bars.map((b) => {
     const v = values.get(b.start);
     return {
-      time: stamp(b, res, symbol),
+      time: b.chart_time ?? stamp(b, res, symbol),
       open: v ?? 0,
       high: v ?? 0,
       low: v ?? 0,
@@ -170,20 +184,41 @@ function barsOf(result, res, ticker) {
     };
   });
 }
+const managedSessions = new Map();
+const maintenanceAsked = new Set();
 const cache = new Map();
+function datasetGeometry(ticker, res) {
+  const matches = widget ? Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i))
+    .filter(chart=>chartUsesSymbol(chart,ticker,res)) : [];
+  // The shared datafeed has no pane identifier. Use the largest real plotting
+  // capacity among matching panes; every matching pane gets enough history.
+  const sizes = matches.map(chart=>({plot_width:chart.getTimeScale().width(),
+    bar_spacing:chart.getTimeScale().barSpacing()})).filter(x=>x.plot_width>0 && x.bar_spacing>0);
+  return sizes.sort((a,b)=>b.plot_width/b.bar_spacing-a.plot_width/a.bar_spacing)[0] ||
+    {plot_width:960,bar_spacing:6};
+}
+
 function query(ticker, res, args) {
-  const { symbol, spec } = decode(ticker);
+  const { symbol, spec, series_kind } = decode(ticker);
   const q = {
     instrument: symbol,
+    series_kind,
     timeframe: frames[res],
+    ...(series_kind === 'managed' ? {published:true,
+      ...(managedSessions.get(symbol+'|'+res)?.start != null
+        ? {dataset_start:managedSessions.get(symbol+'|'+res).start} : {})} : {}),
     ...args,
     ...(spec ? { indicators: [spec] } : {}),
   };
   const key = JSON.stringify(q);
   const old = cache.get(key);
-  if (old && Date.now() - old.time < 1000) return old.promise;
-  const promise = request(q);
-  cache.set(key, { time: Date.now(), promise });
+  if (series_kind === 'managed' && old && Date.now() - old.time < 1000) return old.promise;
+  const epoch = workspaceEpoch;
+  // Native owns the lifetime of its period caches. A temporary period switch
+  // does not cancel a getBars callback that it can reuse when switching back.
+  const promise = request(q, "data", () => epoch === workspaceEpoch &&
+    (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})));
+  if (series_kind === 'managed') cache.set(key, { time: Date.now(), promise });
   if (cache.size > 64) cache.delete(cache.keys().next().value);
   return promise;
 }
@@ -218,7 +253,12 @@ const feed = {
       queueMicrotask(() => cb([]));
       return;
     }
-    request({ op: "quotes", args: { symbols } }, "market")
+    const epoch = workspaceEpoch;
+    // Details/watchlist quotes must not consume the bounded bridge/upstream
+    // slots ahead of the first visible candle page. Failure also opens the gate.
+    Promise.resolve(initialHistoryGate?.promise)
+      .then(() => request({ op: "quotes", args: { symbols } }, "market",
+        () => epoch === workspaceEpoch))
       .then((rows) => cb(rows.map(({ s, n, v }) => ({ s, n, v }))))
       .catch((e) => err(String(e)));
   },
@@ -246,13 +286,15 @@ const feed = {
         "market",
       );
       cb(
-        rows.map((s) => ({
-          symbol: s.id,
-          ticker: s.id,
-          description: s.label + (s.supported ? "" : " · 日历待接入"),
+        ["provider", "managed"].flatMap(series_kind => rows.map((s) => ({
+          symbol: MWSeries.encode(s.id, series_kind),
+          ticker: MWSeries.encode(s.id, series_kind),
+          description: s.label + (series_kind === "provider" ? " · 平台行情" : " · 自建行情") +
+            (series_kind === "managed" && s.managed_status ? " · " + s.managed_status : "") +
+            (s.supported ? "" : " · 日历待接入"),
           exchange: s.source.toUpperCase(),
           type: s.asset_type === "CRYPTO" ? "crypto" : "forex",
-        })),
+        }))),
       );
     } catch (e) {
       cb([]);
@@ -261,15 +303,24 @@ const feed = {
   },
   resolveSymbol: async (ticker, cb, err) => {
     try {
-      const symbol = decode(ticker).symbol;
-      const meta = await request(
-        { op: "resolve", args: { instrument: symbol, timeframe: "M1" } },
+      const {symbol,series_kind} = decode(ticker);
+      // One-time startup metadata rides with workspace configuration. Candle
+      // demand and every subsequent symbol resolve still use the backend.
+      const supplied = initialSymbol?.ticker === ticker ? initialSymbol.metadata : undefined;
+      initialSymbol = undefined;
+      if (supplied) {
+        // Native datafeed callbacks must leave the calling task, even when
+        // their payload arrived with the workspace configuration.
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      const meta = supplied || await request(
+        { op: "resolve", args: { instrument: symbol, series_kind, timeframe: "M1" } },
         "market",
       );
       cb({
         name: ticker,
         ticker,
-        description: meta.name + " · " + meta.basis,
+        description: meta.name + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + meta.basis,
         exchange: meta.source.toUpperCase(),
         listed_exchange: meta.source.toUpperCase(),
         type: meta.calendar === "utc0" ? "crypto" : "forex",
@@ -295,231 +346,129 @@ const feed = {
     }
   },
   getBars: async (s, res, p, cb, err) => {
+    const loadEpoch=workspaceEpoch;
+    const completeTerminal=rangeGuard?.captureTerminalCompletion?.(
+      chart=>chart.symbol()===s.ticker && chart.resolution()===res);
+    const finishTerminal=()=>{
+      // Empty/error loads may never emit native dataReady. Finish only the
+      // captured public loading token after the native callback has returned.
+      if(completeTerminal) setTimeout(()=>{
+        if(loadEpoch===workspaceEpoch) completeTerminal();
+      },0);
+    };
     try {
+      beforeInitialHistory?.();
       if (!frames[res]) throw Error("不支持的周期");
-      const symbol = decode(s.ticker).symbol;
-      const requested = Math.max(1, Math.ceil(p.countBack));
-      if (!Number.isSafeInteger(requested)) throw Error("无效历史根数");
-      const historyKey=decode(s.ticker).symbol+"|"+res;
-      if (p.firstDataRequest || decode(s.ticker).spec)
-        indicatorHistoryNeeds.set(historyKey, Math.max(indicatorHistoryNeeds.get(historyKey)||0,requested));
-      if (indicatorHistoryNeeds.size>64) indicatorHistoryNeeds.delete(indicatorHistoryNeeds.keys().next().value);
-      const epoch = workspaceEpoch;
-      const completeTerminal = rangeGuard?.captureTerminalCompletion(
-        (chart) => chart.symbol() === s.ticker && chart.resolution() === res,
-      );
-      const finishTerminal = () => {
-        // Let the native callback finish processing before restoring sync.
-        setTimeout(() => {
-          if (epoch === workspaceEpoch) completeTerminal?.();
-        }, 0);
-      };
-      const checkActive = () => {
-        if (
-          epoch !== workspaceEpoch ||
-          !hasHistoryViewer({ instrument: symbol, timeframe: frames[res] })
-        ) {
+      if (decode(s.ticker).series_kind === "provider") {
+        // Native requirements pass unchanged; the backend owns cache policy
+        // and provider pagination, including demands larger than one page.
+        const epoch = workspaceEpoch;
+        const page = await query(s.ticker, res, {limit:p.countBack,
+          countBack:p.countBack, from:p.from*1000, before:p.to*1000,
+          firstDataRequest:p.firstDataRequest, client:clientId});
+        if (epoch !== workspaceEpoch) {
           const error = Error("已取消旧图表的历史加载");
-          error.code = "HISTORY_CANCELLED";
-          throw error;
+          error.code = "HISTORY_CANCELLED"; throw error;
         }
-      };
-      if (progressivePages && !["1W", "1M"].includes(res)) {
-        const args = {instrument:symbol,timeframe:frames[res],
-          before:p.firstDataRequest && p.to*1000 >= Date.now()-120000
-            ? null : p.to*1000+(res === "1D" ? 2*86400000 : 0),limit:Math.min(2000,requested)};
-        const restoreRange=refreshingHistoryRanges.get(historyKey);
-        let navigated = false;
-        let rawPage = await progressivePages.get(args);
-        checkActive();
-        if (!p.firstDataRequest && Number.isFinite(p.from) && p.from > 0 && p.from < p.to &&
-            (requested > 2000 || rawPage.bars.length < args.limit)) {
-          const chart = widget.activeChart(), scale = chart.getTimeScale();
-          const visible = Math.min(666, Math.max(1, Math.ceil(scale.width()/scale.barSpacing())));
-          const demand = {id:crypto.randomUUID(),instrument:symbol,timeframe:frames[res],
-            end:p.to*1000,anchor_start:p.from*1000,visible,focused:true};
-          rawPage = await historicalNavigationPage(
-            () => request({op:'historyDemand',args:demand},'market',()=>hasHistoryViewer(args)),
-            before => {
-              args.before = before;
-              args.limit = Math.min(2000,visible*3);
-              return request({op:'historyCache',args},'market',()=>hasHistoryViewer(args));
-            },
-            checkActive,
-            count => send({type:'history-progress',key:symbol+'|'+res,
-              text:`${symbol} ${frames[res]} · 正在准备目标日期附近数据，已有 ${count} 根`}));
-          checkActive();
-          navigated = true;
+        const rows = barsOf(page, res, s.ticker);
+        providerHistoryState.set(s.ticker+'|'+res, {revision:page.cache_revision||0,
+          observed_at:page.as_of||0,cursor:rows.at(-1)?.time||0});
+        const boundary = page.history_boundary === true;
+        if (rows.length) {
+          const key = s.ticker+'|'+res;
+          lastHistory.set(key,Math.max(lastHistory.get(key)||0,rows.at(-1).time));
+          firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,rows[0].time));
         }
-        const page = decode(s.ticker).spec
-          ? await progressiveIndicatorPage(rawPage, () => query(s.ticker,res,
-              {...(args.before == null ? {} : {before:args.before}),limit:args.limit}))
-          : rawPage;
-        checkActive();
-        const bars = barsOf(page,res,s.ticker).filter(bar=>bar.time < p.to*1000);
-        if (bars.length) {
-          const key=s.ticker+'|'+res;
-          lastHistory.set(key,Math.max(lastHistory.get(key)||0,bars.at(-1).time));
-          firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,page.bars[0].start));
-        }
-        // Short local history is a temporary dataset boundary. A subsequent
-        // revision invalidates this native cache and restores the viewport.
-        cb(bars,{noData:!navigated && !restoreRange && bars.length < args.limit});
-        if (!bars.length) finishTerminal();
-        send({type:"history-progress",key:symbol+"|"+res,text:bars.length < args.limit
-          ? `${symbol} ${frames[res]} · 已显示 ${bars.length} 根，历史后台准备中`
-          : ""});
+        cb(rows,{noData:boundary});
+        if(!rows.length) finishTerminal();
         return;
       }
-      let before =
-        p.to * 1000 + (["1D", "1W", "1M"].includes(res) ? 2 * 86400000 : 0);
-      let all = [],
-        earliest = Infinity,
-        localBoundary = false,
-        cacheOnly = false;
-      while (all.length < requested) {
-        checkActive();
-        const args = {
-          instrument: symbol,
-          timeframe: frames[res],
-          before,
-          limit: Math.min(2000, requested - all.length),
-        };
-        let status = await historyQuery(args);
-        checkActive();
-        while (status.status === "pending") {
-          send({
-            type: "status",
-            text:
-              (status.queue_class === "background"
-                ? `周线历史尚未就绪，已加入后台队列 · ${symbol} · 预计耗时暂无法估算`
-                : `正在拉取历史数据 · ${symbol} · 已读取 ${all.length} 根`) +
-              (status.progress
-                ? ` · 当前区间已处理 ${Math.floor(status.progress.completed_ms / 60000)} / ${Math.ceil(status.progress.total_ms / 60000)} 分钟`
-                : ""),
-          });
-          if (frames[res] === "W1" && status.queue_class === "background") {
-            // Yield this native request immediately. tick() polls only while
-            // viewed, then invalidates the native cache when history is ready.
-            // Queued server jobs continue independently of this chart callback.
-            pendingHistory.set(JSON.stringify(args), args);
-            cb([], { noData: true });
-            finishTerminal();
-            return;
+      const identity = decode(s.ticker), symbol=identity.symbol;
+      const requested = Math.max(1, Math.ceil(p.countBack));
+      if (!Number.isSafeInteger(requested)) throw Error('无效历史根数');
+      const key=symbol+'|'+res, epoch=workspaceEpoch;
+      let session=managedSessions.get(key);
+      const indicatorKey=identity.spec ? JSON.stringify(identity.spec) : null;
+      if (!session || indicatorKey && !session.indicators?.has(indicatorKey)) {
+        const geometry=datasetGeometry(s.ticker,res);
+        const dataset=await request({op:'dataset',args:{instrument:symbol,timeframe:frames[res],
+          ...geometry, ...(identity.spec ? {indicators:[identity.spec]} : {})}},'market');
+        if(epoch!==workspaceEpoch) return;
+        send({type:'managed-dataset',dataset});
+        if (!dataset.ready) {
+          if (dataset.reason==='unmaintained' && !nativeReadonly && !maintenanceAsked.has(symbol)) {
+            maintenanceAsked.add(symbol);
+            send({type:'maintenance-required',instrument:symbol,calendar:s.calendar});
           }
-          await new Promise((r) => setTimeout(r, 1500));
-          checkActive();
-          status = await historyQuery(args);
-          checkActive();
+          cb([],{noData:true});
+          finishTerminal();
+          return;
         }
-        if (status.status === "error") {
-          rememberHistoryFailure(args, status);
-          offerHistoryRetry();
-          if (frames[res] === "W1") {
-            // Native error callbacks can strand a subsequent monthly switch.
-            // Complete this unavailable weekly view; an explicit retry clears
-            // its cache before reloading (see pendingHistory in tick).
-            send({
-              type: "status",
-              text: `${symbol} 周线历史拉取失败，未完成补数；可重试或切换周期`,
-            });
-            cb([], { noData: true });
-            finishTerminal();
-            return;
-          }
-          throw Error(status.error || "历史拉取失败");
+        session ||= {start:dataset.start,revision:dataset.revision,indicators:new Set()};
+        if(indicatorKey) session.indicators.add(indicatorKey);
+        managedSessions.set(key,session);
+      }
+      let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
+      let rows=[], boundary=false;
+      while(rows.length < requested) {
+        const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length)});
+        if(epoch!==workspaceEpoch || !hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) {
+          const error=Error('已取消旧图表的历史加载');error.code='HISTORY_CANCELLED';throw error;
         }
-        cacheOnly = status.local_only === true;
-        if (status.status === "empty_interval" && !cacheOnly)
-          throw Error("该区间未返回行情，尚未确认历史起点");
-        // The planning response already includes the ordinary OHLC page.
-        // Python synthetic symbols additionally require indicator calculation.
-        const result = decode(s.ticker).spec
-          ? await query(s.ticker, res, { before, limit: args.limit })
-          : status;
-        checkActive();
-        // Never stitch cached islands across an interval not checked by the planner.
-        const covered = {
-          ...result,
-          bars: result.bars.filter(
-            (bar) => bar.start >= status.requested_start,
-          ),
-        };
-        for (const bar of covered.bars)
-          if (stamp(bar, res, symbol) < p.to * 1000)
-            earliest = Math.min(earliest, bar.start);
-        all = barsOf(covered, res, s.ticker)
-          .filter((bar) => bar.time < p.to * 1000)
-          .concat(all);
-        localBoundary = cacheOnly && result.bars.length < args.limit;
-        if (localBoundary) break;
-        const next = covered.bars[0]?.start ?? status.next_cursor;
-        if (!(next < before)) throw Error("历史分页未推进，请重试");
-        before = next;
-        if (all.length < requested)
-          send({
-            type: "status",
-            text: `正在读取历史数据 · ${symbol} · 已读取 ${all.length} / ${requested} 根`,
-          });
+        rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
+        boundary=!page.has_more;
+        if(boundary) break;
+        const next=page.bars[0]?.start;
+        if(!(next<before)) throw Error('已发布历史分页未推进');
+        before=next;
       }
-      send({
-        type: "status",
-        text: cacheOnly
-          ? all.length
-            ? "月线由本地已有日线生成，缺失历史不自动补数"
-            : "暂无本地月线数据；日线积累后可生成，未安排专门补数"
-          : "行情已加载",
-      });
-      const unique = [...new Map(all.map((b) => [b.time, b])).values()].sort(
-        (a, b) => a.time - b.time,
-      );
-      if (unique.length && Number.isFinite(earliest)) {
-        const key = s.ticker + "|" + res;
-        firstHistory.set(
-          key,
-          p.firstDataRequest
-            ? earliest
-            : Math.min(firstHistory.get(key) ?? earliest, earliest),
-        );
+      rows=[...new Map(rows.map(bar=>[bar.time,bar])).values()].sort((a,b)=>a.time-b.time);
+      if(rows.length) {
+        firstHistory.set(s.ticker+'|'+res,Math.min(firstHistory.get(s.ticker+'|'+res)??Infinity,rows[0].time));
+        lastHistory.set(s.ticker+'|'+res,Math.max(lastHistory.get(s.ticker+'|'+res)||0,rows.at(-1).time));
       }
-      if (unique.length)
-        lastHistory.set(
-          s.ticker + "|" + res,
-          Math.max(
-            lastHistory.get(s.ticker + "|" + res) || 0,
-            unique.at(-1).time,
-          ),
-        );
-      // For monthly cache-only views, noData denotes the local dataset boundary.
-      // It makes no claim about the provider's remote history.
-      cb(unique, { noData: localBoundary });
-      if (!unique.length && localBoundary) finishTerminal();
+      cb(rows,{noData:boundary});
+      if(!rows.length) finishTerminal();
     } catch (e) {
       err(String(e));
+      finishTerminal();
       if (e.code !== "HISTORY_CANCELLED")
         send({ type: "error", error: String(e) });
+    } finally {
+      if (p.firstDataRequest && !decode(s.ticker).spec && initialHistoryGate?.epoch === loadEpoch)
+        initialHistoryGate.resolve();
     }
   },
-  subscribeBars: (s, res, cb, id, reset) =>
-    subscriptions.set(id, {
-      symbol: s.ticker,
-      res,
-      cb,
-      reset,
-      last: lastHistory.get(s.ticker + "|" + res) || 0,
-      revision: null,
-    }),
-  unsubscribeBars: (id) => subscriptions.delete(id),
+  subscribeBars: (s, res, cb, id, reset) => {
+    feed.unsubscribeBars(id);
+    const identity=decode(s.ticker);
+    const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(s.ticker+'|'+res)||0,revision:null};
+    subscriptions.set(id,sub);
+    if(identity.series_kind==='provider') {
+      sub.providerListener=crypto.randomUUID();
+      const state=providerHistoryState.get(s.ticker+'|'+res)||{};
+      send({type:'provider-subscribe',args:{client:clientId,listener:sub.providerListener,
+        instrument:identity.symbol,timeframe:frames[res],cursor:state.cursor||sub.last,
+        revision:state.revision||0,observed_at:state.observed_at||0,
+        indicators:identity.spec?[identity.spec]:[]}});
+    }
+  },
+  unsubscribeBars: id => {
+    const sub=subscriptions.get(id);
+    if(sub?.providerListener)
+      send({type:'provider-unsubscribe',args:{client:clientId,listener:sub.providerListener}});
+    subscriptions.delete(id);
+  },
 };
 let polling = false;
 function chartUsesSymbol(chart, symbol, res) {
   if (chart.resolution() !== res) return false;
-  if (chart.symbol() === symbol) return true;
+  if (MWSeries.same(chart.symbol(), symbol)) return true;
   for (const study of chart.getAllStudies?.() || []) {
     try {
       const inputs = chart.getStudyById(study.id).getInputValues();
       if (
-        inputs.some((input) => input.id === "symbol" && input.value === symbol)
+        inputs.some((input) => input.id === "symbol" && MWSeries.same(input.value, symbol))
       )
         return true;
     } catch {
@@ -559,7 +508,7 @@ async function reloadHistory(symbol, res, relevant = () => true) {
         invalidated=true;
         let notified=false;
         for (const sub of subscriptions.values()) {
-          if (decode(sub.symbol).symbol===symbol && sub.res===res) {
+          if (MWSeries.same(sub.symbol,symbol) && sub.res===res) {
             sub.reset();notified=true;
           }
         }
@@ -570,6 +519,26 @@ async function reloadHistory(symbol, res, relevant = () => true) {
     }
     return true;
   } finally { historyReloading=false; }
+}
+async function refreshManagedHistory(instrument) {
+  if(!ready || loading) return;
+  if(historyReloading || rangeGuard?.busy() || edgeGuard?.busy()) {
+    send({type:'error',error:'图表当前正在操作，请稍后再次刷新历史'});
+    return;
+  }
+  const charts=Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i));
+  const refreshed=new Set();
+  for(const chart of charts) {
+    const identity=decode(chart.symbol()), res=chart.resolution();
+    if(identity.series_kind!=='managed' || instrument && identity.symbol!==instrument) continue;
+    const key=identity.symbol+'|'+res;
+    if(refreshed.has(key)) continue;
+    refreshed.add(key);
+    managedSessions.delete(key);
+    cache.clear();
+    if(!await reloadHistory(identity.symbol,res))
+      send({type:'error',error:'图表当前正在操作，请稍后再次刷新历史'});
+  }
 }
 async function tick() {
   if (polling) return;
@@ -645,7 +614,9 @@ async function tick() {
     }
     for (const group of groups.values()) {
       const first = group[0];
-      const symbol = decode(first.symbol).symbol;
+      const identity = decode(first.symbol);
+      if (identity.series_kind === 'provider') continue;
+      const symbol = MWSeries.encode(identity.symbol, identity.series_kind);
       if (!hasHistoryViewer({ instrument: symbol, timeframe: frames[first.res] })) {
         for (const sub of group) sub.pausedForLayout = true;
         continue;
@@ -658,13 +629,7 @@ async function tick() {
         // polling must still resume instead of waiting for that reset to finish.
       }
       try {
-        await request(
-          {
-            op: "activity",
-            args: { client: clientId, instrument: decode(first.symbol).symbol },
-          },
-          "market",
-        );
+        if (identity.series_kind === 'managed' && !managedSessions.has(identity.symbol+'|'+first.res)) continue;
         const result = await query(first.symbol, first.res, {
           limit: 3,
           track_history: true,
@@ -701,7 +666,7 @@ async function tick() {
               sub.last = bar.time;
             }
         }
-        if (needsReload && await reloadHistory(decode(first.symbol).symbol, first.res))
+        if (needsReload && await reloadHistory(symbol, first.res))
           for (const sub of group) sub.needsHistoryReload = false;
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: "" });
       } catch (e) {
@@ -764,7 +729,9 @@ function boot(
   catalog = {},
   preferences = [],
   workspace = null,
+  symbolMetadata = null,
 ) {
+  initialSymbol = symbolMetadata;
   // save_load_adapter content is a layout envelope; saved_data expects its chart state.
   const storedViewports = doc.state?._mwViewports;
   let chartState = doc.state;
@@ -781,9 +748,18 @@ function boot(
     }
   }
   let pendingViewports = storedViewports || chartState?._mwViewports;
+  let pendingSync = doc.state?._mwSync || chartState?._mwSync;
+  const prepareLegacyViewports = (state) => {
+    beforeInitialHistory = state && !pendingSync ? () => {
+      beforeInitialHistory = undefined;
+      pendingSync = deferLegacyChartSynchronization(widget);
+    } : undefined;
+  };
+  prepareLegacyViewports(chartState);
   if (chartState) {
     chartState = { ...chartState };
     delete chartState._mwViewports;
+    delete chartState._mwSync;
   }
   let viewportRestoring = false;
   const restoreViewports = async () => {
@@ -850,8 +826,9 @@ function boot(
   // not to viewport resizing or cache resets on a period switch.
   const loadContent = layouts.getChartContent;
   const saveLayout = layouts.saveChart;
+  let initialNativeSave = false;
   let busySaveNoticeShown = false;
-  layouts.saveChart = (data) => {
+  layouts.saveChart = async (data) => {
     if (viewportRestoring || rangeGuard?.busy() || edgeGuard?.busy()) {
       dirty = true;
       if (!busySaveNoticeShown) {
@@ -866,8 +843,11 @@ function boot(
       return Promise.reject("图表正在切换，数据就绪后自动保存");
     }
     busySaveNoticeShown = false;
-    const state = JSON.parse(data.content);
-    state._mwViewports = captureChartViewports(widget);
+    // An explicit initial native save binds its returned server ID without
+    // reloading the chart. Only this boot call may target the existing empty
+    // workspace when the native library has no ID; later Save As stays a copy.
+    if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
+    const state = await captureChartLayout(widget);
     return saveLayout({ ...data, content: JSON.stringify(state) });
   };
   let viewportTimer,
@@ -896,13 +876,14 @@ function boot(
           JSON.stringify(viewports)
         )
           return;
-        const raw = await new Promise((resolve) => widget.save(resolve));
+        const raw = await captureChartLayout(widget);
         if (epoch !== workspaceEpoch) return;
         const state =
           typeof savedDoc.state?.content === "string"
             ? { ...savedDoc.state, content: JSON.stringify(raw) }
             : raw;
         state._mwViewports = viewports;
+        state._mwSync = raw._mwSync;
         send({ type: "native-saving" });
         await saveLayout({
           id: currentNativeWorkspace.id,
@@ -942,7 +923,10 @@ function boot(
       await persistViewport();
       const state = JSON.parse(await loadContent(id));
       pendingViewports = state._mwViewports;
+      pendingSync = state._mwSync;
+      prepareLegacyViewports(state);
       delete state._mwViewports;
+      delete state._mwSync;
       return JSON.stringify(nativeLayoutContent(state, currentNativeWorkspace));
     } catch (e) {
       loading = false;
@@ -958,21 +942,15 @@ function boot(
   );
   savedDoc = doc;
   savedDoc.templates ||= {};
+  initialHistoryGate?.resolve();
+  initialHistoryGate = {epoch: workspaceEpoch};
+  initialHistoryGate.promise = new Promise(resolve => {initialHistoryGate.resolve = resolve;});
   loading = true;
   ready = false;
   progressivePages?.dispose();
-  progressivePages = progressiveHistory(
-    (args,warm) => request({op:"historyCache",args},"market",()=>warm
-      ? ready && Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i))
-          .some(chart=>chart.symbol()===args.instrument)
-      : hasHistoryViewer(args)),
-    args => hasHistoryViewer(args),
-    async (args,before,after) => {
-      const res=Object.keys(frames).find(key=>frames[key]===args.timeframe);
-      return reloadHistory(args.instrument,res,
-        chart=>historyChangeIntersects(before,after,chart.getVisibleRange()));
-    },
-    error => send({type:"feed-poll-state",key:"@progressive-history",error:String(error)}));
+  progressivePages = undefined;
+  managedSessions.clear();
+  maintenanceAsked.clear();
   widget = new TradingView.widget({
     save_load_adapter: { ...prefs.templates, ...layouts },
     settings_adapter: prefs.settings,
@@ -986,21 +964,25 @@ function boot(
       details: true,
       datawindow: true,
       watchlist_settings: {
-        default_symbols: ["EURUSD", "XAUUSD", "BTCUSDT"],
+        default_symbols: ["EURUSD", "XAUUSD", "BTCUSDT"].map(symbol=>MWSeries.encode(symbol,"provider")),
         readonly,
       },
     },
     compare_symbols: [
-      { symbol: "EURUSD", title: "EUR/USD" },
-      { symbol: "XAUUSD", title: "黄金 / 美元" },
-      { symbol: "BTCUSDT", title: "BTC/USDT" },
+      { symbol: "MWP:EURUSD", title: "EUR/USD · 平台行情" },
+      { symbol: "MWP:XAUUSD", title: "黄金 / 美元 · 平台行情" },
+      { symbol: "MWP:BTCUSDT", title: "BTC/USDT · 平台行情" },
     ],
     symbol: doc.symbol || "XAUUSD",
     interval: doc.interval || "240",
-    ...(!chartState && ["1D", "1W", "1M"].includes(doc.interval)
+    ...(!chartState && decode(doc.symbol || "XAUUSD").series_kind === "managed" && ["1D", "1W", "1M"].includes(doc.interval)
       ? { timeframe: "3M" }
       : {}),
     locale: "zh",
+    custom_translate_function: original => {
+      if (['No data here', 'No data', 'Loading', 'Loading...'].includes(original)) return '';
+      return null;
+    },
     autosize: true,
     theme:
       preferences.find((p) => p.kind === "setting" && p.name === "mw.theme")
@@ -1045,22 +1027,21 @@ function boot(
       widget.dateRangeSync().setValue(true);
       widget.intervalSync().setValue(false);
       widget.symbolSync().setValue(false);
-      if (workspace) {
+      if (workspace && !readonly) {
         try {
           await new Promise((resolve) =>
             widget.activeChart().dataReady(resolve),
           );
-          // Leave the library's initial ready dispatch before replacing its layout.
+          // Leave the initial ready dispatch before binding the server identity.
           await new Promise((resolve) => setTimeout(resolve, 0));
-          const state = await new Promise((resolve) => widget.save(resolve));
-          await widget.load(state, {
-            uid: workspace.id,
-            name: workspace.name,
-            description: workspace.name,
-          });
+          initialNativeSave = true;
+          await new Promise((resolve, reject) => widget.saveChartToServer(resolve, reject,
+            {chartName: workspace.name}));
         } catch (e) {
           send({ type: "error", error: "工作区初始化失败：" + String(e) });
           return;
+        } finally {
+          initialNativeSave = false;
         }
       }
     }
@@ -1074,7 +1055,7 @@ function boot(
           title: "导出行情及当前 Python 指标",
           onClick: () => {
             const chart = widget.activeChart();
-            const instrument = decode(chart.symbol()).symbol;
+            const {symbol:instrument,series_kind} = decode(chart.symbol());
             const indicators = [];
             for (const study of chart.getAllStudies()) {
               const name = Object.keys(catalog).find(
@@ -1098,6 +1079,7 @@ function boot(
               type: "export-selection",
               selection: {
                 instrument,
+                series_kind,
                 theme: widget.getTheme(),
                 timeframe: frames[chart.resolution()],
                 indicators,
@@ -1174,6 +1156,8 @@ function boot(
     // Read-only adapters keep the original multi-chart document untouched.
     await restoreViewports();
     await rebuildMobileSingleChart();
+    restoreChartSynchronization(widget, pendingSync);
+    pendingSync = undefined;
     ready = true;
     loading = false;
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
@@ -1198,17 +1182,31 @@ function boot(
     );
     const bindEdgeSync = () => {
       edgeGuard?.dispose();
+      const sessionRequests = new Map();
       edgeGuard = edgeRangeSync(
         widget,
-        () => loading || viewportRestoring || !!rangeGuard?.busy(),
+        () => loading || viewportRestoring || historyReloading || !!rangeGuard?.busy(),
         (error) =>
           send({ type: "error", error: "时间范围同步失败：" + String(error) }),
         async (chart, target) => {
+          if (decode(chart.symbol()).series_kind === "provider") return target;
           const symbol = decode(chart.symbol()).symbol;
           if (target.to - target.from > 31 * 86400) return target;
-          const result = await request({op: "viewport", args: {
-            instrument: symbol, start: Math.floor(target.from * 1000), end: Math.ceil(target.to * 1000),
-          }}, "market");
+          // An actual observed candle inside the target proves this is not
+          // an entirely closed session. Ordinary pan/zoom needs no calendar RPC.
+          const historyKey = chart.symbol() + '|' + chart.resolution();
+          if ([firstHistory.get(historyKey),lastHistory.get(historyKey)].some(
+            time => Number.isFinite(time) && time >= target.from*1000 && time < target.to*1000))
+            return {...target,notice:""};
+          const args = {instrument:symbol,start:Math.floor(target.from*1000),end:Math.ceil(target.to*1000)};
+          const key = JSON.stringify(args);
+          let lookup = sessionRequests.get(key);
+          if (!lookup) {
+            lookup = request({op:"viewport",args},"market");
+            sessionRequests.set(key,lookup);
+            lookup.finally(()=>{if(sessionRequests.get(key)===lookup)sessionRequests.delete(key);}).catch(()=>{});
+          }
+          const result = await lookup;
           const label = value => new Date(value * 1000).toISOString().slice(0, 16).replace("T", " ");
           const text = result.closed
             ? `${symbol}：目标区间休市，当前显示休市前行情（目标 ${label(target.from)} 至 ${label(target.to)} UTC）`
@@ -1226,7 +1224,13 @@ function boot(
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
+      for(const [id,sub] of subscriptions) if(sub.providerListener) feed.unsubscribeBars(id);
+      providerHistoryState.clear();
+      lastHistory.clear();
+      firstHistory.clear();
       indicatorHistoryNeeds.clear();
+      managedSessions.clear();
+      maintenanceAsked.clear();
       viewportRestoring = false;
       loading = true;
       dirty = false;
@@ -1239,6 +1243,8 @@ function boot(
       // final event may rebind guards and release the loading state.
       if (await rebuildMobileSingleChart()) return;
       if (epoch !== workspaceEpoch) return;
+      restoreChartSynchronization(widget, pendingSync);
+      pendingSync = undefined;
       loading = false;
       rangeGuard?.dispose();
       rangeGuard = rangeSyncLoadingGuard(widget);
@@ -1261,52 +1267,20 @@ function boot(
     });
     send({ type: "ready" });
     clearInterval(progressivePoll);
-    progressivePoll = setInterval(()=> {
-      if (!ready || loading) return;
-      // Visibility changes must clear old intraday progress even when every
-      // pane switches to W1/MN and no longer submits a daily warmup demand.
-      send({type:"history-views",keys:Array.from({length:widget.chartsCount()},(_,i)=> {
-        const chart=widget.chart(i);return chart.symbol()+"|"+chart.resolution();
-      })});
-      progressivePages?.poll();
-    },2000);
-    widget.headerReady().then(()=>widget.createButton({
-      align:"right",useTradingViewStyle:true,text:"历史任务",title:"查看后台补数进度",
-      onClick:()=>send({type:"history-plans-open"}),
-    }));
+    widget.headerReady().then(()=> {
+      widget.createButton({align:'right',useTradingViewStyle:true,text:'维护历史',
+        title:'填写历史起点，并持续维护最新行情',onClick:()=> {
+          const identity=decode(widget.activeChart().symbol());
+          if(identity.series_kind==='managed') send({type:'maintenance-required',instrument:identity.symbol});
+          else send({type:'history-plans-open'});
+        }});
+      widget.createButton({align:'right',useTradingViewStyle:true,text:'刷新历史',
+        title:'载入新发布历史，保留柱宽与查看位置',onClick:()=>refreshManagedHistory()});
+      widget.createButton({align:'right',useTradingViewStyle:true,text:'历史任务',
+        title:'查看维护状态和各周期可用范围',onClick:()=>send({type:'history-plans-open'})});
+    });
     demandReporter?.dispose();
-    demandReporter = chartDemandReporter(widget, clientId,
-      async args => {
-        const res=Object.keys(frames).find(key=>frames[key]===args.timeframe);
-        const required=indicatorHistoryNeeds.get(args.instrument+"|"+res);
-        if (required>6000) send({type:"feed-poll-state",key:"@indicator-history",
-          error:"指标请求超过6000根历史，请缩小指标计算窗口"});
-        const result = await request({op: "historyDemand", args:{...args,
-          required:Math.min(6000,Math.max(args.visible,required||0))}}, "market");
-        send({type: "feed-poll-state", key: "@history-demand", error: ""});
-        // At most one sequential cache-only prewarm chain. Never schedules
-        // provider downloads; the durable D1 envelope already covers demand.
-        if (args.focused && !prewarming) {
-          prewarming=true;
-          (async()=> {
-            const epoch=workspaceEpoch;
-            for (const timeframe of ["M1","M5","M15","M30","H1","H4","D1"]) {
-              if (epoch!==workspaceEpoch || !ready || widget.activeChart().symbol()!==args.instrument) break;
-              if (timeframe===args.timeframe) continue;
-              await progressivePages.warm({instrument:args.instrument,timeframe,
-                before:args.end >= Date.now()-120000 ? null
-                  : Math.floor(args.end/60000)*60000+60000+(timeframe==="D1"?2*86400000:0),
-                limit:Math.min(2000,args.visible*3)});
-            }
-            send({type:"feed-poll-state",key:"@prewarm",error:""});
-          })().catch(error=> {
-            if(error.code!=="HISTORY_CANCELLED") send({type:"feed-poll-state",key:"@prewarm",error:String(error)});
-          }).finally(()=>{prewarming=false;});
-        }
-        return result;
-      },
-      error => send({type: "feed-poll-state", key: "@history-demand", error: String(error)}));
-    demandReporter.tick();
+    demandReporter=undefined;
     poll = setInterval(() => {
       tick();
       demandReporter?.tick();
@@ -1322,6 +1296,25 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if(m.type==='provider-event') {
+    const event=m.event,sub=[...subscriptions.values()].find(s=>s.providerListener===event?.listener);
+    if(!sub) return;
+    if(event.type==='reset') {
+      sub.needsHistoryReload=true;
+      if(await reloadHistory(sub.symbol,sub.res).catch(error=>send({type:'error',error:String(error)})))
+        sub.needsHistoryReload=false;
+    } else if(event.type==='bars') {
+      if(sub.needsHistoryReload) {
+        if(await reloadHistory(sub.symbol,sub.res))sub.needsHistoryReload=false;
+        return;
+      }
+      const rows=barsOf({bars:event.bars,indicators:event.indicators||[]},sub.res,sub.symbol);
+      for(const bar of rows) if(bar.time>=sub.last) {sub.cb({...bar});sub.last=bar.time;}
+    } else if(event.type==='error') {
+      send({type:'error',error:event.error||'平台行情暂不可用，后台重试中'});
+    }
+    return;
+  }
   if (m.type === "result") {
     const p = pending.get(m.id);
     if (!p) return;
@@ -1331,7 +1324,8 @@ addEventListener("message", async (e) => {
     m.error ? p.reject(Error(m.error)) : p.resolve(m.result);
     drain();
   } else if (m.type === "init" && !widget)
-    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace);
+    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol);
+  else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
   else if (m.type === "save") snapshot();
   else if (m.type === "theme" && ready) {
     savedDoc.theme = m.theme;

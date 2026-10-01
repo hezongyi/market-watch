@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: EventSource reconnect re-registers current native listeners
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-provider-restart.browser.cjs:58:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

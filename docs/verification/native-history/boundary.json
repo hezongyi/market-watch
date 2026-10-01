@@ -1,0 +1,1338 @@
+{
+  "mode": "boundary",
+  "visibleReset": false,
+  "cases": [
+    {
+      "name": "empty initial completes",
+      "pass": true,
+      "evidence": {
+        "r": "1D",
+        "ready": false,
+        "range": {
+          "from": 0,
+          "to": 0
+        },
+        "bars": null,
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 0
+      }
+    },
+    {
+      "name": "20 partial bars render",
+      "pass": true,
+      "evidence": {
+        "before": {
+          "r": "1D",
+          "ready": false,
+          "range": {
+            "from": 0,
+            "to": 0
+          },
+          "bars": null,
+          "spacing": 6,
+          "offset": 10,
+          "version": 0,
+          "count": 0
+        },
+        "after": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1788912000,
+            "to": 1791417600
+          },
+          "bars": {
+            "from": 1788912000,
+            "to": 1790553600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "version": 1,
+          "count": 20
+        }
+      }
+    },
+    {
+      "name": "80 bars preserve latest scale",
+      "pass": true,
+      "evidence": {
+        "before": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1788912000,
+            "to": 1791417600
+          },
+          "bars": {
+            "from": 1788912000,
+            "to": 1790553600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "version": 1,
+          "count": 20
+        },
+        "after": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1783728000,
+            "to": 1791417600
+          },
+          "bars": {
+            "from": 1783728000,
+            "to": 1790553600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "version": 2,
+          "count": 80
+        }
+      }
+    },
+    {
+      "name": "explicit date jump before local edge",
+      "pass": false,
+      "error": "Native must request missing dates or expose the intended dates through a public event"
+    },
+    {
+      "name": "native date dialog exposes missing target",
+      "pass": false,
+      "error": "Native date dialog must expose intended date or request it"
+    },
+    {
+      "name": "mouse drag can request before local edge",
+      "pass": false,
+      "error": "dragging beyond local history should issue a data request"
+    },
+    {
+      "name": "switch to warm M5 while D1 incomplete",
+      "pass": true,
+      "evidence": {
+        "elapsed": 25,
+        "r": "5",
+        "ready": true,
+        "range": {
+          "from": 1790594100,
+          "to": 1790642700
+        },
+        "bars": {
+          "from": 1790594100,
+          "to": 1790639700
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 2,
+        "count": 80
+      }
+    },
+    {
+      "name": "return D1 and fill screen",
+      "pass": true,
+      "evidence": {
+        "before": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1783728000,
+            "to": 1791417600
+          },
+          "bars": {
+            "from": 1783728000,
+            "to": 1790553600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "version": 2,
+          "count": 80
+        },
+        "after": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1777420800,
+            "to": 1791417600
+          },
+          "bars": {
+            "from": 1777420800,
+            "to": 1790553600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "version": 3,
+          "count": 400
+        }
+      }
+    },
+    {
+      "name": "positive control: available older history is requested",
+      "pass": true,
+      "evidence": {
+        "target": {
+          "from": 1757808000,
+          "to": 1760400000
+        },
+        "state": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1757808000,
+            "to": 1760400000
+          },
+          "bars": {
+            "from": 1757808000,
+            "to": 1760400000
+          },
+          "spacing": 31.548387096774192,
+          "offset": -349,
+          "version": 3,
+          "count": 400
+        },
+        "events": [
+          {
+            "kind": "request",
+            "value": {
+              "r": "1D",
+              "p": {
+                "from": 1757808000,
+                "to": 1773014400,
+                "countBack": 176,
+                "firstDataRequest": false
+              },
+              "version": 3,
+              "count": 176,
+              "first": 1757808000000,
+              "last": 1772928000000,
+              "noData": false
+            },
+            "at": 4986
+          },
+          {
+            "kind": "range",
+            "value": {
+              "from": 1757808000,
+              "to": 1760400000
+            },
+            "at": 4993
+          },
+          {
+            "kind": "loaded",
+            "value": {
+              "r": "1D",
+              "ready": true,
+              "range": {
+                "from": 1757808000,
+                "to": 1760400000
+              },
+              "bars": {
+                "from": 1757808000,
+                "to": 1760400000
+              },
+              "spacing": 31.548387096774192,
+              "offset": -349,
+              "version": 3,
+              "count": 400
+            },
+            "at": 4994
+          }
+        ]
+      }
+    },
+    {
+      "name": "historical viewport survives growth",
+      "pass": true,
+      "evidence": {
+        "before": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1777680000,
+            "to": 1780272000
+          },
+          "bars": {
+            "from": 1777680000,
+            "to": 1780272000
+          },
+          "spacing": 31.548387096774192,
+          "offset": -119,
+          "version": 3,
+          "count": 400
+        },
+        "after": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1777680000,
+            "to": 1780272000
+          },
+          "bars": {
+            "from": 1777680000,
+            "to": 1780272000
+          },
+          "spacing": 31.548387096774192,
+          "offset": -119,
+          "version": 4,
+          "count": 600
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1764720000,
+          "to": 1790726400,
+          "countBack": 301,
+          "firstDataRequest": true
+        },
+        "version": 0,
+        "count": 0,
+        "noData": true
+      },
+      "at": 728
+    },
+    {
+      "kind": "subscribe",
+      "value": {
+        "r": "1D",
+        "id": "TEST_#_1D"
+      },
+      "at": 732
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": false,
+        "range": {
+          "from": 0,
+          "to": 0
+        },
+        "bars": null,
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 0
+      },
+      "at": 760
+    },
+    {
+      "kind": "unsubscribe",
+      "value": {
+        "id": "TEST_#_1D"
+      },
+      "at": 3257
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1764720000,
+          "to": 1790726400,
+          "countBack": 301,
+          "firstDataRequest": true
+        },
+        "version": 1,
+        "count": 20,
+        "first": 1788912000000,
+        "last": 1790553600000,
+        "noData": true
+      },
+      "at": 3264
+    },
+    {
+      "kind": "subscribe",
+      "value": {
+        "r": "1D",
+        "id": "TEST_#_1D"
+      },
+      "at": 3277
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 1,
+        "count": 20
+      },
+      "at": 3281
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1788912000,
+        "to": 1791417600
+      },
+      "at": 3281
+    },
+    {
+      "kind": "unsubscribe",
+      "value": {
+        "id": "TEST_#_1D"
+      },
+      "at": 3331
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1776556800,
+          "to": 1790726400,
+          "countBack": 164,
+          "firstDataRequest": true
+        },
+        "version": 2,
+        "count": 80,
+        "first": 1783728000000,
+        "last": 1790553600000,
+        "noData": true
+      },
+      "at": 3335
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1791417600
+      },
+      "at": 3340
+    },
+    {
+      "kind": "subscribe",
+      "value": {
+        "r": "1D",
+        "id": "TEST_#_1D"
+      },
+      "at": 3341
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1783728000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1783728000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 2,
+        "count": 80
+      },
+      "at": 3341
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1783814400
+      },
+      "at": 3451
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1783728000,
+          "to": 1783814400
+        },
+        "bars": {
+          "from": 1783728000,
+          "to": 1783814400
+        },
+        "spacing": 46.57142857142857,
+        "offset": -78,
+        "version": 2,
+        "count": 80
+      },
+      "at": 3452
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1783728000,
+          "to": 1783814400
+        },
+        "bars": {
+          "from": 1783728000,
+          "to": 1783814400
+        },
+        "spacing": 46.57142857142857,
+        "offset": -78,
+        "version": 2,
+        "count": 80
+      },
+      "at": 3934
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1791417600
+      },
+      "at": 4233
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1790899200
+      },
+      "at": 4393
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1790380800
+      },
+      "at": 4412
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1789862400
+      },
+      "at": 4426
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1789257600
+      },
+      "at": 4443
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1788739200
+      },
+      "at": 4461
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1788220800
+      },
+      "at": 4476
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1787702400
+      },
+      "at": 4492
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1787097600
+      },
+      "at": 4509
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1786579200
+      },
+      "at": 4526
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1786060800
+      },
+      "at": 4542
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1785542400
+      },
+      "at": 4559
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1784937600
+      },
+      "at": 4576
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1784419200
+      },
+      "at": 4592
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1783900800
+      },
+      "at": 4609
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1783814400
+      },
+      "at": 4626
+    },
+    {
+      "kind": "interval",
+      "value": {
+        "r": "5",
+        "t": {}
+      },
+      "at": 4844
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "5",
+        "p": {
+          "from": 1790591160,
+          "to": 1790640060,
+          "countBack": 163,
+          "firstDataRequest": true
+        },
+        "version": 2,
+        "count": 163,
+        "first": 1790591100000,
+        "last": 1790639700000,
+        "noData": false
+      },
+      "at": 4855
+    },
+    {
+      "kind": "subscribe",
+      "value": {
+        "r": "5",
+        "id": "TEST_#_5"
+      },
+      "at": 4863
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "5",
+        "ready": true,
+        "range": {
+          "from": 1790594100,
+          "to": 1790642700
+        },
+        "bars": {
+          "from": 1790594100,
+          "to": 1790639700
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 2,
+        "count": 80
+      },
+      "at": 4864
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1790594100,
+        "to": 1790642700
+      },
+      "at": 4864
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "5",
+        "p": {
+          "from": 1780247100,
+          "to": 1790591100,
+          "countBack": 34480,
+          "firstDataRequest": false
+        },
+        "version": 2,
+        "count": 1337,
+        "first": 1790190000000,
+        "last": 1790590800000,
+        "noData": true
+      },
+      "at": 4868
+    },
+    {
+      "kind": "interval",
+      "value": {
+        "r": "1D",
+        "t": {}
+      },
+      "at": 4871
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1783728000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1783728000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 2,
+        "count": 80
+      },
+      "at": 4878
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1783728000,
+        "to": 1791417600
+      },
+      "at": 4878
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1783728000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1783728000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 2,
+        "count": 80
+      },
+      "at": 4879
+    },
+    {
+      "kind": "unsubscribe",
+      "value": {
+        "id": "TEST_#_1D"
+      },
+      "at": 4897
+    },
+    {
+      "kind": "unsubscribe",
+      "value": {
+        "id": "TEST_#_5"
+      },
+      "at": 4897
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1776556800,
+          "to": 1790726400,
+          "countBack": 164,
+          "firstDataRequest": true
+        },
+        "version": 3,
+        "count": 164,
+        "first": 1776470400000,
+        "last": 1790553600000,
+        "noData": false
+      },
+      "at": 4901
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1777420800,
+        "to": 1791417600
+      },
+      "at": 4924
+    },
+    {
+      "kind": "subscribe",
+      "value": {
+        "r": "1D",
+        "id": "TEST_#_1D"
+      },
+      "at": 4924
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1776556800,
+        "to": 1787270400
+      },
+      "at": 4926
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1776556800,
+          "to": 1787270400
+        },
+        "bars": {
+          "from": 1776556800,
+          "to": 1787270400
+        },
+        "spacing": 6,
+        "offset": -38.5,
+        "version": 3,
+        "count": 400
+      },
+      "at": 4926
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1773014400,
+          "to": 1776470400,
+          "countBack": 40,
+          "firstDataRequest": false
+        },
+        "version": 3,
+        "count": 40,
+        "first": 1773014400000,
+        "last": 1776384000000,
+        "noData": false
+      },
+      "at": 4941
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1773187200,
+        "to": 1787270400
+      },
+      "at": 4946
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1773187200,
+          "to": 1787270400
+        },
+        "bars": {
+          "from": 1773187200,
+          "to": 1787270400
+        },
+        "spacing": 6,
+        "offset": -38.5,
+        "version": 3,
+        "count": 400
+      },
+      "at": 4947
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1777420800,
+        "to": 1791417600
+      },
+      "at": 4956
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1757808000,
+          "to": 1773014400,
+          "countBack": 176,
+          "firstDataRequest": false
+        },
+        "version": 3,
+        "count": 176,
+        "first": 1757808000000,
+        "last": 1772928000000,
+        "noData": false
+      },
+      "at": 4986
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1757808000,
+        "to": 1760400000
+      },
+      "at": 4993
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1757808000,
+          "to": 1760400000
+        },
+        "bars": {
+          "from": 1757808000,
+          "to": 1760400000
+        },
+        "spacing": 31.548387096774192,
+        "offset": -349,
+        "version": 3,
+        "count": 400
+      },
+      "at": 4994
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1777680000,
+        "to": 1780272000
+      },
+      "at": 5003
+    },
+    {
+      "kind": "unsubscribe",
+      "value": {
+        "id": "TEST_#_1D"
+      },
+      "at": 5004
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1787961600,
+          "to": 1790726400,
+          "countBack": 32,
+          "firstDataRequest": true
+        },
+        "version": 4,
+        "count": 32,
+        "first": 1787875200000,
+        "last": 1790553600000,
+        "noData": false
+      },
+      "at": 5006
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1787961600,
+        "to": 1788048000
+      },
+      "at": 5010
+    },
+    {
+      "kind": "subscribe",
+      "value": {
+        "r": "1D",
+        "id": "TEST_#_1D"
+      },
+      "at": 5010
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1787961600,
+          "to": 1788048000
+        },
+        "bars": {
+          "from": 1787961600,
+          "to": 1788048000
+        },
+        "spacing": 31.548387096774192,
+        "offset": -29,
+        "version": 4,
+        "count": 600
+      },
+      "at": 5012
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1785283200,
+          "to": 1787875200,
+          "countBack": 30,
+          "firstDataRequest": false
+        },
+        "version": 4,
+        "count": 30,
+        "first": 1785283200000,
+        "last": 1787788800000,
+        "noData": false
+      },
+      "at": 5015
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1785456000,
+        "to": 1788048000
+      },
+      "at": 5023
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1785456000,
+          "to": 1788048000
+        },
+        "bars": {
+          "from": 1785456000,
+          "to": 1788048000
+        },
+        "spacing": 31.548387096774192,
+        "offset": -29,
+        "version": 4,
+        "count": 600
+      },
+      "at": 5024
+    },
+    {
+      "kind": "request",
+      "value": {
+        "r": "1D",
+        "p": {
+          "from": 1777680000,
+          "to": 1785283200,
+          "countBack": 88,
+          "firstDataRequest": false
+        },
+        "version": 4,
+        "count": 88,
+        "first": 1777680000000,
+        "last": 1785196800000,
+        "noData": false
+      },
+      "at": 5049
+    },
+    {
+      "kind": "range",
+      "value": {
+        "from": 1777680000,
+        "to": 1780272000
+      },
+      "at": 5052
+    },
+    {
+      "kind": "loaded",
+      "value": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1777680000,
+          "to": 1780272000
+        },
+        "bars": {
+          "from": 1777680000,
+          "to": 1780272000
+        },
+        "spacing": 31.548387096774192,
+        "offset": -119,
+        "version": 4,
+        "count": 600
+      },
+      "at": 5052
+    }
+  ],
+  "dateJump": {
+    "target": {
+      "from": 1781136000,
+      "to": 1782864000
+    },
+    "actual": {
+      "r": "1D",
+      "ready": true,
+      "range": {
+        "from": 1783728000,
+        "to": 1783814400
+      },
+      "bars": {
+        "from": 1783728000,
+        "to": 1783814400
+      },
+      "spacing": 46.57142857142857,
+      "offset": -78,
+      "version": 2,
+      "count": 80
+    },
+    "events": [
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1783814400
+        },
+        "at": 3451
+      },
+      {
+        "kind": "loaded",
+        "value": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1783728000,
+            "to": 1783814400
+          },
+          "bars": {
+            "from": 1783728000,
+            "to": 1783814400
+          },
+          "spacing": 46.57142857142857,
+          "offset": -78,
+          "version": 2,
+          "count": 80
+        },
+        "at": 3452
+      }
+    ]
+  },
+  "nativeDate": {
+    "state": {
+      "r": "1D",
+      "ready": true,
+      "range": {
+        "from": 1783728000,
+        "to": 1783814400
+      },
+      "bars": {
+        "from": 1783728000,
+        "to": 1783814400
+      },
+      "spacing": 46.57142857142857,
+      "offset": -78,
+      "version": 2,
+      "count": 80
+    },
+    "events": [
+      {
+        "kind": "loaded",
+        "value": {
+          "r": "1D",
+          "ready": true,
+          "range": {
+            "from": 1783728000,
+            "to": 1783814400
+          },
+          "bars": {
+            "from": 1783728000,
+            "to": 1783814400
+          },
+          "spacing": 46.57142857142857,
+          "offset": -78,
+          "version": 2,
+          "count": 80
+        },
+        "at": 3934
+      }
+    ]
+  },
+  "drag": {
+    "state": {
+      "r": "1D",
+      "ready": true,
+      "range": {
+        "from": 1783728000,
+        "to": 1783814400
+      },
+      "bars": {
+        "from": 1783728000,
+        "to": 1783814400
+      },
+      "spacing": 6,
+      "offset": -78,
+      "version": 2,
+      "count": 80
+    },
+    "events": [
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1790899200
+        },
+        "at": 4393
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1790380800
+        },
+        "at": 4412
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1789862400
+        },
+        "at": 4426
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1789257600
+        },
+        "at": 4443
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1788739200
+        },
+        "at": 4461
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1788220800
+        },
+        "at": 4476
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1787702400
+        },
+        "at": 4492
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1787097600
+        },
+        "at": 4509
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1786579200
+        },
+        "at": 4526
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1786060800
+        },
+        "at": 4542
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1785542400
+        },
+        "at": 4559
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1784937600
+        },
+        "at": 4576
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1784419200
+        },
+        "at": 4592
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1783900800
+        },
+        "at": 4609
+      },
+      {
+        "kind": "range",
+        "value": {
+          "from": 1783728000,
+          "to": 1783814400
+        },
+        "at": 4626
+      }
+    ]
+  },
+  "summary": {
+    "passed": 7,
+    "failed": [
+      "explicit date jump before local edge",
+      "native date dialog exposes missing target",
+      "mouse drag can request before local edge"
+    ],
+    "requests": 11
+  }
+}

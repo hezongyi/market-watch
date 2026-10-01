@@ -5,6 +5,7 @@ const events=[];
 const context=vm.createContext({URL,URLSearchParams,Map,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>events.push(m)},
  crypto:{randomUUID:()=> 'test'},addEventListener(){},setTimeout,clearTimeout});
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync('../advanced-host/bridge.js','utf8'),context);
 (async()=>{
  vm.runInContext(`

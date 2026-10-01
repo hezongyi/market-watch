@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "workspace": "2eb7351a-aea2-4b56-b611-d452f70705f9",
+  "target": {
+    "to": 1790860500,
+    "from": 1790849700
+  },
+  "samples": [
+    {
+      "phase": "date-sync",
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "range": {
+            "from": 1790849700,
+            "to": 1790860500
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_GBP",
+          "resolution": "5",
+          "range": {
+            "from": 1790849700,
+            "to": 1790860500
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "MWP:OANDA:EUR_CAD",
+          "resolution": "5",
+          "range": {
+            "from": 1790849700,
+            "to": 1790860500
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_CHF",
+          "resolution": "5",
+          "range": {
+            "from": 1790849700,
+            "to": 1790860500
+          },
+          "spacing": 14.432432432432432
+        }
+      ]
+    },
+    {
+      "phase": "rapid-final",
+      "range": {
+        "from": 1790853300,
+        "to": 1790864100
+      }
+    }
+  ],
+  "restored": {
+    "sync": true,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1790853300,
+          "to": 1790864100
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_GBP",
+        "resolution": "5",
+        "range": {
+          "from": 1790853300,
+          "to": 1790864100
+        }
+      },
+      {
+        "symbol": "MWP:OANDA:EUR_CAD",
+        "resolution": "5",
+        "range": {
+          "from": 1790853300,
+          "to": 1790864100
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_CHF",
+        "resolution": "5",
+        "range": {
+          "from": 1790853300,
+          "to": 1790864100
+        }
+      }
+    ]
+  },
+  "errors": []
+}

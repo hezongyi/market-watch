@@ -1,13 +1,13 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
-const context = vm.createContext({ setTimeout });
+const context = vm.createContext({ setTimeout, requestAnimationFrame: callback => setTimeout(callback, 0) });
 vm.runInContext(
   fs.readFileSync("../advanced-host/viewports.js", "utf8"),
   context,
 );
 (async () => {
-  let sync = true,
+  let sync = true, timeSync = true,
     spacing = 10,
     offset = 10,
     preference = 10;
@@ -34,6 +34,7 @@ vm.runInContext(
       value: () => sync,
       setValue: (value) => (sync = value),
     }),
+    timeSync: () => ({value: () => timeSync,setValue: value => {timeSync=value;}}),
   };
   const saved = context.captureChartViewports(widget);
   saved[0].offset = 9;
@@ -76,6 +77,42 @@ vm.runInContext(
     true,
     "stale restore must leave current workspace untouched",
   );
+  // A ready first pane must not restore geometry while another pane still
+  // loads. Native synchronization can have a queued range call to that pane.
+  let secondReady=false, releaseSecond;
+  const first={...chart,dataReady:callback=>callback(),setVisibleRange:async()=>{
+    assert.equal(secondReady,true,'all pane data must precede range restoration');
+    assert.equal(timeSync,false,'time synchronization must not move peers during restoration');
+  }};
+  const second={...chart,dataReady:callback=>{
+    if(secondReady)callback();else releaseSecond=()=>{secondReady=true;callback()};
+  }};
+  const multi={...widget,chartsCount:()=>2,chart:index=>index?second:first};
+  const restoring=context.restoreChartViewports(multi,saved,()=>true);
+  await new Promise(resolve=>setTimeout(resolve,10));
+  assert.equal(typeof releaseSecond,'function','restoration must observe every pane before the first mutation');
+  assert.equal(sync,true,'initial native date synchronization must settle before changing its toggle');
+  assert.equal(timeSync,true,'initial native time synchronization must settle before changing its toggle');
+  releaseSecond();
+  await restoring;
+  assert.equal(timeSync,true,'restore the actual saved time-sync preference');
+  // A saved synchronized layout has one date-range authority. Updating every
+  // pane independently interrupts native peer synchronization during reopen.
+  const order=[];
+  const panes=[0,1].map(index=>({...chart,dataReady:callback=>callback(),setVisibleRange:async()=>{
+    assert.equal(sync,true,'keep native date synchronization active');
+    assert.equal(timeSync,true,'keep native time synchronization active');
+    order.push(index);
+  }}));
+  const synced={...widget,chartsCount:()=>2,chart:index=>panes[index],activeChartIndex:()=>1,activeChart:()=>panes[1]};
+  await context.restoreChartViewports(synced,[saved[0],saved[0]],()=>true);
+  assert.deepEqual(order,[1],'only the active pane restores a fully synchronized saved layout');
+  order.length=0;
+  const recent={...saved[0],offset:10,spacing:14.7};
+  await context.restoreChartViewports(synced,[recent,recent],()=>true);
+  assert.deepEqual(order,[],'latest-margin restore must use public scale geometry without an extra native goto');
+  assert.equal(spacing,14.7);
+  assert.equal(offset,10);
   console.log(
     "Viewport restoration preserves preferences and checks symbol identity",
   );

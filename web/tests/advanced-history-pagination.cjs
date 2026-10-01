@@ -18,21 +18,25 @@ const context = vm.createContext({
   clearTimeout,
   testRequests: pending,
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 vm.runInContext(
   `
 const planning = [];
-historyQuery = async (args) => {
+request = async (args) => {
+  if(args.op==='dataset') return {ready:true,start:0,revision:1};
+  assertPublished(args);
   planning.push({...args});
-  return { status: "ready", requested_start: args.before - args.limit * 60000,
-    next_cursor: args.before - args.limit * 60000, bars: (await makePage(args)).bars };
+  return makePage(args);
 };
+function assertPublished(args) {
+  if(!args.published || args.series_kind!=='managed') throw Error('expected published managed read');
+}
 const makePage = async (args) => ({bars: Array.from({length: args.limit}, (_, i) => ({
   start: args.before - (args.limit - i) * 60000,
   end: args.before - (args.limit - i - 1) * 60000,
   open: 1, high: 1, low: 1, close: 1,
 })), has_more: true});
-query = async () => { throw Error("ordinary OHLC must reuse planning response"); };
 `,
   context,
 );
@@ -58,7 +62,7 @@ query = async () => { throw Error("ordinary OHLC must reuse planning response");
   );
   vm.runInContext(
     `
-    historyQuery = async (args) => ({status:"ready", bars:[], requested_start:args.before, next_cursor:args.before});
+    request = async (args) => ({bars:[],has_more:true});
   `,
     context,
   );
@@ -74,10 +78,10 @@ query = async () => { throw Error("ordinary OHLC must reuse planning response");
     `
     const notices = [];
     parent.postMessage = (message) => notices.push(message);
-    historyQuery = async (args) => {
+    cache.clear();
+    request = async (args) => {
       workspaceEpoch++;
-      return {status:"ready", bars:(await makePage(args)).bars,
-        requested_start:args.before-args.limit*60000};
+      return makePage(args);
     };
   `,
     context,
@@ -96,7 +100,7 @@ query = async () => { throw Error("ordinary OHLC must reuse planning response");
     "cancelled old workspace must not show an error over the new workspace",
   );
   console.log(
-    "Large countBack traverses planned pages without truncation or duplicate bars",
+    "Large countBack traverses published pages without truncation or duplicate bars",
   );
 })().catch((e) => {
   console.error(e);

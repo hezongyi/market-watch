@@ -1,0 +1,72 @@
+{
+  "passed": false,
+  "registrations": [
+    {
+      "phase": "initial",
+      "status": 200,
+      "body": {
+        "client": "35f9ac19-05a0-4960-bf27-a8774be06978",
+        "listener": "bc09d1d7-0274-4c79-ad7c-09878c8e729d",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790855100000,
+        "revision": 27,
+        "observed_at": 1790855247876,
+        "indicators": []
+      }
+    },
+    {
+      "phase": "initial",
+      "status": 200,
+      "body": {
+        "client": "35f9ac19-05a0-4960-bf27-a8774be06978",
+        "listener": "bc09d1d7-0274-4c79-ad7c-09878c8e729d",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790855100000,
+        "revision": 27,
+        "observed_at": 1790855247876,
+        "indicators": []
+      }
+    }
+  ],
+  "errors": [],
+  "before": {
+    "count": 200,
+    "first": 1790751900000,
+    "last": 1790811600000,
+    "as_of": 1790855266886
+  },
+  "view_before": {
+    "range": {
+      "from": 1790802300,
+      "to": 1790858100
+    },
+    "spacing": 6
+  },
+  "restart_ms": 16487,
+  "persisted_request_ms": 66,
+  "error": "AssertionError [ERR_ASSERTION]: EventSource reconnect re-registers current native listeners",
+  "streams": [
+    {
+      "url": "/api/charts/provider/events?client=35f9ac19-05a0-4960-bf27-a8774be06978",
+      "events": [
+        {
+          "type": "open",
+          "at": 1790855251015,
+          "state": 1
+        },
+        {
+          "type": "error",
+          "at": 1790855277383,
+          "state": 0
+        },
+        {
+          "type": "error",
+          "at": 1790855280385,
+          "state": 2
+        }
+      ]
+    }
+  ]
+}

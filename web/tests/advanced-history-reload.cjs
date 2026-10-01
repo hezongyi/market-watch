@@ -18,6 +18,7 @@ const context = vm.createContext({
   clearTimeout,
   events,
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 (async () => {
   await vm.runInContext(
@@ -33,6 +34,9 @@ widget = {resetCache:()=>{},chartsCount:()=>2, chart:(i)=>({
 })};
 subscriptions.set('five', {symbol:'EURUSD',res:'5', reset:()=>events.push('cache:5')});
 subscriptions.set('hour', {symbol:'EURUSD',res:'60', reset:()=>events.push('cache:60')});
+managedSessions.set('EURUSD|5',{start:0,revision:1});
+managedSessions.set('EURUSD|60',{start:0,revision:1});
+managedSessions.set('XAUUSD|5',{start:0,revision:1});
 pendingHistory.set('EURUSD|5',{instrument:'EURUSD',timeframe:'M5'});
 request = async()=>({status:'ready'});
 query = async()=>({bars:[], history_revision:'one'});
@@ -215,10 +219,11 @@ request=async()=>{throw Error('activity unavailable')};
 await tick();
 })()`, context);
   assert.equal(vm.runInContext("polling",context),false);
-  assert.deepEqual(events,['error:Error: activity unavailable']);
+  assert.deepEqual(events,['query'],
+    'persistent managed maintenance must not depend on a viewport activity renewal');
   events.length=0;
   await vm.runInContext(`(async()=>{request=async()=>({ok:true});await tick()})()`,context);
-  assert.deepEqual(events,['query'],'polling must recover after activity renewal failure');
+  assert.deepEqual(events,['query'],'managed polling remains independent of activity renewals');
   console.log("Grouped polling recovers after failure and prevents overlapping requests");
   console.log(
     "Historical reload invalidates matching cache before resetting only matching panes",

@@ -1,0 +1,62 @@
+{
+  "passed": false,
+  "errors": [],
+  "pages": [
+    {
+      "at": 1790855616421,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790796276000,
+        "firstDataRequest": true,
+        "client": "c5fad3d6-b5a4-4897-b372-e4f598958535",
+        "indicators": [],
+        "before": 1790855676000,
+        "track_history": false
+      }
+    },
+    {
+      "at": 1790855622609,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "before": 1789595100000,
+        "countBack": 10
+      }
+    }
+  ],
+  "extra_history_no_reset": true,
+  "view_before": {
+    "range": {
+      "from": 1790830200,
+      "to": 1790851800
+    },
+    "spacing": 15.36986301369863
+  },
+  "injection": {
+    "action": "revise",
+    "start": 1790849100000,
+    "revision": 40
+  },
+  "reload_ms": 7184,
+  "view_after": {
+    "range": {
+      "from": 1790830200,
+      "to": 1790851800
+    },
+    "spacing": 15.36986301369863,
+    "ready": true
+  },
+  "error": "AssertionError [ERR_ASSERTION]: public reset refetches the revised history",
+  "restoration": {
+    "action": "restore",
+    "start": 1790849100000
+  }
+}

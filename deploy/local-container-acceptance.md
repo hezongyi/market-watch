@@ -74,3 +74,16 @@ docker compose -f compose.acceptance.yaml restart web tls
 2026-09-30已在本机执行本项目down后up --wait，五容器和网络全部重新创建。重建前在web目录运行`MW_SNAPSHOT_MODE=before node tests/advanced-recreate-storage.browser.cjs`，重建后运行同一脚本（不带before），比较完整工作区/偏好摘要；浏览器依赖环境与其他验收测试相同。不要在两次快照之间编辑工作区或并行运行其他浏览器测试。
 
 随后运行advanced-container-https.browser.cjs验证加载与保存。此流程保留开发数据库、配置和镜像；不等于数据库恢复或从零配置整台主机。466个工作区和48项偏好内容比对及HTTPS检查已通过。
+
+### API 容器重建后的代理刷新
+
+当前 web nginx 的 `proxy_pass http://api:8000` 在启动时解析服务地址。
+只重建 api 后，其容器 IP 可能变化；仅重启 tls 不会刷新 web 内的旧地址。
+本机验收升级应在 api 健康后执行：
+
+```bash
+docker compose -f compose.acceptance.yaml restart web tls
+```
+
+沿用同次验收的 `MW_*` 镜像和目录环境变量，确认主入口 `/readyz` 返回成功后再开始浏览器测试。
+此步骤仅针对 Ubuntu acceptance 项目，不用于操作 Unraid 服务。

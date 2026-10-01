@@ -1,0 +1,16 @@
+
+==================================== ERRORS ====================================
+__________ ERROR collecting backend/tests/test_provider_transport.py ___________
+ImportError while importing test module '/home/quant/repos/market-watch-advanced/backend/tests/test_provider_transport.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../miniforge3/envs/planck/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/tests/test_provider_transport.py:3: in <module>
+    from alerts import provider_transport as transport
+E   ImportError: cannot import name 'provider_transport' from 'alerts' (/home/quant/repos/market-watch-advanced/backend/alerts/__init__.py)
+=========================== short test summary info ============================
+ERROR backend/tests/test_provider_transport.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.15s

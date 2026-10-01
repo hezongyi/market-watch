@@ -38,3 +38,7 @@ v1.0.1仅发布本地源码标签，未部署；生产镜像仍以`deploy/releas
 ## v1.2.0 独立图表模块本地交付
 
 按本轮保留原项目、独立接入和仅本地交付要求，v1.2.0标签保留在feature/advanced-charts，不合并原仓库main，不推远端、不部署生产。包版本1.2.0；本机镜像使用1.2.0-local，构建提交与镜像ID见deploy/releases/v1.2.0-local.json。本机origin固定为回环HTTPS，后续生产发布须另行配置和构建。
+
+## v1.3.0 双系列本地候选
+
+包版本1.3.0只表示当前源码的候选版本，不是验收通过或发布声明。先在feature/advanced-charts建立本地候选提交，以同一提交构建API/web/chart并记录镜像ID与构建标签；保持旧已验收版本和旧候选镜像。所有门槛完成后才创建正式本地附注标签，候选阶段不创建v1.3.0正式标签。网络长尾及剩余审计以docs/chart-dual-dataset-acceptance-audit.md为准，不合并main、不push、不操作Unraid。

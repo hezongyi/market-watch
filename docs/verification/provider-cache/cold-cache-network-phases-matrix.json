@@ -1,0 +1,1667 @@
+{
+  "passed": false,
+  "error": "TimeoutError: frame.waitForFunction: Timeout 60000ms exceeded.",
+  "measurements": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1",
+      "began_ms": 1790867022081,
+      "displayed_ms": 3737,
+      "initialized_ms": 3740,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790855203000,
+            "firstDataRequest": true,
+            "client": "a9120e00-e663-4f83-9884-5345c9310bdd",
+            "indicators": [],
+            "before": 1790867083000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1512,
+          "elapsed_ms": 2075,
+          "count": 198,
+          "as_of": 1790867023645,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 4.36,
+            "upstream_slot": 30.85,
+            "network_connection_connect_tcp": 0.37,
+            "network_http11_send_request_headers": 0.25,
+            "network_http11_send_request_body": 0.06,
+            "network_http11_receive_response_headers": 335.56,
+            "network_proxy_start_tls": 1451.41,
+            "network_http11_receive_response_body": 0.27,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 1789.03,
+            "upstream_decode": 0.33,
+            "database_commit": 51.16,
+            "read_total": 2039.41
+          }
+        }
+      ],
+      "range": {
+        "from": 1790856300,
+        "to": 1790867580
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1110,
+        "request_to_display_ms": 236,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M1",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790855210000,
+              "firstDataRequest": true,
+              "client": "e8d90781-6f63-4157-a717-34521b65cf96",
+              "indicators": [],
+              "before": 1790867090000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 874,
+            "elapsed_ms": 52,
+            "count": 198,
+            "as_of": 1790867029486,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 9.2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "5",
+      "began_ms": 1790867033606,
+      "displayed_ms": 2811,
+      "initialized_ms": 2814,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790807695000,
+            "firstDataRequest": true,
+            "client": "9696439c-a5a1-4e59-88e6-50cdb1038635",
+            "indicators": [],
+            "before": 1790867095000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1418,
+          "elapsed_ms": 1241,
+          "count": 198,
+          "as_of": 1790867035040,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 4.13,
+            "upstream_slot": 3.89,
+            "network_http11_send_request_headers": 0.22,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 1134.98,
+            "network_http11_receive_response_body": 0.17,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 1136.21,
+            "upstream_decode": 0.64,
+            "database_commit": 53.32,
+            "read_total": 1227.51
+          }
+        }
+      ],
+      "range": {
+        "from": 1790813400,
+        "to": 1790869800
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1242,
+        "request_to_display_ms": 274,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M5",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790807699000,
+              "firstDataRequest": true,
+              "client": "e7c66483-1c28-4d1c-b924-06e4d026a673",
+              "indicators": [],
+              "before": 1790867099000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 968,
+            "elapsed_ms": 77,
+            "count": 198,
+            "as_of": 1790867037754,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 21.27
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "15",
+      "began_ms": 1790867041885,
+      "displayed_ms": 2269,
+      "initialized_ms": 2277,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790688903000,
+            "firstDataRequest": true,
+            "client": "debea203-7f4e-4c85-bb78-7f6fc6d340a8",
+            "indicators": [],
+            "before": 1790867103000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1517,
+          "elapsed_ms": 553,
+          "count": 198,
+          "as_of": 1790867043439,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 7.76,
+            "upstream_slot": 3,
+            "network_http11_send_request_headers": 0.18,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 387.73,
+            "network_http11_receive_response_body": 0.17,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 388.73,
+            "upstream_decode": 0.28,
+            "database_commit": 46.58,
+            "read_total": 533.12
+          }
+        }
+      ],
+      "range": {
+        "from": 1790706600,
+        "to": 1790875800
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1293,
+        "request_to_display_ms": 417,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M15",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790688905000,
+              "firstDataRequest": true,
+              "client": "9c894064-920f-450d-a319-720f2a98d6bc",
+              "indicators": [],
+              "before": 1790867105000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 876,
+            "elapsed_ms": 256,
+            "count": 198,
+            "as_of": 1790867044002,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 10.71
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "30",
+      "began_ms": 1790867049354,
+      "displayed_ms": 2379,
+      "initialized_ms": 2382,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1790510710000,
+            "firstDataRequest": true,
+            "client": "4f02ec7f-800a-4176-a50d-04a9d10505e6",
+            "indicators": [],
+            "before": 1790867110000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1505,
+          "elapsed_ms": 710,
+          "count": 199,
+          "as_of": 1790867050888,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 5.56,
+            "upstream_slot": 6.44,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 595.84,
+            "network_http11_receive_response_body": 0.11,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 596.81,
+            "upstream_decode": 0.47,
+            "database_commit": 46.6,
+            "read_total": 690.74
+          }
+        }
+      ],
+      "range": {
+        "from": 1790546400,
+        "to": 1790884800
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1167,
+        "request_to_display_ms": 217,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M30",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790510716000,
+              "firstDataRequest": true,
+              "client": "edaa1f65-63e0-4bdf-98c9-df25b2093842",
+              "indicators": [],
+              "before": 1790867116000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 950,
+            "elapsed_ms": 59,
+            "count": 198,
+            "as_of": 1790867054782,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 8.18
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "60",
+      "began_ms": 1790867060224,
+      "displayed_ms": 2075,
+      "initialized_ms": 2089,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1789869201000,
+            "firstDataRequest": true,
+            "client": "55c7745a-aa3f-4e0f-93bc-565f608a77d6",
+            "indicators": [],
+            "before": 1790867121000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1394,
+          "elapsed_ms": 523,
+          "count": 198,
+          "as_of": 1790867061637,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.11,
+            "upstream_slot": 3.63,
+            "network_http11_send_request_headers": 0.21,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 408.29,
+            "network_http11_receive_response_body": 0.15,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 409.33,
+            "upstream_decode": 1.6,
+            "database_commit": 59.03,
+            "read_total": 503.96
+          }
+        }
+      ],
+      "range": {
+        "from": 1790053200,
+        "to": 1790902800
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1210,
+        "request_to_display_ms": 255,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "H1",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1789869207000,
+              "firstDataRequest": true,
+              "client": "04f5931f-ba68-493a-9fb1-08d3b569b113",
+              "indicators": [],
+              "before": 1790867127000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 955,
+            "elapsed_ms": 102,
+            "count": 198,
+            "as_of": 1790867065335,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 75.87
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "240",
+      "began_ms": 1790867070313,
+      "displayed_ms": 2568,
+      "initialized_ms": 2578,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1786875451000,
+            "firstDataRequest": true,
+            "client": "e301d51c-d158-42cd-918f-91fed0f7ff9a",
+            "indicators": [],
+            "before": 1790867131000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1631,
+          "elapsed_ms": 762,
+          "count": 198,
+          "as_of": 1790867071964,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 4.84,
+            "upstream_slot": 5.39,
+            "network_http11_send_request_headers": 0.18,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 628.63,
+            "network_http11_receive_response_body": 0.12,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 629.65,
+            "upstream_decode": 0.24,
+            "database_commit": 61.99,
+            "read_total": 735.97
+          }
+        }
+      ],
+      "range": {
+        "from": 1787259600,
+        "to": 1791176400
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1259,
+        "request_to_display_ms": 195,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "H4",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1786875458000,
+              "firstDataRequest": true,
+              "client": "218eb8ba-614a-42f4-9fb2-7db3deced467",
+              "indicators": [],
+              "before": 1790867138000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1064,
+            "elapsed_ms": 47,
+            "count": 198,
+            "as_of": 1790867076839,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 9.95
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1D",
+      "began_ms": 1790867081562,
+      "displayed_ms": 2098,
+      "initialized_ms": 2108,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1766934343000,
+            "firstDataRequest": true,
+            "client": "1cd974fd-3459-46af-bf4f-937c61027132",
+            "indicators": [],
+            "before": 1790867143000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1461,
+          "elapsed_ms": 482,
+          "count": 199,
+          "as_of": 1790867083072,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 4.49,
+            "upstream_slot": 6.84,
+            "network_http11_send_request_headers": 0.4,
+            "network_http11_send_request_body": 0.05,
+            "network_http11_receive_response_headers": 348.63,
+            "network_http11_receive_response_body": 0.13,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 349.85,
+            "upstream_decode": 0.25,
+            "database_commit": 47.42,
+            "read_total": 447.08
+          }
+        }
+      ],
+      "range": {
+        "from": 1769385600,
+        "to": 1792011600
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1183,
+        "request_to_display_ms": 196,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "D1",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1766934345000,
+              "firstDataRequest": true,
+              "client": "8370f034-7bf9-41cd-adf3-a682cf305c46",
+              "indicators": [],
+              "before": 1790867145000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 987,
+            "elapsed_ms": 36,
+            "count": 198,
+            "as_of": 1790867083572,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 8.47
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1W",
+      "began_ms": 1790867089155,
+      "displayed_ms": 2508,
+      "initialized_ms": 2511,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1671116750000,
+            "firstDataRequest": true,
+            "client": "6e921ea7-92f0-47d6-a9d8-3c404adea8ba",
+            "indicators": [],
+            "before": 1790867150000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1639,
+          "elapsed_ms": 682,
+          "count": 198,
+          "as_of": 1790867090817,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.31,
+            "upstream_slot": 3.88,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 572.77,
+            "network_http11_receive_response_body": 0.12,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 573.87,
+            "upstream_decode": 0.51,
+            "database_commit": 46.39,
+            "read_total": 658.65
+          }
+        }
+      ],
+      "range": {
+        "from": 1682899200,
+        "to": 1796594400
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1336,
+        "request_to_display_ms": 261,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "W1",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1671116756000,
+              "firstDataRequest": true,
+              "client": "d50e700b-1d43-457e-9418-95b0b0b92b68",
+              "indicators": [],
+              "before": 1790867156000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1075,
+            "elapsed_ms": 83,
+            "count": 198,
+            "as_of": 1790867094697,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 18.8
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1M",
+      "began_ms": 1790867099623,
+      "displayed_ms": 2444,
+      "initialized_ms": 2447,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "MN",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1270134361000,
+            "firstDataRequest": true,
+            "client": "d4982f23-ec1d-47e9-8fa0-d94128124398",
+            "indicators": [],
+            "before": 1790867161000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1441,
+          "elapsed_ms": 857,
+          "count": 198,
+          "as_of": 1790867101101,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 7.87,
+            "upstream_slot": 9.29,
+            "network_http11_send_request_headers": 0.24,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 735.25,
+            "network_http11_receive_response_body": 0.13,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 736.3,
+            "upstream_decode": 0.25,
+            "database_commit": 43.84,
+            "read_total": 829.44
+          }
+        }
+      ],
+      "range": {
+        "from": 1322697600,
+        "to": 1817154000
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1314,
+        "request_to_display_ms": 245,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "MN",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1270134365000,
+              "firstDataRequest": true,
+              "client": "5c25b642-9db9-4d15-b343-9f53bd0aad1f",
+              "indicators": [],
+              "before": 1790867165000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1069,
+            "elapsed_ms": 61,
+            "count": 198,
+            "as_of": 1790867103353,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 10.87
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "observed": {
+    "ready": false,
+    "loading": true,
+    "pending": 1,
+    "symbol": "MWP:BTCUSDT",
+    "resolution": "1",
+    "dataReady": false
+  },
+  "requests": [
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790855203000,
+        "firstDataRequest": true,
+        "client": "a9120e00-e663-4f83-9884-5345c9310bdd",
+        "indicators": [],
+        "before": 1790867083000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1512,
+      "elapsed_ms": 2075,
+      "count": 198,
+      "as_of": 1790867023645,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.36,
+        "upstream_slot": 30.85,
+        "network_connection_connect_tcp": 0.37,
+        "network_http11_send_request_headers": 0.25,
+        "network_http11_send_request_body": 0.06,
+        "network_http11_receive_response_headers": 335.56,
+        "network_proxy_start_tls": 1451.41,
+        "network_http11_receive_response_body": 0.27,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 1789.03,
+        "upstream_decode": 0.33,
+        "database_commit": 51.16,
+        "read_total": 2039.41
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M1",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1790855203000,
+        "firstDataRequest": true,
+        "client": "a9120e00-e663-4f83-9884-5345c9310bdd",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -3317,
+      "elapsed_ms": 3318,
+      "count": 230,
+      "as_of": 1790867029486,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2872.26,
+        "upstream_slot": 3.82,
+        "network_http11_send_request_headers": 0.23,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 291.23,
+        "network_http11_receive_response_body": 20.01,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 312.22,
+        "upstream_decode": 0.28,
+        "database_commit": 63.07,
+        "read_total": 3279.94
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790855210000,
+        "firstDataRequest": true,
+        "client": "e8d90781-6f63-4157-a717-34521b65cf96",
+        "indicators": [],
+        "before": 1790867090000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 874,
+      "elapsed_ms": 52,
+      "count": 198,
+      "as_of": 1790867029486,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 9.2
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790807695000,
+        "firstDataRequest": true,
+        "client": "9696439c-a5a1-4e59-88e6-50cdb1038635",
+        "indicators": [],
+        "before": 1790867095000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1418,
+      "elapsed_ms": 1241,
+      "count": 198,
+      "as_of": 1790867035040,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.13,
+        "upstream_slot": 3.89,
+        "network_http11_send_request_headers": 0.22,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 1134.98,
+        "network_http11_receive_response_body": 0.17,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 1136.21,
+        "upstream_decode": 0.64,
+        "database_commit": 53.32,
+        "read_total": 1227.51
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1790807695000,
+        "firstDataRequest": true,
+        "client": "9696439c-a5a1-4e59-88e6-50cdb1038635",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -1373,
+      "elapsed_ms": 1374,
+      "count": 230,
+      "as_of": 1790867037754,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 632.8,
+        "upstream_slot": 3.91,
+        "network_http11_send_request_headers": 0.27,
+        "network_http11_send_request_body": 0.08,
+        "network_http11_receive_response_headers": 616.32,
+        "network_http11_receive_response_body": 0.18,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 617.49,
+        "upstream_decode": 0.3,
+        "database_commit": 56.04,
+        "read_total": 1339.03
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790807699000,
+        "firstDataRequest": true,
+        "client": "e7c66483-1c28-4d1c-b924-06e4d026a673",
+        "indicators": [],
+        "before": 1790867099000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 968,
+      "elapsed_ms": 77,
+      "count": 198,
+      "as_of": 1790867037754,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 21.27
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M15",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790688903000,
+        "firstDataRequest": true,
+        "client": "debea203-7f4e-4c85-bb78-7f6fc6d340a8",
+        "indicators": [],
+        "before": 1790867103000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1517,
+      "elapsed_ms": 553,
+      "count": 198,
+      "as_of": 1790867043439,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 7.76,
+        "upstream_slot": 3,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 387.73,
+        "network_http11_receive_response_body": 0.17,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 388.73,
+        "upstream_decode": 0.28,
+        "database_commit": 46.58,
+        "read_total": 533.12
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M15",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1790688903000,
+        "firstDataRequest": true,
+        "client": "debea203-7f4e-4c85-bb78-7f6fc6d340a8",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -41,
+      "elapsed_ms": 42,
+      "count": 230,
+      "as_of": 1790867044002,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 7.65
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M15",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790688905000,
+        "firstDataRequest": true,
+        "client": "9c894064-920f-450d-a319-720f2a98d6bc",
+        "indicators": [],
+        "before": 1790867105000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 876,
+      "elapsed_ms": 256,
+      "count": 198,
+      "as_of": 1790867044002,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 10.71
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M30",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790510710000,
+        "firstDataRequest": true,
+        "client": "4f02ec7f-800a-4176-a50d-04a9d10505e6",
+        "indicators": [],
+        "before": 1790867110000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1505,
+      "elapsed_ms": 710,
+      "count": 199,
+      "as_of": 1790867050888,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 5.56,
+        "upstream_slot": 6.44,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 595.84,
+        "network_http11_receive_response_body": 0.11,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 596.81,
+        "upstream_decode": 0.47,
+        "database_commit": 46.6,
+        "read_total": 690.74
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M30",
+        "limit": 231,
+        "countBack": 231,
+        "from": 1790510710000,
+        "firstDataRequest": true,
+        "client": "4f02ec7f-800a-4176-a50d-04a9d10505e6",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -3323,
+      "elapsed_ms": 3324,
+      "count": 231,
+      "as_of": 1790867054782,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2284.56,
+        "upstream_slot": 3.92,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 913.56,
+        "network_http11_receive_response_body": 0.12,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 914.53,
+        "upstream_decode": 0.28,
+        "database_commit": 55.53,
+        "read_total": 3287.61
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M30",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790510716000,
+        "firstDataRequest": true,
+        "client": "edaa1f65-63e0-4bdf-98c9-df25b2093842",
+        "indicators": [],
+        "before": 1790867116000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 950,
+      "elapsed_ms": 59,
+      "count": 198,
+      "as_of": 1790867054782,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 8.18
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1789869201000,
+        "firstDataRequest": true,
+        "client": "55c7745a-aa3f-4e0f-93bc-565f608a77d6",
+        "indicators": [],
+        "before": 1790867121000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1394,
+      "elapsed_ms": 523,
+      "count": 198,
+      "as_of": 1790867061637,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.11,
+        "upstream_slot": 3.63,
+        "network_http11_send_request_headers": 0.21,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 408.29,
+        "network_http11_receive_response_body": 0.15,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 409.33,
+        "upstream_decode": 1.6,
+        "database_commit": 59.03,
+        "read_total": 503.96
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1789869201000,
+        "firstDataRequest": true,
+        "client": "55c7745a-aa3f-4e0f-93bc-565f608a77d6",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -3163,
+      "elapsed_ms": 3165,
+      "count": 230,
+      "as_of": 1790867065335,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2273,
+        "upstream_slot": 3.46,
+        "network_http11_send_request_headers": 0.28,
+        "network_http11_send_request_body": 0.04,
+        "network_http11_receive_response_headers": 752.48,
+        "network_http11_receive_response_body": 0.12,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 753.55,
+        "upstream_decode": 0.31,
+        "database_commit": 54.98,
+        "read_total": 3115.9
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1789869207000,
+        "firstDataRequest": true,
+        "client": "04f5931f-ba68-493a-9fb1-08d3b569b113",
+        "indicators": [],
+        "before": 1790867127000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 955,
+      "elapsed_ms": 102,
+      "count": 198,
+      "as_of": 1790867065335,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 75.87
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1786875451000,
+        "firstDataRequest": true,
+        "client": "e301d51c-d158-42cd-918f-91fed0f7ff9a",
+        "indicators": [],
+        "before": 1790867131000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1631,
+      "elapsed_ms": 762,
+      "count": 198,
+      "as_of": 1790867071964,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.84,
+        "upstream_slot": 5.39,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 628.63,
+        "network_http11_receive_response_body": 0.12,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 629.65,
+        "upstream_decode": 0.24,
+        "database_commit": 61.99,
+        "read_total": 735.97
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1786875451000,
+        "firstDataRequest": true,
+        "client": "e301d51c-d158-42cd-918f-91fed0f7ff9a",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -3796,
+      "elapsed_ms": 3797,
+      "count": 230,
+      "as_of": 1790867076839,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3192.17,
+        "upstream_slot": 3.56,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 479.13,
+        "network_http11_receive_response_body": 0.13,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 480.17,
+        "upstream_decode": 0.3,
+        "database_commit": 56.69,
+        "read_total": 3762.11
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1786875458000,
+        "firstDataRequest": true,
+        "client": "218eb8ba-614a-42f4-9fb2-7db3deced467",
+        "indicators": [],
+        "before": 1790867138000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1064,
+      "elapsed_ms": 47,
+      "count": 198,
+      "as_of": 1790867076839,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 9.95
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "D1",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1766934343000,
+        "firstDataRequest": true,
+        "client": "1cd974fd-3459-46af-bf4f-937c61027132",
+        "indicators": [],
+        "before": 1790867143000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1461,
+      "elapsed_ms": 482,
+      "count": 199,
+      "as_of": 1790867083072,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.49,
+        "upstream_slot": 6.84,
+        "network_http11_send_request_headers": 0.4,
+        "network_http11_send_request_body": 0.05,
+        "network_http11_receive_response_headers": 348.63,
+        "network_http11_receive_response_body": 0.13,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 349.85,
+        "upstream_decode": 0.25,
+        "database_commit": 47.42,
+        "read_total": 447.08
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "D1",
+        "limit": 231,
+        "countBack": 231,
+        "from": 1766934343000,
+        "firstDataRequest": true,
+        "client": "1cd974fd-3459-46af-bf4f-937c61027132",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -315,
+      "elapsed_ms": 318,
+      "count": 231,
+      "as_of": 1790867083572,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 7.34
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "D1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1766934345000,
+        "firstDataRequest": true,
+        "client": "8370f034-7bf9-41cd-adf3-a682cf305c46",
+        "indicators": [],
+        "before": 1790867145000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 987,
+      "elapsed_ms": 36,
+      "count": 198,
+      "as_of": 1790867083572,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 8.47
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "W1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1671116750000,
+        "firstDataRequest": true,
+        "client": "6e921ea7-92f0-47d6-a9d8-3c404adea8ba",
+        "indicators": [],
+        "before": 1790867150000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1639,
+      "elapsed_ms": 682,
+      "count": 198,
+      "as_of": 1790867090817,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.31,
+        "upstream_slot": 3.88,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 572.77,
+        "network_http11_receive_response_body": 0.12,
+        "network_http11_response_closed": 0.02,
+        "upstream_http": 573.87,
+        "upstream_decode": 0.51,
+        "database_commit": 46.39,
+        "read_total": 658.65
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "W1",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1671116750000,
+        "firstDataRequest": true,
+        "client": "6e921ea7-92f0-47d6-a9d8-3c404adea8ba",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -2811,
+      "elapsed_ms": 2814,
+      "count": 230,
+      "as_of": 1790867094697,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2099.77,
+        "upstream_slot": 3.24,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 589.04,
+        "network_http11_receive_response_body": 0.15,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 590.01,
+        "upstream_decode": 0.56,
+        "database_commit": 64.45,
+        "read_total": 2791.87
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "W1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1671116756000,
+        "firstDataRequest": true,
+        "client": "d50e700b-1d43-457e-9418-95b0b0b92b68",
+        "indicators": [],
+        "before": 1790867156000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1075,
+      "elapsed_ms": 83,
+      "count": 198,
+      "as_of": 1790867094697,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 18.8
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "MN",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1270134361000,
+        "firstDataRequest": true,
+        "client": "d4982f23-ec1d-47e9-8fa0-d94128124398",
+        "indicators": [],
+        "before": 1790867161000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1441,
+      "elapsed_ms": 857,
+      "count": 198,
+      "as_of": 1790867101101,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 7.87,
+        "upstream_slot": 9.29,
+        "network_http11_send_request_headers": 0.24,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 735.25,
+        "network_http11_receive_response_body": 0.13,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 736.3,
+        "upstream_decode": 0.25,
+        "database_commit": 43.84,
+        "read_total": 829.44
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "MN",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1270134361000,
+        "firstDataRequest": true,
+        "client": "d4982f23-ec1d-47e9-8fa0-d94128124398",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -1316,
+      "elapsed_ms": 1318,
+      "count": 230,
+      "as_of": 1790867103353,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 534.42,
+        "upstream_slot": 3.53,
+        "network_http11_send_request_headers": 0.17,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 654.83,
+        "network_http11_receive_response_body": 0.14,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 655.79,
+        "upstream_decode": 0.31,
+        "database_commit": 61.62,
+        "read_total": 1285.76
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "MN",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1270134365000,
+        "firstDataRequest": true,
+        "client": "5c25b642-9db9-4d15-b343-9f53bd0aad1f",
+        "indicators": [],
+        "before": 1790867165000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1069,
+      "elapsed_ms": 61,
+      "count": 198,
+      "as_of": 1790867103353,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 10.87
+      }
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790855290000,
+        "firstDataRequest": true,
+        "client": "60c22859-0a29-4605-af59-4958f08ff025",
+        "indicators": [],
+        "before": 1790867170000,
+        "track_history": false
+      },
+      "status": 503,
+      "at_ms": 1341,
+      "elapsed_ms": 8509
+    }
+  ]
+}

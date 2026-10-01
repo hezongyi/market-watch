@@ -1,0 +1,299 @@
+{
+  "controller": "http://192.168.7.33:9090",
+  "read_only": true,
+  "configs": {
+    "status": 200,
+    "config": {
+      "mode": "rule",
+      "mixed-port": 7890,
+      "port": 0,
+      "socks-port": 0,
+      "ipv6": false,
+      "allow-lan": true,
+      "log-level": "info",
+      "tcp-concurrent": true,
+      "unified-delay": true
+    }
+  },
+  "proxies": {
+    "status": 200,
+    "proxy_count": 38,
+    "groups": [
+      {
+        "name": "GLOBAL",
+        "type": "Selector",
+        "selected": "🅰️ my_sub",
+        "members": 33
+      },
+      {
+        "name": "♻️ 日本自动测速",
+        "type": "URLTest",
+        "selected": "L1|日本02|中转|流媒体|4x",
+        "members": 20
+      },
+      {
+        "name": "♻️ 流媒体自动测速",
+        "type": "URLTest",
+        "selected": "L1|香港02|中转|流媒体|4x",
+        "members": 42
+      },
+      {
+        "name": "♻️ 美国自动测速",
+        "type": "URLTest",
+        "selected": "L1|美国05|直连|流媒体|2x",
+        "members": 11
+      },
+      {
+        "name": "♻️ 自动测速",
+        "type": "URLTest",
+        "selected": "L1|香港03|中转|流媒体|4x",
+        "members": 72
+      },
+      {
+        "name": "♻️ 香港自动测速",
+        "type": "URLTest",
+        "selected": "L1|香港03|中转|流媒体|4x",
+        "members": 26
+      },
+      {
+        "name": "🅰️ my_sub",
+        "type": "Selector",
+        "selected": "🅰️ my_sub 故障转移",
+        "members": 65
+      },
+      {
+        "name": "🅰️ my_sub 故障转移",
+        "type": "Fallback",
+        "selected": "L1|香港02|中转|流媒体|4x",
+        "members": 26
+      },
+      {
+        "name": "🅰️ my_sub 自动测速",
+        "type": "URLTest",
+        "selected": "L1|香港03|中转|流媒体|4x",
+        "members": 26
+      },
+      {
+        "name": "🅱️ suying_sub",
+        "type": "Selector",
+        "selected": "🅱️ suying_sub 故障转移",
+        "members": 48
+      },
+      {
+        "name": "🅱️ suying_sub 故障转移",
+        "type": "Fallback",
+        "selected": "V4-3309|台湾|x2.0",
+        "members": 46
+      },
+      {
+        "name": "🅱️ suying_sub 自动测速",
+        "type": "URLTest",
+        "selected": "V4-3728|日本GPT|x1.0 ",
+        "members": 46
+      },
+      {
+        "name": "🇭🇰 my_sub",
+        "type": "Fallback",
+        "selected": "L1|香港02|中转|流媒体|4x",
+        "members": 2
+      },
+      {
+        "name": "🇭🇰 suying_sub",
+        "type": "Fallback",
+        "selected": "V4-3503|香港|x1.5",
+        "members": 24
+      },
+      {
+        "name": "🇭🇰 香港专属",
+        "type": "Selector",
+        "selected": "🛟 香港故障转移",
+        "members": 30
+      },
+      {
+        "name": "🇯🇵 my_sub",
+        "type": "Fallback",
+        "selected": "L1|日本01|中转|流媒体|4x",
+        "members": 10
+      },
+      {
+        "name": "🇯🇵 suying_sub",
+        "type": "Fallback",
+        "selected": "V4-3607|日本|x1.5",
+        "members": 10
+      },
+      {
+        "name": "🇯🇵 日本专属",
+        "type": "Selector",
+        "selected": "🛟 日本故障转移",
+        "members": 24
+      },
+      {
+        "name": "🇺🇸 美国专属",
+        "type": "Selector",
+        "selected": "🛟 美国故障转移",
+        "members": 13
+      },
+      {
+        "name": "🎬 流媒体专属",
+        "type": "Selector",
+        "selected": "♻️ 流媒体自动测速",
+        "members": 44
+      },
+      {
+        "name": "📈 Dukascopy行情",
+        "type": "Selector",
+        "selected": "🛟 Dukascopy香港故障转移",
+        "members": 30
+      },
+      {
+        "name": "📈 OANDA行情",
+        "type": "Selector",
+        "selected": "🛟 OANDA美国故障转移",
+        "members": 13
+      },
+      {
+        "name": "📈 Yahoo行情",
+        "type": "Selector",
+        "selected": "🛟 Yahoo香港故障转移",
+        "members": 30
+      },
+      {
+        "name": "🚀 节点选择",
+        "type": "Selector",
+        "selected": "🅱️ suying_sub",
+        "members": 114
+      },
+      {
+        "name": "🛟 Dukascopy香港故障转移",
+        "type": "Fallback",
+        "selected": "L1|香港03|中转|流媒体|4x",
+        "members": 26
+      },
+      {
+        "name": "🛟 OANDA美国故障转移",
+        "type": "Fallback",
+        "selected": "L1|美国01|直连|流媒体|2x",
+        "members": 11
+      },
+      {
+        "name": "🛟 Yahoo香港故障转移",
+        "type": "Fallback",
+        "selected": "L1|香港02|中转|流媒体|4x",
+        "members": 26
+      },
+      {
+        "name": "🛟 全局故障转移",
+        "type": "Fallback",
+        "selected": "L1|香港02|中转|流媒体|4x",
+        "members": 72
+      },
+      {
+        "name": "🛟 日本故障转移",
+        "type": "Fallback",
+        "selected": "L1|日本02|中转|流媒体|4x",
+        "members": 20
+      },
+      {
+        "name": "🛟 流媒体故障转移",
+        "type": "Fallback",
+        "selected": "L1|新加坡04|直连|流媒体|2x",
+        "members": 42
+      },
+      {
+        "name": "🛟 美国故障转移",
+        "type": "Fallback",
+        "selected": "L1|美国01|直连|流媒体|2x",
+        "members": 11
+      },
+      {
+        "name": "🛟 香港故障转移",
+        "type": "Fallback",
+        "selected": "L1|香港03|中转|流媒体|4x",
+        "members": 26
+      }
+    ]
+  },
+  "connections": {
+    "status": 200,
+    "connection_count": 15,
+    "provider_connections": [
+      {
+        "host": "data-api.binance.vision",
+        "network": "tcp",
+        "rule": "DomainSuffix",
+        "chains": [
+          "L1|日本02|中转|流媒体|4x",
+          "🛟 日本故障转移",
+          "🇯🇵 日本专属"
+        ],
+        "start": "2026-10-02T05:44:31.916405735+08:00"
+      },
+      {
+        "host": "data-api.binance.vision",
+        "network": "tcp",
+        "rule": "DomainSuffix",
+        "chains": [
+          "L1|日本02|中转|流媒体|4x",
+          "🛟 日本故障转移",
+          "🇯🇵 日本专属"
+        ],
+        "start": "2026-10-02T05:50:19.824538691+08:00"
+      },
+      {
+        "host": "api-fxpractice.oanda.com",
+        "network": "tcp",
+        "rule": "DomainSuffix",
+        "chains": [
+          "L1|美国01|直连|流媒体|2x",
+          "🛟 OANDA美国故障转移",
+          "📈 OANDA行情"
+        ],
+        "start": "2026-10-02T05:50:13.814940287+08:00"
+      },
+      {
+        "host": "api-fxpractice.oanda.com",
+        "network": "tcp",
+        "rule": "DomainSuffix",
+        "chains": [
+          "L1|美国01|直连|流媒体|2x",
+          "🛟 OANDA美国故障转移",
+          "📈 OANDA行情"
+        ],
+        "start": "2026-10-02T05:25:06.375551969+08:00"
+      },
+      {
+        "host": "data-api.binance.vision",
+        "network": "tcp",
+        "rule": "DomainSuffix",
+        "chains": [
+          "L1|日本02|中转|流媒体|4x",
+          "🛟 日本故障转移",
+          "🇯🇵 日本专属"
+        ],
+        "start": "2026-10-02T05:51:36.406174756+08:00"
+      },
+      {
+        "host": "api-fxpractice.oanda.com",
+        "network": "tcp",
+        "rule": "DomainSuffix",
+        "chains": [
+          "L1|美国01|直连|流媒体|2x",
+          "🛟 OANDA美国故障转移",
+          "📈 OANDA行情"
+        ],
+        "start": "2026-10-02T05:48:39.040036513+08:00"
+      },
+      {
+        "host": "data-api.binance.vision",
+        "network": "tcp",
+        "rule": "DomainSuffix",
+        "chains": [
+          "L1|日本02|中转|流媒体|4x",
+          "🛟 日本故障转移",
+          "🇯🇵 日本专属"
+        ],
+        "start": "2026-10-02T05:56:27.149540614+08:00"
+      }
+    ]
+  }
+}

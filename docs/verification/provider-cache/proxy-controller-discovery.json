@@ -1,0 +1,19 @@
+{
+  "scope": "read-only version endpoints, no settings changes, two conventional controller ports",
+  "records": [
+    {
+      "host": "192.168.7.33",
+      "port": 9090,
+      "path": "/version",
+      "status": 200,
+      "version": "v1.19.31",
+      "meta": true
+    },
+    {
+      "host": "192.168.7.33",
+      "port": 9097,
+      "path": "/version",
+      "error_type": "ConnectError"
+    }
+  ]
+}

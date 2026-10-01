@@ -5,6 +5,7 @@ from datetime import datetime
 import httpx
 
 from .config import settings
+from .market_resources import request_slot
 from .storage import now_ms
 
 
@@ -13,10 +14,11 @@ def fetch_binance(symbol="BTCUSDT", start=None, end=None, mode="live", client=No
         raise ValueError("Unsupported Binance market")
     base = "https://data-api.binance.vision/api/v3"
     owns = client is None
-    client = client or httpx.Client(timeout=15, proxy=settings.binance_proxy or None)
+    client = client or httpx.Client(timeout=15, proxy=settings.effective_binance_proxy or None, trust_env=False)
     try:
         if mode == "quote":
-            response = client.get(base + "/trades", params={"symbol": symbol, "limit": 100})
+            with request_slot("binance"):
+                response = client.get(base + "/trades", params={"symbol": symbol, "limit": 100})
             response.raise_for_status()
             data = response.json()
             return {
@@ -40,8 +42,9 @@ def fetch_binance(symbol="BTCUSDT", start=None, end=None, mode="live", client=No
         cursor = left
         rows = []
         while cursor < right:
-            response = client.get(
-                base + "/klines",
+            with request_slot("binance"):
+                response = client.get(
+                    base + "/klines",
                 params={
                     "symbol": symbol,
                     "interval": "1m",
@@ -109,7 +112,8 @@ def fetch_oanda(symbol, start=None, end=None, mode="live", client=None):
 
         for attempt in range(3):
             try:
-                response = client.get(base + path, params=params, headers=headers)
+                with request_slot("oanda"):
+                    response = client.get(base + path, params=params, headers=headers)
                 if response.status_code not in {502, 503, 504} or attempt == 2:
                     response.raise_for_status()
                     return response

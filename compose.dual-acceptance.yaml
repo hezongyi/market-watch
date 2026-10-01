@@ -1,0 +1,15 @@
+# Parallel local acceptance using only the isolated PostgreSQL fixture.
+# Compose with compose.acceptance.yaml; use a distinct project and env file.
+services:
+  chart-history-worker:
+    cpus: 0.5
+  chart-aggregation-worker:
+    cpus: 0.5
+  chart-origin:
+    ports: !override ["127.0.0.1:15197:80"]
+  tls:
+    ports: !override ["127.0.0.1:15453:443", "127.0.0.1:15454:444"]
+networks:
+  default:
+    external: true
+    name: market-watch-dual-acceptance

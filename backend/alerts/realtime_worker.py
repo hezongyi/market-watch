@@ -10,7 +10,8 @@ from contextlib import ExitStack
 import httpx
 
 from .config import settings
-from .market import fetch_source, once
+from .market import fetch_source, import_once, once
+from .market_resources import lane
 from .providers import fetch_binance, fetch_oanda
 
 
@@ -22,7 +23,7 @@ def main():
             "oanda": stack.enter_context(httpx.Client(timeout=15,
                 proxy=settings.oanda_proxy or None, trust_env=False)),
             "binance": stack.enter_context(httpx.Client(timeout=15,
-                proxy=settings.binance_proxy or None)),
+                proxy=settings.effective_binance_proxy or None, trust_env=False)),
         }
 
         def fetch(source, symbol, start=None, end=None, mode="live"):
@@ -34,7 +35,9 @@ def main():
         while True:
             started = time.monotonic()
             try:
-                once(include_viewers=True, fetcher=fetch)
+                with lane("realtime"):
+                    once(include_viewers=True, fetcher=fetch)
+                    import_once(realtime_only=True, fetcher=fetch)
                 logging.info("realtime_cycle seconds=%.3f", time.monotonic()-started)
             except Exception as error:
                 # Provider/DB details can contain account identifiers.

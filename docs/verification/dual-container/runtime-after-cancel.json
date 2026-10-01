@@ -1,0 +1,128 @@
+{
+  "plans": [
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "status": "cancelled",
+      "target_start": 1788210000000,
+      "target_end": 1790822100000,
+      "cursor": 1790490626194,
+      "realtime_enabled": true,
+      "realtime_end": 1790822820000
+    }
+  ],
+  "publications": [
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "D1",
+      "start": 1790542800000,
+      "end": 1790822820000,
+      "complete_count": 3,
+      "initialized": false
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "H1",
+      "start": 1790542800000,
+      "end": 1790822820000,
+      "complete_count": 77,
+      "initialized": false
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "H4",
+      "start": 1790542800000,
+      "end": 1790822820000,
+      "complete_count": 19,
+      "initialized": false
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "M1",
+      "start": 1790543040000,
+      "end": 1790822820000,
+      "complete_count": 4615,
+      "initialized": false
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "M15",
+      "start": 1790542800000,
+      "end": 1790822820000,
+      "complete_count": 311,
+      "initialized": false
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "M30",
+      "start": 1790542800000,
+      "end": 1790822820000,
+      "complete_count": 155,
+      "initialized": false
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "M5",
+      "start": 1790542800000,
+      "end": 1790822820000,
+      "complete_count": 933,
+      "initialized": false
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "MN",
+      "start": 1790802000000,
+      "end": 1790822820000,
+      "complete_count": 0,
+      "initialized": false
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "timeframe": "W1",
+      "start": 1790542800000,
+      "end": 1790822820000,
+      "complete_count": 0,
+      "initialized": false
+    }
+  ],
+  "connections": [
+    {
+      "application_name": "",
+      "count": 1
+    },
+    {
+      "application_name": "market-watch-compose-acceptance",
+      "count": 4
+    }
+  ],
+  "jobs": [
+    {
+      "priority": 300,
+      "status": "cancelled",
+      "count": 1
+    },
+    {
+      "priority": 300,
+      "status": "complete",
+      "count": 10
+    }
+  ],
+  "newest": [
+    {
+      "instrument_id": "BTCUSDT",
+      "latest": 1790822820000
+    },
+    {
+      "instrument_id": "XAUUSD",
+      "latest": 1790822820000
+    },
+    {
+      "instrument_id": "OANDA:EUR_CHF",
+      "latest": 1790822820000
+    },
+    {
+      "instrument_id": "EURUSD",
+      "latest": 1790822820000
+    }
+  ],
+  "migration": "l13_managed_publication"
+}

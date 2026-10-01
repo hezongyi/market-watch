@@ -13,5 +13,7 @@ vm.runInContext(fs.readFileSync('../advanced-host/history-demand.js','utf8'),con
  active=true;
  await assert.rejects(context.historicalNavigationPage(async()=>({status:'cancelled'}),()=>{throw Error('must not read')},check,()=>{}),/已取消/);
  await assert.rejects(context.historicalNavigationPage(async()=>({window_start:1,window_end:2,window_error:'retry history'}),async()=>({bars:[]}),check,()=>{}),/retry history/);
+ const sparse=await context.historicalNavigationPage(async()=>({window_start:10,window_end:30,timeframe:'M1'}),async()=>({bars:[{start:11}],coverage:[{start:10,end:20},{start:20,end:30}]}),check,()=>{},async()=>{throw Error('certified sparse M1 must not wait forever')});
+ assert.equal(sparse.bars[0].start,11);
  console.log('Historical navigation waits for target coverage and yields to cancellation');
 })().catch(e=>{console.error(e);process.exit(1)});

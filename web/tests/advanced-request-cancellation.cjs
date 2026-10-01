@@ -17,6 +17,7 @@ const context = vm.createContext({
   setTimeout: () => 1,
   clearTimeout() {},
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 (async () => {
   const result = vm.runInContext(
@@ -71,6 +72,25 @@ vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
   console.log(
     "Queued stale history and old workspace requests cancel; current viewers proceed",
   );
+  sent.length = 0;
+  vm.runInContext(`
+    for(let i=0;i<4;i++) request({op:'blocker'},'market');
+    request({op:'historyCache'},'market');
+    request({op:'viewport'},'market');
+    pending.delete([...pending.keys()][0]);
+    drain();
+  `,context);
+  assert.equal(sent.at(-1).query.op,'viewport','viewport interaction precedes queued history');
+  assert.equal(vm.runInContext('pending.size',context),4,'interaction must retain concurrency limit');
+  vm.runInContext(`
+    requests.length=0;
+    request({op:'historyCache',background:true},'market');
+    request({op:'historyDemand'},'market');
+    request({op:'historyCache',background:false},'market');
+    pending.delete([...pending.keys()][0]);
+    drain();
+  `,context);
+  assert.equal(sent.at(-1).query.background,false,'foreground cache read precedes prewarming');
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;

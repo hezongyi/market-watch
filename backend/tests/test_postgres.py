@@ -197,6 +197,7 @@ def test_coverage_millisecond_json_uses_bigint():
 def test_postgres_weekly_demand_dedup_and_concurrent_claim(monkeypatch):
     import uuid
     from threading import Event
+
     from alerts import market_data
     from alerts.storage import WeeklyHistoryRequest
 
@@ -254,6 +255,7 @@ def test_postgres_weekly_migration_roundtrip():
     import subprocess
     import uuid
     from pathlib import Path
+
     from sqlalchemy import inspect
     from sqlalchemy.engine import make_url
 

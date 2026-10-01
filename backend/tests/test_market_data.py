@@ -602,7 +602,7 @@ def test_chart_pages_yield_to_waiting_history_requests(database, monkeypatch, in
     assert set(fetched) == set(starts), "both requests must get a page before either gets two"
     with database.begin() as db:
         jobs = db.scalars(select(ImportJob)).all()
-        assert all(j.cursor == j.start + 4000 * 60000 for j in jobs)
+        assert all(j.cursor == j.start + 600 * 60000 for j in jobs)
         assert all(j.status == "pending" for j in jobs)
 
 

@@ -1,0 +1,14 @@
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(Math.abs(c.range.from-finalRange.from)<=300)
+
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-dual-range-sync.browser.cjs:70:38
+    at Array.forEach (<anonymous>)
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-dual-range-sync.browser.cjs:70:19 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

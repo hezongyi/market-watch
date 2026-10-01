@@ -1,0 +1,15 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_configured_interest_limit_evicts_only_older_reads_of_the_same_session __
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f9f761bb610>
+
+    def test_configured_interest_limit_evicts_only_older_reads_of_the_same_session(database, monkeypatch):
+>       monkeypatch.setattr(service.settings, "provider_interest_limit", 2)
+E       AttributeError: Settings(database_url='[REDACTED]', database_pool_size=2, database_max_overflow=0, database_pool_timeout=15, database_application_name='market-watch', public_url='http://127.0.0.1:8000', admin_password_hash=[REDACTED], cookie_secure=False, ntfy_url='https://ntfy.sh', ntfy_topic='', ntfy_token='', delivery_enabled=False, adapter_path='adapters/dukascopy/probe.mjs', market_proxy='http://192.168.7.33:7890', binance_proxy='', fx_source='dukascopy', oanda_token='[REDACTED]', oanda_account_id='[REDACTED]', oanda_proxy='http://192.168.7.33:7890', session_hours=24, market_poll_seconds=15, import_poll_seconds=5, initial_history_days=0, postgres_bin_dir='/home/quant/.local/libexec/trading-alerts-pg', provider_request_seconds=8.0, provider_fresh_seconds=15, provider_basic_bars=1000, provider_depth_bars=4000, provider_activity_seconds=600, provider_subscription_seconds=60, provider_cache_days=7, provider_cache_max_bars=1000000) has no attribute 'provider_interest_limit'
+
+backend/tests/test_provider_service.py:141: AttributeError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_service.py::test_configured_interest_limit_evicts_only_older_reads_of_the_same_session
+1 failed, 13 deselected in 0.14s

@@ -28,7 +28,6 @@ from .storage import (
     Device,
     DeviceReceipt,
     ImportJob,
-    WeeklyHistoryRequest,
     Instrument,
     LoginSession,
     Notification,
@@ -38,6 +37,7 @@ from .storage import (
     Replay,
     SignalRow,
     Watch,
+    WeeklyHistoryRequest,
     bootstrap,
     candle_dict,
     instant,
@@ -50,7 +50,19 @@ from .storage import (
 @asynccontextmanager
 async def lifespan(app):
     bootstrap()
-    yield
+    from .provider_chart import warm_clients
+    await asyncio.to_thread(warm_clients)
+    from .provider_service import start, stop
+    start()
+    from .provider_cache import interactive_busy
+    from .provider_transport import start as start_transport
+    start_transport(interactive_busy)
+    try:
+        yield
+    finally:
+        await asyncio.to_thread(stop)
+        from .provider_chart import close_clients
+        close_clients()
 
 
 app = FastAPI(title="守望 · Market Watch", lifespan=lifespan)
@@ -1105,7 +1117,9 @@ from .chart_api import router as chart_router  # noqa: E402
 app.include_router(chart_router(authenticated))
 
 from .advanced_api import router as advanced_router  # noqa: E402
+
 app.include_router(advanced_router(authenticated))
 
 from .market_data import router as market_data_router  # noqa: E402
+
 app.include_router(market_data_router(authenticated))

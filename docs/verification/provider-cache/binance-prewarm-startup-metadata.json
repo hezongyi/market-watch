@@ -1,0 +1,522 @@
+{
+  "passed": true,
+  "symbol": "MWP:BTCUSDT",
+  "baseline": {
+    "at": 1790885186457,
+    "reset": true,
+    "datasets": [],
+    "interest_count": 0,
+    "subscriptions": 0,
+    "managed_bars": 70032,
+    "test_symbol": "BTCUSDT",
+    "test_symbol_managed_bars": 1523,
+    "test_symbol_managed_jobs": 2,
+    "test_symbol_managed_plans": [
+      {
+        "instrument": "BTCUSDT",
+        "target_start": 1790814480000,
+        "realtime_enabled": true
+      }
+    ]
+  },
+  "warm_elapsed_ms": 38660,
+  "measurements": [
+    {
+      "resolution": "1D",
+      "elapsed_ms": 280
+    },
+    {
+      "resolution": "240",
+      "elapsed_ms": 501
+    },
+    {
+      "resolution": "5",
+      "elapsed_ms": 50
+    }
+  ],
+  "nativeCallbacks": {
+    "events": [
+      {
+        "type": "bars",
+        "at": 1790885190161,
+        "count": 1,
+        "indicators": 0
+      }
+    ],
+    "callbacks": [
+      {
+        "time": 1790885100000,
+        "at": 1790885190159
+      }
+    ]
+  },
+  "allEvents": [
+    {
+      "type": "bars",
+      "at": 1790885190161,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790885202228,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790885204264,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790885206288,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790885220538,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790885232789,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790885232790,
+      "count": 1,
+      "indicators": 1
+    }
+  ],
+  "pages": [
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790825847000,
+        "firstDataRequest": true,
+        "client": "f9162559-4933-46dd-a1ee-a57732bb2ef2",
+        "indicators": [],
+        "before": 1790885247000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "D1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1773778088000,
+        "firstDataRequest": true,
+        "client": "f9162559-4933-46dd-a1ee-a57732bb2ef2",
+        "indicators": [],
+        "before": 1790885288000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1788034089000,
+        "firstDataRequest": true,
+        "client": "f9162559-4933-46dd-a1ee-a57732bb2ef2",
+        "indicators": [],
+        "before": 1790885289000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "limit": 200,
+        "client": "acceptance-fresh"
+      },
+      "status": 200,
+      "count": 200,
+      "cache_hit": true
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 1,
+        "countBack": 1,
+        "from": 1790825547000,
+        "firstDataRequest": false,
+        "client": "f9162559-4933-46dd-a1ee-a57732bb2ef2",
+        "indicators": [],
+        "before": 1790825847000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 1,
+      "cache_hit": true
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790825700000,
+        "firstDataRequest": true,
+        "client": "f9162559-4933-46dd-a1ee-a57732bb2ef2",
+        "indicators": [
+          {
+            "name": "SMA",
+            "params": {
+              "period": 20
+            }
+          }
+        ],
+        "before": 1790885289000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 199,
+      "cache_hit": true
+    }
+  ],
+  "final": {
+    "at": 1790885249594,
+    "reset": false,
+    "datasets": [
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "D1",
+        "count": 3333,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790885230000
+          ]
+        ],
+        "latest_at": 1790885228905,
+        "revision": 6
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "H1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1776488400000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 6
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "H4",
+        "count": 4005,
+        "earliest": false,
+        "coverage": [
+          [
+            1733227200000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 1790885229189,
+        "revision": 6
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "M1",
+        "count": 4001,
+        "earliest": false,
+        "coverage": [
+          [
+            1790645220000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 6
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "M15",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1787285700000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 6
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "M30",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1783686600000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 6
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "M5",
+        "count": 4199,
+        "earliest": false,
+        "coverage": [
+          [
+            1789625700000,
+            1790885236000
+          ]
+        ],
+        "latest_at": 1790885235206,
+        "revision": 10
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "MN",
+        "count": 111,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "W1",
+        "count": 477,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      }
+    ],
+    "interest_count": 7,
+    "subscriptions": 2,
+    "managed_bars": 70666,
+    "test_symbol": "BTCUSDT",
+    "test_symbol_managed_bars": 1524,
+    "test_symbol_managed_jobs": 2,
+    "test_symbol_managed_plans": [
+      {
+        "instrument": "BTCUSDT",
+        "target_start": 1790814480000,
+        "realtime_enabled": true
+      }
+    ]
+  },
+  "released": {
+    "at": 1790885338543,
+    "reset": false,
+    "datasets": [
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "D1",
+        "count": 3333,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790885230000
+          ]
+        ],
+        "latest_at": 1790885228905,
+        "revision": 6
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "H1",
+        "count": 4017,
+        "earliest": false,
+        "coverage": [
+          [
+            1776427200000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 7
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "H4",
+        "count": 4005,
+        "earliest": false,
+        "coverage": [
+          [
+            1733227200000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 1790885229189,
+        "revision": 6
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "M1",
+        "count": 4990,
+        "earliest": false,
+        "coverage": [
+          [
+            1790585880000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 7
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "M15",
+        "count": 4066,
+        "earliest": false,
+        "coverage": [
+          [
+            1787226300000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 7
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "M30",
+        "count": 4033,
+        "earliest": false,
+        "coverage": [
+          [
+            1783627200000,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 7
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "M5",
+        "count": 4199,
+        "earliest": false,
+        "coverage": [
+          [
+            1789625700000,
+            1790885297000
+          ]
+        ],
+        "latest_at": 1790885296502,
+        "revision": 14
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "MN",
+        "count": 111,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "frame": "W1",
+        "count": 477,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790885230000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      }
+    ],
+    "interest_count": 5,
+    "subscriptions": 0,
+    "managed_bars": 71430,
+    "test_symbol": "BTCUSDT",
+    "test_symbol_managed_bars": 1525,
+    "test_symbol_managed_jobs": 2,
+    "test_symbol_managed_plans": [
+      {
+        "instrument": "BTCUSDT",
+        "target_start": 1790814480000,
+        "realtime_enabled": true
+      }
+    ]
+  },
+  "errors": []
+}

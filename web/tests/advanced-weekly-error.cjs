@@ -17,49 +17,51 @@ const context = vm.createContext({
   setTimeout,
   clearTimeout,
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 vm.runInContext(
-  `historyQuery=async()=>({status:'error',bars:[],error:'provider unavailable',failed_task_ids:[]});`,
+  `request=async args=>{
+    if(args.op==='dataset')return {ready:true,start:0,revision:1};
+    throw Error('provider unavailable');
+  };`,
   context,
 );
 (async () => {
-  const result = await vm.runInContext(
+  await assert.rejects(vm.runInContext(
     `new Promise((resolve,reject)=>feed.getBars({ticker:'EURUSD'},'1W',{to:1800000000,countBack:13},(bars,meta)=>resolve({bars,meta}),reject))`,
     context,
-  );
-  assert.equal(result.bars.length, 0);
-  assert.equal(result.meta.noData, true);
+  ),error=>String(error).includes('provider unavailable'));
   assert.ok(
     sent.some(
-      (m) => m.type === "status" && m.text.includes("周线历史拉取失败"),
+      (m) => m.type === "error" && m.error.includes("provider unavailable"),
     ),
   );
   assert.ok(!sent.some(m => m.text?.includes("已加入后台队列")),
     "failed work must not be reported as queued");
   await vm.runInContext(`(async()=>{
     const recoveryEvents = globalThis.recoveryEvents = [];
-    let retry;
     ready = true;
+    refreshChartHistory=async(widget,chart,invalidate,current)=>{
+      if(!current())return false;invalidate();chart.resetData();return true;
+    };
     widget = {
       chartsCount:()=>1,
       chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '1W',
+        getTimeScale:()=>({rightOffset:()=>0,width:()=>960,barSpacing:()=>6}),
         resetData:()=>recoveryEvents.push('reload')}),
-      showConfirmDialog: options => { retry = options.callback; }
     };
     subscriptions.set('weekly', {symbol:'EURUSD',res:'1W',
       reset:()=>recoveryEvents.push('cache-reset')});
-    rememberHistoryFailure({instrument:'EURUSD',timeframe:'W1'},
-      {failed_task_ids:['failed-week']});
-    offerHistoryRetry();
-    request=async(q)=>{ if(q.op==='retry') recoveryEvents.push('retry'); return {}; };
-    await retry(true);
-    historyQuery=async()=>({status:'ready',bars:[]});
-    query=async()=>({bars:[]});
-    await tick();
+    request=async args=>args.op==='dataset' ? {ready:true,start:0,revision:2} :
+      {bars:[{start:1700000000000,end:1700604800000,open:1,high:2,low:1,close:2}],has_more:false};
+    await refreshManagedHistory('EURUSD');
+    const recovered=await new Promise((resolve,reject)=>feed.getBars({ticker:'EURUSD'},'1W',
+      {to:1800000000,countBack:13},(bars,meta)=>resolve({bars,meta}),reject));
+    if(recovered.bars.length!==1)throw Error('explicit retry must recover real bars');
   })()`, context);
   assert.deepEqual(Array.from(vm.runInContext('recoveryEvents', context)),
-    ['retry', 'cache-reset', 'reload']);
-  console.log("Weekly failure, explicit retry and completion cache refresh passed");
+    ['cache-reset', 'reload']);
+  console.log("Weekly failure stays an error; explicit refresh clears cache and recovers bars");
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;

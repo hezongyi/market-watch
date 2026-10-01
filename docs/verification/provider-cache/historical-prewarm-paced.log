@@ -1,0 +1,97 @@
+AssertionError [ERR_ASSERTION]: completed historic goals cannot recursively extend or refetch
++ actual - expected
+... Skipped lines
+
+  [
+    [
+      'D1',
+      4024,
++     5,
+-     4,
+      [
+        [
+          1315958400000,
++         1790862884052
+-         1790858539000
+        ]
+      ]
+    ],
+    [
+      'H1',
++     4569,
++     5,
+-     4568,
+-     4,
+      [
+        [
+          1767852000000,
++         1790862884476
+-         1790858539000
+        ]
+      ]
+    ],
+    [
+      'H4',
++     4143,
++     5,
+-     4142,
+-     4,
+      [
+        [
+          1706853600000,
++         1790862884212
+-         1790858539000
+        ]
+      ]
+    ],
+    [
+      'M1',
++     8006,
++     12,
+-     8001,
+-     10,
+      [
+        [
+          1787698260000,
++         1788070200000
+-         1787950500000
+        ],
+        [
+          1790612280000,
+          1790858586000
+        ]
+...
+      269,
++     3,
+-     2,
+      [
+        [
+          0,
++         1790862884427
+-         1790858539000
+        ]
+      ]
+    ],
+    [
+      'W1',
+      1165,
++     4,
+-     3,
+      [
+        [
+          0,
++         1790862884130
+-         1790858539000
+        ]
+      ]
+    ]
+  ]
+
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-provider-historical-prewarm.browser.cjs:53:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [Array],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

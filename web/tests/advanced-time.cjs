@@ -19,6 +19,7 @@ const ctx = vm.createContext({
   parent: { postMessage() {} },
   addEventListener() {},
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), ctx);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), ctx);
 function check(start, end, res, symbol, expected) {
   const actual = vm.runInContext(

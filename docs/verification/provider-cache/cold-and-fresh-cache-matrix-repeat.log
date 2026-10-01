@@ -1,0 +1,19 @@
+SAMPLE {"symbol":"MWP:OANDA:AUD_CAD","resolution":"1","began_ms":1790856241824,"displayed_ms":3008,"initialized_ms":3054,"screen_bars":189,"pages":[{"query":{"instrument":"OANDA:AUD_CAD","series_kind":"provider","published":false,"timeframe":"M1","limit":199,"countBack":199,"from":1790844423000,"firstDataRequest":true,"client":"935a4e2e-09d8-4e98-8941-07e6f6102b7d","indicators":[],"before":1790856303000,"track_history":false},"status":200,"at_ms":1773,"elapsed_ms":1105,"count":199,"as_of":1790856243630,"boundary":false,"cache_hit":false}],"range":{"from":1790845560,"to":1790856840},"geometry":{"plot_width":1132,"bar_spacing":6}}
+SAMPLE {"symbol":"MWP:OANDA:AUD_CAD","resolution":"5","began_ms":1790856248538,"displayed_ms":2995,"initialized_ms":3001,"screen_bars":189,"pages":[{"query":{"instrument":"OANDA:AUD_CAD","series_kind":"provider","published":false,"timeframe":"M5","limit":198,"countBack":198,"from":1790796910000,"firstDataRequest":true,"client":"74f0aebe-fac0-4567-b32b-71000a86976b","indicators":[],"before":1790856310000,"track_history":false},"status":200,"at_ms":1621,"elapsed_ms":1221,"count":198,"as_of":1790856250193,"boundary":false,"cache_hit":false}],"range":{"from":1790802600,"to":1790859000},"geometry":{"plot_width":1132,"bar_spacing":6}}
+SAMPLE {"symbol":"MWP:OANDA:AUD_CAD","resolution":"15","began_ms":1790856255912,"displayed_ms":2205,"initialized_ms":2208,"screen_bars":189,"pages":[{"query":{"instrument":"OANDA:AUD_CAD","series_kind":"provider","published":false,"timeframe":"M15","limit":199,"countBack":199,"from":1790678117000,"firstDataRequest":true,"client":"3fa1b601-25db-4473-90d7-1a57b1472831","indicators":[],"before":1790856317000,"track_history":false},"status":200,"at_ms":1573,"elapsed_ms":485,"count":199,"as_of":1790856257501,"boundary":false,"cache_hit":false}],"range":{"from":1790695800,"to":1790865000},"geometry":{"plot_width":1132,"bar_spacing":6}}
+SAMPLE {"symbol":"MWP:OANDA:AUD_CAD","resolution":"30","began_ms":1790856263809,"displayed_ms":2470,"initialized_ms":2486,"screen_bars":189,"pages":[{"query":{"instrument":"OANDA:AUD_CAD","series_kind":"provider","published":false,"timeframe":"M30","limit":198,"countBack":198,"from":1790499925000,"firstDataRequest":true,"client":"0ade5b3e-b841-46c7-a5b8-7e3f48e0d586","indicators":[],"before":1790856325000,"track_history":false},"status":200,"at_ms":1850,"elapsed_ms":475,"count":198,"as_of":1790856265670,"boundary":false,"cache_hit":false}],"range":{"from":1790362800,"to":1790874000},"geometry":{"plot_width":1132,"bar_spacing":6}}
+AssertionError [ERR_ASSERTION]: new native document must consume the fresh persistent cache
+
+false !== true
+
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-provider-first-screen.browser.cjs:75:12
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at process.processImmediate (node:internal/timers:452:9)
+    at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

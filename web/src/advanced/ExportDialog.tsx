@@ -4,6 +4,7 @@ import { apiResponse } from "../api";
 export type ExportSelection = {
   theme?: string;
   instrument: string;
+  series_kind?: "provider" | "managed";
   timeframe: string;
   indicators: Record<string, unknown>[];
 };
@@ -43,6 +44,7 @@ export function ExportDialog({
     setStatus("正在检查历史行情");
     const body = {
       ...selection,
+      published: selection.series_kind !== 'provider',
       start: left,
       end: right,
       indicators: include ? selection.indicators : [],

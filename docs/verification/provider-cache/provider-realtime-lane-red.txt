@@ -1,0 +1,27 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_subscription_updates_use_reserved_realtime_lane _____________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fba161ea450>
+
+    def test_subscription_updates_use_reserved_realtime_lane(database, monkeypatch):
+        from alerts.market_resources import LANE
+        lanes = []
+        def fetch(meta, frame, before, count, **kwargs):
+            lanes.append(LANE.get())
+            return page(before - count * 1000, before)
+        monkeypatch.setattr(upstream, "native_page", fetch)
+        subscribed(monkeypatch, "lane-test", "listener", 0)
+        service.realtime_step()
+>       assert lanes == ["realtime"], "subscription updates cannot consume foreground chart reservations"
+E       AssertionError: subscription updates cannot consume foreground chart reservations
+E       assert ['chart'] == ['realtime']
+E         
+E         At index 0 diff: 'chart' != 'realtime'
+E         Use -v to get more diff
+
+backend/tests/test_provider_service.py:21: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_service.py::test_subscription_updates_use_reserved_realtime_lane
+1 failed, 12 deselected in 0.18s

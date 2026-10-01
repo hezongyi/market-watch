@@ -1,0 +1,63 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const vm = require("node:vm");
+const events = [];
+const ctx = vm.createContext({URL, URLSearchParams, Map, Promise, Date, Intl, Error,
+  location:{search:"?parent=http://localhost"},parent:{postMessage:m=>events.push(m)},
+  crypto:{randomUUID:()=>"test"},addEventListener(){},setTimeout,clearTimeout,
+  atob:s=>Buffer.from(s,"base64").toString("utf8"),btoa:s=>Buffer.from(s).toString("base64")});
+for (const file of ["series.js","bridge.js","indicators.js"])
+  vm.runInContext(fs.readFileSync("../advanced-host/"+file,"utf8"),ctx);
+
+(async()=> {
+  for (const symbol of ["EURUSD","XAUUSD","BTCUSDT","OANDA:EUR_CHF"]) {
+    ctx.symbol = symbol;
+    assert.equal(vm.runInContext('MWSeries.decode(symbol).series_kind',ctx),"managed");
+    assert.equal(vm.runInContext('MWSeries.decode(MWSeries.encode(symbol,"provider")).symbol',ctx),symbol);
+    assert.equal(vm.runInContext('MWSeries.same(symbol,MWSeries.encode(symbol,"provider"))',ctx),false);
+  }
+  ctx.oldSynthetic = "MWPY_"+Buffer.from(JSON.stringify({symbol:"XAUUSD",spec:{name:"SMA"},key:"value"})).toString("base64");
+  ctx.platformSynthetic = "MWPY_"+Buffer.from(JSON.stringify({symbol:"MWP:XAUUSD",spec:{name:"SMA"},key:"value"})).toString("base64");
+  assert.equal(vm.runInContext('decode(oldSynthetic).series_kind',ctx),"managed");
+  assert.equal(vm.runInContext('decode(platformSynthetic).series_kind',ctx),"provider");
+  await vm.runInContext(`(async()=>{
+    globalThis.calls=[];
+    request=async(q,type)=> {
+      calls.push({q,type});
+      if(q.op==='search')return [{id:'OANDA:EUR_CHF',label:'欧元/瑞郎',supported:true,source:'oanda',asset_type:'CURRENCY'}];
+      if(q.op)throw Error('provider unexpectedly requested managed history');
+      return {bars:[{start:1000,end:2000,chart_time:3000,open:1,high:2,low:1,close:2}],
+        history_boundary:true,indicators:[]};
+    };
+    await feed.searchSymbols('EUR','', '', rows=>{globalThis.search=rows});
+    await feed.getBars({ticker:'MWP:OANDA:EUR_CHF'},'1D',
+      {to:10,countBack:10,firstDataRequest:true}, (bars,meta)=>{globalThis.page={bars,meta}}, error=>{throw Error(error)});
+  })()`,ctx);
+  assert.equal(ctx.search[0].ticker,"MWP:OANDA:EUR_CHF","platform search comes first");
+  assert.equal(ctx.search[1].ticker,"OANDA:EUR_CHF","legacy managed identity stays unchanged");
+  assert.equal(ctx.page.bars[0].time,3000,"native provider labels override managed date stamping");
+  assert.equal(ctx.page.meta.noData,true,"only provider's explicit boundary ends pagination");
+  const calls = vm.runInContext('calls',ctx);
+  assert.equal(calls[1].q.series_kind,"provider");
+  assert.equal(calls[1].q.instrument,"OANDA:EUR_CHF");
+  assert.equal(calls[1].type,"data");
+  assert.equal(calls[1].q.limit,10,"first request must preserve native countBack");
+  assert.equal(calls[1].q.countBack,10);
+  assert.equal(calls[1].q.before,10000);
+  assert.equal(calls[1].q.firstDataRequest,true);
+  await vm.runInContext(`(async()=>{
+    request=async(q,type)=>{
+      calls.push({q,type});
+      return {bars:Array.from({length:q.countBack},(_,i)=>({start:(i+1)*1000,
+        end:(i+2)*1000,chart_time:(i+1)*1000,open:1,high:2,low:1,close:2})),
+        history_boundary:false,indicators:[]};
+    };
+    await feed.getBars({ticker:'MWP:BTCUSDT'},'5',{from:1,to:10000,countBack:4500,firstDataRequest:true},
+      bars=>{globalThis.largeBars=bars},error=>{throw Error(error)});
+  })()`,ctx);
+  assert.equal(ctx.largeBars.length,4500,"backend result is delivered without frontend pagination");
+  assert.equal(calls.length,3,"one native request produces exactly one backend read");
+  assert.equal(calls[2].q.countBack,4500);
+  assert.equal(calls[2].q.from,1000);
+  console.log("Series: legacy compatibility, synthetic identity, search defaults, isolated provider feed passed");
+})().catch(error=>{console.error(error);process.exitCode=1});

@@ -1,0 +1,473 @@
+{
+  "passed": true,
+  "symbol": "MWP:OANDA:AUD_CAD",
+  "baseline": {
+    "at": 1790884595169,
+    "reset": true,
+    "datasets": [],
+    "interest_count": 0,
+    "subscriptions": 0,
+    "managed_bars": 63560,
+    "test_symbol": "OANDA:AUD_CAD",
+    "test_symbol_managed_bars": 0,
+    "test_symbol_managed_jobs": 0,
+    "test_symbol_managed_plans": []
+  },
+  "warm_elapsed_ms": 24570,
+  "measurements": [
+    {
+      "resolution": "1D",
+      "elapsed_ms": 383
+    },
+    {
+      "resolution": "240",
+      "elapsed_ms": 406
+    },
+    {
+      "resolution": "5",
+      "elapsed_ms": 38
+    }
+  ],
+  "nativeCallbacks": {
+    "events": [
+      {
+        "type": "bars",
+        "at": 1790884601004,
+        "count": 1,
+        "indicators": 0
+      }
+    ],
+    "callbacks": [
+      {
+        "time": 1790884500000,
+        "at": 1790884601003
+      }
+    ]
+  },
+  "allEvents": [
+    {
+      "type": "bars",
+      "at": 1790884601004,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790884611296,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790884616151,
+      "count": 1,
+      "indicators": 0
+    },
+    {
+      "type": "bars",
+      "at": 1790884630083,
+      "count": 1,
+      "indicators": 1
+    },
+    {
+      "type": "bars",
+      "at": 1790884630084,
+      "count": 1,
+      "indicators": 0
+    }
+  ],
+  "pages": [
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790825256000,
+        "firstDataRequest": true,
+        "client": "3d1dda31-50de-4cac-afbd-dc26549b451d",
+        "indicators": [],
+        "before": 1790884656000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 199,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "D1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1766951885000,
+        "firstDataRequest": true,
+        "client": "3d1dda31-50de-4cac-afbd-dc26549b451d",
+        "indicators": [],
+        "before": 1790884685000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1786893005000,
+        "firstDataRequest": true,
+        "client": "3d1dda31-50de-4cac-afbd-dc26549b451d",
+        "indicators": [],
+        "before": 1790884685000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "limit": 200,
+        "client": "acceptance-fresh"
+      },
+      "status": 200,
+      "count": 200,
+      "cache_hit": true
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790825100000,
+        "firstDataRequest": true,
+        "client": "3d1dda31-50de-4cac-afbd-dc26549b451d",
+        "indicators": [
+          {
+            "name": "SMA",
+            "params": {
+              "period": 20
+            }
+          }
+        ],
+        "before": 1790884686000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 199,
+      "cache_hit": true
+    }
+  ],
+  "final": {
+    "at": 1790884646909,
+    "reset": false,
+    "datasets": [
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "D1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1318032000000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 1790884625662,
+        "revision": 4
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "H1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1770786000000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "H4",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1709791200000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 1790884626030,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1790641020000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M15",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1785902400000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M30",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1780920000000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M5",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1789338900000,
+            1790884645000
+          ]
+        ],
+        "latest_at": 1790884644410,
+        "revision": 7
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "MN",
+        "count": 269,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "W1",
+        "count": 1165,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 4
+      }
+    ],
+    "interest_count": 6,
+    "subscriptions": 2,
+    "managed_bars": 63566,
+    "test_symbol": "OANDA:AUD_CAD",
+    "test_symbol_managed_bars": 0,
+    "test_symbol_managed_jobs": 0,
+    "test_symbol_managed_plans": []
+  },
+  "released": {
+    "at": 1790884739242,
+    "reset": false,
+    "datasets": [
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "D1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1318032000000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 1790884625662,
+        "revision": 4
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "H1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1770786000000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "H4",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1709791200000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 1790884626030,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1790641020000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M15",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1785902400000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M30",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1780920000000,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 3
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M5",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1789338900000,
+            1790884706000
+          ]
+        ],
+        "latest_at": 1790884705994,
+        "revision": 11
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "MN",
+        "count": 269,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "W1",
+        "count": 1165,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790884627000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 4
+      }
+    ],
+    "interest_count": 4,
+    "subscriptions": 0,
+    "managed_bars": 63572,
+    "test_symbol": "OANDA:AUD_CAD",
+    "test_symbol_managed_bars": 0,
+    "test_symbol_managed_jobs": 0,
+    "test_symbol_managed_plans": []
+  },
+  "errors": []
+}

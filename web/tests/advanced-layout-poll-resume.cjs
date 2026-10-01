@@ -18,6 +18,7 @@ const context = vm.createContext({
   clearTimeout,
   events,
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 (async()=>{
  await vm.runInContext(`
@@ -26,6 +27,7 @@ const chart={symbol:()=> 'EURUSD',resolution:()=> '5',getAllStudies:()=>[]};
 widget={chartsCount:()=>1,chart:()=>chart};
 rangeGuard={busy:()=>true};
 subscriptions.set('pane',{symbol:'EURUSD',res:'5',pausedForLayout:true,last:0,cb:()=>{},reset:()=>{}});
+managedSessions.set('EURUSD|5',{start:0,revision:1});
 request=async()=>({});
 query=async()=>{events.push('poll');return {bars:[]}};
 tick();`,context);

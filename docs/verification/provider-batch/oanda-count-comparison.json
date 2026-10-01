@@ -1,0 +1,341 @@
+{
+  "source": "oanda",
+  "instrument": "AUD_CAD",
+  "proxy_enabled": true,
+  "connection": "same pooled client; transport HEAD before samples; counts interleaved in seeded random order",
+  "samples": [
+    {
+      "frame": "M5",
+      "round": 1,
+      "count": 4000,
+      "status": 200,
+      "returned": 4000,
+      "http_ms": 1097.3,
+      "json_ms": 5.4,
+      "total_ms": 1102.7,
+      "bytes": 537200
+    },
+    {
+      "frame": "M5",
+      "round": 1,
+      "count": 1000,
+      "status": 200,
+      "returned": 1000,
+      "http_ms": 780.1,
+      "json_ms": 1.8,
+      "total_ms": 781.9,
+      "bytes": 134707
+    },
+    {
+      "frame": "M5",
+      "round": 1,
+      "count": 600,
+      "status": 200,
+      "returned": 600,
+      "http_ms": 311.7,
+      "json_ms": 0.9,
+      "total_ms": 312.5,
+      "bytes": 80835
+    },
+    {
+      "frame": "M5",
+      "round": 2,
+      "count": 600,
+      "status": 200,
+      "returned": 600,
+      "http_ms": 561.8,
+      "json_ms": 0.7,
+      "total_ms": 562.5,
+      "bytes": 80835
+    },
+    {
+      "frame": "M5",
+      "round": 2,
+      "count": 4000,
+      "status": 200,
+      "returned": 4000,
+      "http_ms": 922.0,
+      "json_ms": 4.0,
+      "total_ms": 926.0,
+      "bytes": 537200
+    },
+    {
+      "frame": "M5",
+      "round": 2,
+      "count": 1000,
+      "status": 200,
+      "returned": 1000,
+      "http_ms": 901.0,
+      "json_ms": 1.5,
+      "total_ms": 902.4,
+      "bytes": 134707
+    },
+    {
+      "frame": "M5",
+      "round": 3,
+      "count": 1000,
+      "status": 200,
+      "returned": 1000,
+      "http_ms": 602.6,
+      "json_ms": 3.2,
+      "total_ms": 605.8,
+      "bytes": 134707
+    },
+    {
+      "frame": "M5",
+      "round": 3,
+      "count": 4000,
+      "status": 200,
+      "returned": 4000,
+      "http_ms": 1131.9,
+      "json_ms": 4.0,
+      "total_ms": 1135.9,
+      "bytes": 537200
+    },
+    {
+      "frame": "M5",
+      "round": 3,
+      "count": 600,
+      "status": 200,
+      "returned": 600,
+      "http_ms": 609.9,
+      "json_ms": 1.0,
+      "total_ms": 610.9,
+      "bytes": 80835
+    },
+    {
+      "frame": "M5",
+      "round": 4,
+      "count": 1000,
+      "status": 200,
+      "returned": 1000,
+      "http_ms": 753.2,
+      "json_ms": 1.0,
+      "total_ms": 754.2,
+      "bytes": 134707
+    },
+    {
+      "frame": "M5",
+      "round": 4,
+      "count": 4000,
+      "status": 200,
+      "returned": 4000,
+      "http_ms": 1124.2,
+      "json_ms": 3.6,
+      "total_ms": 1127.8,
+      "bytes": 537200
+    },
+    {
+      "frame": "M5",
+      "round": 4,
+      "count": 600,
+      "status": 200,
+      "returned": 600,
+      "http_ms": 338.1,
+      "json_ms": 1.6,
+      "total_ms": 339.8,
+      "bytes": 80835
+    },
+    {
+      "frame": "H4",
+      "round": 1,
+      "count": 1000,
+      "status": 200,
+      "returned": 1000,
+      "http_ms": 1189.3,
+      "json_ms": 1.1,
+      "total_ms": 1190.4,
+      "bytes": 136123
+    },
+    {
+      "frame": "H4",
+      "round": 1,
+      "count": 600,
+      "status": 200,
+      "returned": 600,
+      "http_ms": 375.8,
+      "json_ms": 0.7,
+      "total_ms": 376.5,
+      "bytes": 81674
+    },
+    {
+      "frame": "H4",
+      "round": 1,
+      "count": 4000,
+      "status": 200,
+      "returned": 4000,
+      "http_ms": 1098.4,
+      "json_ms": 11.2,
+      "total_ms": 1109.7,
+      "bytes": 544985
+    },
+    {
+      "frame": "H4",
+      "round": 2,
+      "count": 1000,
+      "status": 200,
+      "returned": 1000,
+      "http_ms": 1502.1,
+      "json_ms": 1.4,
+      "total_ms": 1503.5,
+      "bytes": 136123
+    },
+    {
+      "frame": "H4",
+      "round": 2,
+      "count": 4000,
+      "status": 200,
+      "returned": 4000,
+      "http_ms": 1173.0,
+      "json_ms": 4.3,
+      "total_ms": 1177.3,
+      "bytes": 544985
+    },
+    {
+      "frame": "H4",
+      "round": 2,
+      "count": 600,
+      "status": 200,
+      "returned": 600,
+      "http_ms": 613.8,
+      "json_ms": 1.1,
+      "total_ms": 614.9,
+      "bytes": 81674
+    },
+    {
+      "frame": "H4",
+      "round": 3,
+      "count": 600,
+      "status": 200,
+      "returned": 600,
+      "http_ms": 631.5,
+      "json_ms": 0.7,
+      "total_ms": 632.2,
+      "bytes": 81674
+    },
+    {
+      "frame": "H4",
+      "round": 3,
+      "count": 4000,
+      "status": 200,
+      "returned": 4000,
+      "http_ms": 2045.3,
+      "json_ms": 3.8,
+      "total_ms": 2049.2,
+      "bytes": 544985
+    },
+    {
+      "frame": "H4",
+      "round": 3,
+      "count": 1000,
+      "status": 200,
+      "returned": 1000,
+      "http_ms": 401.4,
+      "json_ms": 1.5,
+      "total_ms": 402.8,
+      "bytes": 136123
+    },
+    {
+      "frame": "H4",
+      "round": 4,
+      "count": 4000,
+      "status": 200,
+      "returned": 4000,
+      "http_ms": 1055.6,
+      "json_ms": 4.5,
+      "total_ms": 1060.1,
+      "bytes": 544985
+    },
+    {
+      "frame": "H4",
+      "round": 4,
+      "count": 1000,
+      "status": 200,
+      "returned": 1000,
+      "http_ms": 597.0,
+      "json_ms": 1.4,
+      "total_ms": 598.4,
+      "bytes": 136123
+    },
+    {
+      "frame": "H4",
+      "round": 4,
+      "count": 600,
+      "status": 200,
+      "returned": 600,
+      "http_ms": 616.9,
+      "json_ms": 0.8,
+      "total_ms": 617.8,
+      "bytes": 81674
+    }
+  ],
+  "caveat": "Read-only upstream benchmark. No database writes or browser rendering. Small sample, not a latency guarantee.",
+  "summary": [
+    {
+      "frame": "M5",
+      "count": 600,
+      "n": 4,
+      "median_total_ms": 451.15,
+      "min_total_ms": 312.5,
+      "max_total_ms": 610.9,
+      "median_json_ms": 0.95,
+      "median_bytes": 80835.0,
+      "bars_per_second_at_median": 1329.9
+    },
+    {
+      "frame": "M5",
+      "count": 1000,
+      "n": 4,
+      "median_total_ms": 768.05,
+      "min_total_ms": 605.8,
+      "max_total_ms": 902.4,
+      "median_json_ms": 1.65,
+      "median_bytes": 134707.0,
+      "bars_per_second_at_median": 1302.0
+    },
+    {
+      "frame": "M5",
+      "count": 4000,
+      "n": 4,
+      "median_total_ms": 1115.25,
+      "min_total_ms": 926.0,
+      "max_total_ms": 1135.9,
+      "median_json_ms": 4.0,
+      "median_bytes": 537200.0,
+      "bars_per_second_at_median": 3586.6
+    },
+    {
+      "frame": "H4",
+      "count": 600,
+      "n": 4,
+      "median_total_ms": 616.35,
+      "min_total_ms": 376.5,
+      "max_total_ms": 632.2,
+      "median_json_ms": 0.75,
+      "median_bytes": 81674.0,
+      "bars_per_second_at_median": 973.5
+    },
+    {
+      "frame": "H4",
+      "count": 1000,
+      "n": 4,
+      "median_total_ms": 894.4,
+      "min_total_ms": 402.8,
+      "max_total_ms": 1503.5,
+      "median_json_ms": 1.4,
+      "median_bytes": 136123.0,
+      "bars_per_second_at_median": 1118.1
+    },
+    {
+      "frame": "H4",
+      "count": 4000,
+      "n": 4,
+      "median_total_ms": 1143.5,
+      "min_total_ms": 1060.1,
+      "max_total_ms": 2049.2,
+      "median_json_ms": 4.4,
+      "median_bytes": 544985.0,
+      "bars_per_second_at_median": 3498.0
+    }
+  ]
+}

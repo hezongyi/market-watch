@@ -95,6 +95,23 @@ def validate(spec):
     return name, params
 
 
+def history_requirement(spec):
+    """Extra complete bars needed before a visible page, including recursive warmup."""
+    name, params = validate(spec)
+    if name == "MACD":
+        return 10 * (params["slow"] + params["signal"])
+    if name == "STOCH":
+        return params["k"] + params["smooth"] + params["d"] - 3
+    if name in ("EMA", "RSI", "ATR"):
+        return 10 * params["period"]
+    if "period" in params:
+        return params["period"] - 1
+    requirement = CATALOG[name].get("history_requirement")
+    if requirement is None:
+        raise ValueError("该指标尚未声明前置历史要求")
+    return requirement(params)
+
+
 def calculate(rows, spec):
     name, p = validate(spec)
     arrays = {

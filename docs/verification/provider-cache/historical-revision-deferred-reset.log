@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: public reset refetches the revised history
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-provider-revision.browser.cjs:60:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

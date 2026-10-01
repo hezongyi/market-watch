@@ -1,0 +1,1280 @@
+[
+  {
+    "name": "baseline",
+    "flags": {},
+    "errors": [],
+    "initial": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "request",
+          "value": {
+            "r": "1D",
+            "p": {
+              "from": 1764720000,
+              "to": 1790726400,
+              "countBack": 301,
+              "firstDataRequest": true
+            },
+            "version": 0,
+            "count": 20,
+            "first": 1788912000000,
+            "last": 1790553600000,
+            "noData": true
+          },
+          "at": 820
+        },
+        {
+          "kind": "subscribe",
+          "value": {
+            "r": "1D",
+            "id": "TEST_#_1D"
+          },
+          "at": 852
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1791417600
+          },
+          "at": 858
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "1D",
+            "ready": true,
+            "range": {
+              "from": 1788912000,
+              "to": 1791417600
+            },
+            "bars": {
+              "from": 1788912000,
+              "to": 1790553600
+            },
+            "spacing": 6,
+            "offset": 10,
+            "version": 0,
+            "count": 20
+          },
+          "at": 859
+        }
+      ]
+    },
+    "restoreStart": 4,
+    "restored": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 20
+      },
+      "events": []
+    },
+    "drag": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "spacing": 6,
+        "offset": -18,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790899200
+          },
+          "at": 1729
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790380800
+          },
+          "at": 1746
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789862400
+          },
+          "at": 1763
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789257600
+          },
+          "at": 1782
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1788998400
+          },
+          "at": 1796
+        }
+      ]
+    },
+    "checks": {
+      "partialDisplayed": true,
+      "requestFitsAvailable": false,
+      "preservesSpacing": true,
+      "noFalseEnd": false,
+      "dragRequests": false,
+      "noErrors": true
+    },
+    "pass": false
+  },
+  {
+    "name": "initialTimeframe",
+    "flags": {
+      "initialTimeframe": "1"
+    },
+    "errors": [],
+    "initial": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1789776000,
+          "to": 1790553600
+        },
+        "bars": {
+          "from": 1789776000,
+          "to": 1790553600
+        },
+        "spacing": 102.30000000000001,
+        "offset": 0,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "request",
+          "value": {
+            "r": "1D",
+            "p": {
+              "from": 1764633600,
+              "to": 1790726400,
+              "countBack": 302,
+              "firstDataRequest": true
+            },
+            "version": 0,
+            "count": 20,
+            "first": 1788912000000,
+            "last": 1790553600000,
+            "noData": true
+          },
+          "at": 926
+        },
+        {
+          "kind": "subscribe",
+          "value": {
+            "r": "1D",
+            "id": "TEST_#_1D"
+          },
+          "at": 945
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1789776000,
+            "to": 1790553600
+          },
+          "at": 948
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "1D",
+            "ready": true,
+            "range": {
+              "from": 1789776000,
+              "to": 1790553600
+            },
+            "bars": {
+              "from": 1789776000,
+              "to": 1790553600
+            },
+            "spacing": 102.7,
+            "offset": 0,
+            "version": 0,
+            "count": 20
+          },
+          "at": 951
+        }
+      ]
+    },
+    "restoreStart": 4,
+    "restored": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790553600
+          },
+          "at": 1543
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1791417600
+          },
+          "at": 1544
+        }
+      ]
+    },
+    "drag": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "spacing": 6,
+        "offset": -18,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790899200
+          },
+          "at": 1887
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790380800
+          },
+          "at": 1903
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789862400
+          },
+          "at": 1920
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789257600
+          },
+          "at": 1937
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1788998400
+          },
+          "at": 1953
+        }
+      ]
+    },
+    "checks": {
+      "partialDisplayed": true,
+      "requestFitsAvailable": false,
+      "preservesSpacing": false,
+      "noFalseEnd": false,
+      "dragRequests": false,
+      "noErrors": true
+    },
+    "pass": false
+  },
+  {
+    "name": "intervalHook",
+    "flags": {
+      "intervalHook": "1"
+    },
+    "errors": [],
+    "initial": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1789776000,
+          "to": 1790553600
+        },
+        "bars": {
+          "from": 1789776000,
+          "to": 1790553600
+        },
+        "spacing": 102.3,
+        "offset": 0,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "request",
+          "value": {
+            "r": "5",
+            "p": {
+              "from": 1790550060,
+              "to": 1790640060,
+              "countBack": 300,
+              "firstDataRequest": true
+            },
+            "version": 0,
+            "count": 300,
+            "first": 1790550000000,
+            "last": 1790639700000,
+            "noData": false
+          },
+          "at": 748
+        },
+        {
+          "kind": "subscribe",
+          "value": {
+            "r": "5",
+            "id": "TEST_#_5"
+          },
+          "at": 788
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1790591700,
+            "to": 1790642700
+          },
+          "at": 798
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "5",
+            "ready": true,
+            "range": {
+              "from": 1790591700,
+              "to": 1790642700
+            },
+            "bars": {
+              "from": 1790591700,
+              "to": 1790639700
+            },
+            "spacing": 6,
+            "offset": 10,
+            "version": 0,
+            "count": 20
+          },
+          "at": 798
+        },
+        {
+          "kind": "interval",
+          "value": {
+            "r": "1D",
+            "t": {}
+          },
+          "at": 958
+        },
+        {
+          "kind": "interval-override",
+          "value": {
+            "r": "1D",
+            "t": {
+              "timeframe": {
+                "from": 1789776000,
+                "to": 1790553600,
+                "type": "time-range"
+              }
+            }
+          },
+          "at": 958
+        },
+        {
+          "kind": "request",
+          "value": {
+            "r": "1D",
+            "p": {
+              "from": 1764720000,
+              "to": 1790726400,
+              "countBack": 301,
+              "firstDataRequest": true
+            },
+            "version": 0,
+            "count": 20,
+            "first": 1788912000000,
+            "last": 1790553600000,
+            "noData": true
+          },
+          "at": 1015
+        },
+        {
+          "kind": "subscribe",
+          "value": {
+            "r": "1D",
+            "id": "TEST_#_1D"
+          },
+          "at": 1049
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1789776000,
+            "to": 1790553600
+          },
+          "at": 1050
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "1D",
+            "ready": true,
+            "range": {
+              "from": 1789776000,
+              "to": 1790553600
+            },
+            "bars": {
+              "from": 1789776000,
+              "to": 1790553600
+            },
+            "spacing": 102.3,
+            "offset": 0,
+            "version": 0,
+            "count": 20
+          },
+          "at": 1050
+        }
+      ]
+    },
+    "restoreStart": 10,
+    "restored": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790553600
+          },
+          "at": 1515
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1791417600
+          },
+          "at": 1515
+        }
+      ]
+    },
+    "drag": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "spacing": 6,
+        "offset": -18,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790899200
+          },
+          "at": 1874
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790380800
+          },
+          "at": 1893
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789862400
+          },
+          "at": 1910
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789257600
+          },
+          "at": 1940
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1788998400
+          },
+          "at": 1957
+        }
+      ]
+    },
+    "checks": {
+      "partialDisplayed": true,
+      "requestFitsAvailable": false,
+      "preservesSpacing": false,
+      "noFalseEnd": false,
+      "dragRequests": false,
+      "noErrors": true
+    },
+    "pass": false
+  },
+  {
+    "name": "visibleCount",
+    "flags": {
+      "visibleCount": "1"
+    },
+    "errors": [],
+    "initial": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "request",
+          "value": {
+            "r": "1D",
+            "p": {
+              "from": 1775779200,
+              "to": 1790726400,
+              "countBack": 173,
+              "firstDataRequest": true
+            },
+            "version": 0,
+            "count": 20,
+            "first": 1788912000000,
+            "last": 1790553600000,
+            "noData": true
+          },
+          "at": 772
+        },
+        {
+          "kind": "subscribe",
+          "value": {
+            "r": "1D",
+            "id": "TEST_#_1D"
+          },
+          "at": 808
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1791417600
+          },
+          "at": 815
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "1D",
+            "ready": true,
+            "range": {
+              "from": 1788912000,
+              "to": 1791417600
+            },
+            "bars": {
+              "from": 1788912000,
+              "to": 1790553600
+            },
+            "spacing": 6,
+            "offset": 10,
+            "version": 0,
+            "count": 20
+          },
+          "at": 816
+        }
+      ]
+    },
+    "restoreStart": 4,
+    "restored": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 20
+      },
+      "events": []
+    },
+    "drag": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "spacing": 6,
+        "offset": -18,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790899200
+          },
+          "at": 1660
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790380800
+          },
+          "at": 1676
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789862400
+          },
+          "at": 1693
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789257600
+          },
+          "at": 1710
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1788998400
+          },
+          "at": 1726
+        }
+      ]
+    },
+    "checks": {
+      "partialDisplayed": true,
+      "requestFitsAvailable": false,
+      "preservesSpacing": true,
+      "noFalseEnd": false,
+      "dragRequests": false,
+      "noErrors": true
+    },
+    "pass": false
+  },
+  {
+    "name": "initialTimeframe+visibleCount",
+    "flags": {
+      "initialTimeframe": "1",
+      "visibleCount": "1"
+    },
+    "errors": [],
+    "initial": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1789776000,
+          "to": 1790553600
+        },
+        "bars": {
+          "from": 1789776000,
+          "to": 1790553600
+        },
+        "spacing": 102.30000000000001,
+        "offset": 0,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "request",
+          "value": {
+            "r": "1D",
+            "p": {
+              "from": 1789776000,
+              "to": 1790726400,
+              "countBack": 11,
+              "firstDataRequest": true
+            },
+            "version": 0,
+            "count": 11,
+            "first": 1789689600000,
+            "last": 1790553600000,
+            "noData": false
+          },
+          "at": 801
+        },
+        {
+          "kind": "subscribe",
+          "value": {
+            "r": "1D",
+            "id": "TEST_#_1D"
+          },
+          "at": 822
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1789776000,
+            "to": 1790553600
+          },
+          "at": 825
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "1D",
+            "ready": true,
+            "range": {
+              "from": 1789776000,
+              "to": 1790553600
+            },
+            "bars": {
+              "from": 1789776000,
+              "to": 1790553600
+            },
+            "spacing": 102.7,
+            "offset": 0,
+            "version": 0,
+            "count": 20
+          },
+          "at": 827
+        }
+      ]
+    },
+    "restoreStart": 4,
+    "restored": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1789776000,
+            "to": 1791417600
+          },
+          "at": 1403
+        },
+        {
+          "kind": "request",
+          "value": {
+            "r": "1D",
+            "p": {
+              "from": 1776384000,
+              "to": 1789689600,
+              "countBack": 154,
+              "firstDataRequest": false
+            },
+            "version": 0,
+            "count": 9,
+            "first": 1788912000000,
+            "last": 1789603200000,
+            "noData": true
+          },
+          "at": 1410
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1791417600
+          },
+          "at": 1413
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "1D",
+            "ready": true,
+            "range": {
+              "from": 1788912000,
+              "to": 1791417600
+            },
+            "bars": {
+              "from": 1788912000,
+              "to": 1790553600
+            },
+            "spacing": 6,
+            "offset": 10,
+            "version": 0,
+            "count": 20
+          },
+          "at": 1415
+        }
+      ]
+    },
+    "drag": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "spacing": 6,
+        "offset": -18,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790899200
+          },
+          "at": 1761
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790380800
+          },
+          "at": 1825
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789862400
+          },
+          "at": 1842
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789257600
+          },
+          "at": 1859
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1788998400
+          },
+          "at": 1876
+        }
+      ]
+    },
+    "checks": {
+      "partialDisplayed": true,
+      "requestFitsAvailable": true,
+      "preservesSpacing": false,
+      "noFalseEnd": false,
+      "dragRequests": false,
+      "noErrors": true
+    },
+    "pass": false
+  },
+  {
+    "name": "intervalHook+visibleCount",
+    "flags": {
+      "intervalHook": "1",
+      "visibleCount": "1"
+    },
+    "errors": [],
+    "initial": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1789776000,
+          "to": 1790553600
+        },
+        "bars": {
+          "from": 1789776000,
+          "to": 1790553600
+        },
+        "spacing": 97.8,
+        "offset": 0,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "request",
+          "value": {
+            "r": "5",
+            "p": {
+              "from": 1790588460,
+              "to": 1790640060,
+              "countBack": 172,
+              "firstDataRequest": true
+            },
+            "version": 0,
+            "count": 172,
+            "first": 1790588400000,
+            "last": 1790639700000,
+            "noData": false
+          },
+          "at": 721
+        },
+        {
+          "kind": "subscribe",
+          "value": {
+            "r": "5",
+            "id": "TEST_#_5"
+          },
+          "at": 746
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1790591700,
+            "to": 1790642700
+          },
+          "at": 751
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "5",
+            "ready": true,
+            "range": {
+              "from": 1790591700,
+              "to": 1790642700
+            },
+            "bars": {
+              "from": 1790591700,
+              "to": 1790639700
+            },
+            "spacing": 6,
+            "offset": 10,
+            "version": 0,
+            "count": 20
+          },
+          "at": 751
+        },
+        {
+          "kind": "interval",
+          "value": {
+            "r": "1D",
+            "t": {}
+          },
+          "at": 810
+        },
+        {
+          "kind": "interval-override",
+          "value": {
+            "r": "1D",
+            "t": {
+              "timeframe": {
+                "from": 1789776000,
+                "to": 1790553600,
+                "type": "time-range"
+              }
+            }
+          },
+          "at": 810
+        },
+        {
+          "kind": "request",
+          "value": {
+            "r": "1D",
+            "p": {
+              "from": 1775779200,
+              "to": 1790726400,
+              "countBack": 173,
+              "firstDataRequest": true
+            },
+            "version": 0,
+            "count": 20,
+            "first": 1788912000000,
+            "last": 1790553600000,
+            "noData": true
+          },
+          "at": 974
+        },
+        {
+          "kind": "subscribe",
+          "value": {
+            "r": "1D",
+            "id": "TEST_#_1D"
+          },
+          "at": 1075
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1789776000,
+            "to": 1790553600
+          },
+          "at": 1076
+        },
+        {
+          "kind": "loaded",
+          "value": {
+            "r": "1D",
+            "ready": true,
+            "range": {
+              "from": 1789776000,
+              "to": 1790553600
+            },
+            "bars": {
+              "from": 1789776000,
+              "to": 1790553600
+            },
+            "spacing": 102.3,
+            "offset": 0,
+            "version": 0,
+            "count": 20
+          },
+          "at": 1077
+        }
+      ]
+    },
+    "restoreStart": 10,
+    "restored": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1791417600
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1790553600
+        },
+        "spacing": 6,
+        "offset": 10,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790553600
+          },
+          "at": 1532
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1791417600
+          },
+          "at": 1533
+        }
+      ]
+    },
+    "drag": {
+      "state": {
+        "r": "1D",
+        "ready": true,
+        "range": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "bars": {
+          "from": 1788912000,
+          "to": 1788998400
+        },
+        "spacing": 6,
+        "offset": -18,
+        "version": 0,
+        "count": 20
+      },
+      "events": [
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790899200
+          },
+          "at": 1887
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1790380800
+          },
+          "at": 1904
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789862400
+          },
+          "at": 1927
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1789257600
+          },
+          "at": 1938
+        },
+        {
+          "kind": "range",
+          "value": {
+            "from": 1788912000,
+            "to": 1788998400
+          },
+          "at": 1954
+        }
+      ]
+    },
+    "checks": {
+      "partialDisplayed": true,
+      "requestFitsAvailable": false,
+      "preservesSpacing": false,
+      "noFalseEnd": false,
+      "dragRequests": false,
+      "noErrors": true
+    },
+    "pass": false
+  }
+]

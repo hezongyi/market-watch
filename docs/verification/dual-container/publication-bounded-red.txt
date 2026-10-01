@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_publication_turn_is_bounded_and_rotates_across_all_periods_and_symbols __
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f686d1eab90>
+
+    def test_publication_turn_is_bounded_and_rotates_across_all_periods_and_symbols(database, monkeypatch):
+        from alerts import managed_dataset as managed
+    
+        with database.begin() as db:
+            for ident in ("BTCUSDT", "EURUSD"):
+                join(db, db.get(Instrument, ident), START, START + 30 * MINUTE + 5000)
+        calls = []
+        monkeypatch.setattr(managed, "_PUBLISH_CURSOR", None, raising=False)
+        monkeypatch.setattr(managed, "publish_frame", lambda db, inst, plan, frame, now:
+                            calls.append((inst.id, frame)))
+        managed.publish_once()
+>       assert len(calls) == 1, "one worker aggregation slice must not wait for every publication"
+E       AssertionError: one worker aggregation slice must not wait for every publication
+E       assert 18 == 1
+E        +  where 18 = len([('BTCUSDT', 'M1'), ('BTCUSDT', 'M5'), ('BTCUSDT', 'M15'), ('BTCUSDT', 'M30'), ('BTCUSDT', 'H1'), ('BTCUSDT', 'H4'), ...])
+
+backend/tests/test_managed_dataset.py:76: AssertionError
+=============================== warnings summary ===============================
+../market-watch/.venv/lib/python3.11/site-packages/fastapi/testclient.py:1
+  /home/quant/repos/market-watch/.venv/lib/python3.11/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_managed_dataset.py::test_publication_turn_is_bounded_and_rotates_across_all_periods_and_symbols
+1 failed, 23 deselected, 1 warning in 0.21s

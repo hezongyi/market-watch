@@ -19,6 +19,7 @@ const context = vm.createContext({
   clearTimeout,
   callbacks,
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 vm.runInContext(
   `ready=true;nativeMode=true;dirty=true;

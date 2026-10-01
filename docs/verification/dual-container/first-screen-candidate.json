@@ -1,0 +1,637 @@
+{
+  "passed": false,
+  "error": "AssertionError [ERR_ASSERTION]: MWP:BTCUSDT/15 first display 4957ms exceeds 3s",
+  "measurements": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1",
+      "began_ms": 1790831926441,
+      "displayed_ms": 2681,
+      "initialized_ms": 2717,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1482,
+          "elapsed_ms": 1106,
+          "count": 594,
+          "as_of": 1790831929007,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790821200,
+        "to": 1790832480
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "5",
+      "began_ms": 1790831929632,
+      "displayed_ms": 1575,
+      "initialized_ms": 1579,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 945,
+          "elapsed_ms": 533,
+          "count": 594,
+          "as_of": 1790831931088,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790778300,
+        "to": 1790834700
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "15",
+      "began_ms": 1790831931686,
+      "displayed_ms": 1790,
+      "initialized_ms": 1818,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 597,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1035,
+          "elapsed_ms": 634,
+          "count": 597,
+          "as_of": 1790831933333,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790671500,
+        "to": 1790840700
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "30",
+      "began_ms": 1790831933996,
+      "displayed_ms": 2004,
+      "initialized_ms": 2032,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 597,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 887,
+          "elapsed_ms": 1019,
+          "count": 597,
+          "as_of": 1790831935879,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790337600,
+        "to": 1790848800
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "60",
+      "began_ms": 1790831936469,
+      "displayed_ms": 1663,
+      "initialized_ms": 1679,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H1",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1009,
+          "elapsed_ms": 570,
+          "count": 594,
+          "as_of": 1790831938020,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790017200,
+        "to": 1790866800
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "240",
+      "began_ms": 1790831938677,
+      "displayed_ms": 1630,
+      "initialized_ms": 1635,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1077,
+          "elapsed_ms": 453,
+          "count": 594,
+          "as_of": 1790831940185,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1787230800,
+        "to": 1791147600
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1D",
+      "began_ms": 1790831940826,
+      "displayed_ms": 1597,
+      "initialized_ms": 1623,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 925,
+          "elapsed_ms": 600,
+          "count": 594,
+          "as_of": 1790831942327,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1769385600,
+        "to": 1792011600
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1W",
+      "began_ms": 1790831942944,
+      "displayed_ms": 1664,
+      "initialized_ms": 1695,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 975,
+          "elapsed_ms": 618,
+          "count": 594,
+          "as_of": 1790831944516,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1682899200,
+        "to": 1796594400
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1M",
+      "began_ms": 1790831945152,
+      "displayed_ms": 1699,
+      "initialized_ms": 1717,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "MN",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1019,
+          "elapsed_ms": 596,
+          "count": 269,
+          "as_of": 1790831946753,
+          "boundary": true
+        }
+      ],
+      "range": {
+        "from": 1322697600,
+        "to": 1817154000
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "1",
+      "began_ms": 1790831947389,
+      "displayed_ms": 2217,
+      "initialized_ms": 2249,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1080,
+          "elapsed_ms": 1031,
+          "count": 594,
+          "as_of": 1790831949476,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790821380,
+        "to": 1790832540
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "5",
+      "began_ms": 1790831950142,
+      "displayed_ms": 2671,
+      "initialized_ms": 2691,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 978,
+          "elapsed_ms": 1637,
+          "count": 594,
+          "as_of": 1790831952727,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790778900,
+        "to": 1790834700
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "15",
+      "began_ms": 1790831953356,
+      "displayed_ms": 4957,
+      "initialized_ms": 4993,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 922,
+          "elapsed_ms": 3957,
+          "count": 594,
+          "as_of": 1790831958215,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790673300,
+        "to": 1790840700
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "30",
+      "began_ms": 1790831958870,
+      "displayed_ms": 2472,
+      "initialized_ms": 2494,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1161,
+          "elapsed_ms": 1219,
+          "count": 594,
+          "as_of": 1790831961228,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790514000,
+        "to": 1790848800
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "60",
+      "began_ms": 1790831961927,
+      "displayed_ms": 2220,
+      "initialized_ms": 2246,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H1",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1105,
+          "elapsed_ms": 1050,
+          "count": 594,
+          "as_of": 1790831964062,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1790197200,
+        "to": 1790866800
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "240",
+      "began_ms": 1790831964676,
+      "displayed_ms": 2043,
+      "initialized_ms": 2075,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1121,
+          "elapsed_ms": 819,
+          "count": 594,
+          "as_of": 1790831966596,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1788292800,
+        "to": 1790971200
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "1D",
+      "began_ms": 1790831967233,
+      "displayed_ms": 2288,
+      "initialized_ms": 2290,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1148,
+          "elapsed_ms": 1049,
+          "count": 594,
+          "as_of": 1790831969410,
+          "boundary": false
+        }
+      ],
+      "range": {
+        "from": 1775606400,
+        "to": 1791676800
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "1W",
+      "began_ms": 1790831970044,
+      "displayed_ms": 1789,
+      "initialized_ms": 1799,
+      "screen_bars": 186,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1098,
+          "elapsed_ms": 601,
+          "count": 477,
+          "as_of": 1790831971725,
+          "boundary": true
+        }
+      ],
+      "range": {
+        "from": 1684713600,
+        "to": 1796601600
+      },
+      "geometry": {
+        "plot_width": 1114,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "1M",
+      "began_ms": 1790831972373,
+      "displayed_ms": 1264,
+      "initialized_ms": 1288,
+      "screen_bars": 186,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "MN",
+            "limit": 594,
+            "indicators": [],
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 961,
+          "elapsed_ms": 220,
+          "count": 111,
+          "as_of": 1790831973545,
+          "boundary": true
+        }
+      ],
+      "range": {
+        "from": 1501545600,
+        "to": 1817078400
+      },
+      "geometry": {
+        "plot_width": 1114,
+        "bar_spacing": 6
+      }
+    }
+  ],
+  "errors": []
+}

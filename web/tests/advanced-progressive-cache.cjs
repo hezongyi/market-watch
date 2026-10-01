@@ -3,12 +3,14 @@ const context=vm.createContext({Map,Promise,Date,JSON});
 vm.runInContext(fs.readFileSync('../advanced-host/progressive-history.js','utf8'),context);
 (async()=>{
  let reads=0,active=true,bars=[],updates=0,busy=false;
- const cache=context.progressiveHistory(async()=>{reads++;return {bars:[...bars]}},()=>active,async()=>{if(busy)return false;updates++},e=>{throw e});
+ const priorities=[];
+ const cache=context.progressiveHistory(async(_,background)=>{reads++;priorities.push(!!background);return {bars:[...bars]}},()=>active,async()=>{if(busy)return false;updates++},e=>{throw e});
  const args={instrument:'XAUUSD',timeframe:'D1',before:100,limit:200};
  const [a,b]=await Promise.all([cache.get(args),cache.get(args)]);
  assert.equal(reads,1);assert.deepEqual(a,b);
  await cache.get(args);assert.equal(reads,1);
  await cache.poll();assert.equal(updates,0);
+ assert.deepEqual(priorities,[false,true],'initial read is foreground; periodic refresh is background');
  bars=[{start:10,close:12}];await cache.poll();assert.equal(updates,1);
  await cache.poll();assert.equal(updates,1);
  bars=[{start:10,close:13}];await cache.poll();assert.equal(updates,2);

@@ -1,0 +1,157 @@
+[
+  {
+    "test": "advanced-autosave.cjs",
+    "passed": true,
+    "output": "Autosave preserves in-flight edits and failed-save retry state\n"
+  },
+  {
+    "test": "advanced-chart-style.cjs",
+    "passed": true,
+    "output": "style extraction: presentation whitelist, no workspace objects, detached copy passed\n"
+  },
+  {
+    "test": "advanced-cold-pagination.cjs",
+    "passed": true,
+    "output": ""
+  },
+  {
+    "test": "advanced-edge-sync.cjs",
+    "passed": true,
+    "output": "Edge range synchronization: alignment, loading, user toggle and disposal passed\n"
+  },
+  {
+    "test": "advanced-history-boundaries.cjs",
+    "passed": true,
+    "output": "Published pagination preserves latest subscription boundary and earliest revision range\n"
+  },
+  {
+    "test": "advanced-history-change-range.cjs",
+    "passed": true,
+    "output": "Historical views ignore remote latest revisions; visible revisions and initial data still refresh\n"
+  },
+  {
+    "test": "advanced-history-dedup.cjs",
+    "passed": true,
+    "output": "Concurrent history reads share requests, distinct periods isolate, completion and failure clear entries\n"
+  },
+  {
+    "test": "advanced-history-demand.cjs",
+    "passed": true,
+    "output": "Viewport demand counts spacing, shares pane identity, renews, excludes W/M and disposes\n"
+  },
+  {
+    "test": "advanced-history-pagination.cjs",
+    "passed": true,
+    "output": "Large countBack traverses published pages without truncation or duplicate bars\n"
+  },
+  {
+    "test": "advanced-history-reload.cjs",
+    "passed": true,
+    "output": "Grouped polling recovers after failure and prevents overlapping requests\nHistorical reload invalidates matching cache before resetting only matching panes\n"
+  },
+  {
+    "test": "advanced-inflight-cancellation.cjs",
+    "passed": true,
+    "output": "Four obsolete in-flight histories release slots within 180ms; current request starts\n"
+  },
+  {
+    "test": "advanced-latest-cache.cjs",
+    "passed": true,
+    "output": "Latest snapshot immediate reuse and asynchronous refresh passed\n"
+  },
+  {
+    "test": "advanced-layout-poll-resume.cjs",
+    "passed": true,
+    "output": "Visible polling resumes independently of deferred historical reset\n"
+  },
+  {
+    "test": "advanced-managed.cjs",
+    "passed": true,
+    "output": "Managed feed: consent, refusal, real geometry, published session boundary passed\n"
+  },
+  {
+    "test": "advanced-monthly-cache.cjs",
+    "passed": true,
+    "output": "Monthly local-only history: empty, partial and multi-page cached data passed\n"
+  },
+  {
+    "test": "advanced-native-workspaces.cjs",
+    "passed": true,
+    "output": "native workspace adapter: conflict, serialized saves and readonly passed\n"
+  },
+  {
+    "test": "advanced-navigation-page.cjs",
+    "passed": true,
+    "output": "Historical navigation waits for target coverage and yields to cancellation\n"
+  },
+  {
+    "test": "advanced-preferences.cjs",
+    "passed": true,
+    "output": "native adapters: queued writes, namespaces, reload, conflict and readonly passed\n"
+  },
+  {
+    "test": "advanced-prewarm-cache.cjs",
+    "passed": true,
+    "output": "Prewarmed period pages satisfy smaller requests without network; boundaries and capacity enforced\n"
+  },
+  {
+    "test": "advanced-progressive-cache.cjs",
+    "passed": true,
+    "output": "Progressive cache deduplicates, returns warm data, refreshes revisions and stops hidden polling\n"
+  },
+  {
+    "test": "advanced-progressive-indicators.cjs",
+    "passed": true,
+    "output": "Progressive studies use only ready raw history; empty pages skip calculation\n"
+  },
+  {
+    "test": "advanced-python-indicators.cjs",
+    "passed": true,
+    "output": "Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed\n"
+  },
+  {
+    "test": "advanced-range-sync.cjs",
+    "passed": true,
+    "output": "Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed\n"
+  },
+  {
+    "test": "advanced-refresh-interaction.cjs",
+    "passed": true,
+    "output": "History refresh yields to new mouse/focus/zoom intent and removes listeners\n"
+  },
+  {
+    "test": "advanced-request-cancellation.cjs",
+    "passed": true,
+    "output": "Queued stale history and old workspace requests cancel; current viewers proceed\n"
+  },
+  {
+    "test": "advanced-series.cjs",
+    "passed": true,
+    "output": "Series: legacy compatibility, synthetic identity, search defaults, isolated provider feed passed\n"
+  },
+  {
+    "test": "advanced-time.cjs",
+    "passed": true,
+    "output": "13 calendar label cases passed; intraday timestamp unchanged\n"
+  },
+  {
+    "test": "advanced-viewports.cjs",
+    "passed": true,
+    "output": "Viewport restoration preserves preferences and checks symbol identity\n"
+  },
+  {
+    "test": "advanced-watchlists.cjs",
+    "passed": true,
+    "output": "Watchlist restore avoids empty native collection; retry and readonly passed\n"
+  },
+  {
+    "test": "advanced-weekly-background.cjs",
+    "passed": true,
+    "output": "Weekly preparing callback yields, releases guard, and refreshes only on explicit action\n"
+  },
+  {
+    "test": "advanced-weekly-error.cjs",
+    "passed": true,
+    "output": "Weekly failure stays an error; explicit refresh clears cache and recovers bars\n"
+  }
+]

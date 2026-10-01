@@ -1,0 +1,25 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_pool_retains_all_allowed_connections_without_increasing_concurrency ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f64ec58aed0>
+
+    def test_pool_retains_all_allowed_connections_without_increasing_concurrency(monkeypatch):
+        from alerts.market_resources import lane
+        calls = []
+        original_client = httpx.Client
+        def make(**kwargs):
+            calls.append(kwargs)
+            return original_client(transport=httpx.MockTransport(lambda _: httpx.Response(200)))
+        monkeypatch.setattr(transport.httpx, 'Client', make)
+        transport.close_clients()
+        try:
+            assert transport.pooled_client('binance') is transport.pooled_client('binance')
+>           assert calls[0]['limits'].max_connections == 2
+E           assert 4 == 2
+E            +  where 4 = Limits(max_connections=4, max_keepalive_connections=4, keepalive_expiry=60).max_connections
+
+backend/tests/test_provider_transport.py:45: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_transport.py::test_pool_retains_all_allowed_connections_without_increasing_concurrency
+1 failed, 3 deselected in 0.09s

@@ -8,8 +8,9 @@ import httpx
 
 from .chart_history_plan import advance_pending_plans
 from .config import settings
-from .market import import_once
-from .market_data import advance_weekly_request, refresh_catalog
+from .market import fetch_source, import_once
+from .market_data import refresh_catalog
+from .market_resources import lane
 from .providers import fetch_binance, fetch_oanda
 
 
@@ -19,22 +20,23 @@ def main():
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.info(
         "chart_history_start module=%s oanda_proxy=%s binance_proxy=%s",
-        __file__, bool(settings.oanda_proxy), bool(settings.binance_proxy),
+        __file__, bool(settings.oanda_proxy), bool(settings.effective_binance_proxy),
     )
     with ExitStack() as stack:
         clients = {
             "oanda": stack.enter_context(httpx.Client(timeout=15, proxy=settings.oanda_proxy or None, trust_env=False)),
-            "binance": stack.enter_context(httpx.Client(timeout=15, proxy=settings.binance_proxy or None)),
+            "binance": stack.enter_context(httpx.Client(timeout=15, proxy=settings.effective_binance_proxy or None, trust_env=False)),
         }
         def fetch_page(source, symbol, start, end):
-            provider = {"oanda": fetch_oanda, "binance": fetch_binance}[source]
+            provider = {"oanda": fetch_oanda, "binance": fetch_binance}.get(source)
+            if provider is None:
+                return fetch_source(source, symbol, start, end)
             return provider(symbol, start, end, client=clients[source])
         run(fetch_page)
 
 
 def run(fetch_page):
     refreshed = 0
-    maintained = 0
     while True:
         try:
             if time.monotonic() - refreshed > 86400:
@@ -44,13 +46,15 @@ def run(fetch_page):
                 except Exception as exc:
                     logging.warning("catalog refresh failed: %s",type(exc).__name__)
                     refreshed = time.monotonic()-86400+300
-            if time.monotonic() - maintained > 15:
-                advance_weekly_request()
-                maintained = time.monotonic()
             # Reevaluate after every completed page; do not idle for the
             # maintenance timer while a foreground window is still incomplete.
             advance_pending_plans()
-            worked = import_once(chart_only=True, fetcher=fetch_page, defer_aggregation=True)
+            # Recent repair is owned by the realtime worker. Manual and old
+            # recovery work share this bounded historical executor.
+            with lane('history'):
+                worked = import_once(fetcher=fetch_page, defer_aggregation=True, history_only=True)
+                if not worked:
+                    worked = import_once(chart_only=True, fetcher=fetch_page, defer_aggregation=True, history_only=True)
             time.sleep(0.2 if worked else 1)
         except Exception as exc:
             logging.warning("chart history cycle failed: %s", type(exc).__name__)

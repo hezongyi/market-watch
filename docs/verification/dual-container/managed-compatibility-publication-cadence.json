@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "database": "market_watch_dual",
+  "delivery_enabled": false,
+  "alert": {
+    "watch_id": "538323eb-bfad-45b6-8cfb-ad6fe991b0f9",
+    "price": "84563.5400000000",
+    "occurred_at": 1790887560000,
+    "worker_dispatch_ms": 5163,
+    "outbox_cancelled_without_delivery": true,
+    "caveat": "Historical real-price crossing, realtime-worker dispatch latency; not close-to-notification network latency."
+  },
+  "replay": {
+    "id": "8f95fdc8-6e7c-4874-ab00-0c57e9413ced",
+    "source": "managed candles",
+    "future_hidden": true,
+    "step_minutes": 5,
+    "real_ohlc_matches": true,
+    "export_restore": true,
+    "provider_replay_rejected": true,
+    "provider_alert_rejected": true
+  },
+  "observed_at": 1790890484065
+}

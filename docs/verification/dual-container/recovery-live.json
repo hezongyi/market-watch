@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "started_at": 1790827506131,
+  "samples": [
+    {
+      "phase": "backup",
+      "at": 1790827506484,
+      "backup": "/tmp/mw-dual-recovery-pre.dump"
+    },
+    {
+      "phase": "fault_injected",
+      "at": 1790827517062,
+      "gap_start": 1790818500000,
+      "gap_end": 1790827500000,
+      "deleted_minutes": 149,
+      "published_snapshot_preserved": true,
+      "normalized_adopted_fixture": []
+    },
+    {
+      "phase": "automatic_repair_queued",
+      "at": 1790827518758,
+      "repair_ids": [
+        "2a0fbdb4-dd55-45e2-b3bc-414c9d4c1562"
+      ],
+      "latest_m1": 1790827500000,
+      "history_count": 29,
+      "hold": "next_at deferred to observe priority while realtime polls continue"
+    },
+    {
+      "phase": "live_advanced_while_history_yielded",
+      "at": 1790827565910,
+      "latest_m1": 1790827560000,
+      "latency_ms": 5910,
+      "history_count": 29
+    },
+    {
+      "phase": "repair_released",
+      "at": 1790827565914
+    },
+    {
+      "phase": "repair_complete",
+      "at": 1790827569928,
+      "elapsed_ms": 4014,
+      "repaired_minutes": 150,
+      "no_duplicate_m1": true
+    },
+    {
+      "phase": "history_resumed",
+      "at": 1790827572939,
+      "history_count": 30,
+      "published_end": 1790827560000
+    },
+    {
+      "phase": "publication_recovered",
+      "at": 1790827572949,
+      "dataset": {
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "target_start": 1790814480000,
+        "plot_width": 960,
+        "bar_spacing": 6,
+        "initialization_end": 1790823420000,
+        "cursor": 1790814480000,
+        "history_status": "complete",
+        "realtime_enabled": true,
+        "realtime_end": 1790827560000,
+        "start": 1790814600000,
+        "end": 1790827560000,
+        "revision": 72,
+        "complete_count": 43,
+        "threshold": 480,
+        "ready": true,
+        "initialized": true,
+        "indicator_ready": true,
+        "reason": "ready"
+      },
+      "adopted_initialized": true
+    }
+  ],
+  "database": "market_watch_dual",
+  "fault": "remove recent acquisition M1 and coverage",
+  "finished_at": 1790827573583
+}

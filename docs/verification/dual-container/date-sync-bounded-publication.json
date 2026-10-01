@@ -1,0 +1,97 @@
+{
+  "passed": true,
+  "workspace": "6b748f04-5833-498c-9d26-25d0f119e327",
+  "target": {
+    "to": 1790798700,
+    "from": 1790787900
+  },
+  "samples": [
+    {
+      "phase": "date-sync",
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "range": {
+            "from": 1790787900,
+            "to": 1790798700
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_GBP",
+          "resolution": "5",
+          "range": {
+            "from": 1790787900,
+            "to": 1790798700
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790787900,
+            "to": 1790798700
+          },
+          "spacing": 14.162162162162161
+        },
+        {
+          "symbol": "OANDA:EUR_CHF",
+          "resolution": "5",
+          "range": {
+            "from": 1790787900,
+            "to": 1790798700
+          },
+          "spacing": 14.432432432432432
+        }
+      ]
+    },
+    {
+      "phase": "rapid-final",
+      "range": {
+        "from": 1790877900,
+        "to": 1790888700
+      }
+    }
+  ],
+  "restored": {
+    "sync": true,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1790877900,
+          "to": 1790888700
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_GBP",
+        "resolution": "5",
+        "range": {
+          "from": 1790877900,
+          "to": 1790888700
+        }
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "5",
+        "range": {
+          "from": 1790877900,
+          "to": 1790888700
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_CHF",
+        "resolution": "5",
+        "range": {
+          "from": 1790878200,
+          "to": 1790888700
+        }
+      }
+    ]
+  },
+  "errors": [],
+  "legacy_format": false
+}

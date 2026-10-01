@@ -1,0 +1,17 @@
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   'undefined',
++   'undefined'
++ ]
+- []
+
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-dual-range-sync.browser.cjs:96:10 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

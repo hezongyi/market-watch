@@ -16,6 +16,7 @@ const context = vm.createContext({
   setTimeout,
   clearTimeout,
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 vm.runInContext(
   `
@@ -27,11 +28,11 @@ rangeGuard = { captureTerminalCompletion(matches) {
     throw Error('unrelated pane matched');
   return () => emptyCompletions++;
 }};
-historyQuery = async (args) => {
+request = async (args) => {
+  if(args.op==='dataset') return {ready:localBars.length>0,start:0,revision:1,reason:'preparing'};
   calls++;
   const bars = localBars.filter(b=>b.start < args.before).slice(-args.limit);
-  return {status:bars.length?'ready':'empty_interval',bars,local_only:true,
-    requested_start:0,next_cursor:bars[0]?.start || 0};
+  return {bars,has_more:localBars.some(b=>b.start<(bars[0]?.start || 0))};
 };
 function monthly(count) {
   return new Promise((resolve,reject)=>feed.getBars({ticker:'BTCUSDT'},'1M',

@@ -4,12 +4,13 @@ import hashlib
 import json
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import delete, select, update
 
 from .chart_api import Create, Revision, Save, serialized
 from .chart_indicators import CATALOG, calculate
+from .chart_series import decode
 from .storage import AdvancedPreference, AdvancedWorkspace, Preference, now_ms, transaction
 
 
@@ -29,12 +30,19 @@ class NativeChartWrite(BaseModel):
     content: str = Field(max_length=4_000_000)
     revision: int = Field(default=0, ge=0)
 
+    @field_validator("symbol")
+    @classmethod
+    def valid_symbol(cls, value):
+        decode(value)
+        return value
+
 
 def native_metadata(row):
     return {
         "id": row.id,
         "name": row.name,
         "symbol": row.document.get("symbol", "XAUUSD"),
+        "series_kind": decode(row.document.get("symbol", "XAUUSD"))[1],
         "resolution": row.document.get("interval", "240"),
         "timestamp": row.updated_at // 1000,
         "revision": row.revision,
@@ -212,6 +220,7 @@ def router(authenticated):
                         "schemaVersion": 1,
                         "state": state,
                         "symbol": body.symbol,
+                        "series_kind": decode(body.symbol)[1],
                         "interval": body.resolution,
                     },
                 )
@@ -225,6 +234,7 @@ def router(authenticated):
                     **row.document,
                     "state": state,
                     "symbol": body.symbol,
+                    "series_kind": decode(body.symbol)[1],
                     "interval": body.resolution,
                 }
                 result = db.execute(
@@ -245,19 +255,34 @@ def router(authenticated):
             return {**native_metadata(row), "document": row.document}
 
     @r.get("/workspaces")
-    def listing():
+    def listing(limit: int | None = Query(default=None, ge=1, le=1000)):
         with transaction() as db:
-            return [
+            query = select(AdvancedWorkspace).order_by(AdvancedWorkspace.updated_at.desc())
+            if limit is not None:
+                query = query.limit(limit)
+            rows = [
                 serialized(x)
-                for x in db.scalars(
-                    select(AdvancedWorkspace).order_by(AdvancedWorkspace.updated_at.desc())
-                )
+                for x in db.scalars(query)
             ]
+        if limit == 1 and rows:
+            ticker = rows[0]['document'].get('symbol', 'XAUUSD')
+            try:
+                symbol, kind = decode(ticker)
+                if kind == 'provider':
+                    from .provider_chart import metadata
+
+                    rows[0]['initial_symbol'] = {'ticker': ticker, 'metadata': metadata(symbol)}
+            except (HTTPException, ValueError):
+                # The normal native resolve path reports unavailable/invalid
+                # symbols. Never replace the workspace or its series here.
+                pass
+        return rows
 
     @r.post("/workspaces")
     def create(body: Create):
         with transaction() as db:
-            row = AdvancedWorkspace(name=body.name, document={"engine": "tv31", "schemaVersion": 1})
+            row = AdvancedWorkspace(name=body.name, document={"engine": "tv31", "schemaVersion": 1,
+                                                           "symbol": "MWP:XAUUSD", "series_kind": "provider"})
             db.add(row)
             db.flush()
             return serialized(row)

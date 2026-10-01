@@ -1,0 +1,279 @@
+{
+  "passed": false,
+  "error": "AssertionError [ERR_ASSERTION]: platform cache must not write managed bars\n\n51962 !== 51956\n",
+  "pages": [
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790791964000,
+        "firstDataRequest": true,
+        "client": "ad07ca4c-89f8-4366-ab05-f13f093fd3ea",
+        "indicators": [],
+        "before": 1790851364000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "D1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1766918606000,
+        "firstDataRequest": true,
+        "client": "ad07ca4c-89f8-4366-ab05-f13f093fd3ea",
+        "indicators": [],
+        "before": 1790851406000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1786859726000,
+        "firstDataRequest": true,
+        "client": "ad07ca4c-89f8-4366-ab05-f13f093fd3ea",
+        "indicators": [],
+        "before": 1790851406000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "limit": 200,
+        "client": "acceptance-fresh"
+      },
+      "status": 200,
+      "count": 200,
+      "cache_hit": true
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 1,
+        "countBack": 1,
+        "from": 1790791664000,
+        "firstDataRequest": false,
+        "client": "ad07ca4c-89f8-4366-ab05-f13f093fd3ea",
+        "indicators": [],
+        "before": 1790791964000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 1,
+      "cache_hit": true
+    },
+    {
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790791800000,
+        "firstDataRequest": true,
+        "client": "ad07ca4c-89f8-4366-ab05-f13f093fd3ea",
+        "indicators": [
+          {
+            "name": "SMA",
+            "params": {
+              "period": 20
+            }
+          }
+        ],
+        "before": 1790851407000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 199,
+      "cache_hit": true
+    }
+  ],
+  "measurements": [
+    {
+      "resolution": "1D",
+      "elapsed_ms": 479
+    },
+    {
+      "resolution": "240",
+      "elapsed_ms": 459
+    },
+    {
+      "resolution": "5",
+      "elapsed_ms": 29
+    }
+  ],
+  "latest": {
+    "at": 1790851346088,
+    "reset": false,
+    "datasets": [
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "D1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1318032000000,
+            1790851305000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "H1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1770753600000,
+            1790851305000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "H4",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1709762400000,
+            1790851305000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M1",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1790605020000,
+            1790851305000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M15",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1785869100000,
+            1790851305000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M30",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1780887600000,
+            1790851305000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "M5",
+        "count": 4000,
+        "earliest": false,
+        "coverage": [
+          [
+            1789132800000,
+            1790851339000
+          ]
+        ],
+        "latest_at": 1790851338408,
+        "revision": 5
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "MN",
+        "count": 269,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790851305000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 1
+      },
+      {
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "frame": "W1",
+        "count": 1165,
+        "earliest": true,
+        "coverage": [
+          [
+            0,
+            1790851305000
+          ]
+        ],
+        "latest_at": 0,
+        "revision": 2
+      }
+    ],
+    "interest_count": 2,
+    "subscriptions": 1,
+    "managed_bars": 51962
+  },
+  "errors": []
+}

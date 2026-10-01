@@ -1,0 +1,35 @@
+{
+  "passed": false,
+  "error": "TimeoutError: frame.waitForFunction: Timeout 60000ms exceeded.",
+  "measurements": [],
+  "errors": [],
+  "observed": {
+    "ready": false,
+    "loading": true,
+    "pending": 0,
+    "symbol": "MWP:BTCUSDT",
+    "resolution": "1",
+    "dataReady": false
+  },
+  "requests": [
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790857631000,
+        "firstDataRequest": true,
+        "client": "13d58940-1828-43e1-a417-a80972430adc",
+        "indicators": [],
+        "before": 1790869511000,
+        "track_history": false
+      },
+      "status": 503,
+      "at_ms": 1266,
+      "elapsed_ms": 8535
+    }
+  ]
+}

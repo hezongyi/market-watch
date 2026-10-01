@@ -2,6 +2,8 @@
 
 状态：实施中，未交付。Ubuntu 本机验收，禁止操作 Unraid 生产服务。
 
+**2026-10-01需求修订：** 自动视区扩展、三倍D1预热、原生请求内等待缺历史等规则已被用户确认的双数据系列与“指定历史起点、持续维护至最新”方案取代。后续以 [新方案](chart-dual-dataset-plan.md) 为准；本文保留实施与失败验证证据，冲突清单不再作为交付要求。
+
 ## 已确认需求
 
 1. 首次打开无数据品种也保持图表可操作；M1 至 D1 各周期渐进显示。
@@ -511,3 +513,301 @@
 - /tmp/mw-mobile-final.log当前本机候选竖屏412x915回归通过，单图、服务器工作区/个人偏好不变、MOBILE_WRITES=[]、errors=[]；不新增用户已豁免的实际锁屏验收。
 - 完整隔离PG后端测试215 passed、0 skipped、20.45秒，/tmp/mw-backend-current.log。
 - 不同品种/周期视区同步及重载恢复浏览器用例/tmp/mw-mixed-current.log已启动，待核验。
+
+### 多图同步历史移动未通过
+
+- /tmp/mw-mixed-current.log与/tmp/mw-mixed-trace.log均失败：目标1790631000–1790717400，主图实际1790782200–1790782500，其余同步到近期短范围。与八图稳定轮询不是同一验收项。
+- trace中主图没有对目标日期发getBars，只看到其他窗格跟随回退后的22根近期请求；原生缓存中短页noData边界可能阻止历史导航。
+- 候选撤回只在变化与当前视区相交时才刷新这一优化，保留统一串行刷新及视区恢复；历史补入必须使原生旧noData失效。已部署nav-sync-local，/tmp/mw-mixed-refresh-all.log复验中。该假设尚需运行证据验证，不宣称多图同步已解决。
+
+### 短页边界候选继续验证
+
+- /tmp/mw-mixed-refresh-all.log仍失败，撤回视区过滤不足以解决，先前归因需修正。候选将非空短页noData置false，使原生还能发历史请求；此前导致首屏等待的风险仍需重测。
+- historicalNavigationPage新增仅M1的覆盖区间合并判定，覆盖完整但第一分钟无bar时不再永久等待。更高周期不能以M1覆盖代替聚合完成。window.timeframe由API明确返回；前端稀疏M1回归通过。
+- /tmp/mw-mixed-short-pages.log未走到同步验收，在工作区重载时测试直接读取未创建的rangeGuard.busy抛TypeError；已给测试就绪条件增加ready/loading和控制器存在判断，不据该运行判断产品通过。
+- 正在构建api/chart nav-sparse-local一致版本，build session6481；待部署并重跑八图历史同步。现运行nav-sync-local仍是上一候选。
+
+### 一致镜像部署后代理地址刷新
+
+- nav-sparse-local API/chart/worker部署完成，20项相关后端测试与ruff通过。
+- /tmp/mw-mixed-sparse.log在登录后遭web代理502而退出，未进入功能断言。web/nginx.conf静态解析api地址，API重建更换IP后只重启tls不足。已重启Ubuntu web/tls，补充deploy/local-container-acceptance.md操作步骤。
+- 同一功能用例重新启动/tmp/mw-mixed-sparse-proxy.log，待核验。未以该502作为多图功能结论。
+
+### 非空短页候选等待问题定位中
+
+- nav-sparse-local一致版本与web/tls代理刷新后，/tmp/mw-mixed-sparse-proxy.log进程session1103仍在真实运行，尚未达到MIXED_PANES断言，不能当成已完成。
+- 只读开发库观测聚合66任务且error=None/attempts=0；历史worker仍持续OANDA4000分钟批次，下载约0.45–0.56秒，说明不是全部worker停摆。
+- 最新需求对应EURUSD M30缓存1999根、最早早于目标；相邻EURUSD M5窗口只返回6–7根连续后缀。需要进一步核对原生缺页请求的目标续报与聚合覆盖，不可凭全局数据库有数据认定每窗就绪。
+- 测试新增可选MIXED_DEMAND记录，下一次运行可在配置图表阶段记录需求（现运行脚本版本未包含该记录）。仍保留当前运行句柄等待，不重启测试。
+
+### 多图等待遇到旧失败任务占位
+
+- /tmp/mw-mixed-sparse-proxy.log已退出1（超时），不再等待。只读核验EURUSD M5目标缺口1790721720000–1790734980000等4段，无覆盖此区间的聚合任务，8个旧ImportJob(status=failed,priority100,chart_plan=false,attempts5,error空)占位阻止新规划；NZDUSD也有3个同类任务。
+- control_plan retry原先只选择chart_plan=true，无法释放这些旧占位，同时未重置尝试次数。候选将计划目标内legacy chart失败纳入同一有限重试批次，排除priority<100实时修复，重试attempts归零；测试test_retry_includes_legacy_chart_failures_but_not_live_repairs覆盖该行为。
+- 尚未对开发库实际执行重试，需先部署候选，并验证任务面板能反映旧失败。多图同步验收仍未通过。
+
+### 开发库旧失败任务实际重试
+
+- plan_status补充目标范围内旧图表失败计数；接口状态测试验证失败数1→0，16项相关测试及ruff通过。
+- 已仅部署Ubuntu api/worker:legacy-retry-local，并重启web/tls刷新代理。
+- 在acceptance API容器调用正式control_plan retry，EURUSD失败8→0，NZDUSD失败3→0；有限批次之外的旧任务superseded以释放缺口，由持久计划重排。未删除行情，未修改priority<100实时修复任务。
+- /tmp/mw-mixed-legacy-retry.log多图历史同步已重新启动，session3214待核验；旧任务释放不是同步通过证明。
+
+### 2026-10-01 本机优先级修复与范围对照
+
+- legacy-promote-local历史worker部署完成（session79693退出0）；已有pending、priority>=100任务若占用前台目标，提升其优先级而不重复下载。17项chart_history_plan测试再次通过。
+- session3214退出1，主图历史范围被缩短，其余图未同步，不能视为通过。
+- 修复部署后直接范围对照/tmp/mw-mixed-promote-direct.log退出0（诊断分支，不代表完整验收）。EURUSD、BTCUSDT、NZDUSD已接近目标；XAUUSD M5/M15右界仍差约一小时。关闭同步并逐图调用setVisibleRange后黄金得到相同范围，提示需核对原生休市压缩行为，而非直接认定跨图事件丢失。
+- worker近期实际OANDA单批4000分钟下载0.374–1.123秒，含入库0.519–1.891秒；批间调度、聚合与刷新另计，不能外推为完整首屏耗时。
+- 黄金独立对照继续运行：/tmp/mw-mixed-promote-gold.log。完整八图保存恢复、冷D1逐周期计时等仍待验收。
+
+### 原生历史请求数量与旧视区几何不一致
+
+- 黄金独立对照最终退出0，八图在该次目标均对齐；因此此前一小时偏差不能归为固定休市规则问题。
+- 完整鼠标验收/tmp/mw-mixed-promote-full.log失败。trace明确显示EURUSD M5请求countBack529，却回调114根（1790633100000–1790667000000），24小时目标被缩成约9.4小时，随后所有图同步到被缩短的范围。该次没有history refresh trace支持“刷新覆盖视区”解释。
+- bridge候选按max(对应品种周期图表几何窗口, ceil(min(1998,countBack)/3))计算有界导航需求，避免以切换前38根屏宽限制目标为114根；不提高2000根单次查询上限。原生超大请求仍需独立核验。
+- 实际八图浏览器回归正在运行/tmp/mw-mixed-countback.log（session5837），仅通过路由加载候选bridge，尚未部署镜像；语法与git diff --check通过，不等于功能通过。
+
+### 左边界缩放同步回归
+
+- countback候选浏览器退出1：历史目标范围与十字线断言通过，滚轮缩放失败；主图仅左界移动7800秒，其他图未同步。edgeRangeSync原先只检测右界偏差。
+- advanced-edge-sync.cjs新增左界单独移动场景，修复前实际失败100!==700；补偿判断加入左界后通过。navigation-page、range-sync既有测试亦通过。
+- /tmp/mw-mixed-both-boundaries.log真实八图仍失败，前两个跟随图已缩放，后续图未完成。未把单测或部分图成功当作整体完成。候选仅浏览器路由加载，未部署。
+- /tmp/mw-viewports-edge-probe.js添加临时同步中断/开始追踪，真实浏览器运行/tmp/mw-mixed-edge-abort.log（session20454），待核验；探针不写入产品文件。
+
+### 同步过程中新的滚轮意图
+
+- session20454退出1，历史导航20秒超时，未到滚轮；未重启仍运行的测试。另用固定已测日期1790719800运行/tmp/mw-mixed-edge-fixed.log（session93499，退出1）。
+- 固定日期trace显示旧目标逐图edge-start持续进行，滚轮后无新目标edge-start、无edge-abort；新事件被applying分支忽略。候选在finally比较主图最新范围，若变化且同步仍开启，则重新调度最新范围。尚需回归并核对逐图串行延迟，不能称缩放已通过。
+
+### 同步耗时定位到会话查询
+
+- 最新意图单测覆盖peer等待期间再次滚轮：去掉候选finally补调度后实际失败false!==true，候选通过。
+- /tmp/mw-mixed-latest-intent.log退出1，三秒缩放验收仍失败。
+- /tmp/mw-mixed-sync-timing.log退出1：prepare休市RPC逐图耗时1350、1221、575、504、4526、591ms；对应原生setVisibleRange仅约0.4–12ms。明确瓶颈为串行重复会话查询及请求排队，不能靠增加验收等待解决。
+- 尝试并发prepare使既有“用户关闭同步阻止剩余写入”测试失败，已撤回该尝试；下一步需设计独立会话缓存/合并与可取消并发，保留用户意图优先规则。未部署生产。
+
+### 并行准备、按取消条件应用
+
+- viewports候选仅并行prepare（返回已捕获错误的结果），setVisibleRange仍逐项检查generation/blocked再应用，保持取消规则。
+- bridge在同一绑定生命周期内合并相同品种/目标范围的在途会话RPC；请求完成即移除，不缓存过时日历结果。八图相同品种的不同周期不再重复查询同一范围。
+- edge-sync单测通过，包括关闭同步、周期切换、dispose、等待期间新的滚轮意图。测试改为等待实际peer调用开始再取消，避免依赖固定一次microtask。
+- 本机真实八图回归/tmp/mw-mixed-parallel-prepare.log运行中（session40044）；仅路由加载候选，语法与diff检查通过，尚未判定功能通过。
+
+### 交互请求排队与拖动竞态
+
+- session40044退出1：八图缩放断言通过，拖动左界未对齐。主图18根历史请求已成功返回，跟随图未对齐，不能归为主图缺数据。
+- 候选drain优先选择viewport请求，保持最多4个在途请求；新增队列优先级回归与queued/inflight取消、edge-sync测试通过。
+- /tmp/mw-mixed-interaction-priority.log(session94216)仍失败：鼠标拖动阶段出现原生Value is undefined，BTC右界偏差；需要进一步定位交互与范围设置竞态，未判通过，未部署候选。
+
+### 刷新与范围补偿双向互斥
+
+- bindEdgeSync的blocked加入historyReloading；此前只有reloadHistory等待edgeGuard，反向无保护。阻塞期间范围事件改为延后重试而非丢弃，单测覆盖等待结束后继续处理。
+- edge-sync、refresh-interaction、viewports三项测试通过。
+- /tmp/mw-mixed-refresh-exclusive.log(session85022退出1)本轮无Value is undefined，缩放通过，拖动仍部分未对齐。EURUSD补页18根、M15/M30小页已返回；BTC M5/M15、NZDUSD等历史小页已请求但三秒断言前未返回。需继续核对请求调度/缓存覆盖与交互刷新，不能以一次无异常断言竞态彻底修复。
+
+### 前台补页与预热区分
+
+- /tmp/mw-mixed-page-queue.log(session92943退出1)捕获RPC排队：waiting4–7的cache读取耗时3.5–3.9秒，waiting0样本约0.53秒。viewport优先后约0.59–0.64秒，拖动仍被历史cache排队影响。
+- 候选将直接historyCache读取置于预热之前，warm及poll标记background；保持4并发。request-cancellation/inflight-cancellation与progressive-cache测试通过。
+- /tmp/mw-mixed-foreground-cache.log(session59443)正在验证bridge/viewports候选，但未路由加载progressive-history的新poll标记，只能作预热优先级局部对照。测试已补MARKET_WATCH_PROGRESSIVE_SOURCE，下次完整候选需设置该变量。未部署生产。
+
+### 目标范围内实存bar证明非全休市
+
+- session59443及完整候选session15159(/tmp/mw-mixed-priority-complete.log)均退出1，拖动三秒仍未全部对齐；单靠队列优先级不足。progressive-cache测试新增初读foreground、poll background断言并通过。
+- prepare候选检查对应品种周期已观察first/last bar是否落在目标半开区间，存在则无需查询“是否全休市”；无法证明时仍调用日历API，不能用两端包围目标推断目标开市。
+- /tmp/mw-mixed-observed-session.log正在运行，加载bridge/viewports/progressive完整候选；尚未判通过。
+
+### 拖动控制器状态诊断
+
+- observed-session(session28309)退出1：拖动后主图补页返回，但无跟随图新getBars，不能继续单一归因为缓存网络延迟。
+- 新增仅TRACE模式的DRAG_CONTROLLERS，记录historyReloading、range/edge busy、开关、队列与dataReady，不含认证内容。
+- 首次诊断session50432(/tmp/mw-mixed-drag-controllers.log)因测试读取局部变量viewportRestoring而失败，已删除该非法读取。该次所有M5范围对齐但黄金M15左界偏差一小时；不作为完整通过证据。
+- 修正探针后/tmp/mw-mixed-drag-state.log正在运行。edge-sync/progressive-cache及diff检查通过；候选未部署生产。
+
+### 逐图范围promise阻塞后续图
+
+- drag-state(session66727)退出1。DRAG_CONTROLLERS：historyReloading/loading/rangeBusy均false、所有dataReady true，但edgeBusy true且同步开关暂时false。后续图未执行，不是周期加载控制器阻塞。
+- 候选将已准备范围的setVisibleRange独立并发应用，调用前仍检查generation/blocked；一个图等待不会阻挡其他图。统一finally仍负责恢复开关和补调度最新范围。
+- 单测新增slow peer不阻挡其他图，并用实际未完成prepare验证用户关闭同步、周期切换、dispose后不会启动新写入，全部通过。此前串行测试通过让前图阻塞间接制造“后图未开始”，已改成直接控制prepare完成时间，保留取消要求。
+- /tmp/mw-mixed-independent-ranges.log(session48217)真实八图回归正在运行，未判通过。
+
+### 黄金M15左界休市对照
+
+- session48217退出1：同步不再busy、M5全部对齐，仅黄金M15左界22:00 UTC与目标20:50偏差。20:50后下一个M15边界21:00处于NY17休市，下一实存bar为22:00。
+- /tmp/mw-gold-drag-direct.log(session50212退出0，诊断非全验收)：关闭所有同步独立setVisibleRange，黄金M15左界仍22:00，立即及1秒后相同。说明该偏差不由同步实现引起。
+- 拖动验收补充实存bar核对，仅XAUUSD下一周期落NY17且首个实际bar落NY18、休市不超过1小时，允许匹配实际bar边界；不放宽其他品种/任意缺数偏差。
+- /tmp/mw-mixed-session-aware.log(session89705)运行中；该进程启动早于上述NY17/18限制加入，之后必须以完整当前测试再核验。未部署生产。
+
+### 实时修复队列无执行者
+
+- session89705退出1，未到拖动：EURUSD导航窗口仅37根后缀，20秒超时。只读开发库发现M1缺口1790775960000–1790781919398，被priority0 pending ImportJob(cursor1790775960000,end1790781960000)占位，无对应M5聚合任务。
+- 部署组合中realtime_worker仅once()轮询，chart_history_worker仅import_once(chart_only=True)，无人消费priority<100修复/人工历史队列。此前不能提升这类任务优先级是对的，真正缺的是执行者。
+- 候选历史worker每轮先执行非图表修复队列，无任务才执行图表队列，仍独立于实时轮询且不增加连接池；添加修复优先/完成后继续图表的调度测试。需构建部署Ubuntu并验证实际缺口恢复，未部署生产。
+
+### 修复队列实际恢复
+
+- 构建market-watch-api:recovery-consumer-local成功，仅更新Ubuntu chart-history-worker（session83231退出0），未重启API或操作Unraid。
+- 开发库只读复核：EURUSD priority0任务从pending变complete，cursor=end=1790781960000；1790633400000–1790793300000范围M1覆盖缺口为[]。ready aggregation52，后续仍由独立聚合worker处理。
+- 使用当前完整前端候选及收紧NY17/18的验收脚本重跑/tmp/mw-mixed-recovery-fixed.log，尚未判通过。
+
+### 同步关闭验收基准修正
+
+- recovery-fixed(session96072)退出1：十字线、缩放、拖动（含实际bar及NY17/18校验）通过；关闭同步断言比较的是鼠标操作前moved快照，重设目标后的M15/M30取整变化误判为开关未生效。
+- 测试在关闭同步后、移动主图前记录全部视区，后续要求非活动图精确不变；没有放宽关闭同步行为。/tmp/mw-mixed-save-baseline.log运行中，随后继续自动保存/刷新恢复断言。
+
+### 历史页本地缓冲
+
+- save-baseline(session86515)退出1，拖动三秒仍出现部分图临时补十几根数据的等待，未到保存恢复。既往一次拖动通过不能证明稳定完成。
+- 候选对非首屏getBars多读取50%本地历史，上限仍2000，向原生返回合法的额外早期bar以缓冲小幅拖动。是否触发后台下载仍按原生requested判断，不因缓冲未满扩大下载目标。
+- /tmp/mw-mixed-local-buffer.log(session99929)运行中。请求取消单测、语法、diff检查通过；功能尚未判通过。
+
+### 八图完整用例首次通过与本机镜像
+
+- local-buffer(session99929)退出0：完整八图历史范围、鼠标十字线/缩放/拖动、关闭同步非活动图精确不变、自动保存及刷新恢复全部断言通过，errors为空。黄金边界使用实存bar及NY17/18窄条件验证。
+- 构建并仅部署Ubuntu chart-origin:mixed-buffer-local，重启本项目TLS刷新上游地址；bridge/viewports/progressive-history/history-demand四文件HTTP内容逐字节匹配工作树。未操作Unraid。
+- 五项关联前端单测通过。移除全部脚本路由替换，实际镜像浏览器复验/tmp/mw-mixed-deployed.log运行中；单次用例通过尚非整体交付，冷D1计时/满负荷实时SLO等仍在原清单内。
+
+### 实际镜像八图通过与冷启动计时
+
+- mixed-deployed(session9986)退出0，实际部署文件无路由替换，完整八图鼠标/关闭同步/自动保存刷新恢复通过。
+- 只读开发库确认OANDA:AUD_CAD instruments不存在、Bar计数0。新增advanced-cold-timing.browser.cjs，真实选择新品种D1，目标屏宽200，逐周期观察cache200根就绪（不同于GPU绘制时间），输出/tmp/mw-cold-200-timing.json及截图。
+- /tmp/mw-cold-200.log计时启动。最多15分钟观察窗口并不代表承诺耗时；轮询只读取缓存，不对其他周期单独创建下载需求。
+
+### 冷启动初步计时（继续运行）
+
+- cold-200(session18232)实测10.626秒：M1/M5/M15均200根，M30 147、H1 74、H4 19、D1 4，原生dataReady=true。47.636秒H1达到200，D1 10；完整结果以JSON最终记录为准，不是GPU绘制时间或D1整屏完成。
+- 同时只读快照EURUSD/BTCUSDT最新完整M1距当前约52秒，最后写入相对bar结束约18.9/17.7秒，库Lock waiters=0。XAU最新结束21:00 UTC需结合休市/开市日历单独判断，不能拿单个快照宣称实时SLO通过。
+
+### 冷D1显示范围待核验、后端回归
+
+- 冷启动持续运行session18232，200根缓存首次就绪：M30 15.902秒、H1 47.636秒、H4 95.719秒。183.393秒D1 64根；采样间偶有200→199，包含形成中bar变化，最终解释需区分完整bar。
+- 原生range持续1790640000–1791925200且spacing5.59不变，缓存增加尚不能证明日线原生显示渐进扩展。需在运行完成后检查截图/原生数据边界，保持该需求未验收。
+- 最新后端全量回归仅隔离本机PostgreSQL执行，/tmp/mw-backend-recovery-current.log：218 passed，19.81秒。未运行破坏性测试于共享开发库，未操作生产。
+
+### 冷启动持续下载与显示诊断准备
+
+- session18232仍真实运行，312.624秒D1缓存94根，range不变。只读队列plan pending、failed0、aggregation_failed0，前台priority100；下载/聚合仍在推进，不重启计时。
+- 为下一次显示诊断补充cold-timing样本：nativeFirst/nativeLast、symbol/resolution、offset、控制器busy及每轮截图；当前已运行进程不会加载这些新增记录，不能把新探针能力描述为本次已采集证据。
+
+### 首屏自动续页与历史跳转待区分
+
+- session18232持续运行，423.244秒D1 114根，range仍初始值。代码发现所有非firstDataRequest短页均进入historicalNavigationPage等待目标完整，可能误把冷首屏自动续页视为主动历史跳转；这是待证假设，不据此直接修改生产逻辑。
+- 下一轮cold-timing新增COLD_FEED记录原生请求countBack/from/to/firstDataRequest及回调耗时、首末时间，只记录市场数据。需结合最终截图和请求追踪后确定修复。
+
+### 冷图存在额外历史导航需求
+
+- 只读ChartViewportDemand：AUD_CAD同时有正常D1 viewer需求(start1766613600000,end1790806200000)及无viewer后缀的导航需求(start1695070800000,end1767823386000)，两者focused=true且续期中。这支持自动续页误入导航等待的假设，但仍需原生trace确认。
+- session18232继续运行，512.584秒D1缓存135根。未中断/清除本轮数据，未改变计时定义。
+
+### 保留导入来源兼容
+
+- 恢复队列现由chart-history-worker消费后，fetch_page也可能收到旧Dukascopy任务；候选对非OANDA/Binance来源回落既有fetch_source，避免字典KeyError使队列卡住。该小改尚未部署，当前冷启动继续使用recovery-consumer-local。
+- 三项worker调度测试再次通过（不代表实际Dukascopy联网已验收）。session18232仍在计时，日线显示问题保持未完成。
+
+### 冷启动基准完成但显示验收失败
+
+- session18232退出0仅因200根cache断言达成：M1/M5/M15 10.626秒，M30 15.902秒，H1 47.636秒，H4 95.719秒，D1 796.233秒（13分16秒）。不能当作前端验收通过。
+- 人工检查/tmp/mw-cold-200.png：页面顶部“历史刷新等待超时”，图表无正常K线，角落仍等待目标日期数据。冷D1渐进显示明确失败，需修复。
+- 保存原始基准/tmp/mw-cold-audcad-baseline.json与png；新冷品种OANDA:EUR_CHF（此前只读确认无注册/无bar）用补充原生trace/offset/截图的用例继续诊断，日志/tmp/mw-cold-eurchf-trace.log。
+
+### 冷首屏自动续页复现与候选
+
+- EUR_CHF trace：首次空页，随后firstDataRequest返回2根(1790640000000起)，原生立即以to1767824280续取186根，自动跳过数月。11.4秒起historyReloading=true且nativeFirst停住，复现无需等满15分钟。
+- 已在证据完整后主动结束诊断session95052（非超时重启），不删除已下载数据，持久任务仍后台继续。
+- bridge候选以初始空页标记coldHistory（有界64项），冷系列首屏不足requested时noData=true，阻止错误自动续页；逐次progressive reset继续展示新数据，首屏达到requested后解除标记。暖历史导航仍保持非空短页noData=false。
+- OANDA:AUD_NZD（前次只读确认无注册/无bar）新冷图候选诊断/tmp/mw-cold-audnzd-candidate.log运行中，路由仅替换bridge；尚未判通过。需要回归主动日期跳转及冷图手动导航行为。
+
+### 冷首屏候选实际逐步显示
+
+- session69965运行中，原生回调2→6→8→43根，均firstDataRequest、noData=true，不再触发跳到数月前的自动续页。nativeFirst及可见range.from向过去扩展，spacing5.59/rightOffset10保持。
+- 已人工查看/tmp/mw-cold-200-progress.png：K线实际可见、无顶部刷新超时，角落显示后台准备进度；仍需观察首屏完成和手动历史跳转。
+- 新增advanced-cold-pagination.cjs直接调用真实feed.getBars，覆盖初始空、冷部分页、暖部分页、补满解除冷标记，测试通过；navigation-page也通过。
+- cold-timing最终门槛补充nativeFirst/range扩展与无刷新超时，当前已运行进程不包含新增末尾断言，需按其日志/截图单独核验或后续重跑，不能混称已执行。
+
+### 部分历史重新打开边界
+
+- session69965仍运行，168.238秒D1 99根，nativeFirst/range向左扩展、historyReloading=false，图表柱距5.59保持。后台缓存就绪不是单独验收依据，已观察原生序列增长。
+- 冷标记条件补充首次观测即有少量bar、但从未向原生交付过该系列的情况，覆盖关闭重开部分品种。已完整加载过的暖系列仍允许非空短页历史导航。
+- cold-pagination加入REOPEN部分首屏及先完整后部分的WARM场景，测试通过，navigation-page通过。当前真实冷图进程仍使用前一候选，补充边界需后续浏览器验证。
+
+### 持续负载下实时采样启动
+
+- session69965继续运行，288.998秒D1缓存164根、nativeFirst/range向左推进，柱距和右侧留白稳定，无控制器busy堆积。
+- session61358在Ubuntu API容器另开只读单连接采样，每15秒共20次，事务结束后sleep；输出/tmp/mw-realtime-under-history.jsonl。记录三维护品种完整M1新结束时间、采样时年龄、最后写入延迟、聚合/下载待办和锁等待数；不是通知端到端延迟测试。
+- 首样本EURUSD/XAUUSD/BTCUSDT end一致，采样年龄30.176秒、received lag约17.8–19.5秒；聚合61、下载10、Lock waiters0。需等完整序列，不以首样本宣称负载验收通过。
+
+### 冷图候选200根完成
+
+- session69965退出0，AUD_NZD200根cache：M1/M5/M15 5.969秒、M30 11.379秒、H1 17.231秒、H4 61.090秒、D1 367.378秒。不同品种/并发背景，不能当作与AUD_CAD严格A/B吞吐比较。
+- 人工核验最终/tmp/mw-cold-audnzd-candidate.png：正常日线铺满、无刷新超时，原生末次回调199根（当前交易日标签过滤与形成中bar需分别看待）；柱距保持。记录保存/tmp/mw-cold-audnzd-candidate.json。
+- 开发库只读EUR_CHF完整D1仅49根，启动advanced-cold-reopen.browser.cjs，验证非空部分首屏及主动跳2026-01-05至01-30；日志/tmp/mw-cold-reopen.log。新边界尚未判通过。
+
+### 冷终点标记限制主动导航
+
+- cold-reopen(session5464)退出1：重开dataReady=true且图表可见，但要求2026-01-05..01-30后实际仍2026-08区间。确认冷首屏noData=true使原生认为更早历史结束，候选尚不满足完整导航需求。
+- 临时探针/tmp/mw-cold-auto-error-bridge.js（未写产品/未部署）保留非空首屏noData=false，仅对冷系列p.to早于已观察首bar的自动跳跃续页用onError结束，验证不设置全局历史终点能否保留手动跳转；日志/tmp/mw-cold-reopen-auto-error.log运行中。若可行还须验证UI不出现持久错误及冷增量显示，不可直接判交付。
+
+### 分页探针及实时采样结果
+
+- auto-error(session20188)退出1：重开range0/dataReady=false，手动范围设置Value is null；该探针不可用，未并入产品。
+- 供应商公开HistoryMetadata声明支持nextTime。临时/tmp/mw-cold-nexttime-bridge.js对冷非空短页提供实际首bar时间（秒），保留noData=false，运行/tmp/mw-cold-nexttime.log验证；未修改供应商代码或部署探针。
+- 实时采样session61358退出0，共20样本、三品种各观察5个不同M1结束点；最大采样年龄75.44秒，最后写入延迟上界EUR19.12秒/XAU19.93秒/BTC17.87秒，最大Lock waiters1。样本年龄包含一分钟形成中等待；这些不是首次到达精确时刻或通知端到端测量，不能据此宣称全部SLO通过。
+
+### nextTime分发实现边界
+
+- nextTime秒探针session11795仍活跃时发现d.ts声明毫秒，主动结束参数有疑问的探针，启动毫秒探针session34778。
+- 随后只读实际library.e2f8b3a016c9e1a0b7a5.js：_processEmptyBarset把nextTime乘1000；_processFullBarset对非空页nextTime仅警告，应只用于空页，忽略其值。该实际分发实现与d.ts单位不一致，非空短页提示方向不可行。主动结束session34778，未修改供应商文件或产品逻辑。
+- 冷图noData终点导致主动导航失败仍未解决，需进一步以公开缓存重置/用户导航事件验证，不能将已正常显示的冷首屏当作该需求完成。
+
+### 公开缓存重置隔离探针
+
+- 只读供应商resetCache实现确认purge清除endOfData；request_only_visible_range_on_reset可避免其立即以旧leftDate自动发起请求。
+- /tmp/mw-cold-reset-probe.js临时启用该feature，部分首屏交付后100ms调用订阅提供的reset回调，远历史firstDataRequest允许走现有导航准备路径。此为可行性探针，7天分类是临时试验参数，不是已接受的产品规则。
+- /tmp/mw-cold-reset-probe.log运行中；未部署、未修改供应商，不据该探针缩减冷首屏/原生拖动/主动日期跳转要求。
+
+### 缓存重置探针仍未完成目标范围
+
+- reset-probe(session21031)退出1：重开可见，主动跳转右界达到1769731200，但左界1769385600而非1767571200。说明仅重置缓存不足以完成目标左侧历史，未判通过。
+- cold-reopen新增原生请求/回调首末时间COLD_NAV追踪，用同一探针复验/tmp/mw-cold-reset-trace.log，继续区分目标补齐与视区应用问题。不修改供应商文件。
+
+### 2026-10-01：日线分页日期过滤边界回归
+
+- 上轮浏览器诊断 `/tmp/mw-cold-reset-trace.log` 已退出失败：原生请求 countBack=1 的上一页得到空数组及 noData=true，此后日期跳转不再请求更早历史。请求前的数据库页面并非空，但 D1 session 缓冲经交易日期转换和 exclusive to 过滤后为空。
+- 新增 `advanced-cold-pagination.cjs` 的真实 feed.getBars 边界用例：过滤前存在一根未来交易日期 bar，过滤后没有可用 bar；修复前历史请求次数 0（应为1），修复后通过。
+- bridge 使用转换后且早于 p.to 的可用数量决定冷启动标记及历史补数。导航、渐进缓存、请求取消单测通过；git diff --check 通过。
+- 浏览器临时探针 `/tmp/mw-cold-filtered-reset-probe.js`，日志 `/tmp/mw-cold-filtered-reset.log`，会话27908仍在运行。探针包含之前的 reset 实验，不是最终实现，尚未部署。不能以单测通过认定冷启动导航完成。
+
+### 2026-10-01：导航验收避免后台补数造成假通过
+
+- 会话27908失败；重置探针并未恢复越过缓存边界的日期跳转。订阅跟踪会话27441曾通过，但当时目标日期已落在本次读取的缓存内，因此不能证明越界加载成功。
+- `advanced-cold-reopen.browser.cjs` 改为根据 firstHistory 动态跳到已加载边界之前30天，避免固定日期随着后台下载变成温缓存测试。
+- D1读取额外预留两条本地记录用于 session 日期缓冲过滤；过滤后的实际可用量继续用于判断是否补数。对应读取限额回归及分页回归均通过。
+- 使用当前工作树 bridge（不含临时 reset 探针）的实际浏览器会话33910，日志 `/tmp/mw-cold-boundary-current.log`。已观察初始请求190根返回191/192根且 noData=false，消除了已充足历史被错误标成短页的情况。越界跳转结果仍待最终检查。
+- 冷启动 noData 与用户主动越界导航兼容仍未完成验证；暂不部署本轮候选。
+- 会话33910最终确实发起了越界请求并返回34根更早日线；失败仅为动态目标落在周日2025-12-07，原生左边界吸附到周五12-05，超过测试一天容差。将测试目标显式调整到工作日（不放宽容差），再验会话28239之外请以工具实际句柄为准，日志 `/tmp/mw-cold-boundary-weekday.log`。本结果证明温缓存越界可以请求，不能证明真正短历史冷启动已解决。
+
+### 2026-10-01：独立原生接口验证门槛未通过
+
+按用户要求暂停产品修补，新增纯原生测试页和10项浏览器检查，无应用bridge、后台API或数据库。最终基线7通过3失败，中文资源无加载错误。详情 `docs/native-history-interface-verification.md`，原始事件在 `docs/verification/native-history/`。
+
+关键结论：分批显示与已有视区恢复可行；noData短页结束后，原生日期按钮、setVisibleRange和真实拖动都不能请求更早数据。日期目标未从所测公开事件暴露。因此前述“快照边界+协调器刷新”不能直接作为满足全部需求的实现方案。可见范围重置开关未解决；nextTime产生连续空请求；错误回调造成刷新超时。未部署产品修改，也未操作生产。
+
+### 2026-10-01：timeframe公开接口六组对照
+
+按用户同意验证初始化timeframe、onIntervalChanged修改timeframe，以及按可见范围计算首请求的特性开关。20根固定完整D1、6px柱宽，六组均未同时满足部分显示/保持柱宽/持续历史分页。最优候选首请求降至11根，但柱宽升至102.3px；恢复6px立即追加请求154根，本地仅剩9根，再次触发短页结束。完整事件存档 `docs/verification/native-history/timeframe.json`，结论补充至原生接口报告。未修改产品加载逻辑，未部署。
+
+
+### 2026-10-01：用户纠正维护边界语义
+
+自建行情仅指定历史补数起点，从该起点往后持续维护；不填写截止日期，也不需要另行启用实时维护。此前固定区间/默认不启用后续维护的描述作废，已修订双数据系列方案及验收条件。内部下载分段和发布水位不构成用户维护截止日期。
+
+
+### 2026-10-01：从近到远分段补数、分段开放
+
+用户进一步确认：从现在向历史起点倒序分段补，每段准备好即启用查看，不等待整个目标范围完成。新方案已改为逐段覆盖检查、按周期聚合和发布；未完成段不输出，更早段失败不影响已发布近期范围，实时维护持续运行。先前“整体完成才开放”条款作废。此规则仍不恢复视区自动扩大历史目标或原生getBars内等待补数。
+
+
+### 2026-10-01：各周期首次开放门槛已确认
+
+用户确认按实际绘图区容量的三屏完整K线作为各周期首次开放门槛，同时满足覆盖完整性和所选指标的前置历史。完成一个下载分段不直接等于可查看；开放后逐段扩大范围。补至指定历史起点仍不足三屏时显示真实根数/边界并允许查看，不自动前移起点。此门槛不恢复原来的三倍D1自动预热/扩展策略。最终以双数据系列方案4.4节为准，取代此前“第一段完成即开放”的表述。

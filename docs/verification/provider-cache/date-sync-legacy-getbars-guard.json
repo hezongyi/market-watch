@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "workspace": "28b5696c-8343-4e15-bff1-affdc83f011f",
+  "target": {
+    "to": 1790878200,
+    "from": 1790867400
+  },
+  "samples": [
+    {
+      "phase": "date-sync",
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "range": {
+            "from": 1790867400,
+            "to": 1790878200
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_GBP",
+          "resolution": "5",
+          "range": {
+            "from": 1790867400,
+            "to": 1790878200
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790867400,
+            "to": 1790878200
+          },
+          "spacing": 14.162162162162161
+        },
+        {
+          "symbol": "OANDA:EUR_CHF",
+          "resolution": "5",
+          "range": {
+            "from": 1790867400,
+            "to": 1790878200
+          },
+          "spacing": 14.432432432432432
+        }
+      ]
+    },
+    {
+      "phase": "rapid-final",
+      "range": {
+        "from": 1790871000,
+        "to": 1790881800
+      }
+    }
+  ],
+  "restored": {
+    "sync": true,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1790871000,
+          "to": 1790881800
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_GBP",
+        "resolution": "5",
+        "range": {
+          "from": 1790871000,
+          "to": 1790881500
+        }
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "5",
+        "range": {
+          "from": 1790871000,
+          "to": 1790881800
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_CHF",
+        "resolution": "5",
+        "range": {
+          "from": 1790871000,
+          "to": 1790881500
+        }
+      }
+    ]
+  },
+  "errors": []
+}

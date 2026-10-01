@@ -1,0 +1,5703 @@
+{
+  "read_only": true,
+  "controller": "http://192.168.7.33:9090",
+  "scope": "200 native historical bars; local source port matches Mihomo metadata.sourcePort",
+  "records": [
+    {
+      "round": 0,
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_ms": 37.77,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 39.83
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 40.95
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 41.02
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 41.15
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 41.15
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 41.19
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 41.2
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 41.47
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 41.53
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 712.76
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 712.84
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 712.98
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 712.98
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 713.01
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 713.01
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1016.37
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1016.6
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1016.81
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1016.83
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1016.84
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 979.33,
+      "local_source_port": 46836,
+      "proxy_observations": [
+        {
+          "at_ms": 540.55,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 743.9,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1048.48,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_ms": 1167.67,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1168.02
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1168.16
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1168.17
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1168.19
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1168.19
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1475.81
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1476.01
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1476.24
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1476.26
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1476.27
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 308.9,
+      "local_source_port": 46836,
+      "proxy_observations": [
+        {
+          "at_ms": 540.55,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 743.9,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1048.48,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1251.63,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2546,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1556.23,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2546,
+            "download": 12536
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_ms": 1627.25,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1627.61
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1627.74
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1627.75
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1627.77
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1627.77
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1981.45
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1981.64
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1981.85
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1981.87
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1981.88
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 354.89,
+      "local_source_port": 46836,
+      "proxy_observations": [
+        {
+          "at_ms": 540.55,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 743.9,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1048.48,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1251.63,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2546,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1556.23,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 2546,
+            "download": 12536
+          }
+        },
+        {
+          "at_ms": 1657.83,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 3007,
+            "download": 12536
+          }
+        },
+        {
+          "at_ms": 2063.75,
+          "connection": {
+            "id": "641c295a-9b0f-4011-8ad7-5b54c000b316",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:22.594384221+08:00",
+            "upload": 3007,
+            "download": 16600
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "repeat": 0,
+      "started_at_ms": 12.85,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 13.32
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 16.19
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 16.27
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 16.37
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 16.38
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 16.4
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 16.41
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 16.83
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 16.87
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 2300.73
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 2300.8
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 2300.99
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 2301.0
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 2301.02
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 2301.03
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2478.6
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 2478.87
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 2479.1
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 2479.11
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 2479.12
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 2466.53,
+      "local_source_port": 46838,
+      "proxy_observations": [
+        {
+          "at_ms": 1531.01,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 2241.5,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 2343.12,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 2546.12,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1921,
+            "download": 14531
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "repeat": 1,
+      "started_at_ms": 2630.43,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 2630.78
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 2630.91
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 2630.91
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 2630.94
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 2630.94
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2810.15
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 2810.36
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 2810.55
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 2810.57
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 2810.58
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 180.41,
+      "local_source_port": 46838,
+      "proxy_observations": [
+        {
+          "at_ms": 1531.01,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 2241.5,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 2343.12,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 2546.12,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1921,
+            "download": 14531
+          }
+        },
+        {
+          "at_ms": 2647.6,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 2173,
+            "download": 14531
+          }
+        },
+        {
+          "at_ms": 2850.53,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 2173,
+            "download": 24580
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "repeat": 2,
+      "started_at_ms": 2962.06,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 2962.39
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 2962.53
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 2962.54
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 2962.56
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 2962.56
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 3141.26
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 3141.48
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 3141.67
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 3141.7
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 3141.71
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 179.89,
+      "local_source_port": 46838,
+      "proxy_observations": [
+        {
+          "at_ms": 1531.01,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 2241.5,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 2343.12,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 2546.12,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 1921,
+            "download": 14531
+          }
+        },
+        {
+          "at_ms": 2647.6,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 2173,
+            "download": 14531
+          }
+        },
+        {
+          "at_ms": 2850.53,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 2173,
+            "download": 24580
+          }
+        },
+        {
+          "at_ms": 3056.25,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 2425,
+            "download": 24580
+          }
+        },
+        {
+          "at_ms": 3157.65,
+          "connection": {
+            "id": "f1cd95d9-1f3c-4215-93d9-bc141e1ffc57",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:25.737841824+08:00",
+            "upload": 2425,
+            "download": 34631
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "repeat": 0,
+      "started_at_ms": 13.57,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 14.08
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 14.57
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 14.64
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 14.74
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 14.75
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 14.78
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 14.78
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 14.97
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 15.0
+        },
+        {
+          "name": "proxy.start_tls.failed",
+          "at_ms": 4019.2
+        }
+      ],
+      "error_type": "ConnectTimeout",
+      "elapsed_ms": 4005.73,
+      "local_source_port": 55576,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "repeat": 1,
+      "started_at_ms": 4170.86,
+      "phases": [],
+      "error_type": "PoolTimeout",
+      "elapsed_ms": 4000.45,
+      "local_source_port": 55576,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "repeat": 2,
+      "started_at_ms": 8322.93,
+      "phases": [],
+      "error_type": "PoolTimeout",
+      "elapsed_ms": 4000.51,
+      "local_source_port": 55576,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_ms": 13.09,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 13.46
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 13.82
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 13.86
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 13.96
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 13.97
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 13.99
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 13.99
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 14.29
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 14.32
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 661.27
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 661.33
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 661.46
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 661.46
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 661.49
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 661.49
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1007.01
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1007.21
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1007.39
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1007.41
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1007.42
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 994.78,
+      "local_source_port": 47994,
+      "proxy_observations": [
+        {
+          "at_ms": 514.87,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 718.19,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1022.33,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2085,
+            "download": 8471
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_ms": 1159.36,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1159.77
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1159.92
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1159.92
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1159.95
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1159.95
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1483.33
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1483.53
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1483.73
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1483.75
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1483.76
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 324.68,
+      "local_source_port": 47994,
+      "proxy_observations": [
+        {
+          "at_ms": 514.87,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 718.19,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1022.33,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2085,
+            "download": 8471
+          }
+        },
+        {
+          "at_ms": 1225.11,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2546,
+            "download": 8471
+          }
+        },
+        {
+          "at_ms": 1529.55,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2546,
+            "download": 12534
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_ms": 1635.7,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1636.1
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1636.25
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1636.25
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1636.27
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1636.28
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1970.12
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1970.32
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1970.51
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1970.53
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1970.54
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 335.25,
+      "local_source_port": 47994,
+      "proxy_observations": [
+        {
+          "at_ms": 514.87,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 718.19,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1022.33,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2085,
+            "download": 8471
+          }
+        },
+        {
+          "at_ms": 1225.11,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2546,
+            "download": 8471
+          }
+        },
+        {
+          "at_ms": 1529.55,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 2546,
+            "download": 12534
+          }
+        },
+        {
+          "at_ms": 1732.55,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 3007,
+            "download": 12534
+          }
+        },
+        {
+          "at_ms": 2036.9,
+          "connection": {
+            "id": "6829c411-5d3f-4d8b-b905-d32c26efb5ad",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:40.457821708+08:00",
+            "upload": 3007,
+            "download": 16597
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_ms": 12.07,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 12.52
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 12.89
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 12.93
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 13.01
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 13.02
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 13.04
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 13.04
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 13.33
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 13.36
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 648.43
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 648.51
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 648.64
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 648.65
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 648.68
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 648.68
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 991.63
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 991.83
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 992.01
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 992.03
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 992.04
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 980.38,
+      "local_source_port": 48002,
+      "proxy_observations": [
+        {
+          "at_ms": 513.94,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.0,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1021.4,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_ms": 1144.42,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1144.82
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1144.95
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1144.96
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1144.98
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1144.98
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1548.27
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1548.48
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1548.67
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1548.68
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1548.69
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 404.56,
+      "local_source_port": 48002,
+      "proxy_observations": [
+        {
+          "at_ms": 513.94,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.0,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1021.4,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1224.22,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2546,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1630.06,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2546,
+            "download": 12536
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_ms": 1701.15,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1701.51
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1701.64
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1701.65
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1701.67
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1701.67
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 3016.36
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 3016.56
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 3016.75
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 3016.76
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 3016.79
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1315.9,
+      "local_source_port": 48002,
+      "proxy_observations": [
+        {
+          "at_ms": 513.94,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.0,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1021.4,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1224.22,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2546,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1630.06,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 2546,
+            "download": 12536
+          }
+        },
+        {
+          "at_ms": 1731.7,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 3007,
+            "download": 12536
+          }
+        },
+        {
+          "at_ms": 3051.04,
+          "connection": {
+            "id": "c733e609-091f-46b6-95cc-af9f32a3aad3",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:58:42.573766409+08:00",
+            "upload": 3007,
+            "download": 16600
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "repeat": 0,
+      "started_at_ms": 12.5,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 12.98
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 13.31
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 13.35
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 13.43
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 13.44
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 13.46
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 13.46
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 13.61
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 13.64
+        },
+        {
+          "name": "proxy.start_tls.failed",
+          "at_ms": 4018.22
+        }
+      ],
+      "error_type": "ConnectTimeout",
+      "elapsed_ms": 4005.81,
+      "local_source_port": 48012,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "repeat": 1,
+      "started_at_ms": 4170.77,
+      "phases": [],
+      "error_type": "PoolTimeout",
+      "elapsed_ms": 4000.55,
+      "local_source_port": 48012,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "repeat": 2,
+      "started_at_ms": 8323.72,
+      "phases": [],
+      "error_type": "PoolTimeout",
+      "elapsed_ms": 4000.51,
+      "local_source_port": 48012,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 3,
+      "source": "binance",
+      "repeat": 0,
+      "started_at_ms": 13.24,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 13.58
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 13.95
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 13.98
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 14.06
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 14.06
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 14.09
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 14.09
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 14.32
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 14.35
+        },
+        {
+          "name": "proxy.start_tls.failed",
+          "at_ms": 4017.87
+        }
+      ],
+      "error_type": "ConnectTimeout",
+      "elapsed_ms": 4004.72,
+      "local_source_port": 54746,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 3,
+      "source": "binance",
+      "repeat": 1,
+      "started_at_ms": 4170.52,
+      "phases": [],
+      "error_type": "PoolTimeout",
+      "elapsed_ms": 4000.57,
+      "local_source_port": 54746,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 3,
+      "source": "binance",
+      "repeat": 2,
+      "started_at_ms": 8323.62,
+      "phases": [],
+      "error_type": "PoolTimeout",
+      "elapsed_ms": 4000.53,
+      "local_source_port": 54746,
+      "proxy_observations": [],
+      "observer_errors": []
+    },
+    {
+      "round": 3,
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_ms": 12.95,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 13.71
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 14.07
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 14.1
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 14.18
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 14.19
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 14.23
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 14.23
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 14.44
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 14.47
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 672.8
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 672.86
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 673.0
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 673.01
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 673.03
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 673.04
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1045.64
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1045.84
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1046.03
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1046.05
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1046.06
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1033.58,
+      "local_source_port": 53382,
+      "proxy_observations": [
+        {
+          "at_ms": 513.68,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.7,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1122.96,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 3,
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_ms": 1199.17,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1199.54
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1199.66
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1199.67
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1199.69
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1199.69
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1503.97
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1504.16
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1504.37
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1504.39
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1504.4
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 305.52,
+      "local_source_port": 53382,
+      "proxy_observations": [
+        {
+          "at_ms": 513.68,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.7,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1122.96,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1225.32,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2546,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1530.93,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2546,
+            "download": 12535
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 3,
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_ms": 1657.48,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1657.84
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1657.96
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1657.97
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1657.99
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1658.0
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2001.23
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 2001.44
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 2001.64
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 2001.66
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 2001.66
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 344.6,
+      "local_source_port": 53382,
+      "proxy_observations": [
+        {
+          "at_ms": 513.68,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.7,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1122.96,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1225.32,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2546,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1530.93,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 2546,
+            "download": 12535
+          }
+        },
+        {
+          "at_ms": 1733.97,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 3007,
+            "download": 12535
+          }
+        },
+        {
+          "at_ms": 2038.5,
+          "connection": {
+            "id": "25530a62-b276-4707-bfe1-670bdd8cf4a1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:10.705190974+08:00",
+            "upload": 3007,
+            "download": 16598
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 4,
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_ms": 13.99,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 14.59
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 15.04
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 15.1
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 15.22
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 15.23
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 15.28
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 15.29
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 15.65
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 15.69
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 651.58
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 651.64
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 651.78
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 651.79
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 651.82
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 651.82
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1075.59
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1075.81
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1076.02
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1076.04
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1076.04
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1062.48,
+      "local_source_port": 53392,
+      "proxy_observations": [
+        {
+          "at_ms": 514.17,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.14,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1123.17,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 4,
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_ms": 1229.5,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1229.84
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1229.96
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1229.96
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1229.98
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1229.99
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1750.88
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1751.09
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1751.3
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1751.32
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1751.32
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 522.11,
+      "local_source_port": 53392,
+      "proxy_observations": [
+        {
+          "at_ms": 514.17,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.14,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1123.17,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1326.12,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2546,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1833.47,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2546,
+            "download": 12537
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 4,
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_ms": 1904.71,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1905.05
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1905.2
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1905.21
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1905.23
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1905.23
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2189.27
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 2189.47
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 2189.67
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 2189.7
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 2189.71
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 285.43,
+      "local_source_port": 53392,
+      "proxy_observations": [
+        {
+          "at_ms": 514.17,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.14,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1123.17,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1326.12,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2546,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1833.47,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 2546,
+            "download": 12537
+          }
+        },
+        {
+          "at_ms": 1935.0,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 3007,
+            "download": 12537
+          }
+        },
+        {
+          "at_ms": 2239.7,
+          "connection": {
+            "id": "7493edda-f402-46d6-a54f-409145190293",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:12.848677846+08:00",
+            "upload": 3007,
+            "download": 16601
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 4,
+      "source": "binance",
+      "repeat": 0,
+      "started_at_ms": 12.52,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 13.06
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 13.42
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 13.46
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 13.54
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 13.55
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 13.57
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 13.57
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 13.89
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 13.92
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 616.14
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 616.18
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 616.27
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 616.28
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 616.3
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 616.3
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1031.06
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1031.23
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1031.44
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1031.45
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1031.46
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1019.17,
+      "local_source_port": 53406,
+      "proxy_observations": [
+        {
+          "at_ms": 311.36,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 514.34,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 717.56,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1123.62,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1921,
+            "download": 14531
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 4,
+      "source": "binance",
+      "repeat": 1,
+      "started_at_ms": 1185.26,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1185.59
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1185.72
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1185.73
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1185.75
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1185.75
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1352.77
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1352.98
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1353.18
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1353.2
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1353.21
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 168.2,
+      "local_source_port": 53406,
+      "proxy_observations": [
+        {
+          "at_ms": 311.36,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 514.34,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 717.56,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1123.62,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1921,
+            "download": 14531
+          }
+        },
+        {
+          "at_ms": 1225.2,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 2173,
+            "download": 14531
+          }
+        },
+        {
+          "at_ms": 1428.24,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 2173,
+            "download": 24580
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 4,
+      "source": "binance",
+      "repeat": 2,
+      "started_at_ms": 1507.13,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1507.45
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1507.57
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1507.57
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1507.59
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1507.6
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1674.03
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1674.24
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1674.43
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1674.45
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1674.46
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 167.83,
+      "local_source_port": 53406,
+      "proxy_observations": [
+        {
+          "at_ms": 311.36,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 514.34,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 717.56,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1123.62,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 1921,
+            "download": 14531
+          }
+        },
+        {
+          "at_ms": 1225.2,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 2173,
+            "download": 14531
+          }
+        },
+        {
+          "at_ms": 1428.24,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 2173,
+            "download": 24580
+          }
+        },
+        {
+          "at_ms": 1529.73,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 2425,
+            "download": 24580
+          }
+        },
+        {
+          "at_ms": 1733.15,
+          "connection": {
+            "id": "698e61fd-4d24-4d14-9e86-276a6bad6af1",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:15.062474179+08:00",
+            "upload": 2425,
+            "download": 34629
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 5,
+      "source": "binance",
+      "repeat": 0,
+      "started_at_ms": 12.52,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 12.98
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 13.28
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 13.31
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 13.39
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 13.39
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 13.42
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 13.42
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 13.72
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 13.75
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 612.11
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 612.17
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 612.29
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 612.3
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 612.33
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 612.33
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 782.85
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 783.08
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 783.31
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 783.32
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 783.33
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 771.05,
+      "local_source_port": 53408,
+      "proxy_observations": [
+        {
+          "at_ms": 311.1,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 514.25,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 615.67,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 818.84,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1921,
+            "download": 14533
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 5,
+      "source": "binance",
+      "repeat": 1,
+      "started_at_ms": 938.26,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 938.57
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 938.71
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 938.72
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 938.74
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 938.74
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1108.93
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1109.15
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1109.34
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1109.36
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1109.37
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 171.37,
+      "local_source_port": 53408,
+      "proxy_observations": [
+        {
+          "at_ms": 311.1,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 514.25,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 615.67,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 818.84,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1921,
+            "download": 14533
+          }
+        },
+        {
+          "at_ms": 1021.79,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 2173,
+            "download": 14533
+          }
+        },
+        {
+          "at_ms": 1123.19,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 2173,
+            "download": 24584
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 5,
+      "source": "binance",
+      "repeat": 2,
+      "started_at_ms": 1263.89,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1264.24
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1264.37
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1264.38
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1264.4
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1264.4
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1478.71
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1478.92
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1479.12
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1479.14
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1479.15
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 215.54,
+      "local_source_port": 53408,
+      "proxy_observations": [
+        {
+          "at_ms": 311.1,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 514.25,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 615.67,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 818.84,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 1921,
+            "download": 14533
+          }
+        },
+        {
+          "at_ms": 1021.79,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 2173,
+            "download": 14533
+          }
+        },
+        {
+          "at_ms": 1123.19,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 2173,
+            "download": 24584
+          }
+        },
+        {
+          "at_ms": 1331.91,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 2425,
+            "download": 24584
+          }
+        },
+        {
+          "at_ms": 1534.84,
+          "connection": {
+            "id": "59ca0c70-b313-4369-88ec-d2f10a9be18e",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:16.892714935+08:00",
+            "upload": 2425,
+            "download": 34635
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 5,
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_ms": 12.12,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 12.62
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 12.95
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 12.98
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 13.07
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 13.07
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 13.09
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 13.1
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 13.38
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 13.4
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 691.95
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 692.01
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 692.13
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 692.14
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 692.16
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 692.17
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 998.59
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 998.78
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 998.97
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 998.99
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 998.99
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 987.33,
+      "local_source_port": 50310,
+      "proxy_observations": [
+        {
+          "at_ms": 513.68,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.76,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1021.25,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 5,
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_ms": 1153.98,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1154.35
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1154.5
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1154.5
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1154.53
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1154.53
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1712.28
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1712.48
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1712.67
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1712.69
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1712.7
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 559.04,
+      "local_source_port": 50310,
+      "proxy_observations": [
+        {
+          "at_ms": 513.68,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.76,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1021.25,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1224.08,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2546,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1731.39,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2546,
+            "download": 12536
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 5,
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_ms": 1867.86,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1868.23
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1868.39
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1868.4
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1868.43
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1868.43
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2158.23
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 2158.43
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 2158.65
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 2158.67
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 2158.68
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 291.26,
+      "local_source_port": 50310,
+      "proxy_observations": [
+        {
+          "at_ms": 513.68,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.76,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1021.25,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1224.08,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2546,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1731.39,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 2546,
+            "download": 12536
+          }
+        },
+        {
+          "at_ms": 1934.35,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 3007,
+            "download": 12536
+          }
+        },
+        {
+          "at_ms": 2238.78,
+          "connection": {
+            "id": "d01dc4a3-ddb7-4563-9667-ef5c2ba777ed",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:18.695474482+08:00",
+            "upload": 3007,
+            "download": 16600
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 6,
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_ms": 18.04,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 19.4
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 19.62
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 19.65
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 19.73
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 19.73
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 19.76
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 19.76
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 20.0
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 20.04
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 634.28
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 634.35
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 634.51
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 634.52
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 634.55
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 634.55
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 922.75
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 922.95
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 923.15
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 923.17
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 923.18
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 905.55,
+      "local_source_port": 50320,
+      "proxy_observations": [
+        {
+          "at_ms": 513.29,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.25,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1020.72,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 6,
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_ms": 1078.59,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1078.98
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1079.12
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1079.12
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1079.15
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1079.15
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1380.68
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1380.88
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1381.09
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1381.11
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1381.12
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 302.82,
+      "local_source_port": 50320,
+      "proxy_observations": [
+        {
+          "at_ms": 513.29,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.25,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1020.72,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1122.32,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2546,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1427.05,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2546,
+            "download": 12537
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 6,
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_ms": 1538.07,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1538.51
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1538.65
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1538.65
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1538.68
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1538.68
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1962.98
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1963.18
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1963.37
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1963.39
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1963.4
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 425.74,
+      "local_source_port": 50320,
+      "proxy_observations": [
+        {
+          "at_ms": 513.29,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 716.25,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2085,
+            "download": 3927
+          }
+        },
+        {
+          "at_ms": 1020.72,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2085,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1122.32,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2546,
+            "download": 8473
+          }
+        },
+        {
+          "at_ms": 1427.05,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 2546,
+            "download": 12537
+          }
+        },
+        {
+          "at_ms": 1629.92,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 3007,
+            "download": 12537
+          }
+        },
+        {
+          "at_ms": 2036.02,
+          "connection": {
+            "id": "67f04a1c-2e01-4225-99a0-50538883cd3b",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:20.971810844+08:00",
+            "upload": 3007,
+            "download": 16601
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 6,
+      "source": "binance",
+      "repeat": 0,
+      "started_at_ms": 12.34,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 12.84
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 13.2
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 13.23
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 13.31
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 13.32
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 13.34
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 13.34
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 13.63
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 13.66
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 1171.74
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1171.8
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1171.93
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1171.94
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1171.97
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1171.97
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1358.54
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1358.77
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1358.94
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1358.96
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1358.97
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1346.97,
+      "local_source_port": 50324,
+      "proxy_observations": [
+        {
+          "at_ms": 416.28,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 1027.13,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 1230.18,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1433.15,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1921,
+            "download": 14533
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 6,
+      "source": "binance",
+      "repeat": 1,
+      "started_at_ms": 1514.64,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1514.95
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1515.08
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1515.08
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1515.11
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1515.11
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1701.2
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1701.41
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1701.58
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1701.59
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1701.6
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 187.23,
+      "local_source_port": 50324,
+      "proxy_observations": [
+        {
+          "at_ms": 416.28,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 1027.13,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 1230.18,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1433.15,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1921,
+            "download": 14533
+          }
+        },
+        {
+          "at_ms": 1534.62,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 2173,
+            "download": 14533
+          }
+        },
+        {
+          "at_ms": 1737.64,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 2173,
+            "download": 24584
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 6,
+      "source": "binance",
+      "repeat": 2,
+      "started_at_ms": 1857.67,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1858.01
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1858.14
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1858.15
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1858.17
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1858.18
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2041.11
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 2041.34
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 2041.76
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 2041.79
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 2041.79
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 184.4,
+      "local_source_port": 50324,
+      "proxy_observations": [
+        {
+          "at_ms": 416.28,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 1027.13,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 1230.18,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1921,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1433.15,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 1921,
+            "download": 14533
+          }
+        },
+        {
+          "at_ms": 1534.62,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 2173,
+            "download": 14533
+          }
+        },
+        {
+          "at_ms": 1737.64,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 2173,
+            "download": 24584
+          }
+        },
+        {
+          "at_ms": 1941.05,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 2425,
+            "download": 24584
+          }
+        },
+        {
+          "at_ms": 2042.6,
+          "connection": {
+            "id": "ee04107a-20fa-41b5-8eb3-e8f253f971a3",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:22.987718339+08:00",
+            "upload": 2425,
+            "download": 34635
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 7,
+      "source": "binance",
+      "repeat": 0,
+      "started_at_ms": 13.59,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 14.14
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 14.56
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 14.6
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 14.68
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 14.68
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 14.71
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 14.71
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 15.13
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 15.15
+        },
+        {
+          "name": "proxy.start_tls.failed",
+          "at_ms": 4017.21
+        }
+      ],
+      "error_type": "ConnectTimeout",
+      "elapsed_ms": 4003.71,
+      "local_source_port": 50330,
+      "proxy_observations": [
+        {
+          "at_ms": 3976.02,
+          "connection": {
+            "id": "58a46a7e-e775-45b4-8eb4-5748ca11a2fc",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:28.816807639+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 7,
+      "source": "binance",
+      "repeat": 1,
+      "started_at_ms": 4173.23,
+      "phases": [],
+      "error_type": "PoolTimeout",
+      "elapsed_ms": 4000.56,
+      "local_source_port": 50330,
+      "proxy_observations": [
+        {
+          "at_ms": 3976.02,
+          "connection": {
+            "id": "58a46a7e-e775-45b4-8eb4-5748ca11a2fc",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:28.816807639+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 7,
+      "source": "binance",
+      "repeat": 2,
+      "started_at_ms": 8329.58,
+      "phases": [],
+      "error_type": "PoolTimeout",
+      "elapsed_ms": 4000.52,
+      "local_source_port": 50330,
+      "proxy_observations": [
+        {
+          "at_ms": 3976.02,
+          "connection": {
+            "id": "58a46a7e-e775-45b4-8eb4-5748ca11a2fc",
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:28.816807639+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 7,
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_ms": 13.23,
+      "phases": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 14.21
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 14.63
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 14.67
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 14.77
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 14.77
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 14.8
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 14.8
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 15.11
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 15.14
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 643.71
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 643.81
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 643.95
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 643.95
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 643.98
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 643.98
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1047.33
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1047.55
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1047.75
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1047.77
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1047.78
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1034.83,
+      "local_source_port": 42420,
+      "proxy_observations": [
+        {
+          "at_ms": 514.85,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.94,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1124.1,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 7,
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_ms": 1204.04,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1204.41
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1204.55
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1204.56
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1204.58
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1204.58
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1566.71
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1566.91
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1567.15
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1567.17
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1567.18
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 369.0,
+      "local_source_port": 42420,
+      "proxy_observations": [
+        {
+          "at_ms": 514.85,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.94,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1124.1,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1225.81,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2546,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1632.45,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2546,
+            "download": 12535
+          }
+        }
+      ],
+      "observer_errors": []
+    },
+    {
+      "round": 7,
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_ms": 1729.25,
+      "phases": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1729.63
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1729.77
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1729.78
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1729.8
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1729.8
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2039.5
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 2039.65
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 2039.84
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 2039.86
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 2039.86
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 310.9,
+      "local_source_port": 42420,
+      "proxy_observations": [
+        {
+          "at_ms": 514.85,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 717.94,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2085,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1124.1,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2085,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1225.81,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2546,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 1632.45,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 2546,
+            "download": 12535
+          }
+        },
+        {
+          "at_ms": 1733.7,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 3007,
+            "download": 12535
+          }
+        },
+        {
+          "at_ms": 2139.76,
+          "connection": {
+            "id": "fd161643-c1fa-4682-b71b-4cf43d3b7de1",
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "rule": "DomainSuffix",
+            "start": "2026-10-02T05:59:37.770752341+08:00",
+            "upload": 3007,
+            "download": 16598
+          }
+        }
+      ],
+      "observer_errors": []
+    }
+  ]
+}

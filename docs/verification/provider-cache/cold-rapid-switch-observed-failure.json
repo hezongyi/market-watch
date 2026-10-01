@@ -1,0 +1,70 @@
+{
+  "passed": false,
+  "error": "TimeoutError: frame.waitForFunction: Timeout 10000ms exceeded.",
+  "phase": "MWP:OANDA:AUD_CAD cold burst",
+  "samples": [],
+  "errors": [],
+  "http": [
+    {
+      "phase": "MWP:OANDA:AUD_CAD initial",
+      "elapsed_ms": 385,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790794340000,
+        "firstDataRequest": true,
+        "client": "4dca6e92-9423-49a1-a5ff-13f12a16cc59",
+        "indicators": [],
+        "before": 1790853740000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD immediate",
+      "elapsed_ms": 376,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1789855820000,
+        "firstDataRequest": true,
+        "client": "4dca6e92-9423-49a1-a5ff-13f12a16cc59",
+        "indicators": [],
+        "before": 1790853740000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false
+    }
+  ],
+  "observed": {
+    "ready": true,
+    "loading": false,
+    "resolution": "1",
+    "dataReady": false,
+    "pending": [],
+    "queue": 0,
+    "history": [
+      [
+        "MWP:OANDA:AUD_CAD|5",
+        1790853600000
+      ],
+      [
+        "MWP:OANDA:AUD_CAD|60",
+        1790852400000
+      ]
+    ],
+    "subscriptions": []
+  }
+}

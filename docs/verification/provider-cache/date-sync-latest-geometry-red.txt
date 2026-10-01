@@ -1,0 +1,16 @@
+AssertionError [ERR_ASSERTION]: latest-margin restore must use public scale geometry without an extra native goto
++ actual - expected
+
++ [
++   1
++ ]
+- []
+
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-viewports.cjs:113:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

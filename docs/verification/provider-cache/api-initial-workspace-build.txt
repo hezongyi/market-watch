@@ -1,0 +1,82 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  93.26MB
+Step 1/19 : FROM node:22-bookworm-slim AS adapter
+ ---> 89b30bf5b6a8
+Step 2/19 : WORKDIR /adapter
+ ---> Using cache
+ ---> c990edeff88f
+Step 3/19 : COPY adapters/dukascopy/package*.json ./
+ ---> Using cache
+ ---> 9cc902bd77eb
+Step 4/19 : RUN npm ci --omit=dev
+ ---> Using cache
+ ---> b0d655d5ccb4
+Step 5/19 : COPY adapters/dukascopy/probe.mjs ./
+ ---> Using cache
+ ---> 1a9b47fd514d
+Step 6/19 : FROM python:3.11-slim-bookworm
+ ---> 2410faa698c7
+Step 7/19 : COPY --from=adapter /usr/local/bin/node /usr/local/bin/node
+ ---> Using cache
+ ---> eff81689f50d
+Step 8/19 : WORKDIR /app
+ ---> Using cache
+ ---> 94015452a2f9
+Step 9/19 : COPY pyproject.toml requirements.lock ./
+ ---> Using cache
+ ---> 10c8d80b03c2
+Step 10/19 : RUN pip install --no-cache-dir -r requirements.lock
+ ---> Using cache
+ ---> 5cb51b946ff8
+Step 11/19 : COPY backend ./backend
+ ---> df83a847e928
+Step 12/19 : COPY migrations ./migrations
+ ---> c784b2a6f6f7
+Step 13/19 : COPY alembic.ini ./
+ ---> f79e1b3e848d
+Step 14/19 : RUN pip install --no-cache-dir --no-deps .
+ ---> Running in 3f1530a6349a
+Processing /app
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: market-watch
+  Building wheel for market-watch (pyproject.toml): started
+  Building wheel for market-watch (pyproject.toml): finished with status 'done'
+  Created wheel for market-watch: filename=market_watch-1.2.0-py3-none-any.whl size=186884 sha256=a852a9829de01fda8547baada566d1feb3a6ea3610d68cb37e92b6bd13bd8b10
+  Stored in directory: /tmp/pip-ephem-wheel-cache-iorxk3bl/wheels/57/0f/98/bb57b2b57b95807699b822a35c022f139d38a02c27922f27ce
+Successfully built market-watch
+Installing collected packages: market-watch
+Successfully installed market-watch-1.2.0
+[91mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+[0m[91m
+[notice] A new release of pip is available: 24.0 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+[0m ---> Removed intermediate container 3f1530a6349a
+ ---> 9468766b4e61
+Step 15/19 : COPY --from=adapter /adapter ./adapters/dukascopy
+ ---> dc948f1cf0ac
+Step 16/19 : RUN useradd --uid 10001 --create-home app
+ ---> Running in f4201ab3b2dc
+ ---> Removed intermediate container f4201ab3b2dc
+ ---> ae3029a1a427
+Step 17/19 : USER app
+ ---> Running in 6c591bfaa36b
+ ---> Removed intermediate container 6c591bfaa36b
+ ---> 3abaa4f92025
+Step 18/19 : EXPOSE 8000
+ ---> Running in 2f33e1f7df5a
+ ---> Removed intermediate container 2f33e1f7df5a
+ ---> 84a78af5c97d
+Step 19/19 : CMD ["uvicorn", "alerts.api:app", "--host", "0.0.0.0", "--port", "8000"]
+ ---> Running in 03be1640a090
+ ---> Removed intermediate container 03be1640a090
+ ---> bb40ace2a957
+Successfully built bb40ace2a957
+Successfully tagged market-watch-api:provider-cache-wip-20261001

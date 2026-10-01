@@ -18,6 +18,7 @@ const context = vm.createContext({
   atob: (s) => Buffer.from(s, "base64").toString("utf8"),
   btoa: (s) => Buffer.from(s).toString("base64"),
 });
+vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
 vm.runInContext(
   fs.readFileSync("../advanced-host/indicators.js", "utf8"),

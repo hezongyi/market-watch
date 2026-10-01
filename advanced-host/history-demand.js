@@ -12,7 +12,13 @@ async function historicalNavigationPage(submit, read, checkActive, progress,
     if (window.status === 'cancelled') throw Error('历史补数计划已取消');
     const page = await read(window.window_end);
     checkActive();
-    if (page.bars.length && page.bars[0].start <= window.window_start) return page;
+    let covered=window.window_start;
+    for (const span of [...(page.coverage||[])].sort((a,b)=>a.start-b.start)) {
+      if (span.start>covered) break;
+      covered=Math.max(covered,span.end);
+    }
+    if (page.bars.length && (page.bars[0].start <= window.window_start ||
+      window.timeframe==='M1' && covered>=window.window_end)) return page;
     if (window.window_error) throw Error(window.window_error);
     progress(page.bars.length);
     await pause();
@@ -51,7 +57,7 @@ function chartDemandReporter(widget, client, submit, onError, clock = () => Date
       const work = [];
       for (let i = 0; i < widget.chartsCount(); i++) {
         const chart = widget.chart(i), timeframe = frames[chart.resolution()];
-        if (!timeframe || chart.symbol().startsWith('MWPY_')) continue;
+        if (!timeframe || chart.symbol().startsWith('MWPY_') || chart.symbol().startsWith('MWP:')) continue;
         if (!ids.has(chart)) ids.set(chart, `${client}:${++sequence}`);
         const id = ids.get(chart);
         if (inFlight.has(id)) continue;

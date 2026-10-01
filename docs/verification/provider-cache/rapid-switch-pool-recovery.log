@@ -1,0 +1,5 @@
+TypeError: Cannot read properties of undefined (reading 'waitForFunction')
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-provider-rapid-switch.browser.cjs:32:16
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at process.processImmediate (node:internal/timers:452:9)
+    at process.callbackTrampoline (node:internal/async_hooks:130:17)

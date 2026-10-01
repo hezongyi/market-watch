@@ -1,0 +1,442 @@
+{
+  "passed": true,
+  "first_ready_ms": 11764,
+  "network": [
+    {
+      "path": "/api/advanced-charts/workspaces",
+      "at_ms": 368,
+      "elapsed_ms": 24,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "at_ms": 510,
+      "elapsed_ms": 10,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/catalog",
+      "at_ms": 521,
+      "elapsed_ms": 5,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences",
+      "at_ms": 527,
+      "elapsed_ms": 8,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 1252,
+      "elapsed_ms": 24,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:EUR_AUD",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 1657,
+      "elapsed_ms": 8,
+      "status": 200,
+      "query": {
+        "instrument": "EURUSD",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 1707,
+      "elapsed_ms": 10,
+      "status": 200,
+      "query": {
+        "instrument": "XAUUSD",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 1719,
+      "elapsed_ms": 8,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 1530,
+      "elapsed_ms": 1018,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 1542,
+      "elapsed_ms": 1009,
+      "status": 200
+    },
+    {
+      "path": "/api/charts/data",
+      "at_ms": 1603,
+      "elapsed_ms": 2026,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:EUR_AUD",
+        "timeframe": "M5",
+        "limit": 198
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 1730,
+      "elapsed_ms": 3764,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 2557,
+      "elapsed_ms": 2938,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 5501,
+      "elapsed_ms": 12,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:EUR_AUD",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 5506,
+      "elapsed_ms": 18,
+      "status": 200,
+      "query": {
+        "instrument": "EURUSD",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 5527,
+      "elapsed_ms": 14,
+      "status": 200,
+      "query": {
+        "instrument": "XAUUSD",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 5534,
+      "elapsed_ms": 15,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 5543,
+      "elapsed_ms": 3093,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 5554,
+      "elapsed_ms": 3082,
+      "status": 200
+    },
+    {
+      "path": "/api/charts/data",
+      "at_ms": 8640,
+      "elapsed_ms": 3111,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:EUR_AUD",
+        "timeframe": "M5",
+        "limit": 188
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 2555,
+      "elapsed_ms": 11943,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "at_ms": 14501,
+      "elapsed_ms": 10,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "at_ms": 14515,
+      "elapsed_ms": 15,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 3655,
+      "elapsed_ms": 11673,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 14535,
+      "elapsed_ms": 5336,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 8640,
+      "elapsed_ms": 14372,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 19875,
+      "elapsed_ms": 6117,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 15330,
+      "elapsed_ms": 11548,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 11759,
+      "elapsed_ms": 16163,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "at_ms": 27923,
+      "elapsed_ms": 12,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 23015,
+      "elapsed_ms": 6534,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "at_ms": 29557,
+      "elapsed_ms": 11,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "at_ms": 29574,
+      "elapsed_ms": 11,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "at_ms": 29588,
+      "elapsed_ms": 12,
+      "status": 200
+    },
+    {
+      "path": "/api/charts/data",
+      "at_ms": 25996,
+      "elapsed_ms": 4350,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "limit": 188
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "at_ms": 30360,
+      "elapsed_ms": 22,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 26881,
+      "elapsed_ms": 4515,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "at_ms": 32361,
+      "elapsed_ms": 11,
+      "status": 200
+    },
+    {
+      "path": "/api/charts/data",
+      "at_ms": 30362,
+      "elapsed_ms": 2866,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "timeframe": "H1",
+        "limit": 188
+      }
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "at_ms": 33675,
+      "elapsed_ms": 14,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "at_ms": 35244,
+      "elapsed_ms": 13,
+      "status": 200
+    },
+    {
+      "path": "/api/charts/data",
+      "at_ms": 33316,
+      "elapsed_ms": 2260,
+      "status": 200,
+      "query": {
+        "instrument": "XAUUSD",
+        "timeframe": "H1",
+        "limit": 135
+      }
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "at_ms": 35805,
+      "elapsed_ms": 10,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/workspaces",
+      "at_ms": 36178,
+      "elapsed_ms": 25,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "at_ms": 36252,
+      "elapsed_ms": 7,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/catalog",
+      "at_ms": 36259,
+      "elapsed_ms": 7,
+      "status": 200
+    },
+    {
+      "path": "/api/advanced-charts/preferences",
+      "at_ms": 36267,
+      "elapsed_ms": 6,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 36617,
+      "elapsed_ms": 28,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 36829,
+      "elapsed_ms": 10,
+      "status": 200,
+      "query": {
+        "instrument": "XAUUSD",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 36814,
+      "elapsed_ms": 7865,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "at_ms": 36854,
+      "elapsed_ms": 7826,
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "at_ms": 44684,
+      "elapsed_ms": 17,
+      "status": 200,
+      "query": {
+        "instrument": "EURUSD",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/charts/data",
+      "at_ms": 36885,
+      "elapsed_ms": 9505,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "timeframe": "H1",
+        "limit": 190
+      }
+    }
+  ],
+  "uiSamples": [
+    {
+      "resolution": "1",
+      "click_ms": 230
+    },
+    {
+      "resolution": "5",
+      "click_ms": 212
+    },
+    {
+      "resolution": "60",
+      "click_ms": 193
+    },
+    {
+      "resolution": "1D",
+      "click_ms": 186
+    },
+    {
+      "resolution": "5",
+      "click_ms": 225
+    }
+  ],
+  "restored": {
+    "symbol": "MWP:BTCUSDT",
+    "resolution": "60",
+    "modes": [
+      2,
+      2
+    ],
+    "studies": [
+      [
+        {
+          "id": "source",
+          "value": "close"
+        },
+        {
+          "id": "symbol",
+          "value": "MWP:XAUUSD"
+        }
+      ]
+    ],
+    "tracked": true
+  },
+  "errors": []
+}

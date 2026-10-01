@@ -1,0 +1,29 @@
+         18947023 function calls (18918986 primitive calls) in 23.241 seconds
+
+   Ordered by: cumulative time
+   List reduced from 2068 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.012    0.012   23.283   23.283 managed_dataset.py:293(publish_once)
+       63    0.052    0.001   22.153    0.352 managed_dataset.py:128(publish_frame)
+       99    1.553    0.016   18.454    0.186 market.py:98(stored_coverage)
+       63    0.041    0.001   12.783    0.203 managed_dataset.py:104(continuous_coverage)
+     1606    0.005    0.000    9.798    0.006 loading.py:214(chunks)
+      125    0.033    0.000    7.776    0.062 chart_data.py:58(chart_rows)
+      809    0.011    0.000    7.766    0.010 session.py:2201(_execute_internal)
+      125    0.042    0.000    7.608    0.061 chart_data.py:75(_chart_rows)
+      865    0.002    0.000    7.597    0.009 base.py:1404(execute)
+      865    0.002    0.000    7.595    0.009 elements.py:524(_execute_on_connection)
+      865    0.012    0.000    7.593    0.009 base.py:1618(_execute_clauseelement)
+      803    0.003    0.000    7.593    0.009 context.py:306(orm_execute_statement)
+      868    0.007    0.000    7.439    0.009 base.py:1767(_execute_context)
+     1197    6.415    0.005    7.340    0.006 connection.py:479(wait)
+      868    0.008    0.000    7.284    0.008 base.py:1826(_exec_single_context)
+      933    0.004    0.000    7.229    0.008 cursor.py:100(execute)
+      867    0.001    0.000    7.206    0.008 default.py:1179(do_execute)
+      515    0.002    0.000    6.675    0.013 session.py:2565(scalars)
+      702    0.200    0.000    6.276    0.009 loading.py:235(<listcomp>)
+   582683    1.242    0.000    6.076    0.000 loading.py:1075(_instance)
+
+
+

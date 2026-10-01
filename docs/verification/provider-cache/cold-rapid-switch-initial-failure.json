@@ -1,0 +1,51 @@
+{
+  "passed": false,
+  "error": "TimeoutError: frame.waitForFunction: Timeout 60000ms exceeded.",
+  "phase": "MWP:OANDA:AUD_CAD cold burst",
+  "samples": [],
+  "errors": [],
+  "http": [
+    {
+      "phase": "MWP:OANDA:AUD_CAD initial",
+      "elapsed_ms": 1447,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790794134000,
+        "firstDataRequest": true,
+        "client": "df23744d-b969-4656-945a-ad0a603d4ec8",
+        "indicators": [],
+        "before": 1790853534000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD immediate",
+      "elapsed_ms": 1068,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1789855616000,
+        "firstDataRequest": true,
+        "client": "df23744d-b969-4656-945a-ad0a603d4ec8",
+        "indicators": [],
+        "before": 1790853536000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false
+    }
+  ]
+}

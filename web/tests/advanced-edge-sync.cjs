@@ -72,6 +72,7 @@ function pane(to, offset = 10) {
   const failures = [];
   let blocked = false,
     finish;
+  let delayPreparation = false, finishPreparation;
   const widget = {
     dateRangeSync: () => range,
     timeSync: () => time,
@@ -83,7 +84,13 @@ function pane(to, offset = 10) {
     widget,
     () => blocked,
     (e) => failures.push(e),
+    (peer,target) => delayPreparation && peer === c
+      ? new Promise(resolve => {finishPreparation = () => resolve(target);}) : target,
   );
+  async function waitForPeer() {
+    for(let i=0;i<30 && !finish;i++) await Promise.resolve();
+    assert.equal(typeof finish,"function","peer update must start");
+  }
   async function flush() {
     const f = [...timers.values()];
     timers.clear();
@@ -97,6 +104,15 @@ function pane(to, offset = 10) {
   assert.equal(range.value(), true);
   assert.equal(time.value(), true);
   assert.equal(guard.busy(), false);
+  // Wheel zoom can leave the right boundary fixed while moving only the left.
+  await a.setVisibleRange({from:700,to:1000});
+  a.fire();
+  await flush();
+  assert.equal(b.getVisibleRange().from,700,'left-only zoom must synchronize');
+  assert.equal(c.getVisibleRange().from,700,'all peers must follow zoom');
+  await a.setVisibleRange({from:100,to:1000});
+  a.fire();
+  await flush();
   // A peer can finish native history/range work after the active chart event.
   await b.setVisibleRange({ from: 100, to: 3700 });
   b.fire();
@@ -120,14 +136,40 @@ function pane(to, offset = 10) {
   assert.equal(range.value(), true);
   assert.equal(time.value(), true);
   b.setVisibleRange = setB;
+  // While a peer is loading, another wheel gesture must survive the busy guard.
+  await b.setVisibleRange({from:100,to:3700});
+  await c.setVisibleRange({from:100,to:3700});
+  b.setVisibleRange = r => new Promise(resolve => {
+    finish = async () => { await setB(r); resolve(); };
+  });
+  finish = undefined;
+  a.fire();
+  const changing = flush();
+  await waitForPeer();
+  assert.equal(c.getVisibleRange().to,1000,'a slow peer must not block other panes');
+  await a.setVisibleRange({from:600,to:1000});
+  a.fire();
+  await finish();
+  await changing;
+  b.setVisibleRange = setB;
+  assert.equal(guard.busy(),true,'latest wheel intent must be scheduled');
+  await flush();
+  assert.equal(b.getVisibleRange().from,600);
+  assert.equal(c.getVisibleRange().from,600);
+  await a.setVisibleRange({from:100,to:1000});
+  a.fire();
+  await flush();
   range.setValue(false);
   a.fire();
   assert.equal(timers.size, 0);
   range.setValue(true);
   blocked = true;
   a.fire();
-  assert.equal(timers.size, 0);
+  assert.equal(timers.size, 1,'blocked interaction must be retained');
+  await flush();
+  assert.equal(timers.size,1,'loading postpones reconciliation');
   blocked = false;
+  await flush();
   b.getVisibleRange = () => ({ from: 100, to: 3700 });
   c.getVisibleRange = () => ({ from: 100, to: 3700 });
   b.setVisibleRange = () =>
@@ -135,22 +177,27 @@ function pane(to, offset = 10) {
       finish = resolve;
     });
   let cWrites = 0;
+  delayPreparation = true;
   c.setVisibleRange = async () => {
     cWrites++;
   };
+  finish = undefined;
   a.fire();
   const pending = flush();
-  await Promise.resolve();
+  await waitForPeer();
   range.setValue(false);
+  finishPreparation();
   finish();
   await pending;
   assert.equal(cWrites, 0, "user toggle cancels remaining peer updates");
   assert.equal(range.value(), false, "user disabled sync must stay disabled");
   range.setValue(true);
+  finish = undefined;
   a.fire();
   const switched = flush();
-  await Promise.resolve();
+  await waitForPeer();
   a.change();
+  finishPreparation();
   finish();
   await switched;
   assert.equal(
@@ -158,10 +205,12 @@ function pane(to, offset = 10) {
     0,
     "period or symbol changes cancel remaining edge updates",
   );
+  finish = undefined;
   a.fire();
   const old = flush();
-  await Promise.resolve();
+  await waitForPeer();
   guard.dispose();
+  finishPreparation();
   finish();
   await old;
   assert.equal(cWrites, 0);

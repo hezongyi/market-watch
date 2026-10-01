@@ -1,0 +1,105 @@
+{
+  "passed": false,
+  "error": "TimeoutError: frame.waitForFunction: Timeout 8000ms exceeded.",
+  "phase": "MWP:OANDA:AUD_CAD cold burst",
+  "samples": [],
+  "errors": [],
+  "http": [
+    {
+      "phase": "MWP:OANDA:AUD_CAD initial",
+      "elapsed_ms": 505,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790794457000,
+        "firstDataRequest": true,
+        "client": "5f92a9da-32de-4846-a463-2501ad8a9ff1",
+        "indicators": [],
+        "before": 1790853857000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD immediate",
+      "elapsed_ms": 379,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1789855937000,
+        "firstDataRequest": true,
+        "client": "5f92a9da-32de-4846-a463-2501ad8a9ff1",
+        "indicators": [],
+        "before": 1790853857000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false
+    }
+  ],
+  "observed": {
+    "ready": true,
+    "loading": false,
+    "resolution": "1W",
+    "dataReady": false,
+    "pending": [],
+    "queue": 0,
+    "history": [
+      [
+        "MWP:OANDA:AUD_CAD|5",
+        1790853600000
+      ],
+      [
+        "MWP:OANDA:AUD_CAD|60",
+        1790852400000
+      ]
+    ],
+    "trace": [
+      {
+        "name": "getBars",
+        "at": 1790853798172,
+        "ticker": "MWP:OANDA:AUD_CAD",
+        "resolution": "1W"
+      },
+      {
+        "name": "getBars",
+        "at": 1790853798238,
+        "ticker": "MWP:OANDA:AUD_CAD",
+        "resolution": "1"
+      },
+      {
+        "name": "getBars callback 4",
+        "at": 1790853798272,
+        "value": "Error: 已取消旧图表的历史加载"
+      },
+      {
+        "name": "getBars callback 4",
+        "at": 1790853798338,
+        "value": "Error: 已取消旧图表的历史加载"
+      }
+    ],
+    "subscriptions": [
+      {
+        "symbol": "MWP:OANDA:AUD_CAD",
+        "res": "5",
+        "last": 1790853600000
+      },
+      {
+        "symbol": "MWP:OANDA:AUD_CAD",
+        "res": "60",
+        "last": 1790852400000
+      }
+    ]
+  }
+}

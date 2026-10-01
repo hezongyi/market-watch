@@ -1,0 +1,64 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_repeated_real_connect_tunnel_failures_do_not_exhaust_the_running_pool __
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0f56525750>
+
+    def test_repeated_real_connect_tunnel_failures_do_not_exhaust_the_running_pool(monkeypatch):
+        import socket
+        import threading
+        import time
+        import pytest
+        from alerts import provider_chart
+        from alerts.config import settings
+    
+        proxy = socket.socket()
+        proxy.bind(('127.0.0.1', 0))
+        proxy.listen()
+        proxy.settimeout(0.1)
+        stop = threading.Event()
+        def accept():
+            while not stop.is_set():
+                try:
+                    connection, _ = proxy.accept()
+                except socket.timeout:
+                    continue
+                except OSError:
+                    return
+                def tunnel(connection):
+                    try:
+                        connection.recv(8192)
+                        connection.sendall(b'HTTP/1.1 200 Connection established\r\n\r\n')
+                        stop.wait(1)  # Deliberately never complete the TLS handshake.
+                    finally:
+                        connection.close()
+                threading.Thread(target=tunnel, args=(connection,), daemon=True).start()
+        server = threading.Thread(target=accept, daemon=True)
+        server.start()
+        monkeypatch.setattr(settings, 'binance_proxy', 'http://127.0.0.1:' + str(proxy.getsockname()[1]))
+        transport.close_clients()
+        observed = []
+        try:
+            for _ in range(5):
+                timings = {}
+                token = provider_chart.TIMINGS.set(timings)
+                try:
+                    with pytest.raises(TimeoutError):
+                        provider_chart._request(transport.pooled_client('binance'),
+                                                'https://data-api.binance.vision/api/v3/klines',
+                                                params={}, deadline=time.monotonic() + 0.05)
+                    observed.append(timings)
+                finally:
+                    provider_chart.TIMINGS.reset(token)
+>           assert all('failure_ConnectTimeout' in record for record in observed), (
+                'failed CONNECT tunnels cannot consume all four connections and turn the fifth request into PoolTimeout',
+                observed,
+            )
+E           AssertionError: ('failed CONNECT tunnels cannot consume all four connections and turn the fifth request into PoolTimeout', [{'upstream...{'upstream_slot': 0.006816815584897995, 'upstream_http': 50.49908580258489, 'failure_PoolTimeout': 50.50625512376428}])
+E           assert False
+E            +  where False = all(<generator object test_repeated_real_connect_tunnel_failures_do_not_exhaust_the_running_pool.<locals>.<genexpr> at 0x7f0f569372a0>)
+
+backend/tests/test_provider_transport.py:96: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_transport.py::test_repeated_real_connect_tunnel_failures_do_not_exhaust_the_running_pool
+1 failed, 2 deselected in 0.50s

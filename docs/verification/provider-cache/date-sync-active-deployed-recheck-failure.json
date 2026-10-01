@@ -1,0 +1,299 @@
+{
+  "error": "TimeoutError: frame.waitForFunction: Timeout 60000ms exceeded.",
+  "samples": [],
+  "errors": [],
+  "stacks": [],
+  "observed": {
+    "loading": false,
+    "rangeBusy": false,
+    "edgeBusy": false,
+    "pending": 1,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790842200,
+          "to": 1790868600
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_GBP",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790842200,
+          "to": 1790868600
+        }
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "5",
+        "ready": false,
+        "range": {
+          "from": 0,
+          "to": 0
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_CHF",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790842200,
+          "to": 1790868600
+        }
+      }
+    ]
+  },
+  "dataRequests": [
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "XAUUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1786874121000,
+        "firstDataRequest": true,
+        "client": "6dba46d3-b4b2-408c-84e2-e29d1bac3a92",
+        "indicators": [],
+        "before": 1790865801000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "timings": {
+        "lease_wait": 3.09,
+        "upstream_slot": 8,
+        "upstream_http": 4529.19,
+        "upstream_decode": 0.03,
+        "database_commit": 5.86,
+        "read_total": 4572.22
+      }
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1788210000000,
+        "timeframe": "H4",
+        "limit": 91,
+        "indicators": [],
+        "before": 1790865806000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 91
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1790542800000,
+        "timeframe": "M5",
+        "limit": 10,
+        "indicators": [],
+        "before": 1790865806000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 10
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1788210000000,
+        "timeframe": "M5",
+        "limit": 91,
+        "indicators": [],
+        "before": 1790865806000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 91
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1790542800000,
+        "timeframe": "M5",
+        "limit": 70,
+        "indicators": [],
+        "before": 1790862806000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 70
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1786874126000,
+        "firstDataRequest": true,
+        "client": "6dba46d3-b4b2-408c-84e2-e29d1bac3a92",
+        "indicators": [],
+        "before": 1790865806000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "timings": {
+        "lease_wait": 3.17,
+        "upstream_slot": 41.08,
+        "upstream_http": 330.22,
+        "upstream_decode": 0.04,
+        "database_commit": 5.91,
+        "read_total": 404.01
+      }
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790806407000,
+        "firstDataRequest": true,
+        "client": "6dba46d3-b4b2-408c-84e2-e29d1bac3a92",
+        "indicators": [],
+        "before": 1790865807000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "timings": {
+        "lease_wait": 4.81,
+        "upstream_slot": 8.53,
+        "upstream_http": 311.87,
+        "upstream_decode": 0.03,
+        "database_commit": 7.15,
+        "read_total": 359.8
+      }
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 91,
+        "countBack": 91,
+        "from": 1789555406000,
+        "firstDataRequest": true,
+        "client": "6dba46d3-b4b2-408c-84e2-e29d1bac3a92",
+        "indicators": [],
+        "before": 1790865806000,
+        "track_history": false
+      },
+      "status": 503,
+      "error": "平台行情暂不可用，请重试；尚未确认历史边界"
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1790542800000,
+        "timeframe": "M5",
+        "limit": 3,
+        "indicators": [],
+        "track_history": true,
+        "revision_after": 1790841900000
+      },
+      "status": 200,
+      "count": 3
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1788210000000,
+        "timeframe": "M5",
+        "limit": 3,
+        "indicators": [],
+        "track_history": true,
+        "revision_after": 1790838600000
+      },
+      "status": 200,
+      "count": 3
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 91,
+        "countBack": 91,
+        "from": 1790838515000,
+        "firstDataRequest": true,
+        "client": "6dba46d3-b4b2-408c-84e2-e29d1bac3a92",
+        "indicators": [],
+        "before": 1790865815000,
+        "track_history": false
+      },
+      "status": 503,
+      "error": "平台行情暂不可用，请重试；尚未确认历史边界"
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1790542800000,
+        "timeframe": "M5",
+        "limit": 3,
+        "indicators": [],
+        "track_history": true,
+        "revision_after": 1790841900000
+      },
+      "status": 200,
+      "count": 3
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1788210000000,
+        "timeframe": "M5",
+        "limit": 3,
+        "indicators": [],
+        "track_history": true,
+        "revision_after": 1790838600000
+      },
+      "status": 200,
+      "count": 3
+    }
+  ]
+}

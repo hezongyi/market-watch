@@ -1,0 +1,138 @@
+{
+  "passed": true,
+  "registrations": [
+    {
+      "phase": "initial",
+      "status": 200,
+      "body": {
+        "client": "dc8a1eb9-e553-46de-8567-5e1b7e7b7538",
+        "listener": "07c70d51-2c48-4515-bfb3-6a6b8d269451",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790883600000,
+        "revision": 36,
+        "observed_at": 1790883691280,
+        "indicators": []
+      }
+    },
+    {
+      "phase": "initial",
+      "status": 200,
+      "body": {
+        "client": "dc8a1eb9-e553-46de-8567-5e1b7e7b7538",
+        "listener": "07c70d51-2c48-4515-bfb3-6a6b8d269451",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790883600000,
+        "revision": 36,
+        "observed_at": 1790883691280,
+        "indicators": []
+      }
+    },
+    {
+      "phase": "restart",
+      "status": 200,
+      "body": {
+        "client": "dc8a1eb9-e553-46de-8567-5e1b7e7b7538",
+        "listener": "07c70d51-2c48-4515-bfb3-6a6b8d269451",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790883600000,
+        "revision": 38,
+        "observed_at": 1790883707136,
+        "indicators": []
+      }
+    }
+  ],
+  "errors": [],
+  "before": {
+    "count": 200,
+    "first": 1790780400000,
+    "last": 1790840100000,
+    "as_of": 1790883699168
+  },
+  "view_before": {
+    "range": {
+      "from": 1790830800,
+      "to": 1790886600
+    },
+    "spacing": 6
+  },
+  "restart_ms": 14651,
+  "persisted_request_ms": 58,
+  "resumed_ms": 15216,
+  "events": [
+    {
+      "type": "bars",
+      "cursor": 1790883600000,
+      "revision": 37,
+      "as_of": 1790883699168,
+      "count": 1
+    },
+    {
+      "type": "bars",
+      "cursor": 1790883600000,
+      "revision": 38,
+      "as_of": 1790883707136,
+      "count": 1
+    },
+    {
+      "type": "bars",
+      "cursor": 1790883600000,
+      "revision": 38,
+      "as_of": 1790883707136,
+      "count": 1
+    }
+  ],
+  "view_after": {
+    "range": {
+      "from": 1790830800,
+      "to": 1790886600
+    },
+    "spacing": 6,
+    "ready": true,
+    "pending": 0
+  },
+  "streams": [
+    {
+      "url": "/api/charts/provider/events?client=dc8a1eb9-e553-46de-8567-5e1b7e7b7538",
+      "events": [
+        {
+          "type": "open",
+          "at": 1790883698768,
+          "state": 1
+        },
+        {
+          "type": "error",
+          "at": 1790883712989,
+          "state": 0
+        },
+        {
+          "type": "error",
+          "at": 1790883715991,
+          "state": 2
+        }
+      ]
+    },
+    {
+      "url": "/api/charts/provider/events?client=dc8a1eb9-e553-46de-8567-5e1b7e7b7538",
+      "events": [
+        {
+          "type": "error",
+          "at": 1790883716994,
+          "state": 2
+        }
+      ]
+    },
+    {
+      "url": "/api/charts/provider/events?client=dc8a1eb9-e553-46de-8567-5e1b7e7b7538",
+      "events": [
+        {
+          "type": "open",
+          "at": 1790883718001,
+          "state": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,403 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'undefined'\n+ ]\n- []\n",
+  "samples": [
+    {
+      "phase": "date-sync",
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "range": {
+            "from": 1790848800,
+            "to": 1790859600
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_GBP",
+          "resolution": "5",
+          "range": {
+            "from": 1790848800,
+            "to": 1790859600
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "MWP:OANDA:EUR_CAD",
+          "resolution": "5",
+          "range": {
+            "from": 1790848800,
+            "to": 1790859600
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_CHF",
+          "resolution": "5",
+          "range": {
+            "from": 1790848800,
+            "to": 1790859600
+          },
+          "spacing": 14.432432432432432
+        }
+      ]
+    },
+    {
+      "phase": "rapid-final",
+      "range": {
+        "from": 1790848800,
+        "to": 1790859600
+      }
+    }
+  ],
+  "errors": [
+    "undefined"
+  ],
+  "stacks": [
+    {
+      "phase": "reopen",
+      "stack": "",
+      "message": "undefined"
+    }
+  ],
+  "observed": {
+    "loading": false,
+    "rangeBusy": false,
+    "edgeBusy": false,
+    "pending": 1,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790848800,
+          "to": 1790859600
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_GBP",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790848800,
+          "to": 1790859600
+        }
+      },
+      {
+        "symbol": "MWP:OANDA:EUR_CAD",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790848800,
+          "to": 1790859600
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_CHF",
+        "resolution": "5",
+        "ready": true,
+        "range": {
+          "from": 1790848800,
+          "to": 1790859600
+        }
+      }
+    ]
+  },
+  "rejectionTrace": [
+    {
+      "url": "https://localhost:15453/advanced-charts",
+      "rejections": []
+    },
+    {
+      "url": "https://127.0.0.1:15454/?parent=https%3A%2F%2Flocalhost%3A15453",
+      "rejections": []
+    },
+    {
+      "url": "blob:https://127.0.0.1:15454/1ed73658-e2e7-45f9-9f39-5190fc7a7039",
+      "rejections": [
+        {
+          "reason": "undefined",
+          "origin": "Error: Promise constructor\n    at new globalThis.Promise (<anonymous>:6:39)\n    at s (https://127.0.0.1:15454/charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js:871:261)\n    at H_.gotoTimeRange (https://127.0.0.1:15454/charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js:654:1490)\n    at _chartWidgetGotoTimeRange (https://127.0.0.1:15454/charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js:761:1651)"
+        }
+      ]
+    }
+  ],
+  "dataRequests": [
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "XAUUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1786868854000,
+        "firstDataRequest": true,
+        "client": "e1cf01ea-f815-4909-9daf-56d5b58f7295",
+        "indicators": [],
+        "before": 1790860534000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 199,
+      "timings": {
+        "lease_wait": 3.17,
+        "upstream_slot": 4.15,
+        "upstream_http": 292.78,
+        "upstream_decode": 0.02,
+        "database_commit": 5.63,
+        "read_total": 346.66
+      }
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1788210000000,
+        "timeframe": "H4",
+        "limit": 91,
+        "indicators": [],
+        "before": 1790860535000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 91
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1790542800000,
+        "timeframe": "M5",
+        "limit": 10,
+        "indicators": [],
+        "before": 1790860535000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 10
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1788210000000,
+        "timeframe": "M5",
+        "limit": 91,
+        "indicators": [],
+        "before": 1790860535000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 91
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1790542800000,
+        "timeframe": "M5",
+        "limit": 70,
+        "indicators": [],
+        "before": 1790857500000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 70
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 92,
+        "countBack": 92,
+        "from": 1789025975000,
+        "firstDataRequest": true,
+        "client": "e1cf01ea-f815-4909-9daf-56d5b58f7295",
+        "indicators": [],
+        "before": 1790860535000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 92,
+      "timings": {
+        "lease_wait": 3.22,
+        "upstream_slot": 6.43,
+        "upstream_http": 323.27,
+        "upstream_decode": 0.02,
+        "database_commit": 5.21,
+        "read_total": 364.72
+      }
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1786868855000,
+        "firstDataRequest": true,
+        "client": "e1cf01ea-f815-4909-9daf-56d5b58f7295",
+        "indicators": [],
+        "before": 1790860535000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "timings": {
+        "lease_wait": 47.53,
+        "upstream_slot": 113.77,
+        "upstream_http": 288.56,
+        "upstream_decode": 0.03,
+        "database_commit": 9.1,
+        "read_total": 498.23
+      }
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790801135000,
+        "firstDataRequest": true,
+        "client": "e1cf01ea-f815-4909-9daf-56d5b58f7295",
+        "indicators": [],
+        "before": 1790860535000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 198,
+      "timings": {
+        "lease_wait": 3.62,
+        "upstream_slot": 523.45,
+        "upstream_http": 291.96,
+        "upstream_decode": 0.02,
+        "database_commit": 5.49,
+        "read_total": 848.71
+      }
+    },
+    {
+      "phase": "initial",
+      "query": {
+        "instrument": "OANDA:EUR_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 92,
+        "countBack": 92,
+        "from": 1790833235000,
+        "firstDataRequest": true,
+        "client": "e1cf01ea-f815-4909-9daf-56d5b58f7295",
+        "indicators": [],
+        "before": 1790860535000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 92,
+      "timings": {
+        "lease_wait": 4.1,
+        "upstream_slot": 764.43,
+        "upstream_http": 335.87,
+        "upstream_decode": 0.03,
+        "database_commit": 5.95,
+        "read_total": 1135.53
+      }
+    },
+    {
+      "phase": "reopen",
+      "query": {
+        "instrument": "OANDA:EUR_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 40,
+        "countBack": 40,
+        "from": 1790848538000,
+        "firstDataRequest": true,
+        "client": "0c00fc58-ec4a-47f5-8311-96baa7a1c5dd",
+        "indicators": [],
+        "before": 1790860538000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 40,
+      "timings": {
+        "read_total": 6.77
+      }
+    },
+    {
+      "phase": "reopen",
+      "query": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 40,
+        "countBack": 40,
+        "from": 1790848538000,
+        "firstDataRequest": true,
+        "client": "0c00fc58-ec4a-47f5-8311-96baa7a1c5dd",
+        "indicators": [],
+        "before": 1790860538000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 40,
+      "timings": {
+        "read_total": 10.16
+      }
+    },
+    {
+      "phase": "reopen",
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1790542800000,
+        "timeframe": "M5",
+        "limit": 40,
+        "indicators": [],
+        "before": 1790860538000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 40
+    },
+    {
+      "phase": "reopen",
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "managed",
+        "published": true,
+        "dataset_start": 1788210000000,
+        "timeframe": "M5",
+        "limit": 40,
+        "indicators": [],
+        "before": 1790860538000,
+        "track_history": false
+      },
+      "status": 200,
+      "count": 40
+    }
+  ]
+}

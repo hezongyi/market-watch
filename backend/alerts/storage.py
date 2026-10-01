@@ -448,13 +448,90 @@ class AdvancedPreference(Base):
 
 
 class ChartHistoryPlan(Base):
-    """One durable, expanding M1 acquisition envelope per instrument."""
+    """User-approved history start; target_end is a fixed initialization watermark."""
     __tablename__ = "chart_history_plans"
     instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
     target_start: Mapped[int] = mapped_column(BigInteger)
     target_end: Mapped[int] = mapped_column(BigInteger)
     status: Mapped[str] = mapped_column(String(20), default="pending")
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    cursor: Mapped[int | None] = mapped_column(BigInteger)
+    realtime_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    realtime_end: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
+class ChartPublication(Base):
+    """Atomically published continuous coverage, independently for each period."""
+    __tablename__ = "chart_publications"
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(8), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    complete_count: Mapped[int] = mapped_column(default=0)
+    revision: Mapped[int] = mapped_column(default=1)
+    initialized: Mapped[bool] = mapped_column(Boolean, default=False)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class ChartPublishedBar(Base):
+    """Visible candle snapshot, separate from acquisition/aggregation staging."""
+    __tablename__ = "chart_published_bars"
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(8), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    end: Mapped[int] = mapped_column(BigInteger)
+    complete: Mapped[bool] = mapped_column(Boolean)
+    payload: Mapped[dict] = mapped_column(JSON)
+
+
+class ProviderDataset(Base):
+    """Native provider cache identity and proven ranges, never managed coverage."""
+    __tablename__ = "provider_datasets"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    source: Mapped[str] = mapped_column(String(32))
+    symbol: Mapped[str] = mapped_column(String(64))
+    timeframe: Mapped[str] = mapped_column(String(8))
+    metadata_json: Mapped[dict] = mapped_column(JSON)
+    coverage: Mapped[list] = mapped_column(JSON, default=list)
+    earliest: Mapped[bool] = mapped_column(Boolean, default=False)
+    revision: Mapped[int] = mapped_column(default=0)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    latest_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    accessed_at: Mapped[int] = mapped_column(BigInteger, default=now_ms, index=True)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    generation: Mapped[int] = mapped_column(default=0)
+
+
+class ProviderBar(Base):
+    __tablename__ = "provider_bars"
+    __table_args__ = (Index("ix_provider_bars_range", "dataset_id", "chart_time"),)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("provider_datasets.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    chart_time: Mapped[int] = mapped_column(BigInteger)
+    complete: Mapped[bool] = mapped_column(Boolean)
+    payload: Mapped[dict] = mapped_column(JSON)
+    observed_at: Mapped[int] = mapped_column(BigInteger)
+    changed_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    revision: Mapped[int] = mapped_column(default=1)
+
+
+class ProviderInterest(Base):
+    """Session-owned finite targets; dataset data/leases are shared globally."""
+    __tablename__ = "provider_interests"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    client: Mapped[str] = mapped_column(String(64), index=True)
+    listener: Mapped[str] = mapped_column(String(100))
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("provider_datasets.id"), index=True)
+    subscribed: Mapped[bool] = mapped_column(Boolean, default=False)
+    expires: Mapped[int] = mapped_column(BigInteger, index=True)
+    accessed_at: Mapped[int] = mapped_column(BigInteger)
+    targets: Mapped[list] = mapped_column(JSON, default=list)
+    indicators: Mapped[list] = mapped_column(JSON, default=list)
+    cursor: Mapped[int] = mapped_column(BigInteger, default=0)
+    revision: Mapped[int] = mapped_column(default=0)
+    next_poll: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(200))
 
 
 class ChartViewportDemand(Base):

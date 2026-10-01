@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "workspace": "41a0b8ad-685d-4002-b39a-73b4a0272b5b",
+  "target": {
+    "to": 1790879400,
+    "from": 1790868600
+  },
+  "samples": [
+    {
+      "phase": "date-sync",
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "range": {
+            "from": 1790868600,
+            "to": 1790879400
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_GBP",
+          "resolution": "5",
+          "range": {
+            "from": 1790868600,
+            "to": 1790879400
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790868600,
+            "to": 1790879400
+          },
+          "spacing": 14.162162162162161
+        },
+        {
+          "symbol": "OANDA:EUR_CHF",
+          "resolution": "5",
+          "range": {
+            "from": 1790868600,
+            "to": 1790879400
+          },
+          "spacing": 14.432432432432432
+        }
+      ]
+    },
+    {
+      "phase": "rapid-final",
+      "range": {
+        "from": 1790872200,
+        "to": 1790883000
+      }
+    }
+  ],
+  "restored": {
+    "sync": true,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1790872200,
+          "to": 1790883000
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_GBP",
+        "resolution": "5",
+        "range": {
+          "from": 1790872500,
+          "to": 1790883000
+        }
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "5",
+        "range": {
+          "from": 1790872200,
+          "to": 1790883000
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_CHF",
+        "resolution": "5",
+        "range": {
+          "from": 1790872200,
+          "to": 1790883000
+        }
+      }
+    ]
+  },
+  "errors": [],
+  "legacy_format": true,
+  "legacy_drawing": "M6Nc4D"
+}

@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "workspace": "c957eb8f-581b-40a2-a3e6-cf7a113f489d",
+  "target": {
+    "to": 1790793000,
+    "from": 1790782200
+  },
+  "samples": [
+    {
+      "phase": "date-sync",
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "range": {
+            "from": 1790782200,
+            "to": 1790793000
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "OANDA:EUR_GBP",
+          "resolution": "5",
+          "range": {
+            "from": 1790782200,
+            "to": 1790793000
+          },
+          "spacing": 14.432432432432432
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790782200,
+            "to": 1790793000
+          },
+          "spacing": 14.162162162162161
+        },
+        {
+          "symbol": "OANDA:EUR_CHF",
+          "resolution": "5",
+          "range": {
+            "from": 1790782200,
+            "to": 1790793000
+          },
+          "spacing": 14.432432432432432
+        }
+      ]
+    },
+    {
+      "phase": "rapid-final",
+      "range": {
+        "from": 1790872200,
+        "to": 1790883000
+      }
+    }
+  ],
+  "restored": {
+    "sync": true,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1790872200,
+          "to": 1790883000
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_GBP",
+        "resolution": "5",
+        "range": {
+          "from": 1790872200,
+          "to": 1790882700
+        }
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "5",
+        "range": {
+          "from": 1790872200,
+          "to": 1790883000
+        }
+      },
+      {
+        "symbol": "OANDA:EUR_CHF",
+        "resolution": "5",
+        "range": {
+          "from": 1790872200,
+          "to": 1790882700
+        }
+      }
+    ]
+  },
+  "errors": [],
+  "legacy_format": true,
+  "legacy_drawing": "oryQ35"
+}

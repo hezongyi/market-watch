@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
+from .chart_series import SeriesKind, decode
 from .coverage import covers_interval
 from .domain import Calendar, bucket_bounds, has_trading_gap, scheduled_open, session_bounds
 from .market import stored_coverage
@@ -139,6 +140,7 @@ def queue_history(db, inst, left, right, *, priority=100):
 
 class HistoryQuery(BaseModel):
     instrument: str = Field(max_length=80)
+    series_kind: SeriesKind = "managed"
     timeframe: str
     before: int | None = Field(default=None, gt=0)
     limit: int = Field(default=300, ge=1, le=2000)
@@ -147,6 +149,20 @@ class HistoryQuery(BaseModel):
 class PlanControlQuery(BaseModel):
     instrument: str = Field(max_length=40)
     action: str
+
+
+class MaintenanceQuery(BaseModel):
+    instrument: str = Field(max_length=40)
+    start_date: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
+
+
+class DatasetQuery(BaseModel):
+    instrument: str = Field(max_length=40)
+    timeframe: str
+    plot_width: float = Field(default=960, gt=0, le=16384)
+    bar_spacing: float = Field(default=6, gt=0, le=1000)
+    lookback: int = Field(default=0, ge=0, le=6000)
+    indicators: list[dict] = Field(default_factory=list, max_length=12)
 
 
 class ViewportDemandQuery(BaseModel):
@@ -196,6 +212,11 @@ class QuoteQuery(BaseModel):
 
 
 def renew_demand(db, client, inst):
+    # Searching/selecting/refusing an unmaintained managed series does not
+    # authorize even a temporary M1 maintenance lease.
+    plan = db.get(ChartHistoryPlan, inst.id)
+    if not inst.enabled and not (plan and plan.realtime_enabled):
+        return
     import hashlib
 
     ident = hashlib.sha256((client + "|" + inst.id).encode()).hexdigest()[:40]
@@ -214,6 +235,8 @@ def read_cached_history(body: HistoryQuery):
     Historical partial candles are excluded; a forming candle is usable only
     when its observed prefix is covered from the bucket's actual start.
     """
+    if body.series_kind != "managed":
+        raise HTTPException(422, "平台行情不读取自建覆盖或维护计划")
     if body.timeframe not in FRAMES:
         raise HTTPException(422, "不支持的周期")
     now = now_ms()
@@ -268,6 +291,8 @@ def read_cached_history(body: HistoryQuery):
 
 
 def plan_history(body: HistoryQuery):
+    if body.series_kind != "managed":
+        raise HTTPException(422, "平台行情不创建自建历史任务")
     if body.timeframe not in FRAMES:
         raise HTTPException(422, "不支持的周期")
     right = min(body.before or now_ms(), (now_ms() - 5000) // 60000 * 60000)
@@ -445,8 +470,35 @@ def router(authenticated):
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
         result = []
+        # Fetch platform quotes before opening the managed read transaction.
+        # Platform watchlists never renew managed M1 demand.
+        managed = []
+        for ticker in dict.fromkeys(body.symbols):
+            try:
+                ident, kind = decode(ticker)
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+            if kind == "managed":
+                managed.append(ident)
+                continue
+            from .provider_chart import metadata, quote_page
+
+            try:
+                meta = metadata(ident)
+                page = quote_page(meta)
+                latest = page["bars"][-1] if page["bars"] else None
+                values = {"short_name": meta["symbol"], "description": meta["name"] + " · 平台行情",
+                          "exchange": meta["source"].upper()}
+                if latest:
+                    values["lp"] = float(latest["close"])
+                    if meta["basis"] == "bid":
+                        values["bid"] = values["lp"]
+                result.append({"s": "ok", "n": ticker, "v": values})
+            except Exception:
+                result.append({"s": "error", "n": ticker,
+                               "v": {"description": "平台报价暂不可用，请重试"}})
         with transaction() as db:
-            for ident in dict.fromkeys(body.symbols):
+            for ident in managed:
                 if len(ident) > 80:
                     raise HTTPException(422, "无效品种")
                 inst = db.get(Instrument, ident)
@@ -583,6 +635,17 @@ def router(authenticated):
                         "available": True,
                     },
                 )
+            from .storage import ChartPublication
+            plans = {p.instrument_id: p for p in db.scalars(select(ChartHistoryPlan))}
+            published = {p.instrument_id for p in db.scalars(select(ChartPublication).where(
+                ChartPublication.complete_count > 0))}
+            failures = set(db.scalars(select(ImportJob.instrument_id).where(
+                ImportJob.chart_plan.is_(True), ImportJob.status == 'failed')))
+            for entry in entries.values():
+                plan = plans.get(entry['id'])
+                entry['managed_status'] = ('未维护' if plan is None else
+                    '失败，已发布历史保留' if entry['id'] in failures else
+                    '部分已发布，范围见历史任务' if entry['id'] in published else '处理中')
             return [
                 x
                 for x in entries.values()
@@ -595,6 +658,10 @@ def router(authenticated):
 
     @r.post("/resolve")
     def symbol(body: HistoryQuery):
+        if body.series_kind == "provider":
+            from .provider_chart import metadata
+
+            return metadata(body.instrument)
         with transaction() as db:
             inst = resolve(db, body.instrument)
             return {
@@ -626,6 +693,55 @@ def router(authenticated):
             return [plan_status(db, plan, now_ms()) for plan in db.scalars(
                 select(ChartHistoryPlan).order_by(ChartHistoryPlan.updated_at.desc()).limit(100))]
 
+    @r.post("/maintenance")
+    def maintenance(body: MaintenanceQuery):
+        import httpx
+
+        from .chart_history_plan import plan_status, record_boundary
+        from .managed_dataset import date_start, join
+        from .provider_chart import earliest_m1
+
+        with transaction() as db:
+            inst = resolve(db, body.instrument)
+            try:
+                start = date_start(inst, body.start_date)
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+            meta = dict(id=inst.id, source=inst.source, symbol=inst.symbol, basis=inst.basis)
+        # Release the pool connection before querying the provider's real first
+        # M1. Reject unreachable requests without shifting the approved start.
+        try:
+            earliest = earliest_m1(meta)
+        except (httpx.HTTPError, TimeoutError, ValueError) as error:
+            raise HTTPException(503, "尚未确认最早可用历史，未建立维护任务，请稍后重试") from error
+        if start < earliest:
+            raise HTTPException(422, f"历史起点不可达：该品种最早可用M1为 {instant(earliest).isoformat()}；请明确选择可达起点，原维护范围保持不变")
+        with transaction() as db:
+            inst = resolve(db, body.instrument)
+            existing = db.get(ChartHistoryPlan, inst.id)
+            if existing and existing.target_start < earliest:
+                record_boundary(db, inst, existing.target_start, earliest, now_ms())
+            try:
+                plan = join(db, inst, start, now_ms())
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+            record_boundary(db, inst, plan.target_start, earliest, now_ms())
+            return {**plan_status(db, plan, now_ms()), "calendar": inst.calendar}
+
+    @r.post("/dataset")
+    def dataset(body: DatasetQuery):
+        from .managed_dataset import status
+
+        with transaction() as db:
+            inst = resolve(db, body.instrument)
+            try:
+                from .chart_indicators import history_requirement
+                lookback = max([body.lookback] + [history_requirement(s) for s in body.indicators])
+                return status(db, inst, body.timeframe, width=body.plot_width,
+                              spacing=body.bar_spacing, lookback=lookback)
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+
     @r.post("/history/plans/control")
     def history_plan_control(body: PlanControlQuery):
         from .chart_history_plan import control_plan
@@ -638,7 +754,7 @@ def router(authenticated):
 
     @r.post("/history/demand")
     def viewport_demand(body: ViewportDemandQuery):
-        from .chart_history_plan import history_end, history_start, update_demand
+        from .chart_history_plan import history_end, update_demand
         from .storage import ChartAggregationJob
 
         now = now_ms()
@@ -658,7 +774,9 @@ def router(authenticated):
                     visible=body.visible, focused=body.focused, now=now, required=required)
             except ValueError as error:
                 raise HTTPException(422, str(error)) from error
-            window_start = history_start(inst, body.timeframe, end, required or body.visible)
+            if plan is None:
+                return {"status": "unmaintained", "timeframe": body.timeframe}
+            window_start = max(plan.target_start, body.anchor_start or plan.target_start)
             window_error = None
             if body.anchor_start is not None:
                 failed = db.scalar(select(ImportJob.id).where(
@@ -673,7 +791,8 @@ def router(authenticated):
                     window_error = '目标日期数据处理失败，请在历史任务中重试'
             return {"target_start": plan.target_start, "target_end": plan.target_end,
                     "status": plan.status, "window_end": end,
-                    "window_start": window_start, "window_error": window_error}
+                    "window_start": window_start, "window_error": window_error,
+                    "timeframe": body.timeframe}
 
     @r.post("/history/cache")
     def cached_history(body: HistoryQuery):

@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "database": "market_watch_dual",
+  "fixture": "DUAL_PUBLICATION_PROBE",
+  "input": "copied genuine BTCUSDT M1 observations",
+  "phases": [
+    {
+      "phase": "baseline",
+      "published_bars": 2,
+      "revision": 1
+    },
+    {
+      "phase": "aggregation-failed",
+      "attempts": 1,
+      "old_snapshot_unchanged": true,
+      "retry_persisted": true
+    },
+    {
+      "phase": "container-restart-and-publication-rollback",
+      "published_bars": 3,
+      "no_duplicates": true,
+      "original_bars_unchanged": true,
+      "publication_transaction_rollback": true
+    }
+  ]
+}

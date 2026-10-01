@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import "./advanced.css";
-import { HistoryPlansDialog } from "./HistoryPlansDialog";
+import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
+import { MaintenanceDialog } from "./MaintenanceDialog";
 import { ExportDialog, type ExportSelection } from "./ExportDialog";
+import { providerSubscriptions } from "./providerSubscriptions";
 
 type Workspace = {
   id: string;
   name: string;
   revision: number;
   document: Record<string, unknown>;
+  initial_symbol?: {ticker: string; metadata: Record<string, unknown>};
 };
 const channel = "mw-chart-v1";
 const frames = new Set([
@@ -27,6 +30,8 @@ export default function AdvancedWorkspace() {
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
   const [historyPlansOpen,setHistoryPlansOpen] = useState(false);
+  const [maintenanceInstrument,setMaintenanceInstrument] = useState<string | null>(null);
+  const [datasetViews,setDatasetViews] = useState<DatasetViews>({});
   const [frameKey, setFrameKey] = useState(0);
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
@@ -74,6 +79,7 @@ export default function AdvancedWorkspace() {
   const select = (row: Workspace) => {
     setPollErrors({});
     setHistoryProgress({});
+    setDatasetViews({});
     setSyncNotices({});
     unsaved.current = false;
     current.current = row;
@@ -88,8 +94,8 @@ export default function AdvancedWorkspace() {
     );
     setStatus("正在加载图表");
   };
-  async function refresh() {
-    const list = await api<Workspace[]>("/advanced-charts/workspaces");
+  async function refresh(limit?: number) {
+    const list = await api<Workspace[]>("/advanced-charts/workspaces"+(limit ? '?limit='+limit : ''));
     setRows(list);
     return list;
   }
@@ -104,7 +110,7 @@ export default function AdvancedWorkspace() {
   }, [mobile]);
   useEffect(() => {
     let cancelled = false;
-    refresh()
+    refresh(1)
       .then((list) => {
         if (!cancelled) {
           if (list[0]) select(list[0]);
@@ -118,6 +124,10 @@ export default function AdvancedWorkspace() {
   }, []);
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
+    const provider = providerSubscriptions(api,
+      client => new EventSource('/api/charts/provider/events?client='+encodeURIComponent(client)),
+      event => frame.current?.contentWindow?.postMessage({channel,type:'provider-event',event},origin),
+      error => setError(String(error)));
     const listener = async (e: MessageEvent) => {
       if (
         e.source !== frame.current?.contentWindow ||
@@ -129,6 +139,19 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if(m.type==='provider-subscribe' || m.type==='provider-unsubscribe') {
+        const args=m.args;
+        if(!args || !/^[A-Za-z0-9_-]{1,64}$/.test(args.client) ||
+          typeof args.listener!=='string' || args.listener.length>100) return;
+        try {
+          if(m.type==='provider-subscribe') {
+            await provider.subscribe(args);
+          } else {
+            await provider.unsubscribe(args);
+          }
+        }catch(error){setError(String(error));}
+        return;
+      }
       if (m.type === "history-progress") {
         const key=String(m.key).slice(0,100),text=String(m.text).slice(0,200);
         setHistoryProgress(previous=> {
@@ -146,20 +169,33 @@ export default function AdvancedWorkspace() {
       if (m.type === "history-plans-open") {
         setHistoryPlansOpen(true); return;
       }
+      if (m.type === "managed-dataset" && typeof m.dataset?.instrument === "string" && frames.has(m.dataset?.timeframe)) {
+        const dataset=m.dataset;
+        setDatasetViews(previous=>({...previous,[dataset.instrument+'|'+dataset.timeframe]:dataset}));
+        return;
+      }
+      if (m.type === "maintenance-required" && !mobile && typeof m.instrument === "string" && m.instrument.length <= 40) {
+        setMaintenanceInstrument(m.instrument); return;
+      }
       if (m.type === "cancel-request") {
         marketRequests.get(source)?.get(m.id)?.abort();
         return;
       }
       if (m.type === "loaded") {
+        await provider.clear();
         try {
           if (!mobile) await api("/advanced-charts/preferences/migrate", {});
+          const [catalog, preferences] = await Promise.all([
+            api("/advanced-charts/catalog"), api("/advanced-charts/preferences"),
+          ]);
           reply({
             type: "init",
             document: current.current?.document || {},
             workspace: current.current,
             readonly: mobile,
-            catalog: await api("/advanced-charts/catalog"),
-            preferences: await api("/advanced-charts/preferences"),
+            catalog,
+            preferences,
+            initial_symbol: current.current?.initial_symbol,
           });
         } catch (e) {
           setError(String(e));
@@ -390,6 +426,7 @@ export default function AdvancedWorkspace() {
           history: "/market-data/history",
           historyCache: "/market-data/history/cache",
           historyDemand: "/market-data/history/demand",
+          dataset: "/market-data/dataset",
           activity: "/market-data/activity",
           retry: "/market-data/retry",
           quotes: "/market-data/quotes",
@@ -445,10 +482,11 @@ export default function AdvancedWorkspace() {
               JSON.stringify(q.indicators).length > 2000)) ||
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
+          (q.series_kind !== undefined && !["provider", "managed"].includes(q.series_kind)) ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
-          q.limit > 2000 ||
+          q.limit > (q.series_kind === "provider" ? 20000 : 2000) ||
           (q.before !== undefined &&
             (!Number.isSafeInteger(q.before) || q.before <= 0)) ||
           (q.revision_before !== undefined &&
@@ -462,6 +500,10 @@ export default function AdvancedWorkspace() {
           reply({ type: "result", id: m.id, error: "请求不在允许范围内" });
           return;
         }
+        const controller = new AbortController();
+        if (!marketRequests.has(source)) marketRequests.set(source, new Map());
+        const sourceRequests = marketRequests.get(source)!;
+        sourceRequests.set(m.id, controller);
         inflight.current++;
         try {
           reply({
@@ -469,8 +511,13 @@ export default function AdvancedWorkspace() {
             id: m.id,
             result: await api("/charts/data", {
               instrument: q.instrument,
+              series_kind: q.series_kind || "managed",
+              published: q.series_kind !== "provider",
+              ...(typeof q.dataset_start === 'number' ? {dataset_start:q.dataset_start} : {}),
               timeframe: q.timeframe,
               limit: q.limit,
+              ...(q.series_kind === 'provider' ? {countBack:q.countBack,
+                from:q.from,firstDataRequest:q.firstDataRequest === true,client:q.client} : {}),
               indicators: q.indicators || [],
               ...(q.before ? { before: q.before } : {}),
               track_history: q.track_history === true,
@@ -480,11 +527,13 @@ export default function AdvancedWorkspace() {
               ...(q.revision_before
                 ? { revision_before: q.revision_before }
                 : {}),
-            }),
+            }, controller.signal),
           });
         } catch (e) {
           reply({ type: "result", id: m.id, error: String(e) });
         } finally {
+          sourceRequests.delete(m.id);
+          if (!sourceRequests.size) marketRequests.delete(source);
           inflight.current--;
         }
       } else if (m.type === "snapshot") {
@@ -556,6 +605,7 @@ export default function AdvancedWorkspace() {
     addEventListener("message", listener);
     return () => {
       removeEventListener("message", listener);
+      void provider.dispose();
       for (const requests of marketRequests.values())
         for (const controller of requests.values()) controller.abort();
     };
@@ -597,7 +647,12 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace">
-      {historyPlansOpen && <HistoryPlansDialog onClose={()=>setHistoryPlansOpen(false)} readonly={mobile}/> }
+      {historyPlansOpen && <HistoryPlansDialog onClose={()=>setHistoryPlansOpen(false)} readonly={mobile}
+        onRefresh={()=>post({type:'refresh-managed'})} views={datasetViews}/> }
+      {maintenanceInstrument && <MaintenanceDialog instrument={maintenanceInstrument}
+        onClose={()=>setMaintenanceInstrument(null)} onSubmitted={()=>{
+          setMaintenanceInstrument(null);setHistoryPlansOpen(true);
+        }}/>}
       {exportSelection && (
         <ExportDialog
           selection={exportSelection}
@@ -612,9 +667,6 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
-      {Object.keys(historyProgress).length>0 && <div className="history-progress" role="status" aria-live="polite">
-        {Object.entries(historyProgress).map(([key,text])=><div key={key}>{text}</div>)}
-      </div>}
       {Object.keys(syncNotices).length > 0 && (
         <div role="status" className="advanced-error" data-testid="viewport-notice">
           {Object.values(syncNotices).join("；")}

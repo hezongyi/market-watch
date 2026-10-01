@@ -1,0 +1,340 @@
+{
+  "records": [
+    {
+      "repeat": 0,
+      "source": "binance",
+      "status": 200,
+      "elapsed_ms": 387.41,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.98,
+        "upstream_slot": 3.21,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 195.7,
+        "network_http11_receive_response_body": 0.16,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 196.67,
+        "upstream_decode": 0.23,
+        "database_commit": 140.26,
+        "read_total": 369.37
+      }
+    },
+    {
+      "repeat": 1,
+      "source": "oanda",
+      "status": 200,
+      "elapsed_ms": 454.04,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.24,
+        "upstream_slot": 11.04,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 345.62,
+        "network_http11_receive_response_body": 0.11,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 346.61,
+        "upstream_decode": 0.27,
+        "database_commit": 48.38,
+        "read_total": 436.73
+      }
+    },
+    {
+      "repeat": 2,
+      "source": "binance",
+      "status": 200,
+      "elapsed_ms": 291.73,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.48,
+        "upstream_slot": 3.09,
+        "network_http11_send_request_headers": 0.17,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 194.37,
+        "network_http11_receive_response_body": 0.17,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 195.32,
+        "upstream_decode": 0.26,
+        "database_commit": 45.67,
+        "read_total": 278.07
+      }
+    },
+    {
+      "repeat": 3,
+      "source": "oanda",
+      "status": 200,
+      "elapsed_ms": 560.79,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.0,
+        "upstream_slot": 3.67,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 476.64,
+        "network_http11_receive_response_body": 0.1,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 477.56,
+        "upstream_decode": 0.25,
+        "database_commit": 45.38,
+        "read_total": 549.64
+      }
+    },
+    {
+      "repeat": 4,
+      "source": "binance",
+      "status": 200,
+      "elapsed_ms": 283.28,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.64,
+        "upstream_slot": 2.95,
+        "network_http11_send_request_headers": 0.17,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 194.87,
+        "network_http11_receive_response_body": 0.17,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 195.81,
+        "upstream_decode": 0.21,
+        "database_commit": 51.55,
+        "read_total": 272.09
+      }
+    },
+    {
+      "repeat": 5,
+      "source": "oanda",
+      "status": 200,
+      "elapsed_ms": 370.13,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.5,
+        "upstream_slot": 3.26,
+        "network_http11_send_request_headers": 0.17,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 285.34,
+        "network_http11_receive_response_body": 0.16,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 286.34,
+        "upstream_decode": 0.26,
+        "database_commit": 46.01,
+        "read_total": 358.83
+      }
+    },
+    {
+      "repeat": 6,
+      "source": "binance",
+      "status": 200,
+      "elapsed_ms": 276.43,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.94,
+        "upstream_slot": 3.36,
+        "network_http11_send_request_headers": 0.17,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 194.0,
+        "network_http11_receive_response_body": 0.16,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 194.99,
+        "upstream_decode": 0.23,
+        "database_commit": 43.6,
+        "read_total": 265.21
+      }
+    },
+    {
+      "repeat": 7,
+      "source": "oanda",
+      "status": 200,
+      "elapsed_ms": 4656.37,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.66,
+        "upstream_slot": 3.19,
+        "network_http11_send_request_headers": 0.16,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 4574.18,
+        "network_http11_receive_response_body": 0.1,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 4575.06,
+        "upstream_decode": 0.21,
+        "database_commit": 41.92,
+        "read_total": 4644.93
+      }
+    },
+    {
+      "repeat": 8,
+      "source": "binance",
+      "status": 200,
+      "elapsed_ms": 276.03,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.5,
+        "upstream_slot": 3.16,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 194.07,
+        "network_http11_receive_response_body": 0.16,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 195.09,
+        "upstream_decode": 0.23,
+        "database_commit": 44.86,
+        "read_total": 264.33
+      }
+    },
+    {
+      "repeat": 9,
+      "source": "oanda",
+      "status": 200,
+      "elapsed_ms": 600.36,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.55,
+        "upstream_slot": 3.07,
+        "network_http11_send_request_headers": 0.17,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 492.19,
+        "network_http11_receive_response_body": 0.1,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 493.11,
+        "upstream_decode": 0.26,
+        "database_commit": 68.87,
+        "read_total": 588.99
+      }
+    },
+    {
+      "repeat": 10,
+      "source": "binance",
+      "status": 200,
+      "elapsed_ms": 278.13,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.67,
+        "upstream_slot": 3.18,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 194.23,
+        "network_http11_receive_response_body": 0.17,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 195.22,
+        "upstream_decode": 0.23,
+        "database_commit": 45.12,
+        "read_total": 266.43
+      }
+    },
+    {
+      "repeat": 11,
+      "source": "oanda",
+      "status": 200,
+      "elapsed_ms": 378.52,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.42,
+        "upstream_slot": 3.19,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 297.51,
+        "network_http11_receive_response_body": 0.1,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 298.47,
+        "upstream_decode": 0.27,
+        "database_commit": 44.66,
+        "read_total": 367.38
+      }
+    },
+    {
+      "repeat": 12,
+      "source": "binance",
+      "status": 200,
+      "elapsed_ms": 276.92,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.5,
+        "upstream_slot": 3.04,
+        "network_http11_send_request_headers": 0.17,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 194.15,
+        "network_http11_receive_response_body": 0.16,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 195.09,
+        "upstream_decode": 0.24,
+        "database_commit": 45.45,
+        "read_total": 265.97
+      }
+    },
+    {
+      "repeat": 13,
+      "source": "oanda",
+      "status": 200,
+      "elapsed_ms": 437.15,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.88,
+        "upstream_slot": 14.85,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 340.47,
+        "network_http11_receive_response_body": 0.1,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 341.46,
+        "upstream_decode": 0.29,
+        "database_commit": 44.62,
+        "read_total": 425.16
+      }
+    },
+    {
+      "repeat": 14,
+      "source": "binance",
+      "status": 200,
+      "elapsed_ms": 280.89,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.0,
+        "upstream_slot": 3.53,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 193.7,
+        "network_http11_receive_response_body": 0.16,
+        "network_http11_response_closed": 0.02,
+        "upstream_http": 194.75,
+        "upstream_decode": 0.23,
+        "database_commit": 45.04,
+        "read_total": 267.17
+      }
+    },
+    {
+      "repeat": 15,
+      "source": "oanda",
+      "status": 200,
+      "elapsed_ms": 578.89,
+      "count": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.39,
+        "upstream_slot": 3.04,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 442.98,
+        "network_http11_receive_response_body": 0.12,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 443.92,
+        "upstream_decode": 52.96,
+        "database_commit": 45.84,
+        "read_total": 567.71
+      }
+    }
+  ]
+}

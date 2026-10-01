@@ -1,0 +1,1114 @@
+{
+  "passed": true,
+  "samples": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "initial_ms": 1686,
+      "immediate_resolution": "60",
+      "immediate_ms": 562,
+      "cold_burst_ms": 8781,
+      "coldBurst": {
+        "attempts": [
+          {
+            "resolution": "1W",
+            "value": true
+          },
+          {
+            "resolution": "1",
+            "value": true
+          },
+          {
+            "resolution": "240",
+            "value": true
+          },
+          {
+            "resolution": "1M",
+            "value": true
+          },
+          {
+            "resolution": "30",
+            "value": true
+          },
+          {
+            "resolution": "1D",
+            "value": true
+          },
+          {
+            "resolution": "5",
+            "value": true
+          },
+          {
+            "resolution": "60",
+            "value": true
+          },
+          {
+            "resolution": "15",
+            "value": true
+          },
+          {
+            "resolution": "1W",
+            "value": true
+          },
+          {
+            "resolution": "1M",
+            "value": true
+          },
+          {
+            "resolution": "240",
+            "value": true
+          },
+          {
+            "resolution": "30",
+            "value": true
+          },
+          {
+            "resolution": "1",
+            "value": true
+          },
+          {
+            "resolution": "1D",
+            "value": true
+          },
+          {
+            "resolution": "60",
+            "value": true
+          },
+          {
+            "resolution": "15",
+            "value": true
+          },
+          {
+            "resolution": "5",
+            "value": true
+          },
+          {
+            "resolution": "240",
+            "value": true
+          },
+          {
+            "resolution": "1",
+            "value": true
+          }
+        ],
+        "expected": "1"
+      },
+      "sequential": [
+        {
+          "resolution": "1W",
+          "elapsed_ms": 32
+        },
+        {
+          "resolution": "240",
+          "elapsed_ms": 40
+        },
+        {
+          "resolution": "1",
+          "elapsed_ms": 39
+        },
+        {
+          "resolution": "1M",
+          "elapsed_ms": 65
+        },
+        {
+          "resolution": "30",
+          "elapsed_ms": 41
+        },
+        {
+          "resolution": "1D",
+          "elapsed_ms": 49
+        },
+        {
+          "resolution": "5",
+          "elapsed_ms": 32
+        },
+        {
+          "resolution": "15",
+          "elapsed_ms": 17
+        },
+        {
+          "resolution": "60",
+          "elapsed_ms": 28
+        }
+      ],
+      "burst_elapsed_ms": 1669,
+      "burst": {
+        "attempts": [
+          {
+            "resolution": "1",
+            "value": true,
+            "elapsed_ms": 9
+          },
+          {
+            "resolution": "5",
+            "value": true,
+            "elapsed_ms": 8
+          },
+          {
+            "resolution": "1D",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "15",
+            "value": true,
+            "elapsed_ms": 9
+          },
+          {
+            "resolution": "1W",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "30",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "240",
+            "value": true,
+            "elapsed_ms": 9
+          },
+          {
+            "resolution": "1M",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "60",
+            "value": true,
+            "elapsed_ms": 18
+          },
+          {
+            "resolution": "5",
+            "value": true,
+            "elapsed_ms": 16
+          },
+          {
+            "resolution": "1D",
+            "value": true,
+            "elapsed_ms": 28
+          },
+          {
+            "resolution": "1",
+            "value": true,
+            "elapsed_ms": 19
+          },
+          {
+            "resolution": "30",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "1W",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "15",
+            "value": true,
+            "elapsed_ms": 6
+          },
+          {
+            "resolution": "240",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "60",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "1M",
+            "value": true,
+            "elapsed_ms": 8
+          },
+          {
+            "resolution": "5",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "1",
+            "value": true,
+            "elapsed_ms": 9
+          }
+        ],
+        "expected": "1"
+      },
+      "state": {
+        "symbol": "MWP:OANDA:AUD_CAD",
+        "resolution": "1",
+        "range": {
+          "from": 1790871120,
+          "to": 1790882400
+        },
+        "pending": 0
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "initial_ms": 1627,
+      "immediate_resolution": "15",
+      "immediate_ms": 398,
+      "cold_burst_ms": 4542,
+      "coldBurst": {
+        "attempts": [
+          {
+            "resolution": "1W",
+            "value": true
+          },
+          {
+            "resolution": "1",
+            "value": true
+          },
+          {
+            "resolution": "240",
+            "value": true
+          },
+          {
+            "resolution": "1M",
+            "value": true
+          },
+          {
+            "resolution": "30",
+            "value": true
+          },
+          {
+            "resolution": "1D",
+            "value": true
+          },
+          {
+            "resolution": "5",
+            "value": true
+          },
+          {
+            "resolution": "60",
+            "value": true
+          },
+          {
+            "resolution": "15",
+            "value": true
+          },
+          {
+            "resolution": "1W",
+            "value": true
+          },
+          {
+            "resolution": "1M",
+            "value": true
+          },
+          {
+            "resolution": "240",
+            "value": true
+          },
+          {
+            "resolution": "30",
+            "value": true
+          },
+          {
+            "resolution": "1",
+            "value": true
+          },
+          {
+            "resolution": "1D",
+            "value": true
+          },
+          {
+            "resolution": "60",
+            "value": true
+          },
+          {
+            "resolution": "15",
+            "value": true
+          },
+          {
+            "resolution": "5",
+            "value": true
+          },
+          {
+            "resolution": "240",
+            "value": true
+          },
+          {
+            "resolution": "1",
+            "value": true
+          }
+        ],
+        "expected": "1"
+      },
+      "sequential": [
+        {
+          "resolution": "1W",
+          "elapsed_ms": 13
+        },
+        {
+          "resolution": "240",
+          "elapsed_ms": 30
+        },
+        {
+          "resolution": "1",
+          "elapsed_ms": 28
+        },
+        {
+          "resolution": "1M",
+          "elapsed_ms": 58
+        },
+        {
+          "resolution": "30",
+          "elapsed_ms": 64
+        },
+        {
+          "resolution": "1D",
+          "elapsed_ms": 37
+        },
+        {
+          "resolution": "5",
+          "elapsed_ms": 18
+        },
+        {
+          "resolution": "15",
+          "elapsed_ms": 40
+        },
+        {
+          "resolution": "60",
+          "elapsed_ms": 43
+        }
+      ],
+      "burst_elapsed_ms": 1676,
+      "burst": {
+        "attempts": [
+          {
+            "resolution": "1",
+            "value": true,
+            "elapsed_ms": 18
+          },
+          {
+            "resolution": "5",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "1D",
+            "value": true,
+            "elapsed_ms": 21
+          },
+          {
+            "resolution": "15",
+            "value": true,
+            "elapsed_ms": 12
+          },
+          {
+            "resolution": "1W",
+            "value": true,
+            "elapsed_ms": 14
+          },
+          {
+            "resolution": "30",
+            "value": true,
+            "elapsed_ms": 15
+          },
+          {
+            "resolution": "240",
+            "value": true,
+            "elapsed_ms": 6
+          },
+          {
+            "resolution": "1M",
+            "value": true,
+            "elapsed_ms": 8
+          },
+          {
+            "resolution": "60",
+            "value": true,
+            "elapsed_ms": 6
+          },
+          {
+            "resolution": "5",
+            "value": true,
+            "elapsed_ms": 6
+          },
+          {
+            "resolution": "1D",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "1",
+            "value": true,
+            "elapsed_ms": 10
+          },
+          {
+            "resolution": "30",
+            "value": true,
+            "elapsed_ms": 12
+          },
+          {
+            "resolution": "1W",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "15",
+            "value": true,
+            "elapsed_ms": 14
+          },
+          {
+            "resolution": "240",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "60",
+            "value": true,
+            "elapsed_ms": 8
+          },
+          {
+            "resolution": "1M",
+            "value": true,
+            "elapsed_ms": 9
+          },
+          {
+            "resolution": "5",
+            "value": true,
+            "elapsed_ms": 7
+          },
+          {
+            "resolution": "1",
+            "value": true,
+            "elapsed_ms": 9
+          }
+        ],
+        "expected": "1"
+      },
+      "state": {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "1",
+        "range": {
+          "from": 1790871240,
+          "to": 1790882400
+        },
+        "pending": 0
+      }
+    }
+  ],
+  "errors": [],
+  "http": [
+    {
+      "phase": "MWP:OANDA:AUD_CAD initial",
+      "elapsed_ms": 438,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790822492000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881892000,
+        "track_history": false
+      },
+      "count": 199,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.96,
+        "upstream_slot": 5.62,
+        "network_http11_send_request_headers": 0.28,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 325.24,
+        "network_http11_receive_response_body": 0.11,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 326.36,
+        "upstream_decode": 0.29,
+        "database_commit": 51.83,
+        "read_total": 413.93
+      }
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD immediate",
+      "elapsed_ms": 476,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1789883973000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881893000,
+        "track_history": false
+      },
+      "count": 199,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.39,
+        "upstream_slot": 3.27,
+        "network_http11_send_request_headers": 0.53,
+        "network_http11_send_request_body": 0.04,
+        "network_http11_receive_response_headers": 305.28,
+        "network_http11_receive_response_body": 0.12,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 307.99,
+        "upstream_decode": 0.24,
+        "database_commit": 94.89,
+        "read_total": 453.92
+      }
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD cold burst",
+      "elapsed_ms": 444,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "W1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1671131494000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881894000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.65,
+        "upstream_slot": 3.85,
+        "network_http11_send_request_headers": 0.19,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 336.2,
+        "network_http11_receive_response_body": 0.12,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 337.18,
+        "upstream_decode": 0.69,
+        "database_commit": 47.81,
+        "read_total": 420.26
+      }
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD cold burst",
+      "elapsed_ms": 1308,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "MN",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1270149094000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881894000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.83,
+        "upstream_slot": 271.99,
+        "network_http11_send_request_headers": 0.26,
+        "network_http11_send_request_body": 0.07,
+        "network_http11_receive_response_headers": 926.21,
+        "network_http11_receive_response_body": 0.13,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 927.34,
+        "upstream_decode": 0.26,
+        "database_commit": 50.1,
+        "read_total": 1281.38
+      }
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD cold burst",
+      "elapsed_ms": 550,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "D1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1766949094000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881894000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.15,
+        "upstream_slot": 3.25,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 430.42,
+        "network_http11_receive_response_body": 0.12,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 431.4,
+        "upstream_decode": 0.67,
+        "database_commit": 47.24,
+        "read_total": 508.53
+      }
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD cold burst",
+      "elapsed_ms": 2145,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1786890214000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881894000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.67,
+        "upstream_slot": 885.44,
+        "network_connection_connect_tcp": 0.39,
+        "network_http11_send_request_headers": 0.26,
+        "network_http11_send_request_body": 0.06,
+        "network_http11_receive_response_headers": 461.3,
+        "network_proxy_start_tls": 679.58,
+        "network_http11_receive_response_body": 0.26,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 1142.62,
+        "upstream_decode": 0.25,
+        "database_commit": 48.1,
+        "read_total": 2113.79
+      }
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD cold burst",
+      "elapsed_ms": 375,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M15",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790703694000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881894000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.86,
+        "upstream_slot": 4.57,
+        "network_http11_send_request_headers": 0.19,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 272.52,
+        "network_http11_receive_response_body": 0.11,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 273.5,
+        "upstream_decode": 0.28,
+        "database_commit": 49.87,
+        "read_total": 352.48
+      }
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD cold burst",
+      "elapsed_ms": 3448,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790870014000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881894000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.01,
+        "upstream_slot": 2598.1,
+        "network_http11_send_request_headers": 0.53,
+        "network_http11_send_request_body": 0.04,
+        "network_http11_receive_response_headers": 750.73,
+        "network_http11_receive_response_body": 0.11,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 752.06,
+        "upstream_decode": 0.26,
+        "database_commit": 44.93,
+        "read_total": 3419.89
+      }
+    },
+    {
+      "phase": "MWP:OANDA:AUD_CAD cold burst",
+      "elapsed_ms": 3156,
+      "status": 200,
+      "query": {
+        "instrument": "OANDA:AUD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M30",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790525494000,
+        "firstDataRequest": true,
+        "client": "8c2618bf-85bb-4403-a659-6f0099161a09",
+        "indicators": [],
+        "before": 1790881894000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.42,
+        "upstream_slot": 2755.9,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 306.98,
+        "network_http11_receive_response_body": 0.25,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 308.19,
+        "upstream_decode": 0.26,
+        "database_commit": 47.87,
+        "read_total": 3136.69
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT initial",
+      "elapsed_ms": 346,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790822507000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881907000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.69,
+        "upstream_slot": 3.27,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 218.27,
+        "network_http11_receive_response_body": 0.18,
+        "network_http11_response_closed": 0.32,
+        "upstream_http": 219.61,
+        "upstream_decode": 0.24,
+        "database_commit": 76.61,
+        "read_total": 327.97
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT immediate",
+      "elapsed_ms": 339,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M15",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790703708000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881908000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.07,
+        "upstream_slot": 3.34,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 226.51,
+        "network_http11_receive_response_body": 0.46,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 228.01,
+        "upstream_decode": 0.22,
+        "database_commit": 45.3,
+        "read_total": 309.89
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT cold burst",
+      "elapsed_ms": 392,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "W1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1671131508000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881908000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 14.15,
+        "upstream_slot": 8.07,
+        "network_http11_send_request_headers": 0.19,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 235.36,
+        "network_http11_receive_response_body": 0.2,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 236.54,
+        "upstream_decode": 0.24,
+        "database_commit": 61.76,
+        "read_total": 358.98
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT cold burst",
+      "elapsed_ms": 954,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H4",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1788030708000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881908000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.65,
+        "upstream_slot": 519.88,
+        "network_http11_send_request_headers": 0.26,
+        "network_http11_send_request_body": 0.04,
+        "network_http11_receive_response_headers": 221.55,
+        "network_http11_receive_response_body": 0.2,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 222.74,
+        "upstream_decode": 0.24,
+        "database_commit": 147.18,
+        "read_total": 926.93
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT cold burst",
+      "elapsed_ms": 1427,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790870028000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881908000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.85,
+        "upstream_slot": 1034.36,
+        "network_http11_send_request_headers": 0.22,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 285.11,
+        "network_http11_receive_response_body": 0.17,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 286.47,
+        "upstream_decode": 0.25,
+        "database_commit": 51.21,
+        "read_total": 1396.61
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT cold burst",
+      "elapsed_ms": 1598,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "MN",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1270149109000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881909000,
+        "track_history": false
+      },
+      "count": 111,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 5.49,
+        "upstream_slot": 1302.16,
+        "network_http11_send_request_headers": 0.18,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 206.23,
+        "network_http11_receive_response_body": 0.13,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 207.22,
+        "upstream_decode": 0.15,
+        "database_commit": 31.93,
+        "read_total": 1570.93
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT cold burst",
+      "elapsed_ms": 1296,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "D1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1773774709000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881909000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.24,
+        "upstream_slot": 902.38,
+        "network_http11_send_request_headers": 0.26,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 265.28,
+        "network_http11_receive_response_body": 0.21,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 266.41,
+        "upstream_decode": 0.26,
+        "database_commit": 43.52,
+        "read_total": 1246.32
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT cold burst",
+      "elapsed_ms": 2472,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M30",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790525509000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881909000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 7.63,
+        "upstream_slot": 1589.22,
+        "network_http11_send_request_headers": 0.17,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 768.07,
+        "network_http11_receive_response_body": 0.2,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 769.1,
+        "upstream_decode": 0.22,
+        "database_commit": 44.99,
+        "read_total": 2442.28
+      }
+    },
+    {
+      "phase": "MWP:BTCUSDT cold burst",
+      "elapsed_ms": 3005,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790169109000,
+        "firstDataRequest": true,
+        "client": "7acb5527-56df-47c4-8178-d9af1ba7892f",
+        "indicators": [],
+        "before": 1790881909000,
+        "track_history": false
+      },
+      "count": 198,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.65,
+        "upstream_slot": 1651.28,
+        "network_connection_connect_tcp": 0.35,
+        "network_http11_send_request_headers": 0.27,
+        "network_http11_send_request_body": 0.06,
+        "network_http11_receive_response_headers": 284.86,
+        "network_proxy_start_tls": 973.72,
+        "network_http11_receive_response_body": 0.18,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 1260.17,
+        "upstream_decode": 0.23,
+        "database_commit": 44.46,
+        "read_total": 2981.6
+      }
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "passed": false,
+  "errors": [],
+  "pages": [
+    {
+      "at": 1790855792953,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790796452000,
+        "firstDataRequest": true,
+        "client": "aa827deb-b6e9-4b6c-9877-a7f6546c4a4a",
+        "indicators": [],
+        "before": 1790855852000,
+        "track_history": false
+      }
+    },
+    {
+      "at": 1790855799822,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "before": 1789589100000,
+        "countBack": 10
+      }
+    },
+    {
+      "at": 1790855809512,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 73,
+        "countBack": 73,
+        "from": 1790833969000,
+        "firstDataRequest": true,
+        "client": "aa827deb-b6e9-4b6c-9877-a7f6546c4a4a",
+        "indicators": [],
+        "before": 1790855869000,
+        "track_history": false
+      }
+    },
+    {
+      "at": 1790855809590,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 14,
+        "countBack": 14,
+        "from": 1790829769000,
+        "firstDataRequest": false,
+        "client": "aa827deb-b6e9-4b6c-9877-a7f6546c4a4a",
+        "indicators": [],
+        "before": 1790833969000,
+        "track_history": false
+      }
+    },
+    {
+      "at": 1790855809696,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "before": 1790849700000,
+        "countBack": 1
+      }
+    },
+    {
+      "at": 1790855813820,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 73,
+        "countBack": 73,
+        "from": 1790833973000,
+        "firstDataRequest": true,
+        "client": "aa827deb-b6e9-4b6c-9877-a7f6546c4a4a",
+        "indicators": [],
+        "before": 1790855873000,
+        "track_history": false
+      }
+    },
+    {
+      "at": 1790855813881,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 14,
+        "countBack": 14,
+        "from": 1790829773000,
+        "firstDataRequest": false,
+        "client": "aa827deb-b6e9-4b6c-9877-a7f6546c4a4a",
+        "indicators": [],
+        "before": 1790833973000,
+        "track_history": false
+      }
+    }
+  ],
+  "extra_history_no_reset": true,
+  "view_before": {
+    "range": {
+      "from": 1790830500,
+      "to": 1790852100
+    },
+    "spacing": 15.36986301369863
+  },
+  "injection": {
+    "action": "revise",
+    "start": 1790849400000,
+    "revision": 58
+  },
+  "reload_ms": 4680,
+  "view_after": {
+    "range": {
+      "from": 1790830500,
+      "to": 1790852100
+    },
+    "spacing": 15.36986301369863,
+    "ready": true
+  },
+  "error": "Error: frame.evaluate: ChunkLoadError: Loading chunk 20866 failed.\n(error: https://127.0.0.1:15454/charting_library/bundles/zh.20866.faac5bd68021c0ca72d1.js)\n    at o.f.j (https://127.0.0.1:15454/charting_library/bundles/runtime.d6871abde1090b0329fe.js:12:969)\n    at https://127.0.0.1:15454/charting_library/bundles/runtime.d6871abde1090b0329fe.js:1:2347\n    at Array.reduce (<anonymous>)\n    at o.e (https://127.0.0.1:15454/charting_library/bundles/runtime.d6871abde1090b0329fe.js:1:2325)\n    at c (https://127.0.0.1:15454/charting_library/bundles/runtime.d6871abde1090b0329fe.js:10:2552)",
+  "events": [
+    {
+      "type": "bars",
+      "revision": 56,
+      "cursor": 1790855700000
+    },
+    {
+      "type": "bars",
+      "revision": 57,
+      "cursor": 1790855700000
+    },
+    {
+      "type": "reset",
+      "revision": 58,
+      "cursor": 1790855700000
+    },
+    {
+      "type": "bars",
+      "revision": 59,
+      "cursor": 1790855700000
+    },
+    {
+      "type": "reset",
+      "revision": 60,
+      "cursor": 1790855700000
+    }
+  ],
+  "restoration": {
+    "action": "restore",
+    "start": 1790849400000
+  }
+}

@@ -1,0 +1,10 @@
+SAMPLE {"symbol":"MWP:OANDA:AUD_CAD","resolution":"1","began_ms":1790856169471,"displayed_ms":4149,"initialized_ms":4162,"screen_bars":189,"pages":[{"query":{"instrument":"OANDA:AUD_CAD","series_kind":"provider","published":false,"timeframe":"M1","limit":198,"countBack":198,"from":1790844351000,"firstDataRequest":true,"client":"706aa20f-64ed-4c7c-afe4-ebef1c1d0c0e","indicators":[],"before":1790856231000,"track_history":false},"status":200,"at_ms":1730,"elapsed_ms":2273,"count":198,"as_of":1790856171218,"boundary":false,"cache_hit":false}],"range":{"from":1790845440,"to":1790856720},"geometry":{"plot_width":1132,"bar_spacing":6}}
+AssertionError [ERR_ASSERTION]: MWP:OANDA:AUD_CAD/1 cached demand to display 2171ms exceeds 1s
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-provider-first-screen.browser.cjs:76:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

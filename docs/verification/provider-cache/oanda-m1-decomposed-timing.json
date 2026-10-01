@@ -1,0 +1,250 @@
+{
+  "passed": true,
+  "measurements": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1",
+      "began_ms": 1790858516402,
+      "displayed_ms": 2152,
+      "initialized_ms": 2161,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790846697000,
+            "firstDataRequest": true,
+            "client": "f2548f34-a6c4-481f-b5ea-f5d01cbbbf1e",
+            "indicators": [],
+            "before": 1790858577000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1556,
+          "elapsed_ms": 462,
+          "count": 198,
+          "as_of": 1790858517973,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 2.69,
+            "upstream_slot": 3.64,
+            "upstream_http": 287.73,
+            "upstream_decode": 0.26,
+            "database_commit": 58.93,
+            "read_total": 439.82
+          }
+        }
+      ],
+      "range": {
+        "from": 1790847780,
+        "to": 1790859060
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1253,
+        "request_to_display_ms": 306,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M1",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790846701000,
+              "firstDataRequest": true,
+              "client": "a676bdc6-a0cd-4fda-aca5-50d748c9e59c",
+              "indicators": [],
+              "before": 1790858581000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 947,
+            "elapsed_ms": 78,
+            "count": 198,
+            "as_of": 1790858520480,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 8.37
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1",
+      "began_ms": 1790858527217,
+      "displayed_ms": 2190,
+      "initialized_ms": 2193,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790846708000,
+            "firstDataRequest": true,
+            "client": "e1941562-b712-48df-943c-66d6c88e8b14",
+            "indicators": [],
+            "before": 1790858588000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1565,
+          "elapsed_ms": 439,
+          "count": 198,
+          "as_of": 1790858528804,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 5.86,
+            "upstream_slot": 3.72,
+            "upstream_http": 330.67,
+            "upstream_decode": 0.26,
+            "database_commit": 51.74,
+            "read_total": 421.11
+          }
+        }
+      ],
+      "range": {
+        "from": 1790847840,
+        "to": 1790859120
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1172,
+        "request_to_display_ms": 222,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M1",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790846710000,
+              "firstDataRequest": true,
+              "client": "d3176248-169c-407f-9b28-7793e9c273f6",
+              "indicators": [],
+              "before": 1790858590000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 950,
+            "elapsed_ms": 46,
+            "count": 198,
+            "as_of": 1790858529281,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 6.84
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "resolution": "1",
+      "began_ms": 1790858533080,
+      "displayed_ms": 2144,
+      "initialized_ms": 2146,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1790846714000,
+            "firstDataRequest": true,
+            "client": "935ae236-ff0f-488b-bda6-003803ed38b5",
+            "indicators": [],
+            "before": 1790858594000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1582,
+          "elapsed_ms": 393,
+          "count": 199,
+          "as_of": 1790858534687,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 14.39,
+            "upstream_slot": 5.05,
+            "upstream_http": 282.92,
+            "upstream_decode": 0.25,
+            "database_commit": 48.97,
+            "read_total": 374.77
+          }
+        }
+      ],
+      "range": {
+        "from": 1790847840,
+        "to": 1790859120
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1164,
+        "request_to_display_ms": 237,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:AUD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M1",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790846718000,
+              "firstDataRequest": true,
+              "client": "71903b05-8e4c-4f40-94de-88e5c383578f",
+              "indicators": [],
+              "before": 1790858598000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 927,
+            "elapsed_ms": 51,
+            "count": 198,
+            "as_of": 1790858536960,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 8.62
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "caveat": "Display ends at public native dataReady plus two animation frames; no GPU completion claim. Each sample starts a new layout; provider API response timing and acquisition timestamp are recorded."
+}

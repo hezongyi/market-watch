@@ -1,0 +1,31 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_publication_rotation_does_not_sleep_as_an_idle_worker[True-0.1] _____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f02a85b8e90>
+publication_pending = True, expected_sleep = 0.1
+
+    @pytest.mark.parametrize("publication_pending,expected_sleep", [(True, 0.1), (False, 1)])
+    def test_publication_rotation_does_not_sleep_as_an_idle_worker(monkeypatch, publication_pending, expected_sleep):
+        from alerts import chart_aggregation_worker as publisher
+    
+        monkeypatch.setattr(publisher, "aggregate_once", lambda: False)
+        monkeypatch.setattr(publisher, "publish_once", lambda: publication_pending)
+        delays = []
+        def sleep(seconds):
+            delays.append(seconds)
+            raise SystemExit
+        monkeypatch.setattr(publisher.time, "sleep", sleep)
+        with pytest.raises(SystemExit):
+            publisher.main()
+>       assert delays == [expected_sleep], "live publication work is not an empty aggregation queue"
+E       AssertionError: live publication work is not an empty aggregation queue
+E       assert [1] == [0.1]
+E         
+E         At index 0 diff: 1 != 0.1
+E         Use -v to get more diff
+
+backend/tests/test_chart_worker_cadence.py:54: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_chart_worker_cadence.py::test_publication_rotation_does_not_sleep_as_an_idle_worker[True-0.1]
+1 failed, 1 passed, 2 deselected in 0.07s

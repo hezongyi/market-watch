@@ -1,5 +1,6 @@
 """Authenticated chart APIs with optimistic concurrency and bounded input."""
 
+import asyncio
 import copy
 import hashlib
 import json
@@ -9,16 +10,18 @@ import time
 from collections import OrderedDict
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse, Response, StreamingResponse
+from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import delete, func, select, update
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, chart_rows, future_grid
 from .chart_history_plan import bucket_has_trading
 from .chart_indicators import CATALOG, calculate, validate
+from .chart_series import SeriesKind
 from .domain import Calendar
+from .managed_dataset import data as published_data
 from .storage import (
     Bar,
     ChartTemplate,
@@ -50,21 +53,52 @@ class Template(Create):
 
 class DataQuery(BaseModel):
     instrument: str
+    series_kind: SeriesKind = "managed"
     timeframe: str
     before: int | None = Field(default=None, gt=0)
-    limit: int = Field(default=500, ge=1, le=2000)
+    limit: int = Field(default=500, ge=1, le=20000)
+    from_time: int | None = Field(default=None, alias="from", ge=0)
+    count_back: int | None = Field(default=None, alias="countBack", ge=1, le=20000)
+    first_data_request: bool = Field(default=False, alias="firstDataRequest")
+    client: str | None = Field(default=None, max_length=64)
     indicators: list[dict] = Field(default_factory=list, max_length=12)
     track_history: bool = False
     revision_before: int | None = Field(default=None, gt=0)
     revision_after: int | None = Field(default=None, ge=0)
+    published: bool = False
+    dataset_start: int | None = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def validate_managed_limit(self):
+        if self.series_kind == "managed" and self.limit > 2000:
+            raise ValueError("自建单页最多2000根")
+        return self
 
 
 class ExportQuery(BaseModel):
     instrument: str = Field(max_length=80)
+    series_kind: SeriesKind = "managed"
+    published: bool = False
     timeframe: str
     start: int = Field(ge=0)
     end: int = Field(gt=0)
     indicators: list[dict] = Field(default_factory=list, max_length=12)
+
+
+class ProviderSubscription(BaseModel):
+    client: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    listener: str = Field(min_length=1, max_length=100)
+    instrument: str = Field(min_length=1, max_length=80)
+    timeframe: str
+    cursor: int = Field(default=0, ge=0)
+    revision: int = Field(default=0, ge=0)
+    observed_at: int = Field(default=0, ge=0)
+    indicators: list[dict] = Field(default_factory=list, max_length=1)
+
+
+class ProviderUnsubscribe(BaseModel):
+    client: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    listener: str = Field(min_length=1, max_length=100)
 
 
 def history_check(db, inst, source, visible, body):
@@ -212,6 +246,50 @@ _RESULT_CACHE = OrderedDict()
 def router(authenticated):
     r = APIRouter(prefix="/api/charts", dependencies=[Depends(authenticated)])
 
+    @r.post("/provider/subscribe")
+    def provider_subscribe(body: ProviderSubscription):
+        from .provider_service import subscribe
+
+        if body.timeframe not in FRAMES:
+            raise HTTPException(422, "不支持的周期")
+        try:
+            for spec in body.indicators:
+                validate(spec)
+            return subscribe(body.client, body.listener, body.instrument, body.timeframe,
+                             body.cursor, body.revision, body.observed_at, body.indicators)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @r.post("/provider/unsubscribe")
+    def provider_unsubscribe(body: ProviderUnsubscribe):
+        from .provider_service import unsubscribe
+
+        unsubscribe(body.client, body.listener)
+        return {"ok": True}
+
+    @r.get("/provider/events")
+    async def provider_events(request: Request, client: str):
+        import re
+
+        from .provider_service import events, renew
+
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", client):
+            raise HTTPException(422, "无效客户端")
+
+        async def stream():
+            cursors = {}
+            while not await request.is_disconnected():
+                await asyncio.to_thread(renew, client)
+                messages = await asyncio.to_thread(events, client, cursors)
+                for message in messages:
+                    yield "data: " + json.dumps(message) + "\n\n"
+                yield ": heartbeat\n\n"
+                await asyncio.sleep(2)
+
+        return StreamingResponse(stream(), media_type="text/event-stream", headers={
+            "Cache-Control": "no-cache", "X-Accel-Buffering": "no",
+        })
+
     @r.get("/catalog")
     def catalog():
         return {"frames": FRAMES, "indicators": CATALOG}
@@ -238,6 +316,33 @@ def router(authenticated):
                 validate(spec)
         except (ValueError, TypeError, KeyError, AttributeError) as error:
             raise HTTPException(422, str(error)) from error
+        if body.series_kind == "provider":
+            page = data_sync(DataQuery(instrument=body.instrument, series_kind="provider",
+                                  timeframe=body.timeframe, before=body.end, limit=2000,
+                                  indicators=body.indicators))
+            if len(page["bars"]) == 2000 and page["has_more"] and page["bars"][0]["chart_time"] > body.start:
+                raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
+            page["bars"] = [b for b in page["bars"] if body.start <= b["chart_time"] < body.end]
+            return Response(chart_csv(page, instrument=body.instrument, timeframe=body.timeframe),
+                            media_type="text/csv; charset=utf-8",
+                            headers={"Content-Disposition": 'attachment; filename="market-watch.csv"',
+                                     "Cache-Control": "no-store"})
+        if body.published:
+            from .storage import ChartPublication
+            with transaction() as db:
+                publication = db.get(ChartPublication, (body.instrument, body.timeframe))
+                if not publication or body.start < publication.start or body.end > publication.end:
+                    raise HTTPException(409, "导出范围尚未发布，请通过维护历史入口明确提交起点，并等待相应周期完成")
+            page = data_sync(DataQuery(instrument=body.instrument, timeframe=body.timeframe,
+                                  before=body.end, limit=2000, indicators=body.indicators,
+                                  published=True))
+            if len(page['bars']) == 2000 and page['has_more'] and page['bars'][0]['start'] > body.start:
+                raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
+            page['bars'] = [bar for bar in page['bars'] if body.start <= bar['start'] < body.end]
+            return Response(chart_csv(page, instrument=body.instrument, timeframe=body.timeframe),
+                            media_type="text/csv; charset=utf-8",
+                            headers={"Content-Disposition": 'attachment; filename="market-watch.csv"',
+                                     "Cache-Control": "no-store"})
         with transaction() as db:
             inst = resolve(db, body.instrument)
             calendar = Calendar(inst.calendar)
@@ -284,7 +389,7 @@ def router(authenticated):
                         },
                     )
             instrument = inst.id
-        page = data(
+        page = data_sync(
             DataQuery(
                 instrument=instrument,
                 timeframe=body.timeframe,
@@ -296,7 +401,7 @@ def router(authenticated):
         if len(page["bars"]) == 2000 and page["bars"][0]["start"] > body.start:
             # A leading market closure can leave exactly 2000 bars after start.
             # Probe one predecessor instead of treating empty time as an extra bar.
-            previous = data(
+            previous = data_sync(
                 DataQuery(
                     instrument=instrument,
                     timeframe=body.timeframe,
@@ -431,10 +536,50 @@ def router(authenticated):
         return {"ok": True}
 
     @r.post("/data")
-    def data(body: DataQuery):
+    async def data(body: DataQuery, request: Request):
+        if body.series_kind != "provider":
+            return await asyncio.to_thread(data_sync, body)
+        from .config import settings
+        from .provider_cache import CANCELLED, DEADLINE
+
+        cancelled = threading.Event()
+        token = CANCELLED.set(cancelled)
+        deadline = time.monotonic() + settings.provider_request_seconds
+        deadline_token = DEADLINE.set(deadline)
+        task = asyncio.create_task(asyncio.to_thread(data_sync, body))
+        try:
+            while not task.done():
+                if await request.is_disconnected():
+                    cancelled.set()
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise HTTPException(503, "平台行情暂不可用，请重试；尚未确认历史边界")
+                await asyncio.wait({task}, timeout=min(0.05, remaining))
+            return await task
+        finally:
+            cancelled.set()
+            CANCELLED.reset(token)
+            DEADLINE.reset(deadline_token)
+            if not task.done():
+                # An already sent page can still populate the shared cache;
+                # observe its exception even if the HTTP waiter disappeared.
+                task.add_done_callback(lambda done: done.exception() if not done.cancelled() else None)
+
+    def data_sync(body: DataQuery):
         try:
             for spec in body.indicators:
                 validate(spec)
+            if body.series_kind == "provider":
+                import httpx
+
+                from .provider_chart import data as provider_data
+
+                try:
+                    return provider_data(body)
+                except (httpx.HTTPError, TimeoutError) as error:
+                    raise HTTPException(503, "平台行情暂不可用，请重试；尚未确认历史边界") from error
+            if body.published:
+                return published_data(body)
             with transaction() as db:
                 inst = db.get(Instrument, body.instrument)
                 if not inst:

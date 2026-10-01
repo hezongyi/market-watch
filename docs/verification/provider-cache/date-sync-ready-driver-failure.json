@@ -1,0 +1,14 @@
+{
+  "error": "Error: frame.waitForFunction: ReferenceError: ready is not defined\n    at eval (eval at predicate (eval at evaluate (:311:30)), <anonymous>:1:10)\n    at predicate (eval at evaluate (:311:30), <anonymous>:7:27)\n    at next (eval at evaluate (:311:30), <anonymous>:29:33)\n    at eval (eval at evaluate (:311:30), <anonymous>:42:13)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+  "samples": [],
+  "errors": [
+    "ready is not defined"
+  ],
+  "stacks": [
+    {
+      "phase": "initial",
+      "stack": "ReferenceError: ready is not defined\n    at eval (eval at predicate (eval at evaluate (:311:30)), <anonymous>:1:10)\n    at predicate (eval at evaluate (:311:30), <anonymous>:7:27)\n    at next (eval at evaluate (:311:30), <anonymous>:29:33)\n    at eval (eval at evaluate (:311:30), <anonymous>:42:13)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+      "message": "ready is not defined"
+    }
+  ]
+}

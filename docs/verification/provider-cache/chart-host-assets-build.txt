@@ -1,0 +1,34 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  86.51MB
+Step 1/10 : FROM node:22-bookworm-slim AS assets
+ ---> 89b30bf5b6a8
+Step 2/10 : WORKDIR /assets
+ ---> Using cache
+ ---> 2b571b7ad5b3
+Step 3/10 : COPY index.html build-assets.mjs series.js bridge.js indicators.js preferences.js chart-style.js workspaces.js watchlists.js range-sync.js viewports.js history-demand.js progressive-history.js ./
+ ---> 7761e3acf57d
+Step 4/10 : RUN node build-assets.mjs
+ ---> Running in d524b9c15319
+ ---> Removed intermediate container d524b9c15319
+ ---> 53b32959cbfb
+Step 5/10 : FROM nginx:1.28-alpine
+ ---> 201aafcbd9cd
+Step 6/10 : COPY nginx.conf /etc/nginx/conf.d/default.conf
+ ---> 574e847e1561
+Step 7/10 : COPY --from=assets /assets/ /usr/share/nginx/html/
+ ---> 0b12a3fb2c3c
+Step 8/10 : COPY charting_library/ /usr/share/nginx/html/charting_library/
+ ---> 97587739754a
+Step 9/10 : RUN test -s /usr/share/nginx/html/charting_library/charting_library.js
+ ---> Running in 31a307ea6fae
+ ---> Removed intermediate container 31a307ea6fae
+ ---> 6d7f3f1b3f13
+Step 10/10 : EXPOSE 80
+ ---> Running in b4cd623cbbb4
+ ---> Removed intermediate container b4cd623cbbb4
+ ---> 4734c11e1ec7
+Successfully built 4734c11e1ec7
+Successfully tagged market-watch-chart-origin:provider-host-assets-20261001

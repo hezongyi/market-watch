@@ -74,36 +74,16 @@ def history_end(inst, timeframe, start, count):
 
 
 def update_demand(db, *, ident, instrument, timeframe, end, visible, focused, now, required=None):
-    if timeframe not in FRAMES or not 1 <= visible <= 2000:
-        raise ValueError("Invalid viewport demand")
-    # Calendar scanning is CPU work and must happen before the writer lock.
-    inst = db.get(Instrument, instrument)
-    if inst is None:
-        raise ValueError("Instrument must be resolved before demand registration")
-    required = max(visible, required or visible)
-    if required > 6000:
-        raise ValueError("单次指标历史需求超过6000根，请缩小计算窗口")
-    start = history_start(inst, timeframe, end, required)
-    warm = history_start(inst, timeframe, end, max(required, visible * 3))
-    daily = history_start(inst, "D1", end, visible * 3)
-    target = min(warm, daily)
-    # Serialize the brief target merge, not calendar calculation or network I/O.
-    db.scalar(select(Instrument).where(Instrument.id == instrument).with_for_update())
+    """Viewport interest is read-only with respect to acquisition authorization."""
+    if timeframe not in (*FRAMES, 'W1', 'MN') or not 1 <= visible <= 2000:
+        raise ValueError('Invalid viewport demand')
     plan = db.get(ChartHistoryPlan, instrument)
     if plan is None:
-        plan = ChartHistoryPlan(instrument_id=instrument, target_start=target,
-                                target_end=end, status="pending", updated_at=now)
-        db.add(plan)
-    else:
-        expanded = target < plan.target_start or end > plan.target_end
-        plan.target_start = min(plan.target_start, target)
-        plan.target_end = max(plan.target_end, end)
-        if expanded and plan.status != "cancelled":
-            plan.status = "pending"
-        plan.updated_at = now
+        return None
+    values = dict(instrument_id=instrument, timeframe=timeframe,
+                  start=plan.target_start, end=min(end, plan.target_end),
+                  warm_start=plan.target_start, focused=focused, expires=now + 45000)
     demand = db.get(ChartViewportDemand, ident)
-    values = dict(instrument_id=instrument, timeframe=timeframe, start=start, end=end,
-                  warm_start=warm, focused=focused, expires=now + 45000)
     if demand is None:
         db.add(ChartViewportDemand(id=ident, **values))
     else:
@@ -114,83 +94,62 @@ def update_demand(db, *, ident, instrument, timeframe, end, visible, focused, no
 
 
 def priority_regions(db, plan, now):
-    """Closed windows retain a bounded target at lowest priority (300)."""
-    active = list(db.scalars(select(ChartViewportDemand).where(
-        ChartViewportDemand.instrument_id == plan.instrument_id,
-        ChartViewportDemand.expires > now)))
-    regions = [(d.start, d.end, 100 if d.focused else 110) for d in active]
-    regions += [(d.warm_start, d.end, 130 if d.focused else 150) for d in active]
-    regions.append((plan.target_start, plan.target_end, 170 if active else 300))
-    return sorted(regions, key=lambda region: region[2])
+    # Viewing never outranks realtime work or changes the approved range.
+    return [(plan.target_start, plan.target_end, 300)]
 
 
 def advance_plan(db, plan, now):
-    """Queue at most one bounded missing segment; existing jobs share reservations.
-
-    Only jobs owned by this plan may be demoted. Ordinary repair/manual/weekly
-    jobs retain their own lifecycle. The import worker keeps the actual lease.
-    """
-    from .coverage import covers_interval
+    """Newest missing segment first, one bounded segment in flight per instrument."""
     from .market import stored_coverage
     from .market_data import missing_intervals
     from .storage import ImportJob
 
-    if plan.status != "pending":
+    if plan.status != 'pending':
         return False
     inst = db.scalar(select(Instrument).where(
         Instrument.id == plan.instrument_id).with_for_update())
-    regions = priority_regions(db, plan, now)
     coverage = stored_coverage(db, inst, plan.target_start, plan.target_end)
-    jobs = list(db.scalars(select(ImportJob).where(
-        ImportJob.instrument_id == inst.id,
-        ImportJob.status.in_(["pending", "running", "failed"]),
-        ImportJob.end > plan.target_start, ImportJob.cursor < plan.target_end)))
-    for job in jobs:
-        if job.chart_plan and job.status == "pending":
-            job.priority = min((priority for left, right, priority in regions
-                                if job.cursor < right and job.end > left), default=300)
-    if covers_interval(coverage, plan.target_start, plan.target_end):
-        pending_aggregation = db.scalar(select(ChartAggregationJob.id).where(
+    missing = list(missing_intervals(coverage, plan.target_start, plan.target_end))
+    plan.cursor = missing[-1][1] if missing else plan.target_start
+    if not missing:
+        pending = db.scalar(select(ChartAggregationJob.id).where(
             ChartAggregationJob.instrument_id == inst.id,
             ChartAggregationJob.start < plan.target_end,
             ChartAggregationJob.end > plan.target_start).limit(1))
-        if pending_aggregation is None:
-            plan.status = "complete"
+        if pending is None:
+            plan.status = 'complete'
         return False
-    reserved = coverage + [{"start": job.cursor, "end": job.end} for job in jobs]
-    for left, right, priority in regions:
-        missing = list(missing_intervals(reserved, left, right))
-        if not missing:
-            continue
-        active_jobs = [job for job in jobs if job.chart_plan and
-                       job.status in ("pending", "running")]
-        if len(active_jobs) >= 2:
-            # A newly viewed range can displace queued deep prewarm. Its
-            # durable envelope remains, so the cancelled slice is planned later.
-            replaceable = [job for job in active_jobs if job.status == "pending"
-                           and job.priority > priority]
-            if not replaceable:
-                return False
-            max(replaceable, key=lambda job: job.priority).status = "superseded"
-        start, end = missing[-1]
-        start = max(start, end - 4000 * 60000)
-        db.add(ImportJob(instrument_id=inst.id, start=start, end=end, cursor=start,
-                         priority=priority, chart_plan=True, next_at=now))
-        db.flush()
-        return True
-    return False
+    # Recent repairs yield a whole cycle to the dedicated realtime executor.
+    if db.scalar(select(ImportJob.id).where(ImportJob.priority == 0,
+            ImportJob.status.in_(['pending', 'running'])).limit(1)):
+        return False
+    jobs = list(db.scalars(select(ImportJob).where(
+        ImportJob.instrument_id == inst.id,
+        ImportJob.status.in_(['pending', 'running', 'failed']),
+        ImportJob.end > plan.target_start, ImportJob.cursor < plan.target_end)))
+    # Do not go around an unfinished newer segment into older history.
+    left, right = missing[-1]
+    if any(j.cursor < right and j.end > left for j in jobs):
+        return False
+    # Ten trading hours bounds HTTP, batch writes and aggregation work. It is
+    # an execution unit, never the three-screen opening threshold.
+    start = max(left, right - 600 * 60000)
+    db.add(ImportJob(instrument_id=inst.id, start=start, end=right, cursor=start,
+        priority=300, chart_plan=True, next_at=now))
+    db.flush()
+    return True
 
 
 def advance_pending_plans():
-    """One scheduling pass; each plan contributes at most one download page."""
     from .storage import now_ms, transaction
 
     with transaction() as db:
         ids = list(db.scalars(select(ChartHistoryPlan.instrument_id).where(
-            ChartHistoryPlan.status == "pending").order_by(ChartHistoryPlan.updated_at)))
+            ChartHistoryPlan.status == 'pending').order_by(ChartHistoryPlan.updated_at)))
     queued = 0
     for ident in ids:
-        # Release each instrument lock before moving to another plan.
+        if not validate_history_start(ident):
+            continue
         with transaction() as db:
             plan = db.get(ChartHistoryPlan, ident)
             if plan:
@@ -198,76 +157,157 @@ def advance_pending_plans():
     return queued
 
 
+def boundary_context(inst, start):
+    import hashlib
+
+    from .config import settings
+
+    namespace = hashlib.sha256(settings.oanda_account_id.encode()).hexdigest() if inst.source == 'oanda' else inst.source
+    return dict(target_start=start, source=inst.source, symbol=inst.symbol,
+                basis=inst.basis, namespace=namespace)
+
+
+def record_boundary(db, inst, start, earliest, now):
+    from .storage import Preference, instant
+
+    key = 'chart_history_boundary:' + inst.id
+    row = db.get(Preference, key)
+    value = {**boundary_context(inst, start), 'earliest': earliest,
+             'checked_at': now, 'retry_at': now + 86400000,
+             'error': (f'历史起点不可达：最早可用M1为 {instant(earliest).isoformat()}；请通过维护表单明确选择可达起点。原批准范围和已发布行情保持不变。'
+                       if start < earliest else None)}
+    if row:
+        row.value = value
+    else:
+        db.add(Preference(key=key, value=value))
+
+
+def validate_history_start(instrument):
+    """Validate legacy approvals outside the DB transaction before scheduling.
+
+    New submissions already carry this proof. Unreachable old plans retain
+    their original approval and published data, with an actionable error;
+    they cannot certify pre-listing empty OANDA responses as valid history.
+    """
+    import httpx
+
+    from .provider_chart import earliest_m1
+    from .storage import ImportJob, Preference, now_ms, transaction
+
+    key = 'chart_history_boundary:' + instrument
+    with transaction() as db:
+        plan = db.get(ChartHistoryPlan, instrument)
+        if not plan or plan.status != 'pending':
+            return False
+        inst = db.get(Instrument, instrument)
+        # Only the supported native sources can prove a first M1 here.
+        if inst.source not in ('oanda', 'binance'):
+            return True
+        context = boundary_context(inst, plan.target_start)
+        old = db.get(Preference, key)
+        if old and all(old.value.get(k) == v for k, v in context.items()) and old.value.get('retry_at', 0) > now_ms():
+            return not old.value.get('error')
+        if db.scalar(select(ImportJob.id).where(ImportJob.priority == 0,
+                ImportJob.status.in_(['pending', 'running'])).limit(1)):
+            return False
+        meta = dict(id=inst.id, source=inst.source, symbol=inst.symbol, basis=inst.basis)
+    earliest, error = None, None
+    try:
+        earliest = earliest_m1(meta)
+        if context['target_start'] < earliest:
+            from .storage import instant
+            error = f'历史起点不可达：最早可用M1为 {instant(earliest).isoformat()}；请通过维护表单明确选择可达起点。原批准范围和已发布行情保持不变。'
+    except (httpx.HTTPError, TimeoutError, ValueError):
+        error = '尚未确认最早可用历史，历史任务暂未推进，请稍后重试；实时维护继续运行。'
+    with transaction() as db:
+        inst = db.scalar(select(Instrument).where(Instrument.id == instrument).with_for_update())
+        plan = db.get(ChartHistoryPlan, instrument)
+        if not plan or plan.status != 'pending' or boundary_context(inst, plan.target_start) != context:
+            return False
+        now = now_ms()
+        value = {**context, 'earliest': earliest, 'checked_at': now,
+                 'retry_at': now + (86400000 if earliest is not None else 30000), 'error': error}
+        old = db.get(Preference, key)
+        if old:
+            old.value = value
+        else:
+            db.add(Preference(key=key, value=value))
+        if error:
+            for job in db.scalars(select(ImportJob).where(ImportJob.instrument_id == instrument,
+                    ImportJob.chart_plan.is_(True), ImportJob.status.in_(['pending', 'running']))):
+                if earliest is not None:
+                    job.status, job.error, job.lease_until = 'failed', error, None
+                else:
+                    job.next_at = max(job.next_at, value['retry_at'])
+    return error is None
+
+
 def plan_status(db, plan, now):
+    from .managed_dataset import status
     from .market import stored_coverage
     from .market_data import missing_intervals
-    from .storage import ImportJob
+    from .storage import ImportJob, Preference
 
     inst = db.get(Instrument, plan.instrument_id)
     spans = stored_coverage(db, inst, plan.target_start, plan.target_end)
     total = plan.target_end - plan.target_start
-    missing = sum(b-a for a,b in missing_intervals(spans,plan.target_start,plan.target_end))
+    missing = sum(b-a for a,b in missing_intervals(spans, plan.target_start, plan.target_end))
     jobs = list(db.scalars(select(ImportJob).where(
-        ImportJob.instrument_id == plan.instrument_id, ImportJob.chart_plan.is_(True),
-        ImportJob.status.in_(['pending','running','failed']))))
+        ImportJob.instrument_id == inst.id, ImportJob.chart_plan.is_(True),
+        ImportJob.status.in_(['pending', 'running', 'failed']))))
     aggregation = list(db.scalars(select(ChartAggregationJob).where(
-        ChartAggregationJob.instrument_id == plan.instrument_id,
-        ChartAggregationJob.start < plan.target_end,
-        ChartAggregationJob.end > plan.target_start)))
-    status = 'pending' if aggregation and plan.status == 'complete' else plan.status
-    return dict(instrument=plan.instrument_id, status=status,
-                aggregation_pending=len(aggregation),
-                aggregation_failed=sum(job.error is not None for job in aggregation),
-                start=plan.target_start, end=plan.target_end,
-                covered_ms=total-missing, total_ms=total,
-                priority=priority_regions(db,plan,now)[0][2],
-                pending=sum(job.status=='pending' for job in jobs),
-                running=sum(job.status=='running' for job in jobs),
-                failed=sum(job.status=='failed' for job in jobs))
+        ChartAggregationJob.instrument_id == inst.id)))
+    boundary = db.get(Preference, 'chart_history_boundary:' + inst.id)
+    boundary_error = boundary.value.get('error') if boundary and all(
+        boundary.value.get(k) == v for k, v in boundary_context(inst, plan.target_start).items()) else None
+    return dict(instrument=inst.id, status=plan.status, start=plan.target_start,
+        end=plan.target_end, cursor=plan.cursor, realtime_enabled=plan.realtime_enabled,
+        realtime_end=plan.realtime_end, realtime_quality=inst.quality,
+        realtime_error=inst.error, covered_ms=total-missing, total_ms=total,
+        priority=300, pending=sum(j.status=='pending' for j in jobs),
+        running=sum(j.status=='running' for j in jobs), failed=sum(j.status=='failed' for j in jobs),
+        aggregation_pending=len(aggregation),
+        aggregation_failed=sum(j.error is not None for j in aggregation),
+        boundary_error=boundary_error,
+        download_errors=[dict(id=j.id, start=j.start, end=j.end, error=j.error,
+            attempts=j.attempts, retry_at=j.next_at, status=j.status) for j in jobs if j.error],
+        aggregation_errors=[dict(id=j.id, timeframe=j.timeframe, start=j.start, end=j.end,
+            error=j.error, attempts=j.attempts, retry_at=j.next_at) for j in aggregation if j.error],
+        periods=[status(db, inst, frame) for frame in (*sorted(FRAMES), 'W1', 'MN')])
 
 
 def control_plan(db, instrument, action, now):
     from .storage import ImportJob
 
-    if action not in ('cancel','resume','retry'):
+    if action not in ('cancel', 'resume', 'retry'):
         raise ValueError('Unknown plan action')
-    db.scalar(select(Instrument).where(Instrument.id==instrument).with_for_update())
-    plan = db.get(ChartHistoryPlan,instrument)
+    db.scalar(select(Instrument).where(Instrument.id == instrument).with_for_update())
+    plan = db.get(ChartHistoryPlan, instrument)
     if plan is None:
         raise ValueError('History plan not found')
     jobs = list(db.scalars(select(ImportJob).where(
-        ImportJob.instrument_id==instrument, ImportJob.chart_plan.is_(True),
-        ImportJob.status.in_(['pending','running','failed','cancelled']))))
-    if action=='cancel':
-        plan.status='cancelled'
+        ImportJob.instrument_id == instrument, ImportJob.chart_plan.is_(True),
+        ImportJob.status.in_(['pending', 'running', 'failed', 'cancelled']))))
+    if action == 'cancel':
+        plan.status = 'cancelled'
         for job in jobs:
-            job.status='cancelled'
-            job.lease_until=None
-    else:
-        plan.status='pending'
-        regions = priority_regions(db, plan, now)
-        available = max(0, 2 - sum(job.status in ('pending', 'running') for job in jobs))
-        candidates = [job for job in jobs if job.status == 'cancelled'
-                      or (action == 'retry' and job.status == 'failed')]
-        for job in candidates:
-            job.priority = min((priority for left, right, priority in regions
-                                if job.cursor < right and job.end > left), default=300)
-        # Resume only a bounded batch, choosing the currently viewed range first.
-        # The durable plan retains all remaining holes and requeues them later;
-        # committed coverage and each old cursor remain untouched.
-        candidates.sort(key=lambda job: (job.priority, -job.end, job.id))
-        for index, job in enumerate(candidates):
-            job.status = 'pending' if index < available else 'superseded'
-            job.next_at = now
-            job.error = None
+            job.status = 'cancelled'
             job.lease_until = None
-    if action == 'retry':
-        for aggregate_job in db.scalars(select(ChartAggregationJob).where(
-                ChartAggregationJob.instrument_id == instrument,
-                ChartAggregationJob.error.is_not(None))):
-            aggregate_job.next_at = now
-            aggregate_job.error = None
-            aggregate_job.attempts = 0
-    plan.updated_at=now
+    else:
+        plan.status = 'pending'
+        # The planner reuses committed coverage. Clear old reservations rather
+        # than revive years of legacy slices at once.
+        for job in jobs:
+            if job.status == 'cancelled' or action == 'retry' and job.status == 'failed':
+                job.status = 'superseded'
+                job.lease_until = None
+        if action == 'retry':
+            for job in db.scalars(select(ChartAggregationJob).where(
+                    ChartAggregationJob.instrument_id == instrument,
+                    ChartAggregationJob.error.is_not(None))):
+                job.next_at = now
+                job.error = None
+                job.attempts = 0
+    plan.updated_at = now
     db.flush()
     return plan

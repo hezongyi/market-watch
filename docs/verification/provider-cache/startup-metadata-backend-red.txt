@@ -1,0 +1,38 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_initial_workspace_metadata_is_ephemeral_and_never_fetches_candles ____
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7febca5f8c50>
+
+    def test_initial_workspace_metadata_is_ephemeral_and_never_fetches_candles(database, monkeypatch):
+        from alerts import provider_chart
+        expected = {'id': 'BTCUSDT', 'source': 'binance', 'calendar': 'utc0', 'precision': 2,
+                    'basis': 'last', 'name': 'BTC/USDT', 'series_kind': 'provider'}
+        monkeypatch.setattr(provider_chart, 'metadata', lambda ident: expected if ident == 'BTCUSDT' else None)
+        monkeypatch.setattr(provider_chart, 'native_page', lambda *a, **kw: (_ for _ in ()).throw(
+            AssertionError('startup metadata cannot acquire candles')))
+        with database.begin() as db:
+            row = AdvancedWorkspace(name='startup', document={'symbol': 'MWP:BTCUSDT',
+                                    'state': {'opaque': 'preserved'}})
+            db.add(row)
+            db.flush()
+            ident = row.id
+        api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+        try:
+            with TestClient(api_module.app) as client:
+                loaded = client.get('/api/advanced-charts/workspaces?limit=1').json()[0]
+>               assert loaded['initial_symbol'] == {'ticker': 'MWP:BTCUSDT', 'metadata': expected}
+                       ^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'initial_symbol'
+
+backend/tests/test_provider_workspace.py:53: KeyError
+=============================== warnings summary ===============================
+../market-watch/.venv/lib/python3.11/site-packages/fastapi/testclient.py:1
+  /home/quant/repos/market-watch/.venv/lib/python3.11/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_workspace.py::test_initial_workspace_metadata_is_ephemeral_and_never_fetches_candles
+1 failed, 1 deselected, 1 warning in 0.14s

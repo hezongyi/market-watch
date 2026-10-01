@@ -129,7 +129,11 @@ def stored_coverage(db, instrument, left, right):
         )
     ):
         coverage.append({"start": span.start, "end": span.end})
-    return coverage
+    # Live adapters may query from a sub-minute wall-clock instant. Only full
+    # M1 intervals certify maintenance; never leak fractional download cursors.
+    return [{'start': (s['start'] + 59999) // 60000 * 60000,
+             'end': s['end'] // 60000 * 60000} for s in coverage
+            if (s['start'] + 59999) // 60000 * 60000 < s['end'] // 60000 * 60000]
 
 
 def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False):
@@ -163,7 +167,15 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
         )
     # Commit coverage in the same transaction as bars; source empty observations are
     # not a claim of holiday or of the provider's oldest historical boundary.
-    for span in payload.get("coverage", []):
+    spans = payload.get('coverage', [])
+    if instrument.source != 'oanda':
+        # A successful exchange query with missing minutes cannot certify a
+        # continuous range. Persist observed minute spans, merged below.
+        from .managed_dataset import _merged
+        spans = [{'start': a, 'end': b} for a,b in _merged([
+            {'start': int(r['timestamp']), 'end': int(r['timestamp']) + 60000}
+            for r in payload['rows']])]
+    for span in spans:
         end = min(span["end"], (received_at - 5000) // 60000 * 60000)
         if end <= span["start"]:
             continue
@@ -296,43 +308,39 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
 
 
 
-def enqueue_repair(db, instrument, left, right):
+def enqueue_repair(db, instrument, left, right, *, recent_end=None):
+    """Only the last 24h of a gap is realtime repair; older work stays history."""
+    from .market_data import missing_intervals
+
     if left >= right:
         return
-    t = instant(left)
-    while ms(t) < right:
-        if scheduled_open(
-            t,
-            Calendar(instrument.calendar),
-            gold=instrument.id == "XAUUSD",
-            closures=closures_from(instrument.calendar_profile),
-        ):
-            break
-        t += timedelta(minutes=1)
-    else:
-        return
-    existing = db.scalar(
-        select(ImportJob)
-        .where(
-            ImportJob.instrument_id == instrument.id,
-            ImportJob.start <= left,
-            ImportJob.end >= right,
-            ImportJob.cursor <= left,
-            ImportJob.status.in_(["pending", "running", "failed"]),
-        )
-        .limit(1)
-    )
-    if existing:
-        existing.priority = 0
-        return
-    db.add(ImportJob(instrument_id=instrument.id, start=left, end=right, cursor=left, priority=0))
-    db.add(
-        Audit(
-            kind="market_recovery_queued",
-            details={"instrument": instrument.id, "start": left, "end": right},
-        )
-    )
-    db.flush()
+    recent_end = recent_end if recent_end is not None else (now_ms() - 5000) // 60000 * 60000
+    recent_start = recent_end - 24 * 60 * 60000
+    calendar = Calendar(instrument.calendar)
+    closures = closures_from(instrument.calendar_profile)
+    for start, end, priority in ((left, min(right, recent_start), 50),
+                                  (max(left, recent_start), right, 0)):
+        if end <= start:
+            continue
+        from .chart_history_plan import bucket_has_trading
+        if not bucket_has_trading(instant(start), instant(end), calendar,
+                                  instrument.id == 'XAUUSD', closures):
+            continue
+        # A history reservation must never block a separate recent repair or
+        # be promoted wholesale into the realtime executor.
+        jobs = list(db.scalars(select(ImportJob).where(
+            ImportJob.instrument_id == instrument.id, ImportJob.priority == priority,
+            ImportJob.cursor < end, ImportJob.end > start,
+            ImportJob.status.in_(['pending', 'running', 'failed']))))
+        reserved = stored_coverage(db, instrument, start, end) + [
+            {'start': j.cursor, 'end': j.end} for j in jobs]
+        for a, b in missing_intervals(reserved, start, end):
+            # Bound each lease and writer lock, including recovery after days offline.
+            for cursor in range(a, b, 120 * 60000):
+                stop = min(b, cursor + 120 * 60000)
+                db.add(ImportJob(instrument_id=instrument.id, start=cursor,
+                    end=stop, cursor=cursor, priority=priority))
+        db.flush()
 
 
 def queue_recovery(db, instrument, payload, received_at=None):
@@ -368,7 +376,7 @@ def queue_recovery(db, instrument, payload, received_at=None):
         and previous_end < left
         and not covers_interval(coverage, previous_end, left)
     ):
-        enqueue_repair(db, instrument, previous_end, left)
+        enqueue_repair(db, instrument, previous_end, left, recent_end=cutoff)
     stored = db.scalars(
         select(Bar.start).where(
             Bar.instrument_id == instrument.id,
@@ -381,7 +389,7 @@ def queue_recovery(db, instrument, payload, received_at=None):
     cursor = left
     for at in sorted(set(stored) | {t for t in incoming if left <= t < right}) + [right]:
         if cursor < at and not covers_interval(coverage, cursor, at):
-            enqueue_repair(db, instrument, cursor, at)
+            enqueue_repair(db, instrument, cursor, at, recent_end=cutoff)
         cursor = at + 60000
 
 
@@ -449,7 +457,9 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
     with transaction() as db:
         viewers = set()
         if include_viewers:
-            from .storage import ChartViewportDemand, MarketDemand
+            from .storage import ChartHistoryPlan, ChartViewportDemand, MarketDemand
+            viewers.update(db.scalars(select(ChartHistoryPlan.instrument_id).where(
+                ChartHistoryPlan.realtime_enabled.is_(True))))
             viewers.update(db.scalars(select(MarketDemand.instrument_id).where(
                 MarketDemand.expires > now_ms())))
             viewers.update(db.scalars(select(ChartViewportDemand.instrument_id).where(
@@ -525,7 +535,7 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
                     inst.last_received = now_ms()
                     inst.quality = "receiving" if latest and now_ms() - latest < 180000 else "stale"
                     inst.error = None
-        except (RuntimeError, ValueError, subprocess.TimeoutExpired, OSError, httpx.HTTPError) as e:
+        except (RuntimeError, ValueError, TimeoutError, subprocess.TimeoutExpired, OSError, httpx.HTTPError) as e:
             with transaction() as db:
                 inst = db.get(Instrument, instrument_id)
                 inst.quality = "error"
@@ -550,11 +560,15 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
         db.add(Audit(kind="market_heartbeat", details={}))
 
 
-def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False):
+def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
+                realtime_only=False, history_only=False):
     """One daily slice per iteration. Durable cursor and lease permit safe restart."""
     with transaction() as db:
         from .storage import ChartAggregationJob
 
+        if history_only and db.scalar(select(ImportJob.id).where(
+                ImportJob.priority == 0, ImportJob.status.in_(['pending', 'running'])).limit(1)):
+            return False
         # One history downloader feeds the independent aggregation executor.
         # Bound ready CPU work without throttling live M1 ingestion. Failed
         # slices retain their durable retry state but must not exhaust capacity
@@ -581,6 +595,8 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False):
                     select(Instrument.id).where(Instrument.source.not_in(cooling_sources))
                 ),
                 ImportJob.next_at <= now_ms(),
+                ImportJob.priority == 0 if realtime_only else True,
+                ImportJob.priority > 0 if history_only else True,
                 ImportJob.priority >= 100 if chart_only else ImportJob.priority < 100,
                 or_(
                     ImportJob.status == "pending",
@@ -612,8 +628,8 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False):
             job.id,
             db.get(Instrument, job.instrument_id).symbol,
             job.cursor,
-            min(job.end, job.cursor + 4000 * 60000)
-            if chart_only
+            min(job.end, job.cursor + (120 if realtime_only else 600) * 60000)
+            if chart_only or realtime_only or history_only
             else min(job.end, ((job.cursor // 86400_000) + 1) * 86400_000),
         )
     started = time.monotonic()
@@ -705,7 +721,7 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False):
                 )
             ).all():
                 evaluate_watch(db, watch_id)
-    except (RuntimeError, ValueError, subprocess.TimeoutExpired, OSError, httpx.HTTPError) as e:
+    except (RuntimeError, ValueError, TimeoutError, subprocess.TimeoutExpired, OSError, httpx.HTTPError) as e:
         with transaction() as db:
             # Planner/control paths lock the instrument before updating jobs.
             # Match that order to avoid a job->instrument / instrument->job cycle.

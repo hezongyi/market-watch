@@ -8,6 +8,38 @@ from alerts.storage import Bar, Instrument, Preference, now_ms
 from sqlalchemy import select
 
 
+@pytest.mark.parametrize(
+    ("override", "market", "expected"),
+    [
+        ("", "http://common-proxy:7890", "http://common-proxy:7890"),
+        ("http://binance-proxy:7890", "http://common-proxy:7890", "http://binance-proxy:7890"),
+        ("", "", None),
+    ],
+)
+def test_binance_proxy_applies_to_maintenance_and_native_charts(monkeypatch, override, market, expected):
+    from alerts import provider_chart
+    from alerts.config import settings
+
+    monkeypatch.setattr(settings, "binance_proxy", override)
+    monkeypatch.setattr(settings, "market_proxy", market)
+    original_client = httpx.Client
+    calls = []
+
+    def make_client(**kwargs):
+        calls.append(kwargs)
+        return original_client(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=[])))
+
+    provider_chart.close_clients()
+    monkeypatch.setattr(httpx, "Client", make_client)
+    try:
+        fetch_binance(mode="quote")
+        provider_chart.pooled_client("binance")
+        assert len(calls) == 2
+        assert all(call["proxy"] == expected and call["trust_env"] is False for call in calls)
+    finally:
+        provider_chart.close_clients()
+
+
 def test_binance_pagination_preserves_prices_and_bounds():
     calls = []
     start = 1_800_000_000_000

@@ -1,0 +1,368 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend/alerts/api.py:57:5
+   |
+55 |       from .provider_service import start, stop
+56 |       start()
+57 | /     from .provider_transport import start as start_transport
+58 | |     from .provider_cache import interactive_busy
+   | |________________________________________________^
+59 |       start_transport(interactive_busy)
+60 |       try:
+   |
+help: Organize imports
+   |
+56 |     start()
+57 +     from .provider_cache import interactive_busy
+58 |     from .provider_transport import start as start_transport
+   -     from .provider_cache import interactive_busy
+59 |     start_transport(interactive_busy)
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/alerts/chart_data.py:105:5
+    |
+103 |               groups.setdefault((left, right), []).append(row)
+104 |       closures = closures_from(instrument.calendar_profile)
+105 | /     from .market import stored_coverage
+106 | |     from .coverage import covers_interval
+    | |_________________________________________^
+107 |       coverage = stored_coverage(db, instrument, rows[0].start, rows[-1].end) if rows else []
+108 |       result = []
+    |
+help: Organize imports
+    |
+104 |     closures = closures_from(instrument.calendar_profile)
+105 +     from .coverage import covers_interval
+106 |     from .market import stored_coverage
+    -     from .coverage import covers_interval
+107 |     coverage = stored_coverage(db, instrument, rows[0].start, rows[-1].end) if rows else []
+    |
+
+F401 [*] `sqlalchemy.or_` imported but unused
+ --> backend/alerts/chart_history_plan.py:4:24
+  |
+2 | from datetime import timedelta
+3 |
+4 | from sqlalchemy import or_, select
+  |                        ^^^
+5 |
+6 | from .calendar_profile import closures_from
+  |
+help: Remove unused import: `sqlalchemy.or_`
+  |
+3 |
+  - from sqlalchemy import or_, select
+4 + from sqlalchemy import select
+5 |
+  |
+
+F401 [*] `.coverage.covers_interval` imported but unused
+   --> backend/alerts/chart_history_plan.py:103:27
+    |
+101 | def advance_plan(db, plan, now):
+102 |     """Newest missing segment first, one bounded segment in flight per instrument."""
+103 |     from .coverage import covers_interval
+    |                           ^^^^^^^^^^^^^^^
+104 |     from .market import stored_coverage
+105 |     from .market_data import missing_intervals
+    |
+help: Remove unused import: `.coverage.covers_interval`
+    |
+102 |     """Newest missing segment first, one bounded segment in flight per instrument."""
+    -     from .coverage import covers_interval
+103 |     from .market import stored_coverage
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/alerts/chart_history_plan.py:162:5
+    |
+161 |   def boundary_context(inst, start):
+162 | /     import hashlib
+163 | |     from .config import settings
+    | |________________________________^
+164 |
+165 |       namespace = hashlib.sha256(settings.oanda_account_id.encode()).hexdigest() if inst.source == 'oanda' else inst.source
+    |
+help: Organize imports
+    |
+162 |     import hashlib
+163 +
+164 |     from .config import settings
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/alerts/chart_history_plan.py:192:5
+    |
+190 |       they cannot certify pre-listing empty OANDA responses as valid history.
+191 |       """
+192 | /     import httpx
+193 | |     from .provider_chart import earliest_m1
+194 | |     from .storage import ImportJob, Preference, now_ms, transaction
+    | |___________________________________________________________________^
+195 |
+196 |       key = 'chart_history_boundary:' + instrument
+    |
+help: Organize imports
+    |
+192 |     import httpx
+193 +
+194 |     from .provider_chart import earliest_m1
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend/alerts/chart_history_worker.py:3:1
+   |
+ 1 |   """Dedicated low-concurrency chart import worker; no notification sending."""
+ 2 |
+ 3 | / import logging
+ 4 | | import time
+ 5 | | from contextlib import ExitStack
+ 6 | |
+ 7 | | import httpx
+ 8 | |
+ 9 | | from .chart_history_plan import advance_pending_plans
+10 | | from .config import settings
+11 | | from .market import fetch_source, import_once
+12 | | from .market_data import refresh_catalog
+13 | | from .providers import fetch_binance, fetch_oanda
+14 | | from .market_resources import lane
+   | |__________________________________^
+help: Organize imports
+   |
+12 | from .market_data import refresh_catalog
+13 + from .market_resources import lane
+14 | from .providers import fetch_binance, fetch_oanda
+   - from .market_resources import lane
+15 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/alerts/market_data.py:698:9
+    |
+696 |       @r.post("/maintenance")
+697 |       def maintenance(body: MaintenanceQuery):
+698 | /         from .managed_dataset import date_start, join
+699 | |         from .chart_history_plan import plan_status, record_boundary
+700 | |         from .provider_chart import earliest_m1
+701 | |         import httpx
+    | |____________________^
+702 |
+703 |           with transaction() as db:
+    |
+help: Organize imports
+    |
+697 |     def maintenance(body: MaintenanceQuery):
+    -         from .managed_dataset import date_start, join
+698 +         import httpx
+699 +
+700 |         from .chart_history_plan import plan_status, record_boundary
+701 +         from .managed_dataset import date_start, join
+702 |         from .provider_chart import earliest_m1
+    -         import httpx
+703 |
+    |
+
+F401 [*] `.chart_history_plan.history_start` imported but unused
+   --> backend/alerts/market_data.py:756:54
+    |
+754 |     @r.post("/history/demand")
+755 |     def viewport_demand(body: ViewportDemandQuery):
+756 |         from .chart_history_plan import history_end, history_start, update_demand
+    |                                                      ^^^^^^^^^^^^^
+757 |         from .storage import ChartAggregationJob
+    |
+help: Remove unused import: `.chart_history_plan.history_start`
+    |
+755 |     def viewport_demand(body: ViewportDemandQuery):
+    -         from .chart_history_plan import history_end, history_start, update_demand
+756 +         from .chart_history_plan import history_end, update_demand
+757 |         from .storage import ChartAggregationJob
+    |
+
+F401 [*] `.provider_transport.close_clients` imported but unused
+  --> backend/alerts/provider_chart.py:20:43
+   |
+18 | from .config import settings
+19 | from .domain import Calendar
+20 | from .provider_transport import activity, close_clients, discard_client, pooled_client
+   |                                           ^^^^^^^^^^^^^
+21 | from .storage import Instrument, MarketCatalog, instant, ms, now_ms, transaction
+   |
+help: Remove unused import: `.provider_transport.close_clients`
+   |
+19 | from .domain import Calendar
+   - from .provider_transport import activity, close_clients, discard_client, pooled_client
+20 + from .provider_transport import activity, discard_client, pooled_client
+21 | from .storage import Instrument, MarketCatalog, instant, ms, now_ms, transaction
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> backend/alerts/providers.py:3:1
+  |
+1 |   """Public market-only Binance adapter. Quotes and historical candles use one market."""
+2 |
+3 | / from datetime import datetime
+4 | |
+5 | | import httpx
+6 | |
+7 | | from .config import settings
+8 | | from .storage import now_ms
+9 | | from .market_resources import request_slot
+  | |__________________________________________^
+help: Organize imports
+   |
+7  | from .config import settings
+8  + from .market_resources import request_slot
+9  | from .storage import now_ms
+   - from .market_resources import request_slot
+10 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend/alerts/realtime_worker.py:6:1
+   |
+ 4 |   ordinary market-worker in deployments opting into chart demand maintenance.
+ 5 |   """
+ 6 | / import logging
+ 7 | | import time
+ 8 | | from contextlib import ExitStack
+ 9 | |
+10 | | import httpx
+11 | |
+12 | | from .config import settings
+13 | | from .market import fetch_source, import_once, once
+14 | | from .providers import fetch_binance, fetch_oanda
+15 | | from .market_resources import lane
+   | |__________________________________^
+help: Organize imports
+   |
+13 | from .market import fetch_source, import_once, once
+14 + from .market_resources import lane
+15 | from .providers import fetch_binance, fetch_oanda
+   - from .market_resources import lane
+16 |
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_managed_migration.py:12:52
+   |
+10 |     path=Path(__file__).resolve().parents[2]/'migrations/versions/l13_managed_publication.py'
+11 |     spec=importlib.util.spec_from_file_location('managed_migration',path)
+12 |     migration=importlib.util.module_from_spec(spec);spec.loader.exec_module(migration)
+   |                                                    ^
+13 |     engine=create_engine('sqlite://')
+14 |     with engine.begin() as conn:
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/tests/test_postgres.py:198:5
+    |
+197 |   def test_postgres_weekly_demand_dedup_and_concurrent_claim(monkeypatch):
+198 | /     import uuid
+199 | |     from threading import Event
+200 | |     from alerts import market_data
+201 | |     from alerts.storage import WeeklyHistoryRequest
+    | |___________________________________________________^
+202 |
+203 |       engine = create_engine(URL, pool_size=2, max_overflow=0)
+    |
+help: Organize imports
+    |
+199 |     from threading import Event
+200 +
+201 |     from alerts import market_data
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/tests/test_postgres.py:254:5
+    |
+252 |   def test_postgres_weekly_migration_roundtrip():
+253 |       """Exercise actual Alembic scripts, without bootstrap creating the new table."""
+254 | /     import subprocess
+255 | |     import uuid
+256 | |     from pathlib import Path
+257 | |     from sqlalchemy import inspect
+258 | |     from sqlalchemy.engine import make_url
+    | |__________________________________________^
+259 |
+260 |       engine = create_engine(URL, pool_size=1, max_overflow=0)
+    |
+help: Organize imports
+    |
+256 |     from pathlib import Path
+257 +
+258 |     from sqlalchemy import inspect
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/tests/test_provider_chart.py:151:5
+    |
+150 |   def test_request_slot_wait_counts_against_actual_http_timeout(monkeypatch):
+151 | /     from contextlib import contextmanager
+152 | |     from alerts import market_resources
+    | |_______________________________________^
+153 |
+154 |       clock = [0.0]
+    |
+help: Organize imports
+    |
+151 |     from contextlib import contextmanager
+152 +
+153 |     from alerts import market_resources
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/tests/test_provider_chart.py:175:5
+    |
+174 |   def test_provider_api_deadline_includes_running_http_without_cancelling_shared_page(database, monkeypatch):
+175 | /     import threading
+176 | |     import time
+177 | |     from alerts import provider_cache
+    | |_____________________________________^
+178 |
+179 |       completed = threading.Event()
+    |
+help: Organize imports
+    |
+176 |     import time
+177 +
+178 |     from alerts import provider_cache
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> backend/tests/test_provider_transport.py:1:1
+  |
+1 | / import httpx
+2 | |
+3 | | from alerts import provider_transport as transport
+  | |__________________________________________________^
+help: Organize imports
+  |
+1 | import httpx
+  -
+2 | from alerts import provider_transport as transport
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend/tests/test_provider_transport.py:82:5
+   |
+81 |   def test_repeated_real_connect_tunnel_failures_do_not_exhaust_the_running_pool(monkeypatch):
+82 | /     import socket
+83 | |     import threading
+84 | |     import time
+85 | |     import pytest
+86 | |     from alerts import provider_chart
+87 | |     from alerts.config import settings
+   | |______________________________________^
+88 |
+89 |       proxy = socket.socket()
+   |
+help: Organize imports
+   |
+84 |     import time
+85 +
+86 |     import pytest
+   |
+
+Found 19 errors.
+[*] 18 fixable with the `--fix` option.

@@ -13,12 +13,96 @@ function captureChartViewports(widget) {
     };
   });
 }
+const chartSnapshotQueues = new WeakMap();
+function captureChartLayout(widget) {
+  const pending = (chartSnapshotQueues.get(widget) || Promise.resolve()).catch(() => {})
+    .then(() => captureChartLayoutNow(widget));
+  chartSnapshotQueues.set(widget, pending);
+  const clear = () => { if (chartSnapshotQueues.get(widget) === pending) chartSnapshotQueues.delete(widget); };
+  pending.then(clear, clear);
+  return pending;
+}
+async function captureChartLayoutNow(widget) {
+  const date = widget.dateRangeSync(), time = widget.timeSync();
+  const desired = {date: date.value(), time: time.value()};
+  const viewports = captureChartViewports(widget);
+  // Native startup synchronization can enqueue range jumps before peer tick
+  // marks exist. Capture a layout through the public API with sync deferred;
+  // store the user's choices in our own metadata and restore them after data.
+  if (desired.date && widget.chartsCount() > 1) {
+    date.setValue(false);
+    time.setValue(false);
+  }
+  try {
+    const state = await new Promise((resolve, reject) => {
+      try { widget.save(resolve); } catch(error) { reject(error); }
+    });
+    return {...state, _mwViewports: viewports, _mwSync: desired};
+  } finally {
+    if (time.value() !== desired.time) time.setValue(desired.time);
+    if (date.value() !== desired.date) date.setValue(desired.date);
+  }
+}
+
+function restoreChartSynchronization(widget, desired) {
+  if (typeof desired?.time === 'boolean' && widget.timeSync().value() !== desired.time)
+    widget.timeSync().setValue(desired.time);
+  if (typeof desired?.date === 'boolean' && widget.dateRangeSync().value() !== desired.date)
+    widget.dateRangeSync().setValue(desired.date);
+}
+
+function deferLegacyChartSynchronization(widget) {
+  const date = widget.dateRangeSync(), time = widget.timeSync();
+  const desired = {date: date.value(), time: time.value()};
+  // The first getBars call is early enough to avoid native startup range
+  // propagation and late enough for these public watched values to exist.
+  // Older opaque layouts cannot be rewritten into our new snapshot format.
+  if (desired.date && widget.chartsCount() > 1) {
+    date.setValue(false);
+    time.setValue(false);
+  }
+  return desired;
+}
+
 async function restoreChartViewports(widget, viewports, isCurrent) {
   if (!Array.isArray(viewports) || !isCurrent()) return;
   const sync = widget.dateRangeSync(),
-    desired = sync.value();
-  sync.setValue(false);
+    desired = sync.value(),
+    timeSync = widget.timeSync(),
+    desiredTime = timeSync.value();
+  const matches = (state, chart) => state &&
+    state.symbol === chart.symbol() && state.resolution === chart.resolution() &&
+    Number.isFinite(state.range?.from) && Number.isFinite(state.range?.to) &&
+    state.range.to > state.range.from && state.spacing > 0 &&
+    Number.isFinite(state.spacing) && Number.isFinite(state.offset);
   try {
+    // Let the saved native synchronization finish loading its peers before
+    // changing either toggle. Switching it off while a peer's initial range
+    // call is pending can leave a rejected native deferred without a handler.
+    await Promise.all(Array.from({ length: widget.chartsCount() }, (_, index) =>
+      new Promise(resolve => widget.chart(index).dataReady(resolve))));
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    if (!isCurrent()) return;
+    if (desired && widget.chartsCount() > 1 && viewports.length >= widget.chartsCount() &&
+        viewports.slice(0, widget.chartsCount()).every((state, index) => matches(state, widget.chart(index)))) {
+      // A date-synchronized layout has one range authority. Restore that
+      // chart and let native synchronization move its peers; independent
+      // per-pane mutations interrupt native pending range operations.
+      const chart = widget.activeChart(), state = viewports[widget.activeChartIndex()];
+      if (state.offset < 0) {
+        await chart.setVisibleRange(state.range, { rejectByTimeout: 30000 });
+      } else {
+        // A latest viewport is geometry relative to the current last bar.
+        // Converting its future margin to dates needlessly starts native
+        // gotoTimeRange operations on every synchronized peer during reopen.
+        const scale = chart.getTimeScale();
+        if (Math.abs(scale.barSpacing() - state.spacing) > 1e-6) scale.setBarSpacing(state.spacing);
+        if (Math.abs(scale.rightOffset() - state.offset) > 1e-6) scale.setRightOffset(state.offset);
+      }
+      return;
+    }
+    timeSync.setValue(false);
+    sync.setValue(false);
     for (
       let index = 0;
       index < Math.min(viewports.length, widget.chartsCount());
@@ -26,18 +110,7 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
     ) {
       const state = viewports[index],
         chart = widget.chart(index);
-      if (
-        !state ||
-        state.symbol !== chart.symbol() ||
-        state.resolution !== chart.resolution() ||
-        !Number.isFinite(state.range?.from) ||
-        !Number.isFinite(state.range?.to) ||
-        !(state.range.to > state.range.from) ||
-        !(state.spacing > 0) ||
-        !Number.isFinite(state.spacing) ||
-        !Number.isFinite(state.offset)
-      )
-        continue;
+      if (!matches(state, chart)) continue;
       await new Promise((resolve) => chart.dataReady(resolve));
       // Leave native data-ready dispatch before mutating its scale or sync state.
       await new Promise((resolve) => setTimeout(resolve, 0));
@@ -71,7 +144,10 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
       if (!isCurrent()) return;
     }
   } finally {
-    if (isCurrent()) sync.setValue(desired);
+    if (isCurrent()) {
+      if (timeSync.value() !== desiredTime) timeSync.setValue(desiredTime);
+      if (sync.value() !== desired) sync.setValue(desired);
+    }
   }
 }
 
@@ -118,11 +194,14 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
     if (
       disposed ||
       applying ||
-      blocked() ||
       !range.value() ||
       widget.activeChart() !== chart
     )
       return;
+    if (blocked()) {
+      timer = setTimeout(() => align(widget.activeChart()), 150);
+      return;
+    }
     const target = chart.getVisibleRange();
     if (!(target?.to > target?.from)) return;
     const peers = [...bindings.keys()].filter((peer) => {
@@ -132,7 +211,8 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
         minutes > 0 &&
         Number.isFinite(minutes) &&
         peer.dataReady() &&
-        Math.abs(peer.getVisibleRange().to - target.to) > minutes * 60
+        (Math.abs(peer.getVisibleRange().to - target.to) > minutes * 60 ||
+          Math.abs(peer.getVisibleRange().from - target.from) > minutes * 60)
       );
     });
     for (const peer of bindings.keys()) {
@@ -146,20 +226,34 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
     set(range, false);
     set(time, false);
     try {
-      for (const peer of peers) {
-        if (disposed || current !== generation || blocked()) break;
+      // Start independent session lookups together; settle errors immediately
+      // so cancellation cannot leave an unhandled rejected lookup behind.
+      const prepared = peers.map(peer => Promise.resolve().then(() => prepare(peer, target))
+        .then(value => ({value}), error => ({error})));
+      await Promise.all(peers.map(async (peer,index) => {
+        if (disposed || current !== generation || blocked()) return;
         try {
-          const adjusted = await prepare(peer, target);
-          if (disposed || current !== generation || blocked()) break;
+          const result = await prepared[index];
+          if (result.error) throw result.error;
+          const adjusted = result.value;
+          if (disposed || current !== generation || blocked()) return;
           await peer.setVisibleRange({from: adjusted.from, to: adjusted.to}, { rejectByTimeout: 20000 });
           if (!disposed && current === generation) notice(peer, adjusted.notice || "");
         } catch (error) {
           if (!disposed) onError(error);
         }
-      }
+      }));
     } finally {
       if (!disposed) restore();
       applying = false;
+      // A wheel/drag can arrive while a peer's public range call is pending.
+      // Reconcile the latest active viewport instead of dropping that intent.
+      const latest = !disposed && widget.activeChart() === chart && chart.getVisibleRange();
+      if (!disposed && desiredRange && latest &&
+          (latest.from !== target.from || latest.to !== target.to)) {
+        clearTimeout(timer);
+        timer = setTimeout(() => align(widget.activeChart()), 150);
+      }
     }
   }
   function refresh() {
@@ -183,7 +277,7 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
       chart.onSymbolChanged().subscribe(null, changed);
       chart.onIntervalChanged().subscribe(null, changed);
       const callback = () => {
-        if (disposed || applying || blocked() || !range.value()) return;
+        if (disposed || applying || !range.value()) return;
         clearTimeout(timer);
         timer = setTimeout(() => align(widget.activeChart()), 150);
       };

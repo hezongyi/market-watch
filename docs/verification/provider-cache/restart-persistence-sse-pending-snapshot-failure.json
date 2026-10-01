@@ -1,0 +1,97 @@
+{
+  "passed": false,
+  "registrations": [
+    {
+      "phase": "initial",
+      "status": 200,
+      "body": {
+        "client": "ed39b493-5b6a-4b43-9338-c6f9df43000c",
+        "listener": "aba92cca-8189-4dbe-95d0-0751507f2245",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790854800000,
+        "revision": 17,
+        "observed_at": 1790854960299,
+        "indicators": []
+      }
+    },
+    {
+      "phase": "initial",
+      "status": 200,
+      "body": {
+        "client": "ed39b493-5b6a-4b43-9338-c6f9df43000c",
+        "listener": "aba92cca-8189-4dbe-95d0-0751507f2245",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790854800000,
+        "revision": 17,
+        "observed_at": 1790854960299,
+        "indicators": []
+      }
+    },
+    {
+      "phase": "restart",
+      "status": 200,
+      "body": {
+        "client": "ed39b493-5b6a-4b43-9338-c6f9df43000c",
+        "listener": "aba92cca-8189-4dbe-95d0-0751507f2245",
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "cursor": 1790854800000,
+        "revision": 18,
+        "observed_at": 1790854980984,
+        "indicators": []
+      }
+    }
+  ],
+  "errors": [],
+  "before": {
+    "count": 200,
+    "first": 1790751600000,
+    "last": 1790811300000,
+    "as_of": 1790854980984
+  },
+  "view_before": {
+    "range": {
+      "from": 1790802000,
+      "to": 1790857800
+    },
+    "spacing": 6
+  },
+  "restart_ms": 13469,
+  "persisted_request_ms": 70,
+  "resumed_ms": 29227,
+  "events": [
+    {
+      "type": "bars",
+      "cursor": 1790854800000,
+      "revision": 18,
+      "as_of": 1790854980984,
+      "count": 1
+    },
+    {
+      "type": "bars",
+      "cursor": 1790854800000,
+      "revision": 18,
+      "as_of": 1790854980984,
+      "count": 1
+    },
+    {
+      "type": "bars",
+      "cursor": 1790854800000,
+      "revision": 19,
+      "as_of": 1790855010891,
+      "count": 1
+    }
+  ],
+  "view_after": {
+    "range": {
+      "from": 1790802000,
+      "to": 1790857800
+    },
+    "spacing": 6,
+    "ready": true,
+    "pending": 1
+  },
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n"
+}

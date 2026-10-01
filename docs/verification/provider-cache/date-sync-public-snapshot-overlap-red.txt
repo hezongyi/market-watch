@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: overlapping viewport/native saves must not persist a temporary disabled sync state
+    at /home/quant/repos/market-watch-advanced/web/tests/advanced-sync-snapshot.cjs:25:9 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

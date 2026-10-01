@@ -102,6 +102,9 @@ def _chart_rows(db, instrument, frame, before, limit, now):
         if ms(left) < before:
             groups.setdefault((left, right), []).append(row)
     closures = closures_from(instrument.calendar_profile)
+    from .coverage import covers_interval
+    from .market import stored_coverage
+    coverage = stored_coverage(db, instrument, rows[0].start, rows[-1].end) if rows else []
     result = []
     for (left, right), members in sorted(groups.items())[-limit:]:
         if frame == "M30":
@@ -133,13 +136,17 @@ def _chart_rows(db, instrument, frame, before, limit, now):
             expected = expected_days(left, right, calendar, instrument.id == "XAUUSD", closures)
             complete = bool(expected) and expected <= {r.start for r in members}
             complete = complete and all(r.complete for r in members)
-            if instrument.id == "XAUUSD":
+            if instrument.id == "XAUUSD" and not covers_interval(coverage, ms(left), ms(right)):
                 # Gold's daily maintenance is date-generated, not an eternal rule.
                 # Every expected D1 needs explicit coverage of its NY17 maintenance start.
                 maintenance = [c for c in closures if c.kind == "maintenance"]
                 complete = complete and all(
                     any(ms(c.start) <= day < ms(c.end) for c in maintenance) for day in expected
                 )
+            if covers_interval(coverage, ms(left), ms(right)):
+                # Successful coverage can contain legitimate empty sessions;
+                # all D1 observations that do exist must still be generated.
+                complete = all(r.complete for r in members)
             c = Candle(
                 left,
                 right,

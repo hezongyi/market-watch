@@ -1,0 +1,11 @@
+frame.waitForFunction: ReferenceError: ready is not defined
+    at eval (eval at predicate (eval at evaluate (:311:30)), <anonymous>:1:10)
+    at predicate (eval at evaluate (:311:30), <anonymous>:7:27)
+    at next (eval at evaluate (:311:30), <anonymous>:29:33)
+    at eval (eval at evaluate (:311:30), <anonymous>:42:13)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at getFrame (/home/quant/repos/market-watch-advanced/web/tests/advanced-roundtrip.browser.cjs:13:134)
+    at async /home/quant/repos/market-watch-advanced/web/tests/advanced-roundtrip.browser.cjs:19:49 {
+  log: []
+}

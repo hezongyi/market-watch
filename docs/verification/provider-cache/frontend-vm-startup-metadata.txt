@@ -1,0 +1,70 @@
+advanced-autosave.cjs
+Autosave preserves in-flight edits and failed-save retry state
+advanced-chart-style.cjs
+style extraction: presentation whitelist, no workspace objects, detached copy passed
+advanced-cold-pagination.cjs
+advanced-edge-sync.cjs
+Edge range synchronization: alignment, loading, user toggle and disposal passed
+advanced-history-boundaries.cjs
+Published pagination preserves latest subscription boundary and earliest revision range
+advanced-history-change-range.cjs
+Historical views ignore remote latest revisions; visible revisions and initial data still refresh
+advanced-history-dedup.cjs
+Concurrent history reads share requests, distinct periods isolate, completion and failure clear entries
+advanced-history-demand.cjs
+Viewport demand counts spacing, shares pane identity, renews, excludes W/M and disposes
+advanced-history-pagination.cjs
+Large countBack traverses published pages without truncation or duplicate bars
+advanced-history-reload.cjs
+Grouped polling recovers after failure and prevents overlapping requests
+Historical reload invalidates matching cache before resetting only matching panes
+advanced-inflight-cancellation.cjs
+Four obsolete in-flight histories release slots within 180ms; current request starts
+advanced-latest-cache.cjs
+Latest snapshot immediate reuse and asynchronous refresh passed
+advanced-layout-poll-resume.cjs
+Visible polling resumes independently of deferred historical reset
+advanced-managed.cjs
+Managed feed: consent, refusal, real geometry, published session boundary passed
+advanced-monthly-cache.cjs
+Monthly local-only history: empty, partial and multi-page cached data passed
+advanced-native-workspaces.cjs
+native workspace adapter: conflict, serialized saves and readonly passed
+advanced-navigation-page.cjs
+Historical navigation waits for target coverage and yields to cancellation
+advanced-preferences.cjs
+native adapters: queued writes, namespaces, reload, conflict and readonly passed
+advanced-prewarm-cache.cjs
+Prewarmed period pages satisfy smaller requests without network; boundaries and capacity enforced
+advanced-progressive-cache.cjs
+Progressive cache deduplicates, returns warm data, refreshes revisions and stops hidden polling
+advanced-progressive-indicators.cjs
+Progressive studies use only ready raw history; empty pages skip calculation
+advanced-provider-request-lifetime.cjs
+Provider native requests survive period switches and cancel on workspace replacement
+advanced-provider-subscriptions.cjs
+Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed
+advanced-python-indicators.cjs
+Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed
+advanced-range-sync.cjs
+Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed
+advanced-refresh-interaction.cjs
+History refresh yields to new mouse/focus/zoom intent and removes listeners
+advanced-request-cancellation.cjs
+Queued stale history and old workspace requests cancel; current viewers proceed
+advanced-series.cjs
+Series: legacy compatibility, synthetic identity, search defaults, isolated provider feed passed
+advanced-startup-metadata.cjs
+Startup metadata is consumed once, preserves series identity and does not acquire bars
+advanced-sync-snapshot.cjs
+Public snapshots defer synchronized startup while retaining user choices and vendor content
+advanced-time.cjs
+13 calendar label cases passed; intraday timestamp unchanged
+advanced-viewports.cjs
+Viewport restoration preserves preferences and checks symbol identity
+advanced-watchlists.cjs
+Watchlist restore avoids empty native collection; retry and readonly passed
+advanced-weekly-background.cjs
+Weekly preparing callback yields, releases guard, and refreshes only on explicit action
+advanced-weekly-error.cjs
+Weekly failure stays an error; explicit refresh clears cache and recovers bars

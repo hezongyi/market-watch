@@ -1,0 +1,58 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  880.6kB
+Step 1/11 : FROM node:22-bookworm-slim AS build
+ ---> 89b30bf5b6a8
+Step 2/11 : WORKDIR /web
+ ---> Using cache
+ ---> a7ede49715e0
+Step 3/11 : COPY package*.json ./
+ ---> Using cache
+ ---> bfe4ce6e3ca3
+Step 4/11 : RUN npm ci
+ ---> Using cache
+ ---> 89dd8ef1cdd8
+Step 5/11 : COPY . .
+ ---> 938a6076ae8f
+Step 6/11 : ARG VITE_ADVANCED_CHART_ORIGIN
+ ---> Running in 377528caf481
+ ---> Removed intermediate container 377528caf481
+ ---> 17b8f1c7e14e
+Step 7/11 : ENV VITE_ADVANCED_CHART_ORIGIN=${VITE_ADVANCED_CHART_ORIGIN}
+ ---> Running in 5bc11975e41f
+ ---> Removed intermediate container 5bc11975e41f
+ ---> 8ae38a33f16f
+Step 8/11 : RUN npm run build
+ ---> Running in d36326ef1f56
+
+> market-watch-web@1.2.0 build
+> tsc -b && vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 1611 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                       0.41 kB │ gzip:   0.31 kB
+dist/assets/Workspace-DlAjmeUN.css    9.11 kB │ gzip:   2.47 kB
+dist/assets/index-QKjYZYl7.css       19.39 kB │ gzip:   4.97 kB
+dist/assets/Workspace-C9ew4T8u.js   188.02 kB │ gzip:  51.15 kB
+dist/assets/index-DZUOzot7.js       521.96 kB │ gzip: 166.87 kB
+[91m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[0m✓ built in 3.61s
+ ---> Removed intermediate container d36326ef1f56
+ ---> 8561481bdac9
+Step 9/11 : FROM nginx:1.28-alpine
+ ---> 201aafcbd9cd
+Step 10/11 : COPY --from=build /web/dist /usr/share/nginx/html
+ ---> 41a264fc04d5
+Step 11/11 : COPY nginx.conf /etc/nginx/conf.d/default.conf
+ ---> 9d44ebd9a107
+Successfully built 9d44ebd9a107
+Successfully tagged market-watch-web:provider-init-diagnostic-20261001
