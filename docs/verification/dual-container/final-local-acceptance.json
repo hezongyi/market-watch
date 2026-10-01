@@ -1,0 +1,461 @@
+{
+  "accepted": true,
+  "scope": "Ubuntu local only; user revised cold first screen to majority below 3s",
+  "source_commit": "a71439b34964fea9cf825d7a6e2d412bac071fc5",
+  "release_tag": "v1.3.0",
+  "requirements": [
+    {
+      "id": "D01",
+      "requirement": "新搜索默认平台；旧工作区自建；不后台替换系列",
+      "evidence_reference": "`test_provider_workspace`两项；`advanced-series.cjs`；series身份贯穿bridge",
+      "verdict": "通过；303后端/35VM及源码—镜像—交付清单关联已核对。"
+    },
+    {
+      "id": "D02",
+      "requirement": "未维护品种平台日内/D1/W1/MN可读，不建自建任务",
+      "evidence_reference": "36项 `provider-series/native-periods-live.json`；provider API独立模型；缓存订阅驱动核对managed plans/bars/jobs",
+      "verdict": "旧实测通过；当前镜像未维护OANDA完整预热已通过"
+    },
+    {
+      "id": "D03",
+      "requirement": "平台翻页/日期跳转/快速切换/八图竞争；错误非边界",
+      "evidence_reference": "后端完整分页、exclusive to、错误回归；历史锚点预热；rapid-switch和五分钟八图结果",
+      "verdict": "通过；八图/快速切及历史锚点实测、后端完整分页回归，缓存/锚点相关代码未改，已关联最终镜像。"
+    },
+    {
+      "id": "D04",
+      "requirement": "OANDA/Binance九周期大多数冷首屏<3s；完整数据库缓存需求显示<1s",
+      "evidence_reference": "最新18项1385–2597ms、缓存199–490ms，均无新TLS；已有3769ms等失败；最新API复用等待响应头4574ms",
+      "verdict": "通过用户修订门槛；九周期18/18及部署后6/6低于3秒，PG缓存199–490ms/204–321ms；旧超时/慢样本保留，不承诺每次达标。"
+    },
+    {
+      "id": "D05",
+      "requirement": "拒绝维护不建任务、不显示未准备段",
+      "evidence_reference": "`test_viewing_unmaintained_never_creates_plan_or_task`；旧managed-browser；当前NZD_CAD有界发布复验已通过（CAD_CHF原失败保留）",
+      "verdict": "后端通过；新候选UI完整通过"
+    },
+    {
+      "id": "D06",
+      "requirement": "只提交起点，提交即持续维护，不自动前移",
+      "evidence_reference": "managed API/store；`test_api_start_only_maintenance_and_published_read_does_not_download`；browser单输入、start不变",
+      "verdict": "后端/旧UI通过；新候选UI通过"
+    },
+    {
+      "id": "D07",
+      "requirement": "关闭/退出/历史完成不停止维护；重启补缺口",
+      "evidence_reference": "persisted plan realtime_enabled；realtime worker；旧recovery-live；最新八图维护水位推进",
+      "verdict": "通过；旧真实断线修复、最新八图维护水位和发布worker重启组合核验；持久实时/修复逻辑回归及最终源码关联已核对。"
+    },
+    {
+      "id": "D08",
+      "requirement": "就绪水位推进，不追逐now；已发布图自动实时更新",
+      "evidence_reference": "`session_boundary_freezes_historical_expansion_but_latest_advances`；固定initialization_end；八图采样",
+      "verdict": "回归及当前八图通过"
+    },
+    {
+      "id": "D09",
+      "requirement": "阶段失败/重启不发布半成品；重试只补缺口",
+      "evidence_reference": "aggregation rollback、publication transaction测试；`publication-recovery-publication-cadence.json`实际故障和容器重启",
+      "verdict": "最新镜像通过：写入后聚合失败旧快照不变、重启续做无重复、发布事务回滚完整"
+    },
+    {
+      "id": "D10",
+      "requirement": "倒序分段，各周期三屏/指标先开放，不等全任务",
+      "evidence_reference": "managed_dataset/worker；`period_opens_before_full_target_when_three_screens_complete`；managed-browser",
+      "verdict": "回归/旧真实通过；新候选UI通过"
+    },
+    {
+      "id": "D11",
+      "requirement": "实际plot width/spacing；3N完整bar，形成中不计，不放大柱宽",
+      "evidence_reference": "dataset阈值逻辑、forming-prefix测试；真实948/6=474；八图spacing6",
+      "verdict": "回归/实际几何通过"
+    },
+    {
+      "id": "D12",
+      "requirement": "已补到起点的短目标可看；无完整bar/指标不足不伪造或越权补",
+      "evidence_reference": "completed-short-target、approved-empty-session、indicator历史校验",
+      "verdict": "通过；短目标、无完整bar/指标不足回归通过；空图及原生可控范围见D20。"
+    },
+    {
+      "id": "D13",
+      "requirement": "跨段高周期不完整不输出，已就绪M5不等周月",
+      "evidence_reference": "staged publication及周月聚合；short-target测试；旧managed-browser initialized=false",
+      "verdict": "回归/旧实测通过；新候选UI通过"
+    },
+    {
+      "id": "D14",
+      "requirement": "历史边界渐进；失败取消不损害旧范围/实时/柱宽位置",
+      "evidence_reference": "cancel/resume、staging revision、publication rollback测试；managed-session左界冻结；新修订视区保持",
+      "verdict": "核心回归通过；新候选UI通过"
+    },
+    {
+      "id": "D15",
+      "requirement": "NY DST、黄金休市、起点截断周月/形成中、无成交与真实边界",
+      "evidence_reference": "calendar_profile、history_plan DST双季、provider_chart标签、managed prefix/截断、legacy-boundary-live",
+      "verdict": "对应后端测试与旧真实边界通过"
+    },
+    {
+      "id": "D16",
+      "requirement": "缓存/订阅/Python/工作区/画线永久系列隔离，无复制入口",
+      "evidence_reference": "series namespace、provider API422；VM身份测试；managed drawing切换；`roundtrip-publication-cadence.json`",
+      "verdict": "最新候选跨系列画线及跨工作区隔离、保存重开、手机临时修改不写桌面工作区均通过"
+    },
+    {
+      "id": "D17",
+      "requirement": "预警/演练只用自建；平台负载下维护延迟可接受",
+      "evidence_reference": "`managed-compatibility-publication-cadence.json`真实历史预警5163ms/演练OHLC、平台422；最新八图managed最大lag91232ms",
+      "verdict": "最新镜像通过；预警样本在八图之后，不声称通知网络延迟或同步负载成绩；未发送通知"
+    },
+    {
+      "id": "D18",
+      "requirement": "历史饱和时实时/近期修复优先获额度/DB/聚合资源",
+      "evidence_reference": "market_resources独立额度、DBpool测试、aggregation backpressure、recovery-live、八图",
+      "verdict": "单元/集成及实际负载通过；没有扩池"
+    },
+    {
+      "id": "D19",
+      "requirement": "断线修复积压让位，恢复继续且不重复",
+      "evidence_reference": "crash lease、recent repairs split old gap、recovery-live、publication-recovery-live",
+      "verdict": "通过；实际缺口修复/历史让位及最新发布失败重启无重复，相关核心回归与最终源码关联已核对。"
+    },
+    {
+      "id": "D20",
+      "requirement": "绘图区无应用进度/无数据占位；原生可控范围单独核实",
+      "evidence_reference": "index只有chart/error；bridge无应用进度文字；`blank-plot-product.json/png`及`blank-plot-transient-publication-cadence.json/png`真实未维护USD_SGD拒绝维护，无测试路由/翻译注入",
+      "verdict": "空图无K线/占位文案；初始化至拒绝后23次文本采样无Loading/No data。产品已有公开custom_translate_function词条处理，未改vendor/增加新策略；100ms采样不证明每一帧，也不覆盖所有加载场景"
+    },
+    {
+      "id": "D21",
+      "requirement": "本机集成/版本/回滚/使用文档全部齐全",
+      "evidence_reference": "使用/本机回退文档已写；schema n15；包更新1.3.0本地候选，正在建立源码快照/同提交镜像",
+      "verdict": "通过本地交付；包1.3.0、附注标签v1.3.0、源码/逐服务镜像清单及使用/回退文档齐全；不合并main、不push、不操作生产。"
+    },
+    {
+      "id": "P01",
+      "requirement": "datafeed只桥接，移除×3/M1合成/业务分页/轮询预取",
+      "evidence_reference": "bridge provider路径直接countBack、from/to/firstDataRequest；后端native_page；SSE转交",
+      "verdict": "当前源码/实际请求通过；managed专用边界逻辑不混为平台策略"
+    },
+    {
+      "id": "P02",
+      "requirement": "API后单模块集中持久缓存/分页/调度，不新增Redis/微服务",
+      "evidence_reference": "provider_cache/service/chart/transport四内部模块，现有API进程；m14/n15",
+      "verdict": "当前运行架构通过"
+    },
+    {
+      "id": "P03",
+      "requirement": "OANDA≤4000/Binance≤1000单页；4500等需求完整满足",
+      "evidence_reference": "native_page适配上限；large_count后端分页测试；native countBack无倍率断言",
+      "verdict": "回归与真实矩阵通过；直接请求资源上限20000给明确错误"
+    },
+    {
+      "id": "P04",
+      "requirement": "身份含source/env/真实品种/周期/报价/日历版本；唯一桶键",
+      "evidence_reference": "cache.identity、ProviderBar主键；alias/shared slice回归",
+      "verdict": "后端回归通过"
+    },
+    {
+      "id": "P05",
+      "requirement": "覆盖不是min/max或count；缺口、休市、边界、错误区分",
+      "evidence_reference": "range_gap、disjoint_preceding、failure no coverage、coverage tests；native_page coverage",
+      "verdict": "后端回归通过"
+    },
+    {
+      "id": "P06",
+      "requirement": "前台按需立即满足；缓存命中只补尾部、不等待预热",
+      "evidence_reference": "read缺口数量及fresh_tail；首屏请求limit=countBack；预热后台独立",
+      "verdict": "当前真实矩阵和缓存显示通过"
+    },
+    {
+      "id": "P07",
+      "requirement": "待启动缺口共享/前台提升，已发单页可共享但不等余下页",
+      "evidence_reference": "dataset租约序列与重查；真实PG同范围只一次上游、短等待者独立deadline",
+      "verdict": "PG回归通过；不以数字优先级声称可抢占HTTP"
+    },
+    {
+      "id": "P08",
+      "requirement": "排队/共享/HTTP等计入8s总截止；取消仅自身等待",
+      "evidence_reference": "chart_api异步前台截止；request_slot剩余timeout；PG共享等待测试；cancelled_waiter",
+      "verdict": "回归通过，HTTP在途页可继续完成，错误不是noData"
+    },
+    {
+      "id": "P09",
+      "requirement": "bar/覆盖同短事务；网络不占DB；代际栅栏/旧观测不能回退",
+      "evidence_reference": "commit_page事务、claim/release fence；PG rollback/4000 commit；older_response complete测试",
+      "verdict": "PG及后端通过"
+    },
+    {
+      "id": "P10",
+      "requirement": "最新桶刷新短尾部、≤15s允许年龄，不用last价合成高周期",
+      "evidence_reference": "stale_latest_refresh、provider native granularity；realtime SSE driver",
+      "verdict": "通过；两源普通/Python回调实测，尾部/事件处理代码未改，最终镜像关联完成。"
+    },
+    {
+      "id": "P11",
+      "requirement": "当前周期先基本窗口，九周期两轮1000/4000及用户顺序",
+      "evidence_reference": "activate PERIODS与fixed targets测试；warm_step每次单页；prewarm证据",
+      "verdict": "通过；OANDA九周期24570ms完成，Binance九周期38660ms完成；最终镜像相关预热代码未改"
+    },
+    {
+      "id": "P12",
+      "requirement": "历史同锚点/左右实际根数，右止now、左真边界；不自然时间冒充根数",
+      "evidence_reference": "right_buffer市场休市回归；historical-prewarm-paced-cold实际20目标/共享锚点",
+      "verdict": "通过；最新后端回归及历史20目标/固定锚点实测，缓存目标/缓冲代码未改，最终镜像关联完成。"
+    },
+    {
+      "id": "P13",
+      "requirement": "有限目标不递归；活动10min/订阅60s、关闭回收，不永久维护",
+      "evidence_reference": "finite_two_rounds、renew/unsubscribe scoped、service expires/cleanup；driver关闭subscriptions0",
+      "verdict": "当前OANDA关闭回收通过"
+    },
+    {
+      "id": "P14",
+      "requirement": "每会话目标上限可配置，回收不影响其他会话/订阅",
+      "evidence_reference": "原固定16已改provider_interest_limit；新真实activate回归先红后绿",
+      "verdict": "配置已部署、新全量303项通过；最新五分钟八图通过"
+    },
+    {
+      "id": "P15",
+      "requirement": "历史让位前台/近期修复；多品种/会话批次公平、失败周期退避不堵后续",
+      "evidence_reference": "warm_step busy/backoff/next_at；pacing和shared-goals测试；market_resources",
+      "verdict": "核心回归通过；8图当前负载通过"
+    },
+    {
+      "id": "P16",
+      "requirement": "持久缓存容量/保留，清理与覆盖原子，活跃目标不能被删",
+      "evidence_reference": "cleanup whole dataset原子删除；保护focus/目标；cache_max_bars/cache_days",
+      "verdict": "回归通过；实际大容量清理负载未证明，按当前门槛不声称百万根负载成绩"
+    },
+    {
+      "id": "P17",
+      "requirement": "订阅从历史cursor衔接，重连补接、顺序推送；缺口/旧修订走公开reset",
+      "evidence_reference": "provider_service.events/registration；gap/python discontinuity测试；`restart-publication-cadence.json`及revision-startup-metadata",
+      "verdict": "通过；最新重启恢复16679ms/cache57ms；旧修订reload3764ms、视区保持、fixture恢复，源码事件处理未改"
+    },
+    {
+      "id": "P18",
+      "requirement": "新增更早预热不重载；真实旧bar改动与重复观测区别",
+      "evidence_reference": "unchanged_reobservation、old_revision；revision driver extra_history_no_reset",
+      "verdict": "当前真实修订通过"
+    },
+    {
+      "id": "P19",
+      "requirement": "同一订阅传输SSE；前端不自己定时取API",
+      "evidence_reference": "providerSubscriptions、API event stream；cache-service16秒无data请求",
+      "verdict": "通过；两源普通/Python及16秒无前端data轮询实测，SSE/前端代码未改，最终镜像关联完成。"
+    },
+    {
+      "id": "P20",
+      "requirement": "Binance默认代理；HTTP池复用/失败恢复不能扩大总并发",
+      "evidence_reference": "effective_binance_proxy；chart/realtime/history池2/1/1；transport回归；48次协议证据",
+      "verdict": "通过；默认代理、分lane池和失败恢复回归/实测，不扩大并发；外部TLS/响应长尾为已记录限制，按用户修订门槛不再阻塞交付。"
+    },
+    {
+      "id": "P21",
+      "requirement": "真实缓存/HTTP各冷暖分开，计量各层，留失败和8图/预警负载",
+      "evidence_reference": "first-screen public trace、timings_ms、48协议、16API、CPU、八图/alert evidence",
+      "verdict": "通过；分层及冷暖条件、失败/长尾和八图负载全部留证，性能按用户最新D04门槛验收。"
+    },
+    {
+      "id": "P22",
+      "requirement": "可配置默认值、短事务同步落库；不新增预测/异步写入必需项",
+      "evidence_reference": "config/env.example；1000/4000、15s、8s、600/60s、16兴趣、7天/百万根",
+      "verdict": "参数已部署且回归通过；方向预测/切回宽限/异步落库不纳入首版必需"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/verification/dual-container/eight-chart-publication-cadence.json",
+      "sha256": "018d3a0e800a33e09cb3bf76b5635c4035d7e231b7cd35f1365d7427578abfb7",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/managed-compatibility-publication-cadence.json",
+      "sha256": "e15338934ceb0359bb81448e273999f5064cb7a8e6c751a928f8aa0f0d0eb16b",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/roundtrip-publication-cadence.json",
+      "sha256": "56df0204f0dd098eca403dc0a78daf3b199be8473396bf1e393791ad39d034e5",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/publication-recovery-publication-cadence.json",
+      "sha256": "53afba946b0e349813931efe91f212ae9fa8af69d847721ecbc76b3920b06a01",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/recovery-live.json",
+      "sha256": "21fb4f37e70eb3912b2bec33fda8bf4372755e0878cfa65afefea2ed6a2ba248",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/legacy-boundary-live.json",
+      "sha256": "a6e42074d6b7949a4d25272a4558039dde1b11519dd099ea79f4b107b749bfdb",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/managed-browser-bounded-publication.json",
+      "sha256": "df12047abc386609861df37c423df745a94a9ce95bbc96c6254b698403e998ae",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/native-ui-bounded-publication.json",
+      "sha256": "b64e49f18aa51d451589d939c8d6be5da9546bf4b3c01440a77ed838b4707323",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/date-sync-bounded-publication.json",
+      "sha256": "fcb0954d003fd2c40a21b5dbc27d704b9ed55bfe1d0a198e5e39cffda62ef579",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/blank-plot-product.json",
+      "sha256": "bff851c6b99d996d44c83923d4420768925de93162f501f56a49e1dec64509cb",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/blank-plot-transient-publication-cadence.json",
+      "sha256": "453511615e2eebf3c185363721baa85b8c5b561cb0909de53795de27d928411f",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/provider-cache/restart-publication-cadence.json",
+      "sha256": "30a29ed192c7f62ca82244dcad309ed56d92234379cc89b2423604cef8961114",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/provider-cache/revision-startup-metadata.json",
+      "sha256": "39a59bb9517fab9b9cc227703669f43aba509dc978f969e6df87e28fec725966",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/provider-cache/prewarm-subscriptions-startup-metadata.json",
+      "sha256": "b567f46061831a32b8cec4c39ac1c515700ec6aeb91b66a1b430d29131842cea",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/provider-cache/binance-prewarm-startup-metadata.json",
+      "sha256": "96fd20daf7c04aa18ccaa6bbbdc62a9d4cce8cf8252e46084248276ad585cf83",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/provider-cache/historical-prewarm-paced-cold.json",
+      "sha256": "160613f7ff4b69391841c399dfc630a601537116efaa56efefdb7902fe257fc1",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/provider-cache/rapid-switch-startup-metadata.json",
+      "sha256": "5829a86875c51e30464d394811cc9633da662ea73f2659c2a41c09376866b91b",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/provider-cache/first-screen-publication-cadence-18.json",
+      "sha256": "c2eada88347e38db9dd5bb73ed9fc1a08789f8182a54a427e8e4b2ed75fa9b4a",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/provider-cache/first-screen-1.3.0-candidate.1-six.json",
+      "sha256": "7c2a78cd844c8381e1bd4e58ef7c241de5c33cd413fe9d95013ba2e98af0d25c",
+      "original_passed": true
+    },
+    {
+      "path": "docs/verification/dual-container/backend-publication-cadence-pg16.txt",
+      "sha256": "62b00a3e0ecdcc5ca5aebe0cb22640aaed6b83ebb1197d94bc2ea95c526632db",
+      "required_marker": "303 passed"
+    },
+    {
+      "path": "docs/verification/dual-container/frontend-vm-bounded-publication.txt",
+      "sha256": "6d1870aa6e67f9eaafba4f36899a6db6d97091b2541e550c5845deff71f7939d",
+      "required_marker": "VM_TESTS_PASSED 35"
+    },
+    {
+      "path": "docs/verification/dual-container/candidate-api-content-equivalence.json",
+      "sha256": "2a34a61f183c61e028fdd1b52832a333afba3e249edbdc38f896c349ea49b1be"
+    },
+    {
+      "path": "docs/verification/dual-container/candidate-static-content-equivalence.json",
+      "sha256": "4c97a03f5fda379b4fd00bc1ce6c4c79588b2da72e73564d8726845940872f61"
+    },
+    {
+      "path": "docs/verification/dual-container/publication-cadence-source-impact.json",
+      "sha256": "0339d142d9344af4f1333484d46923206e8833e02042caa60f134f1c6bea2743"
+    },
+    {
+      "path": "docs/verification/dual-container/final-performance-policy-evaluation.json",
+      "sha256": "d7ebc9b2c6e8bf2cb53967b42363a9fcdc37eec249b93fd66991227186dafe6b"
+    },
+    {
+      "path": "docs/verification/dual-container/final-runtime-configuration.json",
+      "sha256": "f0f0f18df7c1c1883ec7c514a8edf7f62d44410affad6861a36236f64e9a7bc8"
+    },
+    {
+      "path": "docs/verification/dual-container/final-known-secret-scan.json",
+      "sha256": "e8f3359f4788f8ab0b342c6d0e381d6580eda49da236a3f3f34b62ce65d61b06"
+    }
+  ],
+  "runtime": [
+    {
+      "service": "api",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "state": "running",
+      "health": "healthy",
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "realtime-worker",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "state": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "chart-history-worker",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "state": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "state": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "web",
+      "image_id": "sha256:8f2087c31b8554a352995c446a902b5dfc1d4074a64ecbfd452c4b3f85f807e0",
+      "state": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "chart-origin",
+      "image_id": "sha256:2770ede098d4b978a833e7a34e1219e0e130d788581a9e7ee91e66ba1fe150c6",
+      "state": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "tls",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "health": null,
+      "source_commit_label": null
+    }
+  ],
+  "equivalence": {
+    "api_runtime_code_and_migrations_unchanged": true,
+    "web_static_files": 18,
+    "chart_static_files": 2943,
+    "earlier_evidence_association": "publication-cadence-source-impact.json manual module-diff audit plus current exact equivalence"
+  },
+  "known_limits": [
+    "External TLS/response-header tails may exceed 3 seconds or fail; failures remain observable errors, never history boundaries.",
+    "Cold PostgreSQL measurements use running HTTP pools; they are not a universal cold-TLS performance guarantee.",
+    "No real notifications sent; alert evidence measures internal historical crossing dispatch, not delivery network latency.",
+    "Million-bar cleanup throughput and every-frame/all-vendor-state loading UI are not claimed."
+  ],
+  "release_completion": "Final manifest/Compose and rollback selections validated; local annotated tag v1.3.0 is the immutable delivery reference. Tag and clean worktree are checked after committing this record."
+}

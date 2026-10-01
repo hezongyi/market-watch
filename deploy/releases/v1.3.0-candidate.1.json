@@ -1,0 +1,49 @@
+{
+  "version": "1.3.0",
+  "candidate": "1.3.0-candidate.1",
+  "accepted": false,
+  "scope": "Ubuntu loopback isolated acceptance only; no production/main/push",
+  "source_commit": "a71439b34964fea9cf825d7a6e2d412bac071fc5",
+  "schema": "n15_provider_revisions",
+  "images": {
+    "api": {
+      "tag": "market-watch-api:1.3.0-candidate.1",
+      "id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    "web": {
+      "tag": "market-watch-web:1.3.0-candidate.1",
+      "id": "sha256:8f2087c31b8554a352995c446a902b5dfc1d4074a64ecbfd452c4b3f85f807e0",
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    "chart-origin": {
+      "tag": "market-watch-chart-origin:1.3.0-candidate.1",
+      "id": "sha256:2770ede098d4b978a833e7a34e1219e0e130d788581a9e7ee91e66ba1fe150c6",
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    }
+  },
+  "worker_uses": "api",
+  "origins": {
+    "app": "https://localhost:15453",
+    "chart": "https://127.0.0.1:15454"
+  },
+  "compose": [
+    "compose.acceptance.yaml",
+    "compose.dual-acceptance.yaml"
+  ],
+  "acceptance_audit": "docs/chart-dual-dataset-acceptance-audit.md",
+  "open_gates": [
+    "D04: stable first-screen <3s, external TLS and reused response-header tail unresolved",
+    "D21: accepted local annotated tag and final acceptance manifest pending"
+  ],
+  "rollback": {
+    "compatible_candidate": {
+      "api": "market-watch-api:provider-publication-cadence-20261002",
+      "web": "market-watch-web:provider-startup-metadata-20261001",
+      "chart-origin": "market-watch-chart-origin:provider-startup-metadata-20261001"
+    },
+    "schema_change_since_previous_candidate": false,
+    "pre_dual_release": "deploy/releases/v1.2.0-local.json",
+    "pre_dual_requires_database_restore": true
+  }
+}

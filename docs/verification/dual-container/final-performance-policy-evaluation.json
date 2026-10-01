@@ -1,0 +1,49 @@
+{
+  "user_revision": "2026-10-02: most cold first screens below 3s; do not require every request",
+  "new_live_tests": false,
+  "original_artifacts_unchanged": true,
+  "records": [
+    {
+      "path": "docs/verification/provider-cache/first-screen-publication-cadence-18.json",
+      "original_verdict": true,
+      "samples": 18,
+      "below_3s": 18,
+      "majority_passed": true,
+      "display_range_ms": [
+        1385,
+        2597
+      ],
+      "slow_samples": []
+    },
+    {
+      "path": "docs/verification/provider-cache/first-screen-1.3.0-candidate.1-six.json",
+      "original_verdict": true,
+      "samples": 6,
+      "below_3s": 6,
+      "majority_passed": true,
+      "display_range_ms": [
+        1280,
+        1829
+      ],
+      "slow_samples": []
+    },
+    {
+      "path": "docs/verification/provider-cache/first-screen-transport-lanes-18.json",
+      "original_verdict": false,
+      "samples": 18,
+      "below_3s": 17,
+      "majority_passed": true,
+      "display_range_ms": [
+        1537,
+        3769
+      ],
+      "slow_samples": [
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "5",
+          "displayed_ms": 3769
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,237 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            BuildKit is currently disabled; enable it by removing the DOCKER_BUILDKIT=0
+            environment-variable.
+
+Sending build context to Docker daemon  114.3MB
+Step 1/21 : FROM node:22-bookworm-slim AS adapter
+ ---> 89b30bf5b6a8
+Step 2/21 : WORKDIR /adapter
+ ---> Using cache
+ ---> c990edeff88f
+Step 3/21 : COPY adapters/dukascopy/package*.json ./
+ ---> Using cache
+ ---> 9cc902bd77eb
+Step 4/21 : RUN npm ci --omit=dev
+ ---> Using cache
+ ---> b0d655d5ccb4
+Step 5/21 : COPY adapters/dukascopy/probe.mjs ./
+ ---> Using cache
+ ---> 1a9b47fd514d
+Step 6/21 : FROM python:3.11-slim-bookworm
+ ---> 2410faa698c7
+Step 7/21 : COPY --from=adapter /usr/local/bin/node /usr/local/bin/node
+ ---> Using cache
+ ---> eff81689f50d
+Step 8/21 : WORKDIR /app
+ ---> Using cache
+ ---> 94015452a2f9
+Step 9/21 : COPY pyproject.toml requirements.lock ./
+ ---> bd0540c465b2
+Step 10/21 : RUN pip install --no-cache-dir -r requirements.lock
+ ---> Running in 7b37c3200a29
+Collecting alembic==1.20.0 (from -r requirements.lock (line 1))
+  Downloading alembic-1.20.0-py3-none-any.whl.metadata (7.3 kB)
+Collecting annotated-doc==0.0.5 (from -r requirements.lock (line 2))
+  Downloading annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+Collecting annotated-types==0.8.0 (from -r requirements.lock (line 3))
+  Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting anyio==4.15.1 (from -r requirements.lock (line 4))
+  Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+Collecting argon2-cffi==25.1.0 (from -r requirements.lock (line 5))
+  Downloading argon2_cffi-25.1.0-py3-none-any.whl.metadata (4.1 kB)
+Collecting argon2-cffi-bindings==26.1.0 (from -r requirements.lock (line 6))
+  Downloading argon2_cffi_bindings-26.1.0-cp310-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl.metadata (7.5 kB)
+Collecting certifi==2026.7.22 (from -r requirements.lock (line 7))
+  Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting cffi==2.1.1 (from -r requirements.lock (line 8))
+  Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+Collecting click==8.5.0 (from -r requirements.lock (line 9))
+  Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting fastapi==0.141.1 (from -r requirements.lock (line 10))
+  Downloading fastapi-0.141.1-py3-none-any.whl.metadata (27 kB)
+Collecting h11==0.16.0 (from -r requirements.lock (line 11))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting httpcore==1.0.9 (from -r requirements.lock (line 12))
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting httpx==0.28.1 (from -r requirements.lock (line 13))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting idna==3.20 (from -r requirements.lock (line 14))
+  Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting iniconfig==2.3.0 (from -r requirements.lock (line 15))
+  Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting Mako==1.4.3 (from -r requirements.lock (line 16))
+  Downloading mako-1.4.3-py3-none-any.whl.metadata (2.9 kB)
+Collecting MarkupSafe==3.0.3 (from -r requirements.lock (line 17))
+  Downloading markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+Requirement already satisfied: packaging==26.3 in /usr/local/lib/python3.11/site-packages (from -r requirements.lock (line 18)) (26.3)
+Collecting pluggy==1.6.0 (from -r requirements.lock (line 19))
+  Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting psycopg==3.3.6 (from -r requirements.lock (line 20))
+  Downloading psycopg-3.3.6-py3-none-any.whl.metadata (4.4 kB)
+Collecting psycopg-binary==3.3.6 (from -r requirements.lock (line 21))
+  Downloading psycopg_binary-3.3.6-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.7 kB)
+Collecting pycparser==3.0 (from -r requirements.lock (line 22))
+  Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+Collecting pydantic==2.13.5 (from -r requirements.lock (line 23))
+  Downloading pydantic-2.13.5-py3-none-any.whl.metadata (110 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 110.2/110.2 kB 1.2 MB/s eta 0:00:00
+Collecting pydantic-settings==2.15.0 (from -r requirements.lock (line 24))
+  Downloading pydantic_settings-2.15.0-py3-none-any.whl.metadata (3.9 kB)
+Collecting pydantic_core==2.46.5 (from -r requirements.lock (line 25))
+  Downloading pydantic_core-2.46.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+Collecting Pygments==2.21.0 (from -r requirements.lock (line 26))
+  Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting pytest==9.1.1 (from -r requirements.lock (line 27))
+  Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+Collecting pytest-asyncio==1.4.0 (from -r requirements.lock (line 28))
+  Downloading pytest_asyncio-1.4.0-py3-none-any.whl.metadata (4.1 kB)
+Collecting python-dotenv==1.2.3 (from -r requirements.lock (line 29))
+  Downloading python_dotenv-1.2.3-py3-none-any.whl.metadata (29 kB)
+Collecting ruff==0.16.9 (from -r requirements.lock (line 30))
+  Downloading ruff-0.16.9-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+Collecting SQLAlchemy==2.1.1 (from -r requirements.lock (line 31))
+  Downloading sqlalchemy-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (9.7 kB)
+Collecting starlette==1.7.0 (from -r requirements.lock (line 32))
+  Downloading starlette-1.7.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting typing-inspection==0.4.4 (from -r requirements.lock (line 33))
+  Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Collecting typing_extensions==4.16.0 (from -r requirements.lock (line 34))
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting uvicorn==0.54.0 (from -r requirements.lock (line 35))
+  Downloading uvicorn-0.54.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting build==1.6.1 (from -r requirements.lock (line 36))
+  Downloading build-1.6.1-py3-none-any.whl.metadata (5.6 kB)
+Collecting numpy==2.4.6 (from -r requirements.lock (line 37))
+  Downloading numpy-2.4.6-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Collecting pyproject_hooks==1.3.3 (from -r requirements.lock (line 38))
+  Downloading pyproject_hooks-1.3.3-py3-none-any.whl.metadata (1.3 kB)
+Collecting TA-Lib==0.6.8 (from -r requirements.lock (line 39))
+  Downloading ta_lib-0.6.8-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (23 kB)
+Downloading alembic-1.20.0-py3-none-any.whl (268 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 268.7/268.7 kB 3.2 MB/s eta 0:00:00
+Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.1/132.1 kB 20.4 MB/s eta 0:00:00
+Downloading argon2_cffi-25.1.0-py3-none-any.whl (14 kB)
+Downloading argon2_cffi_bindings-26.1.0-cp310-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (26 kB)
+Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 137.0/137.0 kB 14.2 MB/s eta 0:00:00
+Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (217 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 217.8/217.8 kB 14.9 MB/s eta 0:00:00
+Downloading click-8.5.0-py3-none-any.whl (125 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 125.3/125.3 kB 10.1 MB/s eta 0:00:00
+Downloading fastapi-0.141.1-py3-none-any.whl (131 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.0/132.0 kB 11.3 MB/s eta 0:00:00
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.8/78.8 kB 12.6 MB/s eta 0:00:00
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 kB 16.5 MB/s eta 0:00:00
+Downloading idna-3.20-py3-none-any.whl (69 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.6/69.6 kB 162.9 MB/s eta 0:00:00
+Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+Downloading mako-1.4.3-py3-none-any.whl (80 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.2/80.2 kB 170.1 MB/s eta 0:00:00
+Downloading markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+Downloading psycopg-3.3.6-py3-none-any.whl (215 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 215.5/215.5 kB 12.9 MB/s eta 0:00:00
+Downloading psycopg_binary-3.3.6-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (5.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.3/5.3 MB 21.1 MB/s eta 0:00:00
+Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.2/48.2 kB 224.7 MB/s eta 0:00:00
+Downloading pydantic-2.13.5-py3-none-any.whl (472 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 472.6/472.6 kB 206.7 MB/s eta 0:00:00
+Downloading pydantic_settings-2.15.0-py3-none-any.whl (69 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.4/69.4 kB 259.3 MB/s eta 0:00:00
+Downloading pydantic_core-2.46.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 77.5 MB/s eta 0:00:00
+Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 105.0 MB/s eta 0:00:00
+Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 386.5/386.5 kB 193.0 MB/s eta 0:00:00
+Downloading pytest_asyncio-1.4.0-py3-none-any.whl (16 kB)
+Downloading python_dotenv-1.2.3-py3-none-any.whl (22 kB)
+Downloading ruff-0.16.9-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (10.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.4/10.4 MB 39.3 MB/s eta 0:00:00
+Downloading sqlalchemy-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.6/4.6 MB 40.5 MB/s eta 0:00:00
+Downloading starlette-1.7.0-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.0/79.0 kB 261.9 MB/s eta 0:00:00
+Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 228.3 MB/s eta 0:00:00
+Downloading uvicorn-0.54.0-py3-none-any.whl (87 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 87.4/87.4 kB 33.6 MB/s eta 0:00:00
+Downloading build-1.6.1-py3-none-any.whl (31 kB)
+Downloading numpy-2.4.6-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.9/16.9 MB 39.8 MB/s eta 0:00:00
+Downloading pyproject_hooks-1.3.3-py3-none-any.whl (10 kB)
+Downloading ta_lib-0.6.8-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.1/4.1 MB 21.2 MB/s eta 0:00:00
+Installing collected packages: typing_extensions, ruff, python-dotenv, pyproject_hooks, Pygments, pycparser, psycopg-binary, pluggy, numpy, MarkupSafe, iniconfig, idna, h11, click, certifi, annotated-types, annotated-doc, uvicorn, typing-inspection, SQLAlchemy, pytest, pydantic_core, psycopg, Mako, httpcore, cffi, build, anyio, TA-Lib, starlette, pytest-asyncio, pydantic, httpx, argon2-cffi-bindings, alembic, pydantic-settings, fastapi, argon2-cffi
+Successfully installed Mako-1.4.3 MarkupSafe-3.0.3 Pygments-2.21.0 SQLAlchemy-2.1.1 TA-Lib-0.6.8 alembic-1.20.0 annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 argon2-cffi-25.1.0 argon2-cffi-bindings-26.1.0 build-1.6.1 certifi-2026.7.22 cffi-2.1.1 click-8.5.0 fastapi-0.141.1 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.3.0 numpy-2.4.6 pluggy-1.6.0 psycopg-3.3.6 psycopg-binary-3.3.6 pycparser-3.0 pydantic-2.13.5 pydantic-settings-2.15.0 pydantic_core-2.46.5 pyproject_hooks-1.3.3 pytest-9.1.1 pytest-asyncio-1.4.0 python-dotenv-1.2.3 ruff-0.16.9 starlette-1.7.0 typing-inspection-0.4.4 typing_extensions-4.16.0 uvicorn-0.54.0
+[91mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+[0m[91m
+[notice] A new release of pip is available: 24.0 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+[0m ---> Removed intermediate container 7b37c3200a29
+ ---> adf81bf3b5a5
+Step 11/21 : COPY backend ./backend
+ ---> 013509173e09
+Step 12/21 : COPY migrations ./migrations
+ ---> 7dd9f9bbf398
+Step 13/21 : COPY alembic.ini ./
+ ---> 0b1dd7815335
+Step 14/21 : RUN pip install --no-cache-dir --no-deps .
+ ---> Running in 7255ef627b6a
+Processing /app
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: market-watch
+  Building wheel for market-watch (pyproject.toml): started
+  Building wheel for market-watch (pyproject.toml): finished with status 'done'
+  Created wheel for market-watch: filename=market_watch-1.3.0-py3-none-any.whl size=196124 sha256=bb58d87caef0a07343ed4a71e10f1e03bca61e9fedbbd4c1f45a845e7ae795e5
+  Stored in directory: /tmp/pip-ephem-wheel-cache-x_qa1qim/wheels/57/0f/98/bb57b2b57b95807699b822a35c022f139d38a02c27922f27ce
+Successfully built market-watch
+Installing collected packages: market-watch
+Successfully installed market-watch-1.3.0
+[91mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+[0m[91m
+[notice] A new release of pip is available: 24.0 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+[0m ---> Removed intermediate container 7255ef627b6a
+ ---> bbfff7210c85
+Step 15/21 : COPY --from=adapter /adapter ./adapters/dukascopy
+ ---> f8fa35eb4b56
+Step 16/21 : RUN useradd --uid 10001 --create-home app
+ ---> Running in 401dcc38c68a
+ ---> Removed intermediate container 401dcc38c68a
+ ---> ecae799bba00
+Step 17/21 : USER app
+ ---> Running in 4bf6e0d68644
+ ---> Removed intermediate container 4bf6e0d68644
+ ---> 8dabc8c564fc
+Step 18/21 : EXPOSE 8000
+ ---> Running in cd48c6439b57
+ ---> Removed intermediate container cd48c6439b57
+ ---> f166fa31f0ad
+Step 19/21 : CMD ["uvicorn", "alerts.api:app", "--host", "0.0.0.0", "--port", "8000"]
+ ---> Running in 2b270945496a
+ ---> Removed intermediate container 2b270945496a
+ ---> 6d75f7e743e0
+Step 20/21 : LABEL market-watch.accepted=false
+ ---> Running in 253af1536721
+ ---> Removed intermediate container 253af1536721
+ ---> 9ce36e08649f
+Step 21/21 : LABEL org.opencontainers.image.revision=a71439b34964fea9cf825d7a6e2d412bac071fc5
+ ---> Running in d9f9a7948a2e
+ ---> Removed intermediate container d9f9a7948a2e
+ ---> 5f3ebe0318da
+Successfully built 5f3ebe0318da
+Successfully tagged market-watch-api:1.3.0-candidate.1

@@ -1,10 +1,18 @@
 # 双系列实施与验证记录
 
-2026-10-01。权威需求仍为 `chart-dual-dataset-plan.md`，目标未完成。仅本机开发，不操作 Unraid 生产、不 push、不发送通知。
+2026-10-01开始，2026-10-02完成本地交付。权威需求为 `chart-dual-dataset-plan.md`，按用户最新修订的“大多数冷首屏低于3秒”验收；不操作 Unraid 生产、不 push、不发送通知。以下旧快照保留当时的未完成状态和失败，不作为当前交付结论。
 
 后续平台取数重构已获实施授权，以[平台取数方案](provider-fetch-service-proposal.md)和用户指定GPT-6.1-Sol/max的[独立复核](provider-fetch-service-review.md)为准。目标是实施并通过真实环境验收后交付，已取代此前暂不实现限制。`/tmp/market-watch-development-handoff-2026-10-01.md`顶部同步最新授权、方案与当前状态，旧交接保留为历史快照。
 
 ## 最新现场状态（覆盖以下历史开发快照）
+
+### 2026-10-02 用户修订性能门槛并完成本地收口
+
+- 用户明确：“不再以每次冷首屏都在3s为目标，因为代理等原因，大多数达到3s即可。建议不再虚耗时间，可以收口。”不再将代理/TLS/上游长尾的完全消除作为本地交付门槛，其余功能、完整数据库缓存小于1秒与资源隔离要求保留。
+- 复核已有真实结果而不新增网络测试：九周期18项18/18低于3秒、部署后6项6/6、较早含慢样本矩阵17/18。原始passed=false、3769ms慢首屏及TLS/响应头长尾全部保留，评估汇总 `verification/dual-container/final-performance-policy-evaluation.json`。测试驱动改为多数判定，继续保存逐次耗时和慢样本，缓存/完整需求/工作区/错误断言不变。
+- 构建源码提交 `a71439b34964fea9cf825d7a6e2d412bac071fc5`，三类1.3.0-candidate.1已统一部署，API healthy、七容器running。后端代码/迁移、web18静态文件和chart2943静态文件与对应验收版本逐字节一致，六项浏览器首屏1280–1829ms、数据库缓存需求到显示204–321ms，无新TLS。
+- 最终本地镜像别名1.3.0-local复用完全相同ID，不为文档改动重建/重启。发布清单 `deploy/releases/v1.3.0-local.json`、非秘密env/Compose覆盖和同schema回退env齐全；构建时accepted=false标签作为历史保留，最终结论以发布清单为准。附注标签v1.3.0包含最终审计/交付记录，继续留在feature/advanced-charts，不合并main、不push、不部署生产。
+- 43项完成审计及证据哈希见 `verification/dual-container/final-local-acceptance.json`；完整PG16后端303通过、VM35通过，八图/预警演练/手机画线/日期同步/故障恢复等证据已按源码内容关联。实际限制保留：外部网络长尾、非逐帧vendor文案覆盖、未作百万根吞吐承诺、未发送实际通知。
 
 ### 2026-10-02 代理链路关联与源码候选快照
 

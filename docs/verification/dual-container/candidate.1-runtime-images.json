@@ -1,0 +1,55 @@
+{
+  "matched_manifest": true,
+  "accepted": false,
+  "services": [
+    {
+      "service": "api",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "status": "running",
+      "health": "healthy",
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "realtime-worker",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "status": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "chart-history-worker",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "status": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "status": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "web",
+      "image_id": "sha256:8f2087c31b8554a352995c446a902b5dfc1d4074a64ecbfd452c4b3f85f807e0",
+      "status": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "chart-origin",
+      "image_id": "sha256:2770ede098d4b978a833e7a34e1219e0e130d788581a9e7ee91e66ba1fe150c6",
+      "status": "running",
+      "health": null,
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5"
+    },
+    {
+      "service": "tls",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "health": null,
+      "source_commit_label": null
+    }
+  ]
+}

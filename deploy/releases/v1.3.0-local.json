@@ -1,0 +1,85 @@
+{
+  "version": "1.3.0",
+  "accepted": true,
+  "scope": "Ubuntu local delivery only; not production/main/push",
+  "release_tag": "v1.3.0",
+  "source_commit": "a71439b34964fea9cf825d7a6e2d412bac071fc5",
+  "schema": "n15_provider_revisions",
+  "images": {
+    "api": {
+      "tag": "market-watch-api:1.3.0-local",
+      "id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5",
+      "build_tag": "market-watch-api:1.3.0-candidate.1"
+    },
+    "web": {
+      "tag": "market-watch-web:1.3.0-local",
+      "id": "sha256:8f2087c31b8554a352995c446a902b5dfc1d4074a64ecbfd452c4b3f85f807e0",
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5",
+      "build_tag": "market-watch-web:1.3.0-candidate.1"
+    },
+    "chart-origin": {
+      "tag": "market-watch-chart-origin:1.3.0-local",
+      "id": "sha256:2770ede098d4b978a833e7a34e1219e0e130d788581a9e7ee91e66ba1fe150c6",
+      "source_commit_label": "a71439b34964fea9cf825d7a6e2d412bac071fc5",
+      "build_tag": "market-watch-chart-origin:1.3.0-candidate.1"
+    },
+    "tls": {
+      "tag": "nginx:1.28-alpine",
+      "id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "source": "existing nginx base image; no product source commit label"
+    }
+  },
+  "worker_uses": "api",
+  "origins": {
+    "app": "https://localhost:15453",
+    "chart": "https://127.0.0.1:15454"
+  },
+  "compose": [
+    "compose.acceptance.yaml",
+    "compose.dual-acceptance.yaml",
+    "deploy/releases/v1.3.0-local.yaml"
+  ],
+  "image_selection_env": "deploy/releases/v1.3.0-local.env",
+  "acceptance_audit": "docs/chart-dual-dataset-acceptance-audit.md",
+  "acceptance_summary": "docs/verification/dual-container/final-local-acceptance.json",
+  "performance_policy": {
+    "user_revision_date": "2026-10-02",
+    "cold_first_screen": "most measured cold displays below 3 seconds; proxy/TLS/upstream outliers retained",
+    "fresh_complete_postgresql_cache": "demand to display below 1 second",
+    "managed_initial_preparation": "no completion-time promise"
+  },
+  "open_gates": [],
+  "known_limitations": [
+    "External TLS/response-header tails may exceed 3 seconds or fail; failures remain observable errors, never history boundaries.",
+    "Cold PostgreSQL measurements use running HTTP pools; they are not a universal cold-TLS performance guarantee.",
+    "No real notifications sent; alert evidence measures internal historical crossing dispatch, not delivery network latency.",
+    "Million-bar cleanup throughput and every-frame/all-vendor-state loading UI are not claimed."
+  ],
+  "rollback": {
+    "compatible_candidate": {
+      "api": {
+        "tag": "market-watch-api:provider-publication-cadence-20261002",
+        "id": "sha256:a087d57ca79f66d31db2b6e130fd9547ddf0700e5b4b881e7517c656a69c362b"
+      },
+      "web": {
+        "tag": "market-watch-web:provider-startup-metadata-20261001",
+        "id": "sha256:f77b6fa8a6cca9b90fb818fbee4955c15c7ca50dd8b8057a943d15a89debc3fd"
+      },
+      "chart-origin": {
+        "tag": "market-watch-chart-origin:provider-startup-metadata-20261001",
+        "id": "sha256:e801e1e776db6e3aed8b552c9dc521b2a8e8de9b394a4817e731e78f22b50aa4"
+      }
+    },
+    "image_selection_env": "deploy/releases/v1.3.0-local.rollback.env",
+    "schema_change_since_previous_candidate": false,
+    "pre_dual_release": "deploy/releases/v1.2.0-local.json",
+    "pre_dual_requires_database_restore": true
+  },
+  "notes": [
+    "Images built from the source snapshot; final tag adds documentation, acceptance records and the user-revised browser performance gate without runtime source changes.",
+    "Immutable image label market-watch.accepted=false records build-time candidate state. This final manifest records subsequent local acceptance.",
+    "Release image aliases point to the existing tested image IDs; no runtime rebuild or restart for documentation changes.",
+    "Runtime secrets/TLS fixtures and licensed vendor binaries are excluded from Git."
+  ]
+}

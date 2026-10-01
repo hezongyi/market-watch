@@ -39,6 +39,8 @@ v1.0.1仅发布本地源码标签，未部署；生产镜像仍以`deploy/releas
 
 按本轮保留原项目、独立接入和仅本地交付要求，v1.2.0标签保留在feature/advanced-charts，不合并原仓库main，不推远端、不部署生产。包版本1.2.0；本机镜像使用1.2.0-local，构建提交与镜像ID见deploy/releases/v1.2.0-local.json。本机origin固定为回环HTTPS，后续生产发布须另行配置和构建。
 
-## v1.3.0 双系列本地候选
+## v1.3.0 双系列本地交付
 
-包版本1.3.0只表示当前源码的候选版本，不是验收通过或发布声明。先在feature/advanced-charts建立本地候选提交，以同一提交构建API/web/chart并记录镜像ID与构建标签；保持旧已验收版本和旧候选镜像。所有门槛完成后才创建正式本地附注标签，候选阶段不创建v1.3.0正式标签。网络长尾及剩余审计以docs/chart-dual-dataset-acceptance-audit.md为准，不合并main、不push、不操作Unraid。
+包版本1.3.0，附注标签v1.3.0仍保留在feature/advanced-charts。API/web/chart由源码提交a71439b34964fea9cf825d7a6e2d412bac071fc5统一构建，发布清单deploy/releases/v1.3.0-local.json记录镜像ID、构建标签和运行核验。交付标签增加验收、运行/回退文档和用户修订的性能验收规则，未改变镜像运行代码；不为文档变更重新构建或移动旧标签。
+
+用户2026-10-02明确接受大多数冷首屏低于3秒，不再要求每次低于3秒；已有代理/TLS/上游长尾保留在审计及证据中。候选镜像内market-watch.accepted=false为构建时状态，最终本地验收结论以v1.3.0-local.json为准，不改写镜像历史元数据。不合并main、不push、不操作Unraid。

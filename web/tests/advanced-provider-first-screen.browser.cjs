@@ -147,9 +147,18 @@ const output=process.env.FIRST_SCREEN_OUTPUT||'/tmp/mw-provider-first-screen.jso
    assert.equal(sample.pages[0].query.limit,sample.pages[0].query.countBack,'bridge forwards native demand without a multiplier');
    assert.ok(sample.pages[0].count>=sample.pages[0].query.countBack||sample.pages[0].boundary,
      'backend must satisfy the entire native demand or prove the upstream boundary');
-   assert.ok(sample.displayed_ms<3000,`${sample.symbol}/${sample.resolution} first display ${sample.displayed_ms}ms exceeds 3s`);
   }
+  // User revised the local acceptance gate on 2026-10-02: most cold
+  // displays below 3s; preserve proxy/network outliers without discarding them.
+  const underThreeSeconds=measurements.filter(sample=>sample.displayed_ms<3000).length;
+  const performanceAcceptance={criterion:'strict majority of measured cold displays below 3000ms',
+   total:measurements.length,under_three_seconds:underThreeSeconds,
+   slow_samples:measurements.filter(sample=>sample.displayed_ms>=3000).map(sample=>({
+    symbol:sample.symbol,resolution:sample.resolution,displayed_ms:sample.displayed_ms}))};
+  assert.ok(underThreeSeconds>measurements.length/2,
+   `${underThreeSeconds}/${measurements.length} cold displays below 3s does not meet the majority gate`);
   fs.writeFileSync(output,JSON.stringify({passed:true,measurements,errors,
+   performance_acceptance:performanceAcceptance,
    caveat:'Display ends at public native dataReady plus two animation frames; no GPU completion claim. Each sample starts a new layout; provider API response timing and acquisition timestamp are recorded.'},null,2));
   await page.screenshot({path:output.replace(/\.json$/,'.png'),fullPage:true});
  }catch(error){const live=page.frames().find(f=>f.url().startsWith(CHART+'/'));
