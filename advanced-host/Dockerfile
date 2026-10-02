@@ -1,6 +1,6 @@
 FROM node:22-bookworm-slim AS assets
 WORKDIR /assets
-COPY index.html build-assets.mjs series.js bridge.js indicators.js preferences.js chart-style.js workspaces.js watchlists.js range-sync.js viewports.js history-demand.js progressive-history.js ./
+COPY index.html build-assets.mjs series.js bridge.js indicators.js preferences.js chart-style.js workspaces.js watchlists.js range-sync.js viewports.js history-demand.js progressive-history.js chart-menu.js chart-menu.css ./
 RUN node build-assets.mjs
 
 FROM nginx:1.28-alpine

@@ -958,6 +958,7 @@ function boot(
       Promise.resolve(pythonStudies(PineJS, catalog)),
     container: "chart",
     library_path: "/charting_library/",
+    custom_css_url: "/chart-menu.css",
     datafeed: feed,
     widgetbar: {
       watchlist: true,
@@ -1048,21 +1049,9 @@ function boot(
     widget
       .headerReady()
       .then(async () => {
-        // The website's account menu is not included in the licensed library.
-        // Use its public dropdown API for this chart's menu instead.
-        const chartWidget = widget;
-        await chartWidget.createDropdown({
-          align: "left",
-          title: "图表菜单",
-          tooltip: "图表菜单：切换暗色或浅色主题",
-          icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 4.5h12M3 9h12M3 13.5h12"/></svg>`,
-          items: ["Dark", "Light"].map((theme) => ({
-            title: theme === "Dark" ? "暗色主题" : "浅色主题",
-            onSelect: () => chartWidget.changeTheme(theme).catch((e) =>
-              send({ type: "error", error: "主题切换失败：" + String(e) }),
-            ),
-          })),
-        });
+        chartThemeMenu(widget, (e) =>
+          send({ type: "error", error: "主题切换失败：" + String(e) }),
+        );
         widget.createButton({
           align: "right",
           useTradingViewStyle: true,

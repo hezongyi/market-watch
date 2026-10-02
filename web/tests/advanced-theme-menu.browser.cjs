@@ -45,35 +45,54 @@ const output = process.env.THEME_MENU_OUTPUT || '/tmp/mw-theme-menu.json';
       document: {engine: 'tv31', schemaVersion: 1, symbol: 'MWP:BTCUSDT',
         series_kind: 'provider', interval: '5'}});
     await page.goto(APP + '/advanced-charts');
-    for (const [label, theme] of [['浅色主题', 'Light'], ['暗色主题', 'Dark']]) {
+    const initial = await chart();
+    const initialDark = (await initial.frame.evaluate(() => widget.getTheme())).toLowerCase() === 'dark';
+    for (const theme of initialDark ? ['Light', 'Dark'] : ['Dark', 'Light']) {
       let {frame, ui} = await chart();
       const menu = ui.getByRole('button', {name: /图表菜单/}).filter({visible: true});
       assert.equal(await menu.count(), 1);
       const box = await menu.boundingBox();
+      assert.equal(box.x, 0, 'menu must be at the far-left corner');
+      assert.equal(box.y, 0, 'menu must be at the top edge');
+      const symbolBox = await ui.locator('#header-toolbar-symbol-search').filter({visible: true}).boundingBox();
+      assert.ok(symbolBox.x >= box.width, 'symbol search must not be obscured');
       await menu.click();
-      await ui.getByText(label, {exact: true}).click();
+      const toggle = ui.getByRole('switch', {name: '暗色主题'});
+      await toggle.click();
       await frame.waitForFunction(theme => widget.getTheme().toLowerCase() === theme.toLowerCase(), theme);
+      await toggle.waitFor({state: 'visible'});
+      assert.equal(await toggle.getAttribute('aria-checked'), String(theme === 'Dark'));
       await page.waitForFunction(async theme => {
         const rows = await (await fetch('/api/advanced-charts/preferences')).json();
         return rows.find(row => row.name === 'mw.theme')?.content.value === theme;
       }, theme);
-      await menu.click();
       await page.screenshot({path: output.replace(/\.json$/, '-' + theme.toLowerCase() + '.png')});
       await page.keyboard.press('Escape');
       await page.reload();
       ({frame, ui} = await chart());
       assert.equal((await frame.evaluate(() => widget.getTheme())).toLowerCase(), theme.toLowerCase());
-      report.cases.push({theme,menu_box:box,clicked:true,server_saved:true,reloaded:true});
+      await ui.getByRole('button', {name: /图表菜单/}).filter({visible: true}).click();
+      assert.equal(await ui.getByRole('switch', {name: '暗色主题'}).getAttribute('aria-checked'), String(theme === 'Dark'));
+      await page.keyboard.press('Escape');
+      report.cases.push({theme,menu_box:box,symbol_box:symbolBox,clicked:true,server_saved:true,reloaded:true});
     }
     // Exercise the same menu without a mouse, including Escape dismissal.
     const {ui} = await chart();
     const menu = ui.getByRole('button', {name: /图表菜单/}).filter({visible: true});
     await menu.focus();
     await page.keyboard.press('Enter');
-    await ui.getByText('浅色主题', {exact: true}).waitFor();
+    await ui.getByRole('switch', {name: '暗色主题'}).waitFor();
     await page.keyboard.press('Escape');
-    await ui.getByText('浅色主题', {exact: true}).waitFor({state: 'hidden'});
+    await ui.getByRole('switch', {name: '暗色主题'}).waitFor({state: 'hidden'});
+    assert.ok(await menu.evaluate(el => el.ownerDocument.activeElement === el));
     report.keyboard_open_and_escape = true;
+    // Compact desktop/tablet width retains an unobscured symbol search.
+    await page.setViewportSize({width: 800, height: 700});
+    const compactBox = await menu.boundingBox();
+    const compactSymbol = await ui.locator('#header-toolbar-symbol-search').filter({visible: true}).boundingBox();
+    assert.equal(compactBox.x, 0);
+    assert.ok(compactSymbol.x >= compactBox.width);
+    report.compact_width = {menu: compactBox, symbol: compactSymbol};
     assert.deepEqual(report.errors, []);
     report.passed = true;
   } catch (error) {
