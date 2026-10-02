@@ -1,0 +1,89 @@
+{
+  "version": "1.3.3",
+  "accepted": true,
+  "acceptance_scope": "Volume functionality, data correctness, source equivalence and existing Ubuntu local acceptance; performance excluded by explicit user instruction",
+  "release_tag": "v1.3.3",
+  "release_method": "Pull request merge from fix/volume-v1.3.3 to main, annotated tag on the final main merge commit",
+  "previous_source_tag": "v1.3.2",
+  "baseline": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+  "source_commit": "edc799a97999b8cf387a03c380669bf6a8d28083",
+  "reviewed_head": "7512a96b24a1bafaab222cb9b390fcdf0373a80c",
+  "tag_relation": "Tag and PR include later evidence/release documentation and the GitHub merge commit; runtime/test/build inputs must match source_commit byte-for-byte.",
+  "schema": "p17_volume",
+  "new_migrations": [
+    "migrations/versions/p17_volume.py"
+  ],
+  "provider_payload_version": "volume-v1",
+  "delivery_document": "docs/chart-v1.3.3-source-delivery.md",
+  "verification": "docs/verification/volume/source-release-audit.json",
+  "source_hashes": "docs/verification/volume/source-verification.json",
+  "completion_audit": "docs/verification/volume/completion-audit.md",
+  "checks": {
+    "backend_full": {
+      "passed": 340,
+      "skipped": 1,
+      "postgresql": "17",
+      "skip": "backup-tool conditional skip retained"
+    },
+    "frontend_vm": {
+      "passed": 39,
+      "failed": 0
+    },
+    "web_build": "passed; existing bundle-size warning retained",
+    "standards_review": "no blockers",
+    "spec_review": "no blockers",
+    "source_equivalence": {
+      "recorded_hashes_verified": 171,
+      "runtime_test_build_files_compared": 349,
+      "mismatches": 0
+    },
+    "browser_acceptance": "Existing final-source candidate M5/monthly and local M5 checks passed; earlier 36-case matrix relationship retained in completion audit",
+    "migration_rollback": "Existing isolated PG16 migration, old-image compatibility, rollback fence and new-image resume evidence passed"
+  },
+  "evidence_sha256": {
+    "docs/verification/volume/backend-pg17.txt": "6138eb8d233f3a89a5745dcae826e9f0d7889cd310687617c10b1e287720874c",
+    "docs/verification/volume/frontend-vm.json": "81b4a66e4cf1caca9a11ae43e92ee1541720a775b9bb89998b87e2aa7f5cd243",
+    "docs/verification/volume/web-build.txt": "eacdaf99374516e666b02d16c8396233990a4c47e07aa25ea7731c5d0e55b201",
+    "docs/verification/volume/code-review.md": "e79fcf3628124339a98b9a1f2bca2e9b52ddf1856f65e1f7c612da347f38a6f6",
+    "docs/verification/volume/completion-audit.md": "b613e6c7b015a53701dbab365dcf026528777b77405438089cd15dcca8cd0328",
+    "docs/verification/volume/source-verification.json": "be8cd5191ce7cf5cee2416c6fbc8a0557078f9bc739d2550eee5346954f9f0d2",
+    "docs/verification/volume/runtime-audit.json": "a2addc27816bd655a66e589d355adec26020926e8c8ee2dc9c77674f33b79bfe",
+    "docs/verification/volume/native-release-candidate.json": "aefa00173e9e06617da19ef2267ec5aa4112026def6e9c02c387eb2d43994fc0",
+    "docs/verification/volume/native-release-monthly.json": "acfd4c970ef4875581628503ce468f85d070ea35a8a3c4a14f8b3594875a88ac",
+    "docs/verification/volume/native-local.json": "86e817edd4e0705d5563540e19c552390d645d396a744c8866f27a0ed2e9dfd4",
+    "docs/verification/volume/migration.json": "842646911b0e41bd1d4ce95eb4cde61f577083b7644a6c9f1f4c0e13d24e7275",
+    "docs/verification/volume/rollback.json": "19e68edc3e0005fcfd261af2c514ad3c5ca2b299cb74da17625960d201805116",
+    "docs/verification/volume/rollback-resume.json": "2eadf984f3124dcb0f278baa4420a15f5e505f02d1eca34d5c5217e76bf8f795",
+    "deploy/releases/v1.3.3-local.json": "59b6b65e70449b5f35e332810811b162a5aba2d46d38617ebcb46e301a0e0d3b"
+  },
+  "images": {
+    "build_source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+    "manifest": "deploy/releases/v1.3.3-local.json",
+    "compose_override": "deploy/releases/v1.3.3-local.yaml",
+    "environment_selection": "deploy/releases/v1.3.3-local.env",
+    "relation": "Existing locally accepted images; no new builds or relabeling during source publication"
+  },
+  "deployment_scope": "Source publication only in this phase; earlier Ubuntu acceptance retained, production not deployed",
+  "runtime_changed_by_source_release": false,
+  "notifications_sent": false,
+  "performance": {
+    "included_in_acceptance": false,
+    "reason": "User explicitly instructed: 性能问题不需要你解决",
+    "result": "Complete-page performance gate failed; failures remain preserved"
+  },
+  "historical_volume_limits": [
+    "BTCUSDT and OANDA:CAD_CHF have partial/unknown historical quantities; no promise of complete old history.",
+    "Volume backfill does not automatically repair conflicting or incomplete prices; explicit price repair is required."
+  ],
+  "source_release_open_gates": [],
+  "deployment_work_remaining": [
+    "Fix target source and build/record target image IDs.",
+    "Back up target database, stop old writers, validate o16 to p17 migration and configuration.",
+    "Complete target-environment functionality and rollback acceptance before production deployment."
+  ],
+  "rollback": {
+    "previous_source_tag": "v1.3.2",
+    "requirements": "Stop new writers, revoke leases and archive volume aggregation tasks before switching to compatible old images; follow tested backup/restore/resume instructions.",
+    "documentation": "docs/chart-v1.3.3-delivery.md"
+  }
+}
