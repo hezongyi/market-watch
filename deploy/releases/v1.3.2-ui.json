@@ -151,7 +151,7 @@
     {
       "service": "tls",
       "name": "market-watch-v132-ui-tls-1",
-      "container_id": "00e41139f2292349e55275bc5fe2d99be6de7419a774887ed32c3b213a20d4fa",
+      "container_id": "9e838c699fc57a51b6d547e58021bf4cd48b55cabab25a4203c7cfe13d97bc9b",
       "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
       "state": "running",
       "health": null,
@@ -272,5 +272,11 @@
     "theme_colors": "verified in both themes",
     "save_acknowledgement_required": true,
     "evidence": "docs/verification/v1.3.2-isolated/lan-browser-ack.json"
+  },
+  "http_redirect": {
+    "status": 308,
+    "verified_at": "2026-10-02T09:23:50.492363+00:00",
+    "evidence": "docs/verification/v1.3.2-isolated/http-redirect.json",
+    "chart_ip_access": "redirects to dedicated chart hostname"
   }
 }
