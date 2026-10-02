@@ -173,7 +173,7 @@ def finish(db, job):
             ChartPublishedBar.timeframe == Bar.timeframe,
             ChartPublishedBar.start == Bar.start,
             ChartPublishedBar.payload["volume_complete"].as_boolean().is_(True)).exists()).limit(1))
-    job.status = 'partial' if missing or unresolved or derived or unpublished else 'complete' 
+    job.status = 'partial' if missing or unresolved or derived or unpublished else 'complete'
     job.error = ("已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划"
         if unpublished and not missing and not unresolved and not derived else
         '仍有缺量、价格冲突或未确认派生量，详见片段') if job.status == 'partial' else None
