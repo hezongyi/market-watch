@@ -488,3 +488,20 @@ def test_native_history_rejects_number_and_time_coercion(field, value):
     with pytest.raises(ValidationError):
         DataQuery(**{'instrument':'BTCUSDT','series_kind':'provider','timeframe':'M5',
                      'native_history':{'chart_count':1},field:value})
+
+
+def test_native_capacity_error_is_structured_and_never_no_data(database, monkeypatch):
+    monkeypatch.setattr(provider, 'metadata', lambda _: META)
+    monkeypatch.setattr(provider, 'native_page', lambda *a, **k: pytest.fail('known N+H capacity failure must not fetch'))
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+    try:
+        with TestClient(api_module.app) as client:
+            response = client.post('/api/charts/data', json={
+                'instrument': META['id'], 'series_kind': 'provider', 'timeframe': 'M5',
+                'countBack': 20000, 'native_history': {'chart_count': 1, 'focused': True},
+                'indicators': [{'name': 'EMA', 'params': {'period': 20}}]})
+        assert response.status_code == 422
+        assert response.json()['detail']['code'] == 'NATIVE_HISTORY_CAPACITY_EXCEEDED'
+        assert 'history_boundary' not in response.json()
+    finally:
+        api_module.app.dependency_overrides.clear()

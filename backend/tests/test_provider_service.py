@@ -329,3 +329,28 @@ def test_historical_right_buffer_counts_real_bars_across_market_closure(database
         )) == 3
         assert target["before"] <= target["until"] == 20001
     assert len(calls) == 3, "finite completed buffers do not fetch again or recursively extend"
+
+
+def test_same_anchor_historical_demand_growth_only_expands_focus_left_targets(database, monkeypatch):
+    monkeypatch.setattr(service.settings, 'provider_basic_bars', 3)
+    monkeypatch.setattr(service.settings, 'provider_depth_bars', 8)
+    key = seed(META, 'M5', 100000, page(90000, 100000))
+    service.activate('grow', key, 100000, 2, latest=False)
+    ident = service.interest_id('grow', 'read:' + key + ':history')
+    with database.begin() as db:
+        row = db.get(ProviderInterest, ident)
+        originals = [dict(t) for t in row.targets]
+        row.targets = [{**t, 'done': True} for t in row.targets]
+    service.activate('grow', key, 100000, 10, latest=False)
+    with database.begin() as db:
+        targets = db.get(ProviderInterest, ident).targets
+        assert len(targets) == 20
+        for original, target in zip(originals, targets):
+            if target['frame'] == 'M5' and 'after' not in target:
+                assert target['count'] == target['goal'] + 10
+                assert target['generation'] == 1
+                assert not target['done']
+            else:
+                assert target['count'] == original['count'] and target['done']
+                assert target['generation'] == 0
+            assert target['task_id'] == original['task_id']

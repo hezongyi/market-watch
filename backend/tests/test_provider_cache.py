@@ -313,3 +313,23 @@ def test_empty_native_snapshot_preserves_dataset_metadata(database):
     state = cache.snapshot(key, 1000000, 200)
     assert state['bars'] == [] and state['cache_revision'] == 0
     assert not state['history_boundary'] and not state['satisfied']
+
+
+def test_reduced_optional_budgets_keep_demand_and_native_loaded_extra_in_backend(database, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
+    monkeypatch.setattr(settings, 'provider_native_first_extra_bars', 1000)
+    seed(META, 'M5', 5000000, page(0, 5000000, boundary=True))
+    result = cache.data(native_body(before=5000000, countBack=200, firstDataRequest=True))
+    assert len(result['bars']) == 1200 and result['mandatory_count'] == 200
+    assert result['optional_count'] == 1000
+    monkeypatch.setattr(settings, 'provider_native_cold_extra_bars', 200)
+    calls = []
+    def fetch(meta, frame, before, count, **kwargs):
+        optional = kwargs.get('optional', 0)
+        calls.append((count, optional))
+        return page(before - (count + optional) * 1000, before)
+    monkeypatch.setattr(upstream, 'native_page', fetch)
+    result = cache.data(native_body(before=20000000, countBack=200, firstDataRequest=True))
+    assert calls == [(200, 200)]
+    assert len(result['bars']) == 400 and result['mandatory_count'] == 200

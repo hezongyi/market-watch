@@ -36,3 +36,17 @@ original demand/observation, show unresolved error, and allow one bounded check
 per explicit public Refresh History action. Automatic review remains once per
 late callback; ordinary SSE/new responses cannot consume the correction.
 Standards re-review reports zero remaining findings.
+
+Final independent Spec review at `fc8af766f44e5355e255a7c71b183ec14cb26feb`
+reports no remaining concrete Spec findings. Subsequent refinement retains a
+bounded list of 64 exact unresolved request/observation pairs. Negative checks
+consume pending only after all proofs are current and mutually consistent;
+confirmed revisions cause one public reload. Overflow is visibly unresolved
+until workspace replacement. Independent VM checks confirmed consistent negative
+proofs clear without reload and mixed proof versions remain pending.
+
+User steering after baseline acceptance: investigate why cold gate failed and
+seek a balanced return quantity. Added backend-only downward configuration
+limits for cold E, first hot E and history hot E, preserving R2 defaults and
+mandatory D/H. Candidate experiments are separately labeled; original 80-sample
+performance result remains immutable. No frontend quantity policy is added.

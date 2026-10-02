@@ -7,11 +7,12 @@ class CapacityExceeded(ValueError):
     code = "NATIVE_HISTORY_CAPACITY_EXCEEDED"
 
 
-def optional_bars(context, demand, prefix, *, hot, first, enabled, python=False):
+def optional_bars(context, demand, prefix, *, hot, first, enabled, python=False,
+                  cold_extra=600, first_extra=3000, history_extra=2000):
     if not enabled or python:
         return 0
     budget = 4000 if context.chart_count == 1 else 2000
-    amount = (3000 if first and not context.historical_navigation else 2000) if hot else 600
+    amount = (first_extra if first and not context.historical_navigation else history_extra) if hot else cold_extra
     if context.chart_count > 1:
         amount = min(amount, 1000)
     if context.chart_count >= 4 and context.focused is False:

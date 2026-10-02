@@ -13,6 +13,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--reset', action='store_true')
     parser.add_argument('--buffer', choices=['on', 'off'])
+    parser.add_argument('--cold-extra', type=int, choices=[200, 400, 600])
+    parser.add_argument('--first-extra', type=int, choices=[1000, 2000, 3000])
     args = parser.parse_args()
     path = Path('/tmp/mw-native-history/api.env')
     config = dict(line.split('=', 1) for line in path.read_text().splitlines()
@@ -21,6 +23,10 @@ def main():
     assert url.host == 'market-watch-native-history-pg' and url.database == 'market_watch_native_history'
     if args.buffer:
         config['ALERTS_PROVIDER_NATIVE_HISTORY_BUFFER'] = str(args.buffer == 'on').lower()
+        if args.cold_extra is not None:
+            config['ALERTS_PROVIDER_NATIVE_COLD_EXTRA_BARS'] = str(args.cold_extra)
+        if args.first_extra is not None:
+            config['ALERTS_PROVIDER_NATIVE_FIRST_EXTRA_BARS'] = str(args.first_extra)
         path.write_text('\n'.join(k + '=' + v for k, v in config.items()) + '\n')
         path.chmod(0o600)
         print('Isolated acceptance buffer flag:', args.buffer)

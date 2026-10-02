@@ -460,6 +460,9 @@ def _native_read(meta, body, before, count, prefix, latest):
             body.native_history, demand, prefix, hot=hot,
             first=body.first_data_request, enabled=settings.provider_native_history_buffer,
             python=bool(body.indicators) or body.history_observation is not None,
+            cold_extra=settings.provider_native_cold_extra_bars,
+            first_extra=settings.provider_native_first_extra_bars,
+            history_extra=settings.provider_native_history_extra_bars,
         )
         if mandatory_done and fresh:
             # Prefix is immediately before D. E never changes Python inputs.
