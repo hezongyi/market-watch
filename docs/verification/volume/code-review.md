@@ -1,7 +1,7 @@
 # Volume implementation review
 
 Baseline: `v1.3.2`, `9596b25eda507ef708a327feb5271f238cdfdc0b`.
-Final runtime source: `fe370c206402aa048bf7c7adbd08d0642e9085ef`.
+Final runtime source: `edc799a97999b8cf387a03c380669bf6a8d28083`.
 Spec: [Volume R2](../../volume-repair-plan.md).
 Skill: `/home/quant/.agents/skills/code-review/SKILL.md`.
 
@@ -35,8 +35,22 @@ from quote polling while retaining it for historical evaluation. The added
 test proves a volume-only M1 observation still obtains a fresh quote and a
 real quote crossing triggers the tick watch. Independent final Spec review
 confirmed the fix; its focused run passed 15 tests. The root focused run
-passed 29 tests; final full run passed 335 with one skip.
+passed 29 tests; first final full run passed 335 with one skip.
 
 Final Spec review: no remaining blockers. Full PostgreSQL test output and
 real runtime limitations are documented separately; review is not runtime
 acceptance.
+
+The later real publication audit found old complete snapshots outside the newest
+continuous span could stay dirty forever. `dc621a7` reconciles confirmed old
+snapshots without moving price coverage or downgrading completeness; forming
+buckets retain both false completeness flags, and new unpublishable ranges
+become partial with durable conflict segments. A no-current-coverage edge was
+then corrected by `edc799a`; only existing confirmed snapshots can publish in
+that branch. Independent final review found no remaining correctness blockers;
+Volume and managed-dataset tests passed48, final full suite passed340 with1skip.
+Performance was not included in this final review, per the user's latest scope.
+
+Standards follow-up of `dc621a7` and `edc799a` also found zero hard
+violations and zero new material smells. No standards blockers remain; the
+review was read-only and did not duplicate the passing full test run.

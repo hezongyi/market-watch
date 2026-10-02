@@ -1,0 +1,377 @@
+{
+  "passed": false,
+  "error": "TimeoutError: frame.waitForFunction: Timeout 60000ms exceeded.",
+  "measurements": [
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "5",
+      "began_ms": 1790930749814,
+      "displayed_ms": 3804,
+      "initialized_ms": 4127,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871411000,
+            "firstDataRequest": true,
+            "client": "8dee0133-c3eb-4163-b6f7-69411733585a",
+            "indicators": [],
+            "before": 1790930811000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1211,
+          "elapsed_ms": 2461,
+          "count": 198,
+          "as_of": 1790930751072,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 6.26,
+            "upstream_slot": 61.9,
+            "network_connection_connect_tcp": 0.46,
+            "network_http11_send_request_headers": 0.33,
+            "network_http11_send_request_body": 0.06,
+            "network_http11_receive_response_headers": 308.56,
+            "network_proxy_start_tls": 1878.81,
+            "network_http11_receive_response_body": 0.18,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 2189.2,
+            "upstream_decode": 0.24,
+            "database_commit": 121.58,
+            "read_total": 2431.63
+          }
+        }
+      ],
+      "range": {
+        "from": 1790877900,
+        "to": 1790933700
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1840,
+        "request_to_display_ms": 758,
+        "pages": [
+          {
+            "query": {
+              "instrument": "BTCUSDT",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M5",
+              "limit": 199,
+              "countBack": 199,
+              "from": 1790871417000,
+              "firstDataRequest": true,
+              "client": "f040dd78-f215-4c6d-99c6-e47ae7034c4f",
+              "indicators": [],
+              "before": 1790930817000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1082,
+            "elapsed_ms": 568,
+            "count": 199,
+            "as_of": 1790930755958,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 7.11
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:GBP_USD",
+      "resolution": "5",
+      "began_ms": 1790930766965,
+      "displayed_ms": 3489,
+      "initialized_ms": 3544,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:GBP_USD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871429000,
+            "firstDataRequest": true,
+            "client": "ac97b929-0909-4ef1-a928-795415bd3f19",
+            "indicators": [],
+            "before": 1790930829000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 2813,
+          "elapsed_ms": 137,
+          "count": 198,
+          "as_of": 1790930758994,
+          "boundary": false,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 36.55
+          }
+        }
+      ],
+      "range": {
+        "from": 1790877300,
+        "to": 1790933700
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1593,
+        "request_to_display_ms": 412,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:GBP_USD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M5",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790871433000,
+              "firstDataRequest": true,
+              "client": "b2f34e59-d2cf-49e8-816e-a1f3b56f63ba",
+              "indicators": [],
+              "before": 1790930833000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1181,
+            "elapsed_ms": 207,
+            "count": 198,
+            "as_of": 1790930758994,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 32.34
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "observed": {
+    "ready": false,
+    "loading": true,
+    "pending": 0,
+    "symbol": "MWP:BTCUSDT",
+    "resolution": "5",
+    "dataReady": false
+  },
+  "requests": [
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790871411000,
+        "firstDataRequest": true,
+        "client": "8dee0133-c3eb-4163-b6f7-69411733585a",
+        "indicators": [],
+        "before": 1790930811000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1211,
+      "elapsed_ms": 2461,
+      "count": 198,
+      "as_of": 1790930751072,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 6.26,
+        "upstream_slot": 61.9,
+        "network_connection_connect_tcp": 0.46,
+        "network_http11_send_request_headers": 0.33,
+        "network_http11_send_request_body": 0.06,
+        "network_http11_receive_response_headers": 308.56,
+        "network_proxy_start_tls": 1878.81,
+        "network_http11_receive_response_body": 0.18,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 2189.2,
+        "upstream_decode": 0.24,
+        "database_commit": 121.58,
+        "read_total": 2431.63
+      }
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1790871411000,
+        "firstDataRequest": true,
+        "client": "8dee0133-c3eb-4163-b6f7-69411733585a",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -2012,
+      "elapsed_ms": 2013,
+      "count": 230,
+      "as_of": 1790930755958,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 1508.33,
+        "upstream_slot": 4.96,
+        "network_http11_send_request_headers": 0.21,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 330.21,
+        "network_http11_receive_response_body": 0.26,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 331.34,
+        "upstream_decode": 0.34,
+        "database_commit": 76.19,
+        "read_total": 1963.92
+      }
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790871417000,
+        "firstDataRequest": true,
+        "client": "f040dd78-f215-4c6d-99c6-e47ae7034c4f",
+        "indicators": [],
+        "before": 1790930817000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1082,
+      "elapsed_ms": 568,
+      "count": 199,
+      "as_of": 1790930755958,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 7.11
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:GBP_USD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790871429000,
+        "firstDataRequest": true,
+        "client": "ac97b929-0909-4ef1-a928-795415bd3f19",
+        "indicators": [],
+        "before": 1790930829000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 2813,
+      "elapsed_ms": 137,
+      "count": 198,
+      "as_of": 1790930758994,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 36.55
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:GBP_USD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1790871429000,
+        "firstDataRequest": true,
+        "client": "ac97b929-0909-4ef1-a928-795415bd3f19",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -593,
+      "elapsed_ms": 596,
+      "count": 230,
+      "as_of": 1790930758994,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 24.27
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:GBP_USD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790871433000,
+        "firstDataRequest": true,
+        "client": "b2f34e59-d2cf-49e8-816e-a1f3b56f63ba",
+        "indicators": [],
+        "before": 1790930833000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1181,
+      "elapsed_ms": 207,
+      "count": 198,
+      "as_of": 1790930758994,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 32.34
+      }
+    },
+    {
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790871442000,
+        "firstDataRequest": true,
+        "client": "34bf8e7f-e3b1-415d-bf99-1f4ada3ca3ed",
+        "indicators": [],
+        "before": 1790930842000,
+        "track_history": false
+      },
+      "status": 503,
+      "at_ms": 1653,
+      "elapsed_ms": 8115
+    }
+  ],
+  "invalid_reason": "Host fixture used empty/default OANDA account in identity, so reset did not touch the target cache. Fixed target account identity before rerun."
+}

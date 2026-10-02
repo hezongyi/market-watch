@@ -3,16 +3,16 @@
 All observations are from 2026-10-02 UTC on this Ubuntu host. Candidate:
 `https://localhost:15553`, chart `https://127.0.0.1:15554`, PostgreSQL16 database
 `market_watch_volume`; local target: ports15453/15454, database `market_watch_dual`.
-Delivery/runtime source is `fe370c206402aa048bf7c7adbd08d0642e9085ef`.
+Delivery/runtime source is `edc799a97999b8cf387a03c380669bf6a8d28083`.
 
 | Evidence | Meaning |
 | --- | --- |
-| backend-pg17.txt | Final full suite:335 passed,1 skipped; fresh disposable PG17 precision/locking fixture, SQLite logical tests also run by the suite |
+| backend-pg17.txt | Final full suite:340 passed,1 skipped; fresh disposable PG17 precision/locking fixture, SQLite logical tests also run by the suite |
 | frontend-vm.json | 39 non-browser Node scripts passed, including market volume and Python internal0/1 bridge |
 | web-build.txt | TypeScript/Vite production build passed; existing chunk-size warning |
 | native-provider.json / native-managed.json | 18 real native cases per series, two sources and nine periods; canvas pixels prove Volume histograms were painted |
 | native-values-*.json | Native data-window/crossHairMoved quantities match API values |
-| native-final-candidate.json | Final same-source images:four M5 source/series cases, histogram/value/save-reopen checks |
+| native-final-candidate.json | Intermediate fe370c2 same-source images:four M5 source/series cases, histogram/value/save-reopen checks |
 | native-zero-missing.json | Controlled VOLUME:CHECK fixture in the actual native package:0 displays0, null displays∅; not a claim of an upstream zero sample |
 | upstream-alignment.json | Six confirmed provider/managed samples re-fetched from real upstream; managed M5 and monthly sums checked member by member |
 | http-csv.json | Authenticated container API and CSV exact Decimal quantities/units, both sources and both series |
@@ -36,9 +36,11 @@ Delivery/runtime source is `fe370c206402aa048bf7c7adbd08d0642e9085ef`.
 | mobile-readonly.txt | Real mobile native read-only probe; no writes or page errors. An existing viewport restoration warning is retained |
 | code-review.md | Independent Standards and Spec conclusions and fixed regressions |
 
-The 36-case matrix predates the final watch-evaluation fixes. Chart/parser/
-aggregation runtime files were unchanged by those fixes; final same-image
-four-case candidate checks, final regression suite and source/image labels
+The 36-case matrix predates the final watch-evaluation/publication fixes.
+Chart/parser/aggregation runtime files were unchanged; the publisher was
+changed to allow existing confirmed historical snapshots to reconcile outside
+the current continuous range, including when current coverage is absent.
+Final same-image browser checks, final regression suite and source/image labels
 establish the relationship. The six real upstream samples include BTC
 September managed month469465.12983000 and OANDA CAD_CHF366489. The BTC month
 required acquiring its approved September M1 range in the acceptance copy;
@@ -53,6 +55,12 @@ during an upstream error; this is not a guarantee that every observation stays
 below120s. Provider latest-tail refreshes that fetch upstream are not asserted
 to be complete cache hits.
 
+The additional complete-page cold benchmark failed its original performance
+gate (balanced12-sample serial run:3 below3s). Performance work was explicitly
+removed from scope by the user's subsequent instruction. Keep this failure;
+the delivery's accepted scope is Volume functionality and data correctness,
+not a claim that complete-page performance passed.
+
 Re-run source checks with `PYTHONPATH=backend .venv/bin/python -m pytest -q`
 and a disposable `TEST_POSTGRES_URL` (never a user database). Run browser probes
 with `node web/tests/advanced-volume.browser.cjs` and
@@ -65,3 +73,19 @@ Browser probes create dedicated acceptance workspaces. The load probe starts
 approved EURUSD/XAUUSD volume tasks, and must run only on the acceptance copy.
 Credentials, API envs, dumps and licensed chart binaries are intentionally
 kept outside Git.
+
+Final-source evidence added after the historical publication fixes:
+
+- native-release-candidate.json:four M5 source/series quantity/pixel/save-reopen checks.
+- native-release-monthly.json:two managed monthly real positive API/pixel/save-reopen checks.
+- native-release-monthly-hover.json:an extra monthly value-probe attempt could not
+  put its cursor on either of only two sparse candles; the retained crosshair
+  event was the previous M5 event. This is a probe failure, not a value match.
+  The separate monthly histogram/API checks and upstream member-sum evidence
+  establish the actual values; no claim of a new monthly data-window check.
+- native-first-screen-balanced-before-fix.json:complete-page serial performance failure.
+- native-first-screen-fixture-scope.json/fixture-identity.json:invalid fixture
+  invocations retained and corrected; not accepted cold measurements.
+
+The final publisher proof is publication-liveness.json:actual old complete
+snapshots reconcile and their dirty queues drain without advancing coverage.
