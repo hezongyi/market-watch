@@ -93,6 +93,18 @@ class DataQuery(BaseModel):
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
 
+    @model_validator(mode="before")
+    @classmethod
+    def validate_native_input_types(cls, value):
+        if isinstance(value, dict) and value.get("native_history") is not None:
+            for field in ("before", "from", "countBack", "limit"):
+                raw = value.get(field)
+                if raw is not None and (not isinstance(raw, int) or isinstance(raw, bool)):
+                    raise ValueError("原生历史数量与时间须为整数")
+            if "firstDataRequest" in value and not isinstance(value["firstDataRequest"], bool):
+                raise ValueError("firstDataRequest须为布尔值")
+        return value
+
     @model_validator(mode="after")
     def validate_managed_limit(self):
         if self.series_kind == "managed" and self.limit > 2000:

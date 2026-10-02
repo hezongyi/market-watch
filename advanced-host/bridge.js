@@ -231,7 +231,12 @@ function query(ticker, res, args, expires = Infinity) {
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
   const promise = request(q, "data", () => epoch === workspaceEpoch && Date.now() < expires &&
-    (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})));
+    (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})))
+    .catch(error=>{
+      if(epoch===workspaceEpoch && Date.now()>=expires)
+        throw Error('历史复核时间预算已耗尽');
+      throw error;
+    });
   if (series_kind === 'managed') cache.set(key, { time: Date.now(), promise });
   if (cache.size > 64) cache.delete(cache.keys().next().value);
   return promise;
@@ -410,10 +415,10 @@ const feed = {
             if(!reviewed.history_revalidation) throw Error('后端未提供历史复核结果');
             page=reviewed;
             if(reviewed.history_revalidation.changed || historyOlder(reviewed,providerHistoryState.get(historyKey)))
-              providerWork.correction={generation,verified:reviewed.history_revalidation.changed===true,attempts:0};
+              mergeProviderCorrection(providerWork,generation,reviewed.history_revalidation.changed===true);
           } catch(error) {
             if(error.code==='HISTORY_CANCELLED') throw error;
-            providerWork.correction={generation,verified:false,attempts:0};
+            mergeProviderCorrection(providerWork,generation,false);
             send({type:'error',error:'历史复核未完成：'+String(error)});
           }
         }
@@ -544,6 +549,10 @@ function hasHistoryViewer(args) {
   return false;
 }
 let historyReloading = false;
+function mergeProviderCorrection(work,generation,verified) {
+  // A failed/older review cannot erase an earlier confirmed real revision.
+  work.correction={generation,verified:verified || work.correction?.verified === true,attempts:0};
+}
 function historyOlder(page,seen) {
   return !!seen && ((page.cache_revision||0)<seen.revision ||
     (page.as_of||0)<seen.observed_at);

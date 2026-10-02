@@ -253,3 +253,52 @@ def test_concurrent_activation_merges_max_and_reopens_completed_goals(provider_p
         assert targets[0]['count'] == targets[9]['count'] == 12
         assert not targets[0]['done']
         assert all(t['generation'] == 0 for t in targets if t['frame'] != 'M5')
+
+
+def test_snapshot_housekeeping_skips_a_locked_dataset(provider_pg):
+    from test_provider_cache import seed
+    factory, _ = provider_pg
+    key = seed(META, 'M5', 10000, page(1000, 10000))
+    with factory.begin() as writer:
+        writer.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update())
+        token = cache.DEADLINE.set(time.monotonic() + 0.5)
+        try:
+            started = time.monotonic()
+            state = cache.snapshot(key, 10000, 5)
+            assert len(state['bars']) == 5
+            assert time.monotonic() - started < 0.5, 'accessed_at cannot block coherent delivery'
+        finally:
+            cache.DEADLINE.reset(token)
+
+
+def test_expired_pool_waiter_executes_no_provider_statement(provider_pg):
+    from sqlalchemy import event
+    from test_provider_cache import seed
+    factory, engine = provider_pg
+    key = seed(META, 'M5', 10000, page(1000, 10000))
+    held = [engine.connect(), engine.connect()]
+    started = threading.Event()
+    statements = []
+    def observed(conn, cursor, statement, params, context, many):
+        statements.append(statement)
+    event.listen(engine, 'before_cursor_execute', observed)
+    def waiter():
+        token = cache.DEADLINE.set(time.monotonic() + 0.1)
+        try:
+            started.set()
+            return cache.snapshot(key, 10000, 5)
+        finally:
+            cache.DEADLINE.reset(token)
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pending = pool.submit(waiter)
+            assert started.wait(1)
+            time.sleep(0.2)
+            held.pop().close()
+            with pytest.raises(TimeoutError):
+                pending.result(timeout=2)
+        assert statements == [], 'expired acquisition must release without provider SQL'
+    finally:
+        for connection in held:
+            connection.close()
+        event.remove(engine, 'before_cursor_execute', observed)

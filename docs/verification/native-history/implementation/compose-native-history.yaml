@@ -1,0 +1,10 @@
+# Compose with compose.acceptance.yaml using the private /tmp/mw-native-history env.
+services:
+  chart-origin:
+    ports: !override ["127.0.0.1:15217:80"]
+  tls:
+    ports: !override ["127.0.0.1:15473:443", "127.0.0.1:15474:444"]
+networks:
+  default:
+    external: true
+    name: market-watch-native-history

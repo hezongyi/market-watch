@@ -9,11 +9,13 @@ import json
 import logging
 import threading
 import time
+from contextlib import contextmanager
 from contextvars import ContextVar
 
-from sqlalchemy import exists, literal, select, true, update
+from sqlalchemy import exists, literal, select, text, true, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+from sqlalchemy.exc import DBAPIError
 
 from . import provider_chart as upstream
 from .chart_indicators import calculate, history_requirement
@@ -33,6 +35,33 @@ def check_cancelled():
     event = CANCELLED.get()
     if event is not None and event.is_set():
         raise TimeoutError("平台读取已取消")
+
+
+def database_budget(db):
+    # Pool checkout timeout is shared configuration. After a delayed checkout,
+    # expired workers release without querying data; the API owns HTTP deadline.
+    connection = db.connection()
+    check_cancelled()
+    deadline = DEADLINE.get()
+    if deadline is not None:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("平台数据库读取超过时间预算")
+        if connection.dialect.name == "postgresql":
+            db.execute(text("SELECT set_config('statement_timeout', :budget, true)"),
+                       {"budget": str(max(1, int(remaining * 1000)))})
+
+
+@contextmanager
+def budget_transaction():
+    try:
+        with transaction() as db:
+            database_budget(db)
+            yield db
+    except DBAPIError as error:
+        if getattr(error.orig, "sqlstate", None) in ("57014", "55P03"):
+            raise TimeoutError("平台数据库读取超过时间预算") from error
+        raise
 
 
 def interactive_busy(source):
@@ -75,7 +104,7 @@ def merge_ranges(ranges):
 
 def ensure(meta, frame):
     key = identity(meta, frame)
-    with transaction() as db:
+    with budget_transaction() as db:
         insert = pg_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
         db.execute(
             insert(ProviderDataset)
@@ -128,7 +157,7 @@ def snapshot(key, before, count, *, observation=None, bounded_limit=None):
         .select_from(ProviderDataset).outerjoin(bounded, true())
         .where(ProviderDataset.id == key).order_by(bounded.c.chart_time)
     )
-    with transaction() as db:
+    with budget_transaction() as db:
         records = db.execute(statement).all()
         if not records:
             raise ValueError("平台缓存已清理，请重试")
@@ -141,7 +170,11 @@ def snapshot(key, before, count, *, observation=None, bounded_limit=None):
                 if readable and r.chart_time is not None and r.chart_time >= readable[0]]
         boundary = bool(readable and metadata.earliest and readable[0] == 0 and len(rows) <= count)
         # Access is housekeeping, not part of the published observation version.
-        db.execute(update(ProviderDataset).where(ProviderDataset.id == key)
+        # Housekeeping skips a busy dataset row instead of blocking delivery.
+        touched = select(ProviderDataset.id).where(ProviderDataset.id == key)
+        if db.get_bind().dialect.name == "postgresql":
+            touched = touched.with_for_update(skip_locked=True)
+        db.execute(update(ProviderDataset).where(ProviderDataset.id.in_(touched))
                    .values(accessed_at=now_ms()))
         return {
             "bars": rows[-count:],
@@ -159,7 +192,7 @@ def snapshot(key, before, count, *, observation=None, bounded_limit=None):
 
 
 def claim(key):
-    with transaction() as db:
+    with budget_transaction() as db:
         now = now_ms()
         token = uid()
         generation = db.scalar(
@@ -179,7 +212,7 @@ def claim(key):
 
 
 def release(key, lease):
-    with transaction() as db:
+    with budget_transaction() as db:
         row = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update())
         if row and (row.lease_token, row.generation) == lease:
             row.lease_token = None
@@ -194,7 +227,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
     if boundary:
         start = 0
     changed = []
-    with transaction() as db:
+    with budget_transaction() as db:
         dataset = db.scalar(
             select(ProviderDataset).where(ProviderDataset.id == key).with_for_update()
         )
@@ -351,29 +384,37 @@ def _read(meta, frame, before, count, *, latest=False, deadline=None):
     raise TimeoutError("平台分页未完成，请重试")
 
 
-def read(meta, frame, before, count, *, latest=False, deadline=None):
+def _observed_read(meta, frame, count, operation):
     started = time.monotonic()
     timings = {}
     token = upstream.TIMINGS.set(timings)
     with _ACTIVE_LOCK:
         _ACTIVE_READS[meta["source"]] += 1
     try:
-        result = _read(meta, frame, before, count, latest=latest, deadline=deadline)
+        result = operation()
         timings["read_total"] = (time.monotonic() - started) * 1000
-        return {**result, "timings_ms": {name: round(value, 2) for name, value in timings.items()}}
+        attempts = timings.pop("candles_attempts", [])
+        return {**result, "candles_http_attempts": attempts,
+                "timings_ms": {name: round(value, 2) for name, value in timings.items()}}
     except Exception as error:
         log.warning(
             "Provider read failed source=%s frame=%s count=%s type=%s status=%s elapsed_ms=%.2f timings_ms=%s",
             meta["source"], frame, count, type(error).__name__,
             getattr(getattr(error, "response", None), "status_code", None),
             (time.monotonic() - started) * 1000,
-            {name: round(value, 2) for name, value in timings.items()},
+            {name: round(value, 2) if isinstance(value, (int, float)) else value
+             for name, value in timings.items()},
         )
         raise
     finally:
         upstream.TIMINGS.reset(token)
         with _ACTIVE_LOCK:
             _ACTIVE_READS[meta["source"]] -= 1
+
+
+def read(meta, frame, before, count, *, latest=False, deadline=None):
+    return _observed_read(meta, frame, count,
+                          lambda: _read(meta, frame, before, count, latest=latest, deadline=deadline))
 
 
 def _native_read(meta, body, before, count, prefix, latest):
@@ -457,19 +498,8 @@ def _native_read(meta, body, before, count, prefix, latest):
 
 
 def native_read(meta, body, before, count, prefix, latest):
-    started = time.monotonic()
-    timings = {}
-    token = upstream.TIMINGS.set(timings)
-    with _ACTIVE_LOCK:
-        _ACTIVE_READS[meta["source"]] += 1
-    try:
-        result = _native_read(meta, body, before, count, prefix, latest)
-        timings["read_total"] = (time.monotonic() - started) * 1000
-        return {**result, "timings_ms": {k: round(v, 2) for k, v in timings.items()}}
-    finally:
-        upstream.TIMINGS.reset(token)
-        with _ACTIVE_LOCK:
-            _ACTIVE_READS[meta["source"]] -= 1
+    return _observed_read(meta, body.timeframe, count + prefix,
+                          lambda: _native_read(meta, body, before, count, prefix, latest))
 
 
 def data(body):
@@ -482,6 +512,8 @@ def data(body):
     latest = body.before is None or body.first_data_request and body.before >= now - 120000
     extra = max((history_requirement(spec) for spec in body.indicators), default=0)
     native = body.native_history is not None
+    if native:
+        latest = body.before is None or before >= now - 120000
     page = (native_read(meta, body, before, count, extra, latest) if native else
             read(meta, body.timeframe, before, count + extra, latest=latest))
     output_count = page.get("mandatory_count", count)

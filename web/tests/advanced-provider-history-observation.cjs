@@ -67,5 +67,20 @@ function page(revision,at,last=990000,close=2){return {cache_revision:revision,a
    }
   }finally{x.dispose()}
  }
+ const x=setup();
+ try {
+  x.begin('firstOld',1,900);x.begin('secondOld',2,910);x.begin('latest',3,1000);
+  const [first,second,latest]=x.data();
+  await x.respond(latest,page(12,12000));await x.ctx.latest;
+  await x.respond(first,page(11,11000,900000));
+  await x.respond(x.data().at(-1),{...page(13,13000,900000),history_revalidation:{changed:true}});
+  await x.ctx.firstOld;
+  assert.equal(x.ctx.reloads,0,'another old callback keeps correction pending');
+  await x.respond(second,page(10,10000,900000));
+  await x.respond(x.data().at(-1),null,'second review failed');await x.ctx.secondOld;
+  await vm.runInContext('flushProviderCorrections()',x.ctx);await flush();
+  assert.equal(x.ctx.reloads,1,'failed later review cannot erase a confirmed correction');
+  assert.equal(x.ctx.delivered.length,3);
+ } finally {x.dispose()}
  console.log('Late native history: backfill, revision, failed/legacy review and inactive correction passed');
 })().catch(error=>{console.error(error);process.exitCode=1});

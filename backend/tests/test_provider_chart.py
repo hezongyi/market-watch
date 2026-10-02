@@ -478,3 +478,13 @@ def test_cold_optional_does_not_add_candles_http(source, count, database, monkey
     assert len(off[0]) == len(on[0]), 'compare real HTTP calls, not native_page invocations'
     assert on[1]['mandatory_count'] == count
     assert off[1]['bars'] == on[1]['bars'][-count:]
+
+
+@pytest.mark.parametrize('field,value', [('countBack',True),('countBack','200'),('countBack',200.0),
+                                       ('before','1000000'),('from',False),('firstDataRequest',1)])
+def test_native_history_rejects_number_and_time_coercion(field, value):
+    from alerts.chart_api import DataQuery
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        DataQuery(**{'instrument':'BTCUSDT','series_kind':'provider','timeframe':'M5',
+                     'native_history':{'chart_count':1},field:value})

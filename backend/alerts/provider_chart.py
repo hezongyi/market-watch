@@ -136,10 +136,21 @@ def _request(client, url, *, params, headers=None, deadline):
                         record_timing("network_" + stage.replace(".", "_"), phases.pop(stage))
                 try:
                     with activity(client) as client:
+                        timings = TIMINGS.get()
+                        if timings is not None:
+                            attempts = timings.setdefault("candles_attempts", [])
+                            attempt_record = {"attempt": attempt + 1}
+                            attempts.append(attempt_record)
                         response = client.get(
                             url, params=params, headers=headers, timeout=min(7, remaining),
                             extensions={"trace": trace},
                         )
+                        if timings is not None:
+                            attempt_record["status"] = response.status_code
+                except Exception as error:
+                    if TIMINGS.get() is not None and 'attempt_record' in locals():
+                        attempt_record["error"] = type(error).__name__
+                    raise
                 finally:
                     record_timing("upstream_http", http_started)
             if response.status_code not in (429, 502, 503, 504) or attempt == 2:
