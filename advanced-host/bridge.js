@@ -5,6 +5,26 @@ if (!parentOrigin || new URL(parentOrigin).origin !== parentOrigin)
 const send = (value) =>
   parent.postMessage({ channel: "mw-chart-v1", ...value }, parentOrigin);
 const pending = new Map();
+// Use public native dialogs. The widget has no public non-modal toast API.
+// Keep acknowledged conditions deduplicated until the parent clears them.
+const acknowledgedNotices = new Set();
+let activeNotices = [], noticeDialogOpen = false, chartMenu;
+function showNextNotice() {
+  if (!ready || noticeDialogOpen) return;
+  const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
+  if (!notice) return;
+  acknowledgedNotices.add(notice.key);
+  noticeDialogOpen = true;
+  const done = () => { noticeDialogOpen = false; showNextNotice(); };
+  if (notice.recover) widget.showConfirmDialog({
+    title: "草稿待恢复", body: notice.text,
+    callback: confirmed => {
+      if (confirmed) send({type: "workspace-action", action: "recover"});
+      done();
+    },
+  });
+  else widget.showNoticeDialog({title: "图表提示", body: notice.text, callback: done});
+}
 let seq = 0,
   widget,
   ready = false,
@@ -248,6 +268,10 @@ function historyQuery(args) {
   return promise;
 }
 const feed = {
+  // The native price-axis countdown requires server time in UNIX seconds.
+  // Authenticated/network access stays in the trusted parent origin.
+  getServerTime: (cb) => request({op: "serverTime"}, "market")
+    .then(cb).catch(error => send({type: "error", error: "服务器时间获取失败：" + String(error)})),
   getQuotes: (symbols, cb, err) => {
     if (!symbols.length) {
       queueMicrotask(() => cb([]));
@@ -276,6 +300,7 @@ const feed = {
           supported_resolutions: resolutions,
           supports_marks: false,
           supports_timescale_marks: false,
+          supports_time: true,
         }),
       0,
     ),
@@ -1005,6 +1030,7 @@ function boot(
       "chart_template_storage",
     ],
     disabled_features: [
+      "widget_logo",
       "use_localstorage_for_settings",
       "open_account_manager",
       "create_volume_indicator_by_default",
@@ -1022,6 +1048,8 @@ function boot(
     ],
   });
   widget.onChartReady(async () => {
+    const grid = chartGridPresentation(widget, preferences,
+      value => prefs.savePreference("setting", "mw.gridStyle", value), readonly);
     if (!doc.state) {
       widget.crosshairSync().setValue(true);
       widget.timeSync().setValue(true);
@@ -1049,79 +1077,11 @@ function boot(
     widget
       .headerReady()
       .then(async () => {
-        chartThemeMenu(widget, (e) =>
-          send({ type: "error", error: "主题切换失败：" + String(e) }),
-        );
-        widget.createButton({
-          align: "right",
-          useTradingViewStyle: true,
-          text: "导出 CSV",
-          title: "导出行情及当前 Python 指标",
-          onClick: () => {
-            const chart = widget.activeChart();
-            const {symbol:instrument,series_kind} = decode(chart.symbol());
-            const indicators = [];
-            for (const study of chart.getAllStudies()) {
-              const name = Object.keys(catalog).find(
-                (name) => study.name === "守望 Python " + name,
-              );
-              if (!name) continue;
-              const inputs = chart.getStudyById(study.id).getInputValues();
-              indicators.push({
-                name,
-                id: study.id,
-                params: Object.fromEntries(
-                  Object.keys(catalog[name].params).map((key) => [
-                    key,
-                    inputs.find((input) => input.id === key)?.value ??
-                      catalog[name].params[key],
-                  ]),
-                ),
-              });
-            }
-            send({
-              type: "export-selection",
-              selection: {
-                instrument,
-                series_kind,
-                theme: widget.getTheme(),
-                timeframe: frames[chart.resolution()],
-                indicators,
-              },
-            });
-          },
-        });
-        widget.createButton({
-          align: "right",
-          useTradingViewStyle: true,
-          text: "使用说明",
-          title: "图表功能与替代入口说明",
-          onClick: () =>
-            widget.showNoticeDialog({
-              title: "图表功能说明",
-              body: "保存图表样式请使用顶部“保存样式”，同名会覆盖；应用和删除在“设置 → 模板”。原生模板菜单的“保存为…”暂不可用。导出请使用顶部“导出 CSV”，包含行情及所选 Python 指标，不包含原生内置指标值。原生数据导出暂不可用。账户管理器入口保留，交易暂未接入；展开为空不代表已连接账户。手机只读，临时操作不会保存到电脑工作区。行情按 M1 更新，并非逐笔报价；成交量、盘口、新闻、交易执行和图上预警暂未接入。",
-              callback: () => {},
-            }),
-        });
-        widget.createButton({
-          align: "right",
-          useTradingViewStyle: true,
-          text: "返回守望",
-          title: "返回守望工作台",
-          onClick: () => send({ type: "workspace-action", action: "home" }),
-        });
-      })
-      .catch((e) => send({ type: "error", error: String(e) }));
-    if (!readonly) {
-      widget
-        .headerReady()
-        .then(() => {
-          widget.createButton({
-            align: "right",
-            useTradingViewStyle: true,
-            text: "保存样式",
-            title: "保存图表样式模板",
-            onClick: async () => {
+        chartMenu = chartThemeMenu(widget, (e) =>
+          send({ type: "error", error: String(e) }),
+          grid, [
+            {label: "守望主页", run: () => send({type: "workspace-action", action: "home"})},
+            ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
                 const epoch = workspaceEpoch;
                 const index = widget.activeChartIndex();
@@ -1142,8 +1102,25 @@ function boot(
               } catch (error) {
                 send({ type: "error", error: String(error) });
               }
-            },
-          });
+            }}] : []),
+            ...(!readonly ? [{label: "维护历史", title: "填写历史起点，并持续维护最新行情", run: () => {
+              const identity = decode(widget.activeChart().symbol());
+              if (identity.series_kind === "managed") send({type: "maintenance-required", instrument: identity.symbol});
+              else send({type: "history-plans-open"});
+            }}] : []),
+            {label: "刷新历史", title: "载入新发布历史，保留柱宽与查看位置", run: () => refreshManagedHistory()},
+            {label: "历史任务", run: () => send({type: "history-plans-open"})},
+            ...(!readonly ? [{label: "复制恢复草稿", recovery: true,
+              run: () => send({type: "workspace-action", action: "recover"})}] : []),
+          ],
+        );
+
+      })
+      .catch((e) => send({ type: "error", error: String(e) }));
+    if (!readonly) {
+      widget
+        .headerReady()
+        .then(() => {
           widget.createButton({
             align: "right",
             useTradingViewStyle: true,
@@ -1164,7 +1141,9 @@ function boot(
     pendingSync = undefined;
     ready = true;
     loading = false;
+    send({ type: "theme-changed", theme: widget.getTheme() });
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
+      send({ type: "theme-changed", theme: widget.getTheme() });
       if (readonly || !standard || onlyActive) return;
       const theme = String(name).toLowerCase() === "light" ? "Light" : "Dark";
       prefs
@@ -1271,18 +1250,6 @@ function boot(
     });
     send({ type: "ready" });
     clearInterval(progressivePoll);
-    widget.headerReady().then(()=> {
-      widget.createButton({align:'right',useTradingViewStyle:true,text:'维护历史',
-        title:'填写历史起点，并持续维护最新行情',onClick:()=> {
-          const identity=decode(widget.activeChart().symbol());
-          if(identity.series_kind==='managed') send({type:'maintenance-required',instrument:identity.symbol});
-          else send({type:'history-plans-open'});
-        }});
-      widget.createButton({align:'right',useTradingViewStyle:true,text:'刷新历史',
-        title:'载入新发布历史，保留柱宽与查看位置',onClick:()=>refreshManagedHistory()});
-      widget.createButton({align:'right',useTradingViewStyle:true,text:'历史任务',
-        title:'查看维护状态和各周期可用范围',onClick:()=>send({type:'history-plans-open'})});
-    });
     demandReporter?.dispose();
     demandReporter=undefined;
     poll = setInterval(() => {
@@ -1300,6 +1267,18 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if (m.type === "notifications" && Array.isArray(m.notices) && ready) {
+    activeNotices = m.notices.slice(0, 24).filter(entry =>
+      typeof entry.id === "string" && entry.id.length <= 2100 &&
+      typeof entry.text === "string" && entry.text.length <= 2000 && entry.text)
+      .map(entry => ({key: JSON.stringify([entry.id, entry.text]),
+        text: entry.text.replace(/^(?:Error:\s*)+/, ""), recover: entry.recover === true && !nativeReadonly}));
+    const live = new Set(activeNotices.map(entry => entry.key));
+    for (const key of acknowledgedNotices) if (!live.has(key)) acknowledgedNotices.delete(key);
+    chartMenu?.setDraftBlocked(m.draftBlocked === true);
+    showNextNotice();
+    return;
+  }
   if(m.type==='provider-event') {
     const event=m.event,sub=[...subscriptions.values()].find(s=>s.providerListener===event?.listener);
     if(!sub) return;

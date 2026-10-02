@@ -1,5 +1,5 @@
 /* Host-owned controls using the public header/custom-CSS integration. */
-function chartThemeMenu(chartWidget, report) {
+function chartThemeMenu(chartWidget, report, grid, actions) {
   // Obtain the chart document through the public HTML-button API, then release
   // that slot: the native header clones its contents for measuring overflow.
   // An independent button keeps the corner control out of those sizing clones.
@@ -32,9 +32,25 @@ function chartThemeMenu(chartWidget, report) {
     '</svg><span>守望<small>MARKET WATCH</small></span></div></div>' +
     '<button type="button" class="mw-chart-theme-switch" role="switch" aria-checked="false" aria-label="暗色主题">' +
     '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M13 2.5a7.5 7.5 0 1 0 4.5 11A7 7 0 0 1 13 2.5Z"/></svg>' +
-    '<span>暗色主题</span><span class="mw-chart-switch-track" aria-hidden="true"><span></span></span></button>';
+    '<span>暗色主题</span><span class="mw-chart-switch-track" aria-hidden="true"><span></span></span></button>' +
+    '<label class="mw-chart-grid-style"><span>网格线</span>' +
+    '<select aria-label="网格线样式"><option value="dotted">点线</option><option value="solid">实线</option></select></label>';
   doc.body.appendChild(panel);
   const toggle = panel.querySelector('[role="switch"]');
+  const gridSelect = panel.querySelector('select');
+  gridSelect.value = grid.value;
+  gridSelect.disabled = grid.readonly;
+  gridSelect.addEventListener("change", async () => {
+    gridSelect.disabled = true;
+    try {
+      await grid.select(gridSelect.value);
+    } catch (error) {
+      report(error);
+    } finally {
+      gridSelect.value = grid.value;
+      gridSelect.disabled = grid.readonly;
+    }
+  });
   let changing = false;
   const sync = () => {
     const dark = chartWidget.getTheme().toLowerCase() === "dark";
@@ -46,6 +62,22 @@ function chartThemeMenu(chartWidget, report) {
     button.setAttribute("aria-expanded", "false");
     if (restoreFocus) button.focus();
   };
+  for (const action of actions) {
+    const entry = doc.createElement("button");
+    entry.type = "button";
+    entry.className = "mw-chart-menu-action";
+    entry.textContent = action.label;
+    entry.title = action.title || action.label;
+    if (action.recovery) {
+      entry.dataset.recovery = "true";
+      entry.hidden = true;
+    }
+    entry.addEventListener("click", async () => {
+      close(true);
+      try { await action.run(); } catch (error) { report(error); }
+    });
+    panel.appendChild(entry);
+  }
   const open = () => {
     sync();
     panel.hidden = false;
@@ -83,4 +115,8 @@ function chartThemeMenu(chartWidget, report) {
   });
   chartWidget.subscribe("chart_theme_changed", sync);
   sync();
+  return {setDraftBlocked(blocked) {
+    for (const entry of panel.querySelectorAll('[data-recovery="true"]'))
+      entry.hidden = !blocked;
+  }};
 }

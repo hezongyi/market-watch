@@ -2,6 +2,17 @@
    The symbol-search id is public library markup; no vendor node is moved. */
 #header-toolbar-symbol-search { margin-left: 52px; }
 
+/* Skin the native indicator button through custom_css_url. Its native click,
+   keyboard shortcuts and responsive sizing remain intact. */
+/* Reference silhouette: four touching columns (4, 7, 5, 10px), a
+   separate rising polyline, and pixel-aligned 1px strokes at native size. */
+[data-name="open-indicators-dialog"] > [role="img"] {
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6.5%2011.5%205-5%204%204%207-5%22%2F%3E%3Cpath%20d%3D%22M6.5%2022.5v-4h4v-3h4v2h4v-5h4v10h-16Zm4%200v-4m4%204v-5m4%205v-5%22%2F%3E%3C%2Fsvg%3E") center / 28px 28px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6.5%2011.5%205-5%204%204%207-5%22%2F%3E%3Cpath%20d%3D%22M6.5%2022.5v-4h4v-3h4v2h4v-5h4v10h-16Zm4%200v-4m4%204v-5m4%205v-5%22%2F%3E%3C%2Fsvg%3E") center / 28px 28px no-repeat;
+}
+[data-name="open-indicators-dialog"] > [role="img"] > svg { visibility: hidden; }
+
 .mw-chart-menu-button,
 .mw-chart-menu {
   --mw-menu-bg: var(--tv-color-pane-background, var(--color-pane-bg, #fff));
@@ -92,6 +103,27 @@
   color: var(--mw-brand-muted);
   margin-top: 3px;
 }
+.mw-chart-grid-style {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+  padding: 0 8px;
+}
+.mw-chart-grid-style select {
+  background: var(--mw-menu-bg);
+  color: inherit;
+  border: 1px solid var(--mw-menu-line);
+  border-radius: 4px;
+  min-height: 32px;
+  padding: 4px 8px;
+  font: inherit;
+  cursor: pointer;
+}
+.mw-chart-grid-style select:focus-visible {
+  outline: 2px solid var(--mw-menu-focus);
+}
 .mw-chart-theme-switch {
   display: flex;
   align-items: center;
@@ -107,6 +139,21 @@
   cursor: pointer;
   touch-action: manipulation;
 }
+.mw-chart-menu-action {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.mw-chart-menu-action[hidden] { display: none; }
+.mw-chart-menu-action:hover { background: var(--mw-menu-hover); }
+.mw-chart-menu-action:focus-visible { outline: 2px solid var(--mw-menu-focus); }
 .mw-chart-menu-button:hover,
 .mw-chart-theme-switch:hover { background: var(--mw-menu-hover); }
 .mw-chart-menu-button:focus-visible,
