@@ -4,6 +4,8 @@ Acquisition writes ordinary candles as staging. A publisher copies only covered,
 finished results in bounded transactions; readers never see unfinished revisions.
 """
 
+import hashlib
+import json
 from datetime import UTC, date, datetime, time, timedelta
 from math import ceil
 
@@ -19,6 +21,7 @@ from .storage import (
     ChartAggregationJob,
     ChartHistoryPlan,
     ChartPublication,
+    ChartPublicationJob,
     ChartPublishedBar,
     Instrument,
     instant,
@@ -126,6 +129,57 @@ def _bounds(at, frame, inst):
     return (bounds if frame in ("M30", "W1", "MN") else bucket_bounds)(instant(at), frame, calendar)
 
 
+def publish_corrections(db, inst, pub, frame, left, right, pending, now):
+    """Reconcile one dirty page without moving the published coverage edges."""
+    if pub is None:
+        return
+    jobs = list(db.scalars(select(ChartPublicationJob).where(
+        ChartPublicationJob.instrument_id == inst.id,
+        ChartPublicationJob.timeframe == frame,
+        ~select(ChartAggregationJob.id).where(
+            ChartAggregationJob.instrument_id == inst.id,
+            ChartAggregationJob.timeframe == _source(frame),
+            ChartAggregationJob.start < ChartPublicationJob.end,
+            ChartAggregationJob.end > ChartPublicationJob.start,
+        ).exists(),
+    ).order_by(ChartPublicationJob.start.desc()).limit(BATCH)))
+    if not jobs:
+        return
+    queued = {job.start: job for job in jobs}
+    rows = chart_rows(db, inst, frame, jobs[0].end, BATCH, now)
+    existing = {row.start: row for row in db.scalars(select(ChartPublishedBar).where(
+        ChartPublishedBar.instrument_id == inst.id,
+        ChartPublishedBar.timeframe == frame,
+        ChartPublishedBar.start.in_([row["start"] for row in rows]),
+    ))}
+    for row in rows:
+        job = queued.get(row["start"])
+        if row["start"] < max(left, pub.start) or row["start"] >= min(right, pub.end):
+            continue
+        if any(j.start < row["end"] and j.end > row["start"] for j in pending):
+            continue
+        if row["end"] <= right and not row["complete"]:
+            continue
+        # A forming bucket still needs a covered prefix; don't publish missing history.
+        row = {**row, "complete": row["complete"] and row["end"] <= right}
+        old = existing.get(row["start"])
+        if old is None:
+            # New observations inside proven coverage are legitimate corrections.
+            db.add(ChartPublishedBar(instrument_id=inst.id, timeframe=frame,
+                                     start=row["start"], end=row["end"],
+                                     complete=row["complete"], payload=row, revision=1))
+            pub.complete_count += int(row["complete"])
+            pub.revision += 1
+        elif old.payload != row:
+            pub.complete_count += int(row["complete"]) - int(old.complete)
+            old.end, old.complete, old.payload = row["end"], row["complete"], row
+            old.revision += 1
+            pub.revision += 1
+        if job is not None:
+            db.delete(job)
+    db.flush()
+
+
 def publish_frame(db, inst, plan, frame, now):
     spans = continuous_coverage(db, inst, plan, now)
     if not spans:
@@ -147,6 +201,7 @@ def publish_frame(db, inst, plan, frame, now):
             )
         )
     )
+    publish_corrections(db, inst, pub, frame, left, right, pending, now)
     if pending:
         # A pending slice is a barrier: publish only the completed suffix on
         # its right, retaining previous snapshots on its left unchanged.
@@ -257,7 +312,8 @@ def publish_frame(db, inst, plan, frame, now):
     statement = insert(ChartPublishedBar.__table__)
     statement = statement.on_conflict_do_update(
         index_elements=["instrument_id", "timeframe", "start"],
-        set_={k: getattr(statement.excluded, k) for k in ("end", "complete", "payload")},
+        set_={**{k: getattr(statement.excluded, k) for k in ("end", "complete", "payload")},
+              "revision": ChartPublishedBar.revision + 1},
     )
     if values:
         db.execute(statement, values)
@@ -442,6 +498,35 @@ def read_rows(db, inst, frame, before, limit, *, dataset_start=None):
     ]
 
 
+def published_history_check(db, inst, pub, visible, body):
+    """Fingerprint a stable session prefix, excluding appends and the streamed last bar."""
+    if not body.track_history or not visible or pub is None:
+        return None
+    next_before = visible[-1]["start"]
+    before = body.revision_before or next_before
+    after = body.revision_after
+    lower = after or 0
+    if after is not None and body.timeframe in ("D1", "W1", "MN"):
+        # The datafeed reports UTC trading-date labels; published keys are session opens.
+        lower = date_start(inst, instant(after).date().isoformat())
+    lower = max(pub.start, body.dataset_start or pub.start, lower)
+
+    def fingerprint(boundary):
+        stamp = db.execute(select(
+            func.count(ChartPublishedBar.start), func.sum(ChartPublishedBar.revision)
+        ).where(
+            ChartPublishedBar.instrument_id == inst.id,
+            ChartPublishedBar.timeframe == body.timeframe,
+            ChartPublishedBar.start >= lower,
+            ChartPublishedBar.start < min(boundary, pub.end),
+        )).one()
+        return hashlib.sha256(json.dumps(list(stamp)).encode()).hexdigest()
+
+    revision = fingerprint(before)
+    return dict(before=before, after=after, revision=revision, next_before=next_before,
+                next_revision=revision if before == next_before else fingerprint(next_before))
+
+
 def data(body):
     from .chart_data import future_grid
     from .chart_indicators import calculate
@@ -476,6 +561,7 @@ def data(body):
         revision = pub.revision if pub else 0
         basis, calendar, precision = inst.basis, inst.calendar, inst.precision
         future = future_grid(inst, body.timeframe, visible[-1]["end"]) if visible else []
+        history_check = published_history_check(db, inst, pub, visible, body)
     indicators = []
     for spec in body.indicators:
         result = calculate(rows, spec)
@@ -500,7 +586,7 @@ def data(body):
         has_more=len(rows) > body.limit,
         bounded_history=True,
         history_revision=str(revision),
-        history_check=None,
+        history_check=history_check,
         future=future,
         basis=basis,
         calendar=calendar,

@@ -66,6 +66,7 @@ def upsert(db, instrument_id, timeframe, c):
         )
     )
     values = {k: getattr(c, k) for k in ["open", "high", "low", "close", "complete"]}
+    changed = row is None or any(getattr(row, k) != v for k, v in values.items())
     if row:
         if any(getattr(row, k) != v for k, v in values.items()):
             db.add(
@@ -92,6 +93,10 @@ def upsert(db, instrument_id, timeframe, c):
         )
         db.add(row)
     db.flush()
+    if changed:
+        from .publication_jobs import enqueue_publication
+
+        enqueue_publication(db, instrument_id, timeframe, [ms(c.start)])
     return row
 
 

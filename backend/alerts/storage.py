@@ -482,6 +482,16 @@ class ChartPublishedBar(Base):
     end: Mapped[int] = mapped_column(BigInteger)
     complete: Mapped[bool] = mapped_column(Boolean)
     payload: Mapped[dict] = mapped_column(JSON)
+    revision: Mapped[int] = mapped_column(default=1, server_default="1")
+
+
+class ChartPublicationJob(Base):
+    """Durable dirty buckets, committed with staging changes and cleared on publication."""
+    __tablename__ = "chart_publication_jobs"
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(8), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    end: Mapped[int] = mapped_column(BigInteger)
 
 
 class ProviderDataset(Base):
