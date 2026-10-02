@@ -1,0 +1,35 @@
+{
+  "base_version": "1.3.2",
+  "change": "Chart toolbar hamburger menu with dark/light theme selection",
+  "deployed": true,
+  "verified_at": "2026-10-02T07:29:27.762608+00:00",
+  "chart_source_commit": "fd281ca162755a872f0e1fa6196d8390fc550d74",
+  "chart_source_sha256": "2cff376088f8ec6e7ada32f9987c389219b801f7290531b6ae05220214798242",
+  "chart_image": {
+    "tag": "market-watch-chart-origin:1.3.2-menu-fd281ca",
+    "id": "sha256:9ea7b4ebe591aef2e0fab5019222fdbce069a52c73f3239855d012c90074a9be",
+    "labels": {
+      "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+      "org.opencontainers.image.revision": "fd281ca162755a872f0e1fa6196d8390fc550d74",
+      "org.opencontainers.image.version": "1.3.2"
+    }
+  },
+  "previous_chart_image": {
+    "tag": "market-watch-chart-origin:1.3.2-9596b25",
+    "id": "sha256:b8129d6cfaedc14cb785b6cd0ff8f5c461869e6e9bc9100a4581b7b2c495d8a3"
+  },
+  "project": "market-watch-dual-acceptance",
+  "runtime_image_selection": "deploy/releases/v1.3.2-local.env",
+  "browser_evidence": "docs/verification/v1.3.2-local/theme-menu/browser.json",
+  "schema": "o16_managed_revisions",
+  "api_and_workers_changed": false,
+  "menu_position": "Native toolbar left group, after the layout button; the public dropdown API does not support inserting it at the far-left corner.",
+  "verification": {
+    "dark": "clicked and persisted across reload",
+    "light": "clicked and persisted across reload",
+    "keyboard": "Enter opens, Escape dismisses",
+    "browser_errors": 0,
+    "original_theme_preference_restored": true,
+    "test_workspace_removed": true
+  }
+}
