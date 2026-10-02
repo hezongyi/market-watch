@@ -23,7 +23,7 @@ function chartThemeMenu(chartWidget, report) {
   panel.className = "mw-chart-menu";
   panel.hidden = true;
   panel.setAttribute("aria-label", "图表菜单");
-  panel.innerHTML = '<div class="mw-chart-menu-heading">守望图表</div>' +
+  panel.innerHTML = '<div class="mw-chart-menu-heading">market watch</div>' +
     '<button type="button" class="mw-chart-theme-switch" role="switch" aria-checked="false" aria-label="暗色主题">' +
     '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M13 2.5a7.5 7.5 0 1 0 4.5 11A7 7 0 0 1 13 2.5Z"/></svg>' +
     '<span>暗色主题</span><span class="mw-chart-switch-track" aria-hidden="true"><span></span></span></button>';
