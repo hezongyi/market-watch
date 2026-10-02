@@ -18,7 +18,7 @@
     "test_database": "native_history_tests",
     "postgres": "16"
   },
-  "default_buffer": false,
+  "default_buffer": true,
   "tuning": {
     "api_image": "sha256:e6c60c418da29a8db398de16568883e65ef7cf7e679b37b6e899117471fd5099",
     "api_source_commit": "893bf576675aa412b7ecd7a4d10ece3106a072fd",
@@ -31,8 +31,9 @@
     },
     "other_services_source": "fc8af766f44e5355e255a7c71b183ec14cb26feb",
     "formal_selected_samples": 40,
-    "formal_result": "failed; default enablement withheld",
-    "restored_runtime_buffer": false
+    "formal_result": "numeric failure retained; later accepted by user in user-acceptance-decision.json",
+    "restored_runtime_buffer": false,
+    "restored_runtime_buffer_note": "Historical restoration was off; superseded by accepted final runtime below"
   },
   "correctness_supplement": {
     "api_image": "sha256:e6c60c418da29a8db398de16568883e65ef7cf7e679b37b6e899117471fd5099",
@@ -71,7 +72,7 @@
     "services": {
       "api": {
         "container": "market-watch-native-history-api-1",
-        "image": "sha256:e6c60c418da29a8db398de16568883e65ef7cf7e679b37b6e899117471fd5099",
+        "image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
         "running": true
       },
       "web": {
@@ -82,6 +83,21 @@
       "chart-origin": {
         "container": "market-watch-native-history-chart-origin-1",
         "image": "sha256:7eac1fd5f3007499bfcd2aa4e4ea50012b808cd569763c00875998052908a0c5",
+        "running": true
+      },
+      "realtime-worker": {
+        "container": "market-watch-native-history-realtime-worker-1",
+        "image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
+        "running": true
+      },
+      "chart-history-worker": {
+        "container": "market-watch-native-history-chart-history-worker-1",
+        "image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
+        "running": true
+      },
+      "chart-aggregation-worker": {
+        "container": "market-watch-native-history-chart-aggregation-worker-1",
+        "image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
         "running": true
       }
     },
@@ -94,6 +110,27 @@
       "8000"
     ],
     "provider_workers": "running; acceptance barrier override removed",
-    "buffer": false
+    "buffer": true,
+    "optional_caps": {
+      "cold": 400,
+      "first": 2000,
+      "history": 2000
+    },
+    "api_health": "healthy"
+  },
+  "accepted_final": {
+    "source_commit": "3ea49c02df73fdd317d0af9a2abd7ef28b5f4986",
+    "api_image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
+    "image_tag": "market-watch-api:native-history-accepted",
+    "buffer": true,
+    "optional_caps": {
+      "cold": 400,
+      "first": 2000,
+      "history": 2000
+    },
+    "decision": "user-acceptance-decision.json",
+    "validation": "enabled-default-tests.txt",
+    "smoke": "browser-new-front-new-api.json",
+    "production_deployed": false
   }
 }

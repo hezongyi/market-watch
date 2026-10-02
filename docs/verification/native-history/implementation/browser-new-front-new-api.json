@@ -1,0 +1,107 @@
+{
+  "combination": "new-front-new-api",
+  "cases": [
+    {
+      "symbol": "MWP:BTCUSDT",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790890272000,
+            "firstDataRequest": true,
+            "client": "e7fd8911-f369-43fd-be22-7e4171936cb1",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790939772000,
+            "track_history": false
+          },
+          "count": 565,
+          "mandatory": 165,
+          "optional": 400,
+          "cache_hit": false
+        }
+      ],
+      "errors": [],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790890272,
+            "to": 1790939772,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790939712429.6,
+          "count": 565,
+          "duplicates": 0
+        }
+      ],
+      "displayed": 1790939719381.6,
+      "native_ms": 6952,
+      "passed": true
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790890281000,
+            "firstDataRequest": true,
+            "client": "a7533b98-6a93-4042-aafc-21f015245765",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790939781000,
+            "track_history": false
+          },
+          "count": 565,
+          "mandatory": 165,
+          "optional": 400,
+          "cache_hit": false
+        }
+      ],
+      "errors": [],
+      "trace": [
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "5",
+          "params": {
+            "from": 1790890281,
+            "to": 1790939781,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790939721533.9,
+          "count": 565,
+          "duplicates": 0
+        }
+      ],
+      "displayed": 1790939724498.9,
+      "native_ms": 2965,
+      "passed": true
+    }
+  ],
+  "finished": "2026-10-02T11:15:24.589Z",
+  "kind": "Enabled-default correctness/display smoke; not a formal latency cohort"
+}

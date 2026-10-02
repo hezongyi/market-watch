@@ -1,11 +1,18 @@
 # Native history acceptance status
 
+**Accepted for delivery on 2026-10-02 under the user's explicit Binance network
+acceptance:** “不解决binance 阻塞，由于网络问题引起的 不进行解决。 视为可以达标”.
+[Recorded decision](user-acceptance-decision.json) binds the unchanged selected
+cohort by SHA256. Original numeric performance gates remain failed for Binance;
+the acceptance decision does not change measurements or establish a network
+cause for every 503/PG miss. No further network investigation is required.
+
 Isolated branch: `feature/native-history-buffer`, baseline v1.3.2
-`9596b25eda507ef708a327feb5271f238cdfdc0b`. Implementation and corrections are
-committed through `893bf576675aa412b7ecd7a4d10ece3106a072fd`; acceptance
-harness/evidence delivery is committed at 698f81f, with a subsequent correctness supplement. Nothing is merged, pushed or
-production deployed. Default buffer remains **false**; isolated acceptance runtime was also restored to off after sampling. Overall acceptance is
-**not passed**.
+`9596b25eda507ef708a327feb5271f238cdfdc0b`. Default enablement is committed at
+`3ea49c02df73fdd317d0af9a2abd7ef28b5f4986`: **buffer=true, cold E400, first PG
+E2000, history E2000**. The ordinary isolated runtime uses that API image with
+provider workers running and no correctness-barrier override. Nothing is merged,
+pushed or production deployed.
 
 ## Primary clock and exact quantities
 
@@ -30,9 +37,9 @@ Common measured M5 first-screen native countBack is 165–166. Exact responses:
 
 These are total delivered bars, not viewport bars. Required range D can exceed
 countBack; Python prefix H, mandatory demand and capacity remain unchanged.
-Downward backend configuration limits only optional E; source defaults remain
-R2. Candidate retains two thirds of optional history and avoids the smallest
-exploration's coverage reduction, but is **not approved for default enablement**.
+Downward backend configuration limits only optional E. The accepted defaults
+are 400/2000/2000; original R2 600/3000/2000 remains a configurable experimental
+upper bound. Required D/H is never reduced.
 
 ## Fixed formal cohorts
 
@@ -74,7 +81,7 @@ This later cohort's worse Binance proportion is not a controlled causal proof
 that E 400 is slower: network conditions vary over time. Do not retest to obtain
 passing percentages or reopen prolonged proxy investigation.
 
-## Behavior and remaining acceptance
+## Behavior and recorded limits
 
 Original behavior evidence is preserved; its 2-chart CPU 4x 503 remains failed in
 [behavior audit](behavior-audit.json). Selected candidate behavior now completes
@@ -113,8 +120,8 @@ OANDA layout preparation in this later run timed out and stays unverified;
 original OANDA PG/direct success remains distinct evidence. Backend PG barriers
 and VM tests cover late old snapshots, bounded correction and worker fencing.
 
-Primary performance gate still fails on the fixed Binance common-first-screen
-cohort. Approximately 10000-bar historical navigation is a separate stress/behavior
+The original numeric performance gate fails on the fixed Binance common-first-screen
+cohort and is accepted for delivery by the explicit user decision above. Approximately 10000-bar historical navigation is a separate stress/behavior
 case: the native request itself demanded 8000–9700 bars, E=0. User clarification
 confirms that common cold loading is mandatory demand plus fixed optional bars,
 then existing finite prewarming; the large-jump timeouts are **not a 10000-bar cold
@@ -151,7 +158,13 @@ v1.3.2/new image combinations for both platforms. Native demand remains N,
 optional context is ignored/absent as expected and no extra bars are returned.
 Per-combination source/image hashes and old-web origin build argument are in
 [runtime manifest](runtime-manifest.json).
-The default enablement step is withheld until applicable gates are satisfied.
+The user accepted the Binance blocker; default enablement is now complete.
+[Final new frontend/new API smoke](browser-new-front-new-api.json) displayed both
+platforms with HTTP 200, 165 mandatory + 400 optional bars and no duplicate times
+or page errors. This two-case smoke is a correctness/display check, not a new
+formal performance cohort; Binance took 6952ms and OANDA 2965ms in its settled
+getBars-to-dataReady/double-RAF observation. These values are not merged into the
+fixed 40-sample scores.
 
 ## Verification and runtime
 
@@ -163,15 +176,17 @@ and separate six-case output remain preserved. Request lifetime, subscriptions
 and history-observation VM checks pass. Web build passed earlier with the existing
 bundle-size warning. Licensed library 2928 files show 0 changes and are not committed.
 [Independent review](review-results.md), [runtime identities](runtime-manifest.json).
-Tuning API uses the 893bf57 source build; web/chart/workers use fc8af766. Runtime
-behavior changes after fc8af766 are backend-only optional caps; no schema change.
-The precise cohort/source/image relation is listed in the manifest.
+Historical tuning cohorts use the 893bf57 API source build and fc8af766 frontend.
+Final API/provider workers use the 3ea49c0 accepted-default image; web/chart use
+fc8af766. [Enabled-default tests](enabled-default-tests.txt): **116 passed**.
+The manifest preserves historical image provenance and records final identities.
+There is no schema change.
 
 ## Switch and rollback
 
 `ALERTS_PROVIDER_NATIVE_HISTORY_BUFFER=false` disables E, preserving mandatory
 native D/H correction and native-held bars. Candidate settings are cold 400,
-first 2000, history 2000; defaults 600/3000/2000 remain unchanged. Complete source
+first 2000, history 2000; these are now the enabled source defaults. Complete source
 rollback to v1.3.2 also restores its older N/H contract. Older backend ignores
 optional unknown fields; no revalidation result is not a negative proof. Older
 frontend without context retains old demand behavior on the new backend.

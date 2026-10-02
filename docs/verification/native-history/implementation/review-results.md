@@ -82,3 +82,13 @@ Supplement validation completed 115 affected tests and all three relevant VM
 scripts. The old combined late-response setup was removed from the public
 revision-only harness; dedicated fresh-workspace positive/negative barrier
 harnesses now own interleave verification. Prior failed evidence is preserved.
+
+Final user acceptance and default enablement: the user explicitly accepted the
+Binance network blocker and directed no further investigation on 2026-10-02.
+`3ea49c0` enables backend defaults at cold400/first2000/history2000 without
+changing mandatory D/H or frontend policy. Enabled-default affected validation
+completed **116 passed**. Final actual new/new-image smoke displayed both
+platforms with HTTP200, mandatory165/optional400, no duplicate bars/page errors.
+The acceptance checker preserves numeric FAIL and permits delivery only with
+the report-hash-bound explicit decision. Original performance records remain
+unchanged; the latest smoke is not added to their fixed denominator.

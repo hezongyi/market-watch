@@ -2,8 +2,8 @@
   "description": "Acceptance evidence hashes; original cohorts preserved; no licensed library assets included",
   "files": {
     "acceptance-status.md": {
-      "sha256": "685a640331bbe1aed465ff7273ef844d7b5bf8f1cc981216ec78e2efe7d886c8",
-      "bytes": 11675
+      "sha256": "9f6c98542b0d655fe46e79934948611c381c0870f243c4253c1c6fa04d8313d8",
+      "bytes": 12668
     },
     "affected-tests.txt": {
       "sha256": "b3d9b5323656d5a0e81a464129fb32e5ec7088933f8a7b6a834e991047526b03",
@@ -112,6 +112,18 @@
     "browser-late-revision.json": {
       "sha256": "2f4b195725a08f29c316f594cca5de31abcc1578c72efa0ef0b5c3f228a01ba4",
       "bytes": 311418
+    },
+    "browser-new-front-new-api-binance.png": {
+      "sha256": "90f6c2d0acf68e4430617dfb6397adfa01b472d1442604d55891bede32a80433",
+      "bytes": 77535
+    },
+    "browser-new-front-new-api-oanda.png": {
+      "sha256": "721d97f627af3d67adf6bf3dc1bb2aa0eb58c229bfd18ba344400e13b5f82165",
+      "bytes": 72989
+    },
+    "browser-new-front-new-api.json": {
+      "sha256": "02db8fb58e3b25732d0efb29e22cbe10d72b0293adbc7326389fb92cc029ce7c",
+      "bytes": 2812
     },
     "browser-new-front-old-api-binance.png": {
       "sha256": "3f676835f766b17f134a6204d059e1ad2c2838a5163a5d3145a2aa70e231ff0b",
@@ -838,8 +850,8 @@
       "bytes": 1259
     },
     "completion-audit.md": {
-      "sha256": "5185ecb1c99cd182df70928963804331b03cf8b31394d54fca7fc3a884543f5c",
-      "bytes": 6600
+      "sha256": "53529680be793d26a2c74167e2ab0716e2c054a06c669b59c22d7174016316b4",
+      "bytes": 7059
     },
     "compose-native-history.yaml": {
       "sha256": "f2f7b7fd1cc4a2047c9e78e3becb0c066832a1e3165650d2d3e2145527a8ab16",
@@ -851,6 +863,10 @@
     },
     "delivery-affected-tests.txt": {
       "sha256": "11c0cac1b3397a1577a50da2e5e344c4deb8afdeec5d2a7ebd62eb093a7a9c9c",
+      "bytes": 696
+    },
+    "enabled-default-tests.txt": {
+      "sha256": "722cdfe65b9b1b891f19aa386f0de590afd8ba84cbc5bab4aa3f9c371de1b7fb",
       "bytes": 696
     },
     "final-affected-tests.txt": {
@@ -882,12 +898,12 @@
       "bytes": 113
     },
     "review-results.md": {
-      "sha256": "c34e20c0071ec94adbb11289743bfaa42cd441697977694c4ea9f36a56707548",
-      "bytes": 5224
+      "sha256": "f836541e5b39538eaa53cc3e092077bd1f13ba55fd0e6a29c919414b8689bb8f",
+      "bytes": 5914
     },
     "runtime-manifest.json": {
-      "sha256": "d50e95bb2e574d55cd8e37b377ad43f2a430d02ef7abc226f6d2fc9fb0203632",
-      "bytes": 4039
+      "sha256": "3b6e945eb2c0528cb61647d14cf5cc64afaf7dfa7092dabc9c29d4cb2f297202",
+      "bytes": 5545
     },
     "supplement-affected-tests.txt": {
       "sha256": "5caabbac41d8fbc52970493622d5a299d0f4c42d395f873f9eab5961a533cd8e",
@@ -896,6 +912,10 @@
     "tuning-backend-tests.txt": {
       "sha256": "1a0d4de125a6a1372a6afd2570199d1dc3164f7ef0e3549a03e8234db52f9053",
       "bytes": 695
+    },
+    "user-acceptance-decision.json": {
+      "sha256": "366a15a65ae6345051853f6d3f4bc1bee5dc4176160d5ac63d0999a02e176b04",
+      "bytes": 1317
     }
   }
 }
