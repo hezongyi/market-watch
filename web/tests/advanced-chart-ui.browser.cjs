@@ -117,6 +117,21 @@ const output = process.env.THEME_MENU_OUTPUT || '/tmp/mw-theme-menu.json';
     await ui.getByText(templateName,{exact:true}).click();
     await page.keyboard.press('Escape');
     report.menu_style_save_and_apply=true;
+    await ui.locator('[data-name="save-load-menu"]').filter({visible:true}).click();
+    const createEntry=ui.locator('[data-name="mw-layout-create"]');
+    await createEntry.waitFor({state:'visible'});
+    assert.equal(await ui.locator('[data-name="custom-tradingview-styled-button"]').filter({hasText:'新建工作区'}).count(),0);
+    page.once('dialog',dialog=>dialog.dismiss());
+    await createEntry.click();
+    assert.equal(await createEntry.count(),0,'layout dropdown closes on create');
+    await ui.locator('[data-name="save-load-menu"]').filter({visible:true}).click();
+    await createEntry.waitFor({state:'visible'});
+    assert.equal(await createEntry.count(),1,'one create entry on each open');
+    page.once('dialog',dialog=>dialog.dismiss());
+    await createEntry.focus();
+    await page.keyboard.press('Enter');
+    report.layout_create_menu={click:true,keyboard:true,reopen_no_duplicates:true};
+
     await api('advanced-charts/preferences/'+style.id+'/delete',{revision:style.revision});
     const before=await page.locator('iframe[title="专业图表工作区"]').boundingBox();
     await page.evaluate(()=>{

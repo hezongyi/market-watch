@@ -154,6 +154,14 @@
 .mw-chart-menu-action[hidden] { display: none; }
 .mw-chart-menu-action:hover { background: var(--mw-menu-hover); }
 .mw-chart-menu-action:focus-visible { outline: 2px solid var(--mw-menu-focus); }
+.mw-layout-autosave { display: flex; align-items: center; gap: 24px; cursor: pointer; }
+.mw-layout-autosave-label { flex: 1; }
+.mw-layout-autosave-label small { font-size: 11px; margin-left: 8px; opacity: .65; }
+.mw-layout-autosave .mw-chart-switch-track { background: #787b86; }
+.mw-layout-autosave[aria-checked="true"] .mw-chart-switch-track { background: #2962ff; }
+.mw-layout-autosave[aria-checked="true"] .mw-chart-switch-track > span { transform: translateX(18px); }
+.mw-layout-autosave[aria-disabled="true"] { opacity: .65; cursor: wait; }
+.mw-layout-autosave:focus-visible { outline: 2px solid #2962ff; outline-offset: -2px; }
 .mw-chart-menu-button:hover,
 .mw-chart-theme-switch:hover { background: var(--mw-menu-hover); }
 .mw-chart-menu-button:focus-visible,

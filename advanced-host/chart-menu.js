@@ -1,11 +1,84 @@
 /* Host-owned controls using the public header/custom-CSS integration. */
-function chartThemeMenu(chartWidget, report, grid, actions) {
+function chartThemeMenu(chartWidget, report, grid, actions, createWorkspace, autoSave) {
   // Obtain the chart document through the public HTML-button API, then release
   // that slot: the native header clones its contents for measuring overflow.
   // An independent button keeps the corner control out of those sizing clones.
   const slot = chartWidget.createButton({align: "left", useTradingViewStyle: false});
   const doc = slot.ownerDocument;
   chartWidget.removeButton(slot);
+  // Native layout menus are recreated on each open. Extend their existing
+  // data-name markup without replacing save/copy/rename/load handlers.
+  if (createWorkspace) {
+    const newEntry = save => {
+      const entry = save.cloneNode(true);
+      entry.removeAttribute("aria-disabled");
+      entry.removeAttribute("disabled");
+      for (const name of [...entry.classList])
+        if (/^isDisabled-/.test(name)) entry.classList.remove(name);
+      return entry;
+    };
+    const extendLayoutMenu = () => {
+      const save = doc.querySelector('[data-name="save-load-menu-item-save"]');
+      const container = save?.parentElement;
+      if (!container) return;
+      if (!container.querySelector('[data-name="mw-layout-create"]')) {
+        const entry = newEntry(save);
+        entry.dataset.name = "mw-layout-create";
+        entry.setAttribute("aria-haspopup", "dialog");
+        entry.setAttribute("tabindex", "0");
+        entry.title = "保存当前工作区并新建空白工作区";
+        const label = entry.firstElementChild;
+        entry.replaceChildren(label);
+        label.firstElementChild.textContent = "新建工作区";
+        const activate = async event => {
+          event.preventDefault();
+          event.stopPropagation();
+          doc.querySelector('[data-name="save-load-menu"]')?.click();
+          try { await createWorkspace(); } catch (error) { report(error); }
+        };
+        entry.addEventListener("click", activate);
+        entry.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") activate(event);
+        });
+        save.after(entry);
+      }
+      if (!container.querySelector('[data-name="mw-layout-autosave"]')) {
+        const entry = newEntry(save);
+        entry.dataset.name = "mw-layout-autosave";
+        entry.classList.add("mw-layout-autosave");
+        entry.setAttribute("role", "switch");
+        entry.setAttribute("aria-label", "自动保存");
+        entry.setAttribute("tabindex", "0");
+        entry.title = "开启后每30秒保存有更改的布局";
+        entry.innerHTML = '<span class="mw-layout-autosave-label">自动保存<small>30秒</small></span>' +
+          '<span class="mw-chart-switch-track" aria-hidden="true"><span></span></span>';
+        let busy = false;
+        const sync = () => {
+          entry.setAttribute("aria-checked", String(autoSave.enabled));
+          entry.setAttribute("aria-disabled", String(busy));
+        };
+        const activate = async event => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (busy) return;
+          busy = true;
+          sync();
+          try { await autoSave.select(!autoSave.enabled); } catch (error) { report(error); }
+          finally { busy = false; sync(); }
+        };
+        entry.addEventListener("click", activate);
+        entry.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") activate(event);
+        });
+        container.querySelector('[data-name="mw-layout-create"]').after(entry);
+        sync();
+      }
+    };
+    const observer = new MutationObserver(extendLayoutMenu);
+    observer.observe(doc.body, {childList: true, subtree: true});
+    extendLayoutMenu();
+    doc.defaultView.addEventListener("pagehide", () => observer.disconnect(), {once: true});
+  }
   const button = doc.createElement("button");
   button.type = "button";
   button.classList.add("mw-chart-menu-button");

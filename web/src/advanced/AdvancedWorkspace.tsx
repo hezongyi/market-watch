@@ -259,6 +259,10 @@ export default function AdvancedWorkspace() {
         });
       }
       else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
+      else if (m.type === "workspace-dirty") {
+        if (!mobile) unsaved.current = true;
+        setStatus("布局有未保存更改");
+      }
       else if (m.type === "native-saving") {
         if (!mobile) unsaved.current = true;
         setStatus("正在保存");

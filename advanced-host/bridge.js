@@ -38,6 +38,13 @@ let seq = 0,
   nativeReadonly = false;
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
 let prewarming = false;
+let autoSave, editRevision = 0, manualSavePending = false;
+function markWorkspaceDirty() {
+  if (nativeReadonly || !ready || loading) return;
+  dirty = true;
+  editRevision++;
+  send({type: "workspace-dirty"});
+}
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
   1: "M1",
@@ -703,14 +710,20 @@ async function tick() {
     offerHistoryRetry();
   }
 }
-function snapshot() {
+function snapshot(manual = true) {
   if (!ready || loading) return;
   if (rangeGuard?.busy() || edgeGuard?.busy()) {
     dirty = true;
+    if (manual) manualSavePending = true;
     return;
   }
   if (nativeMode) {
-    if (nativeReadonly || nativeSaving) return;
+    if (nativeReadonly) return;
+    if (nativeSaving) {
+      if (manual) manualSavePending = true;
+      return;
+    }
+    manualSavePending = false;
     send({ type: "native-saving" });
     nativeSaving = true;
     dirty = false;
@@ -724,7 +737,8 @@ function snapshot() {
       widget.saveChartToServer(
         () => {
           nativeSaving = false;
-          if (dirty) snapshot();
+          if (manualSavePending) snapshot();
+          else if (dirty) send({type: "workspace-dirty"});
           else if (epoch === workspaceEpoch) send({ type: "native-saved" });
         },
         failed,
@@ -873,54 +887,15 @@ function boot(
     // workspace when the native library has no ID; later Save As stays a copy.
     if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
     const state = await captureChartLayout(widget);
-    return saveLayout({ ...data, content: JSON.stringify(state) });
+    const revision = editRevision, epoch = workspaceEpoch;
+    const result = await saveLayout({ ...data, content: JSON.stringify(state) });
+    if (epoch === workspaceEpoch && editRevision === revision) {
+      dirty = false;
+      send({type: "native-saved"});
+    }
+    return result;
   };
-  let viewportTimer,
-    viewportWrite = Promise.resolve();
   const viewportBindings = new Map();
-  const persistViewport = () => {
-    clearTimeout(viewportTimer);
-    const epoch = workspaceEpoch;
-    viewportWrite = viewportWrite
-      .catch(() => {})
-      .then(async () => {
-        if (
-          readonly ||
-          !ready ||
-          loading ||
-          viewportRestoring ||
-          rangeGuard?.busy() ||
-          edgeGuard?.busy() ||
-          epoch !== workspaceEpoch ||
-          !currentNativeWorkspace?.id
-        )
-          return;
-        const viewports = captureChartViewports(widget);
-        if (
-          JSON.stringify(savedDoc.state?._mwViewports) ===
-          JSON.stringify(viewports)
-        )
-          return;
-        const raw = await captureChartLayout(widget);
-        if (epoch !== workspaceEpoch) return;
-        const state =
-          typeof savedDoc.state?.content === "string"
-            ? { ...savedDoc.state, content: JSON.stringify(raw) }
-            : raw;
-        state._mwViewports = viewports;
-        state._mwSync = raw._mwSync;
-        send({ type: "native-saving" });
-        await saveLayout({
-          id: currentNativeWorkspace.id,
-          name: savedDoc.nativeName,
-          symbol: widget.chart(0).symbol(),
-          resolution: widget.chart(0).resolution(),
-          content: JSON.stringify(state),
-        });
-        send({ type: "native-saved" });
-      });
-    return viewportWrite;
-  };
   const bindViewports = () => {
     for (const [chart, changed] of viewportBindings)
       chart.onVisibleRangeChanged().unsubscribe(null, changed);
@@ -929,15 +904,8 @@ function boot(
     for (let i = 0; i < widget.chartsCount(); i++) {
       const chart = widget.chart(i);
       const changed = () => {
-        if (!ready || loading || viewportRestoring) return;
-        clearTimeout(viewportTimer);
-        viewportTimer = setTimeout(
-          () =>
-            persistViewport().catch((e) =>
-              send({ type: "error", error: "视区保存失败：" + String(e) }),
-            ),
-          400,
-        );
+        if (viewportRestoring) return;
+        markWorkspaceDirty();
       };
       viewportBindings.set(chart, changed);
       chart.onVisibleRangeChanged().subscribe(null, changed);
@@ -945,7 +913,11 @@ function boot(
   };
   layouts.getChartContent = async (id) => {
     try {
-      await persistViewport();
+      if (dirty) {
+        // Loading another layout must not silently discard edits when the
+        // user explicitly disabled automatic saving.
+        throw Error("当前布局有未保存更改，请先保存布局再打开其他布局");
+      }
       const state = JSON.parse(await loadContent(id));
       pendingViewports = state._mwViewports;
       pendingSync = state._mwSync;
@@ -965,6 +937,10 @@ function boot(
     readonly,
     (e) => send({ type: "error", error: String(e) }),
   );
+  autoSave?.dispose();
+  autoSave = chartAutoSave(preferences,
+    value => prefs.savePreference("setting", "mw.autoSave", value),
+    () => { if (dirty) snapshot(false); }, readonly);
   savedDoc = doc;
   savedDoc.templates ||= {};
   initialHistoryGate?.resolve();
@@ -1112,27 +1088,11 @@ function boot(
             {label: "历史任务", run: () => send({type: "history-plans-open"})},
             ...(!readonly ? [{label: "复制恢复草稿", recovery: true,
               run: () => send({type: "workspace-action", action: "recover"})}] : []),
-          ],
+          ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave,
         );
 
       })
       .catch((e) => send({ type: "error", error: String(e) }));
-    if (!readonly) {
-      widget
-        .headerReady()
-        .then(() => {
-          widget.createButton({
-            align: "right",
-            useTradingViewStyle: true,
-            text: "新建工作区",
-            title: "保存当前工作区并新建空白工作区",
-            onClick: () => send({ type: "workspace-action", action: "create" }),
-          });
-        })
-        .catch((e) =>
-          send({ type: "error", error: "工作区入口加载失败：" + String(e) }),
-        );
-    }
     // Mobile is a temporary single-chart view of the saved desktop workspace.
     // Read-only adapters keep the original multi-chart document untouched.
     await restoreViewports();
@@ -1245,8 +1205,7 @@ function boot(
     });
     widget.drawOnAllChartsEnabled().setValue(true);
     widget.subscribe("onAutoSaveNeeded", () => {
-      dirty = true;
-      snapshot();
+      markWorkspaceDirty();
     });
     send({ type: "ready" });
     clearInterval(progressivePoll);
@@ -1255,7 +1214,7 @@ function boot(
     poll = setInterval(() => {
       tick();
       demandReporter?.tick();
-      if (dirty) snapshot();
+      if (manualSavePending) snapshot();
     }, 15000);
   });
 }
