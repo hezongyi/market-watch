@@ -1,0 +1,2810 @@
+{
+  "passed": true,
+  "cold": [
+    {
+      "symbol": "USD_CNH",
+      "ms": 1874.2000002861023,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_CNH",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868695000,
+            "firstDataRequest": true,
+            "client": "0eaa86c4-3d5c-42b8-a9f7-1a3f3764ee35",
+            "indicators": [],
+            "before": 1790928095000,
+            "track_history": false
+          },
+          "started": 1790928035387,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "EUR_DKK",
+      "ms": 958.3000001907349,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_DKK",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868697000,
+            "firstDataRequest": true,
+            "client": "0eaa86c4-3d5c-42b8-a9f7-1a3f3764ee35",
+            "indicators": [],
+            "before": 1790928097000,
+            "track_history": false
+          },
+          "started": 1790928037273,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "USD_DKK",
+      "ms": 1221.9000000953674,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_DKK",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868698000,
+            "firstDataRequest": true,
+            "client": "0eaa86c4-3d5c-42b8-a9f7-1a3f3764ee35",
+            "indicators": [],
+            "before": 1790928098000,
+            "track_history": false
+          },
+          "started": 1790928038332,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "USD_MXN",
+      "ms": 872.5,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_MXN",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868699000,
+            "firstDataRequest": true,
+            "client": "0eaa86c4-3d5c-42b8-a9f7-1a3f3764ee35",
+            "indicators": [],
+            "before": 1790928099000,
+            "track_history": false
+          },
+          "started": 1790928039467,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "USD_ZAR",
+      "ms": 715.5999999046326,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_ZAR",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868700000,
+            "firstDataRequest": true,
+            "client": "0eaa86c4-3d5c-42b8-a9f7-1a3f3764ee35",
+            "indicators": [],
+            "before": 1790928100000,
+            "track_history": false
+          },
+          "started": 1790928040387,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "USD_TRY",
+      "ms": 611.1999998092651,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868701000,
+            "firstDataRequest": true,
+            "client": "0eaa86c4-3d5c-42b8-a9f7-1a3f3764ee35",
+            "indicators": [],
+            "before": 1790928101000,
+            "track_history": false
+          },
+          "started": 1790928041045,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    }
+  ],
+  "warm": [
+    {
+      "resolution": "1",
+      "ms": 322,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790916230000,
+            "firstDataRequest": true,
+            "client": "faa70d45-79fb-440e-9d7d-2505b4ae8ff1",
+            "indicators": [],
+            "before": 1790928110000,
+            "track_history": false
+          },
+          "started": 1790928050205,
+          "cache_hit": true,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "resolution": "5",
+      "ms": 333,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868712000,
+            "firstDataRequest": true,
+            "client": "7a0c5b2a-a25c-4356-ad4e-4cd0f5d14012",
+            "indicators": [],
+            "before": 1790928112000,
+            "track_history": false
+          },
+          "started": 1790928052436,
+          "cache_hit": true,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "resolution": "15",
+      "ms": 328,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790749915000,
+            "firstDataRequest": true,
+            "client": "9d50183e-e9e5-4218-a1d1-ed1047520f94",
+            "indicators": [],
+            "before": 1790928115000,
+            "track_history": false
+          },
+          "started": 1790928055991,
+          "cache_hit": true,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "resolution": "30",
+      "ms": 315,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790571719000,
+            "firstDataRequest": true,
+            "client": "e931a711-d16a-4e36-9a9e-e8fdb95df88b",
+            "indicators": [],
+            "before": 1790928119000,
+            "track_history": false
+          },
+          "started": 1790928059098,
+          "cache_hit": true,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "resolution": "60",
+      "ms": 258,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H1",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1789930202000,
+            "firstDataRequest": true,
+            "client": "ced1201c-2719-4701-9366-cc2c6f97b143",
+            "indicators": [],
+            "before": 1790928122000,
+            "track_history": false
+          },
+          "started": 1790928062137,
+          "cache_hit": true,
+          "count": 199,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "resolution": "240",
+      "ms": 395,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1786936446000,
+            "firstDataRequest": true,
+            "client": "e83304e3-ab5c-4f08-840e-807f6b644602",
+            "indicators": [],
+            "before": 1790928126000,
+            "track_history": false
+          },
+          "started": 1790928066364,
+          "cache_hit": true,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "resolution": "1D",
+      "ms": 408,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1766995330000,
+            "firstDataRequest": true,
+            "client": "0cb5dba4-c65e-4adc-981a-6589d1bbb419",
+            "indicators": [],
+            "before": 1790928130000,
+            "track_history": false
+          },
+          "started": 1790928070537,
+          "cache_hit": true,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "resolution": "1W",
+      "ms": 419,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1671177734000,
+            "firstDataRequest": true,
+            "client": "c99e34de-6fb4-4ecf-a2a5-3d8a81dc5cce",
+            "indicators": [],
+            "before": 1790928134000,
+            "track_history": false
+          },
+          "started": 1790928074502,
+          "cache_hit": true,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "resolution": "1M",
+      "ms": 464,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_TRY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "MN",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1270108937000,
+            "firstDataRequest": true,
+            "client": "ccc55aaa-378c-4d39-9531-0e80a4e103c2",
+            "indicators": [],
+            "before": 1790928137000,
+            "track_history": false
+          },
+          "started": 1790928077450,
+          "cache_hit": true,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    }
+  ],
+  "soak": [
+    {
+      "elapsed_ms": 6110,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919300,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919300,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928000000,
+          "latency_ms": 90794,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928000000,
+          "latency_ms": 90794,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928060000,
+          "latency_ms": 30794,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928000000,
+          "latency_ms": 90794,
+          "quality": "receiving"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790928060000,
+          "status": "pending",
+          "generation": 0,
+          "attempts": 0,
+          "next_at": 0,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790928060000,
+          "status": "running",
+          "generation": 1,
+          "attempts": 0,
+          "next_at": 0,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 19605,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928060000,
+          "latency_ms": 44289,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928000000,
+          "latency_ms": 104289,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928060000,
+          "latency_ms": 44289,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928000000,
+          "latency_ms": 104289,
+          "quality": "receiving"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790856060000,
+          "status": "running",
+          "generation": 3,
+          "attempts": 0,
+          "next_at": 1790928102757,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 32375,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928060000,
+          "latency_ms": 57059,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928000000,
+          "latency_ms": 117059,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928060000,
+          "latency_ms": 57059,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928000000,
+          "latency_ms": 117059,
+          "quality": "error"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "pending",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928117007,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 43986,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928060000,
+          "latency_ms": 68670,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928000000,
+          "latency_ms": 128670,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928060000,
+          "latency_ms": 68670,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928000000,
+          "latency_ms": 128670,
+          "quality": "error"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "pending",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928128445,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 56166,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928060000,
+          "latency_ms": 80850,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928060000,
+          "latency_ms": 80850,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928060000,
+          "latency_ms": 80850,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928000000,
+          "latency_ms": 140850,
+          "quality": "receiving"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928137807,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 67850,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921100,
+            "to": 1790930700
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928060000,
+          "latency_ms": 92534,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 32534,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 32534,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928120000,
+          "latency_ms": 32534,
+          "quality": "error"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928137807,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 82042,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928120000,
+          "latency_ms": 46726,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 46726,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 46726,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928120000,
+          "latency_ms": 46726,
+          "quality": "receiving"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928137807,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 94435,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928120000,
+          "latency_ms": 59119,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 59119,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 59119,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928120000,
+          "latency_ms": 59119,
+          "quality": "receiving"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928137807,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 106040,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928120000,
+          "latency_ms": 70724,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 70724,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 70724,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928120000,
+          "latency_ms": 70724,
+          "quality": "receiving"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928137807,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    },
+    {
+      "elapsed_ms": 119969,
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "VPS4yR",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "UP1RPl",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "ryGcB3",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "dovGWd",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "bF2MTK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "BTCUSDT",
+          "ready": true,
+          "range": {
+            "from": 1790921400,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "c75pJE",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "MWP:OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "58wEjK",
+              "name": "Volume"
+            }
+          ]
+        },
+        {
+          "symbol": "OANDA:CAD_CHF",
+          "ready": true,
+          "range": {
+            "from": 1790919600,
+            "to": 1790931000
+          },
+          "studies": [
+            {
+              "id": "msmCdb",
+              "name": "Volume"
+            }
+          ]
+        }
+      ],
+      "maintained": [
+        {
+          "instrument": "OANDA:CAD_CHF",
+          "realtime_end": 1790928120000,
+          "latency_ms": 84653,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "XAUUSD",
+          "realtime_end": 1790928180000,
+          "latency_ms": 24653,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "EURUSD",
+          "realtime_end": 1790928120000,
+          "latency_ms": 84653,
+          "quality": "receiving"
+        },
+        {
+          "instrument": "BTCUSDT",
+          "realtime_end": 1790928120000,
+          "latency_ms": 84653,
+          "quality": "error"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928137807,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790928060000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790928097010,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；已发布快照保留",
+          "unresolved": 0
+        },
+        {
+          "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926680000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926771841,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1790814480000,
+          "end": 1790926620000,
+          "cursor": 1790814480000,
+          "status": "complete",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790926799147,
+          "error": null,
+          "unresolved": 0
+        },
+        {
+          "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+          "instrument_id": "OANDA:CAD_CHF",
+          "source": "oanda",
+          "basis": "bid",
+          "calendar": "ny17",
+          "start": 1788210240000,
+          "end": 1790922720000,
+          "cursor": 1788210240000,
+          "status": "partial",
+          "generation": 76,
+          "attempts": 0,
+          "next_at": 1790923858103,
+          "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+          "unresolved": 1
+        },
+        {
+          "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "calendar": "utc0",
+          "start": 1790814480000,
+          "end": 1790922720000,
+          "cursor": 1790814480000,
+          "status": "partial",
+          "generation": 4,
+          "attempts": 0,
+          "next_at": 1790922889906,
+          "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+          "unresolved": 0
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

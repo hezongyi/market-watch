@@ -1,0 +1,8 @@
+{
+  "passed": false,
+  "origin": "https://localhost:15553",
+  "scope": "Read-only actual history UI; control handlers separately covered by backend regressions",
+  "errors": [],
+  "requests": [],
+  "error": "Error: locator.click: Error: strict mode violation: getByText('历史任务', { exact: true }) resolved to 3 elements:\n    1) <div class=\"js-button-text text-GwQQdU8S\">历史任务</div> aka getByText('历史任务').first()\n    2) <div class=\"js-button-text text-GwQQdU8S\">历史任务</div> aka getByText('历史任务').nth(1)\n    3) <div class=\"js-button-text text-GwQQdU8S\">历史任务</div> aka getByRole('button', { name: '查看维护状态和各周期可用范围' })\n\nCall log:\n\u001b[2m  - waiting for getByText('历史任务', { exact: true })\u001b[22m\n"
+}

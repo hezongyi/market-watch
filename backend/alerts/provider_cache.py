@@ -20,6 +20,7 @@ from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import LANE, lane
 from .storage import ProviderBar, ProviderDataset, now_ms, transaction, uid
+from .volume import metadata as volume_metadata
 
 _ACTIVE_LOCK = threading.Lock()
 _ACTIVE_READS = {"oanda": 0, "binance": 0}
@@ -55,6 +56,7 @@ def identity(meta, frame):
                 meta["basis"],
                 meta["calendar"],
                 upstream.ALIGNMENT_VERSION,
+                upstream.PAYLOAD_VERSION,
             ]
         ).encode()
     ).hexdigest()
@@ -122,6 +124,7 @@ def snapshot(key, before, count):
             )[::-1]
         boundary = bool(readable and dataset.earliest and readable[0] == 0 and len(rows) <= count)
         return {
+            **volume_metadata(dataset.source, dataset.symbol),
             "bars": [r.payload for r in rows[-count:]],
             "history_boundary": boundary,
             "has_more": not boundary,
@@ -194,6 +197,10 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
             old = existing.get(bar["start"])
             if old and (old.observed_at > observed_at or old.complete and not bar["complete"]):
                 continue
+            if old and old.payload.get("volume") is not None and bar.get("volume") is None and all(
+                    old.payload.get(k) == bar.get(k) for k in ("open", "high", "low", "close", "complete", "end")):
+                bar = {**bar, "volume": old.payload.get("volume"),
+                       "volume_complete": old.payload.get("volume_complete", False)}
             revision = 1
             if old:
                 revision = old.revision + (old.payload != bar)

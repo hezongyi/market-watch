@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "restore_database": "market_watch_volume_rollback",
+  "backup": "/tmp/mw-volume-acceptance/before-rollback-p17.dump",
+  "fence": {
+    "applied": true,
+    "jobs": [
+      {
+        "job": "496b0904-1269-4605-be1e-c4536e9df2b9",
+        "archived": "aea47617-3f63-4ee6-a184-0fc1f6bd63ac",
+        "frame": "M5",
+        "start": 1790814480000,
+        "end": 1790922720000
+      }
+    ]
+  },
+  "compatibility": {
+    "old_image": "v1.3.2",
+    "published_read": 177573,
+    "price_write": true
+  },
+  "health": {
+    "health": 200,
+    "ready": 200
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "passed": true,
+  "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+  "database": "market_watch_volume",
+  "before_stalled": 5960,
+  "before_detail": "Complete historical snapshots outside latest continuous coverage; no aggregation work; repeated count remained fixed for many cycles.",
+  "after_remaining": 4,
+  "after_dirty": [
+    {
+      "instrument": "XAUUSD",
+      "frame": "M15",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "MN",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "D1",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "D1",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M15",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M15",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "H4",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "MN",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "H1",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "D1",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "H1",
+      "count": 1
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "H4",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "MN",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M15",
+      "count": 1
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M30",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "H4",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M5",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "H4",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M30",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M30",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "W1",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M5",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M30",
+      "count": 2
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "H1",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "W1",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "H1",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M5",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "W1",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "H4",
+      "count": 1
+    }
+  ],
+  "no_direct_queue_deletion": true,
+  "method": "Normal new-image publisher reconciled dirty jobs; no performance optimization work continued after user scope change.",
+  "at_utc": "2026-10-02T09:44:17.463902+00:00"
+}

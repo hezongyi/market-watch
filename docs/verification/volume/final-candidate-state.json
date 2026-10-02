@@ -1,0 +1,653 @@
+{
+  "jobs": [
+    {
+      "id": "884c2969-e6cb-40ce-b3c4-34fcc734f159",
+      "instrument_id": "XAUUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1790814480000,
+      "end": 1790926680000,
+      "cursor": 1790814480000,
+      "status": "complete",
+      "generation": 4,
+      "attempts": 0,
+      "next_at": 1790926771841,
+      "error": null,
+      "unresolved": 0
+    },
+    {
+      "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+      "instrument_id": "BTCUSDT",
+      "source": "binance",
+      "basis": "last",
+      "calendar": "utc0",
+      "start": 1790814480000,
+      "end": 1790922720000,
+      "cursor": 1790814480000,
+      "status": "partial",
+      "generation": 4,
+      "attempts": 0,
+      "next_at": 1790922889906,
+      "error": "\u5df2\u6709 M1 \u5df2\u8865\u91cf\uff0c\u4f46\u90e8\u5206\u4ef7\u683c\u5c1a\u672a\u5f62\u6210\u5df2\u786e\u8ba4\u91cf\u7684\u53d1\u5e03\u5feb\u7167\uff1b\u672a\u521b\u5efa\u7ef4\u62a4\u8ba1\u5212",
+      "unresolved": 0
+    },
+    {
+      "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+      "instrument_id": "OANDA:CAD_CHF",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1788210240000,
+      "end": 1790922720000,
+      "cursor": 1788210240000,
+      "status": "partial",
+      "generation": 76,
+      "attempts": 0,
+      "next_at": 1790923858103,
+      "error": "\u90e8\u5206\u4ef7\u683c\u6876\u4e0d\u5b8c\u6574\uff0c\u91cf\u53d1\u5e03\u7b49\u5f85\u663e\u5f0f\u4ef7\u683c\u4fee\u590d\uff1b\u5df2\u53d1\u5e03\u5feb\u7167\u4fdd\u7559",
+      "unresolved": 1
+    },
+    {
+      "id": "fa651348-4c4f-4842-96c5-be66730a47ca",
+      "instrument_id": "EURUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1790814480000,
+      "end": 1790926620000,
+      "cursor": 1790814480000,
+      "status": "complete",
+      "generation": 4,
+      "attempts": 0,
+      "next_at": 1790926799147,
+      "error": null,
+      "unresolved": 0
+    },
+    {
+      "id": "f4d93780-a83b-467d-bb7c-dc912691e90a",
+      "instrument_id": "EURUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1790814480000,
+      "end": 1790928060000,
+      "cursor": 1790814480000,
+      "status": "partial",
+      "generation": 4,
+      "attempts": 0,
+      "next_at": 1790928097010,
+      "error": "\u5df2\u6709 M1 \u5df2\u8865\u91cf\uff0c\u4f46\u90e8\u5206\u4ef7\u683c\u5c1a\u672a\u5f62\u6210\u5df2\u786e\u8ba4\u91cf\u7684\u53d1\u5e03\u5feb\u7167\uff1b\u5df2\u53d1\u5e03\u5feb\u7167\u4fdd\u7559",
+      "unresolved": 0
+    },
+    {
+      "id": "b9142b48-071b-4a42-85e0-0b9c68d46007",
+      "instrument_id": "XAUUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1790814480000,
+      "end": 1790928060000,
+      "cursor": 1790814480000,
+      "status": "complete",
+      "generation": 4,
+      "attempts": 0,
+      "next_at": 1790928137807,
+      "error": null,
+      "unresolved": 0
+    }
+  ],
+  "dirty": [
+    {
+      "instrument": "XAUUSD",
+      "frame": "M15",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "MN",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "D1",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "D1",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M15",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M15",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "H4",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "MN",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "H1",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "D1",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "H1",
+      "count": 1
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "H4",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "MN",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M15",
+      "count": 1
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M30",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "H4",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M5",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "H4",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M30",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M30",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "W1",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M5",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M30",
+      "count": 2
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "H1",
+      "count": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "W1",
+      "count": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "H1",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M5",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "W1",
+      "count": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "H4",
+      "count": 1
+    }
+  ],
+  "published": [
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "D1",
+      "count": 32,
+      "with_complete_volume": 31
+    },
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "H1",
+      "count": 754,
+      "with_complete_volume": 753
+    },
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "H4",
+      "count": 189,
+      "with_complete_volume": 188
+    },
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "M1",
+      "count": 45223,
+      "with_complete_volume": 45223
+    },
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "M15",
+      "count": 3015,
+      "with_complete_volume": 3014
+    },
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "M30",
+      "count": 1508,
+      "with_complete_volume": 1507
+    },
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "M5",
+      "count": 9045,
+      "with_complete_volume": 9044
+    },
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "MN",
+      "count": 2,
+      "with_complete_volume": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "timeframe": "W1",
+      "count": 4,
+      "with_complete_volume": 3
+    },
+    {
+      "instrument": "EURUSD",
+      "timeframe": "H1",
+      "count": 33,
+      "with_complete_volume": 32
+    },
+    {
+      "instrument": "EURUSD",
+      "timeframe": "H4",
+      "count": 9,
+      "with_complete_volume": 8
+    },
+    {
+      "instrument": "EURUSD",
+      "timeframe": "M1",
+      "count": 1991,
+      "with_complete_volume": 1991
+    },
+    {
+      "instrument": "EURUSD",
+      "timeframe": "M15",
+      "count": 133,
+      "with_complete_volume": 132
+    },
+    {
+      "instrument": "EURUSD",
+      "timeframe": "M30",
+      "count": 67,
+      "with_complete_volume": 66
+    },
+    {
+      "instrument": "EURUSD",
+      "timeframe": "M5",
+      "count": 399,
+      "with_complete_volume": 398
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "D1",
+      "count": 24,
+      "with_complete_volume": 23
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "H1",
+      "count": 565,
+      "with_complete_volume": 564
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "H4",
+      "count": 142,
+      "with_complete_volume": 141
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "M1",
+      "count": 31412,
+      "with_complete_volume": 31412
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "M15",
+      "count": 2258,
+      "with_complete_volume": 2257
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "M30",
+      "count": 1129,
+      "with_complete_volume": 1128
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "M5",
+      "count": 6741,
+      "with_complete_volume": 6740
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "MN",
+      "count": 2,
+      "with_complete_volume": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "timeframe": "W1",
+      "count": 4,
+      "with_complete_volume": 3
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "D1",
+      "count": 6,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "H1",
+      "count": 140,
+      "with_complete_volume": 4
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "H4",
+      "count": 35,
+      "with_complete_volume": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "M1",
+      "count": 8330,
+      "with_complete_volume": 325
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "M15",
+      "count": 559,
+      "with_complete_volume": 20
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "M30",
+      "count": 280,
+      "with_complete_volume": 10
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "M5",
+      "count": 1677,
+      "with_complete_volume": 64
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "MN",
+      "count": 1,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "timeframe": "W1",
+      "count": 1,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "D1",
+      "count": 4,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "H1",
+      "count": 109,
+      "with_complete_volume": 4
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "H4",
+      "count": 28,
+      "with_complete_volume": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "M1",
+      "count": 6461,
+      "with_complete_volume": 325
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "M15",
+      "count": 435,
+      "with_complete_volume": 20
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "M30",
+      "count": 218,
+      "with_complete_volume": 10
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "M5",
+      "count": 1305,
+      "with_complete_volume": 64
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "MN",
+      "count": 1,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "timeframe": "W1",
+      "count": 1,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "D1",
+      "count": 24,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "H1",
+      "count": 565,
+      "with_complete_volume": 4
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "H4",
+      "count": 142,
+      "with_complete_volume": 1
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "M1",
+      "count": 33336,
+      "with_complete_volume": 324
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "M15",
+      "count": 2259,
+      "with_complete_volume": 20
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "M30",
+      "count": 1130,
+      "with_complete_volume": 10
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "M5",
+      "count": 6777,
+      "with_complete_volume": 64
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "MN",
+      "count": 2,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "timeframe": "W1",
+      "count": 4,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "D1",
+      "count": 5,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "H1",
+      "count": 109,
+      "with_complete_volume": 4
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "H4",
+      "count": 28,
+      "with_complete_volume": 1
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "M1",
+      "count": 6403,
+      "with_complete_volume": 325
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "M15",
+      "count": 435,
+      "with_complete_volume": 20
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "M30",
+      "count": 218,
+      "with_complete_volume": 10
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "M5",
+      "count": 1305,
+      "with_complete_volume": 64
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "MN",
+      "count": 1,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "timeframe": "W1",
+      "count": 1,
+      "with_complete_volume": 0
+    },
+    {
+      "instrument": "VOLUME:CHECK",
+      "timeframe": "M1",
+      "count": 12,
+      "with_complete_volume": 8
+    },
+    {
+      "instrument": "XAUUSD",
+      "timeframe": "H1",
+      "count": 32,
+      "with_complete_volume": 31
+    },
+    {
+      "instrument": "XAUUSD",
+      "timeframe": "H4",
+      "count": 9,
+      "with_complete_volume": 8
+    },
+    {
+      "instrument": "XAUUSD",
+      "timeframe": "M1",
+      "count": 1932,
+      "with_complete_volume": 1932
+    },
+    {
+      "instrument": "XAUUSD",
+      "timeframe": "M15",
+      "count": 129,
+      "with_complete_volume": 128
+    },
+    {
+      "instrument": "XAUUSD",
+      "timeframe": "M30",
+      "count": 65,
+      "with_complete_volume": 64
+    },
+    {
+      "instrument": "XAUUSD",
+      "timeframe": "M5",
+      "count": 387,
+      "with_complete_volume": 386
+    }
+  ],
+  "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+  "at_utc": "2026-10-02T09:44:17.463902+00:00"
+}

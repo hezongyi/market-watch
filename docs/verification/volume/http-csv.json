@@ -1,0 +1,149 @@
+{
+  "passed": true,
+  "samples": [
+    {
+      "instrument": "BTCUSDT",
+      "kind": "provider",
+      "bar": {
+        "start": 1790918400000,
+        "end": 1790918700000,
+        "chart_time": 1790918400000,
+        "complete": true,
+        "volume": "47.60587000",
+        "volume_complete": true,
+        "open": "86493.18000000",
+        "high": "86521.40000000",
+        "low": "86383.03000000",
+        "close": "86383.03000000"
+      },
+      "csv": {
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "basis": "last",
+        "calendar": "utc0",
+        "start_utc": "2026-10-02T05:20:00.000+00:00",
+        "end_utc": "2026-10-02T05:25:00.000+00:00",
+        "start_ms": "1790918400000",
+        "end_ms": "1790918700000",
+        "open": "86493.18000000",
+        "high": "86521.40000000",
+        "low": "86383.03000000",
+        "close": "86383.03000000",
+        "volume": "47.60587000",
+        "complete": "true",
+        "revision": "",
+        "volume_kind": "base",
+        "volume_unit": "BTC",
+        "volume_complete": "true"
+      }
+    },
+    {
+      "instrument": "BTCUSDT",
+      "kind": "managed",
+      "bar": {
+        "start": 1790918400000,
+        "end": 1790918700000,
+        "open": "86493.1800000000",
+        "high": "86521.4000000000",
+        "low": "86383.0300000000",
+        "close": "86383.0300000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "47.605870000000000000",
+        "volume_complete": true
+      },
+      "csv": {
+        "instrument": "BTCUSDT",
+        "timeframe": "M5",
+        "basis": "last",
+        "calendar": "utc0",
+        "start_utc": "2026-10-02T05:20:00.000+00:00",
+        "end_utc": "2026-10-02T05:25:00.000+00:00",
+        "start_ms": "1790918400000",
+        "end_ms": "1790918700000",
+        "open": "86493.1800000000",
+        "high": "86521.4000000000",
+        "low": "86383.0300000000",
+        "close": "86383.0300000000",
+        "volume": "47.605870000000000000",
+        "complete": "true",
+        "revision": "1",
+        "volume_kind": "base",
+        "volume_unit": "BTC",
+        "volume_complete": "true"
+      }
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "kind": "provider",
+      "bar": {
+        "start": 1790918400000,
+        "end": 1790918700000,
+        "chart_time": 1790918400000,
+        "complete": true,
+        "volume": "208",
+        "volume_complete": true,
+        "open": "0.58352",
+        "high": "0.58364",
+        "low": "0.58352",
+        "close": "0.58357"
+      },
+      "csv": {
+        "instrument": "OANDA:CAD_CHF",
+        "timeframe": "M5",
+        "basis": "bid",
+        "calendar": "ny17",
+        "start_utc": "2026-10-02T05:20:00.000+00:00",
+        "end_utc": "2026-10-02T05:25:00.000+00:00",
+        "start_ms": "1790918400000",
+        "end_ms": "1790918700000",
+        "open": "0.58352",
+        "high": "0.58364",
+        "low": "0.58352",
+        "close": "0.58357",
+        "volume": "208",
+        "complete": "true",
+        "revision": "",
+        "volume_kind": "tick",
+        "volume_unit": "quotes",
+        "volume_complete": "true"
+      }
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "kind": "managed",
+      "bar": {
+        "start": 1790918400000,
+        "end": 1790918700000,
+        "open": "0.5835200000",
+        "high": "0.5836400000",
+        "low": "0.5835200000",
+        "close": "0.5835700000",
+        "complete": true,
+        "revision": 4,
+        "volume": "208.000000000000000000",
+        "volume_complete": true
+      },
+      "csv": {
+        "instrument": "OANDA:CAD_CHF",
+        "timeframe": "M5",
+        "basis": "bid",
+        "calendar": "ny17",
+        "start_utc": "2026-10-02T05:20:00.000+00:00",
+        "end_utc": "2026-10-02T05:25:00.000+00:00",
+        "start_ms": "1790918400000",
+        "end_ms": "1790918700000",
+        "open": "0.5835200000",
+        "high": "0.5836400000",
+        "low": "0.5835200000",
+        "close": "0.5835700000",
+        "volume": "208.000000000000000000",
+        "complete": "true",
+        "revision": "4",
+        "volume_kind": "tick",
+        "volume_unit": "quotes",
+        "volume_complete": "true"
+      }
+    }
+  ]
+}

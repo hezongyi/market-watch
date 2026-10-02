@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "at_utc": "2026-10-02T10:02:00.823658+00:00",
+  "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+  "services": [
+    {
+      "service": "api",
+      "image": "sha256:67ed9fe7df9cf4f660f9be8c99034cc09bdd7c41c1c6f7b08cae15ef0125249c",
+      "state": "running",
+      "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+      "matches_manifest": true
+    },
+    {
+      "service": "realtime-worker",
+      "image": "sha256:67ed9fe7df9cf4f660f9be8c99034cc09bdd7c41c1c6f7b08cae15ef0125249c",
+      "state": "running",
+      "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+      "matches_manifest": true
+    },
+    {
+      "service": "chart-history-worker",
+      "image": "sha256:67ed9fe7df9cf4f660f9be8c99034cc09bdd7c41c1c6f7b08cae15ef0125249c",
+      "state": "running",
+      "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+      "matches_manifest": true
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image": "sha256:67ed9fe7df9cf4f660f9be8c99034cc09bdd7c41c1c6f7b08cae15ef0125249c",
+      "state": "running",
+      "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+      "matches_manifest": true
+    },
+    {
+      "service": "web",
+      "image": "sha256:7fc0be6717d9748d76a9e70e5782aee7fa780d053ac64e4795c25e2aa340e340",
+      "state": "running",
+      "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+      "matches_manifest": true
+    },
+    {
+      "service": "chart-origin",
+      "image": "sha256:3ff030ecfb51e65b97b3e99b39f9e328f3a5f4282add40f464430beb22482ba8",
+      "state": "running",
+      "source": "edc799a97999b8cf387a03c380669bf6a8d28083",
+      "matches_manifest": true
+    },
+    {
+      "service": "tls",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "source": null,
+      "matches_manifest": true
+    }
+  ],
+  "schema": "p17_volume",
+  "backup": {
+    "bytes": 27834252,
+    "mode": "0o600",
+    "sha256": "d5107c81fe37d20b0205425b453737514eeb3dbfd3d7a5dba0dbfc19635fb150"
+  },
+  "health": {
+    "/healthz": {
+      "status": 200,
+      "body": "{\"status\":\"ok\",\"time\":1790935321877}"
+    },
+    "/readyz": {
+      "status": 200,
+      "body": "{\"status\":\"ready\",\"time\":1790935321892}"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "samples": [
+    {
+      "listener": "OANDA_CAD_CHF",
+      "type": "bars",
+      "revision": 23,
+      "bars": [
+        {
+          "start": 1790933820000,
+          "end": 1790933880000,
+          "chart_time": 1790933820000,
+          "complete": false,
+          "volume": "15",
+          "volume_complete": false,
+          "open": "0.58188",
+          "high": "0.58198",
+          "low": "0.58188",
+          "close": "0.58197"
+        }
+      ],
+      "received_elapsed_s": 0.29
+    },
+    {
+      "listener": "BTCUSDT",
+      "type": "bars",
+      "revision": 5,
+      "bars": [
+        {
+          "start": 1790933820000,
+          "end": 1790933880000,
+          "chart_time": 1790933820000,
+          "complete": false,
+          "volume": "3.15376000",
+          "volume_complete": false,
+          "open": "86312.01000000",
+          "high": "86328.00000000",
+          "low": "86304.20000000",
+          "close": "86304.20000000"
+        }
+      ],
+      "received_elapsed_s": 0.29
+    }
+  ]
+}

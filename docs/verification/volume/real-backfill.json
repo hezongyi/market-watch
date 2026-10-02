@@ -1,0 +1,851 @@
+{
+  "database": "market_watch_volume",
+  "source": "real upstream API",
+  "passed": true,
+  "jobs": [
+    {
+      "id": "496b0904-1269-4605-be1e-c4536e9df2b9",
+      "instrument_id": "BTCUSDT",
+      "source": "binance",
+      "basis": "last",
+      "calendar": "utc0",
+      "start": 1790814480000,
+      "end": 1790922720000,
+      "cursor": 1790814480000,
+      "status": "partial",
+      "generation": 4,
+      "attempts": 0,
+      "next_at": 1790922889906,
+      "error": "已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划",
+      "unresolved": 0
+    },
+    {
+      "id": "9891f7ec-ffdd-499f-8c08-f60e9448870f",
+      "instrument_id": "OANDA:CAD_CHF",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1788210240000,
+      "end": 1790922720000,
+      "cursor": 1788210240000,
+      "status": "partial",
+      "generation": 76,
+      "attempts": 0,
+      "next_at": 1790923858103,
+      "error": "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留",
+      "unresolved": 1
+    }
+  ],
+  "btc_pages": [
+    {
+      "start": 1788220800000,
+      "end": 1788256800000,
+      "rows": 600,
+      "seconds": 4.815
+    },
+    {
+      "start": 1788256800000,
+      "end": 1788292800000,
+      "rows": 600,
+      "seconds": 0.985
+    },
+    {
+      "start": 1788292800000,
+      "end": 1788328800000,
+      "rows": 600,
+      "seconds": 1.051
+    },
+    {
+      "start": 1788328800000,
+      "end": 1788364800000,
+      "rows": 600,
+      "seconds": 0.817
+    },
+    {
+      "start": 1788364800000,
+      "end": 1788400800000,
+      "rows": 600,
+      "seconds": 0.972
+    },
+    {
+      "start": 1788400800000,
+      "end": 1788436800000,
+      "rows": 600,
+      "seconds": 0.808
+    },
+    {
+      "start": 1788436800000,
+      "end": 1788472800000,
+      "rows": 600,
+      "seconds": 0.958
+    },
+    {
+      "start": 1788472800000,
+      "end": 1788508800000,
+      "rows": 600,
+      "seconds": 2.067
+    },
+    {
+      "start": 1788508800000,
+      "end": 1788544800000,
+      "rows": 600,
+      "seconds": 1.467
+    },
+    {
+      "start": 1788544800000,
+      "end": 1788580800000,
+      "rows": 600,
+      "seconds": 1.058
+    },
+    {
+      "start": 1788580800000,
+      "end": 1788616800000,
+      "rows": 600,
+      "seconds": 1.046
+    },
+    {
+      "start": 1788616800000,
+      "end": 1788652800000,
+      "rows": 600,
+      "seconds": 0.964
+    },
+    {
+      "start": 1788652800000,
+      "end": 1788688800000,
+      "rows": 600,
+      "seconds": 1.284
+    },
+    {
+      "start": 1788688800000,
+      "end": 1788724800000,
+      "rows": 600,
+      "seconds": 1.266
+    },
+    {
+      "start": 1788724800000,
+      "end": 1788760800000,
+      "rows": 600,
+      "seconds": 1.463
+    },
+    {
+      "start": 1788760800000,
+      "end": 1788796800000,
+      "rows": 600,
+      "seconds": 0.956
+    },
+    {
+      "start": 1788796800000,
+      "end": 1788832800000,
+      "rows": 600,
+      "seconds": 1.681
+    },
+    {
+      "start": 1788832800000,
+      "end": 1788868800000,
+      "rows": 600,
+      "seconds": 1.23
+    },
+    {
+      "start": 1788868800000,
+      "end": 1788904800000,
+      "rows": 600,
+      "seconds": 1.417
+    },
+    {
+      "start": 1788904800000,
+      "end": 1788940800000,
+      "rows": 600,
+      "seconds": 1.635
+    },
+    {
+      "start": 1788940800000,
+      "end": 1788976800000,
+      "rows": 600,
+      "seconds": 1.088
+    },
+    {
+      "start": 1788976800000,
+      "end": 1789012800000,
+      "rows": 600,
+      "seconds": 1.476
+    },
+    {
+      "start": 1789012800000,
+      "end": 1789048800000,
+      "rows": 600,
+      "seconds": 0.996
+    },
+    {
+      "start": 1789048800000,
+      "end": 1789084800000,
+      "rows": 600,
+      "seconds": 1.344
+    },
+    {
+      "start": 1789084800000,
+      "end": 1789120800000,
+      "rows": 600,
+      "seconds": 1.542
+    },
+    {
+      "start": 1789120800000,
+      "end": 1789156800000,
+      "rows": 600,
+      "seconds": 1.477
+    },
+    {
+      "start": 1789156800000,
+      "end": 1789192800000,
+      "rows": 600,
+      "seconds": 1.092
+    },
+    {
+      "start": 1789192800000,
+      "end": 1789228800000,
+      "rows": 600,
+      "seconds": 1.044
+    },
+    {
+      "start": 1789228800000,
+      "end": 1789264800000,
+      "rows": 600,
+      "seconds": 1.365
+    },
+    {
+      "start": 1789264800000,
+      "end": 1789300800000,
+      "rows": 600,
+      "seconds": 0.844
+    },
+    {
+      "start": 1789300800000,
+      "end": 1789336800000,
+      "rows": 600,
+      "seconds": 1.652
+    },
+    {
+      "start": 1789336800000,
+      "end": 1789372800000,
+      "rows": 600,
+      "seconds": 1.088
+    },
+    {
+      "start": 1789372800000,
+      "end": 1789408800000,
+      "rows": 600,
+      "seconds": 0.948
+    },
+    {
+      "start": 1789408800000,
+      "end": 1789444800000,
+      "rows": 600,
+      "seconds": 1.347
+    },
+    {
+      "start": 1789444800000,
+      "end": 1789480800000,
+      "rows": 600,
+      "seconds": 1.265
+    },
+    {
+      "start": 1789480800000,
+      "end": 1789516800000,
+      "rows": 600,
+      "seconds": 1.033
+    },
+    {
+      "start": 1789516800000,
+      "end": 1789552800000,
+      "rows": 600,
+      "seconds": 1.248
+    },
+    {
+      "start": 1789552800000,
+      "end": 1789588800000,
+      "rows": 600,
+      "seconds": 1.411
+    },
+    {
+      "start": 1789588800000,
+      "end": 1789624800000,
+      "rows": 600,
+      "seconds": 1.749
+    },
+    {
+      "start": 1789624800000,
+      "end": 1789660800000,
+      "rows": 600,
+      "seconds": 1.061
+    },
+    {
+      "start": 1789660800000,
+      "end": 1789696800000,
+      "rows": 600,
+      "seconds": 1.636
+    },
+    {
+      "start": 1789696800000,
+      "end": 1789732800000,
+      "rows": 600,
+      "seconds": 2.312
+    },
+    {
+      "start": 1789732800000,
+      "end": 1789768800000,
+      "rows": 600,
+      "seconds": 1.531
+    },
+    {
+      "start": 1789768800000,
+      "end": 1789804800000,
+      "rows": 600,
+      "seconds": 1.213
+    },
+    {
+      "start": 1789804800000,
+      "end": 1789840800000,
+      "rows": 600,
+      "seconds": 1.018
+    },
+    {
+      "start": 1789840800000,
+      "end": 1789876800000,
+      "rows": 600,
+      "seconds": 1.389
+    },
+    {
+      "start": 1789876800000,
+      "end": 1789912800000,
+      "rows": 600,
+      "seconds": 0.82
+    },
+    {
+      "start": 1789912800000,
+      "end": 1789948800000,
+      "rows": 600,
+      "seconds": 1.011
+    },
+    {
+      "start": 1789948800000,
+      "end": 1789984800000,
+      "rows": 600,
+      "seconds": 1.912
+    },
+    {
+      "start": 1789984800000,
+      "end": 1790020800000,
+      "rows": 600,
+      "seconds": 1.072
+    },
+    {
+      "start": 1790020800000,
+      "end": 1790056800000,
+      "rows": 600,
+      "seconds": 0.919
+    },
+    {
+      "start": 1790056800000,
+      "end": 1790092800000,
+      "rows": 600,
+      "seconds": 0.962
+    },
+    {
+      "start": 1790092800000,
+      "end": 1790128800000,
+      "rows": 600,
+      "seconds": 1.039
+    },
+    {
+      "start": 1790128800000,
+      "end": 1790164800000,
+      "rows": 600,
+      "seconds": 1.091
+    },
+    {
+      "start": 1790164800000,
+      "end": 1790200800000,
+      "rows": 600,
+      "seconds": 1.647
+    },
+    {
+      "start": 1790200800000,
+      "end": 1790236800000,
+      "rows": 600,
+      "seconds": 1.219
+    },
+    {
+      "start": 1790236800000,
+      "end": 1790272800000,
+      "rows": 600,
+      "seconds": 1.043
+    },
+    {
+      "start": 1790272800000,
+      "end": 1790308800000,
+      "rows": 600,
+      "seconds": 1.165
+    },
+    {
+      "start": 1790308800000,
+      "end": 1790344800000,
+      "rows": 600,
+      "seconds": 0.976
+    },
+    {
+      "start": 1790344800000,
+      "end": 1790380800000,
+      "rows": 600,
+      "seconds": 1.311
+    },
+    {
+      "start": 1790380800000,
+      "end": 1790416800000,
+      "rows": 600,
+      "seconds": 0.895
+    },
+    {
+      "start": 1790416800000,
+      "end": 1790452800000,
+      "rows": 600,
+      "seconds": 0.951
+    },
+    {
+      "start": 1790452800000,
+      "end": 1790488800000,
+      "rows": 600,
+      "seconds": 0.917
+    },
+    {
+      "start": 1790488800000,
+      "end": 1790524800000,
+      "rows": 600,
+      "seconds": 1.064
+    },
+    {
+      "start": 1790524800000,
+      "end": 1790560800000,
+      "rows": 600,
+      "seconds": 1.055
+    },
+    {
+      "start": 1790560800000,
+      "end": 1790596800000,
+      "rows": 600,
+      "seconds": 0.922
+    },
+    {
+      "start": 1790596800000,
+      "end": 1790632800000,
+      "rows": 600,
+      "seconds": 0.988
+    },
+    {
+      "start": 1790632800000,
+      "end": 1790668800000,
+      "rows": 600,
+      "seconds": 0.952
+    },
+    {
+      "start": 1790668800000,
+      "end": 1790704800000,
+      "rows": 600,
+      "seconds": 1.318
+    },
+    {
+      "start": 1790704800000,
+      "end": 1790740800000,
+      "rows": 600,
+      "seconds": 2.941
+    },
+    {
+      "start": 1790740800000,
+      "end": 1790776800000,
+      "rows": 600,
+      "seconds": 1.008
+    },
+    {
+      "start": 1790776800000,
+      "end": 1790812800000,
+      "rows": 600,
+      "seconds": 0.983
+    }
+  ],
+  "price_unchanged": true,
+  "coverage_unchanged": true,
+  "watch_unchanged": true,
+  "replay_unchanged": true,
+  "published": [
+    {
+      "instrument": "BTCUSDT",
+      "frame": "H1",
+      "count": 30,
+      "with_volume": 30
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M1",
+      "count": 1804,
+      "with_volume": 1804
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M15",
+      "count": 121,
+      "with_volume": 121
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M30",
+      "count": 61,
+      "with_volume": 60
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M5",
+      "count": 361,
+      "with_volume": 361
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "H1",
+      "count": 30,
+      "with_volume": 2
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "H4",
+      "count": 8,
+      "with_volume": 1
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M1",
+      "count": 1800,
+      "with_volume": 134
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M15",
+      "count": 121,
+      "with_volume": 9
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M30",
+      "count": 61,
+      "with_volume": 4
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M5",
+      "count": 361,
+      "with_volume": 27
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "D1",
+      "count": 24,
+      "with_volume": 23
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "H1",
+      "count": 562,
+      "with_volume": 562
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "H4",
+      "count": 141,
+      "with_volume": 141
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M1",
+      "count": 31221,
+      "with_volume": 31221
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M15",
+      "count": 2246,
+      "with_volume": 2246
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M30",
+      "count": 1123,
+      "with_volume": 1122
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "M5",
+      "count": 6703,
+      "with_volume": 6703
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "MN",
+      "count": 2,
+      "with_volume": 1
+    },
+    {
+      "instrument": "OANDA:CAD_CHF",
+      "frame": "W1",
+      "count": 4,
+      "with_volume": 3
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "D1",
+      "count": 6,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "H1",
+      "count": 137,
+      "with_volume": 2
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "H4",
+      "count": 34,
+      "with_volume": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "M1",
+      "count": 8139,
+      "with_volume": 134
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "M15",
+      "count": 547,
+      "with_volume": 9
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "M30",
+      "count": 274,
+      "with_volume": 4
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "M5",
+      "count": 1639,
+      "with_volume": 27
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "MN",
+      "count": 1,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CAD",
+      "frame": "W1",
+      "count": 1,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "D1",
+      "count": 4,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "H1",
+      "count": 106,
+      "with_volume": 2
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "H4",
+      "count": 27,
+      "with_volume": 1
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "M1",
+      "count": 6270,
+      "with_volume": 134
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "M15",
+      "count": 423,
+      "with_volume": 9
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "M30",
+      "count": 212,
+      "with_volume": 4
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "M5",
+      "count": 1267,
+      "with_volume": 27
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "MN",
+      "count": 1,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_CHF",
+      "frame": "W1",
+      "count": 1,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "D1",
+      "count": 24,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "H1",
+      "count": 562,
+      "with_volume": 2
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "H4",
+      "count": 141,
+      "with_volume": 1
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "M1",
+      "count": 33145,
+      "with_volume": 133
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "M15",
+      "count": 2247,
+      "with_volume": 9
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "M30",
+      "count": 1124,
+      "with_volume": 4
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "M5",
+      "count": 6739,
+      "with_volume": 27
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "MN",
+      "count": 2,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:EUR_GBP",
+      "frame": "W1",
+      "count": 4,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "D1",
+      "count": 5,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "H1",
+      "count": 106,
+      "with_volume": 2
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "H4",
+      "count": 27,
+      "with_volume": 1
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "M1",
+      "count": 6212,
+      "with_volume": 134
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "M15",
+      "count": 423,
+      "with_volume": 9
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "M30",
+      "count": 212,
+      "with_volume": 4
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "M5",
+      "count": 1267,
+      "with_volume": 27
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "MN",
+      "count": 1,
+      "with_volume": 0
+    },
+    {
+      "instrument": "OANDA:NZD_CAD",
+      "frame": "W1",
+      "count": 1,
+      "with_volume": 0
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "H1",
+      "count": 29,
+      "with_volume": 2
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "H4",
+      "count": 8,
+      "with_volume": 1
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M1",
+      "count": 1740,
+      "with_volume": 134
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M15",
+      "count": 117,
+      "with_volume": 9
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M30",
+      "count": 59,
+      "with_volume": 4
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M5",
+      "count": 349,
+      "with_volume": 27
+    }
+  ]
+}
