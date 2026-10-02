@@ -1,10 +1,10 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.2.0**，新增独立 Advanced Charts 工作台。本轮在Ubuntu本机Docker验收；不代表Unraid已升级。图表验收见[交付核对](docs/advanced-charts-current-acceptance.md)，操作及限制见[图表使用说明](docs/advanced-charts-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.3.1**，包含独立 Advanced Charts、平台/自建双系列及自建历史修订修复。源码发布、验证和部署边界见[v1.3.1交付记录](docs/chart-v1.3.1-delivery.md)，操作及限制见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。
 
-本轮源码目录：`/home/quant/repos/market-watch-advanced`；原目录`/home/quant/repos/market-watch`保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。本轮v1.2.0仅本地交付，生产仍按既有发布清单运行；[本地交付及回退说明](docs/advanced-charts-v1.2.0-delivery.md)。
+本轮源码目录：`/home/quant/repos/market-watch-advanced`；原目录`/home/quant/repos/market-watch`保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。v1.3.1源码合并main并推送远端；本机容器和生产仍按各自既有镜像清单运行。新schema及回退注意事项见[v1.3.1交付记录](docs/chart-v1.3.1-delivery.md)。
 
 ## 当前实例
 

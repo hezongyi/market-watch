@@ -30,8 +30,11 @@ def write_bars(db, instrument_id, timeframe, candles):
         }
         stamp = now_ms()
         values = []
+        changed = []
         for start, candle in batch:
             row = old.get(start)
+            if row is None or any(getattr(row, k) != getattr(candle, k) for k in keys):
+                changed.append(start)
             if row and any(getattr(row, k) != getattr(candle, k) for k in keys):
                 db.add(
                     Audit(
@@ -72,4 +75,7 @@ def write_bars(db, instrument_id, timeframe, candles):
         # ORM callers in this transaction must not see stale revision/value state.
         for row in old.values():
             db.expire(row)
+        from .publication_jobs import enqueue_publication
+
+        enqueue_publication(db, instrument_id, timeframe, changed)
     db.flush()

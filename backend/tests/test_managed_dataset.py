@@ -207,6 +207,146 @@ def test_staging_revision_does_not_replace_published_candles_until_aggregation(d
         assert float(read_rows(db, inst, "M5", end, 100)[0]["close"]) == 20
 
 
+def test_published_internal_revision_outside_tail_is_eventually_visible(database):
+    from alerts.storage import Bar, MarketCoverage
+
+    end = START + 5000 * MINUTE
+    now = end + 5000
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = join(db, inst, START, now)
+        db.add(MarketCoverage(instrument_id=inst.id, source="binance", basis="last",
+                             start=START, end=end, observed=5000, queried_at=now))
+        db.add_all(Bar(instrument_id=inst.id, timeframe="M1", start=START + i * MINUTE,
+                       end=START + (i + 1) * MINUTE, open=10, high=11, low=9, close=10,
+                       complete=True) for i in range(5000))
+        db.flush()
+        for _ in range(4):
+            publish_frame(db, inst, plan, "M1", now)
+        assert len(read_rows(db, inst, "M1", end, 6000)) == 5000
+        target = START + 1000 * MINUTE
+        market.ingest(db, inst, payload(target, 1, 30), received_at=now)
+    # A new transaction also models a publisher restart after ingestion commits.
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = db.get(ChartHistoryPlan, inst.id)
+        for _ in range(10):
+            publish_frame(db, inst, plan, "M1", now)
+        corrected = read_rows(db, inst, "M1", target + MINUTE, 1)
+        assert float(corrected[0]["close"]) == 30
+        assert status(db, inst, "M1")["complete_count"] == 5000
+
+
+def test_published_history_check_tracks_corrections_inside_frozen_session(database):
+    from alerts.chart_api import DataQuery
+    from alerts.managed_dataset import data
+
+    end = START + 20 * MINUTE
+    now = end + 5000
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = join(db, inst, START - 10 * MINUTE, now)
+        market.ingest(db, inst, payload(START, 20), received_at=now)
+        publish_frame(db, inst, plan, "M1", now)
+    body = DataQuery(instrument="BTCUSDT", timeframe="M1", published=True,
+                     track_history=True, dataset_start=START, revision_after=START,
+                     before=end, limit=3)
+    initial = data(body)["history_check"]
+    assert initial is not None
+    body.revision_before = initial["next_before"]
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = db.get(ChartHistoryPlan, inst.id)
+        # Expansion before the frozen session and appending realtime are not corrections.
+        market.ingest(db, inst, payload(START - 10 * MINUTE, 10), received_at=now)
+        market.ingest(db, inst, payload(end, 1, 20), received_at=now + MINUTE)
+        publish_frame(db, inst, plan, "M1", now + MINUTE)
+    body.before = end + MINUTE
+    unchanged = data(body)["history_check"]
+    assert unchanged["revision"] == initial["next_revision"]
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = db.get(ChartHistoryPlan, inst.id)
+        market.ingest(db, inst, payload(end - 2 * MINUTE, 1, 30), received_at=now + MINUTE)
+        publish_frame(db, inst, plan, "M1", now + MINUTE)
+    revised = data(body)["history_check"]
+    assert revised["before"] == unchanged["before"]
+    assert revised["after"] == unchanged["after"]
+    assert revised["revision"] != unchanged["revision"]
+    assert data(body)["origin"] == START
+
+
+def test_derived_corrections_wait_for_aggregation_and_survive_rollback(database, monkeypatch):
+    from decimal import Decimal
+
+    from alerts import managed_dataset as managed
+    from alerts.chart_aggregation import aggregate_once
+
+    # A smaller page exercises an internal M30 bucket beyond the live tail.
+    monkeypatch.setattr(managed, "BATCH", 2)
+    end = START + 180 * MINUTE
+    now = end + 5000
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = join(db, inst, START, now)
+        market.ingest(db, inst, payload(START, 180), received_at=now)
+        for _ in range(4):
+            publish_frame(db, inst, plan, "M30", now)
+        assert len(read_rows(db, inst, "M30", end, 100)) == 6
+        market.ingest(db, inst, payload(START + 59 * MINUTE, 1, 30),
+                      received_at=now, defer_aggregation=True)
+        publish_frame(db, inst, plan, "M30", now)
+        assert Decimal(read_rows(db, inst, "M30", START + 60 * MINUTE, 1)[0]["close"]) == 10
+    for _ in range(5):
+        assert aggregate_once()
+    with pytest.raises(RuntimeError, match="interrupted correction"):
+        with database.begin() as db:
+            inst = db.get(Instrument, "BTCUSDT")
+            publish_frame(db, inst, db.get(ChartHistoryPlan, inst.id), "M30", now)
+            raise RuntimeError("interrupted correction")
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        for _ in range(4):
+            publish_frame(db, inst, db.get(ChartHistoryPlan, inst.id), "M30", now)
+        assert Decimal(read_rows(db, inst, "M30", START + 60 * MINUTE, 1)[0]["close"]) == 30
+        assert status(db, inst, "M30")["complete_count"] == 6
+
+
+@pytest.mark.parametrize("frame,day_index,before_index", [("W1", 10, 11), ("MN", 30, 31)])
+def test_calendar_derived_internal_correction_is_published(database, monkeypatch, frame, day_index, before_index):
+    from decimal import Decimal
+
+    from alerts import managed_dataset as managed
+    from alerts.domain import Candle
+    from alerts.storage import Bar, MarketCoverage, instant
+
+    monkeypatch.setattr(managed, "BATCH", 1)
+    day = 86400000
+    start = ms(datetime(2026, 1, 1, tzinfo=UTC))
+    end = start + 90 * day
+    now = end + 5000
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = join(db, inst, start, now)
+        db.add(MarketCoverage(instrument_id=inst.id, source="binance", basis="last",
+                             start=start, end=end, observed=90 * 1440, queried_at=now))
+        db.add_all(Bar(instrument_id=inst.id, timeframe="D1", start=start + i * day,
+                       end=start + (i + 1) * day, open=10, high=11, low=9, close=10,
+                       complete=True) for i in range(90))
+        db.flush()
+        for _ in range(20):
+            publish_frame(db, inst, plan, frame, now)
+        target = start + day_index * day
+        market.upsert(db, inst.id, "D1", Candle(instant(target), instant(target + day),
+                      Decimal(10), Decimal(31), Decimal(9), Decimal(30), True))
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = db.get(ChartHistoryPlan, inst.id)
+        publish_frame(db, inst, plan, frame, now)
+        row = read_rows(db, inst, frame, start + before_index * day, 1)[0]
+        assert Decimal(row["close"]) == 30
+
+
 def test_session_boundary_freezes_historical_expansion_but_latest_advances(database):
     end = START + 20 * MINUTE
     now = end + 5000
