@@ -1,0 +1,58 @@
+{
+  "planned_pairs": 72,
+  "pairs_per_scenario": 36,
+  "samples_per_arm": 72,
+  "sources": [
+    "binance",
+    "oanda"
+  ],
+  "native_resolutions": [
+    "1",
+    "5",
+    "15",
+    "30",
+    "60",
+    "240",
+    "1D",
+    "1W",
+    "1M"
+  ],
+  "cycles": 2,
+  "scenarios": [
+    "single-first-screen",
+    "two-pane-first-screen"
+  ],
+  "proxy": "Both arms pinned to same original Japan02 and US01 nodes via local Mihomo; no selector changes.",
+  "cache": "Provider cache reset and API recreated before every navigation; native browser HTTP cache warmed identically.",
+  "order": "Paired, alternating arm order within source/resolution strata; second cycle reverses first.",
+  "primary_endpoint": "fraction of navigation-to-public-dataReady-plus-two-frames >=3000ms, including 30s display failures as slow",
+  "secondary_endpoints": [
+    "p50/p90/p95 elapsed",
+    "fraction of first-screen candle demands that make new TCP/TLS",
+    "per-source and per-scenario rates"
+  ],
+  "confidence": "Wilson 95% intervals, paired discordance exact McNemar, paired bootstrap latency differences; repeated same host and route, not an estimate of global production users.",
+  "images": {
+    "baseline": {
+      "tag": "market-watch-api:1.3.0-local",
+      "image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b"
+    },
+    "fix": {
+      "tag": "market-watch-api:provider-latency-fix",
+      "image_id": "sha256:56a23329bb5aa126d31155a0aa7a27b5f94272d7257884ebd6ca04f5df104e55"
+    }
+  },
+  "baseline_code": "v1.3.0 b9d69dd4c7ff8e873c4c75f07054eac29c94b996; product image built from a71439b34964fea9cf825d7a6e2d412bac071fc5, same backend content",
+  "fix_code": "c26decacb8d9fd3d83140a5d2f61861856b2f22a plus comment-only rebuild recorded in runtime-final.json",
+  "resources": {
+    "api_cpu": 1,
+    "api_memory_mib": 512,
+    "api_db_pool": 1,
+    "api_db_overflow": 0,
+    "no_managed_workers_added": true,
+    "existing_baseline_workers_remained_running": true
+  },
+  "library": "Same accepted v1.3.0 chart-origin image; vendor unchanged; no intercepted resources or data",
+  "maintenance_scope": "Recreate API before each trial: this experiment tests startup warmup and first screen, not 60s idle maintenance. Idle effects are covered by deterministic TCP regressions, not this rate estimate.",
+  "templates_sha256": "42f082fd69bef747ce93c05bd7fa1e8cff25d3b30bc3ae321982794605702cfa"
+}

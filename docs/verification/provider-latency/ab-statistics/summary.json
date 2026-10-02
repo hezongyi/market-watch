@@ -1,0 +1,605 @@
+{
+  "complete": true,
+  "records": 144,
+  "groups": {
+    "all": {
+      "baseline": {
+        "n": 72,
+        "completed": 72,
+        "failures": 0,
+        "slow_count": 21,
+        "slow_percent": 29.17,
+        "slow_percent_wilson_95ci": [
+          19.94,
+          40.51
+        ],
+        "completed_display_ms": {
+          "p50": 2385.21,
+          "p90": 6493.42,
+          "p95": 6859.58,
+          "max": 7155.981931000017
+        },
+        "navigations_with_new_connection": 41,
+        "successful_timed_cold_demands": 108,
+        "timed_demands_with_new_connection": 43,
+        "cold_demand_new_connection_percent": 39.81,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 36
+      },
+      "fix": {
+        "n": 72,
+        "completed": 72,
+        "failures": 0,
+        "slow_count": 14,
+        "slow_percent": 19.44,
+        "slow_percent_wilson_95ci": [
+          11.95,
+          30.03
+        ],
+        "completed_display_ms": {
+          "p50": 1950.05,
+          "p90": 4129.73,
+          "p95": 7553.18,
+          "max": 8340.118011999875
+        },
+        "navigations_with_new_connection": 24,
+        "successful_timed_cold_demands": 108,
+        "timed_demands_with_new_connection": 38,
+        "cold_demand_new_connection_percent": 35.19,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 36
+      },
+      "paired_effect": {
+        "complete_pairs": 72,
+        "baseline_slow_fix_fast": 12,
+        "baseline_fast_fix_slow": 5,
+        "discordant_pairs": 17,
+        "mcnemar_exact_two_sided_p": 0.143463,
+        "fix_minus_baseline_slow_percentage_points": -9.72,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          -20.83,
+          0.0
+        ],
+        "both_completed_pairs": 72,
+        "completed_paired_mean_latency_difference_ms": -526.82,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -924.58,
+          -113.1
+        ]
+      }
+    },
+    "binance": {
+      "baseline": {
+        "n": 36,
+        "completed": 36,
+        "failures": 0,
+        "slow_count": 20,
+        "slow_percent": 55.56,
+        "slow_percent_wilson_95ci": [
+          39.58,
+          70.46
+        ],
+        "completed_display_ms": {
+          "p50": 3689.97,
+          "p90": 6859.58,
+          "p95": 7119.19,
+          "max": 7155.981931000017
+        },
+        "navigations_with_new_connection": 23,
+        "successful_timed_cold_demands": 54,
+        "timed_demands_with_new_connection": 25,
+        "cold_demand_new_connection_percent": 46.3,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 18
+      },
+      "fix": {
+        "n": 36,
+        "completed": 36,
+        "failures": 0,
+        "slow_count": 14,
+        "slow_percent": 38.89,
+        "slow_percent_wilson_95ci": [
+          24.78,
+          55.14
+        ],
+        "completed_display_ms": {
+          "p50": 2524.9,
+          "p90": 7553.18,
+          "p95": 8029.59,
+          "max": 8340.118011999875
+        },
+        "navigations_with_new_connection": 24,
+        "successful_timed_cold_demands": 54,
+        "timed_demands_with_new_connection": 38,
+        "cold_demand_new_connection_percent": 70.37,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 18
+      },
+      "paired_effect": {
+        "complete_pairs": 36,
+        "baseline_slow_fix_fast": 11,
+        "baseline_fast_fix_slow": 5,
+        "discordant_pairs": 16,
+        "mcnemar_exact_two_sided_p": 0.210114,
+        "fix_minus_baseline_slow_percentage_points": -16.67,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          -36.11,
+          2.78
+        ],
+        "both_completed_pairs": 36,
+        "completed_paired_mean_latency_difference_ms": -756.2,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -1557.02,
+          79.87
+        ]
+      }
+    },
+    "oanda": {
+      "baseline": {
+        "n": 36,
+        "completed": 36,
+        "failures": 0,
+        "slow_count": 1,
+        "slow_percent": 2.78,
+        "slow_percent_wilson_95ci": [
+          0.49,
+          14.17
+        ],
+        "completed_display_ms": {
+          "p50": 2102.93,
+          "p90": 2567.78,
+          "p95": 2882.23,
+          "max": 3228.535018000024
+        },
+        "navigations_with_new_connection": 18,
+        "successful_timed_cold_demands": 54,
+        "timed_demands_with_new_connection": 18,
+        "cold_demand_new_connection_percent": 33.33,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 18
+      },
+      "fix": {
+        "n": 36,
+        "completed": 36,
+        "failures": 0,
+        "slow_count": 0,
+        "slow_percent": 0.0,
+        "slow_percent_wilson_95ci": [
+          0.0,
+          9.64
+        ],
+        "completed_display_ms": {
+          "p50": 1848.6,
+          "p90": 2165.42,
+          "p95": 2219.2,
+          "max": 2266.4951310000033
+        },
+        "navigations_with_new_connection": 0,
+        "successful_timed_cold_demands": 54,
+        "timed_demands_with_new_connection": 0,
+        "cold_demand_new_connection_percent": 0.0,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 18
+      },
+      "paired_effect": {
+        "complete_pairs": 36,
+        "baseline_slow_fix_fast": 1,
+        "baseline_fast_fix_slow": 0,
+        "discordant_pairs": 1,
+        "mcnemar_exact_two_sided_p": 1.0,
+        "fix_minus_baseline_slow_percentage_points": -2.78,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          -8.33,
+          0.0
+        ],
+        "both_completed_pairs": 36,
+        "completed_paired_mean_latency_difference_ms": -297.44,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -365.86,
+          -226.42
+        ]
+      }
+    },
+    "single-first-screen": {
+      "baseline": {
+        "n": 36,
+        "completed": 36,
+        "failures": 0,
+        "slow_count": 5,
+        "slow_percent": 13.89,
+        "slow_percent_wilson_95ci": [
+          6.08,
+          28.66
+        ],
+        "completed_display_ms": {
+          "p50": 1777.15,
+          "p90": 5492.58,
+          "p95": 6925.61,
+          "max": 7155.981931000017
+        },
+        "navigations_with_new_connection": 5,
+        "successful_timed_cold_demands": 36,
+        "timed_demands_with_new_connection": 5,
+        "cold_demand_new_connection_percent": 13.89,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 0
+      },
+      "fix": {
+        "n": 36,
+        "completed": 36,
+        "failures": 0,
+        "slow_count": 5,
+        "slow_percent": 13.89,
+        "slow_percent_wilson_95ci": [
+          6.08,
+          28.66
+        ],
+        "completed_display_ms": {
+          "p50": 1819.95,
+          "p90": 5267.52,
+          "p95": 5883.12,
+          "max": 8029.593586999923
+        },
+        "navigations_with_new_connection": 10,
+        "successful_timed_cold_demands": 36,
+        "timed_demands_with_new_connection": 10,
+        "cold_demand_new_connection_percent": 27.78,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 0
+      },
+      "paired_effect": {
+        "complete_pairs": 36,
+        "baseline_slow_fix_fast": 4,
+        "baseline_fast_fix_slow": 4,
+        "discordant_pairs": 8,
+        "mcnemar_exact_two_sided_p": 1.0,
+        "fix_minus_baseline_slow_percentage_points": 0.0,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          -13.89,
+          13.89
+        ],
+        "both_completed_pairs": 36,
+        "completed_paired_mean_latency_difference_ms": 73.11,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -564.81,
+          722.81
+        ]
+      }
+    },
+    "binance/single-first-screen": {
+      "baseline": {
+        "n": 18,
+        "completed": 18,
+        "failures": 0,
+        "slow_count": 5,
+        "slow_percent": 27.78,
+        "slow_percent_wilson_95ci": [
+          12.5,
+          50.87
+        ],
+        "completed_display_ms": {
+          "p50": 1756.8,
+          "p90": 6925.61,
+          "p95": 7155.98,
+          "max": 7155.981931000017
+        },
+        "navigations_with_new_connection": 5,
+        "successful_timed_cold_demands": 18,
+        "timed_demands_with_new_connection": 5,
+        "cold_demand_new_connection_percent": 27.78,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 0
+      },
+      "fix": {
+        "n": 18,
+        "completed": 18,
+        "failures": 0,
+        "slow_count": 5,
+        "slow_percent": 27.78,
+        "slow_percent_wilson_95ci": [
+          12.5,
+          50.87
+        ],
+        "completed_display_ms": {
+          "p50": 2150.61,
+          "p90": 5883.12,
+          "p95": 8029.59,
+          "max": 8029.593586999923
+        },
+        "navigations_with_new_connection": 10,
+        "successful_timed_cold_demands": 18,
+        "timed_demands_with_new_connection": 10,
+        "cold_demand_new_connection_percent": 55.56,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 0
+      },
+      "paired_effect": {
+        "complete_pairs": 18,
+        "baseline_slow_fix_fast": 4,
+        "baseline_fast_fix_slow": 4,
+        "discordant_pairs": 8,
+        "mcnemar_exact_two_sided_p": 1.0,
+        "fix_minus_baseline_slow_percentage_points": 0.0,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          -27.78,
+          27.78
+        ],
+        "both_completed_pairs": 18,
+        "completed_paired_mean_latency_difference_ms": 149.69,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -1101.61,
+          1440.19
+        ]
+      }
+    },
+    "oanda/single-first-screen": {
+      "baseline": {
+        "n": 18,
+        "completed": 18,
+        "failures": 0,
+        "slow_count": 0,
+        "slow_percent": 0.0,
+        "slow_percent_wilson_95ci": [
+          0.0,
+          17.59
+        ],
+        "completed_display_ms": {
+          "p50": 1777.15,
+          "p90": 1948.8,
+          "p95": 2102.93,
+          "max": 2102.9257900000084
+        },
+        "navigations_with_new_connection": 0,
+        "successful_timed_cold_demands": 18,
+        "timed_demands_with_new_connection": 0,
+        "cold_demand_new_connection_percent": 0.0,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 0
+      },
+      "fix": {
+        "n": 18,
+        "completed": 18,
+        "failures": 0,
+        "slow_count": 0,
+        "slow_percent": 0.0,
+        "slow_percent_wilson_95ci": [
+          0.0,
+          17.59
+        ],
+        "completed_display_ms": {
+          "p50": 1777.42,
+          "p90": 2182.3,
+          "p95": 2219.2,
+          "max": 2219.198926999932
+        },
+        "navigations_with_new_connection": 0,
+        "successful_timed_cold_demands": 18,
+        "timed_demands_with_new_connection": 0,
+        "cold_demand_new_connection_percent": 0.0,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 0
+      },
+      "paired_effect": {
+        "complete_pairs": 18,
+        "baseline_slow_fix_fast": 0,
+        "baseline_fast_fix_slow": 0,
+        "discordant_pairs": 0,
+        "mcnemar_exact_two_sided_p": 1.0,
+        "fix_minus_baseline_slow_percentage_points": 0.0,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          0.0,
+          0.0
+        ],
+        "both_completed_pairs": 18,
+        "completed_paired_mean_latency_difference_ms": -3.47,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -108.49,
+          104.67
+        ]
+      }
+    },
+    "two-pane-first-screen": {
+      "baseline": {
+        "n": 36,
+        "completed": 36,
+        "failures": 0,
+        "slow_count": 16,
+        "slow_percent": 44.44,
+        "slow_percent_wilson_95ci": [
+          29.54,
+          60.42
+        ],
+        "completed_display_ms": {
+          "p50": 2651.88,
+          "p90": 6501.97,
+          "p95": 6859.58,
+          "max": 7119.193593000062
+        },
+        "navigations_with_new_connection": 36,
+        "successful_timed_cold_demands": 72,
+        "timed_demands_with_new_connection": 38,
+        "cold_demand_new_connection_percent": 52.78,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 36
+      },
+      "fix": {
+        "n": 36,
+        "completed": 36,
+        "failures": 0,
+        "slow_count": 9,
+        "slow_percent": 25.0,
+        "slow_percent_wilson_95ci": [
+          13.75,
+          41.07
+        ],
+        "completed_display_ms": {
+          "p50": 2095.63,
+          "p90": 4042.38,
+          "p95": 7974.33,
+          "max": 8340.118011999875
+        },
+        "navigations_with_new_connection": 14,
+        "successful_timed_cold_demands": 72,
+        "timed_demands_with_new_connection": 28,
+        "cold_demand_new_connection_percent": 38.89,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 36
+      },
+      "paired_effect": {
+        "complete_pairs": 36,
+        "baseline_slow_fix_fast": 8,
+        "baseline_fast_fix_slow": 1,
+        "discordant_pairs": 9,
+        "mcnemar_exact_two_sided_p": 0.039062,
+        "fix_minus_baseline_slow_percentage_points": -19.44,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          -33.33,
+          -5.56
+        ],
+        "both_completed_pairs": 36,
+        "completed_paired_mean_latency_difference_ms": -1126.75,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -1603.63,
+          -609.48
+        ]
+      }
+    },
+    "binance/two-pane-first-screen": {
+      "baseline": {
+        "n": 18,
+        "completed": 18,
+        "failures": 0,
+        "slow_count": 15,
+        "slow_percent": 83.33,
+        "slow_percent_wilson_95ci": [
+          60.78,
+          94.16
+        ],
+        "completed_display_ms": {
+          "p50": 5453.33,
+          "p90": 6859.58,
+          "p95": 7119.19,
+          "max": 7119.193593000062
+        },
+        "navigations_with_new_connection": 18,
+        "successful_timed_cold_demands": 36,
+        "timed_demands_with_new_connection": 20,
+        "cold_demand_new_connection_percent": 55.56,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 18
+      },
+      "fix": {
+        "n": 18,
+        "completed": 18,
+        "failures": 0,
+        "slow_count": 9,
+        "slow_percent": 50.0,
+        "slow_percent_wilson_95ci": [
+          29.03,
+          70.97
+        ],
+        "completed_display_ms": {
+          "p50": 2647.68,
+          "p90": 7974.33,
+          "p95": 8340.12,
+          "max": 8340.118011999875
+        },
+        "navigations_with_new_connection": 14,
+        "successful_timed_cold_demands": 36,
+        "timed_demands_with_new_connection": 28,
+        "cold_demand_new_connection_percent": 77.78,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 18
+      },
+      "paired_effect": {
+        "complete_pairs": 18,
+        "baseline_slow_fix_fast": 7,
+        "baseline_fast_fix_slow": 1,
+        "discordant_pairs": 8,
+        "mcnemar_exact_two_sided_p": 0.070312,
+        "fix_minus_baseline_slow_percentage_points": -33.33,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          -61.11,
+          -5.56
+        ],
+        "both_completed_pairs": 18,
+        "completed_paired_mean_latency_difference_ms": -1662.09,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -2602.44,
+          -643.69
+        ]
+      }
+    },
+    "oanda/two-pane-first-screen": {
+      "baseline": {
+        "n": 18,
+        "completed": 18,
+        "failures": 0,
+        "slow_count": 1,
+        "slow_percent": 5.56,
+        "slow_percent_wilson_95ci": [
+          0.99,
+          25.76
+        ],
+        "completed_display_ms": {
+          "p50": 2469.86,
+          "p90": 2882.23,
+          "p95": 3228.54,
+          "max": 3228.535018000024
+        },
+        "navigations_with_new_connection": 18,
+        "successful_timed_cold_demands": 36,
+        "timed_demands_with_new_connection": 18,
+        "cold_demand_new_connection_percent": 50.0,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 18
+      },
+      "fix": {
+        "n": 18,
+        "completed": 18,
+        "failures": 0,
+        "slow_count": 0,
+        "slow_percent": 0.0,
+        "slow_percent_wilson_95ci": [
+          0.0,
+          17.59
+        ],
+        "completed_display_ms": {
+          "p50": 1907.03,
+          "p90": 2165.42,
+          "p95": 2266.5,
+          "max": 2266.4951310000033
+        },
+        "navigations_with_new_connection": 0,
+        "successful_timed_cold_demands": 36,
+        "timed_demands_with_new_connection": 0,
+        "cold_demand_new_connection_percent": 0.0,
+        "cold_demands_without_success_timings": 0,
+        "navigations_with_overlapping_api_requests": 18
+      },
+      "paired_effect": {
+        "complete_pairs": 18,
+        "baseline_slow_fix_fast": 1,
+        "baseline_fast_fix_slow": 0,
+        "discordant_pairs": 1,
+        "mcnemar_exact_two_sided_p": 1.0,
+        "fix_minus_baseline_slow_percentage_points": -5.56,
+        "paired_bootstrap_slow_difference_95ci_pp": [
+          -16.67,
+          0.0
+        ],
+        "both_completed_pairs": 18,
+        "completed_paired_mean_latency_difference_ms": -591.4,
+        "completed_paired_mean_latency_difference_95ci_ms": [
+          -686.35,
+          -503.26
+        ]
+      }
+    }
+  },
+  "errors": [],
+  "endpoint": "Navigation to public dataReady for all panes plus two frames; >=3000ms or display failure counted slow",
+  "percentiles": "Nearest rank, successful displays only; failures remain in primary slow rate",
+  "inference_limits": "Intervals/tests assume independent pairs; one host, fixed routes, short time window and balanced scenario mix. Subgroup p-values exploratory and unadjusted. Repeated network observations can be correlated; no production-wide probability claim.",
+  "raw_sha256": "3522e1e8c1b9efea9d5e295eb5f8812217739c0d9207fa9c9447a36164a87e40"
+}

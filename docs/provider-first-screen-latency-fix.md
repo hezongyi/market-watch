@@ -1,5 +1,9 @@
 # v1.3.0 基线：平台首屏连接池修复
 
+> 后续已完成 144 个同条件 A/B 样本，见
+> [统计报告](provider-first-screen-latency-statistics.md)：并发加载有收益，整体慢率
+> 降幅未达到统计显著，单图未显示改善，不能将下面的小样本描述外推为总体保证。
+
 基线为 `v1.3.0` / `b9d69dd4c7ff8e873c4c75f07054eac29c94b996`。独立分支
 `fix/provider-first-screen-latency`，worktree 为
 `/home/quant/repos/market-watch-provider-latency`。本次修复不改变 v1.3.0
