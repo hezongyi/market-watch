@@ -1,12 +1,12 @@
 {
   "deployed": true,
-  "verified_at": "2026-10-02T09:38:52.619126+00:00",
+  "verified_at": "2026-10-02T11:02:27.798660+00:00",
   "project": "market-watch-v132-ui",
   "app_origin": "https://192.168.7.232:15653",
   "local_origin": "https://v132.localhost:15653",
   "chart_origin": "https://192.168.7.232:15654",
   "baseline": "v1.3.2 / 9596b25",
-  "chart_menu_source": "7bf84bb",
+  "chart_menu_source": "c6036df",
   "schema": "o16_managed_revisions",
   "source_database_schema_still": "p17_volume",
   "existing_container_comparison": [
@@ -217,8 +217,8 @@
     {
       "service": "web",
       "name": "market-watch-v132-ui-web-1",
-      "container_id": "b18f0ce53d1880424517fc9b8cc85ca24c9de6c35368110092ce326f318507bb",
-      "image_id": "sha256:df3842d517470545760afd3387531b49cc48cd76c131723f9848a897ad61eb76",
+      "container_id": "5667968d15629736beb39d7f1e25f178fa32ca20e77d62726e0d92a88b3744ee",
+      "image_id": "sha256:2c8363f65987cc3ba37928351a459053d5a7ff80cfd7427fbbfe4238c86c9440",
       "state": "running",
       "health": null,
       "networks": [
@@ -239,8 +239,8 @@
     {
       "service": "chart-origin",
       "name": "market-watch-v132-ui-chart-origin-1",
-      "container_id": "d9bbedd5d96c62cd1fca22136dd6226b4b351d38ac5f8274fab2c04793b68e46",
-      "image_id": "sha256:d63628dd50ee8a1c68817c50d16515f4c6544ad76d1352ea1325563a3d7b7860",
+      "container_id": "6c926e308919176843172baafc3d166279719d79ab524641169521db3e138df2",
+      "image_id": "sha256:a673d27b0aff890f7071493d35177921fa43c858194d09f63a40f2959f9e2dfd",
       "state": "running",
       "health": null,
       "networks": [
@@ -283,5 +283,27 @@
     "chart_ip_access": "serves HTTPS directly; plain HTTP redirects to same IP"
   },
   "external_dns_required": false,
-  "session_cookie_scope": "/api"
+  "session_cookie_scope": "/api",
+  "chart_ui_verification": {
+    "passed": true,
+    "evidence": "docs/verification/v1.3.2-isolated/chart-ui-browser.json",
+    "countdown_server_time": "parent /readyz -> UNIX seconds -> native getServerTime",
+    "native_style_save_as": "Two matching chunks absent from original archive; menu fallback saved and applied",
+    "grid": "dotted default; solid survives reload",
+    "notifications": "native dialogs, active conditions deduplicated; no iframe height change",
+    "logo": "widget_logo disabled",
+    "indicator": "four touching columns and separate zigzag, 1px SVG trace",
+    "layout_create": "native layout dropdown, mouse and Enter verified",
+    "source": "c6036df"
+  },
+  "layout_autosave_verification": {
+    "passed": true,
+    "default": "off",
+    "interval_seconds": 30,
+    "observed_delay_ms": 30189,
+    "disabled_no_writes_ms": 33000,
+    "manual_save_while_off": true,
+    "preference_reloads": true,
+    "evidence": "docs/verification/v1.3.2-isolated/layout-autosave-browser.json"
+  }
 }
