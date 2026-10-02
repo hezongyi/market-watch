@@ -13,7 +13,7 @@ from argon2.exceptions import VerificationError
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, model_validator
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 
 from .calendar_profile import closures_from
 from .config import settings
@@ -99,23 +99,25 @@ def login(body: Credentials, response: Response, request: Request):
         )
     if count >= 10:
         raise HTTPException(429, "尝试过于频繁，请一分钟后重试")
-    if not settings.admin_password_hash:
-        raise HTTPException(503, "尚未设置管理员密码，请运行初始化命令")
-    try:
-        PasswordHasher().verify(settings.admin_password_hash, body.password)
-    except VerificationError:
-        with transaction() as db:
-            db.add(Audit(kind="login_failed", details={}))
-        raise HTTPException(401, "密码不正确")
     token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(24)
     with transaction() as db:
-        db.add(
-            LoginSession(
-                token_hash=digest(token),
-                csrf=csrf,
-                expires=now_ms() + settings.session_hours * 3600_000,
-            )
-        )
+        credential = db.scalar(select(Preference).where(Preference.key == "auth.admin").with_for_update())
+        password_hash = credential.value.get("hash", settings.admin_password_hash)
+        if not password_hash:
+            raise HTTPException(503, "尚未设置管理员密码，请运行初始化命令")
+        try:
+            PasswordHasher().verify(password_hash, body.password)
+        except VerificationError:
+            valid = False
+        else:
+            valid = True
+        if valid:
+            db.add(LoginSession(token_hash=digest(token), csrf=csrf,
+                                expires=now_ms() + settings.session_hours * 3600_000))
+        else:
+            db.add(Audit(kind="login_failed", details={}))
+    if not valid:
+        raise HTTPException(401, "密码不正确")
     response.set_cookie(
         "session",
         token,
@@ -139,6 +141,38 @@ def logout(request: Request, response: Response):
         if row:
             db.delete(row)
     response.delete_cookie("session")
+    return {"ok": True}
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(min_length=1, max_length=512)
+    new_password: str = Field(min_length=6, max_length=512)
+
+
+@app.post("/api/account/password", dependencies=[Depends(authenticated)])
+def change_password(body: PasswordChange, request: Request):
+    current_token = digest(request.cookies["session"])
+    with transaction() as db:
+        credential = db.scalar(select(Preference).where(Preference.key == "auth.admin").with_for_update())
+        attempts = db.scalar(select(func.count()).select_from(Audit).where(
+            Audit.kind == "password_change_failed", Audit.at > now_ms() - 60_000))
+        if attempts >= 10:
+            raise HTTPException(429, "尝试过于频繁，请一分钟后重试")
+        try:
+            PasswordHasher().verify(credential.value.get("hash", settings.admin_password_hash),
+                                    body.current_password)
+        except VerificationError:
+            valid = False
+            db.add(Audit(kind="password_change_failed", details={}))
+        else:
+            valid = True
+            if body.current_password == body.new_password:
+                raise HTTPException(422, "新密码不能与当前密码相同")
+            credential.value = {"hash": PasswordHasher().hash(body.new_password)}
+            db.execute(delete(LoginSession).where(LoginSession.token_hash != current_token))
+            db.add(Audit(kind="password_changed", details={}))
+    if not valid:
+        raise HTTPException(400, "当前密码不正确")
     return {"ok": True}
 
 

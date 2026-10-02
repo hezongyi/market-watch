@@ -554,3 +554,36 @@ def test_native_capacity_error_is_structured_and_never_no_data(database, monkeyp
         assert 'history_boundary' not in response.json()
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_provider_quotes_use_previous_complete_native_close(database, monkeypatch):
+    from alerts import api as api_module
+    from alerts.domain import Calendar, session_bounds
+    from alerts.storage import instant, ms
+    from fastapi.testclient import TestClient
+    start = 1790944200000
+    session_start = ms(session_bounds(instant(start), Calendar(META["calendar"]))[0])
+    latest = {"start": start, "close": "120"}
+    calls = []
+    def page(meta, frame, before, count, **kwargs):
+        calls.append((frame, count))
+        return {"bars": [latest]} if frame == "M1" else {"bars": [
+            {"complete": True, "end": session_start, "close": "100"},
+            {"complete": False, "end": session_start + 86400000, "close": "110"},
+        ]}
+    monkeypatch.setattr(provider, "cached_page", page)
+    monkeypatch.setattr(provider, "metadata", lambda _: {**META, "name": "Test pair"})
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            value = client.post("/api/market-data/quotes", json={"symbols": ["MWP:EURUSD"]}).json()[0]["v"]
+            assert value["lp"] == 120 and value["prev_close_price"] == 100
+            assert value["ch"] == 20 and value["chp"] == 20
+            assert value["bid"] == 120
+            def unavailable(*args):
+                raise RuntimeError("previous session unavailable")
+            monkeypatch.setattr(provider, "quote_previous_close", unavailable)
+            value = client.post("/api/market-data/quotes", json={"symbols": ["MWP:EURUSD"]}).json()[0]["v"]
+            assert value["lp"] == 120 and "ch" not in value
+    finally:
+        api_module.app.dependency_overrides.clear()

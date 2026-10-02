@@ -1,0 +1,24 @@
+# Ubuntu local deployment only, layered over acceptance + dual acceptance.
+services:
+  api:
+    pull_policy: never
+    environment:
+      ALERTS_PUBLIC_URL: https://localhost:15453
+  realtime-worker:
+    pull_policy: never
+    environment:
+      ALERTS_PUBLIC_URL: https://localhost:15453
+  chart-history-worker:
+    pull_policy: never
+    environment:
+      ALERTS_PUBLIC_URL: https://localhost:15453
+  chart-aggregation-worker:
+    pull_policy: never
+    environment:
+      ALERTS_PUBLIC_URL: https://localhost:15453
+  web:
+    pull_policy: never
+  chart-origin:
+    pull_policy: never
+  tls:
+    pull_policy: never

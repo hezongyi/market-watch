@@ -39,6 +39,8 @@ export default function AdvancedWorkspace() {
   const [feedError, setFeedError] = useState("");
   const [syncNotices, setSyncNotices] = useState<Record<string, string>>({});
   const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
+  const [chartTheme, setChartTheme] = useState("dark");
+  const [nativeReady, setNativeReady] = useState(false);
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
   const frame = useRef<HTMLIFrameElement>(null),
@@ -77,6 +79,7 @@ export default function AdvancedWorkspace() {
       }, 15000);
     });
   const select = (row: Workspace) => {
+    setNativeReady(false);
     setPollErrors({});
     setHistoryProgress({});
     setDatasetViews({});
@@ -94,6 +97,19 @@ export default function AdvancedWorkspace() {
     );
     setStatus("正在加载图表");
   };
+  const noticeMessages = [
+    ...(blocked.current ? [{id: "draft", text: "草稿尚未保存，自动保存已暂停。是否复制恢复为独立工作区？", recover: true}] : []),
+    ...(!blocked.current && error ? [{id: "workspace", text: error}] : []),
+    ...(feedError && !(blocked.current && /未保存草稿|保存已暂停/.test(feedError))
+      ? [{id: "feed", text: feedError}] : []),
+    ...Object.entries(pollErrors).map(([id, text]) => ({id: "poll:" + id, text})),
+    ...Object.entries(syncNotices).map(([id, text]) => ({id: "viewport:" + id, text})),
+  ];
+  const notificationState = JSON.stringify(noticeMessages);
+  useEffect(() => {
+    if (nativeReady) post({type: "notifications", notices: JSON.parse(notificationState),
+      draftBlocked: blocked.current});
+  }, [nativeReady, notificationState]);
   async function refresh(limit?: number) {
     const list = await api<Workspace[]>("/advanced-charts/workspaces"+(limit ? '?limit='+limit : ''));
     setRows(list);
@@ -107,6 +123,16 @@ export default function AdvancedWorkspace() {
     };
     addEventListener("beforeunload", protect);
     return () => removeEventListener("beforeunload", protect);
+  }, [mobile]);
+  useEffect(() => {
+    const save = (event: KeyboardEvent) => {
+      if (mobile || !(event.ctrlKey || event.metaKey) || event.altKey ||
+          event.key.toLowerCase() !== "s") return;
+      event.preventDefault();
+      post({type: "save"});
+    };
+    addEventListener("keydown", save);
+    return () => removeEventListener("keydown", save);
   }, [mobile]);
   useEffect(() => {
     let cancelled = false;
@@ -214,8 +240,22 @@ export default function AdvancedWorkspace() {
           setExportSelection(value);
       } else if (m.type === "workspace-action") {
         if (m.action === "home") location.assign("/");
+        else if (m.action === "logout") {
+          try {
+            if (!mobile && unsaved.current) await flush();
+            await api("/logout", {});
+            location.assign("/");
+          } catch (e) {setError(String(e));}
+        }
         else if (!mobile && m.action === "create") await create();
-      } else if (m.type === "ready") setStatus("已加载 · 行情每15秒检查");
+        else if (!mobile && m.action === "recover") await copy();
+      } else if (m.type === "theme-changed") {
+        if (typeof m.theme === "string" && /^(dark|light)$/i.test(m.theme))
+          setChartTheme(m.theme.toLowerCase());
+      } else if (m.type === "ready") {
+        setNativeReady(true);
+        setStatus("已加载 · 行情每15秒检查");
+      }
       else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
         setSyncNotices(previous => {
@@ -236,6 +276,10 @@ export default function AdvancedWorkspace() {
         });
       }
       else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
+      else if (m.type === "workspace-dirty") {
+        if (!mobile) unsaved.current = true;
+        setStatus("布局有未保存更改");
+      }
       else if (m.type === "native-saving") {
         if (!mobile) unsaved.current = true;
         setStatus("正在保存");
@@ -378,6 +422,16 @@ export default function AdvancedWorkspace() {
           setError(String(e));
           reply({ type: "result", id: m.id, error: String(e) });
         }
+      } else if (m.type === "account-password") {
+        const body = m.query;
+        if (!body || typeof body.current_password !== "string" || typeof body.new_password !== "string" ||
+            [...body.current_password].length > 512 || [...body.new_password].length > 512) {
+          reply({type: "result", id: m.id, error: "无效密码请求"});
+          return;
+        }
+        try {
+          reply({type: "result", id: m.id, result: await api("/account/password", body)});
+        } catch (error) {reply({type: "result", id: m.id, error: String(error)});}
       } else if (m.type === "style-template-name") {
         const name = mobile
           ? null
@@ -430,6 +484,7 @@ export default function AdvancedWorkspace() {
           activity: "/market-data/activity",
           retry: "/market-data/retry",
           quotes: "/market-data/quotes",
+          serverTime: "/readyz",
         };
         if (
           !q ||
@@ -461,19 +516,23 @@ export default function AdvancedWorkspace() {
         sourceRequests.set(m.id, controller);
         inflight.current++;
         try {
+          let result;
+          if (q.op === "serverTime") {
+            const response = await fetch("/readyz", {signal: controller.signal,
+              credentials: "omit", cache: "no-store"});
+            const health = await response.json();
+            if (!response.ok || !Number.isSafeInteger(health.time) || health.time <= 0)
+              throw Error("服务器时间暂不可用");
+            result = Math.floor(health.time / 1000);
+          } else result = await api(
+            endpoints[q.op] +
+              (q.op === "search" ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
+                : q.op === "retry" ? "/" + encodeURIComponent(q.args.id) : ""),
+            q.op === "search" ? undefined : q.args, controller.signal);
           reply({
             type: "result",
             id: m.id,
-            result: await api(
-              endpoints[q.op] +
-                (q.op === "search"
-                  ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
-                  : q.op === "retry"
-                    ? "/" + encodeURIComponent(q.args.id)
-                    : ""),
-              q.op === "search" ? undefined : q.args,
-              controller.signal,
-            ),
+            result,
           });
         } catch (e) {
           reply({ type: "result", id: m.id, error: String(e) });
@@ -661,7 +720,7 @@ export default function AdvancedWorkspace() {
     }
   }
   return (
-    <main className="advanced-workspace">
+    <main className="advanced-workspace" data-theme={chartTheme}>
       {historyPlansOpen && <HistoryPlansDialog onClose={()=>setHistoryPlansOpen(false)} readonly={mobile}
         onRefresh={()=>post({type:'refresh-managed'})} views={datasetViews}/> }
       {maintenanceInstrument && <MaintenanceDialog instrument={maintenanceInstrument}
@@ -682,18 +741,10 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
-      {Object.keys(syncNotices).length > 0 && (
-        <div role="status" className="advanced-error" data-testid="viewport-notice">
-          {Object.values(syncNotices).join("；")}
-        </div>
-      )}
-      {(error || feedError || Object.keys(pollErrors).length > 0) && (
-        <div role="alert" className="advanced-error">
-          {error || feedError || Object.values(pollErrors).join("；")}
-          {!mobile && blocked.current && (
-            <button onClick={copy}>复制恢复草稿</button>
-          )}
-          <button onClick={() => location.reload()}>重新加载</button>
+      {!nativeReady && noticeMessages.length > 0 && (
+        <div className="advanced-loading-notice" role="alert">
+          {noticeMessages.map(notice => notice.text.replace(/^(?:Error:\s*)+/, "")).join("；")}
+          {blocked.current && !mobile && <button onClick={copy}>复制恢复草稿</button>}
         </div>
       )}
       {active ? (

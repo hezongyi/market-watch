@@ -1,0 +1,24 @@
+# Build only. Runtime configuration is selected separately for the target deployment.
+# Run from the repository root with --project-directory . so contexts resolve correctly.
+name: market-watch-v132-build
+x-source-labels: &source-labels
+  org.opencontainers.image.version: "1.3.2"
+  org.opencontainers.image.revision: "9596b25eda507ef708a327feb5271f238cdfdc0b"
+services:
+  api:
+    image: market-watch-api:1.3.2-9596b25
+    build:
+      context: .
+      labels: *source-labels
+  web:
+    image: market-watch-web:1.3.2-9596b25
+    build:
+      context: ./web
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: ${VITE_ADVANCED_CHART_ORIGIN:?Set the target chart origin before building}
+      labels: *source-labels
+  chart-origin:
+    image: market-watch-chart-origin:1.3.2-9596b25
+    build:
+      context: ./advanced-host
+      labels: *source-labels

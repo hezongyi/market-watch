@@ -89,7 +89,8 @@ def test_initial_history_is_durable_newest_first_and_lower_priority(database, mo
         assert {j.instrument_id for j in jobs} == {"EURUSD", "XAUUSD", "BTCUSDT"}
         assert min(j.start for j in jobs) == START - 2 * 86400_000
         assert max(j.end for j in jobs) == START
-        assert db.scalar(select(func.count()).select_from(Preference)) == 3
+        assert db.scalar(select(func.count()).select_from(Preference).where(
+            Preference.key.startswith("initial_history:"))) == 3
         db.add(
             ImportJob(
                 instrument_id="BTCUSDT", start=START, end=START + 60000, cursor=START, priority=0

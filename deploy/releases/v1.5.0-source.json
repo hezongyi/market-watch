@@ -1,0 +1,95 @@
+{
+  "version": "1.5.0",
+  "accepted": true,
+  "acceptance_scope": "Source integration and release-input equivalence; original UI deployment evidence and controlled password browser contracts. No fresh combined-image full native-library acceptance.",
+  "release_tag": "v1.5.0",
+  "release_method": "Merge PR from feature/chart-ui-account to main; annotated tag on final main merge commit.",
+  "previous_source_tag": "v1.4.0",
+  "baseline": "9fbf0a59cd735ff44e9d4f9f73fe2556716222c2",
+  "ui_original_head": "b3a3363e919bd9af3f7a79e88a86fbc994d64a6b",
+  "source_commit": "535e1c75dd3f7ad3e7b47604d3a608ea0ed9c9bf",
+  "tag_relation": "Tag adds release metadata/documentation and GitHub merge commit; 326 of 329 recorded inputs remain byte-identical, and 3 metadata files change only root package version to 1.5.0. Dependencies unchanged.",
+  "schema": "p17_volume",
+  "new_migrations": [],
+  "delivery_document": "docs/chart-v1.5.0-source-delivery.md",
+  "verification": "docs/verification/chart-ui-integration-v1.4.0/source-release-audit.json",
+  "source_hashes": "docs/verification/chart-ui-release-v1.5.0/source-hashes.json",
+  "checks": {
+    "backend_full": {
+      "passed": 406,
+      "skipped": 1,
+      "postgresql": "17.11 UTF8 disposable fixture stopped after tests"
+    },
+    "frontend_scripts": {
+      "passed": 42,
+      "failed": 0,
+      "scope": "Non-browser Node scripts"
+    },
+    "controlled_browser": {
+      "passed": 8,
+      "scope": "Controlled notice DOM and actual parent RPC branch, no deployed API/account modification."
+    },
+    "web_build": "Version 1.5.0 TypeScript/Vite passed; existing bundle warning.",
+    "package_build": {
+      "version": "1.5.0",
+      "runtime_modules": 41,
+      "source_mismatches": 0
+    },
+    "ruff": "Changed Python scope passed.",
+    "standards_review": "No hard violations; two nonblocking heuristics.",
+    "spec_review": "Two P2 issues fixed; no residual product blockers.",
+    "source_equivalence": {
+      "recorded_inputs": 329,
+      "unchanged_files": 326,
+      "version_only_metadata_files": 3,
+      "unexpected_mismatches": 0
+    },
+    "original_ui_evidence": {
+      "files": 77,
+      "mismatches": 0
+    }
+  },
+  "evidence_sha256": {
+    "docs/verification/chart-ui-integration-v1.4.0/backend-final.txt": "15cb7f91e1cb04e9fa916050f7edf9782ecf5a648293fbe3c2cf42f624dec3a4",
+    "docs/verification/chart-ui-integration-v1.4.0/frontend-final.json": "4d4538c2c5225c49f1ba695c0f272a0439e47f96aff413d60a7ea324c9cc2e77",
+    "docs/verification/chart-ui-integration-v1.4.0/password-unicode-green.txt": "fc3f8e3ada72d489db24e466c8f61f33b75eb39135bc58abaa4a30bbc8fec428",
+    "docs/verification/chart-ui-integration-v1.4.0/native-save-green.txt": "1da9e59bf18915a6999bc006841cbeba637b806f618c4504230a0c360074b217",
+    "docs/verification/chart-ui-integration-v1.4.0/ruff.txt": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "docs/verification/chart-ui-integration-v1.4.0/review-results.md": "bff1ffcb63e467db98713628578692b254cabe0899c45e63c0dc6721d3e1f208",
+    "docs/verification/chart-ui-integration-v1.4.0/checks.json": "01a3b24a8d3f91bca6dda6e09737d0c1e6831376e23a698b1540c9ee0d857420",
+    "docs/verification/chart-ui-integration-v1.4.0/tested-source-hashes.json": "2f96936a02a57595ac73774d2ec67e990a9f9c4228854c96c485037a150b99fb",
+    "docs/verification/chart-ui-integration-v1.4.0/source-release-audit.json": "85e2aea32e6ce9ae9118bb5a2bf53abc9debb5ebe919f6cbae6bfcf573531bce",
+    "docs/verification/chart-ui-release-v1.5.0/web-build.txt": "b4eb5646d89829f943357a8e8b85305c3f36c099b0c1667c2e40b49ce29c2aa5",
+    "docs/verification/chart-ui-release-v1.5.0/wheel-build.txt": "150800cef50fde545403c1754ea14229d6a6a085312f153f1b4457587b45fe74",
+    "docs/verification/chart-ui-release-v1.5.0/web-build-artifacts.json": "195a5706aa4645dcf0874f8d8b6f47fb8f9677f0856750493a5310ae35df4ab5",
+    "docs/verification/chart-ui-release-v1.5.0/source-hashes.json": "d3965eb146d6c1bf307c42424b10bb6588762dc7fd8c770ea69b0df60eaeec34"
+  },
+  "images": {},
+  "image_status": "No new or relabeled v1.5.0 images; original manifests retain their source/image IDs.",
+  "existing_image_manifests": [
+    "deploy/releases/v1.3.2-ui.json",
+    "deploy/releases/v1.3.3-local.json",
+    "docs/verification/native-history/implementation/runtime-manifest.json"
+  ],
+  "deployment_scope": "Source publication only; no existing local instance switch or production deployment.",
+  "runtime_changed_by_source_release": false,
+  "actual_account_password_changed": false,
+  "notifications_sent": false,
+  "known_limits": [
+    "Fresh combined-source native-library browser/runtime acceptance remains deployment work.",
+    "Original UI vendor Save As module 404 limitation and working menu style-save fallback retained.",
+    "Earlier Binance numeric failures remain accepted under the bound user decision; Volume historical partial/null limits retained."
+  ],
+  "deployment_work_remaining": [
+    "Build combined source and record per-service image IDs.",
+    "Back up target database, match schema/configuration and API/worker versions.",
+    "Validate target UI/data/account behavior and safe rollback."
+  ],
+  "rollback": {
+    "previous_source_tag": "v1.4.0",
+    "schema": "p17 unchanged",
+    "effect": "Retains Volume/nativehistory; removes chartUI/account changes.",
+    "credential_requirement": "If password was changed in future runtime, old login ignores auth.admin and uses configured hash. Preserve intended credentials and revoke sessions explicitly before runtime rollback.",
+    "documentation": "docs/chart-v1.5.0-source-delivery.md"
+  }
+}

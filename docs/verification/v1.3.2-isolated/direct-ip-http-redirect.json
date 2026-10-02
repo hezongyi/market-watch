@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "verified_at": "2026-10-02T09:36:02.686729+00:00",
+  "cases": [
+    {
+      "source": "http://192.168.7.232:15653/",
+      "redirect_status": 308,
+      "target": "https://192.168.7.232:15653/",
+      "target_status": 200
+    },
+    {
+      "source": "http://192.168.7.232:15653/advanced-charts?test=redirect",
+      "redirect_status": 308,
+      "target": "https://192.168.7.232:15653/advanced-charts?test=redirect",
+      "target_status": 200
+    },
+    {
+      "source": "http://192.168.7.232:15654/",
+      "redirect_status": 308,
+      "target": "https://192.168.7.232:15654/",
+      "target_status": 200
+    },
+    {
+      "source": "http://192.168.7.232:15654/chart-menu.css?test=redirect",
+      "redirect_status": 308,
+      "target": "https://192.168.7.232:15654/chart-menu.css?test=redirect",
+      "target_status": 200
+    }
+  ]
+}

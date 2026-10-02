@@ -1,9 +1,9 @@
 import {createHash} from 'node:crypto';
 import {readFileSync, writeFileSync} from 'node:fs';
 
-const files = ['series.js', 'indicators.js', 'preferences.js', 'chart-style.js',
+const files = ['series.js', 'indicators.js', 'preferences.js', 'chart-style.js', 'chart-autosave.js',
   'workspaces.js', 'watchlists.js', 'range-sync.js', 'viewports.js',
-  'progressive-history.js', 'history-demand.js', 'bridge.js'];
+  'progressive-history.js', 'history-demand.js', 'chart-account.js', 'chart-menu.js', 'bridge.js'];
 const source = files.map(name => readFileSync(new URL(name, import.meta.url), 'utf8')).join('\n;\n');
 const digest = createHash('sha256').update(source).digest('hex').slice(0, 16);
 const filename = `host.${digest}.js`;

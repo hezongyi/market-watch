@@ -1,12 +1,14 @@
 """On-demand history orchestration. Datafeed requests never mean provider exhaustion."""
 
+from decimal import Decimal
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
-from .chart_series import SeriesKind, decode
+from .chart_series import SeriesKind, decode, display_symbol
 from .coverage import covers_interval
 from .domain import Calendar, bucket_bounds, has_trading_gap, scheduled_open, session_bounds
 from .market import stored_coverage
@@ -493,18 +495,27 @@ def router(authenticated):
             if kind == "managed":
                 managed.append(ident)
                 continue
-            from .provider_chart import metadata, quote_page
+            from .provider_chart import metadata, quote_page, quote_previous_close
 
             try:
                 meta = metadata(ident)
                 page = quote_page(meta)
                 latest = page["bars"][-1] if page["bars"] else None
-                values = {"short_name": meta["symbol"], "description": meta["name"] + " · 平台行情",
+                values = {"short_name": display_symbol(meta["symbol"]), "description": display_symbol(meta["symbol"]) + " · 平台行情",
                           "exchange": meta["source"].upper()}
                 if latest:
                     values["lp"] = float(latest["close"])
                     if meta["basis"] == "bid":
                         values["bid"] = values["lp"]
+                    # Missing prior-session data must not hide a valid last price.
+                    try:
+                        previous = quote_previous_close(meta, latest)
+                        if previous is not None and previous > 0:
+                            delta = Decimal(latest["close"]) - previous
+                            values.update(ch=float(delta), chp=float(delta / previous * 100),
+                                          prev_close_price=float(previous))
+                    except Exception:
+                        pass
                 result.append({"s": "ok", "n": ticker, "v": values})
             except Exception:
                 result.append({"s": "error", "n": ticker,
@@ -536,8 +547,8 @@ def router(authenticated):
                 if not bar:
                     if inst:
                         result.append({"s": "ok", "n": ident, "quality": "pending", "v": {
-                            "short_name": inst.symbol,
-                            "description": inst.label + " · 报价准备中",
+                            "short_name": display_symbol(inst.symbol),
+                            "description": display_symbol(inst.symbol) + " · 报价准备中",
                             "exchange": inst.source.upper(),
                         }})
                     else:
@@ -546,8 +557,8 @@ def router(authenticated):
                     continue
                 values = {
                     "lp": float(bar.close),
-                    "short_name": inst.symbol,
-                    "description": inst.label + " · " + inst.basis + " · M1",
+                    "short_name": display_symbol(inst.symbol),
+                    "description": display_symbol(inst.symbol) + " · " + inst.basis + " · M1",
                     "exchange": inst.source.upper(),
                 }
                 if inst.basis == "bid":

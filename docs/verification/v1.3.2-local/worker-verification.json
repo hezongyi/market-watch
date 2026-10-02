@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-10-02T06:14:51.206594+00:00",
+  "workers": {
+    "realtime-worker": {
+      "log_lines": 27,
+      "cycle_failure_lines": 0,
+      "realtime_success_cycles": 27,
+      "history_start_logged": false
+    },
+    "chart-history-worker": {
+      "log_lines": 1,
+      "cycle_failure_lines": 0,
+      "realtime_success_cycles": 0,
+      "history_start_logged": true
+    },
+    "chart-aggregation-worker": {
+      "log_lines": 0,
+      "cycle_failure_lines": 0,
+      "realtime_success_cycles": 0,
+      "history_start_logged": false
+    }
+  },
+  "schema": "o16_managed_revisions",
+  "remaining_migration_reconciliation_jobs": 41955,
+  "advanced_workspaces_after_smoke_cleanup": 550,
+  "advanced_workspaces_before_smoke": 550
+}

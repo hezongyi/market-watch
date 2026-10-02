@@ -1,0 +1,360 @@
+{
+  "deployed": true,
+  "verified_at": "2026-10-02T13:22:36.238490+00:00",
+  "project": "market-watch-v132-ui",
+  "app_origin": "https://192.168.7.232:15653",
+  "local_origin": "https://v132.localhost:15653",
+  "chart_origin": "https://192.168.7.232:15654",
+  "baseline": "v1.3.2 / 9596b25",
+  "chart_menu_source": "d97d7ec",
+  "schema": "o16_managed_revisions",
+  "source_database_schema_still": "p17_volume",
+  "existing_container_comparison": [
+    {
+      "name": "market-watch-native-history-api-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-dual-acceptance-chart-origin-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-dual-acceptance-web-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-dual-acceptance-realtime-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-dual-acceptance-chart-aggregation-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-dual-acceptance-chart-history-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-dual-acceptance-api-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-volume-acceptance-web-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-volume-acceptance-realtime-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-volume-acceptance-chart-history-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-volume-acceptance-chart-aggregation-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-volume-acceptance-chart-origin-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-volume-acceptance-api-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-native-history-chart-aggregation-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-native-history-web-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-native-history-chart-history-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-native-history-realtime-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-native-history-chart-origin-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-native-history-tls-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-native-history-pg",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-volume-acceptance-tls-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-provider-latency-api-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-provider-latency-tls-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-provider-latency-web-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-provider-latency-chart-origin-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-dual-acceptance-tls-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-acceptance-chart-origin-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-acceptance-chart-history-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-acceptance-realtime-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-acceptance-chart-aggregation-worker-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-acceptance-api-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-postgres-isolated",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-acceptance-web-1",
+      "same_container_id": true
+    },
+    {
+      "name": "market-watch-acceptance-tls-1",
+      "same_container_id": true
+    }
+  ],
+  "services": [
+    {
+      "service": "api",
+      "name": "market-watch-v132-ui-api-1",
+      "container_id": "23d51b12a3df664cfa32ae93d94063db9e874ab8cee427b06c787d664e5aae3b",
+      "image_id": "sha256:e5b779ec08f9e9c179530a8e4e42355c8bcdc75a1014298d5066beac0048e0c3",
+      "state": "running",
+      "health": "healthy",
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "service": "chart-origin",
+      "name": "market-watch-v132-ui-chart-origin-1",
+      "container_id": "3f6465dd457fc06595d8107ee72450bdff2c7294b9be953de1413cfc1e679343",
+      "image_id": "sha256:9d9b3f614b2814d0b66d940460ce37ceb92fe083fce3d8bc805294269bd64ba9",
+      "state": "running",
+      "health": null,
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "80/tcp": null
+      }
+    },
+    {
+      "service": "web",
+      "name": "market-watch-v132-ui-web-1",
+      "container_id": "50906c6ff06891fa219aa4085e3f52e4bc610bdf8b48455b478bd61e12cd8db4",
+      "image_id": "sha256:ea13353272f58d5f2075f1039b69995e72ee7c35e95051cd2155a217826453da",
+      "state": "running",
+      "health": null,
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "80/tcp": null
+      }
+    },
+    {
+      "service": "tls",
+      "name": "market-watch-v132-ui-tls-1",
+      "container_id": "9e838c699fc57a51b6d547e58021bf4cd48b55cabab25a4203c7cfe13d97bc9b",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "health": null,
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "443/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "15653"
+          },
+          {
+            "HostIp": "192.168.7.232",
+            "HostPort": "15653"
+          }
+        ],
+        "444/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "15654"
+          },
+          {
+            "HostIp": "192.168.7.232",
+            "HostPort": "15654"
+          }
+        ],
+        "80/tcp": null
+      }
+    },
+    {
+      "service": "chart-history-worker",
+      "name": "market-watch-v132-ui-chart-history-worker-1",
+      "container_id": "2b0da5e23ba6028868f49fb9a513ee83e0a223d4eea6dd5dcf96383c3bbd1087",
+      "image_id": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "state": "running",
+      "health": null,
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "name": "market-watch-v132-ui-chart-aggregation-worker-1",
+      "container_id": "1143a35a19079a1458b8e442e438359c872728be82031447d31eaa2b717ab321",
+      "image_id": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "state": "running",
+      "health": null,
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "service": "realtime-worker",
+      "name": "market-watch-v132-ui-realtime-worker-1",
+      "container_id": "c1c3c870bf52397e3028569731b5755fe836f2a6b09b9d393de3476378ec9792",
+      "image_id": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "state": "running",
+      "health": null,
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "service": "postgres",
+      "name": "market-watch-v132-ui-postgres-1",
+      "container_id": "3e74a7fa57f5661d4d482210568b941bfd76426e4ec35f9aee07892625f805a8",
+      "image_id": "sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+      "state": "running",
+      "health": "healthy",
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "5432/tcp": null
+      }
+    }
+  ],
+  "notification_delivery": false,
+  "verification_directory": "docs/verification/v1.3.2-isolated",
+  "browser_verification": {
+    "passed": true,
+    "theme_switch_reloads": 2,
+    "chart_requests_checked": 489,
+    "credentials_sent_to_chart": 0,
+    "no_external_dns": true,
+    "session_cookie": {
+      "path": "/api",
+      "httpOnly": true
+    },
+    "evidence": "docs/verification/v1.3.2-isolated/direct-ip-browser.json"
+  },
+  "http_redirect": {
+    "status": 308,
+    "verified_at": "2026-10-02T09:36:35.175183+00:00",
+    "evidence": "docs/verification/v1.3.2-isolated/direct-ip-http-redirect.json",
+    "chart_ip_access": "serves HTTPS directly; plain HTTP redirects to same IP"
+  },
+  "external_dns_required": false,
+  "session_cookie_scope": "/api",
+  "chart_ui_verification": {
+    "passed": true,
+    "evidence": "docs/verification/v1.3.2-isolated/chart-ui-browser.json",
+    "countdown_server_time": "parent /readyz -> UNIX seconds -> native getServerTime",
+    "native_style_save_as": "Two matching chunks absent from original archive; menu fallback saved and applied",
+    "grid": "sparse dotted default [1,4]; native-skinned control under settings layout grid; solid optional; layouts and templates persist metadata",
+    "notifications": "native dialogs, active conditions deduplicated; no iframe height change",
+    "logo": "widget_logo disabled",
+    "indicator": "four touching columns and separate zigzag, 1px SVG trace",
+    "layout_create": "native layout dropdown, mouse and Enter verified",
+    "source": "d97d7ec"
+  },
+  "layout_autosave_verification": {
+    "passed": true,
+    "default": "off",
+    "interval_seconds": 30,
+    "observed_delay_ms": 30189,
+    "disabled_no_writes_ms": 33000,
+    "manual_save_while_off": true,
+    "preference_reloads": true,
+    "evidence": "docs/verification/v1.3.2-isolated/layout-autosave-browser.json"
+  },
+  "customization_source": "d97d7ec",
+  "grid_settings_verification": {
+    "passed": true,
+    "evidence": "docs/verification/v1.3.2-isolated/grid-settings-browser.json",
+    "popup_position": "document overlay using viewport bounds; same left/width and 4px below button",
+    "cancel_restores": true,
+    "layouts_and_templates_persist": true,
+    "selection_colors": {
+      "light": "#000000",
+      "dark": "#8c8c8c"
+    }
+  },
+  "account_quotes_verification": {
+    "passed": true,
+    "evidence": "docs/verification/v1.3.2-isolated/account-quotes-browser.json",
+    "ctrl_s": "native iframe, host iframe and parent all save through workspace snapshot",
+    "password_ui": "public native notice shell, native input and button classes",
+    "quote_subscription": "native getQuotes/subscribeQuotes, refresh every 15 seconds",
+    "quote_change": "previous completed native session close; matching price basis",
+    "display_codes": "EURUSD / XAUUSD / BTCUSDT; identity tickers unchanged",
+    "object_tree": "对象树"
+  },
+  "password_policy_verification": {
+    "passed": true,
+    "evidence": "docs/verification/v1.3.2-isolated/password-policy-browser.json",
+    "minimum_characters": 6,
+    "maximum_characters": 512,
+    "character_types": "unrestricted Unicode, symbols and spaces; no trimming",
+    "backend_parametrized_cases_passed": 6,
+    "actual_account_password_changed": false
+  },
+  "runtime_note": "API/web/chart-origin use customized v1.3.2 images; existing dedicated workers remain on original v1.3.2 image. API recreation requires restarting web then tls to refresh nginx upstream addresses."
+}

@@ -1,0 +1,212 @@
+[
+  {
+    "file": "advanced-autosave-toggle.cjs",
+    "exit_code": 0,
+    "output": "autosave toggle: default off, 30s interval, reload, failed writes and readonly passed\n"
+  },
+  {
+    "file": "advanced-autosave.cjs",
+    "exit_code": 0,
+    "output": "Autosave preserves in-flight edits and failed-save retry state\n"
+  },
+  {
+    "file": "advanced-chart-style.cjs",
+    "exit_code": 0,
+    "output": "style extraction: presentation whitelist, no workspace objects, detached copy passed\ngrid metadata, sparse style, preview cancellation, layout precedence, readonly passed\n"
+  },
+  {
+    "file": "advanced-cold-pagination.cjs",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "file": "advanced-edge-sync.cjs",
+    "exit_code": 0,
+    "output": "Edge range synchronization: alignment, loading, user toggle and disposal passed\n"
+  },
+  {
+    "file": "advanced-history-boundaries.cjs",
+    "exit_code": 0,
+    "output": "Published pagination preserves latest subscription boundary and earliest revision range\n"
+  },
+  {
+    "file": "advanced-history-change-range.cjs",
+    "exit_code": 0,
+    "output": "Historical views ignore remote latest revisions; visible revisions and initial data still refresh\n"
+  },
+  {
+    "file": "advanced-history-dedup.cjs",
+    "exit_code": 0,
+    "output": "Concurrent history reads share requests, distinct periods isolate, completion and failure clear entries\n"
+  },
+  {
+    "file": "advanced-history-demand.cjs",
+    "exit_code": 0,
+    "output": "Viewport demand counts spacing, shares pane identity, renews, excludes W/M and disposes\n"
+  },
+  {
+    "file": "advanced-history-pagination.cjs",
+    "exit_code": 0,
+    "output": "Large countBack traverses published pages without truncation or duplicate bars\n"
+  },
+  {
+    "file": "advanced-history-reload.cjs",
+    "exit_code": 0,
+    "output": "Grouped polling recovers after failure and prevents overlapping requests\nHistorical reload invalidates matching cache before resetting only matching panes\n"
+  },
+  {
+    "file": "advanced-inflight-cancellation.cjs",
+    "exit_code": 0,
+    "output": "Four obsolete in-flight histories release slots within 180ms; current request starts\n"
+  },
+  {
+    "file": "advanced-latest-cache.cjs",
+    "exit_code": 0,
+    "output": "Latest snapshot immediate reuse and asynchronous refresh passed\n"
+  },
+  {
+    "file": "advanced-layout-poll-resume.cjs",
+    "exit_code": 0,
+    "output": "Visible polling resumes independently of deferred historical reset\n"
+  },
+  {
+    "file": "advanced-managed-revisions.cjs",
+    "exit_code": 0,
+    "output": "Actual published API corrections reload managed charts; expansion preserves session bounds\n"
+  },
+  {
+    "file": "advanced-managed.cjs",
+    "exit_code": 0,
+    "output": "Managed feed: consent, refusal, real geometry, published session boundary passed\n"
+  },
+  {
+    "file": "advanced-monthly-cache.cjs",
+    "exit_code": 0,
+    "output": "Monthly local-only history: empty, partial and multi-page cached data passed\n"
+  },
+  {
+    "file": "advanced-native-save-race.cjs",
+    "exit_code": 0,
+    "output": "{\"saved_offset\":10,\"current_offset\":20,\"dirty\":true,\"messages\":[{\"type\":\"workspace-dirty\"}],\"bug_reproduced\":false}\nNative save preserves edits and workspace switches during async capture; unchanged snapshot acknowledges.\n"
+  },
+  {
+    "file": "advanced-native-workspaces.cjs",
+    "exit_code": 0,
+    "output": "native workspace adapter: conflict, serialized saves and readonly passed\n"
+  },
+  {
+    "file": "advanced-navigation-page.cjs",
+    "exit_code": 0,
+    "output": "Historical navigation waits for target coverage and yields to cancellation\n"
+  },
+  {
+    "file": "advanced-preferences.cjs",
+    "exit_code": 0,
+    "output": "native adapters: queued writes, namespaces, reload, conflict and readonly passed\n"
+  },
+  {
+    "file": "advanced-prewarm-cache.cjs",
+    "exit_code": 0,
+    "output": "Prewarmed period pages satisfy smaller requests without network; boundaries and capacity enforced\n"
+  },
+  {
+    "file": "advanced-progressive-cache.cjs",
+    "exit_code": 0,
+    "output": "Progressive cache deduplicates, returns warm data, refreshes revisions and stops hidden polling\n"
+  },
+  {
+    "file": "advanced-progressive-indicators.cjs",
+    "exit_code": 0,
+    "output": "Progressive studies use only ready raw history; empty pages skip calculation\n"
+  },
+  {
+    "file": "advanced-provider-history-observation.cjs",
+    "exit_code": 1,
+    "output": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n2000 !== 1000\n\n    at /home/quant/repos/market-watch-chart-ui-integration/web/tests/advanced-provider-history-observation.cjs:39:11 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 2000,\n  expected: 1000,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "file": "advanced-provider-request-lifetime.cjs",
+    "exit_code": 1,
+    "output": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 2\n\n    at /home/quant/repos/market-watch-chart-ui-integration/web/tests/advanced-provider-request-lifetime.cjs:25:9\n    at runNextTicks (node:internal/process/task_queues:64:5)\n    at process.processTimers (node:internal/timers:518:9) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 0,\n  expected: 2,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "file": "advanced-provider-subscriptions.cjs",
+    "exit_code": 0,
+    "output": "Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed\n"
+  },
+  {
+    "file": "advanced-python-indicators.cjs",
+    "exit_code": 0,
+    "output": "Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed\n"
+  },
+  {
+    "file": "advanced-range-sync.cjs",
+    "exit_code": 0,
+    "output": "Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed\n"
+  },
+  {
+    "file": "advanced-refresh-interaction.cjs",
+    "exit_code": 0,
+    "output": "History refresh yields to new mouse/focus/zoom intent and removes listeners\n"
+  },
+  {
+    "file": "advanced-request-cancellation.cjs",
+    "exit_code": 0,
+    "output": "Queued stale history and old workspace requests cancel; current viewers proceed\n"
+  },
+  {
+    "file": "advanced-series.cjs",
+    "exit_code": 0,
+    "output": "Series: legacy compatibility, synthetic identity, search defaults, isolated provider feed passed\n"
+  },
+  {
+    "file": "advanced-startup-metadata.cjs",
+    "exit_code": 1,
+    "output": "Error: \u884c\u60c5\u8bf7\u6c42\u8d85\u65f6\n"
+  },
+  {
+    "file": "advanced-sync-snapshot.cjs",
+    "exit_code": 0,
+    "output": "Public snapshots defer synchronized startup while retaining user choices and vendor content\n"
+  },
+  {
+    "file": "advanced-time.cjs",
+    "exit_code": 0,
+    "output": "13 calendar label cases passed; intraday timestamp unchanged\n"
+  },
+  {
+    "file": "advanced-viewports.cjs",
+    "exit_code": 0,
+    "output": "Viewport restoration preserves preferences and checks symbol identity\n"
+  },
+  {
+    "file": "advanced-volume.cjs",
+    "exit_code": 0,
+    "output": "Actual bridge preserves quantity/zero/unknown and synthetic validity protocol\n"
+  },
+  {
+    "file": "advanced-watchlists.cjs",
+    "exit_code": 0,
+    "output": "Watchlist restore avoids empty native collection; retry and readonly passed\n"
+  },
+  {
+    "file": "advanced-weekly-background.cjs",
+    "exit_code": 0,
+    "output": "Weekly preparing callback yields, releases guard, and refreshes only on explicit action\n"
+  },
+  {
+    "file": "advanced-weekly-error.cjs",
+    "exit_code": 0,
+    "output": "Weekly failure stays an error; explicit refresh clears cache and recovers bars\n"
+  },
+  {
+    "file": "wait-for-async.cjs",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "file": "wait-for-async.test.cjs",
+    "exit_code": 0,
+    "output": "Async polling waits for truth, times out, and propagates browser failures\n"
+  }
+]

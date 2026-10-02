@@ -1,0 +1,16 @@
+{
+  "deployed": true,
+  "verified_at": "2026-10-02T08:32:12.219051+00:00",
+  "chart_image": {
+    "tag": "market-watch-chart-origin:1.3.2-menu-7bf84bb",
+    "id": "sha256:d63628dd50ee8a1c68817c50d16515f4c6544ad76d1352ea1325563a3d7b7860"
+  },
+  "source_commit": "7bf84bb26480c042e0390285361e2c0bde3941a5",
+  "changes": [
+    "Menu/button background follows native pane background variable: dark #0f0f0f, light #ffffff",
+    "Brand heading background transparent",
+    "Theme-specific brand logo, title and subtitle colors; original typography and SVG unchanged"
+  ],
+  "verification": "Both themes verified by actual browser computed colors and screenshots; original preference restored",
+  "evidence": "docs/verification/v1.3.2-local/menu-themed/browser.json"
+}
