@@ -1,0 +1,126 @@
+{
+  "version": "1.5.2",
+  "baseline": "9de3a39801e105a644c0e342fef21fe48d64ddda",
+  "scope": "Release metadata and builds; runtime inputs identical to merged PR #4. Prior regression results preserved, not rerun.",
+  "checks": {
+    "root_versions": "Python project, web package and two lock root fields equal 1.5.2.",
+    "dependencies_unchanged": true,
+    "byte_identical_baseline_files": 1550,
+    "changed_baseline_files": [
+      "CHANGELOG.md",
+      "README.md",
+      "docs/versioning.md",
+      "pyproject.toml",
+      "web/package-lock.json",
+      "web/package.json"
+    ],
+    "unexpected_source_changes": [],
+    "unchanged_inventory_sha256": "9f8cdda4dbec9b07355eecb74d7549f3fef955242fe43b9ed655308c9408f1bf",
+    "markdown_local_links_checked": 21,
+    "web_build": "Version 1.5.2 TypeScript/Vite passed; existing large chunk warning.",
+    "python_wheel": {
+      "filename": "market_watch-1.5.2-py3-none-any.whl",
+      "sha256": "763fabb1ae9c275815bc3624d4c58f35fc2fbb8258868fb04736d8394b75d5ea",
+      "baseline_identical_runtime_modules": 41
+    },
+    "prior_browser_regression": {
+      "cases": [
+        {
+          "case": "single-provider",
+          "passed": true,
+          "charts": 1,
+          "legacy_formats": [
+            "raw",
+            "envelope"
+          ],
+          "native_load": true,
+          "drawings": true
+        },
+        {
+          "case": "single-managed",
+          "passed": true,
+          "charts": 1,
+          "legacy_formats": [
+            "raw",
+            "envelope"
+          ],
+          "native_load": true,
+          "drawings": true
+        },
+        {
+          "case": "two-provider",
+          "passed": true,
+          "charts": 2,
+          "legacy_formats": [
+            "raw",
+            "envelope"
+          ],
+          "native_load": true,
+          "drawings": true
+        },
+        {
+          "case": "two-same-instrument-mixed",
+          "passed": true,
+          "charts": 2,
+          "legacy_formats": [
+            "raw",
+            "envelope"
+          ],
+          "native_load": true,
+          "drawings": true
+        },
+        {
+          "case": "four-provider",
+          "passed": true,
+          "charts": 4,
+          "legacy_formats": [
+            "raw",
+            "envelope"
+          ],
+          "native_load": true,
+          "drawings": true
+        },
+        {
+          "case": "four-managed-first",
+          "passed": true,
+          "charts": 4,
+          "legacy_formats": [
+            "raw",
+            "envelope"
+          ],
+          "native_load": true,
+          "drawings": true
+        },
+        {
+          "case": "eight-mixed",
+          "passed": true,
+          "charts": 8,
+          "legacy_formats": [
+            "raw",
+            "envelope"
+          ],
+          "native_load": true,
+          "drawings": true
+        }
+      ],
+      "rerun_during_release": false
+    },
+    "prior_node_regressions": 6,
+    "prior_backend_workspace_tests": 5
+  },
+  "fixed_input_sha256": {
+    "advanced-host/bridge.js": "9f000acdf1a6d2a1f3aac31fd965d47485a77f613b1ea838f3384dbb39decb5d",
+    "web/tests/advanced-layout-refresh.browser.cjs": "b0c2eee9b901dd291997b22d31765ac7f3793bd4b2b00003dafa924c4efc36be",
+    "docs/chart-layout-refresh-fix.md": "d54112bc7d268180773f11b529c831cf5fe1787aebeaac67a31fde469a6fb41e"
+  },
+  "evidence_sha256": {
+    "web-build.txt": "8ebb57b5028c4297bf5b6d1e7d63e6d44d396e141bfa381b328afa091b4eb174",
+    "fix-single-red.txt": "fe6f767e406be1bbc1eb58b6543ce149d9c633c25361c3ecb9d89b41df5e3cf0",
+    "wheel-build.txt": "c54f82fd6b1bb19aaaf018cf4cf0742fd327f7cb734a7ffa47dc6334f001ceff",
+    "fix-four-red.txt": "ae234a2d1c6905275cc0867d577f9228c46bd9d2823cda4942144b756bd83edc",
+    "fix-browser-green.txt": "0349a48ebf38688f7e001b868525151a334a5c3f3d7cb6aeb376e5b223bae7dc"
+  },
+  "schema": "p17_volume",
+  "new_migrations": [],
+  "container_built_or_deployed": false
+}

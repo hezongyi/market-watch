@@ -1,10 +1,10 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.5.1**，包含独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲及专业图表菜单、可选自动保存、账户密码和自选报价操作。v1.5.1 仅整理图表能力与 MT4 桥接研究，运行功能沿用 v1.5.0；源码发布和部署边界见[v1.5.1文档交付记录](docs/chart-v1.5.1-source-delivery.md)，操作及限制见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.5.2**，包含独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲及专业图表菜单、可选自动保存、账户密码和自选报价操作。v1.5.2 修复保存布局后刷新导致单图或首图品种及行情来源被覆盖的问题；源码发布和部署边界见[v1.5.2源码交付记录](docs/chart-v1.5.2-source-delivery.md)，操作及限制见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。后续功能选项见[图表能力清单](docs/advanced-charts-v31-future-integration-capability-research.md)，MT4 接入路线见[Windows 桥接研究](docs/mt4-live-trading-bridge-research.md)。
 
-v1.5.1 按本地文档修订发布：五篇研究文档与版本元数据合为一次提交，附注标签指向同一提交；本次未推送远端、未升级运行镜像，源码清单见 [v1.5.1-source.json](deploy/releases/v1.5.1-source.json)。
+v1.5.2 的布局修复通过 PR #4 合入 main，版本及发布记录整理后以附注标签固定并推送源码；源码清单见 [v1.5.2-source.json](deploy/releases/v1.5.2-source.json)。生产运行版本由独立部署清单管理，本次源码发布未升级运行镜像。
 
 源码主目录：`/home/quant/repos/market-watch`；独立开发工作树继续保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。v1.5.0源码通过PR合入main，并使用附注标签发布；图表UI隔离实例仍以[v1.3.2专用清单](deploy/releases/v1.3.2-ui.json)为准，Volume和原生历史镜像保留各自原清单，本次源码发布不包含运行环境升级。schema保持p17_volume，无新增迁移；历史量partial限制及既有Volume迁移/回退见[v1.3.3本机交付](docs/chart-v1.3.3-delivery.md)，新版验证与账户回退要求见[v1.5.0源码交付](docs/chart-v1.5.0-source-delivery.md)。
 

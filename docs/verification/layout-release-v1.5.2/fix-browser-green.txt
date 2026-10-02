@@ -1,0 +1,22 @@
+{"case":"single-provider","phase":"saved","expected":[{"symbol":"MWP:BTCUSDT","resolution":"240"}],"metadata":"MWP:BTCUSDT","mainSeries":[["MWP:BTCUSDT"]]}
+{"case":"single-provider","phase":"refreshed","restored":[{"symbol":"MWP:BTCUSDT","resolution":"240"}]}
+{"case":"single-provider","passed":true,"charts":1,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+{"case":"single-managed","phase":"saved","expected":[{"symbol":"OANDA:EUR_CHF","resolution":"240"}],"metadata":"OANDA:EUR_CHF","mainSeries":[["OANDA:EUR_CHF"]]}
+{"case":"single-managed","phase":"refreshed","restored":[{"symbol":"OANDA:EUR_CHF","resolution":"240"}]}
+{"case":"single-managed","passed":true,"charts":1,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+{"case":"two-provider","phase":"saved","expected":[{"symbol":"MWP:XAUUSD","resolution":"240"},{"symbol":"MWP:EURUSD","resolution":"60"}],"metadata":"MWP:XAUUSD","mainSeries":[["MWP:XAUUSD"],["MWP:EURUSD"]]}
+{"case":"two-provider","phase":"refreshed","restored":[{"symbol":"MWP:XAUUSD","resolution":"240"},{"symbol":"MWP:EURUSD","resolution":"60"}]}
+{"case":"two-provider","passed":true,"charts":2,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+{"case":"two-same-instrument-mixed","phase":"saved","expected":[{"symbol":"MWP:EURUSD","resolution":"240"},{"symbol":"EURUSD","resolution":"60"}],"metadata":"MWP:EURUSD","mainSeries":[["MWP:EURUSD"],["EURUSD"]]}
+{"case":"two-same-instrument-mixed","phase":"refreshed","restored":[{"symbol":"MWP:EURUSD","resolution":"240"},{"symbol":"EURUSD","resolution":"60"}]}
+{"case":"two-same-instrument-mixed","passed":true,"charts":2,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+{"case":"four-provider","phase":"saved","expected":[{"symbol":"MWP:XAUUSD","resolution":"240"},{"symbol":"MWP:BTCUSDT","resolution":"60"},{"symbol":"OANDA:EUR_CHF","resolution":"1D"},{"symbol":"MWP:EURUSD","resolution":"5"}],"metadata":"MWP:XAUUSD","mainSeries":[["MWP:XAUUSD"],["MWP:BTCUSDT"],["OANDA:EUR_CHF"],["MWP:EURUSD"]]}
+{"case":"four-provider","phase":"refreshed","restored":[{"symbol":"MWP:XAUUSD","resolution":"240"},{"symbol":"MWP:BTCUSDT","resolution":"60"},{"symbol":"OANDA:EUR_CHF","resolution":"1D"},{"symbol":"MWP:EURUSD","resolution":"5"}]}
+{"case":"four-provider","passed":true,"charts":4,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+{"case":"four-managed-first","phase":"saved","expected":[{"symbol":"OANDA:EUR_CHF","resolution":"240"},{"symbol":"MWP:BTCUSDT","resolution":"60"},{"symbol":"EURUSD","resolution":"1D"},{"symbol":"MWP:EURUSD","resolution":"5"}],"metadata":"OANDA:EUR_CHF","mainSeries":[["OANDA:EUR_CHF"],["MWP:BTCUSDT"],["EURUSD"],["MWP:EURUSD"]]}
+{"case":"four-managed-first","phase":"refreshed","restored":[{"symbol":"OANDA:EUR_CHF","resolution":"240"},{"symbol":"MWP:BTCUSDT","resolution":"60"},{"symbol":"EURUSD","resolution":"1D"},{"symbol":"MWP:EURUSD","resolution":"5"}]}
+{"case":"four-managed-first","passed":true,"charts":4,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+{"case":"eight-mixed","phase":"saved","expected":[{"symbol":"MWP:OANDA:EUR_CHF","resolution":"240"},{"symbol":"MWP:EURUSD","resolution":"60"},{"symbol":"EURUSD","resolution":"1D"},{"symbol":"MWP:XAUUSD","resolution":"5"},{"symbol":"XAUUSD","resolution":"1W"},{"symbol":"MWP:BTCUSDT","resolution":"30"},{"symbol":"BTCUSDT","resolution":"15"},{"symbol":"MWP:EURUSD","resolution":"1M"}],"metadata":"MWP:OANDA:EUR_CHF","mainSeries":[["MWP:OANDA:EUR_CHF"],["MWP:EURUSD"],["EURUSD"],["MWP:XAUUSD"],["XAUUSD"],["MWP:BTCUSDT"],["BTCUSDT"],["MWP:EURUSD"]]}
+{"case":"eight-mixed","phase":"refreshed","restored":[{"symbol":"MWP:OANDA:EUR_CHF","resolution":"240"},{"symbol":"MWP:EURUSD","resolution":"60"},{"symbol":"EURUSD","resolution":"1D"},{"symbol":"MWP:XAUUSD","resolution":"5"},{"symbol":"XAUUSD","resolution":"1W"},{"symbol":"MWP:BTCUSDT","resolution":"30"},{"symbol":"BTCUSDT","resolution":"15"},{"symbol":"MWP:EURUSD","resolution":"1M"}]}
+{"case":"eight-mixed","passed":true,"charts":8,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+Layout save/refresh retains each chart series, resolution and drawings.

@@ -1,0 +1,24 @@
+{"case":"four-provider","phase":"saved","expected":[{"symbol":"MWP:XAUUSD","resolution":"240"},{"symbol":"MWP:BTCUSDT","resolution":"60"},{"symbol":"OANDA:EUR_CHF","resolution":"1D"},{"symbol":"MWP:EURUSD","resolution":"5"}],"metadata":"EURUSD","mainSeries":[["MWP:XAUUSD"],["MWP:BTCUSDT"],["OANDA:EUR_CHF"],["MWP:EURUSD"]]}
+{"case":"four-provider","phase":"refreshed","restored":[{"symbol":"EURUSD","resolution":"240"},{"symbol":"MWP:BTCUSDT","resolution":"60"},{"symbol":"OANDA:EUR_CHF","resolution":"1D"},{"symbol":"MWP:EURUSD","resolution":"5"}]}
+AssertionError [ERR_ASSERTION]: refresh must preserve saved instrument AND provider/managed identity
++ actual - expected
+
+  [
+    {
+      resolution: '240',
++     symbol: 'EURUSD'
+-     symbol: 'MWP:XAUUSD'
+    },
+    {
+      resolution: '60',
+      symbol: 'MWP:BTCUSDT'
+    },
+
+    at /home/quant/repos/market-watch-layout-restore/web/tests/advanced-layout-refresh.browser.cjs:137:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [Array],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

@@ -1,0 +1,21 @@
+{"case":"single-provider","phase":"saved","expected":[{"symbol":"MWP:BTCUSDT","resolution":"240"}],"metadata":"BTCUSDT","mainSeries":[["MWP:BTCUSDT"]]}
+{"case":"single-provider","phase":"refreshed","restored":[{"symbol":"BTCUSDT","resolution":"240"}]}
+AssertionError [ERR_ASSERTION]: refresh must preserve saved instrument AND provider/managed identity
++ actual - expected
+
+  [
+    {
+      resolution: '240',
++     symbol: 'BTCUSDT'
+-     symbol: 'MWP:BTCUSDT'
+    }
+  ]
+
+    at /home/quant/repos/market-watch-layout-restore/web/tests/advanced-layout-refresh.browser.cjs:301:14 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [Array],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

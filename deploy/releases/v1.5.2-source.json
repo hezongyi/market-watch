@@ -1,0 +1,29 @@
+{
+  "version": "1.5.2",
+  "accepted": true,
+  "acceptance_scope": "Layout persistence fix with isolated native-library regression; source equivalence, version metadata and package builds. No production or live-market acceptance.",
+  "release_tag": "v1.5.2",
+  "release_method": "PR #4 merged to main; version/documentation release commit fast-forwarded to main; annotated tag on the release commit; main and this tag pushed to origin.",
+  "previous_source_tag": "v1.5.1",
+  "baseline": "d3b91ea4555a5649ecb8917fec492cbc850ee0aa",
+  "source_commit": "9de3a39801e105a644c0e342fef21fe48d64ddda",
+  "implementation_commit": "ade65da0ac68d15c94942a5caa79130f6456dffc",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/4",
+  "source_commit_resolution": "Resolve annotated v1.5.2^{commit} to obtain the final main release commit.",
+  "tag_relation": "Runtime source and tests identical to PR #4; release commit changes only root versions and release documentation/evidence.",
+  "delivery_document": "docs/chart-v1.5.2-source-delivery.md",
+  "fix_document": "docs/chart-layout-refresh-fix.md",
+  "verification": "docs/verification/layout-release-v1.5.2/audit.json",
+  "schema": "p17_volume",
+  "new_migrations": [],
+  "dependencies_changed": false,
+  "functional_source_changed_since_previous_tag": true,
+  "runtime_changed_by_source_release": false,
+  "notifications_sent": false,
+  "images": {},
+  "deployment_scope": "Source publication only; no container build, relabeling, instance switch or production deployment.",
+  "rollback": {
+    "previous_source_tag": "v1.5.1",
+    "effect": "Reverts layout restoration fix and release metadata; reintroduces the saved-layout first-series override. No runtime rollback is needed for this source-only release."
+  }
+}
