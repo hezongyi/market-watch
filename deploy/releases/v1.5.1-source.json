@@ -1,0 +1,39 @@
+{
+  "version": "1.5.1",
+  "accepted": true,
+  "acceptance_scope": "Documentation, root package metadata, source equivalence and package builds only; no new functional or live trading acceptance.",
+  "release_tag": "v1.5.1",
+  "release_method": "Single commit on fix/docs-v1.5.1; local main fast-forward; local annotated tag on the same commit.",
+  "previous_source_tag": "v1.5.0",
+  "baseline": "37cf4048ca10f3206963c1aec67f49b38140f5a8",
+  "source_commit_resolution": "Resolve the annotated v1.5.1 tag to obtain this single release commit.",
+  "tag_relation": "All baseline files unchanged except README, CHANGELOG, versioning documentation and three version-only metadata files. Five research documents and release records added.",
+  "research_documents": [
+    "docs/advanced-charts-v31-alert-module-research.md",
+    "docs/advanced-charts-v31-replay-module-research.md",
+    "docs/advanced-charts-v31-strategy-pine-trading-research.md",
+    "docs/advanced-charts-v31-future-integration-capability-research.md",
+    "docs/mt4-live-trading-bridge-research.md"
+  ],
+  "delivery_document": "docs/chart-v1.5.1-source-delivery.md",
+  "verification": "docs/verification/research-release-v1.5.1/audit.json",
+  "schema": "p17_volume",
+  "new_migrations": [],
+  "dependencies_changed": false,
+  "functional_source_changed": false,
+  "runtime_changed_by_source_release": false,
+  "remote_pushed": false,
+  "notifications_sent": false,
+  "images": {},
+  "existing_image_manifests": [
+    "deploy/releases/v1.3.2-ui.json",
+    "deploy/releases/v1.3.3-local.json",
+    "docs/verification/native-history/implementation/runtime-manifest.json"
+  ],
+  "deployment_scope": "Local source documentation release only; no container build, relabeling, instance switch or production deployment.",
+  "previous_functional_verification": "deploy/releases/v1.5.0-source.json",
+  "rollback": {
+    "previous_source_tag": "v1.5.0",
+    "effect": "Revert documentation and root package versions only; runtime source and schema unchanged."
+  }
+}

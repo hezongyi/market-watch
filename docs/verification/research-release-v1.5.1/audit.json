@@ -1,0 +1,42 @@
+{
+  "version": "1.5.1",
+  "baseline": "37cf4048ca10f3206963c1aec67f49b38140f5a8",
+  "scope": "Documentation and version metadata; static evidence checks and package builds, no functional/browser/live-trading tests rerun.",
+  "checks": {
+    "root_versions": "Four root version fields equal 1.5.1; other TOML/JSON values unchanged.",
+    "dependencies_unchanged": true,
+    "baseline_files": 1546,
+    "byte_identical_baseline_files": 1540,
+    "changed_baseline_files": [
+      "CHANGELOG.md",
+      "README.md",
+      "docs/versioning.md",
+      "pyproject.toml",
+      "web/package-lock.json",
+      "web/package.json"
+    ],
+    "unexpected_source_changes": [],
+    "unchanged_baseline_inventory_sha256": "d7b8328294a9b712ae8a728d935c35c21e1ed6431742216631d277e7c60e4461",
+    "markdown_local_links_checked": 97,
+    "missing_links_or_out_of_range_lines": [],
+    "web_build": "npm run build passed; existing >500 kB bundle warning retained.",
+    "python_wheel": {
+      "filename": "market_watch-1.5.1-py3-none-any.whl",
+      "sha256": "b3554fd846217f571145bd2ca98496f3efd9bd85db0abe0e0099e1cda9ce5725",
+      "baseline_identical_runtime_modules": 41
+    },
+    "zip_sha256": "e4eabc20e156000b2a8fda7747044fd82b95c714526c7ab7f34bcfe62abaf9ee",
+    "active_loader_and_bundle_snippet_checks": 8,
+    "prior_functional_tests": "Not rerun; prior results remain in deploy/releases/v1.5.0-source.json."
+  },
+  "research_document_sha256": {
+    "docs/advanced-charts-v31-alert-module-research.md": "5f45c1b7db2598b72f6ef674bccb27943146fb940e5813eb74dbe55eab9a13bb",
+    "docs/advanced-charts-v31-future-integration-capability-research.md": "34fa965259d969fde32441ded3fddfc8bdad618be5ead28651ad4ffc550211d3",
+    "docs/advanced-charts-v31-replay-module-research.md": "aef46e7ccbb20955e6de818a899958a08f88781a5048efe28e317ba06076f9ec",
+    "docs/advanced-charts-v31-strategy-pine-trading-research.md": "12894a05cae860f9659e36f43746aabbe3e75a876cd4bb191ca1b351b71366d5",
+    "docs/mt4-live-trading-bridge-research.md": "1265ae224bced29317f52ac4c6d9370f5fbefa7a068333b83996371211f256ae"
+  },
+  "runtime_modified": false,
+  "remote_pushed": false,
+  "container_built_or_deployed": false
+}
