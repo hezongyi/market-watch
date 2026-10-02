@@ -1,0 +1,421 @@
+{
+  "acquisition": [
+    {
+      "source": "oanda",
+      "count": 200,
+      "samples": 10,
+      "failures": 0,
+      "median_ms": 405.12,
+      "min_ms": 368.81,
+      "max_ms": 1288.1,
+      "http_median_ms": 296.01,
+      "commit_median_ms": 49.84
+    },
+    {
+      "source": "oanda",
+      "count": 400,
+      "samples": 10,
+      "failures": 0,
+      "median_ms": 533.17,
+      "min_ms": 472.78,
+      "max_ms": 968.82,
+      "http_median_ms": 355.32,
+      "commit_median_ms": 95.31
+    },
+    {
+      "source": "oanda",
+      "count": 600,
+      "samples": 10,
+      "failures": 0,
+      "median_ms": 644.45,
+      "min_ms": 508.67,
+      "max_ms": 1001.54,
+      "http_median_ms": 403.57,
+      "commit_median_ms": 180.83
+    },
+    {
+      "source": "oanda",
+      "count": 1000,
+      "samples": 10,
+      "failures": 0,
+      "median_ms": 757.34,
+      "min_ms": 682.97,
+      "max_ms": 1028.3,
+      "http_median_ms": 418.16,
+      "commit_median_ms": 263.4
+    },
+    {
+      "source": "oanda",
+      "count": 2000,
+      "samples": 3,
+      "failures": 0,
+      "median_ms": 1639.51,
+      "min_ms": 1520.68,
+      "max_ms": 3577.91,
+      "http_median_ms": 1069.65,
+      "commit_median_ms": 674.09
+    },
+    {
+      "source": "oanda",
+      "count": 4000,
+      "samples": 3,
+      "failures": 0,
+      "median_ms": 2636.02,
+      "min_ms": 2610.0,
+      "max_ms": 3805.85,
+      "http_median_ms": 1108.48,
+      "commit_median_ms": 1292.43
+    },
+    {
+      "source": "binance",
+      "count": 200,
+      "samples": 10,
+      "failures": 0,
+      "median_ms": 280.14,
+      "min_ms": 239.74,
+      "max_ms": 503.51,
+      "http_median_ms": 175.26,
+      "commit_median_ms": 51.14
+    },
+    {
+      "source": "binance",
+      "count": 400,
+      "samples": 10,
+      "failures": 0,
+      "median_ms": 389.8,
+      "min_ms": 324.32,
+      "max_ms": 538.72,
+      "http_median_ms": 211.5,
+      "commit_median_ms": 107.26
+    },
+    {
+      "source": "binance",
+      "count": 600,
+      "samples": 10,
+      "failures": 0,
+      "median_ms": 466.93,
+      "min_ms": 391.7,
+      "max_ms": 808.19,
+      "http_median_ms": 221.56,
+      "commit_median_ms": 158.29
+    },
+    {
+      "source": "binance",
+      "count": 1000,
+      "samples": 10,
+      "failures": 0,
+      "median_ms": 609.19,
+      "min_ms": 543.95,
+      "max_ms": 939.72,
+      "http_median_ms": 289.53,
+      "commit_median_ms": 274.89
+    },
+    {
+      "source": "binance",
+      "count": 2000,
+      "samples": 3,
+      "failures": 0,
+      "median_ms": 1273.52,
+      "min_ms": 1163.15,
+      "max_ms": 1487.44,
+      "http_median_ms": 593.71,
+      "commit_median_ms": 490.76
+    },
+    {
+      "source": "binance",
+      "count": 4000,
+      "samples": 3,
+      "failures": 0,
+      "median_ms": 2703.0,
+      "min_ms": 2298.41,
+      "max_ms": 3038.5,
+      "http_median_ms": 1214.32,
+      "commit_median_ms": 988.61
+    }
+  ],
+  "cached_api": [
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "count": 200,
+      "samples": 3,
+      "median_ms": 25.4,
+      "max_ms": 35.6,
+      "response_bytes": 31323
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "count": 600,
+      "samples": 3,
+      "median_ms": 52.62,
+      "max_ms": 53.06,
+      "response_bytes": 93324
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "count": 1000,
+      "samples": 3,
+      "median_ms": 56.66,
+      "max_ms": 75.24,
+      "response_bytes": 155324
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "count": 2000,
+      "samples": 3,
+      "median_ms": 95.17,
+      "max_ms": 102.04,
+      "response_bytes": 310324
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "count": 4000,
+      "samples": 3,
+      "median_ms": 274.39,
+      "max_ms": 275.66,
+      "response_bytes": 620325
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "count": 8000,
+      "samples": 3,
+      "median_ms": 361.63,
+      "max_ms": 367.86,
+      "response_bytes": 1240325
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "count": 16000,
+      "samples": 3,
+      "median_ms": 710.87,
+      "max_ms": 717.5,
+      "response_bytes": 2480325
+    },
+    {
+      "instrument": "BTCUSDT",
+      "count": 200,
+      "samples": 3,
+      "median_ms": 23.57,
+      "max_ms": 51.73,
+      "response_bytes": 37725
+    },
+    {
+      "instrument": "BTCUSDT",
+      "count": 600,
+      "samples": 3,
+      "median_ms": 39.35,
+      "max_ms": 60.44,
+      "response_bytes": 112526
+    },
+    {
+      "instrument": "BTCUSDT",
+      "count": 1000,
+      "samples": 3,
+      "median_ms": 104.32,
+      "max_ms": 121.46,
+      "response_bytes": 187325
+    },
+    {
+      "instrument": "BTCUSDT",
+      "count": 2000,
+      "samples": 3,
+      "median_ms": 102.11,
+      "max_ms": 133.61,
+      "response_bytes": 374326
+    },
+    {
+      "instrument": "BTCUSDT",
+      "count": 4000,
+      "samples": 3,
+      "median_ms": 163.16,
+      "max_ms": 240.01,
+      "response_bytes": 747236
+    },
+    {
+      "instrument": "BTCUSDT",
+      "count": 8000,
+      "samples": 3,
+      "median_ms": 372.73,
+      "max_ms": 603.29,
+      "response_bytes": 1479237
+    },
+    {
+      "instrument": "BTCUSDT",
+      "count": 16000,
+      "samples": 3,
+      "median_ms": 771.8,
+      "max_ms": 809.19,
+      "response_bytes": 2943237
+    }
+  ],
+  "native_display": [
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "cached": false,
+      "count": 200,
+      "samples": 3,
+      "full_display_median_ms": 1412.9,
+      "full_display_max_ms": 1784.3,
+      "request_to_display_median_ms": 709.2,
+      "request_to_display_max_ms": 841.2
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "cached": false,
+      "count": 400,
+      "samples": 3,
+      "full_display_median_ms": 1389.3,
+      "full_display_max_ms": 1565.7,
+      "request_to_display_median_ms": 676.2,
+      "request_to_display_max_ms": 772.9
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "cached": false,
+      "count": 600,
+      "samples": 3,
+      "full_display_median_ms": 1582.2,
+      "full_display_max_ms": 1693.2,
+      "request_to_display_median_ms": 814.9,
+      "request_to_display_max_ms": 831.7
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "cached": false,
+      "count": 1000,
+      "samples": 3,
+      "full_display_median_ms": 1530.7,
+      "full_display_max_ms": 2043.1,
+      "request_to_display_median_ms": 905.3,
+      "request_to_display_max_ms": 1248.2
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "cached": true,
+      "count": 200,
+      "samples": 3,
+      "full_display_median_ms": 987.8,
+      "full_display_max_ms": 1106.6,
+      "request_to_display_median_ms": 216.6,
+      "request_to_display_max_ms": 304.7
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "cached": true,
+      "count": 1000,
+      "samples": 3,
+      "full_display_median_ms": 1015.1,
+      "full_display_max_ms": 1430.6,
+      "request_to_display_median_ms": 409.0,
+      "request_to_display_max_ms": 482.8
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "cached": true,
+      "count": 4000,
+      "samples": 3,
+      "full_display_median_ms": 1448.1,
+      "full_display_max_ms": 1494,
+      "request_to_display_median_ms": 752.7,
+      "request_to_display_max_ms": 836.9
+    },
+    {
+      "instrument": "OANDA:AUD_CAD",
+      "cached": true,
+      "count": 8000,
+      "samples": 3,
+      "full_display_median_ms": 1977.2,
+      "full_display_max_ms": 2472.5,
+      "request_to_display_median_ms": 1260.8,
+      "request_to_display_max_ms": 1368.2
+    },
+    {
+      "instrument": "BTCUSDT",
+      "cached": false,
+      "count": 200,
+      "samples": 3,
+      "full_display_median_ms": 1423.4,
+      "full_display_max_ms": 1511,
+      "request_to_display_median_ms": 559.2,
+      "request_to_display_max_ms": 639.9
+    },
+    {
+      "instrument": "BTCUSDT",
+      "cached": false,
+      "count": 400,
+      "samples": 2,
+      "full_display_median_ms": 1940.3,
+      "full_display_max_ms": 2149.4,
+      "request_to_display_median_ms": 1032.45,
+      "request_to_display_max_ms": 1207.0
+    },
+    {
+      "instrument": "BTCUSDT",
+      "cached": false,
+      "count": 600,
+      "samples": 3,
+      "full_display_median_ms": 2115.5,
+      "full_display_max_ms": 2764.3,
+      "request_to_display_median_ms": 1308.2,
+      "request_to_display_max_ms": 2126.8
+    },
+    {
+      "instrument": "BTCUSDT",
+      "cached": false,
+      "count": 1000,
+      "samples": 3,
+      "full_display_median_ms": 2113.9,
+      "full_display_max_ms": 2460.3,
+      "request_to_display_median_ms": 1428.9,
+      "request_to_display_max_ms": 1429.7
+    },
+    {
+      "instrument": "BTCUSDT",
+      "cached": true,
+      "count": 200,
+      "samples": 3,
+      "full_display_median_ms": 895.8,
+      "full_display_max_ms": 1192.4,
+      "request_to_display_median_ms": 230.8,
+      "request_to_display_max_ms": 273.6
+    },
+    {
+      "instrument": "BTCUSDT",
+      "cached": true,
+      "count": 1000,
+      "samples": 3,
+      "full_display_median_ms": 1116.3,
+      "full_display_max_ms": 1365.9,
+      "request_to_display_median_ms": 434.4,
+      "request_to_display_max_ms": 435.1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "cached": true,
+      "count": 4000,
+      "samples": 3,
+      "full_display_median_ms": 1519.2,
+      "full_display_max_ms": 1696.4,
+      "request_to_display_median_ms": 796.6,
+      "request_to_display_max_ms": 919.6
+    },
+    {
+      "instrument": "BTCUSDT",
+      "cached": true,
+      "count": 8000,
+      "samples": 3,
+      "full_display_median_ms": 2007.9,
+      "full_display_max_ms": 2012,
+      "request_to_display_median_ms": 1321.4,
+      "request_to_display_max_ms": 1356.5
+    }
+  ],
+  "caveats": [
+    "M5 real providers; cold PostgreSQL means empty test cache with running warmed HTTP pools, not cold TLS.",
+    "200/400/600/1000 acquisition counts have ten samples/source; 2000/4000 have three, no stable p95 claim.",
+    "Actual cache API counts have three samples/source; no automatic prewarm interests created.",
+    "Native display uses isolated widget and Playwright binding to running API, not production React bridge; multi-process binding adds copies.",
+    "One designated cold native sample hit existing cache; preserved in raw records, excluded from cold aggregation.",
+    "Historical data anchors differ in native cold display trials to avoid runtime cache deletion; proxy/environment variation retained.",
+    "Render/CPU simulation is desktop headless; no real phone/browser/GPU universal promise."
+  ]
+}

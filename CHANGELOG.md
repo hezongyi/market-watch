@@ -1,5 +1,13 @@
 # 更新日志
 
+## [1.4.0] - 2026-10-02
+
+- 默认启用平台原生历史缓冲：cold E400、first PG E2000、history E2000；保留完整原生需求 D 和 Python 计算前缀 H，多图/focus 只缩减可选缓冲。
+- 后端复用有界预热，bars、版本及 Volume 元信息来自同一 SQL 快照；晚到历史响应有界复核，真实修订通过公开重载更新。
+- 修复可选预热等待行锁/第二次连接 checkout 丢弃 ready bars，以及请求取消/过期阻止 owner 释放 lease；增加六项真实 PostgreSQL 生命周期回归。
+- 与 v1.3.3 Volume 源码集成，后端 395 passed、1 skipped，40 个前端脚本及构建通过；无新增迁移，schema 保持 p17_volume。
+- 源码通过 PR 合入 main，并以附注标签 v1.4.0 发布；清单与证据边界见 deploy/releases/v1.4.0-source.json。Binance 性能数值失败按既有用户决定接受，未进行新组合镜像浏览器验收或生产部署。
+
 ## [1.3.3] - 2026-10-02
 
 - 修复平台与自建行情 Volume 全链路，Binance 使用基础资产量，OANDA 使用报价量。

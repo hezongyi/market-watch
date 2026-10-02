@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import delete, func, select, update
 
 from .calendar_profile import closures_from
@@ -52,7 +52,30 @@ class Template(Create):
     indicators: list[dict] = Field(max_length=12)
 
 
+class NativeHistory(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    chart_count: int = Field(ge=1, le=8)
+    focused: bool | None = None
+    historical_navigation: bool = False
+
+
+class HistoryObservation(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    revision: int = Field(ge=0)
+    observed_at: int = Field(ge=0)
+    first: int = Field(ge=0)
+    last: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def ordered_window(self):
+        if self.first > self.last:
+            raise ValueError("历史观察窗口无效")
+        return self
+
+
 class DataQuery(BaseModel):
+    # v1.3.2 compatibility: optional fields from newer bridges remain ignorable.
+    model_config = ConfigDict(extra="ignore")
     instrument: str
     series_kind: SeriesKind = "managed"
     timeframe: str
@@ -68,11 +91,32 @@ class DataQuery(BaseModel):
     revision_after: int | None = Field(default=None, ge=0)
     published: bool = False
     dataset_start: int | None = Field(default=None, ge=0)
+    native_history: NativeHistory | None = None
+    history_observation: HistoryObservation | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_native_input_types(cls, value):
+        if isinstance(value, dict) and value.get("native_history") is not None:
+            for field in ("before", "from", "countBack", "limit"):
+                raw = value.get(field)
+                if raw is not None and (not isinstance(raw, int) or isinstance(raw, bool)):
+                    raise ValueError("原生历史数量与时间须为整数")
+            if "firstDataRequest" in value and not isinstance(value["firstDataRequest"], bool):
+                raise ValueError("firstDataRequest须为布尔值")
+        return value
 
     @model_validator(mode="after")
     def validate_managed_limit(self):
         if self.series_kind == "managed" and self.limit > 2000:
             raise ValueError("自建单页最多2000根")
+        if self.native_history is not None or self.history_observation is not None:
+            if self.series_kind != "provider":
+                raise ValueError("原生历史上下文仅适用于平台行情")
+            if self.history_observation is not None and self.native_history is None:
+                raise ValueError("历史复核需要原生历史上下文")
+            if self.from_time is not None and self.before is not None and self.from_time >= self.before:
+                raise ValueError("原生历史区间须满足from<to")
         return self
 
 
@@ -732,6 +776,7 @@ def router(authenticated):
                 "as_of": now_ms(),
             }
         except (ValueError, TypeError, KeyError, AttributeError) as e:
-            raise HTTPException(422, str(e)) from e
+            detail = {"code": e.code, "message": str(e)} if hasattr(e, "code") else str(e)
+            raise HTTPException(422, detail) from e
 
     return r

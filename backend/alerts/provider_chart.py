@@ -140,10 +140,21 @@ def _request(client, url, *, params, headers=None, deadline):
                         record_timing("network_" + stage.replace(".", "_"), phases.pop(stage))
                 try:
                     with activity(client) as client:
+                        timings = TIMINGS.get()
+                        if timings is not None:
+                            attempts = timings.setdefault("candles_attempts", [])
+                            attempt_record = {"attempt": attempt + 1}
+                            attempts.append(attempt_record)
                         response = client.get(
                             url, params=params, headers=headers, timeout=min(7, remaining),
                             extensions={"trace": trace},
                         )
+                        if timings is not None:
+                            attempt_record["status"] = response.status_code
+                except Exception as error:
+                    if TIMINGS.get() is not None and 'attempt_record' in locals():
+                        attempt_record["error"] = type(error).__name__
+                    raise
                 finally:
                     record_timing("upstream_http", http_started)
             if response.status_code not in (429, 502, 503, 504) or attempt == 2:
@@ -177,7 +188,7 @@ def _end(start, frame, calendar):
     return start + FRAME_MS[frame]
 
 
-def native_page(meta, frame, before, count, *, client=None, deadline=None):
+def native_page(meta, frame, before, count, *, client=None, deadline=None, optional=0):
     """Return upstream native OHLC, exclusive chart labels and an explicit boundary."""
     if frame not in FRAMES or not 1 <= count <= (4000 if meta["source"] == "oanda" else 1000):
         raise ValueError("无效平台周期或根数")
@@ -189,9 +200,11 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
     cursor = min(now_ms() + 1, before + (2 * 86400000 if frame in ("D1", "W1", "MN") else 0))
     boundary = False
     for _ in range(8):
+        # Optional bars can fill this mandatory HTTP request, but never extend
+        # the loop. High-period translation/filtering still stops at count.
         batch_count = min(
             4000 if source == "oanda" else 1000,
-            count - len(rows) + (3 if frame in ("D1", "W1", "MN") else 0),
+            count - len(rows) + optional + (3 if frame in ("D1", "W1", "MN") else 0),
         )
         if source == "oanda":
             if not settings.oanda_token:
@@ -271,8 +284,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
         cursor = next_cursor
     else:
         raise ValueError("平台分页超过请求上限")
-    visible = rows[-count:]
-    exhausted = boundary and len(rows) <= count
+    visible = rows[-(count + optional):]
+    exhausted = boundary and len(rows) <= count + optional
     proven_start = 0 if exhausted else visible[0]["chart_time"] if visible else before
     return {
         "bars": visible,

@@ -1,0 +1,91 @@
+{
+  "version": "1.4.0",
+  "accepted": true,
+  "acceptance_scope": "Source integration with unchanged tested runtime/test inputs; original native-history acceptance under hash-bound user decision. No fresh combined-image browser acceptance.",
+  "release_tag": "v1.4.0",
+  "release_method": "Pull request merge from feature/native-history-buffer to main, annotated tag on final main merge commit.",
+  "previous_source_tag": "v1.3.3",
+  "baseline": "dd9ba43a4abc09359c0a05aa12390ba1885978df",
+  "native_original_head": "efe0ba4783a2ec95697ee494ed0c1c1a28550f54",
+  "source_commit": "93db03bd20cfad60a7a41469a00851fd9742472b",
+  "tag_relation": "Tag includes release metadata/documentation and GitHub merge commit; 332 tested runtime/test files remain byte-identical to source_commit. Python/web and lock root versions change to 1.4.0; dependencies unchanged.",
+  "schema": "p17_volume",
+  "new_migrations": [],
+  "delivery_document": "docs/chart-v1.4.0-source-delivery.md",
+  "verification": "docs/verification/native-history/source-release-audit.json",
+  "source_hashes": "docs/verification/native-history/integration-v1.3.3/final-source-hashes.json",
+  "checks": {
+    "backend_full": {
+      "passed": 395,
+      "skipped": 1,
+      "postgresql": "17.11 disposable fixture, stopped after execution"
+    },
+    "frontend_scripts": {
+      "passed": 40,
+      "failed": 0,
+      "scope": "Non-browser Node scripts"
+    },
+    "web_build": "1.4.0 TypeScript/Vite build passed; existing bundle-size warning.",
+    "package_build": {
+      "version": "1.4.0",
+      "runtime_modules": 41,
+      "source_mismatches": 0
+    },
+    "standards_review": "No hard violations; two low-priority heuristics remain.",
+    "spec_review": "No residual blockers after six lifecycle regressions fixed.",
+    "source_hashes": {
+      "files": 332,
+      "mismatches": 0
+    },
+    "original_evidence": {
+      "files": 229,
+      "mismatches": 0
+    }
+  },
+  "evidence_sha256": {
+    "docs/verification/native-history/integration-v1.3.3/final-source-hashes.json": "ded9e137d7805f2543eb64ed8b7ab2f4d6717707fb98f68359b3cb6ce8afba9e",
+    "docs/verification/native-history/implementation/delivery-evidence-manifest.json": "78cc2b13b8358aff804ade55705ac6596f3180c1df1ff14fda8141c1b66d3e65",
+    "docs/verification/native-history/integration-v1.3.3/backend-final.txt": "230d5d7e5809467c2240e423c03145fe947bb40c2ddd1fa0dc4eeef44fde3a6f",
+    "docs/verification/native-history/integration-v1.3.3/frontend-final.json": "239a5064c39c3a73be056a0cfb3178838a90379a3c99840ef89224a23098fcff",
+    "docs/verification/native-history/integration-v1.3.3/review-results.md": "3d4fceeeaa68703a858ae6a9034d03f2f7728c2bd8edb3bafabc6ed245a0106a",
+    "docs/verification/native-history/source-release-audit.json": "063e7317805ff87b5b8c590635bec6471293d8fb62a33cad86a14784b6008eef",
+    "docs/verification/native-history/release-v1.4.0/web-build.txt": "a276b72f06d6a77d57409e503ab65d3e5303a79ada0b28f9c32b67ca69609e7a",
+    "docs/verification/native-history/release-v1.4.0/wheel-build.txt": "f8ce42ba6abd8833a181ccc8ce0c3d33ee73e099730a0f297b117d951ba63b4b",
+    "docs/verification/native-history/release-v1.4.0/web-build-artifacts.json": "dab5bf6eb6e68a80d7d32a16c14486390ea33723f6f432345ceacfc81e4bd421"
+  },
+  "default_optional_caps": {
+    "enabled": true,
+    "cold": 400,
+    "first_pg": 2000,
+    "history": 2000,
+    "mandatory_demand": "D+H retained; multi-pane/focus reduce optional amount only."
+  },
+  "performance": {
+    "user_decision": "docs/verification/native-history/implementation/user-acceptance-decision.json",
+    "binance_cold_numeric": "4/10 FAIL",
+    "binance_pg_numeric": "7/10 FAIL",
+    "actual_pg_hits": "8/10",
+    "decision": "Accepted delivery limitation; raw failures retained. No network investigation or new cohort.",
+    "clock": "Native getBars entry to dataReady plus double RAF."
+  },
+  "images": {},
+  "image_status": "No new v1.4.0 images; original native/Volume manifests preserve their own source IDs.",
+  "existing_image_manifests": [
+    "docs/verification/native-history/implementation/runtime-manifest.json",
+    "deploy/releases/v1.3.3-local.json"
+  ],
+  "deployment_scope": "Source publication only; no production or local runtime upgrade.",
+  "runtime_changed_by_source_release": false,
+  "notifications_sent": false,
+  "deployment_work_remaining": [
+    "Pin combined source, build/record per-service image IDs.",
+    "Back up target database and verify schema/configuration and API/worker consistency.",
+    "Complete target-environment combined functionality and rollback acceptance."
+  ],
+  "rollback": {
+    "previous_source_tag": "v1.3.3",
+    "schema": "p17 unchanged",
+    "effect": "Removes native D/H contract and buffering while retaining Volume; disabling ALERTS_PROVIDER_NATIVE_HISTORY_BUFFER only sets optional E to zero and preserves native D/H.",
+    "documentation": "docs/chart-v1.4.0-source-delivery.md"
+  }
+}

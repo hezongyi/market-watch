@@ -1,0 +1,84 @@
+{
+  "combination": "old-front-new-api",
+  "cases": [
+    {
+      "symbol": "MWP:BTCUSDT",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790885802000,
+            "firstDataRequest": true,
+            "client": "05bc5e69-5970-438e-902d-d93e047ab775",
+            "indicators": [],
+            "before": 1790935302000,
+            "track_history": false
+          },
+          "count": 165
+        }
+      ],
+      "errors": [],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790885802,
+            "to": 1790935302,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "count": 165,
+          "duplicates": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790885812000,
+            "firstDataRequest": true,
+            "client": "978df057-ce06-4e62-bead-1f0edcb1454b",
+            "indicators": [],
+            "before": 1790935312000,
+            "track_history": false
+          },
+          "count": 166
+        }
+      ],
+      "errors": [],
+      "trace": [
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "5",
+          "params": {
+            "from": 1790885812,
+            "to": 1790935312,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "count": 166,
+          "duplicates": 0
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "finished": "2026-10-02T10:00:53.917Z"
+}

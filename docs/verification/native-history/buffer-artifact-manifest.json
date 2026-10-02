@@ -1,0 +1,62 @@
+{
+  "scope": "buffer research artifacts only",
+  "files": [
+    {
+      "path": "docs/native-chart-buffer-return-policy.md",
+      "sha256": "9203a146d226bf9e20da338c24677ebb783494257f2edfdad909036235dbb0a0"
+    },
+    {
+      "path": "docs/native-chart-buffer-renderer-study.md",
+      "sha256": "1999ee179c6c3981498e8046c74e537f6068bf6a618d4142b4cf9a674975c63e"
+    },
+    {
+      "path": "scripts/benchmark_provider_buffers.py",
+      "sha256": "fd1a3b370302fe5fffe823c80177872d2ec7cb0d5dee2a69c2d2cee4b75b508b"
+    },
+    {
+      "path": "scripts/benchmark_provider_buffer_api.py",
+      "sha256": "e39fe888fc7fd8aa57bd9d27e3b7d55b9765e79712f09b84f5e3956ac353d527"
+    },
+    {
+      "path": "web/tests/advanced-native-buffer-api-display.browser.cjs",
+      "sha256": "c3172d32de75bed5cff3797a7ad61f762230333738459c8a9d044ca1b8a87690"
+    },
+    {
+      "path": "web/tests/advanced-native-buffer-renderer.browser.cjs",
+      "sha256": "bbb24ef3b413d3b311d67a5df769bce52a7fe5cf5254a1e4aa02d066a1560adb"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-sizing-summary.json",
+      "sha256": "324ee918afbf535975c4113c9db73484aaaf9fef4ef4b04f1b336b17d751dc20"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-acquisition/results.json",
+      "sha256": "2bc29d622703ebe213dfe16b01e5d2d1bbf50eb89030e61271ccc8d2afc7d727"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-acquisition-confirmation/results.json",
+      "sha256": "2f3ab71372b04ff321dee9d9f7725ec7f31441648b8d8f2046ce23c1a17ada0c"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-api-cache/results.json",
+      "sha256": "11ea6079b79783950149e53b4255f5adac345b8f72c2ccba9c2db4daec4cfaf3"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-api-display/results.json",
+      "sha256": "92649cc04bfa5c5feb839c26fc95c3f3764db594f81789f71e28c5f6861c6629"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-renderer/results.json",
+      "sha256": "565864625457d55d8d5257155f969cf91090b1c66b3b01cbbdc2e8f99a7c000c"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-renderer/cpu4/results.json",
+      "sha256": "3e42f82470df1d655b003da3b6b86cef91893dacb8112b2031ae71a9d47cf759"
+    }
+  ],
+  "known_secret_scan_matches": 0,
+  "runtime_api_image_id": "sha256:5f3ebe0318da4b63428d1c676ec573e34867f5682a8eb61d9ba6b6352e72808b",
+  "runtime_chart_image_id": "sha256:2770ede098d4b978a833e7a34e1219e0e130d788581a9e7ee91e66ba1fe150c6",
+  "native_version": "TT v31.1.0",
+  "note": "Actual API/browser measurements use unchanged running candidate. Standalone PostgreSQL read tests use workspace provider modules in unique removed test schemas; no product buffering policy implemented."
+}
