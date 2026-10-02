@@ -164,6 +164,35 @@ def test_cancelled_waiter_does_not_release_another_requests_lease(database):
     assert cache.read(META, "M5", 10000, 3)["cache_hit"]
 
 
+@pytest.mark.parametrize('cancelled', [False, True])
+def test_failed_owner_releases_lease_after_deadline_or_cancellation(database, monkeypatch, cancelled):
+    import threading
+    import time
+    key = cache.ensure(META, 'M5')
+    event = threading.Event()
+    cancel_token = cache.CANCELLED.set(event)
+    deadline_token = cache.DEADLINE.set(time.monotonic() + 2)
+    def fail(*args, **kwargs):
+        if cancelled:
+            event.set()
+        else:
+            cache.DEADLINE.set(time.monotonic() - 1)
+        raise TimeoutError('upstream request failed')
+    monkeypatch.setattr(upstream, 'native_page', fail)
+    try:
+        with pytest.raises(TimeoutError):
+            cache.fetch_page(key, META, 'M5', 10000, 5, time.monotonic() + 2)
+    finally:
+        cache.CANCELLED.reset(cancel_token)
+        cache.DEADLINE.reset(deadline_token)
+    with database.begin() as db:
+        row = db.get(ProviderDataset, key)
+        assert row.lease_token is None and row.lease_until == 0
+    retry = cache.claim(key)
+    assert retry is not None, 'failed owners must not fence immediate retries for30 seconds'
+    cache.release(key, retry)
+
+
 def test_disjoint_preceding_cache_cannot_reduce_foreground_missing_count(database, monkeypatch):
     seed(META, "M5", 100000, page(1000, 100000))
     calls = []

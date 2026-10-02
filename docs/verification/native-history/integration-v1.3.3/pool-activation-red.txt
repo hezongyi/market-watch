@@ -1,0 +1,168 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_ready_history_activation_reuses_snapshot_connection[False] ________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://native_history_review@127.0.0.1:39577/postgres), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://native_history_review@127.0.0.1:39577/postgres))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f621b27ddd0>
+native = False
+
+    @pytest.mark.parametrize('native', [False, True])
+    def test_ready_history_activation_reuses_snapshot_connection(provider_pg, monkeypatch, native):
+        from alerts import provider_service as service
+        from alerts.chart_api import DataQuery
+        from test_provider_cache import seed
+        _, engine = provider_pg
+        seed(META, 'M5', 100000, page(90000, 100000))
+        monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+        monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('cached demand'))
+        body = DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
+                         before=100000, countBack=3, client='pool-contention',
+                         native_history={'chart_count': 1, 'focused': True} if native else None)
+        entered = threading.Event()
+        held = []
+        original = service.activate
+        def activate(*args, **kwargs):
+            while engine.pool.checkedout() < engine.pool.size():
+                held.append(engine.connect())
+            entered.set()
+            return original(*args, **kwargs)
+        monkeypatch.setattr(service, 'activate', activate)
+        def read():
+            token = cache.DEADLINE.set(time.monotonic() + 0.3)
+            try:
+                return cache.data(body)
+            finally:
+                cache.DEADLINE.reset(token)
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pending = pool.submit(read)
+            assert entered.wait(2)
+            try:
+>               result = pending.result(timeout=0.8)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_provider_postgres.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None, timeout = 0.8
+
+    def result(self, timeout=None):
+        """Return the result of the call that the future represents.
+    
+        Args:
+            timeout: The number of seconds to wait for the result if the future
+                isn't done. If None, then there is no limit on the wait time.
+    
+        Returns:
+            The result of the call that the future represents.
+    
+        Raises:
+            CancelledError: If the future was cancelled.
+            TimeoutError: If the future didn't finish executing before the given
+                timeout.
+            Exception: If the call raised then that exception will be raised.
+        """
+        try:
+            with self._condition:
+                if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]:
+                    raise CancelledError()
+                elif self._state == FINISHED:
+                    return self.__get_result()
+    
+                self._condition.wait(timeout)
+    
+                if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]:
+                    raise CancelledError()
+                elif self._state == FINISHED:
+                    return self.__get_result()
+                else:
+>                   raise TimeoutError()
+E                   TimeoutError
+
+../../miniforge3/envs/planck/lib/python3.11/concurrent/futures/_base.py:458: TimeoutError
+------------------------------ Captured log call -------------------------------
+WARNING  alerts.provider_cache:provider_cache.py:549 Provider optional activation failed source=oanda frame=M5
+________ test_ready_history_activation_reuses_snapshot_connection[True] ________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://native_history_review@127.0.0.1:39577/postgres), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://native_history_review@127.0.0.1:39577/postgres))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f621a68ecd0>
+native = True
+
+    @pytest.mark.parametrize('native', [False, True])
+    def test_ready_history_activation_reuses_snapshot_connection(provider_pg, monkeypatch, native):
+        from alerts import provider_service as service
+        from alerts.chart_api import DataQuery
+        from test_provider_cache import seed
+        _, engine = provider_pg
+        seed(META, 'M5', 100000, page(90000, 100000))
+        monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+        monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('cached demand'))
+        body = DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
+                         before=100000, countBack=3, client='pool-contention',
+                         native_history={'chart_count': 1, 'focused': True} if native else None)
+        entered = threading.Event()
+        held = []
+        original = service.activate
+        def activate(*args, **kwargs):
+            while engine.pool.checkedout() < engine.pool.size():
+                held.append(engine.connect())
+            entered.set()
+            return original(*args, **kwargs)
+        monkeypatch.setattr(service, 'activate', activate)
+        def read():
+            token = cache.DEADLINE.set(time.monotonic() + 0.3)
+            try:
+                return cache.data(body)
+            finally:
+                cache.DEADLINE.reset(token)
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pending = pool.submit(read)
+            assert entered.wait(2)
+            try:
+>               result = pending.result(timeout=0.8)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_provider_postgres.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None, timeout = 0.8
+
+    def result(self, timeout=None):
+        """Return the result of the call that the future represents.
+    
+        Args:
+            timeout: The number of seconds to wait for the result if the future
+                isn't done. If None, then there is no limit on the wait time.
+    
+        Returns:
+            The result of the call that the future represents.
+    
+        Raises:
+            CancelledError: If the future was cancelled.
+            TimeoutError: If the future didn't finish executing before the given
+                timeout.
+            Exception: If the call raised then that exception will be raised.
+        """
+        try:
+            with self._condition:
+                if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]:
+                    raise CancelledError()
+                elif self._state == FINISHED:
+                    return self.__get_result()
+    
+                self._condition.wait(timeout)
+    
+                if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]:
+                    raise CancelledError()
+                elif self._state == FINISHED:
+                    return self.__get_result()
+                else:
+>                   raise TimeoutError()
+E                   TimeoutError
+
+../../miniforge3/envs/planck/lib/python3.11/concurrent/futures/_base.py:458: TimeoutError
+------------------------------ Captured log call -------------------------------
+WARNING  alerts.provider_cache:provider_cache.py:549 Provider optional activation failed source=oanda frame=M5
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_postgres.py::test_ready_history_activation_reuses_snapshot_connection[False]
+FAILED backend/tests/test_provider_postgres.py::test_ready_history_activation_reuses_snapshot_connection[True]
+2 failed, 12 deselected in 2.48s

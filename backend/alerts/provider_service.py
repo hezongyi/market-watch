@@ -10,7 +10,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, text
 
 from . import provider_cache as cache
 from . import provider_chart as upstream
@@ -30,122 +30,133 @@ def interest_id(client, listener):
     return hashlib.sha256((client + "|" + listener).encode()).hexdigest()
 
 
-def activate(client, key, before, count, *, latest=False):
+def activate(client, key, before, count, *, latest=False, db=None):
     if not client:
         return
+    if db is not None:
+        cache.database_budget(db)
+        return _activate(db, client, key, before, count, latest=latest)
+    with cache.budget_transaction() as owned:
+        return _activate(owned, client, key, before, count, latest=latest)
+
+
+def _activate(db, client, key, before, count, *, latest=False):
     now = now_ms()
-    with transaction() as db:
-        # Serialize activations even when the interest row has not been created
-        # yet. Workers lock only the interest during their short CAS writeback.
-        focus = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update())
-        # One latest and one historical focus per dataset/client; requests for
-        # other panes remain separate. Fixed anchor targets do not chase now.
-        listener = "read:" + key + (":latest" if latest else ":history")
-        ident = interest_id(client, listener)
-        old = db.scalar(select(ProviderInterest).where(ProviderInterest.id == ident).with_for_update())
-        if old and (latest or abs(old.cursor - before) < 1000):
-            old.expires = now + settings.provider_activity_seconds * 1000
-            old.accessed_at = now
-            targets = [dict(target) for target in old.targets]
-            for target in targets:
-                if target["frame"] != focus.timeframe or "after" in target:
-                    continue
-                # Latest uses its original fixed anchor, never moving now.
-                goal = target.get("goal", settings.provider_basic_bars)
-                wanted = max(goal, count) if latest else goal + count
-                if wanted <= target["count"]:
-                    continue
-                target["count"] = wanted
-                target["generation"] = target.get("generation", 0) + 1
-                interval = next((r for r in focus.coverage
-                                 if r[0] < target["before"] <= r[1]), None)
-                actual = db.scalar(select(func.count()).select_from(ProviderBar).where(
-                    ProviderBar.dataset_id == key,
-                    ProviderBar.chart_time >= (interval[0] if interval else target["before"]),
-                    ProviderBar.chart_time < target["before"],
-                ))
-                target["done"] = bool(interval and
-                                      (actual >= wanted or focus.earliest and interval[0] == 0))
-                target["next_at"] = 0
-            old.targets = targets
-            return
-        frames = (focus.timeframe,) + tuple(f for f in PERIODS if f != focus.timeframe)
-        targets = []
-        for goal in (settings.provider_basic_bars, settings.provider_depth_bars):
-            for frame in frames:
-                targets.append(
-                    {
-                        "frame": frame,
-                        "before": before,
-                        "count": max(goal, count if frame == focus.timeframe else 0),
-                        "goal": goal,
-                        "done": False,
-                        "next_at": 0,
-                        "attempts": 0,
-                    }
-                )
-        if not latest:
-            # Historical left buffer includes the requested window. Right
-            # buffer is a separate bounded anchor, clamped to the present.
-            for goal in (settings.provider_basic_bars, settings.provider_depth_bars):
-                targets.append(
-                    {
-                        "frame": focus.timeframe,
-                        "before": min(now + 1, before + goal * upstream.FRAME_MS[focus.timeframe]),
-                        "after": before,
-                        "until": now + 1,
-                        "count": goal,
-                        "done": False,
-                        "next_at": 0,
-                        "attempts": 0,
-                    }
-                )
-            for target in targets:
-                if target["frame"] == focus.timeframe and target["before"] == before:
-                    target["count"] = target["goal"] + count
-            # Neighbor buffers precede cross-period work in each round.
-            right = targets[-2:]
-            targets = [targets[0], right[0], *targets[1:9], targets[9], right[1], *targets[10:18]]
-        task_id = uid()
+    if cache.DEADLINE.get() is not None and db.get_bind().dialect.name == "postgresql":
+        # Optional activation must not hold completed bars behind any
+        # dataset, interest, or cleanup write lock. A later read retries it.
+        db.execute(text("SELECT set_config('lock_timeout', '1', true)"))
+    # Serialize activations even when the interest row has not been created
+    # yet. Workers lock only the interest during their short CAS writeback.
+    focus = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update())
+    # One latest and one historical focus per dataset/client; requests for
+    # other panes remain separate. Fixed anchor targets do not chase now.
+    listener = "read:" + key + (":latest" if latest else ":history")
+    ident = interest_id(client, listener)
+    old = db.scalar(select(ProviderInterest).where(ProviderInterest.id == ident).with_for_update())
+    if old and (latest or abs(old.cursor - before) < 1000):
+        old.expires = now + settings.provider_activity_seconds * 1000
+        old.accessed_at = now
+        targets = [dict(target) for target in old.targets]
         for target in targets:
-            target["task_id"] = task_id
-            target["generation"] = 0
-        values = dict(
-            dataset_id=key,
-            expires=now + settings.provider_activity_seconds * 1000,
-            accessed_at=now,
-            targets=targets,
-            cursor=before,
-        )
-        if old:
-            for field, value in values.items():
-                setattr(old, field, value)
-        else:
-            db.add(
-                ProviderInterest(
-                    id=ident,
-                    client=client,
-                    listener=listener,
-                    subscribed=False,
-                    revision=0,
-                    next_poll=0,
-                    **values,
-                )
+            if target["frame"] != focus.timeframe or "after" in target:
+                continue
+            # Latest uses its original fixed anchor, never moving now.
+            goal = target.get("goal", settings.provider_basic_bars)
+            wanted = max(goal, count) if latest else goal + count
+            if wanted <= target["count"]:
+                continue
+            target["count"] = wanted
+            target["generation"] = target.get("generation", 0) + 1
+            interval = next((r for r in focus.coverage
+                             if r[0] < target["before"] <= r[1]), None)
+            actual = db.scalar(select(func.count()).select_from(ProviderBar).where(
+                ProviderBar.dataset_id == key,
+                ProviderBar.chart_time >= (interval[0] if interval else target["before"]),
+                ProviderBar.chart_time < target["before"],
+            ))
+            target["done"] = bool(interval and
+                                  (actual >= wanted or focus.earliest and interval[0] == 0))
+            target["next_at"] = 0
+        old.targets = targets
+        return
+    frames = (focus.timeframe,) + tuple(f for f in PERIODS if f != focus.timeframe)
+    targets = []
+    for goal in (settings.provider_basic_bars, settings.provider_depth_bars):
+        for frame in frames:
+            targets.append(
+                {
+                    "frame": frame,
+                    "before": before,
+                    "count": max(goal, count if frame == focus.timeframe else 0),
+                    "goal": goal,
+                    "done": False,
+                    "next_at": 0,
+                    "attempts": 0,
+                }
             )
-        # Bound per-session targets, including abandoned rapid symbol changes.
-        stale = list(
-            db.scalars(
-                select(ProviderInterest)
-                .where(
-                    ProviderInterest.client == client,
-                    ProviderInterest.subscribed.is_(False),
-                )
-                .order_by(ProviderInterest.accessed_at.desc())
-                .offset(settings.provider_interest_limit)
+    if not latest:
+        # Historical left buffer includes the requested window. Right
+        # buffer is a separate bounded anchor, clamped to the present.
+        for goal in (settings.provider_basic_bars, settings.provider_depth_bars):
+            targets.append(
+                {
+                    "frame": focus.timeframe,
+                    "before": min(now + 1, before + goal * upstream.FRAME_MS[focus.timeframe]),
+                    "after": before,
+                    "until": now + 1,
+                    "count": goal,
+                    "done": False,
+                    "next_at": 0,
+                    "attempts": 0,
+                }
+            )
+        for target in targets:
+            if target["frame"] == focus.timeframe and target["before"] == before:
+                target["count"] = target["goal"] + count
+        # Neighbor buffers precede cross-period work in each round.
+        right = targets[-2:]
+        targets = [targets[0], right[0], *targets[1:9], targets[9], right[1], *targets[10:18]]
+    task_id = uid()
+    for target in targets:
+        target["task_id"] = task_id
+        target["generation"] = 0
+    values = dict(
+        dataset_id=key,
+        expires=now + settings.provider_activity_seconds * 1000,
+        accessed_at=now,
+        targets=targets,
+        cursor=before,
+    )
+    if old:
+        for field, value in values.items():
+            setattr(old, field, value)
+    else:
+        db.add(
+            ProviderInterest(
+                id=ident,
+                client=client,
+                listener=listener,
+                subscribed=False,
+                revision=0,
+                next_poll=0,
+                **values,
             )
         )
-        for item in stale:
-            db.delete(item)
+    # Bound per-session targets, including abandoned rapid symbol changes.
+    stale = list(
+        db.scalars(
+            select(ProviderInterest)
+            .where(
+                ProviderInterest.client == client,
+                ProviderInterest.subscribed.is_(False),
+            )
+            .order_by(ProviderInterest.accessed_at.desc())
+            .offset(settings.provider_interest_limit)
+        )
+    )
+    for item in stale:
+        db.delete(item)
 
 
 def subscribe(

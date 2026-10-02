@@ -48,8 +48,49 @@
       "with_bound_user_decision": "exit 0",
       "strict_numeric": "exit 1, expected Binance cold 4/10 and PG 7/10 failures retained."
     },
-    "secret_scan": "11 feature commits; 322 blobs, 134 text blobs, no regex or known-local-secret findings."
+    "secret_scan": "11 feature commits; 322 blobs, 134 text blobs, no regex or known-local-secret findings.",
+    "post_review_affected_tests": {
+      "passed": 141,
+      "failed": 0,
+      "postgres": "Disposable PostgreSQL17.11",
+      "scope": [
+        "test_provider_cache.py",
+        "test_provider_postgres.py",
+        "test_provider_service.py",
+        "test_provider_chart.py",
+        "test_provider_transport.py",
+        "test_volume.py",
+        "test_volume_postgres.py"
+      ],
+      "red_cases_fixed": 4,
+      "meaning": "Intermediate lifecycle fix validation; final shared-connection refinement superseded by full395-pass result."
+    },
+    "backend_final": {
+      "passed": 395,
+      "failed": 0,
+      "skipped": 1,
+      "postgres": "17.11 disposable fixture stopped after execution",
+      "evidence": "backend-final.txt",
+      "source_hashes": "final-source-hashes.json",
+      "runtime_test_files_hashed": 332,
+      "source_hash_mismatches": 0,
+      "six_new_lifecycle_regressions": "Two row-lock, two pool-exhaustion native/legacy, two expired/cancelled owner cases."
+    },
+    "review": "Final Standards:0 hard violations,2 low-priority heuristics; final Spec:0 blockers. See review-results.md."
   },
   "runtime_acceptance": "Existing native/Volume images and browser evidence retain their original sources. This integration has source-level checks only; no new combined-image browser/runtime acceptance.",
-  "remote_actions": "No push, PR creation, main merge, tag or deployment in this analysis phase."
+  "remote_actions": "No push, PR creation, main merge, tag or deployment in this analysis phase.",
+  "first_integrated_source": "5f7fed0159db80e99f4f0da280985c1a83d6ebd2",
+  "review_discovered_fixes": [
+    {
+      "issue": "Optional activation waits behind dataset/interest row locks and can turn cached demand into HTTP timeout.",
+      "reproduction": "Locked dataset/interest and exhausted second pool checkout reproduced by four real-PG native/legacy cases.",
+      "fix": "Run optional activation inside final coherent snapshot using its checked-out session/connection; SAVEPOINT isolates failure, request budget plus1ms PGlock timeout bound SQL contention. No-deadline administrative activation stays serialized."
+    },
+    {
+      "issue": "Expired/cancelled owners cannot release the lease through request-budget transaction.",
+      "reproduction": "Two expired/cancelled owner cases retain30-second lease before fix.",
+      "fix": "Cleanup independent of request cancellation/deadline; atomicUPDATE fenced by id/token/generation,250ms PGstatement timeout, expected contention logged/no retries. Pool checkout retains existing configured bound."
+    }
+  ]
 }

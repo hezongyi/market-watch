@@ -271,6 +271,80 @@ def test_snapshot_housekeeping_skips_a_locked_dataset(provider_pg):
             cache.DEADLINE.reset(token)
 
 
+@pytest.mark.parametrize('locked', ['dataset', 'interest'])
+def test_optional_activation_does_not_block_cached_native_delivery(provider_pg, monkeypatch, locked):
+    from alerts import provider_service as service
+    from alerts.chart_api import DataQuery
+    from alerts.storage import ProviderInterest
+    from test_provider_cache import seed
+    factory, _ = provider_pg
+    key = seed(META, 'M5', 100000, page(90000, 100000))
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('cached demand'))
+    body = DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
+                     before=100000, countBack=3, client='locked-activation',
+                     native_history={'chart_count': 1, 'focused': True})
+    service.activate(body.client, key, 100000, 3)
+    ident = service.interest_id(body.client, 'read:' + key + ':history')
+    def read():
+        token = cache.DEADLINE.set(time.monotonic() + 0.3)
+        try:
+            return cache.data(body)
+        finally:
+            cache.DEADLINE.reset(token)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        with factory.begin() as writer:
+            if locked == 'dataset':
+                writer.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update())
+            else:
+                writer.scalar(select(ProviderInterest).where(ProviderInterest.id == ident).with_for_update())
+            pending = pool.submit(read)
+            try:
+                result = pending.result(timeout=0.8)
+            finally:
+                writer.rollback()
+    assert result['cache_hit'] and result['mandatory_count'] == 3
+    assert len(result['bars']) >= 3
+
+
+@pytest.mark.parametrize('native', [False, True])
+def test_ready_history_activation_reuses_snapshot_connection(provider_pg, monkeypatch, native):
+    from alerts import provider_service as service
+    from alerts.chart_api import DataQuery
+    from test_provider_cache import seed
+    _, engine = provider_pg
+    seed(META, 'M5', 100000, page(90000, 100000))
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('cached demand'))
+    body = DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
+                     before=100000, countBack=3, client='pool-contention',
+                     native_history={'chart_count': 1, 'focused': True} if native else None)
+    entered = threading.Event()
+    held = []
+    original = service.activate
+    def activate(*args, **kwargs):
+        while engine.pool.checkedout() < engine.pool.size():
+            held.append(engine.connect())
+        entered.set()
+        return original(*args, **kwargs)
+    monkeypatch.setattr(service, 'activate', activate)
+    def read():
+        token = cache.DEADLINE.set(time.monotonic() + 0.3)
+        try:
+            return cache.data(body)
+        finally:
+            cache.DEADLINE.reset(token)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        pending = pool.submit(read)
+        assert entered.wait(2)
+        try:
+            result = pending.result(timeout=0.8)
+        finally:
+            for connection in held:
+                connection.close()
+    assert result['cache_hit'] and len(result['bars']) >= 3
+
+
 def test_expired_pool_waiter_executes_no_provider_statement(provider_pg):
     from sqlalchemy import event
     from test_provider_cache import seed
