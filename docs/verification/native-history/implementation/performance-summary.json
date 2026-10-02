@@ -1,0 +1,97 @@
+{
+  "primary_clock": "native getBars to rendered dataReady doubleRAF; user correction",
+  "source_commit": "fc8af766f44e5355e255a7c71b183ec14cb26feb",
+  "completed_at": "2026-10-02T08:06:51.264Z",
+  "groups": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "enabled": false,
+      "scenario": "cold",
+      "samples": 10,
+      "errors": 0,
+      "under_threshold": 4,
+      "threshold_ms": 3000,
+      "median_ms": 3339.5,
+      "max_ms": 4615.6
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "enabled": false,
+      "scenario": "pg",
+      "samples": 10,
+      "errors": 0,
+      "under_threshold": 10,
+      "threshold_ms": 1000,
+      "median_ms": 709.9,
+      "max_ms": 875.1
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "enabled": true,
+      "scenario": "cold",
+      "samples": 10,
+      "errors": 0,
+      "under_threshold": 10,
+      "threshold_ms": 3000,
+      "median_ms": 1381.3,
+      "max_ms": 1904.5
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "enabled": true,
+      "scenario": "pg",
+      "samples": 10,
+      "errors": 0,
+      "under_threshold": 9,
+      "threshold_ms": 1000,
+      "median_ms": 767.3,
+      "max_ms": 1036.1
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "enabled": false,
+      "scenario": "cold",
+      "samples": 10,
+      "errors": 1,
+      "under_threshold": 4,
+      "threshold_ms": 3000,
+      "median_ms": 3350.5,
+      "max_ms": 6026.8
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "enabled": false,
+      "scenario": "pg",
+      "samples": 10,
+      "errors": 0,
+      "under_threshold": 9,
+      "threshold_ms": 1000,
+      "median_ms": 669.4,
+      "max_ms": 1988.2
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "enabled": true,
+      "scenario": "cold",
+      "samples": 10,
+      "errors": 0,
+      "under_threshold": 7,
+      "threshold_ms": 3000,
+      "median_ms": 1328.7,
+      "max_ms": 7404.7
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "enabled": true,
+      "scenario": "pg",
+      "samples": 10,
+      "errors": 0,
+      "under_threshold": 9,
+      "threshold_ms": 1000,
+      "median_ms": 959.6,
+      "max_ms": 1017.3
+    }
+  ],
+  "raw_samples": 80,
+  "default_enable_gate": false
+}

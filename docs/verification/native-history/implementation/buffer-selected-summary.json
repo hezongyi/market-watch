@@ -1,0 +1,53 @@
+{
+  "clock": "native getBars entry to dataReady + double RAF; page construction excluded",
+  "samples": 40,
+  "source_report": "buffer-selected-acceptance.json",
+  "groups": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "cold",
+      "threshold_ms": 3000,
+      "successes": 10,
+      "samples": 10,
+      "median_numeric_ms": 900.8499755859375,
+      "actual_cache_hits": 0,
+      "failed_records": [],
+      "passed": true
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "pg",
+      "threshold_ms": 1000,
+      "successes": 9,
+      "samples": 10,
+      "median_numeric_ms": 734.199951171875,
+      "actual_cache_hits": 10,
+      "failed_records": [],
+      "passed": true
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "cold",
+      "threshold_ms": 3000,
+      "successes": 4,
+      "samples": 10,
+      "median_numeric_ms": 3277,
+      "actual_cache_hits": 0,
+      "failed_records": [
+        0
+      ],
+      "passed": false
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "pg",
+      "threshold_ms": 1000,
+      "successes": 7,
+      "samples": 10,
+      "median_numeric_ms": 798.550048828125,
+      "actual_cache_hits": 8,
+      "failed_records": [],
+      "passed": false
+    }
+  ]
+}

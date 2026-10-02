@@ -78,10 +78,16 @@ const docker=cmd=>execFileSync('sg',['docker','-c',cmd],{cwd:root,timeout:60000,
      return attempts;
     });
     assert.equal(item.rapid.length,20);assert.ok(item.rapid.every(t=>!t.error));
+    item.burst=await env.frame.evaluate(async()=>{
+     const sequence=['1','5','1D','15','1W','30','240','1M','60','5','1D','1','30','1W','15','240','60','1M','5','1'];
+     const promises=[],attempts=[];for(const res of sequence){const start=Date.now();promises.push(widget.activeChart().setResolution(res,{doNotActivateChart:true}).then(result=>attempts.push({res,result,elapsed:Date.now()-start}),error=>attempts.push({res,error:String(error)})));await new Promise(ok=>setTimeout(ok,80));}
+     await Promise.all(promises);return attempts;
+    });
+    await settle(env.frame);assert.equal(item.burst.length,20);assert.ok(item.burst.every(t=>!t.error));
     item.trace=await env.frame.evaluate(()=>historyTrace);assert.ok(item.trace.every(t=>!t.duplicates));
     await env.page.screenshot({path:OUT.replace('.json',`-${symbol.includes('OANDA')?'oanda':'binance'}.png`)});
    }catch(error){item.error=error.message;}
-   finally{await Promise.allSettled(env.work);await env.page.close();report.cases.push(item);save();console.log(JSON.stringify({symbol,kind:item.kind,error:item.error,drags:item.movements?.map(x=>x.newRequests),periods:item.periods?.length,rapid:item.rapid?.length}));}
+   finally{await Promise.allSettled(env.work);if(!item.error && (env.errors.length||env.http.some(h=>h.status!==200)))item.error='a completed provider response failed';await env.page.close();report.cases.push(item);save();console.log(JSON.stringify({symbol,kind:item.kind,error:item.error,drags:item.movements?.map(x=>x.newRequests),periods:item.periods?.length,rapid:item.rapid?.length}));}
   }
   for(const cpu of [1,4])for(const count of [1,2,4,8]){
    const symbol='MWP:BTCUSDT';await prepare(symbol);const env=await open(symbol,cpu);const item={kind:'multichart',cpu,count,http:env.http,errors:env.errors};
@@ -99,7 +105,7 @@ const docker=cmd=>execFileSync('sg',['docker','-c',cmd],{cwd:root,timeout:60000,
     assert.ok(item.trace.every(t=>!t.duplicates));
     await env.page.screenshot({path:OUT.replace('.json',`-${count}-cpu${cpu}.png`)});
    }catch(error){item.error=error.message;}
-   finally{await Promise.allSettled(env.work);await env.page.close();report.cases.push(item);save();console.log(JSON.stringify({kind:item.kind,cpu,count,error:item.error,http:item.http.map(x=>({count:x.count,optional:x.optional,context:x.query.native_history})),drag:item.drag?.newRequests}));}
+   finally{await Promise.allSettled(env.work);if(!item.error && (env.errors.length||env.http.some(h=>h.status!==200)))item.error='a completed provider response failed';await env.page.close();report.cases.push(item);save();console.log(JSON.stringify({kind:item.kind,cpu,count,error:item.error,http:item.http.map(x=>({count:x.count,optional:x.optional,context:x.query.native_history})),drag:item.drag?.newRequests}));}
   }
  }finally{report.finished_at=new Date().toISOString();save();await browser.close()}
 })().catch(error=>{report.error=error.message;save();console.error(error.message);process.exitCode=1});

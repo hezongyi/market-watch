@@ -1,0 +1,1161 @@
+{
+  "kind": "real product native historical corridor and direct historical startup; real upstream; finite deadline failures kept",
+  "cases": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "cache": "cold",
+      "startup": false,
+      "target": {
+        "from": 1786668600,
+        "to": 1786718100
+      },
+      "http": [
+        {
+          "at": 1790931317210,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790881876000,
+            "firstDataRequest": true,
+            "client": "2852f838-edb8-4546-a3e8-77d864e11326",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931376000,
+            "track_history": false
+          },
+          "count": 566,
+          "mandatory": 166,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings": {
+            "lease_wait": 16.86,
+            "upstream_slot": 10.51,
+            "network_http11_send_request_headers": 0.21,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 276.83,
+            "network_http11_receive_response_body": 38.29,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 316.05,
+            "upstream_decode": 0.99,
+            "database_commit": 222.9,
+            "read_total": 633.09
+          }
+        },
+        {
+          "at": 1790931329143,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 9746,
+            "countBack": 9746,
+            "from": 1786668600000,
+            "firstDataRequest": false,
+            "client": "2852f838-edb8-4546-a3e8-77d864e11326",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790761800000,
+            "track_history": false
+          },
+          "count": 9746,
+          "mandatory": 9746,
+          "optional": 0,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            },
+            {
+              "attempt": 1,
+              "status": 200
+            },
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings": {
+            "lease_wait": 30.59,
+            "upstream_slot": 10.01,
+            "network_http11_send_request_headers": 0.79,
+            "network_http11_send_request_body": 0.09,
+            "network_http11_receive_response_headers": 983.78,
+            "network_http11_receive_response_body": 823.46,
+            "network_http11_response_closed": 0.04,
+            "upstream_http": 1812.14,
+            "upstream_decode": 14.96,
+            "database_commit": 3440.62,
+            "read_total": 6039.45
+          }
+        }
+      ],
+      "errors": [],
+      "gestures": [
+        {
+          "before": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786642500,
+              "to": 1786692300
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1786642500,
+              "to": 1786692300
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786694400,
+              "to": 1786917000
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        }
+      ],
+      "uiStart": 1790931314736,
+      "jumpStart": 1790931322546,
+      "displayed": 1790931329531,
+      "view": {
+        "range": {
+          "from": 1786668600,
+          "to": 1786718100
+        },
+        "spacing": 5.614457831325301,
+        "trace": [
+          {
+            "ticker": "MWP:OANDA:AUD_CAD",
+            "res": "5",
+            "params": {
+              "from": 1790881876,
+              "to": 1790931376,
+              "countBack": 166,
+              "firstDataRequest": true
+            },
+            "at": 1790931316515.7,
+            "callback": 1790931317205.9,
+            "count": 566,
+            "first": 1790761800000,
+            "last": 1790931300000,
+            "duplicates": 0,
+            "invalidTo": false
+          },
+          {
+            "ticker": "MWP:OANDA:AUD_CAD",
+            "res": "5",
+            "params": {
+              "from": 1786668600,
+              "to": 1790761800,
+              "countBack": 9746,
+              "firstDataRequest": false
+            },
+            "at": 1790931322557.9,
+            "callback": 1790931329086,
+            "count": 9746,
+            "first": 1786625100000,
+            "last": 1790761500000,
+            "duplicates": 0,
+            "invalidTo": false
+          }
+        ]
+      },
+      "native_ms": 6973.10009765625,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790881876,
+            "to": 1790931376,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "at": 1790931316515.7,
+          "callback": 1790931317205.9,
+          "count": 566,
+          "first": 1790761800000,
+          "last": 1790931300000,
+          "duplicates": 0,
+          "invalidTo": false
+        },
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1786668600,
+            "to": 1790761800,
+            "countBack": 9746,
+            "firstDataRequest": false
+          },
+          "at": 1790931322557.9,
+          "callback": 1790931329086,
+          "count": 9746,
+          "first": 1786625100000,
+          "last": 1790761500000,
+          "duplicates": 0,
+          "invalidTo": false
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "cache": "cold",
+      "startup": true,
+      "target": {
+        "from": 1786668600,
+        "to": 1786718100
+      },
+      "http": [
+        {
+          "at": 1790931342530,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 176,
+            "countBack": 176,
+            "from": 1790878601000,
+            "firstDataRequest": true,
+            "client": "ca992571-aee7-4d88-8cbd-bacaa94a6612",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931401000,
+            "track_history": false
+          },
+          "count": 576,
+          "mandatory": 176,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings": {
+            "lease_wait": 19.21,
+            "upstream_slot": 20.26,
+            "network_http11_send_request_headers": 5.8,
+            "network_http11_send_request_body": 0.05,
+            "network_http11_receive_response_headers": 515.81,
+            "network_http11_receive_response_body": 0.24,
+            "network_http11_response_closed": 0.03,
+            "upstream_http": 522.66,
+            "upstream_decode": 1.03,
+            "database_commit": 428.55,
+            "read_total": 1157.56
+          }
+        },
+        {
+          "at": 1790931350897,
+          "status": 503,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 9739,
+            "countBack": 9739,
+            "from": 1786668600000,
+            "firstDataRequest": false,
+            "client": "ca992571-aee7-4d88-8cbd-bacaa94a6612",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790758800000,
+            "track_history": false
+          }
+        }
+      ],
+      "errors": [],
+      "gestures": [],
+      "uiStart": 1790931339176,
+      "error": "frame.waitForFunction: Timeout 22000ms exceeded.",
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790878601,
+            "to": 1790931401,
+            "countBack": 176,
+            "firstDataRequest": true
+          },
+          "at": 1790931341283.3,
+          "callback": 1790931342526.4001,
+          "count": 576,
+          "first": 1790758800000,
+          "last": 1790931300000,
+          "duplicates": 0,
+          "invalidTo": false
+        },
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1786668600,
+            "to": 1790758800,
+            "countBack": 9739,
+            "firstDataRequest": false
+          },
+          "at": 1790931342771.4001,
+          "error": "Error: Error: 平台行情暂不可用，请重试；尚未确认历史边界"
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "cache": "pg",
+      "startup": false,
+      "target": {
+        "from": 1786668600,
+        "to": 1786718100
+      },
+      "http": [
+        {
+          "at": 1790931394093,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790881953000,
+            "firstDataRequest": true,
+            "client": "57c3f7dc-f314-4f63-bf5d-9310718aa0b5",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931453000,
+            "track_history": false
+          },
+          "count": 2165,
+          "mandatory": 165,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "timings": {
+            "read_total": 292.34
+          }
+        },
+        {
+          "at": 1790931401263,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 8193,
+            "countBack": 8193,
+            "from": 1786668600000,
+            "firstDataRequest": false,
+            "client": "57c3f7dc-f314-4f63-bf5d-9310718aa0b5",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790109300000,
+            "track_history": false
+          },
+          "count": 8193,
+          "mandatory": 8193,
+          "optional": 0,
+          "hit": true,
+          "attempts": [],
+          "timings": {
+            "read_total": 266.79
+          }
+        }
+      ],
+      "errors": [],
+      "gestures": [
+        {
+          "before": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786642500,
+              "to": 1786692300
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1786642500,
+              "to": 1786692300
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786694400,
+              "to": 1786917000
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        }
+      ],
+      "preparation": "{\"prepared_native_pg_bars\": 12000, \"cache_hit\": false, \"target_10000\": 1786718400000, \"target_10165\": 1786668900000}\n",
+      "uiStart": 1790931392053,
+      "jumpStart": 1790931400308,
+      "displayed": 1790931401661,
+      "view": {
+        "range": {
+          "from": 1786668600,
+          "to": 1786718100
+        },
+        "spacing": 5.614457831325301,
+        "trace": [
+          {
+            "ticker": "MWP:OANDA:AUD_CAD",
+            "res": "5",
+            "params": {
+              "from": 1790881953,
+              "to": 1790931453,
+              "countBack": 165,
+              "firstDataRequest": true
+            },
+            "at": 1790931393648.1,
+            "callback": 1790931394182.7002,
+            "count": 2165,
+            "first": 1790109300000,
+            "last": 1790931300000,
+            "duplicates": 0,
+            "invalidTo": false
+          },
+          {
+            "ticker": "MWP:OANDA:AUD_CAD",
+            "res": "5",
+            "params": {
+              "from": 1786668600,
+              "to": 1790109300,
+              "countBack": 8193,
+              "firstDataRequest": false
+            },
+            "at": 1790931400351.1,
+            "callback": 1790931401212.7002,
+            "count": 8193,
+            "first": 1786611300000,
+            "last": 1790109000000,
+            "duplicates": 0,
+            "invalidTo": false
+          }
+        ]
+      },
+      "native_ms": 1309.89990234375,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790881953,
+            "to": 1790931453,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "at": 1790931393648.1,
+          "callback": 1790931394182.7002,
+          "count": 2165,
+          "first": 1790109300000,
+          "last": 1790931300000,
+          "duplicates": 0,
+          "invalidTo": false
+        },
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1786668600,
+            "to": 1790109300,
+            "countBack": 8193,
+            "firstDataRequest": false
+          },
+          "at": 1790931400351.1,
+          "callback": 1790931401212.7002,
+          "count": 8193,
+          "first": 1786611300000,
+          "last": 1790109000000,
+          "duplicates": 0,
+          "invalidTo": false
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "cache": "pg",
+      "startup": true,
+      "target": {
+        "from": 1786668600,
+        "to": 1786718100
+      },
+      "http": [
+        {
+          "at": 1790931420541,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 176,
+            "countBack": 176,
+            "from": 1790878679000,
+            "firstDataRequest": true,
+            "client": "8ee5cc39-d3ba-446f-8807-fdee5bf07d5e",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931479000,
+            "track_history": false
+          },
+          "count": 2176,
+          "mandatory": 176,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "timings": {
+            "read_total": 454.25
+          }
+        },
+        {
+          "at": 1790931421424,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 8185,
+            "countBack": 8185,
+            "from": 1786668600000,
+            "firstDataRequest": false,
+            "client": "8ee5cc39-d3ba-446f-8807-fdee5bf07d5e",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790106000000,
+            "track_history": false
+          },
+          "count": 8185,
+          "mandatory": 8185,
+          "optional": 0,
+          "hit": true,
+          "attempts": [],
+          "timings": {
+            "read_total": 299.17
+          }
+        }
+      ],
+      "errors": [],
+      "gestures": [
+        {
+          "before": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786642500,
+              "to": 1786692300
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1786642500,
+              "to": 1786692300
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1786668600,
+              "to": 1786718100
+            },
+            "requests": 2
+          },
+          "after": {
+            "range": {
+              "from": 1786694400,
+              "to": 1786917000
+            },
+            "requests": 2
+          },
+          "newRequests": 0
+        }
+      ],
+      "preparation": "{\"prepared_native_pg_bars\": 12000, \"cache_hit\": false, \"target_10000\": 1786718400000, \"target_10165\": 1786668900000}\n",
+      "uiStart": 1790931417684,
+      "displayed": 1790931423824,
+      "view": {
+        "range": {
+          "from": 1786668600,
+          "to": 1786718100
+        },
+        "spacing": 5.614457831325301,
+        "trace": [
+          {
+            "ticker": "MWP:OANDA:AUD_CAD",
+            "res": "5",
+            "params": {
+              "from": 1790878679,
+              "to": 1790931479,
+              "countBack": 176,
+              "firstDataRequest": true
+            },
+            "at": 1790931419703.2,
+            "callback": 1790931420531.4001,
+            "count": 2176,
+            "first": 1790106000000,
+            "last": 1790931300000,
+            "duplicates": 0,
+            "invalidTo": false
+          },
+          {
+            "ticker": "MWP:OANDA:AUD_CAD",
+            "res": "5",
+            "params": {
+              "from": 1786668600,
+              "to": 1790106000,
+              "countBack": 8185,
+              "firstDataRequest": false
+            },
+            "at": 1790931420799.9001,
+            "callback": 1790931421388.8,
+            "count": 8185,
+            "first": 1786610400000,
+            "last": 1790105700000,
+            "duplicates": 0,
+            "invalidTo": false
+          }
+        ]
+      },
+      "native_ms": 4120.800048828125,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790878679,
+            "to": 1790931479,
+            "countBack": 176,
+            "firstDataRequest": true
+          },
+          "at": 1790931419703.2,
+          "callback": 1790931420531.4001,
+          "count": 2176,
+          "first": 1790106000000,
+          "last": 1790931300000,
+          "duplicates": 0,
+          "invalidTo": false
+        },
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1786668600,
+            "to": 1790106000,
+            "countBack": 8185,
+            "firstDataRequest": false
+          },
+          "at": 1790931420799.9001,
+          "callback": 1790931421388.8,
+          "count": 8185,
+          "first": 1786610400000,
+          "last": 1790105700000,
+          "duplicates": 0,
+          "invalidTo": false
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "cache": "cold",
+      "startup": false,
+      "target": {
+        "from": 1787881800,
+        "to": 1787931300
+      },
+      "http": [
+        {
+          "at": 1790931432998,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790881991000,
+            "firstDataRequest": true,
+            "client": "8bb9abb9-8711-4eee-b624-ed1d7b2237fd",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931491000,
+            "track_history": false
+          },
+          "count": 565,
+          "mandatory": 165,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings": {
+            "lease_wait": 23.67,
+            "upstream_slot": 20.71,
+            "network_connection_connect_tcp": 0.48,
+            "network_http11_send_request_headers": 0.38,
+            "network_http11_send_request_body": 0.07,
+            "network_http11_receive_response_headers": 245.51,
+            "network_proxy_start_tls": 774.46,
+            "network_http11_receive_response_body": 190.48,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 1212.23,
+            "upstream_decode": 0.62,
+            "database_commit": 294.48,
+            "read_total": 1644.02
+          }
+        },
+        {
+          "at": 1790931441771,
+          "status": 503,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 9601,
+            "countBack": 9601,
+            "from": 1787881800000,
+            "firstDataRequest": false,
+            "client": "8bb9abb9-8711-4eee-b624-ed1d7b2237fd",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790762100000,
+            "track_history": false
+          }
+        }
+      ],
+      "errors": [],
+      "gestures": [],
+      "uiStart": 1790931428916,
+      "jumpStart": 1790931433741,
+      "error": "frame.evaluate: Error: Rejected by timeout\n    at https://127.0.0.1:15474/charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js:779:667",
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790881991,
+            "to": 1790931491,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "at": 1790931431300.5999,
+          "callback": 1790931432996.7,
+          "count": 565,
+          "first": 1790762100000,
+          "last": 1790931300000,
+          "duplicates": 0,
+          "invalidTo": false
+        },
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1787881800,
+            "to": 1790762100,
+            "countBack": 9601,
+            "firstDataRequest": false
+          },
+          "at": 1790931433759.4,
+          "error": "Error: Error: 平台行情暂不可用，请重试；尚未确认历史边界"
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "cache": "cold",
+      "startup": true,
+      "target": {
+        "from": 1787881800,
+        "to": 1787931300
+      },
+      "http": [
+        {
+          "at": 1790931480143,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 178,
+            "countBack": 178,
+            "from": 1790878134000,
+            "firstDataRequest": true,
+            "client": "25aa93b6-56be-49ea-895f-43d1a07775ec",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931534000,
+            "track_history": false
+          },
+          "count": 578,
+          "mandatory": 178,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings": {
+            "lease_wait": 3.12,
+            "upstream_slot": 5.33,
+            "network_connection_connect_tcp": 0.91,
+            "network_http11_send_request_headers": 0.32,
+            "network_http11_send_request_body": 0.06,
+            "network_http11_receive_response_headers": 207.94,
+            "network_proxy_start_tls": 4710.27,
+            "network_http11_receive_response_body": 27.77,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 4948.12,
+            "upstream_decode": 1.02,
+            "database_commit": 317.94,
+            "read_total": 5320.88
+          }
+        },
+        {
+          "at": 1790931488542,
+          "status": 503,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 9588,
+            "countBack": 9588,
+            "from": 1787881800000,
+            "firstDataRequest": false,
+            "client": "25aa93b6-56be-49ea-895f-43d1a07775ec",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790758200000,
+            "track_history": false
+          }
+        }
+      ],
+      "errors": [],
+      "gestures": [],
+      "uiStart": 1790931472010,
+      "error": "frame.waitForFunction: Timeout 22000ms exceeded.",
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790878134,
+            "to": 1790931534,
+            "countBack": 178,
+            "firstDataRequest": true
+          },
+          "at": 1790931474741,
+          "callback": 1790931480143.8,
+          "count": 578,
+          "first": 1790758200000,
+          "last": 1790931300000,
+          "duplicates": 0,
+          "invalidTo": false
+        },
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1787881800,
+            "to": 1790758200,
+            "countBack": 9588,
+            "firstDataRequest": false
+          },
+          "at": 1790931480518.0999,
+          "error": "Error: Error: 平台行情暂不可用，请重试；尚未确认历史边界"
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "cache": "pg",
+      "startup": false,
+      "target": {
+        "from": 1787881800,
+        "to": 1787931300
+      },
+      "http": [
+        {
+          "at": 1790931555362,
+          "status": 503,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790882107000,
+            "firstDataRequest": true,
+            "client": "fd117627-2da5-4ca3-8bf9-89a6205202a3",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931607000,
+            "track_history": false
+          }
+        }
+      ],
+      "errors": [],
+      "gestures": [],
+      "preparation": "{\"prepared_native_pg_bars\": 12000, \"cache_hit\": false, \"target_10000\": 1787931300000, \"target_10165\": 1787881800000}\n",
+      "uiStart": 1790931544677,
+      "error": "frame.waitForFunction: Timeout 22000ms exceeded.",
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790882107,
+            "to": 1790931607,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "at": 1790931547296.7998,
+          "error": "Error: Error: 平台行情暂不可用，请重试；尚未确认历史边界"
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "cache": "pg",
+      "startup": true,
+      "target": {
+        "from": 1787881800,
+        "to": 1787931300
+      },
+      "http": [
+        {
+          "at": 1790931598361,
+          "status": 503,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 178,
+            "countBack": 178,
+            "from": 1790878250000,
+            "firstDataRequest": true,
+            "client": "0dea86d5-d4e6-4633-8813-4b6730396642",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931650000,
+            "track_history": false
+          }
+        }
+      ],
+      "errors": [],
+      "gestures": [],
+      "preparation": "{\"prepared_native_pg_bars\": 12000, \"cache_hit\": false, \"target_10000\": 1787931300000, \"target_10165\": 1787881800000}\n",
+      "uiStart": 1790931588157,
+      "error": "frame.waitForFunction: Timeout 22000ms exceeded.",
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790878250,
+            "to": 1790931650,
+            "countBack": 178,
+            "firstDataRequest": true
+          },
+          "at": 1790931590344.5,
+          "error": "Error: Error: 平台行情暂不可用，请重试；尚未确认历史边界"
+        }
+      ]
+    }
+  ],
+  "preparations": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "prepared": {
+        "prepared_native_pg_bars": 12000,
+        "cache_hit": false,
+        "target_10000": 1786718100000,
+        "target_10165": 1786668600000
+      },
+      "target": {
+        "from": 1786668600,
+        "to": 1786718100
+      },
+      "passed": true
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "prepared": {
+        "prepared_native_pg_bars": 12000,
+        "cache_hit": false,
+        "target_10000": 1787931300000,
+        "target_10165": 1787881800000
+      },
+      "target": {
+        "from": 1787881800,
+        "to": 1787931300
+      },
+      "passed": true
+    }
+  ],
+  "completed": "2026-10-02T09:00:10.738Z"
+}

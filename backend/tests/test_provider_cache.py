@@ -333,3 +333,20 @@ def test_reduced_optional_budgets_keep_demand_and_native_loaded_extra_in_backend
     result = cache.data(native_body(before=20000000, countBack=200, firstDataRequest=True))
     assert calls == [(200, 200)]
     assert len(result['bars']) == 400 and result['mandatory_count'] == 200
+
+
+@pytest.mark.parametrize('charts,focused,expected', [(1,True,3500),(2,True,1500),
+                                                  (4,True,1500),(4,False,500),(8,None,1500)])
+def test_native_multichart_response_budget_and_focus(database, monkeypatch, charts, focused, expected):
+    from alerts.chart_api import DataQuery
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
+    seed(META, 'M5', 5000000, page(0, 5000000, boundary=True))
+    body = DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5', before=5000000,
+                     countBack=500, firstDataRequest=True,
+                     native_history={'chart_count':charts,'focused':focused})
+    result = cache.data(body)
+    assert len(result['bars']) == expected
+    assert result['mandatory_count'] == 500
+    larger = body.model_copy(update={'count_back':4500})
+    assert len(cache.data(larger)['bars']) == 4500, 'multichart budget never trims mandatory demand'

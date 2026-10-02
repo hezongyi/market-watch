@@ -1,0 +1,98 @@
+[
+  {
+    "symbol": "MWP:OANDA:AUD_CAD",
+    "enabled": false,
+    "scenario": "cold",
+    "phase_medians_ms": {
+      "before_native": 1694.6,
+      "callback_to_display": 135.7,
+      "backend_read": 3152.3,
+      "upstream": 1586.3,
+      "commit": 1193.4
+    }
+  },
+  {
+    "symbol": "MWP:OANDA:AUD_CAD",
+    "enabled": false,
+    "scenario": "pg",
+    "phase_medians_ms": {
+      "before_native": 1854.2,
+      "callback_to_display": 341.3,
+      "backend_read": 119.0,
+      "upstream": 0.0,
+      "commit": 0.0
+    }
+  },
+  {
+    "symbol": "MWP:OANDA:AUD_CAD",
+    "enabled": true,
+    "scenario": "cold",
+    "phase_medians_ms": {
+      "before_native": 1659.3,
+      "callback_to_display": 148.8,
+      "backend_read": 1165.0,
+      "upstream": 697.1,
+      "commit": 286.9
+    }
+  },
+  {
+    "symbol": "MWP:OANDA:AUD_CAD",
+    "enabled": true,
+    "scenario": "pg",
+    "phase_medians_ms": {
+      "before_native": 1866.8,
+      "callback_to_display": 341.9,
+      "backend_read": 132.6,
+      "upstream": 0.0,
+      "commit": 0.0
+    }
+  },
+  {
+    "symbol": "MWP:BTCUSDT",
+    "enabled": false,
+    "scenario": "cold",
+    "phase_medians_ms": {
+      "before_native": 1657.7,
+      "callback_to_display": 146.5,
+      "backend_read": 3205.6,
+      "upstream": 3118.4,
+      "commit": 356.4
+    }
+  },
+  {
+    "symbol": "MWP:BTCUSDT",
+    "enabled": false,
+    "scenario": "pg",
+    "phase_medians_ms": {
+      "before_native": 1727.9,
+      "callback_to_display": 323.1,
+      "backend_read": 123.7,
+      "upstream": 0.0,
+      "commit": 0.0
+    }
+  },
+  {
+    "symbol": "MWP:BTCUSDT",
+    "enabled": true,
+    "scenario": "cold",
+    "phase_medians_ms": {
+      "before_native": 1586.1,
+      "callback_to_display": 137.1,
+      "backend_read": 1104.6,
+      "upstream": 814.7,
+      "commit": 256.9
+    }
+  },
+  {
+    "symbol": "MWP:BTCUSDT",
+    "enabled": true,
+    "scenario": "pg",
+    "phase_medians_ms": {
+      "before_native": 1759.2,
+      "callback_to_display": 314.5,
+      "backend_read": 106.4,
+      "upstream": 0.0,
+      "commit": 0.0
+    }
+  }
+]

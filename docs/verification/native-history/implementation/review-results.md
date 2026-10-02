@@ -50,3 +50,21 @@ seek a balanced return quantity. Added backend-only downward configuration
 limits for cold E, first hot E and history hot E, preserving R2 defaults and
 mandatory D/H. Candidate experiments are separately labeled; original 80-sample
 performance result remains immutable. No frontend quantity policy is added.
+
+Acceptance checker refinement adopted the final Spec observation: page errors,
+failed HTTP and PG demand misses are failed samples even if numeric latency is
+fast. Both cold and hot now use the user's native-entry clock. The selected
+40-sample cohort stays immutable, including two PG misses and a cold503.
+Final109affected tests and the three relevant frontend VM scripts pass. Runtime
+caps remain backend-only, downward, with unchanged default-off gating.
+
+Final acceptance-harness review (delta from893bf57): Standards found0hard
+violations and1low-priority possible Duplicated Code across test-only native
+observation wrappers. Deferred shared harness extraction to avoid changing
+immutable evidence formats during acceptance. Spec confirmed fixed cohort
+scores and truthful failure/default-off reporting; found2revision-harness gaps:
+held-response setup could consume the8s review budget, and exact injected close
+was not a stable assertion reference. Adopted explicit6500ms setup-release bound
+and the exact injected close in the restricted fixture/callback assertion.
+Earlier failed interleave attempts remain failed setup evidence, not proof of
+successful revision interleave. No runtime-demand regression found.

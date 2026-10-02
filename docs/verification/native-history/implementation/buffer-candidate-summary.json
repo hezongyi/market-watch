@@ -1,0 +1,208 @@
+{
+  "exploratory": true,
+  "primary_clock": "native getBars to rendered dataReady doubleRAF",
+  "groups": [
+    {
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "cold",
+      "n": 3,
+      "errors": 0,
+      "under": 3,
+      "median": 1055.3,
+      "max": 2152.9,
+      "returned": [
+        365,
+        366
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "pg",
+      "n": 3,
+      "errors": 0,
+      "under": 2,
+      "median": 970.1,
+      "max": 1266.2,
+      "returned": [
+        1165,
+        1166
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "cold",
+      "n": 3,
+      "errors": 0,
+      "under": 3,
+      "median": 1045.1,
+      "max": 1330.8,
+      "returned": [
+        365,
+        366
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "pg",
+      "n": 3,
+      "errors": 0,
+      "under": 3,
+      "median": 863.3,
+      "max": 883.3,
+      "returned": [
+        1165,
+        1166
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "cold",
+      "n": 3,
+      "errors": 0,
+      "under": 3,
+      "median": 1089.3,
+      "max": 1116.1,
+      "returned": [
+        565,
+        566
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "pg",
+      "n": 3,
+      "errors": 0,
+      "under": 3,
+      "median": 611,
+      "max": 923.5,
+      "returned": [
+        2165,
+        2166
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "cold",
+      "n": 3,
+      "errors": 0,
+      "under": 2,
+      "median": 811.7,
+      "max": 7439.7,
+      "returned": [
+        565,
+        566
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "pg",
+      "n": 3,
+      "errors": 0,
+      "under": 3,
+      "median": 636,
+      "max": 652.5,
+      "returned": [
+        2165
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "cold",
+      "n": 3,
+      "errors": 0,
+      "under": 3,
+      "median": 1446.6,
+      "max": 1610.3,
+      "returned": [
+        765
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "pg",
+      "n": 3,
+      "errors": 0,
+      "under": 2,
+      "median": 818.1,
+      "max": 1084.3,
+      "returned": [
+        3165,
+        3166
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "cold",
+      "n": 3,
+      "errors": 0,
+      "under": 2,
+      "median": 1948.6,
+      "max": 5627.5,
+      "returned": [
+        765,
+        766
+      ]
+    },
+    {
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "pg",
+      "n": 3,
+      "errors": 0,
+      "under": 2,
+      "median": 895,
+      "max": 1566.8,
+      "returned": [
+        3165,
+        3166
+      ]
+    }
+  ]
+}

@@ -13,7 +13,7 @@ const save=()=>fs.writeFileSync(OUT,JSON.stringify(report,null,2));
 const fixture=(...args)=>execFileSync(python,[path.join(root,'scripts/native_history_acceptance_fixture.py'),...args],
  {cwd:root,env:{...process.env,PYTHONPATH:path.join(root,'backend')},timeout:45000,stdio:['ignore','pipe','pipe']});
 function toggle(enabled,candidate){
- fixture('--buffer',enabled?'on':'off',...(candidate?['--cold-extra',String(candidate.cold),'--first-extra',String(candidate.hot)]:[]));
+ fixture('--buffer',enabled?'on':'off',...['--cold-extra',String(candidate?.cold||600),'--first-extra',String(candidate?.hot||3000)]);
  execFileSync('sg',['docker','-c','docker compose --env-file /tmp/mw-native-history/compose.env -p market-watch-native-history -f compose.acceptance.yaml -f docs/verification/native-history/implementation/compose-native-history.yaml up -d --no-deps --force-recreate api'],
   {cwd:root,timeout:60000,stdio:['ignore','pipe','pipe']});
  execFileSync('sg',['docker','-c','docker exec market-watch-native-history-web-1 nginx -s reload'],{stdio:['ignore','pipe','pipe']});
@@ -85,10 +85,10 @@ function toggle(enabled,candidate){
     native_ms:state.trace[0]?finished-state.trace[0].start:null});
    if(state.symbol!==symbol||state.resolution!=='5')throw Error('wrong symbol/period');
    if(state.trace.some(t=>t.error||t.duplicates))throw Error('native error/duplicate chart time');
-   await page.screenshot({path:OUT.replace(/\.json$/,`-${repeat}-${enabled?'on':'off'}-${scenario}-${symbol.includes('OANDA')?'oanda':'binance'}.png`)});
+   await page.screenshot({path:OUT.replace(/\.json$/,`-${repeat}-${candidate?candidate.cold+'-'+candidate.hot:(enabled?'on':'off')}-${scenario}-${symbol.includes('OANDA')?'oanda':'binance'}.png`)});
   }catch(error){sample.error=error.message.split('\n')[0];if(frame)sample.trace=await frame.evaluate(()=>nativeHistoryTrace).catch(()=>[]);}
   finally{await Promise.allSettled(waits);await page.close();report.records.push(sample);save();
-   console.log(JSON.stringify({repeat,enabled,scenario,symbol,ui_ms:sample.ui_ms,native_ms:sample.native_ms,error:sample.error,http:sample.http.map(r=>({status:r.status,bars:r.bars,cache_hit:r.cache_hit,attempts:r.attempts?.length}))}));}
+   console.log(JSON.stringify({repeat,enabled,candidate,scenario,symbol,ui_ms:sample.ui_ms,native_ms:sample.native_ms,error:sample.error,http:sample.http.map(r=>({status:r.status,bars:r.bars,cache_hit:r.cache_hit,attempts:r.attempts?.length}))}));}
   return sample;
  }
  try{
@@ -106,9 +106,9 @@ function toggle(enabled,candidate){
     try{
      execFileSync('sg',['docker','-c','docker cp scripts/native_history_prepare_cache.py market-watch-native-history-api-1:/tmp/native_history_prepare_cache.py'],{cwd:root,stdio:['ignore','pipe','pipe']});
      const preparation=execFileSync('sg',['docker','-c',`docker exec market-watch-native-history-api-1 python /tmp/native_history_prepare_cache.py ${symbol.slice(4)}`],{cwd:root,timeout:45000,stdio:['ignore','pipe','pipe']}).toString();
-     report.preparations ||= [];report.preparations.push({repeat,enabled,symbol,result:preparation.trim()});
+     report.preparations ||= [];report.preparations.push({repeat,enabled,candidate,symbol,result:preparation.trim()});
      await measure(workspace,symbol,enabled,repeat,'pg',candidate);
-    }catch(error){report.records.push({repeat,enabled,scenario:'pg',symbol,error:'preparation: '+error.message});save();console.log('PG PREPARATION FAILED',symbol,error.message);}
+    }catch(error){report.records.push({repeat,enabled,candidate,scenario:'pg',symbol,error:'preparation: '+error.message});save();console.log('PG PREPARATION FAILED',symbol,error.message);}
    }
   }
  }finally{report.finished_at=new Date().toISOString();save();await browser.close();}

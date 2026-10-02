@@ -1,0 +1,37 @@
+{
+  "source_commit": "fc8af766f44e5355e255a7c71b183ec14cb26feb",
+  "baseline_commit": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+  "licensed_files": 2928,
+  "licensed_mismatches": [],
+  "images": {
+    "api": "sha256:04034a0781eacb0a13fb617078d3250bbec57f4be08394d16426a104c42562bb",
+    "web": "sha256:d361ba693648c383e552e2772b42138863835393f78e1e164c65688a0b78ef6f",
+    "chart-origin": "sha256:7eac1fd5f3007499bfcd2aa4e4ea50012b808cd569763c00875998052908a0c5"
+  },
+  "origins": {
+    "app": "https://localhost:15473",
+    "chart": "https://127.0.0.1:15474"
+  },
+  "database": {
+    "container": "market-watch-native-history-pg",
+    "database": "market_watch_native_history",
+    "test_database": "native_history_tests",
+    "postgres": "16"
+  },
+  "default_buffer": false,
+  "tuning": {
+    "api_image": "sha256:e6c60c418da29a8db398de16568883e65ef7cf7e679b37b6e899117471fd5099",
+    "api_source_commit": "893bf576675aa412b7ecd7a4d10ece3106a072fd",
+    "image_tag": "market-watch-api:native-history-tuning-ae629c1",
+    "tag_note": "tag names ae629c1; actual build source includes import-only 893bf57 refinement",
+    "selected_optional_caps": {
+      "cold": 400,
+      "first": 2000,
+      "history": 2000
+    },
+    "other_services_source": "fc8af766f44e5355e255a7c71b183ec14cb26feb",
+    "formal_selected_samples": 40,
+    "formal_result": "failed; default enablement withheld",
+    "restored_runtime_buffer": false
+  }
+}
