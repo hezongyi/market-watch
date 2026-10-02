@@ -274,16 +274,19 @@ def test_native_future_empty_range_and_confirmed_young_boundary(database, monkey
     assert all(b['chart_time'] < 1001000 for b in result['bars'])
 
 
-def test_native_python_uses_identical_real_demand_and_prefix_with_e_on_off(database, monkeypatch):
+@pytest.mark.parametrize('from_time,demand', [(None, 200), (4500000, 500)])
+def test_native_python_uses_identical_real_demand_and_prefix_with_e_on_off(
+    database, monkeypatch, from_time, demand
+):
     monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
     seed(META, 'M5', 5000000, page(0, 5000000, boundary=True))
-    body = native_body(before=5000000, countBack=200, **{'from': 4500000},
+    body = native_body(before=5000000, countBack=200, **{'from': from_time},
                        indicators=[{'name': 'EMA', 'params': {'period': 20}}])
     monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
     off = cache.data(body)
     monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
     on = cache.data(body)
-    assert len(off['bars']) == len(on['bars']) == 500
+    assert len(off['bars']) == len(on['bars']) == demand
     assert off['bars'] == on['bars'] and off['indicators'] == on['indicators']
     assert on['optional_count'] == 0
 

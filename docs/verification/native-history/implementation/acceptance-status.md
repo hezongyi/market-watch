@@ -182,3 +182,9 @@ HTTP waiter is bounded; an expired thread in existing pool checkout waits for
 pool timeout then releases without provider SQL. No per-request pool mutation.
 
 Requirement-by-requirement status and limits: [completion audit](completion-audit.md).
+
+Final audit supplement: [Python native-demand tests](python-native-demand-tests.txt)
+proves E on/off produces identical bars and EMA output with both D=N and D>N.
+No product code or original performance sample changed. Existing v1.3.2 already
+prewarms/maintains two chart connections and rotates failed pools; current
+recorded TLS reconnects are not evidence of missing buffer-layer prewarming.
