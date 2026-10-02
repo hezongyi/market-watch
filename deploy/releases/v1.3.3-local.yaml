@@ -1,0 +1,16 @@
+# Never pull over the locally verified images.
+services:
+  api:
+    pull_policy: never
+  realtime-worker:
+    pull_policy: never
+  chart-history-worker:
+    pull_policy: never
+  chart-aggregation-worker:
+    pull_policy: never
+  web:
+    pull_policy: never
+  chart-origin:
+    pull_policy: never
+  tls:
+    pull_policy: never

@@ -1,0 +1,9 @@
+{
+  "service": "chart-origin",
+  "image": "sha256:28181d88e5110ebe149b0c78f9e59e2fe836739542a18a6634fa4c1290737184",
+  "configured_image": "market-watch-chart-origin:1.3.2-menu-052eacb",
+  "created": "2026-10-02T08:21:16.59555661Z",
+  "source": "052eacb2d5a9ab0e382ed003945f664100bb51db",
+  "compose_working_dir": "/home/quant/repos/market-watch-deploy-v1.3.2",
+  "reason": "Concurrent deployment replaced Volume image after successful local upgrade; detected by API/native volume mismatch. Restored matching Volume image before final acceptance."
+}

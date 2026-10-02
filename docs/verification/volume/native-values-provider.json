@@ -1,0 +1,472 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "5",
+      "valueCheck": {
+        "selected": 1790907300,
+        "expected": 96.03949,
+        "displayed": 96.03949,
+        "lines": [
+          "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表",
+          "",
+          "开始使用键盘导航模式。按Alt + Z",
+          "快速搜索。按Ctrl + K",
+          "更改商品。开始输入商品名称",
+          "更改时间周期。按数字或逗号",
+          "指标、指标和策略。按斜线",
+          "开放式布局。按下句号",
+          "BTCUSDT",
+          "5分",
+          "指标",
+          "Volume real acceptance",
+          "保存",
+          "导出 CSV",
+          "使用说明",
+          "返回守望",
+          "保存样式",
+          "新建工作区",
+          "维护历史",
+          "刷新历史",
+          "历史任务",
+          "比特币 / USDT · 平台行情 · last · 成交量 / BTC",
+          "5",
+          "BINANCE",
+          "开=",
+          "85,086.02",
+          "高=",
+          "85,086.02",
+          "低=",
+          "84,944.00",
+          "收=",
+          "84,995.24",
+          "Vol",
+          "96.04",
+          "成交量(Volume)",
+          "96.03949",
+          "5年",
+          "1年",
+          "3个月",
+          "1个月",
+          "5天",
+          "1天",
+          "06:52:02 UTC",
+          "log",
+          "自动",
+          "数据窗口",
+          "日期",
+          "周五 2026-10-02",
+          "时间",
+          "02:15",
+          "MWP:BTCUSDT · 5 · BINANCE",
+          "开盘价",
+          "85,086.02",
+          "最高价",
+          "85,086.02",
+          "最低价",
+          "84,944.00",
+          "收盘价",
+          "84,995.24",
+          "涨跌",
+          "−90.78 (−0.11%)",
+          "Vol",
+          "96.04",
+          "最后一天变化",
+          "0.00 (0.00%)",
+          "成交量(Volume)",
+          "Volume",
+          "96.03949",
+          "账户管理器"
+        ]
+      },
+      "elapsed_ms": 1070,
+      "state": {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "5",
+        "range": {
+          "from": 1790877300,
+          "to": 1790926800
+        },
+        "study": {
+          "id": "ay2m7G",
+          "name": "Volume"
+        },
+        "styles": {
+          "styles": {
+            "vol": {
+              "display": 4294967295,
+              "linestyle": 0,
+              "linewidth": 1,
+              "plottype": 5,
+              "trackPrice": false,
+              "transparency": 0,
+              "color": "#ff00ff",
+              "title": "vol"
+            },
+            "vol_ma": {
+              "display": 0,
+              "linestyle": 0,
+              "linewidth": 1,
+              "plottype": 0,
+              "trackPrice": false,
+              "transparency": 0,
+              "color": "#2196f3",
+              "title": "vol_ma"
+            },
+            "smoothedMA": {
+              "display": 0,
+              "linestyle": 0,
+              "linewidth": 1,
+              "plottype": 0,
+              "trackPrice": false,
+              "transparency": 0,
+              "color": "#2196f3",
+              "title": "smoothedMA"
+            }
+          },
+          "bands": {},
+          "filledAreas": {},
+          "palettes": {
+            "volumePalette": {
+              "colors": {
+                "0": {
+                  "color": "#ff00ff",
+                  "width": 1,
+                  "style": 0
+                },
+                "1": {
+                  "color": "#00ffff",
+                  "width": 1,
+                  "style": 0
+                }
+              }
+            }
+          },
+          "graphics": {},
+          "ohlcPlots": {},
+          "filledAreasStyle": {}
+        },
+        "visible": true
+      },
+      "painted": [
+        {
+          "width": 996,
+          "height": 532,
+          "colored": 0
+        },
+        {
+          "width": 996,
+          "height": 532,
+          "colored": 0
+        },
+        {
+          "width": 98,
+          "height": 532,
+          "colored": 0
+        },
+        {
+          "width": 98,
+          "height": 532,
+          "colored": 0
+        },
+        {
+          "width": 996,
+          "height": 266,
+          "colored": 20613
+        },
+        {
+          "width": 996,
+          "height": 266,
+          "colored": 0
+        },
+        {
+          "width": 98,
+          "height": 266,
+          "colored": 851
+        },
+        {
+          "width": 98,
+          "height": 266,
+          "colored": 0
+        },
+        {
+          "width": 996,
+          "height": 28,
+          "colored": 0
+        },
+        {
+          "width": 996,
+          "height": 28,
+          "colored": 0
+        },
+        {
+          "width": 98,
+          "height": 28,
+          "colored": 0
+        }
+      ],
+      "volume_legend": [
+        "Volume real acceptance",
+        "比特币 / USDT · 平台行情 · last · 成交量 / BTC",
+        "Vol",
+        "成交量(Volume)",
+        "数据窗口",
+        "Vol",
+        "成交量(Volume)",
+        "Volume"
+      ],
+      "api": {
+        "start": 1790868900000,
+        "end": 1790869200000,
+        "chart_time": 1790868900000,
+        "complete": true,
+        "volume": "38.58142000",
+        "volume_complete": true,
+        "open": "83860.56000000",
+        "high": "84010.76000000",
+        "low": "83846.00000000",
+        "close": "83955.87000000"
+      },
+      "bar_count": 28,
+      "volume_kind": "base"
+    },
+    {
+      "symbol": "MWP:OANDA:CAD_CHF",
+      "resolution": "5",
+      "valueCheck": {
+        "selected": 1790910900,
+        "expected": 21,
+        "displayed": 21,
+        "lines": [
+          "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表",
+          "",
+          "开始使用键盘导航模式。按Alt + Z",
+          "快速搜索。按Ctrl + K",
+          "更改商品。开始输入商品名称",
+          "更改时间周期。按数字或逗号",
+          "指标、指标和策略。按斜线",
+          "开放式布局。按下句号",
+          "OANDA",
+          "5分",
+          "指标",
+          "Volume real acceptance",
+          "保存",
+          "导出 CSV",
+          "使用说明",
+          "返回守望",
+          "保存样式",
+          "新建工作区",
+          "维护历史",
+          "刷新历史",
+          "历史任务",
+          "CAD/CHF · 平台行情 · bid · OANDA 报价量",
+          "5",
+          "OANDA",
+          "开=",
+          "0.58394",
+          "高=",
+          "0.58397",
+          "低=",
+          "0.58390",
+          "收=",
+          "0.58390",
+          "Vol",
+          "21",
+          "成交量(Volume)",
+          "21",
+          "5年",
+          "1年",
+          "3个月",
+          "1个月",
+          "5天",
+          "1天",
+          "06:52:04 UTC",
+          "log",
+          "自动",
+          "数据窗口",
+          "日期",
+          "周五 2026-10-02",
+          "时间",
+          "03:15",
+          "MWP:OANDA:CAD_CHF · 5 · OANDA",
+          "开盘价",
+          "0.58394",
+          "最高价",
+          "0.58397",
+          "最低价",
+          "0.58390",
+          "收盘价",
+          "0.58390",
+          "涨跌",
+          "−0.00003 (−0.01%)",
+          "Vol",
+          "21",
+          "最后一天变化",
+          "0.00000 (0.00%)",
+          "成交量(Volume)",
+          "Volume",
+          "21",
+          "账户管理器"
+        ]
+      },
+      "elapsed_ms": 2025,
+      "state": {
+        "symbol": "MWP:OANDA:CAD_CHF",
+        "resolution": "5",
+        "range": {
+          "from": 1790875500,
+          "to": 1790926800
+        },
+        "study": {
+          "id": "ay2m7G",
+          "name": "Volume"
+        },
+        "styles": {
+          "styles": {
+            "vol": {
+              "display": 4294967295,
+              "linestyle": 0,
+              "linewidth": 1,
+              "plottype": 5,
+              "trackPrice": false,
+              "transparency": 0,
+              "color": "#ff00ff",
+              "title": "vol"
+            },
+            "vol_ma": {
+              "display": 0,
+              "linestyle": 0,
+              "linewidth": 1,
+              "plottype": 0,
+              "trackPrice": false,
+              "transparency": 0,
+              "color": "#2196f3",
+              "title": "vol_ma"
+            },
+            "smoothedMA": {
+              "display": 0,
+              "linestyle": 0,
+              "linewidth": 1,
+              "plottype": 0,
+              "trackPrice": false,
+              "transparency": 0,
+              "color": "#2196f3",
+              "title": "smoothedMA"
+            }
+          },
+          "bands": {},
+          "filledAreas": {},
+          "palettes": {
+            "volumePalette": {
+              "colors": {
+                "0": {
+                  "color": "#ff00ff",
+                  "width": 1,
+                  "style": 0
+                },
+                "1": {
+                  "color": "#00ffff",
+                  "width": 1,
+                  "style": 0
+                }
+              }
+            }
+          },
+          "graphics": {},
+          "ohlcPlots": {},
+          "filledAreasStyle": {}
+        },
+        "visible": true
+      },
+      "painted": [
+        {
+          "width": 1032,
+          "height": 532,
+          "colored": 0
+        },
+        {
+          "width": 1032,
+          "height": 532,
+          "colored": 0
+        },
+        {
+          "width": 62,
+          "height": 532,
+          "colored": 0
+        },
+        {
+          "width": 62,
+          "height": 532,
+          "colored": 0
+        },
+        {
+          "width": 1032,
+          "height": 266,
+          "colored": 63679
+        },
+        {
+          "width": 1032,
+          "height": 266,
+          "colored": 0
+        },
+        {
+          "width": 62,
+          "height": 266,
+          "colored": 401
+        },
+        {
+          "width": 62,
+          "height": 266,
+          "colored": 0
+        },
+        {
+          "width": 1032,
+          "height": 28,
+          "colored": 0
+        },
+        {
+          "width": 1032,
+          "height": 28,
+          "colored": 0
+        },
+        {
+          "width": 62,
+          "height": 28,
+          "colored": 0
+        }
+      ],
+      "volume_legend": [
+        "Volume real acceptance",
+        "CAD/CHF · 平台行情 · bid · OANDA 报价量",
+        "Vol",
+        "成交量(Volume)",
+        "数据窗口",
+        "Vol",
+        "成交量(Volume)",
+        "Volume"
+      ],
+      "api": {
+        "start": 1790923500000,
+        "end": 1790923800000,
+        "chart_time": 1790923500000,
+        "complete": true,
+        "volume": "132",
+        "volume_complete": true,
+        "open": "0.58309",
+        "high": "0.58337",
+        "low": "0.58306",
+        "close": "0.58335"
+      },
+      "bar_count": 211,
+      "volume_kind": "tick"
+    }
+  ],
+  "errors": [],
+  "saved_reopened": [
+    {
+      "id": "ay2m7G",
+      "name": "Volume"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "at_utc": "2026-10-02T08:39:43.209099+00:00",
+  "cpus": 4,
+  "uptime": "08:39:43 up 30 days,  8:55,  0 users,  load average: 6.13, 6.73, 6.09",
+  "concurrent_other_benchmark": [
+    "2779160       06:00 node tests/advanced-native-history-acceptance.browser.cjs"
+  ],
+  "own_native_local_browser_was_also_running": "during part of the full-page failure run",
+  "scope": "Do not stop unrelated services or benchmark processes. Serial rerun pending after competing benchmark exits.",
+  "failure_summary": {
+    "full_page_samples": 5,
+    "under3s": 1,
+    "warm_over1s": 1
+  }
+}

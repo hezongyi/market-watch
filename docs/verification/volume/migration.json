@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "postgres": "16.15",
+  "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef",
+  "fresh_n15_chain": {
+    "database": "market_watch_volume_n15_chain",
+    "steps": [
+      {
+        "target": "n15_provider_revisions",
+        "actual": "n15_provider_revisions"
+      },
+      {
+        "target": "o16_managed_revisions",
+        "actual": "o16_managed_revisions"
+      },
+      {
+        "target": "p17_volume",
+        "actual": "p17_volume"
+      }
+    ],
+    "columns": [
+      "volume|numeric|38|18",
+      "volume_complete|boolean||",
+      "volume_received_at|bigint|64|0",
+      "volume_revision|integer|32|0"
+    ]
+  },
+  "restored_o16_to_p17": {
+    "database": "market_watch_volume_migration_proof",
+    "backup": "/tmp/mw-volume-acceptance/before-n15.dump",
+    "actual_backup_schema": "o16_managed_revisions",
+    "after": "p17_volume"
+  },
+  "note": "The historical backup filename before-n15.dump was misleading; pg_restore alembic_version confirms o16. Fresh chain independently tests n15->o16->p17."
+}

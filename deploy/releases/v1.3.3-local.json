@@ -1,0 +1,158 @@
+{
+  "version": "1.3.3",
+  "scope": "Ubuntu local only",
+  "accepted": false,
+  "baseline": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+  "build_source": "fe370c206402aa048bf7c7adbd08d0642e9085ef",
+  "branch": "fix/volume-v1.3.3",
+  "project": "market-watch-dual-acceptance",
+  "main_origin": "https://localhost:15453",
+  "chart_origin": "https://127.0.0.1:15454",
+  "schema": "p17_volume",
+  "provider_payload_version": "volume-v1",
+  "services": [
+    {
+      "service": "api",
+      "image": "sha256:8d4fb7eb0e68f6f62d5a3fa7bb545b2a99ba829a58f30fbb9fee168f96a48ea2",
+      "configured_image": "market-watch-api:volume-delivery",
+      "container": "cb42836624e12fa6c258b9651a17c6fa798e3fa6db9a76537da14792b3b9d810",
+      "state": "running",
+      "health": "healthy",
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "realtime-worker",
+      "image": "sha256:8d4fb7eb0e68f6f62d5a3fa7bb545b2a99ba829a58f30fbb9fee168f96a48ea2",
+      "configured_image": "market-watch-api:volume-delivery",
+      "container": "8c6715d7162ab087bd2d873a4456796089adbbfeeca9435d8079e3712a946b83",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "chart-history-worker",
+      "image": "sha256:8d4fb7eb0e68f6f62d5a3fa7bb545b2a99ba829a58f30fbb9fee168f96a48ea2",
+      "configured_image": "market-watch-api:volume-delivery",
+      "container": "e5b8e91b98d94a5b1adec4a8c8131f13477ccefef7122210e05f2487f31905f2",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image": "sha256:8d4fb7eb0e68f6f62d5a3fa7bb545b2a99ba829a58f30fbb9fee168f96a48ea2",
+      "configured_image": "market-watch-api:volume-delivery",
+      "container": "b3135ca49e4a2254b407ed13229ef7f15f6ef634e898090e2344812d5f71f34b",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "web",
+      "image": "sha256:3672a1a960575dff21cb35cf4729df66c031b89fffa1f128bbbe1c446fb490d0",
+      "configured_image": "market-watch-web:volume-local-delivery",
+      "container": "4cd12cb59e45527a60c9f9500c004179995e9701e3cf220e88dacb42ddc01d2f",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "chart-origin",
+      "image": "sha256:2ccc491cceb77c788b957f79a0a385d849e37ad52f94aedfe19696bf9d4f30a2",
+      "configured_image": "market-watch-chart-origin:volume-delivery",
+      "container": "666d89daf6d9b91b6ea5894cf752020338ef8dd81a1c8e22c32b4b19ef607f37",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "tls",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "configured_image": "nginx:1.28-alpine",
+      "container": "0802d070ed55e529b85a38b52be9119b490e44d10fd526bd9ceb43a0f2faf8bd",
+      "state": "running",
+      "health": null,
+      "source": null
+    }
+  ],
+  "backup": {
+    "path": "/tmp/mw-dual-acceptance/before-volume-upgrade.dump",
+    "bytes": 27834252,
+    "sha256": "d5107c81fe37d20b0205425b453737514eeb3dbfd3d7a5dba0dbfc19635fb150"
+  },
+  "started_jobs": [
+    {
+      "id": "3bc1e81e-9eb2-4e14-b15a-9b7f5f91abf3",
+      "instrument_id": "XAUUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1790814480000,
+      "end": 1790929080000,
+      "cursor": 1790929080000,
+      "status": "pending",
+      "generation": 0,
+      "attempts": 0,
+      "next_at": 0,
+      "error": null,
+      "unresolved": 0
+    },
+    {
+      "id": "ff89bc54-0272-4756-a44e-768284cfa430",
+      "instrument_id": "BTCUSDT",
+      "source": "binance",
+      "basis": "last",
+      "calendar": "utc0",
+      "start": 1790814480000,
+      "end": 1790929080000,
+      "cursor": 1790929080000,
+      "status": "pending",
+      "generation": 0,
+      "attempts": 0,
+      "next_at": 0,
+      "error": null,
+      "unresolved": 0
+    },
+    {
+      "id": "058fb6c0-51d9-4115-9da8-c3e713f43084",
+      "instrument_id": "EURUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1790814480000,
+      "end": 1790929140000,
+      "cursor": 1790929140000,
+      "status": "pending",
+      "generation": 0,
+      "attempts": 0,
+      "next_at": 0,
+      "error": null,
+      "unresolved": 0
+    },
+    {
+      "id": "d454c442-a15b-4ea1-a0ee-24c2c479ad6f",
+      "instrument_id": "OANDA:CAD_CHF",
+      "source": "oanda",
+      "basis": "bid",
+      "calendar": "ny17",
+      "start": 1788210240000,
+      "end": 1790929140000,
+      "cursor": 1790929140000,
+      "status": "pending",
+      "generation": 0,
+      "attempts": 0,
+      "next_at": 0,
+      "error": null,
+      "unresolved": 0
+    }
+  ],
+  "verification": "docs/chart-v1.3.3-delivery.md",
+  "runtime_evidence": "docs/verification/volume/local-final-state.json",
+  "limits": [
+    "Old historical backfill continues in bounded jobs; unknown/conflicting quantities stay null/partial.",
+    "Eight-chart soak had a transient 140850ms publication lag during upstream error; final maintenance lag was below120s and advanced.",
+    "No production deployment, main merge or remote push."
+  ],
+  "at_utc": "2026-10-02T08:36:44.424723+00:00",
+  "acceptance_status": "Volume functionality and local same-source runtime passed; supplementary serial full-page performance gate pending"
+}
