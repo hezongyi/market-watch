@@ -414,12 +414,16 @@ const feed = {
             if(epoch!==workspaceEpoch) throw Object.assign(Error('已取消旧图表的历史加载'),{code:'HISTORY_CANCELLED'});
             if(!reviewed.history_revalidation) throw Error('后端未提供历史复核结果');
             page=reviewed;
-            if(reviewed.history_revalidation.changed || historyOlder(reviewed,providerHistoryState.get(historyKey)))
-              mergeProviderCorrection(providerWork,generation,reviewed.history_revalidation.changed===true);
+            const superseded=historyOlder(reviewed,providerHistoryState.get(historyKey));
+            if(reviewed.history_revalidation.changed || superseded)
+              mergeProviderCorrection(providerWork,generation,reviewed.history_revalidation.changed===true,
+                {args,observation});
+            if(superseded)
+              send({type:'error',error:'历史复核期间出现新版本，请点击刷新历史完成检查'});
           } catch(error) {
             if(error.code==='HISTORY_CANCELLED') throw error;
-            mergeProviderCorrection(providerWork,generation,false);
-            send({type:'error',error:'历史复核未完成：'+String(error)});
+            mergeProviderCorrection(providerWork,generation,false,{args,observation});
+            send({type:'error',error:'历史复核未完成，请点击刷新历史：'+String(error)});
           }
         }
         const rows = barsOf(page, res, s.ticker);
@@ -549,9 +553,39 @@ function hasHistoryViewer(args) {
   return false;
 }
 let historyReloading = false;
-function mergeProviderCorrection(work,generation,verified) {
+function mergeProviderCorrection(work,generation,verified,original) {
   // A failed/older review cannot erase an earlier confirmed real revision.
-  work.correction={generation,verified:verified || work.correction?.verified === true,attempts:0};
+  work.correction={generation,verified:verified || work.correction?.verified === true,
+    attempts:0,original:original || work.correction?.original};
+}
+async function refreshProviderHistoryCorrections() {
+  // Explicit user recovery uses the existing backend contract. Each click
+  // performs one check per pending active sequence, without automatic retries.
+  const epoch=workspaceEpoch;
+  for(const [key,work] of providerHistoryWork) {
+    const correction=work.correction;
+    if(!correction || work.inflight || work.reloading) continue;
+    const split=key.lastIndexOf('|'),symbol=key.slice(0,split),res=key.slice(split+1);
+    if(!hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) continue;
+    if(!correction.verified && correction.original) {
+      work.reloading=true;
+      try {
+        const page=await query(symbol,res,{...correction.original.args,
+          history_observation:correction.original.observation},Date.now()+8000);
+        if(epoch!==workspaceEpoch || work.correction!==correction) continue;
+        if(!page.history_revalidation || historyOlder(page,providerHistoryState.get(key)))
+          throw Error('尚未取得最新历史复核结果');
+        if(!page.history_revalidation.changed) {
+          if(!work.inflight) work.correction=null;
+          continue;
+        }
+        correction.verified=true;
+      } catch(error) {send({type:'error',error:'历史检查未完成：'+String(error)});}
+      finally {work.reloading=false;}
+    }
+    correction.attempts=0;
+  }
+  await flushProviderCorrections();
 }
 function historyOlder(page,seen) {
   return !!seen && ((page.cache_revision||0)<seen.revision ||
@@ -1362,7 +1396,10 @@ function boot(
           else send({type:'history-plans-open'});
         }});
       widget.createButton({align:'right',useTradingViewStyle:true,text:'刷新历史',
-        title:'载入新发布历史，保留柱宽与查看位置',onClick:()=>refreshManagedHistory()});
+        title:'载入新发布历史，保留柱宽与查看位置',onClick:async()=>{
+          await refreshProviderHistoryCorrections();
+          await refreshManagedHistory();
+        }});
       widget.createButton({align:'right',useTradingViewStyle:true,text:'历史任务',
         title:'查看维护状态和各周期可用范围',onClick:()=>send({type:'history-plans-open'})});
     });

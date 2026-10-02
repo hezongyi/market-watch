@@ -82,5 +82,26 @@ function page(revision,at,last=990000,close=2){return {cache_revision:revision,a
   assert.equal(x.ctx.reloads,1,'failed later review cannot erase a confirmed correction');
   assert.equal(x.ctx.delivered.length,3);
  } finally {x.dispose()}
+ const superseded=setup();
+ try {
+  superseded.begin('oldResponse',1,900);superseded.begin('initialNew',2,1000);
+  const [oldResponse,initialNew]=superseded.data();
+  await superseded.respond(initialNew,page(12,12000));await superseded.ctx.initialNew;
+  await superseded.respond(oldResponse,page(11,11000,900000));
+  const initialReview=superseded.data().at(-1);
+  superseded.begin('newDuringReview',3,1000);
+  await superseded.respond(superseded.data().at(-1),page(13,13000));await superseded.ctx.newDuringReview;
+  await superseded.respond(initialReview,{...page(12,12000,900000),history_revalidation:{changed:false}});
+  await superseded.ctx.oldResponse;
+  assert.equal(superseded.ctx.reloads,0);
+  assert.ok(superseded.messages.some(m=>m.type==='error'),'superseded proof must be visibly unresolved');
+  const refresh=vm.runInContext('refreshProviderHistoryCorrections()',superseded.ctx);
+  const userReview=superseded.data().at(-1);
+  assert.notEqual(userReview.id,initialReview.id,'explicit user action performs one bounded recovery');
+  await superseded.respond(userReview,{...page(13,13000,900000),history_revalidation:{changed:true}});
+  await refresh;
+  assert.equal(superseded.ctx.reloads,1);
+  assert.equal(vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5').correction`,superseded.ctx),null);
+ } finally {superseded.dispose()}
  console.log('Late native history: backfill, revision, failed/legacy review and inactive correction passed');
 })().catch(error=>{console.error(error);process.exitCode=1});

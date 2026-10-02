@@ -29,3 +29,10 @@ with native reads missing the corresponding failure log. Adopted: both use
 The initial independent report found 1 judgment-only Standards item and 3 Spec
 items. These fixes require re-review and formal runtime acceptance; this record
 is not a performance or completion claim.
+
+Second Spec review at c9d12859 found one additional P1: revalidation superseded
+by a newer delivered response remained unverified and silent. Adopted: retain
+original demand/observation, show unresolved error, and allow one bounded check
+per explicit public Refresh History action. Automatic review remains once per
+late callback; ordinary SSE/new responses cannot consume the correction.
+Standards re-review reports zero remaining findings.
