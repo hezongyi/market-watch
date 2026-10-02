@@ -9,7 +9,7 @@ import json
 from datetime import UTC, date, datetime, time, timedelta
 from math import ceil
 
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
@@ -136,6 +136,16 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
     jobs = list(db.scalars(select(ChartPublicationJob).where(
         ChartPublicationJob.instrument_id == inst.id,
         ChartPublicationJob.timeframe == frame,
+        or_(
+            and_(ChartPublicationJob.start >= max(left, pub.start),
+                 ChartPublicationJob.start < min(right, pub.end)),
+            select(ChartPublishedBar.start).where(
+                ChartPublishedBar.instrument_id == inst.id,
+                ChartPublishedBar.timeframe == frame,
+                ChartPublishedBar.start == ChartPublicationJob.start,
+                ChartPublishedBar.complete.is_(True),
+            ).exists(),
+        ),
         ~select(ChartAggregationJob.id).where(
             ChartAggregationJob.instrument_id == inst.id,
             ChartAggregationJob.timeframe == _source(frame),
@@ -154,15 +164,17 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
     ))}
     for row in rows:
         job = queued.get(row["start"])
-        if row["start"] < max(left, pub.start) or row["start"] >= min(right, pub.end):
+        old = existing.get(row["start"])
+        if (old is None or not old.complete) and (row["start"] < max(left, pub.start) or row["start"] >= min(right, pub.end)):
             continue
         if any(j.start < row["end"] and j.end > row["start"] for j in pending):
             continue
-        if row["end"] <= right and not row["complete"]:
+        if not row["complete"] and (row["end"] <= now or old is not None and old.complete):
             continue
         # A forming bucket still needs a covered prefix; don't publish missing history.
-        row = {**row, "complete": row["complete"] and row["end"] <= right}
-        old = existing.get(row["start"])
+        complete = row["complete"] if old is not None else row["complete"] and row["end"] <= right
+        row = {**row, "complete": complete,
+               "volume_complete": complete and row.get("volume_complete", False)}
         if old is None:
             # New observations inside proven coverage are legitimate corrections.
             db.add(ChartPublishedBar(instrument_id=inst.id, timeframe=frame,

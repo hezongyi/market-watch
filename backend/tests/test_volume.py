@@ -270,3 +270,83 @@ def test_volume_only_live_ingest_keeps_independent_tick_quotes(database, monkeyp
     assert calls == ['M1', 'quote']
     with database.begin() as db:
         assert db.get(Watch, watch_id).status == 'triggered'
+
+
+def test_old_published_volume_revision_ignores_new_live_coverage_edges(database):
+    from alerts.chart_data import chart_rows
+    from alerts.domain import Candle
+    from alerts.managed_dataset import publish_corrections
+    from alerts.market import upsert
+    from alerts.storage import ChartPublication, ChartPublicationJob, ChartPublishedBar, instant
+
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        row = upsert(db, inst.id, 'M1', Candle(instant(0), instant(60000),
+                     D(10), D(11), D(9), D(10)))
+        old = ChartPublishedBar(instrument_id=inst.id, timeframe='M1', start=0,
+                                end=60000, complete=True,
+                                payload=chart_rows(db, inst, 'M1', 60000, 1, 305000)[0])
+        pub = ChartPublication(instrument_id=inst.id, timeframe='M1', start=0,
+                               end=300000, complete_count=1)
+        db.add_all([old, pub])
+        db.flush()
+        price = (row.open, row.high, row.low, row.close, row.complete,
+                 row.revision, row.received_at)
+        row.volume, row.volume_complete = D('2.12345678'), True
+        db.add(ChartPublicationJob(instrument_id=inst.id, timeframe='M1', start=0, end=60000))
+        db.flush()
+        # Both current edges exclude this old confirmed snapshot. They cannot
+        # downgrade its price completeness or prevent an independent quantity revision.
+        publish_corrections(db, inst, pub, 'M1', 180000, 240000, [], 305000)
+        assert old.payload['volume'] == '2.12345678' and old.payload['volume_complete']
+        assert old.complete and old.payload['complete']
+        assert (pub.start, pub.end, pub.complete_count) == (0, 300000, 1)
+        assert (row.open, row.high, row.low, row.close, row.complete,
+                row.revision, row.received_at) == price
+        assert db.scalar(select(ChartPublicationJob.start)) is None
+
+
+def test_unpublished_dirty_volume_outside_proven_range_is_partial(database):
+    from alerts import volume_jobs
+    from alerts.domain import Candle
+    from alerts.market import upsert
+    from alerts.storage import ChartPublication, ChartPublicationJob, instant
+
+    with database.begin() as db:
+        upsert(db, 'BTCUSDT', 'M1', Candle(instant(0), instant(60000),
+               D(10), D(11), D(9), D(10), volume=D(2)))
+        job = volume_jobs.create(db, 'BTCUSDT', start=0, end=60000)
+        job.cursor = job.start
+        db.add(ChartPublication(instrument_id='BTCUSDT', timeframe='M1',
+                                start=180000, end=300000))
+        db.add(ChartPublicationJob(instrument_id='BTCUSDT', timeframe='M1', start=0, end=60000))
+        db.flush()
+        assert volume_jobs.finish(db, job)
+        assert job.status == 'partial' and '没有可更新发布快照' in job.error
+        assert db.scalar(select(ChartPublicationJob.start)) == 0
+
+
+def test_forming_published_quantity_revision_keeps_both_completeness_flags_false(database):
+    from alerts.managed_dataset import join, publish_corrections, publish_frame
+    from alerts.storage import ChartPublication, ChartPublicationJob, ChartPublishedBar
+
+    rows = [dict(timestamp=i * 60000, open=10, high=11, low=9, close=10, volume='2')
+            for i in range(12)]
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        plan = join(db, inst, 0, 725000)
+        ingest(db, inst, {'rows': rows}, received_at=725000)
+        publish_frame(db, inst, plan, 'M5', 725000)
+        pub = db.get(ChartPublication, (inst.id, 'M5'))
+        old = db.get(ChartPublishedBar, (inst.id, 'M5', 600000))
+        assert old is not None and not old.complete
+        staging = db.scalar(select(Bar).where(Bar.instrument_id == inst.id,
+                            Bar.timeframe == 'M5', Bar.start == 600000))
+        staging.volume = D(99)
+        db.add(ChartPublicationJob(instrument_id=inst.id, timeframe='M5', start=600000, end=900000))
+        db.flush()
+        publish_corrections(db, inst, pub, 'M5', 0, 720000, [], 725000)
+        assert old.payload['volume'] == '99'
+        assert not old.complete and not old.payload['complete'] and not old.payload['volume_complete']
+        assert db.scalar(select(ChartPublicationJob.start).where(
+            ChartPublicationJob.timeframe == 'M5', ChartPublicationJob.start == 600000)) is None

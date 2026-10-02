@@ -13,6 +13,9 @@ from alerts.storage import Bar, instant
 from sqlalchemy import select, text
 from test_managed_revisions_postgres import managed_pg as pg_fixture
 from test_volume import (
+    test_old_published_volume_revision_ignores_new_live_coverage_edges as check_old_publication,
+)
+from test_volume import (
     test_volume_only_ingest_preserves_price_and_duplicate_is_noop as check_isolation,
 )
 
@@ -46,6 +49,10 @@ def test_pg_quantity_exact_null_safe_and_legacy_replay(managed_pg):
 
 def test_pg_volume_only_price_isolation(managed_pg):
     check_isolation(managed_pg[0])
+
+
+def test_pg_old_published_volume_revision_outside_live_coverage(managed_pg):
+    check_old_publication(managed_pg[0])
 
 
 def test_pg_volume_migration_roundtrip_keeps_legacy_prices(managed_pg):

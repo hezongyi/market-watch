@@ -158,7 +158,10 @@ def finish(db, job):
         ChartPublicationJob.start < job.end, ChartPublicationJob.end > job.start).limit(1))
     if publication is not None and not pending:
         from .chart_data import chart_rows
+        from .managed_dataset import continuous_coverage
         inst = db.get(Instrument, job.instrument_id)
+        plan = db.get(ChartHistoryPlan, job.instrument_id)
+        spans = continuous_coverage(db, inst, plan, now_ms()) if plan else []
         for dirty in db.scalars(select(ChartPublicationJob).where(
                 ChartPublicationJob.instrument_id == job.instrument_id,
                 ChartPublicationJob.start < job.end, ChartPublicationJob.end > job.start).limit(100)):
@@ -169,6 +172,17 @@ def finish(db, job):
                     status="conflict", detail="既有价格桶不完整，量任务不能修复价格或发布该桶"))
                 job.status, job.error = "partial", "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留"
                 return True
+            existing = db.get(ChartPublishedBar, (job.instrument_id, dirty.timeframe, dirty.start))
+            if existing is None or not existing.complete:
+                from .storage import ChartPublication
+                pub = db.get(ChartPublication, (job.instrument_id, dirty.timeframe))
+                left, right = spans[-1] if spans else (pub.start, pub.end) if pub and not plan else (0, 0)
+                if pub is None or not max(left, pub.start) <= dirty.start < min(right, pub.end):
+                    db.add(VolumeBackfillSegment(job_id=job.id,
+                        start=max(job.start, dirty.start), end=min(job.end, dirty.end),
+                        status="conflict", detail="价格桶没有既有发布快照且不在当前已确认发布范围，量任务不能扩大价格覆盖"))
+                    job.status, job.error = "partial", "部分量没有可更新发布快照，等待显式价格覆盖修复；已发布快照保留"
+                    return True
     if pending is not None or publication is not None:
         job.next_at = now_ms()+1000
         return True
