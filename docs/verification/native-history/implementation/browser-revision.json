@@ -1,0 +1,138 @@
+{
+  "passed": true,
+  "errors": [],
+  "pages": [
+    {
+      "at": 1790931167584,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790871825000,
+        "firstDataRequest": true,
+        "client": "0c72f114-b505-4c91-8e7b-2013448eff66",
+        "native_history": {
+          "chart_count": 1,
+          "focused": true,
+          "historical_navigation": false
+        },
+        "indicators": [],
+        "before": 1790931225000,
+        "track_history": false
+      }
+    },
+    {
+      "at": 1790931185398,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "before": 1787331300000,
+        "countBack": 10
+      }
+    },
+    {
+      "at": 1790931198888,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 73,
+        "countBack": 73,
+        "from": 1790909358000,
+        "firstDataRequest": true,
+        "client": "0c72f114-b505-4c91-8e7b-2013448eff66",
+        "native_history": {
+          "chart_count": 1,
+          "focused": true,
+          "historical_navigation": false
+        },
+        "indicators": [],
+        "before": 1790931258000,
+        "track_history": false
+      }
+    },
+    {
+      "at": 1790931199028,
+      "status": 200,
+      "query": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "before": 1790925000000,
+        "countBack": 1
+      }
+    }
+  ],
+  "extra_history_no_reset": true,
+  "view_before": {
+    "range": {
+      "from": 1790905800,
+      "to": 1790927400
+    },
+    "spacing": 15.36986301369863
+  },
+  "injection": {
+    "action": "revise",
+    "start": 1790924700000,
+    "revision": 43
+  },
+  "reload_ms": 10913,
+  "view_after": {
+    "range": {
+      "from": 1790905800,
+      "to": 1790927400
+    },
+    "spacing": 15.36986301369863,
+    "ready": true
+  },
+  "revised_native_callbacks": [
+    {
+      "time": 1790924700000,
+      "open": 85918.01,
+      "high": 86077.8,
+      "low": 85912.01,
+      "close": 85989.9,
+      "isLastBar": false,
+      "isBarClosed": true
+    }
+  ],
+  "export_limitation": "Native exportData cannot be used here: supplied vendor package lacks zh.20866 chunk. Verification observes public getBars callback and dataReady instead.",
+  "events": [
+    {
+      "type": "bars",
+      "cursor": 1790931000000,
+      "revision": 41,
+      "as_of": 1790931181573
+    },
+    {
+      "type": "bars",
+      "cursor": 1790931000000,
+      "revision": 42,
+      "as_of": 1790931183605
+    },
+    {
+      "type": "reset",
+      "cursor": 1790931000000,
+      "revision": 43,
+      "as_of": 1790931188932
+    },
+    {
+      "type": "bars",
+      "cursor": 1790931000000,
+      "revision": 44,
+      "as_of": 1790931196872
+    }
+  ],
+  "restoration": {
+    "action": "restore",
+    "start": 1790924700000
+  }
+}

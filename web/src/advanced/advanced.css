@@ -102,3 +102,6 @@
 .history-plans-dialog button:focus-visible { outline:2px solid #2962ff; outline-offset:2px; }
 
 .history-progress { position:absolute; z-index:3; left:64px; bottom:78px; max-width:calc(100% - 100px); padding:4px 8px; background:#202020e8; color:#ddd; font-size:11px; pointer-events:none; }
+
+.volume-job { padding:16px 0; border-top:1px solid #78849a55; overflow-wrap:anywhere; }
+.volume-job button { min-height:44px; margin:4px; }

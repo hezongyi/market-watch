@@ -1,0 +1,1595 @@
+{
+  "kind": "additive buffer research: actual native countBack plus extras; isolated native widget connected to real running API via test binding; no product workspace/bridge modifications",
+  "records": [
+    {
+      "cached": false,
+      "repeat": 0,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 0,
+      "visible": 0,
+      "before": 1622815200000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 441,
+          "bytes": 27775,
+          "countBack": 175,
+          "returned": 175,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.09,
+            "upstream_slot": 3.71,
+            "network_http11_send_request_headers": 0.27,
+            "network_http11_send_request_body": 0.06,
+            "network_http11_receive_response_headers": 319.51,
+            "network_http11_receive_response_body": 0.12,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 320.71,
+            "upstream_decode": 0.49,
+            "database_commit": 64.87,
+            "read_total": 418.08
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1157.5999999046326,
+      "pre_request_ms": 606.7999997138977,
+      "callback_to_display_ms": 60.09999990463257,
+      "log": [
+        {
+          "kind": "request",
+          "at": 721.9000000953674,
+          "params": {
+            "from": 1622763060,
+            "to": 1622815260,
+            "countBack": 175,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1229.3000001907349,
+          "count": 175
+        }
+      ],
+      "range": {
+        "from": 1622768700,
+        "to": 1622817900
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 0,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 600,
+      "visible": 0,
+      "before": 1620396000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 709,
+          "bytes": 120620,
+          "countBack": 174,
+          "returned": 774,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.28,
+            "upstream_slot": 4.45,
+            "network_http11_send_request_headers": 0.18,
+            "network_http11_send_request_body": 0.04,
+            "network_http11_receive_response_headers": 408.5,
+            "network_http11_receive_response_body": 0.34,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 409.71,
+            "upstream_decode": 1.35,
+            "database_commit": 229.74,
+            "read_total": 678.45
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1496.1999998092651,
+      "pre_request_ms": 634.1999998092651,
+      "callback_to_display_ms": 59.59999990463257,
+      "log": [
+        {
+          "kind": "request",
+          "at": 688.5,
+          "params": {
+            "from": 1620343860,
+            "to": 1620396060,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1507,
+          "count": 774
+        }
+      ],
+      "range": {
+        "from": 1620349500,
+        "to": 1620398700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 0,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 600,
+      "visible": 700,
+      "before": 1617976800000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 779,
+          "bytes": 202306,
+          "countBack": 701,
+          "returned": 1301,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.28,
+            "upstream_slot": 3.99,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 322.56,
+            "network_http11_receive_response_body": 15.25,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 338.75,
+            "upstream_decode": 1.77,
+            "database_commit": 298.75,
+            "read_total": 737.17
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1600.0999999046326,
+      "pre_request_ms": 613.0999999046326,
+      "callback_to_display_ms": 78.80000019073486,
+      "log": [
+        {
+          "kind": "request",
+          "at": 656.7000002861023,
+          "params": {
+            "from": 1617766800,
+            "to": 1617976860,
+            "countBack": 701,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1589.6000003814697,
+          "count": 1301
+        }
+      ],
+      "range": {
+        "from": 1617766800,
+        "to": 1617976800
+      },
+      "spacing": 1.4094151212553494
+    },
+    {
+      "cached": true,
+      "repeat": 0,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 3000,
+      "visible": 0,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 199,
+          "bytes": 492295,
+          "countBack": 174,
+          "returned": 3174,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 94.14
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1202.5999999046326,
+      "pre_request_ms": 574.6999998092651,
+      "callback_to_display_ms": 85.19999980926514,
+      "log": [
+        {
+          "kind": "request",
+          "at": 624.9000000953674,
+          "params": {
+            "from": 1747783860,
+            "to": 1747836060,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1186,
+          "count": 3174
+        }
+      ],
+      "range": {
+        "from": 1747789500,
+        "to": 1747838700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": true,
+      "repeat": 0,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 3000,
+      "visible": 2500,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 337,
+          "bytes": 852981,
+          "countBack": 2501,
+          "returned": 5501,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 198.12
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1704,
+      "pre_request_ms": 580.6999998092651,
+      "callback_to_display_ms": 176.2000002861023,
+      "log": [
+        {
+          "kind": "request",
+          "at": 635.4000000953674,
+          "params": {
+            "from": 1747086000,
+            "to": 1747836060,
+            "countBack": 2501,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1637.7000002861023,
+          "count": 5501
+        }
+      ],
+      "range": {
+        "from": 1747086000,
+        "to": 1747836000
+      },
+      "spacing": 0.5145833333333334
+    },
+    {
+      "cached": false,
+      "repeat": 0,
+      "instrument": "BTCUSDT",
+      "extra": 0,
+      "visible": 0,
+      "before": 1615557600000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 535,
+          "bytes": 32675,
+          "countBack": 175,
+          "returned": 175,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.97,
+            "upstream_slot": 7.19,
+            "network_http11_send_request_headers": 0.17,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 416,
+            "network_http11_receive_response_body": 0.15,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 416.98,
+            "upstream_decode": 0.22,
+            "database_commit": 46.85,
+            "read_total": 509.76
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1318.4000000953674,
+      "pre_request_ms": 701.4000000953674,
+      "callback_to_display_ms": 57.40000009536743,
+      "log": [
+        {
+          "kind": "request",
+          "at": 749.0999999046326,
+          "params": {
+            "from": 1615505460,
+            "to": 1615557660,
+            "countBack": 175,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1322.4000000953674,
+          "count": 175
+        }
+      ],
+      "range": {
+        "from": 1615512600,
+        "to": 1615560300
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 0,
+      "instrument": "BTCUSDT",
+      "extra": 600,
+      "visible": 0,
+      "before": 1613138400000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 542,
+          "bytes": 142476,
+          "countBack": 175,
+          "returned": 775,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.39,
+            "upstream_slot": 3.48,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 191.68,
+            "network_http11_receive_response_body": 58.86,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 251.48,
+            "upstream_decode": 0.88,
+            "database_commit": 198.4,
+            "read_total": 511.87
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1390,
+      "pre_request_ms": 711.5,
+      "callback_to_display_ms": 57.90000009536743,
+      "log": [
+        {
+          "kind": "request",
+          "at": 771.0999999046326,
+          "params": {
+            "from": 1613086260,
+            "to": 1613138460,
+            "countBack": 175,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1405.6999998092651,
+          "count": 775
+        }
+      ],
+      "range": {
+        "from": 1613093400,
+        "to": 1613141100
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 0,
+      "instrument": "BTCUSDT",
+      "extra": 600,
+      "visible": 700,
+      "before": 1610719200000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 1149,
+          "bytes": 238737,
+          "countBack": 701,
+          "returned": 1301,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 6.08,
+            "upstream_slot": 10.47,
+            "network_http11_send_request_headers": 0.52,
+            "network_http11_send_request_body": 0.06,
+            "network_http11_receive_response_headers": 513.32,
+            "network_http11_receive_response_body": 18.99,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 534.19,
+            "upstream_decode": 1.59,
+            "database_commit": 331.4,
+            "read_total": 1107.99
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 2068.699999809265,
+      "pre_request_ms": 703.6999998092651,
+      "callback_to_display_ms": 80.2999997138977,
+      "log": [
+        {
+          "kind": "request",
+          "at": 772.4000000953674,
+          "params": {
+            "from": 1610509200,
+            "to": 1610719260,
+            "countBack": 701,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 2081.1000003814697,
+          "count": 1301
+        }
+      ],
+      "range": {
+        "from": 1610509200,
+        "to": 1610719200
+      },
+      "spacing": 1.3637660485021397
+    },
+    {
+      "cached": true,
+      "repeat": 0,
+      "instrument": "BTCUSDT",
+      "extra": 3000,
+      "visible": 0,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 196,
+          "bytes": 593864,
+          "countBack": 174,
+          "returned": 3174,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 71.94
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1222.3999996185303,
+      "pre_request_ms": 584.6999998092651,
+      "callback_to_display_ms": 81.89999961853027,
+      "log": [
+        {
+          "kind": "request",
+          "at": 628.5999999046326,
+          "params": {
+            "from": 1747783860,
+            "to": 1747836060,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1199.2999997138977,
+          "count": 3174
+        }
+      ],
+      "range": {
+        "from": 1747791300,
+        "to": 1747838700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": true,
+      "repeat": 0,
+      "instrument": "BTCUSDT",
+      "extra": 3000,
+      "visible": 2500,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 328,
+          "bytes": 1021920,
+          "countBack": 2501,
+          "returned": 5501,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 196.48
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1680.1999998092651,
+      "pre_request_ms": 600.3000001907349,
+      "callback_to_display_ms": 167.89999961853027,
+      "log": [
+        {
+          "kind": "request",
+          "at": 640.4000000953674,
+          "params": {
+            "from": 1747086000,
+            "to": 1747836060,
+            "countBack": 2501,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1609.9000000953674,
+          "count": 5501
+        }
+      ],
+      "range": {
+        "from": 1747237500,
+        "to": 1747836000
+      },
+      "spacing": 0.4759519038076152
+    },
+    {
+      "cached": true,
+      "repeat": 1,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 3000,
+      "visible": 2500,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 240,
+          "bytes": 852980,
+          "countBack": 2501,
+          "returned": 5501,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 97.99
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1550.1999998092651,
+      "pre_request_ms": 615.6999998092651,
+      "callback_to_display_ms": 147.30000019073486,
+      "log": [
+        {
+          "kind": "request",
+          "at": 673,
+          "params": {
+            "from": 1747086000,
+            "to": 1747836060,
+            "countBack": 2501,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1509.1999998092651,
+          "count": 5501
+        }
+      ],
+      "range": {
+        "from": 1747086000,
+        "to": 1747836000
+      },
+      "spacing": 0.5145833333333334
+    },
+    {
+      "cached": true,
+      "repeat": 1,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 3000,
+      "visible": 0,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 189,
+          "bytes": 492296,
+          "countBack": 174,
+          "returned": 3174,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 105.09
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1433.5,
+      "pre_request_ms": 826.0999999046326,
+      "callback_to_display_ms": 99.09999990463257,
+      "log": [
+        {
+          "kind": "request",
+          "at": 894.0999999046326,
+          "params": {
+            "from": 1747783860,
+            "to": 1747836060,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1419.7999997138977,
+          "count": 3174
+        }
+      ],
+      "range": {
+        "from": 1747789500,
+        "to": 1747838700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 1,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 600,
+      "visible": 700,
+      "before": 1608300000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 1022,
+          "bytes": 202306,
+          "countBack": 701,
+          "returned": 1301,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.11,
+            "upstream_slot": 4.44,
+            "network_http11_send_request_headers": 0.19,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 572.47,
+            "network_http11_receive_response_body": 0.49,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 573.89,
+            "upstream_decode": 2.01,
+            "database_commit": 303.76,
+            "read_total": 978.15
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1904.8000001907349,
+      "pre_request_ms": 643.5999999046326,
+      "callback_to_display_ms": 79.5,
+      "log": [
+        {
+          "kind": "request",
+          "at": 698.5,
+          "params": {
+            "from": 1608090000,
+            "to": 1608300060,
+            "countBack": 701,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1904.8000001907349,
+          "count": 1301
+        }
+      ],
+      "range": {
+        "from": 1608090000,
+        "to": 1608300000
+      },
+      "spacing": 1.4094151212553494
+    },
+    {
+      "cached": false,
+      "repeat": 1,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 600,
+      "visible": 0,
+      "before": 1605880800000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 613,
+          "bytes": 120620,
+          "countBack": 174,
+          "returned": 774,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.04,
+            "upstream_slot": 4.86,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 290.05,
+            "network_http11_receive_response_body": 2.64,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 293.62,
+            "upstream_decode": 1.17,
+            "database_commit": 185.08,
+            "read_total": 564.72
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1439.5,
+      "pre_request_ms": 674.4000000953674,
+      "callback_to_display_ms": 69.69999980926514,
+      "log": [
+        {
+          "kind": "request",
+          "at": 734,
+          "params": {
+            "from": 1605828660,
+            "to": 1605880860,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1445.2999997138977,
+          "count": 774
+        }
+      ],
+      "range": {
+        "from": 1605834300,
+        "to": 1605883500
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 1,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 0,
+      "visible": 0,
+      "before": 1603461600000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 640,
+          "bytes": 27774,
+          "countBack": 175,
+          "returned": 175,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 10.33,
+            "upstream_slot": 6.38,
+            "network_http11_send_request_headers": 0.18,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 514.7,
+            "network_http11_receive_response_body": 0.1,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 515.69,
+            "upstream_decode": 0.22,
+            "database_commit": 46.88,
+            "read_total": 619.38
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1385.0999999046326,
+      "pre_request_ms": 655.3999996185303,
+      "callback_to_display_ms": 57.09999990463257,
+      "log": [
+        {
+          "kind": "request",
+          "at": 712.7999997138977,
+          "params": {
+            "from": 1603409460,
+            "to": 1603461660,
+            "countBack": 175,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1399.5999999046326,
+          "count": 175
+        }
+      ],
+      "range": {
+        "from": 1603415100,
+        "to": 1603464300
+      },
+      "spacing": 6
+    },
+    {
+      "cached": true,
+      "repeat": 1,
+      "instrument": "BTCUSDT",
+      "extra": 3000,
+      "visible": 2500,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 395,
+          "bytes": 1021920,
+          "countBack": 2501,
+          "returned": 5501,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 145.59
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1749.1999998092651,
+      "pre_request_ms": 630.2999997138977,
+      "callback_to_display_ms": 138.40000009536743,
+      "log": [
+        {
+          "kind": "request",
+          "at": 692.5999999046326,
+          "params": {
+            "from": 1747086000,
+            "to": 1747836060,
+            "countBack": 2501,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1722.4000000953674,
+          "count": 5501
+        }
+      ],
+      "range": {
+        "from": 1747237500,
+        "to": 1747836000
+      },
+      "spacing": 0.4759519038076152
+    },
+    {
+      "cached": true,
+      "repeat": 1,
+      "instrument": "BTCUSDT",
+      "extra": 3000,
+      "visible": 0,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 177,
+          "bytes": 593864,
+          "countBack": 174,
+          "returned": 3174,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 93.05
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1235.4000000953674,
+      "pre_request_ms": 631.2000002861023,
+      "callback_to_display_ms": 78.2999997138977,
+      "log": [
+        {
+          "kind": "request",
+          "at": 686.8000001907349,
+          "params": {
+            "from": 1747783860,
+            "to": 1747836060,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1227,
+          "count": 3174
+        }
+      ],
+      "range": {
+        "from": 1747791300,
+        "to": 1747838700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 1,
+      "instrument": "BTCUSDT",
+      "extra": 600,
+      "visible": 700,
+      "before": 1601042400000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 1121,
+          "bytes": 238738,
+          "countBack": 701,
+          "returned": 1301,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 8.11,
+            "upstream_slot": 13.48,
+            "network_http11_send_request_headers": 0.34,
+            "network_http11_send_request_body": 0.05,
+            "network_http11_receive_response_headers": 542.03,
+            "network_http11_receive_response_body": 72.66,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 616.37,
+            "upstream_decode": 1.61,
+            "database_commit": 335.19,
+            "read_total": 1075.36
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1939.7000002861023,
+      "pre_request_ms": 590.4000000953674,
+      "callback_to_display_ms": 96,
+      "log": [
+        {
+          "kind": "request",
+          "at": 650.8000001907349,
+          "params": {
+            "from": 1600832400,
+            "to": 1601042460,
+            "countBack": 701,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1931.4000000953674,
+          "count": 1301
+        }
+      ],
+      "range": {
+        "from": 1600832400,
+        "to": 1601042400
+      },
+      "spacing": 1.3637660485021397
+    },
+    {
+      "cached": false,
+      "repeat": 1,
+      "instrument": "BTCUSDT",
+      "extra": 600,
+      "visible": 0,
+      "before": 1598623200000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 675,
+          "bytes": 142477,
+          "countBack": 175,
+          "returned": 775,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.03,
+            "upstream_slot": 17.56,
+            "network_http11_send_request_headers": 0.21,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 272.83,
+            "network_http11_receive_response_body": 0.67,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 275.63,
+            "upstream_decode": 1.07,
+            "database_commit": 191.8,
+            "read_total": 645.38
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1417,
+      "pre_request_ms": 602,
+      "callback_to_display_ms": 60.10000038146973,
+      "log": [
+        {
+          "kind": "request",
+          "at": 654.6000003814697,
+          "params": {
+            "from": 1598571060,
+            "to": 1598623260,
+            "countBack": 175,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1424,
+          "count": 775
+        }
+      ],
+      "range": {
+        "from": 1598578200,
+        "to": 1598625900
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 1,
+      "instrument": "BTCUSDT",
+      "extra": 0,
+      "visible": 0,
+      "before": 1596204000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 377,
+          "bytes": 32674,
+          "countBack": 175,
+          "returned": 175,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.73,
+            "upstream_slot": 4.11,
+            "network_http11_send_request_headers": 0.19,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 240.4,
+            "network_http11_receive_response_body": 0.16,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 241.45,
+            "upstream_decode": 0.22,
+            "database_commit": 60.6,
+            "read_total": 357.65
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1088.6999998092651,
+      "pre_request_ms": 625.7999997138977,
+      "callback_to_display_ms": 58.80000019073486,
+      "log": [
+        {
+          "kind": "request",
+          "at": 673.9000000953674,
+          "params": {
+            "from": 1596151860,
+            "to": 1596204060,
+            "countBack": 175,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1093.5,
+          "count": 175
+        }
+      ],
+      "range": {
+        "from": 1596159000,
+        "to": 1596206700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 2,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 0,
+      "visible": 0,
+      "before": 1593784800000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 572,
+          "bytes": 27618,
+          "countBack": 174,
+          "returned": 174,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 6.89,
+            "upstream_slot": 3.7,
+            "network_http11_send_request_headers": 0.19,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 471.39,
+            "network_http11_receive_response_body": 0.1,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 472.41,
+            "upstream_decode": 0.21,
+            "database_commit": 43.65,
+            "read_total": 549.35
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1244.7999997138977,
+      "pre_request_ms": 588.5,
+      "callback_to_display_ms": 55.799999713897705,
+      "log": [
+        {
+          "kind": "request",
+          "at": 656.9000000953674,
+          "params": {
+            "from": 1593732660,
+            "to": 1593784860,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1271.6999998092651,
+          "count": 174
+        }
+      ],
+      "range": {
+        "from": 1593738300,
+        "to": 1593787500
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 2,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 600,
+      "visible": 0,
+      "before": 1591365600000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 880,
+          "bytes": 120620,
+          "countBack": 174,
+          "returned": 774,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3,
+            "upstream_slot": 3.96,
+            "network_http11_send_request_headers": 0.19,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 528.78,
+            "network_http11_receive_response_body": 4.67,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 534.37,
+            "upstream_decode": 1.14,
+            "database_commit": 234.05,
+            "read_total": 835.61
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1725.4000000953674,
+      "pre_request_ms": 709.5999999046326,
+      "callback_to_display_ms": 60.10000038146973,
+      "log": [
+        {
+          "kind": "request",
+          "at": 770.6999998092651,
+          "params": {
+            "from": 1591313460,
+            "to": 1591365660,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1740.5,
+          "count": 774
+        }
+      ],
+      "range": {
+        "from": 1591319100,
+        "to": 1591368300
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 2,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 600,
+      "visible": 700,
+      "before": 1588946400000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 1288,
+          "bytes": 202311,
+          "countBack": 701,
+          "returned": 1301,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 15.19,
+            "upstream_slot": 11.66,
+            "network_http11_send_request_headers": 0.18,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 570.18,
+            "network_http11_receive_response_body": 180.08,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 751.14,
+            "upstream_decode": 1.68,
+            "database_commit": 425.83,
+            "read_total": 1243.08
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 2148.9000000953674,
+      "pre_request_ms": 656.4000000953674,
+      "callback_to_display_ms": 79.69999980926514,
+      "log": [
+        {
+          "kind": "request",
+          "at": 720.1999998092651,
+          "params": {
+            "from": 1588736400,
+            "to": 1588946460,
+            "countBack": 701,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 2158.3999996185303,
+          "count": 1301
+        }
+      ],
+      "range": {
+        "from": 1588736400,
+        "to": 1588946400
+      },
+      "spacing": 1.4094151212553494
+    },
+    {
+      "cached": true,
+      "repeat": 2,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 3000,
+      "visible": 0,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 138,
+          "bytes": 492295,
+          "countBack": 174,
+          "returned": 3174,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 46.67
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1262.1000003814697,
+      "pre_request_ms": 652,
+      "callback_to_display_ms": 106.5,
+      "log": [
+        {
+          "kind": "request",
+          "at": 715.1999998092651,
+          "params": {
+            "from": 1747783860,
+            "to": 1747836060,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1239.0999999046326,
+          "count": 3174
+        }
+      ],
+      "range": {
+        "from": 1747789500,
+        "to": 1747838700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": true,
+      "repeat": 2,
+      "instrument": "OANDA:AUD_CAD",
+      "extra": 3000,
+      "visible": 2500,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 576,
+          "bytes": 852981,
+          "countBack": 2501,
+          "returned": 5501,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 293.82
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 2621.5,
+      "pre_request_ms": 896.5,
+      "callback_to_display_ms": 311,
+      "log": [
+        {
+          "kind": "request",
+          "at": 937.1000003814697,
+          "params": {
+            "from": 1747086000,
+            "to": 1747836060,
+            "countBack": 2501,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 2469.4000000953674,
+          "count": 5501
+        }
+      ],
+      "range": {
+        "from": 1747086000,
+        "to": 1747836000
+      },
+      "spacing": 0.5145833333333334
+    },
+    {
+      "cached": false,
+      "repeat": 2,
+      "instrument": "BTCUSDT",
+      "extra": 0,
+      "visible": 0,
+      "before": 1586527200000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 383,
+          "bytes": 31796,
+          "countBack": 174,
+          "returned": 174,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 20.55,
+            "upstream_slot": 8.8,
+            "network_http11_send_request_headers": 0.18,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 177.98,
+            "network_http11_receive_response_body": 0.17,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 179.04,
+            "upstream_decode": 0.24,
+            "database_commit": 87.6,
+            "read_total": 363.11
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1433.5,
+      "pre_request_ms": 917.7999997138977,
+      "callback_to_display_ms": 87.2000002861023,
+      "log": [
+        {
+          "kind": "request",
+          "at": 979.7999997138977,
+          "params": {
+            "from": 1586475060,
+            "to": 1586527260,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1428.0999999046326,
+          "count": 174
+        }
+      ],
+      "range": {
+        "from": 1586481900,
+        "to": 1586529900
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 2,
+      "instrument": "BTCUSDT",
+      "extra": 600,
+      "visible": 0,
+      "before": 1584108000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 607,
+          "bytes": 139198,
+          "countBack": 174,
+          "returned": 774,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 4.24,
+            "upstream_slot": 6.48,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 197.14,
+            "network_http11_receive_response_body": 25.95,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 224.04,
+            "upstream_decode": 1.21,
+            "database_commit": 233.28,
+            "read_total": 545.27
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1514.4000000953674,
+      "pre_request_ms": 753.2999997138977,
+      "callback_to_display_ms": 70.10000038146973,
+      "log": [
+        {
+          "kind": "request",
+          "at": 874.5999999046326,
+          "params": {
+            "from": 1584055860,
+            "to": 1584108060,
+            "countBack": 174,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1587.8000001907349,
+          "count": 774
+        }
+      ],
+      "range": {
+        "from": 1584062700,
+        "to": 1584110700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": false,
+      "repeat": 2,
+      "instrument": "BTCUSDT",
+      "extra": 600,
+      "visible": 700,
+      "before": 1581688800000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 1351,
+          "bytes": 237128,
+          "countBack": 701,
+          "returned": 1301,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 6.33,
+            "upstream_slot": 8.15,
+            "network_http11_send_request_headers": 0.43,
+            "network_http11_send_request_body": 0.14,
+            "network_http11_receive_response_headers": 383.45,
+            "network_http11_receive_response_body": 366.83,
+            "network_http11_response_closed": 0.03,
+            "upstream_http": 752.24,
+            "upstream_decode": 3.65,
+            "database_commit": 412,
+            "read_total": 1303.17
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 2725.4000000953674,
+      "pre_request_ms": 1151.1000003814697,
+      "callback_to_display_ms": 89.69999980926514,
+      "log": [
+        {
+          "kind": "request",
+          "at": 1286.1000003814697,
+          "params": {
+            "from": 1581478800,
+            "to": 1581688860,
+            "countBack": 701,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 2797.6000003814697,
+          "count": 1301
+        }
+      ],
+      "range": {
+        "from": 1581478800,
+        "to": 1581688800
+      },
+      "spacing": 1.3637660485021397
+    },
+    {
+      "cached": true,
+      "repeat": 2,
+      "instrument": "BTCUSDT",
+      "extra": 3000,
+      "visible": 0,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 184,
+          "bytes": 594051,
+          "countBack": 175,
+          "returned": 3175,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 57.68
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 1433.5,
+      "pre_request_ms": 769.2999997138977,
+      "callback_to_display_ms": 94.30000019073486,
+      "log": [
+        {
+          "kind": "request",
+          "at": 896.6999998092651,
+          "params": {
+            "from": 1747783860,
+            "to": 1747836060,
+            "countBack": 175,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 1485.0999999046326,
+          "count": 3175
+        }
+      ],
+      "range": {
+        "from": 1747791300,
+        "to": 1747838700
+      },
+      "spacing": 6
+    },
+    {
+      "cached": true,
+      "repeat": 2,
+      "instrument": "BTCUSDT",
+      "extra": 3000,
+      "visible": 2500,
+      "before": 1747836000000,
+      "http": [
+        {
+          "status": 200,
+          "elapsed_ms": 349,
+          "bytes": 1021920,
+          "countBack": 2501,
+          "returned": 5501,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 205.66
+          }
+        }
+      ],
+      "errors": [],
+      "displayed_ms": 2160,
+      "pre_request_ms": 902.2000002861023,
+      "callback_to_display_ms": 253.5,
+      "log": [
+        {
+          "kind": "request",
+          "at": 978.5999999046326,
+          "params": {
+            "from": 1747086000,
+            "to": 1747836060,
+            "countBack": 2501,
+            "firstDataRequest": true
+          }
+        },
+        {
+          "kind": "callback",
+          "at": 2073.699999809265,
+          "count": 5501
+        }
+      ],
+      "range": {
+        "from": 1747237500,
+        "to": 1747836000
+      },
+      "spacing": 0.4759519038076152
+    }
+  ]
+}

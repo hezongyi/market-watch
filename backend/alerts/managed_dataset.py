@@ -9,7 +9,7 @@ import json
 from datetime import UTC, date, datetime, time, timedelta
 from math import ceil
 
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
@@ -136,6 +136,16 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
     jobs = list(db.scalars(select(ChartPublicationJob).where(
         ChartPublicationJob.instrument_id == inst.id,
         ChartPublicationJob.timeframe == frame,
+        or_(
+            and_(ChartPublicationJob.start >= max(left, pub.start),
+                 ChartPublicationJob.start < min(right, pub.end)),
+            select(ChartPublishedBar.start).where(
+                ChartPublishedBar.instrument_id == inst.id,
+                ChartPublishedBar.timeframe == frame,
+                ChartPublishedBar.start == ChartPublicationJob.start,
+                ChartPublishedBar.complete.is_(True),
+            ).exists(),
+        ),
         ~select(ChartAggregationJob.id).where(
             ChartAggregationJob.instrument_id == inst.id,
             ChartAggregationJob.timeframe == _source(frame),
@@ -154,15 +164,17 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
     ))}
     for row in rows:
         job = queued.get(row["start"])
-        if row["start"] < max(left, pub.start) or row["start"] >= min(right, pub.end):
+        old = existing.get(row["start"])
+        if (old is None or not old.complete) and (row["start"] < max(left, pub.start) or row["start"] >= min(right, pub.end)):
             continue
         if any(j.start < row["end"] and j.end > row["start"] for j in pending):
             continue
-        if row["end"] <= right and not row["complete"]:
+        if not row["complete"] and (row["end"] <= now or old is not None and old.complete):
             continue
         # A forming bucket still needs a covered prefix; don't publish missing history.
-        row = {**row, "complete": row["complete"] and row["end"] <= right}
-        old = existing.get(row["start"])
+        complete = row["complete"] if old is not None else row["complete"] and row["end"] <= right
+        row = {**row, "complete": complete,
+               "volume_complete": complete and row.get("volume_complete", False)}
         if old is None:
             # New observations inside proven coverage are legitimate corrections.
             db.add(ChartPublishedBar(instrument_id=inst.id, timeframe=frame,
@@ -183,6 +195,11 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
 def publish_frame(db, inst, plan, frame, now):
     spans = continuous_coverage(db, inst, plan, now)
     if not spans:
+        pub = db.get(ChartPublication, (inst.id, frame))
+        if pub:
+            # No current coverage proof permits new snapshots, but confirmed
+            # historical snapshots still accept independent revisions.
+            publish_corrections(db, inst, pub, frame, 0, 0, [], now)
         return False
     left, right = spans[-1]
     plan.realtime_end = max(plan.realtime_end, right)
@@ -357,7 +374,8 @@ def publish_once():
     global _PUBLISH_CURSOR
     adopt_legacy_once()
     with transaction() as db:
-        ids = list(db.scalars(select(ChartHistoryPlan.instrument_id).order_by(ChartHistoryPlan.instrument_id)))
+        ids = sorted(set(db.scalars(select(ChartHistoryPlan.instrument_id))) |
+                     set(db.scalars(select(ChartPublication.instrument_id))))
     targets = [(ident, frame) for ident in ids for frame in FRAMES]
     if not targets:
         _PUBLISH_CURSOR = None
@@ -369,6 +387,10 @@ def publish_once():
         plan = db.get(ChartHistoryPlan, ident)
         if plan:
             publish_frame(db, inst, plan, frame, now_ms())
+        else:
+            pub = db.get(ChartPublication, (ident, frame))
+            if pub:
+                publish_corrections(db, inst, pub, frame, pub.start, pub.end, [], now_ms())
     return True
 
 
@@ -559,6 +581,8 @@ def data(body):
         visible = rows[-body.limit :]
         left = max(pub.start, body.dataset_start or pub.start) if pub else None
         revision = pub.revision if pub else 0
+        from .volume import metadata
+        volume_meta = metadata(inst.source, inst.symbol)
         basis, calendar, precision = inst.basis, inst.calendar, inst.precision
         future = future_grid(inst, body.timeframe, visible[-1]["end"]) if visible else []
         history_check = published_history_check(db, inst, pub, visible, body)
@@ -580,6 +604,7 @@ def data(body):
             }
         )
     return dict(
+        **volume_meta,
         bars=visible,
         indicators=indicators,
         origin=left,

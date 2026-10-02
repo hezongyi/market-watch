@@ -77,6 +77,11 @@ class Bar(Base):
     complete: Mapped[bool] = mapped_column(Boolean, default=False)
     revision: Mapped[int] = mapped_column(default=1)
     received_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    observed_at: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    volume: Mapped[Decimal | None] = mapped_column(Numeric(38, 18))
+    volume_complete: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    volume_received_at: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    volume_revision: Mapped[int] = mapped_column(default=0, server_default="0")
 
     def candle(self):
         return Candle(
@@ -88,6 +93,9 @@ class Bar(Base):
             self.close,
             self.complete,
             self.revision,
+            self.volume,
+            self.volume_complete,
+            True,
         )
 
 
@@ -325,6 +333,8 @@ def candle_dict(c):
         "close": str(c.close),
         "complete": c.complete,
         "revision": c.revision,
+        "volume": format(c.volume, "f") if c.volume is not None else None,
+        "volume_complete": bool(c.volume_complete),
     }
 
 
@@ -335,6 +345,9 @@ def candle_from(d):
         *(Decimal(d[k]) for k in ["open", "high", "low", "close"]),
         d.get("complete", True),
         d.get("revision", 1),
+        Decimal(d["volume"]) if d.get("volume") is not None else None,
+        d.get("volume_complete", False),
+        "volume" in d,
     )
 
 
@@ -561,6 +574,7 @@ class ChartViewportDemand(Base):
 
 class ChartAggregationJob(Base):
     __tablename__ = 'chart_aggregation_jobs'
+    kind: Mapped[str] = mapped_column(String(8), default='price', server_default='price')
     __table_args__ = (UniqueConstraint('instrument_id', 'timeframe', 'start', 'end'),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     instrument_id: Mapped[str] = mapped_column(String(40), ForeignKey('instruments.id'))
@@ -571,3 +585,37 @@ class ChartAggregationJob(Base):
     attempts: Mapped[int] = mapped_column(default=0)
     next_at: Mapped[int] = mapped_column(BigInteger, default=0)
     error: Mapped[str | None] = mapped_column(String(200))
+
+
+class VolumeBackfillJob(Base):
+    __tablename__ = "volume_backfill_jobs"
+    __table_args__ = (Index("ix_volume_jobs_selection", "status", "next_at"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    instrument_id: Mapped[str] = mapped_column(String(40), ForeignKey("instruments.id"), index=True)
+    source: Mapped[str] = mapped_column(String(32))
+    symbol: Mapped[str] = mapped_column(String(64))
+    basis: Mapped[str] = mapped_column(String(16))
+    calendar: Mapped[str] = mapped_column(String(16))
+    calendar_profile: Mapped[dict] = mapped_column(JSON)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(16), default="pending")
+    generation: Mapped[int] = mapped_column(default=0)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    attempts: Mapped[int] = mapped_column(default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(250))
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class VolumeBackfillSegment(Base):
+    __tablename__ = "volume_backfill_segments"
+    __table_args__ = (Index("ix_volume_segments_range", "job_id", "start", "end"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    job_id: Mapped[str] = mapped_column(String(36), ForeignKey("volume_backfill_jobs.id"))
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(24))
+    detail: Mapped[str | None] = mapped_column(String(250))

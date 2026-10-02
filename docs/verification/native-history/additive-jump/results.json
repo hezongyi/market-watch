@@ -1,0 +1,2498 @@
+{
+  "kind": "native v31.1 additive historical jump boundaries; synthetic M5; no API/DB",
+  "cases": [
+    {
+      "config": {
+        "name": "cold-latest-then-jump",
+        "mode": "cold",
+        "startup": false
+      },
+      "initial": {
+        "at": 1192.5999999046326,
+        "range": {
+          "from": 1790763900,
+          "to": 1790815500
+        },
+        "spacing": 6,
+        "offset": 10,
+        "dataReady": true,
+        "pending": 0,
+        "requests": 1
+      },
+      "jump": {
+        "at": 1778.8000001907349,
+        "range": {
+          "from": 1787763300,
+          "to": 1787812800
+        },
+        "spacing": 5.9879518072289155,
+        "offset": -9999,
+        "dataReady": true,
+        "pending": 0,
+        "requests": 2
+      },
+      "movements": [
+        {
+          "name": "older",
+          "before": {
+            "at": 2086.4000000953674,
+            "range": {
+              "from": 1787763300,
+              "to": 1787812800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "after": {
+            "at": 3200,
+            "range": {
+              "from": 1787736000,
+              "to": 1787785800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -10089.181087,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "name": "newer-return",
+          "before": {
+            "at": 3203.7000002861023,
+            "range": {
+              "from": 1787736000,
+              "to": 1787785800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -10089.181087,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "after": {
+            "at": 3993,
+            "range": {
+              "from": 1787763300,
+              "to": 1787812800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "name": "newer-beyond-target",
+          "before": {
+            "at": 3994.5999999046326,
+            "range": {
+              "from": 1787763300,
+              "to": 1787812800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "after": {
+            "at": 4775,
+            "range": {
+              "from": 1787790300,
+              "to": 1787840100
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -9908.818913,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "newRequests": 0
+        }
+      ],
+      "trace": [
+        {
+          "at": 771,
+          "phase": "initial",
+          "params": {
+            "from": 1790760660,
+            "to": 1790812860,
+            "countBack": 174,
+            "firstDataRequest": true
+          },
+          "visible": {
+            "from": 0,
+            "to": 0
+          },
+          "callback_at": 822.8000001907349,
+          "returned": 774,
+          "extra": 600,
+          "first": 1790580600,
+          "last": 1790812500,
+          "hasAtOrAfterTo": false
+        },
+        {
+          "at": 1323.2000002861023,
+          "phase": "jump",
+          "params": {
+            "from": 1787763300,
+            "to": 1790580600,
+            "countBack": 9391,
+            "firstDataRequest": false
+          },
+          "visible": {
+            "from": 1790766000,
+            "to": 1790815500
+          },
+          "callback_at": 1386.5999999046326,
+          "returned": 9991,
+          "extra": 600,
+          "first": 1787583300,
+          "last": 1790580300,
+          "hasAtOrAfterTo": false
+        }
+      ],
+      "events": [
+        {
+          "at": 859.8000001907349,
+          "phase": "initial",
+          "range": {
+            "from": 1790763600,
+            "to": 1790815500
+          }
+        },
+        {
+          "at": 881.5,
+          "phase": "initial",
+          "range": {
+            "from": 1790763900,
+            "to": 1790815500
+          }
+        },
+        {
+          "at": 1219.7000002861023,
+          "phase": "initial",
+          "range": {
+            "from": 1790766000,
+            "to": 1790815500
+          }
+        },
+        {
+          "at": 1526.4000000953674,
+          "phase": "jump",
+          "range": {
+            "from": 1787763300,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 2253,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787811300
+          }
+        },
+        {
+          "at": 2272.800000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787809800
+          }
+        },
+        {
+          "at": 2304.5,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787808300
+          }
+        },
+        {
+          "at": 2338.4000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787806800
+          }
+        },
+        {
+          "at": 2352.5999999046326,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787805300
+          }
+        },
+        {
+          "at": 2368.5999999046326,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787803800
+          }
+        },
+        {
+          "at": 2385.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787802300
+          }
+        },
+        {
+          "at": 2403.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787800800
+          }
+        },
+        {
+          "at": 2419,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787799300
+          }
+        },
+        {
+          "at": 2435.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787797800
+          }
+        },
+        {
+          "at": 2451.9000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787796300
+          }
+        },
+        {
+          "at": 2472,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787794800
+          }
+        },
+        {
+          "at": 2486.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787793300
+          }
+        },
+        {
+          "at": 2501.9000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787791800
+          }
+        },
+        {
+          "at": 2535.4000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787790300
+          }
+        },
+        {
+          "at": 2552.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787788800
+          }
+        },
+        {
+          "at": 2575.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787787300
+          }
+        },
+        {
+          "at": 2601.800000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787785800
+          }
+        },
+        {
+          "at": 2793.800000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787736000,
+            "to": 1787785800
+          }
+        },
+        {
+          "at": 3318.7000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787737800,
+            "to": 1787787300
+          }
+        },
+        {
+          "at": 3337.4000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787739300,
+            "to": 1787788800
+          }
+        },
+        {
+          "at": 3351.800000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787740800,
+            "to": 1787790300
+          }
+        },
+        {
+          "at": 3368.9000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787742300,
+            "to": 1787791800
+          }
+        },
+        {
+          "at": 3385.2000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787743800,
+            "to": 1787793300
+          }
+        },
+        {
+          "at": 3402.2000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787745300,
+            "to": 1787794800
+          }
+        },
+        {
+          "at": 3418.5999999046326,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787746800,
+            "to": 1787796300
+          }
+        },
+        {
+          "at": 3435.7000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787748300,
+            "to": 1787797800
+          }
+        },
+        {
+          "at": 3468.800000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787749800,
+            "to": 1787799300
+          }
+        },
+        {
+          "at": 3485.300000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787751300,
+            "to": 1787800800
+          }
+        },
+        {
+          "at": 3501.800000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787752800,
+            "to": 1787802300
+          }
+        },
+        {
+          "at": 3518.7000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787754300,
+            "to": 1787803800
+          }
+        },
+        {
+          "at": 3535.5999999046326,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787755800,
+            "to": 1787805300
+          }
+        },
+        {
+          "at": 3552,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787757300,
+            "to": 1787806800
+          }
+        },
+        {
+          "at": 3568.7000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787758800,
+            "to": 1787808300
+          }
+        },
+        {
+          "at": 3585.4000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787760300,
+            "to": 1787809800
+          }
+        },
+        {
+          "at": 3601.7000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787761800,
+            "to": 1787811300
+          }
+        },
+        {
+          "at": 3621.0999999046326,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787763300,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 4054.9000000953674,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787764800,
+            "to": 1787814300
+          }
+        },
+        {
+          "at": 4070.4000000953674,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787766300,
+            "to": 1787815800
+          }
+        },
+        {
+          "at": 4086.9000000953674,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787767800,
+            "to": 1787817300
+          }
+        },
+        {
+          "at": 4103.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787769300,
+            "to": 1787818800
+          }
+        },
+        {
+          "at": 4121.099999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787770800,
+            "to": 1787820300
+          }
+        },
+        {
+          "at": 4137.200000286102,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787772300,
+            "to": 1787821800
+          }
+        },
+        {
+          "at": 4153.599999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787773800,
+            "to": 1787823300
+          }
+        },
+        {
+          "at": 4170.200000286102,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787775300,
+            "to": 1787824800
+          }
+        },
+        {
+          "at": 4187.400000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787776800,
+            "to": 1787826300
+          }
+        },
+        {
+          "at": 4219.099999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787778300,
+            "to": 1787827800
+          }
+        },
+        {
+          "at": 4252.300000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787779800,
+            "to": 1787829300
+          }
+        },
+        {
+          "at": 4268.900000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787781300,
+            "to": 1787830800
+          }
+        },
+        {
+          "at": 4302,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787782800,
+            "to": 1787832300
+          }
+        },
+        {
+          "at": 4318.800000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787784300,
+            "to": 1787833800
+          }
+        },
+        {
+          "at": 4335.599999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787785800,
+            "to": 1787835300
+          }
+        },
+        {
+          "at": 4369.400000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787787300,
+            "to": 1787836800
+          }
+        },
+        {
+          "at": 4385.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787788800,
+            "to": 1787838300
+          }
+        },
+        {
+          "at": 4402.099999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787790300,
+            "to": 1787840100
+          }
+        }
+      ],
+      "target": {
+        "from": 1787763300,
+        "to": 1787812800
+      },
+      "version": "TT v31.1.0 (internal id 6b804c486857f27920cf761aa7eb6e29d9bb6362 @ 2026-04-08T18:21:25.992Z)",
+      "errors": []
+    },
+    {
+      "config": {
+        "name": "cached-latest-then-jump",
+        "mode": "cached",
+        "startup": false
+      },
+      "initial": {
+        "at": 1354.9000000953674,
+        "range": {
+          "from": 1790766000,
+          "to": 1790815500
+        },
+        "spacing": 6,
+        "offset": 10,
+        "dataReady": true,
+        "pending": 0,
+        "requests": 1
+      },
+      "jump": {
+        "at": 1857.7000002861023,
+        "range": {
+          "from": 1787763300,
+          "to": 1787812800
+        },
+        "spacing": 5.9879518072289155,
+        "offset": -9999,
+        "dataReady": true,
+        "pending": 0,
+        "requests": 2
+      },
+      "movements": [
+        {
+          "name": "older",
+          "before": {
+            "at": 2173.7000002861023,
+            "range": {
+              "from": 1787763300,
+              "to": 1787812800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "after": {
+            "at": 3138,
+            "range": {
+              "from": 1787736000,
+              "to": 1787785800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -10089.181087,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "name": "newer-return",
+          "before": {
+            "at": 3146.800000190735,
+            "range": {
+              "from": 1787736000,
+              "to": 1787785800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -10089.181087,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "after": {
+            "at": 3955.800000190735,
+            "range": {
+              "from": 1787763300,
+              "to": 1787812800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "newRequests": 0
+        },
+        {
+          "name": "newer-beyond-target",
+          "before": {
+            "at": 3957.4000000953674,
+            "range": {
+              "from": 1787763300,
+              "to": 1787812800
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "after": {
+            "at": 4775.10000038147,
+            "range": {
+              "from": 1787790300,
+              "to": 1787840100
+            },
+            "spacing": 5.9879518072289155,
+            "offset": -9908.818913,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 2
+          },
+          "newRequests": 0
+        }
+      ],
+      "trace": [
+        {
+          "at": 907.5,
+          "phase": "initial",
+          "params": {
+            "from": 1790760660,
+            "to": 1790812860,
+            "countBack": 174,
+            "firstDataRequest": true
+          },
+          "visible": {
+            "from": 0,
+            "to": 0
+          },
+          "callback_at": 958.9000000953674,
+          "returned": 3174,
+          "extra": 3000,
+          "first": 1789860600,
+          "last": 1790812500,
+          "hasAtOrAfterTo": false
+        },
+        {
+          "at": 1388.5,
+          "phase": "jump",
+          "params": {
+            "from": 1787763300,
+            "to": 1789860600,
+            "countBack": 6991,
+            "firstDataRequest": false
+          },
+          "visible": {
+            "from": 1790766000,
+            "to": 1790815500
+          },
+          "callback_at": 1442.1000003814697,
+          "returned": 8991,
+          "extra": 2000,
+          "first": 1787163300,
+          "last": 1789860300,
+          "hasAtOrAfterTo": false
+        }
+      ],
+      "events": [
+        {
+          "at": 999.8000001907349,
+          "phase": "initial",
+          "range": {
+            "from": 1790763600,
+            "to": 1790815500
+          }
+        },
+        {
+          "at": 1026,
+          "phase": "initial",
+          "range": {
+            "from": 1790763900,
+            "to": 1790815500
+          }
+        },
+        {
+          "at": 1331.7000002861023,
+          "phase": "initial",
+          "range": {
+            "from": 1790766000,
+            "to": 1790815500
+          }
+        },
+        {
+          "at": 1571.8000001907349,
+          "phase": "jump",
+          "range": {
+            "from": 1787763300,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 2361.800000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787811300
+          }
+        },
+        {
+          "at": 2378.1000003814697,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787809800
+          }
+        },
+        {
+          "at": 2394.7000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787808300
+          }
+        },
+        {
+          "at": 2411.4000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787806800
+          }
+        },
+        {
+          "at": 2445.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787805300
+          }
+        },
+        {
+          "at": 2461.4000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787803800
+          }
+        },
+        {
+          "at": 2478.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787802300
+          }
+        },
+        {
+          "at": 2494.7000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787800800
+          }
+        },
+        {
+          "at": 2517.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787799300
+          }
+        },
+        {
+          "at": 2545.7000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787797800
+          }
+        },
+        {
+          "at": 2561.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787796300
+          }
+        },
+        {
+          "at": 2579.5,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787794800
+          }
+        },
+        {
+          "at": 2596,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787793300
+          }
+        },
+        {
+          "at": 2611.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787791800
+          }
+        },
+        {
+          "at": 2627.800000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787790300
+          }
+        },
+        {
+          "at": 2644.9000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787788800
+          }
+        },
+        {
+          "at": 2661.5,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787787300
+          }
+        },
+        {
+          "at": 2677.9000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787785800
+          }
+        },
+        {
+          "at": 2842.5,
+          "phase": "older",
+          "range": {
+            "from": 1787736000,
+            "to": 1787785800
+          }
+        },
+        {
+          "at": 3228.300000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787737800,
+            "to": 1787787300
+          }
+        },
+        {
+          "at": 3244.6000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787739300,
+            "to": 1787788800
+          }
+        },
+        {
+          "at": 3266.6000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787740800,
+            "to": 1787790300
+          }
+        },
+        {
+          "at": 3294.800000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787742300,
+            "to": 1787791800
+          }
+        },
+        {
+          "at": 3312.1000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787743800,
+            "to": 1787793300
+          }
+        },
+        {
+          "at": 3345.7000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787745300,
+            "to": 1787794800
+          }
+        },
+        {
+          "at": 3378.300000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787746800,
+            "to": 1787796300
+          }
+        },
+        {
+          "at": 3395,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787748300,
+            "to": 1787797800
+          }
+        },
+        {
+          "at": 3416.1000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787749800,
+            "to": 1787799300
+          }
+        },
+        {
+          "at": 3428.800000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787751300,
+            "to": 1787800800
+          }
+        },
+        {
+          "at": 3445.5,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787752800,
+            "to": 1787802300
+          }
+        },
+        {
+          "at": 3461.6000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787754300,
+            "to": 1787803800
+          }
+        },
+        {
+          "at": 3478.300000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787755800,
+            "to": 1787805300
+          }
+        },
+        {
+          "at": 3494.7000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787757300,
+            "to": 1787806800
+          }
+        },
+        {
+          "at": 3511.4000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787758800,
+            "to": 1787808300
+          }
+        },
+        {
+          "at": 3528.300000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787760300,
+            "to": 1787809800
+          }
+        },
+        {
+          "at": 3561.800000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787761800,
+            "to": 1787811300
+          }
+        },
+        {
+          "at": 3579.7000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787763300,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 4044.6000003814697,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787764800,
+            "to": 1787814300
+          }
+        },
+        {
+          "at": 4062,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787766300,
+            "to": 1787815800
+          }
+        },
+        {
+          "at": 4078,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787767800,
+            "to": 1787817300
+          }
+        },
+        {
+          "at": 4096.400000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787769300,
+            "to": 1787818800
+          }
+        },
+        {
+          "at": 4111.300000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787770800,
+            "to": 1787820300
+          }
+        },
+        {
+          "at": 4128.10000038147,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787772300,
+            "to": 1787821800
+          }
+        },
+        {
+          "at": 4144.900000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787773800,
+            "to": 1787823300
+          }
+        },
+        {
+          "at": 4164,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787775300,
+            "to": 1787824800
+          }
+        },
+        {
+          "at": 4177.900000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787776800,
+            "to": 1787826300
+          }
+        },
+        {
+          "at": 4200.800000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787778300,
+            "to": 1787827800
+          }
+        },
+        {
+          "at": 4229.400000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787779800,
+            "to": 1787829300
+          }
+        },
+        {
+          "at": 4261.400000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787781300,
+            "to": 1787830800
+          }
+        },
+        {
+          "at": 4279.700000286102,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787782800,
+            "to": 1787832300
+          }
+        },
+        {
+          "at": 4311.200000286102,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787784300,
+            "to": 1787833800
+          }
+        },
+        {
+          "at": 4327.800000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787785800,
+            "to": 1787835300
+          }
+        },
+        {
+          "at": 4344.700000286102,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787787300,
+            "to": 1787836800
+          }
+        },
+        {
+          "at": 4379.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787788800,
+            "to": 1787838300
+          }
+        },
+        {
+          "at": 4396,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787790300,
+            "to": 1787840100
+          }
+        }
+      ],
+      "target": {
+        "from": 1787763300,
+        "to": 1787812800
+      },
+      "version": "TT v31.1.0 (internal id 6b804c486857f27920cf761aa7eb6e29d9bb6362 @ 2026-04-08T18:21:25.992Z)",
+      "errors": []
+    },
+    {
+      "config": {
+        "name": "cold-historical-startup",
+        "mode": "cold",
+        "startup": true
+      },
+      "initial": {
+        "at": 1736,
+        "range": {
+          "from": 1787765400,
+          "to": 1787812800
+        },
+        "spacing": 6.259036144578314,
+        "offset": -9999,
+        "dataReady": true,
+        "pending": 0,
+        "requests": 1
+      },
+      "jump": {
+        "at": 1773.4000000953674,
+        "range": {
+          "from": 1787765400,
+          "to": 1787812800
+        },
+        "spacing": 6.259036144578314,
+        "offset": -9999,
+        "dataReady": true,
+        "pending": 0,
+        "requests": 1
+      },
+      "movements": [
+        {
+          "name": "older",
+          "before": {
+            "at": 2077.2000002861023,
+            "range": {
+              "from": 1787765400,
+              "to": 1787812800
+            },
+            "spacing": 6.259036144578314,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "after": {
+            "at": 3162.6000003814697,
+            "range": {
+              "from": 1787739600,
+              "to": 1787787000
+            },
+            "spacing": 6.259036144578314,
+            "offset": -10085.275265,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "newRequests": 0
+        },
+        {
+          "name": "newer-return",
+          "before": {
+            "at": 3170.4000000953674,
+            "range": {
+              "from": 1787739600,
+              "to": 1787787000
+            },
+            "spacing": 6.259036144578314,
+            "offset": -10085.275265,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "after": {
+            "at": 3980.5,
+            "range": {
+              "from": 1787765400,
+              "to": 1787812800
+            },
+            "spacing": 6.259036144578314,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "newRequests": 0
+        },
+        {
+          "name": "newer-beyond-target",
+          "before": {
+            "at": 3982.9000000953674,
+            "range": {
+              "from": 1787765400,
+              "to": 1787812800
+            },
+            "spacing": 6.259036144578314,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "after": {
+            "at": 4728,
+            "range": {
+              "from": 1787791200,
+              "to": 1787838900
+            },
+            "spacing": 6.259036144578314,
+            "offset": -9912.724735,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "newRequests": 0
+        }
+      ],
+      "trace": [
+        {
+          "at": 1031.4000000953674,
+          "phase": "initial",
+          "params": {
+            "from": 1787763300,
+            "to": 1790812860,
+            "countBack": 10166,
+            "firstDataRequest": true
+          },
+          "visible": {
+            "from": 0,
+            "to": 0
+          },
+          "callback_at": 1090,
+          "returned": 10766,
+          "extra": 600,
+          "first": 1787583000,
+          "last": 1790812500,
+          "hasAtOrAfterTo": false
+        }
+      ],
+      "events": [
+        {
+          "at": 1366.8000001907349,
+          "phase": "initial",
+          "range": {
+            "from": 1787763300,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 1689.6000003814697,
+          "phase": "initial",
+          "range": {
+            "from": 1787765400,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 2229,
+          "phase": "older",
+          "range": {
+            "from": 1787763900,
+            "to": 1787811600
+          }
+        },
+        {
+          "at": 2254.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787810100
+          }
+        },
+        {
+          "at": 2278.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787808600
+          }
+        },
+        {
+          "at": 2315.7000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787807100
+          }
+        },
+        {
+          "at": 2344.7000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787805600
+          }
+        },
+        {
+          "at": 2361.5,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787804400
+          }
+        },
+        {
+          "at": 2380.5,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787802900
+          }
+        },
+        {
+          "at": 2411.4000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787801400
+          }
+        },
+        {
+          "at": 2433.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787799900
+          }
+        },
+        {
+          "at": 2463.800000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787798400
+          }
+        },
+        {
+          "at": 2494.7000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787797200
+          }
+        },
+        {
+          "at": 2512.4000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787795700
+          }
+        },
+        {
+          "at": 2529.6000003814697,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787794200
+          }
+        },
+        {
+          "at": 2565.1000003814697,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787792700
+          }
+        },
+        {
+          "at": 2597.1000003814697,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787791200
+          }
+        },
+        {
+          "at": 2629.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787790000
+          }
+        },
+        {
+          "at": 2694.6000003814697,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787788500
+          }
+        },
+        {
+          "at": 2711.1000003814697,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787787000
+          }
+        },
+        {
+          "at": 2863.2000002861023,
+          "phase": "older",
+          "range": {
+            "from": 1787739600,
+            "to": 1787787000
+          }
+        },
+        {
+          "at": 3228.1000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787740800,
+            "to": 1787788500
+          }
+        },
+        {
+          "at": 3246.9000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787742300,
+            "to": 1787790000
+          }
+        },
+        {
+          "at": 3267.4000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787743800,
+            "to": 1787791200
+          }
+        },
+        {
+          "at": 3297.2000002861023,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787745300,
+            "to": 1787792700
+          }
+        },
+        {
+          "at": 3312.800000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787746800,
+            "to": 1787794200
+          }
+        },
+        {
+          "at": 3329.5,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787748000,
+            "to": 1787795700
+          }
+        },
+        {
+          "at": 3346.4000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787749500,
+            "to": 1787797200
+          }
+        },
+        {
+          "at": 3378.9000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787751000,
+            "to": 1787798400
+          }
+        },
+        {
+          "at": 3415.5,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787752500,
+            "to": 1787799900
+          }
+        },
+        {
+          "at": 3428.4000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787754000,
+            "to": 1787801400
+          }
+        },
+        {
+          "at": 3461.5,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787755200,
+            "to": 1787802900
+          }
+        },
+        {
+          "at": 3480.6000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787756700,
+            "to": 1787804400
+          }
+        },
+        {
+          "at": 3496.1000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787758200,
+            "to": 1787805600
+          }
+        },
+        {
+          "at": 3512.6000003814697,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787759700,
+            "to": 1787807100
+          }
+        },
+        {
+          "at": 3527.9000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787760900,
+            "to": 1787808600
+          }
+        },
+        {
+          "at": 3544.9000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787762400,
+            "to": 1787810100
+          }
+        },
+        {
+          "at": 3578.300000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787763900,
+            "to": 1787811600
+          }
+        },
+        {
+          "at": 3595.9000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787765400,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 4044.4000000953674,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787766900,
+            "to": 1787814300
+          }
+        },
+        {
+          "at": 4061.6000003814697,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787768100,
+            "to": 1787815800
+          }
+        },
+        {
+          "at": 4077.9000000953674,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787769600,
+            "to": 1787817300
+          }
+        },
+        {
+          "at": 4094.6000003814697,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787771100,
+            "to": 1787818500
+          }
+        },
+        {
+          "at": 4111.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787772600,
+            "to": 1787820000
+          }
+        },
+        {
+          "at": 4127.800000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787774100,
+            "to": 1787821500
+          }
+        },
+        {
+          "at": 4146.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787775300,
+            "to": 1787823000
+          }
+        },
+        {
+          "at": 4161.10000038147,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787776800,
+            "to": 1787824500
+          }
+        },
+        {
+          "at": 4189.400000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787778300,
+            "to": 1787825700
+          }
+        },
+        {
+          "at": 4214.900000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787779800,
+            "to": 1787827200
+          }
+        },
+        {
+          "at": 4227.700000286102,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787781300,
+            "to": 1787828700
+          }
+        },
+        {
+          "at": 4244.60000038147,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787782500,
+            "to": 1787830200
+          }
+        },
+        {
+          "at": 4263.10000038147,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787784000,
+            "to": 1787831700
+          }
+        },
+        {
+          "at": 4278.10000038147,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787785500,
+            "to": 1787832900
+          }
+        },
+        {
+          "at": 4295.800000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787787000,
+            "to": 1787834400
+          }
+        },
+        {
+          "at": 4311.200000286102,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787788500,
+            "to": 1787835900
+          }
+        },
+        {
+          "at": 4327.800000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787789700,
+            "to": 1787837400
+          }
+        },
+        {
+          "at": 4344.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787791200,
+            "to": 1787838900
+          }
+        }
+      ],
+      "target": {
+        "from": 1787763300,
+        "to": 1787812800
+      },
+      "version": "TT v31.1.0 (internal id 6b804c486857f27920cf761aa7eb6e29d9bb6362 @ 2026-04-08T18:21:25.992Z)",
+      "errors": []
+    },
+    {
+      "config": {
+        "name": "cached-historical-startup",
+        "mode": "cached",
+        "startup": true
+      },
+      "initial": {
+        "at": 1757,
+        "range": {
+          "from": 1787765400,
+          "to": 1787812800
+        },
+        "spacing": 6.259036144578314,
+        "offset": -9999,
+        "dataReady": true,
+        "pending": 0,
+        "requests": 1
+      },
+      "jump": {
+        "at": 1807.8000001907349,
+        "range": {
+          "from": 1787765400,
+          "to": 1787812800
+        },
+        "spacing": 6.259036144578314,
+        "offset": -9999,
+        "dataReady": true,
+        "pending": 0,
+        "requests": 1
+      },
+      "movements": [
+        {
+          "name": "older",
+          "before": {
+            "at": 2113,
+            "range": {
+              "from": 1787765400,
+              "to": 1787812800
+            },
+            "spacing": 6.259036144578314,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "after": {
+            "at": 3108.5999999046326,
+            "range": {
+              "from": 1787739600,
+              "to": 1787787000
+            },
+            "spacing": 6.259036144578314,
+            "offset": -10085.275265,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "newRequests": 0
+        },
+        {
+          "name": "newer-return",
+          "before": {
+            "at": 3110.0999999046326,
+            "range": {
+              "from": 1787739600,
+              "to": 1787787000
+            },
+            "spacing": 6.259036144578314,
+            "offset": -10085.275265,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "after": {
+            "at": 3965,
+            "range": {
+              "from": 1787765400,
+              "to": 1787812800
+            },
+            "spacing": 6.259036144578314,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "newRequests": 0
+        },
+        {
+          "name": "newer-beyond-target",
+          "before": {
+            "at": 3971.5,
+            "range": {
+              "from": 1787765400,
+              "to": 1787812800
+            },
+            "spacing": 6.259036144578314,
+            "offset": -9999,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "after": {
+            "at": 4957.300000190735,
+            "range": {
+              "from": 1787791200,
+              "to": 1787838900
+            },
+            "spacing": 6.259036144578314,
+            "offset": -9912.724735,
+            "dataReady": true,
+            "pending": 0,
+            "requests": 1
+          },
+          "newRequests": 0
+        }
+      ],
+      "trace": [
+        {
+          "at": 1039.8000001907349,
+          "phase": "initial",
+          "params": {
+            "from": 1787763300,
+            "to": 1790812860,
+            "countBack": 10166,
+            "firstDataRequest": true
+          },
+          "visible": {
+            "from": 0,
+            "to": 0
+          },
+          "callback_at": 1120.8000001907349,
+          "returned": 12166,
+          "extra": 2000,
+          "first": 1787163000,
+          "last": 1790812500,
+          "hasAtOrAfterTo": false
+        }
+      ],
+      "events": [
+        {
+          "at": 1384.3000001907349,
+          "phase": "initial",
+          "range": {
+            "from": 1787763300,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 1723.9000000953674,
+          "phase": "initial",
+          "range": {
+            "from": 1787765400,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 2284.0999999046326,
+          "phase": "older",
+          "range": {
+            "from": 1787763900,
+            "to": 1787811600
+          }
+        },
+        {
+          "at": 2325.699999809265,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787810100
+          }
+        },
+        {
+          "at": 2342.5999999046326,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787808600
+          }
+        },
+        {
+          "at": 2359.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787807100
+          }
+        },
+        {
+          "at": 2375.5999999046326,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787805600
+          }
+        },
+        {
+          "at": 2392.699999809265,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787804400
+          }
+        },
+        {
+          "at": 2409.5999999046326,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787802900
+          }
+        },
+        {
+          "at": 2426.9000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787801400
+          }
+        },
+        {
+          "at": 2442.4000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787799900
+          }
+        },
+        {
+          "at": 2475.699999809265,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787798400
+          }
+        },
+        {
+          "at": 2511.699999809265,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787797200
+          }
+        },
+        {
+          "at": 2542.5,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787795700
+          }
+        },
+        {
+          "at": 2559.300000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787794200
+          }
+        },
+        {
+          "at": 2576.800000190735,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787792700
+          }
+        },
+        {
+          "at": 2594.699999809265,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787791200
+          }
+        },
+        {
+          "at": 2625.9000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787790000
+          }
+        },
+        {
+          "at": 2659.9000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787788500
+          }
+        },
+        {
+          "at": 2675.5,
+          "phase": "older",
+          "range": {
+            "from": 1787763300,
+            "to": 1787787000
+          }
+        },
+        {
+          "at": 2826.9000000953674,
+          "phase": "older",
+          "range": {
+            "from": 1787739600,
+            "to": 1787787000
+          }
+        },
+        {
+          "at": 3226,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787740800,
+            "to": 1787788500
+          }
+        },
+        {
+          "at": 3242.300000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787742300,
+            "to": 1787790000
+          }
+        },
+        {
+          "at": 3259.4000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787743800,
+            "to": 1787791200
+          }
+        },
+        {
+          "at": 3276.699999809265,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787745300,
+            "to": 1787792700
+          }
+        },
+        {
+          "at": 3292.199999809265,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787746800,
+            "to": 1787794200
+          }
+        },
+        {
+          "at": 3308.9000000953674,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787748000,
+            "to": 1787795700
+          }
+        },
+        {
+          "at": 3325.5,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787749500,
+            "to": 1787797200
+          }
+        },
+        {
+          "at": 3342.5,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787751000,
+            "to": 1787798400
+          }
+        },
+        {
+          "at": 3376,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787752500,
+            "to": 1787799900
+          }
+        },
+        {
+          "at": 3392.199999809265,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787754000,
+            "to": 1787801400
+          }
+        },
+        {
+          "at": 3408.800000190735,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787755200,
+            "to": 1787802900
+          }
+        },
+        {
+          "at": 3426,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787756700,
+            "to": 1787804400
+          }
+        },
+        {
+          "at": 3459.199999809265,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787758200,
+            "to": 1787805600
+          }
+        },
+        {
+          "at": 3476,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787759700,
+            "to": 1787807100
+          }
+        },
+        {
+          "at": 3492.5999999046326,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787760900,
+            "to": 1787808600
+          }
+        },
+        {
+          "at": 3509,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787762400,
+            "to": 1787810100
+          }
+        },
+        {
+          "at": 3544,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787763900,
+            "to": 1787811600
+          }
+        },
+        {
+          "at": 3580.199999809265,
+          "phase": "newer-return",
+          "range": {
+            "from": 1787765400,
+            "to": 1787812800
+          }
+        },
+        {
+          "at": 4092.0999999046326,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787766900,
+            "to": 1787814300
+          }
+        },
+        {
+          "at": 4126.300000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787768100,
+            "to": 1787815800
+          }
+        },
+        {
+          "at": 4166.699999809265,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787769600,
+            "to": 1787817300
+          }
+        },
+        {
+          "at": 4205.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787771100,
+            "to": 1787818500
+          }
+        },
+        {
+          "at": 4264.099999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787772600,
+            "to": 1787820000
+          }
+        },
+        {
+          "at": 4292.699999809265,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787774100,
+            "to": 1787821500
+          }
+        },
+        {
+          "at": 4308.800000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787775300,
+            "to": 1787823000
+          }
+        },
+        {
+          "at": 4340.099999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787776800,
+            "to": 1787824500
+          }
+        },
+        {
+          "at": 4358.699999809265,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787778300,
+            "to": 1787825700
+          }
+        },
+        {
+          "at": 4375.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787779800,
+            "to": 1787827200
+          }
+        },
+        {
+          "at": 4392,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787781300,
+            "to": 1787828700
+          }
+        },
+        {
+          "at": 4408.900000095367,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787782500,
+            "to": 1787830200
+          }
+        },
+        {
+          "at": 4425.5,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787784000,
+            "to": 1787831700
+          }
+        },
+        {
+          "at": 4443.599999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787785500,
+            "to": 1787832900
+          }
+        },
+        {
+          "at": 4479.300000190735,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787787000,
+            "to": 1787834400
+          }
+        },
+        {
+          "at": 4512.599999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787788500,
+            "to": 1787835900
+          }
+        },
+        {
+          "at": 4543,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787789700,
+            "to": 1787837400
+          }
+        },
+        {
+          "at": 4576.099999904633,
+          "phase": "newer-beyond-target",
+          "range": {
+            "from": 1787791200,
+            "to": 1787838900
+          }
+        }
+      ],
+      "target": {
+        "from": 1787763300,
+        "to": 1787812800
+      },
+      "version": "TT v31.1.0 (internal id 6b804c486857f27920cf761aa7eb6e29d9bb6362 @ 2026-04-08T18:21:25.992Z)",
+      "errors": []
+    }
+  ],
+  "script": "web/tests/advanced-native-additive-jump.browser.cjs",
+  "script_sha256": "c8f4c1d2c0c3c96dbe94b4dd88ac6b54dfd031c049c3947530c997d64a1af12a",
+  "limitations": [
+    "Synthetic continuous 24x7 M5 without indicators; cold/cache names select additive bar budgets, not real database state or provider performance.",
+    "Jump is 10000 bars before latest; all callbacks are asynchronous with 50 ms artificial delay; no reset or private API.",
+    "All responses enforce timestamp < periodParams.to; right-side coverage comes from existing native history plus legal continuous fill, not out-of-contract future bars.",
+    "Immediate drag means after requested jump has loaded; no experiment promises invisible transition during initial jump or infinite seamless dragging.",
+    "No full-frame continuity evidence is collected in this probe; results prove usable loaded history by zero additional getBars during three valid pan gestures."
+  ]
+}

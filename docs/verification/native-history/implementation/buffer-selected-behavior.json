@@ -1,0 +1,4676 @@
+{
+  "kind": "formal product behavior; real provider native periods; no mock data or vendor edits",
+  "cases": [
+    {
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "kind": "single native buffer/MA/period switch",
+      "http": [
+        {
+          "at": 1790930845383,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871505000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930905000,
+            "track_history": false
+          },
+          "count": 2198,
+          "mandatory": 198,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 341125
+        },
+        {
+          "at": 1790930865707,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 408,
+            "countBack": 408,
+            "from": 1790906505000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930925000,
+            "track_history": false
+          },
+          "count": 808,
+          "mandatory": 408,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 126026
+        },
+        {
+          "at": 1790930866581,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1790564626000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930926000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 125870
+        },
+        {
+          "at": 1790930869091,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1782725806000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930926000,
+            "track_history": false
+          },
+          "count": 813,
+          "mandatory": 413,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 126802
+        },
+        {
+          "at": 1790930869955,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1741769329000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930929000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 125868
+        },
+        {
+          "at": 1790930870647,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1544777330000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930930000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 125869
+        },
+        {
+          "at": 1790930871447,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "MN",
+            "limit": 407,
+            "countBack": 407,
+            "from": 720607730000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930930000,
+            "track_history": false
+          },
+          "count": 269,
+          "mandatory": 407,
+          "optional": 0,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 42477
+        },
+        {
+          "at": 1790930872851,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1789905292000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930932000,
+            "track_history": false
+          },
+          "count": 856,
+          "mandatory": 456,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 133464
+        },
+        {
+          "at": 1790930873684,
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H1",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1788879653000,
+            "firstDataRequest": true,
+            "client": "9a9312c6-3452-4da6-9bc1-cb5f67d52ebf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930933000,
+            "track_history": false
+          },
+          "count": 825,
+          "mandatory": 425,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 128657
+        }
+      ],
+      "errors": [],
+      "initial": {
+        "range": {
+          "from": 1790877300,
+          "to": 1790933700
+        },
+        "spacing": 6,
+        "requests": 1,
+        "ready": true,
+        "pending": 0,
+        "queue": 0
+      },
+      "movements": [
+        {
+          "before": {
+            "range": {
+              "from": 1790877300,
+              "to": 1790933700
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "after": {
+            "range": {
+              "from": 1790849700,
+              "to": 1790906400
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "newRequests": 0,
+          "intervals": [
+            -7.5,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.80000000000291,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.700000000000728,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728
+          ]
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1790849700,
+              "to": 1790906400
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "after": {
+            "range": {
+              "from": 1790877300,
+              "to": 1790933700
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "newRequests": 0,
+          "intervals": [
+            9.731999713898404,
+            16.667999999997846,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.799999999999272,
+            16.599999999998545,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.799999999999272,
+            16.599999999998545,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709
+          ]
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1790877300,
+              "to": 1790933700
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 1,
+            "queue": 0
+          },
+          "after": {
+            "range": {
+              "from": 1790904900,
+              "to": 1790961300
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "newRequests": 0,
+          "intervals": [
+            -12.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.599999999998545,
+            16.799999999999272,
+            16.600000000002183,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.599999999998545,
+            16.799999999999272,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            33.400000000001455,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.799999999999272,
+            16.700000000000728,
+            16.600000000002183,
+            33.39999999999782,
+            16.600000000002183,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.799999999999272,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.799999999999272,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.599999999998545,
+            16.700000000000728
+          ]
+        }
+      ],
+      "ma": "z5aNgM",
+      "maTrace": [
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "5",
+          "params": {
+            "from": 1790871505,
+            "to": 1790930905,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790930845120.4,
+          "callback": 1790930845404.3,
+          "count": 2198,
+          "first": 1790098800000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "periods": [
+        {
+          "resolution": "1",
+          "elapsed": 825,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:OANDA:AUD_CAD",
+              "resolution": "1",
+              "params": {
+                "from": 1790906505,
+                "to": 1790930925,
+                "countBack": 408,
+                "firstDataRequest": true
+              },
+              "start": 1790930865190.9,
+              "callback": 1790930865690.9,
+              "count": 808,
+              "first": 1790881260000,
+              "last": 1790930820000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "15",
+          "elapsed": 798,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:OANDA:AUD_CAD",
+              "resolution": "15",
+              "params": {
+                "from": 1790564626,
+                "to": 1790930926,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930866040.9,
+              "callback": 1790930866571.2,
+              "count": 807,
+              "first": 1790032500000,
+              "last": 1790930700000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "240",
+          "elapsed": 2513,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:OANDA:AUD_CAD",
+              "resolution": "240",
+              "params": {
+                "from": 1782725806,
+                "to": 1790930926,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930866802.4,
+              "callback": 1790930869083.5,
+              "count": 813,
+              "first": 1774558800000,
+              "last": 1790917200000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "1D",
+          "elapsed": 865,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:OANDA:AUD_CAD",
+              "resolution": "1D",
+              "params": {
+                "from": 1741769329,
+                "to": 1790930929,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930869310.9,
+              "callback": 1790930869946,
+              "count": 807,
+              "first": 1692748800000,
+              "last": 1790899200000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "1W",
+          "elapsed": 681,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:OANDA:AUD_CAD",
+              "resolution": "1W",
+              "params": {
+                "from": 1544777330,
+                "to": 1790930930,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930870174.2,
+              "callback": 1790930870642.3,
+              "count": 807,
+              "first": 1303084800000,
+              "last": 1790553600000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "1M",
+          "elapsed": 834,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:OANDA:AUD_CAD",
+              "resolution": "1M",
+              "params": {
+                "from": 720607730,
+                "to": 1790930930,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930870867,
+              "callback": 1790930871439.7,
+              "count": 269,
+              "first": 1086048000000,
+              "last": 1790812800000,
+              "duplicates": 0
+            }
+          ]
+        }
+      ],
+      "rapid": [
+        {
+          "resolution": "1",
+          "elapsed": 83,
+          "trace": []
+        },
+        {
+          "resolution": "5",
+          "elapsed": 78,
+          "trace": []
+        },
+        {
+          "resolution": "1D",
+          "elapsed": 83,
+          "trace": []
+        },
+        {
+          "resolution": "15",
+          "elapsed": 68,
+          "trace": []
+        },
+        {
+          "resolution": "1W",
+          "elapsed": 113,
+          "trace": []
+        },
+        {
+          "resolution": "30",
+          "elapsed": 839,
+          "trace": [
+            {
+              "symbol": "MWP:OANDA:AUD_CAD",
+              "resolution": "30",
+              "params": {
+                "from": 1789905292,
+                "to": 1790930932,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930872131.5999,
+              "callback": 1790930872847.5999,
+              "count": 856,
+              "first": 1788872400000,
+              "last": 1790929800000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "240",
+          "elapsed": 86,
+          "trace": []
+        },
+        {
+          "resolution": "1M",
+          "elapsed": 78,
+          "trace": []
+        },
+        {
+          "resolution": "60",
+          "elapsed": 622,
+          "trace": [
+            {
+              "symbol": "MWP:OANDA:AUD_CAD",
+              "resolution": "60",
+              "params": {
+                "from": 1788879653,
+                "to": 1790930933,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930873123.0999,
+              "callback": 1790930873678,
+              "count": 825,
+              "first": 1786924800000,
+              "last": 1790928000000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "5",
+          "elapsed": 61,
+          "trace": []
+        },
+        {
+          "resolution": "1D",
+          "elapsed": 100,
+          "trace": []
+        },
+        {
+          "resolution": "1",
+          "elapsed": 134,
+          "trace": []
+        },
+        {
+          "resolution": "30",
+          "elapsed": 82,
+          "trace": []
+        },
+        {
+          "resolution": "1W",
+          "elapsed": 67,
+          "trace": []
+        },
+        {
+          "resolution": "15",
+          "elapsed": 67,
+          "trace": []
+        },
+        {
+          "resolution": "240",
+          "elapsed": 54,
+          "trace": []
+        },
+        {
+          "resolution": "60",
+          "elapsed": 145,
+          "trace": []
+        },
+        {
+          "resolution": "1M",
+          "elapsed": 101,
+          "trace": []
+        },
+        {
+          "resolution": "5",
+          "elapsed": 67,
+          "trace": []
+        },
+        {
+          "resolution": "1",
+          "elapsed": 66,
+          "trace": []
+        }
+      ],
+      "burst": [
+        {
+          "res": "1",
+          "result": true,
+          "elapsed": 0
+        },
+        {
+          "res": "5",
+          "result": true,
+          "elapsed": 19
+        },
+        {
+          "res": "1D",
+          "result": true,
+          "elapsed": 36
+        },
+        {
+          "res": "15",
+          "result": true,
+          "elapsed": 31
+        },
+        {
+          "res": "1W",
+          "result": true,
+          "elapsed": 32
+        },
+        {
+          "res": "30",
+          "result": true,
+          "elapsed": 22
+        },
+        {
+          "res": "240",
+          "result": true,
+          "elapsed": 17
+        },
+        {
+          "res": "1M",
+          "result": true,
+          "elapsed": 20
+        },
+        {
+          "res": "60",
+          "result": true,
+          "elapsed": 16
+        },
+        {
+          "res": "5",
+          "result": true,
+          "elapsed": 22
+        },
+        {
+          "res": "1D",
+          "result": true,
+          "elapsed": 17
+        },
+        {
+          "res": "1",
+          "result": true,
+          "elapsed": 13
+        },
+        {
+          "res": "30",
+          "result": true,
+          "elapsed": 14
+        },
+        {
+          "res": "1W",
+          "result": true,
+          "elapsed": 24
+        },
+        {
+          "res": "15",
+          "result": true,
+          "elapsed": 26
+        },
+        {
+          "res": "240",
+          "result": true,
+          "elapsed": 37
+        },
+        {
+          "res": "60",
+          "result": true,
+          "elapsed": 36
+        },
+        {
+          "res": "1M",
+          "result": true,
+          "elapsed": 20
+        },
+        {
+          "res": "5",
+          "result": true,
+          "elapsed": 15
+        },
+        {
+          "res": "1",
+          "result": true,
+          "elapsed": 15
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "5",
+          "params": {
+            "from": 1790871505,
+            "to": 1790930905,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790930845120.4,
+          "callback": 1790930845404.3,
+          "count": 2198,
+          "first": 1790098800000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "1",
+          "params": {
+            "from": 1790906505,
+            "to": 1790930925,
+            "countBack": 408,
+            "firstDataRequest": true
+          },
+          "start": 1790930865190.9,
+          "callback": 1790930865690.9,
+          "count": 808,
+          "first": 1790881260000,
+          "last": 1790930820000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "15",
+          "params": {
+            "from": 1790564626,
+            "to": 1790930926,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930866040.9,
+          "callback": 1790930866571.2,
+          "count": 807,
+          "first": 1790032500000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "240",
+          "params": {
+            "from": 1782725806,
+            "to": 1790930926,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930866802.4,
+          "callback": 1790930869083.5,
+          "count": 813,
+          "first": 1774558800000,
+          "last": 1790917200000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "1D",
+          "params": {
+            "from": 1741769329,
+            "to": 1790930929,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930869310.9,
+          "callback": 1790930869946,
+          "count": 807,
+          "first": 1692748800000,
+          "last": 1790899200000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "1W",
+          "params": {
+            "from": 1544777330,
+            "to": 1790930930,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930870174.2,
+          "callback": 1790930870642.3,
+          "count": 807,
+          "first": 1303084800000,
+          "last": 1790553600000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "1M",
+          "params": {
+            "from": 720607730,
+            "to": 1790930930,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930870867,
+          "callback": 1790930871439.7,
+          "count": 269,
+          "first": 1086048000000,
+          "last": 1790812800000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "30",
+          "params": {
+            "from": 1789905292,
+            "to": 1790930932,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930872131.5999,
+          "callback": 1790930872847.5999,
+          "count": 856,
+          "first": 1788872400000,
+          "last": 1790929800000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_CAD",
+          "resolution": "60",
+          "params": {
+            "from": 1788879653,
+            "to": 1790930933,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930873123.0999,
+          "callback": 1790930873678,
+          "count": 825,
+          "first": 1786924800000,
+          "last": 1790928000000,
+          "duplicates": 0
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "kind": "single native buffer/MA/period switch",
+      "http": [
+        {
+          "at": 1790930891345,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871550000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930950000,
+            "track_history": false
+          },
+          "count": 2198,
+          "mandatory": 198,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 402671
+        },
+        {
+          "at": 1790930908761,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1790906546000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930966000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 148543
+        },
+        {
+          "at": 1790930909705,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1790564668000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930968000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 148467
+        },
+        {
+          "at": 1790930910717,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1785070169000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930969000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 148467
+        },
+        {
+          "at": 1790930911937,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1755766170000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930970000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 149329
+        },
+        {
+          "at": 1790930912854,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1544777372000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930972000,
+            "track_history": false
+          },
+          "count": 477,
+          "mandatory": 407,
+          "optional": 70,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 87673
+        },
+        {
+          "at": 1790930913543,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "MN",
+            "limit": 407,
+            "countBack": 407,
+            "from": 720607773000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930973000,
+            "track_history": false
+          },
+          "count": 111,
+          "mandatory": 407,
+          "optional": 0,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 21003
+        },
+        {
+          "at": 1790930915881,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1790198374000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930974000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 148467
+        },
+        {
+          "at": 1790930917909,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H1",
+            "limit": 407,
+            "countBack": 407,
+            "from": 1789465776000,
+            "firstDataRequest": true,
+            "client": "c1258555-d40b-4318-bab9-c9838eb44903",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930976000,
+            "track_history": false
+          },
+          "count": 807,
+          "mandatory": 407,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 148469
+        }
+      ],
+      "errors": [],
+      "initial": {
+        "range": {
+          "from": 1790877900,
+          "to": 1790933700
+        },
+        "spacing": 6,
+        "requests": 1,
+        "ready": true,
+        "pending": 0,
+        "queue": 0
+      },
+      "movements": [
+        {
+          "before": {
+            "range": {
+              "from": 1790877900,
+              "to": 1790933700
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "after": {
+            "range": {
+              "from": 1790850300,
+              "to": 1790906400
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "newRequests": 0,
+          "intervals": [
+            -5.7999998092655005,
+            16.600000000000364,
+            16.700000000000728,
+            50,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.69999999999891,
+            16.600000000000364,
+            16.600000000000364,
+            16.69999999999891,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.69999999999891
+          ]
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1790850300,
+              "to": 1790906400
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 1,
+            "queue": 0
+          },
+          "after": {
+            "range": {
+              "from": 1790877900,
+              "to": 1790933700
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "newRequests": 0,
+          "intervals": [
+            10.766000190735213,
+            16.73400000000038,
+            16.599999999998545,
+            16.700000000000728,
+            33.29999999999927,
+            16.600000000000364,
+            16.80000000000109,
+            16.599999999998545,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.600000000000364,
+            16.80000000000109,
+            16.599999999998545,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.69999999999891,
+            16.600000000000364,
+            16.80000000000109,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.600000000000364,
+            16.700000000000728,
+            16.69999999999891,
+            16.600000000000364,
+            16.80000000000109,
+            16.599999999998545,
+            16.700000000000728,
+            49.899999999999636,
+            33.399999999999636,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.69999999999891,
+            16.700000000000728,
+            16.600000000000364,
+            16.600000000000364,
+            16.799999999999272,
+            16.599999999998545,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709
+          ]
+        },
+        {
+          "before": {
+            "range": {
+              "from": 1790877900,
+              "to": 1790933700
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 1,
+            "queue": 0
+          },
+          "after": {
+            "range": {
+              "from": 1790905200,
+              "to": 1790961300
+            },
+            "spacing": 6,
+            "requests": 1,
+            "ready": true,
+            "pending": 0,
+            "queue": 0
+          },
+          "newRequests": 0,
+          "intervals": [
+            -12.99999980926441,
+            16.799999999999272,
+            16.599999999998545,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999709,
+            16.700000000000728,
+            33.20000000000073,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.700000000000728,
+            16.600000000002183,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.599999999998545,
+            16.700000000000728,
+            16.700000000000728,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183,
+            16.700000000000728,
+            16.69999999999709,
+            16.600000000002183
+          ]
+        }
+      ],
+      "ma": "dPsssD",
+      "maTrace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871550,
+            "to": 1790930950,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790930890996.2,
+          "callback": 1790930891416.5999,
+          "count": 2198,
+          "first": 1790271600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "periods": [
+        {
+          "resolution": "1",
+          "elapsed": 2399,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "1",
+              "params": {
+                "from": 1790906546,
+                "to": 1790930966,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930906594.7998,
+              "callback": 1790930908752.2,
+              "count": 807,
+              "first": 1790882520000,
+              "last": 1790930880000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "15",
+          "elapsed": 947,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "15",
+              "params": {
+                "from": 1790564668,
+                "to": 1790930968,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930908977.9,
+              "callback": 1790930909699.9,
+              "count": 807,
+              "first": 1790205300000,
+              "last": 1790930700000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "240",
+          "elapsed": 1015,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "240",
+              "params": {
+                "from": 1785070169,
+                "to": 1790930969,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930909924.0999,
+              "callback": 1790930910713.7,
+              "count": 807,
+              "first": 1779321600000,
+              "last": 1790928000000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "1D",
+          "elapsed": 1200,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "1D",
+              "params": {
+                "from": 1755766170,
+                "to": 1790930970,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930910962.0999,
+              "callback": 1790930911927.5999,
+              "count": 807,
+              "first": 1721260800000,
+              "last": 1790899200000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "1W",
+          "elapsed": 934,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "1W",
+              "params": {
+                "from": 1544777372,
+                "to": 1790930972,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930912156.5,
+              "callback": 1790930912852,
+              "count": 477,
+              "first": 1502668800000,
+              "last": 1790553600000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "1M",
+          "elapsed": 692,
+          "nativeRequests": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "1M",
+              "params": {
+                "from": 720607773,
+                "to": 1790930973,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930913135,
+              "callback": 1790930913544,
+              "count": 111,
+              "first": 1501545600000,
+              "last": 1790812800000,
+              "duplicates": 0
+            }
+          ]
+        }
+      ],
+      "rapid": [
+        {
+          "resolution": "1",
+          "elapsed": 135,
+          "trace": []
+        },
+        {
+          "resolution": "5",
+          "elapsed": 98,
+          "trace": []
+        },
+        {
+          "resolution": "1D",
+          "elapsed": 100,
+          "trace": []
+        },
+        {
+          "resolution": "15",
+          "elapsed": 145,
+          "trace": []
+        },
+        {
+          "resolution": "1W",
+          "elapsed": 233,
+          "trace": []
+        },
+        {
+          "resolution": "30",
+          "elapsed": 1558,
+          "trace": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "30",
+              "params": {
+                "from": 1790198374,
+                "to": 1790930974,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930914591.2998,
+              "callback": 1790930915873.0999,
+              "count": 807,
+              "first": 1789479000000,
+              "last": 1790929800000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "240",
+          "elapsed": 163,
+          "trace": []
+        },
+        {
+          "resolution": "1M",
+          "elapsed": 193,
+          "trace": []
+        },
+        {
+          "resolution": "60",
+          "elapsed": 1560,
+          "trace": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "60",
+              "params": {
+                "from": 1789465776,
+                "to": 1790930976,
+                "countBack": 407,
+                "firstDataRequest": true
+              },
+              "start": 1790930916429.4,
+              "callback": 1790930917911.0999,
+              "count": 807,
+              "first": 1788026400000,
+              "last": 1790928000000,
+              "duplicates": 0
+            }
+          ]
+        },
+        {
+          "resolution": "5",
+          "elapsed": 326,
+          "trace": []
+        },
+        {
+          "resolution": "1D",
+          "elapsed": 334,
+          "trace": []
+        },
+        {
+          "resolution": "1",
+          "elapsed": 166,
+          "trace": []
+        },
+        {
+          "resolution": "30",
+          "elapsed": 151,
+          "trace": []
+        },
+        {
+          "resolution": "1W",
+          "elapsed": 186,
+          "trace": []
+        },
+        {
+          "resolution": "15",
+          "elapsed": 164,
+          "trace": []
+        },
+        {
+          "resolution": "240",
+          "elapsed": 116,
+          "trace": []
+        },
+        {
+          "resolution": "60",
+          "elapsed": 68,
+          "trace": []
+        },
+        {
+          "resolution": "1M",
+          "elapsed": 133,
+          "trace": []
+        },
+        {
+          "resolution": "5",
+          "elapsed": 981,
+          "trace": []
+        },
+        {
+          "resolution": "1",
+          "elapsed": 118,
+          "trace": []
+        }
+      ],
+      "burst": [
+        {
+          "res": "1",
+          "result": true,
+          "elapsed": 0
+        },
+        {
+          "res": "5",
+          "result": true,
+          "elapsed": 22
+        },
+        {
+          "res": "1D",
+          "result": true,
+          "elapsed": 16
+        },
+        {
+          "res": "15",
+          "result": true,
+          "elapsed": 20
+        },
+        {
+          "res": "1W",
+          "result": true,
+          "elapsed": 37
+        },
+        {
+          "res": "30",
+          "result": true,
+          "elapsed": 40
+        },
+        {
+          "res": "240",
+          "result": true,
+          "elapsed": 36
+        },
+        {
+          "res": "1M",
+          "result": true,
+          "elapsed": 27
+        },
+        {
+          "res": "60",
+          "result": true,
+          "elapsed": 43
+        },
+        {
+          "res": "5",
+          "result": true,
+          "elapsed": 52
+        },
+        {
+          "res": "1D",
+          "result": true,
+          "elapsed": 27
+        },
+        {
+          "res": "1",
+          "result": true,
+          "elapsed": 21
+        },
+        {
+          "res": "30",
+          "result": true,
+          "elapsed": 22
+        },
+        {
+          "res": "1W",
+          "result": true,
+          "elapsed": 30
+        },
+        {
+          "res": "15",
+          "result": true,
+          "elapsed": 23
+        },
+        {
+          "res": "240",
+          "result": true,
+          "elapsed": 33
+        },
+        {
+          "res": "60",
+          "result": true,
+          "elapsed": 16
+        },
+        {
+          "res": "1M",
+          "result": true,
+          "elapsed": 27
+        },
+        {
+          "res": "5",
+          "result": true,
+          "elapsed": 51
+        },
+        {
+          "res": "1",
+          "result": true,
+          "elapsed": 51
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871550,
+            "to": 1790930950,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790930890996.2,
+          "callback": 1790930891416.5999,
+          "count": 2198,
+          "first": 1790271600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "1",
+          "params": {
+            "from": 1790906546,
+            "to": 1790930966,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930906594.7998,
+          "callback": 1790930908752.2,
+          "count": 807,
+          "first": 1790882520000,
+          "last": 1790930880000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "15",
+          "params": {
+            "from": 1790564668,
+            "to": 1790930968,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930908977.9,
+          "callback": 1790930909699.9,
+          "count": 807,
+          "first": 1790205300000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "240",
+          "params": {
+            "from": 1785070169,
+            "to": 1790930969,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930909924.0999,
+          "callback": 1790930910713.7,
+          "count": 807,
+          "first": 1779321600000,
+          "last": 1790928000000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "1D",
+          "params": {
+            "from": 1755766170,
+            "to": 1790930970,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930910962.0999,
+          "callback": 1790930911927.5999,
+          "count": 807,
+          "first": 1721260800000,
+          "last": 1790899200000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "1W",
+          "params": {
+            "from": 1544777372,
+            "to": 1790930972,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930912156.5,
+          "callback": 1790930912852,
+          "count": 477,
+          "first": 1502668800000,
+          "last": 1790553600000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "1M",
+          "params": {
+            "from": 720607773,
+            "to": 1790930973,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930913135,
+          "callback": 1790930913544,
+          "count": 111,
+          "first": 1501545600000,
+          "last": 1790812800000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "30",
+          "params": {
+            "from": 1790198374,
+            "to": 1790930974,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930914591.2998,
+          "callback": 1790930915873.0999,
+          "count": 807,
+          "first": 1789479000000,
+          "last": 1790929800000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "60",
+          "params": {
+            "from": 1789465776,
+            "to": 1790930976,
+            "countBack": 407,
+            "firstDataRequest": true
+          },
+          "start": 1790930916429.4,
+          "callback": 1790930917911.0999,
+          "count": 807,
+          "first": 1788026400000,
+          "last": 1790928000000,
+          "duplicates": 0
+        }
+      ]
+    },
+    {
+      "kind": "multichart",
+      "cpu": 1,
+      "count": 1,
+      "http": [
+        {
+          "at": 1790930930285,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871589000,
+            "firstDataRequest": true,
+            "client": "75159027-4f28-409f-83fd-7aae3e5e3c3c",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930989000,
+            "track_history": false
+          },
+          "count": 2198,
+          "mandatory": 198,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 402672
+        },
+        {
+          "at": 1790930934033,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 187,
+            "countBack": 187,
+            "from": 1790874893000,
+            "firstDataRequest": true,
+            "client": "75159027-4f28-409f-83fd-7aae3e5e3c3c",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930993000,
+            "track_history": false
+          },
+          "count": 2187,
+          "mandatory": 187,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 400658
+        }
+      ],
+      "errors": [],
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790877900,
+            "to": 1790933700
+          },
+          "spacing": 6
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871589,
+            "to": 1790930989,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790930929649.7,
+          "callback": 1790930930388.7,
+          "count": 2198,
+          "first": 1790271600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790874893,
+            "to": 1790930993,
+            "countBack": 187,
+            "firstDataRequest": true
+          },
+          "start": 1790930933707.2,
+          "callback": 1790930934027.4,
+          "count": 2187,
+          "first": 1790274900000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "longTasks": [
+        {
+          "start": 1790930928547.5999,
+          "duration": 317
+        },
+        {
+          "start": 1790930928867.5,
+          "duration": 348
+        },
+        {
+          "start": 1790930929860.5,
+          "duration": 78
+        },
+        {
+          "start": 1790930930143.0999,
+          "duration": 51
+        },
+        {
+          "start": 1790930930375,
+          "duration": 69
+        },
+        {
+          "start": 1790930930375,
+          "duration": 69
+        },
+        {
+          "start": 1790930930628.5999,
+          "duration": 79
+        },
+        {
+          "start": 1790930930820.7,
+          "duration": 56
+        }
+      ],
+      "metrics": [
+        {
+          "name": "LayoutDuration",
+          "value": 0.025577
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.182662
+        },
+        {
+          "name": "TaskDuration",
+          "value": 0.413055
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 4336608
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 6352896
+        }
+      ],
+      "drag": {
+        "before": {
+          "range": {
+            "from": 1790877900,
+            "to": 1790933700
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "after": {
+          "range": {
+            "from": 1790850300,
+            "to": 1790906400
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "newRequests": 0,
+        "intervals": [
+          6.7000001907344995,
+          49.900000000000546,
+          66.69999999999982,
+          16.600000000000364,
+          33.399999999999636,
+          16.600000000000364,
+          83.39999999999964,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          33.30000000000018,
+          33.399999999999636,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.599999999999454,
+          16.800000000000182,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.599999999999454,
+          16.800000000000182,
+          16.600000000000364,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          33.399999999999636,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364
+        ]
+      }
+    },
+    {
+      "kind": "multichart",
+      "cpu": 1,
+      "count": 2,
+      "http": [
+        {
+          "at": 1790930941203,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871600000,
+            "firstDataRequest": true,
+            "client": "43796eef-99a6-4baa-9538-8eb4b8564752",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931000000,
+            "track_history": false
+          },
+          "count": 2198,
+          "mandatory": 198,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 402671
+        },
+        {
+          "at": 1790930944662,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790904604000,
+            "firstDataRequest": true,
+            "client": "43796eef-99a6-4baa-9538-8eb4b8564752",
+            "native_history": {
+              "chart_count": 2,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931004000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 199539
+        }
+      ],
+      "errors": [],
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871600,
+            "to": 1790931000,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790930940653.5,
+          "callback": 1790930941292.0999,
+          "count": 2198,
+          "first": 1790271600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790904604,
+            "to": 1790931004,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790930944376.2,
+          "callback": 1790930944656.4,
+          "count": 1088,
+          "first": 1790604600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "longTasks": [
+        {
+          "start": 1790930939913.5999,
+          "duration": 332
+        },
+        {
+          "start": 1790930940247.8,
+          "duration": 201
+        },
+        {
+          "start": 1790930940661.3,
+          "duration": 72
+        },
+        {
+          "start": 1790930940834.0999,
+          "duration": 70
+        },
+        {
+          "start": 1790930940908.7,
+          "duration": 99
+        },
+        {
+          "start": 1790930941636,
+          "duration": 69
+        },
+        {
+          "start": 1790930941636,
+          "duration": 69
+        },
+        {
+          "start": 1790930944077.9,
+          "duration": 72
+        },
+        {
+          "start": 1790930944150.8,
+          "duration": 54
+        },
+        {
+          "start": 1790930944217.5999,
+          "duration": 63
+        }
+      ],
+      "metrics": [
+        {
+          "name": "LayoutDuration",
+          "value": 0.021608
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.0928
+        },
+        {
+          "name": "TaskDuration",
+          "value": 0.314813
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 4363700
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 6090752
+        }
+      ],
+      "drag": {
+        "before": {
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "after": {
+          "range": {
+            "from": 1790900400,
+            "to": 1790926500
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "newRequests": 0,
+        "intervals": [
+          9.89999990463275,
+          16.599999999999454,
+          33.400000000000546,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.800000000000182,
+          16.600000000000364,
+          16.699999999999818,
+          16.599999999999454,
+          16.600000000000364,
+          16.800000000000182,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454
+        ]
+      }
+    },
+    {
+      "kind": "multichart",
+      "cpu": 1,
+      "count": 4,
+      "http": [
+        {
+          "at": 1790930951690,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1790871611000,
+            "firstDataRequest": true,
+            "client": "a3740b7b-fda8-4acb-8eb6-ada39f055d14",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931011000,
+            "track_history": false
+          },
+          "count": 2199,
+          "mandatory": 199,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 402855
+        },
+        {
+          "at": 1790930953059,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790904612000,
+            "firstDataRequest": true,
+            "client": "a3740b7b-fda8-4acb-8eb6-ada39f055d14",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931012000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 199540
+        }
+      ],
+      "errors": [],
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871611,
+            "to": 1790931011,
+            "countBack": 199,
+            "firstDataRequest": true
+          },
+          "start": 1790930951361.5,
+          "callback": 1790930951733,
+          "count": 2199,
+          "first": 1790271300000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790904612,
+            "to": 1790931012,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790930952600.9,
+          "callback": 1790930953036.4,
+          "count": 1088,
+          "first": 1790604600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "longTasks": [
+        {
+          "start": 1790930950016.9,
+          "duration": 325
+        },
+        {
+          "start": 1790930950346.0999,
+          "duration": 354
+        },
+        {
+          "start": 1790930951029,
+          "duration": 57
+        },
+        {
+          "start": 1790930951190.7998,
+          "duration": 94
+        },
+        {
+          "start": 1790930951973.7,
+          "duration": 60
+        },
+        {
+          "start": 1790930951973.7,
+          "duration": 60
+        },
+        {
+          "start": 1790930952161.5999,
+          "duration": 129
+        },
+        {
+          "start": 1790930952291.5,
+          "duration": 60
+        },
+        {
+          "start": 1790930952390.9,
+          "duration": 85
+        }
+      ],
+      "metrics": [
+        {
+          "name": "LayoutDuration",
+          "value": 0.051416
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.109531
+        },
+        {
+          "name": "TaskDuration",
+          "value": 0.358699
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 4502644
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 6352896
+        }
+      ],
+      "drag": {
+        "before": {
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "after": {
+          "range": {
+            "from": 1790900400,
+            "to": 1790926500
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "newRequests": 0,
+        "intervals": [
+          13.818000286102233,
+          16.682000000000244,
+          33.19999999999982,
+          33.40000000000009,
+          33.40000000000009,
+          16.59999999999991,
+          16.699999999999818,
+          50,
+          16.59999999999991,
+          16.700000000000273,
+          16.700000000000273,
+          16.699999999999818,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.800000000000182,
+          16.600000000000364,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          33.29999999999927,
+          16.700000000000728,
+          16.699999999999818,
+          16.5,
+          16.800000000000182,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364
+        ]
+      }
+    },
+    {
+      "kind": "multichart",
+      "cpu": 1,
+      "count": 8,
+      "http": [
+        {
+          "at": 1790930959325,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871618000,
+            "firstDataRequest": true,
+            "client": "3b45413f-4f6e-42b4-a27b-7169ccf5a757",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931018000,
+            "track_history": false
+          },
+          "count": 2198,
+          "mandatory": 198,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 402672
+        },
+        {
+          "at": 1790930963650,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 38,
+            "countBack": 38,
+            "from": 1790919623000,
+            "firstDataRequest": true,
+            "client": "3b45413f-4f6e-42b4-a27b-7169ccf5a757",
+            "native_history": {
+              "chart_count": 8,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931023000,
+            "track_history": false
+          },
+          "count": 1038,
+          "mandatory": 38,
+          "optional": 1000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 190390
+        }
+      ],
+      "errors": [],
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871618,
+            "to": 1790931018,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790930958963,
+          "callback": 1790930959393.7,
+          "count": 2198,
+          "first": 1790271600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790919623,
+            "to": 1790931023,
+            "countBack": 38,
+            "firstDataRequest": true
+          },
+          "start": 1790930963407,
+          "callback": 1790930963666.9,
+          "count": 1038,
+          "first": 1790619600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "longTasks": [
+        {
+          "start": 1790930957759,
+          "duration": 332
+        },
+        {
+          "start": 1790930958093.5,
+          "duration": 302
+        },
+        {
+          "start": 1790930958643.3,
+          "duration": 63
+        },
+        {
+          "start": 1790930958757.2,
+          "duration": 118
+        },
+        {
+          "start": 1790930959027.4,
+          "duration": 70
+        },
+        {
+          "start": 1790930959390.4,
+          "duration": 57
+        },
+        {
+          "start": 1790930959390.4,
+          "duration": 57
+        },
+        {
+          "start": 1790930962460.2,
+          "duration": 333
+        },
+        {
+          "start": 1790930962793.4,
+          "duration": 142
+        },
+        {
+          "start": 1790930962997.5999,
+          "duration": 185
+        },
+        {
+          "start": 1790930963200.7,
+          "duration": 65
+        },
+        {
+          "start": 1790930963640.3,
+          "duration": 94
+        }
+      ],
+      "metrics": [
+        {
+          "name": "LayoutDuration",
+          "value": 0.049617
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.142501
+        },
+        {
+          "name": "TaskDuration",
+          "value": 0.375248
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 5050752
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 6877184
+        }
+      ],
+      "drag": {
+        "before": {
+          "range": {
+            "from": 1790922600,
+            "to": 1790933700
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "after": {
+          "range": {
+            "from": 1790915400,
+            "to": 1790926500
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "newRequests": 0,
+        "intervals": [
+          0.7859997138975814,
+          33.314000000000306,
+          16.599999999999454,
+          16.700000000000728,
+          33.29999999999927,
+          16.700000000000728,
+          16.699999999999818,
+          50,
+          16.699999999999818,
+          50,
+          16.600000000000364,
+          16.699999999999818,
+          16.599999999999454,
+          16.800000000000182,
+          16.600000000000364,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.599999999999454,
+          16.800000000000182,
+          16.600000000000364,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          33.400000000000546,
+          49.899999999999636,
+          33.400000000000546,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818
+        ]
+      }
+    },
+    {
+      "kind": "multichart",
+      "cpu": 4,
+      "count": 1,
+      "http": [
+        {
+          "at": 1790930972864,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1790871631000,
+            "firstDataRequest": true,
+            "client": "8646c391-ed62-47b5-8767-0c1c66ced5a1",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931031000,
+            "track_history": false
+          },
+          "count": 599,
+          "mandatory": 199,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 110477
+        },
+        {
+          "at": 1790930975226,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 187,
+            "countBack": 187,
+            "from": 1790874934000,
+            "firstDataRequest": true,
+            "client": "8646c391-ed62-47b5-8767-0c1c66ced5a1",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931034000,
+            "track_history": false
+          },
+          "count": 2187,
+          "mandatory": 187,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 400659
+        }
+      ],
+      "errors": [],
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790877900,
+            "to": 1790933700
+          },
+          "spacing": 6
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871631,
+            "to": 1790931031,
+            "countBack": 199,
+            "firstDataRequest": true
+          },
+          "start": 1790930971066.7,
+          "callback": 1790930972846.8,
+          "count": 599,
+          "first": 1790751300000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790874934,
+            "to": 1790931034,
+            "countBack": 187,
+            "firstDataRequest": true
+          },
+          "start": 1790930974936.5,
+          "callback": 1790930975204.2,
+          "count": 2187,
+          "first": 1790274900000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "longTasks": [
+        {
+          "start": 1790930969814.1,
+          "duration": 503
+        },
+        {
+          "start": 1790930970323.5,
+          "duration": 321
+        },
+        {
+          "start": 1790930971173.3,
+          "duration": 80
+        },
+        {
+          "start": 1790930971304.7,
+          "duration": 76
+        },
+        {
+          "start": 1790930971435.7,
+          "duration": 108
+        },
+        {
+          "start": 1790930971718,
+          "duration": 80
+        },
+        {
+          "start": 1790930971840.5,
+          "duration": 62
+        },
+        {
+          "start": 1790930972845.6,
+          "duration": 74
+        },
+        {
+          "start": 1790930972845.6,
+          "duration": 74
+        }
+      ],
+      "metrics": [
+        {
+          "name": "LayoutDuration",
+          "value": 0.104303
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.577831
+        },
+        {
+          "name": "TaskDuration",
+          "value": 1.38996
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 3876756
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 6090752
+        }
+      ],
+      "drag": {
+        "before": {
+          "range": {
+            "from": 1790877900,
+            "to": 1790933700
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "after": {
+          "range": {
+            "from": 1790850300,
+            "to": 1790906400
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "newRequests": 0,
+        "intervals": [
+          12.500000095367795,
+          16.699999999999818,
+          33.30000000000018,
+          33.29999999999927,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.600000000000364,
+          16.800000000000182,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.600000000000364,
+          16.800000000000182,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.800000000000182,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.800000000000182
+        ]
+      }
+    },
+    {
+      "kind": "multichart",
+      "cpu": 4,
+      "count": 2,
+      "http": [
+        {
+          "at": 1790930982573,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1790871641000,
+            "firstDataRequest": true,
+            "client": "5e2ea08f-476f-40cf-96ea-359c9a63796a",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931041000,
+            "track_history": false
+          },
+          "count": 2199,
+          "mandatory": 199,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 402855
+        },
+        {
+          "at": 1790930984846,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790904643000,
+            "firstDataRequest": true,
+            "client": "5e2ea08f-476f-40cf-96ea-359c9a63796a",
+            "native_history": {
+              "chart_count": 2,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931043000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 199540
+        }
+      ],
+      "errors": [],
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871641,
+            "to": 1790931041,
+            "countBack": 199,
+            "firstDataRequest": true
+          },
+          "start": 1790930981788.9,
+          "callback": 1790930982618.9,
+          "count": 2199,
+          "first": 1790271300000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790904643,
+            "to": 1790931043,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790930983774.6,
+          "callback": 1790930984833.9,
+          "count": 1088,
+          "first": 1790604600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "longTasks": [
+        {
+          "start": 1790930980474,
+          "duration": 458
+        },
+        {
+          "start": 1790930980935.4,
+          "duration": 396
+        },
+        {
+          "start": 1790930981654.6,
+          "duration": 94
+        },
+        {
+          "start": 1790930981800.5,
+          "duration": 55
+        },
+        {
+          "start": 1790930981901.1,
+          "duration": 76
+        },
+        {
+          "start": 1790930982070.4,
+          "duration": 115
+        },
+        {
+          "start": 1790930982660.2,
+          "duration": 57
+        },
+        {
+          "start": 1790930982854.9,
+          "duration": 79
+        },
+        {
+          "start": 1790930983260.5,
+          "duration": 82
+        },
+        {
+          "start": 1790930983646.6,
+          "duration": 59
+        },
+        {
+          "start": 1790930983708,
+          "duration": 65
+        }
+      ],
+      "metrics": [
+        {
+          "name": "LayoutDuration",
+          "value": 0.09183
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.624035
+        },
+        {
+          "name": "TaskDuration",
+          "value": 1.712209
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 4499120
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 6352896
+        }
+      ],
+      "drag": {
+        "before": {
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "after": {
+          "range": {
+            "from": 1790900400,
+            "to": 1790926500
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "newRequests": 0,
+        "intervals": [
+          1.8260001907347032,
+          16.673999999999978,
+          33.400000000000546,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.800000000000182,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.800000000000182,
+          33.29999999999927,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.599999999999454,
+          16.699999999999818,
+          16.600000000000364,
+          16.800000000000182,
+          16.599999999999454,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          33.399999999999636,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818
+        ]
+      }
+    },
+    {
+      "kind": "multichart",
+      "cpu": 4,
+      "count": 4,
+      "http": [
+        {
+          "at": 1790930996608,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871656000,
+            "firstDataRequest": true,
+            "client": "ad0c83ad-fc38-4305-b87b-6f18081128a9",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931056000,
+            "track_history": false
+          },
+          "count": 2198,
+          "mandatory": 198,
+          "optional": 2000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 402671
+        },
+        {
+          "at": 1790931000399,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790904659000,
+            "firstDataRequest": true,
+            "client": "ad0c83ad-fc38-4305-b87b-6f18081128a9",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931059000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 199540
+        }
+      ],
+      "errors": [],
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871656,
+            "to": 1790931056,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790930996333.8,
+          "callback": 1790930996699,
+          "count": 2198,
+          "first": 1790271600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790904659,
+            "to": 1790931059,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790930999967.3,
+          "callback": 1790931000385.1,
+          "count": 1088,
+          "first": 1790604600000,
+          "last": 1790930700000,
+          "duplicates": 0
+        }
+      ],
+      "longTasks": [
+        {
+          "start": 1790930994506.4001,
+          "duration": 579
+        },
+        {
+          "start": 1790930995087.4001,
+          "duration": 413
+        },
+        {
+          "start": 1790930995921.3,
+          "duration": 68
+        },
+        {
+          "start": 1790930996072.9001,
+          "duration": 59
+        },
+        {
+          "start": 1790930996159.3,
+          "duration": 74
+        },
+        {
+          "start": 1790930996641,
+          "duration": 53
+        },
+        {
+          "start": 1790930996695.6,
+          "duration": 51
+        },
+        {
+          "start": 1790930996695.6,
+          "duration": 51
+        },
+        {
+          "start": 1790930996856.5,
+          "duration": 70
+        },
+        {
+          "start": 1790930999462.4001,
+          "duration": 202
+        },
+        {
+          "start": 1790930999664.9001,
+          "duration": 80
+        },
+        {
+          "start": 1790930999790.2002,
+          "duration": 98
+        }
+      ],
+      "metrics": [
+        {
+          "name": "LayoutDuration",
+          "value": 0.107986
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.535813
+        },
+        {
+          "name": "TaskDuration",
+          "value": 1.338922
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 4562164
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 6352896
+        }
+      ],
+      "drag": {
+        "before": {
+          "range": {
+            "from": 1790907600,
+            "to": 1790933700
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "after": {
+          "range": {
+            "from": 1790900400,
+            "to": 1790926500
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "newRequests": 0,
+        "intervals": [
+          3.350000190735045,
+          33.25,
+          33.399999999999636,
+          50,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.600000000000364,
+          16.699999999999818,
+          33.399999999999636,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.599999999999454,
+          16.800000000000182,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.599999999999454,
+          16.800000000000182,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          16.700000000000728,
+          16.699999999999818,
+          16.699999999999818,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          33.30000000000018,
+          16.699999999999818,
+          16.600000000000364,
+          16.699999999999818,
+          16.600000000000364,
+          16.599999999999454,
+          16.699999999999818,
+          16.700000000000728,
+          16.699999999999818,
+          16.599999999999454,
+          33.400000000000546,
+          16.699999999999818,
+          33.29999999999927,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728
+        ]
+      }
+    },
+    {
+      "kind": "multichart",
+      "cpu": 4,
+      "count": 8,
+      "http": [
+        {
+          "at": 1790931009353,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871668000,
+            "firstDataRequest": true,
+            "client": "15b15c6d-c51e-4fce-8e99-c69514989cb2",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931068000,
+            "track_history": false
+          },
+          "count": 598,
+          "mandatory": 198,
+          "optional": 400,
+          "hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "bytes": 110222
+        },
+        {
+          "at": 1790931013128,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 38,
+            "countBack": 38,
+            "from": 1790919672000,
+            "firstDataRequest": true,
+            "client": "15b15c6d-c51e-4fce-8e99-c69514989cb2",
+            "native_history": {
+              "chart_count": 8,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790931072000,
+            "track_history": false
+          },
+          "count": 1038,
+          "mandatory": 38,
+          "optional": 1000,
+          "hit": true,
+          "attempts": [],
+          "bytes": 190390
+        }
+      ],
+      "errors": [],
+      "charts": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790871668,
+            "to": 1790931068,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790931008190.1,
+          "callback": 1790931009346.4001,
+          "count": 598,
+          "first": 1790751900000,
+          "last": 1790931000000,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790919672,
+            "to": 1790931072,
+            "countBack": 38,
+            "firstDataRequest": true
+          },
+          "start": 1790931012488,
+          "callback": 1790931013108.2002,
+          "count": 1038,
+          "first": 1790619900000,
+          "last": 1790931000000,
+          "duplicates": 0
+        }
+      ],
+      "longTasks": [
+        {
+          "start": 1790931006430.4001,
+          "duration": 452
+        },
+        {
+          "start": 1790931006885.1,
+          "duration": 554
+        },
+        {
+          "start": 1790931008031,
+          "duration": 105
+        },
+        {
+          "start": 1790931008276.6,
+          "duration": 66
+        },
+        {
+          "start": 1790931009345.3,
+          "duration": 61
+        },
+        {
+          "start": 1790931009345.3,
+          "duration": 61
+        },
+        {
+          "start": 1790931009641.4001,
+          "duration": 92
+        },
+        {
+          "start": 1790931011558.4001,
+          "duration": 354
+        },
+        {
+          "start": 1790931011912.4001,
+          "duration": 90
+        },
+        {
+          "start": 1790931012060.6,
+          "duration": 147
+        },
+        {
+          "start": 1790931012210.7002,
+          "duration": 95
+        },
+        {
+          "start": 1790931012360.5,
+          "duration": 60
+        },
+        {
+          "start": 1790931012430.2002,
+          "duration": 54
+        },
+        {
+          "start": 1790931013107.1,
+          "duration": 77
+        }
+      ],
+      "metrics": [
+        {
+          "name": "LayoutDuration",
+          "value": 0.113092
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.377052
+        },
+        {
+          "name": "TaskDuration",
+          "value": 1.290637
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 4165228
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 6090752
+        }
+      ],
+      "drag": {
+        "before": {
+          "range": {
+            "from": 1790922900,
+            "to": 1790934000
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "after": {
+          "range": {
+            "from": 1790915700,
+            "to": 1790926800
+          },
+          "spacing": 6,
+          "requests": 2,
+          "ready": true,
+          "pending": 0,
+          "queue": 0
+        },
+        "newRequests": 0,
+        "intervals": [
+          10.932000095367584,
+          66.56800000000021,
+          66.69999999999891,
+          16.700000000000728,
+          66.60000000000036,
+          66.69999999999891,
+          33.30000000000109,
+          33.29999999999927,
+          16.80000000000109,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          33.30000000000109,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.80000000000109,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.80000000000109,
+          16.5,
+          16.69999999999891,
+          16.700000000000728,
+          16.69999999999891,
+          133.3000000000011,
+          50,
+          83.39999999999964,
+          233.29999999999927,
+          83.30000000000109
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "finished_at": "2026-10-02T08:50:15.817Z"
+}

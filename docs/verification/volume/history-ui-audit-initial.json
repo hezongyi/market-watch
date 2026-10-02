@@ -1,0 +1,8 @@
+{
+  "passed": false,
+  "origin": "https://localhost:15553",
+  "scope": "Read-only actual history UI; control handlers separately covered by backend regressions",
+  "errors": [],
+  "requests": [],
+  "error": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('历史任务', { exact: true })\u001b[22m\n"
+}

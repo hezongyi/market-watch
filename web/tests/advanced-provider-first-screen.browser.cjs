@@ -80,6 +80,7 @@ const output=process.env.FIRST_SCREEN_OUTPUT||'/tmp/mw-provider-first-screen.jso
    await page.goto(APP+'/');
    if(process.env.FIRST_SCREEN_RESET_CACHE==='1')
     execFileSync('../.venv/bin/python',['../scripts/provider_acceptance_fixture.py','--reset',
+      '--instrument',sample.symbol.slice(4),
       '--profile',process.env.FIRST_SCREEN_FIXTURE_PROFILE||'dual'],
       {env:{...process.env,PYTHONPATH:'../backend'},timeout:45000});
    const before=await api('advanced-charts/native-charts');

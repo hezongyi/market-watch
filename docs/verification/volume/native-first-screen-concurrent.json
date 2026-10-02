@@ -1,0 +1,936 @@
+{
+  "passed": false,
+  "error": "AssertionError [ERR_ASSERTION]: MWP:OANDA:EUR_CHF/5 cached demand to display 1073ms exceeds 1s",
+  "measurements": [
+    {
+      "symbol": "MWP:OANDA:GBP_USD",
+      "resolution": "5",
+      "began_ms": 1790930133099,
+      "displayed_ms": 2991,
+      "initialized_ms": 3009,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:GBP_USD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790870794000,
+            "firstDataRequest": true,
+            "client": "0211b197-b77e-407b-8cfc-85f8139655a9",
+            "indicators": [],
+            "before": 1790930194000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1355,
+          "elapsed_ms": 1410,
+          "count": 198,
+          "as_of": 1790930134629,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 2.86,
+            "upstream_slot": 49.11,
+            "network_connection_connect_tcp": 1.45,
+            "network_http11_send_request_headers": 0.31,
+            "network_http11_send_request_body": 0.07,
+            "network_http11_receive_response_headers": 304.33,
+            "network_proxy_start_tls": 663.48,
+            "network_http11_receive_response_body": 0.22,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 971.05,
+            "upstream_decode": 0.23,
+            "database_commit": 111.81,
+            "read_total": 1185.29
+          }
+        }
+      ],
+      "range": {
+        "from": 1790876700,
+        "to": 1790933100
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1144,
+        "request_to_display_ms": 293,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:GBP_USD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M5",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790870798000,
+              "firstDataRequest": true,
+              "client": "590b9a04-4cb0-4885-b99f-dae5b0d7d776",
+              "indicators": [],
+              "before": 1790930198000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 851,
+            "elapsed_ms": 59,
+            "count": 198,
+            "as_of": 1790930136745,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 11.82
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:USD_CAD",
+      "resolution": "5",
+      "began_ms": 1790930139839,
+      "displayed_ms": 4631,
+      "initialized_ms": 4640,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1790870802000,
+            "firstDataRequest": true,
+            "client": "cf9c35e1-b79b-43c0-9201-bdb62624e63f",
+            "indicators": [],
+            "before": 1790930202000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 2635,
+          "elapsed_ms": 1729,
+          "count": 199,
+          "as_of": 1790930143670,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 11.47,
+            "upstream_slot": 10.57,
+            "network_http11_send_request_headers": 0.22,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 299.7,
+            "network_http11_receive_response_body": 0.24,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 302.55,
+            "upstream_decode": 0.27,
+            "database_commit": 172.87,
+            "read_total": 565.95
+          }
+        }
+      ],
+      "range": {
+        "from": 1790876700,
+        "to": 1790933100
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1714,
+        "request_to_display_ms": 288,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:USD_CAD",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M5",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790870807000,
+              "firstDataRequest": true,
+              "client": "86269a93-bd88-428e-b807-a398d4931df5",
+              "indicators": [],
+              "before": 1790930207000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1426,
+            "elapsed_ms": 59,
+            "count": 198,
+            "as_of": 1790930145539,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 16.24
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:EUR_JPY",
+      "resolution": "5",
+      "began_ms": 1790930149993,
+      "displayed_ms": 4602,
+      "initialized_ms": 4614,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_JPY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790870813000,
+            "firstDataRequest": true,
+            "client": "6b644883-aa40-4132-bbb0-5195600280e5",
+            "indicators": [],
+            "before": 1790930213000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 3383,
+          "elapsed_ms": 714,
+          "count": 198,
+          "as_of": 1790930153423,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 15.77,
+            "upstream_slot": 15.51,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 283.16,
+            "network_http11_receive_response_body": 0.26,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 286.9,
+            "upstream_decode": 0.59,
+            "database_commit": 243.24,
+            "read_total": 629.04
+          }
+        }
+      ],
+      "range": {
+        "from": 1790876700,
+        "to": 1790933100
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 2575,
+        "request_to_display_ms": 584,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:EUR_JPY",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M5",
+              "limit": 198,
+              "countBack": 198,
+              "from": 1790870818000,
+              "firstDataRequest": true,
+              "client": "616a9f98-431f-4e1e-a531-561d12c8a390",
+              "indicators": [],
+              "before": 1790930218000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1991,
+            "elapsed_ms": 140,
+            "count": 198,
+            "as_of": 1790930156222,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 52.17
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:EUR_GBP",
+      "resolution": "5",
+      "began_ms": 1790930162599,
+      "displayed_ms": 5726,
+      "initialized_ms": 5945,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_GBP",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1790870824000,
+            "firstDataRequest": true,
+            "client": "dd8d355e-53ce-4b66-a833-5b840467603a",
+            "indicators": [],
+            "before": 1790930224000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1964,
+          "elapsed_ms": 3309,
+          "count": 199,
+          "as_of": 1790930167122,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 10,
+            "upstream_slot": 7.39,
+            "network_http11_send_request_headers": 3.92,
+            "network_http11_send_request_body": 0.06,
+            "network_http11_receive_response_headers": 310.86,
+            "network_http11_receive_response_body": 0.25,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 315.77,
+            "upstream_decode": 0.26,
+            "database_commit": 299.95,
+            "read_total": 734.62
+          }
+        }
+      ],
+      "range": {
+        "from": 1790876700,
+        "to": 1790933100
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 1841,
+        "request_to_display_ms": 451,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:EUR_GBP",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M5",
+              "limit": 199,
+              "countBack": 199,
+              "from": 1790870831000,
+              "firstDataRequest": true,
+              "client": "22db841e-3dfd-42eb-abe5-72863be9e07d",
+              "indicators": [],
+              "before": 1790930231000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1390,
+            "elapsed_ms": 82,
+            "count": 199,
+            "as_of": 1790930169658,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 12.65
+            }
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:EUR_CHF",
+      "resolution": "5",
+      "began_ms": 1790930174775,
+      "displayed_ms": 3743,
+      "initialized_ms": 3842,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_CHF",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 199,
+            "countBack": 199,
+            "from": 1790870836000,
+            "firstDataRequest": true,
+            "client": "46f8846f-66b4-4e17-867e-91cfaf750b77",
+            "indicators": [],
+            "before": 1790930236000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1747,
+          "elapsed_ms": 1629,
+          "count": 199,
+          "as_of": 1790930177619,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.45,
+            "upstream_slot": 19.56,
+            "network_http11_send_request_headers": 0.21,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 276.16,
+            "network_http11_receive_response_body": 0.24,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 277.34,
+            "upstream_decode": 0.26,
+            "database_commit": 141.83,
+            "read_total": 523.65
+          }
+        }
+      ],
+      "range": {
+        "from": 1790876700,
+        "to": 1790933100
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "warm": {
+        "navigation_ms": 2637,
+        "request_to_display_ms": 1073,
+        "pages": [
+          {
+            "query": {
+              "instrument": "OANDA:EUR_CHF",
+              "series_kind": "provider",
+              "published": false,
+              "timeframe": "M5",
+              "limit": 199,
+              "countBack": 199,
+              "from": 1790870841000,
+              "firstDataRequest": true,
+              "client": "b37282b0-26ce-430a-a940-211e605833b4",
+              "indicators": [],
+              "before": 1790930241000,
+              "track_history": false
+            },
+            "status": 200,
+            "at_ms": 1564,
+            "elapsed_ms": 783,
+            "count": 199,
+            "as_of": 1790930179341,
+            "boundary": false,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 21.42
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "observed": {
+    "ready": true,
+    "loading": false,
+    "pending": 1,
+    "symbol": "MWP:OANDA:EUR_CHF",
+    "resolution": "5",
+    "dataReady": true
+  },
+  "requests": [
+    {
+      "query": {
+        "instrument": "OANDA:GBP_USD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790870794000,
+        "firstDataRequest": true,
+        "client": "0211b197-b77e-407b-8cfc-85f8139655a9",
+        "indicators": [],
+        "before": 1790930194000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1355,
+      "elapsed_ms": 1410,
+      "count": 198,
+      "as_of": 1790930134629,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.86,
+        "upstream_slot": 49.11,
+        "network_connection_connect_tcp": 1.45,
+        "network_http11_send_request_headers": 0.31,
+        "network_http11_send_request_body": 0.07,
+        "network_http11_receive_response_headers": 304.33,
+        "network_proxy_start_tls": 663.48,
+        "network_http11_receive_response_body": 0.22,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 971.05,
+        "upstream_decode": 0.23,
+        "database_commit": 111.81,
+        "read_total": 1185.29
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:GBP_USD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1790870794000,
+        "firstDataRequest": true,
+        "client": "0211b197-b77e-407b-8cfc-85f8139655a9",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -552,
+      "elapsed_ms": 554,
+      "count": 230,
+      "as_of": 1790930136745,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.98,
+        "upstream_slot": 4.75,
+        "network_http11_send_request_headers": 0.19,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 296.23,
+        "network_http11_receive_response_body": 15.16,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 312.32,
+        "upstream_decode": 0.32,
+        "database_commit": 80.29,
+        "read_total": 485.11
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:GBP_USD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790870798000,
+        "firstDataRequest": true,
+        "client": "590b9a04-4cb0-4885-b99f-dae5b0d7d776",
+        "indicators": [],
+        "before": 1790930198000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 851,
+      "elapsed_ms": 59,
+      "count": 198,
+      "as_of": 1790930136745,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 11.82
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:USD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790870802000,
+        "firstDataRequest": true,
+        "client": "cf9c35e1-b79b-43c0-9201-bdb62624e63f",
+        "indicators": [],
+        "before": 1790930202000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 2635,
+      "elapsed_ms": 1729,
+      "count": 199,
+      "as_of": 1790930143670,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 11.47,
+        "upstream_slot": 10.57,
+        "network_http11_send_request_headers": 0.22,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 299.7,
+        "network_http11_receive_response_body": 0.24,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 302.55,
+        "upstream_decode": 0.27,
+        "database_commit": 172.87,
+        "read_total": 565.95
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:USD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 231,
+        "countBack": 231,
+        "from": 1790870802000,
+        "firstDataRequest": true,
+        "client": "cf9c35e1-b79b-43c0-9201-bdb62624e63f",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -783,
+      "elapsed_ms": 860,
+      "count": 231,
+      "as_of": 1790930145539,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 41.74,
+        "upstream_slot": 64.28,
+        "network_http11_send_request_headers": 0.22,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 294.11,
+        "network_http11_receive_response_body": 7.35,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 302.38,
+        "upstream_decode": 0.3,
+        "database_commit": 194.21,
+        "read_total": 680.39
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:USD_CAD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790870807000,
+        "firstDataRequest": true,
+        "client": "86269a93-bd88-428e-b807-a398d4931df5",
+        "indicators": [],
+        "before": 1790930207000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1426,
+      "elapsed_ms": 59,
+      "count": 198,
+      "as_of": 1790930145539,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 16.24
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_JPY",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790870813000,
+        "firstDataRequest": true,
+        "client": "6b644883-aa40-4132-bbb0-5195600280e5",
+        "indicators": [],
+        "before": 1790930213000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 3383,
+      "elapsed_ms": 714,
+      "count": 198,
+      "as_of": 1790930153423,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 15.77,
+        "upstream_slot": 15.51,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 283.16,
+        "network_http11_receive_response_body": 0.26,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 286.9,
+        "upstream_decode": 0.59,
+        "database_commit": 243.24,
+        "read_total": 629.04
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_JPY",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 230,
+        "countBack": 230,
+        "from": 1790870813000,
+        "firstDataRequest": true,
+        "client": "6b644883-aa40-4132-bbb0-5195600280e5",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -542,
+      "elapsed_ms": 546,
+      "count": 230,
+      "as_of": 1790930156222,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 5.43,
+        "upstream_slot": 10.58,
+        "network_http11_send_request_headers": 0.23,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 312.5,
+        "network_http11_receive_response_body": 0.35,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 313.82,
+        "upstream_decode": 0.3,
+        "database_commit": 82.05,
+        "read_total": 472.28
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_JPY",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 198,
+        "countBack": 198,
+        "from": 1790870818000,
+        "firstDataRequest": true,
+        "client": "616a9f98-431f-4e1e-a531-561d12c8a390",
+        "indicators": [],
+        "before": 1790930218000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1991,
+      "elapsed_ms": 140,
+      "count": 198,
+      "as_of": 1790930156222,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 52.17
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790870824000,
+        "firstDataRequest": true,
+        "client": "dd8d355e-53ce-4b66-a833-5b840467603a",
+        "indicators": [],
+        "before": 1790930224000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1964,
+      "elapsed_ms": 3309,
+      "count": 199,
+      "as_of": 1790930167122,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 10,
+        "upstream_slot": 7.39,
+        "network_http11_send_request_headers": 3.92,
+        "network_http11_send_request_body": 0.06,
+        "network_http11_receive_response_headers": 310.86,
+        "network_http11_receive_response_body": 0.25,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 315.77,
+        "upstream_decode": 0.26,
+        "database_commit": 299.95,
+        "read_total": 734.62
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 231,
+        "countBack": 231,
+        "from": 1790870824000,
+        "firstDataRequest": true,
+        "client": "dd8d355e-53ce-4b66-a833-5b840467603a",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -650,
+      "elapsed_ms": 689,
+      "count": 231,
+      "as_of": 1790930169658,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 12.49,
+        "upstream_slot": 8.49,
+        "network_http11_send_request_headers": 0.21,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 271.33,
+        "network_http11_receive_response_body": 0.24,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 272.48,
+        "upstream_decode": 0.3,
+        "database_commit": 182.65,
+        "read_total": 537.16
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_GBP",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790870831000,
+        "firstDataRequest": true,
+        "client": "22db841e-3dfd-42eb-abe5-72863be9e07d",
+        "indicators": [],
+        "before": 1790930231000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1390,
+      "elapsed_ms": 82,
+      "count": 199,
+      "as_of": 1790930169658,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 12.65
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790870836000,
+        "firstDataRequest": true,
+        "client": "46f8846f-66b4-4e17-867e-91cfaf750b77",
+        "indicators": [],
+        "before": 1790930236000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1747,
+      "elapsed_ms": 1629,
+      "count": 199,
+      "as_of": 1790930177619,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.45,
+        "upstream_slot": 19.56,
+        "network_http11_send_request_headers": 0.21,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 276.16,
+        "network_http11_receive_response_body": 0.24,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 277.34,
+        "upstream_decode": 0.26,
+        "database_commit": 141.83,
+        "read_total": 523.65
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 231,
+        "countBack": 231,
+        "from": 1790870836000,
+        "firstDataRequest": true,
+        "client": "46f8846f-66b4-4e17-867e-91cfaf750b77",
+        "indicators": [],
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": -858,
+      "elapsed_ms": 858,
+      "count": 231,
+      "as_of": 1790930179341,
+      "boundary": false,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 19.88,
+        "upstream_slot": 3.4,
+        "network_http11_send_request_headers": 0.2,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 303.95,
+        "network_http11_receive_response_body": 0.19,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 305.02,
+        "upstream_decode": 0.54,
+        "database_commit": 210.05,
+        "read_total": 632.6
+      }
+    },
+    {
+      "query": {
+        "instrument": "OANDA:EUR_CHF",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "M5",
+        "limit": 199,
+        "countBack": 199,
+        "from": 1790870841000,
+        "firstDataRequest": true,
+        "client": "b37282b0-26ce-430a-a940-211e605833b4",
+        "indicators": [],
+        "before": 1790930241000,
+        "track_history": false
+      },
+      "status": 200,
+      "at_ms": 1564,
+      "elapsed_ms": 783,
+      "count": 199,
+      "as_of": 1790930179341,
+      "boundary": false,
+      "cache_hit": true,
+      "timings_ms": {
+        "read_total": 21.42
+      }
+    }
+  ]
+}

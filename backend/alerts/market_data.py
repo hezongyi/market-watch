@@ -26,6 +26,7 @@ from .storage import (
     now_ms,
     transaction,
 )
+from .volume import metadata as volume_metadata
 
 FRAME_MS = {
     "M1": 60000,
@@ -466,6 +467,17 @@ def advance_weekly_request():
     return True
 
 
+class VolumeStartQuery(BaseModel):
+    instrument: str
+    start: int | None = None
+    end: int | None = None
+
+
+class VolumeControlQuery(BaseModel):
+    id: str
+    action: str
+
+
 def router(authenticated):
     r = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
 
@@ -683,6 +695,7 @@ def router(authenticated):
                 "precision": inst.precision,
                 "calendar": inst.calendar,
                 "frames": FRAMES,
+                **volume_metadata(inst.source, inst.symbol),
             }
 
     @r.post("/viewport-session")
@@ -703,6 +716,44 @@ def router(authenticated):
         with transaction() as db:
             return [plan_status(db, plan, now_ms()) for plan in db.scalars(
                 select(ChartHistoryPlan).order_by(ChartHistoryPlan.updated_at.desc()).limit(100))]
+
+    @r.get("/history/volume")
+    def volume_listing():
+        from .storage import VolumeBackfillJob
+        from .volume_jobs import describe
+        with transaction() as db:
+            return [describe(db, j) for j in db.scalars(select(VolumeBackfillJob)
+                .order_by(VolumeBackfillJob.created_at.desc()).limit(100))]
+
+    @r.get("/history/volume/{ident}/segments")
+    def volume_segments(ident: str, offset: int = 0, limit: int = 100):
+        from .storage import VolumeBackfillSegment
+        if offset < 0 or not 1 <= limit <= 200:
+            raise HTTPException(422, "无效分页")
+        with transaction() as db:
+            return [dict(start=s.start, end=s.end, status=s.status, detail=s.detail)
+                for s in db.scalars(select(VolumeBackfillSegment).where(
+                    VolumeBackfillSegment.job_id == ident).order_by(VolumeBackfillSegment.start.desc())
+                    .offset(offset).limit(limit))]
+
+    @r.post("/history/volume/start")
+    def volume_start(body: VolumeStartQuery):
+        from .volume_jobs import create, describe
+        with transaction() as db:
+            try:
+                resolve(db, body.instrument)
+                return describe(db, create(db, body.instrument, start=body.start, end=body.end))
+            except ValueError as exc:
+                raise HTTPException(422, str(exc)) from exc
+
+    @r.post("/history/volume/control")
+    def volume_control(body: VolumeControlQuery):
+        from .volume_jobs import control, describe
+        with transaction() as db:
+            try:
+                return describe(db, control(db, body.id, body.action))
+            except ValueError as exc:
+                raise HTTPException(422, str(exc)) from exc
 
     @r.post("/maintenance")
     def maintenance(body: MaintenanceQuery):

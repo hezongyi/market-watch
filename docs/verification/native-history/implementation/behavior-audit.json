@@ -1,0 +1,84 @@
+{
+  "cases": [
+    {
+      "kind": "single native buffer/MA/period switch",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "charts": null,
+      "cpu": null,
+      "passed": true,
+      "failure": null
+    },
+    {
+      "kind": "single native buffer/MA/period switch",
+      "symbol": "MWP:BTCUSDT",
+      "charts": null,
+      "cpu": null,
+      "passed": true,
+      "failure": null
+    },
+    {
+      "kind": "multichart",
+      "symbol": null,
+      "charts": 1,
+      "cpu": 1,
+      "passed": true,
+      "failure": null
+    },
+    {
+      "kind": "multichart",
+      "symbol": null,
+      "charts": 2,
+      "cpu": 1,
+      "passed": true,
+      "failure": null
+    },
+    {
+      "kind": "multichart",
+      "symbol": null,
+      "charts": 4,
+      "cpu": 1,
+      "passed": true,
+      "failure": null
+    },
+    {
+      "kind": "multichart",
+      "symbol": null,
+      "charts": 8,
+      "cpu": 1,
+      "passed": true,
+      "failure": null
+    },
+    {
+      "kind": "multichart",
+      "symbol": null,
+      "charts": 1,
+      "cpu": 4,
+      "passed": true,
+      "failure": null
+    },
+    {
+      "kind": "multichart",
+      "symbol": null,
+      "charts": 2,
+      "cpu": 4,
+      "passed": false,
+      "failure": "completed provider HTTP response failed"
+    },
+    {
+      "kind": "multichart",
+      "symbol": null,
+      "charts": 4,
+      "cpu": 4,
+      "passed": true,
+      "failure": null
+    },
+    {
+      "kind": "multichart",
+      "symbol": null,
+      "charts": 8,
+      "cpu": 4,
+      "passed": true,
+      "failure": null
+    }
+  ]
+}

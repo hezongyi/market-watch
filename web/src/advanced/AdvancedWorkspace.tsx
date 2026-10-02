@@ -493,6 +493,19 @@ export default function AdvancedWorkspace() {
           (q.op === "retry" &&
             !/^[a-zA-Z0-9-]{1,40}$/.test(String(q.args?.id || ""))) ||
           inflight.current >= 8
+          || (q.native_history !== undefined &&
+            (q.series_kind !== 'provider' || !q.native_history ||
+              typeof q.native_history !== 'object' || Array.isArray(q.native_history) ||
+              !Number.isInteger(q.native_history.chart_count) ||
+              q.native_history.chart_count < 1 || q.native_history.chart_count > 8 ||
+              (q.native_history.focused !== null && typeof q.native_history.focused !== 'boolean') ||
+              typeof q.native_history.historical_navigation !== 'boolean'))
+          || (q.history_observation !== undefined &&
+            (!q.native_history || !q.history_observation ||
+              typeof q.history_observation !== 'object' || Array.isArray(q.history_observation) ||
+              !['revision','observed_at','first','last'].every(field =>
+                Number.isSafeInteger(q.history_observation[field]) && q.history_observation[field] >= 0) ||
+              q.history_observation.first > q.history_observation.last))
         ) {
           reply({ type: "result", id: m.id, error: "无效行情请求" });
           return;
@@ -576,7 +589,9 @@ export default function AdvancedWorkspace() {
               timeframe: q.timeframe,
               limit: q.limit,
               ...(q.series_kind === 'provider' ? {countBack:q.countBack,
-                from:q.from,firstDataRequest:q.firstDataRequest === true,client:q.client} : {}),
+                from:q.from,firstDataRequest:q.firstDataRequest === true,client:q.client,
+                ...(q.native_history !== undefined ? {native_history:q.native_history} : {}),
+                ...(q.history_observation !== undefined ? {history_observation:q.history_observation} : {})} : {}),
               indicators: q.indicators || [],
               ...(q.before ? { before: q.before } : {}),
               track_history: q.track_history === true,

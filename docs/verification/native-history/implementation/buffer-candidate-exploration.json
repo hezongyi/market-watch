@@ -1,0 +1,4090 @@
+{
+  "kind": "formal React/postMessage/native getBars to rendered dataReady; real upstream and isolated PG",
+  "source": "893bf576675aa412b7ecd7a4d10ece3106a072fd",
+  "records": [
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880117000,
+            "firstDataRequest": true,
+            "client": "50f49d4c-eb68-4201-8405-4c280c5d2d83",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929617000,
+            "track_history": false
+          },
+          "start": 1790929557402,
+          "bytes": 57520,
+          "bars": 366,
+          "mandatory_count": 166,
+          "optional_count": 200,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 5.18,
+            "upstream_slot": 5.06,
+            "network_http11_send_request_headers": 0.19,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 490.86,
+            "network_http11_receive_response_body": 1316.66,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 1808.91,
+            "upstream_decode": 0.76,
+            "database_commit": 99.06,
+            "read_total": 1966.37
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929555758,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880117,
+            "to": 1790929617,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929557395.9,
+          "callback": 1790929559409.5,
+          "count": 366,
+          "first": 1790820000000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929556358.4,
+          "duration": 259
+        },
+        {
+          "start": 1790929556620.4,
+          "duration": 312
+        },
+        {
+          "start": 1790929557416.8,
+          "duration": 51
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 30449817,
+      "displayed": 1790929559548.8,
+      "ui_ms": 3790.800048828125,
+      "native_ms": 2152.900146484375
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880127000,
+            "firstDataRequest": true,
+            "client": "ba1d34a1-076c-4c1d-8f4b-827cd04fa462",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929627000,
+            "track_history": false
+          },
+          "start": 1790929567862,
+          "bytes": 181166,
+          "bars": 1166,
+          "mandatory_count": 166,
+          "optional_count": 1000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 131.41
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929565036,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880127,
+            "to": 1790929627,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929567848.8,
+          "callback": 1790929568717.5,
+          "count": 1166,
+          "first": 1790580000000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929565989.5999,
+          "duration": 378
+        },
+        {
+          "start": 1790929566372.0999,
+          "duration": 554
+        },
+        {
+          "start": 1790929567286.9,
+          "duration": 133
+        },
+        {
+          "start": 1790929567481.5999,
+          "duration": 60
+        },
+        {
+          "start": 1790929567543.7,
+          "duration": 99
+        },
+        {
+          "start": 1790929568213.7,
+          "duration": 54
+        },
+        {
+          "start": 1790929568482.2,
+          "duration": 101
+        },
+        {
+          "start": 1790929568644.4,
+          "duration": 52
+        },
+        {
+          "start": 1790929568715.4,
+          "duration": 113
+        },
+        {
+          "start": 1790929568715.4,
+          "duration": 113
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 33153636,
+      "displayed": 1790929569115,
+      "ui_ms": 4079,
+      "native_ms": 1266.199951171875
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880134000,
+            "firstDataRequest": true,
+            "client": "8fb23038-3ba7-495a-a292-bcf552020b21",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929634000,
+            "track_history": false
+          },
+          "start": 1790929574014,
+          "bytes": 67655,
+          "bars": 365,
+          "mandatory_count": 165,
+          "optional_count": 200,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 3.49,
+            "upstream_slot": 10.66,
+            "network_connection_connect_tcp": 3.23,
+            "network_http11_send_request_headers": 0.35,
+            "network_http11_send_request_body": 0.06,
+            "network_http11_receive_response_headers": 263.35,
+            "network_proxy_start_tls": 668.07,
+            "network_http11_receive_response_body": 0.38,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 936.38,
+            "upstream_decode": 0.42,
+            "database_commit": 147.34,
+            "read_total": 1158.79
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929571730,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880134,
+            "to": 1790929634,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929574010.9,
+          "callback": 1790929575211.4,
+          "count": 365,
+          "first": 1790820300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929572678.8,
+          "duration": 432
+        },
+        {
+          "start": 1790929573112.8,
+          "duration": 471
+        },
+        {
+          "start": 1790929574015.5999,
+          "duration": 82
+        },
+        {
+          "start": 1790929574660.5999,
+          "duration": 60
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 29572440,
+      "displayed": 1790929575341.7,
+      "ui_ms": 3611.699951171875,
+      "native_ms": 1330.800048828125
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880144000,
+            "firstDataRequest": true,
+            "client": "6133e330-8506-4d44-a491-81b56c2dd92f",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929644000,
+            "track_history": false
+          },
+          "start": 1790929584420,
+          "bytes": 213632,
+          "bars": 1165,
+          "mandatory_count": 165,
+          "optional_count": 1000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 219.64
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929582582,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880144,
+            "to": 1790929644,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929584415.7002,
+          "callback": 1790929584813.9001,
+          "count": 1165,
+          "first": 1790580300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929583285.7002,
+          "duration": 341
+        },
+        {
+          "start": 1790929583628.8,
+          "duration": 312
+        },
+        {
+          "start": 1790929584419.9001,
+          "duration": 79
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 31005668,
+      "displayed": 1790929585087.8,
+      "ui_ms": 2505.800048828125,
+      "native_ms": 672.099853515625
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880161000,
+            "firstDataRequest": true,
+            "client": "07caace8-43c6-449a-8304-6786dba45d74",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929661000,
+            "track_history": false
+          },
+          "start": 1790929601263,
+          "bytes": 88517,
+          "bars": 566,
+          "mandatory_count": 166,
+          "optional_count": 400,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 5.94,
+            "upstream_slot": 7.6,
+            "network_http11_send_request_headers": 0.91,
+            "network_http11_send_request_body": 0.04,
+            "network_http11_receive_response_headers": 478.43,
+            "network_http11_receive_response_body": 173.08,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 653.38,
+            "upstream_decode": 0.82,
+            "database_commit": 167.84,
+            "read_total": 909.48
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929599837,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880161,
+            "to": 1790929661,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929601258.4,
+          "callback": 1790929602239.5,
+          "count": 566,
+          "first": 1790760000000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929600518.8,
+          "duration": 289
+        },
+        {
+          "start": 1790929600809.8,
+          "duration": 190
+        },
+        {
+          "start": 1790929601295,
+          "duration": 59
+        },
+        {
+          "start": 1790929601453.5999,
+          "duration": 60
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 29800078,
+      "displayed": 1790929602374.5,
+      "ui_ms": 2537.5,
+      "native_ms": 1116.10009765625
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880171000,
+            "firstDataRequest": true,
+            "client": "de1d8305-436d-41b6-ab39-f8638dc20986",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929671000,
+            "track_history": false
+          },
+          "start": 1790929611246,
+          "bytes": 336010,
+          "bars": 2165,
+          "mandatory_count": 165,
+          "optional_count": 2000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 90.59
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929609373,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880171,
+            "to": 1790929671,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929611235.9,
+          "callback": 1790929611611.4,
+          "count": 2165,
+          "first": 1790107500000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929609978.8,
+          "duration": 356
+        },
+        {
+          "start": 1790929610336.7,
+          "duration": 334
+        },
+        {
+          "start": 1790929611088.6,
+          "duration": 61
+        },
+        {
+          "start": 1790929611289.1,
+          "duration": 60
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 34351300,
+      "displayed": 1790929611755.9,
+      "ui_ms": 2382.89990234375,
+      "native_ms": 520
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880175000,
+            "firstDataRequest": true,
+            "client": "16dfd1ce-1c8e-4e24-95b7-3c6d373b817f",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929675000,
+            "track_history": false
+          },
+          "start": 1790929615839,
+          "bytes": 104180,
+          "bars": 565,
+          "mandatory_count": 165,
+          "optional_count": 400,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 11.14,
+            "upstream_slot": 3.38,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 404,
+            "network_http11_receive_response_body": 48.9,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 453.88,
+            "upstream_decode": 1.1,
+            "database_commit": 138.42,
+            "read_total": 652.55
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929614535,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880175,
+            "to": 1790929675,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929615834,
+          "callback": 1790929616527.9001,
+          "count": 565,
+          "first": 1790760300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929615103.5,
+          "duration": 283
+        },
+        {
+          "start": 1790929615388.8,
+          "duration": 217
+        },
+        {
+          "start": 1790929615940.2002,
+          "duration": 57
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 29605030,
+      "displayed": 1790929616645.7002,
+      "ui_ms": 2110.7001953125,
+      "native_ms": 811.7001953125
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880187000,
+            "firstDataRequest": true,
+            "client": "3a72a56d-2d50-482d-89cc-201cc05643ad",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929687000,
+            "track_history": false
+          },
+          "start": 1790929627833,
+          "bytes": 396632,
+          "bars": 2165,
+          "mandatory_count": 165,
+          "optional_count": 2000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 199.08
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929625727,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880187,
+            "to": 1790929687,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929627828.2,
+          "callback": 1790929628244.6,
+          "count": 2165,
+          "first": 1790280300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929626452.2,
+          "duration": 326
+        },
+        {
+          "start": 1790929626780.4,
+          "duration": 542
+        },
+        {
+          "start": 1790929627694.5,
+          "duration": 63
+        },
+        {
+          "start": 1790929628164.1,
+          "duration": 70
+        },
+        {
+          "start": 1790929628241.4,
+          "duration": 75
+        },
+        {
+          "start": 1790929628241.4,
+          "duration": 75
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 33712905,
+      "displayed": 1790929628480.7,
+      "ui_ms": 2753.699951171875,
+      "native_ms": 652.5
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880207000,
+            "firstDataRequest": true,
+            "client": "fca56c43-cd62-43cb-a786-a6eb8c686699",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929707000,
+            "track_history": false
+          },
+          "start": 1790929647637,
+          "bytes": 119363,
+          "bars": 765,
+          "mandatory_count": 165,
+          "optional_count": 600,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 4.41,
+            "upstream_slot": 4,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 806.69,
+            "network_http11_receive_response_body": 313.81,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 1121.58,
+            "upstream_decode": 0.96,
+            "database_commit": 222.88,
+            "read_total": 1418.53
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929646161,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880207,
+            "to": 1790929707,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929647631.9001,
+          "callback": 1790929649108.4001,
+          "count": 765,
+          "first": 1790700300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929646800.1,
+          "duration": 256
+        },
+        {
+          "start": 1790929647059.4001,
+          "duration": 341
+        },
+        {
+          "start": 1790929647765.7002,
+          "duration": 54
+        },
+        {
+          "start": 1790929648249.8,
+          "duration": 62
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 30046921,
+      "displayed": 1790929649242.2002,
+      "ui_ms": 3081.2001953125,
+      "native_ms": 1610.300048828125
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880218000,
+            "firstDataRequest": true,
+            "client": "53caf14f-57af-4879-9b08-a747c6cb86c8",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929718000,
+            "track_history": false
+          },
+          "start": 1790929658185,
+          "bytes": 491010,
+          "bars": 3165,
+          "mandatory_count": 165,
+          "optional_count": 3000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 93.47
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929655061,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880218,
+            "to": 1790929718,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929658172.4,
+          "callback": 1790929658635.4,
+          "count": 3165,
+          "first": 1789634400000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929656033.7,
+          "duration": 765
+        },
+        {
+          "start": 1790929656807,
+          "duration": 479
+        },
+        {
+          "start": 1790929657286.0999,
+          "duration": 73
+        },
+        {
+          "start": 1790929657688.4,
+          "duration": 91
+        },
+        {
+          "start": 1790929657838.3,
+          "duration": 86
+        },
+        {
+          "start": 1790929657937,
+          "duration": 103
+        },
+        {
+          "start": 1790929658552.0999,
+          "duration": 74
+        },
+        {
+          "start": 1790929658627,
+          "duration": 128
+        },
+        {
+          "start": 1790929658627,
+          "duration": 128
+        },
+        {
+          "start": 1790929658964.2,
+          "duration": 97
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 34649372,
+      "displayed": 1790929659256.7,
+      "ui_ms": 4195.699951171875,
+      "native_ms": 1084.300048828125
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880223000,
+            "firstDataRequest": true,
+            "client": "a5a18807-35ba-4d8c-a744-6e40db88aa5b",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929723000,
+            "track_history": false
+          },
+          "start": 1790929663259,
+          "bytes": 141040,
+          "bars": 766,
+          "mandatory_count": 166,
+          "optional_count": 600,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 6.92,
+            "upstream_slot": 9.79,
+            "network_connection_connect_tcp": 0.44,
+            "network_http11_send_request_headers": 0.31,
+            "network_http11_send_request_body": 0.07,
+            "network_http11_receive_response_headers": 381.69,
+            "network_proxy_start_tls": 4386.5,
+            "network_http11_receive_response_body": 392.58,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 5162.46,
+            "upstream_decode": 1.69,
+            "database_commit": 199.96,
+            "read_total": 5441.92
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929661422,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880223,
+            "to": 1790929723,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929663256.7002,
+          "callback": 1790929668743.8,
+          "count": 766,
+          "first": 1790700000000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929662082.6,
+          "duration": 308
+        },
+        {
+          "start": 1790929662392.4001,
+          "duration": 299
+        },
+        {
+          "start": 1790929663044.5,
+          "duration": 57
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 31608460,
+      "displayed": 1790929668884.2002,
+      "ui_ms": 7462.2001953125,
+      "native_ms": 5627.5
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880238000,
+            "firstDataRequest": true,
+            "client": "938689de-e8a8-4bc5-8bb8-2a6d156f7f5c",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929738000,
+            "track_history": false
+          },
+          "start": 1790929678906,
+          "bytes": 579814,
+          "bars": 3166,
+          "mandatory_count": 166,
+          "optional_count": 3000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 53.32
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929677251,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880238,
+            "to": 1790929738,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929678900.4,
+          "callback": 1790929679483.5999,
+          "count": 3166,
+          "first": 1789980000000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929678127.9,
+          "duration": 278
+        },
+        {
+          "start": 1790929678407.7998,
+          "duration": 215
+        },
+        {
+          "start": 1790929678998,
+          "duration": 72
+        },
+        {
+          "start": 1790929679479.4,
+          "duration": 55
+        },
+        {
+          "start": 1790929679479.4,
+          "duration": 55
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 33810921,
+      "displayed": 1790929679795.4,
+      "ui_ms": 2544.39990234375,
+      "native_ms": 895
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880255000,
+            "firstDataRequest": true,
+            "client": "a8248cdf-07fa-40e3-91c7-2be824ce84f6",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929755000,
+            "track_history": false
+          },
+          "start": 1790929695733,
+          "bytes": 88515,
+          "bars": 566,
+          "mandatory_count": 166,
+          "optional_count": 400,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 4.59,
+            "upstream_slot": 9.63,
+            "network_http11_send_request_headers": 0.21,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 306.6,
+            "network_http11_receive_response_body": 24.74,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 332.48,
+            "upstream_decode": 0.8,
+            "database_commit": 321.89,
+            "read_total": 766.04
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929694286,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880255,
+            "to": 1790929755,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929695726.6,
+          "callback": 1790929696595.8,
+          "count": 566,
+          "first": 1790760000000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929694955.5,
+          "duration": 309
+        },
+        {
+          "start": 1790929695268.4001,
+          "duration": 275
+        },
+        {
+          "start": 1790929695843.8,
+          "duration": 56
+        },
+        {
+          "start": 1790929695903.2002,
+          "duration": 74
+        },
+        {
+          "start": 1790929696185.5,
+          "duration": 66
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 29590399,
+      "displayed": 1790929696752.8,
+      "ui_ms": 2466.800048828125,
+      "native_ms": 1026.199951171875
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880266000,
+            "firstDataRequest": true,
+            "client": "bc33a35e-49a5-4f0a-b8d6-9896fbf15dd1",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929766000,
+            "track_history": false
+          },
+          "start": 1790929706036,
+          "bytes": 336011,
+          "bars": 2165,
+          "mandatory_count": 165,
+          "optional_count": 2000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 108.25
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929703899,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880266,
+            "to": 1790929766,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929706032.5999,
+          "callback": 1790929706757,
+          "count": 2165,
+          "first": 1790107500000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929704837.5999,
+          "duration": 266
+        },
+        {
+          "start": 1790929705118.9,
+          "duration": 384
+        },
+        {
+          "start": 1790929705536.9,
+          "duration": 82
+        },
+        {
+          "start": 1790929705879.3,
+          "duration": 67
+        },
+        {
+          "start": 1790929706145.5,
+          "duration": 69
+        },
+        {
+          "start": 1790929706752.4,
+          "duration": 67
+        },
+        {
+          "start": 1790929706752.4,
+          "duration": 67
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 33512779,
+      "displayed": 1790929706956.0999,
+      "ui_ms": 3057.099853515625,
+      "native_ms": 923.5
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880274000,
+            "firstDataRequest": true,
+            "client": "13db5b4d-e4db-40c3-a5c4-0450b9b9868e",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929774000,
+            "track_history": false
+          },
+          "start": 1790929714083,
+          "bytes": 104321,
+          "bars": 565,
+          "mandatory_count": 165,
+          "optional_count": 400,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "error": "ConnectError"
+            },
+            {
+              "attempt": 2,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 4.44,
+            "upstream_slot": 22,
+            "network_connection_connect_tcp": 1.3,
+            "network_http11_send_request_headers": 0.46,
+            "network_http11_send_request_body": 0.09,
+            "network_http11_receive_response_headers": 831.66,
+            "network_proxy_start_tls": 5859.95,
+            "upstream_http": 6695.73,
+            "failure_ConnectError": 5007.97,
+            "network_http11_receive_response_body": 0.66,
+            "network_http11_response_closed": 0.01,
+            "upstream_decode": 0.7,
+            "database_commit": 127.77,
+            "read_total": 7242.8
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929712375,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880274,
+            "to": 1790929774,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929714075.0999,
+          "callback": 1790929721365.5,
+          "count": 565,
+          "first": 1790760300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929712972.7,
+          "duration": 294
+        },
+        {
+          "start": 1790929713268.4,
+          "duration": 309
+        },
+        {
+          "start": 1790929713923,
+          "duration": 57
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 35552340,
+      "displayed": 1790929721514.8,
+      "ui_ms": 9139.800048828125,
+      "native_ms": 7439.7001953125
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880292000,
+            "firstDataRequest": true,
+            "client": "84f0b823-9868-4f68-95e3-5dcc32d29555",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929792000,
+            "track_history": false
+          },
+          "start": 1790929732921,
+          "bytes": 396632,
+          "bars": 2165,
+          "mandatory_count": 165,
+          "optional_count": 2000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 238.66
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929730961,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880292,
+            "to": 1790929792,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929732917,
+          "callback": 1790929733303.1,
+          "count": 2165,
+          "first": 1790280300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929731798.5,
+          "duration": 304
+        },
+        {
+          "start": 1790929732107.4001,
+          "duration": 371
+        },
+        {
+          "start": 1790929733221.9001,
+          "duration": 69
+        },
+        {
+          "start": 1790929733298.7002,
+          "duration": 62
+        },
+        {
+          "start": 1790929733298.7002,
+          "duration": 62
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 33677633,
+      "displayed": 1790929733534.5,
+      "ui_ms": 2573.5,
+      "native_ms": 617.5
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880309000,
+            "firstDataRequest": true,
+            "client": "58894e7d-9f0a-4435-adcf-6b0a0ea495fe",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929809000,
+            "track_history": false
+          },
+          "start": 1790929749183,
+          "bytes": 119361,
+          "bars": 765,
+          "mandatory_count": 165,
+          "optional_count": 600,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 3.97,
+            "upstream_slot": 5.7,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 588.85,
+            "network_http11_receive_response_body": 27.27,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 617.32,
+            "upstream_decode": 2.19,
+            "database_commit": 290.31,
+            "read_total": 1180.72
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929747474,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880309,
+            "to": 1790929809,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929749165.8,
+          "callback": 1790929750412.5999,
+          "count": 765,
+          "first": 1790700300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929748294.8,
+          "duration": 342
+        },
+        {
+          "start": 1790929748639,
+          "duration": 266
+        },
+        {
+          "start": 1790929749204.9,
+          "duration": 69
+        },
+        {
+          "start": 1790929749310.3,
+          "duration": 58
+        },
+        {
+          "start": 1790929749372,
+          "duration": 64
+        },
+        {
+          "start": 1790929749858.9,
+          "duration": 58
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 29935468,
+      "displayed": 1790929750612.4,
+      "ui_ms": 3138.39990234375,
+      "native_ms": 1446.599853515625
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880318000,
+            "firstDataRequest": true,
+            "client": "ce22f047-0f1a-4dff-a49d-f0597ac463cf",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929818000,
+            "track_history": false
+          },
+          "start": 1790929758724,
+          "bytes": 491010,
+          "bars": 3165,
+          "mandatory_count": 165,
+          "optional_count": 3000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 149.1
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929756538,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880318,
+            "to": 1790929818,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929758720.7,
+          "callback": 1790929759263.8,
+          "count": 3165,
+          "first": 1789634400000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929757321.3,
+          "duration": 357
+        },
+        {
+          "start": 1790929757680.6,
+          "duration": 401
+        },
+        {
+          "start": 1790929758416.1,
+          "duration": 71
+        },
+        {
+          "start": 1790929758529.2,
+          "duration": 70
+        },
+        {
+          "start": 1790929758795.9001,
+          "duration": 62
+        },
+        {
+          "start": 1790929759098.8,
+          "duration": 81
+        },
+        {
+          "start": 1790929759258.3,
+          "duration": 73
+        },
+        {
+          "start": 1790929759258.3,
+          "duration": 73
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 32848905,
+      "displayed": 1790929759538.8,
+      "ui_ms": 3000.800048828125,
+      "native_ms": 818.10009765625
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880323000,
+            "firstDataRequest": true,
+            "client": "50c30bc2-f18d-4c57-a098-fac28bc3df2d",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929823000,
+            "track_history": false
+          },
+          "start": 1790929763236,
+          "bytes": 140783,
+          "bars": 765,
+          "mandatory_count": 165,
+          "optional_count": 600,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 3.13,
+            "upstream_slot": 4.13,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 217.75,
+            "network_http11_receive_response_body": 107.65,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 326.35,
+            "upstream_decode": 1.03,
+            "database_commit": 352.58,
+            "read_total": 744.06
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929761174,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880323,
+            "to": 1790929823,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929763229.7,
+          "callback": 1790929764024.7,
+          "count": 765,
+          "first": 1790700300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929761847.8,
+          "duration": 346
+        },
+        {
+          "start": 1790929762203.7,
+          "duration": 440
+        },
+        {
+          "start": 1790929762996.5,
+          "duration": 50
+        },
+        {
+          "start": 1790929763086.6,
+          "duration": 84
+        },
+        {
+          "start": 1790929763288.4001,
+          "duration": 55
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 31485524,
+      "displayed": 1790929764229,
+      "ui_ms": 3055,
+      "native_ms": 999.300048828125
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880336000,
+            "firstDataRequest": true,
+            "client": "b75c9eef-9676-4942-be0e-0bdb020abb0f",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929836000,
+            "track_history": false
+          },
+          "start": 1790929776935,
+          "bytes": 579632,
+          "bars": 3165,
+          "mandatory_count": 165,
+          "optional_count": 3000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 114.78
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929775377,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880336,
+            "to": 1790929836,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929776930.3,
+          "callback": 1790929777387.5,
+          "count": 3165,
+          "first": 1789980300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929776017,
+          "duration": 306
+        },
+        {
+          "start": 1790929776325.4001,
+          "duration": 291
+        },
+        {
+          "start": 1790929777014.8,
+          "duration": 70
+        },
+        {
+          "start": 1790929777170.4001,
+          "duration": 50
+        },
+        {
+          "start": 1790929777381.4001,
+          "duration": 58
+        },
+        {
+          "start": 1790929777381.4001,
+          "duration": 58
+        }
+      ],
+      "range": {
+        "from": 1790886600,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 33396457,
+      "displayed": 1790929777693.2002,
+      "ui_ms": 2316.2001953125,
+      "native_ms": 762.900146484375
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880355000,
+            "firstDataRequest": true,
+            "client": "09bcbcee-ca22-4123-bf91-773283e75dfa",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929855000,
+            "track_history": false
+          },
+          "start": 1790929795682,
+          "bytes": 57358,
+          "bars": 365,
+          "mandatory_count": 165,
+          "optional_count": 200,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 4.22,
+            "upstream_slot": 9.68,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 304.65,
+            "network_http11_receive_response_body": 13.11,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 318.82,
+            "upstream_decode": 0.6,
+            "database_commit": 172.5,
+            "read_total": 617.7
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929793928,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880355,
+            "to": 1790929855,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929795677.3,
+          "callback": 1790929796425.1,
+          "count": 365,
+          "first": 1790820300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929794755.8,
+          "duration": 334
+        },
+        {
+          "start": 1790929795091.8,
+          "duration": 227
+        },
+        {
+          "start": 1790929795700.7,
+          "duration": 55
+        },
+        {
+          "start": 1790929795783.7,
+          "duration": 68
+        },
+        {
+          "start": 1790929795873,
+          "duration": 82
+        },
+        {
+          "start": 1790929796424.3,
+          "duration": 61
+        },
+        {
+          "start": 1790929796424.3,
+          "duration": 61
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 29753483,
+      "displayed": 1790929796621.5,
+      "ui_ms": 2693.5,
+      "native_ms": 944.199951171875
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880367000,
+            "firstDataRequest": true,
+            "client": "28b09baa-e518-4e8d-9f18-70da21396033",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929867000,
+            "track_history": false
+          },
+          "start": 1790929807141,
+          "bytes": 181010,
+          "bars": 1165,
+          "mandatory_count": 165,
+          "optional_count": 1000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 82.89
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929805433,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880367,
+            "to": 1790929867,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929807104.7,
+          "callback": 1790929807709.1,
+          "count": 1165,
+          "first": 1790580300000,
+          "last": 1790929500000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929806287.3,
+          "duration": 327
+        },
+        {
+          "start": 1790929806618.5,
+          "duration": 321
+        },
+        {
+          "start": 1790929807107.4001,
+          "duration": 139
+        },
+        {
+          "start": 1790929807256.7,
+          "duration": 51
+        },
+        {
+          "start": 1790929807406.6,
+          "duration": 60
+        },
+        {
+          "start": 1790929807707.6,
+          "duration": 54
+        },
+        {
+          "start": 1790929807707.6,
+          "duration": 54
+        }
+      ],
+      "range": {
+        "from": 1790886000,
+        "to": 1790932500
+      },
+      "spacing": 6,
+      "heap": 30803095,
+      "displayed": 1790929808043.1,
+      "ui_ms": 2610.10009765625,
+      "native_ms": 938.400146484375
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880371000,
+            "firstDataRequest": true,
+            "client": "9f237c7e-216f-4d55-88bd-ce37fd816526",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929871000,
+            "track_history": false
+          },
+          "start": 1790929811457,
+          "bytes": 67582,
+          "bars": 365,
+          "mandatory_count": 165,
+          "optional_count": 200,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 4.17,
+            "upstream_slot": 14.85,
+            "network_http11_send_request_headers": 2.89,
+            "network_http11_send_request_body": 0.05,
+            "network_http11_receive_response_headers": 584,
+            "network_http11_receive_response_body": 2.92,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 591.08,
+            "upstream_decode": 0.42,
+            "database_commit": 149.53,
+            "read_total": 819.48
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929809955,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880371,
+            "to": 1790929871,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929811451,
+          "callback": 1790929812319.8,
+          "count": 365,
+          "first": 1790820600000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929810671.1,
+          "duration": 277
+        },
+        {
+          "start": 1790929810951.1,
+          "duration": 226
+        },
+        {
+          "start": 1790929811478.7,
+          "duration": 50
+        }
+      ],
+      "range": {
+        "from": 1790886900,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 29909277,
+      "displayed": 1790929812496.1,
+      "ui_ms": 2541.10009765625,
+      "native_ms": 1045.10009765625
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880381000,
+            "firstDataRequest": true,
+            "client": "d5d234ea-ed7d-4485-adf6-753967b81b87",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929881000,
+            "track_history": false
+          },
+          "start": 1790929821360,
+          "bytes": 213815,
+          "bars": 1166,
+          "mandatory_count": 166,
+          "optional_count": 1000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 151.09
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929819676,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880381,
+            "to": 1790929881,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929821355.6,
+          "callback": 1790929821914.5,
+          "count": 1166,
+          "first": 1790580300000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929820404.1,
+          "duration": 342
+        },
+        {
+          "start": 1790929820748.4001,
+          "duration": 270
+        },
+        {
+          "start": 1790929821510.1,
+          "duration": 82
+        }
+      ],
+      "range": {
+        "from": 1790886900,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 32623013,
+      "displayed": 1790929822218.9001,
+      "ui_ms": 2542.900146484375,
+      "native_ms": 863.300048828125
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880397000,
+            "firstDataRequest": true,
+            "client": "b533807b-f4d7-433f-b660-1fa1b16415c3",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929897000,
+            "track_history": false
+          },
+          "start": 1790929837609,
+          "bytes": 119359,
+          "bars": 765,
+          "mandatory_count": 165,
+          "optional_count": 600,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 5.62,
+            "upstream_slot": 5.38,
+            "network_http11_send_request_headers": 0.22,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 578.75,
+            "network_http11_receive_response_body": 0.97,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 580.9,
+            "upstream_decode": 0.94,
+            "database_commit": 282.3,
+            "read_total": 933.34
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929835958,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880397,
+            "to": 1790929897,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929837529.7,
+          "callback": 1790929838588.8,
+          "count": 765,
+          "first": 1790700600000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929836663,
+          "duration": 278
+        },
+        {
+          "start": 1790929836944.3,
+          "duration": 310
+        },
+        {
+          "start": 1790929838587.4001,
+          "duration": 58
+        },
+        {
+          "start": 1790929838587.4001,
+          "duration": 58
+        }
+      ],
+      "range": {
+        "from": 1790886300,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 29741719,
+      "displayed": 1790929838776.1,
+      "ui_ms": 2818.10009765625,
+      "native_ms": 1246.400146484375
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880408000,
+            "firstDataRequest": true,
+            "client": "a92c982c-37d6-4824-ba6d-7b2242010d75",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929908000,
+            "track_history": false
+          },
+          "start": 1790929848623,
+          "bytes": 491165,
+          "bars": 3166,
+          "mandatory_count": 166,
+          "optional_count": 3000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 62.07
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929846717,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880408,
+            "to": 1790929908,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929848616.9,
+          "callback": 1790929848915.2,
+          "count": 3166,
+          "first": 1789634400000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929847483.2,
+          "duration": 286
+        },
+        {
+          "start": 1790929847770.8,
+          "duration": 335
+        },
+        {
+          "start": 1790929848910.8,
+          "duration": 84
+        },
+        {
+          "start": 1790929848910.8,
+          "duration": 84
+        }
+      ],
+      "range": {
+        "from": 1790886300,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 34250942,
+      "displayed": 1790929849168.9,
+      "ui_ms": 2451.89990234375,
+      "native_ms": 552
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880412000,
+            "firstDataRequest": true,
+            "client": "a4e3ae9d-2049-48a5-925a-41bea97704a9",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929912000,
+            "track_history": false
+          },
+          "start": 1790929852532,
+          "bytes": 140856,
+          "bars": 765,
+          "mandatory_count": 165,
+          "optional_count": 600,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 3.15,
+            "upstream_slot": 5.14,
+            "network_connection_connect_tcp": 15,
+            "network_http11_send_request_headers": 0.36,
+            "network_http11_send_request_body": 0.07,
+            "network_http11_receive_response_headers": 278.41,
+            "network_proxy_start_tls": 1019.13,
+            "network_http11_receive_response_body": 75.71,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 1390.42,
+            "upstream_decode": 1.1,
+            "database_commit": 257.37,
+            "read_total": 1694.56
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929850979,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880412,
+            "to": 1790929912,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929852530,
+          "callback": 1790929854272.8,
+          "count": 765,
+          "first": 1790700600000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929851616.4,
+          "duration": 311
+        },
+        {
+          "start": 1790929851930,
+          "duration": 255
+        },
+        {
+          "start": 1790929852666.5,
+          "duration": 66
+        }
+      ],
+      "range": {
+        "from": 1790886900,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 30522958,
+      "displayed": 1790929854478.5999,
+      "ui_ms": 3499.599853515625,
+      "native_ms": 1948.599853515625
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880424000,
+            "firstDataRequest": true,
+            "client": "80824b37-42b5-4fe0-8217-1facc411c794",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929924000,
+            "track_history": false
+          },
+          "start": 1790929864985,
+          "bytes": 579632,
+          "bars": 3165,
+          "mandatory_count": 165,
+          "optional_count": 3000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 381.61
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929861252,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880424,
+            "to": 1790929924,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929864976.2,
+          "callback": 1790929865963.7,
+          "count": 3165,
+          "first": 1789980600000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929862431.6,
+          "duration": 578
+        },
+        {
+          "start": 1790929863016,
+          "duration": 1043
+        },
+        {
+          "start": 1790929864523.2,
+          "duration": 101
+        },
+        {
+          "start": 1790929864680.3,
+          "duration": 83
+        },
+        {
+          "start": 1790929864772.9001,
+          "duration": 75
+        },
+        {
+          "start": 1790929865019,
+          "duration": 147
+        },
+        {
+          "start": 1790929865231.7,
+          "duration": 58
+        },
+        {
+          "start": 1790929865292.1,
+          "duration": 98
+        },
+        {
+          "start": 1790929865874.3,
+          "duration": 65
+        },
+        {
+          "start": 1790929865958.2,
+          "duration": 198
+        },
+        {
+          "start": 1790929865958.2,
+          "duration": 198
+        },
+        {
+          "start": 1790929866325.7,
+          "duration": 61
+        }
+      ],
+      "range": {
+        "from": 1790886900,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 32800821,
+      "displayed": 1790929866543,
+      "ui_ms": 5291,
+      "native_ms": 1566.800048828125
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880446000,
+            "firstDataRequest": true,
+            "client": "8781b0bc-cfed-4242-a334-9d68d2f65059",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929946000,
+            "track_history": false
+          },
+          "start": 1790929886450,
+          "bytes": 57361,
+          "bars": 365,
+          "mandatory_count": 165,
+          "optional_count": 200,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 4.08,
+            "upstream_slot": 3.45,
+            "network_http11_send_request_headers": 0.22,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 290.9,
+            "network_http11_receive_response_body": 26.94,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 319.23,
+            "upstream_decode": 0.67,
+            "database_commit": 366.97,
+            "read_total": 840.59
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929883818,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880446,
+            "to": 1790929946,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929886446.4001,
+          "callback": 1790929887362.8,
+          "count": 365,
+          "first": 1790820600000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929884831.7002,
+          "duration": 346
+        },
+        {
+          "start": 1790929885180.4001,
+          "duration": 497
+        },
+        {
+          "start": 1790929886123.8,
+          "duration": 63
+        },
+        {
+          "start": 1790929886230.8,
+          "duration": 138
+        },
+        {
+          "start": 1790929886546.6,
+          "duration": 54
+        }
+      ],
+      "range": {
+        "from": 1790886300,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 33081810,
+      "displayed": 1790929887501.7002,
+      "ui_ms": 3683.7001953125,
+      "native_ms": 1055.300048828125
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880458000,
+            "firstDataRequest": true,
+            "client": "40cb6628-f7c5-4d6b-927b-3dc7c6b62952",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929958000,
+            "track_history": false
+          },
+          "start": 1790929898077,
+          "bytes": 181166,
+          "bars": 1166,
+          "mandatory_count": 166,
+          "optional_count": 1000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 338.28
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929895099,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880458,
+            "to": 1790929958,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929898054.8,
+          "callback": 1790929898776.3,
+          "count": 1166,
+          "first": 1790580300000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929896130.6,
+          "duration": 421
+        },
+        {
+          "start": 1790929896575.4001,
+          "duration": 618
+        },
+        {
+          "start": 1790929897227.3,
+          "duration": 67
+        },
+        {
+          "start": 1790929897430.4001,
+          "duration": 114
+        },
+        {
+          "start": 1790929897605.3,
+          "duration": 92
+        },
+        {
+          "start": 1790929897758.4001,
+          "duration": 143
+        },
+        {
+          "start": 1790929897933,
+          "duration": 76
+        },
+        {
+          "start": 1790929898165.6,
+          "duration": 71
+        },
+        {
+          "start": 1790929898256.7,
+          "duration": 60
+        },
+        {
+          "start": 1790929898385.5,
+          "duration": 51
+        },
+        {
+          "start": 1790929898653.1,
+          "duration": 51
+        },
+        {
+          "start": 1790929898774.5,
+          "duration": 61
+        },
+        {
+          "start": 1790929898774.5,
+          "duration": 61
+        }
+      ],
+      "range": {
+        "from": 1790886300,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 30855998,
+      "displayed": 1790929899024.9001,
+      "ui_ms": 3925.900146484375,
+      "native_ms": 970.10009765625
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880463000,
+            "firstDataRequest": true,
+            "client": "2e88197f-b8ee-4a41-b98c-e772b05c5b18",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929963000,
+            "track_history": false
+          },
+          "start": 1790929903547,
+          "bytes": 67765,
+          "bars": 366,
+          "mandatory_count": 166,
+          "optional_count": 200,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 3.32,
+            "upstream_slot": 5.25,
+            "network_http11_send_request_headers": 0.24,
+            "network_http11_send_request_body": 0.04,
+            "network_http11_receive_response_headers": 215.77,
+            "network_http11_receive_response_body": 0.49,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 224.94,
+            "upstream_decode": 0.44,
+            "database_commit": 160.12,
+            "read_total": 464.38
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929901788,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880463,
+            "to": 1790929963,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929903541.5999,
+          "callback": 1790929904124.5999,
+          "count": 366,
+          "first": 1790820300000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929902467.2,
+          "duration": 320
+        },
+        {
+          "start": 1790929902789,
+          "duration": 288
+        },
+        {
+          "start": 1790929903626.4,
+          "duration": 54
+        },
+        {
+          "start": 1790929904053.7998,
+          "duration": 50
+        },
+        {
+          "start": 1790929904123.0999,
+          "duration": 66
+        },
+        {
+          "start": 1790929904123.0999,
+          "duration": 66
+        }
+      ],
+      "range": {
+        "from": 1790886900,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 30080278,
+      "displayed": 1790929904331,
+      "ui_ms": 2543,
+      "native_ms": 789.400146484375
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880476000,
+            "firstDataRequest": true,
+            "client": "689b391c-cc56-4306-94e1-559e9dac0f59",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929976000,
+            "track_history": false
+          },
+          "start": 1790929916922,
+          "bytes": 213814,
+          "bars": 1166,
+          "mandatory_count": 166,
+          "optional_count": 1000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 93.24
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929914614,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880476,
+            "to": 1790929976,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929916909.8,
+          "callback": 1790929917603,
+          "count": 1166,
+          "first": 1790580300000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929915526.4001,
+          "duration": 325
+        },
+        {
+          "start": 1790929915866.5,
+          "duration": 389
+        },
+        {
+          "start": 1790929916380.1,
+          "duration": 52
+        },
+        {
+          "start": 1790929916664.5,
+          "duration": 61
+        },
+        {
+          "start": 1790929916732.6,
+          "duration": 79
+        },
+        {
+          "start": 1790929916820.8,
+          "duration": 75
+        },
+        {
+          "start": 1790929917059.4001,
+          "duration": 54
+        },
+        {
+          "start": 1790929917280.7002,
+          "duration": 61
+        }
+      ],
+      "range": {
+        "from": 1790886900,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 31160569,
+      "displayed": 1790929917793.1,
+      "ui_ms": 3179.10009765625,
+      "native_ms": 883.300048828125
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880490000,
+            "firstDataRequest": true,
+            "client": "e16da6a2-1b87-4907-8c5f-8fa769a6931c",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929990000,
+            "track_history": false
+          },
+          "start": 1790929930902,
+          "bytes": 88359,
+          "bars": 565,
+          "mandatory_count": 165,
+          "optional_count": 400,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 9.1,
+            "upstream_slot": 22.5,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 417.96,
+            "network_http11_receive_response_body": 26.75,
+            "network_http11_response_closed": 0.02,
+            "upstream_http": 445.89,
+            "upstream_decode": 0.79,
+            "database_commit": 206.82,
+            "read_total": 760.6
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929929442,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880490,
+            "to": 1790929990,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929930898.9001,
+          "callback": 1790929931730,
+          "count": 565,
+          "first": 1790760600000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929930088.4001,
+          "duration": 298
+        },
+        {
+          "start": 1790929930388.3,
+          "duration": 239
+        },
+        {
+          "start": 1790929931018.4001,
+          "duration": 62
+        },
+        {
+          "start": 1790929931093.7,
+          "duration": 67
+        },
+        {
+          "start": 1790929931914.7,
+          "duration": 73
+        },
+        {
+          "start": 1790929931914.7,
+          "duration": 73
+        }
+      ],
+      "range": {
+        "from": 1790886300,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 30630511,
+      "displayed": 1790929931988.2,
+      "ui_ms": 2546.199951171875,
+      "native_ms": 1089.2998046875
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "OANDA:AUD_CAD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880499000,
+            "firstDataRequest": true,
+            "client": "87a0b753-69bd-4e15-b103-d06bc2373c00",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790929999000,
+            "track_history": false
+          },
+          "start": 1790929939427,
+          "bytes": 336166,
+          "bars": 2166,
+          "mandatory_count": 166,
+          "optional_count": 2000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 116.39
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929937689,
+      "trace": [
+        {
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "res": "5",
+          "params": {
+            "from": 1790880499,
+            "to": 1790929999,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929939403.5999,
+          "callback": 1790929939754.7,
+          "count": 2166,
+          "first": 1790107500000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929938294.5999,
+          "duration": 369
+        },
+        {
+          "start": 1790929938665.4,
+          "duration": 279
+        },
+        {
+          "start": 1790929939330.2,
+          "duration": 62
+        },
+        {
+          "start": 1790929939750.7998,
+          "duration": 57
+        },
+        {
+          "start": 1790929939750.7998,
+          "duration": 57
+        }
+      ],
+      "range": {
+        "from": 1790886300,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 33532372,
+      "displayed": 1790929940014.5999,
+      "ui_ms": 2325.599853515625,
+      "native_ms": 611
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "cold",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 166,
+            "countBack": 166,
+            "from": 1790880504000,
+            "firstDataRequest": true,
+            "client": "31ba7a0a-ca70-4fd4-87ae-abe36b198d37",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930004000,
+            "track_history": false
+          },
+          "start": 1790929944120,
+          "bytes": 104366,
+          "bars": 566,
+          "mandatory_count": 166,
+          "optional_count": 400,
+          "cache_hit": false,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ],
+          "timings_ms": {
+            "lease_wait": 5.61,
+            "upstream_slot": 4.05,
+            "network_http11_send_request_headers": 0.23,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 207.25,
+            "network_http11_receive_response_body": 43.18,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 252.05,
+            "upstream_decode": 0.84,
+            "database_commit": 300.18,
+            "read_total": 623.75
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929942261,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880504,
+            "to": 1790930004,
+            "countBack": 166,
+            "firstDataRequest": true
+          },
+          "start": 1790929944115.7998,
+          "callback": 1790929944779.7,
+          "count": 566,
+          "first": 1790760300000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929943108.7998,
+          "duration": 300
+        },
+        {
+          "start": 1790929943410.9,
+          "duration": 267
+        },
+        {
+          "start": 1790929944122.5999,
+          "duration": 57
+        }
+      ],
+      "range": {
+        "from": 1790886900,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 29755386,
+      "displayed": 1790929944925.4,
+      "ui_ms": 2664.39990234375,
+      "native_ms": 809.60009765625
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "scenario": "pg",
+      "symbol": "MWP:BTCUSDT",
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "resolution": "5",
+      "http": [
+        {
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 165,
+            "countBack": 165,
+            "from": 1790880517000,
+            "firstDataRequest": true,
+            "client": "5ed9c39a-27bf-4de5-844b-9003d59288cc",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790930017000,
+            "track_history": false
+          },
+          "start": 1790929957916,
+          "bytes": 396631,
+          "bars": 2165,
+          "mandatory_count": 165,
+          "optional_count": 2000,
+          "cache_hit": true,
+          "attempts": [],
+          "timings_ms": {
+            "read_total": 87.99
+          },
+          "boundary": false
+        }
+      ],
+      "errors": [],
+      "ui_start": 1790929956070,
+      "trace": [
+        {
+          "ticker": "MWP:BTCUSDT",
+          "res": "5",
+          "params": {
+            "from": 1790880517,
+            "to": 1790930017,
+            "countBack": 165,
+            "firstDataRequest": true
+          },
+          "start": 1790929957909.1,
+          "callback": 1790929958196.6,
+          "count": 2165,
+          "first": 1790280600000,
+          "last": 1790929800000,
+          "noData": false,
+          "duplicates": 0
+        }
+      ],
+      "long_tasks": [
+        {
+          "start": 1790929956665.8,
+          "duration": 316
+        },
+        {
+          "start": 1790929956983.7,
+          "duration": 382
+        },
+        {
+          "start": 1790929957719.9,
+          "duration": 52
+        },
+        {
+          "start": 1790929957781.8,
+          "duration": 53
+        },
+        {
+          "start": 1790929958103.4,
+          "duration": 53
+        },
+        {
+          "start": 1790929958192.2,
+          "duration": 128
+        },
+        {
+          "start": 1790929958192.2,
+          "duration": 128
+        }
+      ],
+      "range": {
+        "from": 1790886900,
+        "to": 1790932800
+      },
+      "spacing": 6,
+      "heap": 34048557,
+      "displayed": 1790929958545.1,
+      "ui_ms": 2475.10009765625,
+      "native_ms": 636
+    }
+  ],
+  "environment": {
+    "app": "https://localhost:15473",
+    "chart": "https://127.0.0.1:15474",
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "cpu": 1
+  },
+  "started_at": "2026-10-02T08:25:44.644Z",
+  "preparations": [
+    {
+      "repeat": 0,
+      "enabled": true,
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 0,
+      "enabled": true,
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 1,
+      "enabled": true,
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "candidate": {
+        "cold": 600,
+        "hot": 3000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "candidate": {
+        "cold": 200,
+        "hot": 1000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    },
+    {
+      "repeat": 2,
+      "enabled": true,
+      "candidate": {
+        "cold": 400,
+        "hot": 2000
+      },
+      "symbol": "MWP:BTCUSDT",
+      "result": "Prepared native PG bars: 4000 cache_hit: False"
+    }
+  ],
+  "finished_at": "2026-10-02T08:32:38.745Z"
+}

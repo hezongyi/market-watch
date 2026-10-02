@@ -1,0 +1,74 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_failed_owner_releases_lease_after_deadline_or_cancellation[False] ____
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f836fd7e890>
+cancelled = False
+
+    @pytest.mark.parametrize('cancelled', [False, True])
+    def test_failed_owner_releases_lease_after_deadline_or_cancellation(database, monkeypatch, cancelled):
+        import threading
+        import time
+        key = cache.ensure(META, 'M5')
+        event = threading.Event()
+        cancel_token = cache.CANCELLED.set(event)
+        deadline_token = cache.DEADLINE.set(time.monotonic() + 2)
+        def fail(*args, **kwargs):
+            if cancelled:
+                event.set()
+            else:
+                cache.DEADLINE.set(time.monotonic() - 1)
+            raise TimeoutError('upstream request failed')
+        monkeypatch.setattr(upstream, 'native_page', fail)
+        try:
+            with pytest.raises(TimeoutError):
+                cache.fetch_page(key, META, 'M5', 10000, 5, time.monotonic() + 2)
+        finally:
+            cache.CANCELLED.reset(cancel_token)
+            cache.DEADLINE.reset(deadline_token)
+        with database.begin() as db:
+            row = db.get(ProviderDataset, key)
+>           assert row.lease_token is None and row.lease_until == 0
+E           AssertionError: assert ('1ddaaa9f-b5e2-43d6-99bc-a059541e79af' is None)
+E            +  where '1ddaaa9f-b5e2-43d6-99bc-a059541e79af' = <alerts.storage.ProviderDataset object at 0x7f8370052390>.lease_token
+
+backend/tests/test_provider_cache.py:190: AssertionError
+____ test_failed_owner_releases_lease_after_deadline_or_cancellation[True] _____
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f836ff34910>
+cancelled = True
+
+    @pytest.mark.parametrize('cancelled', [False, True])
+    def test_failed_owner_releases_lease_after_deadline_or_cancellation(database, monkeypatch, cancelled):
+        import threading
+        import time
+        key = cache.ensure(META, 'M5')
+        event = threading.Event()
+        cancel_token = cache.CANCELLED.set(event)
+        deadline_token = cache.DEADLINE.set(time.monotonic() + 2)
+        def fail(*args, **kwargs):
+            if cancelled:
+                event.set()
+            else:
+                cache.DEADLINE.set(time.monotonic() - 1)
+            raise TimeoutError('upstream request failed')
+        monkeypatch.setattr(upstream, 'native_page', fail)
+        try:
+            with pytest.raises(TimeoutError):
+                cache.fetch_page(key, META, 'M5', 10000, 5, time.monotonic() + 2)
+        finally:
+            cache.CANCELLED.reset(cancel_token)
+            cache.DEADLINE.reset(deadline_token)
+        with database.begin() as db:
+            row = db.get(ProviderDataset, key)
+>           assert row.lease_token is None and row.lease_until == 0
+E           AssertionError: assert ('7f52b3b2-0a8f-4834-a8b0-5c3eede9cea9' is None)
+E            +  where '7f52b3b2-0a8f-4834-a8b0-5c3eede9cea9' = <alerts.storage.ProviderDataset object at 0x7f836ffc7e90>.lease_token
+
+backend/tests/test_provider_cache.py:190: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_cache.py::test_failed_owner_releases_lease_after_deadline_or_cancellation[False]
+FAILED backend/tests/test_provider_cache.py::test_failed_owner_releases_lease_after_deadline_or_cancellation[True]
+2 failed, 27 deselected in 0.27s

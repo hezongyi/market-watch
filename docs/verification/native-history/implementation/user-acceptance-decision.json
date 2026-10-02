@@ -1,0 +1,37 @@
+{
+  "status": "accepted_by_user",
+  "date": "2026-10-02",
+  "user_instruction": "不解决binance 阻塞，由于网络问题引起的 不进行解决。 视为可以达标",
+  "decision": "The user accepts the recorded Binance network-related performance blocker for this delivery and directs no further network troubleshooting. Implementation acceptance is satisfied under this explicit decision; measured scores are not changed.",
+  "report": "buffer-selected-acceptance.json",
+  "report_sha256": "86ebf658a7993d1ee547cf7ddf89ea1b8f6c0c6bebab8d9d66222da7ac313df0",
+  "accepted_groups": [
+    [
+      "MWP:BTCUSDT",
+      "cold"
+    ],
+    [
+      "MWP:BTCUSDT",
+      "pg"
+    ]
+  ],
+  "original_results": {
+    "oanda_cold": "10/10",
+    "oanda_pg": "9/10",
+    "binance_cold": "4/10",
+    "binance_pg": "7/10",
+    "binance_pg_actual_hits": "8/10"
+  },
+  "limits_retained": [
+    "All failures/timeouts/PG misses remain in fixed denominators",
+    "No claim that every 503 cause was traced or every PG miss was a network failure",
+    "Remote ~10000-bar navigation is separate stress behavior, not ordinary cold fetch policy",
+    "No production merge/push/deployment in this task"
+  ],
+  "accepted_defaults": {
+    "buffer": true,
+    "cold_extra": 400,
+    "first_extra": 2000,
+    "history_extra": 2000
+  }
+}

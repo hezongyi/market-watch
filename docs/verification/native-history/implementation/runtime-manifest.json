@@ -1,0 +1,136 @@
+{
+  "source_commit": "fc8af766f44e5355e255a7c71b183ec14cb26feb",
+  "baseline_commit": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+  "licensed_files": 2928,
+  "licensed_mismatches": [],
+  "images": {
+    "api": "sha256:04034a0781eacb0a13fb617078d3250bbec57f4be08394d16426a104c42562bb",
+    "web": "sha256:d361ba693648c383e552e2772b42138863835393f78e1e164c65688a0b78ef6f",
+    "chart-origin": "sha256:7eac1fd5f3007499bfcd2aa4e4ea50012b808cd569763c00875998052908a0c5"
+  },
+  "origins": {
+    "app": "https://localhost:15473",
+    "chart": "https://127.0.0.1:15474"
+  },
+  "database": {
+    "container": "market-watch-native-history-pg",
+    "database": "market_watch_native_history",
+    "test_database": "native_history_tests",
+    "postgres": "16"
+  },
+  "default_buffer": true,
+  "tuning": {
+    "api_image": "sha256:e6c60c418da29a8db398de16568883e65ef7cf7e679b37b6e899117471fd5099",
+    "api_source_commit": "893bf576675aa412b7ecd7a4d10ece3106a072fd",
+    "image_tag": "market-watch-api:native-history-tuning-ae629c1",
+    "tag_note": "tag names ae629c1; actual build source includes import-only 893bf57 refinement",
+    "selected_optional_caps": {
+      "cold": 400,
+      "first": 2000,
+      "history": 2000
+    },
+    "other_services_source": "fc8af766f44e5355e255a7c71b183ec14cb26feb",
+    "formal_selected_samples": 40,
+    "formal_result": "numeric failure retained; later accepted by user in user-acceptance-decision.json",
+    "restored_runtime_buffer": false,
+    "restored_runtime_buffer_note": "Historical restoration was off; superseded by accepted final runtime below"
+  },
+  "correctness_supplement": {
+    "api_image": "sha256:e6c60c418da29a8db398de16568883e65ef7cf7e679b37b6e899117471fd5099",
+    "api_source": "893bf576675aa412b7ecd7a4d10ece3106a072fd",
+    "frontend_source": "fc8af766f44e5355e255a7c71b183ec14cb26feb",
+    "entrypoint": "scripts/native_history_barrier_server.py",
+    "autonomous_provider_loops": "held only for deterministic injected-revision/focus/compatibility correctness; no performance samples",
+    "barrier_buffer": false,
+    "focus_buffer": true,
+    "focus_optional_caps": {
+      "cold": 400,
+      "first": 2000,
+      "history": 2000
+    }
+  },
+  "compatibility": {
+    "new-front-old-api": {
+      "api": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "api_source": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+      "web": "sha256:d361ba693648c383e552e2772b42138863835393f78e1e164c65688a0b78ef6f",
+      "chart": "sha256:7eac1fd5f3007499bfcd2aa4e4ea50012b808cd569763c00875998052908a0c5",
+      "frontend_source": "fc8af766f44e5355e255a7c71b183ec14cb26feb",
+      "report": "browser-new-front-old-api.json"
+    },
+    "old-front-new-api": {
+      "api": "sha256:e6c60c418da29a8db398de16568883e65ef7cf7e679b37b6e899117471fd5099",
+      "api_source": "893bf576675aa412b7ecd7a4d10ece3106a072fd",
+      "web": "sha256:bc8d00e83b5e062b283d558e492895b6d38ba04eec11cfe50910986b4e635033",
+      "chart": "sha256:b8129d6cfaedc14cb785b6cd0ff8f5c461869e6e9bc9100a4581b7b2c495d8a3",
+      "frontend_source": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+      "web_build": "git archive baseline web with only VITE_ADVANCED_CHART_ORIGIN=https://127.0.0.1:15474 build argument",
+      "report": "browser-old-front-new-api.json"
+    }
+  },
+  "delivery_restore": {
+    "services": {
+      "api": {
+        "container": "market-watch-native-history-api-1",
+        "image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
+        "running": true
+      },
+      "web": {
+        "container": "market-watch-native-history-web-1",
+        "image": "sha256:d361ba693648c383e552e2772b42138863835393f78e1e164c65688a0b78ef6f",
+        "running": true
+      },
+      "chart-origin": {
+        "container": "market-watch-native-history-chart-origin-1",
+        "image": "sha256:7eac1fd5f3007499bfcd2aa4e4ea50012b808cd569763c00875998052908a0c5",
+        "running": true
+      },
+      "realtime-worker": {
+        "container": "market-watch-native-history-realtime-worker-1",
+        "image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
+        "running": true
+      },
+      "chart-history-worker": {
+        "container": "market-watch-native-history-chart-history-worker-1",
+        "image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
+        "running": true
+      },
+      "chart-aggregation-worker": {
+        "container": "market-watch-native-history-chart-aggregation-worker-1",
+        "image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
+        "running": true
+      }
+    },
+    "api_command": [
+      "uvicorn",
+      "alerts.api:app",
+      "--host",
+      "0.0.0.0",
+      "--port",
+      "8000"
+    ],
+    "provider_workers": "running; acceptance barrier override removed",
+    "buffer": true,
+    "optional_caps": {
+      "cold": 400,
+      "first": 2000,
+      "history": 2000
+    },
+    "api_health": "healthy"
+  },
+  "accepted_final": {
+    "source_commit": "3ea49c02df73fdd317d0af9a2abd7ef28b5f4986",
+    "api_image": "sha256:c6438d8c4b827cacead102abd1075ce543eb84458fcd3565f21db372947d7690",
+    "image_tag": "market-watch-api:native-history-accepted",
+    "buffer": true,
+    "optional_caps": {
+      "cold": 400,
+      "first": 2000,
+      "history": 2000
+    },
+    "decision": "user-acceptance-decision.json",
+    "validation": "enabled-default-tests.txt",
+    "smoke": "browser-new-front-new-api.json",
+    "production_deployed": false
+  }
+}

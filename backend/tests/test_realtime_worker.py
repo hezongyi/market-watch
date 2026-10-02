@@ -5,7 +5,7 @@ from alerts.storage import ChartViewportDemand, Instrument
 def test_realtime_keeps_maintained_symbols_and_only_active_viewers(database, monkeypatch):
     now = 1790780000000
     monkeypatch.setattr(market, 'now_ms', lambda: now)
-    monkeypatch.setattr(market, 'ingest', lambda *args: 0)
+    monkeypatch.setattr(market, 'ingest', lambda *args, **kwargs: market.Ingestion(0, False))
     monkeypatch.setattr(market, 'queue_recovery', lambda *args: None)
     with database.begin() as db:
         # Keep one permanent instrument, two demand-only instruments.

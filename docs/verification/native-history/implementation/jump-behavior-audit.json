@@ -1,0 +1,283 @@
+{
+  "rule": "Only gestures wholly inside previously delivered native history require zero new getBars. D>R legitimately suppresses E; first older gesture may cross delivered boundary. Source JSON remains unchanged.",
+  "cases": [
+    {
+      "report": "browser-jump.json",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "cold",
+      "startup": false,
+      "original_error": null,
+      "gestures": [
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786625100.0,
+          "after_range": {
+            "from": 1786642500,
+            "to": 1786692300
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786625100.0,
+          "after_range": {
+            "from": 1786668600,
+            "to": 1786718100
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786625100.0,
+          "after_range": {
+            "from": 1786694400,
+            "to": 1786917000
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        }
+      ],
+      "browser_contract_pass": true
+    },
+    {
+      "report": "browser-jump.json",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "cold",
+      "startup": true,
+      "original_error": "frame.waitForFunction: Timeout 22000ms exceeded.",
+      "gestures": [],
+      "browser_contract_pass": false
+    },
+    {
+      "report": "browser-jump.json",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "pg",
+      "startup": false,
+      "original_error": null,
+      "gestures": [
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786611300.0,
+          "after_range": {
+            "from": 1786642500,
+            "to": 1786692300
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786611300.0,
+          "after_range": {
+            "from": 1786668600,
+            "to": 1786718100
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786611300.0,
+          "after_range": {
+            "from": 1786694400,
+            "to": 1786917000
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        }
+      ],
+      "browser_contract_pass": true
+    },
+    {
+      "report": "browser-jump.json",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "pg",
+      "startup": true,
+      "original_error": null,
+      "gestures": [
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786610400.0,
+          "after_range": {
+            "from": 1786642500,
+            "to": 1786692300
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786610400.0,
+          "after_range": {
+            "from": 1786668600,
+            "to": 1786718100
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1786610400.0,
+          "after_range": {
+            "from": 1786694400,
+            "to": 1786917000
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        }
+      ],
+      "browser_contract_pass": true
+    },
+    {
+      "report": "browser-jump.json",
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "cold",
+      "startup": false,
+      "original_error": "frame.evaluate: Error: Rejected by timeout\n    at https://127.0.0.1:15474/charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js:779:667",
+      "gestures": [],
+      "browser_contract_pass": false
+    },
+    {
+      "report": "browser-jump.json",
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "cold",
+      "startup": true,
+      "original_error": "frame.waitForFunction: Timeout 22000ms exceeded.",
+      "gestures": [],
+      "browser_contract_pass": false
+    },
+    {
+      "report": "browser-jump.json",
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "pg",
+      "startup": false,
+      "original_error": "frame.waitForFunction: Timeout 22000ms exceeded.",
+      "gestures": [],
+      "browser_contract_pass": false
+    },
+    {
+      "report": "browser-jump.json",
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "pg",
+      "startup": true,
+      "original_error": "frame.waitForFunction: Timeout 22000ms exceeded.",
+      "gestures": [],
+      "browser_contract_pass": false
+    },
+    {
+      "report": "browser-jump-cache-refresh.json",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "pg",
+      "startup": false,
+      "original_error": "real historical layout preparation failed",
+      "gestures": [],
+      "browser_contract_pass": false
+    },
+    {
+      "report": "browser-jump-cache-refresh.json",
+      "symbol": "MWP:OANDA:AUD_CAD",
+      "scenario": "pg",
+      "startup": true,
+      "original_error": "real historical layout preparation failed",
+      "gestures": [],
+      "browser_contract_pass": false
+    },
+    {
+      "report": "browser-jump-cache-refresh.json",
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "pg",
+      "startup": false,
+      "original_error": "loaded corridor must allow immediate left/right gestures",
+      "gestures": [
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1787882400.0,
+          "after_range": {
+            "from": 1787856000,
+            "to": 1787905800
+          },
+          "beyond_loaded_history": true,
+          "new_requests": 1,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 3,
+          "loaded_first": 1787332500.0,
+          "after_range": {
+            "from": 1787882400,
+            "to": 1787931900
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 3,
+          "loaded_first": 1787332500.0,
+          "after_range": {
+            "from": 1787908500,
+            "to": 1787958300
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        }
+      ],
+      "browser_contract_pass": true
+    },
+    {
+      "report": "browser-jump-cache-refresh.json",
+      "symbol": "MWP:BTCUSDT",
+      "scenario": "pg",
+      "startup": true,
+      "original_error": "loaded corridor must allow immediate left/right gestures",
+      "gestures": [
+        {
+          "before_native_requests": 2,
+          "loaded_first": 1787882400.0,
+          "after_range": {
+            "from": 1787856000,
+            "to": 1787905800
+          },
+          "beyond_loaded_history": true,
+          "new_requests": 1,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 3,
+          "loaded_first": 1787332500.0,
+          "after_range": {
+            "from": 1787882400,
+            "to": 1787931900
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        },
+        {
+          "before_native_requests": 3,
+          "loaded_first": 1787332500.0,
+          "after_range": {
+            "from": 1787908500,
+            "to": 1787958300
+          },
+          "beyond_loaded_history": false,
+          "new_requests": 0,
+          "contract_pass": true
+        }
+      ],
+      "browser_contract_pass": true
+    }
+  ]
+}

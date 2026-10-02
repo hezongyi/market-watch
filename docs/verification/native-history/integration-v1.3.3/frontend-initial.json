@@ -1,0 +1,202 @@
+[
+  {
+    "file": "advanced-autosave.cjs",
+    "exit_code": 0,
+    "output": "Autosave preserves in-flight edits and failed-save retry state\n"
+  },
+  {
+    "file": "advanced-browser.cjs",
+    "exit_code": 1,
+    "output": "browserType.launch: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> /home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/tmp/playwright_chromiumdev_profile-gGzWKL --remote-debugging-pipe --no-startup-window\n<launched> pid=27\n[pid=27][err] /home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome: error while loading shared libraries: libatk-1.0.so.0: cannot open shared object file: No such file or directory\nCall log:\n\u001b[2m  - <launching> /home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/tmp/playwright_chromiumdev_profile-gGzWKL --remote-debugging-pipe --no-startup-window\u001b[22m\n\u001b[2m  - <launched> pid=27\u001b[22m\n\u001b[2m  - [pid=27][err] /home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome: error while loading shared libraries: libatk-1.0.so.0: cannot open shared object file: No such file or directory\u001b[22m\n\u001b[2m  - [pid=27] <gracefully close start>\u001b[22m\n\u001b[2m  - [pid=27] <kill>\u001b[22m\n\u001b[2m  - [pid=27] <will force kill>\u001b[22m\n\u001b[2m  - [pid=27] <process did exit: exitCode=127, signal=null>\u001b[22m\n\u001b[2m  - [pid=27] starting temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=27] finished temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=27] <gracefully close end>\u001b[22m\n\n    at /home/quant/repos/market-watch-native-history-integration/web/tests/advanced-browser.cjs:6:34\n    at Object.<anonymous> (/home/quant/repos/market-watch-native-history-integration/web/tests/advanced-browser.cjs:153:3) {\n  log: [\n    '  - <launching> /home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/tmp/playwright_chromiumdev_profile-gGzWKL --remote-debugging-pipe --no-startup-window',\n    '  - <launched> pid=27',\n    '  - [pid=27][err] /home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome: error while loading shared libraries: libatk-1.0.so.0: cannot open shared object file: No such file or directory',\n    '  - [pid=27] <gracefully close start>',\n    '  - [pid=27] <kill>',\n    '  - [pid=27] <will force kill>',\n    '  - [pid=27] <process did exit: exitCode=127, signal=null>',\n    '  - [pid=27] starting temporary directories cleanup',\n    '  - [pid=27] finished temporary directories cleanup',\n    '  - [pid=27] <gracefully close end>'\n  ]\n}\n"
+  },
+  {
+    "file": "advanced-chart-style.cjs",
+    "exit_code": 0,
+    "output": "style extraction: presentation whitelist, no workspace objects, detached copy passed\n"
+  },
+  {
+    "file": "advanced-cold-pagination.cjs",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "file": "advanced-edge-sync.cjs",
+    "exit_code": 0,
+    "output": "Edge range synchronization: alignment, loading, user toggle and disposal passed\n"
+  },
+  {
+    "file": "advanced-history-boundaries.cjs",
+    "exit_code": 0,
+    "output": "Published pagination preserves latest subscription boundary and earliest revision range\n"
+  },
+  {
+    "file": "advanced-history-change-range.cjs",
+    "exit_code": 0,
+    "output": "Historical views ignore remote latest revisions; visible revisions and initial data still refresh\n"
+  },
+  {
+    "file": "advanced-history-dedup.cjs",
+    "exit_code": 0,
+    "output": "Concurrent history reads share requests, distinct periods isolate, completion and failure clear entries\n"
+  },
+  {
+    "file": "advanced-history-demand.cjs",
+    "exit_code": 0,
+    "output": "Viewport demand counts spacing, shares pane identity, renews, excludes W/M and disposes\n"
+  },
+  {
+    "file": "advanced-history-pagination.cjs",
+    "exit_code": 0,
+    "output": "Large countBack traverses published pages without truncation or duplicate bars\n"
+  },
+  {
+    "file": "advanced-history-reload.cjs",
+    "exit_code": 0,
+    "output": "Grouped polling recovers after failure and prevents overlapping requests\nHistorical reload invalidates matching cache before resetting only matching panes\n"
+  },
+  {
+    "file": "advanced-inflight-cancellation.cjs",
+    "exit_code": 0,
+    "output": "Four obsolete in-flight histories release slots within 180ms; current request starts\n"
+  },
+  {
+    "file": "advanced-latest-cache.cjs",
+    "exit_code": 0,
+    "output": "Latest snapshot immediate reuse and asynchronous refresh passed\n"
+  },
+  {
+    "file": "advanced-layout-poll-resume.cjs",
+    "exit_code": 0,
+    "output": "Visible polling resumes independently of deferred historical reset\n"
+  },
+  {
+    "file": "advanced-managed-revisions.cjs",
+    "exit_code": 1,
+    "output": "node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nnull !== 0\n\n    at Object.<anonymous> (/home/quant/repos/market-watch-native-history-integration/web/tests/advanced-managed-revisions.cjs:12:8)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: null,\n  expected: 0,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.23.2\n"
+  },
+  {
+    "file": "advanced-managed.cjs",
+    "exit_code": 0,
+    "output": "Managed feed: consent, refusal, real geometry, published session boundary passed\n"
+  },
+  {
+    "file": "advanced-monthly-cache.cjs",
+    "exit_code": 0,
+    "output": "Monthly local-only history: empty, partial and multi-page cached data passed\n"
+  },
+  {
+    "file": "advanced-native-workspaces.cjs",
+    "exit_code": 0,
+    "output": "native workspace adapter: conflict, serialized saves and readonly passed\n"
+  },
+  {
+    "file": "advanced-navigation-page.cjs",
+    "exit_code": 0,
+    "output": "Historical navigation waits for target coverage and yields to cancellation\n"
+  },
+  {
+    "file": "advanced-preferences.cjs",
+    "exit_code": 0,
+    "output": "native adapters: queued writes, namespaces, reload, conflict and readonly passed\n"
+  },
+  {
+    "file": "advanced-prewarm-cache.cjs",
+    "exit_code": 0,
+    "output": "Prewarmed period pages satisfy smaller requests without network; boundaries and capacity enforced\n"
+  },
+  {
+    "file": "advanced-progressive-cache.cjs",
+    "exit_code": 0,
+    "output": "Progressive cache deduplicates, returns warm data, refreshes revisions and stops hidden polling\n"
+  },
+  {
+    "file": "advanced-progressive-indicators.cjs",
+    "exit_code": 0,
+    "output": "Progressive studies use only ready raw history; empty pages skip calculation\n"
+  },
+  {
+    "file": "advanced-provider-history-observation.cjs",
+    "exit_code": 0,
+    "output": "Late native history: backfill, revision, failed/legacy review and inactive correction passed\n"
+  },
+  {
+    "file": "advanced-provider-request-lifetime.cjs",
+    "exit_code": 0,
+    "output": "Provider native requests survive period switches and cancel on workspace replacement\n"
+  },
+  {
+    "file": "advanced-provider-subscriptions.cjs",
+    "exit_code": 0,
+    "output": "Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed\n"
+  },
+  {
+    "file": "advanced-python-indicators.cjs",
+    "exit_code": 0,
+    "output": "Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed\n"
+  },
+  {
+    "file": "advanced-range-sync.cjs",
+    "exit_code": 0,
+    "output": "Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed\n"
+  },
+  {
+    "file": "advanced-refresh-interaction.cjs",
+    "exit_code": 0,
+    "output": "History refresh yields to new mouse/focus/zoom intent and removes listeners\n"
+  },
+  {
+    "file": "advanced-request-cancellation.cjs",
+    "exit_code": 0,
+    "output": "Queued stale history and old workspace requests cancel; current viewers proceed\n"
+  },
+  {
+    "file": "advanced-series.cjs",
+    "exit_code": 0,
+    "output": "Series: legacy compatibility, synthetic identity, search defaults, isolated provider feed passed\n"
+  },
+  {
+    "file": "advanced-startup-metadata.cjs",
+    "exit_code": 0,
+    "output": "Startup metadata is consumed once, preserves series identity and does not acquire bars\n"
+  },
+  {
+    "file": "advanced-sync-snapshot.cjs",
+    "exit_code": 0,
+    "output": "Public snapshots defer synchronized startup while retaining user choices and vendor content\n"
+  },
+  {
+    "file": "advanced-time.cjs",
+    "exit_code": 0,
+    "output": "13 calendar label cases passed; intraday timestamp unchanged\n"
+  },
+  {
+    "file": "advanced-viewports.cjs",
+    "exit_code": 0,
+    "output": "Viewport restoration preserves preferences and checks symbol identity\n"
+  },
+  {
+    "file": "advanced-volume.cjs",
+    "exit_code": 0,
+    "output": "Actual bridge preserves quantity/zero/unknown and synthetic validity protocol\n"
+  },
+  {
+    "file": "advanced-watchlists.cjs",
+    "exit_code": 0,
+    "output": "Watchlist restore avoids empty native collection; retry and readonly passed\n"
+  },
+  {
+    "file": "advanced-weekly-background.cjs",
+    "exit_code": 0,
+    "output": "Weekly preparing callback yields, releases guard, and refreshes only on explicit action\n"
+  },
+  {
+    "file": "advanced-weekly-error.cjs",
+    "exit_code": 0,
+    "output": "Weekly failure stays an error; explicit refresh clears cache and recovers bars\n"
+  },
+  {
+    "file": "wait-for-async.test.cjs",
+    "exit_code": 0,
+    "output": "Async polling waits for truth, times out, and propagates browser failures\n"
+  }
+]

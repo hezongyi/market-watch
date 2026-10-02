@@ -20,6 +20,8 @@ from .domain import Calendar, session_bounds
 from .provider_transport import activity, discard_client, pooled_client, warm_connections
 from .provider_transport import close_clients as close_clients
 from .storage import Instrument, MarketCatalog, instant, ms, now_ms, transaction
+from .volume import encoded
+from .volume import metadata as volume_metadata
 
 OANDA_FRAMES = {**{f: f for f in FRAMES}, "D1": "D", "W1": "W", "MN": "M"}
 BINANCE_FRAMES = dict(zip(FRAMES, ("1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", "1M")))
@@ -29,6 +31,7 @@ FRAME_MS = dict(
     )
 )
 ALIGNMENT_VERSION = "native-bid-ny17-sunday-v1"
+PAYLOAD_VERSION = "volume-v1"
 _LOCK = threading.Lock()
 _CACHE = OrderedDict()
 _INFLIGHT = {}
@@ -95,6 +98,7 @@ def metadata(ident):
         "precision": precision,
         "frames": FRAMES,
         "series_kind": "provider",
+        **volume_metadata(source, symbol),
     }
 
 
@@ -136,10 +140,21 @@ def _request(client, url, *, params, headers=None, deadline):
                         record_timing("network_" + stage.replace(".", "_"), phases.pop(stage))
                 try:
                     with activity(client) as client:
+                        timings = TIMINGS.get()
+                        if timings is not None:
+                            attempts = timings.setdefault("candles_attempts", [])
+                            attempt_record = {"attempt": attempt + 1}
+                            attempts.append(attempt_record)
                         response = client.get(
                             url, params=params, headers=headers, timeout=min(7, remaining),
                             extensions={"trace": trace},
                         )
+                        if timings is not None:
+                            attempt_record["status"] = response.status_code
+                except Exception as error:
+                    if TIMINGS.get() is not None and 'attempt_record' in locals():
+                        attempt_record["error"] = type(error).__name__
+                    raise
                 finally:
                     record_timing("upstream_http", http_started)
             if response.status_code not in (429, 502, 503, 504) or attempt == 2:
@@ -173,7 +188,7 @@ def _end(start, frame, calendar):
     return start + FRAME_MS[frame]
 
 
-def native_page(meta, frame, before, count, *, client=None, deadline=None):
+def native_page(meta, frame, before, count, *, client=None, deadline=None, optional=0):
     """Return upstream native OHLC, exclusive chart labels and an explicit boundary."""
     if frame not in FRAMES or not 1 <= count <= (4000 if meta["source"] == "oanda" else 1000):
         raise ValueError("无效平台周期或根数")
@@ -185,9 +200,11 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
     cursor = min(now_ms() + 1, before + (2 * 86400000 if frame in ("D1", "W1", "MN") else 0))
     boundary = False
     for _ in range(8):
+        # Optional bars can fill this mandatory HTTP request, but never extend
+        # the loop. High-period translation/filtering still stops at count.
         batch_count = min(
             4000 if source == "oanda" else 1000,
-            count - len(rows) + (3 if frame in ("D1", "W1", "MN") else 0),
+            count - len(rows) + optional + (3 if frame in ("D1", "W1", "MN") else 0),
         )
         if source == "oanda":
             if not settings.oanda_token:
@@ -222,6 +239,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
                         "end": _end(start, frame, meta["calendar"]),
                         "chart_time": label(start, frame, meta["calendar"]),
                         "complete": bool(candle["complete"]),
+                        "volume": encoded(candle.get("volume"), tick=True),
+                        "volume_complete": bool(candle["complete"] and candle.get("volume") is not None),
                         **{
                             k: prices[v]
                             for k, v in (("open", "o"), ("high", "h"), ("low", "l"), ("close", "c"))
@@ -246,6 +265,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
                     "end": int(c[6]) + 1,
                     "chart_time": label(int(c[0]), frame, "utc0"),
                     "complete": int(c[6]) < now_ms(),
+                    "volume": encoded(c[5]),
+                    "volume_complete": int(c[6]) < now_ms() and c[5] is not None,
                     **dict(zip(("open", "high", "low", "close"), c[1:5])),
                 }
                 for c in candles
@@ -263,8 +284,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
         cursor = next_cursor
     else:
         raise ValueError("平台分页超过请求上限")
-    visible = rows[-count:]
-    exhausted = boundary and len(rows) <= count
+    visible = rows[-(count + optional):]
+    exhausted = boundary and len(rows) <= count + optional
     proven_start = 0 if exhausted else visible[0]["chart_time"] if visible else before
     return {
         "bars": visible,
@@ -280,6 +301,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
         if exhausted
         else None,
         "series_kind": "provider",
+        **volume_metadata(source, meta["symbol"]),
         "basis": meta["basis"],
         "calendar": meta["calendar"],
         "precision": meta["precision"],
@@ -304,6 +326,7 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
         meta["basis"],
         meta["calendar"],
         ALIGNMENT_VERSION,
+        PAYLOAD_VERSION,
         before,
         count,
         quote,

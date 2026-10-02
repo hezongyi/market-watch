@@ -47,6 +47,9 @@ def chart_csv(page, *, instrument, timeframe):
             "volume",
             "complete",
             "revision",
+            "volume_kind",
+            "volume_unit",
+            "volume_complete",
             *[name for name, _ in columns],
         ]
     )
@@ -75,6 +78,9 @@ def chart_csv(page, *, instrument, timeframe):
                     bar.get("volume"),
                     str(bar["complete"]).lower(),
                     bar.get("revision"),
+                    page.get("volume_kind", "unavailable"),
+                    page.get("volume_unit"),
+                    str(bar.get("volume_complete", False)).lower(),
                     *[values.get(bar["start"]) for _, values in columns],
                 ]
             ]
