@@ -1,0 +1,78 @@
+{
+  "version": "1.3.1",
+  "source_commit": "8774f329f35aa2c56b2c14db280ab60718405138",
+  "schema": "o16_managed_revisions",
+  "scope": "source release; no container build, restart or production deployment",
+  "backend_full": {
+    "passed": 314,
+    "skipped": 1,
+    "postgresql": "17.11 new disposable local fixture",
+    "skip": "backup dump/restore requires matching pg_dump/pg_restore unavailable in this environment",
+    "source_relation": "full suite after final legacy sparse-observation repair; tested runtime and test sources match the fixed source commit",
+    "command": "PYTHONPATH=backend .venv/bin/python /tmp/market-watch-v131-run-pg-tests.py",
+    "log": "docs/verification/v1.3.1/backend-full-pg17.txt"
+  },
+  "frontend_vm": {
+    "tests": 36,
+    "passed": 36,
+    "failures": [],
+    "source_relation": "35 existing VM tests plus managed API-response integration VM; final Python feed fixture included",
+    "record": "docs/verification/v1.3.1/frontend-vm.json"
+  },
+  "ruff": {
+    "passed": true,
+    "command": ".venv/bin/ruff check backend migrations/versions/o16_managed_revisions.py web/tests/fixtures/managed-revision-feed.py"
+  },
+  "web_build": {
+    "passed": true,
+    "version": "1.3.1",
+    "checks": [
+      "TypeScript",
+      "Vite"
+    ],
+    "known_warning": "existing >500KB bundle warning",
+    "log": "docs/verification/v1.3.1/web-build.txt",
+    "artifacts": "docs/verification/v1.3.1/web-build-artifacts.json"
+  },
+  "wheel_build": {
+    "passed": true,
+    "source_commit": "8774f329f35aa2c56b2c14db280ab60718405138",
+    "filename": "market_watch-1.3.1-py3-none-any.whl",
+    "sha256": "74687744dc5e10a2f64a1eafd33817a12d7c114e499cd2ae5652592951887f8c",
+    "size_bytes": 201865,
+    "runtime_module_count": 38,
+    "byte_mismatches": [],
+    "extra_runtime_modules": [],
+    "scope": "Python alerts runtime modules; migrations, web and chart assets remain in the source tree",
+    "command": ".venv/bin/python -m pip wheel --no-deps --no-build-isolation --wheel-dir /tmp/market-watch-v131-build .",
+    "record": "docs/verification/v1.3.1/wheel-equivalence.json",
+    "artifact_delivery": "built in /tmp only; not uploaded as a remote release attachment"
+  },
+  "versions": {
+    "python": "1.3.1",
+    "web": "1.3.1",
+    "lockfile": "1.3.1",
+    "lockfile_root": "1.3.1"
+  },
+  "reviews": {
+    "standards": "passed; no remaining merge blocker",
+    "spec": "passed; no remaining merge blocker",
+    "record": "docs/verification/v1.3.1/review-results.md"
+  },
+  "fixed_cases": [
+    "5000-bar internal correction outside latest 2000",
+    "durable correction across transactions",
+    "pending aggregate preserves published snapshot",
+    "correction rollback retains pending work",
+    "M30 and weekly/monthly affected buckets",
+    "SQLite and PostgreSQL o16 upgrade/downgrade",
+    "legacy sparse observation absent from old published snapshot is repaired after migration",
+    "frozen session ignores appends and older expansion",
+    "actual managed API response triggers public chart reload"
+  ],
+  "limitations": [
+    "no new Docker image or browser-container acceptance; existing v1.3.0 runtime remains",
+    "PG17 fixture does not replace previous PG16 production-version-specific acceptance",
+    "old proxy performance matrix not rerun for this source fix"
+  ]
+}

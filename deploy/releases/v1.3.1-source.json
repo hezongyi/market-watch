@@ -1,0 +1,77 @@
+{
+  "version": "1.3.1",
+  "accepted": true,
+  "acceptance_scope": "source-only release with backend, frontend VM, package and web build verification",
+  "release_tag": "v1.3.1",
+  "source_commit": "8774f329f35aa2c56b2c14db280ab60718405138",
+  "tag_relation": "tagged release includes subsequent documentation and verification records; runtime sources match source_commit",
+  "schema": "o16_managed_revisions",
+  "schema_baseline": "n15_provider_revisions",
+  "delivery_document": "docs/chart-v1.3.1-delivery.md",
+  "verification": "docs/verification/v1.3.1/source-verification.json",
+  "source_hashes": "docs/verification/v1.3.1/source-files.json",
+  "checks": {
+    "backend_full": {
+      "passed": 314,
+      "skipped": 1,
+      "postgresql": "17.11",
+      "skip": "matching pg_dump/pg_restore unavailable"
+    },
+    "frontend_vm": {
+      "passed": 36,
+      "failed": 0
+    },
+    "ruff": "passed",
+    "web_build": "passed with existing bundle-size warning",
+    "wheel_byte_equivalence": {
+      "runtime_modules": 38,
+      "mismatches": 0
+    },
+    "standards_review": "passed",
+    "spec_review": "passed"
+  },
+  "build": {
+    "source_commit": "8774f329f35aa2c56b2c14db280ab60718405138",
+    "wheel": {
+      "filename": "market_watch-1.3.1-py3-none-any.whl",
+      "sha256": "74687744dc5e10a2f64a1eafd33817a12d7c114e499cd2ae5652592951887f8c",
+      "delivery": "local temporary artifact; not published as a remote release attachment"
+    },
+    "web_artifact_hashes": "docs/verification/v1.3.1/web-build-artifacts.json"
+  },
+  "evidence_sha256": {
+    "docs/verification/v1.3.1/backend-full-pg17.txt": "ec4f7cd5cc103690be66f0f0da0e20095b1704de60a347ceca9ed22e985110f4",
+    "docs/verification/v1.3.1/frontend-vm.json": "3b89946dd5ef42f8874cdfbc469f533dd15df9588821b9ce7dcbecfc605f97e3",
+    "docs/verification/v1.3.1/review-results.md": "1978b43a784fac890b206c26073e0523b7f12e04963b0a919f679b56bb0a7c10",
+    "docs/verification/v1.3.1/source-files.json": "cc6c079282890bb90a434a9b71326d612f22749919b3ac1a7b03b604624ab415",
+    "docs/verification/v1.3.1/source-verification.json": "bd877fda852e287ce7a75c91f9cc7c0f92bb251e0040cbc1c27d4fc39be484ce",
+    "docs/verification/v1.3.1/web-build-artifacts.json": "db96b69226c80d6b1e3815541c2201e59c4ced794e801c06413d7f221700e7fa",
+    "docs/verification/v1.3.1/web-build.txt": "3a11d5b0edaa15802b0bc5fe2f18b8ed8f53e783d3ec5d1fbbdeb135414db216",
+    "docs/verification/v1.3.1/wheel-build.txt": "3280fda065794bf302bc99dffa00e5a87e1441a7f2f35a10f26435e07023fd75",
+    "docs/verification/v1.3.1/wheel-equivalence.json": "42c53f2f78043da6e89ee5e5b827c06c1675f6d3615f1b18a8f25a2721df02f7"
+  },
+  "images": {},
+  "image_status": "not built; no v1.3.1 Docker images and no relabeling of v1.3.0 images",
+  "deployed": false,
+  "runtime_changed": false,
+  "notifications_sent": false,
+  "existing_runtime_manifest": "deploy/releases/v1.3.0-local.json",
+  "existing_runtime_relation": "unchanged local runtime uses its old schema and images; old acceptance does not validate v1.3.1 runtime changes",
+  "source_release_open_gates": [],
+  "deployment_work_remaining": [
+    "build images from fixed source and record exact image IDs",
+    "prepare target origin, realtime/aggregation workers and database connection budget",
+    "back up target database and validate o16 migration and chart historical reload in target isolated environment before deployment"
+  ],
+  "rollback": {
+    "previous_source_tag": "v1.3.0",
+    "downgrade": "o16 -> n15 preserves source bars and snapshots, removes publication jobs and published row revisions",
+    "operational_requirement": "stop writes, back up and match application/worker images to schema",
+    "known_effect": "v1.3.0 reintroduces the repaired managed-history defects"
+  },
+  "limitations": [
+    "no new Docker image or browser-container acceptance; existing v1.3.0 runtime remains",
+    "PG17 fixture does not replace previous PG16 production-version-specific acceptance",
+    "old proxy performance matrix not rerun for this source fix"
+  ]
+}
