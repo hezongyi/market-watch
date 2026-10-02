@@ -6,11 +6,10 @@ preload mechanism and changes no product endpoint or foreground deadline.
 import argparse
 import time
 
-from sqlalchemy.engine import make_url
-
 from alerts import provider_cache, provider_chart
 from alerts.config import settings
 from alerts.storage import now_ms
+from sqlalchemy.engine import make_url
 
 parser = argparse.ArgumentParser()
 parser.add_argument('instrument')
