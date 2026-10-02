@@ -412,3 +412,69 @@ def test_earliest_probe_uses_positive_epoch_and_does_not_write_managed_data(data
     with database.begin() as db:
         assert db.scalar(select(func.count()).select_from(Bar)) == 0
         assert db.scalar(select(func.count()).select_from(ImportJob)) == 0
+
+
+@pytest.mark.parametrize('context', [
+    {'chart_count': True}, {'chart_count': '2'}, {'chart_count': 0},
+    {'chart_count': 9}, {'chart_count': 1, 'focused': 'true'},
+    {'chart_count': 1, 'historical_navigation': 1},
+])
+def test_native_history_context_rejects_coercion(context):
+    from alerts.chart_api import DataQuery
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        DataQuery(instrument='BTCUSDT', series_kind='provider', timeframe='M5', native_history=context)
+
+
+def test_optional_history_context_is_provider_only_and_unknown_fields_stay_ignored():
+    from alerts.chart_api import DataQuery
+    from pydantic import ValidationError
+    base = {'instrument': 'BTCUSDT', 'timeframe': 'M5', 'countBack': 200}
+    with pytest.raises(ValidationError):
+        DataQuery(**base, native_history={'chart_count': 1})
+    query = DataQuery(**base, series_kind='provider', future_optional_context={'value': 1})
+    assert query.count_back == 200 and query.native_history is None
+    with pytest.raises(ValidationError):
+        DataQuery(**base, series_kind='provider', before=1000, **{'from': 2000},
+                  native_history={'chart_count': 1})
+
+
+@pytest.mark.parametrize('source,count', [('binance',200),('binance',700),('binance',1000),
+                                         ('binance',1200),('oanda',3999)])
+def test_cold_optional_does_not_add_candles_http(source, count, database, monkeypatch):
+    from alerts import provider_cache as cache
+    from alerts.chart_api import DataQuery
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    meta = {**META, 'source': source, 'symbol': 'BTCUSDT' if source == 'binance' else 'EUR_CHF',
+            'calendar': 'utc0' if source == 'binance' else 'ny17'}
+    monkeypatch.setattr(provider, 'metadata', lambda _: meta)
+    before = stamp('2026-10-01T00:00:00+00:00')
+    attempts = []
+    def handle(request):
+        params = request.url.params
+        amount = int(params['limit' if source == 'binance' else 'count'])
+        end = int(params['endTime']) + 1 if source == 'binance' else int(Decimal(params['to']) * 1000)
+        attempts.append(amount)
+        times = range(end - amount * 300000, end, 300000)
+        if source == 'binance':
+            payload = [[t, '1', '3', '0', '2', '0', t + 299999] for t in times]
+        else:
+            payload = {'candles': [{'time': str(t / 1000), 'complete': True,
+                                   'bid': {'o': '1', 'h': '3', 'l': '0', 'c': '2'}} for t in times]}
+        return httpx.Response(200, json=payload)
+    from decimal import Decimal
+    body = DataQuery(instrument='BTCUSDT', series_kind='provider', timeframe='M5', before=before,
+                     countBack=count, native_history={'chart_count': 1, 'focused': True})
+    results = []
+    for enabled in [False, True]:
+        meta = {**meta, 'symbol': ('BTCUSDT' if source == 'binance' else 'EUR_CHF') + str(enabled)}
+        attempts.clear()
+        monkeypatch.setattr(settings, 'provider_native_history_buffer', enabled)
+        with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+            monkeypatch.setattr(provider, 'pooled_client', lambda _: client)
+            result = cache.data(body)
+        results.append((list(attempts), result))
+    off, on = results
+    assert len(off[0]) == len(on[0]), 'compare real HTTP calls, not native_page invocations'
+    assert on[1]['mandatory_count'] == count
+    assert off[1]['bars'] == on[1]['bars'][-count:]

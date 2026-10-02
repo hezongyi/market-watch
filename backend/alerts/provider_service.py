@@ -17,7 +17,7 @@ from . import provider_chart as upstream
 from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import lane
-from .storage import ProviderBar, ProviderDataset, ProviderInterest, now_ms, transaction
+from .storage import ProviderBar, ProviderDataset, ProviderInterest, now_ms, transaction, uid
 
 PERIODS = ("D1", "W1", "H4", "M5", "M1", "MN", "H1", "M30", "M15")
 _STOP = threading.Event()
@@ -35,15 +35,39 @@ def activate(client, key, before, count, *, latest=False):
         return
     now = now_ms()
     with transaction() as db:
-        focus = db.get(ProviderDataset, key)
+        # Serialize activations even when the interest row has not been created
+        # yet. Workers lock only the interest during their short CAS writeback.
+        focus = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update())
         # One latest and one historical focus per dataset/client; requests for
         # other panes remain separate. Fixed anchor targets do not chase now.
         listener = "read:" + key + (":latest" if latest else ":history")
         ident = interest_id(client, listener)
-        old = db.get(ProviderInterest, ident)
+        old = db.scalar(select(ProviderInterest).where(ProviderInterest.id == ident).with_for_update())
         if old and (latest or abs(old.cursor - before) < 1000):
             old.expires = now + settings.provider_activity_seconds * 1000
             old.accessed_at = now
+            targets = [dict(target) for target in old.targets]
+            for target in targets:
+                if target["frame"] != focus.timeframe or "after" in target:
+                    continue
+                # Latest uses its original fixed anchor, never moving now.
+                goal = target.get("goal", settings.provider_basic_bars)
+                wanted = max(goal, count) if latest else goal + count
+                if wanted <= target["count"]:
+                    continue
+                target["count"] = wanted
+                target["generation"] = target.get("generation", 0) + 1
+                interval = next((r for r in focus.coverage
+                                 if r[0] < target["before"] <= r[1]), None)
+                actual = db.scalar(select(func.count()).select_from(ProviderBar).where(
+                    ProviderBar.dataset_id == key,
+                    ProviderBar.chart_time >= (interval[0] if interval else target["before"]),
+                    ProviderBar.chart_time < target["before"],
+                ))
+                target["done"] = bool(interval and
+                                      (actual >= wanted or focus.earliest and interval[0] == 0))
+                target["next_at"] = 0
+            old.targets = targets
             return
         frames = (focus.timeframe,) + tuple(f for f in PERIODS if f != focus.timeframe)
         targets = []
@@ -82,6 +106,10 @@ def activate(client, key, before, count, *, latest=False):
             # Neighbor buffers precede cross-period work in each round.
             right = targets[-2:]
             targets = [targets[0], right[0], *targets[1:9], targets[9], right[1], *targets[10:18]]
+        task_id = uid()
+        for target in targets:
+            target["task_id"] = task_id
+            target["generation"] = 0
         values = dict(
             dataset_id=key,
             expires=now + settings.provider_activity_seconds * 1000,
@@ -444,9 +472,14 @@ def warm_step(source, after=None):
         target["next_at"] = now_ms() + min(60000, 1000 * 2 ** min(6, target["attempts"]))
         target["error"] = type(exc).__name__
     with transaction() as db:
-        interest = db.get(ProviderInterest, ident)
-        if interest and interest.cursor == anchor and index < len(interest.targets):
+        interest = db.scalar(select(ProviderInterest).where(ProviderInterest.id == ident)
+                             .with_for_update())
+        if (interest and interest.expires > now_ms() and interest.cursor == anchor
+                and index < len(interest.targets)
+                and interest.targets[index].get("task_id") == target.get("task_id")
+                and interest.targets[index].get("generation", 0) == target.get("generation", 0)):
             targets = list(interest.targets)
+            target["count"] = max(target["count"], targets[index]["count"])
             targets[index] = target
             interest.targets = targets
     return ident, True

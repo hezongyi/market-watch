@@ -1,0 +1,1850 @@
+{
+  "kind": "cold provider cache in unique PostgreSQL test schema; running warmed provider connections; no runtime cache deletion",
+  "counts": [
+    200,
+    800,
+    1000,
+    1200,
+    3900,
+    4500
+  ],
+  "records": [
+    {
+      "repeat": 0,
+      "source": "binance",
+      "frame": "M5",
+      "count": 4500,
+      "before": 1788962400000,
+      "elapsed_ms": 3006.04,
+      "returned": 4500,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 17.45,
+        "upstream_slot": 23.05,
+        "network_http11_send_request_headers": 0.64,
+        "network_http11_send_request_body": 0.13,
+        "network_http11_receive_response_headers": 1219.32,
+        "network_http11_receive_response_body": 285.79,
+        "network_http11_response_closed": 0.09,
+        "upstream_http": 1509.6,
+        "upstream_decode": 4.2,
+        "database_commit": 1097.58,
+        "read_total": 3005.99
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 1000,
+          "before": 1788662400000
+        },
+        {
+          "count": 1000,
+          "before": 1788362400000
+        },
+        {
+          "count": 1000,
+          "before": 1788062400000
+        },
+        {
+          "count": 500,
+          "before": 1787762400000
+        }
+      ],
+      "serialize_ms": 9.0,
+      "response_bytes": 824232,
+      "warm_reads": [
+        {
+          "elapsed_ms": 94.88,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 54.25,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 96.56,
+          "cache_hit": true,
+          "returned": 4500
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "binance",
+      "frame": "M5",
+      "count": 1200,
+      "before": 1788962400000,
+      "elapsed_ms": 1109.11,
+      "returned": 1200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 6.66,
+        "upstream_slot": 7.65,
+        "network_http11_send_request_headers": 0.3,
+        "network_http11_send_request_body": 0.05,
+        "network_http11_receive_response_headers": 430.26,
+        "network_http11_receive_response_body": 326.57,
+        "network_http11_response_closed": 0.03,
+        "upstream_http": 758.53,
+        "upstream_decode": 1.25,
+        "database_commit": 271.66,
+        "read_total": 1108.2
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 200,
+          "before": 1788662400000
+        }
+      ],
+      "serialize_ms": 2.4,
+      "response_bytes": 220327,
+      "warm_reads": [
+        {
+          "elapsed_ms": 59.94,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 17.97,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 17.98,
+          "cache_hit": true,
+          "returned": 1200
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 800,
+      "before": 1788962400000,
+      "elapsed_ms": 772.27,
+      "returned": 800,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.74,
+        "upstream_slot": 6.53,
+        "network_http11_send_request_headers": 0.12,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 459.54,
+        "network_http11_receive_response_body": 68.85,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 529.13,
+        "upstream_decode": 0.83,
+        "database_commit": 204.77,
+        "read_total": 772.0
+      },
+      "upstream_pages": [
+        {
+          "count": 800,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.4,
+      "response_bytes": 124725,
+      "warm_reads": [
+        {
+          "elapsed_ms": 15.43,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 14.2,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 59.88,
+          "cache_hit": true,
+          "returned": 800
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 3900,
+      "before": 1788962400000,
+      "elapsed_ms": 1981.1,
+      "returned": 3900,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.81,
+        "upstream_slot": 3.94,
+        "network_http11_send_request_headers": 0.14,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 331.18,
+        "network_http11_receive_response_body": 352.95,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 684.95,
+        "upstream_decode": 3.69,
+        "database_commit": 1218.51,
+        "read_total": 1980.78
+      },
+      "upstream_pages": [
+        {
+          "count": 3900,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 6.67,
+      "response_bytes": 605229,
+      "warm_reads": [
+        {
+          "elapsed_ms": 103.78,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 49.77,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 151.5,
+          "cache_hit": true,
+          "returned": 3900
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 1000,
+      "before": 1788962400000,
+      "elapsed_ms": 659.01,
+      "returned": 1000,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.9,
+        "upstream_slot": 3.37,
+        "network_http11_send_request_headers": 0.16,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 302.88,
+        "network_http11_receive_response_body": 20.41,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 324.17,
+        "upstream_decode": 1.21,
+        "database_commit": 290.33,
+        "read_total": 658.21
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.86,
+      "response_bytes": 155725,
+      "warm_reads": [
+        {
+          "elapsed_ms": 55.8,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 20.71,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 18.11,
+          "cache_hit": true,
+          "returned": 1000
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "binance",
+      "frame": "M5",
+      "count": 800,
+      "before": 1788962400000,
+      "elapsed_ms": 597.43,
+      "returned": 800,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.3,
+        "upstream_slot": 3.98,
+        "network_http11_send_request_headers": 0.12,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 305.76,
+        "network_http11_receive_response_body": 0.69,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 307.18,
+        "upstream_decode": 42.67,
+        "database_commit": 198.42,
+        "read_total": 597.16
+      },
+      "upstream_pages": [
+        {
+          "count": 800,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.45,
+      "response_bytes": 147126,
+      "warm_reads": [
+        {
+          "elapsed_ms": 13.3,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 13.55,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 13.29,
+          "cache_hit": true,
+          "returned": 800
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 4500,
+      "before": 1788962400000,
+      "elapsed_ms": 2456.52,
+      "returned": 4500,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 5.84,
+        "upstream_slot": 6.64,
+        "network_http11_send_request_headers": 0.25,
+        "network_http11_send_request_body": 0.05,
+        "network_http11_receive_response_headers": 876.38,
+        "network_http11_receive_response_body": 124.8,
+        "network_http11_response_closed": 0.02,
+        "upstream_http": 1002.75,
+        "upstream_decode": 4.53,
+        "database_commit": 1268.48,
+        "read_total": 2456.22
+      },
+      "upstream_pages": [
+        {
+          "count": 4000,
+          "before": 1788962400000
+        },
+        {
+          "count": 500,
+          "before": 1787241000000
+        }
+      ],
+      "serialize_ms": 7.8,
+      "response_bytes": 698229,
+      "warm_reads": [
+        {
+          "elapsed_ms": 51.38,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 108.45,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 59.36,
+          "cache_hit": true,
+          "returned": 4500
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "binance",
+      "frame": "M5",
+      "count": 3900,
+      "before": 1788962400000,
+      "elapsed_ms": 2341.21,
+      "returned": 3900,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 12.5,
+        "upstream_slot": 15.62,
+        "network_http11_send_request_headers": 0.51,
+        "network_http11_send_request_body": 0.1,
+        "network_http11_receive_response_headers": 939.18,
+        "network_http11_receive_response_body": 241.35,
+        "network_http11_response_closed": 0.05,
+        "upstream_http": 1183.67,
+        "upstream_decode": 4.06,
+        "database_commit": 868.01,
+        "read_total": 2340.35
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 1000,
+          "before": 1788662400000
+        },
+        {
+          "count": 1000,
+          "before": 1788362400000
+        },
+        {
+          "count": 900,
+          "before": 1788062400000
+        }
+      ],
+      "serialize_ms": 7.8,
+      "response_bytes": 714430,
+      "warm_reads": [
+        {
+          "elapsed_ms": 99.01,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 56.02,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 94.91,
+          "cache_hit": true,
+          "returned": 3900
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 200,
+      "before": 1788962400000,
+      "elapsed_ms": 378.12,
+      "returned": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.19,
+        "upstream_slot": 4.2,
+        "network_http11_send_request_headers": 0.14,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 293.11,
+        "network_http11_receive_response_body": 0.11,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 293.99,
+        "upstream_decode": 0.24,
+        "database_commit": 50.3,
+        "read_total": 377.15
+      },
+      "upstream_pages": [
+        {
+          "count": 200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 0.41,
+      "response_bytes": 31722,
+      "warm_reads": [
+        {
+          "elapsed_ms": 9.08,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 9.46,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 11.75,
+          "cache_hit": true,
+          "returned": 200
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "binance",
+      "frame": "M5",
+      "count": 200,
+      "before": 1788962400000,
+      "elapsed_ms": 265.13,
+      "returned": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.9,
+        "upstream_slot": 3.42,
+        "network_http11_send_request_headers": 0.12,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 187.16,
+        "network_http11_receive_response_body": 0.2,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 188.08,
+        "upstream_decode": 0.19,
+        "database_commit": 48.56,
+        "read_total": 265.04
+      },
+      "upstream_pages": [
+        {
+          "count": 200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 0.35,
+      "response_bytes": 37323,
+      "warm_reads": [
+        {
+          "elapsed_ms": 7.17,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 8.19,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 9.01,
+          "cache_hit": true,
+          "returned": 200
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 1200,
+      "before": 1788962400000,
+      "elapsed_ms": 951.56,
+      "returned": 1200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.8,
+        "upstream_slot": 3.57,
+        "network_http11_send_request_headers": 0.14,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 601.92,
+        "network_http11_receive_response_body": 0.48,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 603.18,
+        "upstream_decode": 1.28,
+        "database_commit": 306.18,
+        "read_total": 951.47
+      },
+      "upstream_pages": [
+        {
+          "count": 1200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 2.09,
+      "response_bytes": 186724,
+      "warm_reads": [
+        {
+          "elapsed_ms": 16.11,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 22.67,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 16.65,
+          "cache_hit": true,
+          "returned": 1200
+        }
+      ]
+    },
+    {
+      "repeat": 0,
+      "source": "binance",
+      "frame": "M5",
+      "count": 1000,
+      "before": 1788962400000,
+      "elapsed_ms": 568.04,
+      "returned": 1000,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.74,
+        "upstream_slot": 3.36,
+        "network_http11_send_request_headers": 0.13,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 191.18,
+        "network_http11_receive_response_body": 90.21,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 282.14,
+        "upstream_decode": 0.95,
+        "database_commit": 200.84,
+        "read_total": 567.73
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.88,
+      "response_bytes": 183727,
+      "warm_reads": [
+        {
+          "elapsed_ms": 15.12,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 14.41,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 15.1,
+          "cache_hit": true,
+          "returned": 1000
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 1000,
+      "before": 1788962400000,
+      "elapsed_ms": 567.37,
+      "returned": 1000,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.81,
+        "upstream_slot": 3.64,
+        "network_http11_send_request_headers": 0.14,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 309.47,
+        "network_http11_receive_response_body": 9.97,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 320.24,
+        "upstream_decode": 1.03,
+        "database_commit": 208.44,
+        "read_total": 567.1
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.63,
+      "response_bytes": 155724,
+      "warm_reads": [
+        {
+          "elapsed_ms": 56.63,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 14.72,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 16.0,
+          "cache_hit": true,
+          "returned": 1000
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "binance",
+      "frame": "M5",
+      "count": 3900,
+      "before": 1788962400000,
+      "elapsed_ms": 3126.34,
+      "returned": 3900,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 14.55,
+        "upstream_slot": 14.46,
+        "network_http11_send_request_headers": 0.6,
+        "network_http11_send_request_body": 0.1,
+        "network_http11_receive_response_headers": 949.83,
+        "network_http11_receive_response_body": 991.74,
+        "network_http11_response_closed": 0.05,
+        "upstream_http": 1944.91,
+        "upstream_decode": 4.09,
+        "database_commit": 927.51,
+        "read_total": 3126.01
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 1000,
+          "before": 1788662400000
+        },
+        {
+          "count": 1000,
+          "before": 1788362400000
+        },
+        {
+          "count": 900,
+          "before": 1788062400000
+        }
+      ],
+      "serialize_ms": 8.0,
+      "response_bytes": 714430,
+      "warm_reads": [
+        {
+          "elapsed_ms": 55.19,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 105.98,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 53.13,
+          "cache_hit": true,
+          "returned": 3900
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "binance",
+      "frame": "M5",
+      "count": 1000,
+      "before": 1788962400000,
+      "elapsed_ms": 634.8,
+      "returned": 1000,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 3.1,
+        "upstream_slot": 3.91,
+        "network_http11_send_request_headers": 0.14,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 267.83,
+        "network_http11_receive_response_body": 58.69,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 327.29,
+        "upstream_decode": 1.04,
+        "database_commit": 262.05,
+        "read_total": 633.89
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 2.19,
+      "response_bytes": 183726,
+      "warm_reads": [
+        {
+          "elapsed_ms": 16.98,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 15.35,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 14.93,
+          "cache_hit": true,
+          "returned": 1000
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 200,
+      "before": 1788962400000,
+      "elapsed_ms": 488.15,
+      "returned": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.72,
+        "upstream_slot": 3.18,
+        "network_http11_send_request_headers": 0.12,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 409.76,
+        "network_http11_receive_response_body": 0.13,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 410.6,
+        "upstream_decode": 0.21,
+        "database_commit": 48.12,
+        "read_total": 487.84
+      },
+      "upstream_pages": [
+        {
+          "count": 200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 0.31,
+      "response_bytes": 31723,
+      "warm_reads": [
+        {
+          "elapsed_ms": 7.57,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 7.05,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 7.54,
+          "cache_hit": true,
+          "returned": 200
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "binance",
+      "frame": "M5",
+      "count": 200,
+      "before": 1788962400000,
+      "elapsed_ms": 277.48,
+      "returned": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.43,
+        "upstream_slot": 3.33,
+        "network_http11_send_request_headers": 0.12,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 193.54,
+        "network_http11_receive_response_body": 0.18,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 194.44,
+        "upstream_decode": 0.21,
+        "database_commit": 51.17,
+        "read_total": 277.39
+      },
+      "upstream_pages": [
+        {
+          "count": 200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 0.38,
+      "response_bytes": 37325,
+      "warm_reads": [
+        {
+          "elapsed_ms": 10.53,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 8.99,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 7.42,
+          "cache_hit": true,
+          "returned": 200
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "binance",
+      "frame": "M5",
+      "count": 1200,
+      "before": 1788962400000,
+      "elapsed_ms": 1050.33,
+      "returned": 1200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 5.42,
+        "upstream_slot": 110.51,
+        "network_http11_send_request_headers": 0.26,
+        "network_http11_send_request_body": 0.07,
+        "network_http11_receive_response_headers": 439.39,
+        "network_http11_receive_response_body": 133.73,
+        "network_http11_response_closed": 0.02,
+        "upstream_http": 574.63,
+        "upstream_decode": 1.14,
+        "database_commit": 301.55,
+        "read_total": 1050.24
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 200,
+          "before": 1788662400000
+        }
+      ],
+      "serialize_ms": 2.29,
+      "response_bytes": 220331,
+      "warm_reads": [
+        {
+          "elapsed_ms": 16.73,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 15.99,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 15.93,
+          "cache_hit": true,
+          "returned": 1200
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 800,
+      "before": 1788962400000,
+      "elapsed_ms": 637.6,
+      "returned": 800,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.53,
+        "upstream_slot": 3.62,
+        "network_http11_send_request_headers": 0.12,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 373.4,
+        "network_http11_receive_response_body": 3.1,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 377.25,
+        "upstream_decode": 0.85,
+        "database_commit": 224.3,
+        "read_total": 637.21
+      },
+      "upstream_pages": [
+        {
+          "count": 800,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.49,
+      "response_bytes": 124722,
+      "warm_reads": [
+        {
+          "elapsed_ms": 14.56,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 13.0,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 12.67,
+          "cache_hit": true,
+          "returned": 800
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "binance",
+      "frame": "M5",
+      "count": 4500,
+      "before": 1788962400000,
+      "elapsed_ms": 2949.47,
+      "returned": 4500,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 16.26,
+        "upstream_slot": 17.54,
+        "network_http11_send_request_headers": 0.6,
+        "network_http11_send_request_body": 0.11,
+        "network_http11_receive_response_headers": 1303.13,
+        "network_http11_receive_response_body": 243.38,
+        "network_http11_response_closed": 0.06,
+        "upstream_http": 1550.16,
+        "upstream_decode": 4.2,
+        "database_commit": 1130.02,
+        "read_total": 2949.2
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 1000,
+          "before": 1788662400000
+        },
+        {
+          "count": 1000,
+          "before": 1788362400000
+        },
+        {
+          "count": 1000,
+          "before": 1788062400000
+        },
+        {
+          "count": 500,
+          "before": 1787762400000
+        }
+      ],
+      "serialize_ms": 7.6,
+      "response_bytes": 824231,
+      "warm_reads": [
+        {
+          "elapsed_ms": 97.43,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 49.04,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 53.17,
+          "cache_hit": true,
+          "returned": 4500
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 3900,
+      "before": 1788962400000,
+      "elapsed_ms": 1651.31,
+      "returned": 3900,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.61,
+        "upstream_slot": 4.13,
+        "network_http11_send_request_headers": 0.13,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 377.46,
+        "network_http11_receive_response_body": 87.38,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 465.65,
+        "upstream_decode": 48.31,
+        "database_commit": 1063.01,
+        "read_total": 1650.36
+      },
+      "upstream_pages": [
+        {
+          "count": 3900,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 6.34,
+      "response_bytes": 605229,
+      "warm_reads": [
+        {
+          "elapsed_ms": 91.12,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 44.14,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 46.34,
+          "cache_hit": true,
+          "returned": 3900
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 4500,
+      "before": 1788962400000,
+      "elapsed_ms": 2667.18,
+      "returned": 4500,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 6.65,
+        "upstream_slot": 9.99,
+        "network_http11_send_request_headers": 0.55,
+        "network_http11_send_request_body": 0.06,
+        "network_http11_receive_response_headers": 949.05,
+        "network_http11_receive_response_body": 77.52,
+        "network_http11_response_closed": 0.04,
+        "upstream_http": 1028.61,
+        "upstream_decode": 4.75,
+        "database_commit": 1326.85,
+        "read_total": 2666.23
+      },
+      "upstream_pages": [
+        {
+          "count": 4000,
+          "before": 1788962400000
+        },
+        {
+          "count": 500,
+          "before": 1787241000000
+        }
+      ],
+      "serialize_ms": 8.68,
+      "response_bytes": 698229,
+      "warm_reads": [
+        {
+          "elapsed_ms": 149.12,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 90.04,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 65.61,
+          "cache_hit": true,
+          "returned": 4500
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 1200,
+      "before": 1788962400000,
+      "elapsed_ms": 995.78,
+      "returned": 1200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.5,
+        "upstream_slot": 4.3,
+        "network_http11_send_request_headers": 0.13,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 618.19,
+        "network_http11_receive_response_body": 0.52,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 619.51,
+        "upstream_decode": 48.91,
+        "database_commit": 281.27,
+        "read_total": 994.86
+      },
+      "upstream_pages": [
+        {
+          "count": 1200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 2.16,
+      "response_bytes": 186724,
+      "warm_reads": [
+        {
+          "elapsed_ms": 18.59,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 62.6,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 18.67,
+          "cache_hit": true,
+          "returned": 1200
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "source": "binance",
+      "frame": "M5",
+      "count": 800,
+      "before": 1788962400000,
+      "elapsed_ms": 479.51,
+      "returned": 800,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.62,
+        "upstream_slot": 4.66,
+        "network_http11_send_request_headers": 0.57,
+        "network_http11_send_request_body": 0.19,
+        "network_http11_receive_response_headers": 209.14,
+        "network_http11_receive_response_body": 34.73,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 246.41,
+        "upstream_decode": 1.08,
+        "database_commit": 193.11,
+        "read_total": 478.99
+      },
+      "upstream_pages": [
+        {
+          "count": 800,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.62,
+      "response_bytes": 147127,
+      "warm_reads": [
+        {
+          "elapsed_ms": 18.3,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 16.27,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 13.65,
+          "cache_hit": true,
+          "returned": 800
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 200,
+      "before": 1788962400000,
+      "elapsed_ms": 937.02,
+      "returned": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.56,
+        "upstream_slot": 3.35,
+        "network_http11_send_request_headers": 0.13,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 860.9,
+        "network_http11_receive_response_body": 0.11,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 861.76,
+        "upstream_decode": 0.22,
+        "database_commit": 46.27,
+        "read_total": 936.72
+      },
+      "upstream_pages": [
+        {
+          "count": 200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 0.31,
+      "response_bytes": 31723,
+      "warm_reads": [
+        {
+          "elapsed_ms": 7.16,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 6.52,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 7.76,
+          "cache_hit": true,
+          "returned": 200
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 1200,
+      "before": 1788962400000,
+      "elapsed_ms": 746.94,
+      "returned": 1200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.38,
+        "upstream_slot": 3.46,
+        "network_http11_send_request_headers": 0.13,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 360.1,
+        "network_http11_receive_response_body": 12.82,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 373.76,
+        "upstream_decode": 1.17,
+        "database_commit": 332.55,
+        "read_total": 746.82
+      },
+      "upstream_pages": [
+        {
+          "count": 1200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 2.49,
+      "response_bytes": 186725,
+      "warm_reads": [
+        {
+          "elapsed_ms": 18.8,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 19.04,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 138.84,
+          "cache_hit": true,
+          "returned": 1200
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 800,
+      "before": 1788962400000,
+      "elapsed_ms": 1163.52,
+      "returned": 800,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.83,
+        "upstream_slot": 7.24,
+        "network_http11_send_request_headers": 0.13,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 330.76,
+        "network_http11_receive_response_body": 608.47,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 940.06,
+        "upstream_decode": 0.87,
+        "database_commit": 183.2,
+        "read_total": 1163.11
+      },
+      "upstream_pages": [
+        {
+          "count": 800,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.62,
+      "response_bytes": 124727,
+      "warm_reads": [
+        {
+          "elapsed_ms": 31.5,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 19.07,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 29.26,
+          "cache_hit": true,
+          "returned": 800
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "binance",
+      "frame": "M5",
+      "count": 1000,
+      "before": 1788962400000,
+      "elapsed_ms": 670.37,
+      "returned": 1000,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.09,
+        "upstream_slot": 6.65,
+        "network_http11_send_request_headers": 0.28,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 216.06,
+        "network_http11_receive_response_body": 95.02,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 312.89,
+        "upstream_decode": 2.22,
+        "database_commit": 288.61,
+        "read_total": 670.11
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 2.11,
+      "response_bytes": 183727,
+      "warm_reads": [
+        {
+          "elapsed_ms": 17.25,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 17.06,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 19.0,
+          "cache_hit": true,
+          "returned": 1000
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "binance",
+      "frame": "M5",
+      "count": 800,
+      "before": 1788962400000,
+      "elapsed_ms": 806.3,
+      "returned": 800,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.76,
+        "upstream_slot": 5.23,
+        "network_http11_send_request_headers": 0.13,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 432.77,
+        "network_http11_receive_response_body": 103.32,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 536.87,
+        "upstream_decode": 0.8,
+        "database_commit": 230.35,
+        "read_total": 806.02
+      },
+      "upstream_pages": [
+        {
+          "count": 800,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.46,
+      "response_bytes": 147127,
+      "warm_reads": [
+        {
+          "elapsed_ms": 14.22,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 16.22,
+          "cache_hit": true,
+          "returned": 800
+        },
+        {
+          "elapsed_ms": 17.84,
+          "cache_hit": true,
+          "returned": 800
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "binance",
+      "frame": "M5",
+      "count": 1200,
+      "before": 1788962400000,
+      "elapsed_ms": 884.84,
+      "returned": 1200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 7.32,
+        "upstream_slot": 9.03,
+        "network_http11_send_request_headers": 0.3,
+        "network_http11_send_request_body": 0.05,
+        "network_http11_receive_response_headers": 451.92,
+        "network_http11_receive_response_body": 38.55,
+        "network_http11_response_closed": 0.02,
+        "upstream_http": 492.15,
+        "upstream_decode": 1.29,
+        "database_commit": 267.29,
+        "read_total": 884.6
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 200,
+          "before": 1788662400000
+        }
+      ],
+      "serialize_ms": 2.07,
+      "response_bytes": 220325,
+      "warm_reads": [
+        {
+          "elapsed_ms": 17.05,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 18.29,
+          "cache_hit": true,
+          "returned": 1200
+        },
+        {
+          "elapsed_ms": 18.03,
+          "cache_hit": true,
+          "returned": 1200
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "binance",
+      "frame": "M5",
+      "count": 4500,
+      "before": 1788962400000,
+      "elapsed_ms": 5995.07,
+      "returned": 4500,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 18.65,
+        "upstream_slot": 125.38,
+        "network_http11_send_request_headers": 0.89,
+        "network_http11_send_request_body": 0.15,
+        "network_http11_receive_response_headers": 2342.29,
+        "network_http11_receive_response_body": 2077.03,
+        "network_http11_response_closed": 0.06,
+        "upstream_http": 4423.79,
+        "upstream_decode": 5.24,
+        "database_commit": 1136.49,
+        "read_total": 5994.72
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 1000,
+          "before": 1788662400000
+        },
+        {
+          "count": 1000,
+          "before": 1788362400000
+        },
+        {
+          "count": 1000,
+          "before": 1788062400000
+        },
+        {
+          "count": 500,
+          "before": 1787762400000
+        }
+      ],
+      "serialize_ms": 7.92,
+      "response_bytes": 824236,
+      "warm_reads": [
+        {
+          "elapsed_ms": 47.9,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 96.7,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 49.0,
+          "cache_hit": true,
+          "returned": 4500
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 3900,
+      "before": 1788962400000,
+      "elapsed_ms": 1628.06,
+      "returned": 3900,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 2.68,
+        "upstream_slot": 3.39,
+        "network_http11_send_request_headers": 0.13,
+        "network_http11_send_request_body": 0.02,
+        "network_http11_receive_response_headers": 386.98,
+        "network_http11_receive_response_body": 81.83,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 469.68,
+        "upstream_decode": 3.97,
+        "database_commit": 1083.19,
+        "read_total": 1626.9
+      },
+      "upstream_pages": [
+        {
+          "count": 3900,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 7.72,
+      "response_bytes": 605227,
+      "warm_reads": [
+        {
+          "elapsed_ms": 93.4,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 48.76,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 41.98,
+          "cache_hit": true,
+          "returned": 3900
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 4500,
+      "before": 1788962400000,
+      "elapsed_ms": 2463.94,
+      "returned": 4500,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 5.96,
+        "upstream_slot": 8.77,
+        "network_http11_send_request_headers": 0.27,
+        "network_http11_send_request_body": 0.05,
+        "network_http11_receive_response_headers": 959.14,
+        "network_http11_receive_response_body": 82.55,
+        "network_http11_response_closed": 0.02,
+        "upstream_http": 1043.35,
+        "upstream_decode": 5.57,
+        "database_commit": 1200.47,
+        "read_total": 2462.81
+      },
+      "upstream_pages": [
+        {
+          "count": 4000,
+          "before": 1788962400000
+        },
+        {
+          "count": 500,
+          "before": 1787241000000
+        }
+      ],
+      "serialize_ms": 9.98,
+      "response_bytes": 698229,
+      "warm_reads": [
+        {
+          "elapsed_ms": 68.68,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 178.2,
+          "cache_hit": true,
+          "returned": 4500
+        },
+        {
+          "elapsed_ms": 74.27,
+          "cache_hit": true,
+          "returned": 4500
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "binance",
+      "frame": "M5",
+      "count": 200,
+      "before": 1788962400000,
+      "elapsed_ms": 445.41,
+      "returned": 200,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.22,
+        "upstream_slot": 8.37,
+        "network_http11_send_request_headers": 0.32,
+        "network_http11_send_request_body": 0.05,
+        "network_http11_receive_response_headers": 285.92,
+        "network_http11_receive_response_body": 0.18,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 287.17,
+        "upstream_decode": 0.18,
+        "database_commit": 96.7,
+        "read_total": 444.4
+      },
+      "upstream_pages": [
+        {
+          "count": 200,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 0.46,
+      "response_bytes": 37323,
+      "warm_reads": [
+        {
+          "elapsed_ms": 12.56,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 7.34,
+          "cache_hit": true,
+          "returned": 200
+        },
+        {
+          "elapsed_ms": 13.0,
+          "cache_hit": true,
+          "returned": 200
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "oanda",
+      "frame": "M5",
+      "count": 1000,
+      "before": 1788962400000,
+      "elapsed_ms": 648.16,
+      "returned": 1000,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 4.18,
+        "upstream_slot": 5.38,
+        "network_http11_send_request_headers": 0.32,
+        "network_http11_send_request_body": 0.03,
+        "network_http11_receive_response_headers": 404.82,
+        "network_http11_receive_response_body": 6.95,
+        "network_http11_response_closed": 0.01,
+        "upstream_http": 412.76,
+        "upstream_decode": 1.13,
+        "database_commit": 187.01,
+        "read_total": 648.06
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        }
+      ],
+      "serialize_ms": 1.93,
+      "response_bytes": 155725,
+      "warm_reads": [
+        {
+          "elapsed_ms": 19.69,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 18.63,
+          "cache_hit": true,
+          "returned": 1000
+        },
+        {
+          "elapsed_ms": 70.14,
+          "cache_hit": true,
+          "returned": 1000
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "source": "binance",
+      "frame": "M5",
+      "count": 3900,
+      "before": 1788962400000,
+      "elapsed_ms": 2758.76,
+      "returned": 3900,
+      "cache_hit": false,
+      "timings_ms": {
+        "lease_wait": 20.9,
+        "upstream_slot": 16.04,
+        "network_http11_send_request_headers": 0.55,
+        "network_http11_send_request_body": 0.11,
+        "network_http11_receive_response_headers": 1162.24,
+        "network_http11_receive_response_body": 368.89,
+        "network_http11_response_closed": 0.05,
+        "upstream_http": 1534.79,
+        "upstream_decode": 4.0,
+        "database_commit": 875.37,
+        "read_total": 2758.47
+      },
+      "upstream_pages": [
+        {
+          "count": 1000,
+          "before": 1788962400000
+        },
+        {
+          "count": 1000,
+          "before": 1788662400000
+        },
+        {
+          "count": 1000,
+          "before": 1788362400000
+        },
+        {
+          "count": 900,
+          "before": 1788062400000
+        }
+      ],
+      "serialize_ms": 8.4,
+      "response_bytes": 714431,
+      "warm_reads": [
+        {
+          "elapsed_ms": 52.68,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 46.51,
+          "cache_hit": true,
+          "returned": 3900
+        },
+        {
+          "elapsed_ms": 87.74,
+          "cache_hit": true,
+          "returned": 3900
+        }
+      ]
+    }
+  ],
+  "test_schema_removed": true
+}

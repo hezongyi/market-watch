@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     postgres_bin_dir: str = ""
     provider_request_seconds: float = Field(default=8, ge=1, le=30)
     provider_fresh_seconds: int = Field(default=15, ge=1, le=60)
+    provider_native_history_buffer: bool = False
     provider_basic_bars: int = Field(default=1000, ge=600, le=4000)
     provider_depth_bars: int = Field(default=4000, ge=1000, le=10000)
     provider_activity_seconds: int = Field(default=600, ge=30, le=3600)

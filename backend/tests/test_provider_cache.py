@@ -196,3 +196,120 @@ def test_fresh_short_history_boundary_reuses_recent_tail_without_refetch(databas
     result = cache.read(META, "MN", clock[0], 200, latest=True)
     assert calls == [3], "stale short histories refresh the tail rather than redownloading all months"
     assert result["history_boundary"] and len(result["bars"]) == 9
+
+
+def native_body(**kwargs):
+    from alerts.chart_api import DataQuery
+    return DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
+                     native_history={'chart_count': 1, 'focused': True}, **kwargs)
+
+
+def test_native_range_demand_is_preserved_with_buffer_switch_off_and_on(database, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    seed(META, 'M5', 5000000, page(0, 5000000, boundary=True))
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('mandatory cache hit'))
+    body = native_body(before=5000000, countBack=200, **{'from': 4500000})
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
+    off = cache.data(body)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
+    on = cache.data(body)
+    assert off['mandatory_count'] == on['mandatory_count'] == 500
+    assert len(off['bars']) == 500 and len(on['bars']) == 2500
+    assert off['bars'] == on['bars'][-500:]
+    assert off['cache_revision'] == on['cache_revision']
+    assert on['cache_hit']
+
+
+def test_native_missing_optional_or_disconnected_history_never_fetches(database, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
+    seed(META, 'M5', 1000000, page(0, 1000000))
+    seed(META, 'M5', 5000000, page(4500000, 5000000))
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('no optional fetch'))
+    result = cache.data(native_body(before=5000000, countBack=200, firstDataRequest=True))
+    assert len(result['bars']) == 500
+    assert result['bars'][0]['chart_time'] == 4500000
+    assert result['cache_hit'] and not result['history_boundary']
+
+
+def test_native_cold_range_requires_more_than_count_back(database, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
+    calls = []
+    def fetch(meta, frame, before, count, **kwargs):
+        calls.append((before, count))
+        start = max(0, before - count * 1000)
+        return page(start, before, boundary=start == 0)
+    monkeypatch.setattr(upstream, 'native_page', fetch)
+    result = cache.data(native_body(before=8000000, countBack=200, **{'from': 3500000}))
+    assert len(result['bars']) == 4500
+    assert result['bars'][0]['chart_time'] == 3500000
+    assert len(calls) > 1, 'countBack alone cannot terminate the mandatory corridor'
+    assert not result['cache_hit']
+
+
+def test_native_capacity_exact_limit_and_one_over(database, monkeypatch):
+    from alerts.provider_history_policy import CapacityExceeded
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
+    # Commit in legal upstream chunks, not one oversized PostgreSQL insert.
+    for start in range(0, 24000000, 4000000):
+        seed(META, 'M5', start + 4000000, page(start, start + 4000000))
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('cached capacity test'))
+    result = cache.data(native_body(before=24000000, countBack=200, **{'from': 4000000}))
+    assert len(result['bars']) == 20000 and result['optional_count'] == 0
+    with pytest.raises(CapacityExceeded):
+        cache.data(native_body(before=24000000, countBack=200, **{'from': 3999000}))
+
+
+def test_native_future_empty_range_and_confirmed_young_boundary(database, monkeypatch):
+    monkeypatch.setattr(cache, 'now_ms', lambda: 1000000)
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
+    seed(META, 'M5', 1001000, page(995000, 1001000, boundary=True), latest=True)
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('empty future range'))
+    result = cache.data(native_body(before=2000000, countBack=200,
+                                   firstDataRequest=True, **{'from': 1500000}))
+    assert len(result['bars']) == 6 and result['history_boundary']
+    assert all(b['chart_time'] < 1001000 for b in result['bars'])
+
+
+def test_native_python_uses_identical_real_demand_and_prefix_with_e_on_off(database, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    seed(META, 'M5', 5000000, page(0, 5000000, boundary=True))
+    body = native_body(before=5000000, countBack=200, **{'from': 4500000},
+                       indicators=[{'name': 'EMA', 'params': {'period': 20}}])
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
+    off = cache.data(body)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
+    on = cache.data(body)
+    assert len(off['bars']) == len(on['bars']) == 500
+    assert off['bars'] == on['bars'] and off['indicators'] == on['indicators']
+    assert on['optional_count'] == 0
+
+
+def test_native_observation_checks_inclusive_last_and_ignores_backfill(database, monkeypatch):
+    clock = [10000000]
+    monkeypatch.setattr(cache, 'now_ms', lambda: clock[0])
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
+    seed(META, 'M5', 1000000, page(500000, 1000000))
+    original = cache.data(native_body(before=1000000, countBack=200))
+    body = native_body(before=1000000, countBack=200, history_observation={
+        'revision': original['cache_revision'], 'observed_at': original['as_of'],
+        'first': original['bars'][0]['chart_time'], 'last': original['bars'][-1]['chart_time']})
+    clock[0] += 1000
+    seed(META, 'M5', 500000, page(0, 500000, boundary=True))
+    assert cache.data(body)['history_revalidation'] == {'changed': False}
+    clock[0] += 1000
+    seed(META, 'M5', 1000000, page(999000, 1000000, close='5'))
+    result = cache.data(body)
+    assert result['history_revalidation'] == {'changed': True}
+    assert result['bars'][-1]['close'] == '5'
+    assert result['optional_count'] == 0
+
+
+def test_empty_native_snapshot_preserves_dataset_metadata(database):
+    key = cache.ensure(META, 'M5')
+    state = cache.snapshot(key, 1000000, 200)
+    assert state['bars'] == [] and state['cache_revision'] == 0
+    assert not state['history_boundary'] and not state['satisfied']

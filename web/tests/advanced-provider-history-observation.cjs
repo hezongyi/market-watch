@@ -1,0 +1,71 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const flush=()=>new Promise(resolve=>setImmediate(resolve));
+function setup(){
+ const messages=[],handlers=[];
+ const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
+  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
+  crypto:{randomUUID:()=> 'listener'},addEventListener:(name,fn)=>handlers.push(fn),setTimeout,clearTimeout});
+ for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
+ vm.runInContext(`globalThis.delivered=[];globalThis.failures=[];globalThis.reloads=0;
+  ready=true;globalThis.currentRes='5';
+  const chart={resolution:()=>currentRes,symbol:()=> 'MWP:BTCUSDT',getAllStudies:()=>[]};
+  widget={chartsCount:()=>1,chart:()=>chart,activeChart:()=>chart};
+  reloadHistory=async()=>{reloads++;return true;};`,ctx);
+ const begin=(name,from,to)=>vm.runInContext(`globalThis.${name}=feed.getBars({ticker:'MWP:BTCUSDT'},'5',
+  {from:${from},to:${to},countBack:2,firstDataRequest:false},
+  rows=>delivered.push({name:'${name}',rows}),error=>failures.push(error));`,ctx);
+ const data=()=>messages.filter(m=>m.type==='data');
+ const respond=async(sent,result,error)=>{
+  await handlers[0]({source:ctx.parent,origin:'http://localhost',data:{channel:'mw-chart-v1',
+   type:'result',id:sent.id,result,error}});await flush();
+ };
+ const dispose=()=>vm.runInContext(`for(const p of pending.values()){clearTimeout(p.timer);clearTimeout(p.cancellationTimer)}`,ctx);
+ return {ctx,messages,handlers,begin,data,respond,dispose};
+}
+function page(revision,at,last=990000,close=2){return {cache_revision:revision,as_of:at,history_boundary:false,
+ bars:[last-300000,last].map(t=>({start:t,chart_time:t,end:t+300000,open:1,high:3,low:0,close,complete:true}))};}
+(async()=>{
+ for(const scenario of ['backfill','revision','failure','legacy','inactive']){
+  const x=setup();
+  try{
+   x.begin('old',1,990);x.begin('newer',2,1000);
+   const [older,newer]=x.data();
+   assert.equal(newer.query.native_history.chart_count,1);
+   await x.respond(newer,page(12,12000));await x.ctx.newer;
+   await x.respond(older,page(11,11000,900000));
+   const review=x.data().at(-1);
+   assert.notEqual(review.id,older.id,'one bounded review follows a late snapshot');
+   assert.equal(review.query.countBack,older.query.countBack);
+   assert.equal(review.query.from,older.query.from);
+   assert.equal(review.query.before,older.query.before);
+   assert.equal(review.query.history_observation.first,600000);
+   assert.equal(review.query.history_observation.last,900000,'inclusive actual last chart label');
+   assert.equal(review.query.history_observation.revision,11);
+   if(scenario==='inactive')vm.runInContext(`currentRes='1'`,x.ctx);
+   if(scenario==='failure')await x.respond(review,null,'fixture unavailable');
+   else if(scenario==='legacy')await x.respond(review,page(11,11000,900000));
+   else await x.respond(review,{...page(13,13000,900000,3),history_revalidation:{changed:scenario!=='backfill'}});
+   await x.ctx.old;
+   assert.equal(x.ctx.delivered.length,2,'each legal native callback completes exactly once');
+   assert.equal(x.ctx.failures.length,0,'review failure cannot fail an already valid original callback');
+   await vm.runInContext('flushProviderCorrections()',x.ctx);await flush();
+   const state=vm.runInContext(`providerHistoryState.get('MWP:BTCUSDT|5')`,x.ctx);
+   assert.equal(state.cursor,990000,'older pagination cannot move latest subscription cursor');
+   assert.ok(state.revision>=12,'old observations cannot overwrite an already delivered newer version');
+   assert.equal(x.data().length,3,'no recursive review');
+   if(scenario==='revision'){
+    assert.equal(x.ctx.reloads,1);await vm.runInContext('flushProviderCorrections()',x.ctx);
+    assert.equal(x.ctx.reloads,1,'confirmed revision schedules one merged reload');
+   } else if(scenario==='inactive'){
+    assert.equal(x.ctx.reloads,0,'inactive series keeps a correction pending');
+    vm.runInContext(`currentRes='5'`,x.ctx);await vm.runInContext('flushProviderCorrections()',x.ctx);
+    assert.equal(x.ctx.reloads,1,'switching back consumes the correction');
+   } else assert.equal(x.ctx.reloads,0,'backfill or unproven review cannot reset historical bars');
+   if(['failure','legacy'].includes(scenario)){
+    assert.ok(vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5').correction`,x.ctx));
+    assert.ok(x.messages.some(m=>m.type==='error'));
+   }
+  }finally{x.dispose()}
+ }
+ console.log('Late native history: backfill, revision, failed/legacy review and inactive correction passed');
+})().catch(error=>{console.error(error);process.exitCode=1});

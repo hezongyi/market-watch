@@ -11,7 +11,7 @@ import threading
 import time
 from contextvars import ContextVar
 
-from sqlalchemy import select, update
+from sqlalchemy import exists, literal, select, true, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
@@ -19,6 +19,7 @@ from . import provider_chart as upstream
 from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import LANE, lane
+from .provider_history_policy import CAPACITY, CapacityExceeded, optional_bars
 from .storage import ProviderBar, ProviderDataset, now_ms, transaction, uid
 
 _ACTIVE_LOCK = threading.Lock()
@@ -98,39 +99,62 @@ def ensure(meta, frame):
     return key
 
 
-def snapshot(key, before, count):
+def snapshot(key, before, count, *, observation=None, bounded_limit=None):
+    """Bars and dataset metadata share one statement snapshot, including empty data.
+
+    The bounded subquery is independent of coverage; filter it using the coverage
+    returned by that same statement, never a preceding READ COMMITTED SELECT.
+    """
+    bounded = (
+        select(ProviderBar.chart_time, ProviderBar.payload)
+        .where(ProviderBar.dataset_id == key, ProviderBar.chart_time < before)
+        .order_by(ProviderBar.chart_time.desc())
+        .limit(bounded_limit or count + 1)
+        .subquery()
+    )
+    changed = literal(False)
+    if observation is not None:
+        changed = exists(select(ProviderBar.start).where(
+            ProviderBar.dataset_id == key,
+            ProviderBar.chart_time >= observation.first,
+            ProviderBar.chart_time <= observation.last,
+            ProviderBar.revision > 1,
+            ProviderBar.changed_at > observation.observed_at,
+        ))
+    statement = (
+        select(ProviderDataset.coverage, ProviderDataset.earliest,
+               ProviderDataset.updated_at, ProviderDataset.latest_at, ProviderDataset.revision,
+               bounded.c.chart_time, bounded.c.payload, changed.label("changed"))
+        .select_from(ProviderDataset).outerjoin(bounded, true())
+        .where(ProviderDataset.id == key).order_by(bounded.c.chart_time)
+    )
     with transaction() as db:
-        dataset = db.get(ProviderDataset, key)
-        dataset.accessed_at = now_ms()
-        ranges = dataset.coverage
+        records = db.execute(statement).all()
+        if not records:
+            raise ValueError("平台缓存已清理，请重试")
+        metadata = records[0]
+        ranges = metadata.coverage
         interval = next((r for r in ranges if r[0] < before <= r[1]), None)
         preceding = next((r for r in reversed(ranges) if r[1] < before), None)
         readable = interval or preceding
-        rows = []
-        if readable:
-            rows = list(
-                db.scalars(
-                    select(ProviderBar)
-                    .where(
-                        ProviderBar.dataset_id == key,
-                        ProviderBar.chart_time >= readable[0],
-                        ProviderBar.chart_time < before,
-                    )
-                    .order_by(ProviderBar.chart_time.desc())
-                    .limit(count + 1)
-                )
-            )[::-1]
-        boundary = bool(readable and dataset.earliest and readable[0] == 0 and len(rows) <= count)
+        rows = [r.payload for r in records
+                if readable and r.chart_time is not None and r.chart_time >= readable[0]]
+        boundary = bool(readable and metadata.earliest and readable[0] == 0 and len(rows) <= count)
+        # Access is housekeeping, not part of the published observation version.
+        db.execute(update(ProviderDataset).where(ProviderDataset.id == key)
+                   .values(accessed_at=now_ms()))
         return {
-            "bars": [r.payload for r in rows[-count:]],
+            "bars": rows[-count:],
             "history_boundary": boundary,
             "has_more": not boundary,
-            "as_of": dataset.updated_at,
-            "latest_at": dataset.latest_at,
-            "cache_revision": dataset.revision,
+            "as_of": metadata.updated_at,
+            "latest_at": metadata.latest_at,
+            "cache_revision": metadata.revision,
             "interval": interval,
             "preceding": preceding,
             "satisfied": bool(interval and (len(rows) >= count or boundary)),
+            **({"history_revalidation": {"changed": bool(metadata.changed)}}
+               if observation is not None else {}),
         }
 
 
@@ -244,7 +268,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
     return changed
 
 
-def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", latest=False):
+def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", latest=False,
+               optional=0):
     lease_started = time.monotonic()
     while time.monotonic() < deadline:
         check_cancelled()
@@ -265,7 +290,8 @@ def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", lates
         observed_at = now_ms()
         check_cancelled()
         with lane(kind):
-            page = upstream.native_page(meta, frame, before, count, deadline=deadline)
+            kwargs = {"optional": optional} if optional else {}
+            page = upstream.native_page(meta, frame, before, count, deadline=deadline, **kwargs)
         commit_started = time.monotonic()
         commit_page(key, lease, page, before, observed_at, latest=latest)
         upstream.record_timing("database_commit", commit_started)
@@ -350,6 +376,102 @@ def read(meta, frame, before, count, *, latest=False, deadline=None):
             _ACTIVE_READS[meta["source"]] -= 1
 
 
+def _native_read(meta, body, before, count, prefix, latest):
+    """Discover demand using real bars and coverage; optional history is PG-only
+    except for spare capacity in a mandatory upstream request.
+    """
+    if body.timeframe not in upstream.FRAMES:
+        raise ValueError("无效平台周期")
+    if count + prefix > CAPACITY:
+        raise CapacityExceeded("原生历史必需数量及计算前缀超过20000根")
+    if body.from_time is not None and body.from_time >= (body.before or before):
+        raise ValueError("原生历史区间须满足from<to")
+    from_time = body.from_time if body.from_time is not None and body.from_time < before else None
+    deadline = DEADLINE.get() or time.monotonic() + settings.provider_request_seconds
+    key = ensure(meta, body.timeframe)
+    cap = 4000 if meta["source"] == "oanda" else 1000
+    hot = None
+    for _ in range(80):
+        check_cancelled()
+        if time.monotonic() >= deadline:
+            raise TimeoutError("平台读取超过时间预算，请重试")
+        # One bounded statement discovers the real range demand, prefix and E.
+        # No metadata from another observation is attached to these bars.
+        state = snapshot(key, before, CAPACITY + 1, observation=body.history_observation,
+                         bounded_limit=CAPACITY + 1)
+        bars = state["bars"]
+        in_range = sum(b["chart_time"] >= from_time for b in bars) if from_time is not None else 0
+        demand = max(count, in_range)
+        if demand + prefix > CAPACITY:
+            raise CapacityExceeded("原生历史必需数量及计算前缀超过20000根")
+        connected = state["interval"]
+        recent_tail = (latest and state["preceding"] and
+                       before - state["preceding"][1] <= settings.provider_fresh_seconds * 1000)
+        readable = connected or (state["preceding"] if recent_tail else None)
+        range_done = from_time is None or bool(readable and readable[0] <= from_time)
+        boundary = state["history_boundary"]
+        mandatory_done = bool(readable and range_done and
+                              (len(bars) >= demand + prefix or boundary))
+        fresh = not latest or now_ms() - state["latest_at"] < settings.provider_fresh_seconds * 1000
+        if hot is None:
+            hot = mandatory_done and fresh
+        optional = optional_bars(
+            body.native_history, demand, prefix, hot=hot,
+            first=body.first_data_request, enabled=settings.provider_native_history_buffer,
+            python=bool(body.indicators) or body.history_observation is not None,
+        )
+        if mandatory_done and fresh:
+            # Prefix is immediately before D. E never changes Python inputs.
+            required = bars[-(demand + prefix):]
+            visible = required[-demand:]
+            if optional:
+                visible = bars[-min(len(bars), demand + optional):]
+            boundary = boundary and len(visible) == len(bars)
+            return {
+                **state, "bars": required if body.indicators else visible,
+                "history_boundary": boundary, "has_more": not boundary,
+                "series_kind": "provider", "basis": meta["basis"],
+                "calendar": meta["calendar"], "precision": meta["precision"],
+                "dataset_id": key, "cache_hit": bool(hot), "indicators": [],
+                "mandatory_count": demand, "mandatory_read_count": demand + prefix,
+                "optional_count": len(visible) - min(demand, len(visible)),
+            }
+        tail = latest and bool(bars) and (not fresh or not connected)
+        if tail:
+            elapsed = max(0, now_ms() - bars[-1]["start"])
+            amount = min(cap, max(3, elapsed // upstream.FRAME_MS[body.timeframe] + 3))
+            cursor = before
+            attached = 0
+        else:
+            cursor = connected[0] if connected else before
+            missing = max(1, demand + prefix - (len(bars) if connected else 0))
+            # Unknown range length is discovered with mandatory pages. When
+            # count still needs a page, spare HTTP capacity may include E; it
+            # never controls the next page's stopping condition.
+            amount = min(cap, missing if range_done or missing > 1 else cap)
+            attached = min(optional, max(0, cap - amount), max(0, CAPACITY - demand - prefix))
+        fetch_page(key, meta, body.timeframe, cursor, amount, deadline,
+                   kind=LANE.get() or "chart", latest=latest and cursor == before,
+                   optional=attached)
+    raise TimeoutError("平台分页未完成，请重试")
+
+
+def native_read(meta, body, before, count, prefix, latest):
+    started = time.monotonic()
+    timings = {}
+    token = upstream.TIMINGS.set(timings)
+    with _ACTIVE_LOCK:
+        _ACTIVE_READS[meta["source"]] += 1
+    try:
+        result = _native_read(meta, body, before, count, prefix, latest)
+        timings["read_total"] = (time.monotonic() - started) * 1000
+        return {**result, "timings_ms": {k: round(v, 2) for k, v in timings.items()}}
+    finally:
+        upstream.TIMINGS.reset(token)
+        with _ACTIVE_LOCK:
+            _ACTIVE_READS[meta["source"]] -= 1
+
+
 def data(body):
     meta = upstream.metadata(body.instrument)
     now = (now_ms() // 1000 + 1) * 1000
@@ -359,12 +481,19 @@ def data(body):
     count = body.count_back or body.limit
     latest = body.before is None or body.first_data_request and body.before >= now - 120000
     extra = max((history_requirement(spec) for spec in body.indicators), default=0)
-    page = read(meta, body.timeframe, before, count + extra, latest=latest)
+    native = body.native_history is not None
+    page = (native_read(meta, body, before, count, extra, latest) if native else
+            read(meta, body.timeframe, before, count + extra, latest=latest))
+    output_count = page.get("mandatory_count", count)
     if body.client:
         from .provider_service import activate
 
-        activate(body.client, page["dataset_id"], before, count + extra, latest=latest)
-    visible = page["bars"][-count:]
+        try:
+            activate(body.client, page["dataset_id"], before, output_count + extra, latest=latest)
+        except Exception:
+            log.warning("Provider optional activation failed source=%s frame=%s",
+                        meta["source"], body.timeframe, exc_info=False)
+    visible = page["bars"] if native and not body.indicators else page["bars"][-output_count:]
     first = visible[0]["start"] if visible else before
     indicators = []
     for spec in body.indicators:
@@ -385,8 +514,8 @@ def data(body):
             **page,
             "bars": visible,
             "indicators": indicators,
-            "has_more": len(page["bars"]) > count or page["has_more"],
-            "history_boundary": len(page["bars"]) <= count and page["history_boundary"],
+            "has_more": len(page["bars"]) > len(visible) or page["has_more"],
+            "history_boundary": len(page["bars"]) <= len(visible) and page["history_boundary"],
         }.items()
         if k not in ("interval", "preceding", "satisfied")
     }

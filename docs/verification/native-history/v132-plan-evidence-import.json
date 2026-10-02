@@ -1,0 +1,60 @@
+{
+  "kind": "immutable prior research evidence imported for v1.3.2 plan; not v1.3.2 runtime acceptance",
+  "source_worktree": "/home/quant/repos/market-watch-advanced",
+  "source_worktree_commit": "db0c4e1",
+  "plan_baseline_commit": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+  "files": [
+    {
+      "path": "docs/native-chart-additive-buffer-jump-study.md",
+      "sha256": "15d09f52cdf69675162f5d3eef9655f7057f8eefc2167a13b0111c9769c4cab4"
+    },
+    {
+      "path": "docs/verification/native-history/additive-acquisition/results.json",
+      "sha256": "698b1e98686c588cf765a8e59faf7afc93aa12281f4867d763ddc9591a8b9017"
+    },
+    {
+      "path": "docs/verification/native-history/additive-buffer-summary.json",
+      "sha256": "1f7c111b96b03e378c866d531479e8a0af19759d944205968f3dfcef8a851c3c"
+    },
+    {
+      "path": "docs/verification/native-history/additive-display/results.json",
+      "sha256": "ab351920b3fce925d04c8c1617af34cda4e3f36dd39c3bf4ba1b88e62678fa26"
+    },
+    {
+      "path": "docs/verification/native-history/additive-jump/results.json",
+      "sha256": "f5088c8afeaa0a48223319a1f47a7baaa7d0520c37e2ec5f2974ec59714a4cae"
+    },
+    {
+      "path": "docs/verification/native-history/additive-multichart/results.json",
+      "sha256": "26ec89a9a68c8098bb6aeecad717396e458767cce37eeab3423ed7531f7bfbb3"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-artifact-manifest.json",
+      "sha256": "c20495b65914be9fd0a883b966edd0647fe197cc534aad872d4598bda756210d"
+    },
+    {
+      "path": "docs/verification/native-history/buffer-sizing-summary.json",
+      "sha256": "324ee918afbf535975c4113c9db73484aaaf9fef4ef4b04f1b336b17d751dc20"
+    },
+    {
+      "path": "scripts/benchmark_provider_buffers.py",
+      "sha256": "fd1a3b370302fe5fffe823c80177872d2ec7cb0d5dee2a69c2d2cee4b75b508b"
+    },
+    {
+      "path": "web/tests/advanced-native-additive-buffer-display.browser.cjs",
+      "sha256": "1b7cef23bd9d22763234991aa3438b54c78459431f17a3b20fca28339dcf5487"
+    },
+    {
+      "path": "web/tests/advanced-native-additive-jump.browser.cjs",
+      "sha256": "c8f4c1d2c0c3c96dbe94b4dd88ac6b54dfd031c049c3947530c997d64a1af12a"
+    },
+    {
+      "path": "web/tests/advanced-native-buffer-renderer.browser.cjs",
+      "sha256": "bbb24ef3b413d3b311d67a5df769bce52a7fe5cf5254a1e4aa02d066a1560adb"
+    }
+  ],
+  "limits": [
+    "buffer-artifact-manifest.json refers to an earlier evidence set in the source research worktree; its hashes are not a manifest of current plan docs",
+    "source code at research worktree differs from v1.3.2 transport modules; acquisition/display evidence not new baseline acceptance"
+  ]
+}

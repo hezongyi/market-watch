@@ -173,7 +173,7 @@ def _end(start, frame, calendar):
     return start + FRAME_MS[frame]
 
 
-def native_page(meta, frame, before, count, *, client=None, deadline=None):
+def native_page(meta, frame, before, count, *, client=None, deadline=None, optional=0):
     """Return upstream native OHLC, exclusive chart labels and an explicit boundary."""
     if frame not in FRAMES or not 1 <= count <= (4000 if meta["source"] == "oanda" else 1000):
         raise ValueError("无效平台周期或根数")
@@ -185,9 +185,11 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
     cursor = min(now_ms() + 1, before + (2 * 86400000 if frame in ("D1", "W1", "MN") else 0))
     boundary = False
     for _ in range(8):
+        # Optional bars can fill this mandatory HTTP request, but never extend
+        # the loop. High-period translation/filtering still stops at count.
         batch_count = min(
             4000 if source == "oanda" else 1000,
-            count - len(rows) + (3 if frame in ("D1", "W1", "MN") else 0),
+            count - len(rows) + optional + (3 if frame in ("D1", "W1", "MN") else 0),
         )
         if source == "oanda":
             if not settings.oanda_token:
@@ -263,8 +265,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
         cursor = next_cursor
     else:
         raise ValueError("平台分页超过请求上限")
-    visible = rows[-count:]
-    exhausted = boundary and len(rows) <= count
+    visible = rows[-(count + optional):]
+    exhausted = boundary and len(rows) <= count + optional
     proven_start = 0 if exhausted else visible[0]["chart_time"] if visible else before
     return {
         "bars": visible,

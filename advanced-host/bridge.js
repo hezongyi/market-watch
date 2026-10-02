@@ -34,6 +34,7 @@ const subscriptions = new Map();
 const quoteSubscriptions = new Map();
 const lastHistory = new Map();
 const providerHistoryState = new Map();
+const providerHistoryWork = new Map();
 const firstHistory = new Map();
 const coldHistory = new Set();
 const refreshingHistoryRanges = new Map();
@@ -198,7 +199,20 @@ function datasetGeometry(ticker, res) {
     {plot_width:960,bar_spacing:6};
 }
 
-function query(ticker, res, args) {
+function nativeHistoryContext(ticker, res) {
+  try {
+    const count = widget.chartsCount();
+    if (!Number.isInteger(count) || count < 1 || count > 8)
+      throw Error('Unknown chart count');
+    const active = widget.activeChart();
+    return {chart_count:count, focused:chartUsesSymbol(active,ticker,res),
+      historical_navigation:false};
+  } catch (_) {
+    return {chart_count:8,focused:null,historical_navigation:false};
+  }
+}
+
+function query(ticker, res, args, expires = Infinity) {
   const { symbol, spec, series_kind } = decode(ticker);
   const q = {
     instrument: symbol,
@@ -216,7 +230,7 @@ function query(ticker, res, args) {
   const epoch = workspaceEpoch;
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
-  const promise = request(q, "data", () => epoch === workspaceEpoch &&
+  const promise = request(q, "data", () => epoch === workspaceEpoch && Date.now() < expires &&
     (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})));
   if (series_kind === 'managed') cache.set(key, { time: Date.now(), promise });
   if (cache.size > 64) cache.delete(cache.keys().next().value);
@@ -347,6 +361,15 @@ const feed = {
   },
   getBars: async (s, res, p, cb, err) => {
     const loadEpoch=workspaceEpoch;
+    const historyKey=s.ticker+'|'+res;
+    const isProvider=decode(s.ticker).series_kind==='provider';
+    const providerWork=isProvider ? (providerHistoryWork.get(historyKey) ||
+      {inflight:0,generation:0,correction:null,reloading:false}) : null;
+    if(providerWork) {
+      providerHistoryWork.set(historyKey,providerWork);
+      providerWork.inflight++;
+    }
+    const historyDeadline=Date.now()+8000;
     const completeTerminal=rangeGuard?.captureTerminalCompletion?.(
       chart=>chart.symbol()===s.ticker && chart.resolution()===res);
     const finishTerminal=()=>{
@@ -363,16 +386,43 @@ const feed = {
         // Native requirements pass unchanged; the backend owns cache policy
         // and provider pagination, including demands larger than one page.
         const epoch = workspaceEpoch;
-        const page = await query(s.ticker, res, {limit:p.countBack,
+        const args={limit:p.countBack,
           countBack:p.countBack, from:p.from*1000, before:p.to*1000,
-          firstDataRequest:p.firstDataRequest, client:clientId});
+          firstDataRequest:p.firstDataRequest, client:clientId,
+          native_history:nativeHistoryContext(s.ticker,res)};
+        let page = await query(s.ticker, res, args);
         if (epoch !== workspaceEpoch) {
           const error = Error("已取消旧图表的历史加载");
           error.code = "HISTORY_CANCELLED"; throw error;
         }
+        const seen=providerHistoryState.get(historyKey);
+        const older=historyOlder(page,seen);
+        if(older && page.bars?.length) {
+          const generation=++providerWork.generation;
+          // Exactly one review of this late response. Keep its callback valid
+          // even on failure or a v1.3.2 response without a review result.
+          const observation={revision:page.cache_revision||0,observed_at:page.as_of||0,
+            first:page.bars[0].chart_time,last:page.bars.at(-1).chart_time};
+          try {
+            if(Date.now()>=historyDeadline) throw Error('历史复核时间预算已耗尽');
+            const reviewed=await query(s.ticker,res,{...args,history_observation:observation},historyDeadline);
+            if(epoch!==workspaceEpoch) throw Object.assign(Error('已取消旧图表的历史加载'),{code:'HISTORY_CANCELLED'});
+            if(!reviewed.history_revalidation) throw Error('后端未提供历史复核结果');
+            page=reviewed;
+            if(reviewed.history_revalidation.changed || historyOlder(reviewed,providerHistoryState.get(historyKey)))
+              providerWork.correction={generation,verified:reviewed.history_revalidation.changed===true,attempts:0};
+          } catch(error) {
+            if(error.code==='HISTORY_CANCELLED') throw error;
+            providerWork.correction={generation,verified:false,attempts:0};
+            send({type:'error',error:'历史复核未完成：'+String(error)});
+          }
+        }
         const rows = barsOf(page, res, s.ticker);
-        providerHistoryState.set(s.ticker+'|'+res, {revision:page.cache_revision||0,
-          observed_at:page.as_of||0,cursor:rows.at(-1)?.time||0});
+        if(!historyOlder(page,providerHistoryState.get(historyKey))) {
+          const previous=providerHistoryState.get(historyKey);
+          providerHistoryState.set(historyKey,{revision:page.cache_revision||0,
+            observed_at:page.as_of||0,cursor:Math.max(previous?.cursor||0,rows.at(-1)?.time||0)});
+        }
         const boundary = page.history_boundary === true;
         if (rows.length) {
           const key = s.ticker+'|'+res;
@@ -435,6 +485,10 @@ const feed = {
       if (e.code !== "HISTORY_CANCELLED")
         send({ type: "error", error: String(e) });
     } finally {
+      if(providerWork) {
+        providerWork.inflight--;
+        if(loadEpoch===workspaceEpoch) setTimeout(()=>flushProviderCorrections(),0);
+      }
       if (p.firstDataRequest && !decode(s.ticker).spec && initialHistoryGate?.epoch === loadEpoch)
         initialHistoryGate.resolve();
     }
@@ -490,6 +544,29 @@ function hasHistoryViewer(args) {
   return false;
 }
 let historyReloading = false;
+function historyOlder(page,seen) {
+  return !!seen && ((page.cache_revision||0)<seen.revision ||
+    (page.as_of||0)<seen.observed_at);
+}
+async function flushProviderCorrections() {
+  if(!ready || loading || historyReloading || rangeGuard?.busy() || edgeGuard?.busy()) return;
+  for(const [key,work] of providerHistoryWork) {
+    const correction=work.correction;
+    if(work.inflight || work.reloading || !correction?.verified || correction.attempts) continue;
+    const split=key.lastIndexOf('|'),symbol=key.slice(0,split),res=key.slice(split+1);
+    if(!hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) continue;
+    work.reloading=true;
+    correction.attempts++;
+    const epoch=workspaceEpoch;
+    try {
+      const corrected=await reloadHistory(symbol,res);
+      if(corrected && epoch===workspaceEpoch && !work.inflight && work.correction===correction)
+        work.correction=null;
+      else if(!corrected) send({type:'error',error:'历史更正待处理，请刷新历史'});
+    } catch(error) {send({type:'error',error:'历史更正未完成：'+String(error)});}
+    finally {work.reloading=false;}
+  }
+}
 async function reloadHistory(symbol, res, relevant = () => true) {
   if (!ready || loading || historyReloading || rangeGuard?.busy() || edgeGuard?.busy()) return false;
   historyReloading = true;
@@ -1226,6 +1303,7 @@ function boot(
       workspaceEpoch++;
       for(const [id,sub] of subscriptions) if(sub.providerListener) feed.unsubscribeBars(id);
       providerHistoryState.clear();
+      providerHistoryWork.clear();
       lastHistory.clear();
       firstHistory.clear();
       indicatorHistoryNeeds.clear();
@@ -1283,6 +1361,7 @@ function boot(
     demandReporter=undefined;
     poll = setInterval(() => {
       tick();
+      flushProviderCorrections();
       demandReporter?.tick();
       if (dirty) snapshot();
     }, 15000);
@@ -1299,6 +1378,11 @@ addEventListener("message", async (e) => {
   if(m.type==='provider-event') {
     const event=m.event,sub=[...subscriptions.values()].find(s=>s.providerListener===event?.listener);
     if(!sub) return;
+    const key=sub.symbol+'|'+sub.res;
+    const old=providerHistoryState.get(key);
+    if(event.type!=='error' && !historyOlder({cache_revision:event.revision,as_of:event.as_of},old))
+      providerHistoryState.set(key,{revision:event.revision||0,observed_at:event.as_of||0,
+        cursor:Math.max(old?.cursor||0,event.cursor||0)});
     if(event.type==='reset') {
       sub.needsHistoryReload=true;
       if(await reloadHistory(sub.symbol,sub.res).catch(error=>send({type:'error',error:String(error)})))

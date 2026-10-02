@@ -151,3 +151,105 @@ def test_revision_migration_backfills_existing_observations_and_preserves_bars(p
         bars = list(db.scalars(select(ProviderBar).where(ProviderBar.dataset_id == key)))
         assert len(bars) == 3 and all(bar.changed_at == 123456 for bar in bars)
     assert cache.snapshot(key, 4000, 3)["bars"] == before
+
+
+def test_history_response_is_one_statement_snapshot_during_revision(provider_pg, monkeypatch):
+    from sqlalchemy import event
+    from test_provider_cache import seed
+    _, engine = provider_pg
+    clock = [100000]
+    monkeypatch.setattr(cache, 'now_ms', lambda: clock[0])
+    key = seed(META, 'M5', 10000, page(1000, 10000))
+    read_done, revision_done = threading.Event(), threading.Event()
+    selects = []
+    reader_ident = []
+    def pause_after_select(conn, cursor, statement, params, context, many):
+        if threading.get_ident() not in reader_ident or not statement.lstrip().upper().startswith('SELECT'):
+            return
+        selects.append(statement)
+        if 'LEFT OUTER JOIN' in statement and 'provider_datasets' in statement:
+            read_done.set()
+            assert revision_done.wait(4)
+    event.listen(engine, 'after_cursor_execute', pause_after_select)
+    def reader():
+        reader_ident.append(threading.get_ident())
+        return cache.snapshot(key, 10000, 5)
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pending = pool.submit(reader)
+            assert read_done.wait(3)
+            clock[0] = 101000
+            seed(META, 'M5', 6000, page(5000, 6000, close='5'))
+            revision_done.set()
+            original = pending.result(timeout=3)
+        assert len(selects) == 1, 'metadata and bars must share one statement, not default transaction isolation'
+        assert original['as_of'] == 100000 and original['cache_revision'] == 1
+        # The changed bar is in the response window; pairing old bars with a
+        # new metadata version would incorrectly suppress the subscription reset.
+        assert original['bars'][0]['close'] == '2'
+        current = cache.snapshot(key, 10000, 6)
+        assert current['as_of'] == 101000 and current['cache_revision'] == 2
+        assert current['bars'][1]['close'] == '5'
+        empty = cache.ensure({**META, 'symbol': 'EMPTY_SNAPSHOT'}, 'M5')
+        assert cache.snapshot(empty, 10000, 5)['bars'] == []
+    finally:
+        revision_done.set()
+        event.remove(engine, 'after_cursor_execute', pause_after_select)
+
+
+@pytest.mark.parametrize('replace', [False, True])
+def test_old_warmer_cannot_overwrite_expanded_or_recreated_task(provider_pg, monkeypatch, replace):
+    from alerts import provider_service as service
+    from alerts.storage import ProviderInterest
+    from test_provider_cache import seed
+    factory, _ = provider_pg
+    monkeypatch.setattr(service.settings, 'provider_basic_bars', 3)
+    monkeypatch.setattr(service.settings, 'provider_depth_bars', 8)
+    key = seed(META, 'M5', 100000, page(99000, 100000))
+    service.activate('race', key, 100000, 3, latest=True)
+    ident = service.interest_id('race', 'read:' + key + ':latest')
+    started, finish = threading.Event(), threading.Event()
+    def fetch(meta, frame, before, count, **kwargs):
+        started.set()
+        assert finish.wait(4)
+        return page(before - count * 1000, before)
+    monkeypatch.setattr(upstream, 'native_page', fetch)
+    with factory.begin() as db:
+        original_task = db.get(ProviderInterest, ident).targets[0]['task_id']
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        worker = pool.submit(service.warm_step, 'oanda')
+        assert started.wait(3)
+        if replace:
+            service.unsubscribe('race', 'read:' + key + ':latest')
+        service.activate('race', key, 100000, 10, latest=True)
+        finish.set()
+        worker.result(timeout=3)
+    with factory.begin() as db:
+        target = db.get(ProviderInterest, ident).targets[0]
+        assert target['count'] == 10 and not target['done']
+        assert (target['task_id'] != original_task) == replace
+        assert target['generation'] == (0 if replace else 1)
+        assert db.scalar(select(func.count()).select_from(ProviderBar)) == 3, 'successful old worker page remains useful'
+
+
+def test_concurrent_activation_merges_max_and_reopens_completed_goals(provider_pg, monkeypatch):
+    from alerts import provider_service as service
+    from alerts.storage import ProviderInterest
+    from test_provider_cache import seed
+    factory, _ = provider_pg
+    monkeypatch.setattr(service.settings, 'provider_basic_bars', 3)
+    monkeypatch.setattr(service.settings, 'provider_depth_bars', 8)
+    key = seed(META, 'M5', 100000, page(95000, 100000))
+    service.activate('race', key, 100000, 3, latest=True)
+    service.warm_step('oanda')
+    ident = service.interest_id('race', 'read:' + key + ':latest')
+    with factory.begin() as db:
+        assert db.get(ProviderInterest, ident).targets[0]['done']
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        list(pool.map(lambda n: service.activate('race', key, 110000, n, latest=True), [12, 10]))
+    with factory.begin() as db:
+        targets = db.get(ProviderInterest, ident).targets
+        assert targets[0]['before'] == 100000, 'latest anchor stays fixed'
+        assert targets[0]['count'] == targets[9]['count'] == 12
+        assert not targets[0]['done']
+        assert all(t['generation'] == 0 for t in targets if t['frame'] != 'M5')
