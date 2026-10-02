@@ -35,6 +35,9 @@ Delivery/runtime source is `edc799a97999b8cf387a03c380669bf6a8d28083`.
 | native-local-initial.json / native-local-debug.json | Local mismatch detection while that old chart image was present |
 | mobile-readonly.txt | Real mobile native read-only probe; no writes or page errors. An existing viewport restoration warning is retained |
 | code-review.md | Independent Standards and Spec conclusions and fixed regressions |
+| completion-audit.md / runtime-audit.json | Final requirement audit; current images/source, schema, health and backup hash/mode confirmed |
+| history-ui-audit.json | Real task page reads jobs and two segment pages; controls visible; reading/closing performs no task writes |
+| history-ui-audit-initial.json / history-ui-audit-selector.json / history-ui-audit-page-order.json | Probe failures: wrong iframe, ambiguous text selector, then invalid assumption that the first page contains the conflict; corrected without product changes |
 
 The 36-case matrix predates the final watch-evaluation/publication fixes.
 Chart/parser/aggregation runtime files were unchanged; the publisher was

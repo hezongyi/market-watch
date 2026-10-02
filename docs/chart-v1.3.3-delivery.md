@@ -35,6 +35,8 @@ Python合成指标内部volume=0/1有效性协议保留。量任务不创建新�
 
 完整索引及失败记录见[证据说明](verification/volume/README.md)，独立两轴审阅见
 [code-review.md](verification/volume/code-review.md)。
+最终逐项收口核对见[completion-audit.md](verification/volume/completion-audit.md)，
+当前运行镜像/schema/备份复核及真实任务页分页读取均已补充留证。
 
 | 验证 | 结果 |
 | --- | --- |
