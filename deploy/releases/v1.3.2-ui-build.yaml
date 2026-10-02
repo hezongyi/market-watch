@@ -1,12 +1,12 @@
 name: market-watch-v132-ui-build
 services:
   web:
-    image: market-watch-web:1.3.2-ui-87785c0-lan-p15654
+    image: market-watch-web:1.3.2-ui-c3d1607-lan-ip-p15654
     build:
       context: ../../web
       args:
-        VITE_ADVANCED_CHART_ORIGIN: https://chart-v132.192.168.7.232.sslip.io:15654
+        VITE_ADVANCED_CHART_ORIGIN: https://192.168.7.232:15654
       labels:
         org.opencontainers.image.version: "1.3.2"
-        org.opencontainers.image.revision: "87785c0"
+        org.opencontainers.image.revision: "c3d1607"
         market-watch.purpose: v1.3.2-ui

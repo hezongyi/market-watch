@@ -1,10 +1,10 @@
 {
   "deployed": true,
-  "verified_at": "2026-10-02T09:15:01.800219+00:00",
+  "verified_at": "2026-10-02T09:38:52.619126+00:00",
   "project": "market-watch-v132-ui",
   "app_origin": "https://192.168.7.232:15653",
   "local_origin": "https://v132.localhost:15653",
-  "chart_origin": "https://chart-v132.192.168.7.232.sslip.io:15654",
+  "chart_origin": "https://192.168.7.232:15654",
   "baseline": "v1.3.2 / 9596b25",
   "chart_menu_source": "7bf84bb",
   "schema": "o16_managed_revisions",
@@ -217,8 +217,8 @@
     {
       "service": "web",
       "name": "market-watch-v132-ui-web-1",
-      "container_id": "561e4b83cd674b2b12299bb43c2d66e33f1b18396f1a2b2e60b8b9cae344587b",
-      "image_id": "sha256:fc2c7b8a9bb8b427cd8aef0b64ed6a879ec257e9f35eebd3542e2f82f7aa4a97",
+      "container_id": "b18f0ce53d1880424517fc9b8cc85ca24c9de6c35368110092ce326f318507bb",
+      "image_id": "sha256:df3842d517470545760afd3387531b49cc48cd76c131723f9848a897ad61eb76",
       "state": "running",
       "health": null,
       "networks": [
@@ -266,17 +266,22 @@
   "verification_directory": "docs/verification/v1.3.2-isolated",
   "browser_verification": {
     "passed": true,
-    "theme_switch_reloads": 6,
-    "chart_requests_checked": 1141,
+    "theme_switch_reloads": 2,
+    "chart_requests_checked": 489,
     "credentials_sent_to_chart": 0,
-    "theme_colors": "verified in both themes",
-    "save_acknowledgement_required": true,
-    "evidence": "docs/verification/v1.3.2-isolated/lan-browser-ack.json"
+    "no_external_dns": true,
+    "session_cookie": {
+      "path": "/api",
+      "httpOnly": true
+    },
+    "evidence": "docs/verification/v1.3.2-isolated/direct-ip-browser.json"
   },
   "http_redirect": {
     "status": 308,
-    "verified_at": "2026-10-02T09:23:50.492363+00:00",
-    "evidence": "docs/verification/v1.3.2-isolated/http-redirect.json",
-    "chart_ip_access": "redirects to dedicated chart hostname"
-  }
+    "verified_at": "2026-10-02T09:36:35.175183+00:00",
+    "evidence": "docs/verification/v1.3.2-isolated/direct-ip-http-redirect.json",
+    "chart_ip_access": "serves HTTPS directly; plain HTTP redirects to same IP"
+  },
+  "external_dns_required": false,
+  "session_cookie_scope": "/api"
 }
