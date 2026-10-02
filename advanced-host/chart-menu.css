@@ -4,23 +4,29 @@
 
 .mw-chart-menu-button,
 .mw-chart-menu {
-  --mw-menu-bg: #fff;
+  --mw-menu-bg: var(--tv-color-pane-background, var(--color-pane-bg, #fff));
   --mw-menu-text: #131722;
   --mw-menu-line: #e0e3eb;
   --mw-menu-hover: #f0f3fa;
   --mw-menu-focus: #2962ff;
   --mw-menu-track: #b2b5be;
+  --mw-brand-text: #25332a;
+  --mw-brand-logo: #294f3c;
+  --mw-brand-muted: #69766c;
   color: var(--mw-menu-text);
   background: var(--mw-menu-bg);
   font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
 }
 .mw-chart-menu-button[data-theme="dark"],
 .mw-chart-menu[data-theme="dark"] {
-  --mw-menu-bg: #202020;
+  --mw-menu-bg: var(--tv-color-pane-background, var(--color-pane-bg, #0f0f0f));
   --mw-menu-text: #ddd;
-  --mw-menu-line: #434343;
-  --mw-menu-hover: #2a2a2a;
+  --mw-menu-line: #2a2a2a;
+  --mw-menu-hover: #1c1c1c;
   --mw-menu-track: #787b86;
+  --mw-brand-text: #eef4e6;
+  --mw-brand-logo: #d9e9b3;
+  --mw-brand-muted: #a6b6a9;
 }
 .mw-chart-menu-button {
   position: fixed;
@@ -51,7 +57,7 @@
 }
 .mw-chart-menu[hidden] { display: none; }
 .mw-chart-menu-heading {
-  background: #17231c;
+  background: transparent;
   padding: 16px 6px;
   border-bottom: 1px solid var(--mw-menu-line);
   margin: 0 -6px 6px;
@@ -61,7 +67,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #eef4e6;
+  color: var(--mw-brand-text);
   padding: 0 10px;
   font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   font-synthesis: none;
@@ -72,7 +78,7 @@
   width: 34px;
   height: 34px;
   flex-shrink: 0;
-  color: #d9e9b3;
+  color: var(--mw-brand-logo);
 }
 .mw-chart-menu-brand > span {
   font-size: 23px;
@@ -83,7 +89,7 @@
   display: block;
   font-size: 9px;
   letter-spacing: 2.3px;
-  color: #a6b6a9;
+  color: var(--mw-brand-muted);
   margin-top: 3px;
 }
 .mw-chart-theme-switch {
