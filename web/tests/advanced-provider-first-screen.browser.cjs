@@ -2,7 +2,8 @@
 const {chromium}=require('@playwright/test');
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const {execFileSync}=require('node:child_process');
-const APP='https://localhost:15453',CHART='https://127.0.0.1:15454';
+const APP=process.env.FIRST_SCREEN_APP_ORIGIN||'https://localhost:15453',
+ CHART=process.env.FIRST_SCREEN_CHART_ORIGIN||'https://127.0.0.1:15454';
 const frames=['1','5','15','30','60','240','1D','1W','1M'];
 const samples=process.env.FIRST_SCREEN_SAMPLES ? JSON.parse(process.env.FIRST_SCREEN_SAMPLES) :
  ['MWP:OANDA:AUD_CAD','MWP:BTCUSDT'].flatMap(symbol=>frames.map(resolution=>({symbol,resolution})));
@@ -78,7 +79,8 @@ const output=process.env.FIRST_SCREEN_OUTPUT||'/tmp/mw-provider-first-screen.jso
   for(const sample of samples){
    await page.goto(APP+'/');
    if(process.env.FIRST_SCREEN_RESET_CACHE==='1')
-    execFileSync('../.venv/bin/python',['../scripts/provider_acceptance_fixture.py','--reset'],
+    execFileSync('../.venv/bin/python',['../scripts/provider_acceptance_fixture.py','--reset',
+      '--profile',process.env.FIRST_SCREEN_FIXTURE_PROFILE||'dual'],
       {env:{...process.env,PYTHONPATH:'../backend'},timeout:45000});
    const before=await api('advanced-charts/native-charts');
    const workspace=await api('advanced-charts/workspaces',{name:'平台首屏 '+sample.symbol+' '+sample.resolution});

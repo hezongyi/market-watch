@@ -17,7 +17,7 @@ from fastapi import HTTPException
 from .chart_data import FRAMES, bounds
 from .config import settings
 from .domain import Calendar
-from .provider_transport import activity, discard_client, pooled_client
+from .provider_transport import activity, discard_client, pooled_client, warm_connections
 from .provider_transport import close_clients as close_clients
 from .storage import Instrument, MarketCatalog, instant, ms, now_ms, transaction
 
@@ -51,15 +51,10 @@ def warm_clients():
     from concurrent.futures import ThreadPoolExecutor
 
     def connect(source):
-        origin = (
-            "https://api-fxpractice.oanda.com"
-            if source == "oanda"
-            else "https://data-api.binance.vision"
-        )
         client = pooled_client(source)
         try:
             with activity(client) as client:
-                client.head(origin, timeout=4)
+                warm_connections(client, source)
         except (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout):
             discard_client(client)
         except httpx.HTTPError:

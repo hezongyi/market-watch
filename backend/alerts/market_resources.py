@@ -73,7 +73,7 @@ def release(source, token):
 
 
 @contextmanager
-def request_slot(source, *, deadline=None):
+def request_slot(source, *, deadline=None, cancelled=None):
     kind = LANE.get()
     # Native adapters remain independently testable. Runtime owners set a lane
     # before entering an upstream fetch, including provider chart cache misses.
@@ -83,6 +83,8 @@ def request_slot(source, *, deadline=None):
     deadline = deadline or time.monotonic() + (15 if kind == "realtime" else 23)
     token = None
     while time.monotonic() < deadline:
+        if cancelled and cancelled():
+            raise TimeoutError("后台额度等待已让位于前台请求")
         token = acquire(source, kind, now_ms())
         if token:
             break

@@ -367,7 +367,7 @@ def test_startup_transport_warmup_never_fetches_or_caches_candles(monkeypatch):
     with httpx.Client(transport=httpx.MockTransport(handle)) as client:
         monkeypatch.setattr(provider, "pooled_client", lambda _: client)
         provider.warm_clients()
-    assert len(requests) == 2 and provider._CACHE == before
+    assert len(requests) == 4 and provider._CACHE == before
 
 
 def test_quote_refreshes_share_poll_bucket_without_stalling_new_chart_pages(database, monkeypatch):

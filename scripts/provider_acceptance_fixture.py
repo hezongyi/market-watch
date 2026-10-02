@@ -1,4 +1,4 @@
-"""Reset/snapshot only the local dual-acceptance provider cache, never managed data."""
+"""Reset/snapshot only explicitly named local acceptance caches, never managed data."""
 
 import argparse
 import json
@@ -14,18 +14,23 @@ from sqlalchemy.orm import sessionmaker
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--reset", action="store_true")
+    parser.add_argument("--profile", choices=["dual", "provider-fix"], default="dual")
     parser.add_argument("--output")
     parser.add_argument("--instrument", default="OANDA:AUD_CAD")
     parser.add_argument("--client", help="Inspect only this local acceptance client's finite targets")
     parser.add_argument("--expire-client", action="store_true")
     args = parser.parse_args()
+    env_path, database, host = {
+        "dual": ("/tmp/mw-dual-acceptance/api.env", "market_watch_dual", "market-watch-postgres-isolated"),
+        "provider-fix": ("/tmp/mw-provider-latency/api.env", "market_watch_provider_fix", "127.0.0.1"),
+    }[args.profile]
     config = dict(
         line.split("=", 1)
-        for line in Path("/tmp/mw-dual-acceptance/api.env").read_text().splitlines()
+        for line in Path(env_path).read_text().splitlines()
         if "=" in line and not line.startswith("#")
     )
     url = make_url(config["ALERTS_DATABASE_URL"])
-    assert url.host == "market-watch-postgres-isolated" and url.database == "market_watch_dual"
+    assert url.host == host and url.database == database and (url.port or 5432) == (15432 if args.profile == "provider-fix" else 5432)
     os.environ["ALERTS_DATABASE_URL"] = url.set(host="127.0.0.1", port=15432).render_as_string(
         hide_password=False
     )

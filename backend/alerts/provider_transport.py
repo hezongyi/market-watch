@@ -3,7 +3,7 @@
 import threading
 import time
 import weakref
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager, nullcontext
 
 import httpx
 
@@ -41,7 +41,7 @@ def state_for_key(key):
                                  limits=httpx.Limits(max_connections=capacity,
                                                     max_keepalive_connections=capacity,
                                                     keepalive_expiry=60)),
-            'last_used': time.monotonic(), 'active': 0,
+            'last_maintained': time.monotonic(), 'active': 0,
         }
         _KEYS[_CLIENTS[key]['client']] = key
     return _CLIENTS[key]
@@ -55,14 +55,12 @@ def activity(client):
         if state:
             client = state['client']
             state['active'] += 1
-            state['last_used'] = time.monotonic()
     try:
         yield client
     finally:
         if state:
             with _LOCK:
                 state['active'] -= 1
-                state['last_used'] = time.monotonic()
             close_retired()
 
 
@@ -89,26 +87,55 @@ def close_retired():
         state['client'].close()
 
 
+def warm_connections(client, source, *, seconds=4, busy=None, reserved=False):
+    """Touch both chart connections without reading candles or growing the pool.
+
+    Keep each HEAD response open until the next socket is acquired; ordinary
+    sequential HEAD calls otherwise reuse only the first HTTP/1.1 connection.
+    Consume the empty responses before closing so HTTPcore can retain sockets.
+    """
+    from .market_resources import lane, request_slot
+
+    deadline = time.monotonic() + seconds
+    with ExitStack() as opened:
+        responses = []
+        try:
+            for _ in range(2):
+                if busy and busy(source):
+                    return False
+                reservation = request_slot(
+                    source, deadline=deadline,
+                    cancelled=(lambda: busy(source)) if busy else None,
+                ) if reserved else nullcontext()
+                with lane('history'), reservation:
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0 or (busy and busy(source)):
+                        return False
+                    responses.append(opened.enter_context(client.stream(
+                        'HEAD', ORIGINS[source], timeout=min(1 if reserved else 4, remaining),
+                    )))
+            return True
+        finally:
+            for response in responses:
+                response.read()
+
+
 def maintain(source, busy):
     if busy(source):
         return False
     with _LOCK:
         state = next((value for (kind, _, kind_lane), value in _CLIENTS.items()
                       if kind == source and kind_lane == 'chart'), None)
-        if not state or state['active'] or time.monotonic() - state['last_used'] < IDLE_SECONDS:
+        # Traffic may keep one socket hot while the unused second one expires.
+        # Recent reads cannot postpone maintenance of unused sockets.
+        if not state or state['active'] or time.monotonic() - state['last_maintained'] < IDLE_SECONDS:
             return False
         state['active'] += 1
-        state['last_used'] = time.monotonic()
+        state['last_maintained'] = time.monotonic()
     try:
-        # Reuse the background reservation, never take foreground/realtime slots.
-        from .market_resources import lane, request_slot
-        deadline = time.monotonic() + 2
-        with lane('history'), request_slot(source, deadline=deadline):
-            remaining = deadline - time.monotonic()
-            if remaining <= 0 or busy(source):
-                return False
-            state['client'].head(ORIGINS[source], timeout=min(1, remaining))
-        return True
+        # Each HEAD gets the existing one-per-second background reservation.
+        # Check foreground work between sockets; never take its quota or retry.
+        return warm_connections(state['client'], source, seconds=2, busy=busy, reserved=True)
     except (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout):
         discard_client(state['client'])
         return False
@@ -117,7 +144,7 @@ def maintain(source, busy):
     finally:
         with _LOCK:
             state['active'] -= 1
-            state['last_used'] = time.monotonic()
+            state['last_maintained'] = time.monotonic()
         close_retired()
 
 
