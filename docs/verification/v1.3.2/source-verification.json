@@ -1,0 +1,87 @@
+{
+  "version": "1.3.2",
+  "source_commit": "2aef8acfab6871b9e9c0770067219581c48ad16e",
+  "schema": "o16_managed_revisions",
+  "scope": "source release; no new Docker images, restart, provider requests, proxy changes or production deployment",
+  "backend_full": {
+    "passed": 318,
+    "skipped": 1,
+    "postgresql": "17.11 disposable local fixture",
+    "tested_tree": "3c21afac59d600644fc65aae4f85286166052c66",
+    "source_relation": "Tests executed against the integration tree before 1.3.2 metadata edits; all recorded sources except three version metadata files byte-match that tested tree.",
+    "skip": "backup dump/restore requires matching pg_dump/pg_restore unavailable in this environment",
+    "log": "docs/verification/v1.3.2/backend-full-pg17.txt"
+  },
+  "frontend_vm": {
+    "tests": 36,
+    "passed": 36,
+    "failures": [],
+    "tested_tree": "3c21afac59d600644fc65aae4f85286166052c66",
+    "source_relation": "Frontend scripts and Python integration fixture unchanged from the tested tree; version metadata only updated.",
+    "record": "docs/verification/v1.3.2/frontend-vm.json"
+  },
+  "ruff": {
+    "passed": true,
+    "scope": "all backend, o16 migration, managed revision feed fixture and changed Python scripts",
+    "record": "docs/verification/v1.3.2/ruff-scope.json",
+    "existing_findings": "19 existing broader lint findings across 14 unchanged old migrations/diagnostic scripts; docs/verification/v1.3.2/ruff-existing-baseline.json"
+  },
+  "web_build": {
+    "passed": true,
+    "source_commit": "2aef8acfab6871b9e9c0770067219581c48ad16e",
+    "version": "1.3.2",
+    "checks": [
+      "TypeScript",
+      "Vite"
+    ],
+    "known_warning": "existing >500KB bundle warning",
+    "log": "docs/verification/v1.3.2/web-build.txt",
+    "artifacts": "docs/verification/v1.3.2/web-build-artifacts.json"
+  },
+  "wheel_build": {
+    "source_commit": "2aef8acfab6871b9e9c0770067219581c48ad16e",
+    "filename": "market_watch-1.3.2-py3-none-any.whl",
+    "sha256": "f6d9847448cfea6f5340d102cd1c0516ba7ab90ab0c72eb68cca965488a2c379",
+    "size_bytes": 204215,
+    "runtime_module_count": 38,
+    "byte_mismatches": [],
+    "missing_runtime_modules": [],
+    "extra_runtime_modules": [],
+    "scope": "Python alerts runtime modules; migrations, web and chart assets remain in the source tree",
+    "command": "python -m pip wheel --no-deps --no-build-isolation --no-cache-dir --no-index --wheel-dir /tmp/market-watch-v132-build .",
+    "artifact_delivery": "local temporary artifact; not a remote release attachment or Docker image",
+    "passed": true,
+    "record": "docs/verification/v1.3.2/wheel-equivalence.json"
+  },
+  "versions": {
+    "python": "1.3.2",
+    "web": "1.3.2",
+    "lockfile": "1.3.2",
+    "lockfile_root": "1.3.2"
+  },
+  "reviews": {
+    "standards": "passed; no remaining merge blocker",
+    "spec": "passed; no remaining merge blocker",
+    "record": "docs/verification/v1.3.2/review-results.md"
+  },
+  "source_hashes": "docs/verification/v1.3.2/source-files.json",
+  "tested_source_equivalence": "docs/verification/v1.3.2/tested-source-equivalence.json",
+  "performance_evidence": {
+    "report": "docs/provider-first-screen-latency-statistics.md",
+    "baseline_commit": "b9d69dd4c7ff8e873c4c75f07054eac29c94b996",
+    "implementation_commit": "c26decacb8d9fd3d83140a5d2f61861856b2f22a",
+    "records": 144,
+    "pairs": 72,
+    "scope": "original v1.3.0 controlled A/B, not v1.3.2 container or online acceptance",
+    "overall_p": 0.143463,
+    "single_pane_slow_rate": "5/36 in both arms",
+    "p95": "baseline 6859.58ms; fix 7553.18ms",
+    "note": "No new A/B sampling; raw evidence and adverse samples preserved."
+  },
+  "limitations": [
+    "one backend backup test skipped; PG17 does not replace target PG16 validation",
+    "no v1.3.2 Docker images or integrated runtime/browser acceptance",
+    "existing bundle-size warning and unchanged legacy lint findings",
+    "original performance A/B does not establish a statistically significant overall slow-rate reduction"
+  ]
+}

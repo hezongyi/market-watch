@@ -1,0 +1,22 @@
+{
+  "count": 19,
+  "files": [
+    "migrations/env.py",
+    "migrations/versions/6be9ffe49143_initial_monitoring_schema.py",
+    "migrations/versions/878ba03c3c44_instrument_availability_and_separate_.py",
+    "migrations/versions/971dbb57af10_import_priority.py",
+    "migrations/versions/b9a47ce41120_calendar_profiles.py",
+    "migrations/versions/c4d0e6858711_compressed_replay_warmup.py",
+    "scripts/backup_sqlite.py",
+    "scripts/check_oanda_gaps.py",
+    "scripts/compare_oanda_daily.py",
+    "scripts/diagnose_provider_idle_transport.py",
+    "scripts/diagnose_provider_runtime.py",
+    "scripts/verify_dual_recovery.py",
+    "scripts/verify_legacy_boundary.py",
+    "scripts/verify_managed_compatibility.py"
+  ],
+  "baseline_commit": "db0c4e1340cd3a9dbdce46d561b85c41bbc263b0",
+  "unchanged_from_main": true,
+  "note": "Existing lint findings in old migrations/diagnostic scripts; release does not change these files. The appropriate backend/current migration/changed-script check below passes."
+}

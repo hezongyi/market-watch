@@ -1,0 +1,88 @@
+{
+  "version": "1.3.2",
+  "accepted": true,
+  "acceptance_scope": "source-only release with tested integration equivalence, backend, frontend local scripts, package and web build verification",
+  "release_tag": "v1.3.2",
+  "source_commit": "2aef8acfab6871b9e9c0770067219581c48ad16e",
+  "tag_relation": "final tag includes subsequent documentation and evidence; runtime, test and build input files must match source_commit",
+  "schema": "o16_managed_revisions",
+  "new_migrations": [],
+  "previous_source_tag": "v1.3.1",
+  "delivery_document": "docs/chart-v1.3.2-delivery.md",
+  "verification": "docs/verification/v1.3.2/source-verification.json",
+  "source_hashes": "docs/verification/v1.3.2/source-files.json",
+  "checks": {
+    "backend_full": {
+      "passed": 318,
+      "skipped": 1,
+      "postgresql": "17.11",
+      "skip": "matching pg_dump/pg_restore unavailable",
+      "tested_tree": "3c21afac59d600644fc65aae4f85286166052c66",
+      "equivalence": "docs/verification/v1.3.2/tested-source-equivalence.json"
+    },
+    "frontend_vm": {
+      "passed": 36,
+      "failed": 0
+    },
+    "ruff": "appropriate scope passed; 19 unchanged broader legacy findings separately recorded",
+    "web_build": "passed with existing bundle-size warning",
+    "wheel_byte_equivalence": {
+      "runtime_modules": 38,
+      "mismatches": 0
+    },
+    "standards_review": "passed",
+    "spec_review": "passed"
+  },
+  "build": {
+    "source_commit": "2aef8acfab6871b9e9c0770067219581c48ad16e",
+    "wheel": {
+      "filename": "market_watch-1.3.2-py3-none-any.whl",
+      "sha256": "f6d9847448cfea6f5340d102cd1c0516ba7ab90ab0c72eb68cca965488a2c379",
+      "delivery": "local temporary artifact; not published as a remote release attachment"
+    },
+    "web_artifact_hashes": "docs/verification/v1.3.2/web-build-artifacts.json"
+  },
+  "evidence_sha256": {
+    "docs/verification/v1.3.2/backend-full-pg17.txt": "1472dc671ceee6c6b356f05ae1aa058dd988fb52c67363865fd6999ff55df6d6",
+    "docs/verification/v1.3.2/frontend-vm.json": "ce9e68c906bd61bdcbde49aff43ee46d943baaffca3ca341666aa753d548ee35",
+    "docs/verification/v1.3.2/review-results.md": "e69e0ba348faa598bc8d996a7e98e6cb4d2685c9d9096d7d0675cec125ff8521",
+    "docs/verification/v1.3.2/ruff-existing-baseline.json": "60ff3f44e41f6370170bad461a51472f839e700ebd67530f4912f633ad2b8410",
+    "docs/verification/v1.3.2/ruff-scope.json": "46905e87a7acdd7c678affd95d6f0bb6079062601cbd24b5cb8fd907de7460b9",
+    "docs/verification/v1.3.2/ruff.txt": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "docs/verification/v1.3.2/source-files.json": "5d04ca9faf35ac0243c258c1692bc54a9bd3706aa1f9b6a9b2b406cf04eebbaa",
+    "docs/verification/v1.3.2/source-verification.json": "90100d7bdd4bd9db5d7b9fa49645a2ff4dc4feb819c237691666ff88a1d6c747",
+    "docs/verification/v1.3.2/tested-integration-tree.json": "61322f710fbe3a071a7a35e9e1f00beed1b5206ee404ca9a8f62cadbbfd5a13c",
+    "docs/verification/v1.3.2/tested-source-equivalence.json": "a99e9eb5ad12ad3543d1b4842b9504ae4ae195e95238e37074e32f2b0c5d7de5",
+    "docs/verification/v1.3.2/web-build-artifacts.json": "eda50103dba024a5dac3495d621af358e7895808f6ec0d779c33d7192d0b0c87",
+    "docs/verification/v1.3.2/web-build.txt": "dbad4c3375a88c9dd107557bf7c836a2e17281704f701e49e516d0d49c223d4a",
+    "docs/verification/v1.3.2/wheel-build.txt": "bc8fabf7f2ec1cff673bb50414c94dd05e6d698723a3a07f6a70e2acf91337ef",
+    "docs/verification/v1.3.2/wheel-equivalence.json": "93d9a0085cec6fbdb674aa4694086081600781cbc722e91eeb0599febc41495a"
+  },
+  "images": {},
+  "image_status": "not built; no new or relabeled v1.3.2 Docker images",
+  "deployed": false,
+  "runtime_changed": false,
+  "notifications_sent": false,
+  "proxy_changed": false,
+  "existing_runtime_manifest": "deploy/releases/v1.3.0-local.json",
+  "existing_runtime_relation": "existing local and production services left unchanged; original provider experiments remain on their prior fixed images and configuration; no old image acceptance claims for v1.3.2",
+  "source_release_open_gates": [],
+  "deployment_work_remaining": [
+    "build new images from fixed source and record exact image IDs",
+    "configure target origin, workers and database connection budget",
+    "back up target database and validate o16 if upgrading from older schema",
+    "validate target-environment provider first-screen/cache and managed historical reload"
+  ],
+  "rollback": {
+    "previous_source_tag": "v1.3.1",
+    "schema": "o16 unchanged between v1.3.1 and v1.3.2",
+    "known_effect": "v1.3.1 preserves managed-history fixes but reintroduces provider connection-maintenance defects",
+    "operational_requirement": "match actual target images, configuration and schema; no runtime rollback needed for this source-only delivery"
+  },
+  "performance_limits": [
+    "overall slow-rate decrease not statistically significant (p=0.143463)",
+    "single-pane slow rate unchanged in original A/B",
+    "fix P95 and maximum latency were worse",
+    "original v1.3.0 A/B is not v1.3.2 deployment acceptance"
+  ]
+}

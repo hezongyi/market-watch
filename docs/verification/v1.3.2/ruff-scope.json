@@ -1,0 +1,15 @@
+{
+  "command": [
+    "ruff",
+    "check",
+    "backend",
+    "migrations/versions/o16_managed_revisions.py",
+    "web/tests/fixtures/managed-revision-feed.py",
+    "scripts/diagnose_provider_egress.py",
+    "scripts/diagnose_provider_pool_overlap.py",
+    "scripts/provider_acceptance_fixture.py",
+    "scripts/provider_latency_ab_fixture.py",
+    "scripts/summarize_provider_latency_ab.py"
+  ],
+  "exit_code": 0
+}
