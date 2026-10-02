@@ -1,0 +1,83 @@
+{
+  "version": "1.3.2",
+  "scope": "Ubuntu local dual-chart deployment",
+  "deployed": true,
+  "deployment_verified_at": "2026-10-02T06:13:22.711831+00:00",
+  "source_commit": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+  "source_tag": "v1.3.2",
+  "branch": "deploy/v1.3.2",
+  "worktree": "/home/quant/repos/market-watch-deploy-v1.3.2",
+  "project": "market-watch-dual-acceptance",
+  "origins": {
+    "app": "https://localhost:15453",
+    "chart": "https://127.0.0.1:15454"
+  },
+  "schema": "o16_managed_revisions",
+  "previous_schema": "n15_provider_revisions",
+  "database": "market_watch_dual",
+  "postgres_container": "market-watch-postgres-isolated",
+  "images": {
+    "api": {
+      "tag": "market-watch-api:1.3.2-9596b25",
+      "id": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "source_commit_label": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+      "version_label": "1.3.2"
+    },
+    "web": {
+      "tag": "market-watch-web:1.3.2-9596b25",
+      "id": "sha256:bda799ae2396b1606c9dc999a82b002ba58e27acf5cfb208ff04055a0890b1b4",
+      "source_commit_label": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+      "version_label": "1.3.2"
+    },
+    "chart-origin": {
+      "tag": "market-watch-chart-origin:1.3.2-9596b25",
+      "id": "sha256:b8129d6cfaedc14cb785b6cd0ff8f5c461869e6e9bc9100a4581b7b2c495d8a3",
+      "source_commit_label": "9596b25eda507ef708a327feb5271f238cdfdc0b",
+      "version_label": "1.3.2"
+    }
+  },
+  "worker_uses": "api",
+  "compose": [
+    "compose.acceptance.yaml",
+    "compose.dual-acceptance.yaml",
+    "deploy/releases/v1.3.2-local.yaml"
+  ],
+  "image_selection_env": "deploy/releases/v1.3.2-local.env",
+  "notifications_enabled": false,
+  "database_pool_per_backend_service": {
+    "size": 1,
+    "max_overflow": 0
+  },
+  "backup": {
+    "path": "/home/quant/repos/market-watch-deploy-v1.3.2/backups/pre-v1.3.2-20261002.dump",
+    "bytes": 23642594,
+    "sha256": "00a71ec501cec0d01b53f838167c10d44be45e36cb22bc13fe986719e3d7725f",
+    "permissions": "0600",
+    "archive_list_checked": true,
+    "actual_restore_checked": true,
+    "restore_schema": "n15_provider_revisions",
+    "restored_published_bars": 120035,
+    "restored_advanced_workspaces": 550,
+    "temporary_restore_database_removed": true
+  },
+  "verification": {
+    "api_readyz": "passed",
+    "chart_https": "HTTP 200",
+    "browser": "docs/verification/v1.3.2-local/browser-smoke.json",
+    "installed_runtime_modules": 38,
+    "source_mismatches": 0,
+    "runtime_inventory": "docs/verification/v1.3.2-local/runtime-after.json",
+    "migration_preserved_published_bar_count": 120035
+  },
+  "rollback": {
+    "image_selection": "deploy/releases/v1.3.2-local.rollback.env",
+    "runtime_inventory": "docs/verification/v1.3.2-local/runtime-before.json",
+    "requires_schema_alignment": true,
+    "note": "Old v1.3.0 images require n15 schema: stop writers and review o16 downgrade or an approved database restore; do not switch images blindly."
+  },
+  "limits": [
+    "Provider navigation to chart-ready in deployment smoke was 4.354s and 6.517s; no sub-3s first-screen or new performance A/B acceptance claimed.",
+    "Licensed vendor binaries remain ignored. Runtime credentials and TLS fixtures remain in /tmp/mw-dual-acceptance and must be retained or regenerated after cleanup.",
+    "Other Ubuntu experiments and Unraid production were not upgraded."
+  ]
+}
