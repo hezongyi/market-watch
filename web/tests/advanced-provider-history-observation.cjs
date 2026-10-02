@@ -103,5 +103,27 @@ function page(revision,at,last=990000,close=2){return {cache_revision:revision,a
   assert.equal(superseded.ctx.reloads,1);
   assert.equal(vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5').correction`,superseded.ctx),null);
  } finally {superseded.dispose()}
+ const multiple=setup();
+ try {
+  multiple.begin('windowA',1,400);multiple.begin('windowB',2,990);multiple.begin('latestSeen',3,1000);
+  const [a,b,latest]=multiple.data();
+  await multiple.respond(latest,page(13,13000));await multiple.ctx.latestSeen;
+  await multiple.respond(a,page(11,11000,400000));
+  await multiple.respond(multiple.data().at(-1),null,'first failed');await multiple.ctx.windowA;
+  await multiple.respond(b,page(12,12000,990000));
+  await multiple.respond(multiple.data().at(-1),null,'second failed');await multiple.ctx.windowB;
+  const correction=vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5').correction`,multiple.ctx);
+  assert.equal(correction.originals.length,2,'disjoint unresolved observations must both be kept');
+  const recovery=vm.runInContext('refreshProviderHistoryCorrections()',multiple.ctx);
+  const firstReview=multiple.data().at(-1);
+  assert.equal(firstReview.query.history_observation.last,400000);
+  await multiple.respond(firstReview,{...page(13,13000,400000),history_revalidation:{changed:false}});
+  const secondReview=multiple.data().at(-1);
+  assert.notEqual(firstReview.id,secondReview.id,'checking one window cannot consume the other');
+  assert.equal(secondReview.query.history_observation.last,990000);
+  await multiple.respond(secondReview,{...page(13,13000,990000),history_revalidation:{changed:true}});
+  await recovery;
+  assert.equal(multiple.ctx.reloads,1);
+ } finally {multiple.dispose()}
  console.log('Late native history: backfill, revision, failed/legacy review and inactive correction passed');
 })().catch(error=>{console.error(error);process.exitCode=1});

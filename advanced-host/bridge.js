@@ -555,8 +555,14 @@ function hasHistoryViewer(args) {
 let historyReloading = false;
 function mergeProviderCorrection(work,generation,verified,original) {
   // A failed/older review cannot erase an earlier confirmed real revision.
+  const originals=[...(work.correction?.originals || [])];
+  let overflow=work.correction?.overflow || false;
+  if(original && !originals.some(item=>JSON.stringify(item)===JSON.stringify(original))) {
+    if(originals.length<64) originals.push(original);
+    else overflow=true;
+  }
   work.correction={generation,verified:verified || work.correction?.verified === true,
-    attempts:0,original:original || work.correction?.original};
+    attempts:0,originals,overflow};
 }
 async function refreshProviderHistoryCorrections() {
   // Explicit user recovery uses the existing backend contract. Each click
@@ -567,19 +573,33 @@ async function refreshProviderHistoryCorrections() {
     if(!correction || work.inflight || work.reloading) continue;
     const split=key.lastIndexOf('|'),symbol=key.slice(0,split),res=key.slice(split+1);
     if(!hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) continue;
-    if(!correction.verified && correction.original) {
+    if(!correction.verified && correction.originals.length) {
       work.reloading=true;
       try {
-        const page=await query(symbol,res,{...correction.original.args,
-          history_observation:correction.original.observation},Date.now()+8000);
+        const deadline=Date.now()+8000;
+        const proofs=[];
+        for(const original of [...correction.originals]) {
+          const page=await query(symbol,res,{...original.args,
+            history_observation:original.observation},deadline);
+          if(epoch!==workspaceEpoch || work.correction!==correction) break;
+          if(!page.history_revalidation || historyOlder(page,providerHistoryState.get(key)))
+            throw Error('尚未取得最新历史复核结果');
+          if(page.history_revalidation.changed) {
+            correction.verified=true;
+            break;
+          }
+          proofs.push(page);
+        }
         if(epoch!==workspaceEpoch || work.correction!==correction) continue;
-        if(!page.history_revalidation || historyOlder(page,providerHistoryState.get(key)))
-          throw Error('尚未取得最新历史复核结果');
-        if(!page.history_revalidation.changed) {
+        if(!correction.verified && proofs.length===correction.originals.length) {
+          if(correction.overflow) throw Error('历史检查积压，请重新打开工作区');
+          const seen=providerHistoryState.get(key);
+          if(proofs.some(proof=>historyOlder(proof,seen) || proofs.some(other=>
+            historyOlder(proof,{revision:other.cache_revision||0,observed_at:other.as_of||0}))))
+            throw Error('历史检查期间出现新版本，请再次刷新历史');
           if(!work.inflight) work.correction=null;
           continue;
         }
-        correction.verified=true;
       } catch(error) {send({type:'error',error:'历史检查未完成：'+String(error)});}
       finally {work.reloading=false;}
     }
