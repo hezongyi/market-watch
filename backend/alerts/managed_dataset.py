@@ -150,12 +150,10 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
     existing = {row.start: row for row in db.scalars(select(ChartPublishedBar).where(
         ChartPublishedBar.instrument_id == inst.id,
         ChartPublishedBar.timeframe == frame,
-        ChartPublishedBar.start.in_([row["start"] for row in rows if row["start"] in queued]),
+        ChartPublishedBar.start.in_([row["start"] for row in rows]),
     ))}
     for row in rows:
         job = queued.get(row["start"])
-        if job is None:
-            continue
         if row["start"] < max(left, pub.start) or row["start"] >= min(right, pub.end):
             continue
         if any(j.start < row["end"] and j.end > row["start"] for j in pending):
@@ -177,7 +175,8 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
             old.end, old.complete, old.payload = row["end"], row["complete"], row
             old.revision += 1
             pub.revision += 1
-        db.delete(job)
+        if job is not None:
+            db.delete(job)
     db.flush()
 
 

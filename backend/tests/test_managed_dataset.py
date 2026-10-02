@@ -347,6 +347,51 @@ def test_calendar_derived_internal_correction_is_published(database, monkeypatch
         assert Decimal(row["close"]) == 30
 
 
+def test_legacy_sparse_internal_observation_is_repaired_after_migration(database):
+    import importlib.util
+    from pathlib import Path
+
+    from alembic.migration import MigrationContext
+    from alembic.operations import Operations
+    from alerts.storage import Bar, MarketCoverage
+
+    end = START + 5000 * MINUTE
+    now = end + 5000
+    missing = START + 1000 * MINUTE
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        inst.source = "oanda"
+        plan = join(db, inst, START, now)
+        db.add(MarketCoverage(instrument_id=inst.id, source="oanda", basis="bid",
+                             start=START, end=end, observed=4999, queried_at=now))
+        db.add_all(Bar(instrument_id=inst.id, timeframe="M1", start=START + i * MINUTE,
+                       end=START + (i + 1) * MINUTE, open=10, high=11, low=9, close=10,
+                       complete=True) for i in range(5000) if i != 1000)
+        db.flush()
+        for _ in range(4):
+            publish_frame(db, inst, plan, "M1", now)
+        assert status(db, inst, "M1")["complete_count"] == 4999
+        # Simulate an observation ingested by v1.3.0, which had no dirty queue.
+        db.add(Bar(instrument_id=inst.id, timeframe="M1", start=missing,
+                   end=missing + MINUTE, open=30, high=31, low=29, close=30, complete=True))
+    path = Path(__file__).resolve().parents[2] / "migrations/versions/o16_managed_revisions.py"
+    spec = importlib.util.spec_from_file_location("legacy_reconciliation_migration", path)
+    migration = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(migration)
+    with database.kw["bind"].begin() as conn:
+        migration.op = Operations(MigrationContext.configure(conn))
+        migration.downgrade()
+        migration.upgrade()
+    with database.begin() as db:
+        inst = db.get(Instrument, "EURUSD")
+        plan = db.get(ChartHistoryPlan, inst.id)
+        for _ in range(10):
+            publish_frame(db, inst, plan, "M1", now)
+        assert status(db, inst, "M1")["complete_count"] == 5000
+        corrected = read_rows(db, inst, "M1", missing + MINUTE, 1)
+        assert corrected[0]["start"] == missing and float(corrected[0]["close"]) == 30
+
+
 def test_session_boundary_freezes_historical_expansion_but_latest_advances(database):
     end = START + 20 * MINUTE
     now = end + 5000

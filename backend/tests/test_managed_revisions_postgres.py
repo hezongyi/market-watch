@@ -15,6 +15,9 @@ from test_managed_dataset import (
     test_derived_corrections_wait_for_aggregation_and_survive_rollback as check_derived,
 )
 from test_managed_dataset import (
+    test_legacy_sparse_internal_observation_is_repaired_after_migration as check_legacy,
+)
+from test_managed_dataset import (
     test_published_history_check_tracks_corrections_inside_frozen_session as check_history,
 )
 from test_managed_dataset import (
@@ -47,6 +50,10 @@ def managed_pg(monkeypatch):
 
 def test_pg_internal_correction_is_durable_and_eventually_published(managed_pg):
     check_internal(managed_pg[0])
+
+
+def test_pg_legacy_sparse_observation_is_repaired_after_migration(managed_pg):
+    check_legacy(managed_pg[0])
 
 
 def test_pg_frozen_history_check_excludes_appends_and_detects_corrections(managed_pg):
