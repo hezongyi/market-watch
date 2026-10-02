@@ -425,7 +425,7 @@ export default function AdvancedWorkspace() {
       } else if (m.type === "account-password") {
         const body = m.query;
         if (!body || typeof body.current_password !== "string" || typeof body.new_password !== "string" ||
-            body.current_password.length > 512 || body.new_password.length > 512) {
+            [...body.current_password].length > 512 || [...body.new_password].length > 512) {
           reply({type: "result", id: m.id, error: "无效密码请求"});
           return;
         }

@@ -1,0 +1,13 @@
+{"saved_offset":10,"current_offset":20,"dirty":false,"messages":[{"type":"workspace-dirty"},{"type":"native-saved"}],"bug_reproduced":true}
+AssertionError [ERR_ASSERTION]: viewport edit during capture must remain dirty
+
+false !== true
+
+    at /home/quant/repos/market-watch-chart-ui-integration/web/tests/advanced-native-save-race.cjs:46:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

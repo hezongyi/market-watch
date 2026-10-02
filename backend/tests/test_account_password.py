@@ -40,7 +40,7 @@ def test_password_change_throttles_without_altering_credential(database, monkeyp
         assert client.post("/api/login", json={"password": old}).status_code == 200
 
 
-@pytest.mark.parametrize("password", ["aB! 9x", "密码任意字符", " abcde", "abcde ", "🦉🌙⭐🌍🍃🎈", "x" * 33])
+@pytest.mark.parametrize("password", ["aB! 9x", "密码任意字符", " abcde", "abcde ", "🦉🌙⭐🌍🍃🎈", "x" * 33, "🦉" * 512])
 def test_password_allows_six_characters_unicode_spaces_and_over_32(database, monkeypatch, password):
     old = "old-test-password-123"
     monkeypatch.setattr(api_module.settings, "admin_password_hash", PasswordHasher().hash(old))
@@ -51,3 +51,15 @@ def test_password_allows_six_characters_unicode_spaces_and_over_32(database, mon
         assert client.post("/api/login", json={"password": password}).status_code == 200
         if password != password.strip():
             assert client.post("/api/login", json={"password": password.strip()}).status_code == 401
+
+
+def test_password_rejects_over_512_characters_without_changing_login(database, monkeypatch):
+    old = "old-test-password-123"
+    monkeypatch.setattr(api_module.settings, "admin_password_hash", PasswordHasher().hash(old))
+    with TestClient(api_module.app, base_url="https://testserver") as client:
+        csrf = client.post("/api/login", json={"password": old}).json()["csrf"]
+        result = client.post("/api/account/password", json={
+            "current_password": old, "new_password": "🦉" * 513,
+        }, headers={"X-CSRF-Token": csrf})
+        assert result.status_code == 422
+        assert client.post("/api/login", json={"password": old}).status_code == 200

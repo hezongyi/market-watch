@@ -32,10 +32,9 @@ function chartPasswordDialog(widget, doc, submit, report) {
       label.textContent = title;
       const wrapper = doc.createElement("span");
       wrapper.className = "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh";
-      wrapper.innerHTML = '<span class="inner-slot-W53jtLjw inner-middle-slot-W53jtLjw"><input class="input-RUSovanF size-small-RUSovanF" type="password" required maxlength="512"></span><span class="highlight-WDZ0PRNh size-small-WDZ0PRNh"></span>';
+      wrapper.innerHTML = '<span class="inner-slot-W53jtLjw inner-middle-slot-W53jtLjw"><input class="input-RUSovanF size-small-RUSovanF" type="password" required></span><span class="highlight-WDZ0PRNh size-small-WDZ0PRNh"></span>';
       const input = wrapper.querySelector("input");
       input.autocomplete = autocomplete;
-      if (autocomplete === "new-password") input.minLength = 6;
       input.addEventListener("focus", () => {
         wrapper.classList.remove("intent-default-WDZ0PRNh");
         wrapper.classList.add("intent-primary-WDZ0PRNh", "focused-WDZ0PRNh", "with-highlight-WDZ0PRNh");
@@ -49,7 +48,7 @@ function chartPasswordDialog(widget, doc, submit, report) {
       form.appendChild(label);
     }
     const hint = doc.createElement("small");
-    hint.textContent = "新密码至少 6 位，支持 32 位及以上和任意字符";
+    hint.textContent = "新密码为 6–512 个字符，支持中文、表情、符号和空格";
     const error = doc.createElement("p");
     error.setAttribute("role", "alert");
     error.hidden = true;
@@ -88,7 +87,9 @@ function chartPasswordDialog(widget, doc, submit, report) {
     async function submitPassword() {
       if (busy || !form.reportValidity()) return;
       const [current, password, confirmation] = inputs;
-      if ([...password.value].length < 6) {showError("新密码至少 6 位");center();return;}
+      if ([...current.value].length > 512) {showError("当前密码最多 512 个字符");center();return;}
+      const length = [...password.value].length;
+      if (length < 6 || length > 512) {showError("新密码须为 6–512 个字符");center();return;}
       if (password.value !== confirmation.value) {showError("两次输入的新密码不一致");center();return;}
       busy = true;
       error.hidden = true;

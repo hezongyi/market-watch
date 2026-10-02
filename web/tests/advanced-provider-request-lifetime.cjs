@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const messages=[],handlers=[];
 const ctx=vm.createContext({URL,URLSearchParams,Map,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
- crypto:{randomUUID:()=> 'test'},addEventListener:(name,fn)=>handlers.push(fn),setTimeout,clearTimeout});
+ crypto:{randomUUID:()=> 'test'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout});
 for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
 (async()=>{
  vm.runInContext(`globalThis.delivered=[];globalThis.failures=[];

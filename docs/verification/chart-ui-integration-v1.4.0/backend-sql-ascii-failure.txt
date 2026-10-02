@@ -1,0 +1,2591 @@
+...................s.................................................... [ 17%]
+.......F................................................................ [ 35%]
+.....EEEEE.............................................................. [ 53%]
+............FFFFF....................................................... [ 70%]
+..............................EEEEEEEEEEEEEE............................ [ 88%]
+...........................................EEEE                          [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_pg_internal_correction_is_durable_and_eventually_published _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc644dc64d0>
+
+    @pytest.fixture
+    def managed_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        schema = "managed_revisions_" + uuid.uuid4().hex
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+>       with admin.begin() as conn:
+
+backend/tests/test_managed_revisions_postgres.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_pg_legacy_sparse_observation_is_repaired_after_migration _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc6444c0190>
+
+    @pytest.fixture
+    def managed_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        schema = "managed_revisions_" + uuid.uuid4().hex
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+>       with admin.begin() as conn:
+
+backend/tests/test_managed_revisions_postgres.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_pg_frozen_history_check_excludes_appends_and_detects_corrections _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc64463a610>
+
+    @pytest.fixture
+    def managed_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        schema = "managed_revisions_" + uuid.uuid4().hex
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+>       with admin.begin() as conn:
+
+backend/tests/test_managed_revisions_postgres.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_pg_derived_correction_waits_for_aggregation_and_rolls_back_atomically _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc643ba9850>
+
+    @pytest.fixture
+    def managed_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        schema = "managed_revisions_" + uuid.uuid4().hex
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+>       with admin.begin() as conn:
+
+backend/tests/test_managed_revisions_postgres.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_pg_revision_migration_preserves_snapshots_and_seeds_reconciliation _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc6445d1d10>
+
+    @pytest.fixture
+    def managed_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        schema = "managed_revisions_" + uuid.uuid4().hex
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+>       with admin.begin() as conn:
+
+backend/tests/test_managed_revisions_postgres.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_shared_waiters_have_independent_deadlines_and_only_one_upstream_fetch _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc646b7ffd0>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_claim_fences_competing_owners_and_rollback_is_atomic __
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc62be4c550>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+____ ERROR at setup of test_bulk_4000_commit_range_and_migration_roundtrip _____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc642f81750>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_revision_migration_backfills_existing_observations_and_preserves_bars _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc644bb9350>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_history_response_is_one_statement_snapshot_during_revision _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc644d95b10>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_old_warmer_cannot_overwrite_expanded_or_recreated_task[False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc62bcfeb90>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_old_warmer_cannot_overwrite_expanded_or_recreated_task[True] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc64478db10>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_concurrent_activation_merges_max_and_reopens_completed_goals _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc646b9d610>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_____ ERROR at setup of test_snapshot_housekeeping_skips_a_locked_dataset ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc6451fdc90>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_optional_activation_does_not_block_cached_native_delivery[dataset] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc62b950510>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_optional_activation_does_not_block_cached_native_delivery[interest] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc6466db490>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_ready_history_activation_reuses_snapshot_connection[False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc6407d5410>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_ready_history_activation_reuses_snapshot_connection[True] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc644dd39d0>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+__ ERROR at setup of test_expired_pool_waiter_executes_no_provider_statement ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc64474aa90>
+
+    @pytest.fixture
+    def provider_pg(monkeypatch):
+        url = os.environ["TEST_POSTGRES_URL"]
+        admin = create_engine(url, pool_size=1, max_overflow=0)
+        schema = "provider_" + uuid.uuid4().hex
+>       with admin.begin() as conn:
+
+backend/tests/test_provider_postgres.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_____ ERROR at setup of test_pg_quantity_exact_null_safe_and_legacy_replay _____
+
+fixturedef = <FixtureDef argname='managed_pg' scope='function' baseid='backend/tests/test_volume_postgres.py'>
+request = <SubRequest 'managed_pg' for <Function test_pg_quantity_exact_null_safe_and_legacy_replay>>
+
+>   ???
+
+/home/quant/repos/trading-alerts/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/tests/test_managed_revisions_postgres.py:35: in managed_pg
+    with admin.begin() as conn:
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+____________ ERROR at setup of test_pg_volume_only_price_isolation _____________
+
+fixturedef = <FixtureDef argname='managed_pg' scope='function' baseid='backend/tests/test_volume_postgres.py'>
+request = <SubRequest 'managed_pg' for <Function test_pg_volume_only_price_isolation>>
+
+>   ???
+
+/home/quant/repos/trading-alerts/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/tests/test_managed_revisions_postgres.py:35: in managed_pg
+    with admin.begin() as conn:
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+_ ERROR at setup of test_pg_old_published_volume_revision_outside_live_coverage _
+
+fixturedef = <FixtureDef argname='managed_pg' scope='function' baseid='backend/tests/test_volume_postgres.py'>
+request = <SubRequest 'managed_pg' for <Function test_pg_old_published_volume_revision_outside_live_coverage>>
+
+>   ???
+
+/home/quant/repos/trading-alerts/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/tests/test_managed_revisions_postgres.py:35: in managed_pg
+    with admin.begin() as conn:
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+___ ERROR at setup of test_pg_volume_migration_roundtrip_keeps_legacy_prices ___
+
+fixturedef = <FixtureDef argname='managed_pg' scope='function' baseid='backend/tests/test_volume_postgres.py'>
+request = <SubRequest 'managed_pg' for <Function test_pg_volume_migration_roundtrip_keeps_legacy_prices>>
+
+>   ???
+
+/home/quant/repos/trading-alerts/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/tests/test_managed_revisions_postgres.py:35: in managed_pg
+    with admin.begin() as conn:
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+=================================== FAILURES ===================================
+______________ test_transfer_rolls_back_when_fingerprint_differs _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-quant/pytest-813/test_transfer_rolls_back_when_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc6457aded0>
+
+    def test_transfer_rolls_back_when_fingerprint_differs(tmp_path, monkeypatch):
+        url = os.getenv("TEST_POSTGRES_URL")
+        if not url:
+            pytest.skip("Requires isolated TEST_POSTGRES_URL")
+        backup = tmp_path / "source.db"
+        source = create_engine(f"sqlite:///{backup}")
+        Base.metadata.create_all(source)
+        with source.begin() as c:
+            c.execute(text("CREATE TABLE alembic_version (version_num VARCHAR(32))"))
+            c.execute(text("INSERT INTO alembic_version VALUES ('test')"))
+            c.execute(
+                Base.metadata.tables["preferences"].insert(),
+                {"key": "rollback-probe", "value": {"nested": [1, True, None]}},
+            )
+            c.execute(
+                Base.metadata.tables["audit_events"].insert(),
+                {"id": 9001, "kind": "transfer_fixture", "at": 1, "details": {}},
+            )
+        source.dispose()
+        # Manifest verification is independently tested in test_backup; use a tiny fixture here.
+        monkeypatch.setattr(transfer_module, "restore_check", lambda path: None)
+        schema = "transfer_test_" + uuid.uuid4().hex
+        admin = create_engine(url)
+>       with admin.begin() as c:
+
+backend/tests/test_database_transfer.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+______________ test_postgres_concurrent_trigger_and_outbox_lease _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc64511a210>
+
+    def test_postgres_concurrent_trigger_and_outbox_lease(monkeypatch):
+        engine = create_engine(URL)
+        # A dedicated schema ensures this test cannot remove unrelated application tables.
+        import uuid
+    
+        schema = "acceptance_" + uuid.uuid4().hex
+>       with engine.begin() as c:
+
+backend/tests/test_postgres.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+__________ test_postgres_oanda_coverage_query_and_sparse_aggregation ___________
+
+    def test_postgres_oanda_coverage_query_and_sparse_aggregation():
+        import uuid
+    
+        from alerts.market import ingest
+        from alerts.storage import Audit, Instrument
+    
+        engine = create_engine(URL)
+        schema = "coverage_" + uuid.uuid4().hex
+>       with engine.begin() as c:
+
+backend/tests/test_postgres.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+__________________ test_coverage_millisecond_json_uses_bigint __________________
+
+    def test_coverage_millisecond_json_uses_bigint():
+        from alerts.market import stored_coverage
+        from alerts.storage import Audit, Instrument
+    
+        engine = create_engine(URL)
+        import uuid
+    
+        schema = "coverage_" + uuid.uuid4().hex
+>       with engine.begin() as c:
+
+backend/tests/test_postgres.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+____________ test_postgres_weekly_demand_dedup_and_concurrent_claim ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc64275ca90>
+
+    def test_postgres_weekly_demand_dedup_and_concurrent_claim(monkeypatch):
+        import uuid
+        from threading import Event
+    
+        from alerts import market_data
+        from alerts.storage import WeeklyHistoryRequest
+    
+        engine = create_engine(URL, pool_size=2, max_overflow=0)
+        schema = "acceptance_" + uuid.uuid4().hex
+>       with engine.begin() as c:
+
+backend/tests/test_postgres.py:206: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+___________________ test_postgres_weekly_migration_roundtrip ___________________
+
+    def test_postgres_weekly_migration_roundtrip():
+        """Exercise actual Alembic scripts, without bootstrap creating the new table."""
+        import subprocess
+        import uuid
+        from pathlib import Path
+    
+        from sqlalchemy import inspect
+        from sqlalchemy.engine import make_url
+    
+        engine = create_engine(URL, pool_size=1, max_overflow=0)
+        schema = "acceptance_" + uuid.uuid4().hex
+        root = Path(__file__).resolve().parents[2]
+>       with engine.begin() as connection:
+
+backend/tests/test_postgres.py:265: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniforge3/envs/planck/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3224: in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3260: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3284: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1287: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:918: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:910: in __connect
+    )._exec_w_sync_on_first_run(self.dbapi_connection, self)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:500: in _exec_w_sync_on_first_run
+    self(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/event/attr.py:514: in __call__
+    fn(*args, **kw)
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:2119: in go
+    return once_fn(*arg, **kw)
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:751: in first_connect
+    dialect.initialize(c)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:470: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:3775: in initialize
+    super().initialize(connection)
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:759: in initialize
+    self.server_version_info = self._get_server_version_info(
+.venv/lib/python3.11/site-packages/sqlalchemy/dialects/postgresql/base.py:4073: in _get_server_version_info
+    m = re.match(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pattern = '.*(?:PostgreSQL|EnterpriseDB) (\\d+)\\.?(\\d+)?(?:\\.(\\d+))?(?:\\.\\d+)?(?:devel|beta)?'
+string = b'PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+flags = 0
+
+    def match(pattern, string, flags=0):
+        """Try to apply the pattern at the start of the string, returning
+        a Match object, or None if no match was found."""
+>       return _compile(pattern, flags).match(string)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use a string pattern on a bytes-like object
+
+../../miniforge3/envs/planck/lib/python3.11/re/__init__.py:166: TypeError
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/fastapi/testclient.py:1
+  /home/quant/repos/market-watch-chart-ui-integration/.venv/lib/python3.11/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_database_transfer.py::test_transfer_rolls_back_when_fingerprint_differs
+FAILED backend/tests/test_postgres.py::test_postgres_concurrent_trigger_and_outbox_lease
+FAILED backend/tests/test_postgres.py::test_postgres_oanda_coverage_query_and_sparse_aggregation
+FAILED backend/tests/test_postgres.py::test_coverage_millisecond_json_uses_bigint
+FAILED backend/tests/test_postgres.py::test_postgres_weekly_demand_dedup_and_concurrent_claim
+FAILED backend/tests/test_postgres.py::test_postgres_weekly_migration_roundtrip
+ERROR backend/tests/test_managed_revisions_postgres.py::test_pg_internal_correction_is_durable_and_eventually_published
+ERROR backend/tests/test_managed_revisions_postgres.py::test_pg_legacy_sparse_observation_is_repaired_after_migration
+ERROR backend/tests/test_managed_revisions_postgres.py::test_pg_frozen_history_check_excludes_appends_and_detects_corrections
+ERROR backend/tests/test_managed_revisions_postgres.py::test_pg_derived_correction_waits_for_aggregation_and_rolls_back_atomically
+ERROR backend/tests/test_managed_revisions_postgres.py::test_pg_revision_migration_preserves_snapshots_and_seeds_reconciliation
+ERROR backend/tests/test_provider_postgres.py::test_shared_waiters_have_independent_deadlines_and_only_one_upstream_fetch
+ERROR backend/tests/test_provider_postgres.py::test_claim_fences_competing_owners_and_rollback_is_atomic
+ERROR backend/tests/test_provider_postgres.py::test_bulk_4000_commit_range_and_migration_roundtrip
+ERROR backend/tests/test_provider_postgres.py::test_revision_migration_backfills_existing_observations_and_preserves_bars
+ERROR backend/tests/test_provider_postgres.py::test_history_response_is_one_statement_snapshot_during_revision
+ERROR backend/tests/test_provider_postgres.py::test_old_warmer_cannot_overwrite_expanded_or_recreated_task[False]
+ERROR backend/tests/test_provider_postgres.py::test_old_warmer_cannot_overwrite_expanded_or_recreated_task[True]
+ERROR backend/tests/test_provider_postgres.py::test_concurrent_activation_merges_max_and_reopens_completed_goals
+ERROR backend/tests/test_provider_postgres.py::test_snapshot_housekeeping_skips_a_locked_dataset
+ERROR backend/tests/test_provider_postgres.py::test_optional_activation_does_not_block_cached_native_delivery[dataset]
+ERROR backend/tests/test_provider_postgres.py::test_optional_activation_does_not_block_cached_native_delivery[interest]
+ERROR backend/tests/test_provider_postgres.py::test_ready_history_activation_reuses_snapshot_connection[False]
+ERROR backend/tests/test_provider_postgres.py::test_ready_history_activation_reuses_snapshot_connection[True]
+ERROR backend/tests/test_provider_postgres.py::test_expired_pool_waiter_executes_no_provider_statement
+ERROR backend/tests/test_volume_postgres.py::test_pg_quantity_exact_null_safe_and_legacy_replay
+ERROR backend/tests/test_volume_postgres.py::test_pg_volume_only_price_isolation
+ERROR backend/tests/test_volume_postgres.py::test_pg_old_published_volume_revision_outside_live_coverage
+ERROR backend/tests/test_volume_postgres.py::test_pg_volume_migration_roundtrip_keeps_legacy_prices
+6 failed, 377 passed, 1 skipped, 1 warning, 23 errors in 102.61s (0:01:42)

@@ -1033,9 +1033,9 @@ function boot(
     // reloading the chart. Only this boot call may target the existing empty
     // workspace when the native library has no ID; later Save As stays a copy.
     if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
+    const revision = editRevision, epoch = workspaceEpoch;
     const state = await captureChartLayout(widget);
     state._mwGridStyle = grid.value;
-    const revision = editRevision, epoch = workspaceEpoch;
     const result = await saveLayout({ ...data, content: JSON.stringify(state) });
     if (epoch === workspaceEpoch && editRevision === revision) {
       dirty = false;

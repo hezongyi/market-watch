@@ -1,0 +1,64 @@
+{
+  "base_main": "9fbf0a59cd735ff44e9d4f9f73fe2556716222c2",
+  "original_ui_head": "b3a3363e919bd9af3f7a79e88a86fbc994d64a6b",
+  "first_integrated_source": "09b6281666329a430f3d2749dafbf42b58e40d05",
+  "integration_branch": "review/chart-ui-v140-integration",
+  "original_ui_commits": 22,
+  "conflicts": [
+    "advanced-host/bridge.js",
+    "backend/tests/test_provider_chart.py"
+  ],
+  "semantic_resolution": [
+    "Compact display code plus Volume quantity description.",
+    "Menu history refresh calls provider correction recovery and managed history refresh.",
+    "Both prior-session quote and native-history test groups retained."
+  ],
+  "review_fixes": [
+    "Unicode code-point512boundary in native password dialog and parent RPC; no UTF16maxlength truncation.",
+    "Capture editRevision/workspaceEpoch before async native snapshot; intervening edits remain dirty."
+  ],
+  "test_compatibility_fixes": [
+    "Count initial_history preference markers instead of all Preference rows, because account bootstrap adds auth.admin.",
+    "Register only message handlers in three VM message-response harnesses.",
+    "Existing deployed account browser script now asserts explicit length error/no API call."
+  ],
+  "backend_final": {
+    "passed": 406,
+    "skipped": 1,
+    "failed": 0,
+    "postgresql": "17.11 UTF8 disposable fixture stopped after run"
+  },
+  "frontend_final": {
+    "passed": 42,
+    "failed": 0,
+    "scope": "Non-browser Node scripts"
+  },
+  "controlled_browser": {
+    "passed": 8,
+    "scope": "Real Chromium with controlled notice DOM and actual parent RPC branch; not deployed native-library/combined-image acceptance.",
+    "actual_password_changed": false
+  },
+  "web_build": "TypeScript/Vite passed; existing bundle-size warning.",
+  "ruff": "Changed Python scope passed.",
+  "tested_source_hashes": {
+    "files": 329,
+    "manifest": "tested-source-hashes.json"
+  },
+  "original_deployment_evidence": {
+    "files_compared": 77,
+    "mismatches": 0
+  },
+  "setup_failures_retained": [
+    "Initial disposable PG stopped with originating command, causing connection refusals.",
+    "Second fixture initialized SQL_ASCII, causing psycopg byte/SQLAlchemy version parsing errors; rebuilt UTF8."
+  ],
+  "review": {
+    "standards_hard_violations": 0,
+    "standards_minor_heuristics": 2,
+    "spec_initial_p2": 2,
+    "spec_residual_product_blockers": 0
+  },
+  "schema": "p17_volume inherited from main; no new migration.",
+  "runtime_scope": "Original v1.3.2 dedicated deployment, other services and worktrees unchanged; no combined-image browser acceptance.",
+  "remote_actions": "No push, PR creation, merge, tag or deployment in analysis phase."
+}
