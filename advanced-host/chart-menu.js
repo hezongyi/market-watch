@@ -1,7 +1,13 @@
-/* Host-owned controls in the public header slot; vendor DOM stays untouched. */
+/* Host-owned controls using the public header/custom-CSS integration. */
 function chartThemeMenu(chartWidget, report) {
-  const button = chartWidget.createButton({align: "left", useTradingViewStyle: false});
-  const doc = button.ownerDocument;
+  // Obtain the chart document through the public HTML-button API, then release
+  // that slot: the native header clones its contents for measuring overflow.
+  // An independent button keeps the corner control out of those sizing clones.
+  const slot = chartWidget.createButton({align: "left", useTradingViewStyle: false});
+  const doc = slot.ownerDocument;
+  chartWidget.removeButton(slot);
+  const button = doc.createElement("button");
+  button.type = "button";
   button.classList.add("mw-chart-menu-button");
   button.setAttribute("role", "button");
   button.setAttribute("tabindex", "0");
@@ -10,6 +16,7 @@ function chartThemeMenu(chartWidget, report) {
   button.setAttribute("aria-controls", "mw-chart-menu");
   button.setAttribute("title", "图表菜单");
   button.innerHTML = '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h16M2 10h16M2 16h16"/></svg>';
+  doc.body.appendChild(button);
 
   const panel = doc.createElement("section");
   panel.id = "mw-chart-menu";
@@ -40,12 +47,6 @@ function chartThemeMenu(chartWidget, report) {
     toggle.focus();
   };
   button.addEventListener("click", () => panel.hidden ? open() : close());
-  button.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      panel.hidden ? open() : close();
-    }
-  });
   toggle.addEventListener("click", async () => {
     if (changing) return;
     changing = true;
