@@ -125,6 +125,16 @@ export default function AdvancedWorkspace() {
     return () => removeEventListener("beforeunload", protect);
   }, [mobile]);
   useEffect(() => {
+    const save = (event: KeyboardEvent) => {
+      if (mobile || !(event.ctrlKey || event.metaKey) || event.altKey ||
+          event.key.toLowerCase() !== "s") return;
+      event.preventDefault();
+      post({type: "save"});
+    };
+    addEventListener("keydown", save);
+    return () => removeEventListener("keydown", save);
+  }, [mobile]);
+  useEffect(() => {
     let cancelled = false;
     refresh(1)
       .then((list) => {
@@ -230,6 +240,13 @@ export default function AdvancedWorkspace() {
           setExportSelection(value);
       } else if (m.type === "workspace-action") {
         if (m.action === "home") location.assign("/");
+        else if (m.action === "logout") {
+          try {
+            if (!mobile && unsaved.current) await flush();
+            await api("/logout", {});
+            location.assign("/");
+          } catch (e) {setError(String(e));}
+        }
         else if (!mobile && m.action === "create") await create();
         else if (!mobile && m.action === "recover") await copy();
       } else if (m.type === "theme-changed") {
@@ -405,6 +422,16 @@ export default function AdvancedWorkspace() {
           setError(String(e));
           reply({ type: "result", id: m.id, error: String(e) });
         }
+      } else if (m.type === "account-password") {
+        const body = m.query;
+        if (!body || typeof body.current_password !== "string" || typeof body.new_password !== "string" ||
+            body.current_password.length > 512 || body.new_password.length > 512) {
+          reply({type: "result", id: m.id, error: "无效密码请求"});
+          return;
+        }
+        try {
+          reply({type: "result", id: m.id, result: await api("/account/password", body)});
+        } catch (error) {reply({type: "result", id: m.id, error: String(error)});}
       } else if (m.type === "style-template-name") {
         const name = mobile
           ? null

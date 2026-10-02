@@ -350,9 +350,9 @@ const feed = {
         "market",
       );
       cb({
-        name: ticker,
+        name: MWSeries.display(symbol),
         ticker,
-        description: meta.name + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + meta.basis,
+        description: MWSeries.display(symbol) + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + meta.basis,
         exchange: meta.source.toUpperCase(),
         listed_exchange: meta.source.toUpperCase(),
         type: meta.calendar === "utc0" ? "crypto" : "forex",
@@ -786,6 +786,8 @@ function boot(
       return;
     }
   }
+  let grid;
+  const pendingGridStyle = chartState?._mwGridStyle;
   let pendingViewports = storedViewports || chartState?._mwViewports;
   let pendingSync = doc.state?._mwSync || chartState?._mwSync;
   const prepareLegacyViewports = (state) => {
@@ -799,6 +801,7 @@ function boot(
     chartState = { ...chartState };
     delete chartState._mwViewports;
     delete chartState._mwSync;
+    delete chartState._mwGridStyle;
   }
   let viewportRestoring = false;
   const restoreViewports = async () => {
@@ -887,6 +890,7 @@ function boot(
     // workspace when the native library has no ID; later Save As stays a copy.
     if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
     const state = await captureChartLayout(widget);
+    state._mwGridStyle = grid.value;
     const revision = editRevision, epoch = workspaceEpoch;
     const result = await saveLayout({ ...data, content: JSON.stringify(state) });
     if (epoch === workspaceEpoch && editRevision === revision) {
@@ -919,6 +923,8 @@ function boot(
         throw Error("当前布局有未保存更改，请先保存布局再打开其他布局");
       }
       const state = JSON.parse(await loadContent(id));
+      grid.restore(state._mwGridStyle);
+      delete state._mwGridStyle;
       pendingViewports = state._mwViewports;
       pendingSync = state._mwSync;
       prepareLegacyViewports(state);
@@ -981,7 +987,8 @@ function boot(
       ? { timeframe: "3M" }
       : {}),
     locale: "zh",
-    custom_translate_function: original => {
+    custom_translate_function: (original, singular, translated) => {
+      if ([original, singular, translated].some(text => /^object tree$/i.test(String(text)))) return "对象树";
       if (['No data here', 'No data', 'Loading', 'Loading...'].includes(original)) return '';
       return null;
     },
@@ -1024,8 +1031,11 @@ function boot(
     ],
   });
   widget.onChartReady(async () => {
-    const grid = chartGridPresentation(widget, preferences,
-      value => prefs.savePreference("setting", "mw.gridStyle", value), readonly);
+    grid = chartGridPresentation(widget, preferences,
+      async value => {
+        await prefs.savePreference("setting", "mw.gridStyle", value);
+        markWorkspaceDirty();
+      }, readonly, pendingGridStyle);
     if (!doc.state) {
       widget.crosshairSync().setValue(true);
       widget.timeSync().setValue(true);
@@ -1064,7 +1074,7 @@ function boot(
                 const state = await new Promise((resolve) =>
                   widget.save(resolve),
                 );
-                const content = chartStyleTemplate(state, index);
+                const content = chartStyleTemplate(state, index, grid.value);
                 const name = await request({}, "style-template-name");
                 if (!name) return;
                 if (epoch !== workspaceEpoch)
@@ -1086,9 +1096,11 @@ function boot(
             }}] : []),
             {label: "刷新历史", title: "载入新发布历史，保留柱宽与查看位置", run: () => refreshManagedHistory()},
             {label: "历史任务", run: () => send({type: "history-plans-open"})},
+            {label: "修改密码", run: () => chartMenu.changePassword()},
+            {label: "登出", run: () => send({type: "workspace-action", action: "logout"})},
             ...(!readonly ? [{label: "复制恢复草稿", recovery: true,
               run: () => send({type: "workspace-action", action: "recover"})}] : []),
-          ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave,
+          ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave, () => snapshot(), body => request(body, "account-password"),
         );
 
       })
@@ -1104,6 +1116,14 @@ function boot(
     send({ type: "theme-changed", theme: widget.getTheme() });
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
       send({ type: "theme-changed", theme: widget.getTheme() });
+      if (!standard && !readonly) {
+        prefs.templates.getChartTemplateContent(name)
+          .then(({content}) => {
+            if (["solid", "dotted"].includes(content._mwGridStyle))
+              return grid.applyTemplate(content._mwGridStyle);
+          })
+          .catch(e => send({type: "error", error: "网格线样式恢复失败：" + String(e)}));
+      }
       if (readonly || !standard || onlyActive) return;
       const theme = String(name).toLowerCase() === "light" ? "Light" : "Dark";
       prefs
@@ -1218,6 +1238,13 @@ function boot(
     }, 15000);
   });
 }
+// Events do not cross iframe boundaries; cover the host document as well.
+addEventListener("keydown", event => {
+  if (!(event.ctrlKey || event.metaKey) || event.altKey ||
+      event.key.toLowerCase() !== "s" || nativeReadonly) return;
+  event.preventDefault();
+  snapshot();
+});
 addEventListener("message", async (e) => {
   if (
     e.source !== parent ||

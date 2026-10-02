@@ -283,6 +283,8 @@ def bootstrap(db_engine=engine):
             connection.execute(text("SELECT pg_advisory_xact_lock(8675309)"))
         Base.metadata.create_all(connection)
         with sessionmaker(bind=connection).begin() as db:
+            if not db.get(Preference, "auth.admin"):
+                db.add(Preference(key="auth.admin", value={}))
             for name, label, calendar, precision in [
                 ("EURUSD", "欧元 / 美元", "ny17", 5),
                 ("XAUUSD", "黄金 / 美元", "ny17", 2),

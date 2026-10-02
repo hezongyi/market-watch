@@ -21,3 +21,8 @@ def encode(symbol: str, kind: SeriesKind = "managed") -> str:
     if kind not in ("provider", "managed") or decode(symbol)[1] != "managed":
         raise ValueError("无效行情系列或基础品种")
     return PROVIDER_PREFIX + symbol if kind == "provider" else symbol
+
+
+def display_symbol(symbol: str) -> str:
+    """A compact UI code; provider routing always retains the original ticker."""
+    return symbol.rsplit(":", 1)[-1].replace("_", "").replace("/", "").upper()

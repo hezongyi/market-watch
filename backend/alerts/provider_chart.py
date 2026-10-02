@@ -16,7 +16,7 @@ from fastapi import HTTPException
 
 from .chart_data import FRAMES, bounds
 from .config import settings
-from .domain import Calendar
+from .domain import Calendar, session_bounds
 from .provider_transport import activity, discard_client, pooled_client, warm_connections
 from .provider_transport import close_clients as close_clients
 from .storage import Instrument, MarketCatalog, instant, ms, now_ms, transaction
@@ -288,7 +288,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
     }
 
 
-def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadline=None):
+def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadline=None, cache_seconds=None):
     deadline = deadline or time.monotonic() + 23
     namespace = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
@@ -331,7 +331,8 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
         with lane("history" if quote else "chart"):
             page = native_page(meta, frame, before, count, deadline=deadline)
         with _LOCK:
-            _CACHE[key] = (time.monotonic() + (15 if quote else 1 if latest else 300), page)
+            ttl = cache_seconds if cache_seconds is not None else (15 if quote else 1 if latest else 300)
+            _CACHE[key] = (time.monotonic() + ttl, page)
             while len(_CACHE) > 128 or sum(len(v[1]["bars"]) for v in _CACHE.values()) > 100000:
                 _CACHE.popitem(last=False)
         future.set_result(page)
@@ -351,6 +352,15 @@ def quote_page(meta):
     # One polling window shares a current M1 acquisition, not a managed candle.
     before = (now_ms() // 15000) * 15000 + 1
     return cached_page(meta, "M1", before, 1, latest=True, quote=True)
+
+
+def quote_previous_close(meta, latest):
+    """Previous completed native session close, with the same price basis."""
+    current_label = label(latest["start"], "D1", meta["calendar"])
+    session_start = ms(session_bounds(instant(latest["start"]), Calendar(meta["calendar"]))[0])
+    page = cached_page(meta, "D1", current_label, 2, quote=True, cache_seconds=300)
+    complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= session_start]
+    return Decimal(complete[-1]["close"]) if complete else None
 
 
 def data(body):

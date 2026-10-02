@@ -25,5 +25,6 @@ const MWSeries = (() => {
     const a = decode(left), b = decode(right);
     return a.symbol === b.symbol && a.series_kind === b.series_kind;
   }
-  return { decode, encode, same };
+  const display = symbol => symbol.split(":").at(-1).replace(/[_/]/g, "").toUpperCase();
+  return { decode, encode, same, display };
 })();

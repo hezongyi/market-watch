@@ -81,22 +81,32 @@ const output = process.env.THEME_MENU_OUTPUT || '/tmp/mw-theme-menu.json';
     await ui.getByRole('button',{name:'图表菜单',exact:true}).click();
     for (const name of ['守望主页','保存样式','维护历史','刷新历史','历史任务'])
       await ui.getByRole('button',{name,exact:true}).waitFor({state:'visible'});
-    let grid=ui.getByLabel('网格线样式');
-    report.grid_initial=await grid.inputValue();
+    await page.keyboard.press('Escape');
+    const gridValue = grid => grid.getAttribute('data-value');
+    const chooseGrid = async (grid, value) => {
+      await grid.click();
+      await ui.getByRole('option', {name:value==='solid'?'实线':'点线',exact:true}).click();
+    };
+    const openGrid = async () => {
+      await frame.evaluate(()=>widget.activeChart().executeActionById('chartProperties'));
+      await ui.getByText('版面',{exact:true}).click();
+      return ui.getByRole('combobox',{name:'网格线样式',exact:true});
+    };
+    let grid=await openGrid();
+    report.grid_initial=await gridValue(grid);
     for(const value of ['solid','dotted']) {
       const saved=page.waitForResponse(r=>r.url().endsWith('/advanced-charts/preferences/save')&&r.request().postDataJSON()?.name==='mw.gridStyle');
-      await grid.selectOption(value);assert.equal((await saved).status(),200);
-      await grid.waitFor({state:'visible'});
-      await page.waitForTimeout(500);
+      await chooseGrid(grid, value);
+      await ui.locator('[data-name="submit-button"]').click();
+      assert.equal((await saved).status(),200);
+      await frame.evaluate(()=>new Promise((resolve,reject)=>widget.saveChartToServer(resolve,reject)));
       if(value==='solid'){
         await page.reload();({frame,ui}=await chart());
-        await ui.getByRole('button',{name:'图表菜单',exact:true}).click();
-        grid=ui.getByLabel('网格线样式');
-        assert.equal(await grid.inputValue(),'solid','solid style survives reload');
+        grid=await openGrid();
+        assert.equal(await gridValue(grid),'solid','saved layout restores grid style');
         report.grid_solid_reload=true;
       }
     }
-    await page.keyboard.press('Escape');
     report.grid_persistence=true;
     await page.screenshot({path:output.replace(/\.json$/,'-chart.png')});
     await ui.getByRole('button',{name:'图表菜单',exact:true}).click();

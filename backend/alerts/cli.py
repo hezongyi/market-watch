@@ -18,9 +18,9 @@ def main():
             parser.error(
                 "Environment file already exists; refusing to overwrite existing credentials"
             )
-        password = getpass.getpass("管理员密码（至少 12 位）: ")
-        if len(password) < 12:
-            parser.error("Password must contain at least 12 characters")
+        password = getpass.getpass("管理员密码（至少 6 位）: ")
+        if len(password) < 6:
+            parser.error("Password must contain at least 6 characters")
         if getpass.getpass("再次输入: ") != password:
             parser.error("Passwords do not match")
         data = (
