@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "errors": [],
+  "watchlist_header": true,
+  "ctrl_s_native": true,
+  "ctrl_s_host": true,
+  "ctrl_s_parent": true,
+  "quotes": [
+    {
+      "s": "ok",
+      "n": "MWP:EURUSD",
+      "v": {
+        "short_name": "EURUSD",
+        "description": "EURUSD · 平台行情",
+        "exchange": "OANDA",
+        "lp": 1.12575,
+        "bid": 1.12575,
+        "ch": 0.00159,
+        "chp": 0.1414389410760034,
+        "prev_close_price": 1.12416
+      }
+    },
+    {
+      "s": "ok",
+      "n": "MWP:XAUUSD",
+      "v": {
+        "short_name": "XAUUSD",
+        "description": "XAUUSD · 平台行情",
+        "exchange": "OANDA",
+        "lp": 4213.93,
+        "bid": 4213.93,
+        "ch": 36.88,
+        "chp": 0.882919763948241,
+        "prev_close_price": 4177.05
+      }
+    },
+    {
+      "s": "ok",
+      "n": "MWP:BTCUSDT",
+      "v": {
+        "short_name": "BTCUSDT",
+        "description": "BTCUSDT · 平台行情",
+        "exchange": "BINANCE",
+        "lp": 86842,
+        "ch": 1961.95,
+        "chp": 2.3114383179557505,
+        "prev_close_price": 84880.05
+      }
+    }
+  ],
+  "quote_change_fields": true,
+  "periodic_quote_updates": 1,
+  "native_watchlist": [
+    {
+      "symbol": "MWP:EURUSD",
+      "text": "EURUSD\n1.12567\n0.00151\n0.13%"
+    },
+    {
+      "symbol": "MWP:XAUUSD",
+      "text": "XAUUSD\n4,212.410\n35.360\n0.85%"
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "text": "BTCUSDT\n86,834.00\n1,953.95\n2.30%"
+    }
+  ],
+  "password_confirmation_validation": true,
+  "password_wrong_current_rejected": true,
+  "logout_revokes_session": true,
+  "original_password_unchanged": true
+}

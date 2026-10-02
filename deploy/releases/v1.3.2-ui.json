@@ -1,12 +1,12 @@
 {
   "deployed": true,
-  "verified_at": "2026-10-02T11:02:27.798660+00:00",
+  "verified_at": "2026-10-02T13:22:36.238490+00:00",
   "project": "market-watch-v132-ui",
   "app_origin": "https://192.168.7.232:15653",
   "local_origin": "https://v132.localhost:15653",
   "chart_origin": "https://192.168.7.232:15654",
   "baseline": "v1.3.2 / 9596b25",
-  "chart_menu_source": "c6036df",
+  "chart_menu_source": "d97d7ec",
   "schema": "o16_managed_revisions",
   "source_database_schema_still": "p17_volume",
   "existing_container_comparison": [
@@ -149,6 +149,48 @@
   ],
   "services": [
     {
+      "service": "api",
+      "name": "market-watch-v132-ui-api-1",
+      "container_id": "23d51b12a3df664cfa32ae93d94063db9e874ab8cee427b06c787d664e5aae3b",
+      "image_id": "sha256:e5b779ec08f9e9c179530a8e4e42355c8bcdc75a1014298d5066beac0048e0c3",
+      "state": "running",
+      "health": "healthy",
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "service": "chart-origin",
+      "name": "market-watch-v132-ui-chart-origin-1",
+      "container_id": "3f6465dd457fc06595d8107ee72450bdff2c7294b9be953de1413cfc1e679343",
+      "image_id": "sha256:9d9b3f614b2814d0b66d940460ce37ceb92fe083fce3d8bc805294269bd64ba9",
+      "state": "running",
+      "health": null,
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "80/tcp": null
+      }
+    },
+    {
+      "service": "web",
+      "name": "market-watch-v132-ui-web-1",
+      "container_id": "50906c6ff06891fa219aa4085e3f52e4bc610bdf8b48455b478bd61e12cd8db4",
+      "image_id": "sha256:ea13353272f58d5f2075f1039b69995e72ee7c35e95051cd2155a217826453da",
+      "state": "running",
+      "health": null,
+      "networks": [
+        "market-watch-v132-ui_default"
+      ],
+      "ports": {
+        "80/tcp": null
+      }
+    },
+    {
       "service": "tls",
       "name": "market-watch-v132-ui-tls-1",
       "container_id": "9e838c699fc57a51b6d547e58021bf4cd48b55cabab25a4203c7cfe13d97bc9b",
@@ -178,7 +220,8 @@
             "HostIp": "192.168.7.232",
             "HostPort": "15654"
           }
-        ]
+        ],
+        "80/tcp": null
       }
     },
     {
@@ -190,7 +233,10 @@
       "health": null,
       "networks": [
         "market-watch-v132-ui_default"
-      ]
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
     },
     {
       "service": "chart-aggregation-worker",
@@ -201,7 +247,10 @@
       "health": null,
       "networks": [
         "market-watch-v132-ui_default"
-      ]
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
     },
     {
       "service": "realtime-worker",
@@ -212,40 +261,10 @@
       "health": null,
       "networks": [
         "market-watch-v132-ui_default"
-      ]
-    },
-    {
-      "service": "web",
-      "name": "market-watch-v132-ui-web-1",
-      "container_id": "5667968d15629736beb39d7f1e25f178fa32ca20e77d62726e0d92a88b3744ee",
-      "image_id": "sha256:2c8363f65987cc3ba37928351a459053d5a7ff80cfd7427fbbfe4238c86c9440",
-      "state": "running",
-      "health": null,
-      "networks": [
-        "market-watch-v132-ui_default"
-      ]
-    },
-    {
-      "service": "api",
-      "name": "market-watch-v132-ui-api-1",
-      "container_id": "6f6c4848d9ecad3a5ad76b46c2ef223617a0809a83861424ad73c5cf080583dd",
-      "image_id": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
-      "state": "running",
-      "health": "healthy",
-      "networks": [
-        "market-watch-v132-ui_default"
-      ]
-    },
-    {
-      "service": "chart-origin",
-      "name": "market-watch-v132-ui-chart-origin-1",
-      "container_id": "6c926e308919176843172baafc3d166279719d79ab524641169521db3e138df2",
-      "image_id": "sha256:a673d27b0aff890f7071493d35177921fa43c858194d09f63a40f2959f9e2dfd",
-      "state": "running",
-      "health": null,
-      "networks": [
-        "market-watch-v132-ui_default"
-      ]
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
     },
     {
       "service": "postgres",
@@ -257,9 +276,9 @@
       "networks": [
         "market-watch-v132-ui_default"
       ],
-      "database_volume": [
-        "market-watch-v132-ui_pgdata"
-      ]
+      "ports": {
+        "5432/tcp": null
+      }
     }
   ],
   "notification_delivery": false,
@@ -289,12 +308,12 @@
     "evidence": "docs/verification/v1.3.2-isolated/chart-ui-browser.json",
     "countdown_server_time": "parent /readyz -> UNIX seconds -> native getServerTime",
     "native_style_save_as": "Two matching chunks absent from original archive; menu fallback saved and applied",
-    "grid": "dotted default; solid survives reload",
+    "grid": "sparse dotted default [1,4]; native-skinned control under settings layout grid; solid optional; layouts and templates persist metadata",
     "notifications": "native dialogs, active conditions deduplicated; no iframe height change",
     "logo": "widget_logo disabled",
     "indicator": "four touching columns and separate zigzag, 1px SVG trace",
     "layout_create": "native layout dropdown, mouse and Enter verified",
-    "source": "c6036df"
+    "source": "d97d7ec"
   },
   "layout_autosave_verification": {
     "passed": true,
@@ -305,5 +324,37 @@
     "manual_save_while_off": true,
     "preference_reloads": true,
     "evidence": "docs/verification/v1.3.2-isolated/layout-autosave-browser.json"
-  }
+  },
+  "customization_source": "d97d7ec",
+  "grid_settings_verification": {
+    "passed": true,
+    "evidence": "docs/verification/v1.3.2-isolated/grid-settings-browser.json",
+    "popup_position": "document overlay using viewport bounds; same left/width and 4px below button",
+    "cancel_restores": true,
+    "layouts_and_templates_persist": true,
+    "selection_colors": {
+      "light": "#000000",
+      "dark": "#8c8c8c"
+    }
+  },
+  "account_quotes_verification": {
+    "passed": true,
+    "evidence": "docs/verification/v1.3.2-isolated/account-quotes-browser.json",
+    "ctrl_s": "native iframe, host iframe and parent all save through workspace snapshot",
+    "password_ui": "public native notice shell, native input and button classes",
+    "quote_subscription": "native getQuotes/subscribeQuotes, refresh every 15 seconds",
+    "quote_change": "previous completed native session close; matching price basis",
+    "display_codes": "EURUSD / XAUUSD / BTCUSDT; identity tickers unchanged",
+    "object_tree": "对象树"
+  },
+  "password_policy_verification": {
+    "passed": true,
+    "evidence": "docs/verification/v1.3.2-isolated/password-policy-browser.json",
+    "minimum_characters": 6,
+    "maximum_characters": 512,
+    "character_types": "unrestricted Unicode, symbols and spaces; no trimming",
+    "backend_parametrized_cases_passed": 6,
+    "actual_account_password_changed": false
+  },
+  "runtime_note": "API/web/chart-origin use customized v1.3.2 images; existing dedicated workers remain on original v1.3.2 image. API recreation requires restarting web then tls to refresh nginx upstream addresses."
 }
