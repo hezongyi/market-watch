@@ -6,6 +6,7 @@ import logging
 import os
 import subprocess
 import time
+from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
 
@@ -105,7 +106,13 @@ def stored_coverage(db, instrument, left, right):
             if (s['start'] + 59999) // 60000 * 60000 < s['end'] // 60000 * 60000]
 
 
-def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False):
+@dataclass(frozen=True)
+class Ingestion:
+    minutes: int
+    price_changed: bool
+
+
+def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False, report_changes=False):
     # Serialize bounded writes for one instrument across live and history workers.
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
     if payload.get("source") and payload["source"] != instrument.source:
@@ -211,7 +218,7 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
         else:
             aggregate_touched(db, instrument, volume_touched, received_at=received_at, kind="volume")
     if not touched:
-        return len(changed)
+        return Ingestion(len(changed), False) if report_changes else len(changed)
     if defer_aggregation:
         from .chart_aggregation import PERIODS, enqueue_aggregation
 
@@ -225,7 +232,7 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
                 complete=False, revision=Bar.revision+1, received_at=received_at))
     else:
         aggregate_touched(db, instrument, touched, received_at=received_at)
-    return len(changed)
+    return Ingestion(len(changed), True) if report_changes else len(changed)
 
 
 def aggregate_touched(db, instrument, touched, *, received_at=None,
@@ -484,7 +491,8 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
                 inst = db.get(Instrument, instrument_id)
                 if not start:
                     queue_recovery(db, inst, payload)
-                count = ingest(db, inst, payload)
+                ingestion = ingest(db, inst, payload, report_changes=True)
+                count = ingestion.minutes
                 db.add(
                     Audit(
                         kind="market_ingested",
@@ -494,7 +502,8 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
             with transaction() as db:
                 for watch_id in db.scalars(
                     select(Watch.id).where(
-                        Watch.status == "active", Watch.instrument_id == instrument_id
+                        Watch.status == "active", Watch.instrument_id == instrument_id,
+                        ingestion.price_changed
                     )
                 ).all():
                     evaluate_watch(db, watch_id)
@@ -504,7 +513,8 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
                         w.rule.get("timeframe") == "tick"
                         for w in db.scalars(
                             select(Watch).where(
-                                Watch.status == "active", Watch.instrument_id == instrument_id
+                                Watch.status == "active", Watch.instrument_id == instrument_id,
+                        ingestion.price_changed
                             )
                         )
                     )
@@ -676,7 +686,7 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                         raise ValueError("交易时段返回空数据，保留补数游标等待重试")
                     t += timedelta(minutes=1)
             inst = db.get(Instrument, job.instrument_id)
-            ingest(db, inst, payload, defer_aggregation=defer_aggregation)
+            ingestion = ingest(db, inst, payload, defer_aggregation=defer_aggregation, report_changes=True)
             if not fully_queried_oanda:
                 # A nonempty response is not proof that the requested slice is complete.
                 present = set(
@@ -721,7 +731,7 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                 )
             for watch_id in db.scalars(
                 select(Watch.id).where(
-                    Watch.instrument_id == job.instrument_id, Watch.status == "active"
+                    Watch.instrument_id == job.instrument_id, Watch.status == "active", ingestion.price_changed
                 )
             ).all():
                 evaluate_watch(db, watch_id)

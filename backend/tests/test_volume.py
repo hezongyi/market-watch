@@ -223,3 +223,17 @@ def test_unpublishable_existing_price_bucket_is_partial_not_infinite_pending(dat
         db.flush()
         assert volume_jobs.finish(db,job)
         assert job.status == 'partial' and '价格桶不完整' in job.error
+
+
+def test_volume_only_import_does_not_run_price_watch_evaluation(database, monkeypatch):
+    from alerts import market
+    from alerts.storage import ImportJob, Watch
+    rows=[dict(timestamp=i*60000,open=10,high=11,low=9,close=10) for i in range(5)]
+    with database.begin() as db:
+        market.ingest(db,db.get(Instrument,'BTCUSDT'),{'rows':rows},received_at=305000)
+        db.add(ImportJob(instrument_id='BTCUSDT',start=0,end=300000,cursor=0))
+        db.add(Watch(instrument_id='BTCUSDT',name='price',rule={'kind':'price','timeframe':'M1','level':'11'},armed_at=0,status='active'))
+    called=[]
+    monkeypatch.setattr(market,'evaluate_watch',lambda *a:called.append(a))
+    assert market.import_once(fetcher=lambda *a:dict(source='binance',basis='last',rows=[{**r,'volume':'2'} for r in rows]),defer_aggregation=True)
+    assert called==[]
