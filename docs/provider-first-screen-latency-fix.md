@@ -6,8 +6,11 @@
 
 基线为 `v1.3.0` / `b9d69dd4c7ff8e873c4c75f07054eac29c94b996`。独立分支
 `fix/provider-first-screen-latency`，worktree 为
-`/home/quant/repos/market-watch-provider-latency`。本次修复不改变 v1.3.0
-已经接受的“大多数冷缓存首屏低于三秒”标准，不创建新发布标签。
+`/home/quant/repos/market-watch-provider-latency`。原修复与验收不改变 v1.3.0
+已经接受的“大多数冷缓存首屏低于三秒”标准，原轮次未创建发布标签。
+后续已按用户授权整合 v1.3.1 并准备 v1.3.2 源码发布，见
+[v1.3.2交付记录](chart-v1.3.2-delivery.md)。以下真实提供商和镜像证据仍绑定
+原 v1.3.0 修复分支，不作为集成版本的容器验收。
 
 ## 根因与实施
 

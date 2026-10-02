@@ -48,3 +48,7 @@ v1.0.1仅发布本地源码标签，未部署；生产镜像仍以`deploy/releas
 ## v1.3.1 历史修订修复与源码发布
 
 v1.3.1修复自建历史内部更正无法发布及图表不自动重载的问题；新增o16_managed_revisions迁移。按用户本轮授权合并main并推送main及v1.3.1附注标签，保留v1.3.0及其发布记录。新版本是源码发布，测试/构建关联及镜像状态见deploy/releases/v1.3.1-source.json和docs/chart-v1.3.1-delivery.md；没有把v1.3.0镜像改标为新版。生产域名、镜像、迁移/备份、worker及部署验收仍单独安排。
+
+## v1.3.2 平台连接生命周期修复与源码发布
+
+v1.3.2修复平台chart池容量为二却只预热/维护一条连接及后台额度等待未及时让位的问题。整合最新main的v1.3.1自建历史修订修复，schema仍为o16_managed_revisions，没有新增迁移。按用户授权合并main并推送main及v1.3.2附注标签，保留全部旧版本标签和证据。源码发布清单为deploy/releases/v1.3.2-source.json，验证/构建关系和性能限制见docs/chart-v1.3.2-delivery.md；未构建或部署新容器，不把旧镜像标为新版。
