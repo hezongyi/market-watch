@@ -156,6 +156,19 @@ def finish(db, job):
     publication = db.scalar(select(ChartPublicationJob.start).where(
         ChartPublicationJob.instrument_id == job.instrument_id,
         ChartPublicationJob.start < job.end, ChartPublicationJob.end > job.start).limit(1))
+    if publication and not pending:
+        from .chart_data import chart_rows
+        inst = db.get(Instrument, job.instrument_id)
+        for dirty in db.scalars(select(ChartPublicationJob).where(
+                ChartPublicationJob.instrument_id == job.instrument_id,
+                ChartPublicationJob.start < job.end, ChartPublicationJob.end > job.start).limit(100)):
+            bars = chart_rows(db, inst, dirty.timeframe, dirty.end, 1, now_ms())
+            if dirty.end <= now_ms() and (not bars or bars[-1]["start"] != dirty.start or not bars[-1]["complete"]):
+                left, right = max(job.start, dirty.start), min(job.end, dirty.end)
+                db.add(VolumeBackfillSegment(job_id=job.id, start=left, end=right,
+                    status="conflict", detail="既有价格桶不完整，量任务不能修复价格或发布该桶"))
+                job.status, job.error = "partial", "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留"
+                return True
     if pending or publication:
         job.next_at = now_ms()+1000
         return True
@@ -174,7 +187,8 @@ def finish(db, job):
             ChartPublishedBar.start == Bar.start,
             ChartPublishedBar.payload["volume_complete"].as_boolean().is_(True)).exists()).limit(1))
     job.status = 'partial' if missing or unresolved or derived or unpublished else 'complete'
-    job.error = ("已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划"
+    job.error = ("已有 M1 已补量，但部分价格尚未形成已确认量的发布快照"
+        + ("；未创建维护计划" if db.get(ChartHistoryPlan, job.instrument_id) is None else "；已发布快照保留")
         if unpublished and not missing and not unresolved and not derived else
         '仍有缺量、价格冲突或未确认派生量，详见片段') if job.status == 'partial' else None
     return True

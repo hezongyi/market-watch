@@ -208,3 +208,18 @@ def test_retry_page_is_bounded_and_advances_failed_cursor(database):
         job = db.get(VolumeBackfillJob, ident)
         assert job.cursor == 50400000
         assert db.scalar(select(VolumeBackfillSegment.end).where(VolumeBackfillSegment.status=='retry')) == 50400000
+
+
+def test_unpublishable_existing_price_bucket_is_partial_not_infinite_pending(database):
+    from alerts import volume_jobs
+    from alerts.domain import Candle
+    from alerts.market import upsert
+    from alerts.storage import ChartPublicationJob, instant
+    with database.begin() as db:
+        upsert(db, 'BTCUSDT', 'M1', Candle(instant(0), instant(60000), D(10), D(11), D(9), D(10), volume=D(2)))
+        job = volume_jobs.create(db, 'BTCUSDT', start=0, end=60000)
+        job.cursor = job.start
+        db.add(ChartPublicationJob(instrument_id='BTCUSDT', timeframe='M30', start=0, end=1800000))
+        db.flush()
+        assert volume_jobs.finish(db,job)
+        assert job.status == 'partial' and '价格桶不完整' in job.error
