@@ -36,6 +36,10 @@ def main():
         hide_password=False
     )
     os.environ["ALERTS_DELIVERY_ENABLED"] = "false"
+    if args.profile == "volume":
+        # OANDA account is part of identity; the fixture must hash the target
+        # configuration rather than the host's default/empty account.
+        os.environ["ALERTS_OANDA_ACCOUNT_ID"] = config.get("ALERTS_OANDA_ACCOUNT_ID", "")
     from alerts.storage import (
         Bar,
         ChartHistoryPlan,
