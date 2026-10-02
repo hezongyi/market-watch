@@ -559,6 +559,8 @@ def data(body):
         visible = rows[-body.limit :]
         left = max(pub.start, body.dataset_start or pub.start) if pub else None
         revision = pub.revision if pub else 0
+        from .volume import metadata
+        volume_meta = metadata(inst.source, inst.symbol)
         basis, calendar, precision = inst.basis, inst.calendar, inst.precision
         future = future_grid(inst, body.timeframe, visible[-1]["end"]) if visible else []
         history_check = published_history_check(db, inst, pub, visible, body)
@@ -580,6 +582,7 @@ def data(body):
             }
         )
     return dict(
+        **volume_meta,
         bars=visible,
         indicators=indicators,
         origin=left,

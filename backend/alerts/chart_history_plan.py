@@ -114,6 +114,7 @@ def advance_plan(db, plan, now):
     if not missing:
         pending = db.scalar(select(ChartAggregationJob.id).where(
             ChartAggregationJob.instrument_id == inst.id,
+            ChartAggregationJob.kind == "price",
             ChartAggregationJob.start < plan.target_end,
             ChartAggregationJob.end > plan.target_start).limit(1))
         if pending is None:
@@ -289,6 +290,12 @@ def control_plan(db, instrument, action, now):
         ImportJob.instrument_id == instrument, ImportJob.chart_plan.is_(True),
         ImportJob.status.in_(['pending', 'running', 'failed', 'cancelled']))))
     if action == 'cancel':
+        from .storage import VolumeBackfillJob
+        from .volume_jobs import control
+        for volume_job in db.scalars(select(VolumeBackfillJob).where(
+                VolumeBackfillJob.instrument_id == instrument,
+                VolumeBackfillJob.status.in_(("pending", "running", "partial", "failed")))):
+            control(db, volume_job.id, "cancel")
         plan.status = 'cancelled'
         for job in jobs:
             job.status = 'cancelled'

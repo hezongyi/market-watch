@@ -20,6 +20,8 @@ from .domain import Calendar
 from .provider_transport import activity, discard_client, pooled_client, warm_connections
 from .provider_transport import close_clients as close_clients
 from .storage import Instrument, MarketCatalog, instant, ms, now_ms, transaction
+from .volume import encoded
+from .volume import metadata as volume_metadata
 
 OANDA_FRAMES = {**{f: f for f in FRAMES}, "D1": "D", "W1": "W", "MN": "M"}
 BINANCE_FRAMES = dict(zip(FRAMES, ("1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", "1M")))
@@ -29,6 +31,7 @@ FRAME_MS = dict(
     )
 )
 ALIGNMENT_VERSION = "native-bid-ny17-sunday-v1"
+PAYLOAD_VERSION = "volume-v1"
 _LOCK = threading.Lock()
 _CACHE = OrderedDict()
 _INFLIGHT = {}
@@ -95,6 +98,7 @@ def metadata(ident):
         "precision": precision,
         "frames": FRAMES,
         "series_kind": "provider",
+        **volume_metadata(source, symbol),
     }
 
 
@@ -222,6 +226,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
                         "end": _end(start, frame, meta["calendar"]),
                         "chart_time": label(start, frame, meta["calendar"]),
                         "complete": bool(candle["complete"]),
+                        "volume": encoded(candle.get("volume"), tick=True),
+                        "volume_complete": bool(candle["complete"] and candle.get("volume") is not None),
                         **{
                             k: prices[v]
                             for k, v in (("open", "o"), ("high", "h"), ("low", "l"), ("close", "c"))
@@ -246,6 +252,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
                     "end": int(c[6]) + 1,
                     "chart_time": label(int(c[0]), frame, "utc0"),
                     "complete": int(c[6]) < now_ms(),
+                    "volume": encoded(c[5]),
+                    "volume_complete": int(c[6]) < now_ms() and c[5] is not None,
                     **dict(zip(("open", "high", "low", "close"), c[1:5])),
                 }
                 for c in candles
@@ -280,6 +288,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None):
         if exhausted
         else None,
         "series_kind": "provider",
+        **volume_metadata(source, meta["symbol"]),
         "basis": meta["basis"],
         "calendar": meta["calendar"],
         "precision": meta["precision"],
@@ -304,6 +313,7 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
         meta["basis"],
         meta["calendar"],
         ALIGNMENT_VERSION,
+        PAYLOAD_VERSION,
         before,
         count,
         quote,

@@ -39,8 +39,17 @@ class Candle:
     close: Decimal
     complete: bool = True
     revision: int = 1
+    volume: Decimal | None = None
+    volume_complete: bool | None = None
+    volume_supplied: bool = field(default=False, compare=False)
 
     def __post_init__(self):
+        from .volume import quantity
+
+        quantity(self.volume)
+        object.__setattr__(self, "volume_supplied", self.volume_supplied or self.volume is not None)
+        object.__setattr__(self, "volume_complete", bool(self.complete and self.volume is not None
+            and (self.volume_complete if self.volume_complete is not None else True)))
         aware(self.start)
         aware(self.end)
         if self.end <= self.start:
@@ -149,6 +158,9 @@ def aggregate(
     if any(b.end - b.start != timedelta(minutes=1) for b in rows):
         raise ValueError("Aggregation input must be M1")
     actual = {b.start for b in rows}
+    from .volume import total
+    price_complete = all(b.complete for b in rows) and expected_starts <= actual
+    volume = total(rows) if expected_starts <= actual else None
     return Candle(
         start,
         end,
@@ -156,7 +168,10 @@ def aggregate(
         max(b.high for b in rows),
         min(b.low for b in rows),
         rows[-1].close,
-        all(b.complete for b in rows) and expected_starts <= actual,
+        price_complete,
+        volume=volume,
+        volume_complete=price_complete and all(b.volume_complete for b in rows),
+        volume_supplied=True,
     )
 
 

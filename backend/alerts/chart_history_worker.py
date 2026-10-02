@@ -55,6 +55,9 @@ def run(fetch_page):
                 worked = import_once(fetcher=fetch_page, defer_aggregation=True, history_only=True)
                 if not worked:
                     worked = import_once(chart_only=True, fetcher=fetch_page, defer_aggregation=True, history_only=True)
+                if not worked:
+                    from .volume_jobs import once
+                    worked = once(fetch_page)
             time.sleep(0.2 if worked else 1)
         except Exception as exc:
             logging.warning("chart history cycle failed: %s", type(exc).__name__)

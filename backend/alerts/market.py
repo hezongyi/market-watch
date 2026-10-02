@@ -28,7 +28,6 @@ from .storage import (
     Preference,
     Watch,
     bootstrap,
-    candle_dict,
     instant,
     ms,
     now_ms,
@@ -60,44 +59,9 @@ def fetch_source(source, symbol, start=None, end=None, mode="live"):
 
 
 def upsert(db, instrument_id, timeframe, c):
-    row = db.scalar(
-        select(Bar).where(
-            Bar.instrument_id == instrument_id, Bar.timeframe == timeframe, Bar.start == ms(c.start)
-        )
-    )
-    values = {k: getattr(c, k) for k in ["open", "high", "low", "close", "complete"]}
-    changed = row is None or any(getattr(row, k) != v for k, v in values.items())
-    if row:
-        if any(getattr(row, k) != v for k, v in values.items()):
-            db.add(
-                Audit(
-                    kind="candle_revision",
-                    details={
-                        "instrument": instrument_id,
-                        "timeframe": timeframe,
-                        "previous": candle_dict(row.candle()),
-                    },
-                )
-            )
-            for k, v in values.items():
-                setattr(row, k, v)
-            row.revision += 1
-            row.received_at = now_ms()
-    else:
-        row = Bar(
-            instrument_id=instrument_id,
-            timeframe=timeframe,
-            start=ms(c.start),
-            end=ms(c.end),
-            **values,
-        )
-        db.add(row)
-    db.flush()
-    if changed:
-        from .publication_jobs import enqueue_publication
-
-        enqueue_publication(db, instrument_id, timeframe, [ms(c.start)])
-    return row
+    write_bars(db, instrument_id, timeframe, [c])
+    return db.scalar(select(Bar).where(Bar.instrument_id == instrument_id,
+        Bar.timeframe == timeframe, Bar.start == ms(c.start)))
 
 
 def stored_coverage(db, instrument, left, right):
@@ -149,6 +113,8 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
     if payload.get("basis") and payload["basis"] != instrument.basis:
         raise ValueError("报价口径不匹配，拒绝混合数据")
     received_at = received_at or now_ms()
+    range_starts = [int(r["timestamp"]) for r in payload["rows"]] + [s["start"] for s in payload.get("coverage", [])]
+    previous_coverage = stored_coverage(db, instrument, min(range_starts), received_at) if instrument.source == "oanda" and range_starts else []
     closures = closures_from(instrument.calendar_profile)
     if any(
         c.start <= instant(int(r["timestamp"])) < c.end for r in payload["rows"] for c in closures
@@ -218,20 +184,34 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
         # Exclude forming minute; conservative 5s margin. Provider finality remains a source gate.
         if ms(end) > received_at - 5000:
             continue
-        c = Candle(start, end, *(Decimal(str(raw[k])) for k in ["open", "high", "low", "close"]))
+        if not raw.get("complete", True):
+            continue
+        from .volume import quantity
+        c = Candle(start, end, *(Decimal(str(raw[k])) for k in ["open", "high", "low", "close"]),
+                   volume=quantity(raw.get("volume"), tick=instrument.source == "oanda"),
+                   volume_supplied="volume" in raw)
         minute_candles.append(c)
         changed.append(start)
-    write_bars(db, instrument.id, "M1", minute_candles)
-    touched = set(changed)
+    changes = write_bars(db, instrument.id, "M1", minute_candles, observed_at=received_at)
+    touched = set(changed) if changes.price else set()
+    volume_touched = {instant(at) for at in changes.volume}
     if instrument.source == "oanda":
         for span in payload.get("coverage", []):
             cursor = ((span["start"] + 59999) // 60000) * 60000
             cutoff = min(span["end"], received_at - 5000)
             while cursor + 60000 <= cutoff:
-                touched.add(instant(cursor))
+                if not covers_interval(previous_coverage, cursor, cursor + 60000):
+                    touched.add(instant(cursor))
                 cursor += 60000
+    if volume_touched:
+        if defer_aggregation:
+            from .chart_aggregation import enqueue_aggregation
+            enqueue_aggregation(db, instrument.id, ms(min(volume_touched)),
+                ms(max(volume_touched)) + 60000, received_at, kind="volume")
+        else:
+            aggregate_touched(db, instrument, volume_touched, received_at=received_at, kind="volume")
     if not touched:
-        return 0
+        return len(changed)
     if defer_aggregation:
         from .chart_aggregation import PERIODS, enqueue_aggregation
 
@@ -249,7 +229,7 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
 
 
 def aggregate_touched(db, instrument, touched, *, received_at=None,
-                      timeframes=("M5", "M15", "H1", "H4", "D1")):
+                      timeframes=("M5", "M15", "H1", "H4", "D1"), kind="price"):
     """Rebuild selected periods from persisted M1, without fetching or altering M1.
 
     Callers may process one period in a short independent transaction. The
@@ -307,9 +287,28 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
             c = aggregate([r.candle() for r in rows], left, right, expected_starts=expected)
             if c:
                 complete = c.complete and bool(expected) and ms(right) <= received_at - 5000
-                c = Candle(c.start, c.end, c.open, c.high, c.low, c.close, complete)
+                from dataclasses import replace
+
+                from .volume import total
+                observed_expected = {t for t in expected if ms(t)+60000 <= received_at-5000}
+                amount = total(rows) if observed_expected <= {instant(r.start) for r in rows} else None
+                if ms(right) <= received_at-5000 and not c.complete:
+                    amount = None
+                c = replace(c, volume=amount)
+                c = replace(c, complete=complete, volume_complete=complete and c.volume_complete)
                 outputs.append(c)
-        write_bars(db, instrument.id, timeframe, outputs)
+        if kind == "volume":
+            # Never pair a new quantity with staging prices being repaired.
+            from .storage import ChartAggregationJob
+            if db.scalar(select(ChartAggregationJob.id).where(
+                    ChartAggregationJob.instrument_id == instrument.id,
+                    ChartAggregationJob.timeframe == timeframe,
+                    ChartAggregationJob.kind == "price",
+                    ChartAggregationJob.start < latest_boundary,
+                    ChartAggregationJob.end > earliest).limit(1)):
+                continue
+        write_bars(db, instrument.id, timeframe, outputs, observed_at=received_at,
+                   volume_only=kind == "volume", authoritative_volume=True)
 
 
 

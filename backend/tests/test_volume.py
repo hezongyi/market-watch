@@ -1,0 +1,146 @@
+from decimal import Decimal as D
+
+import httpx
+from alerts import provider_chart
+from alerts.market import ingest
+from alerts.storage import Bar, Instrument
+from sqlalchemy import select
+
+
+def test_native_volume_preserves_decimal_and_zero():
+    meta = dict(source='binance', symbol='BTCUSDT', calendar='utc0', basis='last', precision=2)
+    def handle(request):
+        return httpx.Response(200, json=[
+            [0, '10', '11', '9', '10', '0.123456789123456789', 59999],
+            [60000, '10', '11', '9', '10', '0', 119999]])
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        page = provider_chart.native_page(meta, 'M1', 180000, 3, client=client)
+    assert [b.get('volume') for b in page['bars']] == ['0.123456789123456789', '0']
+    assert all(b['volume_complete'] for b in page['bars'])
+
+
+def test_volume_only_ingest_preserves_price_and_duplicate_is_noop(database):
+    rows = [dict(timestamp=i*60000, open='10', high='11', low='9', close='10') for i in range(5)]
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        ingest(db, inst, {'rows': rows}, received_at=305000)
+        m5 = db.scalar(select(Bar).where(Bar.timeframe == 'M5'))
+        before = (m5.complete, m5.revision, m5.received_at)
+        ingest(db, inst, {'rows': [{**r, 'volume': '2'} for r in rows]},
+               received_at=365000, defer_aggregation=True)
+        assert (m5.complete, m5.revision, m5.received_at) == before
+        assert m5.complete
+    from alerts.chart_aggregation import aggregate_once
+    while aggregate_once():
+        pass
+    with database.begin() as db:
+        m5 = db.scalar(select(Bar).where(Bar.timeframe == 'M5'))
+        assert m5.volume == D('10') and m5.volume_complete
+        revision = m5.volume_revision
+        ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': [{**r, 'volume': '2'} for r in rows]},
+               received_at=425000, defer_aggregation=True)
+        assert m5.volume_revision == revision
+        assert (m5.complete, m5.revision, m5.received_at) == before
+
+
+def test_known_volume_survives_legacy_but_price_correction_invalidates(database):
+    from alerts.domain import Candle
+    from alerts.market import upsert
+    from alerts.storage import instant
+    with database.begin() as db:
+        c = Candle(instant(0), instant(60000), D(10), D(11), D(9), D(10), volume=D(0))
+        r = upsert(db, 'BTCUSDT', 'M1', c)
+        revision = r.volume_revision
+        upsert(db, 'BTCUSDT', 'M1', Candle(c.start, c.end, c.open, c.high, c.low, c.close))
+        assert r.volume == 0 and r.volume_revision == revision
+        upsert(db, 'BTCUSDT', 'M1', Candle(c.start, c.end, c.open, D(12), c.low, c.close))
+        assert r.volume is None and not r.volume_complete
+
+
+def test_volume_job_conflicts_missing_and_cancellation_are_durable(database):
+    from alerts import volume_jobs
+    from alerts.domain import Candle
+    from alerts.market import upsert
+    from alerts.storage import VolumeBackfillJob, VolumeBackfillSegment, instant
+    with database.begin() as db:
+        for i in range(3):
+            upsert(db, 'BTCUSDT', 'M1', Candle(instant(i*60000), instant((i+1)*60000),
+                D(10), D(11), D(9), D(10)))
+        job = volume_jobs.create(db, 'BTCUSDT', start=0, end=180000)
+        ident = job.id
+    def response(*args):
+        return dict(source='binance', basis='last', instrument='BTCUSDT', rows=[
+            dict(timestamp=0, open='10', high='11', low='9', close='10', volume='3'),
+            dict(timestamp=60000, open='10', high='12', low='9', close='10', volume='9')])
+    assert volume_jobs.once(response)
+    with database.begin() as db:
+        assert db.get(VolumeBackfillJob, ident).status == 'pending'
+        assert {'resolved', 'conflict', 'unreachable'} <= set(db.scalars(select(VolumeBackfillSegment.status)))
+        volume_jobs.control(db, ident, 'retry')
+    def cancelled(*args):
+        with database.begin() as db:
+            volume_jobs.control(db, ident, 'cancel')
+        return dict(source='binance', basis='last', instrument='BTCUSDT', rows=[
+            dict(timestamp=60000, open='10', high='11', low='9', close='10', volume='9')])
+    assert volume_jobs.once(cancelled)
+    with database.begin() as db:
+        assert db.get(VolumeBackfillJob, ident).status == 'cancelled'
+        bars = list(db.scalars(select(Bar).where(Bar.timeframe == 'M1').order_by(Bar.start)))
+        assert bars[0].volume == 3 and bars[1].volume is None and bars[1].high == 11
+
+
+def test_quantity_range_and_tick_rules():
+    import pytest
+    from alerts.volume import quantity
+    for bad in ('NaN', 'Infinity', '-1', '1e20', '0.0000000000000000001'):
+        with pytest.raises(ValueError):
+            quantity(bad)
+    with pytest.raises(ValueError):
+        quantity('1.5', tick=True)
+    assert quantity('99999999999999999999.999999999999999999') == D('99999999999999999999.999999999999999999')
+
+
+def test_completed_price_plan_volume_authorization_does_not_resume_cancelled(database):
+    import pytest
+    from alerts import volume_jobs
+    from alerts.storage import ChartHistoryPlan, VolumeBackfillJob
+    rows = [dict(timestamp=i*60000, open='10', high='11', low='9', close='10') for i in range(5)]
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        ingest(db, inst, {'rows': rows}, received_at=305000)
+        plan = ChartHistoryPlan(instrument_id=inst.id, target_start=0, target_end=300000,
+                                status='complete', realtime_enabled=True)
+        db.add(plan)
+        db.flush()
+        j = volume_jobs.create(db, inst.id, automatic=True, now=365000)
+        assert j and plan.status == 'complete'
+        volume_jobs.control(db, j.id, 'cancel')
+        plan.status = 'cancelled'
+        assert volume_jobs.create(db, inst.id, automatic=True, now=365000) is None
+        plan.status = 'complete'
+        plan.realtime_enabled = False
+        assert volume_jobs.create(db, inst.id, automatic=True, now=365000) is None
+        assert db.get(VolumeBackfillJob, j.id).status == 'cancelled'
+        with pytest.raises(ValueError):
+            volume_jobs.create(db, inst.id, start=-60000, end=300000, now=365000)
+
+
+def test_missing_member_never_reports_partial_closed_total(database):
+    rows = [dict(timestamp=i*60000, open='10', high='11', low='9', close='10',
+                 **({'volume': '2'} if i != 2 else {})) for i in range(5)]
+    with database.begin() as db:
+        ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': rows}, received_at=305000)
+        m5 = db.scalar(select(Bar).where(Bar.timeframe == 'M5'))
+        assert m5.complete and m5.volume is None and not m5.volume_complete
+
+
+def test_volume_task_does_not_hide_prices_while_pending(database):
+    from alerts.chart_data import chart_rows
+    rows = [dict(timestamp=i*60000, open='10', high='11', low='9', close='10') for i in range(5)]
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        ingest(db, inst, {'rows': rows}, received_at=305000)
+        ingest(db, inst, {'rows': [{**r, 'volume': '2'} for r in rows]}, received_at=365000,
+               defer_aggregation=True)
+        rows = chart_rows(db, inst, 'M5', 365000, 10, 365000)
+        assert rows[0]['complete'] and not rows[0].get('pending_aggregation')
