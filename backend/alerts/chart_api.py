@@ -32,6 +32,7 @@ from .storage import (
     transaction,
     uid,
 )
+from .volume import metadata as volume_metadata
 
 
 class Create(BaseModel):
@@ -154,7 +155,7 @@ def history_check(db, inst, source, visible, body):
 
     def fingerprint(boundary):
         stamp = db.execute(
-            select(func.count(Bar.id), func.sum(Bar.revision), func.max(Bar.received_at)).where(
+            select(func.count(Bar.id), func.sum(Bar.revision + Bar.volume_revision), func.max(Bar.received_at)).where(
                 Bar.instrument_id == inst.id,
                 Bar.timeframe == source,
                 Bar.start < boundary,
@@ -643,7 +644,7 @@ def router(authenticated):
                     page = chart_rows(db, inst, body.timeframe, before, body.limit + 1, now_ms())
                     visible = page[-body.limit :]
                     revision_at = db.scalar(
-                        select(func.max(Bar.received_at)).where(
+                        select(func.sum(Bar.revision + Bar.volume_revision)).where(
                             Bar.instrument_id == inst.id, Bar.timeframe == source
                         )
                     )
@@ -663,6 +664,7 @@ def router(authenticated):
                         if visible
                         else [],
                         "basis": inst.basis,
+                        **volume_metadata(inst.source, inst.symbol),
                         "calendar": inst.calendar,
                         "precision": inst.precision,
                         "as_of": now_ms(),
@@ -671,7 +673,7 @@ def router(authenticated):
                     select(
                         func.count(Bar.id),
                         func.max(Bar.received_at),
-                        func.sum(Bar.revision),
+                        func.sum(Bar.revision + Bar.volume_revision),
                         func.min(Bar.start),
                         func.max(Bar.start),
                     ).where(Bar.instrument_id == inst.id, Bar.timeframe == source)
@@ -768,6 +770,7 @@ def router(authenticated):
                 if all_rows
                 else [],
                 "basis": inst.basis,
+                        **volume_metadata(inst.source, inst.symbol),
                 "calendar": inst.calendar,
                 "precision": inst.precision,
                 "as_of": now_ms(),

@@ -1,0 +1,165 @@
+{
+  "passed": false,
+  "cold": [
+    {
+      "symbol": "GBP_AUD",
+      "ms": 712,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:GBP_AUD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868476000,
+            "firstDataRequest": true,
+            "client": "b1a571f0-e375-4897-a324-f81a3cb3d3c6",
+            "indicators": [],
+            "before": 1790927876000,
+            "track_history": false
+          },
+          "started": 1790927816776,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "EUR_NOK",
+      "ms": 992.8000001907349,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_NOK",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868477000,
+            "firstDataRequest": true,
+            "client": "b1a571f0-e375-4897-a324-f81a3cb3d3c6",
+            "indicators": [],
+            "before": 1790927877000,
+            "track_history": false
+          },
+          "started": 1790927817512,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "USD_NOK",
+      "ms": 747.3000001907349,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_NOK",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868478000,
+            "firstDataRequest": true,
+            "client": "b1a571f0-e375-4897-a324-f81a3cb3d3c6",
+            "indicators": [],
+            "before": 1790927878000,
+            "track_history": false
+          },
+          "started": 1790927818544,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "EUR_SEK",
+      "ms": 1814,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_SEK",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868480000,
+            "firstDataRequest": true,
+            "client": "b1a571f0-e375-4897-a324-f81a3cb3d3c6",
+            "indicators": [],
+            "before": 1790927880000,
+            "track_history": false
+          },
+          "started": 1790927820510,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "USD_SEK",
+      "ms": 534.5,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_SEK",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868481000,
+            "firstDataRequest": true,
+            "client": "b1a571f0-e375-4897-a324-f81a3cb3d3c6",
+            "indicators": [],
+            "before": 1790927881000,
+            "track_history": false
+          },
+          "started": 1790927821183,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "GBP_SGD",
+      "ms": 2133.6000003814697,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:GBP_SGD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868481000,
+            "firstDataRequest": true,
+            "client": "b1a571f0-e375-4897-a324-f81a3cb3d3c6",
+            "indicators": [],
+            "before": 1790927881000,
+            "track_history": false
+          },
+          "started": 1790927821706,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    }
+  ],
+  "warm": [],
+  "soak": [],
+  "errors": [],
+  "error": "AssertionError [ERR_ASSERTION]: Warm measurement must read proven backend cache"
+}

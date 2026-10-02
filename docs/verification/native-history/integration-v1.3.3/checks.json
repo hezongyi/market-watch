@@ -1,0 +1,55 @@
+{
+  "at_utc": "2026-10-02T11:54:19.120702+00:00",
+  "native_head": "efe0ba4783a2ec95697ee494ed0c1c1a28550f54",
+  "main_base": "dd9ba43a4abc09359c0a05aa12390ba1885978df",
+  "integration_branch": "review/native-history-v133-integration",
+  "integration_worktree": "/home/quant/repos/market-watch-native-history-integration",
+  "conflicts": [
+    "backend/alerts/provider_cache.py"
+  ],
+  "resolution": "Include provider source/symbol in the same statement snapshot and preserve Volume metadata plus native history payload dicts.",
+  "new_regressions": {
+    "sources": [
+      "oanda",
+      "binance"
+    ],
+    "scope": "Native optional buffer preserves exact amount, zero/null and volume-only history revalidation."
+  },
+  "checks": {
+    "backend_full_initial": {
+      "passed": 388,
+      "failed": 1,
+      "skipped": 1,
+      "failure": "Migration test requires worktree-local .venv/bin/alembic; isolated worktree dependency link initially missing."
+    },
+    "migration_retest": {
+      "passed": 1,
+      "failed": 0,
+      "setup_fix": "Link existing .venv for worktree-local tool paths; no product changes."
+    },
+    "backend_unique_final": {
+      "passed": 389,
+      "failed": 0,
+      "skipped": 1,
+      "postgres": "Fresh disposable PostgreSQL 17.11; stopped after tests.",
+      "skip": "Existing conditional backup-tool skip."
+    },
+    "frontend_final": {
+      "passed": 40,
+      "failed": 0,
+      "scope": "Non-browser Node scripts. Initial selection included a browser entry by filename mistake; missing browser shared-library failure retained. Managed-revision script initially lacked worktree-local Python link and passed after that setup fix."
+    },
+    "web_build": "TypeScript/Vite passed; existing bundle-size warning.",
+    "existing_evidence_manifest": {
+      "verified_files": 229,
+      "mismatches": 0
+    },
+    "acceptance_checker": {
+      "with_bound_user_decision": "exit 0",
+      "strict_numeric": "exit 1, expected Binance cold 4/10 and PG 7/10 failures retained."
+    },
+    "secret_scan": "11 feature commits; 322 blobs, 134 text blobs, no regex or known-local-secret findings."
+  },
+  "runtime_acceptance": "Existing native/Volume images and browser evidence retain their original sources. This integration has source-level checks only; no new combined-image browser/runtime acceptance.",
+  "remote_actions": "No push, PR creation, main merge, tag or deployment in this analysis phase."
+}

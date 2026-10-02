@@ -1,0 +1,48 @@
+HTTP_FAILURE 401 /api/session
+CONSOLE Failed to load resource: the server responded with a status of 401 (Unauthorized)
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 59 undefined
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 59 undefined
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 59 undefined
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 59 undefined
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 173 undefined
+CONSOLE MOBILE_LOAD_FORMAT {"id":"2c4011aa-8f9a-4852-8ccc-1ea781f52f11","name":"Volume load acceptance","keys":["name","layout","charts","symbolLock","intervalLock","trackTimeLock","dateRangeLock","crosshairLock","layoutsSizes","studyMetaInfoMap","_mwViewports","_mwSync"],"contentType":"undefined","charts":true}
+CONSOLE MOBILE_LOAD_FORMAT {"id":"fe6f9f7a-b2ea-48eb-81f9-b463ca9def17","name":"Volume load acceptance","keys":["name","layout","charts","symbolLock","intervalLock","trackTimeLock","dateRangeLock","crosshairLock","layoutsSizes","studyMetaInfoMap","_mwViewports","_mwSync"],"contentType":"undefined","charts":true}
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 141 undefined
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 173 undefined
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 173 undefined
+MOBILE_ANALYSIS_PRESERVED {
+  studies: [
+    { id: 'dRB2K6', name: 'Moving Average', inputs: [Array] },
+    { id: 'VPS4yR', name: 'Volume', inputs: [Array] }
+  ],
+  shapes: [
+    { id: 'GhHjyk', name: 'horizontal_line', points: [Array] },
+    { id: '3Ps6ey', name: 'trend_line', points: [Array] }
+  ]
+}
+RESPONSE 200 https://localhost:15553/api/charts/data undefined 173 undefined
+MOBILE_BEFORE_RANGE {
+  active: 'MWP:BTCUSDT',
+  sync: false,
+  guard: false,
+  panes: [
+    {
+      symbol: 'MWP:BTCUSDT',
+      res: '15',
+      ready: true,
+      range: [Object],
+      width: 825,
+      max: false
+    }
+  ]
+}
+MOBILE_WRITES []
+MOBILE_READONLY true
+status 已加载 · 行情每15秒检查 error [ '视区恢复失败：Error: Value is null重新加载' ]
+chart {
+  ready: true,
+  count: 1,
+  symbol: 'MWP:BTCUSDT',
+  range: { from: 1790811000, to: 1790934300 }
+}
+{ errors: [] }

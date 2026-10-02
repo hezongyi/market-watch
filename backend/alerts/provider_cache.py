@@ -23,6 +23,7 @@ from .config import settings
 from .market_resources import LANE, lane
 from .provider_history_policy import CAPACITY, CapacityExceeded, optional_bars
 from .storage import ProviderBar, ProviderDataset, now_ms, transaction, uid
+from .volume import metadata as volume_metadata
 
 _ACTIVE_LOCK = threading.Lock()
 _ACTIVE_READS = {"oanda": 0, "binance": 0}
@@ -85,6 +86,7 @@ def identity(meta, frame):
                 meta["basis"],
                 meta["calendar"],
                 upstream.ALIGNMENT_VERSION,
+                upstream.PAYLOAD_VERSION,
             ]
         ).encode()
     ).hexdigest()
@@ -151,7 +153,8 @@ def snapshot(key, before, count, *, observation=None, bounded_limit=None):
             ProviderBar.changed_at > observation.observed_at,
         ))
     statement = (
-        select(ProviderDataset.coverage, ProviderDataset.earliest,
+        select(ProviderDataset.source, ProviderDataset.symbol,
+               ProviderDataset.coverage, ProviderDataset.earliest,
                ProviderDataset.updated_at, ProviderDataset.latest_at, ProviderDataset.revision,
                bounded.c.chart_time, bounded.c.payload, changed.label("changed"))
         .select_from(ProviderDataset).outerjoin(bounded, true())
@@ -177,6 +180,7 @@ def snapshot(key, before, count, *, observation=None, bounded_limit=None):
         db.execute(update(ProviderDataset).where(ProviderDataset.id.in_(touched))
                    .values(accessed_at=now_ms()))
         return {
+            **volume_metadata(metadata.source, metadata.symbol),
             "bars": rows[-count:],
             "history_boundary": boundary,
             "has_more": not boundary,
@@ -251,6 +255,10 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
             old = existing.get(bar["start"])
             if old and (old.observed_at > observed_at or old.complete and not bar["complete"]):
                 continue
+            if old and old.payload.get("volume") is not None and bar.get("volume") is None and all(
+                    old.payload.get(k) == bar.get(k) for k in ("open", "high", "low", "close", "complete", "end")):
+                bar = {**bar, "volume": old.payload.get("volume"),
+                       "volume_complete": old.payload.get("volume_complete", False)}
             revision = 1
             if old:
                 revision = old.revision + (old.payload != bar)

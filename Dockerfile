@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.lock
 COPY backend ./backend
 COPY migrations ./migrations
 COPY alembic.ini ./
+COPY scripts/volume_backfill.py ./scripts/volume_backfill.py
 RUN pip install --no-cache-dir --no-deps .
 COPY --from=adapter /adapter ./adapters/dukascopy
 RUN useradd --uid 10001 --create-home app

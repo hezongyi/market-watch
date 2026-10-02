@@ -52,3 +52,11 @@ v1.3.1修复自建历史内部更正无法发布及图表不自动重载的问�
 ## v1.3.2 平台连接生命周期修复与源码发布
 
 v1.3.2修复平台chart池容量为二却只预热/维护一条连接及后台额度等待未及时让位的问题。整合最新main的v1.3.1自建历史修订修复，schema仍为o16_managed_revisions，没有新增迁移。按用户授权合并main并推送main及v1.3.2附注标签，保留全部旧版本标签和证据。源码发布清单为deploy/releases/v1.3.2-source.json，验证/构建关系和性能限制见docs/chart-v1.3.2-delivery.md；未构建或部署新容器，不把旧镜像标为新版。
+
+## v1.3.3 Volume 本机交付
+
+以v1.3.2为基线在fix/volume-v1.3.3隔离worktree完成平台/自建Volume、独立修订和有界历史补量，新增p17_volume。逐服务同提交镜像及本机数据库备份、批准补量清单、运行复验见deploy/releases/v1.3.3-local.json和docs/chart-v1.3.3-delivery.md。用户最后明确性能问题不需处理，保留原性能失败证据，不将其描述为通过。本机验收阶段仅更新Ubuntu，未合并main、推送远端或创建正式标签；后续源码发布见下节。
+
+## v1.3.3 Volume 源码发布
+
+用户确认可以合并并授权执行及打标签后，通过fix/volume-v1.3.3到main的PR保留原提交历史，采用附注标签v1.3.3指向最终main合并提交。源码发布清单为deploy/releases/v1.3.3-source.json；运行、测试和构建输入须与已验收源码edc799a保持逐字节一致，后续提交仅整理证据与发布文档。保留全部旧版本标签和失败记录，不force、不将旧镜像改标为标签提交的新构建。本次源码发布不重建或切换运行镜像、不操作生产；性能排除和旧历史量partial/null限制继续有效。最终关系和回退见docs/chart-v1.3.3-source-delivery.md。

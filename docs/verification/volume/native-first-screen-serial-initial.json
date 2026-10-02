@@ -1,0 +1,175 @@
+{
+  "passed": false,
+  "measurements": [
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "5",
+      "began_ms": 1790930871164,
+      "displayed_ms": 9680,
+      "initialized_ms": 9701,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871532000,
+            "firstDataRequest": true,
+            "client": "07454cc8-eb5d-4d2e-86cf-d144046c580c",
+            "indicators": [],
+            "before": 1790930932000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1780,
+          "elapsed_ms": 7732,
+          "count": 198,
+          "as_of": 1790930872982,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 4.46,
+            "upstream_slot": 9.05,
+            "network_connection_connect_tcp": 2.11,
+            "network_http11_send_request_headers": 0.52,
+            "network_http11_send_request_body": 0.1,
+            "network_http11_receive_response_headers": 373.96,
+            "network_proxy_start_tls": 6807.39,
+            "upstream_http": 7185.91,
+            "failure_ConnectError": 5022.42,
+            "network_http11_receive_response_body": 0.26,
+            "network_http11_response_closed": 0.01,
+            "upstream_decode": 0.22,
+            "database_commit": 67.73,
+            "read_total": 7698.14
+          }
+        }
+      ],
+      "range": {
+        "from": 1790877900,
+        "to": 1790933700
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:GBP_USD",
+      "resolution": "5",
+      "began_ms": 1790930897588,
+      "displayed_ms": 2491,
+      "initialized_ms": 2577,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:GBP_USD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871559000,
+            "firstDataRequest": true,
+            "client": "952c3d08-6ee6-408f-8733-b666239e9dce",
+            "indicators": [],
+            "before": 1790930959000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1455,
+          "elapsed_ms": 730,
+          "count": 198,
+          "as_of": 1790930899171,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 29.08,
+            "upstream_slot": 20.01,
+            "network_http11_send_request_headers": 0.22,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 293.58,
+            "network_http11_receive_response_body": 0.88,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 295.41,
+            "upstream_decode": 0.25,
+            "database_commit": 191.4,
+            "read_total": 642.7
+          }
+        }
+      ],
+      "range": {
+        "from": 1790877300,
+        "to": 1790933700
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "5",
+      "began_ms": 1790930914262,
+      "displayed_ms": 11482,
+      "initialized_ms": 13561,
+      "screen_bars": 187,
+      "pages": [
+        {
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790871576000,
+            "firstDataRequest": true,
+            "client": "73326e2f-56a5-4230-b227-2472d7c6ffd4",
+            "indicators": [],
+            "before": 1790930976000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 2072,
+          "elapsed_ms": 9178,
+          "count": 198,
+          "as_of": 1790930917865,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 5.13,
+            "upstream_slot": 15.57,
+            "network_connection_connect_tcp": 5.38,
+            "network_http11_send_request_headers": 0.51,
+            "network_http11_send_request_body": 0.1,
+            "network_http11_receive_response_headers": 212.08,
+            "network_proxy_start_tls": 5832.55,
+            "upstream_http": 6052.31,
+            "failure_ConnectError": 5281.07,
+            "network_http11_receive_response_body": 0.2,
+            "network_http11_response_closed": 0.01,
+            "upstream_decode": 0.23,
+            "database_commit": 293.41,
+            "read_total": 7626.26
+          }
+        }
+      ],
+      "range": {
+        "from": 1790877900,
+        "to": 1790933700
+      },
+      "geometry": {
+        "plot_width": 1122,
+        "bar_spacing": 6
+      }
+    }
+  ],
+  "error": "new native document must consume the fresh persistent cache: false != true",
+  "note": "Cold measurements reconstructed from stdout; previous full JSON overwritten on next run. BTC third warm request refreshed upstream and did not qualify as a complete-cache measurement. Cold TLS failures are retained."
+}

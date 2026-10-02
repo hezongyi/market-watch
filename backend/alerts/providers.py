@@ -7,6 +7,7 @@ import httpx
 from .config import settings
 from .market_resources import request_slot
 from .storage import now_ms
+from .volume import encoded
 
 
 def fetch_binance(symbol="BTCUSDT", start=None, end=None, mode="live", client=None):
@@ -62,7 +63,7 @@ def fetch_binance(symbol="BTCUSDT", start=None, end=None, mode="live", client=No
             for r in batch:
                 if left <= r[0] < right:
                     rows.append(
-                        {"timestamp": r[0], "open": r[1], "high": r[2], "low": r[3], "close": r[4]}
+                        {"timestamp": r[0], "open": r[1], "high": r[2], "low": r[3], "close": r[4], "volume": encoded(r[5] if len(r) > 5 else None)}
                     )
             next_cursor = int(batch[-1][0]) + 60_000
             if next_cursor <= cursor:
@@ -175,6 +176,8 @@ def fetch_oanda(symbol, start=None, end=None, mode="live", client=None):
                     rows.append(
                         {
                             "timestamp": at,
+                            "volume": encoded(candle.get("volume"), tick=True),
+                            "complete": True,
                             **{
                                 k: prices[v]
                                 for k, v in [

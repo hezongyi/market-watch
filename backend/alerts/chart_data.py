@@ -62,6 +62,7 @@ def chart_rows(db, instrument, frame, before, limit, now):
     source = "M15" if frame == "M30" else "D1" if frame in ("W1", "MN") else frame
     pending = list(db.scalars(select(ChartAggregationJob).where(
         ChartAggregationJob.instrument_id == instrument.id,
+        ChartAggregationJob.kind == "price",
         ChartAggregationJob.timeframe == source,
         ChartAggregationJob.start < rows[-1]["end"],
         ChartAggregationJob.end > rows[0]["start"])))
@@ -156,6 +157,8 @@ def _chart_rows(db, instrument, frame, before, limit, now):
                 members[-1].close,
                 complete,
             )
+        from .volume import total
+        volume = total(members)
         c = Candle(
             c.start,
             c.end,
@@ -165,6 +168,9 @@ def _chart_rows(db, instrument, frame, before, limit, now):
             c.close,
             complete and ms(right) <= now,
             max(r.revision for r in members),
+            volume=volume if complete else None,
+            volume_complete=complete and ms(right) <= now and all(r.volume_complete for r in members),
+            volume_supplied=True,
         )
         result.append(candle_dict(c))
     return result

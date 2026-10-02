@@ -167,6 +167,8 @@ function barsOf(result, res, ticker) {
       high: Number(b.high),
       low: Number(b.low),
       close: Number(b.close),
+      ...(b.volume !== null && b.volume !== undefined && Number.isFinite(Number(b.volume)) && Number(b.volume) >= 0
+        ? { volume: Number(b.volume) } : {}),
     }));
   const values = new Map(
     (result.indicators[0]?.series.find((s) => s.key === key)?.values || []).map(
@@ -339,7 +341,7 @@ const feed = {
       cb({
         name: ticker,
         ticker,
-        description: meta.name + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + meta.basis,
+        description: meta.name + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + meta.basis + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
         exchange: meta.source.toUpperCase(),
         listed_exchange: meta.source.toUpperCase(),
         type: meta.calendar === "utc0" ? "crypto" : "forex",
@@ -355,6 +357,8 @@ const feed = {
         weekly_multipliers: ["1"],
         monthly_multipliers: ["1"],
         supported_resolutions: resolutions,
+        visible_plots_set: meta.volume_kind && meta.volume_kind !== "unavailable" ? "ohlcv" : "ohlc",
+        volume_precision: meta.volume_kind === "tick" ? 0 : 8,
         format: "price",
         data_status: "streaming",
         has_empty_bars: false,

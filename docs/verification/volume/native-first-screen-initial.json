@@ -1,0 +1,224 @@
+{
+  "passed": false,
+  "measurements": [
+    {
+      "symbol": "MWP:OANDA:USD_PLN",
+      "resolution": "5",
+      "began_ms": 1790929970150,
+      "displayed_ms": 2268,
+      "initialized_ms": 2343,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_PLN",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790870631000,
+            "firstDataRequest": true,
+            "client": "403e5a98-7d36-44c3-95a8-a21ccc91960f",
+            "indicators": [],
+            "before": 1790930031000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1306,
+          "elapsed_ms": 725,
+          "count": 198,
+          "as_of": 1790929971542,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 4.05,
+            "upstream_slot": 12.42,
+            "network_http11_send_request_headers": 0.22,
+            "network_http11_send_request_body": 0.04,
+            "network_http11_receive_response_headers": 297.13,
+            "network_http11_receive_response_body": 0.24,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 298.33,
+            "upstream_decode": 0.27,
+            "database_commit": 199.19,
+            "read_total": 676.44
+          }
+        }
+      ],
+      "range": {
+        "from": 1790876400,
+        "to": 1790932800
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:USD_PLN",
+      "resolution": "60",
+      "began_ms": 1790929978434,
+      "displayed_ms": 3458,
+      "initialized_ms": 3478,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_PLN",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1789932120000,
+            "firstDataRequest": true,
+            "client": "0494d3eb-775d-4cc2-830a-0832f150ff91",
+            "indicators": [],
+            "before": 1790930040000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1806,
+          "elapsed_ms": 1440,
+          "count": 198,
+          "as_of": 1790929980795,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 7.92,
+            "upstream_slot": 16.72,
+            "network_http11_send_request_headers": 0.21,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 717.34,
+            "network_http11_receive_response_body": 0.26,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 718.55,
+            "upstream_decode": 0.56,
+            "database_commit": 84.58,
+            "read_total": 865.6
+          }
+        }
+      ],
+      "range": {
+        "from": 1790114400,
+        "to": 1790964000
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:EUR_PLN",
+      "resolution": "5",
+      "began_ms": 1790929986723,
+      "displayed_ms": 2890,
+      "initialized_ms": 2908,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_PLN",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790870648000,
+            "firstDataRequest": true,
+            "client": "5ff01846-5252-4f74-b23f-8c00cf17585a",
+            "indicators": [],
+            "before": 1790930048000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1668,
+          "elapsed_ms": 994,
+          "count": 198,
+          "as_of": 1790929988412,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 3.73,
+            "upstream_slot": 3.6,
+            "network_http11_send_request_headers": 0.19,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 316.1,
+            "network_http11_receive_response_body": 0.22,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 320.6,
+            "upstream_decode": 0.25,
+            "database_commit": 80.06,
+            "read_total": 967.07
+          }
+        }
+      ],
+      "range": {
+        "from": 1790876100,
+        "to": 1790932800
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    },
+    {
+      "symbol": "MWP:OANDA:EUR_PLN",
+      "resolution": "60",
+      "began_ms": 1790929995093,
+      "displayed_ms": 3138,
+      "initialized_ms": 4576,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_PLN",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1789932136000,
+            "firstDataRequest": true,
+            "client": "5c3c83ae-55a0-4295-b517-ff59885b70d4",
+            "indicators": [],
+            "before": 1790930056000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1633,
+          "elapsed_ms": 1359,
+          "count": 198,
+          "as_of": 1790929997404,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 6.36,
+            "upstream_slot": 32.42,
+            "network_http11_send_request_headers": 0.2,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 545.51,
+            "network_http11_receive_response_body": 0.17,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 546.57,
+            "upstream_decode": 0.48,
+            "database_commit": 61.98,
+            "read_total": 674.13
+          }
+        }
+      ],
+      "range": {
+        "from": 1790114400,
+        "to": 1790964000
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      }
+    }
+  ],
+  "error": "TimeoutError: frame.waitForFunction: Timeout 60000ms exceeded.",
+  "evidence_origin": "Reconstructed measured SAMPLE records from preserved stdout after later run accidentally overwrote the JSON; incomplete run is not acceptance.",
+  "warm_detail": "Four earlier warm reads were observed; omitted here because the full warm JSON was overwritten."
+}

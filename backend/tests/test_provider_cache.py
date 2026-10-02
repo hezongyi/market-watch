@@ -204,6 +204,53 @@ def native_body(**kwargs):
                      native_history={'chart_count': 1, 'focused': True}, **kwargs)
 
 
+@pytest.mark.parametrize('source,kind,unit,amount', [
+    ('oanda', 'tick', 'quotes', '4'),
+    ('binance', 'base', 'BTC', '0.123456789123456789'),
+])
+def test_native_buffer_keeps_volume_and_revalidates_volume_only_corrections(
+    database, monkeypatch, source, kind, unit, amount
+):
+    from alerts.chart_api import DataQuery, HistoryObservation
+    meta = META if source == 'oanda' else {
+        **META, 'id': 'BTCUSDT', 'symbol': 'BTCUSDT', 'source': source,
+        'basis': 'last', 'calendar': 'utc0',
+    }
+    clock = [1000000]
+    monkeypatch.setattr(cache, 'now_ms', lambda: clock[0])
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument: meta)
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('cached volume'))
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
+    payload = page(0, 30000)
+    for index, bar in enumerate(payload['bars']):
+        bar.update(volume=[amount, '0', None][index % 3],
+                   volume_complete=index % 3 != 2)
+    seed(meta, 'M5', 30000, payload)
+    body = DataQuery(instrument=meta['id'], series_kind='provider', timeframe='M5',
+                     before=30000, countBack=5,
+                     native_history={'chart_count': 1, 'focused': True})
+    original = cache.data(body)
+    assert original['mandatory_count'] == 5 and original['optional_count'] == 25
+    assert original['volume_kind'] == kind and original['volume_unit'] == unit
+    assert [bar['volume'] for bar in original['bars']] == [
+        bar['volume'] for bar in payload['bars']
+    ]
+    observation = dict(revision=original['cache_revision'], observed_at=original['as_of'],
+                       first=original['bars'][0]['chart_time'],
+                       last=original['bars'][-1]['chart_time'])
+    clock[0] += 1000
+    corrected = page(28000, 29000)
+    corrected['bars'][0].update(volume=amount, volume_complete=True)
+    seed(meta, 'M5', 29000, corrected)
+    reviewed = cache.data(body.model_copy(update={
+        'history_observation': HistoryObservation(**observation),
+    }))
+    assert reviewed['history_revalidation']['changed'] is True
+    assert reviewed['cache_revision'] > original['cache_revision']
+    assert reviewed['bars'][-2]['volume'] == amount
+    assert reviewed['bars'][-2]['close'] == original['bars'][-2]['close']
+
+
 def test_native_range_demand_is_preserved_with_buffer_switch_off_and_on(database, monkeypatch):
     monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
     seed(META, 'M5', 5000000, page(0, 5000000, boundary=True))

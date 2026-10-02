@@ -1,0 +1,165 @@
+{
+  "passed": false,
+  "cold": [
+    {
+      "symbol": "GBP_NZD",
+      "ms": 1527.6999998092651,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:GBP_NZD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868171000,
+            "firstDataRequest": true,
+            "client": "50afecf1-3057-44fe-8b04-efe476ce9273",
+            "indicators": [],
+            "before": 1790927571000,
+            "track_history": false
+          },
+          "started": 1790927511650,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "NZD_JPY",
+      "ms": 1276.5999999046326,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:NZD_JPY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868172000,
+            "firstDataRequest": true,
+            "client": "50afecf1-3057-44fe-8b04-efe476ce9273",
+            "indicators": [],
+            "before": 1790927572000,
+            "track_history": false
+          },
+          "started": 1790927512966,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "AUD_JPY",
+      "ms": 1328,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:AUD_JPY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868174000,
+            "firstDataRequest": true,
+            "client": "50afecf1-3057-44fe-8b04-efe476ce9273",
+            "indicators": [],
+            "before": 1790927574000,
+            "track_history": false
+          },
+          "started": 1790927514772,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "CHF_JPY",
+      "ms": 1253.9000000953674,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:CHF_JPY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868175000,
+            "firstDataRequest": true,
+            "client": "50afecf1-3057-44fe-8b04-efe476ce9273",
+            "indicators": [],
+            "before": 1790927575000,
+            "track_history": false
+          },
+          "started": 1790927515530,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "CAD_JPY",
+      "ms": 1024.5,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:CAD_JPY",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868177000,
+            "firstDataRequest": true,
+            "client": "50afecf1-3057-44fe-8b04-efe476ce9273",
+            "indicators": [],
+            "before": 1790927577000,
+            "track_history": false
+          },
+          "started": 1790927517212,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    },
+    {
+      "symbol": "EUR_AUD",
+      "ms": 1139.4000000953674,
+      "requests": [
+        {
+          "query": {
+            "instrument": "OANDA:EUR_AUD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790868177000,
+            "firstDataRequest": true,
+            "client": "50afecf1-3057-44fe-8b04-efe476ce9273",
+            "indicators": [],
+            "before": 1790927577000,
+            "track_history": false
+          },
+          "started": 1790927517828,
+          "cache_hit": false,
+          "count": 198,
+          "boundary": false
+        }
+      ]
+    }
+  ],
+  "warm": [],
+  "soak": [],
+  "errors": [],
+  "error": "TimeoutError: page.waitForResponse: Timeout 30000ms exceeded while waiting for event \"response\""
+}

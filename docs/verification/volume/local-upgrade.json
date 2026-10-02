@@ -1,0 +1,193 @@
+{
+  "passed": true,
+  "project": "market-watch-dual-acceptance",
+  "database": "market_watch_dual",
+  "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef",
+  "before": [
+    {
+      "service": "api",
+      "container": "d914165de52dc72a024b1a38487733ea86ff10e027c610a0a2c615a02f82a18c",
+      "image": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "configured_image": "market-watch-api:1.3.2-9596b25"
+    },
+    {
+      "service": "realtime-worker",
+      "container": "6839de7647aedb06253898f87b5a64b4aa7249a51d1ab7cfb96848cb93395170",
+      "image": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "configured_image": "market-watch-api:1.3.2-9596b25"
+    },
+    {
+      "service": "chart-history-worker",
+      "container": "b4f04e0b8d610e14dc300fa65abf1907cf85586ac770120632a65ef444dc023c",
+      "image": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "configured_image": "market-watch-api:1.3.2-9596b25"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "container": "e45e6e0bd41acf682b40bf655950242e1473143d3754bf17f267d99e94d21e73",
+      "image": "sha256:984c06927924a178823f06446dad206a4408e644c0da3d3305c47d16f88ec3ac",
+      "configured_image": "market-watch-api:1.3.2-9596b25"
+    },
+    {
+      "service": "web",
+      "container": "edc462bc79b9bf2490ed4f62cfd8046a45da51f0aeb7775a6fc148187ee8212a",
+      "image": "sha256:bda799ae2396b1606c9dc999a82b002ba58e27acf5cfb208ff04055a0890b1b4",
+      "configured_image": "market-watch-web:1.3.2-9596b25"
+    },
+    {
+      "service": "chart-origin",
+      "container": "354aea1a2f8f53d351b3b2bc67dc5c48ab716f93e56eedadfbc28cbbbe392f4b",
+      "image": "sha256:ca30c21c4e15d46343f75193b1d446a22b92aaea2ba843db54a6f182630bf72e",
+      "configured_image": "market-watch-chart-origin:1.3.2-menu-da7a402"
+    },
+    {
+      "service": "tls",
+      "container": "0802d070ed55e529b85a38b52be9119b490e44d10fd526bd9ceb43a0f2faf8bd",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "configured_image": "nginx:1.28-alpine"
+    }
+  ],
+  "schema_before": "o16_managed_revisions",
+  "backup": {
+    "path": "/tmp/mw-dual-acceptance/before-volume-upgrade.dump",
+    "bytes": 27834252,
+    "sha256": "d5107c81fe37d20b0205425b453737514eeb3dbfd3d7a5dba0dbfc19635fb150"
+  },
+  "migration_output": "",
+  "schema_after": "p17_volume",
+  "volume_jobs_started": {
+    "applied": true,
+    "jobs": [
+      {
+        "id": "3bc1e81e-9eb2-4e14-b15a-9b7f5f91abf3",
+        "instrument_id": "XAUUSD",
+        "source": "oanda",
+        "basis": "bid",
+        "calendar": "ny17",
+        "start": 1790814480000,
+        "end": 1790929080000,
+        "cursor": 1790929080000,
+        "status": "pending",
+        "generation": 0,
+        "attempts": 0,
+        "next_at": 0,
+        "error": null,
+        "unresolved": 0
+      },
+      {
+        "id": "ff89bc54-0272-4756-a44e-768284cfa430",
+        "instrument_id": "BTCUSDT",
+        "source": "binance",
+        "basis": "last",
+        "calendar": "utc0",
+        "start": 1790814480000,
+        "end": 1790929080000,
+        "cursor": 1790929080000,
+        "status": "pending",
+        "generation": 0,
+        "attempts": 0,
+        "next_at": 0,
+        "error": null,
+        "unresolved": 0
+      },
+      {
+        "id": "058fb6c0-51d9-4115-9da8-c3e713f43084",
+        "instrument_id": "EURUSD",
+        "source": "oanda",
+        "basis": "bid",
+        "calendar": "ny17",
+        "start": 1790814480000,
+        "end": 1790929140000,
+        "cursor": 1790929140000,
+        "status": "pending",
+        "generation": 0,
+        "attempts": 0,
+        "next_at": 0,
+        "error": null,
+        "unresolved": 0
+      },
+      {
+        "id": "d454c442-a15b-4ea1-a0ee-24c2c479ad6f",
+        "instrument_id": "OANDA:CAD_CHF",
+        "source": "oanda",
+        "basis": "bid",
+        "calendar": "ny17",
+        "start": 1788210240000,
+        "end": 1790929140000,
+        "cursor": 1790929140000,
+        "status": "pending",
+        "generation": 0,
+        "attempts": 0,
+        "next_at": 0,
+        "error": null,
+        "unresolved": 0
+      }
+    ]
+  },
+  "after": [
+    {
+      "service": "api",
+      "container": "cb42836624e12fa6c258b9651a17c6fa798e3fa6db9a76537da14792b3b9d810",
+      "image": "sha256:8d4fb7eb0e68f6f62d5a3fa7bb545b2a99ba829a58f30fbb9fee168f96a48ea2",
+      "configured_image": "market-watch-api:volume-delivery",
+      "state": "running",
+      "health": "healthy",
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "realtime-worker",
+      "container": "8c6715d7162ab087bd2d873a4456796089adbbfeeca9435d8079e3712a946b83",
+      "image": "sha256:8d4fb7eb0e68f6f62d5a3fa7bb545b2a99ba829a58f30fbb9fee168f96a48ea2",
+      "configured_image": "market-watch-api:volume-delivery",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "chart-history-worker",
+      "container": "e5b8e91b98d94a5b1adec4a8c8131f13477ccefef7122210e05f2487f31905f2",
+      "image": "sha256:8d4fb7eb0e68f6f62d5a3fa7bb545b2a99ba829a58f30fbb9fee168f96a48ea2",
+      "configured_image": "market-watch-api:volume-delivery",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "container": "b3135ca49e4a2254b407ed13229ef7f15f6ef634e898090e2344812d5f71f34b",
+      "image": "sha256:8d4fb7eb0e68f6f62d5a3fa7bb545b2a99ba829a58f30fbb9fee168f96a48ea2",
+      "configured_image": "market-watch-api:volume-delivery",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "web",
+      "container": "4cd12cb59e45527a60c9f9500c004179995e9701e3cf220e88dacb42ddc01d2f",
+      "image": "sha256:3672a1a960575dff21cb35cf4729df66c031b89fffa1f128bbbe1c446fb490d0",
+      "configured_image": "market-watch-web:volume-local-delivery",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "chart-origin",
+      "container": "ea7ad2a7f0e6b298e0aa359b24122523e861424e2d610f3e2ba9843966342576",
+      "image": "sha256:2ccc491cceb77c788b957f79a0a385d849e37ad52f94aedfe19696bf9d4f30a2",
+      "configured_image": "market-watch-chart-origin:volume-delivery",
+      "state": "running",
+      "health": null,
+      "source": "fe370c206402aa048bf7c7adbd08d0642e9085ef"
+    },
+    {
+      "service": "tls",
+      "container": "0802d070ed55e529b85a38b52be9119b490e44d10fd526bd9ceb43a0f2faf8bd",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "configured_image": "nginx:1.28-alpine",
+      "state": "running",
+      "health": null,
+      "source": null
+    }
+  ],
+  "at_utc": "2026-10-02T08:19:51.113927+00:00"
+}

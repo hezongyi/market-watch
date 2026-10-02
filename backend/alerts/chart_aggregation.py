@@ -6,18 +6,20 @@ from .storage import ChartAggregationJob, ChartViewportDemand, Instrument
 PERIODS = ('M5', 'M15', 'H1', 'H4', 'D1')
 
 
-def enqueue_aggregation(db, instrument, start, end, now):
+def enqueue_aggregation(db, instrument, start, end, now, *, kind="price"):
     """Caller owns the instrument lock and commits this alongside M1 coverage."""
     for left in range(start, end, 1440 * 60000):
         right = min(end, left + 1440 * 60000)
         for frame in PERIODS:
-            exists = db.scalar(select(ChartAggregationJob.id).where(
+            exists = db.scalar(select(ChartAggregationJob).where(
                 ChartAggregationJob.instrument_id == instrument,
                 ChartAggregationJob.timeframe == frame,
                 ChartAggregationJob.start == left, ChartAggregationJob.end == right))
             if exists is None:
                 db.add(ChartAggregationJob(instrument_id=instrument, timeframe=frame,
-                                          start=left, end=right, created_at=now))
+                                          start=left, end=right, created_at=now, kind=kind))
+            elif kind == "price":
+                exists.kind = "price"
     db.flush()
 
 
@@ -61,7 +63,7 @@ def aggregate_once():
             # A failed calculation/write must not publish any partial aggregate.
             # Keep the outer transaction usable to persist retry state.
             with db.begin_nested():
-                aggregate_touched(db, inst, touched, received_at=now, timeframes=(job.timeframe,))
+                aggregate_touched(db, inst, touched, received_at=now, timeframes=(job.timeframe,), kind=job.kind)
                 db.delete(job)
                 db.flush()
         except Exception as error:
