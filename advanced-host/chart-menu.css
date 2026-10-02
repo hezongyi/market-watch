@@ -51,11 +51,40 @@
 }
 .mw-chart-menu[hidden] { display: none; }
 .mw-chart-menu-heading {
-  font-weight: 600;
-  font-size: 18px;
-  padding: 16px 10px;
+  background: #17231c;
+  padding: 16px 6px;
   border-bottom: 1px solid var(--mw-menu-line);
-  margin-bottom: 6px;
+  margin: 0 -6px 6px;
+  border-radius: 0 4px 0 0;
+}
+.mw-chart-menu-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #eef4e6;
+  padding: 0 10px;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-synthesis: none;
+  font-weight: 400;
+  line-height: normal;
+}
+.mw-chart-menu-brand > svg {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  color: #d9e9b3;
+}
+.mw-chart-menu-brand > span {
+  font-size: 23px;
+  font-weight: 650;
+  letter-spacing: 3px;
+}
+.mw-chart-menu-brand small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2.3px;
+  color: #a6b6a9;
+  margin-top: 3px;
 }
 .mw-chart-theme-switch {
   display: flex;
