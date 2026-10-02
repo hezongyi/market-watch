@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "source": "read-only pg_dump snapshot of market_watch_dual",
+  "target": "dedicated market_watch_v132_ui",
+  "before": {
+    "schema": "p17_volume",
+    "candles": "118697",
+    "chart_published_bars": "121836",
+    "provider_bars": "686989",
+    "advanced_chart_workspaces": "557",
+    "advanced_chart_preferences": "35",
+    "watches": "3",
+    "instruments": "10",
+    "advanced_chart_workspaces_digest": "fcd2095287bc7edefa313d3431c37594",
+    "advanced_chart_preferences_digest": "213ba862e3196056ee512e37dc729935"
+  },
+  "after": {
+    "schema": "o16_managed_revisions",
+    "candles": "118697",
+    "chart_published_bars": "121836",
+    "provider_bars": "686989",
+    "advanced_chart_workspaces": "557",
+    "advanced_chart_preferences": "35",
+    "watches": "3",
+    "instruments": "10",
+    "advanced_chart_workspaces_digest": "fcd2095287bc7edefa313d3431c37594",
+    "advanced_chart_preferences_digest": "213ba862e3196056ee512e37dc729935"
+  },
+  "workspace_and_preference_documents_unchanged": true
+}

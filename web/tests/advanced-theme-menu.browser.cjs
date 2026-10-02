@@ -58,7 +58,15 @@ const output = process.env.THEME_MENU_OUTPUT || '/tmp/mw-theme-menu.json';
       assert.ok(symbolBox.x >= box.width, 'symbol search must not be obscured');
       await menu.click();
       const toggle = ui.getByRole('switch', {name: '暗色主题'});
+      // Wait for the write acknowledgement before reloading. A matching GET
+      // alone can observe an earlier value while the current save is queued.
+      const themeSaved = page.waitForResponse(response =>
+        response.url().endsWith('/advanced-charts/preferences/save') &&
+        response.request().method() === 'POST' &&
+        response.request().postDataJSON()?.name === 'mw.theme' &&
+        response.request().postDataJSON()?.content?.value === theme);
       await toggle.click();
+      assert.equal((await themeSaved).status(), 200, 'theme write must succeed');
       await frame.waitForFunction(theme => widget.getTheme().toLowerCase() === theme.toLowerCase(), theme);
       await toggle.waitFor({state: 'visible'});
       assert.equal(await toggle.getAttribute('aria-checked'), String(theme === 'Dark'));

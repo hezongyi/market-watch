@@ -1,0 +1,803 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "theme": "Light",
+      "menu_box": {
+        "x": 0,
+        "y": 0,
+        "width": 52,
+        "height": 38
+      },
+      "symbol_box": {
+        "x": 52,
+        "y": 0,
+        "width": 100,
+        "height": 38
+      },
+      "clicked": true,
+      "server_saved": true,
+      "reloaded": true
+    },
+    {
+      "theme": "Dark",
+      "menu_box": {
+        "x": 0,
+        "y": 0,
+        "width": 52,
+        "height": 38
+      },
+      "symbol_box": {
+        "x": 52,
+        "y": 0,
+        "width": 100,
+        "height": 38
+      },
+      "clicked": true,
+      "server_saved": true,
+      "reloaded": true
+    },
+    {
+      "theme": "Light",
+      "menu_box": {
+        "x": 0,
+        "y": 0,
+        "width": 52,
+        "height": 38
+      },
+      "symbol_box": {
+        "x": 52,
+        "y": 0,
+        "width": 100,
+        "height": 38
+      },
+      "clicked": true,
+      "server_saved": true,
+      "reloaded": true
+    },
+    {
+      "theme": "Dark",
+      "menu_box": {
+        "x": 0,
+        "y": 0,
+        "width": 52,
+        "height": 38
+      },
+      "symbol_box": {
+        "x": 52,
+        "y": 0,
+        "width": 100,
+        "height": 38
+      },
+      "clicked": true,
+      "server_saved": true,
+      "reloaded": true
+    },
+    {
+      "theme": "Light",
+      "menu_box": {
+        "x": 0,
+        "y": 0,
+        "width": 52,
+        "height": 38
+      },
+      "symbol_box": {
+        "x": 52,
+        "y": 0,
+        "width": 100,
+        "height": 38
+      },
+      "clicked": true,
+      "server_saved": true,
+      "reloaded": true
+    },
+    {
+      "theme": "Dark",
+      "menu_box": {
+        "x": 0,
+        "y": 0,
+        "width": 52,
+        "height": 38
+      },
+      "symbol_box": {
+        "x": 52,
+        "y": 0,
+        "width": 100,
+        "height": 38
+      },
+      "clicked": true,
+      "server_saved": true,
+      "reloaded": true
+    }
+  ],
+  "errors": [],
+  "theme_colors": [
+    {
+      "theme": "Light",
+      "panel": "rgb(255, 255, 255)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(41, 79, 60)",
+      "title": "rgb(37, 51, 42)",
+      "subtitle": "rgb(105, 118, 108)",
+      "divider": "0px"
+    },
+    {
+      "theme": "Dark",
+      "panel": "rgb(15, 15, 15)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(217, 233, 179)",
+      "title": "rgb(238, 244, 230)",
+      "subtitle": "rgb(166, 182, 169)",
+      "divider": "0px"
+    },
+    {
+      "theme": "Light",
+      "panel": "rgb(255, 255, 255)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(41, 79, 60)",
+      "title": "rgb(37, 51, 42)",
+      "subtitle": "rgb(105, 118, 108)",
+      "divider": "0px"
+    },
+    {
+      "theme": "Dark",
+      "panel": "rgb(15, 15, 15)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(217, 233, 179)",
+      "title": "rgb(238, 244, 230)",
+      "subtitle": "rgb(166, 182, 169)",
+      "divider": "0px"
+    },
+    {
+      "theme": "Light",
+      "panel": "rgb(255, 255, 255)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(41, 79, 60)",
+      "title": "rgb(37, 51, 42)",
+      "subtitle": "rgb(105, 118, 108)",
+      "divider": "0px"
+    },
+    {
+      "theme": "Dark",
+      "panel": "rgb(15, 15, 15)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(217, 233, 179)",
+      "title": "rgb(238, 244, 230)",
+      "subtitle": "rgb(166, 182, 169)",
+      "divider": "0px"
+    }
+  ],
+  "reload_diagnostics": [
+    {
+      "sql": "{\"value\": \"Light\"}|32",
+      "expected": "Light",
+      "actual": "light",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 32
+      },
+      "saved": {
+        "chartState": false
+      }
+    },
+    {
+      "sql": "{\"value\": \"Dark\"}|33",
+      "expected": "Dark",
+      "actual": "dark",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 33
+      },
+      "saved": {
+        "chartState": false
+      }
+    },
+    {
+      "sql": "{\"value\": \"Light\"}|34",
+      "expected": "Light",
+      "actual": "light",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 34
+      },
+      "saved": {
+        "chartState": false
+      }
+    },
+    {
+      "sql": "{\"value\": \"Dark\"}|35",
+      "expected": "Dark",
+      "actual": "dark",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 35
+      },
+      "saved": {
+        "chartState": false
+      }
+    },
+    {
+      "sql": "{\"value\": \"Light\"}|36",
+      "expected": "Light",
+      "actual": "light",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 36
+      },
+      "saved": {
+        "chartState": false
+      }
+    },
+    {
+      "sql": "{\"value\": \"Dark\"}|37",
+      "expected": "Dark",
+      "actual": "dark",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 37
+      },
+      "saved": {
+        "chartState": false
+      }
+    }
+  ],
+  "keyboard_open_and_escape": true,
+  "compact_width": {
+    "menu": {
+      "x": 0,
+      "y": 0,
+      "width": 52,
+      "height": 38
+    },
+    "symbol": {
+      "x": 52,
+      "y": 0,
+      "width": 100,
+      "height": 38
+    }
+  },
+  "chart_requests_checked": 1141,
+  "credentials_sent_to_chart": 0,
+  "preference_trace": [
+    {
+      "at": 1790932373445,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 31
+      }
+    },
+    {
+      "at": 1790932373840,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 31
+      }
+    },
+    {
+      "at": 1790932378473,
+      "method": "POST",
+      "status": 200,
+      "request": {
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 31
+      },
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 32
+      }
+    },
+    {
+      "at": 1790932378514,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 32
+      }
+    },
+    {
+      "at": 1790932378894,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 32
+      }
+    },
+    {
+      "at": 1790932380623,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 32
+      }
+    },
+    {
+      "at": 1790932381460,
+      "method": "POST",
+      "status": 200,
+      "request": {
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 32
+      },
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 33
+      }
+    },
+    {
+      "at": 1790932381538,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 33
+      }
+    },
+    {
+      "at": 1790932381877,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 33
+      }
+    },
+    {
+      "at": 1790932383491,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 33
+      }
+    },
+    {
+      "at": 1790932384511,
+      "method": "POST",
+      "status": 200,
+      "request": {
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 33
+      },
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 34
+      }
+    },
+    {
+      "at": 1790932384549,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 34
+      }
+    },
+    {
+      "at": 1790932384843,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 34
+      }
+    },
+    {
+      "at": 1790932386292,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 34
+      }
+    },
+    {
+      "at": 1790932386903,
+      "method": "POST",
+      "status": 200,
+      "request": {
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 34
+      },
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 35
+      }
+    },
+    {
+      "at": 1790932386951,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 35
+      }
+    },
+    {
+      "at": 1790932387328,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 35
+      }
+    },
+    {
+      "at": 1790932388654,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 35
+      }
+    },
+    {
+      "at": 1790932389315,
+      "method": "POST",
+      "status": 200,
+      "request": {
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 35
+      },
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 36
+      }
+    },
+    {
+      "at": 1790932389853,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 36
+      }
+    },
+    {
+      "at": 1790932390255,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 36
+      }
+    },
+    {
+      "at": 1790932391801,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 36
+      }
+    },
+    {
+      "at": 1790932392662,
+      "method": "POST",
+      "status": 200,
+      "request": {
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 36
+      },
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 37
+      }
+    },
+    {
+      "at": 1790932392709,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 37
+      }
+    },
+    {
+      "at": 1790932393021,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 37
+      }
+    },
+    {
+      "at": 1790932394612,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 37
+      }
+    },
+    {
+      "at": 1790932395576,
+      "method": "GET",
+      "status": 200,
+      "request": null,
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 37
+      }
+    },
+    {
+      "at": 1790932395690,
+      "method": "POST",
+      "status": 200,
+      "request": {
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 37
+      },
+      "row": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 38
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "passed": false,
+  "cases": [],
+  "errors": [],
+  "theme_colors": [
+    {
+      "theme": "Light",
+      "panel": "rgb(255, 255, 255)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(41, 79, 60)",
+      "title": "rgb(37, 51, 42)",
+      "subtitle": "rgb(105, 118, 108)",
+      "divider": "0px"
+    }
+  ],
+  "reload_diagnostics": [
+    {
+      "expected": "Light",
+      "actual": "dark",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 27
+      },
+      "saved": {
+        "chartState": false
+      }
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'dark' !== 'light'\n"
+}

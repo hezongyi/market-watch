@@ -1,0 +1,88 @@
+# Dedicated local Ubuntu deployment. Do not layer shared acceptance overrides.
+name: market-watch-v132-ui
+x-service: &service
+  restart: unless-stopped
+  labels:
+    market-watch.purpose: v1.3.2-ui
+  mem_limit: 512m
+  cpus: 1
+x-api: &api
+  <<: *service
+  image: ${MW_V132_API_IMAGE:?Set the fixed v1.3.2 API image}
+  pull_policy: never
+  env_file:
+    - path: ${MW_V132_PRIVATE_DIR:?Set the private persistent directory}/api.env
+      format: raw
+  environment:
+    ALERTS_PUBLIC_URL: https://192.168.7.232:15653
+    ALERTS_DELIVERY_ENABLED: "false"
+    ALERTS_DATABASE_POOL_SIZE: "1"
+    ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    ALERTS_DATABASE_APPLICATION_NAME: market-watch-v132-ui
+services:
+  postgres:
+    <<: *service
+    image: ${MW_V132_POSTGRES_IMAGE:?Set the PostgreSQL 16 image}
+    pull_policy: never
+    env_file:
+      - path: ${MW_V132_PRIVATE_DIR}/postgres.env
+        format: raw
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d market_watch_v132_ui"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+  api:
+    <<: *api
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+  realtime-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.realtime_worker"]
+    depends_on:
+      api: {condition: service_healthy}
+  chart-history-worker:
+    <<: *api
+    cpus: 0.5
+    command: ["python", "-m", "alerts.chart_history_worker"]
+    depends_on:
+      api: {condition: service_healthy}
+  chart-aggregation-worker:
+    <<: *api
+    cpus: 0.5
+    command: ["python", "-m", "alerts.chart_aggregation_worker"]
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    <<: *service
+    image: ${MW_V132_WEB_IMAGE:?Build the web image for chart origin port 15654}
+    pull_policy: never
+    depends_on:
+      api: {condition: service_healthy}
+  chart-origin:
+    <<: *service
+    image: ${MW_V132_CHART_IMAGE:?Set the themed-menu chart image}
+    pull_policy: never
+  tls:
+    <<: *service
+    image: ${MW_V132_TLS_IMAGE:?Set the nginx image}
+    pull_policy: never
+    ports:
+      - "127.0.0.1:15653:443"
+      - "127.0.0.1:15654:444"
+      - "192.168.7.232:15653:443"
+      - "192.168.7.232:15654:444"
+    volumes:
+      - ${MW_V132_PRIVATE_DIR}/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${MW_V132_PRIVATE_DIR}/cert.pem:/certs/cert.pem:ro
+      - ${MW_V132_PRIVATE_DIR}/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+volumes:
+  pgdata:

@@ -1,0 +1,115 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "theme": "Light",
+      "menu_box": {
+        "x": 0,
+        "y": 0,
+        "width": 52,
+        "height": 38
+      },
+      "symbol_box": {
+        "x": 52,
+        "y": 0,
+        "width": 100,
+        "height": 38
+      },
+      "clicked": true,
+      "server_saved": true,
+      "reloaded": true
+    },
+    {
+      "theme": "Dark",
+      "menu_box": {
+        "x": 0,
+        "y": 0,
+        "width": 52,
+        "height": 38
+      },
+      "symbol_box": {
+        "x": 52,
+        "y": 0,
+        "width": 100,
+        "height": 38
+      },
+      "clicked": true,
+      "server_saved": true,
+      "reloaded": true
+    }
+  ],
+  "errors": [],
+  "theme_colors": [
+    {
+      "theme": "Light",
+      "panel": "rgb(255, 255, 255)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(41, 79, 60)",
+      "title": "rgb(37, 51, 42)",
+      "subtitle": "rgb(105, 118, 108)",
+      "divider": "0px"
+    },
+    {
+      "theme": "Dark",
+      "panel": "rgb(15, 15, 15)",
+      "heading": "rgba(0, 0, 0, 0)",
+      "logo": "rgb(217, 233, 179)",
+      "title": "rgb(238, 244, 230)",
+      "subtitle": "rgb(166, 182, 169)",
+      "divider": "0px"
+    }
+  ],
+  "reload_diagnostics": [
+    {
+      "expected": "Light",
+      "actual": "light",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Light"
+        },
+        "revision": 25
+      },
+      "saved": {
+        "chartState": false
+      }
+    },
+    {
+      "expected": "Dark",
+      "actual": "dark",
+      "server": {
+        "id": "c10f7cd2ece072adfd1eba1fc90160c6fdf392e7a82b43751a21d278fc2ce1d1",
+        "kind": "setting",
+        "name": "mw.theme",
+        "tool": "",
+        "content": {
+          "value": "Dark"
+        },
+        "revision": 26
+      },
+      "saved": {
+        "chartState": false
+      }
+    }
+  ],
+  "keyboard_open_and_escape": true,
+  "compact_width": {
+    "menu": {
+      "x": 0,
+      "y": 0,
+      "width": 52,
+      "height": 38
+    },
+    "symbol": {
+      "x": 52,
+      "y": 0,
+      "width": 100,
+      "height": 38
+    }
+  },
+  "chart_requests_checked": 489,
+  "credentials_sent_to_chart": 0
+}
