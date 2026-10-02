@@ -237,3 +237,36 @@ def test_volume_only_import_does_not_run_price_watch_evaluation(database, monkey
     monkeypatch.setattr(market,'evaluate_watch',lambda *a:called.append(a))
     assert market.import_once(fetcher=lambda *a:dict(source='binance',basis='last',rows=[{**r,'volume':'2'} for r in rows]),defer_aggregation=True)
     assert called==[]
+
+
+def test_volume_only_live_ingest_keeps_independent_tick_quotes(database, monkeypatch):
+    from alerts import market
+    from alerts.service import create_watch, evaluate_quote
+    from alerts.storage import Watch
+
+    rows = [dict(timestamp=i * 60000, open=10, high=11, low=9, close=10)
+            for i in range(5)]
+    with database.begin() as db:
+        inst = db.get(Instrument, 'EURUSD')
+        market.ingest(db, inst, {'rows': rows}, received_at=305000)
+        evaluate_quote(db, inst, 305000, D('9'), D('9.1'))
+        watch = create_watch(db, 'EURUSD', 'live tick',
+                             {'kind': 'price', 'timeframe': 'tick', 'level': '10',
+                              'direction': 'buy'}, armed_at=306000)
+        watch_id = watch.id
+    historical_evaluations = []
+    calls = []
+    monkeypatch.setattr(market, 'evaluate_watch',
+                        lambda *args: historical_evaluations.append(args))
+
+    def fetch(source, symbol, *args, **kwargs):
+        calls.append(kwargs.get('mode', 'M1'))
+        if kwargs.get('mode') == 'quote':
+            return {'rows': [dict(timestamp=307000, bidPrice='11', askPrice='11.1')]}
+        return {'rows': [{**row, 'volume': '2'} for row in rows]}
+
+    market.once('EURUSD', fetcher=fetch)
+    assert historical_evaluations == []
+    assert calls == ['M1', 'quote']
+    with database.begin() as db:
+        assert db.get(Watch, watch_id).status == 'triggered'

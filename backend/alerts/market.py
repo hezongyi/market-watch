@@ -514,7 +514,6 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
                         for w in db.scalars(
                             select(Watch).where(
                                 Watch.status == "active", Watch.instrument_id == instrument_id,
-                        ingestion.price_changed
                             )
                         )
                     )
