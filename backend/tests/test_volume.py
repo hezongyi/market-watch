@@ -144,3 +144,67 @@ def test_volume_task_does_not_hide_prices_while_pending(database):
                defer_aggregation=True)
         rows = chart_rows(db, inst, 'M5', 365000, 10, 365000)
         assert rows[0]['complete'] and not rows[0].get('pending_aggregation')
+
+
+def test_no_plan_volume_cannot_claim_unpublished_history_complete(database):
+    from alerts import volume_jobs
+    from alerts.chart_aggregation import aggregate_once
+    from alerts.domain import Candle
+    from alerts.market import upsert
+    from alerts.storage import VolumeBackfillJob, instant
+    with database.begin() as db:
+        upsert(db, 'BTCUSDT', 'M1', Candle(instant(0), instant(60000), D(10), D(11), D(9), D(10)))
+        ident = volume_jobs.create(db, 'BTCUSDT', start=0, end=60000).id
+    volume_jobs.once(lambda *a: dict(source='binance', basis='last', rows=[
+        dict(timestamp=0, open=10, high=11, low=9, close=10, volume=2)]))
+    while aggregate_once():
+        pass
+    with database.begin() as db:
+        volume_jobs.finish(db, db.get(VolumeBackfillJob, ident))
+        assert db.get(VolumeBackfillJob, ident).status == 'partial'
+        assert '发布快照' in db.get(VolumeBackfillJob, ident).error
+
+
+def test_bridging_jobs_merge_all_overlaps_and_revoke_owners(database):
+    from alerts import volume_jobs
+    from alerts.domain import Candle
+    from alerts.market import upsert
+    from alerts.storage import VolumeBackfillJob, instant
+    with database.begin() as db:
+        for at in (0, 1740000):
+            upsert(db, 'BTCUSDT', 'M1', Candle(instant(at), instant(at+60000), D(10), D(11), D(9), D(10)))
+        volume_jobs.create(db, 'BTCUSDT', start=0, end=600000)
+        second = volume_jobs.create(db, 'BTCUSDT', start=1200000, end=1800000)
+        second.status, second.lease_token, second.lease_until = 'running', 'old', 9999999999999
+        volume_jobs.create(db, 'BTCUSDT', start=300000, end=1500000)
+        active = list(db.scalars(select(VolumeBackfillJob).where(VolumeBackfillJob.status != 'cancelled')))
+        assert len(active) == 1 and active[0].start == 0 and active[0].end == 1800000
+        assert second.lease_token is None and second.generation == 1
+        import pytest
+        with pytest.raises(ValueError, match='重叠'):
+            volume_jobs.control(db, second.id, 'resume')
+
+
+def test_retry_page_is_bounded_and_advances_failed_cursor(database):
+    from alerts import volume_jobs
+    from alerts.domain import Candle
+    from alerts.market import upsert
+    from alerts.storage import VolumeBackfillJob, VolumeBackfillSegment, instant
+    with database.begin() as db:
+        for at in (0, 86340000):
+            upsert(db, 'BTCUSDT', 'M1', Candle(instant(at), instant(at+60000), D(10), D(11), D(9), D(10)))
+        job = volume_jobs.create(db, 'BTCUSDT', start=0, end=86400000)
+        ident = job.id
+        db.add(VolumeBackfillSegment(job_id=ident, start=0, end=86400000, status='retry'))
+    windows = []
+    def fetched(source, symbol, start, end):
+        from datetime import datetime
+        left,right = int(datetime.fromisoformat(start).timestamp()*1000),int(datetime.fromisoformat(end).timestamp()*1000)
+        windows.append((left,right))
+        return dict(source=source, basis='last', rows=[])
+    volume_jobs.once(fetched)
+    assert windows == [(50400000,86400000)]
+    with database.begin() as db:
+        job = db.get(VolumeBackfillJob, ident)
+        assert job.cursor == 50400000
+        assert db.scalar(select(VolumeBackfillSegment.end).where(VolumeBackfillSegment.status=='retry')) == 50400000

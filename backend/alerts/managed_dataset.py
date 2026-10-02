@@ -357,7 +357,8 @@ def publish_once():
     global _PUBLISH_CURSOR
     adopt_legacy_once()
     with transaction() as db:
-        ids = list(db.scalars(select(ChartHistoryPlan.instrument_id).order_by(ChartHistoryPlan.instrument_id)))
+        ids = sorted(set(db.scalars(select(ChartHistoryPlan.instrument_id))) |
+                     set(db.scalars(select(ChartPublication.instrument_id))))
     targets = [(ident, frame) for ident in ids for frame in FRAMES]
     if not targets:
         _PUBLISH_CURSOR = None
@@ -369,6 +370,10 @@ def publish_once():
         plan = db.get(ChartHistoryPlan, ident)
         if plan:
             publish_frame(db, inst, plan, frame, now_ms())
+        else:
+            pub = db.get(ChartPublication, (ident, frame))
+            if pub:
+                publish_corrections(db, inst, pub, frame, pub.start, pub.end, [], now_ms())
     return True
 
 

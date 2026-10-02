@@ -11,6 +11,7 @@ from .storage import (
     ChartAggregationJob,
     ChartHistoryPlan,
     ChartPublicationJob,
+    ChartPublishedBar,
     ImportJob,
     Instrument,
     Preference,
@@ -59,24 +60,37 @@ def create(db, instrument, *, start=None, end=None, automatic=False, now=None):
     if left >= right or left % 60000 or right % 60000:
         raise ValueError('无有效的已收盘分钟范围')
     # A single active authorization per instrument avoids overlapping requests.
-    existing = db.scalar(select(VolumeBackfillJob).where(
+    matches = list(db.scalars(select(VolumeBackfillJob).where(
         VolumeBackfillJob.instrument_id == instrument,
-        VolumeBackfillJob.status.in_(('pending', 'running', 'failed', 'partial')),
-        VolumeBackfillJob.start < right, VolumeBackfillJob.end > left).with_for_update())
-    if existing:
-        if not authorized(existing, inst):
-            raise ValueError('旧量任务口径变化，须取消后重新建立任务')
-        if left < existing.start or right > existing.end:
+        VolumeBackfillJob.status.in_(("pending", "running", "failed", "partial")),
+        VolumeBackfillJob.start < right, VolumeBackfillJob.end > left)
+        .order_by(VolumeBackfillJob.created_at, VolumeBackfillJob.id).with_for_update()))
+    if matches:
+        if any(not authorized(j, inst) for j in matches):
+            raise ValueError("旧量任务口径变化，须取消后重新建立任务")
+        existing = matches[0]
+        if left < existing.start or right > existing.end or len(matches) > 1:
             old_end = existing.end
             existing.generation += 1
             existing.lease_token, existing.lease_until = None, 0
-            existing.start, existing.end = min(left, existing.start), max(right, existing.end)
-            existing.status, existing.next_at = 'pending', 0
-            for start_at in range(old_end, right, 600*60000):
+            existing.start = min(left, *(j.start for j in matches))
+            existing.end = max(right, *(j.end for j in matches))
+            existing.cursor = max(j.cursor for j in matches)
+            existing.status, existing.next_at = "pending", 0
+            for start_at in range(max(old_end, existing.cursor), existing.end, 600*60000):
                 db.add(VolumeBackfillSegment(job_id=existing.id, start=start_at,
-                    end=min(right, start_at+600*60000), status='retry'))
-            db.add(Audit(kind='volume_backfill_extend', details=dict(job=existing.id,
-                start=existing.start, end=existing.end, automatic=automatic)))
+                    end=min(existing.end, start_at+600*60000), status="retry"))
+            for other in matches[1:]:
+                for segment in db.scalars(select(VolumeBackfillSegment).where(
+                        VolumeBackfillSegment.job_id == other.id,
+                        VolumeBackfillSegment.status.in_(UNRESOLVED))):
+                    db.add(VolumeBackfillSegment(job_id=existing.id, start=segment.start,
+                        end=segment.end, status="retry", detail=segment.detail))
+                other.generation += 1
+                other.status, other.lease_token, other.lease_until = "cancelled", None, 0
+            db.add(Audit(kind="volume_backfill_extend", details=dict(job=existing.id,
+                start=existing.start, end=existing.end, automatic=automatic,
+                merged=[j.id for j in matches[1:]])))
         return existing
     job = VolumeBackfillJob(instrument_id=instrument, **context(inst), start=left, end=right,
                             cursor=right, status='pending')
@@ -103,6 +117,11 @@ def control(db, ident, action):
     inst, job = locked(db, ident)
     if action != 'cancel' and not authorized(job, inst):
         raise ValueError('来源或价格口径变化，旧量任务不能恢复')
+    if action != "cancel" and db.scalar(select(VolumeBackfillJob.id).where(
+            VolumeBackfillJob.id != job.id, VolumeBackfillJob.instrument_id == inst.id,
+            VolumeBackfillJob.status.in_(("pending", "running", "partial", "failed")),
+            VolumeBackfillJob.start < job.end, VolumeBackfillJob.end > job.start).limit(1)):
+        raise ValueError("已有重叠活动量任务，请完成或取消后恢复")
     job.generation += 1
     job.lease_token, job.lease_until = None, 0
     job.error, job.attempts, job.next_at = None, 0, 0
@@ -147,8 +166,17 @@ def finish(db, job):
     derived = db.scalar(select(Bar.id).where(Bar.instrument_id == job.instrument_id,
         Bar.timeframe != 'M1', Bar.complete.is_(True), Bar.start >= job.start, Bar.end <= job.end,
         or_(Bar.volume.is_(None), Bar.volume_complete.is_(False))).limit(1))
-    job.status = 'partial' if missing or unresolved or derived else 'complete'
-    job.error = '仍有缺量、价格冲突或未确认派生量，详见片段' if job.status == 'partial' else None
+    unpublished = db.scalar(select(Bar.id).where(Bar.instrument_id == job.instrument_id,
+        Bar.complete.is_(True), Bar.start >= job.start, Bar.end <= job.end,
+        ~select(ChartPublishedBar.start).where(
+            ChartPublishedBar.instrument_id == Bar.instrument_id,
+            ChartPublishedBar.timeframe == Bar.timeframe,
+            ChartPublishedBar.start == Bar.start,
+            ChartPublishedBar.payload["volume_complete"].as_boolean().is_(True)).exists()).limit(1))
+    job.status = 'partial' if missing or unresolved or derived or unpublished else 'complete' 
+    job.error = ("已有 M1 已补量，但部分价格尚未形成已确认量的发布快照；未创建维护计划"
+        if unpublished and not missing and not unresolved and not derived else
+        '仍有缺量、价格冲突或未确认派生量，详见片段') if job.status == 'partial' else None
     return True
 
 
@@ -204,7 +232,9 @@ def once(fetcher=None):
         retry = db.scalar(select(VolumeBackfillSegment).where(VolumeBackfillSegment.job_id == job.id,
             VolumeBackfillSegment.status == 'retry').order_by(VolumeBackfillSegment.start.desc()).limit(1))
         if retry:
-            left, right, retry_id = retry.start, retry.end, retry.id
+            right, retry_id = retry.end, retry.id
+            left = max(retry.start, right-600*60000)
+            retry_start = retry.start
         else:
             if finish(db, job):
                 return True
@@ -257,8 +287,10 @@ def once(fetcher=None):
                     outcomes[row.start] = 'missing'
             if retry_id:
                 db.execute(delete(VolumeBackfillSegment).where(VolumeBackfillSegment.id == retry_id))
+                if retry_start < left:
+                    db.add(VolumeBackfillSegment(job_id=job.id, start=retry_start, end=left, status="retry"))
             segments(db, job, rows, outcomes, left, right)
-            if not retry_id:
+            if not retry_id or right == job.cursor:
                 job.cursor = left
             job.status, job.lease_token, job.lease_until = 'pending', None, 0
             job.error, job.attempts, job.next_at = None, 0, now_ms()+200
