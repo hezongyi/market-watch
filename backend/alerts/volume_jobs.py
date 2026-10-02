@@ -156,7 +156,7 @@ def finish(db, job):
     publication = db.scalar(select(ChartPublicationJob.start).where(
         ChartPublicationJob.instrument_id == job.instrument_id,
         ChartPublicationJob.start < job.end, ChartPublicationJob.end > job.start).limit(1))
-    if publication and not pending:
+    if publication is not None and not pending:
         from .chart_data import chart_rows
         inst = db.get(Instrument, job.instrument_id)
         for dirty in db.scalars(select(ChartPublicationJob).where(
@@ -169,7 +169,7 @@ def finish(db, job):
                     status="conflict", detail="既有价格桶不完整，量任务不能修复价格或发布该桶"))
                 job.status, job.error = "partial", "部分价格桶不完整，量发布等待显式价格修复；已发布快照保留"
                 return True
-    if pending or publication:
+    if pending is not None or publication is not None:
         job.next_at = now_ms()+1000
         return True
     missing = db.scalar(select(Bar.id).where(Bar.instrument_id == job.instrument_id,
