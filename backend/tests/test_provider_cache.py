@@ -338,7 +338,7 @@ def test_reduced_optional_budgets_keep_demand_and_native_loaded_extra_in_backend
     assert len(result['bars']) == 400 and result['mandatory_count'] == 200
 
 
-@pytest.mark.parametrize('charts,focused,expected', [(1,True,3500),(2,True,1500),
+@pytest.mark.parametrize('charts,focused,expected', [(1,True,2500),(2,True,1500),
                                                   (4,True,1500),(4,False,500),(8,None,1500)])
 def test_native_multichart_response_budget_and_focus(database, monkeypatch, charts, focused, expected):
     from alerts.chart_api import DataQuery

@@ -8,7 +8,7 @@ class CapacityExceeded(ValueError):
 
 
 def optional_bars(context, demand, prefix, *, hot, first, enabled, python=False,
-                  cold_extra=600, first_extra=3000, history_extra=2000):
+                  cold_extra=400, first_extra=2000, history_extra=2000):
     if not enabled or python:
         return 0
     budget = 4000 if context.chart_count == 1 else 2000
