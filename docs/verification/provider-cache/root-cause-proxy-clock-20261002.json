@@ -1,0 +1,73 @@
+{
+  "method": "HTTP Date truncates to seconds; interval bounds proxy clock minus local clock",
+  "samples": [
+    {
+      "local_start_epoch_ms": 1790896636786.56,
+      "local_end_epoch_ms": 1790896636789.17,
+      "server_date_epoch_ms": 1790896636000.0,
+      "rtt_ms": 2.61,
+      "clock_offset_lower_ms": -789.17,
+      "clock_offset_upper_ms": 213.44
+    },
+    {
+      "local_start_epoch_ms": 1790896636969.29,
+      "local_end_epoch_ms": 1790896636970.64,
+      "server_date_epoch_ms": 1790896636000.0,
+      "rtt_ms": 1.34,
+      "clock_offset_lower_ms": -970.64,
+      "clock_offset_upper_ms": 30.71
+    },
+    {
+      "local_start_epoch_ms": 1790896637150.79,
+      "local_end_epoch_ms": 1790896637152.0,
+      "server_date_epoch_ms": 1790896637000.0,
+      "rtt_ms": 1.2,
+      "clock_offset_lower_ms": -152.0,
+      "clock_offset_upper_ms": 849.21
+    },
+    {
+      "local_start_epoch_ms": 1790896637332.18,
+      "local_end_epoch_ms": 1790896637333.39,
+      "server_date_epoch_ms": 1790896637000.0,
+      "rtt_ms": 1.21,
+      "clock_offset_lower_ms": -333.39,
+      "clock_offset_upper_ms": 667.82
+    },
+    {
+      "local_start_epoch_ms": 1790896637513.61,
+      "local_end_epoch_ms": 1790896637514.91,
+      "server_date_epoch_ms": 1790896637000.0,
+      "rtt_ms": 1.3,
+      "clock_offset_lower_ms": -514.91,
+      "clock_offset_upper_ms": 486.39
+    },
+    {
+      "local_start_epoch_ms": 1790896637695.06,
+      "local_end_epoch_ms": 1790896637696.33,
+      "server_date_epoch_ms": 1790896637000.0,
+      "rtt_ms": 1.26,
+      "clock_offset_lower_ms": -696.33,
+      "clock_offset_upper_ms": 304.94
+    },
+    {
+      "local_start_epoch_ms": 1790896637876.44,
+      "local_end_epoch_ms": 1790896637877.73,
+      "server_date_epoch_ms": 1790896637000.0,
+      "rtt_ms": 1.29,
+      "clock_offset_lower_ms": -877.73,
+      "clock_offset_upper_ms": 123.56
+    },
+    {
+      "local_start_epoch_ms": 1790896638057.88,
+      "local_end_epoch_ms": 1790896638059.19,
+      "server_date_epoch_ms": 1790896638000.0,
+      "rtt_ms": 1.31,
+      "clock_offset_lower_ms": -59.19,
+      "clock_offset_upper_ms": 942.12
+    }
+  ],
+  "clock_offset_interval_ms": [
+    -59.19,
+    30.71
+  ]
+}

@@ -1,0 +1,58 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______ test_startup_warms_both_chart_connections_before_overlapping_reads ______
+
+persistent_provider_origin = ('http://127.0.0.1:42671', [55322, 55338, 55340], <threading.Event at 0x7f38afb87c50: set>, <threading.Event at 0x7f38afb87a90: set>)
+
+    def test_startup_warms_both_chart_connections_before_overlapping_reads(persistent_provider_origin):
+        from alerts import provider_chart
+
+        origin = persistent_provider_origin
+        provider_chart.warm_clients()
+        warmed = len(origin[1])
+        overlapping_provider_reads(origin, transport.pooled_client("binance"))
+>       assert len(origin[1]) == warmed, (
+            "A second concurrent chart cannot incur a cold connection after startup warmup",
+            warmed, origin[1],
+        )
+E       AssertionError: ('A second concurrent chart cannot incur a cold connection after startup warmup', 2, [55322, 55338, 55340])
+E       assert 3 == 2
+E        +  where 3 = len([55322, 55338, 55340])
+
+backend/tests/test_provider_transport.py:236: AssertionError
+_________ test_idle_maintenance_keeps_the_second_chart_connection_warm _________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+persistent_provider_origin = ('http://127.0.0.1:35083', [41938, 41940, 49282], <threading.Event at 0x7f38afd3abd0: set>, <threading.Event at 0x7f38afdf59d0: set>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f38afdf4110>
+
+    def test_idle_maintenance_keeps_the_second_chart_connection_warm(database, persistent_provider_origin, monkeypatch):
+        origin = persistent_provider_origin
+        client = transport.pooled_client("binance")
+        overlapping_provider_reads(origin, client)
+        opened = len(origin[1])
+        for elapsed in (25, 50, 75):
+            # Expiry uses HTTPcore's real clock seam; no minute-long test sleeps.
+            with monkeypatch.context() as tick:
+                import httpcore._sync.http11 as http11
+                real_clock = http11.time.monotonic
+                tick.setattr(http11.time, "monotonic", lambda: real_clock() + elapsed)
+                assert transport.maintain("binance", lambda _: False)
+        with monkeypatch.context() as tick:
+            import httpcore._sync.http11 as http11
+            real_clock = http11.time.monotonic
+            tick.setattr(http11.time, "monotonic", lambda: real_clock() + 80)
+            overlapping_provider_reads(origin, client)
+>       assert len(origin[1]) == opened, (
+            "Idle maintenance must refresh every front-end connection, not just the first",
+            opened, origin[1],
+        )
+E       AssertionError: ('Idle maintenance must refresh every front-end connection, not just the first', 2, [41938, 41940, 49282])
+E       assert 3 == 2
+E        +  where 3 = len([41938, 41940, 49282])
+
+backend/tests/test_provider_transport.py:259: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_transport.py::test_startup_warms_both_chart_connections_before_overlapping_reads
+FAILED backend/tests/test_provider_transport.py::test_idle_maintenance_keeps_the_second_chart_connection_warm
+2 failed, 4 deselected in 3.17s

@@ -1,0 +1,47 @@
+{
+  "source": "MetaCubeX/mihomo official version corresponding to read-only /version",
+  "files": [
+    {
+      "path": "listener/http/proxy.go",
+      "version": "v1.19.31",
+      "url": "https://github.com/MetaCubeX/mihomo/blob/v1.19.31/listener/http/proxy.go",
+      "sha256": "789314ce46bfb11c8060e41cc179f489dad1622b53ddb2f6bc573cdd71a0b675",
+      "bytes": 4843
+    },
+    {
+      "path": "tunnel/tunnel.go",
+      "version": "v1.19.31",
+      "url": "https://github.com/MetaCubeX/mihomo/blob/v1.19.31/tunnel/tunnel.go",
+      "sha256": "bd0818dddd04779aad3f078819b3ca050bd8bdce29ba57e5a377770539278596",
+      "bytes": 20268
+    },
+    {
+      "path": "tunnel/statistic/tracker.go",
+      "version": "v1.19.31",
+      "url": "https://github.com/MetaCubeX/mihomo/blob/v1.19.31/tunnel/statistic/tracker.go",
+      "sha256": "80e8cc0df115c35a62baea5aec4c3ad4a28c1cf9c47c52a78e76523520c83a6f",
+      "bytes": 5599
+    },
+    {
+      "path": "component/sniffer/dispatcher.go",
+      "version": "v1.19.31",
+      "url": "https://github.com/MetaCubeX/mihomo/blob/v1.19.31/component/sniffer/dispatcher.go",
+      "sha256": "93bcf92cbee8aeb813ee2254614caeed0f2a0b494676b08eebfeb4bf9c8bf7b0",
+      "bytes": 11636
+    },
+    {
+      "path": "adapter/outboundgroup/fallback.go",
+      "version": "v1.19.31",
+      "url": "https://github.com/MetaCubeX/mihomo/blob/v1.19.31/adapter/outboundgroup/fallback.go",
+      "sha256": "3e9861bdcce02cdc1bfa923c4a402dafce3401542c3d76071c3cfb54b725d7ee",
+      "bytes": 4298
+    }
+  ],
+  "key_lines": {
+    "CONNECT_ACK_before_HandleTCPConn": "listener/http/proxy.go:68-76",
+    "preHandle_sniff_resolve_dial_before_tracker": "tunnel/tunnel.go:519-615",
+    "tracker_clock_after_outbound_preparation": "tunnel/statistic/tracker.go:119-127",
+    "internal_dial_retry": "tunnel/tunnel.go:739-759",
+    "fallback_selects_liveness_not_actual_provider_latency": "adapter/outboundgroup/fallback.go:105-123"
+  }
+}

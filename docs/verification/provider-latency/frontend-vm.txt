@@ -1,0 +1,256 @@
+VM files: 35
+TAP version 13
+# Autosave preserves in-flight edits and failed-save retry state
+# Subtest: tests/advanced-autosave.cjs
+ok 1 - tests/advanced-autosave.cjs
+  ---
+  duration_ms: 47.343598
+  type: 'test'
+  ...
+# style extraction: presentation whitelist, no workspace objects, detached copy passed
+# Subtest: tests/advanced-chart-style.cjs
+ok 2 - tests/advanced-chart-style.cjs
+  ---
+  duration_ms: 49.214358
+  type: 'test'
+  ...
+# Subtest: tests/advanced-cold-pagination.cjs
+ok 3 - tests/advanced-cold-pagination.cjs
+  ---
+  duration_ms: 60.153921
+  type: 'test'
+  ...
+# Edge range synchronization: alignment, loading, user toggle and disposal passed
+# Subtest: tests/advanced-edge-sync.cjs
+ok 4 - tests/advanced-edge-sync.cjs
+  ---
+  duration_ms: 48.688567
+  type: 'test'
+  ...
+# Published pagination preserves latest subscription boundary and earliest revision range
+# Subtest: tests/advanced-history-boundaries.cjs
+ok 5 - tests/advanced-history-boundaries.cjs
+  ---
+  duration_ms: 73.369791
+  type: 'test'
+  ...
+# Historical views ignore remote latest revisions; visible revisions and initial data still refresh
+# Subtest: tests/advanced-history-change-range.cjs
+ok 6 - tests/advanced-history-change-range.cjs
+  ---
+  duration_ms: 49.724718
+  type: 'test'
+  ...
+# Concurrent history reads share requests, distinct periods isolate, completion and failure clear entries
+# Subtest: tests/advanced-history-dedup.cjs
+ok 7 - tests/advanced-history-dedup.cjs
+  ---
+  duration_ms: 58.151593
+  type: 'test'
+  ...
+# Viewport demand counts spacing, shares pane identity, renews, excludes W/M and disposes
+# Subtest: tests/advanced-history-demand.cjs
+ok 8 - tests/advanced-history-demand.cjs
+  ---
+  duration_ms: 72.477179
+  type: 'test'
+  ...
+# Large countBack traverses published pages without truncation or duplicate bars
+# Subtest: tests/advanced-history-pagination.cjs
+ok 9 - tests/advanced-history-pagination.cjs
+  ---
+  duration_ms: 118.671078
+  type: 'test'
+  ...
+# Grouped polling recovers after failure and prevents overlapping requests
+# Historical reload invalidates matching cache before resetting only matching panes
+# Subtest: tests/advanced-history-reload.cjs
+ok 10 - tests/advanced-history-reload.cjs
+  ---
+  duration_ms: 56.203728
+  type: 'test'
+  ...
+# Four obsolete in-flight histories release slots within 180ms; current request starts
+# Subtest: tests/advanced-inflight-cancellation.cjs
+ok 11 - tests/advanced-inflight-cancellation.cjs
+  ---
+  duration_ms: 262.603991
+  type: 'test'
+  ...
+# Latest snapshot immediate reuse and asynchronous refresh passed
+# Subtest: tests/advanced-latest-cache.cjs
+ok 12 - tests/advanced-latest-cache.cjs
+  ---
+  duration_ms: 57.94929
+  type: 'test'
+  ...
+# Visible polling resumes independently of deferred historical reset
+# Subtest: tests/advanced-layout-poll-resume.cjs
+ok 13 - tests/advanced-layout-poll-resume.cjs
+  ---
+  duration_ms: 45.25667
+  type: 'test'
+  ...
+# Managed feed: consent, refusal, real geometry, published session boundary passed
+# Subtest: tests/advanced-managed.cjs
+ok 14 - tests/advanced-managed.cjs
+  ---
+  duration_ms: 38.114123
+  type: 'test'
+  ...
+# Monthly local-only history: empty, partial and multi-page cached data passed
+# Subtest: tests/advanced-monthly-cache.cjs
+ok 15 - tests/advanced-monthly-cache.cjs
+  ---
+  duration_ms: 288.910448
+  type: 'test'
+  ...
+# native workspace adapter: conflict, serialized saves and readonly passed
+# Subtest: tests/advanced-native-workspaces.cjs
+ok 16 - tests/advanced-native-workspaces.cjs
+  ---
+  duration_ms: 41.789189
+  type: 'test'
+  ...
+# Historical navigation waits for target coverage and yields to cancellation
+# Subtest: tests/advanced-navigation-page.cjs
+ok 17 - tests/advanced-navigation-page.cjs
+  ---
+  duration_ms: 41.211023
+  type: 'test'
+  ...
+# native adapters: queued writes, namespaces, reload, conflict and readonly passed
+# Subtest: tests/advanced-preferences.cjs
+ok 18 - tests/advanced-preferences.cjs
+  ---
+  duration_ms: 53.666696
+  type: 'test'
+  ...
+# Prewarmed period pages satisfy smaller requests without network; boundaries and capacity enforced
+# Subtest: tests/advanced-prewarm-cache.cjs
+ok 19 - tests/advanced-prewarm-cache.cjs
+  ---
+  duration_ms: 99.018317
+  type: 'test'
+  ...
+# Progressive cache deduplicates, returns warm data, refreshes revisions and stops hidden polling
+# Subtest: tests/advanced-progressive-cache.cjs
+ok 20 - tests/advanced-progressive-cache.cjs
+  ---
+  duration_ms: 42.889813
+  type: 'test'
+  ...
+# Progressive studies use only ready raw history; empty pages skip calculation
+# Subtest: tests/advanced-progressive-indicators.cjs
+ok 21 - tests/advanced-progressive-indicators.cjs
+  ---
+  duration_ms: 52.228579
+  type: 'test'
+  ...
+# Provider native requests survive period switches and cancel on workspace replacement
+# Subtest: tests/advanced-provider-request-lifetime.cjs
+ok 22 - tests/advanced-provider-request-lifetime.cjs
+  ---
+  duration_ms: 400.317915
+  type: 'test'
+  ...
+# Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed
+# Subtest: tests/advanced-provider-subscriptions.cjs
+ok 23 - tests/advanced-provider-subscriptions.cjs
+  ---
+  duration_ms: 328.15775
+  type: 'test'
+  ...
+# Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed
+# Subtest: tests/advanced-python-indicators.cjs
+ok 24 - tests/advanced-python-indicators.cjs
+  ---
+  duration_ms: 61.195995
+  type: 'test'
+  ...
+# Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed
+# Subtest: tests/advanced-range-sync.cjs
+ok 25 - tests/advanced-range-sync.cjs
+  ---
+  duration_ms: 43.372587
+  type: 'test'
+  ...
+# History refresh yields to new mouse/focus/zoom intent and removes listeners
+# Subtest: tests/advanced-refresh-interaction.cjs
+ok 26 - tests/advanced-refresh-interaction.cjs
+  ---
+  duration_ms: 113.867645
+  type: 'test'
+  ...
+# Queued stale history and old workspace requests cancel; current viewers proceed
+# Subtest: tests/advanced-request-cancellation.cjs
+ok 27 - tests/advanced-request-cancellation.cjs
+  ---
+  duration_ms: 41.340035
+  type: 'test'
+  ...
+# Series: legacy compatibility, synthetic identity, search defaults, isolated provider feed passed
+# Subtest: tests/advanced-series.cjs
+ok 28 - tests/advanced-series.cjs
+  ---
+  duration_ms: 50.913828
+  type: 'test'
+  ...
+# Startup metadata is consumed once, preserves series identity and does not acquire bars
+# Subtest: tests/advanced-startup-metadata.cjs
+ok 29 - tests/advanced-startup-metadata.cjs
+  ---
+  duration_ms: 40.04434
+  type: 'test'
+  ...
+# Public snapshots defer synchronized startup while retaining user choices and vendor content
+# Subtest: tests/advanced-sync-snapshot.cjs
+ok 30 - tests/advanced-sync-snapshot.cjs
+  ---
+  duration_ms: 49.696931
+  type: 'test'
+  ...
+# 13 calendar label cases passed; intraday timestamp unchanged
+# Subtest: tests/advanced-time.cjs
+ok 31 - tests/advanced-time.cjs
+  ---
+  duration_ms: 71.398161
+  type: 'test'
+  ...
+# Viewport restoration preserves preferences and checks symbol identity
+# Subtest: tests/advanced-viewports.cjs
+ok 32 - tests/advanced-viewports.cjs
+  ---
+  duration_ms: 296.199078
+  type: 'test'
+  ...
+# Watchlist restore avoids empty native collection; retry and readonly passed
+# Subtest: tests/advanced-watchlists.cjs
+ok 33 - tests/advanced-watchlists.cjs
+  ---
+  duration_ms: 365.434674
+  type: 'test'
+  ...
+# Weekly preparing callback yields, releases guard, and refreshes only on explicit action
+# Subtest: tests/advanced-weekly-background.cjs
+ok 34 - tests/advanced-weekly-background.cjs
+  ---
+  duration_ms: 65.108427
+  type: 'test'
+  ...
+# Weekly failure stays an error; explicit refresh clears cache and recovers bars
+# Subtest: tests/advanced-weekly-error.cjs
+ok 35 - tests/advanced-weekly-error.cjs
+  ---
+  duration_ms: 81.105159
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1324.265596

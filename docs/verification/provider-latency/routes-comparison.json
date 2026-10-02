@@ -1,0 +1,627 @@
+{
+  "read_only": true,
+  "interleaved": true,
+  "records": [
+    {
+      "round": 0,
+      "source": "binance",
+      "route": "shared-jp02",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 837.95,
+      "phases_ms": {
+        "connection.connect_tcp": 1.04,
+        "http11.send_request_headers": 0.16,
+        "http11.send_request_body": 0.04,
+        "http11.receive_response_headers": 196.73,
+        "proxy.start_tls": 638.01,
+        "http11.receive_response_body": 0.23,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "route": "shared-jp02",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 432.8,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 431.68,
+        "http11.receive_response_body": 0.2,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "route": "local-jp02-relay",
+      "repeat": 0,
+      "error_type": "ConnectTimeout",
+      "elapsed_ms": 4002.75,
+      "phases_ms": {
+        "connection.connect_tcp": 0.17,
+        "http11.send_request_headers": 0.1,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 0.25,
+        "proxy.start_tls": 4001.24
+      }
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "route": "local-jp01-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 3227.26,
+      "phases_ms": {
+        "connection.connect_tcp": 0.18,
+        "http11.send_request_headers": 0.15,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 112.13,
+        "proxy.start_tls": 3113.01,
+        "http11.receive_response_body": 0.22,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "route": "local-jp01-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 107.88,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 106.89,
+        "http11.receive_response_body": 0.2,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "route": "local-jp-vmess",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 1673.89,
+      "phases_ms": {
+        "connection.connect_tcp": 0.16,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 346.93,
+        "proxy.start_tls": 1325.05,
+        "http11.receive_response_body": 0.24,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "binance",
+      "route": "local-jp-vmess",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 347.81,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 346.83,
+        "http11.receive_response_body": 0.2,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "route": "shared-us01",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 959.93,
+      "phases_ms": {
+        "connection.connect_tcp": 0.39,
+        "http11.send_request_headers": 0.16,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 310.45,
+        "proxy.start_tls": 646.93,
+        "http11.receive_response_body": 0.21,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "route": "shared-us01",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 305.68,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 304.6,
+        "http11.receive_response_body": 0.21,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "route": "local-us01-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 963.21,
+      "phases_ms": {
+        "connection.connect_tcp": 0.16,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 319.9,
+        "proxy.start_tls": 641.35,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "route": "local-us01-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 364.52,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 363.54,
+        "http11.receive_response_body": 0.18,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "route": "local-us02-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 925.11,
+      "phases_ms": {
+        "connection.connect_tcp": 0.22,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 295.9,
+        "proxy.start_tls": 627.27,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 0,
+      "source": "oanda",
+      "route": "local-us02-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 325.2,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 324.15,
+        "http11.receive_response_body": 0.21,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "route": "local-us02-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 1181.06,
+      "phases_ms": {
+        "connection.connect_tcp": 0.15,
+        "http11.send_request_headers": 0.15,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 384.07,
+        "proxy.start_tls": 795.02,
+        "http11.receive_response_body": 0.2,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "route": "local-us02-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 495.64,
+      "phases_ms": {
+        "http11.send_request_headers": 0.11,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 494.72,
+        "http11.receive_response_body": 0.22,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "route": "local-us01-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 1344.54,
+      "phases_ms": {
+        "connection.connect_tcp": 0.17,
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 334.81,
+        "proxy.start_tls": 1007.75,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "route": "local-us01-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 292.13,
+      "phases_ms": {
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 287.57,
+        "http11.receive_response_body": 3.75,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "route": "shared-us01",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 977.63,
+      "phases_ms": {
+        "connection.connect_tcp": 0.32,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 341.57,
+        "proxy.start_tls": 631.48,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "oanda",
+      "route": "shared-us01",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 659.74,
+      "phases_ms": {
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 658.77,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "route": "local-jp-vmess",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 1700.26,
+      "phases_ms": {
+        "connection.connect_tcp": 0.25,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 359.56,
+        "proxy.start_tls": 1338.48,
+        "http11.receive_response_body": 0.17,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "route": "local-jp-vmess",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 360.8,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 359.86,
+        "http11.receive_response_body": 0.17,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "route": "local-jp01-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 998.31,
+      "phases_ms": {
+        "connection.connect_tcp": 0.15,
+        "http11.send_request_headers": 0.15,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 104.11,
+        "proxy.start_tls": 892.3,
+        "http11.receive_response_body": 0.17,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "route": "local-jp01-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 104.8,
+      "phases_ms": {
+        "http11.send_request_headers": 0.12,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 103.9,
+        "http11.receive_response_body": 0.18,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "route": "local-jp02-relay",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 877.34,
+      "phases_ms": {
+        "connection.connect_tcp": 0.14,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 233.84,
+        "proxy.start_tls": 641.57,
+        "http11.receive_response_body": 0.21,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "route": "local-jp02-relay",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 177.03,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 175.99,
+        "http11.receive_response_body": 0.21,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 1,
+      "source": "binance",
+      "route": "shared-jp02",
+      "repeat": 0,
+      "error_type": "ConnectTimeout",
+      "elapsed_ms": 4007.25,
+      "phases_ms": {
+        "connection.connect_tcp": 0.38,
+        "http11.send_request_headers": 1.96,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 0.25,
+        "proxy.start_tls": 4003.71
+      }
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "route": "shared-jp02",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 805.25,
+      "phases_ms": {
+        "connection.connect_tcp": 0.39,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 175.25,
+        "proxy.start_tls": 628.07,
+        "http11.receive_response_body": 0.17,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "route": "shared-jp02",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 176.12,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 175.1,
+        "http11.receive_response_body": 0.18,
+        "http11.response_closed": 0.04
+      }
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "route": "local-jp02-relay",
+      "repeat": 0,
+      "error_type": "ConnectTimeout",
+      "elapsed_ms": 4006.21,
+      "phases_ms": {
+        "connection.connect_tcp": 0.3,
+        "http11.send_request_headers": 0.41,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 0.09,
+        "proxy.start_tls": 4004.44
+      }
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "route": "local-jp01-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 2468.8,
+      "phases_ms": {
+        "connection.connect_tcp": 0.14,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 95.03,
+        "proxy.start_tls": 2371.86,
+        "http11.receive_response_body": 0.18,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "route": "local-jp01-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 96.86,
+      "phases_ms": {
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 95.97,
+        "http11.receive_response_body": 0.17,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "route": "local-jp-vmess",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 1807.26,
+      "phases_ms": {
+        "connection.connect_tcp": 0.17,
+        "http11.send_request_headers": 0.13,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 380.23,
+        "proxy.start_tls": 1424.89,
+        "http11.receive_response_body": 0.17,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "binance",
+      "route": "local-jp-vmess",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 394.83,
+      "phases_ms": {
+        "http11.send_request_headers": 0.11,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 393.98,
+        "http11.receive_response_body": 0.18,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "route": "shared-us01",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 1154.03,
+      "phases_ms": {
+        "connection.connect_tcp": 0.34,
+        "http11.send_request_headers": 0.12,
+        "http11.send_request_body": 0.04,
+        "http11.receive_response_headers": 484.85,
+        "proxy.start_tls": 666.9,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "route": "shared-us01",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 346.51,
+      "phases_ms": {
+        "http11.send_request_headers": 0.1,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 345.65,
+        "http11.receive_response_body": 0.2,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "route": "local-us01-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 976.73,
+      "phases_ms": {
+        "connection.connect_tcp": 0.19,
+        "http11.send_request_headers": 0.14,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 301.68,
+        "proxy.start_tls": 668.05,
+        "http11.receive_response_body": 4.25,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "route": "local-us01-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 293.34,
+      "phases_ms": {
+        "http11.send_request_headers": 0.15,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 288.24,
+        "http11.receive_response_body": 4.25,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "route": "local-us02-direct",
+      "repeat": 0,
+      "status": 200,
+      "elapsed_ms": 1025.87,
+      "phases_ms": {
+        "connection.connect_tcp": 0.16,
+        "http11.send_request_headers": 0.12,
+        "http11.send_request_body": 0.03,
+        "http11.receive_response_headers": 399.89,
+        "proxy.start_tls": 623.95,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      }
+    },
+    {
+      "round": 2,
+      "source": "oanda",
+      "route": "local-us02-direct",
+      "repeat": 1,
+      "status": 200,
+      "elapsed_ms": 340.19,
+      "phases_ms": {
+        "http11.send_request_headers": 0.12,
+        "http11.send_request_body": 0.02,
+        "http11.receive_response_headers": 339.29,
+        "http11.receive_response_body": 0.19,
+        "http11.response_closed": 0.01
+      }
+    }
+  ]
+}

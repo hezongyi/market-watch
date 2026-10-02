@@ -1,0 +1,43 @@
+{
+  "baseline": "v1.3.0",
+  "configuration": "local VMess Japan / direct US01; no shared selector modifications",
+  "services": {
+    "api": {
+      "image_id": "sha256:7fe248d8ee828f69987a306dc32d378f4b940a2218a20471c30640a15ab2ef22",
+      "image_tag": "market-watch-api:provider-latency-fix",
+      "running": true,
+      "cpu_nanos": 1000000000,
+      "memory_bytes": 536870912,
+      "network_mode": "host",
+      "source_hashes": [
+        "f0d49f704c6bfd31ff763c295959e4567ec1db06422810e5e42775c51dcdfe75  /app/backend/alerts/provider_transport.py",
+        "a6f1314d8df750a33823871231b5b4008f89971d97dc56f54e4d802cfbebdbb5  /app/backend/alerts/provider_chart.py",
+        "38778142677521c672593c809062ba1a20bab9b2ad4744804ff5ff32d7078a31  /app/backend/alerts/market_resources.py"
+      ]
+    },
+    "web": {
+      "image_id": "sha256:53a31ca58aa4f7a34fc29225d30477635e47e04ec55ff613c421ff42004781b4",
+      "image_tag": "market-watch-web:provider-latency-fix",
+      "running": true,
+      "cpu_nanos": 1000000000,
+      "memory_bytes": 536870912,
+      "network_mode": "host"
+    },
+    "chart-origin": {
+      "image_id": "sha256:2770ede098d4b978a833e7a34e1219e0e130d788581a9e7ee91e66ba1fe150c6",
+      "image_tag": "market-watch-chart-origin:1.3.0-local",
+      "running": true,
+      "cpu_nanos": 1000000000,
+      "memory_bytes": 536870912,
+      "network_mode": "market-watch-provider-latency_default"
+    },
+    "tls": {
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "image_tag": "nginx:1.28-alpine",
+      "running": true,
+      "cpu_nanos": 1000000000,
+      "memory_bytes": 536870912,
+      "network_mode": "host"
+    }
+  }
+}

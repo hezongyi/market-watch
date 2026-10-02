@@ -1,0 +1,3967 @@
+{
+  "read_only": true,
+  "serial": true,
+  "minimum_request_start_interval_seconds": 1,
+  "records": [
+    {
+      "source": "oanda",
+      "repeat": 0,
+      "started_at_epoch_ms": 1790894158407,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.51
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.6
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.66
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.79
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.8
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.84
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.84
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2.33
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 2.37
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 654.92
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 655.01
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 655.14
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 655.15
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 655.18
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 655.19
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1083.55
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1083.82
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1088.57
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1088.61
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1088.63
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 449.82,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 1544,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 753.44,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 2091,
+            "download": 3926
+          }
+        },
+        {
+          "at_ms": 1208.66,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 2091,
+            "download": 8472
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1089.01,
+      "source_port": 46392,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "oanda",
+      "repeat": 1,
+      "started_at_epoch_ms": 1790894159656,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.39
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.54
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.54
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 307.14
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 307.42
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 307.66
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 307.68
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 307.69
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 110.76,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 2558,
+            "download": 8472
+          }
+        },
+        {
+          "at_ms": 414.16,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 2558,
+            "download": 12643
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 308.0,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 2,
+      "started_at_epoch_ms": 1790894160657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.44
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 300.77
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 301.0
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 301.22
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 301.25
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 301.26
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 16.06,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 3025,
+            "download": 12643
+          }
+        },
+        {
+          "at_ms": 319.33,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 3025,
+            "download": 16754
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 301.65,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 3,
+      "started_at_epoch_ms": 1790894161657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.43
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 302.02
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 302.25
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 302.44
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 302.47
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 302.48
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 71.55,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 3492,
+            "download": 16754
+          }
+        },
+        {
+          "at_ms": 374.85,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 3492,
+            "download": 20684
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 302.74,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 4,
+      "started_at_epoch_ms": 1790894162657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.42
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 337.8
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 338.05
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 338.25
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 338.27
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 338.28
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 127.01,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 3959,
+            "download": 20684
+          }
+        },
+        {
+          "at_ms": 430.43,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 3959,
+            "download": 24810
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 338.66,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 5,
+      "started_at_epoch_ms": 1790894163657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.42
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 621.45
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 621.68
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 621.92
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 621.94
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 621.95
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 32.44,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 4426,
+            "download": 24810
+          }
+        },
+        {
+          "at_ms": 638.98,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 4426,
+            "download": 29039
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 622.23,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 6,
+      "started_at_epoch_ms": 1790894164657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.43
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 293.77
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 294.02
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 294.22
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 294.24
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 294.25
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 90.73,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 4893,
+            "download": 29039
+          }
+        },
+        {
+          "at_ms": 393.99,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 4893,
+            "download": 33026
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 294.64,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 7,
+      "started_at_epoch_ms": 1790894165657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.49
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.65
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.68
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.69
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 279.99
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 280.23
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 283.45
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 283.48
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 283.5
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 146.03,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 5360,
+            "download": 33026
+          }
+        },
+        {
+          "at_ms": 297.59,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 5360,
+            "download": 37013
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 283.79,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 8,
+      "started_at_epoch_ms": 1790894166657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.45
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.67
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.68
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 391.41
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 391.66
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 391.87
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 391.89
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 391.9
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 49.67,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 5827,
+            "download": 37013
+          }
+        },
+        {
+          "at_ms": 504.96,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 5827,
+            "download": 40968
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 392.21,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 9,
+      "started_at_epoch_ms": 1790894167657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.43
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 362.44
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 362.67
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 362.87
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 362.89
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 362.9
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 107.12,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 6294,
+            "download": 40968
+          }
+        },
+        {
+          "at_ms": 410.44,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 6294,
+            "download": 45118
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 363.32,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 10,
+      "started_at_epoch_ms": 1790894168657,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.44
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.62
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.66
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.67
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 348.3
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 348.54
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 348.78
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 348.81
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 348.82
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 12.38,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 6761,
+            "download": 45118
+          }
+        },
+        {
+          "at_ms": 467.73,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 6761,
+            "download": 49168
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 349.11,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 11,
+      "started_at_epoch_ms": 1790894169658,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.45
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.65
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.66
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.69
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.69
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 358.96
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 359.22
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 359.43
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 359.45
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 359.46
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 69.72,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 7228,
+            "download": 49168
+          }
+        },
+        {
+          "at_ms": 373.09,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 7228,
+            "download": 53183
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 359.75,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 12,
+      "started_at_epoch_ms": 1790894170658,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.46
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 871.75
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 871.99
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 872.23
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 872.25
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 872.26
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 125.42,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 7695,
+            "download": 53183
+          }
+        },
+        {
+          "at_ms": 883.98,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 7695,
+            "download": 57439
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 872.56,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 13,
+      "started_at_epoch_ms": 1790894171692,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.38
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.52
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.53
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.56
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.56
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 291.85
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 292.08
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 292.19
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 292.21
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 292.22
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 151.56,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 8162,
+            "download": 57439
+          }
+        },
+        {
+          "at_ms": 303.1,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 8162,
+            "download": 61368
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 292.49,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 14,
+      "started_at_epoch_ms": 1790894172692,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.43
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.59
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.62
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.63
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 367.48
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 367.75
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 367.86
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 367.89
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 367.9
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 56.13,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 8629,
+            "download": 61368
+          }
+        },
+        {
+          "at_ms": 511.09,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 8629,
+            "download": 65297
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 368.2,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 15,
+      "started_at_epoch_ms": 1790894173692,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.41
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.63
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.63
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 305.22
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 305.44
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 305.57
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 305.59
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 305.6
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 113.16,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 9096,
+            "download": 65297
+          }
+        },
+        {
+          "at_ms": 416.71,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 9096,
+            "download": 69374
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 306.06,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 16,
+      "started_at_epoch_ms": 1790894174692,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.46
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.66
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.66
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 636.97
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 637.2
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 637.32
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 637.34
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 637.35
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 18.58,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 9563,
+            "download": 69374
+          }
+        },
+        {
+          "at_ms": 777.28,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 9563,
+            "download": 73556
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 637.67,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 17,
+      "started_at_epoch_ms": 1790894175693,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.44
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.63
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 390.41
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 390.62
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 390.73
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 390.75
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 390.76
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 79.02,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 10030,
+            "download": 73556
+          }
+        },
+        {
+          "at_ms": 533.93,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 10030,
+            "download": 77641
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 391.66,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 18,
+      "started_at_epoch_ms": 1790894176693,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.43
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 327.82
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 328.05
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 328.17
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 328.19
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 328.2
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 135.96,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 10497,
+            "download": 77641
+          }
+        },
+        {
+          "at_ms": 439.6,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 10497,
+            "download": 81688
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 328.48,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 19,
+      "started_at_epoch_ms": 1790894177693,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.45
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 329.51
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 329.75
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 329.87
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 329.89
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 329.9
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 41.61,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 10964,
+            "download": 81688
+          }
+        },
+        {
+          "at_ms": 345.34,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 10964,
+            "download": 85859
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 330.21,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 20,
+      "started_at_epoch_ms": 1790894178693,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.41
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.55
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.56
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.59
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 434.51
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 434.74
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 434.86
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 434.89
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 434.9
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 97.65,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 11431,
+            "download": 85859
+          }
+        },
+        {
+          "at_ms": 552.74,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 11431,
+            "download": 90064
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 435.33,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 21,
+      "started_at_epoch_ms": 1790894179693,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.44
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 293.36
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 293.6
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 293.71
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 293.73
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 293.74
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 4.67,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 11898,
+            "download": 90064
+          }
+        },
+        {
+          "at_ms": 308.02,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 11898,
+            "download": 94269
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 294.06,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 22,
+      "started_at_epoch_ms": 1790894180693,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.42
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 332.58
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 332.81
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 332.92
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 332.96
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 332.97
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 60.18,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 12365,
+            "download": 94269
+          }
+        },
+        {
+          "at_ms": 363.47,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 12365,
+            "download": 98422
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 333.26,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 23,
+      "started_at_epoch_ms": 1790894181693,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.42
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.62
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.65
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.67
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.68
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 378.32
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 378.54
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 378.66
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 378.68
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 378.69
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 115.47,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 12832,
+            "download": 98422
+          }
+        },
+        {
+          "at_ms": 418.83,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 12832,
+            "download": 102429
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 379.12,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 24,
+      "started_at_epoch_ms": 1790894182693,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.42
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.57
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 362.6
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 362.83
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 362.94
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 362.96
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 362.97
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 20.61,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 13299,
+            "download": 102429
+          }
+        },
+        {
+          "at_ms": 475.69,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 13299,
+            "download": 106569
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 363.25,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 25,
+      "started_at_epoch_ms": 1790894183694,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.45
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.65
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.68
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.68
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 329.69
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 329.93
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 330.05
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 330.07
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 330.08
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 77.67,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 13766,
+            "download": 106569
+          }
+        },
+        {
+          "at_ms": 381.28,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 13766,
+            "download": 110690
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 330.42,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 26,
+      "started_at_epoch_ms": 1790894184694,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.44
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.58
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.59
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.62
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 585.77
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 586.0
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 586.12
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 586.14
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 586.17
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 133.41,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 14233,
+            "download": 110690
+          }
+        },
+        {
+          "at_ms": 588.27,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 14233,
+            "download": 114915
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 586.62,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 27,
+      "started_at_epoch_ms": 1790894185694,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.47
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.77
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.78
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.81
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.81
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 285.38
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 285.62
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 285.74
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 285.76
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 285.77
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 41.63,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 14700,
+            "download": 114915
+          }
+        },
+        {
+          "at_ms": 344.93,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 14700,
+            "download": 119109
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 286.07,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 28,
+      "started_at_epoch_ms": 1790894186694,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.44
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.59
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.59
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.62
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.63
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 298.54
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 298.77
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 298.9
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 298.92
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 298.93
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 97.05,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 15167,
+            "download": 119109
+          }
+        },
+        {
+          "at_ms": 400.47,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 15167,
+            "download": 123303
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 299.22,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 29,
+      "started_at_epoch_ms": 1790894187694,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.44
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 368.54
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 368.77
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 368.9
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 368.92
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 368.93
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 2.19,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 15634,
+            "download": 123303
+          }
+        },
+        {
+          "at_ms": 457.15,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 15634,
+            "download": 127422
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 369.38,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 30,
+      "started_at_epoch_ms": 1790894188694,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.43
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.59
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.63
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.63
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 282.37
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 282.61
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 282.72
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 282.74
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 282.77
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 59.32,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 16101,
+            "download": 127422
+          }
+        },
+        {
+          "at_ms": 362.88,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 16101,
+            "download": 131552
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 283.07,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "oanda",
+      "repeat": 31,
+      "started_at_epoch_ms": 1790894189694,
+      "events": [
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.44
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.6
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.65
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 0.65
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 321.85
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 322.09
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 322.2
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 322.22
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 322.23
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 114.99,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 16568,
+            "download": 131552
+          }
+        },
+        {
+          "at_ms": 418.23,
+          "connection": {
+            "id": "7269d8fa-1ee8-43f9-980f-7f43be3d1e21",
+            "source_port": 46392,
+            "chains": [
+              "L1|美国01|直连|流媒体|2x",
+              "🛟 OANDA美国故障转移",
+              "📈 OANDA行情"
+            ],
+            "start": "2026-10-02T06:35:58.81269537+08:00",
+            "upload": 16568,
+            "download": 135516
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 322.54,
+      "source_port": 46392,
+      "new_connection": false,
+      "confirmed_reuse": true
+    },
+    {
+      "source": "binance",
+      "repeat": 0,
+      "started_at_epoch_ms": 1790894190694,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.4
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 0.86
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.95
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.04
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.05
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.08
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.08
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.44
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.48
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 3637.31
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 3637.38
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 3637.52
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 3637.53
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 3637.56
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 3637.56
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 3816.48
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 3816.67
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 3816.9
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 3816.92
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 3816.93
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 2905.31,
+          "connection": {
+            "id": "f5184f05-9bf4-4d2d-bfa1-01d0f3e8875b",
+            "source_port": 53412,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:33.517076501+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 3512.05,
+          "connection": {
+            "id": "f5184f05-9bf4-4d2d-bfa1-01d0f3e8875b",
+            "source_port": 53412,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:33.517076501+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 3663.98,
+          "connection": {
+            "id": "f5184f05-9bf4-4d2d-bfa1-01d0f3e8875b",
+            "source_port": 53412,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:33.517076501+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 3815.55,
+          "connection": {
+            "id": "f5184f05-9bf4-4d2d-bfa1-01d0f3e8875b",
+            "source_port": 53412,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:33.517076501+08:00",
+            "upload": 1925,
+            "download": 12674
+          }
+        },
+        {
+          "at_ms": 3967.44,
+          "connection": {
+            "id": "f5184f05-9bf4-4d2d-bfa1-01d0f3e8875b",
+            "source_port": 53412,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:33.517076501+08:00",
+            "upload": 1925,
+            "download": 14532
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 3817.14,
+      "source_port": 53412,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 1,
+      "started_at_epoch_ms": 1790894194688,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.53
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 0.93
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.98
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.07
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.07
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.1
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.11
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.39
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.42
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 622.46
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 622.53
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 622.67
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 622.68
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 622.81
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 622.81
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 799.46
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 799.73
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 799.95
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 799.97
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 799.98
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 428.96,
+          "connection": {
+            "id": "78f19e5c-cc97-4e0a-ab0e-ab3d4b1209c0",
+            "source_port": 53424,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:34.954922107+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 580.78,
+          "connection": {
+            "id": "78f19e5c-cc97-4e0a-ab0e-ab3d4b1209c0",
+            "source_port": 53424,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:34.954922107+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 732.34,
+          "connection": {
+            "id": "78f19e5c-cc97-4e0a-ab0e-ab3d4b1209c0",
+            "source_port": 53424,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:34.954922107+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 884.35,
+          "connection": {
+            "id": "78f19e5c-cc97-4e0a-ab0e-ab3d4b1209c0",
+            "source_port": 53424,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:34.954922107+08:00",
+            "upload": 1925,
+            "download": 14757
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 800.24,
+      "source_port": 53424,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 2,
+      "started_at_epoch_ms": 1790894195688,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.71
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.07
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.13
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.22
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.23
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.26
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.26
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.47
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.51
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 646.54
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 646.6
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 646.74
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 646.75
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 646.78
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 646.79
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 835.48
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 835.75
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 835.97
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 835.99
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 836.0
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 339.03,
+          "connection": {
+            "id": "d886850a-21e6-487d-a46d-36d3ebe2445e",
+            "source_port": 53428,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:35.969960974+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 490.71,
+          "connection": {
+            "id": "d886850a-21e6-487d-a46d-36d3ebe2445e",
+            "source_port": 53428,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:35.969960974+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 794.81,
+          "connection": {
+            "id": "d886850a-21e6-487d-a46d-36d3ebe2445e",
+            "source_port": 53428,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:35.969960974+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 946.5,
+          "connection": {
+            "id": "d886850a-21e6-487d-a46d-36d3ebe2445e",
+            "source_port": 53428,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:35.969960974+08:00",
+            "upload": 1925,
+            "download": 14755
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 836.26,
+      "source_port": 53428,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 3,
+      "started_at_epoch_ms": 1790894196701,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.6
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 0.98
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.02
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.14
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.14
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.17
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.18
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.46
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.5
+        },
+        {
+          "name": "proxy.start_tls.failed",
+          "at_ms": 4005.22
+        }
+      ],
+      "proxy_observations": [],
+      "error_type": "ConnectTimeout",
+      "elapsed_ms": 4006.27,
+      "source_port": 41840,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 4,
+      "started_at_epoch_ms": 1790894200889,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.36
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 0.8
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.85
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 0.95
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 0.96
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 0.99
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.0
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.5
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.53
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 1335.23
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1335.29
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1335.44
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1335.45
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1335.48
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1335.48
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1510.77
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1510.96
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1511.17
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1511.19
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1511.2
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 1053.46,
+          "connection": {
+            "id": "a6065e02-0fdf-47f5-8eec-032d8a6d7791",
+            "source_port": 41854,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:41.837805433+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 1205.12,
+          "connection": {
+            "id": "a6065e02-0fdf-47f5-8eec-032d8a6d7791",
+            "source_port": 41854,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:41.837805433+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 1356.99,
+          "connection": {
+            "id": "a6065e02-0fdf-47f5-8eec-032d8a6d7791",
+            "source_port": 41854,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:41.837805433+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1508.58,
+          "connection": {
+            "id": "a6065e02-0fdf-47f5-8eec-032d8a6d7791",
+            "source_port": 41854,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:41.837805433+08:00",
+            "upload": 1925,
+            "download": 12674
+          }
+        },
+        {
+          "at_ms": 1660.41,
+          "connection": {
+            "id": "a6065e02-0fdf-47f5-8eec-032d8a6d7791",
+            "source_port": 41854,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:41.837805433+08:00",
+            "upload": 1925,
+            "download": 14776
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1511.45,
+      "source_port": 41854,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 5,
+      "started_at_epoch_ms": 1790894202577,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.63
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.05
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.1
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.24
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.25
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.28
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.28
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.64
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.67
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 567.86
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 567.93
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 568.08
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 568.08
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 568.11
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 568.12
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 731.39
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 731.59
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 731.79
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 731.81
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 731.82
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 275.45,
+          "connection": {
+            "id": "50705f86-97cf-4dfa-bf98-79218173ecde",
+            "source_port": 41860,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:42.817006527+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 427.08,
+          "connection": {
+            "id": "50705f86-97cf-4dfa-bf98-79218173ecde",
+            "source_port": 41860,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:42.817006527+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 578.67,
+          "connection": {
+            "id": "50705f86-97cf-4dfa-bf98-79218173ecde",
+            "source_port": 41860,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:42.817006527+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 730.47,
+          "connection": {
+            "id": "50705f86-97cf-4dfa-bf98-79218173ecde",
+            "source_port": 41860,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:42.817006527+08:00",
+            "upload": 1925,
+            "download": 12674
+          }
+        },
+        {
+          "at_ms": 882.34,
+          "connection": {
+            "id": "50705f86-97cf-4dfa-bf98-79218173ecde",
+            "source_port": 41860,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:42.817006527+08:00",
+            "upload": 1925,
+            "download": 14796
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 732.05,
+      "source_port": 41860,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 6,
+      "started_at_epoch_ms": 1790894203577,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.64
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.0
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.04
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.14
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.14
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.19
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.2
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.64
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.67
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 663.61
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 663.68
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 663.83
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 663.84
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 663.87
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 663.87
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 852.95
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 853.21
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 853.43
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 853.45
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 853.46
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 337.27,
+          "connection": {
+            "id": "a304f64a-176b-4065-b614-18cdbae5f2d9",
+            "source_port": 41874,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:43.864290218+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 640.69,
+          "connection": {
+            "id": "a304f64a-176b-4065-b614-18cdbae5f2d9",
+            "source_port": 41874,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:43.864290218+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 793.1,
+          "connection": {
+            "id": "a304f64a-176b-4065-b614-18cdbae5f2d9",
+            "source_port": 41874,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:43.864290218+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 944.83,
+          "connection": {
+            "id": "a304f64a-176b-4065-b614-18cdbae5f2d9",
+            "source_port": 41874,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:43.864290218+08:00",
+            "upload": 1925,
+            "download": 14704
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 853.72,
+      "source_port": 41874,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 7,
+      "started_at_epoch_ms": 1790894204608,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.56
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 0.98
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.02
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.12
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.13
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.15
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.16
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.41
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.44
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 648.73
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 648.79
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 648.93
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 648.93
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 648.97
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 648.97
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 834.25
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 834.52
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 834.75
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 834.78
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 834.79
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 369.84,
+          "connection": {
+            "id": "063df395-679d-44e8-8bcf-fc21256569aa",
+            "source_port": 41876,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:44.888606609+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 521.59,
+          "connection": {
+            "id": "063df395-679d-44e8-8bcf-fc21256569aa",
+            "source_port": 41876,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:44.888606609+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 673.29,
+          "connection": {
+            "id": "063df395-679d-44e8-8bcf-fc21256569aa",
+            "source_port": 41876,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:44.888606609+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 976.63,
+          "connection": {
+            "id": "063df395-679d-44e8-8bcf-fc21256569aa",
+            "source_port": 41876,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:36:44.888606609+08:00",
+            "upload": 1925,
+            "download": 14563
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 835.05,
+      "source_port": 41876,
+      "new_connection": true,
+      "confirmed_reuse": false
+    }
+  ],
+  "observer_errors": [],
+  "scope": "native historical 200-bar reads; exact host/source-port route match; no database/cache reset"
+}

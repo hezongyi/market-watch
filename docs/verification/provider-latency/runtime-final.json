@@ -1,0 +1,64 @@
+{
+  "baseline_commit": "b9d69dd4c7ff8e873c4c75f07054eac29c94b996",
+  "branch": "fix/provider-first-screen-latency",
+  "configuration": "local VMess Japan / direct US01",
+  "services": {
+    "api": {
+      "image_id": "sha256:56a23329bb5aa126d31155a0aa7a27b5f94272d7257884ebd6ca04f5df104e55",
+      "running": true,
+      "health": "healthy",
+      "cpu_nanos": 1000000000,
+      "memory_bytes": 536870912,
+      "network_mode": "host",
+      "source_hashes": [
+        "ebdd7a48ba99cee70f13264c42fa7d9cc3dfef70b62b08049768e32904cff4d6  /app/backend/alerts/provider_transport.py",
+        "a6f1314d8df750a33823871231b5b4008f89971d97dc56f54e4d802cfbebdbb5  /app/backend/alerts/provider_chart.py",
+        "38778142677521c672593c809062ba1a20bab9b2ad4744804ff5ff32d7078a31  /app/backend/alerts/market_resources.py"
+      ]
+    },
+    "web": {
+      "image_id": "sha256:53a31ca58aa4f7a34fc29225d30477635e47e04ec55ff613c421ff42004781b4",
+      "running": true,
+      "health": null,
+      "cpu_nanos": 1000000000,
+      "memory_bytes": 536870912,
+      "network_mode": "host"
+    },
+    "chart-origin": {
+      "image_id": "sha256:2770ede098d4b978a833e7a34e1219e0e130d788581a9e7ee91e66ba1fe150c6",
+      "running": true,
+      "health": null,
+      "cpu_nanos": 1000000000,
+      "memory_bytes": 536870912,
+      "network_mode": "market-watch-provider-latency_default"
+    },
+    "tls": {
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "running": true,
+      "health": null,
+      "cpu_nanos": 1000000000,
+      "memory_bytes": 536870912,
+      "network_mode": "host"
+    }
+  },
+  "smoke": {
+    "status": 200,
+    "count": 200,
+    "cache_hit": false,
+    "elapsed_ms": 560.28,
+    "timings_ms": {
+      "lease_wait": 4.57,
+      "upstream_slot": 3.24,
+      "network_http11_send_request_headers": 0.25,
+      "network_http11_send_request_body": 0.03,
+      "network_http11_receive_response_headers": 380.84,
+      "network_http11_receive_response_body": 0.24,
+      "network_http11_response_closed": 0.01,
+      "upstream_http": 382.27,
+      "upstream_decode": 0.26,
+      "database_commit": 114.07,
+      "read_total": 535.16
+    }
+  },
+  "code_commit": "c26decacb8d9fd3d83140a5d2f61861856b2f22a"
+}

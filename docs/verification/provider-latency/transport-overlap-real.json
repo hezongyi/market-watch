@@ -1,0 +1,313 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "source": "binance",
+      "mode": "baseline-single-head",
+      "repeat": 0,
+      "reader": 0,
+      "warm_ms": 1617.62,
+      "bars": 200,
+      "elapsed_ms": 1656.72,
+      "timings_ms": {
+        "upstream_slot": 0.005661044269800186,
+        "network_connection_connect_tcp": 0.18020672723650932,
+        "network_http11_send_request_headers": 0.23185135796666145,
+        "network_http11_send_request_body": 0.06350502371788025,
+        "network_http11_receive_response_headers": 346.40737203881145,
+        "network_proxy_start_tls": 1308.2316890358925,
+        "network_http11_receive_response_body": 0.24424493312835693,
+        "network_http11_response_closed": 0.01171184703707695,
+        "upstream_http": 1656.1252679675817,
+        "upstream_decode": 0.160854309797287
+      }
+    },
+    {
+      "source": "binance",
+      "mode": "baseline-single-head",
+      "repeat": 0,
+      "reader": 1,
+      "warm_ms": 1617.62,
+      "bars": 200,
+      "elapsed_ms": 357.84,
+      "timings_ms": {
+        "upstream_slot": 0.009992159903049469,
+        "network_http11_send_request_headers": 0.28455816209316254,
+        "network_http11_send_request_body": 0.038528814911842346,
+        "network_http11_receive_response_headers": 355.7141236960888,
+        "network_http11_receive_response_body": 0.2297181636095047,
+        "network_http11_response_closed": 0.01219986006617546,
+        "upstream_http": 357.01303696259856,
+        "upstream_decode": 0.37758611142635345
+      }
+    },
+    {
+      "source": "binance",
+      "mode": "baseline-single-head",
+      "repeat": 1,
+      "reader": 0,
+      "warm_ms": 1617.62,
+      "bars": 200,
+      "elapsed_ms": 347.15,
+      "timings_ms": {
+        "upstream_slot": 0.006909016519784927,
+        "network_http11_send_request_headers": 0.24435436353087425,
+        "network_http11_send_request_body": 0.02896692603826523,
+        "network_http11_receive_response_headers": 345.47076700255275,
+        "network_http11_receive_response_body": 0.20360667258501053,
+        "network_http11_response_closed": 0.012386124581098557,
+        "upstream_http": 346.56048798933625,
+        "upstream_decode": 0.16311509534716606
+      }
+    },
+    {
+      "source": "binance",
+      "mode": "baseline-single-head",
+      "repeat": 1,
+      "reader": 1,
+      "warm_ms": 1617.62,
+      "bars": 200,
+      "elapsed_ms": 358.63,
+      "timings_ms": {
+        "upstream_slot": 0.010025221854448318,
+        "network_http11_send_request_headers": 0.6247749552130699,
+        "network_http11_send_request_body": 0.03406498581171036,
+        "network_http11_receive_response_headers": 356.4953450113535,
+        "network_http11_receive_response_body": 0.20494172349572182,
+        "network_http11_response_closed": 0.011886004358530045,
+        "upstream_http": 358.02578274160624,
+        "upstream_decode": 0.16280682757496834
+      }
+    },
+    {
+      "source": "binance",
+      "mode": "full-pool-warmup",
+      "repeat": 0,
+      "reader": 0,
+      "warm_ms": 3229.68,
+      "bars": 200,
+      "elapsed_ms": 345.21,
+      "timings_ms": {
+        "upstream_slot": 0.0063301995396614075,
+        "network_http11_send_request_headers": 0.2060108818113804,
+        "network_http11_send_request_body": 0.04329392686486244,
+        "network_http11_receive_response_headers": 343.7674161978066,
+        "network_http11_receive_response_body": 0.16391277313232422,
+        "network_http11_response_closed": 0.008479226380586624,
+        "upstream_http": 344.6625261567533,
+        "upstream_decode": 0.1499648205935955
+      }
+    },
+    {
+      "source": "binance",
+      "mode": "full-pool-warmup",
+      "repeat": 0,
+      "reader": 1,
+      "warm_ms": 3229.68,
+      "bars": 200,
+      "elapsed_ms": 343.31,
+      "timings_ms": {
+        "upstream_slot": 0.010233838111162186,
+        "network_http11_send_request_headers": 0.5671740509569645,
+        "network_http11_send_request_body": 0.03183819353580475,
+        "network_http11_receive_response_headers": 341.04332979768515,
+        "network_http11_receive_response_body": 0.21146796643733978,
+        "network_http11_response_closed": 0.016647856682538986,
+        "upstream_http": 342.5806132145226,
+        "upstream_decode": 0.15716999769210815
+      }
+    },
+    {
+      "source": "binance",
+      "mode": "full-pool-warmup",
+      "repeat": 1,
+      "reader": 0,
+      "warm_ms": 3229.68,
+      "bars": 200,
+      "elapsed_ms": 356.62,
+      "timings_ms": {
+        "upstream_slot": 0.007011927664279938,
+        "network_http11_send_request_headers": 0.22146524861454964,
+        "network_http11_send_request_body": 0.023235566914081573,
+        "network_http11_receive_response_headers": 355.06554739549756,
+        "network_http11_receive_response_body": 0.2051340416073799,
+        "network_http11_response_closed": 0.008674804121255875,
+        "upstream_http": 356.0468298383057,
+        "upstream_decode": 0.17656106501817703
+      }
+    },
+    {
+      "source": "binance",
+      "mode": "full-pool-warmup",
+      "repeat": 1,
+      "reader": 1,
+      "warm_ms": 3229.68,
+      "bars": 200,
+      "elapsed_ms": 355.44,
+      "timings_ms": {
+        "upstream_slot": 0.009201932698488235,
+        "network_http11_send_request_headers": 0.6214091554284096,
+        "network_http11_send_request_body": 0.031135044991970062,
+        "network_http11_receive_response_headers": 353.4218119457364,
+        "network_http11_receive_response_body": 0.18876930698752403,
+        "network_http11_response_closed": 0.009683892130851746,
+        "upstream_http": 354.85573299229145,
+        "upstream_decode": 0.16627507284283638
+      }
+    },
+    {
+      "source": "oanda",
+      "mode": "baseline-single-head",
+      "repeat": 0,
+      "reader": 0,
+      "warm_ms": 828.19,
+      "bars": 200,
+      "elapsed_ms": 1001.32,
+      "timings_ms": {
+        "upstream_slot": 0.007042195647954941,
+        "network_connection_connect_tcp": 1.4598206616938114,
+        "network_http11_send_request_headers": 0.23611914366483688,
+        "network_http11_send_request_body": 0.05325069651007652,
+        "network_http11_receive_response_headers": 360.38832319900393,
+        "network_proxy_start_tls": 637.5123062171042,
+        "network_http11_receive_response_body": 0.21691014990210533,
+        "network_http11_response_closed": 0.009090173989534378,
+        "upstream_http": 1000.6051510572433,
+        "upstream_decode": 0.18148915842175484
+      }
+    },
+    {
+      "source": "oanda",
+      "mode": "baseline-single-head",
+      "repeat": 0,
+      "reader": 1,
+      "warm_ms": 828.19,
+      "bars": 200,
+      "elapsed_ms": 340.24,
+      "timings_ms": {
+        "upstream_slot": 0.009634066373109818,
+        "network_http11_send_request_headers": 0.6823479197919369,
+        "network_http11_send_request_body": 0.1577450893819332,
+        "network_http11_receive_response_headers": 337.17310009524226,
+        "network_http11_receive_response_body": 0.19467994570732117,
+        "network_http11_response_closed": 0.009469222277402878,
+        "upstream_http": 338.8650072738528,
+        "upstream_decode": 0.8074869401752949
+      }
+    },
+    {
+      "source": "oanda",
+      "mode": "baseline-single-head",
+      "repeat": 1,
+      "reader": 0,
+      "warm_ms": 828.19,
+      "bars": 200,
+      "elapsed_ms": 430.2,
+      "timings_ms": {
+        "upstream_slot": 0.003836117684841156,
+        "network_http11_send_request_headers": 0.13354606926441193,
+        "network_http11_send_request_body": 0.023759901523590088,
+        "network_http11_receive_response_headers": 428.45568526536226,
+        "network_http11_receive_response_body": 0.19242474809288979,
+        "network_http11_response_closed": 0.00965222716331482,
+        "upstream_http": 429.5025239698589,
+        "upstream_decode": 0.19258400425314903
+      }
+    },
+    {
+      "source": "oanda",
+      "mode": "baseline-single-head",
+      "repeat": 1,
+      "reader": 1,
+      "warm_ms": 828.19,
+      "bars": 200,
+      "elapsed_ms": 284.38,
+      "timings_ms": {
+        "upstream_slot": 0.008413102477788925,
+        "network_http11_send_request_headers": 0.48070028424263,
+        "network_http11_send_request_body": 0.023237895220518112,
+        "network_http11_receive_response_headers": 282.02821128070354,
+        "network_http11_receive_response_body": 0.18978537991642952,
+        "network_http11_response_closed": 0.010446179658174515,
+        "upstream_http": 283.55513187125325,
+        "upstream_decode": 0.19174814224243164
+      }
+    },
+    {
+      "source": "oanda",
+      "mode": "full-pool-warmup",
+      "repeat": 0,
+      "reader": 0,
+      "warm_ms": 1766.99,
+      "bars": 200,
+      "elapsed_ms": 640.0,
+      "timings_ms": {
+        "upstream_slot": 0.007000286132097244,
+        "network_http11_send_request_headers": 0.49369828775525093,
+        "network_http11_send_request_body": 0.026030000299215317,
+        "network_http11_receive_response_headers": 637.9213379696012,
+        "network_http11_receive_response_body": 0.19652768969535828,
+        "network_http11_response_closed": 0.010347925126552582,
+        "upstream_http": 639.194373972714,
+        "upstream_decode": 0.18627289682626724
+      }
+    },
+    {
+      "source": "oanda",
+      "mode": "full-pool-warmup",
+      "repeat": 0,
+      "reader": 1,
+      "warm_ms": 1766.99,
+      "bars": 200,
+      "elapsed_ms": 359.11,
+      "timings_ms": {
+        "upstream_slot": 0.01017516478896141,
+        "network_http11_send_request_headers": 0.6333836354315281,
+        "network_http11_send_request_body": 0.02981489524245262,
+        "network_http11_receive_response_headers": 341.1675002425909,
+        "network_http11_receive_response_body": 15.681927092373371,
+        "network_http11_response_closed": 0.012015923857688904,
+        "upstream_http": 358.23570284992456,
+        "upstream_decode": 0.19526295363903046
+      }
+    },
+    {
+      "source": "oanda",
+      "mode": "full-pool-warmup",
+      "repeat": 1,
+      "reader": 0,
+      "warm_ms": 1766.99,
+      "bars": 200,
+      "elapsed_ms": 303.45,
+      "timings_ms": {
+        "upstream_slot": 0.007331836968660355,
+        "network_http11_send_request_headers": 0.2180822193622589,
+        "network_http11_send_request_body": 0.0253249891102314,
+        "network_http11_receive_response_headers": 301.6333458945155,
+        "network_http11_receive_response_body": 0.1977509818971157,
+        "network_http11_response_closed": 0.010488089174032211,
+        "upstream_http": 302.6334000751376,
+        "upstream_decode": 0.18887780606746674
+      }
+    },
+    {
+      "source": "oanda",
+      "mode": "full-pool-warmup",
+      "repeat": 1,
+      "reader": 1,
+      "warm_ms": 1766.99,
+      "bars": 200,
+      "elapsed_ms": 347.05,
+      "timings_ms": {
+        "upstream_slot": 0.009274110198020935,
+        "network_http11_send_request_headers": 0.6103403866291046,
+        "network_http11_send_request_body": 0.03025401383638382,
+        "network_http11_receive_response_headers": 328.545433934778,
+        "network_http11_receive_response_body": 16.40957035124302,
+        "network_http11_response_closed": 0.011970754712820053,
+        "upstream_http": 346.2221920490265,
+        "upstream_decode": 0.24031009525060654
+      }
+    }
+  ]
+}

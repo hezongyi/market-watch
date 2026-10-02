@@ -1,0 +1,1686 @@
+{
+  "passed": true,
+  "measurements": [
+    {
+      "symbol": "MWP:OANDA:USD_CHF",
+      "resolution": "5",
+      "began_ms": 1790893430881,
+      "displayed_ms": 1927,
+      "initialized_ms": 1930,
+      "screen_bars": 189,
+      "pages": [
+        {
+          "query": {
+            "instrument": "OANDA:USD_CHF",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790834092000,
+            "firstDataRequest": true,
+            "client": "de6201ab-346b-4f64-b31a-ccb4d8094868",
+            "indicators": [],
+            "before": 1790893492000,
+            "track_history": false
+          },
+          "status": 200,
+          "at_ms": 1217,
+          "elapsed_ms": 426,
+          "count": 198,
+          "as_of": 1790893432134,
+          "boundary": false,
+          "cache_hit": false,
+          "timings_ms": {
+            "lease_wait": 5.9,
+            "upstream_slot": 3.93,
+            "network_http11_send_request_headers": 0.19,
+            "network_http11_send_request_body": 0.03,
+            "network_http11_receive_response_headers": 286.59,
+            "network_http11_receive_response_body": 0.28,
+            "network_http11_response_closed": 0.01,
+            "upstream_http": 287.78,
+            "upstream_decode": 0.26,
+            "database_commit": 62.88,
+            "read_total": 402.04
+          }
+        }
+      ],
+      "range": {
+        "from": 1790839800,
+        "to": 1790896200
+      },
+      "geometry": {
+        "plot_width": 1132,
+        "bar_spacing": 6
+      },
+      "boot": [
+        {
+          "url": "https://localhost:15453/advanced-charts",
+          "performance": {
+            "time_origin": 1790893430886.1,
+            "marks": [
+              {
+                "name": "dom-ready",
+                "at": 44.80000019073486
+              },
+              {
+                "name": "message-loaded",
+                "at": 180.40000009536743
+              },
+              {
+                "name": "message-data",
+                "at": 1211.1999998092651
+              },
+              {
+                "name": "message-market",
+                "op": "resolve",
+                "at": 1680.4000000953674
+              },
+              {
+                "name": "message-market",
+                "op": "resolve",
+                "at": 1681
+              },
+              {
+                "name": "message-market",
+                "op": "resolve",
+                "at": 1681.4000000953674
+              },
+              {
+                "name": "message-provider-subscribe",
+                "at": 1713.6999998092651
+              },
+              {
+                "name": "message-market",
+                "op": "quotes",
+                "at": 1717.3000001907349
+              },
+              {
+                "name": "message-workspace",
+                "op": "save",
+                "at": 1829.0999999046326
+              },
+              {
+                "name": "message-ready",
+                "at": 1898.9000000953674
+              }
+            ],
+            "long_tasks": [],
+            "navigation": [
+              {
+                "name": "https://localhost:15453/advanced-charts",
+                "entryType": "navigation",
+                "startTime": 0,
+                "duration": 45.40000009536743,
+                "navigationId": 8415,
+                "initiatorType": "navigation",
+                "deliveryType": "",
+                "nextHopProtocol": "http/1.1",
+                "renderBlockingStatus": "non-blocking",
+                "contentType": "text/html",
+                "contentEncoding": "",
+                "workerStart": 0,
+                "workerRouterEvaluationStart": 0,
+                "workerCacheLookupStart": 0,
+                "workerMatchedSourceType": "",
+                "workerFinalSourceType": "",
+                "redirectStart": 0,
+                "redirectEnd": 0,
+                "fetchStart": 0.5,
+                "domainLookupStart": 0.5,
+                "domainLookupEnd": 0.5,
+                "connectStart": 0.5,
+                "secureConnectionStart": 0.5,
+                "connectEnd": 0.5,
+                "requestStart": 1.3000001907348633,
+                "responseStart": 2.1999998092651367,
+                "firstInterimResponseStart": 0,
+                "finalResponseHeadersStart": 2.1999998092651367,
+                "responseEnd": 2.5999999046325684,
+                "transferSize": 714,
+                "encodedBodySize": 414,
+                "decodedBodySize": 414,
+                "responseStatus": 200,
+                "serverTiming": [],
+                "unloadEventStart": 13.400000095367432,
+                "unloadEventEnd": 13.400000095367432,
+                "domInteractive": 42,
+                "domContentLoadedEventStart": 44.80000019073486,
+                "domContentLoadedEventEnd": 45,
+                "domComplete": 45.40000009536743,
+                "loadEventStart": 45.40000009536743,
+                "loadEventEnd": 45.40000009536743,
+                "type": "navigate",
+                "redirectCount": 0,
+                "activationStart": 0,
+                "criticalCHRestart": 0,
+                "notRestoredReasons": null,
+                "confidence": {
+                  "randomizedTriggerRate": 0.4994798,
+                  "value": "low"
+                }
+              }
+            ],
+            "resources": [
+              {
+                "name": "https://localhost:15453/assets/index-DkBB2coM.js",
+                "start": 23.5,
+                "duration": 0,
+                "transfer": 0,
+                "size": 522019
+              },
+              {
+                "name": "https://localhost:15453/assets/index-QKjYZYl7.css",
+                "start": 34.5,
+                "duration": 0,
+                "transfer": 0,
+                "size": 19390
+              },
+              {
+                "name": "https://localhost:15453/api/session",
+                "start": 48.40000009536743,
+                "duration": 7.900000095367432,
+                "transfer": 343,
+                "size": 43
+              },
+              {
+                "name": "https://localhost:15453/api/advanced-charts/workspaces?limit=1",
+                "start": 78.19999980926514,
+                "duration": 10.300000190734863,
+                "transfer": 809,
+                "size": 509
+              },
+              {
+                "name": "https://localhost:15453/favicon.ico",
+                "start": 79.09999990463257,
+                "duration": 1.8000001907348633,
+                "transfer": 714,
+                "size": 414
+              },
+              {
+                "name": "https://127.0.0.1:15454/?parent=https%3A%2F%2Flocalhost%3A15453",
+                "start": 96.5,
+                "duration": 79.69999980926514,
+                "transfer": 0,
+                "size": 0
+              },
+              {
+                "name": "https://localhost:15453/api/advanced-charts/preferences/migrate",
+                "start": 182,
+                "duration": 7.800000190734863,
+                "transfer": 311,
+                "size": 11
+              },
+              {
+                "name": "https://localhost:15453/api/advanced-charts/catalog",
+                "start": 190.90000009536743,
+                "duration": 13.299999713897705,
+                "transfer": 1408,
+                "size": 1108
+              },
+              {
+                "name": "https://localhost:15453/api/advanced-charts/preferences",
+                "start": 192.30000019073486,
+                "duration": 9.299999713897705,
+                "transfer": 13845,
+                "size": 13545
+              },
+              {
+                "name": "https://localhost:15453/api/charts/data",
+                "start": 1211.5999999046326,
+                "duration": 420.7000002861023,
+                "transfer": 31651,
+                "size": 31351
+              },
+              {
+                "name": "https://localhost:15453/api/market-data/resolve",
+                "start": 1680.6999998092651,
+                "duration": 15.5,
+                "transfer": 497,
+                "size": 197
+              },
+              {
+                "name": "https://localhost:15453/api/market-data/resolve",
+                "start": 1681.1999998092651,
+                "duration": 18.200000286102295,
+                "transfer": 494,
+                "size": 194
+              },
+              {
+                "name": "https://localhost:15453/api/market-data/resolve",
+                "start": 1681.5999999046326,
+                "duration": 18.5,
+                "transfer": 510,
+                "size": 210
+              },
+              {
+                "name": "https://localhost:15453/api/charts/provider/subscribe",
+                "start": 1714.8000001907349,
+                "duration": 16,
+                "transfer": 453,
+                "size": 153
+              },
+              {
+                "name": "https://localhost:15453/api/charts/provider/subscribe",
+                "start": 1750.8000001907349,
+                "duration": 20.299999713897705,
+                "transfer": 453,
+                "size": 153
+              },
+              {
+                "name": "https://localhost:15453/api/advanced-charts/native-charts/save",
+                "start": 1830.4000000953674,
+                "duration": 17.699999809265137,
+                "transfer": 12048,
+                "size": 11748
+              }
+            ]
+          }
+        },
+        {
+          "url": "https://127.0.0.1:15454/?parent=https%3A%2F%2Flocalhost%3A15453",
+          "performance": {
+            "time_origin": 1790893430986.3,
+            "marks": [
+              {
+                "name": "dom-ready",
+                "at": 64
+              },
+              {
+                "name": "message-init",
+                "at": 114.69999980926514
+              },
+              {
+                "name": "widget-constructor",
+                "at": 116.2999997138977
+              },
+              {
+                "name": "widget-constructor-return",
+                "at": 126.69999980926514
+              },
+              {
+                "name": "onReady",
+                "at": 480.09999990463257
+              },
+              {
+                "name": "onReady-callback",
+                "at": 488.69999980926514
+              },
+              {
+                "name": "resolveSymbol",
+                "at": 665.0999999046326
+              },
+              {
+                "name": "resolveSymbol-callback",
+                "at": 984.7999997138977
+              },
+              {
+                "name": "getBars",
+                "at": 1109.6999998092651
+              },
+              {
+                "name": "resolveSymbol",
+                "at": 1577.3999996185303
+              },
+              {
+                "name": "resolveSymbol",
+                "at": 1577.5999999046326
+              },
+              {
+                "name": "resolveSymbol",
+                "at": 1577.6999998092651
+              },
+              {
+                "name": "message-result",
+                "at": 1583.6999998092651
+              },
+              {
+                "name": "getBars-callback",
+                "at": 1584.0999999046326
+              },
+              {
+                "name": "widget-ready",
+                "at": 1604.5
+              },
+              {
+                "name": "message-result",
+                "at": 1712.6999998092651
+              },
+              {
+                "name": "resolveSymbol-callback",
+                "at": 1712.6999998092651
+              },
+              {
+                "name": "message-result",
+                "at": 1713
+              },
+              {
+                "name": "resolveSymbol-callback",
+                "at": 1713
+              },
+              {
+                "name": "message-result",
+                "at": 1713.0999999046326
+              },
+              {
+                "name": "resolveSymbol-callback",
+                "at": 1713.0999999046326
+              },
+              {
+                "name": "message-result",
+                "at": 1761
+              }
+            ],
+            "long_tasks": [
+              {
+                "at": 228.09999990463257,
+                "duration": 259
+              },
+              {
+                "at": 489.19999980926514,
+                "duration": 197
+              },
+              {
+                "at": 883.1999998092651,
+                "duration": 89
+              },
+              {
+                "at": 1224.3999996185303,
+                "duration": 66
+              },
+              {
+                "at": 1611.8999996185303,
+                "duration": 63
+              }
+            ],
+            "navigation": [
+              {
+                "name": "https://127.0.0.1:15454/?parent=https%3A%2F%2Flocalhost%3A15453",
+                "entryType": "navigation",
+                "startTime": 0,
+                "duration": 65.09999990463257,
+                "navigationId": 3164,
+                "initiatorType": "navigation",
+                "deliveryType": "",
+                "nextHopProtocol": "http/1.1",
+                "renderBlockingStatus": "non-blocking",
+                "contentType": "text/html",
+                "contentEncoding": "",
+                "workerStart": 0,
+                "workerRouterEvaluationStart": 0,
+                "workerCacheLookupStart": 0,
+                "workerMatchedSourceType": "",
+                "workerFinalSourceType": "",
+                "redirectStart": 0,
+                "redirectEnd": 0,
+                "fetchStart": 11.099999904632568,
+                "domainLookupStart": 15.699999809265137,
+                "domainLookupEnd": 15.699999809265137,
+                "connectStart": 15.699999809265137,
+                "secureConnectionStart": 15.899999618530273,
+                "connectEnd": 18.799999713897705,
+                "requestStart": 18.899999618530273,
+                "responseStart": 20.399999618530273,
+                "firstInterimResponseStart": 0,
+                "finalResponseHeadersStart": 20.399999618530273,
+                "responseEnd": 21,
+                "transferSize": 906,
+                "encodedBodySize": 606,
+                "decodedBodySize": 606,
+                "responseStatus": 200,
+                "serverTiming": [],
+                "unloadEventStart": 0,
+                "unloadEventEnd": 0,
+                "domInteractive": 41.09999990463257,
+                "domContentLoadedEventStart": 63.5,
+                "domContentLoadedEventEnd": 64,
+                "domComplete": 65.09999990463257,
+                "loadEventStart": 65.09999990463257,
+                "loadEventEnd": 65.09999990463257,
+                "type": "navigate",
+                "redirectCount": 0,
+                "activationStart": 0,
+                "criticalCHRestart": 0,
+                "notRestoredReasons": null,
+                "confidence": null
+              }
+            ],
+            "resources": [
+              {
+                "name": "https://127.0.0.1:15454/charting_library/charting_library.js",
+                "start": 37.69999980926514,
+                "duration": 6.300000190734863,
+                "transfer": 19103,
+                "size": 60521
+              },
+              {
+                "name": "https://127.0.0.1:15454/host.587017974eec58f8.js",
+                "start": 38.299999713897705,
+                "duration": 15,
+                "transfer": 31105,
+                "size": 91037
+              }
+            ]
+          }
+        },
+        {
+          "url": "blob:https://127.0.0.1:15454/e5599db8-c55b-48ff-922d-4e9f2a5bd7dd",
+          "performance": {
+            "time_origin": 1790893431107,
+            "marks": [
+              {
+                "name": "dom-ready",
+                "at": 360.69999980926514
+              }
+            ],
+            "long_tasks": [
+              {
+                "at": 107.40000009536743,
+                "duration": 259
+              },
+              {
+                "at": 368.5,
+                "duration": 197
+              },
+              {
+                "at": 762.5,
+                "duration": 89
+              },
+              {
+                "at": 1103.6999998092651,
+                "duration": 66
+              },
+              {
+                "at": 1491.1999998092651,
+                "duration": 63
+              }
+            ],
+            "navigation": [
+              {
+                "name": "blob:https://127.0.0.1:15454/e5599db8-c55b-48ff-922d-4e9f2a5bd7dd",
+                "entryType": "navigation",
+                "startTime": 0,
+                "duration": 361.19999980926514,
+                "navigationId": 7483,
+                "initiatorType": "navigation",
+                "deliveryType": "",
+                "nextHopProtocol": "",
+                "renderBlockingStatus": "non-blocking",
+                "contentType": "text/html",
+                "contentEncoding": "",
+                "workerStart": 0,
+                "workerRouterEvaluationStart": 0,
+                "workerCacheLookupStart": 0,
+                "workerMatchedSourceType": "",
+                "workerFinalSourceType": "",
+                "redirectStart": 0,
+                "redirectEnd": 0,
+                "fetchStart": 2.5999999046325684,
+                "domainLookupStart": 2.5999999046325684,
+                "domainLookupEnd": 2.5999999046325684,
+                "connectStart": 2.5999999046325684,
+                "secureConnectionStart": 2.5999999046325684,
+                "connectEnd": 2.5999999046325684,
+                "requestStart": 2.5999999046325684,
+                "responseStart": 2.5999999046325684,
+                "firstInterimResponseStart": 0,
+                "finalResponseHeadersStart": 0,
+                "responseEnd": 4.099999904632568,
+                "transferSize": 6623,
+                "encodedBodySize": 6323,
+                "decodedBodySize": 6323,
+                "responseStatus": 200,
+                "serverTiming": [],
+                "unloadEventStart": 0,
+                "unloadEventEnd": 0,
+                "domInteractive": 33.90000009536743,
+                "domContentLoadedEventStart": 360.69999980926514,
+                "domContentLoadedEventEnd": 360.80000019073486,
+                "domComplete": 361.09999990463257,
+                "loadEventStart": 361.09999990463257,
+                "loadEventEnd": 361.19999980926514,
+                "type": "navigate",
+                "redirectCount": 0,
+                "activationStart": 0,
+                "criticalCHRestart": 0,
+                "notRestoredReasons": null,
+                "confidence": null
+              }
+            ],
+            "resources": [
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/runtime.d6871abde1090b0329fe.js",
+                "start": 10.099999904632568,
+                "duration": 7.599999904632568,
+                "transfer": 19244,
+                "size": 36160
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.2838.51471b74599c80665ee4.js",
+                "start": 10.099999904632568,
+                "duration": 28.90000009536743,
+                "transfer": 53364,
+                "size": 198029
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/41890.26660955cd3bff3b75c4.js",
+                "start": 10.300000190734863,
+                "duration": 20,
+                "transfer": 28043,
+                "size": 77577
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js",
+                "start": 10.300000190734863,
+                "duration": 58.39999961853027,
+                "transfer": 812210,
+                "size": 2661744
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/23308.30febcf44ed37ac44457.css",
+                "start": 10.400000095367432,
+                "duration": 17.90000009536743,
+                "transfer": 24996,
+                "size": 147107
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.89843.7d8cdfa8deb4035edd5d.js",
+                "start": 373.19999980926514,
+                "duration": 21.700000286102295,
+                "transfer": 2510,
+                "size": 5730
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/83159.fbb750fd312778403036.css",
+                "start": 374,
+                "duration": 20.5,
+                "transfer": 300,
+                "size": 0
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/82593.6a08fc3d7286497dfb5c.css",
+                "start": 374.80000019073486,
+                "duration": 21.699999809265137,
+                "transfer": 2969,
+                "size": 20160
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/43946.9831f80c5744716ce514.css",
+                "start": 375.09999990463257,
+                "duration": 22.700000286102295,
+                "transfer": 753,
+                "size": 1046
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/34663.c6bb312e84fe5f5d7ace.css",
+                "start": 375.30000019073486,
+                "duration": 23.899999618530273,
+                "transfer": 621,
+                "size": 321
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/1355.eaddeff6b33b6ef1b484.css",
+                "start": 375.40000009536743,
+                "duration": 156.09999990463257,
+                "transfer": 782,
+                "size": 1251
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/10162.84454d9522365162b47f.css",
+                "start": 375.59999990463257,
+                "duration": 33.80000019073486,
+                "transfer": 1654,
+                "size": 5498
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/70221.a35afd2176ea6f1cf8db.css",
+                "start": 375.80000019073486,
+                "duration": 39.299999713897705,
+                "transfer": 816,
+                "size": 1067
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/55578.362fa6a7ab1f3e3b06c4.css",
+                "start": 376.5,
+                "duration": 44.59999990463257,
+                "transfer": 555,
+                "size": 255
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/50779.89b41c884d5213432809.css",
+                "start": 377,
+                "duration": 48.59999990463257,
+                "transfer": 358,
+                "size": 58
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/69437.2948ab6dbdff9ed7521d.css",
+                "start": 377.19999980926514,
+                "duration": 62.80000019073486,
+                "transfer": 1053,
+                "size": 2860
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/57296.cffada78ccaf26c745ae.css",
+                "start": 377.40000009536743,
+                "duration": 216.90000009536743,
+                "transfer": 1511,
+                "size": 7926
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/16639.d806fb47537c11ca4025.css",
+                "start": 377.69999980926514,
+                "duration": 72.30000019073486,
+                "transfer": 878,
+                "size": 1856
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/43296.a9f9476cfccebb241395.css",
+                "start": 377.90000009536743,
+                "duration": 76.59999990463257,
+                "transfer": 1076,
+                "size": 776
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/88638.73dc27555ae7d6fe6658.css",
+                "start": 377.90000009536743,
+                "duration": 80.40000009536743,
+                "transfer": 1051,
+                "size": 3831
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/88090.4cf624bc12fb215eb8bc.css",
+                "start": 378.09999990463257,
+                "duration": 83.59999990463257,
+                "transfer": 978,
+                "size": 2474
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/63458.0dacb9bf3649da7e2a0b.css",
+                "start": 378.19999980926514,
+                "duration": 89.40000009536743,
+                "transfer": 1011,
+                "size": 2588
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/51326.ef930db5ef4b533a7904.css",
+                "start": 378.40000009536743,
+                "duration": 215.2999997138977,
+                "transfer": 331,
+                "size": 31
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/13885.227359fe461ff7db045b.css",
+                "start": 378.5,
+                "duration": 102,
+                "transfer": 1176,
+                "size": 2405
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/72414.6707a4012bf5cd2d92e6.css",
+                "start": 378.59999990463257,
+                "duration": 106.09999990463257,
+                "transfer": 2204,
+                "size": 7241
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/39231.4c4149f8d99af1a4bf36.css",
+                "start": 378.69999980926514,
+                "duration": 111,
+                "transfer": 1637,
+                "size": 6176
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/66894.a33c76f5549cc7102e61.css",
+                "start": 378.90000009536743,
+                "duration": 114.5,
+                "transfer": 332,
+                "size": 32
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/86062.a8b17c5d88bfc065c1d7.css",
+                "start": 379.09999990463257,
+                "duration": 126,
+                "transfer": 901,
+                "size": 1531
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/18316.fbb750fd312778403036.css",
+                "start": 379.19999980926514,
+                "duration": 212.60000038146973,
+                "transfer": 300,
+                "size": 0
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/90130.39e6202ba00cf6f84f33.css",
+                "start": 379.30000019073486,
+                "duration": 141.39999961853027,
+                "transfer": 363,
+                "size": 63
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/61309.30433d848f8e9fdd4e0e.css",
+                "start": 379.5,
+                "duration": 140.90000009536743,
+                "transfer": 1878,
+                "size": 5321
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/29365.5b7877a63c3aafa14f69.js",
+                "start": 379.90000009536743,
+                "duration": 296,
+                "transfer": 53064,
+                "size": 139296
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/55469.09b41c336fb29292ccae.js",
+                "start": 380.09999990463257,
+                "duration": 293.2000002861023,
+                "transfer": 5598,
+                "size": 13742
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/18233.73a03009f28a189d16a2.js",
+                "start": 380.40000009536743,
+                "duration": 293.19999980926514,
+                "transfer": 4583,
+                "size": 9980
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/line-tools-icons.0bc6cf9256445e52727d.js",
+                "start": 380.5,
+                "duration": 293.80000019073486,
+                "transfer": 16212,
+                "size": 75219
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/25165.3737902be0ae525b23a7.js",
+                "start": 380.80000019073486,
+                "duration": 292.09999990463257,
+                "transfer": 11575,
+                "size": 32609
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/87041.635b64459be4f9fef691.js",
+                "start": 381,
+                "duration": 291.40000009536743,
+                "transfer": 13889,
+                "size": 37900
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/floating-toolbars.47df2a0632b65c8dff7b.js",
+                "start": 381.19999980926514,
+                "duration": 308,
+                "transfer": 44522,
+                "size": 135775
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.53428.3de7b8c94af7919dcf76.js",
+                "start": 386.80000019073486,
+                "duration": 300.5,
+                "transfer": 1499,
+                "size": 3335
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/17039.2020d73e26d49ab4f152.css",
+                "start": 387.09999990463257,
+                "duration": 133.2000002861023,
+                "transfer": 382,
+                "size": 82
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/96868.2fb5f6f3eb739c16078d.css",
+                "start": 387.30000019073486,
+                "duration": 132.69999980926514,
+                "transfer": 529,
+                "size": 229
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/9876.4db113a94ddabe52ea7c.css",
+                "start": 387.40000009536743,
+                "duration": 132.90000009536743,
+                "transfer": 606,
+                "size": 306
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/99942.7fb8be8c332650e84371.css",
+                "start": 387.5,
+                "duration": 207.09999990463257,
+                "transfer": 1338,
+                "size": 3163
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/89041.4f56202acc53dc9b0ded.js",
+                "start": 387.90000009536743,
+                "duration": 300.09999990463257,
+                "transfer": 7104,
+                "size": 18766
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/chart-bottom-toolbar.9b66d46456dc04af830a.js",
+                "start": 388.19999980926514,
+                "duration": 310.1000003814697,
+                "transfer": 26070,
+                "size": 81887
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.62671.0f2e3671fdafb6472d2c.js",
+                "start": 399.09999990463257,
+                "duration": 288,
+                "transfer": 1448,
+                "size": 2351
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/error-renderer.413a3d46ec04c09f7cb9.js",
+                "start": 399.69999980926514,
+                "duration": 288,
+                "transfer": 2482,
+                "size": 5635
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.43529.0592527759102501f773.js",
+                "start": 422.30000019073486,
+                "duration": 275.59999990463257,
+                "transfer": 7914,
+                "size": 19907
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/85715.8b652352c5fa37697ca2.css",
+                "start": 422.59999990463257,
+                "duration": 109.2000002861023,
+                "transfer": 4626,
+                "size": 50744
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/15043.49b83eeebe4037b3d646.css",
+                "start": 422.69999980926514,
+                "duration": 108.5,
+                "transfer": 1451,
+                "size": 4138
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/15211.005052e314b2de339c3c.css",
+                "start": 423,
+                "duration": 107,
+                "transfer": 801,
+                "size": 2106
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/47649.ae1ef6aa1cbb9375826c.css",
+                "start": 423.19999980926514,
+                "duration": 107.2000002861023,
+                "transfer": 1675,
+                "size": 5424
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/85376.10fd79bdcf7d87919e93.css",
+                "start": 423.40000009536743,
+                "duration": 182,
+                "transfer": 1432,
+                "size": 4263
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/32972.502a2bfaa4b3396033c4.css",
+                "start": 423.59999990463257,
+                "duration": 117,
+                "transfer": 2596,
+                "size": 9222
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/62224.c354edad3b1c411c325d.css",
+                "start": 423.90000009536743,
+                "duration": 118.90000009536743,
+                "transfer": 929,
+                "size": 629
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/40939.0bd961e2a4b54f16d070.css",
+                "start": 424.19999980926514,
+                "duration": 119.10000038146973,
+                "transfer": 6930,
+                "size": 36684
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/83520.8b45993dfd5a7fded571.js",
+                "start": 424.40000009536743,
+                "duration": 284.5,
+                "transfer": 11563,
+                "size": 33327
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/99279.48a2851690e2ea97e0bf.js",
+                "start": 424.69999980926514,
+                "duration": 284.6000003814697,
+                "transfer": 8542,
+                "size": 21063
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/92035.d03b6bb0f7e21de40e78.js",
+                "start": 425,
+                "duration": 273.09999990463257,
+                "transfer": 21765,
+                "size": 70288
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/chart-widget-gui.a8be4265514fe0ddfd35.js",
+                "start": 425.19999980926514,
+                "duration": 298.1000003814697,
+                "transfer": 46893,
+                "size": 162228
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.61342.0fdf2179e2028484f2b6.js",
+                "start": 431.19999980926514,
+                "duration": 277.40000009536743,
+                "transfer": 2538,
+                "size": 5612
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/16687.bfb3f04bc4010c693f88.css",
+                "start": 431.5,
+                "duration": 121.19999980926514,
+                "transfer": 1122,
+                "size": 822
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/85431.840e3808e3ae0de87347.css",
+                "start": 431.69999980926514,
+                "duration": 123.7000002861023,
+                "transfer": 1441,
+                "size": 4254
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/75866.9ce134321e5f7ed1c4ad.css",
+                "start": 431.90000009536743,
+                "duration": 190.09999990463257,
+                "transfer": 690,
+                "size": 390
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/11798.3b6e6a44133a66f3f38a.css",
+                "start": 432.09999990463257,
+                "duration": 123.7000002861023,
+                "transfer": 1167,
+                "size": 2755
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/83899.bb51b63e079c12f34d9d.css",
+                "start": 432.30000019073486,
+                "duration": 144.09999990463257,
+                "transfer": 722,
+                "size": 422
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/13804.994a27332cd6fb7d9250.css",
+                "start": 432.40000009536743,
+                "duration": 143.19999980926514,
+                "transfer": 801,
+                "size": 1149
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/71954.e5232e0eb892021a5cad.css",
+                "start": 432.59999990463257,
+                "duration": 202.7000002861023,
+                "transfer": 1176,
+                "size": 876
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/70814.d9b617031ddcb9f1c25c.css",
+                "start": 432.80000019073486,
+                "duration": 143.2999997138977,
+                "transfer": 685,
+                "size": 385
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/34430.ef0bd3010b1c05e755bc.css",
+                "start": 432.90000009536743,
+                "duration": 143.90000009536743,
+                "transfer": 352,
+                "size": 52
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/85786.d08b322ccf5a089c2724.css",
+                "start": 433,
+                "duration": 144.40000009536743,
+                "transfer": 5409,
+                "size": 21341
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/47440.577f49cce83cd13b2b13.js",
+                "start": 433.30000019073486,
+                "duration": 276.5,
+                "transfer": 6131,
+                "size": 15632
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/87106.eda24b9e644e52c9dbf7.js",
+                "start": 433.59999990463257,
+                "duration": 276.59999990463257,
+                "transfer": 24142,
+                "size": 61761
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js",
+                "start": 433.69999980926514,
+                "duration": 298.7000002861023,
+                "transfer": 45778,
+                "size": 150671
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.44335.659b9e628aebc76cc3a7.js",
+                "start": 434.09999990463257,
+                "duration": 288.7000002861023,
+                "transfer": 701,
+                "size": 401
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/16245.7c8021aaa4581206bf5d.css",
+                "start": 434.19999980926514,
+                "duration": 212.5,
+                "transfer": 2199,
+                "size": 6762
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/header-toolbar.c73521c33c31f7a2f740.js",
+                "start": 434.40000009536743,
+                "duration": 290.59999990463257,
+                "transfer": 13130,
+                "size": 37621
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.83147.2c60298ab85186939108.js",
+                "start": 437,
+                "duration": 285.40000009536743,
+                "transfer": 1303,
+                "size": 1003
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/90017.bab830f174bdff79b76c.js",
+                "start": 437.09999990463257,
+                "duration": 288.40000009536743,
+                "transfer": 7111,
+                "size": 16559
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/40614.4a0f9bb4e51cf9c333fb.js",
+                "start": 437.30000019073486,
+                "duration": 304.7999997138977,
+                "transfer": 4583,
+                "size": 9980
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/75213.195cf0284c0c7186c0c4.js",
+                "start": 437.5,
+                "duration": 304.40000009536743,
+                "transfer": 11362,
+                "size": 33041
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/symbol-list-service.e06c1d09027bdd04b5ba.js",
+                "start": 437.69999980926514,
+                "duration": 299.5,
+                "transfer": 2232,
+                "size": 4238
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/63214.85a354988ef1aba52418.css",
+                "start": 501.90000009536743,
+                "duration": 95.69999980926514,
+                "transfer": 896,
+                "size": 1351
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/user-defined-bars-marks-tooltip.74ed71d69efdd19ef55f.js",
+                "start": 502.5,
+                "duration": 235.59999990463257,
+                "transfer": 1996,
+                "size": 4419
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.84012.dc3ac992a30759e11dfb.js",
+                "start": 508.09999990463257,
+                "duration": 233.59999990463257,
+                "transfer": 1282,
+                "size": 982
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/85503.0690e2be01801db84f0f.js",
+                "start": 508.59999990463257,
+                "duration": 259.2000002861023,
+                "transfer": 7782,
+                "size": 21413
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/13819.16cc5d407553a985d38a.js",
+                "start": 509,
+                "duration": 257.40000009536743,
+                "transfer": 4344,
+                "size": 11241
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/595.f27c7ff3fb3541f7a5a9.js",
+                "start": 509.40000009536743,
+                "duration": 260.69999980926514,
+                "transfer": 48043,
+                "size": 144214
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/54050.8a961ff36b3fd2551b86.js",
+                "start": 510.5,
+                "duration": 258,
+                "transfer": 4744,
+                "size": 12563
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/studies.1664dd8ce61268a99f21.js",
+                "start": 510.90000009536743,
+                "duration": 257.90000009536743,
+                "transfer": 19953,
+                "size": 58800
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.22510.97ea9d1230f787704bab.js",
+                "start": 528.5999999046326,
+                "duration": 239.5,
+                "transfer": 597,
+                "size": 297
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/97085.e8cb5e4798d2a95fd51a.css",
+                "start": 529.1999998092651,
+                "duration": 118.7000002861023,
+                "transfer": 1151,
+                "size": 3784
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/price-scale-mode-buttons-renderer.7808a3d0f985418722a5.js",
+                "start": 529.8000001907349,
+                "duration": 253.89999961853027,
+                "transfer": 2002,
+                "size": 4423
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.40528.59c512ccf81272f80ff8.js",
+                "start": 547.3000001907349,
+                "duration": 235.69999980926514,
+                "transfer": 784,
+                "size": 1036
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/52485.0013c1de7f3983cb0702.css",
+                "start": 547.6999998092651,
+                "duration": 58,
+                "transfer": 1190,
+                "size": 890
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/50160.e2da57e52d49f6d7a278.css",
+                "start": 548.5999999046326,
+                "duration": 57.59999990463257,
+                "transfer": 790,
+                "size": 1060
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/85997.6ebc9854b0db5bfacff5.css",
+                "start": 549.1999998092651,
+                "duration": 71.2000002861023,
+                "transfer": 2107,
+                "size": 9353
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/18566.5b77c805ba0a2936e5c4.css",
+                "start": 549.9000000953674,
+                "duration": 71.5,
+                "transfer": 1208,
+                "size": 6715
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/93732.e2e2ad7de327b6a9266d.css",
+                "start": 550.3000001907349,
+                "duration": 70.5,
+                "transfer": 1235,
+                "size": 935
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/68243.43a2ca48755e1180f291.js",
+                "start": 550.5999999046326,
+                "duration": 239.80000019073486,
+                "transfer": 5579,
+                "size": 15125
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/change-interval-dialog.e48122fa4dfe08e7385a.js",
+                "start": 551.1999998092651,
+                "duration": 233.5,
+                "transfer": 8903,
+                "size": 22966
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.9711.3709b6810207a776630f.js",
+                "start": 552.0999999046326,
+                "duration": 231.90000009536743,
+                "transfer": 2707,
+                "size": 6107
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/1644.ec13e683352881af5b51.css",
+                "start": 552.5999999046326,
+                "duration": 69.09999990463257,
+                "transfer": 1259,
+                "size": 3118
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/93274.4c73acc985e2db926fde.css",
+                "start": 553.5999999046326,
+                "duration": 67.5,
+                "transfer": 1525,
+                "size": 4378
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/10767.cc048c527ae0ed545dde.css",
+                "start": 553.9000000953674,
+                "duration": 78.69999980926514,
+                "transfer": 2586,
+                "size": 8483
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/50254.8e51b2705e4e47c1830f.js",
+                "start": 554.5,
+                "duration": 237.80000019073486,
+                "transfer": 4437,
+                "size": 11107
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/50225.aff9cbfa76b3d29fa67b.js",
+                "start": 555,
+                "duration": 257,
+                "transfer": 15650,
+                "size": 39426
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/drawing-toolbar.fce67f141eb6ebe35dfc.js",
+                "start": 555.8000001907349,
+                "duration": 259,
+                "transfer": 26665,
+                "size": 75311
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/80202.783319ebb0c35b72cd16.css",
+                "start": 556.5999999046326,
+                "duration": 77.40000009536743,
+                "transfer": 909,
+                "size": 1576
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/bottom-widgetbar.9b761f37589e7950f29b.js",
+                "start": 557.0999999046326,
+                "duration": 241.90000009536743,
+                "transfer": 7379,
+                "size": 23260
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.24811.7569a58daa2d0922b42e.js",
+                "start": 558.9000000953674,
+                "duration": 239,
+                "transfer": 464,
+                "size": 164
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/45295.5590f61c6ca6a343b817.css",
+                "start": 559.4000000953674,
+                "duration": 75.40000009536743,
+                "transfer": 720,
+                "size": 420
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/trading-bottom-widget.7bf58f78840d93eb75fd.js",
+                "start": 559.6999998092651,
+                "duration": 238.60000038146973,
+                "transfer": 3035,
+                "size": 7569
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.7966.4e40d0e7bad90a30672a.js",
+                "start": 560.0999999046326,
+                "duration": 251.5,
+                "transfer": 1582,
+                "size": 2893
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/74776.046655fecc28d4543a62.css",
+                "start": 560.5,
+                "duration": 73.90000009536743,
+                "transfer": 893,
+                "size": 1530
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/trading-bottom-widget-custom-title.4ff9df078ad056b07db9.js",
+                "start": 560.8000001907349,
+                "duration": 253.39999961853027,
+                "transfer": 17625,
+                "size": 45048
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/trading-widget-controller.f160b6401d864b68b40d.js",
+                "start": 561.4000000953674,
+                "duration": 251.2999997138977,
+                "transfer": 1203,
+                "size": 2201
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.65331.56204b40e814a2043d75.js",
+                "start": 561.9000000953674,
+                "duration": 246.09999990463257,
+                "transfer": 644,
+                "size": 344
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/41707.35fc60bac7bba7427820.css",
+                "start": 562.3000001907349,
+                "duration": 73.19999980926514,
+                "transfer": 658,
+                "size": 1059
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/13654.5aab6690df9cc823979b.css",
+                "start": 562.5,
+                "duration": 83.90000009536743,
+                "transfer": 1337,
+                "size": 3172
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/footer-widget.d59866ea10799f4c27f4.js",
+                "start": 562.9000000953674,
+                "duration": 265.90000009536743,
+                "transfer": 14630,
+                "size": 40495
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.6026.c24592cb857f81c8a3d4.js",
+                "start": 564,
+                "duration": 263.80000019073486,
+                "transfer": 1245,
+                "size": 2167
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/74219.b1fdfb8c01fa2ccc3563.css",
+                "start": 564.5,
+                "duration": 81.40000009536743,
+                "transfer": 1425,
+                "size": 5665
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/10627.267c6b3976ed72c9c3bf.css",
+                "start": 565,
+                "duration": 82.40000009536743,
+                "transfer": 1121,
+                "size": 5323
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/47081.586fdfa9fc67a5bf4d60.css",
+                "start": 565.1999998092651,
+                "duration": 81.80000019073486,
+                "transfer": 2473,
+                "size": 7248
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/widgetbar.c6e39002f99475679d03.js",
+                "start": 565.5999999046326,
+                "duration": 263.90000009536743,
+                "transfer": 34737,
+                "size": 104249
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.16465.e072c5cb6efeb3edfd7a.js",
+                "start": 1154.5999999046326,
+                "duration": 5.700000286102295,
+                "transfer": 1397,
+                "size": 2588
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/16651.7b0d640d46a06eec0b92.css",
+                "start": 1155.5,
+                "duration": 2.9000000953674316,
+                "transfer": 900,
+                "size": 1372
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/84551.f2e1edd6097be38e73da.css",
+                "start": 1156.8000001907349,
+                "duration": 4.699999809265137,
+                "transfer": 358,
+                "size": 58
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/4500.388f05210735cc1ee824.css",
+                "start": 1157.5,
+                "duration": 11.699999809265137,
+                "transfer": 905,
+                "size": 1631
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/39983.f5f264bb4298497c0f97.css",
+                "start": 1157.9000000953674,
+                "duration": 13.199999809265137,
+                "transfer": 548,
+                "size": 248
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/8117.801d73756f943dcb4a7f.css",
+                "start": 1158.1999998092651,
+                "duration": 14.600000381469727,
+                "transfer": 945,
+                "size": 2826
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/32327.d047694e43d46e5c8cd4.css",
+                "start": 1158.4000000953674,
+                "duration": 15.5,
+                "transfer": 360,
+                "size": 60
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/60451.b5acda22a891bd0b8b78.css",
+                "start": 1158.5999999046326,
+                "duration": 31.200000286102295,
+                "transfer": 478,
+                "size": 178
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/55921.8577632fdab29ee53ddf.css",
+                "start": 1158.8000001907349,
+                "duration": 22.399999618530273,
+                "transfer": 349,
+                "size": 49
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/5840.f520a97183687f9dfabe.css",
+                "start": 1159.0999999046326,
+                "duration": 31.09999990463257,
+                "transfer": 7506,
+                "size": 35022
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/36282.5842e2a91f45177846c7.css",
+                "start": 1160.4000000953674,
+                "duration": 21.199999809265137,
+                "transfer": 686,
+                "size": 1347
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/31892.cadd6c828bd2c0930e97.css",
+                "start": 1161.5,
+                "duration": 27.800000190734863,
+                "transfer": 624,
+                "size": 324
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/36145.0a033667f92d241ce17e.js",
+                "start": 1162.3000001907349,
+                "duration": 48.39999961853027,
+                "transfer": 12942,
+                "size": 34122
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/32171.3b60eb8b024157f00d73.js",
+                "start": 1162.6999998092651,
+                "duration": 46.200000286102295,
+                "transfer": 11073,
+                "size": 27183
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/3854.565e01fe026671c3a0ca.js",
+                "start": 1163.0999999046326,
+                "duration": 48.5,
+                "transfer": 37291,
+                "size": 102671
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/symbol-search-dialog.86ad5d2523fa1a9364fb.js",
+                "start": 1163.5,
+                "duration": 47.69999980926514,
+                "transfer": 4483,
+                "size": 10689
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/study-pane-views.0cde0c19be7bb0392c66.js",
+                "start": 1196.0999999046326,
+                "duration": 19.40000009536743,
+                "transfer": 6309,
+                "size": 17778
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.39525.e2c2b2ce3206addf0942.js",
+                "start": 1273.9000000953674,
+                "duration": 18.40000009536743,
+                "transfer": 3283,
+                "size": 7607
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/46853.1871485f1e39c0f64252.css",
+                "start": 1274.1999998092651,
+                "duration": 16.200000286102295,
+                "transfer": 1182,
+                "size": 882
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/23819.86d4f770693fe6935bba.css",
+                "start": 1274.5,
+                "duration": 16.300000190734863,
+                "transfer": 749,
+                "size": 1330
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/16468.3e4f89ce6749c1e5f8df.css",
+                "start": 1274.6999998092651,
+                "duration": 16.700000286102295,
+                "transfer": 1145,
+                "size": 3339
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/55287.82c987befbfc614cdc0b.css",
+                "start": 1275,
+                "duration": 17.09999990463257,
+                "transfer": 708,
+                "size": 408
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/87202.e197bd2cf8e6d2360b6f.css",
+                "start": 1275.1999998092651,
+                "duration": 16.700000286102295,
+                "transfer": 1327,
+                "size": 3333
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/48194.053cede951b9d64dea44.css",
+                "start": 1275.4000000953674,
+                "duration": 25,
+                "transfer": 965,
+                "size": 2314
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/66998.ca7edaed1ed119c20a86.css",
+                "start": 1275.5999999046326,
+                "duration": 25.40000009536743,
+                "transfer": 8707,
+                "size": 40676
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/12374.d522bf503121d2801223.js",
+                "start": 1275.8000001907349,
+                "duration": 39.39999961853027,
+                "transfer": 10788,
+                "size": 26336
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/86338.95e5ed7946c7d42a149c.js",
+                "start": 1276.0999999046326,
+                "duration": 43.700000286102295,
+                "transfer": 16736,
+                "size": 51506
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/19504.49d66914e4964e59b2aa.js",
+                "start": 1276.3000001907349,
+                "duration": 43.299999713897705,
+                "transfer": 24151,
+                "size": 65604
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/watchlist-widget.f2884e5a3090b7d69890.js",
+                "start": 1276.5999999046326,
+                "duration": 54.59999990463257,
+                "transfer": 64387,
+                "size": 186481
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/zh.4745.18c4f191274cb8b0de61.js",
+                "start": 1378.1999998092651,
+                "duration": 13,
+                "transfer": 31267,
+                "size": 91597
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/69921.5c8b1b079e22afe0d4f1.css",
+                "start": 1378.5999999046326,
+                "duration": 9,
+                "transfer": 880,
+                "size": 580
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/88887.8bacf5f9fc03193bdafe.css",
+                "start": 1378.6999998092651,
+                "duration": 11,
+                "transfer": 807,
+                "size": 507
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/53796.5221e147c4eb0d224a86.css",
+                "start": 1379,
+                "duration": 11,
+                "transfer": 3004,
+                "size": 11491
+              },
+              {
+                "name": "https://127.0.0.1:15454/charting_library/bundles/symbol-details.204694b8864593818b0b.js",
+                "start": 1379.3000001907349,
+                "duration": 12.299999713897705,
+                "transfer": 39724,
+                "size": 124406
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "performance_acceptance": {
+    "criterion": "strict majority of measured cold displays below 3000ms",
+    "total": 1,
+    "under_three_seconds": 1,
+    "slow_samples": []
+  },
+  "caveat": "Display ends at public native dataReady plus two animation frames; no GPU completion claim. Each sample starts a new layout; provider API response timing and acquisition timestamp are recorded."
+}

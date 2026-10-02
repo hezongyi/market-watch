@@ -1,0 +1,1219 @@
+{
+  "read_only": true,
+  "serial": true,
+  "minimum_request_start_interval_seconds": 1,
+  "records": [
+    {
+      "source": "binance",
+      "repeat": 0,
+      "started_at_epoch_ms": 1790895193286,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.43
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 0.81
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 0.88
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.0
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.0
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.04
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.05
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.38
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.42
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 584.5
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 584.57
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 584.71
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 584.72
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 584.75
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 584.76
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 751.55
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 751.85
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 752.11
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 752.14
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 752.15
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 299.05,
+          "connection": {
+            "id": "5fa7b8a5-a913-4a17-9766-489311062a8c",
+            "source_port": 48936,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:13.550022746+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 450.75,
+          "connection": {
+            "id": "5fa7b8a5-a913-4a17-9766-489311062a8c",
+            "source_port": 48936,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:13.550022746+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 602.46,
+          "connection": {
+            "id": "5fa7b8a5-a913-4a17-9766-489311062a8c",
+            "source_port": 48936,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:13.550022746+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 754.23,
+          "connection": {
+            "id": "5fa7b8a5-a913-4a17-9766-489311062a8c",
+            "source_port": 48936,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:13.550022746+08:00",
+            "upload": 1925,
+            "download": 14532
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 752.41,
+      "source_port": 48936,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 1,
+      "started_at_epoch_ms": 1790895194286,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.85
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.16
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.21
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.31
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.31
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.35
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.35
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.64
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.67
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 615.64
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 615.71
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 615.87
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 615.88
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 615.91
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 615.91
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 785.95
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 786.2
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 786.43
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 786.45
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 786.46
+        }
+      ],
+      "proxy_observations": [],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 786.75,
+      "source_port": 48940,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 2,
+      "started_at_epoch_ms": 1790895195286,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.7
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.57
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.64
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.79
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.8
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.83
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.83
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 2.11
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 2.15
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 631.56
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 631.65
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 631.79
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 631.8
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 631.83
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 631.84
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 812.76
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 813.02
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 813.23
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 813.25
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 813.26
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 419.99,
+          "connection": {
+            "id": "b49994d2-2446-4e70-955d-fcbb5206fdf2",
+            "source_port": 48946,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:15.576492932+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 571.51,
+          "connection": {
+            "id": "b49994d2-2446-4e70-955d-fcbb5206fdf2",
+            "source_port": 48946,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:15.576492932+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 723.05,
+          "connection": {
+            "id": "b49994d2-2446-4e70-955d-fcbb5206fdf2",
+            "source_port": 48946,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:15.576492932+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 874.75,
+          "connection": {
+            "id": "b49994d2-2446-4e70-955d-fcbb5206fdf2",
+            "source_port": 48946,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:15.576492932+08:00",
+            "upload": 1925,
+            "download": 14755
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 813.5,
+      "source_port": 48946,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 3,
+      "started_at_epoch_ms": 1790895196286,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.74
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.17
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.22
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.32
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.32
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.35
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.35
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.6
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.63
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 610.39
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 610.46
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 610.61
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 610.61
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 610.64
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 610.65
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 781.67
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 781.93
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 782.16
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 782.18
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 782.19
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 329.84,
+          "connection": {
+            "id": "dd168a6e-d2f9-45f2-a78f-5425ed1473ae",
+            "source_port": 48948,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:16.559803388+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 481.51,
+          "connection": {
+            "id": "dd168a6e-d2f9-45f2-a78f-5425ed1473ae",
+            "source_port": 48948,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:16.559803388+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 633.08,
+          "connection": {
+            "id": "dd168a6e-d2f9-45f2-a78f-5425ed1473ae",
+            "source_port": 48948,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:16.559803388+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 784.48,
+          "connection": {
+            "id": "dd168a6e-d2f9-45f2-a78f-5425ed1473ae",
+            "source_port": 48948,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:16.559803388+08:00",
+            "upload": 1925,
+            "download": 14783
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 782.43,
+      "source_port": 48948,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 4,
+      "started_at_epoch_ms": 1790895197287,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.76
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.14
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.19
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.46
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.47
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.51
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.51
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.61
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.64
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 1696.34
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1696.4
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1696.55
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1696.55
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1696.58
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1696.59
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1886.4
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1886.67
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1886.91
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1886.93
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1886.94
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 390.53,
+          "connection": {
+            "id": "a0d3cd42-5bbd-40af-92ef-df164937dddf",
+            "source_port": 42814,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:17.592720676+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 1606.0,
+          "connection": {
+            "id": "a0d3cd42-5bbd-40af-92ef-df164937dddf",
+            "source_port": 42814,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:17.592720676+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 1757.59,
+          "connection": {
+            "id": "a0d3cd42-5bbd-40af-92ef-df164937dddf",
+            "source_port": 42814,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:17.592720676+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1914.22,
+          "connection": {
+            "id": "a0d3cd42-5bbd-40af-92ef-df164937dddf",
+            "source_port": 42814,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:17.592720676+08:00",
+            "upload": 1925,
+            "download": 14776
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1887.19,
+      "source_port": 42814,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 5,
+      "started_at_epoch_ms": 1790895199347,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.6
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.02
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.06
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.15
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.16
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.19
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.19
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.62
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.65
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 627.88
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 627.95
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 628.08
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 628.09
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 628.12
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 628.12
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 808.21
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 808.46
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 808.69
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 808.72
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 808.73
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 307.89,
+          "connection": {
+            "id": "d849bf84-f1a1-4ac5-af6a-d5e4c9b5f745",
+            "source_port": 42820,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:19.635770658+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 610.89,
+          "connection": {
+            "id": "d849bf84-f1a1-4ac5-af6a-d5e4c9b5f745",
+            "source_port": 42820,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:19.635770658+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 762.51,
+          "connection": {
+            "id": "d849bf84-f1a1-4ac5-af6a-d5e4c9b5f745",
+            "source_port": 42820,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:19.635770658+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 914.09,
+          "connection": {
+            "id": "d849bf84-f1a1-4ac5-af6a-d5e4c9b5f745",
+            "source_port": 42820,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:19.635770658+08:00",
+            "upload": 1925,
+            "download": 14796
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 808.97,
+      "source_port": 42820,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 6,
+      "started_at_epoch_ms": 1790895200348,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.74
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.12
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.17
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.27
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.27
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.3
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.3
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.55
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.59
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 609.09
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 609.16
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 609.3
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 609.31
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 609.34
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 609.34
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 784.48
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 784.74
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 784.92
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 784.94
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 784.95
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 369.09,
+          "connection": {
+            "id": "8645a1ef-8d14-41f3-8ccd-1b492954a90a",
+            "source_port": 42828,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:20.624743064+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 523.47,
+          "connection": {
+            "id": "8645a1ef-8d14-41f3-8ccd-1b492954a90a",
+            "source_port": 42828,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:20.624743064+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 675.1,
+          "connection": {
+            "id": "8645a1ef-8d14-41f3-8ccd-1b492954a90a",
+            "source_port": 42828,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:20.624743064+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 826.83,
+          "connection": {
+            "id": "8645a1ef-8d14-41f3-8ccd-1b492954a90a",
+            "source_port": 42828,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:20.624743064+08:00",
+            "upload": 1925,
+            "download": 14704
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 785.19,
+      "source_port": 42828,
+      "new_connection": true,
+      "confirmed_reuse": false
+    },
+    {
+      "source": "binance",
+      "repeat": 7,
+      "started_at_epoch_ms": 1790895201348,
+      "events": [
+        {
+          "name": "connection.connect_tcp.started",
+          "at_ms": 0.81
+        },
+        {
+          "name": "connection.connect_tcp.complete",
+          "at_ms": 1.22
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 1.27
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 1.37
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 1.37
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 1.4
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 1.4
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1.69
+        },
+        {
+          "name": "proxy.start_tls.started",
+          "at_ms": 1.72
+        },
+        {
+          "name": "proxy.start_tls.complete",
+          "at_ms": 894.74
+        },
+        {
+          "name": "http11.send_request_headers.started",
+          "at_ms": 894.8
+        },
+        {
+          "name": "http11.send_request_headers.complete",
+          "at_ms": 894.94
+        },
+        {
+          "name": "http11.send_request_body.started",
+          "at_ms": 894.94
+        },
+        {
+          "name": "http11.send_request_body.complete",
+          "at_ms": 894.97
+        },
+        {
+          "name": "http11.receive_response_headers.started",
+          "at_ms": 894.98
+        },
+        {
+          "name": "http11.receive_response_headers.complete",
+          "at_ms": 1072.0
+        },
+        {
+          "name": "http11.receive_response_body.started",
+          "at_ms": 1072.28
+        },
+        {
+          "name": "http11.receive_response_body.complete",
+          "at_ms": 1072.46
+        },
+        {
+          "name": "http11.response_closed.started",
+          "at_ms": 1072.48
+        },
+        {
+          "name": "http11.response_closed.complete",
+          "at_ms": 1072.49
+        }
+      ],
+      "proxy_observations": [
+        {
+          "at_ms": 431.55,
+          "connection": {
+            "id": "dcd94978-dd7a-4e56-bd94-022b81b36970",
+            "source_port": 42834,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:21.631803308+08:00",
+            "upload": 1543,
+            "download": 0
+          }
+        },
+        {
+          "at_ms": 583.08,
+          "connection": {
+            "id": "dcd94978-dd7a-4e56-bd94-022b81b36970",
+            "source_port": 42834,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:21.631803308+08:00",
+            "upload": 1669,
+            "download": 4278
+          }
+        },
+        {
+          "at_ms": 1037.8,
+          "connection": {
+            "id": "dcd94978-dd7a-4e56-bd94-022b81b36970",
+            "source_port": 42834,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:21.631803308+08:00",
+            "upload": 1925,
+            "download": 4482
+          }
+        },
+        {
+          "at_ms": 1189.35,
+          "connection": {
+            "id": "dcd94978-dd7a-4e56-bd94-022b81b36970",
+            "source_port": 42834,
+            "chains": [
+              "L1|日本02|中转|流媒体|4x",
+              "🛟 日本故障转移",
+              "🇯🇵 日本专属"
+            ],
+            "start": "2026-10-02T06:53:21.631803308+08:00",
+            "upload": 1925,
+            "download": 14563
+          }
+        }
+      ],
+      "status": 200,
+      "bars": 200,
+      "elapsed_ms": 1072.76,
+      "source_port": 42834,
+      "new_connection": true,
+      "confirmed_reuse": false
+    }
+  ],
+  "observer_errors": [],
+  "matched_controller_logs": [
+    {
+      "observed_at_epoch_ms": 1790895193562,
+      "message": "[TCP] 192.168.7.232:48936 --> data-api.binance.vision:443 match DomainSuffix(binance.vision) using 🇯🇵 日本专属[L1|日本02|中转|流媒体|4x]"
+    },
+    {
+      "observed_at_epoch_ms": 1790895195588,
+      "message": "[TCP] 192.168.7.232:48946 --> data-api.binance.vision:443 match DomainSuffix(binance.vision) using 🇯🇵 日本专属[L1|日本02|中转|流媒体|4x]"
+    },
+    {
+      "observed_at_epoch_ms": 1790895196571,
+      "message": "[TCP] 192.168.7.232:48948 --> data-api.binance.vision:443 match DomainSuffix(binance.vision) using 🇯🇵 日本专属[L1|日本02|中转|流媒体|4x]"
+    },
+    {
+      "observed_at_epoch_ms": 1790895197604,
+      "message": "[TCP] 192.168.7.232:42814 --> data-api.binance.vision:443 match DomainSuffix(binance.vision) using 🇯🇵 日本专属[L1|日本02|中转|流媒体|4x]"
+    },
+    {
+      "observed_at_epoch_ms": 1790895199647,
+      "message": "[TCP] 192.168.7.232:42820 --> data-api.binance.vision:443 match DomainSuffix(binance.vision) using 🇯🇵 日本专属[L1|日本02|中转|流媒体|4x]"
+    },
+    {
+      "observed_at_epoch_ms": 1790895200636,
+      "message": "[TCP] 192.168.7.232:42828 --> data-api.binance.vision:443 match DomainSuffix(binance.vision) using 🇯🇵 日本专属[L1|日本02|中转|流媒体|4x]"
+    },
+    {
+      "observed_at_epoch_ms": 1790895201643,
+      "message": "[TCP] 192.168.7.232:42834 --> data-api.binance.vision:443 match DomainSuffix(binance.vision) using 🇯🇵 日本专属[L1|日本02|中转|流媒体|4x]"
+    }
+  ],
+  "controller_log_errors": [],
+  "scope": "native historical 200-bar reads; exact host/source-port route match; no database/cache reset"
+}

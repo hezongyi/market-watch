@@ -1,0 +1,78 @@
+{
+  "baseline_commit": "b9d69dd4c7ff8e873c4c75f07054eac29c94b996",
+  "code_commit": "c26decacb8d9fd3d83140a5d2f61861856b2f22a",
+  "backend": {
+    "passed": 307,
+    "skipped": 0
+  },
+  "frontend_vm": {
+    "passed": 35
+  },
+  "local_egress": {
+    "criterion": "strict majority of measured cold displays below 3000ms",
+    "total": 18,
+    "under_three_seconds": 16,
+    "slow_samples": [
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "1D",
+        "displayed_ms": 3048
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "1W",
+        "displayed_ms": 3053
+      }
+    ]
+  },
+  "shared_egress": {
+    "criterion": "strict majority of measured cold displays below 3000ms",
+    "total": 6,
+    "under_three_seconds": 5,
+    "slow_samples": [
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "1",
+        "displayed_ms": 3680
+      }
+    ]
+  },
+  "cached_request_to_display_ms": {
+    "local": [
+      208,
+      595
+    ],
+    "shared": [
+      199,
+      665
+    ]
+  },
+  "full_pool_concurrent_reads": {
+    "total": 8,
+    "success": 8,
+    "new_tcp_or_tls": 0
+  },
+  "secret_value_scan": "passed for added and modified files; actual provider, proxy, DB and local login values checked",
+  "caveat": "Cold provider database cache with prewarmed connections; external tails remain possible; no claim of statistically improved end-to-end latency.",
+  "artifact_sha256": {
+    "backend-pg16.txt": "d9b3093a82efe8b2e77f2480205af163b8e3e6c8a4128e95271369e51b7d0f55",
+    "first-screen-before-periodic-fix-18.json": "efeb6865992dd1cfa4baa03e8688a802ef9710e6d5d919e9655d2d4974a45eca",
+    "first-screen-before-periodic-fix-18.png": "dbce9c886d0db6f8a42782d2aaf1730dd647505e27eca0d1fb275b8ee160c731",
+    "first-screen-fix-18.json": "53335a5746310131b890f4b5f7913701cd2bf1bc1210d01b77db644c50ada826",
+    "first-screen-fix-18.png": "edb059c4779cd5c8531d463c1fa3473972a245682ff414b29ae8dac99b121522",
+    "first-screen-fixture-missing-catalog.json": "fe066329e4a77779b9f1e56fe20f692abdc598b8668df52cf70b55330ea69ffd",
+    "first-screen-shared-egress-six.json": "43727961627a496614e21c04b2833ada9415ad03c5d2e58d8b2b7e717ef26678",
+    "first-screen-shared-egress-six.png": "d61c8253d0c70ba36b647fd3a346ad6556f49b63eabd6f519ee6df27940ec5c6",
+    "fixture-compose.yaml": "e7afe2a906f94c1ce8ab6a89b20259ea8c85b3ef23c3d8eaecbddb4515480821",
+    "fixture-tls.conf": "e0b166360d88360e981b119de439936fde034de8b2fc3b75ef2dbd9e12e06daa",
+    "fixture-web.conf": "ca693d1343cf07bafa4f66d3a3ce42d245209f60d32afdf84aa6d0ad18108271",
+    "frontend-vm.txt": "184c0c320721dc1bcd259e93e5ec6134797b3638ec6b27b0c44cf0aace07c951",
+    "provider-fixture-snapshot.json": "07ff48a216e8b664b938c3223f018ff7945e0e5d545176c853942dec5baf6181",
+    "routes-comparison.json": "2820fe427b061feeb575a6da49734f9af51e12157388a38bb7c4f725f981b257",
+    "runtime-final.json": "c6375ee58bdf42c1fbcdca81538cc7cfe12d35104f81c7ff73af8b448c69a55e",
+    "runtime-local-egress-18.json": "10fe31f4b4ee1fdaba53f63fa4e5b123949aabceba020d4da5d47e32467e6c7f",
+    "transport-baseline-red.txt": "aeac210dc71185faba3120c5f71305f077c1ec073f4670d08511891bb3e70b56",
+    "transport-green.txt": "9069dece47203af46d47c77e0056db830e14bb52d64c3c6f550f97530a83b89b",
+    "transport-overlap-real.json": "1818b3f69ca5b4fac33ac44f7e5b11d1690365463bbaccfc740c0fa8fab2f58f"
+  }
+}
