@@ -1,0 +1,7 @@
+# Deterministic correctness barrier, not a performance/deployment configuration.
+# Restoring the ordinary acceptance compose restores autonomous provider loops.
+services:
+  api:
+    command: ["python", "/opt/native_history_barrier_server.py"]
+    volumes:
+      - ./scripts/native_history_barrier_server.py:/opt/native_history_barrier_server.py:ro

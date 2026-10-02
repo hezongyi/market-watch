@@ -17,6 +17,7 @@ def main():
     parser.add_argument("action", choices=("revise", "restore", "snapshot"))
     parser.add_argument("--native-history", action="store_true")
     parser.add_argument("--offset", type=int, default=20)
+    parser.add_argument("--start", type=int)
     parser.add_argument("--marker", required=True)
     args = parser.parse_args()
     assert 0 <= args.offset <= 20000
@@ -57,9 +58,15 @@ def main():
                     ).with_for_update())
                     assert dataset is not None
                     if dataset.lease_until <= now_ms():
-                        row = db.scalar(select(ProviderBar).where(
+                        query = select(ProviderBar).where(
                             ProviderBar.dataset_id == dataset.id, ProviderBar.complete.is_(True)
-                        ).order_by(ProviderBar.chart_time.desc()).offset(args.offset).limit(1))
+                        )
+                        if args.start is not None:
+                            assert args.start > 0
+                            query = query.where(ProviderBar.start == args.start)
+                        else:
+                            query = query.order_by(ProviderBar.chart_time.desc()).offset(args.offset)
+                        row = db.scalar(query.limit(1))
                         assert row is not None
                         saved = {"dataset_id": dataset.id, "start": row.start, "payload": row.payload}
                         marker.write_text(json.dumps(saved))

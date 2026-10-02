@@ -54,17 +54,31 @@ performance result remains immutable. No frontend quantity policy is added.
 Acceptance checker refinement adopted the final Spec observation: page errors,
 failed HTTP and PG demand misses are failed samples even if numeric latency is
 fast. Both cold and hot now use the user's native-entry clock. The selected
-40-sample cohort stays immutable, including two PG misses and a cold503.
-Final109affected tests and the three relevant frontend VM scripts pass. Runtime
+40-sample cohort stays immutable, including two PG misses and a cold 503.
+Final 109 affected tests and the three relevant frontend VM scripts pass. Runtime
 caps remain backend-only, downward, with unchanged default-off gating.
 
-Final acceptance-harness review (delta from893bf57): Standards found0hard
-violations and1low-priority possible Duplicated Code across test-only native
+Final acceptance-harness review (delta from 893bf57): Standards found 0hard
+violations and 1low-priority possible Duplicated Code across test-only native
 observation wrappers. Deferred shared harness extraction to avoid changing
 immutable evidence formats during acceptance. Spec confirmed fixed cohort
-scores and truthful failure/default-off reporting; found2revision-harness gaps:
-held-response setup could consume the8s review budget, and exact injected close
-was not a stable assertion reference. Adopted explicit6500ms setup-release bound
+scores and truthful failure/default-off reporting; found 2revision-harness gaps:
+held-response setup could consume the 8s review budget, and exact injected close
+was not a stable assertion reference. Adopted explicit 6500ms setup-release bound
 and the exact injected close in the restricted fixture/callback assertion.
 Earlier failed interleave attempts remain failed setup evidence, not proof of
 successful revision interleave. No runtime-demand regression found.
+
+Supplemental final review after 698f81f: Standards reports 0new violations or
+material smells. Spec confirms actual held-response/exact-close revision proof,
+one automatic positive/negative review, budget 2817/3464ms, cleared work/no-reset,
+independent focus budgets and both real-image compatibility behaviors. Adopted
+its sole delivery observation: record per-combination API/web/chart image IDs
+and source provenance, including only the old-web chart-origin build argument.
+No product runtime code changed during this supplement. Controlled loops are
+explicitly correctness-only and are restored in the ordinary runtime afterward.
+
+Supplement validation completed 115 affected tests and all three relevant VM
+scripts. The old combined late-response setup was removed from the public
+revision-only harness; dedicated fresh-workspace positive/negative barrier
+harnesses now own interleave verification. Prior failed evidence is preserved.

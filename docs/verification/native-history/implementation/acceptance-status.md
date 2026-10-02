@@ -2,8 +2,8 @@
 
 Isolated branch: `feature/native-history-buffer`, baseline v1.3.2
 `9596b25eda507ef708a327feb5271f238cdfdc0b`. Implementation and corrections are
-committed through `893bf576675aa412b7ecd7a4d10ece3106a072fd`; later acceptance
-harness/evidence changes are recorded separately. Nothing is merged, pushed or
+committed through `893bf576675aa412b7ecd7a4d10ece3106a072fd`; acceptance
+harness/evidence delivery is committed at 698f81f, with a subsequent correctness supplement. Nothing is merged, pushed or
 production deployed. Default buffer remains **false**; isolated acceptance runtime was also restored to off after sampling. Overall acceptance is
 **not passed**.
 
@@ -114,30 +114,53 @@ original OANDA PG/direct success remains distinct evidence. Backend PG barriers
 and VM tests cover late old snapshots, bounded correction and worker fencing.
 
 Primary performance gate still fails on the fixed Binance common-first-screen
-cohort. Approximately10000-bar historical navigation is a separate stress/behavior
-case: the native request itself demanded 8000–9700bars, E=0. User clarification
+cohort. Approximately 10000-bar historical navigation is a separate stress/behavior
+case: the native request itself demanded 8000–9700 bars, E=0. User clarification
 confirms that common cold loading is mandatory demand plus fixed optional bars,
 then existing finite prewarming; the large-jump timeouts are **not a 10000-bar cold
 prefetch policy and not the 3s common-cold gate**. They remain documented deadline
 limits, not a reason to raise ordinary first-screen fetch quantity.
 
-The real browser late-response interleave remains unproven: transport hold
-setup was not reached in subsequent navigation attempts; an earlier held
-reset response did not receive the intended new SSE reset before its budget.
-[First interleave attempt](browser-revision-interleave.json),
-[navigation attempt](browser-revision-navigation-interleave.json),
-[bounded-harness attempt](browser-revision-bounded-interleave.json). Each fixture
-restored its injected historical bar. These failures do not replace the earlier
-passing historical revision test or the real-PG/VM correctness evidence.
-Remaining browser/runtime coverage gaps are late-response interleave, full
-old/new runtime compatibility combinations and independent nonfocused series.
+Controlled real browser late-response interleaves now pass in a fresh workspace:
+[revision barrier](browser-late-revision-barrier.json) holds an unchanged actual
+native response until a real PG revision arrives over the real React/SSE chain.
+Release is 2817ms after native navigation action, leaving the original 8s budget;
+exactly one automatic review returns changed=true. The public native callback
+receives the exact injected revised close, correction reload completes and the
+bounded pending work clears. [Pure-backfill barrier](browser-late-backfill-barrier.json)
+uses an actual provider older-history read, releases in 3464ms, returns one
+changed=false review and causes no reset or additional native reload.
+
+These are correctness barriers, not additional performance samples. The unchanged
+API image runs [acceptance-only entrypoint](../../../../scripts/native_history_barrier_server.py)
+with autonomous provider warm/live loops held, so upstream can neither replace
+an injected revision nor consume its setup budget. Product foreground, snapshot,
+endpoint, bridge, native and SSE paths remain real. The uncontrolled attempt
+[browser late revision](browser-late-revision.json) reached the intended interleave
+but failed exact-value assertion after an ordinary provider refresh legitimately
+restored the supplier's original historical price. That failed record remains.
+Prior reset/navigation setup failures also remain in their original JSON files.
+
+[Independent multichart focus](browser-focus.json) passes at CPU 1x/4x with four
+actual distinct periods: M5 focused receives up to 1000 optional bars, M1/M15/M30
+unfocused receive E=0; mandatory demand is retained. Two matching M5 charts
+share one response and use focus priority. No HTTP/page/native/time errors.
+[New frontend/old API](browser-new-front-old-api.json) and
+[old frontend/new API](browser-old-front-new-api.json) both pass with actual
+v1.3.2/new image combinations for both platforms. Native demand remains N,
+optional context is ignored/absent as expected and no extra bars are returned.
+Per-combination source/image hashes and old-web origin build argument are in
+[runtime manifest](runtime-manifest.json).
 The default enablement step is withheld until applicable gates are satisfied.
 
 ## Verification and runtime
 
-[Delivery affected tests](delivery-affected-tests.txt): 109 passed with real
-PostgreSQL snapshot/worker/lease barriers. Request lifetime, subscriptions and
-history-observation VM checks pass. Web build passed earlier with the existing
+[Supplement affected tests](supplement-affected-tests.txt): **115 passed** with
+real PostgreSQL snapshot/worker/lease barriers. Includes six high-period HTTP
+stop cases for D1/W1/MN on both adapters, exercising actual count padding and
+trading label filtering without an extra optional HTTP. Original 109-test evidence
+and separate six-case output remain preserved. Request lifetime, subscriptions
+and history-observation VM checks pass. Web build passed earlier with the existing
 bundle-size warning. Licensed library 2928 files show 0 changes and are not committed.
 [Independent review](review-results.md), [runtime identities](runtime-manifest.json).
 Tuning API uses the 893bf57 source build; web/chart/workers use fc8af766. Runtime
@@ -157,3 +180,5 @@ No schema migration was added; schema remains o16.
 PG statements use remaining request budget and SKIP LOCKED access bookkeeping.
 HTTP waiter is bounded; an expired thread in existing pool checkout waits for
 pool timeout then releases without provider SQL. No per-request pool mutation.
+
+Requirement-by-requirement status and limits: [completion audit](completion-audit.md).

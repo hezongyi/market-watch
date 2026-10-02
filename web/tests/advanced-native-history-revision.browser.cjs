@@ -17,7 +17,7 @@ const inject=(action,offset=20)=>JSON.parse(execFileSync('/home/quant/repos/mark
   const r=await fetch('/api/'+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:body?JSON.stringify(body):undefined});
   if(!r.ok)throw Error(path+' '+r.status);return r.json();
  },{path,body});}
- const evidence={passed:false,errors,pages,interleave_clock:'hold setup must release within6500ms of request action, original getBars budget8000ms'};
+ const evidence={passed:false,errors,pages};
  try{
   await page.goto(APP+'/');await page.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync('../../market-watch/artifacts/local-credentials.json')).password);
   await page.getByRole('button',{name:'登录工作台'}).click();await page.waitForFunction(()=>!document.querySelector('input[type="password"]'));
@@ -70,53 +70,8 @@ const inject=(action,offset=20)=>JSON.parse(execFileSync('/home/quant/repos/mark
   assert.equal(actual.at(-1).close,Number(cached.bars[0].close),'native callback receives the revised cache close');
   evidence.export_limitation='Native exportData cannot be used here: supplied vendor package lacks zh.20866 chunk. Verification observes public getBars callback and dataReady instead.';
   evidence.events=await frame.evaluate(()=>revisionEvents.map(e=>({type:e.type,cursor:e.cursor,revision:e.revision,as_of:e.as_of})));
-  // A real response is held at the browser transport boundary until a newer
-  // real SSE revision arrives. Its bytes remain unchanged; no provider mock.
-  evidence.first_restoration=inject('restore');
-  await frame.waitForFunction(()=>!historyReloading&&widget.activeChart().dataReady()&&!loading&&!rangeGuard.busy()&&!edgeGuard.busy(),null,{timeout:40000});
-  await page.waitForTimeout(1000);
-  let release,heldResolve,heldReject,holdNext=true,heldBody;
-  const held=new Promise((ok,fail)=>{heldResolve=ok;heldReject=fail});
-  const released=new Promise(ok=>{release=ok});
-  const reviewResponses=[];const reviewWork=[];
-  const handler=async route=>{
-   try{
-    const query=route.request().postDataJSON();
-    if(holdNext&&query.instrument==='BTCUSDT'&&!query.history_observation){
-     holdNext=false;const response=await route.fetch({timeout:12000});heldBody=await response.json();heldResolve();
-     await released;await route.fulfill({response});
-    }else if(query.history_observation){
-     const task=(async()=>{const response=await route.fetch({timeout:12000});const body=await response.json();reviewResponses.push({status:response.status(),query,revision:body.cache_revision,revalidation:body.history_revalidation,optional:body.optional_count});await route.fulfill({response})})();reviewWork.push(task);await task;
-    }else await route.continue();
-   }catch(error){heldReject(error);await route.abort().catch(()=>{});}
-  };
-  await page.route('**/api/charts/data',handler);
-  const eventOffset=await frame.evaluate(()=>revisionEvents.length);
-  const lateTarget={to:Math.floor(Date.now()/300000)*300-3000*300};lateTarget.from=lateTarget.to-165*300;
-  const holdStart=Date.now();
-  await frame.evaluate(target=>{globalThis.lateRangePromise=widget.activeChart().setVisibleRange(target,{rejectByTimeout:22000}).catch(error=>{globalThis.lateRangeError=String(error)})},lateTarget);
-  try{
-   // The production native read/review budget is 8s. Reserve 1.5s for the
-   // actual review and classify an absent transport response as setup expiry.
-   await Promise.race([held,new Promise((_,fail)=>setTimeout(()=>fail(Error('real history response was not held within setup budget')),6500))]);
-   assert.ok(heldBody.bars?.length,'held response must contain real provider bars');
-   await frame.evaluate(()=>{loading=true});
-   evidence.late_injection=inject('revise',2500);
-   assert.ok(heldBody.bars.some(b=>b.start===evidence.late_injection.start),'revision must be inside held real snapshot');
-   await frame.waitForFunction(({offset,revision})=>revisionEvents.slice(offset).some(e=>e.type==='reset'&&e.revision>=revision),{offset:eventOffset,revision:evidence.late_injection.revision},{timeout:Math.max(1,6500-(Date.now()-holdStart))});
-   evidence.hold_to_release_ms=Date.now()-holdStart;
-   assert.ok(evidence.hold_to_release_ms<6500,'interleave setup must leave budget for the automatic review');
-   release();await Promise.all(reviewWork);
-   await frame.waitForFunction(()=>[...providerHistoryWork.values()].some(w=>w.correction?.verified)&&![...providerHistoryWork.values()].some(w=>w.inflight),null,{timeout:12000});
-   evidence.late_held_revision=heldBody.cache_revision;
-   await frame.evaluate(()=>{loading=false});
-   await frame.waitForFunction(()=>!historyReloading&&widget.activeChart().dataReady()&&![...providerHistoryWork.values()].some(w=>w.correction),null,{timeout:40000});
-   await Promise.all(reviewWork);evidence.late_reviews=reviewResponses;
-   assert.equal(reviewResponses.length,1,'one automatic revalidation per delayed native response');
-   assert.deepEqual(reviewResponses[0].revalidation,{changed:true});
-   assert.equal(reviewResponses[0].optional,0,'correction has no optional buffer');
-   evidence.late_response_revalidated=true;
-  }finally{release();await frame.evaluate(()=>{loading=false}).catch(()=>{});await page.unroute('**/api/charts/data',handler);}
+  // Delayed revision/backfill interleaves use the dedicated fresh-workspace
+  // advanced-native-history-late.browser.cjs and acceptance barrier entrypoint.
   assert.ok(pages.every(p=>p.status===200),'all history responses must succeed');
   await page.screenshot({path:output.replace('.json','.png')});
   assert.deepEqual(errors,[]);evidence.passed=true;

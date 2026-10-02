@@ -1,0 +1,1135 @@
+{
+  "kind": "four independent native periods, explicit unfocused budget and shared-series focus",
+  "cases": [
+    {
+      "cpu": 1,
+      "http": [
+        {
+          "at": 1790934950029,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790875606000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935006000,
+            "track_history": false
+          },
+          "count": 598,
+          "mandatory": 198,
+          "optional": 400,
+          "hit": false,
+          "bytes": 110296
+        },
+        {
+          "at": 1790934954256,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 91,
+            "countBack": 91,
+            "from": 1790853113000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935013000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 91,
+          "optional": 0,
+          "hit": false,
+          "bytes": 17436
+        },
+        {
+          "at": 1790934954495,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 91,
+            "countBack": 91,
+            "from": 1790771214000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935014000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 91,
+          "optional": 0,
+          "hit": true,
+          "bytes": 17086
+        },
+        {
+          "at": 1790934955396,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 91,
+            "countBack": 91,
+            "from": 1790929554000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935014000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 91,
+          "optional": 0,
+          "hit": false,
+          "bytes": 17435
+        },
+        {
+          "at": 1790934956514,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790908615000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935015000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "bytes": 199540
+        },
+        {
+          "at": 1790934956635,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790929735000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935015000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934956653,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790855815000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935015000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934957131,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790776615000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935015000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": false,
+          "bytes": 16888
+        },
+        {
+          "at": 1790934957745,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790908617000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935017000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "bytes": 199540
+        }
+      ],
+      "errors": [],
+      "geometry": {
+        "active": 0,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5"
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "15"
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "30"
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1"
+          }
+        ]
+      },
+      "independent": [
+        {
+          "at": 1790934956514,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790908615000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935015000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "bytes": 199540
+        },
+        {
+          "at": 1790934956635,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790929735000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935015000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934956653,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790855815000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935015000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934957131,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790776615000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935015000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": false,
+          "bytes": 16888
+        }
+      ],
+      "shared": [
+        {
+          "at": 1790934957745,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790908617000,
+            "firstDataRequest": true,
+            "client": "0d6ee801-50c1-421b-aa74-7de0a7af97e6",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935017000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "bytes": 199540
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790875606,
+            "to": 1790935006,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790934946646,
+          "count": 598,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "15",
+          "params": {
+            "from": 1790853113,
+            "to": 1790935013,
+            "countBack": 91,
+            "firstDataRequest": true
+          },
+          "start": 1790934953535,
+          "count": 91,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "30",
+          "params": {
+            "from": 1790771214,
+            "to": 1790935014,
+            "countBack": 91,
+            "firstDataRequest": true
+          },
+          "start": 1790934954271,
+          "count": 91,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "1",
+          "params": {
+            "from": 1790929554,
+            "to": 1790935014,
+            "countBack": 91,
+            "firstDataRequest": true
+          },
+          "start": 1790934954507,
+          "count": 91,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790908615,
+            "to": 1790935015,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934955467,
+          "count": 1088,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "15",
+          "params": {
+            "from": 1790855815,
+            "to": 1790935015,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934955469,
+          "count": 88,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "30",
+          "params": {
+            "from": 1790776615,
+            "to": 1790935015,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934955471,
+          "count": 88,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "1",
+          "params": {
+            "from": 1790929735,
+            "to": 1790935015,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934955474,
+          "count": 88,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790908617,
+            "to": 1790935017,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934957249,
+          "count": 1088,
+          "duplicates": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "cpu": 4,
+      "http": [
+        {
+          "at": 1790934961924,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1790875621000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935021000,
+            "track_history": false
+          },
+          "count": 2198,
+          "mandatory": 198,
+          "optional": 2000,
+          "hit": true,
+          "bytes": 402672
+        },
+        {
+          "at": 1790934964968,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 91,
+            "countBack": 91,
+            "from": 1790853124000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935024000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 91,
+          "optional": 0,
+          "hit": true,
+          "bytes": 17086
+        },
+        {
+          "at": 1790934965238,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 91,
+            "countBack": 91,
+            "from": 1790771224000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935024000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 91,
+          "optional": 0,
+          "hit": true,
+          "bytes": 17086
+        },
+        {
+          "at": 1790934965841,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 91,
+            "countBack": 91,
+            "from": 1790929565000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 91,
+          "optional": 0,
+          "hit": true,
+          "bytes": 17086
+        },
+        {
+          "at": 1790934967306,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790929745000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934967374,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790855825000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934967710,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790776625000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934968723,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790908625000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 488,
+          "mandatory": 88,
+          "optional": 400,
+          "hit": false,
+          "bytes": 90090
+        },
+        {
+          "at": 1790934969577,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790908628000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935028000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "bytes": 199540
+        }
+      ],
+      "errors": [],
+      "geometry": {
+        "active": 0,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5"
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "15"
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "30"
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1"
+          }
+        ]
+      },
+      "independent": [
+        {
+          "at": 1790934967306,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M1",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790929745000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934967374,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M15",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790855825000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934967710,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M30",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790776625000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 88,
+          "mandatory": 88,
+          "optional": 0,
+          "hit": true,
+          "bytes": 16537
+        },
+        {
+          "at": 1790934968723,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790908625000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935025000,
+            "track_history": false
+          },
+          "count": 488,
+          "mandatory": 88,
+          "optional": 400,
+          "hit": false,
+          "bytes": 90090
+        }
+      ],
+      "shared": [
+        {
+          "at": 1790934969577,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 88,
+            "countBack": 88,
+            "from": 1790908628000,
+            "firstDataRequest": true,
+            "client": "154fb430-f235-47ff-8b06-17866e713a79",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false
+            },
+            "indicators": [],
+            "before": 1790935028000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 88,
+          "optional": 1000,
+          "hit": true,
+          "bytes": 199540
+        }
+      ],
+      "trace": [
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790875621,
+            "to": 1790935021,
+            "countBack": 198,
+            "firstDataRequest": true
+          },
+          "start": 1790934961311,
+          "count": 2198,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "15",
+          "params": {
+            "from": 1790853124,
+            "to": 1790935024,
+            "countBack": 91,
+            "firstDataRequest": true
+          },
+          "start": 1790934964484,
+          "count": 91,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "30",
+          "params": {
+            "from": 1790771224,
+            "to": 1790935024,
+            "countBack": 91,
+            "firstDataRequest": true
+          },
+          "start": 1790934964998,
+          "count": 91,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "1",
+          "params": {
+            "from": 1790929565,
+            "to": 1790935025,
+            "countBack": 91,
+            "firstDataRequest": true
+          },
+          "start": 1790934965240,
+          "count": 91,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790908625,
+            "to": 1790935025,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934965937,
+          "count": 488,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "15",
+          "params": {
+            "from": 1790855825,
+            "to": 1790935025,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934965937,
+          "count": 88,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "30",
+          "params": {
+            "from": 1790776625,
+            "to": 1790935025,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934965939,
+          "count": 88,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "1",
+          "params": {
+            "from": 1790929745,
+            "to": 1790935025,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934965939,
+          "count": 88,
+          "duplicates": 0
+        },
+        {
+          "symbol": "MWP:BTCUSDT",
+          "resolution": "5",
+          "params": {
+            "from": 1790908628,
+            "to": 1790935028,
+            "countBack": 88,
+            "firstDataRequest": true
+          },
+          "start": 1790934968846,
+          "count": 1088,
+          "duplicates": 0
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "preparation": [
+    {
+      "frame": "M1",
+      "result": {
+        "prepared_native_pg_bars": 2000,
+        "cache_hit": false,
+        "tail_read_cache_hit": true,
+        "target_10000": null,
+        "target_10165": null
+      }
+    },
+    {
+      "frame": "M5",
+      "result": {
+        "prepared_native_pg_bars": 2000,
+        "cache_hit": false,
+        "tail_read_cache_hit": true,
+        "target_10000": null,
+        "target_10165": null
+      }
+    },
+    {
+      "frame": "M15",
+      "result": {
+        "prepared_native_pg_bars": 2000,
+        "cache_hit": false,
+        "tail_read_cache_hit": true,
+        "target_10000": null,
+        "target_10165": null
+      }
+    },
+    {
+      "frame": "M30",
+      "result": {
+        "prepared_native_pg_bars": 2000,
+        "cache_hit": false,
+        "tail_read_cache_hit": true,
+        "target_10000": null,
+        "target_10165": null
+      }
+    }
+  ],
+  "finished": "2026-10-02T09:56:09.773Z"
+}
