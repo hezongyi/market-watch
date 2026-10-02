@@ -595,7 +595,7 @@ def test_chart_pages_yield_to_waiting_history_requests(database, monkeypatch, in
 
     monkeypatch.setattr(market, "fetch_source", fetch)
     # Coverage is the upstream query result; ingestion is orthogonal to scheduling.
-    monkeypatch.setattr(market, "ingest", lambda *args, **kwargs: None)
+    monkeypatch.setattr(market, "ingest", lambda *args, **kwargs: market.Ingestion(0, False))
     assert market.import_once(chart_only=True, fetcher=fetch if injected else None)
     clock[0] += 2000
     assert market.import_once(chart_only=True, fetcher=fetch if injected else None)
