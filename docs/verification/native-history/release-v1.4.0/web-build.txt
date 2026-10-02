@@ -1,0 +1,20 @@
+
+> market-watch-web@1.4.0 build
+> tsc -b && vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 1611 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                       0.41 kB │ gzip:   0.31 kB
+dist/assets/Workspace-DlAjmeUN.css    9.11 kB │ gzip:   2.47 kB
+dist/assets/index-B4RfX0-S.css       19.52 kB │ gzip:   5.00 kB
+dist/assets/Workspace-DTyI2iRz.js   188.02 kB │ gzip:  51.15 kB
+dist/assets/index-CbM6tNq0.js       525.67 kB │ gzip: 167.92 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.73s

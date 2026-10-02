@@ -1,0 +1,51 @@
+{
+  "at_utc": "2026-10-02T12:52:02.403357+00:00",
+  "tested_source_commit": "93db03bd20cfad60a7a41469a00851fd9742472b",
+  "main_base": "dd9ba43a4abc09359c0a05aa12390ba1885978df",
+  "scope": "Release metadata and documentation only after tested integration; no runtime/source/test/dependency changes.",
+  "versions": {
+    "pyproject.toml": "1.4.0",
+    "web/package.json": "1.4.0",
+    "web/package-lock.json": "1.4.0",
+    "lock_root": "1.4.0"
+  },
+  "version_only_metadata_changes": true,
+  "dependencies_unchanged": true,
+  "tested_runtime_test_hashes": {
+    "files": 332,
+    "mismatches": [],
+    "manifest": "docs/verification/native-history/integration-v1.3.3/final-source-hashes.json"
+  },
+  "original_acceptance_evidence": {
+    "files": 229,
+    "mismatches": [],
+    "manifest": "docs/verification/native-history/implementation/delivery-evidence-manifest.json"
+  },
+  "post_test_tracked_changes": [
+    "CHANGELOG.md",
+    "README.md",
+    "docs/versioning.md",
+    "pyproject.toml",
+    "web/package-lock.json",
+    "web/package.json"
+  ],
+  "package_build": {
+    "filename": "market_watch-1.4.0-py3-none-any.whl",
+    "sha256": "12c529580b1a2933e8b98cd1a4a3339c98173306ad8b2cc1a8039d184c0973a5",
+    "runtime_python_modules": 41,
+    "source_mismatches": 0,
+    "delivery": "Temporary local wheel; not uploaded as a release attachment.",
+    "evidence": "docs/verification/native-history/release-v1.4.0/wheel-build.txt"
+  },
+  "web_build": {
+    "passed": true,
+    "evidence": "docs/verification/native-history/release-v1.4.0/web-build.txt",
+    "artifacts": "docs/verification/native-history/release-v1.4.0/web-build-artifacts.json",
+    "warning": "Existing bundle-size warning retained."
+  },
+  "backend_tests": "Existing final full 395 passed, 1 skipped; unchanged tested source, no repeat.",
+  "frontend_tests": "Existing 40 non-browser scripts passed; unchanged tested source, no repeat.",
+  "browser_runtime": "No fresh combined-image browser/runtime acceptance.",
+  "images": "No Docker builds or relabeling during source release; original image manifests retained.",
+  "merge_verification": "Before tagging, verify final main tree equals PR head tree and tested hashes remain identical."
+}
