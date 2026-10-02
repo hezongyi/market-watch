@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--reset", action="store_true")
-    parser.add_argument("--profile", choices=["dual", "provider-fix"], default="dual")
+    parser.add_argument("--profile", choices=["dual", "provider-fix", "volume"], default="dual")
     parser.add_argument("--output")
     parser.add_argument("--instrument", default="OANDA:AUD_CAD")
     parser.add_argument("--client", help="Inspect only this local acceptance client's finite targets")
@@ -23,6 +23,7 @@ def main():
     env_path, database, host = {
         "dual": ("/tmp/mw-dual-acceptance/api.env", "market_watch_dual", "market-watch-postgres-isolated"),
         "provider-fix": ("/tmp/mw-provider-latency/api.env", "market_watch_provider_fix", "127.0.0.1"),
+        "volume": ("/tmp/mw-volume-acceptance/api.env", "market_watch_volume", "market-watch-postgres-isolated"),
     }[args.profile]
     config = dict(
         line.split("=", 1)
@@ -47,20 +48,31 @@ def main():
 
     engine = create_engine(os.environ["ALERTS_DATABASE_URL"], pool_size=1, max_overflow=0)
     factory = sessionmaker(engine)
+    keys = None
+    if args.profile == "volume":
+        from alerts.provider_cache import identity
+        from alerts.provider_chart import FRAMES, metadata
+
+        meta = metadata(args.instrument)
+        # Only this acceptance symbol's current payload identity. Old-version
+        # caches and all managed data remain available for rollback evidence.
+        keys = [identity(meta, frame) for frame in FRAMES]
     if args.expire_client:
         assert args.client and args.client.startswith("acceptance-history-"), "only expire a named acceptance client"
         with factory.begin() as db:
             db.execute(update(ProviderInterest).where(ProviderInterest.client == args.client).values(expires=now_ms()-1))
     if args.reset:
         with factory.begin() as db:
-            db.execute(delete(ProviderInterest))
+            statement = delete(ProviderInterest)
+            db.execute(statement.where(ProviderInterest.dataset_id.in_(keys)) if keys else statement)
         deadline = time.monotonic() + 35
         while True:
             with factory.begin() as db:
                 busy = db.scalar(
                     select(func.count())
                     .select_from(ProviderDataset)
-                    .where(ProviderDataset.lease_until > now_ms())
+                    .where(ProviderDataset.lease_until > now_ms(),
+                           ProviderDataset.id.in_(keys) if keys else True)
                 )
             if not busy:
                 break
@@ -68,11 +80,14 @@ def main():
                 raise TimeoutError("In-flight provider work did not finish")
             time.sleep(0.1)
         with factory.begin() as db:
-            assert db.scalar(select(func.count()).select_from(ProviderInterest)) == 0, (
+            assert db.scalar(select(func.count()).select_from(ProviderInterest).where(
+                ProviderInterest.dataset_id.in_(keys) if keys else True)) == 0, (
                 "close the chart before resetting the fixture"
             )
-            db.execute(delete(ProviderBar))
-            db.execute(delete(ProviderDataset))
+            bars = delete(ProviderBar)
+            datasets = delete(ProviderDataset)
+            db.execute(bars.where(ProviderBar.dataset_id.in_(keys)) if keys else bars)
+            db.execute(datasets.where(ProviderDataset.id.in_(keys)) if keys else datasets)
     with factory.begin() as db:
         datasets = []
         for row in db.scalars(
