@@ -1,0 +1,57 @@
+{
+  "at_utc": "2026-10-02T14:23:58.018789+00:00",
+  "tested_source_commit": "535e1c75dd3f7ad3e7b47604d3a608ea0ed9c9bf",
+  "main_base": "9fbf0a59cd735ff44e9d4f9f73fe2556716222c2",
+  "scope": "Release metadata/documentation only after full integration tests; no product source or dependencies changed.",
+  "versions": {
+    "pyproject.toml": "1.5.0",
+    "web/package.json": "1.5.0",
+    "web/package-lock.json": "1.5.0",
+    "lock_root": "1.5.0"
+  },
+  "version_only_metadata": true,
+  "dependencies_unchanged": true,
+  "tested_input_comparison": {
+    "recorded_files": 329,
+    "byte_identical": 326,
+    "version_only_exceptions": [
+      "pyproject.toml",
+      "web/package-lock.json",
+      "web/package.json"
+    ],
+    "unexpected_mismatches": 0,
+    "original_manifest": "docs/verification/chart-ui-integration-v1.4.0/tested-source-hashes.json"
+  },
+  "release_input_hashes": "docs/verification/chart-ui-release-v1.5.0/source-hashes.json",
+  "original_ui_deployment_evidence": {
+    "files_compared": 77,
+    "mismatches": 0,
+    "source": "b3a3363e919bd9af3f7a79e88a86fbc994d64a6b"
+  },
+  "post_test_tracked_changes": [
+    "CHANGELOG.md",
+    "README.md",
+    "docs/versioning.md",
+    "pyproject.toml",
+    "web/package-lock.json",
+    "web/package.json"
+  ],
+  "package_build": {
+    "filename": "market_watch-1.5.0-py3-none-any.whl",
+    "sha256": "3c3458f34581367c25ed24c814b2041a4acb8af957aac35cdf1fb0fcbca5e2d4",
+    "runtime_modules": 41,
+    "source_mismatches": 0,
+    "delivery": "Temporary local artifact; not a release upload.",
+    "evidence": "docs/verification/chart-ui-release-v1.5.0/wheel-build.txt"
+  },
+  "web_build": {
+    "passed": true,
+    "evidence": "docs/verification/chart-ui-release-v1.5.0/web-build.txt",
+    "artifacts": "docs/verification/chart-ui-release-v1.5.0/web-build-artifacts.json",
+    "warning": "Existing bundle-size warning."
+  },
+  "tests": "Existing final406backend passed/1skipped,42non-browser scripts,8controlled browser cases; product source unchanged, no repeated suites.",
+  "browser_runtime": "No fresh combined-image full native-library/runtime acceptance.",
+  "images": "No builds/relabeling/runtime switches during source publication; prior manifests retained.",
+  "merge_verification": "Before tagging, compare main merge tree to PR head tree and329release input hashes."
+}

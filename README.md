@@ -1,10 +1,10 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.4.0**，包含独立 Advanced Charts、平台/自建双系列、自建历史修订、平台首屏连接池修复、Volume 全链路修复及默认开启的原生历史缓冲。源码发布、验证和部署边界见[v1.4.0源码交付记录](docs/chart-v1.4.0-source-delivery.md)，操作及限制见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.5.0**，包含独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲及专业图表菜单、可选自动保存、账户密码和自选报价操作。源码发布、验证和部署边界见[v1.5.0源码交付记录](docs/chart-v1.5.0-source-delivery.md)，操作及限制见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。
 
-源码主目录：`/home/quant/repos/market-watch`；独立开发工作树继续保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。v1.4.0源码通过PR合入main，并使用附注标签发布；既有Volume本机镜像仍以[v1.3.3本机清单](deploy/releases/v1.3.3-local.json)为准，原生历史隔离验收保持[原来源](docs/verification/native-history/implementation/runtime-manifest.json)，本次源码发布不包含运行环境升级。schema保持p17_volume，无新增迁移；历史量partial限制及既有Volume迁移/回退见[v1.3.3本机交付](docs/chart-v1.3.3-delivery.md)，新版验证与回退见[v1.4.0源码交付](docs/chart-v1.4.0-source-delivery.md)。
+源码主目录：`/home/quant/repos/market-watch`；独立开发工作树继续保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。v1.5.0源码通过PR合入main，并使用附注标签发布；图表UI隔离实例仍以[v1.3.2专用清单](deploy/releases/v1.3.2-ui.json)为准，Volume和原生历史镜像保留各自原清单，本次源码发布不包含运行环境升级。schema保持p17_volume，无新增迁移；历史量partial限制及既有Volume迁移/回退见[v1.3.3本机交付](docs/chart-v1.3.3-delivery.md)，新版验证与账户回退要求见[v1.5.0源码交付](docs/chart-v1.5.0-source-delivery.md)。
 
 ## 当前实例
 
