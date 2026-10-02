@@ -350,3 +350,30 @@ def test_forming_published_quantity_revision_keeps_both_completeness_flags_false
         assert not old.complete and not old.payload['complete'] and not old.payload['volume_complete']
         assert db.scalar(select(ChartPublicationJob.start).where(
             ChartPublicationJob.timeframe == 'M5', ChartPublicationJob.start == 600000)) is None
+
+
+def test_confirmed_old_snapshot_volume_publishes_without_current_coverage(database):
+    from alerts.chart_data import chart_rows
+    from alerts.domain import Candle
+    from alerts.managed_dataset import join, publish_frame
+    from alerts.market import upsert
+    from alerts.storage import ChartPublication, ChartPublicationJob, ChartPublishedBar, instant
+
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        plan = join(db, inst, 0, 305000)
+        row = upsert(db, inst.id, 'M1', Candle(instant(0), instant(60000),
+                     D(10), D(11), D(9), D(10), volume=D(1)))
+        old = ChartPublishedBar(instrument_id=inst.id, timeframe='M1', start=0,
+                                end=60000, complete=True,
+                                payload=chart_rows(db, inst, 'M1', 60000, 1, 305000)[0])
+        pub = ChartPublication(instrument_id=inst.id, timeframe='M1', start=0,
+                               end=60000, complete_count=1)
+        db.add_all([old, pub])
+        row.volume = D(2)
+        db.add(ChartPublicationJob(instrument_id=inst.id, timeframe='M1', start=0, end=60000))
+        db.flush()
+        assert not publish_frame(db, inst, plan, 'M1', 305000)
+        assert old.payload['volume'] == '2' and old.payload['volume_complete']
+        assert old.complete and (pub.start, pub.end, pub.complete_count) == (0, 60000, 1)
+        assert db.scalar(select(ChartPublicationJob.start)) is None

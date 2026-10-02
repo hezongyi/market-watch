@@ -195,6 +195,11 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
 def publish_frame(db, inst, plan, frame, now):
     spans = continuous_coverage(db, inst, plan, now)
     if not spans:
+        pub = db.get(ChartPublication, (inst.id, frame))
+        if pub:
+            # No current coverage proof permits new snapshots, but confirmed
+            # historical snapshots still accept independent revisions.
+            publish_corrections(db, inst, pub, frame, 0, 0, [], now)
         return False
     left, right = spans[-1]
     plan.realtime_end = max(plan.realtime_end, right)
