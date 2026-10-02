@@ -1036,7 +1036,12 @@ function boot(
     const revision = editRevision, epoch = workspaceEpoch;
     const state = await captureChartLayout(widget);
     state._mwGridStyle = grid.value;
-    const result = await saveLayout({ ...data, content: JSON.stringify(state) });
+    // Native save metadata uses the resolved display name, which omits MWP:
+    // and can belong to a different active pane. Pin it to the captured first
+    // chart's public identity so list/load metadata retains the series kind.
+    const primary = state._mwViewports[0];
+    const result = await saveLayout({ ...data, symbol: primary.symbol,
+      resolution: primary.resolution, content: JSON.stringify(state) });
     if (epoch === workspaceEpoch && editRevision === revision) {
       dirty = false;
       send({type: "native-saved"});
@@ -1125,7 +1130,10 @@ function boot(
       { symbol: "MWP:XAUUSD", title: "黄金 / 美元 · 平台行情" },
       { symbol: "MWP:BTCUSDT", title: "BTC/USDT · 平台行情" },
     ],
-    symbol: doc.symbol || "XAUUSD",
+    // A constructor symbol overrides the first MainSeries in saved_data.
+    // Existing layouts may have stale/display-only top-level metadata; the
+    // saved chart state is authoritative when restoring a layout.
+    ...(!chartState?.charts?.length ? {symbol: doc.symbol || "XAUUSD"} : {}),
     interval: doc.interval || "240",
     ...(!chartState && decode(doc.symbol || "XAUUSD").series_kind === "managed" && ["1D", "1W", "1M"].includes(doc.interval)
       ? { timeframe: "3M" }
