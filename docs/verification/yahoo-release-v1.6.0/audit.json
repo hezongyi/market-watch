@@ -1,0 +1,68 @@
+{
+  "version": "1.6.0",
+  "verified_at_date": "2026-10-03",
+  "baseline_commit": "4ef0e845f2acc63e68ede8603d3a622086444e66",
+  "implementation_commit": "b747d5b5656c8dbcca3cab8c9e8dd7e6c28071e9",
+  "result": "passed",
+  "release_scope": "Root version metadata, release documentation and build evidence only.",
+  "baseline_files_checked": 1600,
+  "unchanged_baseline_files": 1594,
+  "unchanged_file_inventory_sha256": "db246baaf796bdeb08d272ff05a6144e035708509c1a0aeb37d1c13fd7660f8d",
+  "changed_baseline_files": [
+    "CHANGELOG.md",
+    "README.md",
+    "docs/versioning.md",
+    "pyproject.toml",
+    "web/package-lock.json",
+    "web/package.json"
+  ],
+  "added_release_files": [
+    "deploy/releases/v1.6.0-source.json",
+    "docs/verification/yahoo-release-v1.6.0/audit.json",
+    "docs/verification/yahoo-release-v1.6.0/web-build.txt",
+    "docs/verification/yahoo-release-v1.6.0/wheel-build.txt",
+    "docs/yahoo-v1.6.0-source-delivery.md"
+  ],
+  "versions_consistent": true,
+  "dependency_specs_and_lock_unchanged_from_baseline": true,
+  "runtime_tests_migrations_and_existing_evidence_unchanged_from_baseline": true,
+  "local_markdown_links_checked": 22,
+  "critical_file_sha256": {
+    "advanced-host/bridge.js": "c066cf6f50dab92883d817c9b5aab408bf20f92b799ea1685647787e52328bab",
+    "backend/alerts/provider_yahoo.py": "dcf53d9671e0b440886946614580f26efe5de870b9a1a3ccb6165a66bd671f88",
+    "backend/alerts/yahoo_catalog.py": "fcc3150d79c0d03e0f5ab848285d3e733763d264e843a5e20043eff61d48e73c",
+    "migrations/versions/q18_yahoo_catalog.py": "113476c6a820ff4b9aa33ec69d65f48d94649f292a7c039d0223d8e8413c96fa",
+    "requirements.lock": "cd24ac5cea7c5d5b2d8db318f05a669d25fceaa393fbc5e53d7fa02ec7b8d957"
+  },
+  "frontend_build": {
+    "command": "npm run build",
+    "result": "passed",
+    "log": "docs/verification/yahoo-release-v1.6.0/web-build.txt",
+    "log_sha256": "e981ca59ac6f88b0431f08e15913f74309fbfc870ffd3047462461f7b65a24da",
+    "warning": "Existing minified bundle exceeds 500 kB."
+  },
+  "python_wheel_build": {
+    "command": "python -m build --wheel --no-isolation",
+    "result": "passed",
+    "filename": "market_watch-1.6.0-py3-none-any.whl",
+    "wheel_sha256": "e5ac655f068c6f4f05a2db745ac138686877e100f5bf8783ebce8c78257989c7",
+    "version": "1.6.0",
+    "runtime_modules_checked": 46,
+    "runtime_modules_byte_identical_to_baseline": true,
+    "log": "docs/verification/yahoo-release-v1.6.0/wheel-build.txt",
+    "log_sha256": "42b35bb7ccc23c6ea5cd7dd5f8cfe40150b33eabe18b981e89c232446f409444"
+  },
+  "functional_verification_carried_forward": {
+    "source": "docs/verification/yahoo/pr5-fixes.md",
+    "implementation_commit": "b747d5b5656c8dbcca3cab8c9e8dd7e6c28071e9",
+    "backend_passed": 228,
+    "isolated_postgresql_passed": 16,
+    "total_passed": 244,
+    "frontend_contracts_passed": 4,
+    "rerun_during_release": false,
+    "basis": "Runtime source, tests, dependencies, migrations and prior evidence byte-identical to merged baseline."
+  },
+  "fresh_live_yahoo_network_acceptance": false,
+  "fresh_full_browser_acceptance": false,
+  "production_deployed": false
+}
