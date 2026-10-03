@@ -50,6 +50,7 @@ def chart_csv(page, *, instrument, timeframe):
             "volume_kind",
             "volume_unit",
             "volume_complete",
+            *(["source", "raw_symbol", "adjustment"] if page.get("source") == "yahoo" else []),
             *[name for name, _ in columns],
         ]
     )
@@ -81,6 +82,7 @@ def chart_csv(page, *, instrument, timeframe):
                     page.get("volume_kind", "unavailable"),
                     page.get("volume_unit"),
                     str(bar.get("volume_complete", False)).lower(),
+                    *([page["source"], page["symbol"], page["adjustment"]] if page.get("source") == "yahoo" else []),
                     *[values.get(bar["start"]) for _, values in columns],
                 ]
             ]

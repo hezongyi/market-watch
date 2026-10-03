@@ -8,7 +8,7 @@ import hashlib
 import logging
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 
 from sqlalchemy import delete, func, select, text
 
@@ -17,6 +17,8 @@ from . import provider_chart as upstream
 from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import lane
+from .provider_capabilities import enabled_sources, page_capacity, poll_seconds
+from .provider_capabilities import frames as source_frames
 from .storage import ProviderBar, ProviderDataset, ProviderInterest, now_ms, transaction, uid
 
 PERIODS = ("D1", "W1", "H4", "M5", "M1", "MN", "H1", "M30", "M15")
@@ -80,7 +82,7 @@ def _activate(db, client, key, before, count, *, latest=False):
             target["next_at"] = 0
         old.targets = targets
         return
-    frames = (focus.timeframe,) + tuple(f for f in PERIODS if f != focus.timeframe)
+    frames = (focus.timeframe,) + tuple(f for f in PERIODS if f != focus.timeframe and f in source_frames(focus.source))
     targets = []
     for goal in (settings.provider_basic_bars, settings.provider_depth_bars):
         for frame in frames:
@@ -116,7 +118,9 @@ def _activate(db, client, key, before, count, *, latest=False):
                 target["count"] = target["goal"] + count
         # Neighbor buffers precede cross-period work in each round.
         right = targets[-2:]
-        targets = [targets[0], right[0], *targets[1:9], targets[9], right[1], *targets[10:18]]
+        width = len(frames)
+        targets = [targets[0], right[0], *targets[1:width],
+                   targets[width], right[1], *targets[width+1:2*width]]
     task_id = uid()
     for target in targets:
         target["task_id"] = task_id
@@ -163,6 +167,8 @@ def subscribe(
     client, listener, instrument, frame, cursor=0, revision=0, observed_at=0, indicators=None
 ):
     meta = upstream.metadata(instrument)
+    if frame not in source_frames(meta["source"]):
+        raise ValueError("此源不支持该原生周期")
     key = cache.ensure(meta, frame)
     ident = interest_id(client, listener)
     now = now_ms()
@@ -279,12 +285,19 @@ def events(client, cursors):
                 )
                 is not None
             )
+            if not bars and dataset.metadata_json.get("invalidated_at", 0) > interest.accessed_at:
+                result.append({"listener":interest.listener, "type":"reset", "bars":[],
+                               "indicators":[], "revision":dataset.revision, "cursor":last,
+                               "as_of":dataset.updated_at})
+                cursors[interest.listener] = (last, dataset.revision)
             if bars:
                 new_last = bars[-1].chart_time
                 connected = any(a <= last and new_last < b for a, b in dataset.coverage)
                 kind = (
                     "reset"
-                    if old_changed or len(bars) > 2000 or (last and not connected)
+                    if old_changed or dataset.metadata_json.get("invalidated_at", 0) >
+                    cursors.get(interest.listener + ":at", interest.accessed_at)
+                    or len(bars) > 2000 or (last and not connected)
                     else "bars"
                 )
                 indicators = []
@@ -367,9 +380,14 @@ def realtime_step(source=None):
                 dataset.timeframe,
                 max(extra + 3, old[2] if old else 3),
             )
-            row.next_poll = now + settings.market_poll_seconds * 1000
+            row.next_poll = now + poll_seconds(dataset.source) * 1000
     for key, (meta, frame, count) in groups.items():
+        if meta["source"] == "yahoo" and not settings.yahoo_enabled:
+            continue
         try:
+            if meta["source"] == "yahoo":
+                from .yahoo_catalog import chart_metadata
+                meta = chart_metadata(meta["id"])
             with lane("realtime"):
                 cache.read(meta, frame, (now_ms() // 1000 + 1) * 1000, count, latest=True)
             with transaction() as db:
@@ -400,6 +418,8 @@ def right_status(key, target):
 
 
 def warm_step(source, after=None):
+    if source == "yahoo" and not settings.yahoo_enabled:
+        return after, False
     if cache.interactive_busy(source):
         return after, False
     now = now_ms()
@@ -461,7 +481,7 @@ def warm_step(source, after=None):
             missing = target["count"]
             if right is None and state["interval"]:
                 missing -= len(state["bars"])
-            cap = 4000 if source == "oanda" else 1000
+            cap = page_capacity(source)
             cache.fetch_page(
                 key,
                 meta,
@@ -476,7 +496,7 @@ def warm_step(source, after=None):
                 satisfied, _, _ = right_status(key, target)
             else:
                 satisfied = state["satisfied"]
-        target["done"] = satisfied
+        target["done"] = satisfied or state["window_limit"]
         target["next_at"] = now_ms() + 1000
     except Exception as exc:
         target["attempts"] += 1
@@ -536,7 +556,9 @@ def start():
     if _EXECUTOR:
         return
     _STOP.clear()
-    _EXECUTOR = ThreadPoolExecutor(max_workers=5, thread_name_prefix="provider")
+    from .yahoo_catalog import seed
+    seed()
+    _EXECUTOR = ThreadPoolExecutor(max_workers=2*len(enabled_sources())+1, thread_name_prefix="provider")
 
     def warmer(source):
         after = None
@@ -567,8 +589,8 @@ def start():
                 log.exception("Provider cache cleanup failed")
             _STOP.wait(60)
 
-    _FUTURES = [_EXECUTOR.submit(warmer, source) for source in ("oanda", "binance")]
-    _FUTURES.extend(_EXECUTOR.submit(live, source) for source in ("oanda", "binance"))
+    _FUTURES = [_EXECUTOR.submit(warmer, source) for source in enabled_sources()]
+    _FUTURES.extend(_EXECUTOR.submit(live, source) for source in enabled_sources())
     _FUTURES.append(_EXECUTOR.submit(janitor))
 
 
@@ -578,3 +600,47 @@ def stop():
     if _EXECUTOR:
         _EXECUTOR.shutdown(wait=True)
         _EXECUTOR = None
+
+
+_QUOTE_LOCK = threading.Lock()
+_QUOTE_CACHE = {}
+_QUOTE_INFLIGHT = {}
+
+
+def yahoo_quote(meta, *, deadline=None):
+    """Request-driven expiration and in-flight merge; no independent quote worker."""
+    from .provider_yahoo import quote
+    deadline = deadline or time.monotonic()+settings.provider_request_seconds
+    key = meta["id"]
+    with _QUOTE_LOCK:
+        old = _QUOTE_CACHE.get(key)
+        if old and old[0] > time.monotonic():
+            return dict(old[1])
+        future = _QUOTE_INFLIGHT.get(key)
+        owner = future is None
+        if owner:
+            future = Future()
+            _QUOTE_INFLIGHT[key] = future
+    if not owner:
+        return dict(future.result(timeout=max(0,deadline-time.monotonic())))
+    try:
+        with lane("chart"):
+            result = quote(meta, deadline=deadline)
+        with _QUOTE_LOCK:
+            _QUOTE_CACHE[key] = (time.monotonic()+settings.yahoo_poll_seconds,result)
+            while len(_QUOTE_CACHE)>250:
+                _QUOTE_CACHE.pop(next(iter(_QUOTE_CACHE)))
+        future.set_result(result)
+        return dict(result)
+    except Exception as error:
+        if old:
+            result = {**old[1], "status":"fetch_failed"}
+            with _QUOTE_LOCK:
+                _QUOTE_CACHE[key] = (time.monotonic()+settings.yahoo_poll_seconds,result)
+            future.set_result(result)
+            return result
+        future.set_exception(error)
+        raise
+    finally:
+        with _QUOTE_LOCK:
+            _QUOTE_INFLIGHT.pop(key,None)

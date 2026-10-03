@@ -1,0 +1,21 @@
+{
+  "search": {
+    "query": "NVDA",
+    "symbol": "NVDA",
+    "series_kinds": [
+      "provider"
+    ]
+  },
+  "csv": {
+    "status": 200,
+    "rows": 12,
+    "negative_price": true,
+    "source": "yahoo",
+    "adjustment": "supplier"
+  },
+  "unsupported_frames": {
+    "M30": 422,
+    "H4": 422
+  },
+  "managed_status": 422
+}

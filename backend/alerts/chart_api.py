@@ -639,9 +639,13 @@ def router(authenticated):
                 import httpx
 
                 from .provider_chart import data as provider_data
+                from .provider_yahoo import YahooError
 
                 try:
                     return provider_data(body)
+                except YahooError as error:
+                    raise HTTPException(503, {"message":str(error), "status":error.status,
+                                              "history_boundary":False}) from None
                 except (httpx.HTTPError, TimeoutError) as error:
                     raise HTTPException(503, "平台行情暂不可用，请重试；尚未确认历史边界") from error
             if body.published:

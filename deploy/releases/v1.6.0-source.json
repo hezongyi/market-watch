@@ -1,0 +1,31 @@
+{
+  "version": "1.6.0",
+  "accepted": true,
+  "acceptance_scope": "Yahoo native market data and provider-only Chinese search with targeted backend/PostgreSQL/frontend regression, source equivalence and release package builds. No fresh full live-market/browser or production acceptance during release.",
+  "release_tag": "v1.6.0",
+  "release_method": "PR #5 merged to main; version/documentation release commit fast-forwarded to main; annotated v1.6.0 tag on the release commit; main and this tag pushed to origin.",
+  "previous_source_tag": "v1.5.2",
+  "baseline": "5dd196e2dc1cef460e3649c8dcf26f3b11bc8d98",
+  "source_commit": "4ef0e845f2acc63e68ede8603d3a622086444e66",
+  "implementation_commit": "b747d5b5656c8dbcca3cab8c9e8dd7e6c28071e9",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/5",
+  "source_commit_resolution": "Resolve annotated v1.6.0^{commit} to obtain the final main release commit.",
+  "tag_relation": "Runtime source, tests, dependencies and migrations identical to merged PR #5; release commit changes only root versions and release documentation/evidence.",
+  "delivery_document": "docs/yahoo-v1.6.0-source-delivery.md",
+  "fix_document": "docs/verification/yahoo/pr5-fixes.md",
+  "verification": "docs/verification/yahoo-release-v1.6.0/audit.json",
+  "schema": "q18_yahoo_catalog",
+  "new_migrations": ["q18_yahoo_catalog"],
+  "dependencies_changed": true,
+  "new_provider_dependency": "yfinance==1.7.0",
+  "yahoo_enabled_by_default": false,
+  "functional_source_changed_since_previous_tag": true,
+  "runtime_changed_by_source_release": false,
+  "notifications_sent": false,
+  "images": {},
+  "deployment_scope": "Source publication only; no container build, relabeling, instance switch or production migration/deployment.",
+  "rollback": {
+    "previous_source_tag": "v1.5.2",
+    "effect": "Removes Yahoo market data and this release's Chinese provider-only search. No runtime rollback is needed for this source-only release; deployed q18 migration rollback drops catalog metadata and must follow target-instance backup/runtime manifests."
+  }
+}

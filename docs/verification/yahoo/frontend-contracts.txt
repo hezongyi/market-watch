@@ -1,0 +1,11 @@
+node tests/advanced-series.cjs
+Series: legacy compatibility, synthetic identity, search defaults, isolated provider feed passed
+
+node tests/advanced-native-workspaces.cjs
+native workspace adapter: conflict, serialized saves and readonly passed
+
+node tests/advanced-provider-subscriptions.cjs
+Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed
+
+node tests/advanced-provider-request-lifetime.cjs
+Provider native requests survive period switches and cancel on workspace replacement

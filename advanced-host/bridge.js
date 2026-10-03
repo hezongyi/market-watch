@@ -59,6 +59,7 @@ const frames = {
 };
 const subscriptions = new Map();
 const quoteSubscriptions = new Map();
+const symbolPresentations = new Map();
 const lastHistory = new Map();
 const providerHistoryState = new Map();
 const providerHistoryWork = new Map();
@@ -335,6 +336,13 @@ function historyQuery(args) {
   promise.then(remove, remove);
   return promise;
 }
+function yahooPresentationRows(symbols) {
+  return symbols.flatMap(ticker => {
+    const meta = symbolPresentations.get(decode(ticker).symbol);
+    return meta ? [{s:"ok",n:ticker,v:{short_name:meta.symbol,
+      description:meta.name + " · Yahoo 市场报价",exchange:meta.exchange}}] : [];
+  });
+}
 const feed = {
   // The native price-axis countdown requires server time in UNIX seconds.
   // Authenticated/network access stays in the trusted parent origin.
@@ -355,10 +363,17 @@ const feed = {
       .catch((e) => err(String(e)));
   },
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
-    quoteSubscriptions.set(id, {
-      symbols: [...new Set([...symbols, ...fastSymbols])],
-      cb,
-    });
+    const all=[...new Set([...symbols, ...fastSymbols])];
+    quoteSubscriptions.set(id, {symbols:all,cb});
+    const yahoo=all.filter(ticker=>decode(ticker).symbol.startsWith("YAHOO:"));
+    if(yahoo.length) {
+      // Give native details its resolved human name while the real market
+      // snapshot loads. No price, change or quote time is invented here.
+      const named=yahooPresentationRows(yahoo);
+      if(named.length) setTimeout(()=>{if(quoteSubscriptions.has(id)) cb(named)},0);
+      feed.getQuotes(yahoo,rows=>{if(quoteSubscriptions.has(id)) cb(rows)},
+        error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}));
+    }
   },
   unsubscribeQuotes: (id) => quoteSubscriptions.delete(id),
   onReady: (cb) =>
@@ -379,15 +394,14 @@ const feed = {
         "market",
       );
       cb(
-        ["provider", "managed"].flatMap(series_kind => rows.map((s) => ({
-          symbol: MWSeries.encode(s.id, series_kind),
-          ticker: MWSeries.encode(s.id, series_kind),
-          description: s.label + (series_kind === "provider" ? " · 平台行情" : " · 自建行情") +
-            (series_kind === "managed" && s.managed_status ? " · " + s.managed_status : "") +
+        rows.map(s => ({
+          symbol: s.symbol,
+          ticker: MWSeries.encode(s.id, "provider"),
+          description: s.label + " · 平台行情" +
             (s.supported ? "" : " · 日历待接入"),
-          exchange: s.source.toUpperCase(),
-          type: s.asset_type === "CRYPTO" ? "crypto" : "forex",
-        }))),
+          exchange: s.exchange || s.source.toUpperCase(),
+          type: ({CRYPTO:"crypto", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[s.asset_type] || "forex",
+        })),
       );
     } catch (e) {
       cb([]);
@@ -410,31 +424,46 @@ const feed = {
         { op: "resolve", args: { instrument: symbol, series_kind, timeframe: "M1" } },
         "market",
       );
+      if(meta.source === "yahoo") {
+        symbolPresentations.set(symbol,meta);
+        while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
+      }
       cb({
-        name: MWSeries.display(symbol),
+        name: meta.source === "yahoo" ? meta.symbol : MWSeries.display(symbol),
         ticker,
-        description: MWSeries.display(symbol) + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + meta.basis + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
-        exchange: meta.source.toUpperCase(),
-        listed_exchange: meta.source.toUpperCase(),
-        type: meta.calendar === "utc0" ? "crypto" : "forex",
-        session: meta.calendar === "utc0" ? "24x7" : "1700-1700:23456",
-        timezone: meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York",
+        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
+        exchange: meta.exchange || meta.source.toUpperCase(),
+        listed_exchange: meta.exchange || meta.source.toUpperCase(),
+        type: ({INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
+        session: meta.session || (meta.source === "yahoo" ? "0000-0000:23456" : meta.calendar === "utc0" ? "24x7" : "1700-1700:23456"),
+        timezone: meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York"),
         minmov: 1,
         pricescale: 10 ** meta.precision,
         has_intraday: true,
-        intraday_multipliers: ["1", "5", "15", "30", "60", "240"],
+        intraday_multipliers: meta.frames ? meta.frames.filter(f => !["D1","W1","MN"].includes(f)).map(f=>Object.keys(frames).find(r=>frames[r]===f)) : ["1", "5", "15", "30", "60", "240"],
         has_daily: true,
         daily_multipliers: ["1"],
         has_weekly_and_monthly: true,
         weekly_multipliers: ["1"],
         monthly_multipliers: ["1"],
-        supported_resolutions: resolutions,
+        supported_resolutions: meta.frames ? resolutions.filter(r=>meta.frames.includes(frames[r])) : resolutions,
         visible_plots_set: meta.volume_kind && meta.volume_kind !== "unavailable" ? "ohlcv" : "ohlc",
         volume_precision: meta.volume_kind === "tick" ? 0 : 8,
         format: "price",
-        data_status: "streaming",
+        data_status: meta.delay_seconds > 0 ? "delayed_streaming" : "streaming",
+        ...(meta.delay_seconds > 0 ? {delay:meta.delay_seconds} : {}),
+        ...(meta.currency ? {currency_code:meta.currency} : {}),
         has_empty_bars: false,
       });
+      // The library keeps the old interval on a source switch even if the
+      // newly resolved symbol excludes it. Use its public chart method.
+      if(meta.source === "yahoo") setTimeout(()=>{
+        for(let index=0; widget && index<widget.chartsCount(); index++) {
+          const chart=widget.chart(index);
+          if(MWSeries.same(chart.symbol(),ticker) && !meta.frames.includes(frames[chart.resolution()]))
+            chart.setResolution("60",{doNotActivateChart:true});
+        }
+      },0);
     } catch (e) {
       err(String(e));
       send({ type: "error", error: String(e) });
@@ -463,6 +492,10 @@ const feed = {
     try {
       beforeInitialHistory?.();
       if (!frames[res]) throw Error("不支持的周期");
+      if(decode(s.ticker).symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) {
+        cb([],{noData:false});
+        return;
+      }
       if (decode(s.ticker).series_kind === "provider") {
         // Native requirements pass unchanged; the backend owns cache policy
         // and provider pagination, including demands larger than one page.
@@ -508,7 +541,17 @@ const feed = {
           providerHistoryState.set(historyKey,{revision:page.cache_revision||0,
             observed_at:page.as_of||0,cursor:Math.max(previous?.cursor||0,rows.at(-1)?.time||0)});
         }
-        const boundary = page.history_boundary === true;
+        const boundary = page.has_more === undefined
+          ? page.history_boundary === true || page.window_limit === true
+          : page.has_more === false;
+        if(page.window_limit) send({type:'feed-poll-state',key:s.ticker,
+          error:'已到 Yahoo 当前可获取窗口边界，早期已缓存历史仍可查看'});
+        if(decode(s.ticker).symbol.startsWith("YAHOO:") && rows.some(bar=>Math.min(bar.open,bar.high,bar.low,bar.close)<=0)) {
+          for(let index=0; index<widget.chartsCount(); index++) {
+            const chart=widget.chart(index);
+            if(MWSeries.same(chart.symbol(),s.ticker)) chart.getPanes()[0]?.getMainSourcePriceScale()?.setMode(0);
+          }
+        }
         if (rows.length) {
           const key = s.ticker+'|'+res;
           lastHistory.set(key,Math.max(lastHistory.get(key)||0,rows.at(-1).time));
@@ -583,6 +626,7 @@ const feed = {
   subscribeBars: (s, res, cb, id, reset) => {
     feed.unsubscribeBars(id);
     const identity=decode(s.ticker);
+    if(identity.symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) return;
     const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(s.ticker+'|'+res)||0,revision:null};
     subscriptions.set(id,sub);
     if(identity.series_kind==='provider') {
@@ -957,6 +1001,8 @@ function boot(
   symbolMetadata = null,
 ) {
   initialSymbol = symbolMetadata;
+  if(symbolMetadata?.metadata?.source === "yahoo")
+    symbolPresentations.set(decode(symbolMetadata.ticker).symbol,symbolMetadata.metadata);
   // save_load_adapter content is a layout envelope; saved_data expects its chart state.
   const storedViewports = doc.state?._mwViewports;
   let chartState = doc.state;
@@ -1091,7 +1137,23 @@ function boot(
     return result;
   };
   const viewportBindings = new Map();
+  const symbolResolutionBindings = new Map();
   const bindViewports = () => {
+    // Symbol change events also fire for the library's cached resolutions.
+    // resolveSymbol alone cannot correct a return to a previously seen symbol.
+    for(const [chart,changed] of symbolResolutionBindings)
+      chart.onSymbolChanged().unsubscribe(null,changed);
+    symbolResolutionBindings.clear();
+    for(let index=0; index<widget.chartsCount(); index++) {
+      const chart=widget.chart(index);
+      const changed=info=>{
+        if(info.ticker && decode(info.ticker).symbol.startsWith("YAHOO:") &&
+           info.supported_resolutions && !info.supported_resolutions.includes(chart.resolution()))
+          chart.setResolution("60",{doNotActivateChart:true});
+      };
+      chart.onSymbolChanged().subscribe(null,changed);
+      symbolResolutionBindings.set(chart,changed);
+    }
     for (const [chart, changed] of viewportBindings)
       chart.onVisibleRangeChanged().unsubscribe(null, changed);
     viewportBindings.clear();
@@ -1202,6 +1264,7 @@ function boot(
       "determine_first_data_request_size_using_visible_range",
       "header_layouttoggle",
       "disable_resolution_rebuild",
+      "prefer_quote_short_name",
       "study_templates",
       "items_favoriting",
       "chart_template_storage",

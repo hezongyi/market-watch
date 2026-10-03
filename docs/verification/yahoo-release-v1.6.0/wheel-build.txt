@@ -1,0 +1,325 @@
+* Getting build dependencies for wheel...
+running egg_info
+creating backend/market_watch.egg-info
+writing backend/market_watch.egg-info/PKG-INFO
+writing dependency_links to backend/market_watch.egg-info/dependency_links.txt
+writing requirements to backend/market_watch.egg-info/requires.txt
+writing top-level names to backend/market_watch.egg-info/top_level.txt
+writing manifest file 'backend/market_watch.egg-info/SOURCES.txt'
+reading manifest file 'backend/market_watch.egg-info/SOURCES.txt'
+writing manifest file 'backend/market_watch.egg-info/SOURCES.txt'
+* Building wheel...
+running bdist_wheel
+running build
+running build_py
+creating build/lib/alerts
+copying backend/alerts/market_names.py -> build/lib/alerts
+copying backend/alerts/indicators.py -> build/lib/alerts
+copying backend/alerts/volume_jobs.py -> build/lib/alerts
+copying backend/alerts/advanced_api.py -> build/lib/alerts
+copying backend/alerts/managed_dataset.py -> build/lib/alerts
+copying backend/alerts/chart_api.py -> build/lib/alerts
+copying backend/alerts/provider_chart.py -> build/lib/alerts
+copying backend/alerts/chart_history_worker.py -> build/lib/alerts
+copying backend/alerts/yahoo_aliases.py -> build/lib/alerts
+copying backend/alerts/provider_history_policy.py -> build/lib/alerts
+copying backend/alerts/provider_service.py -> build/lib/alerts
+copying backend/alerts/__init__.py -> build/lib/alerts
+copying backend/alerts/market_data.py -> build/lib/alerts
+copying backend/alerts/replay_history.py -> build/lib/alerts
+copying backend/alerts/service.py -> build/lib/alerts
+copying backend/alerts/realtime_worker.py -> build/lib/alerts
+copying backend/alerts/calendar_admin.py -> build/lib/alerts
+copying backend/alerts/notify.py -> build/lib/alerts
+copying backend/alerts/chart_aggregation_worker.py -> build/lib/alerts
+copying backend/alerts/provider_cache.py -> build/lib/alerts
+copying backend/alerts/market.py -> build/lib/alerts
+copying backend/alerts/provider_capabilities.py -> build/lib/alerts
+copying backend/alerts/domain.py -> build/lib/alerts
+copying backend/alerts/yahoo_catalog.py -> build/lib/alerts
+copying backend/alerts/chart_export.py -> build/lib/alerts
+copying backend/alerts/database_transfer.py -> build/lib/alerts
+copying backend/alerts/chart_history_plan.py -> build/lib/alerts
+copying backend/alerts/volume.py -> build/lib/alerts
+copying backend/alerts/site.py -> build/lib/alerts
+copying backend/alerts/provider_transport.py -> build/lib/alerts
+copying backend/alerts/backup.py -> build/lib/alerts
+copying backend/alerts/cli.py -> build/lib/alerts
+copying backend/alerts/market_resources.py -> build/lib/alerts
+copying backend/alerts/coverage.py -> build/lib/alerts
+copying backend/alerts/provider_yahoo.py -> build/lib/alerts
+copying backend/alerts/chart_data.py -> build/lib/alerts
+copying backend/alerts/publication_jobs.py -> build/lib/alerts
+copying backend/alerts/api.py -> build/lib/alerts
+copying backend/alerts/providers.py -> build/lib/alerts
+copying backend/alerts/chart_series.py -> build/lib/alerts
+copying backend/alerts/storage.py -> build/lib/alerts
+copying backend/alerts/config.py -> build/lib/alerts
+copying backend/alerts/chart_indicators.py -> build/lib/alerts
+copying backend/alerts/chart_aggregation.py -> build/lib/alerts
+copying backend/alerts/calendar_profile.py -> build/lib/alerts
+copying backend/alerts/bar_batch.py -> build/lib/alerts
+creating build/lib/tests
+copying backend/tests/test_provider_transport.py -> build/lib/tests
+copying backend/tests/test_database_transfer.py -> build/lib/tests
+copying backend/tests/test_realtime_worker.py -> build/lib/tests
+copying backend/tests/test_provider_workspace.py -> build/lib/tests
+copying backend/tests/verify_provider_live.py -> build/lib/tests
+copying backend/tests/test_chart_history_plan.py -> build/lib/tests
+copying backend/tests/test_managed_revisions_postgres.py -> build/lib/tests
+copying backend/tests/test_postgres.py -> build/lib/tests
+copying backend/tests/test_backup.py -> build/lib/tests
+copying backend/tests/test_provider_chart.py -> build/lib/tests
+copying backend/tests/test_service.py -> build/lib/tests
+copying backend/tests/test_managed_dataset.py -> build/lib/tests
+copying backend/tests/test_providers.py -> build/lib/tests
+copying backend/tests/test_provider_cache.py -> build/lib/tests
+copying backend/tests/test_source_selection.py -> build/lib/tests
+copying backend/tests/test_config.py -> build/lib/tests
+copying backend/tests/test_chart_workspace.py -> build/lib/tests
+copying backend/tests/test_database_pool.py -> build/lib/tests
+copying backend/tests/test_coverage.py -> build/lib/tests
+copying backend/tests/test_volume.py -> build/lib/tests
+copying backend/tests/test_advanced_workspace.py -> build/lib/tests
+copying backend/tests/test_market_data.py -> build/lib/tests
+copying backend/tests/test_advanced_preferences.py -> build/lib/tests
+copying backend/tests/test_volume_postgres.py -> build/lib/tests
+copying backend/tests/test_managed_revision_migration.py -> build/lib/tests
+copying backend/tests/test_calendar_profile.py -> build/lib/tests
+copying backend/tests/test_notify.py -> build/lib/tests
+copying backend/tests/test_chart_worker_cadence.py -> build/lib/tests
+copying backend/tests/test_domain.py -> build/lib/tests
+copying backend/tests/test_devices.py -> build/lib/tests
+copying backend/tests/test_managed_migration.py -> build/lib/tests
+copying backend/tests/test_imports.py -> build/lib/tests
+copying backend/tests/test_provider_service.py -> build/lib/tests
+copying backend/tests/test_market_resources.py -> build/lib/tests
+copying backend/tests/test_health.py -> build/lib/tests
+copying backend/tests/test_indicators.py -> build/lib/tests
+copying backend/tests/conftest.py -> build/lib/tests
+copying backend/tests/test_market.py -> build/lib/tests
+copying backend/tests/test_notification_test.py -> build/lib/tests
+copying backend/tests/test_recovery.py -> build/lib/tests
+copying backend/tests/test_provider_postgres.py -> build/lib/tests
+copying backend/tests/test_oanda_schedule.py -> build/lib/tests
+copying backend/tests/test_chart_aggregation_migration.py -> build/lib/tests
+copying backend/tests/test_replay_capacity.py -> build/lib/tests
+copying backend/tests/test_provider_yahoo.py -> build/lib/tests
+copying backend/tests/test_history_cache.py -> build/lib/tests
+copying backend/tests/test_chart_aggregation.py -> build/lib/tests
+copying backend/tests/test_chart_export.py -> build/lib/tests
+copying backend/tests/test_account_password.py -> build/lib/tests
+running egg_info
+writing backend/market_watch.egg-info/PKG-INFO
+writing dependency_links to backend/market_watch.egg-info/dependency_links.txt
+writing requirements to backend/market_watch.egg-info/requires.txt
+writing top-level names to backend/market_watch.egg-info/top_level.txt
+reading manifest file 'backend/market_watch.egg-info/SOURCES.txt'
+writing manifest file 'backend/market_watch.egg-info/SOURCES.txt'
+installing to build/bdist.linux-x86_64/wheel
+running install
+running install_lib
+creating build/bdist.linux-x86_64/wheel
+creating build/bdist.linux-x86_64/wheel/alerts
+copying build/lib/alerts/market_names.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/indicators.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/volume_jobs.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/advanced_api.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/managed_dataset.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_api.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/provider_chart.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_history_worker.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/yahoo_aliases.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/provider_history_policy.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/provider_service.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/__init__.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/market_data.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/replay_history.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/service.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/realtime_worker.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/calendar_admin.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/notify.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_aggregation_worker.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/provider_cache.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/market.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/provider_capabilities.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/domain.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/yahoo_catalog.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_export.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/database_transfer.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_history_plan.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/volume.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/site.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/provider_transport.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/backup.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/cli.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/market_resources.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/coverage.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/provider_yahoo.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_data.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/publication_jobs.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/api.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/providers.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_series.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/storage.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/config.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_indicators.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/chart_aggregation.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/calendar_profile.py -> build/bdist.linux-x86_64/wheel/./alerts
+copying build/lib/alerts/bar_batch.py -> build/bdist.linux-x86_64/wheel/./alerts
+creating build/bdist.linux-x86_64/wheel/tests
+copying build/lib/tests/test_provider_transport.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_database_transfer.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_realtime_worker.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_provider_workspace.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/verify_provider_live.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_chart_history_plan.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_managed_revisions_postgres.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_postgres.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_backup.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_provider_chart.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_service.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_managed_dataset.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_providers.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_provider_cache.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_source_selection.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_config.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_chart_workspace.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_database_pool.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_coverage.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_volume.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_advanced_workspace.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_market_data.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_advanced_preferences.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_volume_postgres.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_managed_revision_migration.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_calendar_profile.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_notify.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_chart_worker_cadence.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_domain.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_devices.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_managed_migration.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_imports.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_provider_service.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_market_resources.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_health.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_indicators.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/conftest.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_market.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_notification_test.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_recovery.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_provider_postgres.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_oanda_schedule.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_chart_aggregation_migration.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_replay_capacity.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_provider_yahoo.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_history_cache.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_chart_aggregation.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_chart_export.py -> build/bdist.linux-x86_64/wheel/./tests
+copying build/lib/tests/test_account_password.py -> build/bdist.linux-x86_64/wheel/./tests
+running install_egg_info
+Copying backend/market_watch.egg-info to build/bdist.linux-x86_64/wheel/./market_watch-1.6.0-py3.11.egg-info
+running install_scripts
+creating build/bdist.linux-x86_64/wheel/market_watch-1.6.0.dist-info/WHEEL
+creating '/tmp/market-watch-v1.6.0-dist/.tmp-bj3il3oe/market_watch-1.6.0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+adding 'alerts/__init__.py'
+adding 'alerts/advanced_api.py'
+adding 'alerts/api.py'
+adding 'alerts/backup.py'
+adding 'alerts/bar_batch.py'
+adding 'alerts/calendar_admin.py'
+adding 'alerts/calendar_profile.py'
+adding 'alerts/chart_aggregation.py'
+adding 'alerts/chart_aggregation_worker.py'
+adding 'alerts/chart_api.py'
+adding 'alerts/chart_data.py'
+adding 'alerts/chart_export.py'
+adding 'alerts/chart_history_plan.py'
+adding 'alerts/chart_history_worker.py'
+adding 'alerts/chart_indicators.py'
+adding 'alerts/chart_series.py'
+adding 'alerts/cli.py'
+adding 'alerts/config.py'
+adding 'alerts/coverage.py'
+adding 'alerts/database_transfer.py'
+adding 'alerts/domain.py'
+adding 'alerts/indicators.py'
+adding 'alerts/managed_dataset.py'
+adding 'alerts/market.py'
+adding 'alerts/market_data.py'
+adding 'alerts/market_names.py'
+adding 'alerts/market_resources.py'
+adding 'alerts/notify.py'
+adding 'alerts/provider_cache.py'
+adding 'alerts/provider_capabilities.py'
+adding 'alerts/provider_chart.py'
+adding 'alerts/provider_history_policy.py'
+adding 'alerts/provider_service.py'
+adding 'alerts/provider_transport.py'
+adding 'alerts/provider_yahoo.py'
+adding 'alerts/providers.py'
+adding 'alerts/publication_jobs.py'
+adding 'alerts/realtime_worker.py'
+adding 'alerts/replay_history.py'
+adding 'alerts/service.py'
+adding 'alerts/site.py'
+adding 'alerts/storage.py'
+adding 'alerts/volume.py'
+adding 'alerts/volume_jobs.py'
+adding 'alerts/yahoo_aliases.py'
+adding 'alerts/yahoo_catalog.py'
+adding 'tests/conftest.py'
+adding 'tests/test_account_password.py'
+adding 'tests/test_advanced_preferences.py'
+adding 'tests/test_advanced_workspace.py'
+adding 'tests/test_backup.py'
+adding 'tests/test_calendar_profile.py'
+adding 'tests/test_chart_aggregation.py'
+adding 'tests/test_chart_aggregation_migration.py'
+adding 'tests/test_chart_export.py'
+adding 'tests/test_chart_history_plan.py'
+adding 'tests/test_chart_worker_cadence.py'
+adding 'tests/test_chart_workspace.py'
+adding 'tests/test_config.py'
+adding 'tests/test_coverage.py'
+adding 'tests/test_database_pool.py'
+adding 'tests/test_database_transfer.py'
+adding 'tests/test_devices.py'
+adding 'tests/test_domain.py'
+adding 'tests/test_health.py'
+adding 'tests/test_history_cache.py'
+adding 'tests/test_imports.py'
+adding 'tests/test_indicators.py'
+adding 'tests/test_managed_dataset.py'
+adding 'tests/test_managed_migration.py'
+adding 'tests/test_managed_revision_migration.py'
+adding 'tests/test_managed_revisions_postgres.py'
+adding 'tests/test_market.py'
+adding 'tests/test_market_data.py'
+adding 'tests/test_market_resources.py'
+adding 'tests/test_notification_test.py'
+adding 'tests/test_notify.py'
+adding 'tests/test_oanda_schedule.py'
+adding 'tests/test_postgres.py'
+adding 'tests/test_provider_cache.py'
+adding 'tests/test_provider_chart.py'
+adding 'tests/test_provider_postgres.py'
+adding 'tests/test_provider_service.py'
+adding 'tests/test_provider_transport.py'
+adding 'tests/test_provider_workspace.py'
+adding 'tests/test_provider_yahoo.py'
+adding 'tests/test_providers.py'
+adding 'tests/test_realtime_worker.py'
+adding 'tests/test_recovery.py'
+adding 'tests/test_replay_capacity.py'
+adding 'tests/test_service.py'
+adding 'tests/test_source_selection.py'
+adding 'tests/test_volume.py'
+adding 'tests/test_volume_postgres.py'
+adding 'tests/verify_provider_live.py'
+adding 'market_watch-1.6.0.dist-info/METADATA'
+adding 'market_watch-1.6.0.dist-info/WHEEL'
+adding 'market_watch-1.6.0.dist-info/top_level.txt'
+adding 'market_watch-1.6.0.dist-info/RECORD'
+removing build/bdist.linux-x86_64/wheel
+Successfully built market_watch-1.6.0-py3-none-any.whl

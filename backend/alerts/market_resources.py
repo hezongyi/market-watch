@@ -47,7 +47,10 @@ def acquire(source, kind, now):
             .where(ImportJob.priority == 0, ImportJob.status.in_(["pending", "running"]))
             .limit(1)
         )
-        allowed = (
+        if source == "yahoo":
+            allowed = (not active and not requests and values.get("cooldown_until", 0) <= now)
+        else:
+            allowed = (
             not repair
             and sum(e["kind"] == kind for e in active) < capacity
             and sum(e["kind"] == kind for e in requests) < capacity
@@ -56,8 +59,23 @@ def acquire(source, kind, now):
             return None
         active.append(dict(token=token, kind=kind, expires=now + 90000))
         requests.append(dict(kind=kind, at=now))
-        row.value = dict(active=active, requests=requests)
+        row.value = {**values, "active": active, "requests": requests}
     return token
+
+
+def cooldown(source, *, retry_seconds=None):
+    """Persist a shared source cooldown; no per-chart rate-limit retry loops."""
+    with transaction() as db:
+        insert = pg_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
+        db.execute(insert(Preference.__table__).values(key="upstream_slots:" + source, value={})
+                   .on_conflict_do_nothing(index_elements=["key"]))
+        row = db.scalar(select(Preference).where(Preference.key == "upstream_slots:" + source)
+                        .with_for_update())
+        values = row.value
+        strikes = min(5, values.get("cooldown_strikes", 0) + 1)
+        seconds = retry_seconds if retry_seconds is not None else min(900, 60 * 2**(strikes-1))
+        row.value = {**values, "cooldown_strikes": strikes,
+                     "cooldown_until": now_ms() + seconds*1000}
 
 
 def release(source, token):
