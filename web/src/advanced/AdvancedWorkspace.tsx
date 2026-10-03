@@ -567,6 +567,16 @@ export default function AdvancedWorkspace() {
           (q.revision_after !== undefined &&
             (!Number.isSafeInteger(q.revision_after) ||
               q.revision_after < 0)) ||
+          (q.native_reserve !== undefined &&
+            (q.series_kind !== 'provider' || !q.native_history || !q.native_reserve ||
+              typeof q.native_reserve !== 'object' || Array.isArray(q.native_reserve) ||
+              !Number.isInteger(q.native_reserve.screen_bars) ||
+              q.native_reserve.screen_bars < 1 || q.native_reserve.screen_bars > 2000 ||
+              ![1, 2].includes(q.native_reserve.batch_screens) ||
+              !Number.isInteger(q.native_reserve.warmup_bars) ||
+              q.native_reserve.warmup_bars < 0 || q.native_reserve.warmup_bars > 2000 ||
+              Object.keys(q.native_reserve).some(k => !['screen_bars', 'batch_screens', 'warmup_bars'].includes(k)) ||
+              q.indicators?.length || q.history_observation !== undefined)) ||
           inflight.current >= 8
         ) {
           reply({ type: "result", id: m.id, error: "请求不在允许范围内" });
@@ -581,7 +591,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            result: await api("/charts/data", {
+            result: await api(q.native_reserve ? "/charts/reserve" : "/charts/data", {
               instrument: q.instrument,
               series_kind: q.series_kind || "managed",
               published: q.series_kind !== "provider",
@@ -591,6 +601,7 @@ export default function AdvancedWorkspace() {
               ...(q.series_kind === 'provider' ? {countBack:q.countBack,
                 from:q.from,firstDataRequest:q.firstDataRequest === true,client:q.client,
                 ...(q.native_history !== undefined ? {native_history:q.native_history} : {}),
+                ...(q.native_reserve !== undefined ? {native_reserve:q.native_reserve} : {}),
                 ...(q.history_observation !== undefined ? {history_observation:q.history_observation} : {})} : {}),
               indicators: q.indicators || [],
               ...(q.before ? { before: q.before } : {}),

@@ -71,11 +71,11 @@ def warm_clients():
         list(executor.map(connect, ("oanda", "binance")))
 
 
-def metadata(ident, *, deadline=None):
+def metadata(ident, *, deadline=None, cached_only=False):
     if ident.startswith("YAHOO:"):
         from .provider_cache import DEADLINE
         from .yahoo_catalog import chart_metadata
-        return chart_metadata(ident, deadline=deadline or DEADLINE.get())
+        return chart_metadata(ident, deadline=deadline or DEADLINE.get(), cached_only=cached_only)
     with transaction() as db:
         entry = db.get(MarketCatalog, ident)
         inst = db.get(Instrument, ident)

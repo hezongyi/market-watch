@@ -57,6 +57,8 @@ class NativeHistory(BaseModel):
     chart_count: int = Field(ge=1, le=8)
     focused: bool | None = None
     historical_navigation: bool = False
+    screen_bars: int | None = Field(default=None, ge=1, le=2000)
+    batch_screens: int = Field(default=1, ge=1, le=2)
 
 
 class HistoryObservation(BaseModel):
@@ -71,6 +73,14 @@ class HistoryObservation(BaseModel):
         if self.first > self.last:
             raise ValueError("历史观察窗口无效")
         return self
+
+
+class NativeReserve(BaseModel):
+    """Optional, PG-only history for a visible chart; never upstream demand."""
+    model_config = ConfigDict(extra="forbid", strict=True)
+    screen_bars: int = Field(ge=1, le=2000)
+    batch_screens: int = Field(ge=1, le=2)
+    warmup_bars: int = Field(default=0, ge=0, le=2000)
 
 
 class DataQuery(BaseModel):
@@ -93,6 +103,7 @@ class DataQuery(BaseModel):
     dataset_start: int | None = Field(default=None, ge=0)
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
+    native_reserve: NativeReserve | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -108,6 +119,10 @@ class DataQuery(BaseModel):
 
     @model_validator(mode="after")
     def validate_managed_limit(self):
+        if self.native_reserve is not None:
+            if (self.series_kind != "provider" or self.native_history is None or
+                    self.indicators or self.history_observation is not None or self.before is None):
+                raise ValueError("图表储备只适用于带原生上下文的纯平台历史缓存读取")
         if self.series_kind == "managed" and self.limit > 2000:
             raise ValueError("自建单页最多2000根")
         if self.native_history is not None or self.history_observation is not None:
@@ -579,6 +594,12 @@ def router(authenticated):
         with transaction() as db:
             db.execute(delete(ChartTemplate).where(ChartTemplate.id == id))
         return {"ok": True}
+
+    @r.post("/reserve")
+    async def reserve(body: DataQuery, request: Request):
+        if body.native_reserve is None:
+            raise HTTPException(422, "缺少图表储备上下文")
+        return await data(body, request)
 
     @r.post("/data")
     async def data(body: DataQuery, request: Request):

@@ -1,0 +1,914 @@
+{
+  "code_commit": "5717f81",
+  "baseline": "5dd196e",
+  "real_environment": {
+    "PostgreSQL": "16",
+    "browser": "Chromium 1243",
+    "providers": "OANDA bid, actual original OHLC",
+    "production_resources_used": false,
+    "notifications": false
+  },
+  "sources": [
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/browser-release.json",
+      "sha256": "6452f953d62f689630c2ad484c7ab9d3088ff2742172e7b5f79d2eab9b2dd7ae"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/sync-release.json",
+      "sha256": "3a89ba94ed64dfc040babebeed92ea6cfbd87f8600e4838a960224cef9b42570"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/sync-multisymbol.json",
+      "sha256": "4e9f15ead4e6075a5ceb5b862fce941610cf41e440a6bfe2655924481b624d40"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-implementation/warmup-settled.json",
+      "sha256": "7e1028c60f7f27c096c5d81762f27dedd0de84673c907a6e6ae1f296c33d8054"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-implementation/warmup-result.json",
+      "sha256": "7e5193b920458584e9a709c8e3a5c3260217bbb94711018c32ed6c1083098127"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-implementation/error-result.json",
+      "sha256": "ec50d2f4a26e3e3ab32a0f0568aee75cfa1d7fa5eb746d41fdbeb8481272b0c3"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-implementation/miss-result.json",
+      "sha256": "3bbc60bdaa61c5178ed0a5217b8eafd5b3c5fde2a5546758cf593e3f29837ccd"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-implementation/boundary-result.json",
+      "sha256": "a5f6e503107bef584f93cade263d76283fb7bb91b99d6f701ffdff8f76868303"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-implementation/no-study-prefix.json",
+      "sha256": "cf32a3c67b83aa7d67fa20979c821d8df118f56928706b8b11a0ea383ad6ffc3"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/backend-final.log",
+      "sha256": "c3a3ec7e3ba6313306d68caa7ccbf1624c95a8ea9a2e700743e04678f04d3a0c"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/postgres-final.log",
+      "sha256": "8157409076800fafb712ae6bc6cdff606ea2ef3af725540d90570294c817d316"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/js-final.json",
+      "sha256": "87d83b4b597c1c83ff9805f2afdc918fb5ddc7459fad579564f577673ac22d77"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/layout-final.log",
+      "sha256": "0349a48ebf38688f7e001b868525151a334a5c3f3d7cb6aeb376e5b223bae7dc"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/patch-check.json",
+      "sha256": "7b4e12106d59a6b54c60868d39386b2edb41b6a635a20b4cb945dcb1b446a460"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/lifetime-red.log",
+      "sha256": "6e782a75acffd59ee5deefb28d63b9eda00614e8edb5960bfb2cbfcb8d484e0a"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-implementation/error-eight-final.json",
+      "sha256": "88cedeabf98bd632df7b051cf44173098eaedf25d83075be7c10c3cac79bf807"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-implementation/miss-eight-final.json",
+      "sha256": "98e7499d51aa1d6d82f96a31c6830401b7a071529077379974ed10d8914982d3"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/scheduler-green.log",
+      "sha256": "ea81ba1648d86d861972ce3ac4f054f3c475d90580ad8ad9986679a523bab340"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/lifetime-green.log",
+      "sha256": "8ace3812861176c5e29cb8afe04b9e76fe5fc2320b3ee34f44e8847b2d1d96cb"
+    },
+    {
+      "artifact": "/tmp/mw-viewport-acceptance/disabled-smoke-release.json",
+      "sha256": "c2dbd8b57c6db7b4225785a5a99eada98d13c120acaa6dbe30215ff9c1415051"
+    }
+  ],
+  "drag": [
+    {
+      "charts": 1,
+      "actual_pointer": true,
+      "native_draws": 154,
+      "missing": 0,
+      "blank": 0,
+      "passed": true,
+      "reserve_requests": 1,
+      "optional_bars": 378,
+      "source": "/tmp/mw-viewport-acceptance/browser-release.json"
+    },
+    {
+      "charts": 2,
+      "actual_pointer": false,
+      "native_draws": 151,
+      "missing": 0,
+      "blank": 0,
+      "passed": true,
+      "reserve_requests": 1,
+      "optional_bars": 378,
+      "source": "/tmp/mw-viewport-acceptance/browser-release.json"
+    },
+    {
+      "charts": 4,
+      "actual_pointer": false,
+      "native_draws": 150,
+      "missing": 0,
+      "blank": 0,
+      "passed": true,
+      "reserve_requests": 5,
+      "optional_bars": 1623,
+      "source": "/tmp/mw-viewport-acceptance/browser-release.json"
+    },
+    {
+      "charts": 8,
+      "actual_pointer": false,
+      "native_draws": 151,
+      "missing": 0,
+      "blank": 0,
+      "passed": true,
+      "reserve_requests": 6,
+      "optional_bars": 1618,
+      "source": "/tmp/mw-viewport-acceptance/browser-release.json"
+    }
+  ],
+  "sync": [
+    {
+      "charts": 2,
+      "peer_symbol": null,
+      "passed": true,
+      "errors": [],
+      "source": "/tmp/mw-viewport-acceptance/sync-release.json",
+      "phases": [
+        {
+          "name": "crosshair-only",
+          "draws": 0,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790964300,
+            1790964300
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   18:05",
+            "周五 2026-10-02   18:05"
+          ]
+        },
+        {
+          "name": "time-only",
+          "draws": 33,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790942400,
+            1790895600
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   12:00",
+            "周四 2026-10-01   23:00"
+          ]
+        },
+        {
+          "name": "range-only",
+          "draws": 162,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [],
+          "cursor_labels": []
+        },
+        {
+          "name": "all-sync",
+          "draws": 153,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790814000,
+            1790814000
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   00:20",
+            "周四 2026-10-01   00:20"
+          ]
+        },
+        {
+          "name": "mixed-crosshair-only",
+          "draws": 0,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790812800,
+            1790812800
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   00:00",
+            "周四 2026-10-01   00:00"
+          ]
+        },
+        {
+          "name": "mixed-time-only",
+          "draws": 29,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790794800,
+            1790812800
+          ],
+          "cursor_labels": [
+            "周三 2026-09-30   19:00",
+            "周四 2026-10-01   00:00"
+          ]
+        },
+        {
+          "name": "mixed-range-only",
+          "draws": 48,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [],
+          "cursor_labels": []
+        },
+        {
+          "name": "mixed-all-sync",
+          "draws": 107,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790744400,
+            1790744400
+          ],
+          "cursor_labels": [
+            "周三 2026-09-30   05:00",
+            "周三 2026-09-30   05:00"
+          ]
+        },
+        {
+          "name": "linked-period-change",
+          "draws": 30,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790730900,
+            1790730900
+          ],
+          "cursor_labels": [
+            "周三 2026-09-30   01:15",
+            "周三 2026-09-30   01:15"
+          ]
+        },
+        {
+          "name": "post-refresh-linked-drag",
+          "draws": 29,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790717400,
+            1790717400
+          ],
+          "cursor_labels": [
+            "周二 2026-09-29   21:30",
+            "周二 2026-09-29   21:30"
+          ]
+        }
+      ]
+    },
+    {
+      "charts": 8,
+      "peer_symbol": null,
+      "passed": true,
+      "errors": [],
+      "source": "/tmp/mw-viewport-acceptance/sync-release.json",
+      "phases": [
+        {
+          "name": "crosshair-only",
+          "draws": 9,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790971800,
+            1790971800,
+            1790971800,
+            1790971800,
+            1790971800,
+            1790971800,
+            1790971800,
+            1790971800
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   20:10",
+            "周五 2026-10-02   20:10",
+            "周五 2026-10-02   20:10",
+            "周五 2026-10-02   20:10",
+            "周五 2026-10-02   20:10",
+            "周五 2026-10-02   20:10",
+            "周五 2026-10-02   20:10",
+            "周五 2026-10-02   20:10"
+          ]
+        },
+        {
+          "name": "time-only",
+          "draws": 69,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790963100,
+            1790943600,
+            1790943600,
+            1790943600,
+            1790943600,
+            1790943600,
+            1790943600,
+            1790943600
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   17:45",
+            "周五 2026-10-02   12:20",
+            "周五 2026-10-02   12:20",
+            "周五 2026-10-02   12:20",
+            "周五 2026-10-02   12:20",
+            "周五 2026-10-02   12:20",
+            "周五 2026-10-02   12:20",
+            "周五 2026-10-02   12:20"
+          ]
+        },
+        {
+          "name": "range-only",
+          "draws": 554,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [],
+          "cursor_labels": []
+        },
+        {
+          "name": "all-sync",
+          "draws": 565,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790912100,
+            1790912100,
+            1790912100,
+            1790912100,
+            1790912100,
+            1790912100,
+            1790912100,
+            1790912100
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   03:35",
+            "周五 2026-10-02   03:35",
+            "周五 2026-10-02   03:35",
+            "周五 2026-10-02   03:35",
+            "周五 2026-10-02   03:35",
+            "周五 2026-10-02   03:35",
+            "周五 2026-10-02   03:35",
+            "周五 2026-10-02   03:35"
+          ]
+        },
+        {
+          "name": "mixed-crosshair-only",
+          "draws": 0,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790903400,
+            1790903400,
+            1790903400,
+            1790903400,
+            1790902800,
+            1790902800,
+            1790902800,
+            1790902800
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   01:10",
+            "周五 2026-10-02   01:10",
+            "周五 2026-10-02   01:10",
+            "周五 2026-10-02   01:10",
+            "周五 2026-10-02   01:00",
+            "周五 2026-10-02   01:00",
+            "周五 2026-10-02   01:00",
+            "周五 2026-10-02   01:00"
+          ]
+        },
+        {
+          "name": "mixed-time-only",
+          "draws": 50,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790887500,
+            1790903400,
+            1790903400,
+            1790903400,
+            1790902800,
+            1790902800,
+            1790902800,
+            1790902800
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   20:45",
+            "周五 2026-10-02   01:10",
+            "周五 2026-10-02   01:10",
+            "周五 2026-10-02   01:10",
+            "周五 2026-10-02   01:00",
+            "周五 2026-10-02   01:00",
+            "周五 2026-10-02   01:00",
+            "周五 2026-10-02   01:00"
+          ]
+        },
+        {
+          "name": "mixed-range-only",
+          "draws": 182,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [],
+          "cursor_labels": []
+        },
+        {
+          "name": "mixed-all-sync",
+          "draws": 358,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790841000,
+            1790841000,
+            1790841000,
+            1790841000,
+            1790840700,
+            1790840700,
+            1790840700,
+            1790840700
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   07:50",
+            "周四 2026-10-01   07:50",
+            "周四 2026-10-01   07:50",
+            "周四 2026-10-01   07:50",
+            "周四 2026-10-01   07:45",
+            "周四 2026-10-01   07:45",
+            "周四 2026-10-01   07:45",
+            "周四 2026-10-01   07:45"
+          ]
+        },
+        {
+          "name": "linked-period-change",
+          "draws": 105,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790829000,
+            1790829000,
+            1790829000,
+            1790829000,
+            1790829000,
+            1790829000,
+            1790829000,
+            1790829000
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   04:30",
+            "周四 2026-10-01   04:30",
+            "周四 2026-10-01   04:30",
+            "周四 2026-10-01   04:30",
+            "周四 2026-10-01   04:30",
+            "周四 2026-10-01   04:30",
+            "周四 2026-10-01   04:30",
+            "周四 2026-10-01   04:30"
+          ]
+        },
+        {
+          "name": "post-refresh-linked-drag",
+          "draws": 96,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790817300,
+            1790817300,
+            1790817300,
+            1790817300,
+            1790817300,
+            1790817300,
+            1790817300,
+            1790817300
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   01:15",
+            "周四 2026-10-01   01:15",
+            "周四 2026-10-01   01:15",
+            "周四 2026-10-01   01:15",
+            "周四 2026-10-01   01:15",
+            "周四 2026-10-01   01:15",
+            "周四 2026-10-01   01:15",
+            "周四 2026-10-01   01:15"
+          ]
+        }
+      ]
+    },
+    {
+      "charts": 4,
+      "peer_symbol": "MWP:XAUUSD",
+      "passed": true,
+      "errors": [],
+      "source": "/tmp/mw-viewport-acceptance/sync-multisymbol.json",
+      "phases": [
+        {
+          "name": "crosshair-only",
+          "draws": 0,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790964300,
+            1790964300,
+            1790964300,
+            1790964300
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   18:05",
+            "周五 2026-10-02   18:05",
+            "周五 2026-10-02   18:05",
+            "周五 2026-10-02   18:05"
+          ]
+        },
+        {
+          "name": "time-only",
+          "draws": 37,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790942400,
+            1790895600,
+            1790968200,
+            1790968200
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   12:00",
+            "周四 2026-10-01   23:00",
+            "周五 2026-10-02   19:10",
+            "周五 2026-10-02   19:10"
+          ]
+        },
+        {
+          "name": "range-only",
+          "draws": 333,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [],
+          "cursor_labels": []
+        },
+        {
+          "name": "all-sync",
+          "draws": 331,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790820300,
+            1790820300,
+            1790820300,
+            1790820300
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   02:05",
+            "周四 2026-10-01   02:05",
+            "周四 2026-10-01   02:05",
+            "周四 2026-10-01   02:05"
+          ]
+        },
+        {
+          "name": "mixed-crosshair-only",
+          "draws": 2,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790818200,
+            1790818200,
+            1790818200,
+            1790818200
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   01:30",
+            "周四 2026-10-01   01:30",
+            "周四 2026-10-01   01:30",
+            "周四 2026-10-01   01:30"
+          ]
+        },
+        {
+          "name": "mixed-time-only",
+          "draws": 45,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790800200,
+            1790818200,
+            1790818200,
+            1790818200
+          ],
+          "cursor_labels": [
+            "周三 2026-09-30   20:30",
+            "周四 2026-10-01   01:30",
+            "周四 2026-10-01   01:30",
+            "周四 2026-10-01   01:30"
+          ]
+        },
+        {
+          "name": "mixed-range-only",
+          "draws": 105,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [],
+          "cursor_labels": []
+        },
+        {
+          "name": "mixed-all-sync",
+          "draws": 225,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790749800,
+            1790749800,
+            1790749800,
+            1790749800
+          ],
+          "cursor_labels": [
+            "周三 2026-09-30   06:30",
+            "周三 2026-09-30   06:30",
+            "周三 2026-09-30   06:30",
+            "周三 2026-09-30   06:30"
+          ]
+        },
+        {
+          "name": "linked-period-change",
+          "draws": 72,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790906400,
+            1790906400,
+            1790906400,
+            1790906400
+          ],
+          "cursor_labels": [
+            "周五 2026-10-02   02:00",
+            "周五 2026-10-02   02:00",
+            "周五 2026-10-02   02:00",
+            "周五 2026-10-02   02:00"
+          ]
+        },
+        {
+          "name": "post-refresh-linked-drag",
+          "draws": 66,
+          "missing": 0,
+          "blank": 0,
+          "cursor_times": [
+            1790866800,
+            1790866800,
+            1790866800,
+            1790866800
+          ],
+          "cursor_labels": [
+            "周四 2026-10-01   15:00",
+            "周四 2026-10-01   15:00",
+            "周四 2026-10-01   15:00",
+            "周四 2026-10-01   15:00"
+          ]
+        }
+      ]
+    }
+  ],
+  "controlled": [
+    {
+      "experiment": "warmup-settled",
+      "resolution": "5",
+      "completed": true,
+      "synthetic": true,
+      "delay_ms": 1200,
+      "gesture": "rapidlong",
+      "requests": 7,
+      "draws": 155,
+      "missing": 0,
+      "blank": 0,
+      "retry_stable_requests": null,
+      "boundary_stable": null,
+      "source": "/tmp/mw-viewport-implementation/warmup-settled.json"
+    },
+    {
+      "experiment": "warmup-settled",
+      "resolution": "1D",
+      "completed": true,
+      "synthetic": true,
+      "delay_ms": 1200,
+      "gesture": "rapidlong",
+      "requests": 7,
+      "draws": 160,
+      "missing": 0,
+      "blank": 0,
+      "retry_stable_requests": null,
+      "boundary_stable": null,
+      "source": "/tmp/mw-viewport-implementation/warmup-settled.json"
+    },
+    {
+      "experiment": "warmup-result",
+      "resolution": "5",
+      "completed": true,
+      "synthetic": true,
+      "delay_ms": 1200,
+      "gesture": "rapidlong",
+      "requests": 7,
+      "draws": 160,
+      "missing": 7,
+      "blank": 6,
+      "retry_stable_requests": null,
+      "boundary_stable": null,
+      "source": "/tmp/mw-viewport-implementation/warmup-result.json"
+    },
+    {
+      "experiment": "warmup-result",
+      "resolution": "1D",
+      "completed": true,
+      "synthetic": true,
+      "delay_ms": 1200,
+      "gesture": "rapidlong",
+      "requests": 8,
+      "draws": 159,
+      "missing": 0,
+      "blank": 0,
+      "retry_stable_requests": null,
+      "boundary_stable": null,
+      "source": "/tmp/mw-viewport-implementation/warmup-result.json"
+    },
+    {
+      "experiment": "error-result",
+      "resolution": "5",
+      "completed": true,
+      "synthetic": true,
+      "delay_ms": 100,
+      "gesture": "idle",
+      "requests": 5,
+      "draws": 0,
+      "missing": 0,
+      "blank": 0,
+      "retry_stable_requests": 5,
+      "boundary_stable": null,
+      "source": "/tmp/mw-viewport-implementation/error-result.json"
+    },
+    {
+      "experiment": "miss-result",
+      "resolution": "5",
+      "completed": true,
+      "synthetic": true,
+      "delay_ms": 100,
+      "gesture": "idle",
+      "requests": 5,
+      "draws": 0,
+      "missing": 0,
+      "blank": 0,
+      "retry_stable_requests": 5,
+      "boundary_stable": null,
+      "source": "/tmp/mw-viewport-implementation/miss-result.json"
+    },
+    {
+      "experiment": "boundary-result",
+      "resolution": "5",
+      "completed": true,
+      "synthetic": true,
+      "delay_ms": 100,
+      "gesture": "boundary",
+      "requests": 9,
+      "draws": 300,
+      "missing": 82,
+      "blank": 80,
+      "retry_stable_requests": null,
+      "boundary_stable": {
+        "requests": 9,
+        "endOfData": true
+      },
+      "source": "/tmp/mw-viewport-implementation/boundary-result.json"
+    },
+    {
+      "experiment": "no-study-prefix",
+      "resolution": "5",
+      "completed": true,
+      "synthetic": true,
+      "delay_ms": 800,
+      "gesture": "rapidlong",
+      "requests": 7,
+      "draws": 153,
+      "missing": 0,
+      "blank": 0,
+      "retry_stable_requests": null,
+      "boundary_stable": null,
+      "source": "/tmp/mw-viewport-implementation/no-study-prefix.json"
+    },
+    {
+      "experiment": "error-eight-final",
+      "charts": 8,
+      "synthetic": true,
+      "shared_symbol": true,
+      "completed": true,
+      "requests": 5,
+      "reserve_requests": 4,
+      "stationary_requests": 5,
+      "all_peer_retry_counts": 4,
+      "source": "/tmp/mw-viewport-implementation/error-eight-final.json"
+    },
+    {
+      "experiment": "miss-eight-final",
+      "charts": 8,
+      "synthetic": true,
+      "shared_symbol": true,
+      "completed": true,
+      "requests": 5,
+      "reserve_requests": 4,
+      "stationary_requests": 5,
+      "all_peer_retry_counts": 4,
+      "source": "/tmp/mw-viewport-implementation/miss-eight-final.json"
+    }
+  ],
+  "implementation_sha256": {
+    "advanced-host/native-reserve.js": "b43ced95d908fcb07ef09b64979402d8de817366b2437319635f0aa7c792f72a",
+    "advanced-host/patch-native-reserve.mjs": "4478bae170aed4d695f6338693994a1e8d35155cd72dfa8155281bb12de5c80c",
+    "advanced-host/bridge.js": "0ab56985ac9a58fbf077ef6a2e34167c56ec0131f3b9ad1e7ba022fe62ab3ccc",
+    "advanced-host/build-assets.mjs": "c0cfcaa967707e182d160e95243a92042b032b4b77690f0a97a0b023ab961181",
+    "web/src/advanced/AdvancedWorkspace.tsx": "f26ceb30f0d101c110fde4f276443c3b5a68090a3dbf4392e0a82e3b07562fc7",
+    "backend/alerts/chart_api.py": "ae67b3080a8ce55fdd0f0e0e266e9e074aee34fa0194bdccdfa5716b4d60d5a4",
+    "backend/alerts/provider_cache.py": "bb1b37304ceaa854e98cd93e1a24caba82027f77c83f15aa4cd6ef5f04285c47",
+    "backend/alerts/provider_history_policy.py": "362c74b6111dd7c7c38a0db42be5522a6f32aa0e5471fa3d017eb54d92d4c448",
+    "web/tests/advanced-viewport-sync.browser.cjs": "aee3c06d59b5687e9683625f6b026de7da4a09561375fdb65fe1068c89b538a4",
+    "web/tests/advanced-viewport-reserve.browser.cjs": "a6367010731cd1aa4aab74794814f0a8d3b5394821e86d38d84be82fa8c005e4"
+  },
+  "images": [
+    "market-watch-api:viewport-5717f81 sha256:8dda2d279bb3e8ad92886ebc2b3289916c3e10b5396ab3afe447d1b5735341d6",
+    "market-watch-web:viewport-5717f81 sha256:81877f66b7bf26ea31de9818b9aa1f761bff403960211bfbfced9243862e35ad",
+    "market-watch-chart-origin:viewport-5717f81 sha256:2d3f11ad8d39324253b8c2298d7499803b77b2e945f2b77c9e7a54d5b97ea985"
+  ],
+  "deployed_release": {
+    "source": "/tmp/mw-viewport-acceptance/deployed-release.json",
+    "sha256": "cc508f289db7381bae761075ad67ae8ea75da8ef9633442fcf0c93a4da3584ae",
+    "passed": true,
+    "charts": 4,
+    "peer_symbol": "MWP:XAUUSD",
+    "draws": 1170
+  },
+  "disabled_image": "market-watch-chart-origin:viewport-7394305-disabled sha256:860a6ee7f6358480b6e41185f6647b42b0251a27b05e5b484ca74b0a6eac4f7c",
+  "review": {
+    "fixed_point": "5dd196e",
+    "implementation_commits": [
+      "7ea4110",
+      "7394305",
+      "5717f81"
+    ],
+    "standards": {
+      "documented_violations": 0,
+      "original_material_findings": 1,
+      "remaining_material_findings": 0
+    },
+    "spec": {
+      "original_implementation_findings": 2,
+      "original_verification_gaps": 1,
+      "remaining_findings": 0
+    },
+    "fixed": [
+      "shared thread error/miss allowance and backoff",
+      "stale completion identity fence",
+      "new/rejoined pane viewport restart baseline",
+      "independent mixed-period sync and recorded lifecycle dragging",
+      "mixed failures/cache misses count toward one four-attempt allowance"
+    ]
+  },
+  "regression": {
+    "backend": {
+      "passed": 131,
+      "source": "/tmp/mw-viewport-acceptance/backend-final.log"
+    },
+    "postgres": {
+      "passed": 16,
+      "source": "/tmp/mw-viewport-acceptance/postgres-final.log"
+    },
+    "javascript_existing_groups": 12,
+    "javascript_new_groups": [
+      "native-reserve-scheduler",
+      "native-reserve-lifetime"
+    ],
+    "layout_cases": 7
+  },
+  "disabled_smoke": {
+    "passed": true,
+    "reserve_requests": 0,
+    "original_native_missing_render_samples": 73,
+    "notes": "fallback preserves original engine behavior; finite native drag undo commands allowed"
+  },
+  "final_runtime_acceptance": {
+    "commit": "5717f81",
+    "charts": 4,
+    "peer_symbol": "MWP:XAUUSD",
+    "passed": true,
+    "phases": 10,
+    "draws": 1179,
+    "missing": 0,
+    "blank": 0,
+    "source": "/tmp/mw-viewport-acceptance/final-sync.json",
+    "sha256": "f1797f0995641dd3fddb6596c7c3f5e7c1fb0a593ac2b5ae6a214ab8fb6586d6"
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "candidate_source_revision": "ed936873445311fcbe8d16be6c81958d8aa50c41",
+  "environment": "isolated PG14 clone of current production; real provider OHLC; TLS tunnel; actual licensed v31.1.0 library with observation-only render probes",
+  "backend": {
+    "passed": 436,
+    "skipped": 35,
+    "duration_seconds": 69.24
+  },
+  "postgres": {
+    "passed": 18
+  },
+  "deterministic_javascript_groups": 42,
+  "reviews": {
+    "standards": "passed; no blockers at ed93687",
+    "spec": "passed; no blockers; Yahoo expired-metadata sentinel has zero upstream calls"
+  },
+  "migration": {
+    "from": "p17_volume",
+    "to": "q18_yahoo_catalog",
+    "business_tables_unchanged": 35,
+    "user_state_fingerprints_unchanged": 6,
+    "old_v150_readyz_on_q18": 200
+  },
+  "reserve": [
+    {
+      "count": 1,
+      "passed": true,
+      "renders": 156,
+      "missing": 0,
+      "blank": 0,
+      "reserve_requests": 1,
+      "mandatory_zero": true,
+      "candles_http_attempts_empty": true
+    },
+    {
+      "count": 2,
+      "passed": true,
+      "renders": 153,
+      "missing": 0,
+      "blank": 0,
+      "reserve_requests": 2,
+      "mandatory_zero": true,
+      "candles_http_attempts_empty": true
+    },
+    {
+      "count": 4,
+      "passed": true,
+      "renders": 149,
+      "missing": 0,
+      "blank": 0,
+      "reserve_requests": 5,
+      "mandatory_zero": true,
+      "candles_http_attempts_empty": true
+    },
+    {
+      "count": 8,
+      "passed": true,
+      "renders": 153,
+      "missing": 0,
+      "blank": 0,
+      "reserve_requests": 4,
+      "mandatory_zero": true,
+      "candles_http_attempts_empty": true
+    }
+  ],
+  "sync": [
+    {
+      "count": 2,
+      "passed": true,
+      "phases": [
+        {
+          "name": "crosshair-only",
+          "renders": 0,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "time-only",
+          "renders": 31,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "range-only",
+          "renders": 162,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "all-sync",
+          "renders": 154,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-crosshair-only",
+          "renders": 0,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-time-only",
+          "renders": 31,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-range-only",
+          "renders": 48,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-all-sync",
+          "renders": 107,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "linked-period-change",
+          "renders": 30,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "post-refresh-linked-drag",
+          "renders": 27,
+          "missing": 0,
+          "blank": 0
+        }
+      ],
+      "reserve_requests": 4,
+      "mandatory_zero": true,
+      "candles_http_attempts_empty": true
+    },
+    {
+      "count": 4,
+      "passed": true,
+      "phases": [
+        {
+          "name": "crosshair-only",
+          "renders": 10,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "time-only",
+          "renders": 39,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "range-only",
+          "renders": 314,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "all-sync",
+          "renders": 309,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-crosshair-only",
+          "renders": 0,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-time-only",
+          "renders": 36,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-range-only",
+          "renders": 94,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-all-sync",
+          "renders": 207,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "linked-period-change",
+          "renders": 50,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "post-refresh-linked-drag",
+          "renders": 48,
+          "missing": 0,
+          "blank": 0
+        }
+      ],
+      "reserve_requests": 5,
+      "mandatory_zero": true,
+      "candles_http_attempts_empty": true
+    },
+    {
+      "count": 8,
+      "passed": true,
+      "phases": [
+        {
+          "name": "crosshair-only",
+          "renders": 15,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "time-only",
+          "renders": 46,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "range-only",
+          "renders": 553,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "all-sync",
+          "renders": 566,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-crosshair-only",
+          "renders": 0,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-time-only",
+          "renders": 54,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-range-only",
+          "renders": 157,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "mixed-all-sync",
+          "renders": 377,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "linked-period-change",
+          "renders": 96,
+          "missing": 0,
+          "blank": 0
+        },
+        {
+          "name": "post-refresh-linked-drag",
+          "renders": 91,
+          "missing": 0,
+          "blank": 0
+        }
+      ],
+      "reserve_requests": 9,
+      "mandatory_zero": true,
+      "candles_http_attempts_empty": true
+    }
+  ],
+  "readonly_browser": {
+    "passed": true,
+    "mobile_width": 390,
+    "mobile_overflow": false,
+    "native_readonly_width": 640,
+    "secure_cookie": true,
+    "http_only_cookie": true,
+    "credential_isolation": "localhost ports share cookie host; actual public-domain assertion deferred to production verification"
+  },
+  "source_and_evidence_hashes": {
+    "reserve.json": "53bb2affea7551d8677cdb5ebe6c2c413dac648cd4d6bf113749e19f8a4e6d5c",
+    "sync.json": "7ad770086f87335e8efa0aec7f12d87ad94d478a4bd040617dbcb51f04f3fe74",
+    "advanced-viewport-reserve.browser.cjs": "5b7b9ab48c55b7463485ad683aeac1287cccc52346289022341bbf6e95f64fd2",
+    "advanced-viewport-sync.browser.cjs": "c4cc15347d39c7220f056184887b378b7a7513cf3f99dc587340bb5020f3cd7e",
+    "backend-final.log": "c994e009473f886fe2266f608ad5aedefaaef4394a1e77cc960fb3bfac0ca578"
+  }
+}
