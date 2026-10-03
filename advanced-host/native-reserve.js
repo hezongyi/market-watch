@@ -2,6 +2,7 @@
  * register its existing threads/models; the host supplies PG-only reads. */
 const MWNativeReserve = (() => {
   const models = new Map(), threads = new Map(), flights = new Map();
+  const retries = new WeakMap();
   const key = (symbol, resolution) => `${symbol}|${resolution}`;
   let transport, calculationPrefix = () => 0;
   const enabled = globalThis.MW_NATIVE_RESERVE_ENABLED !== false &&
@@ -19,6 +20,9 @@ const MWNativeReserve = (() => {
   }
   function schedule(m, delay = 0) {
     const state = models.get(m);
+    if (state?.timer && state.identity !== identity(m)) {
+      clearTimeout(state.timer); state.timer = 0;
+    }
     if (!state || state.disposed || state.timer || state.raf) return;
     if (delay) state.timer = setTimeout(() => {state.timer = 0; schedule(m);}, delay);
     else state.raf = requestAnimationFrame(() => {state.raf = 0; check(m);});
@@ -47,16 +51,20 @@ const MWNativeReserve = (() => {
     const k = key(symbol, resolution), thread = threads.get(k);
     if (!thread || thread._destroyed) return;
     if (state.identity !== k) {
-      state.identity = k; state.failures = 0; state.misses = 0; state.retryAt = 0; state.boundary = false;
+      state.identity = k; state.previous = undefined; state.enhancedUntil = 0;
+      state.lastAttemptOffset = g.ts.rightOffset();
     }
+    const retry = retries.get(thread);
     const mode = tier(state, g), deficit = Math.ceil(mode.threshold * g.screen - g.reserve);
     state.screen = g.screen; state.batch = mode.batch;
     if (g.ts._requestingMoreData) return;
-    if ((state.failures >= 4 || state.misses >= 4) &&
+    if ((retry.failures >= 4 || retry.misses >= 4) &&
+        Number.isFinite(state.lastAttemptOffset) &&
         Math.abs(g.ts.rightOffset() - state.lastAttemptOffset) >= g.screen / 4) {
-      state.failures = 0; state.misses = 0; state.retryAt = 0;
+      retry.failures = 0; retry.misses = 0; retry.retryAt = 0;
     }
-    if (deficit <= 0 || state.failures >= 4 || state.misses >= 4 || now() < state.retryAt) return;
+    if (deficit <= 0 || retry.failures >= 4 || retry.misses >= 4) return;
+    if (now() < retry.retryAt) {schedule(m, retry.retryAt - now()); return;}
     const available = cachedExtra(thread, g);
     // Native engine requests two alignment bars even without an indicator.
     // Keep indicator warmup in the adapter cache when promoting hidden history.
@@ -67,39 +75,44 @@ const MWNativeReserve = (() => {
       g.ts.requestMoreHistoryPoints(Math.min(deficit, available - prefix));
       schedule(m); return;
     }
-    if (state.boundary || thread._endOfData || g.ts._endOfData) return;
+    if (retry.boundary || thread._endOfData || g.ts._endOfData) return;
     if (thread._requesting) return;
     if (flights.has(k)) {await flights.get(k); schedule(m); return;}
     const before = thread._cache.bars[0]?.time;
     if (!before) return;
     const requestBefore = thread._dealignTime(before);
     const started = now();
-    state.lastAttemptOffset = g.ts.rightOffset();
+    // Each pane compares subsequent movement with its own geometry. A peer
+    // with a different viewport must not restart the shared retry allowance.
+    for (const [model, entry] of models) if (identity(model) === k)
+      entry.lastAttemptOffset = model.timeScale().rightOffset();
+    const current = () => !thread._destroyed && threads.get(k) === thread;
     const flight = (async () => {
       try {
         const result = await transport({symbol, resolution, before:requestBefore,
           screen_bars: g.screen, batch_screens: mode.batch, warmup_bars: warmup});
-        if (now() - started >= 800) state.enhancedUntil = now() + 10000;
-        if (thread._destroyed || threads.get(k) !== thread || state.identity !== k) return;
+        if (!current()) return;
+        if (now() - started >= 800)
+          for (const [model, entry] of models) if (identity(model) === k)
+            entry.enhancedUntil = now() + 10000;
         const rows = result.bars.filter(b => b.time < requestBefore);
         if (rows.length && !thread._requesting && thread._cache.bars[0]?.time === before) {
           thread._processBars(rows, {noData: result.history_boundary === true});
-          state.failures = 0; state.misses = 0; state.retryAt = 0;
+          retry.failures = 0; retry.misses = 0; retry.retryAt = 0;
         } else if (!rows.length) {
-          if (result.history_boundary) {thread._setEndOfData(); state.boundary = true;}
-          else {state.misses++; state.retryAt = now() + 1500;
-            if(state.misses < 4) schedule(m, 1500);}
+          if (result.history_boundary) {thread._setEndOfData(); retry.boundary = true;}
+          else {retry.misses++; retry.retryAt = now() + 1500;}
         }
       } catch (_) {
-        state.failures++;
-        const delay = Math.min(30000, 1000 * 2 ** (state.failures - 1));
-        state.retryAt = now() + delay;
-        if (state.failures < 4) schedule(m, delay);
+        if (!current()) return;
+        retry.failures++;
+        const delay = Math.min(30000, 1000 * 2 ** (retry.failures - 1));
+        retry.retryAt = now() + delay;
       }
     })();
     flights.set(k, flight);
     await flight;
-    flights.delete(k);
+    if (flights.get(k) === flight) flights.delete(k);
     // Every completion checks finite viewport demand again; no blind extension.
     for (const [model, entry] of models) if (entry.identity === k) schedule(model);
   }
@@ -107,12 +120,15 @@ const MWNativeReserve = (() => {
     configure(read, prefix = () => 0) {transport = read; calculationPrefix = prefix;
       for (const m of models.keys()) schedule(m);},
     bindThread(thread, info, resolution) {
-      if (enabled) threads.set(key(info.ticker || info.name, resolution), thread);
+      if (enabled) {
+        threads.set(key(info.ticker || info.name, resolution), thread);
+        if (!retries.has(thread)) retries.set(thread, {failures:0, misses:0, retryAt:0, boundary:false});
+      }
     },
     unbindThread(thread) {if (threads.get(threadKey(thread)) === thread) threads.delete(threadKey(thread));},
     bindModel(m) {
       if (!enabled || models.has(m)) return;
-      const state = {identity: '', enhancedUntil: 0, failures: 0, retryAt: 0};
+      const state = {identity: '', enhancedUntil: 0};
       models.set(m, state);
       requestAnimationFrame(() => {
         if (!models.has(m)) return;
@@ -151,7 +167,7 @@ const MWNativeReserve = (() => {
     },
     enabled: () => enabled,
     diagnostics: () => ({models: [...models].map(([m, state]) => ({symbol: m.mainSeries().symbol(),
-      resolution: m.interval(), state: {...state}, geometry: (() => {const g = geometry(m);
+      resolution: m.interval(), state: {...state, ...retries.get(threads.get(identity(m)))}, geometry: (() => {const g = geometry(m);
         return g && {screen:g.screen, reserve:g.reserve,
           firstTime:g.ts.points().valueAt(g.points.firstIndex), requesting:g.ts._requestingMoreData};})()})),
       threads: [...threads].map(([k,t]) => ({key:k, cache:t._cache.bars.length,
