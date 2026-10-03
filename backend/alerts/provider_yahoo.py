@@ -314,8 +314,18 @@ def _rows(meta, frame, data, before):
             else start
         )
 
-        prices = [DecimalString(row[name]) for name in ("Open", "High", "Low", "Close")]
+        price_columns = ("Open", "High", "Low", "Close")
+        prices = [DecimalString(row[name]) for name in price_columns]
         if any(v is None for v in prices):
+            # actions=True can add a pure corporate-action row without a price
+            # observation. It is neither a candle nor evidence of completion.
+            volume = row.get("Volume")
+            actions = [DecimalString(row.get(name))
+                       for name in ("Dividends", "Stock Splits", "Capital Gains")]
+            if (all(pd.isna(row[name]) for name in price_columns)
+                    and (pd.isna(volume) or volume == 0)
+                    and any(value is not None and float(value) != 0 for value in actions)):
+                continue
             raise YahooError("invalid_data", "Yahoo OHLC 缺失或不是有限数值")
         o, h, low, c = map(float, prices)
         if h < max(o, c, low) or low > min(o, c, h):

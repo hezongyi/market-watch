@@ -584,6 +584,49 @@ def test_invalid_ohlc_never_commits_lifecycle_or_replaces_cached_prices(
     assert not empty["history_boundary"]
 
 
+@pytest.mark.parametrize("event,value", [("Dividends", 0.25), ("Stock Splits", 4), ("Capital Gains", 0.5)])
+def test_sdk_event_without_prices_does_not_reject_or_complete_price_history(
+    adapter, monkeypatch, event, value
+):
+    from yfinance import utils
+
+    # Exercise the pinned SDK's real merge: an event after the last quotation
+    # creates an OHLC-NaN row which actions=True intentionally retains.
+    quotes = pd.DataFrame({"Open": [10.0], "High": [12.0], "Low": [9.0],
+                           "Close": [11.0], "Adj Close": [11.0], "Volume": [1000]},
+                          index=pd.DatetimeIndex(["2026-01-02"], tz="America/New_York"))
+    events = pd.DataFrame({event: [value]},
+                          index=pd.DatetimeIndex(["2026-01-05"], tz="America/New_York"))
+    data = utils.auto_adjust(utils.safe_merge_dfs(quotes, events, "1d"))
+    assert data.loc[events.index[0], ["Open", "High", "Low", "Close"]].isna().all()
+    monkeypatch.setattr(yahoo, "_history", lambda *a, **k: data)
+    result = yahoo.native_page({**META, "adjustment": "auto"}, "D1",
+                               stamp("2026-01-06T00:00:00Z"), 1)
+    assert len(result["bars"]) == 1
+    assert result["bars"][0]["chart_time"] == stamp("2026-01-02T00:00:00Z")
+    assert result["bars"][0]["close"] == "11.0"
+    assert not result["bars"][0]["complete"], "an event cannot prove a successor price bar"
+    assert not result["history_boundary"]
+
+
+@pytest.mark.parametrize("prices,volume,dividend", [
+    ([None, None, None, None], 0, 0),
+    ([None, None, None, None], 100, 0.25),
+    ([1, None, 0, 1], 0, 0.25),
+    ([float("inf")] * 4, 0, 0.25),
+])
+def test_invalid_price_rows_cannot_masquerade_as_corporate_actions(
+    adapter, prices, volume, dividend
+):
+    data, _ = adapter
+    data.loc[data.index[0], ["Open", "High", "Low", "Close"]] = prices
+    data.loc[data.index[0], "Volume"] = volume
+    data.loc[data.index[0], "Dividends"] = dividend
+    with pytest.raises(yahoo.YahooError) as failure:
+        yahoo.native_page(META, "D1", stamp("2020-04-22T00:00:00Z"), 2)
+    assert failure.value.status == "invalid_data"
+
+
 def test_switch_off_stops_new_background_work(database, monkeypatch):
     monkeypatch.setattr(settings, "yahoo_enabled", False)
     assert service.warm_step("yahoo", "old_cursor") == ("old_cursor", False)
