@@ -1,14 +1,14 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.7.0**，新增 Yahoo 原生七周期行情、延迟报价和平台品种中文搜索，保留独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲、专业图表菜单、账户及工作区操作。源码发布、启用方法及上游限制见[v1.6.0源码交付记录](docs/yahoo-v1.6.0-source-delivery.md)，操作及既有系列规则见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码与生产版本 **v1.7.0**，支持 Yahoo 原生七周期行情、延迟报价和平台品种中文搜索，保留独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲、专业图表菜单、账户及工作区操作。源码发布、启用方法及上游限制见[v1.6.0源码交付记录](docs/yahoo-v1.6.0-source-delivery.md)，操作及既有系列规则见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
 
 v1.7.0 增加原生视窗历史储备，并修复缓存重置及 Yahoo PG-only 储备边界。功能要求见 [实施计划](docs/native-viewport-history-buffer-plan.md)，发布与部署记录见 [v1.7.0 交付](docs/chart-v1.7.0-delivery.md)。
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。后续功能选项见[图表能力清单](docs/advanced-charts-v31-future-integration-capability-research.md)，MT4 接入路线见[Windows 桥接研究](docs/mt4-live-trading-bridge-research.md)。
 
-v1.6.0 的 Yahoo 行情及审查修复通过 PR #5 合入 main，版本及发布记录整理后以附注标签固定并推送源码；源码清单见 [v1.6.0-source.json](deploy/releases/v1.6.0-source.json)。生产运行版本由独立部署清单管理，本次源码发布未升级运行镜像。
+PR #6 已合入 main，附注标签 `v1.7.0` 指向 `e40eaac` 并已推送。Unraid 生产已从 v1.5.0 升级；四类镜像由该标签源码构建，实际镜像、备份恢复与验收见 [v1.7.0-production.json](deploy/releases/v1.7.0-production.json)。
 
-源码主目录：`/home/quant/repos/market-watch`；独立开发工作树继续保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。图表UI隔离实例仍以[v1.3.2专用清单](deploy/releases/v1.3.2-ui.json)为准，Volume和原生历史镜像保留各自原清单，本次源码发布不包含运行环境升级。源码新增从 `p17_volume` 派生的 `q18_yahoo_catalog` 加法迁移，仅增加目录元数据；Yahoo 默认关闭，启用需应用迁移并配置后端代理。历史量partial限制及既有Volume迁移/回退见[v1.3.3本机交付](docs/chart-v1.3.3-delivery.md)，账户回退要求见[v1.5.0源码交付](docs/chart-v1.5.0-source-delivery.md)。
+源码主目录：`/home/quant/repos/market-watch`；独立开发工作树继续保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。既有隔离实例与历史镜像保留原清单；当前生产以 v1.7.0 清单为准。生产已应用 `p17_volume`→`q18_yahoo_catalog` 加法迁移，仅增加目录元数据；Yahoo 默认及当前生产仍关闭，启用需配置后端代理。历史量partial限制及既有Volume迁移/回退见[v1.3.3本机交付](docs/chart-v1.3.3-delivery.md)，账户回退要求见[v1.5.0源码交付](docs/chart-v1.5.0-source-delivery.md)。
 
 ## 当前实例
 
@@ -78,7 +78,7 @@ npm run build
 
 ## 生产部署
 
-生产使用 `compose.external-db.yaml` 与固定镜像版本文件 `compose.release.yaml`，复用Unraid现有PG14；操作步骤见[部署手册](deploy/remote-docker.md)。不要将原`compose.yaml`与此配置混用。
+生产使用独立 `compose.release.yaml`，复用 Unraid 现有 PG14；固定配置见 [v1.7.0-production.yaml](deploy/releases/v1.7.0-production.yaml)，操作步骤见 [部署手册](deploy/remote-docker.md)。该发布文件单独使用，不与旧 Compose 文件叠加。
 
 API异常退出自动恢复、HTTPS浏览器登录及手机确认已验证；锁屏验收由用户确认通过，整机重启测试按用户要求取消，详见交付矩阵。使用ntfy原生应用，不开发配套APK。
 
@@ -90,4 +90,4 @@ TA-Lib Python（BSD-2-Clause）、NumPy（BSD-3-Clause）、FastAPI（MIT）、R
 
 从工作台导航进入独立图表页面，支持多工作区、多图同步、八种画线和Python指标。
 [操作与维护](docs/chart-workspace-implementation.md) · [验收记录](docs/chart-workspace-acceptance.md)。
-本地版本与生产部署分开管理；本次图表模块尚未部署Unraid。
+专业图表已在 Unraid 生产部署；当前版本与验收以 v1.7.0 生产清单为准。

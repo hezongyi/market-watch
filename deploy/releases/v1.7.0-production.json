@@ -1,0 +1,242 @@
+{
+  "version": "1.7.0",
+  "accepted": true,
+  "deployed": true,
+  "release_tag": "v1.7.0",
+  "release_tag_object": "1eee650c76633e70d8eb2e77324a312e310590c7",
+  "source_commit": "e40eaacfb83a759b2c7fdcfaa58dcbf2fb0e9758",
+  "pr": {
+    "number": 6,
+    "url": "https://github.com/hezongyi/market-watch/pull/6",
+    "merged": true,
+    "merged_at": "2026-10-03T12:08:15Z"
+  },
+  "cutover_at": "2026-10-03T12:19:09.083020+00:00",
+  "host": "unraid",
+  "project": "trading-alerts",
+  "release_directory": "/mnt/user/appdata/trading-alerts/releases/v1.7.0-e40eaac",
+  "active_release": "releases/v1.7.0-e40eaac",
+  "compose": "deploy/releases/v1.7.0-production.yaml",
+  "previous_runtime_version": "1.5.0",
+  "source_archive_sha256": "8727c2022f50e17874c0143283e9498131f0d55d23944e37e92d893badfc98f9",
+  "images": {
+    "api": {
+      "tag": "trading-alerts-api:v1.7.0-e40eaac",
+      "id": "sha256:2a481996fb103d7b009b86d3b0791fb366a83fafb25b07be2d08496bfc917b89",
+      "source_revision": "e40eaacfb83a759b2c7fdcfaa58dcbf2fb0e9758"
+    },
+    "web": {
+      "tag": "trading-alerts-web:v1.7.0-e40eaac",
+      "id": "sha256:968fc325cd4a5a11491a694e85090de196b0f72a8a6e213454f8fa714ebc7d3c",
+      "source_revision": "e40eaacfb83a759b2c7fdcfaa58dcbf2fb0e9758"
+    },
+    "chart-origin": {
+      "tag": "trading-alerts-chart-origin:v1.7.0-e40eaac",
+      "id": "sha256:8b4fee24594f7f82f26db4e1d2c45bca6828e2fe38c4268c39e0b204a6a82c46",
+      "source_revision": "e40eaacfb83a759b2c7fdcfaa58dcbf2fb0e9758"
+    },
+    "backup": {
+      "tag": "trading-alerts-backup:v1.7.0-e40eaac",
+      "id": "sha256:bb9a9845efe4ea8e5e59918a61565125948aaa7033db46330748666a96171ba3",
+      "source_revision": "e40eaacfb83a759b2c7fdcfaa58dcbf2fb0e9758"
+    }
+  },
+  "candidate_runtime_layers_match": {
+    "api": true,
+    "web": true,
+    "chart-origin": true
+  },
+  "services": [
+    {
+      "service": "api",
+      "image": "trading-alerts-api:v1.7.0-e40eaac",
+      "image_id": "sha256:2a481996fb103d7b009b86d3b0791fb366a83fafb25b07be2d08496bfc917b89",
+      "running": true,
+      "restart_count": 0,
+      "health": "healthy"
+    },
+    {
+      "service": "realtime-worker",
+      "image": "trading-alerts-api:v1.7.0-e40eaac",
+      "image_id": "sha256:2a481996fb103d7b009b86d3b0791fb366a83fafb25b07be2d08496bfc917b89",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck"
+    },
+    {
+      "service": "chart-history-worker",
+      "image": "trading-alerts-api:v1.7.0-e40eaac",
+      "image_id": "sha256:2a481996fb103d7b009b86d3b0791fb366a83fafb25b07be2d08496bfc917b89",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image": "trading-alerts-api:v1.7.0-e40eaac",
+      "image_id": "sha256:2a481996fb103d7b009b86d3b0791fb366a83fafb25b07be2d08496bfc917b89",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck"
+    },
+    {
+      "service": "notify-worker",
+      "image": "trading-alerts-api:v1.7.0-e40eaac",
+      "image_id": "sha256:2a481996fb103d7b009b86d3b0791fb366a83fafb25b07be2d08496bfc917b89",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck"
+    },
+    {
+      "service": "web",
+      "image": "trading-alerts-web:v1.7.0-e40eaac",
+      "image_id": "sha256:968fc325cd4a5a11491a694e85090de196b0f72a8a6e213454f8fa714ebc7d3c",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck"
+    },
+    {
+      "service": "chart-origin",
+      "image": "trading-alerts-chart-origin:v1.7.0-e40eaac",
+      "image_id": "sha256:8b4fee24594f7f82f26db4e1d2c45bca6828e2fe38c4268c39e0b204a6a82c46",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck"
+    }
+  ],
+  "schema": {
+    "before": "p17_volume",
+    "after": "q18_yahoo_catalog",
+    "business_table_counts_unchanged": 35,
+    "user_state_fingerprints_unchanged": 6
+  },
+  "reviews": {
+    "standards": "passed; no blockers",
+    "spec": "passed; no blockers"
+  },
+  "verification": {
+    "candidate_audit": "docs/verification/viewport-release-v1.7.0/candidate-audit.json",
+    "backend_passed": 436,
+    "backend_skipped": 35,
+    "independent_postgres_passed": 18,
+    "javascript_groups": 42,
+    "candidate_reserve_renders": 611,
+    "candidate_sync_renders": 3652,
+    "missing_history_and_blank_renders": 0,
+    "production_browser": {
+      "passed": true,
+      "checkedAt": "2026-10-03T12:19:47.886Z",
+      "secureCookie": true,
+      "httpOnlyCookie": true,
+      "errors": [],
+      "failures": [],
+      "chartCredentialLeaks": [],
+      "mobileOverflow": false,
+      "productionWorkspaceCount": 1,
+      "productionPreferences": 20,
+      "workerStatus": {
+        "market_heartbeat": "running",
+        "notify_heartbeat": "running",
+        "import_heartbeat": "stale"
+      },
+      "nativeDiagnostics": {
+        "enabled": true,
+        "models": 1,
+        "threads": 1,
+        "charts": 1,
+        "allReady": true
+      },
+      "reserveResponses": [
+        {
+          "status": 200,
+          "mandatory": 0,
+          "optional": 58,
+          "reserve_status": "ready",
+          "attempts": []
+        }
+      ],
+      "nativeReadOnly": true,
+      "emptyWorkspaceEntry": false,
+      "actualPasswordChanged": false,
+      "notificationTestSent": false
+    },
+    "production_readonly_state": {
+      "at": 1791030404717,
+      "schema": "q18_yahoo_catalog",
+      "user_state_preserved": {
+        "advanced_chart_workspaces": true,
+        "advanced_chart_preferences": true,
+        "watches": true
+      },
+      "account_credential_unchanged": true,
+      "notification_settings_unchanged": true,
+      "preference_keys_changed_by_normal_workers": [
+        "upstream_slots:binance",
+        "upstream_slots:oanda"
+      ],
+      "notification_test_events_added": 0,
+      "market_and_notify_heartbeats_fresh": true,
+      "worker_progress_counts": {
+        "import_jobs": 704,
+        "chart_published_bars": 34966,
+        "chart_aggregation_jobs": 0,
+        "chart_publication_jobs": 0,
+        "provider_bars": 237241
+      },
+      "yahoo_enabled": false,
+      "legacy_import_heartbeat": "not emitted by the dedicated chart-history-worker; stale predates this release"
+    },
+    "healthz": 200,
+    "readyz": 200,
+    "chart_origin": 200,
+    "chart_api": 404
+  },
+  "backups": {
+    "pre": {
+      "file": "/backups/alerts-20261003T121811948105Z.dump",
+      "sha256": "428f33abf5c30dd330ce81583d59c596c4836e88220c92488e3d0dddee1c0fa0",
+      "bytes": 32622226,
+      "restore_verified": true,
+      "restore_tables": 35,
+      "restore_environment": "independent PG14 validation server; temporary database removed by restore_check"
+    },
+    "post": {
+      "file": "/backups/alerts-20261003T121943052192Z.dump",
+      "sha256": "f39a929b62b33d9d90e4066a4174eb8878d5390ad00bf312e3c15a0b358af29b",
+      "bytes": 32623188,
+      "restore_verified": true,
+      "restore_tables": 35,
+      "restore_environment": "independent PG14 validation server; temporary database removed by restore_check"
+    }
+  },
+  "configuration_backup": {
+    "file": "/mnt/user/backup/trading-alerts/config-20261003T121950Z-lXCZpm.tar.gz",
+    "sha256": "d930fbefef3b4dab4300c8e36f90307c8cda86dceaea827728c488fa68a933f5",
+    "archive_verified": true,
+    "isolated_extraction_verified": true,
+    "env_byte_identical": true,
+    "compose_quiet_validation_passed": true
+  },
+  "deployment_attempts": {
+    "first": "Fresh backup succeeded; restore-check failed because production role lacks CREATE DATABASE; previous images restarted before migration. No permissions changed.",
+    "final": "Fresh backup restored and checked on independent PG14; migration and service cutover passed."
+  },
+  "rollback": {
+    "previous_compose_private_path": "/mnt/user/appdata/trading-alerts/releases/v1.7.0-e40eaac/validation/rollback/compose.release.yaml",
+    "old_images_preserved": true,
+    "old_v150_readyz_on_q18_verified": 200,
+    "database_restore_automatic": false,
+    "procedure": "Stop project writers, back up current state, restore previous compose/scripts/active-release, start old services and restart web. Retain additive q18; do not automatically downgrade or overwrite new user data."
+  },
+  "scope_limits": [
+    "Yahoo remains disabled in current production configuration.",
+    "New native reserve does not guarantee arbitrary-speed drags before buffers are established.",
+    "Legacy import_heartbeat remains stale: dedicated chart-history-worker does not emit that legacy metric. Worker process/queue and market/notify freshness independently checked.",
+    "Database and configuration restore checks do not constitute a fresh-machine disaster recovery drill."
+  ],
+  "notifications_sent_by_validation": false,
+  "account_password_changed": false,
+  "production_layout_mutations": false,
+  "private_licensed_assets_committed": false,
+  "cleanup": "Dedicated clone containers/network and temporary credential/config copies removed after evidence capture; production and rollback images retained."
+}

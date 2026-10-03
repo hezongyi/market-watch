@@ -1,5 +1,27 @@
 # Unraid 生产部署与升级
 
+## 当前 v1.7.0（2026-10-03）
+
+生产为 v1.7.0，schema `q18_yahoo_catalog`，发布源码 `e40eaac`。实际四类镜像和恢复证据见 [生产清单](releases/v1.7.0-production.json)，固定 standalone 配置见 [Compose](releases/v1.7.0-production.yaml)。API、四个 worker、web、独立 chart-origin 常驻；迁移服务退出 0。web 仍为 192.168.7.33:18080，chart-origin 为 :18083。数据库池 size=2、overflow=0 保留，行情／图表 worker 投递关闭，notify 保留既有生产配置。
+
+实际启动仅使用服务器项目根目录的独立文件：
+
+```bash
+cd /mnt/user/appdata/trading-alerts
+./tools/docker-compose -f compose.release.yaml config --quiet
+./tools/docker-compose -f compose.release.yaml up -d --no-build
+```
+
+该文件不要与 `compose.external-db.yaml` 或 `compose.yaml` 叠加。API 重建后重启 web 刷新 Nginx 上游。只操作本项目，不重启共享 PG14 或其他服务。
+
+`deploy/active-release` 为 `releases/v1.7.0-e40eaac`。每日脚本使用当前 Compose 的固定 PG14 backup 镜像，数据库及私密配置归档仍保存在 `/mnt/user/backup/trading-alerts`。生产 DB 账号无 CREATE DATABASE 权限；恢复演练使用独立 PG14 与独立账号，不能直接在生产连接执行需要该权限的 restore-check，也不为演练提升生产权限。最新实际恢复 35 表及配置解包校验已通过；未重测整机重启或手机响铃。
+
+回退配置保存在发布目录 `validation/rollback/`；旧 v1.5.0 已验证可读 q18。先停本项目写入并备份当前状态，再恢复旧配置／镜像；不要自动降级或覆盖用户新数据。完整流程见 [v1.7.0 交付](../docs/chart-v1.7.0-delivery.md)。
+
+## 2026-09-29 历史记录
+
+下文保留旧部署来源及演练记录。当前运行和命令以上方 v1.7.0 清单为准。
+
 ## 当前部署
 
 - 网站：**https://trade.kookvv.com:8443**。反向代理后端为192.168.7.33:18080。

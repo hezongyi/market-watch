@@ -1,6 +1,6 @@
 # v1.7.0 修复后复审及运行验收
 
-2026-10-03；候选源码 `ed936873445311fcbe8d16be6c81958d8aa50c41`。最新 main v1.6.0 已并入，原两项 P1 均已修复。发布前运行结果见 [candidate-audit.json](candidate-audit.json)；最终标签、镜像和生产状态见 `deploy/releases/v1.7.0-production.json`，该清单在部署完成后归档。
+2026-10-03；候选源码 `ed936873445311fcbe8d16be6c81958d8aa50c41`。最新 main v1.6.0 已并入，原两项 P1 均已修复。发布前运行结果见 [candidate-audit.json](candidate-audit.json)；最终标签、镜像和生产状态见 `deploy/releases/v1.7.0-production.json`，该清单已归档生产部署与正式域名验证。
 
 ## Standards
 
@@ -21,3 +21,5 @@
 隔离浏览器登录、历史演练、设置、原生只读和手机溢出通过；相同 localhost 的不同端口共享 Cookie 域，凭证域隔离需在正式域名核查，未将该环境的 Cookie 行为冒称产品泄漏或隔离验证通过。隔离 worker 未启动，因此其心跳不用于生产健康判断。
 
 原始 v1.5.2 验收仍在 `docs/verification/viewport-history/`；本目录只记录修复后的候选构建。本次测试没有改生产密码、布局或发送测试通知。
+
+最终标签 e40eaac 的正式镜像运行层与候选一致；生产于 12:19 UTC 切换，正式域名凭证隔离、原生只读及储备响应通过。升级前后备份独立恢复和配置恢复通过，准确状态见生产清单。

@@ -21,13 +21,13 @@
 .venv/bin/python -m alerts.backup --restore-check backups/alerts-具体时间.dump
 ```
 
-恢复检查需要当前连接有 CREATE DATABASE 权限。它新建随机名称 `alerts_restore_<uuid>` 的临时数据库，使用 pg_restore 恢复并核对所有业务表记录数，最后删除自己创建的临时库。不会覆盖源库、不会启动通知/行情进程，也不会发送手机消息。SHA-256 不匹配时拒绝恢复。命令返回非零表示未通过；程序对外只显示错误类别，避免输出连接凭据。
+恢复检查需要当前连接有 CREATE DATABASE 权限。当前生产账号没有该权限，v1.7.0 已使用独立 PG14 服务器／账号恢复新备份并核对 35 张业务表；不要给生产账号临时提权，也不要将下面的 restore-check 命令直接用于当前生产连接。它新建随机名称 `alerts_restore_<uuid>` 的临时数据库，使用 pg_restore 恢复并核对所有业务表记录数，最后删除自己创建的临时库。不会覆盖源库、不会启动通知/行情进程，也不会发送手机消息。SHA-256 不匹配时拒绝恢复。命令返回非零表示未通过；程序对外只显示错误类别，避免输出连接凭据。
 
-生产使用PG14服务端和PG14客户端。已验证的Ubuntu持久客户端包装路径为 `/home/quant/.local/libexec/trading-alerts-pg`；Unraid备份镜像为 `trading-alerts-backup:20260929-pg14`。早期PG17客户端生成的备份无法直接通过PG14恢复检查，不能当作已通过验收的恢复点。
+生产使用PG14服务端和PG14客户端。已验证的Ubuntu持久客户端包装路径为 `/home/quant/.local/libexec/trading-alerts-pg`；当前 Unraid 备份镜像为 `trading-alerts-backup:v1.7.0-e40eaac`，精确 ID 见 [生产清单](releases/v1.7.0-production.json)；旧 `20260929-pg14` 是历史镜像。早期PG17客户端生成的备份无法直接通过PG14恢复检查，不能当作已通过验收的恢复点。
 
 ## 当前每日任务（Unraid）
 
-`deploy/unraid-backup.sh`使用固定PG14备份镜像，保存到 `/mnt/user/backup/trading-alerts`。原生cron文件 `/boot/config/plugins/dynamix/trading-alerts.cron` 每日主机时间03:00执行，日志为 `/mnt/user/backup/trading-alerts/latest-run.log`；已安装并核对crontab。脚本实际备份、随机临时PG数据库恢复和16表计数匹配均已验证；临时cron自动调度已通过，原每日03:00时刻尚未观察。
+`deploy/unraid-backup.sh`使用当前 standalone Compose 的固定 PG14 备份镜像，保存到 `/mnt/user/backup/trading-alerts`。原生cron文件 `/boot/config/plugins/dynamix/trading-alerts.cron` 每日主机时间03:00执行，日志为 `/mnt/user/backup/trading-alerts/latest-run.log`；已安装并核对crontab。v1.7.0 升级前后备份已在独立 PG14 随机临时库恢复，35 张业务表计数匹配；配置归档已独立解包验证。旧 16 表恢复和临时 cron 自动调度属于历史验证，尚未观察新镜像的下一次每日03:00任务。
 
 Ubuntu旧生产备份timer已停止禁用，避免与开发.env混用。systemd目录中的timer供独立部署参考，并非当前生产执行方式。
 
