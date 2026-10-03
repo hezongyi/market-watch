@@ -58,12 +58,12 @@ const MWNativeReserve = (() => {
     const mode = tier(state, g), deficit = Math.ceil(mode.threshold * g.screen - g.reserve);
     state.screen = g.screen; state.batch = mode.batch;
     if (g.ts._requestingMoreData) return;
-    if ((retry.failures >= 4 || retry.misses >= 4) &&
+    if ((retry.failures + retry.misses >= 4) &&
         Number.isFinite(state.lastAttemptOffset) &&
         Math.abs(g.ts.rightOffset() - state.lastAttemptOffset) >= g.screen / 4) {
       retry.failures = 0; retry.misses = 0; retry.retryAt = 0;
     }
-    if (deficit <= 0 || retry.failures >= 4 || retry.misses >= 4) return;
+    if (deficit <= 0 || retry.failures + retry.misses >= 4) return;
     if (now() < retry.retryAt) {schedule(m, retry.retryAt - now()); return;}
     const available = cachedExtra(thread, g);
     // Native engine requests two alignment bars even without an indicator.

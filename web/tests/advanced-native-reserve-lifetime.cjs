@@ -28,12 +28,13 @@ function fixture(count=8){
  return{api,a,b,models,requests,deferred,advance,flush,addModel,switch:(next='MWP:B')=>{symbol=next;listeners.forEach(fn=>fn());}};
 }
 (async()=>{
- for(const fault of ['error','miss']){
+ for(const fault of ['error','miss','alternating']){
   const f=fixture();await f.advance(100);assert.equal(f.requests.length,1);
   for(let attempt=0;attempt<4;attempt++){
    const d=f.deferred[attempt];assert.ok(d);
-   if(fault==='error')d.reject(Error('HTTP failure'));else d.resolve({bars:[],history_boundary:false});
-   await f.flush();const wait=fault==='error'?1000*2**attempt:1500;
+   const error=fault==='error'||fault==='alternating'&&attempt%2===0;
+   if(error)d.reject(Error('HTTP failure'));else d.resolve({bars:[],history_boundary:false});
+   await f.flush();const wait=error?1000*2**(f.api.diagnostics().models[0].state.failures-1):1500;
    await f.advance(wait-100);assert.equal(f.requests.length,attempt+1,'all peers must share backoff');
    await f.advance(200);
    assert.equal(f.requests.length,Math.min(attempt+2,4),'one shared request per retry');
