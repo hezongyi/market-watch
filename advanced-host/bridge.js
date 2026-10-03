@@ -110,11 +110,13 @@ function drain() {
     // Pointer-driven viewport checks must not sit behind queued prewarming.
     // Keep the same four in-flight limit and leave ongoing reads untouched.
     const quoteBusy = [...pending.values()].some(entry => entry.quote);
-    const eligible = entry => entry.query.op !== 'quotes' || !quoteBusy;
+    const reserveBusy = [...pending.values()].filter(entry => entry.reserve).length;
+    const eligible = entry => (entry.query.op !== 'quotes' || !quoteBusy) &&
+      (!entry.query.native_reserve || reserveBusy < 2);
     let interaction = requests.findIndex(entry => entry.query.op === "viewport");
     if (interaction < 0) interaction = requests.findIndex(entry =>
       entry.query.op === "historyCache" && !entry.query.background);
-    if (interaction < 0) interaction = requests.findIndex(entry => !entry.query.op);
+    if (interaction < 0) interaction = requests.findIndex(entry => !entry.query.op && !entry.query.native_reserve);
     if (interaction < 0) interaction = requests.findIndex(entry => entry.type === 'workspace');
     if (interaction < 0) interaction = requests.findIndex(eligible);
     if (interaction < 0) break;
@@ -132,7 +134,8 @@ function drain() {
       reject(Error("行情请求超时"));
       drain();
     }, 30000);
-    const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes' };
+    const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
+      reserve: !!query.native_reserve };
     pending.set(id, entry);
     if (isCurrent) {
       const check = () => {
@@ -234,12 +237,49 @@ function nativeHistoryContext(ticker, res) {
     if (!Number.isInteger(count) || count < 1 || count > 8)
       throw Error('Unknown chart count');
     const active = widget.activeChart();
-    return {chart_count:count, focused:chartUsesSymbol(active,ticker,res),
+    const context = {chart_count:count, focused:chartUsesSymbol(active,ticker,res),
       historical_navigation:false};
+    if (globalThis.MWNativeReserve?.enabled()) {
+      const g = datasetGeometry(ticker, res), screen = Math.min(2000, Math.ceil(g.plot_width / g.bar_spacing));
+      Object.assign(context, {screen_bars:screen,
+        batch_screens:MWNativeReserve.extra({ticker},res) > screen ? 2 : 1});
+    }
+    return context;
   } catch (_) {
     return {chart_count:8,focused:null,historical_navigation:false};
   }
 }
+
+function nativeReserveWarmup(symbol, resolution) {
+  let prefix = 0;
+  if (!widget) return prefix;
+  for (let i=0;i<widget.chartsCount();i++) {
+    const chart=widget.chart(i); if(!chartUsesSymbol(chart,symbol,resolution)) continue;
+    for (const study of chart.getAllStudies()) {
+      const api=chart.getStudyById(study.id), values=new Map(api.getInputValues().map(v=>[v.id,v.value]));
+      for(const input of api.getInputsInfo()) {
+        const value=values.get(input.id);
+        if(/length|period/i.test(input.name) && Number.isInteger(value) && value>0)
+          prefix=Math.max(prefix,Math.min(2000,value));
+      }
+    }
+  }
+  return prefix;
+}
+globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen_bars, batch_screens, warmup_bars}) => {
+  const page = await query(symbol, resolution, {
+    before, limit: screen_bars * batch_screens, countBack: screen_bars * batch_screens,
+    client: clientId, native_history: nativeHistoryContext(symbol, resolution),
+    native_reserve: {screen_bars, batch_screens, warmup_bars},
+  });
+  // An old API silently ignores optional fields. Never feed its unbounded
+  // mandatory result into the reserve lane or mistake an empty miss for EOD.
+  if (!['ready', 'partial', 'miss'].includes(page.reserve_status))
+    throw Error('后端尚不支持图表储备协议');
+  if (historyOlder(page, providerHistoryState.get(symbol+'|'+resolution)))
+    throw Error('已丢弃旧版本的图表储备响应');
+  return {...page, bars: barsOf(page, resolution, symbol)};
+}, nativeReserveWarmup);
 
 function query(ticker, res, args, expires = Infinity) {
   const { symbol, spec, series_kind } = decode(ticker);
@@ -426,7 +466,7 @@ const feed = {
       if (decode(s.ticker).series_kind === "provider") {
         // Native requirements pass unchanged; the backend owns cache policy
         // and provider pagination, including demands larger than one page.
-        const epoch = workspaceEpoch;
+        const epoch = workspaceEpoch, reserveStarted = globalThis.performance?.now() || 0;
         const args={limit:p.countBack,
           countBack:p.countBack, from:p.from*1000, before:p.to*1000,
           firstDataRequest:p.firstDataRequest, client:clientId,
@@ -475,6 +515,8 @@ const feed = {
           firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,rows[0].time));
         }
         cb(rows,{noData:boundary});
+        if (globalThis.MWNativeReserve)
+          requestAnimationFrame(() => MWNativeReserve.delivered(s, res, performance.now() - reserveStarted));
         if(!rows.length) finishTerminal();
         return;
       }

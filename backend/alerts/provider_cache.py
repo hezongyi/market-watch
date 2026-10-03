@@ -540,12 +540,46 @@ def native_read(meta, body, before, count, prefix, latest, on_ready=None):
                           lambda: _native_read(meta, body, before, count, prefix, latest, on_ready))
 
 
+def _reserve_read(meta, body, before):
+    """Read only proven contiguous PG history; misses schedule existing warming.
+
+    Empty/partial cache is not noData. Only a supplier-confirmed boundary may
+    stop native history. This path never invokes fetch_page/native_page.
+    """
+    target = min(4000, body.native_reserve.screen_bars * body.native_reserve.batch_screens) + body.native_reserve.warmup_bars
+    key = ensure(meta, body.timeframe)
+    with snapshot_transaction(key, before, target) as (db, state):
+        connected = bool(state['interval'])
+        bars = state['bars'] if connected else []
+        boundary = connected and state['history_boundary']
+        status = 'ready' if len(bars) >= target or boundary else 'partial' if bars else 'miss'
+        if status != 'ready' and body.client:
+            from .provider_service import activate
+            try:
+                with db.begin_nested():
+                    activate(body.client, key, before, target, latest=False, db=db)
+            except Exception:
+                log.warning('Provider reserve activation deferred source=%s frame=%s',
+                            meta['source'], body.timeframe)
+        return {**state, 'bars': bars, 'history_boundary': bool(boundary),
+                'has_more': not boundary, 'cache_hit': connected,
+                'series_kind': 'provider', 'dataset_id': key, 'basis': meta['basis'],
+                'calendar': meta['calendar'], 'precision': meta['precision'],
+                'indicators': [], 'mandatory_count': 0, 'optional_count': len(bars),
+                'reserve_status': status, 'reserve_requested_count': target}
+
+
 def data(body):
     meta = upstream.metadata(body.instrument)
     now = (now_ms() // 1000 + 1) * 1000
     # Native to can include the chart's future right margin. It is exclusive;
     # never ask for/cache proof of future provider data.
     before = min(body.before or now, now)
+    if body.native_reserve is not None:
+        if body.timeframe not in upstream.FRAMES:
+            raise ValueError("无效平台周期")
+        page = _observed_read(meta, body.timeframe, 0, lambda: _reserve_read(meta, body, before))
+        return {k: v for k, v in page.items() if k not in ('interval', 'preceding', 'satisfied')}
     count = body.count_back or body.limit
     latest = body.before is None or body.first_data_request and body.before >= now - 120000
     extra = max((history_requirement(spec) for spec in body.indicators), default=0)

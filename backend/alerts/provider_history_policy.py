@@ -13,6 +13,8 @@ def optional_bars(context, demand, prefix, *, hot, first, enabled, python=False,
         return 0
     budget = 4000 if context.chart_count == 1 else 2000
     amount = (first_extra if first and not context.historical_navigation else history_extra) if hot else cold_extra
+    if context.screen_bars is not None:
+        amount = min(amount, context.screen_bars * context.batch_screens)
     if context.chart_count > 1:
         amount = min(amount, 1000)
     if context.chart_count >= 4 and context.focused is False:
