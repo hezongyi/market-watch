@@ -397,3 +397,38 @@ def test_yahoo_catalog_additive_migration_upgrade_and_downgrade(provider_pg):
             migration.downgrade()
         assert 'metadata_json' not in {c['name'] for c in inspect(connection).get_columns('market_instrument_catalog')}
         assert connection.scalar(text("SELECT count(*) FROM market_instrument_catalog")) == 1
+
+
+def test_concurrent_yahoo_catalog_initialization_is_idempotent(provider_pg, monkeypatch):
+    from alerts import yahoo_catalog
+    from alerts.config import settings
+    from alerts.provider_yahoo import stable_id
+    from alerts.storage import MarketCatalog
+    from alerts.yahoo_aliases import ALIASES
+    from sqlalchemy.orm import Session
+
+    factory, _ = provider_pg
+    monkeypatch.setattr(settings, "yahoo_enabled", True)
+    first = stable_id(next(iter(ALIASES)))
+    ready = threading.Barrier(2)
+    original_get = Session.get
+
+    def simultaneous_first_read(db, entity, ident, **kwargs):
+        result = original_get(db, entity, ident, **kwargs)
+        if entity is MarketCatalog and ident == first and result is None:
+            ready.wait(timeout=5)
+        return result
+
+    monkeypatch.setattr(Session, "get", simultaneous_first_read)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        requests = [pool.submit(yahoo_catalog.seed) for _ in range(2)]
+        for request in requests:
+            request.result(timeout=10)
+    with factory.begin() as db:
+        rows = list(db.scalars(select(MarketCatalog)))
+        assert {row.symbol for row in rows} == set(ALIASES)
+        db.get(MarketCatalog, first).metadata_json = {"verified": True}
+    yahoo_catalog.seed()
+    with factory.begin() as db:
+        assert db.scalar(select(func.count()).select_from(MarketCatalog)) == len(ALIASES)
+        assert db.get(MarketCatalog, first).metadata_json == {"verified": True}

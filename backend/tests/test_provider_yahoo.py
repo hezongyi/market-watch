@@ -168,6 +168,46 @@ def test_temporary_window_preserves_cached_prices_and_never_sets_earliest(databa
         assert not db.get(storage.ProviderDataset, key).earliest
 
 
+@pytest.mark.parametrize("buffer,total,count,delivered", [(False, 10, 2, 2), (True, 3000, 100, 2100)])
+def test_cached_minutes_remain_pageable_at_rolling_window(
+    database, monkeypatch, buffer, total, count, delivered
+):
+    from alerts.chart_api import DataQuery
+
+    monkeypatch.setattr(settings, "provider_native_history_buffer", buffer)
+    monkeypatch.setattr(cache.upstream, "metadata", lambda ident: META)
+    monkeypatch.setattr(cache.upstream, "native_page", lambda *a, **k: pytest.fail("use cached history"))
+    left = stamp("2026-01-02T00:00:00Z")
+    before = left + total * 60000
+    bars = [{"start": left + index * 60000, "end": left + (index + 1) * 60000,
+             "chart_time": left + index * 60000, "open": "1", "high": "2",
+             "low": "0", "close": "1", "complete": True}
+            for index in range(total)]
+    key = cache.ensure(META, "M1")
+    lease = cache.claim(key)
+    cache.commit_page(key, lease, {
+        "bars": bars, "history_boundary": False, "coverage": [[left, before]],
+        "boundary_evidence": {"kind": "rolling_window", "left": before + 60000,
+                              "retry_at": storage.now_ms() + 60000},
+    }, before, storage.now_ms())
+    cache.release(key, lease)
+
+    def read(cursor):
+        return cache.data(DataQuery(instrument=META["id"], timeframe="M1", series_kind="provider",
+                                    before=cursor, limit=count, countBack=count,
+                                    native_history={"chart_count": 1, "focused": True}))
+
+    result = read(before)
+    assert len(result["bars"]) == delivered
+    assert result["window_limit"] and result["has_more"] and not result["history_boundary"]
+    seen = [bar["chart_time"] for bar in result["bars"]]
+    while result["has_more"]:
+        result = read(result["bars"][0]["chart_time"])
+        assert result["bars"], "a page with more cached history must advance"
+        seen.extend(bar["chart_time"] for bar in result["bars"])
+    assert sorted(seen) == [bar["chart_time"] for bar in bars]
+
+
 def test_request_failure_never_commits_coverage(database, monkeypatch):
     key = cache.ensure(META, "M1")
 
@@ -504,6 +544,44 @@ def test_short_lifecycle_is_confirmed_by_metadata_and_successful_window(adapter)
     )
     assert page["history_boundary"] and page["boundary_evidence"]["kind"] == "lifecycle"
     assert page["coverage"] == [[0, stamp("2026-01-06T00:00:00Z")]]
+
+
+@pytest.mark.parametrize("invalid_price", [float("nan"), float("inf"), None])
+def test_invalid_ohlc_never_commits_lifecycle_or_replaces_cached_prices(
+    database, adapter, monkeypatch, invalid_price
+):
+    data, _ = adapter
+    data.index = pd.DatetimeIndex(["2026-01-02", "2026-01-05"], tz="America/New_York")
+    yahoo.yf.Ticker("CL=F")._price_history._history_metadata["firstTradeDate"] = data.index[0]
+    meta = {**META, "first_trade_ms": stamp("2026-01-02T05:00:00Z")}
+    before = stamp("2026-01-06T00:00:00Z")
+    valid = yahoo.native_page(meta, "D1", before, 1000)
+    key = cache.ensure(meta, "D1")
+    lease = cache.claim(key)
+    observed_at = storage.now_ms() - settings.yahoo_metadata_ttl_seconds * 1000 - 1
+    cache.commit_page(key, lease, valid, before, observed_at)
+    cache.release(key, lease)
+    original = cache.snapshot(key, before, 1000)
+
+    data.loc[data.index[0], "High"] = invalid_price
+    # Include the listing boundary: dropping this row must not turn a failed
+    # revalidation into proof that all history was successfully observed.
+    with pytest.raises(yahoo.YahooError) as failure:
+        cache.fetch_page(key, meta, "D1", before, 1000, time.monotonic() + 2, revalidate=True)
+    assert failure.value.status == "invalid_data"
+    current = cache.snapshot(key, before, 1000)
+    assert current["bars"] == original["bars"]
+    assert current["cache_revision"] == original["cache_revision"]
+    assert current["history_boundary"] == original["history_boundary"]
+    assert current["interval"] == original["interval"]
+
+    fresh = {**meta, "symbol": "NEW=F"}
+    fresh_key = cache.ensure(fresh, "D1")
+    with pytest.raises(yahoo.YahooError):
+        cache.fetch_page(fresh_key, fresh, "D1", before, 1000, time.monotonic() + 2)
+    empty = cache.snapshot(fresh_key, before, 1000)
+    assert empty["bars"] == [] and empty["interval"] is None
+    assert not empty["history_boundary"]
 
 
 def test_switch_off_stops_new_background_work(database, monkeypatch):

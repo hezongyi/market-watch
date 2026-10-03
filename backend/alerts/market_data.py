@@ -662,12 +662,18 @@ def router(authenticated):
         seed()
         search_status = "local"
         if query.strip() and settings.yahoo_enabled:
-            # Code/Chinese/English aliases remain immediate and usable offline.
+            # Exact codes/names and known Chinese aliases remain local. A
+            # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
+            term = query.strip().upper()
             with transaction() as db:
-                known = any(query.upper() in (x.symbol+x.label+(chinese_name(x.source, x.symbol) or "")+(x.metadata_json or {}).get("english_name", "")).upper()
-                            for x in db.scalars(select(MarketCatalog)))
-                known = known or any(query.upper() in (x.symbol+x.label+(chinese_name(x.source, x.symbol) or "")).upper()
-                                     for x in db.scalars(select(Instrument)))
+                local = list(db.scalars(select(MarketCatalog))) + list(db.scalars(select(Instrument)))
+                known = any(
+                    term in {x.symbol.upper(), x.label.upper(),
+                             (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
+                    or not term.isascii() and term in
+                    (x.label + (chinese_name(x.source, x.symbol) or "")).upper()
+                    for x in local
+                )
             if not known:
                 search_status = search(query)
         with transaction() as db:

@@ -6,6 +6,8 @@ from concurrent.futures import Future
 
 from fastapi import HTTPException
 from sqlalchemy import delete, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from .config import settings
 from .storage import (
@@ -29,14 +31,15 @@ def seed():
     from .provider_yahoo import stable_id
 
     with transaction() as db:
+        insert = pg_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
         for symbol, (label, kind) in ALIASES.items():
             ident = stable_id(symbol)
             row = db.get(MarketCatalog, ident)
             if row and row.symbol != symbol:
                 raise ValueError("Yahoo 稳定身份冲突")
             if row is None:
-                db.add(
-                    MarketCatalog(
+                db.execute(
+                    insert(MarketCatalog.__table__).values(
                         id=ident,
                         source="yahoo",
                         symbol=symbol,
@@ -47,8 +50,12 @@ def seed():
                         available=True,
                         metadata_json={},
                         updated_at=0,
-                    )
+                    ).on_conflict_do_nothing(index_elements=["id"])
                 )
+                # The other initializer may have inserted while we read. Keep
+                # the identity collision check without overwriting its metadata.
+                if db.get(MarketCatalog, ident).symbol != symbol:
+                    raise ValueError("Yahoo 稳定身份冲突")
 
 
 def _store(details):

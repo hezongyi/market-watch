@@ -61,6 +61,20 @@ for (const file of ["series.js","bridge.js","indicators.js"])
   assert.equal(calls[2].q.countBack,4500);
   assert.equal(calls[2].q.from,1000);
   await vm.runInContext(`(async()=>{
+    globalThis.windowPages=[];
+    request=async()=>({bars:[{start:1000,end:61000,chart_time:1000,
+      open:1,high:2,low:1,close:2}],history_boundary:false,window_limit:true,
+      has_more:windowPages.length===0,indicators:[]});
+    for(let index=0;index<2;index++)
+      await feed.getBars({ticker:'MWP:YAHOO:22222222222222222222222222222222'},'1',
+        {from:0,to:100,countBack:1,firstDataRequest:false},
+        (bars,meta)=>windowPages.push({bars,meta}),error=>{throw Error(error)});
+  })()`,ctx);
+  assert.equal(ctx.windowPages[0].meta.noData,false,
+    "an upstream rolling limit must not hide more cached history");
+  assert.equal(ctx.windowPages[1].meta.noData,true,
+    "pagination ends once the cached history is exhausted");
+  await vm.runInContext(`(async()=>{
     const ident='YAHOO:11111111111111111111111111111111', ticker='MWP:'+ident;
     symbolPresentations.set(ident,{symbol:'AAPL',name:'苹果公司',exchange:'NasdaqGS'});
     globalThis.quoteEvents=[];globalThis.quoteReads=0;

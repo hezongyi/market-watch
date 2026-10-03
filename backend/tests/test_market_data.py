@@ -52,6 +52,45 @@ def test_catalog_chinese_search_is_local_and_keeps_supplier_code(database, monke
         api_module.app.dependency_overrides.clear()
 
 
+@pytest.mark.parametrize("query,existing", [("GS", "^GSPC"), ("MS", "MSFT")])
+@pytest.mark.parametrize("remote_fails", [False, True])
+def test_catalog_partial_match_does_not_hide_new_equity(
+    database, monkeypatch, query, existing, remote_fails
+):
+    from alerts import provider_yahoo, yahoo_catalog
+    from alerts.config import settings
+
+    monkeypatch.setattr(settings, "yahoo_enabled", True)
+    monkeypatch.setattr(yahoo_catalog, "_SEARCH", {})
+    searched = []
+
+    def search_metadata(term, **kwargs):
+        searched.append(term)
+        if remote_fails:
+            raise TimeoutError("Yahoo search unavailable")
+        return [{"symbol": query, "quoteType": "EQUITY", "exchange": "NYQ",
+                 "longname": "Goldman Sachs" if query == "GS" else "Morgan Stanley"}]
+
+    monkeypatch.setattr(provider_yahoo, "search_metadata", search_metadata)
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            response = client.get("/api/market-data/catalog", params={"query": query})
+            assert response.status_code == 200
+            rows = response.json()
+            assert searched == [query]
+            assert any(row["symbol"] == existing for row in rows)
+            assert all(row["search_status"] == ("failed" if remote_fails else "ok")
+                       for row in rows)
+            if not remote_fails:
+                assert any(row["symbol"] == query for row in rows)
+                # Once the exact code is known, subsequent lookup stays local.
+                assert client.get("/api/market-data/catalog", params={"query": query}).status_code == 200
+                assert searched == [query]
+    finally:
+        api_module.app.dependency_overrides.clear()
+
+
 def test_history_jobs_share_work(database):
     with database.begin() as db:
         inst = db.get(Instrument, "EURUSD")

@@ -501,7 +501,9 @@ const feed = {
           providerHistoryState.set(historyKey,{revision:page.cache_revision||0,
             observed_at:page.as_of||0,cursor:Math.max(previous?.cursor||0,rows.at(-1)?.time||0)});
         }
-        const boundary = page.history_boundary === true || page.window_limit === true;
+        const boundary = page.has_more === undefined
+          ? page.history_boundary === true || page.window_limit === true
+          : page.has_more === false;
         if(page.window_limit) send({type:'feed-poll-state',key:s.ticker,
           error:'已到 Yahoo 当前可获取窗口边界，早期已缓存历史仍可查看'});
         if(decode(s.ticker).symbol.startsWith("YAHOO:") && rows.some(bar=>Math.min(bar.open,bar.high,bar.low,bar.close)<=0)) {

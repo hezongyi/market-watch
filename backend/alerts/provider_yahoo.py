@@ -316,7 +316,7 @@ def _rows(meta, frame, data, before):
 
         prices = [DecimalString(row[name]) for name in ("Open", "High", "Low", "Close")]
         if any(v is None for v in prices):
-            continue
+            raise YahooError("invalid_data", "Yahoo OHLC 缺失或不是有限数值")
         o, h, low, c = map(float, prices)
         if h < max(o, c, low) or low > min(o, c, h):
             raise YahooError("invalid_data", "Yahoo OHLC 高低关系无效")
