@@ -114,7 +114,7 @@ def _store(details):
     return ident
 
 
-def chart_metadata(ident, *, deadline=None):
+def chart_metadata(ident, *, deadline=None, cached_only=False):
     from .chart_series import decode
     ident = decode(ident)[0]
     if not settings.yahoo_enabled:
@@ -133,7 +133,9 @@ def chart_metadata(ident, *, deadline=None):
         expired = (
             now_ms() - row.updated_at >= settings.yahoo_metadata_ttl_seconds * 1000 or not details
         )
-    if expired:
+    if cached_only and not details.get('adjustment'):
+        raise HTTPException(503, 'Yahoo 本地元信息尚未就绪，请先加载图表')
+    if expired and not cached_only:
         with _LOCK:
             future = _INFLIGHT.get(ident)
             owner = future is None

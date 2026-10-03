@@ -639,7 +639,11 @@ def _reserve_read(meta, body, before):
 
 def data(body):
     metadata_started = time.monotonic()
-    meta = upstream.metadata(body.instrument)
+    # A reserve may use expired persisted identity metadata, but cannot refresh
+    # Yahoo metadata over HTTP. Mandatory reads retain their refresh policy.
+    meta = (upstream.metadata(body.instrument, cached_only=True)
+            if body.native_reserve is not None and body.instrument.startswith('YAHOO:')
+            else upstream.metadata(body.instrument))
     metadata_ms = (time.monotonic()-metadata_started)*1000
     now = (now_ms() // 1000 + 1) * 1000
     # Native to can include the chart's future right margin. It is exclusive;

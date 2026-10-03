@@ -67,5 +67,38 @@ function fixture(count=8){
   if(outcome==='error')f.deferred[0].reject(Error('destroyed thread'));else f.deferred[0].resolve({bars:[{time:90000}],history_boundary:false});
   await f.flush();await f.advance(10000);assert.equal(f.a.processed,undefined);assert.equal(f.requests.length,1);
  }
+ for(const outcome of ['boundary','miss','error','bars'])for(const first of [100000,1000000]){
+  const f=fixture(1);await f.advance(100);await f.advance(1000);
+  // Native _purgeCache replaces the cache but keeps the same thread, including
+  // when a later mandatory load happens to return exactly the same first bar.
+  f.a._cache={bars:[{time:first}]};f.a._endOfData=false;
+  if(outcome==='error')f.deferred[0].reject(Error('before reset'));
+  else f.deferred[0].resolve({bars:outcome==='bars'?[{time:90000}]:[],history_boundary:outcome==='boundary'});
+  await f.flush();await f.advance(100);
+  const state=f.api.diagnostics().models[0].state;
+  assert.equal(!!f.a._endOfData,false,'old boundary cannot end reset cache');
+  assert.equal(f.a.processed,undefined,'old rows cannot enter reset cache');
+  assert.equal(state.failures+state.misses,0,'old outcome cannot spend reset retry budget');
+  assert.equal(state.enhancedUntil,0,'old latency cannot enhance reset cache');
+  assert.equal(f.requests.length,2,'reset demand resumes after obsolete completion');
+ }
+ for(const outcome of ['boundary','error']){
+  const f=fixture(1);await f.advance(100);
+  f.a._cache.bars=[{time:1000000}];
+  if(outcome==='error')f.deferred[0].reject(Error('obsolete cursor'));
+  else f.deferred[0].resolve({bars:[],history_boundary:true});
+  await f.flush();await f.advance(100);
+  assert.equal(!!f.a._endOfData,false,'mandatory paging invalidates old reserve cursor');
+  assert.equal(f.api.diagnostics().models[0].state.failures,0);
+  assert.equal(f.requests.length,2);
+ }
+ {
+  const f=fixture(1);await f.advance(100);
+  f.deferred[0].resolve({bars:[],history_boundary:true});await f.flush();
+  assert.equal(f.a._endOfData,true,'current confirmed boundary still stops');
+  f.a._cache={bars:[{time:100000}]};f.a._endOfData=false;
+  f.api.delivered(f.a._symbolInfo,'5',1);await f.advance(100);
+  assert.equal(f.requests.length,2,'reset clears latched reserve boundary');
+ }
  console.log('Shared error/miss backoff, bounded retries, viewport restart and stale completion isolation passed');
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -2,7 +2,7 @@
  * register its existing threads/models; the host supplies PG-only reads. */
 const MWNativeReserve = (() => {
   const models = new Map(), threads = new Map(), flights = new Map();
-  const retries = new WeakMap();
+  const retries = new WeakMap(), caches = new WeakMap();
   const key = (symbol, resolution) => `${symbol}|${resolution}`;
   let transport, calculationPrefix = () => 0;
   const enabled = globalThis.MW_NATIVE_RESERVE_ENABLED !== false &&
@@ -11,6 +11,15 @@ const MWNativeReserve = (() => {
   const threadKey = t => key(t._symbolInfo?.ticker || t._symbolInfo?.name, t._resolution);
   const identity = m => key(m.mainSeries().symbol(), m.interval());
   const provider = symbol => typeof symbol === 'string' && symbol.startsWith('MWP:');
+  function retryState(thread) {
+    // Native reset/purge reuses the thread but replaces its cache object.
+    // Keep retries and terminal state scoped to that cache generation.
+    if (caches.get(thread) !== thread._cache) {
+      caches.set(thread, thread._cache);
+      retries.set(thread, {failures:0, misses:0, retryAt:0, boundary:false});
+    }
+    return retries.get(thread);
+  }
   function geometry(m) {
     const ts = m.timeScale(), range = ts.visibleBarsStrictRange();
     const points = ts.points().range().value();
@@ -54,7 +63,7 @@ const MWNativeReserve = (() => {
       state.identity = k; state.previous = undefined; state.enhancedUntil = 0;
       state.lastAttemptOffset = g.ts.rightOffset();
     }
-    const retry = retries.get(thread);
+    const retry = retryState(thread);
     const mode = tier(state, g), deficit = Math.ceil(mode.threshold * g.screen - g.reserve);
     state.screen = g.screen; state.batch = mode.batch;
     if (g.ts._requestingMoreData) return;
@@ -86,7 +95,9 @@ const MWNativeReserve = (() => {
     // with a different viewport must not restart the shared retry allowance.
     for (const [model, entry] of models) if (identity(model) === k)
       entry.lastAttemptOffset = model.timeScale().rightOffset();
-    const current = () => !thread._destroyed && threads.get(k) === thread;
+    const cache = thread._cache;
+    const current = () => !thread._destroyed && threads.get(k) === thread &&
+      thread._cache === cache && thread._cache.bars[0]?.time === before && !thread._requesting;
     const flight = (async () => {
       try {
         const result = await transport({symbol, resolution, before:requestBefore,
@@ -96,7 +107,7 @@ const MWNativeReserve = (() => {
           for (const [model, entry] of models) if (identity(model) === k)
             entry.enhancedUntil = now() + 10000;
         const rows = result.bars.filter(b => b.time < requestBefore);
-        if (rows.length && !thread._requesting && thread._cache.bars[0]?.time === before) {
+        if (rows.length) {
           thread._processBars(rows, {noData: result.history_boundary === true});
           retry.failures = 0; retry.misses = 0; retry.retryAt = 0;
         } else if (!rows.length) {
@@ -122,7 +133,7 @@ const MWNativeReserve = (() => {
     bindThread(thread, info, resolution) {
       if (enabled) {
         threads.set(key(info.ticker || info.name, resolution), thread);
-        if (!retries.has(thread)) retries.set(thread, {failures:0, misses:0, retryAt:0, boundary:false});
+        retryState(thread);
       }
     },
     unbindThread(thread) {if (threads.get(threadKey(thread)) === thread) threads.delete(threadKey(thread));},
