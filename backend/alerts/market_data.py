@@ -1,5 +1,6 @@
 """On-demand history orchestration. Datafeed requests never mean provider exhaustion."""
 
+import time
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -12,6 +13,7 @@ from .chart_series import SeriesKind, decode, display_symbol
 from .coverage import covers_interval
 from .domain import Calendar, bucket_bounds, has_trading_gap, scheduled_open, session_bounds
 from .market import stored_coverage
+from .market_names import chinese_name
 from .providers import fetch_oanda_catalog
 from .storage import (
     Bar,
@@ -66,6 +68,8 @@ def refresh_catalog():
 def resolve(db, ident):
     inst = db.get(Instrument, ident)
     entry = db.get(MarketCatalog, ident)
+    if entry and entry.source == "yahoo":
+        raise HTTPException(422, "Yahoo 品种仅支持平台系列，不创建历史维护任务")
     if entry and not entry.available:
         raise HTTPException(422, "此品种已不在当前账户目录中，历史保留")
     if not inst:
@@ -498,7 +502,32 @@ def router(authenticated):
             from .provider_chart import metadata, quote_page, quote_previous_close
 
             try:
-                meta = metadata(ident)
+                from .config import settings
+                deadline = time.monotonic() + settings.provider_request_seconds
+                meta = metadata(ident, deadline=deadline) if ident.startswith("YAHOO:") else metadata(ident)
+                if meta["source"] == "yahoo":
+                    from .provider_service import yahoo_quote
+                    snapshot = yahoo_quote(meta, deadline=deadline)
+                    stamp = snapshot["quote_time"]
+                    delay = snapshot["delay_seconds"]
+                    description = meta["name"] + " · Yahoo 市场报价"
+                    if stamp is not None:
+                        description += " · " + instant(stamp).strftime("%Y-%m-%d %H:%M UTC")
+                    description += " · 延迟 " + str(delay//60) + " 分钟" if delay is not None and delay>0 else " · 延迟未知" if delay is None else " · 实时"
+                    if snapshot["status"] != "ok":
+                        description += " · 抓取失败，保留上次报价"
+                    values = {"short_name":meta["symbol"], "description":description,
+                              "exchange":meta["exchange"], "lp":float(snapshot["price"]),
+                              "quote_time":stamp, "fetched_at":snapshot["fetched_at"],
+                              "delay_seconds":delay, "fetch_status":snapshot["status"]}
+                    previous = snapshot["previous_close"]
+                    if previous is not None and Decimal(previous) != 0:
+                        delta = Decimal(snapshot["price"])-Decimal(previous)
+                        values.update(ch=float(delta), chp=float(delta/Decimal(previous)*100),
+                                      prev_close_price=float(previous))
+                    result.append({"s":"ok", "n":ticker, "v":values,
+                                   **{k:snapshot[k] for k in ("quote_time","fetched_at","delay_seconds","status")}})
+                    continue
                 page = quote_page(meta)
                 latest = page["bars"][-1] if page["bars"] else None
                 values = {"short_name": display_symbol(meta["symbol"]), "description": display_symbol(meta["symbol"]) + " · 平台行情",
@@ -628,6 +657,25 @@ def router(authenticated):
 
     @r.get("/catalog")
     def catalog(query: str = ""):
+        from .config import settings
+        from .yahoo_catalog import search, seed
+        seed()
+        search_status = "local"
+        if query.strip() and settings.yahoo_enabled:
+            # Exact codes/names and known Chinese aliases remain local. A
+            # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
+            term = query.strip().upper()
+            with transaction() as db:
+                local = list(db.scalars(select(MarketCatalog))) + list(db.scalars(select(Instrument)))
+                known = any(
+                    term in {x.symbol.upper(), x.label.upper(),
+                             (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
+                    or not term.isascii() and term in
+                    (x.label + (chinese_name(x.source, x.symbol) or "")).upper()
+                    for x in local
+                )
+            if not known:
+                search_status = search(query)
         with transaction() as db:
             entries = {
                 x.id: {
@@ -638,7 +686,12 @@ def router(authenticated):
                     "asset_type": x.asset_type,
                     "precision": x.precision,
                     "supported": bool(x.calendar),
-                    "available": x.available,
+                    "available": x.available and (x.source != "yahoo" or settings.yahoo_enabled),
+                    "series_kinds": ["provider"] if x.source == "yahoo" else ["provider", "managed"],
+                    "english_name": (x.metadata_json or {}).get("english_name", ""),
+                    "exchange": (x.metadata_json or {}).get("exchange"),
+                    "currency": (x.metadata_json or {}).get("currency"),
+                    "search_status": search_status,
                 }
                 for x in db.scalars(select(MarketCatalog))
             }
@@ -665,6 +718,11 @@ def router(authenticated):
             failures = set(db.scalars(select(ImportJob.instrument_id).where(
                 ImportJob.chart_plan.is_(True), ImportJob.status == 'failed')))
             for entry in entries.values():
+                localized = chinese_name(entry['source'], entry['symbol'])
+                entry['chinese_name'] = localized or ''
+                if localized:
+                    entry['english_name'] = entry.get('english_name') or entry['label']
+                    entry['label'] = localized
                 plan = plans.get(entry['id'])
                 entry['managed_status'] = ('未维护' if plan is None else
                     '失败，已发布历史保留' if entry['id'] in failures else
@@ -672,7 +730,7 @@ def router(authenticated):
             return [
                 x
                 for x in entries.values()
-                if query.upper() in (x["id"] + x["label"] + x["symbol"]).upper()
+                if x["available"] and query.upper() in (x["id"] + x["label"] + x["symbol"] + x.get("english_name", "")).upper()
             ][:250]
 
     @r.post("/catalog/refresh")

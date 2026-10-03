@@ -1,0 +1,153 @@
+{
+  "verified_at": "2026-10-03T05:33:30.767231+00:00",
+  "backend": {
+    "passed": 208,
+    "evidence": "backend-tests.txt"
+  },
+  "provider_final": {
+    "passed": 132,
+    "evidence": "provider-final-tests.txt"
+  },
+  "postgres": {
+    "passed": 15,
+    "evidence": "postgres-tests.txt"
+  },
+  "cache_final": {
+    "passed": 53,
+    "evidence": "cache-final-tests.txt"
+  },
+  "search_final": {
+    "passed": 67,
+    "evidence": "search-final-tests.txt"
+  },
+  "web_build": {
+    "passed": true,
+    "evidence": "web-build.txt"
+  },
+  "browser": {
+    "provider_only_chinese_search": true,
+    "passed": true,
+    "evidence": "browser.json",
+    "completed_at": "2026-10-03T05:31:55.700Z",
+    "current_bridge_verified": true,
+    "nested_frames_presentation_verified": true,
+    "visible_errors": 0
+  },
+  "actual_lease_expiry": {
+    "passed": true,
+    "evidence": "runtime-expiry.json"
+  },
+  "live_api": {
+    "passed": true,
+    "evidence": "api-live.json"
+  },
+  "live_postgres": {
+    "passed": true,
+    "evidence": "postgres-live.json",
+    "samples": 6,
+    "cold_ms": [
+      6829.5,
+      2114.19,
+      2050.3,
+      2129.64,
+      2031.62,
+      1874.81
+    ],
+    "hot_ms": [
+      24.43,
+      57.66,
+      12.32,
+      26.77,
+      12.16,
+      14.12
+    ]
+  },
+  "sdk_proxy": {
+    "passed": true,
+    "evidence": "sdk-probe.json"
+  },
+  "live_windows": {
+    "evidence": "adapter-live.json",
+    "successful": 38,
+    "total": 42,
+    "upstream_errors": [
+      {
+        "symbol": "GC=F",
+        "frame": "MN",
+        "status": "error"
+      },
+      {
+        "symbol": "EURUSD=X",
+        "frame": "D1",
+        "status": "error"
+      },
+      {
+        "symbol": "EURUSD=X",
+        "frame": "W1",
+        "status": "error"
+      },
+      {
+        "symbol": "EURUSD=X",
+        "frame": "MN",
+        "status": "error"
+      }
+    ]
+  },
+  "frontend_contracts": {
+    "passed": true,
+    "evidence": "frontend-contracts.txt",
+    "commands": [
+      "node tests/advanced-series.cjs",
+      "node tests/advanced-native-workspaces.cjs",
+      "node tests/advanced-provider-subscriptions.cjs",
+      "node tests/advanced-provider-request-lifetime.cjs"
+    ]
+  },
+  "dependencies": {
+    "pip_check": "passed",
+    "evidence": "dependencies.txt",
+    "sdk": "yfinance==1.7.0",
+    "python": "3.11",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "curl_cffi": "0.16.3"
+  },
+  "static": {
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "evidence": "static-checks.txt"
+  },
+  "scope": {
+    "branch": "feat/yahoo-native-market-data",
+    "base": "5dd196e",
+    "isolated_postgres": true,
+    "production_changed": false,
+    "pushed": false,
+    "published": false
+  },
+  "evidence_sha256": {
+    "README.md": "7dc20af63ca977493de4e1d5323551893239bd12eeb9193e4df70bff21646837",
+    "adapter-initial-failure.json": "67edd91a48e3972e159b65b4fb3ab8d95eaef2ed69e4de5af3f98d3c8f4b5804",
+    "adapter-live.json": "56507d0718248ddc06067ebd52af74e7429ab31a85acfa61e4f829fcd1a0e1fe",
+    "api-live.json": "5d5d56481e2d3befb2b259ffcfa38e9a5944239452552b66912a28f5a0c340b1",
+    "backend-tests.txt": "6fb3794f769f71b0b44e882b5c07d661212f7110dbc08980f6f951deef242ded",
+    "browser.json": "338385467e3626eea57080344b0a4e68c9eaa320135626b180843b66d5345a9c",
+    "cache-final-tests.txt": "79561a734aabebbfdf928f0a0cf5c2d3974572da6349c78fbad0fa79bd74d4b2",
+    "chinese-search.png": "4619c4dd151c1dbb5ee84c7a3125fbb7aa7c6dae5b0595f0e9574bc2ccecb42d",
+    "dependencies.txt": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09",
+    "exchange-delays.json": "9aef62ac2ee8b866a08167495d9c1e67089bb5bc59300ac5e10ff398fef13a43",
+    "frontend-contracts.txt": "be956363a175c3aebd12676374f821141d0d3b4271ad5d3b57907454d6cf1199",
+    "negative-oil.csv": "20ccc4cf3f50aa05c58782331f88871eb7929e929141a612e43cacf5e4eb8c42",
+    "negative-oil.png": "4b0a11d7f39e08aba19be3f5ca64a17c6973d8d6dfd904dfa9b9a08dd4f58cb6",
+    "postgres-live.json": "155da41f2b7e111447c773e41561fe61b26750bd888c3f01317685173026ca3a",
+    "postgres-tests.txt": "93ade075d98d8258a7b59db5c1623acdbfed26ca171ff2edb934c0708fbaf35b",
+    "provider-final-tests.txt": "bc8cd6e17735832ce06d3a872547a46b8fb302d6e27d36a359d628bfe065ccce",
+    "runtime-expiry.json": "3499ea7bb4394ca02dea24522ab3ea63da18a640d4f933220775c35cfb6e664f",
+    "sdk-probe.json": "020e8ba6b01445d796d2005f77de4b08c2218fb1c36d25c15bcb60c5ae9fa3eb",
+    "search-final-tests.txt": "f8755f053a89734f41e30c3d3ca10fc7e15a26c3d90e41f993b5bcb92ae78dc4",
+    "search-live.json": "49c68c4ef5294a8b98af33d676d801d53a5dc64a7b4318f3690dae432c6a223b",
+    "static-checks.txt": "aa8e1567997b362d60e40a9571998be8840d837cc44d4a706b8f3dfa4932b45f",
+    "web-build.txt": "1b701a3745519d260c341b8aa48462db82a75a78fe276daef0285ecd256c063c",
+    "window-probe.json": "33c275b4b56fe39f5a219dc3b0d293b06c9195e542bd80a8ee9b7d2cfbb54795"
+  }
+}

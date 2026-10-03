@@ -17,6 +17,8 @@ from fastapi import HTTPException
 from .chart_data import FRAMES, bounds
 from .config import settings
 from .domain import Calendar, session_bounds
+from .provider_capabilities import SOURCES, versions
+from .provider_capabilities import frames as source_frames
 from .provider_transport import activity, discard_client, pooled_client, warm_connections
 from .provider_transport import close_clients as close_clients
 from .storage import Instrument, MarketCatalog, instant, ms, now_ms, transaction
@@ -44,9 +46,9 @@ def record_timing(name, started):
         timings[name] = timings.get(name, 0) + (time.monotonic() - started) * 1000
 # Independent slots: an older chart page cannot occupy the latest-candle slot.
 # Worker-wide realtime reservations are enforced by the maintenance scheduler.
-_HISTORY_SLOTS = {source: threading.BoundedSemaphore(1) for source in ("oanda", "binance")}
-_LATEST_SLOTS = {source: threading.BoundedSemaphore(2) for source in ("oanda", "binance")}
-_QUOTE_SLOTS = {source: threading.BoundedSemaphore(1) for source in ("oanda", "binance")}
+_HISTORY_SLOTS = {source: threading.BoundedSemaphore(1) for source in SOURCES}
+_LATEST_SLOTS = {source: threading.BoundedSemaphore(2) for source in SOURCES}
+_QUOTE_SLOTS = {source: threading.BoundedSemaphore(1) for source in SOURCES}
 
 
 def warm_clients():
@@ -69,7 +71,11 @@ def warm_clients():
         list(executor.map(connect, ("oanda", "binance")))
 
 
-def metadata(ident):
+def metadata(ident, *, deadline=None):
+    if ident.startswith("YAHOO:"):
+        from .provider_cache import DEADLINE
+        from .yahoo_catalog import chart_metadata
+        return chart_metadata(ident, deadline=deadline or DEADLINE.get())
     with transaction() as db:
         entry = db.get(MarketCatalog, ident)
         inst = db.get(Instrument, ident)
@@ -190,7 +196,10 @@ def _end(start, frame, calendar):
 
 def native_page(meta, frame, before, count, *, client=None, deadline=None, optional=0):
     """Return upstream native OHLC, exclusive chart labels and an explicit boundary."""
-    if frame not in FRAMES or not 1 <= count <= (4000 if meta["source"] == "oanda" else 1000):
+    if meta["source"] == "yahoo":
+        from .provider_yahoo import native_page as yahoo_page
+        return yahoo_page(meta, frame, before, count, deadline=deadline, optional=optional)
+    if frame not in source_frames(meta["source"]) or not 1 <= count <= (4000 if meta["source"] == "oanda" else 1000):
         raise ValueError("无效平台周期或根数")
     source = meta["source"]
     deadline = deadline or time.monotonic() + 20
@@ -315,7 +324,7 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
     namespace = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
         if meta["source"] == "oanda"
-        else "binance-public"
+        else "yahoo-anonymous" if meta["source"] == "yahoo" else "binance-public"
     )
     key = (
         meta["source"],
@@ -325,8 +334,7 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
         frame,
         meta["basis"],
         meta["calendar"],
-        ALIGNMENT_VERSION,
-        PAYLOAD_VERSION,
+        *versions(meta),
         before,
         count,
         quote,
@@ -399,10 +407,12 @@ def earliest_m1(meta, *, client=None):
     """Probe the actual first native M1; never infer it from an empty time slice."""
     from .market_resources import lane
 
+    if meta["source"] == "yahoo":
+        raise ValueError("Yahoo 品种仅支持平台系列，不建立自建维护任务")
     namespace = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
         if meta["source"] == "oanda"
-        else "binance-public"
+        else "yahoo-anonymous" if meta["source"] == "yahoo" else "binance-public"
     )
     key = (meta["source"], namespace, meta["id"], meta["basis"], ALIGNMENT_VERSION)
     with _LOCK:

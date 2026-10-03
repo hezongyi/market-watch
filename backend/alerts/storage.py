@@ -430,6 +430,7 @@ class MarketCatalog(Base):
     calendar: Mapped[str | None] = mapped_column(String(32))
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
     available: Mapped[bool] = mapped_column(default=True)
+    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, server_default="{}")
 
 
 class MarketDemand(Base):

@@ -22,6 +22,14 @@ class Settings(BaseSettings):
     adapter_path: str = "adapters/dukascopy/probe.mjs"
     market_proxy: str = ""
     binance_proxy: str = ""
+    yahoo_enabled: bool = False
+    yahoo_proxy: str = Field(default="", repr=False)
+    yahoo_poll_seconds: int = Field(default=60, ge=15, le=900)
+    yahoo_metadata_ttl_seconds: int = Field(default=86400, ge=60, le=86400)
+    yahoo_m1_span_days: int = Field(default=7, ge=1, le=8)
+    yahoo_m1_retention_days: int = Field(default=30, ge=7, le=60)
+    yahoo_minute_retention_days: int = Field(default=60, ge=1, le=60)
+    yahoo_hour_retention_days: int = Field(default=730, ge=1, le=730)
     fx_source: Literal["dukascopy", "oanda"] = "dukascopy"
     oanda_token: str = Field(default="", repr=False)
     oanda_account_id: str = Field(default="", repr=False)
@@ -44,6 +52,10 @@ class Settings(BaseSettings):
     provider_interest_limit: int = Field(default=16, ge=1, le=128)
     provider_cache_days: int = Field(default=7, ge=1, le=90)
     provider_cache_max_bars: int = Field(default=1000000, ge=40000, le=10000000)
+
+    @property
+    def effective_yahoo_proxy(self) -> str:
+        return self.yahoo_proxy or self.market_proxy
 
     @property
     def effective_binance_proxy(self) -> str:

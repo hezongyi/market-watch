@@ -12,14 +12,16 @@ const MWSeries = (() => {
       return { ...base, spec: payload.spec, key: payload.key };
     }
     const series_kind = ticker.startsWith(prefix) ? "provider" : "managed";
-    const symbol = series_kind === "provider" ? ticker.slice(prefix.length) : ticker;
+    let symbol = series_kind === "provider" ? ticker.slice(prefix.length) : ticker;
+    if (/^YAHOO:[A-Fa-f0-9]{32}$/.test(symbol)) symbol = "YAHOO:" + symbol.slice(6).toLowerCase();
     if (!/^[A-Za-z0-9:_-]{1,40}$/.test(symbol)) throw Error("无效品种标识");
     return { symbol, series_kind, ticker };
   }
   function encode(symbol, series_kind = "managed") {
     if (!["provider", "managed"].includes(series_kind)) throw Error("未知行情系列");
     if (decode(symbol).series_kind !== "managed") throw Error("需要基础品种标识");
-    return series_kind === "provider" ? prefix + symbol : symbol;
+    const canonical = decode(symbol).symbol;
+    return series_kind === "provider" ? prefix + canonical : canonical;
   }
   function same(left, right) {
     const a = decode(left), b = decode(right);

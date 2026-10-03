@@ -376,3 +376,59 @@ def test_expired_pool_waiter_executes_no_provider_statement(provider_pg):
         for connection in held:
             connection.close()
         event.remove(engine, 'before_cursor_execute', observed)
+
+
+def test_yahoo_catalog_additive_migration_upgrade_and_downgrade(provider_pg):
+    _, engine = provider_pg
+    module_path = Path(__file__).parents[2] / "migrations/versions/q18_yahoo_catalog.py"
+    spec = importlib.util.spec_from_file_location("yahoo_catalog_migration", module_path)
+    migration = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(migration)
+    with engine.begin() as connection:
+        connection.execute(text('ALTER TABLE market_instrument_catalog DROP COLUMN metadata_json'))
+        connection.execute(text("INSERT INTO market_instrument_catalog "
+            "(id, source, symbol, label, asset_type, precision, calendar, updated_at, available) "
+            "VALUES ('existing', 'oanda', 'EUR_USD', 'existing label', 'CURRENCY', 5, 'ny17', 0, true)"))
+        with Operations.context(MigrationContext.configure(connection)):
+            migration.upgrade()
+        assert connection.scalar(text("SELECT metadata_json FROM market_instrument_catalog WHERE id='existing'")) == {}
+        assert connection.scalar(text("SELECT label FROM market_instrument_catalog WHERE id='existing'")) == 'existing label'
+        with Operations.context(MigrationContext.configure(connection)):
+            migration.downgrade()
+        assert 'metadata_json' not in {c['name'] for c in inspect(connection).get_columns('market_instrument_catalog')}
+        assert connection.scalar(text("SELECT count(*) FROM market_instrument_catalog")) == 1
+
+
+def test_concurrent_yahoo_catalog_initialization_is_idempotent(provider_pg, monkeypatch):
+    from alerts import yahoo_catalog
+    from alerts.config import settings
+    from alerts.provider_yahoo import stable_id
+    from alerts.storage import MarketCatalog
+    from alerts.yahoo_aliases import ALIASES
+    from sqlalchemy.orm import Session
+
+    factory, _ = provider_pg
+    monkeypatch.setattr(settings, "yahoo_enabled", True)
+    first = stable_id(next(iter(ALIASES)))
+    ready = threading.Barrier(2)
+    original_get = Session.get
+
+    def simultaneous_first_read(db, entity, ident, **kwargs):
+        result = original_get(db, entity, ident, **kwargs)
+        if entity is MarketCatalog and ident == first and result is None:
+            ready.wait(timeout=5)
+        return result
+
+    monkeypatch.setattr(Session, "get", simultaneous_first_read)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        requests = [pool.submit(yahoo_catalog.seed) for _ in range(2)]
+        for request in requests:
+            request.result(timeout=10)
+    with factory.begin() as db:
+        rows = list(db.scalars(select(MarketCatalog)))
+        assert {row.symbol for row in rows} == set(ALIASES)
+        db.get(MarketCatalog, first).metadata_json = {"verified": True}
+    yahoo_catalog.seed()
+    with factory.begin() as db:
+        assert db.scalar(select(func.count()).select_from(MarketCatalog)) == len(ALIASES)
+        assert db.get(MarketCatalog, first).metadata_json == {"verified": True}

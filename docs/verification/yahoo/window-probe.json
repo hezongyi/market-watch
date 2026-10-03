@@ -1,0 +1,58 @@
+[
+  {
+    "frame": "M1",
+    "left_days": 8,
+    "right_days": 0,
+    "status": "error",
+    "error": "YFPricesMissingError",
+    "reason": "$AAPL: 1m data not available for startTime=1790307365 and endTime=1790998566. Only 8 days worth of 1m granularity data are allowed to be fetched per request."
+  },
+  {
+    "frame": "M1",
+    "left_days": 20,
+    "right_days": 13,
+    "status": "ok",
+    "bars": 1950,
+    "first": "2026-09-14 09:30:00-04:00"
+  },
+  {
+    "frame": "M1",
+    "left_days": 31,
+    "right_days": 24,
+    "status": "error",
+    "error": "YFPricesMissingError",
+    "reason": "$AAPL: 1m data not available for startTime=1788320165 and endTime=1788924966. The requested range must be within the last 30 days."
+  },
+  {
+    "frame": "M5",
+    "left_days": 59,
+    "right_days": 55,
+    "status": "ok",
+    "bars": 234,
+    "first": "2026-08-05 09:30:00-04:00"
+  },
+  {
+    "frame": "M5",
+    "left_days": 62,
+    "right_days": 60,
+    "status": "error",
+    "error": "YFPricesMissingError",
+    "reason": "$AAPL: 5m data not available for startTime=1785641765 and endTime=1785814566. The requested range must be within the last 60 days."
+  },
+  {
+    "frame": "H1",
+    "left_days": 729,
+    "right_days": 725,
+    "status": "ok",
+    "bars": 14,
+    "first": "2024-10-04 09:30:00-04:00"
+  },
+  {
+    "frame": "H1",
+    "left_days": 732,
+    "right_days": 730,
+    "status": "error",
+    "error": "YFPricesMissingError",
+    "reason": "$AAPL: 1h data not available for startTime=1727753765 and endTime=1727926566. The requested range must be within the last 730 days."
+  }
+]
