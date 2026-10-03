@@ -6,6 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": process.env.MARKET_WATCH_API_URL || "http://127.0.0.1:8000",
+      "/readyz": process.env.MARKET_WATCH_API_URL || "http://127.0.0.1:8000",
     },
   },
 });

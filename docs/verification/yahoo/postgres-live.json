@@ -1,0 +1,176 @@
+{
+  "sdk": "1.7.0",
+  "samples": [
+    {
+      "symbol": "AAPL",
+      "cold_ms": 6829.5,
+      "metadata_ms": 6272.71,
+      "hot_ms": 24.43,
+      "bars": 100,
+      "timings": {
+        "lease_wait": 5.83,
+        "yahoo_history": 180.3,
+        "database_commit": 150.58,
+        "read_total": 555.18,
+        "metadata": 1.38
+      },
+      "quote": {
+        "price": "333.69",
+        "previous_close": "330.32",
+        "quote_time": 1790971201000,
+        "fetched_at": 1791002316162,
+        "delay_seconds": 0,
+        "reported_delay_seconds": 0,
+        "declared_delay_seconds": null,
+        "status": "ok",
+        "basis": "Yahoo 市场报价"
+      }
+    },
+    {
+      "symbol": "SPY",
+      "cold_ms": 2114.19,
+      "metadata_ms": 1113.33,
+      "hot_ms": 57.66,
+      "bars": 100,
+      "timings": {
+        "lease_wait": 10.31,
+        "yahoo_history": 272.0,
+        "database_commit": 71.22,
+        "read_total": 999.37,
+        "metadata": 1.32
+      },
+      "quote": {
+        "price": "769.64",
+        "previous_close": "763.99",
+        "quote_time": 1790971200000,
+        "fetched_at": 1791002319354,
+        "delay_seconds": 0,
+        "reported_delay_seconds": 0,
+        "declared_delay_seconds": null,
+        "status": "ok",
+        "basis": "Yahoo 市场报价"
+      }
+    },
+    {
+      "symbol": "GC=F",
+      "cold_ms": 2050.3,
+      "metadata_ms": 1035.08,
+      "hot_ms": 12.32,
+      "bars": 100,
+      "timings": {
+        "lease_wait": 7.13,
+        "yahoo_history": 184.46,
+        "database_commit": 156.11,
+        "read_total": 1013.89,
+        "metadata": 1.16
+      },
+      "quote": {
+        "price": "4162.3",
+        "previous_close": "4202.3",
+        "quote_time": 1790974798000,
+        "fetched_at": 1791002322350,
+        "delay_seconds": 1800,
+        "reported_delay_seconds": 600,
+        "declared_delay_seconds": 1800,
+        "status": "ok",
+        "basis": "Yahoo 市场报价"
+      }
+    },
+    {
+      "symbol": "CL=F",
+      "cold_ms": 2129.64,
+      "metadata_ms": 1153.51,
+      "hot_ms": 26.77,
+      "bars": 100,
+      "timings": {
+        "lease_wait": 3.16,
+        "yahoo_history": 193.06,
+        "database_commit": 236.15,
+        "read_total": 974.63,
+        "metadata": 1.32
+      },
+      "quote": {
+        "price": "91.11",
+        "previous_close": "92.87",
+        "quote_time": 1790974799000,
+        "fetched_at": 1791002325382,
+        "delay_seconds": 1800,
+        "reported_delay_seconds": 600,
+        "declared_delay_seconds": 1800,
+        "status": "ok",
+        "basis": "Yahoo 市场报价"
+      }
+    },
+    {
+      "symbol": "EURUSD=X",
+      "cold_ms": 2031.62,
+      "metadata_ms": 1033.73,
+      "hot_ms": 12.16,
+      "bars": 100,
+      "timings": {
+        "lease_wait": 2.72,
+        "yahoo_history": 183.07,
+        "database_commit": 173.07,
+        "read_total": 996.82,
+        "metadata": 0.91
+      },
+      "quote": {
+        "price": "1.1257458",
+        "previous_close": "1.1244799",
+        "quote_time": 1790976545000,
+        "fetched_at": 1791002328395,
+        "delay_seconds": 0,
+        "reported_delay_seconds": 0,
+        "declared_delay_seconds": null,
+        "status": "ok",
+        "basis": "Yahoo 市场报价"
+      }
+    },
+    {
+      "symbol": "^GSPC",
+      "cold_ms": 1874.81,
+      "metadata_ms": 1109.45,
+      "hot_ms": 14.12,
+      "bars": 100,
+      "timings": {
+        "lease_wait": 3.23,
+        "yahoo_history": 170.82,
+        "database_commit": 51.05,
+        "read_total": 763.73,
+        "metadata": 1.46
+      },
+      "quote": {
+        "price": "7722.72",
+        "previous_close": "7666.45",
+        "quote_time": 1790974753000,
+        "fetched_at": 1791002331449,
+        "delay_seconds": 0,
+        "reported_delay_seconds": 0,
+        "declared_delay_seconds": null,
+        "status": "ok",
+        "basis": "Yahoo 市场报价"
+      }
+    }
+  ],
+  "isolation": {
+    "candles": 0,
+    "chart_history_plans": 0,
+    "chart_publications": 0,
+    "import_jobs": 0,
+    "watches": 0,
+    "outbox": 0
+  },
+  "source_limits": [],
+  "negative_oil": {
+    "start": 1587355200000,
+    "end": 1587441600000,
+    "chart_time": 1587340800000,
+    "open": "17.729999542236328",
+    "high": "17.850000381469727",
+    "low": "-40.31999969482422",
+    "close": "-37.630001068115234",
+    "complete": true,
+    "volume": "247947.0",
+    "volume_complete": true
+  }
+}

@@ -14,13 +14,16 @@ def decode(ticker: str) -> tuple[str, SeriesKind]:
     symbol = ticker[len(PROVIDER_PREFIX) :] if kind == "provider" else ticker
     if not re.fullmatch(r"[A-Za-z0-9:_-]{1,40}", symbol):
         raise ValueError("无效品种标识")
+    if re.fullmatch(r"YAHOO:[A-Fa-f0-9]{32}", symbol):
+        symbol = "YAHOO:" + symbol[6:].lower()
     return symbol, kind
 
 
 def encode(symbol: str, kind: SeriesKind = "managed") -> str:
     if kind not in ("provider", "managed") or decode(symbol)[1] != "managed":
         raise ValueError("无效行情系列或基础品种")
-    return PROVIDER_PREFIX + symbol if kind == "provider" else symbol
+    canonical = decode(symbol)[0]
+    return PROVIDER_PREFIX + canonical if kind == "provider" else canonical
 
 
 def display_symbol(symbol: str) -> str:

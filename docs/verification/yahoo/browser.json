@@ -1,0 +1,312 @@
+{
+  "passed": true,
+  "started_at": "2026-10-03T05:31:27.398Z",
+  "completed_at": "2026-10-03T05:31:55.700Z",
+  "source_sha256": {
+    "../advanced-host/bridge.js": "225398445bc86e8e4d61a20dfb11c757bbdb2e393805412599d5f9b41d51f6ae",
+    "../advanced-host/series.js": "056e35c64b730ba7729535342d1eea88163a75b37d627702f0b7f47a6f809156",
+    "../backend/alerts/market_data.py": "a5f1036af17c228803b7ca97dabfba4ba2ea6e6b8843d5daa73c162ac56c600a",
+    "../backend/alerts/market_names.py": "952cec745d8e1673aab85dcd9cb30bf4dc0325a1a976608b7b47c4e4ae609461",
+    "../backend/alerts/yahoo_aliases.py": "d9a53a18a8675709be38e12ab02f0c141a3bb38f9fd9eb7df604500d150cfca6"
+  },
+  "visiblePresentation": {
+    "original_symbol": true,
+    "chinese_name": true,
+    "quote_time": true,
+    "delay": true,
+    "internal_hash_absent": true
+  },
+  "metrics": [
+    {
+      "resolution": "1",
+      "elapsed_ms": 992,
+      "range": {
+        "from": 1790962440,
+        "to": 1791207540
+      }
+    },
+    {
+      "resolution": "15",
+      "elapsed_ms": 1196,
+      "range": {
+        "from": 1790352000,
+        "to": 1791215100
+      }
+    },
+    {
+      "resolution": "60",
+      "elapsed_ms": 39,
+      "range": {
+        "from": 1788445800,
+        "to": 1791300600
+      }
+    },
+    {
+      "resolution": "1D",
+      "elapsed_ms": 1089,
+      "range": {
+        "from": 1772755200,
+        "to": 1792071000
+      }
+    },
+    {
+      "resolution": "1W",
+      "elapsed_ms": 505,
+      "range": {
+        "from": 1702857600,
+        "to": 1796049000
+      }
+    },
+    {
+      "resolution": "1M",
+      "elapsed_ms": 932,
+      "range": {
+        "from": 1409529600,
+        "to": 1814448600
+      }
+    },
+    {
+      "resolution": "5",
+      "elapsed_ms": 172,
+      "range": {
+        "from": 1790864400,
+        "to": 1791209700
+      }
+    }
+  ],
+  "resolve": {
+    "name": "GC=F",
+    "ticker": "MWP:YAHOO:652cc40d03a64e41ad50e19a49a0ef77",
+    "description": "黄金期货 · COMEX · GC=F · 平台行情 · Yahoo 供应商价格 · 量不可用",
+    "exchange": "COMEX",
+    "listed_exchange": "COMEX",
+    "type": "futures",
+    "session": "1800-1700:23456",
+    "timezone": "America/New_York",
+    "minmov": 1,
+    "pricescale": 100000000,
+    "has_intraday": true,
+    "intraday_multipliers": [
+      "1",
+      "5",
+      "15",
+      "60"
+    ],
+    "has_daily": true,
+    "daily_multipliers": [
+      "1"
+    ],
+    "has_weekly_and_monthly": true,
+    "weekly_multipliers": [
+      "1"
+    ],
+    "monthly_multipliers": [
+      "1"
+    ],
+    "supported_resolutions": [
+      "1",
+      "5",
+      "15",
+      "60",
+      "1D",
+      "1W",
+      "1M"
+    ],
+    "visible_plots_set": "ohlcv",
+    "volume_precision": 8,
+    "format": "price",
+    "data_status": "delayed_streaming",
+    "delay": 1800,
+    "currency_code": "USD",
+    "has_empty_bars": false
+  },
+  "search": [
+    {
+      "symbol": "GC=F",
+      "ticker": "MWP:YAHOO:652cc40d03a64e41ad50e19a49a0ef77",
+      "description": "黄金期货 · COMEX · 平台行情",
+      "exchange": "COMEX",
+      "type": "futures"
+    }
+  ],
+  "chineseSearch": {
+    "欧元": [
+      {
+        "symbol": "EURUSD=X",
+        "ticker": "MWP:YAHOO:edb0c8f3d3a261a3a3497905f4873c34",
+        "description": "欧元／美元 · 平台行情",
+        "exchange": "CCY",
+        "type": "forex"
+      }
+    ],
+    "比特币": [
+      {
+        "symbol": "BTCUSDT",
+        "ticker": "MWP:BTCUSDT",
+        "description": "比特币 / USDT · 平台行情",
+        "exchange": "BINANCE",
+        "type": "crypto"
+      }
+    ],
+    "英伟达": [
+      {
+        "symbol": "NVDA",
+        "ticker": "MWP:YAHOO:426219f2bc19829619cd8e71b51d7b93",
+        "description": "英伟达 · 平台行情",
+        "exchange": "NasdaqGS",
+        "type": "stock"
+      }
+    ]
+  },
+  "nativeSearchText": [
+    "GC=F黄金期货 · COMEX · 平台行情futuresCOMEX"
+  ],
+  "quotes": [
+    {
+      "s": "ok",
+      "n": "MWP:YAHOO:652cc40d03a64e41ad50e19a49a0ef77",
+      "v": {
+        "short_name": "GC=F",
+        "description": "黄金期货 · COMEX · Yahoo 市场报价 · 2026-10-02 20:59 UTC · 延迟 30 分钟",
+        "exchange": "COMEX",
+        "lp": 4162.3,
+        "quote_time": 1790974798000,
+        "fetched_at": 1791005509318,
+        "delay_seconds": 1800,
+        "fetch_status": "ok",
+        "ch": -40,
+        "chp": -0.9518596958808272,
+        "prev_close_price": 4202.3
+      }
+    }
+  ],
+  "oil": {
+    "mode": 0,
+    "range": {
+      "from": 1586908800,
+      "to": 1588291200
+    },
+    "priceRange": {
+      "from": -46.500208550391626,
+      "to": 30.649261141938496
+    }
+  },
+  "pages": [
+    {
+      "status": 200,
+      "frame": "M5",
+      "bars": 572,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "M5",
+      "bars": 572,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "H4",
+      "bars": 572,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "H1",
+      "bars": 582,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "M1",
+      "bars": 572,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "M15",
+      "bars": 582,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "D1",
+      "bars": 572,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "W1",
+      "bars": 572,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "MN",
+      "bars": 502,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "M5",
+      "bars": 1149,
+      "cache_hit": true
+    },
+    {
+      "status": 200,
+      "frame": "M5",
+      "bars": 193,
+      "cache_hit": true
+    },
+    {
+      "status": 200,
+      "frame": "M5",
+      "bars": 173,
+      "cache_hit": true
+    },
+    {
+      "status": 200,
+      "frame": "M5",
+      "bars": 1149,
+      "cache_hit": true
+    },
+    {
+      "status": 200,
+      "frame": "M5",
+      "bars": 573,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "M5",
+      "bars": 173,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "D1",
+      "bars": 573,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "D1",
+      "bars": 173,
+      "cache_hit": false
+    },
+    {
+      "status": 200,
+      "frame": "D1",
+      "bars": 3096,
+      "cache_hit": true
+    },
+    {
+      "status": 200,
+      "frame": "D1",
+      "bars": 1511,
+      "cache_hit": true
+    }
+  ],
+  "errors": [],
+  "feedErrors": []
+}

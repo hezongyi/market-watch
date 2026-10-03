@@ -17,6 +17,41 @@ def test_missing_intervals_are_half_open():
     ) == [(0, 20), (60, 100)]
 
 
+@pytest.mark.parametrize('query,expected', [
+    ('欧元', 'EURUSD'), ('黄金', 'XAUUSD'), ('比特币', 'BTCUSDT'),
+    ('苹果', 'AAPL'), ('英伟达', 'NVDA'),
+])
+def test_catalog_chinese_search_is_local_and_keeps_supplier_code(database, monkeypatch, query, expected):
+    from alerts import yahoo_catalog
+    from alerts.config import settings
+    from alerts.provider_yahoo import stable_id
+
+    monkeypatch.setattr(settings, 'yahoo_enabled', True)
+    def unexpected_search(query):
+        raise AssertionError('Known Chinese names should not require remote search')
+    monkeypatch.setattr(yahoo_catalog, 'search', unexpected_search)
+    with database.begin() as db:
+        for ident in ('EURUSD', 'XAUUSD'):
+            row = db.get(Instrument, ident)
+            row.source = 'oanda'
+            row.symbol = {'EURUSD':'EUR_USD', 'XAUUSD':'XAU_USD'}[ident]
+            row.label = row.symbol  # supplier labels may contain no Chinese
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+    try:
+        with TestClient(api_module.app) as client:
+            response = client.get('/api/market-data/catalog', params={'query':query})
+            assert response.status_code == 200
+            ident = stable_id(expected) if expected in ('AAPL', 'NVDA') else expected
+            found = next(row for row in response.json() if row['id'] == ident)
+            assert query in found['label'] and query in found['chinese_name']
+            assert found['symbol'] and found['symbol'] != found['label']
+            assert found['english_name']
+            by_code = client.get('/api/market-data/catalog', params={'query':found['symbol']})
+            assert any(row['id']==ident for row in by_code.json())
+    finally:
+        api_module.app.dependency_overrides.clear()
+
+
 def test_history_jobs_share_work(database):
     with database.begin() as db:
         inst = db.get(Instrument, "EURUSD")

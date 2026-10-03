@@ -1,0 +1,353 @@
+{
+  "version": "1.7.0",
+  "samples": [
+    {
+      "symbol": "AAPL",
+      "metadata": {
+        "symbol": "AAPL",
+        "quoteType": "EQUITY",
+        "exchange": "NMS",
+        "fullExchangeName": "NasdaqGS",
+        "currency": "USD",
+        "exchangeTimezoneName": "America/New_York",
+        "regularMarketPrice": 333.69,
+        "regularMarketTime": 1790971201,
+        "regularMarketPreviousClose": 330.32,
+        "exchangeDataDelayedBy": 0,
+        "longName": "Apple Inc.",
+        "shortName": "Apple Inc."
+      },
+      "m1": {
+        "count": 1950,
+        "first": "2026-09-28 09:30:00-04:00",
+        "last": "2026-10-02 15:59:00-04:00"
+      },
+      "status": "ok",
+      "elapsed_ms": 3227,
+      "routes": [
+        {
+          "host": "fc.yahoo.com",
+          "path": "",
+          "proxied": true,
+          "status": 404
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/v1/test/getcrumb",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v10/finance/quoteSummary/AAPL",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/v7/finance/quote",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/ws/fundamentals-timeseries/v1/finance/timeseries/AAPL",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/AAPL",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/AAPL",
+          "proxied": true,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "symbol": "SPY",
+      "metadata": {
+        "symbol": "SPY",
+        "quoteType": "ETF",
+        "exchange": "PCX",
+        "fullExchangeName": "NYSEArca",
+        "currency": "USD",
+        "exchangeTimezoneName": "America/New_York",
+        "regularMarketPrice": 769.64,
+        "regularMarketTime": 1790971200,
+        "regularMarketPreviousClose": 763.99,
+        "exchangeDataDelayedBy": 0,
+        "longName": "State Street SPDR S&P 500 ETF Trust",
+        "shortName": "State Street SPDR S&P 500 ETF T"
+      },
+      "m1": {
+        "count": 1950,
+        "first": "2026-09-28 09:30:00-04:00",
+        "last": "2026-10-02 15:59:00-04:00"
+      },
+      "status": "ok",
+      "elapsed_ms": 1019,
+      "routes": [
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v10/finance/quoteSummary/SPY",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/v7/finance/quote",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/ws/fundamentals-timeseries/v1/finance/timeseries/SPY",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/SPY",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/SPY",
+          "proxied": true,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "symbol": "GC=F",
+      "metadata": {
+        "symbol": "GC=F",
+        "quoteType": "FUTURE",
+        "exchange": "CMX",
+        "fullExchangeName": "COMEX",
+        "currency": "USD",
+        "exchangeTimezoneName": "America/New_York",
+        "regularMarketPrice": 4172.1,
+        "regularMarketTime": 1790974798,
+        "regularMarketPreviousClose": 4202.3,
+        "exchangeDataDelayedBy": 10,
+        "longName": null,
+        "shortName": "Gold Dec 26"
+      },
+      "m1": {
+        "count": 6532,
+        "first": "2026-09-28 00:00:00-04:00",
+        "last": "2026-10-02 16:59:00-04:00"
+      },
+      "status": "ok",
+      "elapsed_ms": 1237,
+      "routes": [
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v10/finance/quoteSummary/GC=F",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/v7/finance/quote",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/ws/fundamentals-timeseries/v1/finance/timeseries/GC=F",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/GC=F",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/GC=F",
+          "proxied": true,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "symbol": "CL=F",
+      "metadata": {
+        "symbol": "CL=F",
+        "quoteType": "FUTURE",
+        "exchange": "NYM",
+        "fullExchangeName": "NY Mercantile",
+        "currency": "USD",
+        "exchangeTimezoneName": "America/New_York",
+        "regularMarketPrice": 91.26,
+        "regularMarketTime": 1790974799,
+        "regularMarketPreviousClose": 92.87,
+        "exchangeDataDelayedBy": 10,
+        "longName": null,
+        "shortName": "Crude Oil Nov 26"
+      },
+      "m1": {
+        "count": 6516,
+        "first": "2026-09-28 00:00:00-04:00",
+        "last": "2026-10-02 16:59:00-04:00"
+      },
+      "status": "ok",
+      "elapsed_ms": 1014,
+      "routes": [
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v10/finance/quoteSummary/CL=F",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/v7/finance/quote",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/ws/fundamentals-timeseries/v1/finance/timeseries/CL=F",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/CL=F",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/CL=F",
+          "proxied": true,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "symbol": "EURUSD=X",
+      "metadata": {
+        "symbol": "EURUSD=X",
+        "quoteType": "CURRENCY",
+        "exchange": "CCY",
+        "fullExchangeName": "CCY",
+        "currency": "USD",
+        "exchangeTimezoneName": "Europe/London",
+        "regularMarketPrice": 1.1257458,
+        "regularMarketTime": 1790976545,
+        "regularMarketPreviousClose": 1.1244799,
+        "exchangeDataDelayedBy": 0,
+        "longName": "EUR/USD",
+        "shortName": "EUR/USD"
+      },
+      "m1": {
+        "count": 7082,
+        "first": "2026-09-28 00:00:00+01:00",
+        "last": "2026-10-02 22:29:00+01:00"
+      },
+      "status": "ok",
+      "elapsed_ms": 1006,
+      "routes": [
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v10/finance/quoteSummary/EURUSD=X",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/v7/finance/quote",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/ws/fundamentals-timeseries/v1/finance/timeseries/EURUSD=X",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/EURUSD=X",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/EURUSD=X",
+          "proxied": true,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "symbol": "^GSPC",
+      "metadata": {
+        "symbol": "^GSPC",
+        "quoteType": "INDEX",
+        "exchange": "SNP",
+        "fullExchangeName": "SNP",
+        "currency": "USD",
+        "exchangeTimezoneName": "America/New_York",
+        "regularMarketPrice": 7722.72,
+        "regularMarketTime": 1790974753,
+        "regularMarketPreviousClose": 7666.45,
+        "exchangeDataDelayedBy": 0,
+        "longName": "S&P 500",
+        "shortName": "S&P 500"
+      },
+      "m1": {
+        "count": 1950,
+        "first": "2026-09-28 09:30:00-04:00",
+        "last": "2026-10-02 15:59:00-04:00"
+      },
+      "status": "ok",
+      "elapsed_ms": 972,
+      "routes": [
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v10/finance/quoteSummary/^GSPC",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/v7/finance/quote",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query1.finance.yahoo.com",
+          "path": "/ws/fundamentals-timeseries/v1/finance/timeseries/^GSPC",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/^GSPC",
+          "proxied": true,
+          "status": 200
+        },
+        {
+          "host": "query2.finance.yahoo.com",
+          "path": "/v8/finance/chart/^GSPC",
+          "proxied": true,
+          "status": 200
+        }
+      ]
+    }
+  ]
+}

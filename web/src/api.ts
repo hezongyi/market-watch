@@ -22,7 +22,9 @@ export async function api<T = any>(path: string, body?: unknown, signal?: AbortS
     throw new Error(
       typeof result.detail === "string"
         ? result.detail
-        : JSON.stringify(result.detail),
+        : typeof result.detail?.message === "string"
+          ? result.detail.message
+          : JSON.stringify(result.detail),
     );
   return result;
 }

@@ -33,8 +33,9 @@ class NativeChartWrite(BaseModel):
     @field_validator("symbol")
     @classmethod
     def valid_symbol(cls, value):
-        decode(value)
-        return value
+        from .chart_series import encode
+        symbol, kind = decode(value)
+        return encode(symbol, kind)
 
 
 def native_metadata(row):
@@ -272,7 +273,7 @@ def router(authenticated):
                     from .provider_chart import metadata
 
                     rows[0]['initial_symbol'] = {'ticker': ticker, 'metadata': metadata(symbol)}
-            except (HTTPException, ValueError):
+            except (HTTPException, ValueError, TimeoutError, RuntimeError):
                 # The normal native resolve path reports unavailable/invalid
                 # symbols. Never replace the workspace or its series here.
                 pass

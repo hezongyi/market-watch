@@ -376,3 +376,24 @@ def test_expired_pool_waiter_executes_no_provider_statement(provider_pg):
         for connection in held:
             connection.close()
         event.remove(engine, 'before_cursor_execute', observed)
+
+
+def test_yahoo_catalog_additive_migration_upgrade_and_downgrade(provider_pg):
+    _, engine = provider_pg
+    module_path = Path(__file__).parents[2] / "migrations/versions/q18_yahoo_catalog.py"
+    spec = importlib.util.spec_from_file_location("yahoo_catalog_migration", module_path)
+    migration = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(migration)
+    with engine.begin() as connection:
+        connection.execute(text('ALTER TABLE market_instrument_catalog DROP COLUMN metadata_json'))
+        connection.execute(text("INSERT INTO market_instrument_catalog "
+            "(id, source, symbol, label, asset_type, precision, calendar, updated_at, available) "
+            "VALUES ('existing', 'oanda', 'EUR_USD', 'existing label', 'CURRENCY', 5, 'ny17', 0, true)"))
+        with Operations.context(MigrationContext.configure(connection)):
+            migration.upgrade()
+        assert connection.scalar(text("SELECT metadata_json FROM market_instrument_catalog WHERE id='existing'")) == {}
+        assert connection.scalar(text("SELECT label FROM market_instrument_catalog WHERE id='existing'")) == 'existing label'
+        with Operations.context(MigrationContext.configure(connection)):
+            migration.downgrade()
+        assert 'metadata_json' not in {c['name'] for c in inspect(connection).get_columns('market_instrument_catalog')}
+        assert connection.scalar(text("SELECT count(*) FROM market_instrument_catalog")) == 1
