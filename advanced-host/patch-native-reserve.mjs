@@ -10,7 +10,7 @@ let source = readFileSync(file, 'utf8');
 const expected = '114428b8dde6eb137fd7ef3bc20ef35882189186c4bd092bb743b64d11682be1';
 const runtime = 'globalThis.parent?.MWNativeReserve';
 const navigation = 'globalThis.parent?.MWNativeNavigation';
-const replacements = [
+const previous = [
   ['class h{constructor(e,t){this._bars=[],this._invalidated=!0',
    `class h{constructor(e,t){${runtime}?.bindModel(t);globalThis.parent?.MWNativeNavigation?.bindModel(t);this._bars=[],this._invalidated=!0`],
   ['destroy(){this._abortController.abort(),this.clearIntervals()',
@@ -45,25 +45,26 @@ const replacements = [
   ['distance(e,t){if(!this.isValid())return{success:!1};',
    'mwRequiredCount(e,t,i){const s=this._symbolInfo;return(0,ee.getPeriodsBetweenDates)(s.session,s.session_holidays,s.corrections,i.letter(),i.multiplier(),e*1e3,t*1e3)}mwDistance(e,t){return(0,te.extrapolateBarsFrontToTime)(this.barBuilder(),e*1e3,t*1e3,20000,!1).count}distance(e,t){if(!this.isValid())return{success:!1};'],
 ];
-const legacy = replacements.slice(0,6).map(([before, after])=>[before,after]);
+// Continuous history keeps only cache delivery, lifetime and recoverable-error
+// hooks. No window identity, range interception, count extrapolation or anchor.
+const replacements = [previous[0],previous[1],previous[2],previous[3],previous[4],previous[5],previous[11],previous[15]];
+const legacy = previous.slice(0,6).map(([before, after])=>[before,after]);
 legacy[0][1] = `class h{constructor(e,t){${runtime}?.bindModel(t);this._bars=[],this._invalidated=!0`;
 legacy[1][1] = `destroy(){${runtime}?.unbindModel(this);this._abortController.abort(),this.clearIntervals()`;
 legacy[2][1] = `this._datafeed=e,this._symbolInfo=t,${runtime}?.bindThread(this,t,i),this._interval=Ne.Interval.parse(i)`;
 legacy[3][1] = `destroy(){${runtime}?.unbindThread(this);0!==this._subscribers.length&&this._logWarning`;
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const currentComplete = replacements.every(([, after])=>source.split(after).length===2);
-  const legacyComplete = legacy.every(([,after])=>source.split(after).length===2);
-  if (!currentComplete && !legacyComplete)
-    throw Error('Incomplete native hooks: restore the verified original bundle before installing');
+  const installed = [previous, replacements, legacy].find(candidate=>
+    candidate.every(([,after])=>source.split(after).length===2));
+  if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;
-  for (const [before, after] of currentComplete ? replacements : legacy) original = original.replace(after, before);
+  for (const [before, after] of installed) original = original.replace(after, before);
   if (digest(original) !== expected)
     throw Error('Unsupported licensed bundle: supply the original verified v31.1.0 distribution');
   if (disabled) {writeFileSync(file, original);console.log('Restored verified original native bundle');process.exit(0);}
-  if (currentComplete) {
-    console.log('Verified existing native reserve hooks');
-    process.exit(0);
+  if (installed === replacements) {
+    console.log('Verified existing continuous native hooks');process.exit(0);
   }
   source = original;
 }

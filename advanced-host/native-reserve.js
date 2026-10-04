@@ -108,6 +108,7 @@ const MWNativeReserve = (() => {
             entry.enhancedUntil = now() + 10000;
         const rows = result.bars.filter(b => b.time < requestBefore);
         if (rows.length) {
+          globalThis.MWNativeNavigation?.admitCached(thread, rows);
           thread._processBars(rows, {noData: result.history_boundary === true});
           retry.failures = 0; retry.misses = 0; retry.retryAt = 0;
         } else if (!rows.length) {

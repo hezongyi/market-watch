@@ -135,7 +135,7 @@ function drain() {
       send({type:"cancel-request",id});
       reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
       drain();
-    }, 30000);
+    }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
     const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
       reserve: !!query.native_reserve };
     pending.set(id, entry);
@@ -283,18 +283,6 @@ globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen
   return {...page, bars: barsOf(page, resolution, symbol)};
 }, nativeReserveWarmup);
 
-globalThis.MWNativeNavigation?.configure(async (window, current) => {
-  const prefix = nativeReserveWarmup(window.symbol, window.resolution) + 4;
-  if (window.count + prefix > 20000)
-    throw Object.assign(Error('显示范围过大，请缩小时间范围后重试'), {code:'NATIVE_HISTORY_CAPACITY_EXCEEDED'});
-  const page = await query(window.symbol, window.resolution, {
-    limit:window.count + prefix, countBack:window.count + prefix,
-    from:window.from * 1000, before:window.to * 1000, firstDataRequest:true,
-    client:clientId, native_history:{...nativeHistoryContext(window.symbol, window.resolution), historical_navigation:true},
-  }, Date.now() + 30000, current);
-  if (!page.bars.length) throw Error('目标时间暂无可用历史行情');
-  window.seed = {page, count:window.count + prefix};
-}, (symbol,resolution) => nativeReserveWarmup(symbol,resolution) + 4);
 globalThis.addEventListener('mw-navigation-error', event => {
   if (event.detail?.code !== 'HISTORY_CANCELLED') send({type:'error',error:String(event.detail)});
 });
@@ -524,7 +512,7 @@ const feed = {
           firstDataRequest:p.firstDataRequest, client:clientId,
           native_history:nativeHistoryContext(s.ticker,res)};
         let page = globalThis.MWNativeNavigation?.takeSeed(s, res, p) ||
-          await query(s.ticker, res, args, Infinity, () => !s.mw_window || MWNativeNavigation.hasWindow(s.mw_window));
+          await query(s.ticker, res, args, Infinity, () => (!s.mw_current || s.mw_current()) && (!s.mw_window || MWNativeNavigation.hasWindow(s.mw_window)));
         if (epoch !== workspaceEpoch) {
           const error = Error("已取消旧图表的历史加载");
           error.code = "HISTORY_CANCELLED"; throw error;
@@ -556,6 +544,15 @@ const feed = {
           }
         }
         const rows = barsOf(page, res, s.ticker);
+        if(providerWork && page.bars?.length) {
+          const old=providerWork.observation;
+          providerWork.observation={
+            first:Math.min(old?.first ?? Infinity,page.history_dependency_first ?? page.bars[0].chart_time),
+            last:Math.max(old?.last ?? 0,page.bars.at(-1).chart_time),
+            revision:Math.min(old?.revision ?? Infinity,page.cache_revision||0),
+            observed_at:Math.min(old?.observed_at ?? Infinity,page.as_of||0),
+          };
+        }
         if(!historyOlder(page,providerHistoryState.get(historyKey))) {
           const previous=providerHistoryState.get(historyKey);
           providerHistoryState.set(historyKey,{revision:page.cache_revision||0,
@@ -671,7 +668,7 @@ const feed = {
       send({type:'provider-unsubscribe',args:{client:clientId,listener:sub.providerListener}});
     subscriptions.delete(id);
     if (sub?.window && ![...subscriptions.values()].some(other=>other.window===sub.window)) {
-      const key=sub.symbol+'|'+sub.res+'|'+sub.window;
+      const key=sub.symbol+'|'+sub.res+'|'+(sub.window || '');
       providerHistoryWork.delete(key);lastHistory.delete(key);firstHistory.delete(key);
     }
   },
@@ -713,6 +710,44 @@ function hasProviderWindowViewer(work) {
     chart=>chartUsesSymbol(chart,work.symbol,work.res) && providerWindowMatches(chart,work));
 }
 let historyReloading = false;
+function reviewProviderReset(sub, event) {
+  sub.resetRevision=Math.max(sub.resetRevision||0,event.revision||0);
+  if(sub.resetReview) return sub.resetReview;
+  const epoch=workspaceEpoch;
+  const current=()=>epoch===workspaceEpoch &&
+    [...subscriptions.values()].includes(sub);
+  const task=(async()=>{
+    for(let attempt=0;attempt<3 && current();attempt++) {
+      const work=providerHistoryWork.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
+      const observation=work?.observation;
+      if(!observation) throw Error('历史数据尚未完成观察，请稍后刷新历史');
+      if(sub.resetRevision<=observation.revision) return;
+      // Stream gaps do not prove delivered history changed. Verify delivered
+      // bars and indicator dependencies before invalidating the native source.
+      const page=await query(sub.symbol,sub.res,{
+        limit:1,countBack:1,before:observation.last+1,
+        native_history:{...nativeHistoryContext(sub.symbol,sub.res),historical_navigation:true},
+        history_observation:{...observation},
+      },Date.now()+30000,current);
+      if(!current()) return;
+      if(!page.history_revalidation || historyOlder(page,{
+        revision:observation.revision,observed_at:observation.observed_at}))
+        throw Error('历史更正尚未核实，请刷新历史');
+      if(page.history_revalidation.changed) {
+        sub.needsHistoryReload=true;
+        if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub)))
+          sub.needsHistoryReload=false;
+        return;
+      }
+      if(work.observation!==observation) continue;
+      work.observation={...observation,revision:page.cache_revision||0,observed_at:page.as_of||0};
+      if(sub.resetRevision<=work.observation.revision) return;
+    }
+    if(current()) throw Error('历史更正尚未核实，请刷新历史');
+  })();
+  sub.resetReview=task;
+  return task.finally(()=>{if(sub.resetReview===task)sub.resetReview=null;});
+}
 function mergeProviderCorrection(work,generation,verified,original) {
   // A failed/older review cannot erase an earlier confirmed real revision.
   const originals=[...(work.correction?.originals || [])];
@@ -1584,9 +1619,9 @@ addEventListener("message", async (e) => {
       providerHistoryState.set(key,{revision:event.revision||0,observed_at:event.as_of||0,
         cursor:Math.max(old?.cursor||0,event.cursor||0)});
     if(event.type==='reset') {
-      sub.needsHistoryReload=true;
-      if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub)).catch(error=>send({type:'error',error:String(error)})))
-        sub.needsHistoryReload=false;
+      await reviewProviderReset(sub,event).catch(error=>{
+        if(error.code!=='HISTORY_CANCELLED') send({type:'error',error:'历史检查未完成：'+String(error)});
+      });
     } else if(event.type==='bars') {
       if(sub.needsHistoryReload) {
         if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub)))sub.needsHistoryReload=false;
@@ -1608,8 +1643,13 @@ addEventListener("message", async (e) => {
     clearTimeout(p.cancellationTimer);
     m.error ? p.reject(Object.assign(Error(m.error),m.errorDetails)) : p.resolve(m.result);
     drain();
-  } else if (m.type === "init" && !widget)
+  } else if (m.type === "cancel-history") {
+    MWNativeNavigation.cancelAll();
+  } else if (m.type === "init" && !widget) {
+    MWNativeNavigation.setCapabilities(m.history_capabilities);
+    globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
     boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol);
+  }
   else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
   else if (m.type === "save") snapshot();
   else if (m.type === "theme" && ready) {

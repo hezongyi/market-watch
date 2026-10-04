@@ -1,3 +1,7 @@
+import {
+  loadNativeHistory,
+  type HistoryCapabilities,
+} from "./nativeHistoryLoads";
 import { useEffect, useRef, useState } from "react";
 import { api, apiErrorDetails } from "../api";
 import "./advanced.css";
@@ -11,7 +15,7 @@ type Workspace = {
   name: string;
   revision: number;
   document: Record<string, unknown>;
-  initial_symbol?: {ticker: string; metadata: Record<string, unknown>};
+  initial_symbol?: { ticker: string; metadata: Record<string, unknown> };
 };
 const channel = "mw-chart-v1";
 const frames = new Set([
@@ -29,18 +33,24 @@ const frames = new Set([
 export default function AdvancedWorkspace() {
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
-  const [historyPlansOpen,setHistoryPlansOpen] = useState(false);
-  const [maintenanceInstrument,setMaintenanceInstrument] = useState<string | null>(null);
-  const [datasetViews,setDatasetViews] = useState<DatasetViews>({});
+  const [historyPlansOpen, setHistoryPlansOpen] = useState(false);
+  const [maintenanceInstrument, setMaintenanceInstrument] = useState<
+    string | null
+  >(null);
+  const [datasetViews, setDatasetViews] = useState<DatasetViews>({});
   const [frameKey, setFrameKey] = useState(0);
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
-  const [historyProgress,setHistoryProgress] = useState<Record<string,string>>({});
+  const [historyProgress, setHistoryProgress] = useState<
+    Record<string, string>
+  >({});
   const [feedError, setFeedError] = useState("");
   const [syncNotices, setSyncNotices] = useState<Record<string, string>>({});
   const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
   const [chartTheme, setChartTheme] = useState("dark");
   const [nativeReady, setNativeReady] = useState(false);
+  const historyCapabilities = useRef<HistoryCapabilities | null>(null);
+  const [nativeLoads, setNativeLoads] = useState<Record<string, string>>({});
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
   const frame = useRef<HTMLIFrameElement>(null),
@@ -98,20 +108,42 @@ export default function AdvancedWorkspace() {
     setStatus("正在加载图表");
   };
   const noticeMessages = [
-    ...(blocked.current ? [{id: "draft", text: "草稿尚未保存，自动保存已暂停。是否复制恢复为独立工作区？", recover: true}] : []),
-    ...(!blocked.current && error ? [{id: "workspace", text: error}] : []),
-    ...(feedError && !(blocked.current && /未保存草稿|保存已暂停/.test(feedError))
-      ? [{id: "feed", text: feedError}] : []),
-    ...Object.entries(pollErrors).map(([id, text]) => ({id: "poll:" + id, text})),
-    ...Object.entries(syncNotices).map(([id, text]) => ({id: "viewport:" + id, text})),
+    ...(blocked.current
+      ? [
+          {
+            id: "draft",
+            text: "草稿尚未保存，自动保存已暂停。是否复制恢复为独立工作区？",
+            recover: true,
+          },
+        ]
+      : []),
+    ...(!blocked.current && error ? [{ id: "workspace", text: error }] : []),
+    ...(feedError &&
+    !(blocked.current && /未保存草稿|保存已暂停/.test(feedError))
+      ? [{ id: "feed", text: feedError }]
+      : []),
+    ...Object.entries(pollErrors).map(([id, text]) => ({
+      id: "poll:" + id,
+      text,
+    })),
+    ...Object.entries(syncNotices).map(([id, text]) => ({
+      id: "viewport:" + id,
+      text,
+    })),
   ];
   const notificationState = JSON.stringify(noticeMessages);
   useEffect(() => {
-    if (nativeReady) post({type: "notifications", notices: JSON.parse(notificationState),
-      draftBlocked: blocked.current});
+    if (nativeReady)
+      post({
+        type: "notifications",
+        notices: JSON.parse(notificationState),
+        draftBlocked: blocked.current,
+      });
   }, [nativeReady, notificationState]);
   async function refresh(limit?: number) {
-    const list = await api<Workspace[]>("/advanced-charts/workspaces"+(limit ? '?limit='+limit : ''));
+    const list = await api<Workspace[]>(
+      "/advanced-charts/workspaces" + (limit ? "?limit=" + limit : ""),
+    );
     setRows(list);
     return list;
   }
@@ -126,10 +158,15 @@ export default function AdvancedWorkspace() {
   }, [mobile]);
   useEffect(() => {
     const save = (event: KeyboardEvent) => {
-      if (mobile || !(event.ctrlKey || event.metaKey) || event.altKey ||
-          event.key.toLowerCase() !== "s") return;
+      if (
+        mobile ||
+        !(event.ctrlKey || event.metaKey) ||
+        event.altKey ||
+        event.key.toLowerCase() !== "s"
+      )
+        return;
       event.preventDefault();
-      post({type: "save"});
+      post({ type: "save" });
     };
     addEventListener("keydown", save);
     return () => removeEventListener("keydown", save);
@@ -150,10 +187,19 @@ export default function AdvancedWorkspace() {
   }, []);
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
-    const provider = providerSubscriptions(api,
-      client => new EventSource('/api/charts/provider/events?client='+encodeURIComponent(client)),
-      event => frame.current?.contentWindow?.postMessage({channel,type:'provider-event',event},origin),
-      error => setError(String(error)));
+    const provider = providerSubscriptions(
+      api,
+      (client) =>
+        new EventSource(
+          "/api/charts/provider/events?client=" + encodeURIComponent(client),
+        ),
+      (event) =>
+        frame.current?.contentWindow?.postMessage(
+          { channel, type: "provider-event", event },
+          origin,
+        ),
+      (error) => setError(String(error)),
+    );
     const listener = async (e: MessageEvent) => {
       if (
         e.source !== frame.current?.contentWindow ||
@@ -165,43 +211,73 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
-      if(m.type==='provider-subscribe' || m.type==='provider-unsubscribe') {
-        const args=m.args;
-        if(!args || !/^[A-Za-z0-9_-]{1,64}$/.test(args.client) ||
-          typeof args.listener!=='string' || args.listener.length>100) return;
+      if (
+        m.type === "provider-subscribe" ||
+        m.type === "provider-unsubscribe"
+      ) {
+        const args = m.args;
+        if (
+          !args ||
+          !/^[A-Za-z0-9_-]{1,64}$/.test(args.client) ||
+          typeof args.listener !== "string" ||
+          args.listener.length > 100
+        )
+          return;
         try {
-          if(m.type==='provider-subscribe') {
+          if (m.type === "provider-subscribe") {
             await provider.subscribe(args);
           } else {
             await provider.unsubscribe(args);
           }
-        }catch(error){setError(String(error));}
+        } catch (error) {
+          setError(String(error));
+        }
         return;
       }
       if (m.type === "history-progress") {
-        const key=String(m.key).slice(0,100),text=String(m.text).slice(0,200);
-        setHistoryProgress(previous=> {
-          const next={...previous};
-          if(text)next[key]=text;else delete next[key];
+        const key = String(m.key).slice(0, 100),
+          text = String(m.text).slice(0, 200);
+        setHistoryProgress((previous) => {
+          const next = { ...previous };
+          if (text) next[key] = text;
+          else delete next[key];
           return next;
         });
         return;
       }
       if (m.type === "history-views" && Array.isArray(m.keys)) {
-        const keys=new Set(m.keys.slice(0,8));
-        setHistoryProgress(previous=>Object.fromEntries(Object.entries(previous).filter(([key])=>keys.has(key))));
+        const keys = new Set(m.keys.slice(0, 8));
+        setHistoryProgress((previous) =>
+          Object.fromEntries(
+            Object.entries(previous).filter(([key]) => keys.has(key)),
+          ),
+        );
         return;
       }
       if (m.type === "history-plans-open") {
-        setHistoryPlansOpen(true); return;
-      }
-      if (m.type === "managed-dataset" && typeof m.dataset?.instrument === "string" && frames.has(m.dataset?.timeframe)) {
-        const dataset=m.dataset;
-        setDatasetViews(previous=>({...previous,[dataset.instrument+'|'+dataset.timeframe]:dataset}));
+        setHistoryPlansOpen(true);
         return;
       }
-      if (m.type === "maintenance-required" && !mobile && typeof m.instrument === "string" && m.instrument.length <= 40) {
-        setMaintenanceInstrument(m.instrument); return;
+      if (
+        m.type === "managed-dataset" &&
+        typeof m.dataset?.instrument === "string" &&
+        frames.has(m.dataset?.timeframe)
+      ) {
+        const dataset = m.dataset;
+        setDatasetViews((previous) => ({
+          ...previous,
+          [dataset.instrument + "|" + dataset.timeframe]: dataset,
+        }));
+        return;
+      }
+      if (
+        m.type === "maintenance-required" &&
+        !mobile &&
+        typeof m.instrument === "string" &&
+        m.instrument.length <= 40
+      ) {
+        setMaintenanceInstrument(m.instrument);
+        return;
       }
       if (m.type === "cancel-request") {
         marketRequests.get(source)?.get(m.id)?.abort();
@@ -211,11 +287,15 @@ export default function AdvancedWorkspace() {
         await provider.clear();
         try {
           if (!mobile) await api("/advanced-charts/preferences/migrate", {});
-          const [catalog, preferences] = await Promise.all([
-            api("/advanced-charts/catalog"), api("/advanced-charts/preferences"),
+          const [catalog, preferences, capabilities] = await Promise.all([
+            api("/advanced-charts/catalog"),
+            api("/advanced-charts/preferences"),
+            api("/charts/history-capabilities"),
           ]);
+          historyCapabilities.current = capabilities;
           reply({
             type: "init",
+            history_capabilities: capabilities,
             document: current.current?.document || {},
             workspace: current.current,
             readonly: mobile,
@@ -245,9 +325,10 @@ export default function AdvancedWorkspace() {
             if (!mobile && unsaved.current) await flush();
             await api("/logout", {});
             location.assign("/");
-          } catch (e) {setError(String(e));}
-        }
-        else if (!mobile && m.action === "create") await create();
+          } catch (e) {
+            setError(String(e));
+          }
+        } else if (!mobile && m.action === "create") await create();
         else if (!mobile && m.action === "recover") await copy();
       } else if (m.type === "theme-changed") {
         if (typeof m.theme === "string" && /^(dark|light)$/i.test(m.theme))
@@ -255,32 +336,29 @@ export default function AdvancedWorkspace() {
       } else if (m.type === "ready") {
         setNativeReady(true);
         setStatus("已加载 · 行情每15秒检查");
-      }
-      else if (m.type === "viewport-notice") {
+      } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
-        setSyncNotices(previous => {
+        setSyncNotices((previous) => {
           if (m.key === "*") return {};
-          const next = {...previous};
+          const next = { ...previous };
           if (m.text) next[m.key] = String(m.text).slice(0, 500);
           else delete next[m.key];
           return next;
         });
-      }
-      else if (m.type === "feed-poll-state") {
+      } else if (m.type === "feed-poll-state") {
         if (typeof m.key !== "string" || m.key.length > 2000) return;
-        setPollErrors(previous => {
+        setPollErrors((previous) => {
           const next = { ...previous };
           if (m.error) next[m.key] = String(m.error).slice(0, 500);
           else delete next[m.key];
           return next;
         });
-      }
-      else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
+      } else if (m.type === "error")
+        setFeedError(String(m.error).slice(0, 500));
       else if (m.type === "workspace-dirty") {
         if (!mobile) unsaved.current = true;
         setStatus("布局有未保存更改");
-      }
-      else if (m.type === "native-saving") {
+      } else if (m.type === "native-saving") {
         if (!mobile) unsaved.current = true;
         setStatus("正在保存");
       } else if (m.type === "native-saved") {
@@ -420,18 +498,34 @@ export default function AdvancedWorkspace() {
             setStatus("保存已暂停 · 草稿已保留，请复制恢复");
           }
           setError(String(e));
-          reply({ type: "result", id: m.id, error: String(e), errorDetails:apiErrorDetails(e) });
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
         }
       } else if (m.type === "account-password") {
         const body = m.query;
-        if (!body || typeof body.current_password !== "string" || typeof body.new_password !== "string" ||
-            [...body.current_password].length > 512 || [...body.new_password].length > 512) {
-          reply({type: "result", id: m.id, error: "无效密码请求"});
+        if (
+          !body ||
+          typeof body.current_password !== "string" ||
+          typeof body.new_password !== "string" ||
+          [...body.current_password].length > 512 ||
+          [...body.new_password].length > 512
+        ) {
+          reply({ type: "result", id: m.id, error: "无效密码请求" });
           return;
         }
         try {
-          reply({type: "result", id: m.id, result: await api("/account/password", body)});
-        } catch (error) {reply({type: "result", id: m.id, error: String(error)});}
+          reply({
+            type: "result",
+            id: m.id,
+            result: await api("/account/password", body),
+          });
+        } catch (error) {
+          reply({ type: "result", id: m.id, error: String(error) });
+        }
       } else if (m.type === "style-template-name") {
         const name = mobile
           ? null
@@ -469,7 +563,12 @@ export default function AdvancedWorkspace() {
             ),
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e), errorDetails:apiErrorDetails(e) });
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
         }
       } else if (m.type === "market") {
         const q = m.query;
@@ -492,19 +591,28 @@ export default function AdvancedWorkspace() {
           JSON.stringify(q).length > 4000 ||
           (q.op === "retry" &&
             !/^[a-zA-Z0-9-]{1,40}$/.test(String(q.args?.id || ""))) ||
-          inflight.current >= 8
-          || (q.native_history !== undefined &&
-            (q.series_kind !== 'provider' || !q.native_history ||
-              typeof q.native_history !== 'object' || Array.isArray(q.native_history) ||
+          inflight.current >= 8 ||
+          (q.native_history !== undefined &&
+            (q.series_kind !== "provider" ||
+              !q.native_history ||
+              typeof q.native_history !== "object" ||
+              Array.isArray(q.native_history) ||
               !Number.isInteger(q.native_history.chart_count) ||
-              q.native_history.chart_count < 1 || q.native_history.chart_count > 8 ||
-              (q.native_history.focused !== null && typeof q.native_history.focused !== 'boolean') ||
-              typeof q.native_history.historical_navigation !== 'boolean'))
-          || (q.history_observation !== undefined &&
-            (!q.native_history || !q.history_observation ||
-              typeof q.history_observation !== 'object' || Array.isArray(q.history_observation) ||
-              !['revision','observed_at','first','last'].every(field =>
-                Number.isSafeInteger(q.history_observation[field]) && q.history_observation[field] >= 0) ||
+              q.native_history.chart_count < 1 ||
+              q.native_history.chart_count > 8 ||
+              (q.native_history.focused !== null &&
+                typeof q.native_history.focused !== "boolean") ||
+              typeof q.native_history.historical_navigation !== "boolean")) ||
+          (q.history_observation !== undefined &&
+            (!q.native_history ||
+              !q.history_observation ||
+              typeof q.history_observation !== "object" ||
+              Array.isArray(q.history_observation) ||
+              !["revision", "observed_at", "first", "last"].every(
+                (field) =>
+                  Number.isSafeInteger(q.history_observation[field]) &&
+                  q.history_observation[field] >= 0,
+              ) ||
               q.history_observation.first > q.history_observation.last))
         ) {
           reply({ type: "result", id: m.id, error: "无效行情请求" });
@@ -518,24 +626,42 @@ export default function AdvancedWorkspace() {
         try {
           let result;
           if (q.op === "serverTime") {
-            const response = await fetch("/readyz", {signal: controller.signal,
-              credentials: "omit", cache: "no-store"});
+            const response = await fetch("/readyz", {
+              signal: controller.signal,
+              credentials: "omit",
+              cache: "no-store",
+            });
             const health = await response.json();
-            if (!response.ok || !Number.isSafeInteger(health.time) || health.time <= 0)
+            if (
+              !response.ok ||
+              !Number.isSafeInteger(health.time) ||
+              health.time <= 0
+            )
               throw Error("服务器时间暂不可用");
             result = Math.floor(health.time / 1000);
-          } else result = await api(
-            endpoints[q.op] +
-              (q.op === "search" ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
-                : q.op === "retry" ? "/" + encodeURIComponent(q.args.id) : ""),
-            q.op === "search" ? undefined : q.args, controller.signal);
+          } else
+            result = await api(
+              endpoints[q.op] +
+                (q.op === "search"
+                  ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
+                  : q.op === "retry"
+                    ? "/" + encodeURIComponent(q.args.id)
+                    : ""),
+              q.op === "search" ? undefined : q.args,
+              controller.signal,
+            );
           reply({
             type: "result",
             id: m.id,
             result,
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e), errorDetails:apiErrorDetails(e) });
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
         } finally {
           sourceRequests.delete(m.id);
           if (!sourceRequests.size) marketRequests.delete(source);
@@ -554,11 +680,15 @@ export default function AdvancedWorkspace() {
               JSON.stringify(q.indicators).length > 2000)) ||
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
-          (q.series_kind !== undefined && !["provider", "managed"].includes(q.series_kind)) ||
+          (q.series_kind !== undefined &&
+            !["provider", "managed"].includes(q.series_kind)) ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
-          q.limit > (q.series_kind === "provider" ? 20000 : 2000) ||
+          q.limit >
+            (q.series_kind === "provider"
+              ? historyCapabilities.current?.max_bars || 20000
+              : 2000) ||
           (q.before !== undefined &&
             (!Number.isSafeInteger(q.before) || q.before <= 0)) ||
           (q.revision_before !== undefined &&
@@ -568,21 +698,45 @@ export default function AdvancedWorkspace() {
             (!Number.isSafeInteger(q.revision_after) ||
               q.revision_after < 0)) ||
           (q.native_reserve !== undefined &&
-            (q.series_kind !== 'provider' || !q.native_history || !q.native_reserve ||
-              typeof q.native_reserve !== 'object' || Array.isArray(q.native_reserve) ||
+            (q.series_kind !== "provider" ||
+              !q.native_history ||
+              !q.native_reserve ||
+              typeof q.native_reserve !== "object" ||
+              Array.isArray(q.native_reserve) ||
               !Number.isInteger(q.native_reserve.screen_bars) ||
-              q.native_reserve.screen_bars < 1 || q.native_reserve.screen_bars > 2000 ||
+              q.native_reserve.screen_bars < 1 ||
+              q.native_reserve.screen_bars > 2000 ||
               ![1, 2].includes(q.native_reserve.batch_screens) ||
               !Number.isInteger(q.native_reserve.warmup_bars) ||
-              q.native_reserve.warmup_bars < 0 || q.native_reserve.warmup_bars > 2000 ||
-              Object.keys(q.native_reserve).some(k => !['screen_bars', 'batch_screens', 'warmup_bars'].includes(k)) ||
-              q.indicators?.length || q.history_observation !== undefined))
+              q.native_reserve.warmup_bars < 0 ||
+              q.native_reserve.warmup_bars > 2000 ||
+              Object.keys(q.native_reserve).some(
+                (k) =>
+                  !["screen_bars", "batch_screens", "warmup_bars"].includes(k),
+              ) ||
+              q.indicators?.length ||
+              q.history_observation !== undefined))
         ) {
-          reply({ type: "result", id: m.id, error: "请求不在允许范围内", errorDetails: {code:q?.series_kind === "provider" && q?.limit > 20000 ? "NATIVE_HISTORY_CAPACITY_EXCEEDED" : "INVALID_HISTORY_REQUEST"} });
+          reply({
+            type: "result",
+            id: m.id,
+            error: "请求不在允许范围内",
+            errorDetails: {
+              code:
+                q?.series_kind === "provider" && q?.limit > 20000
+                  ? "NATIVE_HISTORY_CAPACITY_EXCEEDED"
+                  : "INVALID_HISTORY_REQUEST",
+            },
+          });
           return;
         }
         if (inflight.current >= 8) {
-          reply({type:"result", id:m.id, error:"行情服务繁忙，请稍后重试", errorDetails:{code:"HISTORY_BUSY",status:503}});
+          reply({
+            type: "result",
+            id: m.id,
+            error: "行情服务繁忙，请稍后重试",
+            errorDetails: { code: "HISTORY_BUSY", status: 503 },
+          });
           return;
         }
         const controller = new AbortController();
@@ -594,31 +748,76 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            result: await api(q.native_reserve ? "/charts/reserve" : "/charts/data", {
-              instrument: q.instrument,
-              series_kind: q.series_kind || "managed",
-              published: q.series_kind !== "provider",
-              ...(typeof q.dataset_start === 'number' ? {dataset_start:q.dataset_start} : {}),
-              timeframe: q.timeframe,
-              limit: q.limit,
-              ...(q.series_kind === 'provider' ? {countBack:q.countBack,
-                from:q.from,firstDataRequest:q.firstDataRequest === true,client:q.client,
-                ...(q.native_history !== undefined ? {native_history:q.native_history} : {}),
-                ...(q.native_reserve !== undefined ? {native_reserve:q.native_reserve} : {}),
-                ...(q.history_observation !== undefined ? {history_observation:q.history_observation} : {})} : {}),
-              indicators: q.indicators || [],
-              ...(q.before ? { before: q.before } : {}),
-              track_history: q.track_history === true,
-              ...(q.revision_after !== undefined
-                ? { revision_after: q.revision_after }
-                : {}),
-              ...(q.revision_before
-                ? { revision_before: q.revision_before }
-                : {}),
-            }, controller.signal),
+            result: await (
+              q.series_kind === "provider" &&
+                q.native_history &&
+                !q.native_reserve
+                ? (body: unknown, signal: AbortSignal) =>
+                    loadNativeHistory(
+                      body,
+                      signal,
+                      historyCapabilities.current!,
+                      (text) =>
+                        setNativeLoads((previous) => {
+                          const next = { ...previous };
+                          if (text) next[String(m.id)] = text;
+                          else delete next[String(m.id)];
+                          return next;
+                        }),
+                    )
+                : (body: unknown, signal: AbortSignal) =>
+                    api(
+                      q.native_reserve ? "/charts/reserve" : "/charts/data",
+                      body,
+                      signal,
+                    )
+            )(
+              {
+                instrument: q.instrument,
+                series_kind: q.series_kind || "managed",
+                published: q.series_kind !== "provider",
+                ...(typeof q.dataset_start === "number"
+                  ? { dataset_start: q.dataset_start }
+                  : {}),
+                timeframe: q.timeframe,
+                limit: q.limit,
+                ...(q.series_kind === "provider"
+                  ? {
+                      countBack: q.countBack,
+                      from: q.from,
+                      firstDataRequest: q.firstDataRequest === true,
+                      client: q.client,
+                      ...(q.native_history !== undefined
+                        ? { native_history: q.native_history }
+                        : {}),
+                      ...(q.native_reserve !== undefined
+                        ? { native_reserve: q.native_reserve }
+                        : {}),
+                      ...(q.history_observation !== undefined
+                        ? { history_observation: q.history_observation }
+                        : {}),
+                    }
+                  : {}),
+                indicators: q.indicators || [],
+                ...(q.before ? { before: q.before } : {}),
+                track_history: q.track_history === true,
+                ...(q.revision_after !== undefined
+                  ? { revision_after: q.revision_after }
+                  : {}),
+                ...(q.revision_before
+                  ? { revision_before: q.revision_before }
+                  : {}),
+              },
+              controller.signal,
+            ),
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e), errorDetails:apiErrorDetails(e) });
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
         } finally {
           sourceRequests.delete(m.id);
           if (!sourceRequests.size) marketRequests.delete(source);
@@ -735,12 +934,36 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
-      {historyPlansOpen && <HistoryPlansDialog onClose={()=>setHistoryPlansOpen(false)} readonly={mobile}
-        onRefresh={()=>post({type:'refresh-managed'})} views={datasetViews}/> }
-      {maintenanceInstrument && <MaintenanceDialog instrument={maintenanceInstrument}
-        onClose={()=>setMaintenanceInstrument(null)} onSubmitted={()=>{
-          setMaintenanceInstrument(null);setHistoryPlansOpen(true);
-        }}/>}
+      {Object.keys(nativeLoads).length > 0 && (
+        <div className="advanced-loading-notice" role="status">
+          {Object.values(nativeLoads).join("；")}
+          <button
+            onClick={() => {
+              post({ type: "cancel-history" });
+            }}
+          >
+            取消历史加载
+          </button>
+        </div>
+      )}
+      {historyPlansOpen && (
+        <HistoryPlansDialog
+          onClose={() => setHistoryPlansOpen(false)}
+          readonly={mobile}
+          onRefresh={() => post({ type: "refresh-managed" })}
+          views={datasetViews}
+        />
+      )}
+      {maintenanceInstrument && (
+        <MaintenanceDialog
+          instrument={maintenanceInstrument}
+          onClose={() => setMaintenanceInstrument(null)}
+          onSubmitted={() => {
+            setMaintenanceInstrument(null);
+            setHistoryPlansOpen(true);
+          }}
+        />
+      )}
       {exportSelection && (
         <ExportDialog
           selection={exportSelection}
@@ -757,8 +980,12 @@ export default function AdvancedWorkspace() {
       </div>
       {!nativeReady && noticeMessages.length > 0 && (
         <div className="advanced-loading-notice" role="alert">
-          {noticeMessages.map(notice => notice.text.replace(/^(?:Error:\s*)+/, "")).join("；")}
-          {blocked.current && !mobile && <button onClick={copy}>复制恢复草稿</button>}
+          {noticeMessages
+            .map((notice) => notice.text.replace(/^(?:Error:\s*)+/, ""))
+            .join("；")}
+          {blocked.current && !mobile && (
+            <button onClick={copy}>复制恢复草稿</button>
+          )}
         </div>
       )}
       {active ? (
