@@ -88,6 +88,8 @@ const MWNativeNavigation = (() => {
   }
   function begin(m, state) {
     state.generation++;
+    state.publicRange?.reject(cancelled());
+    state.publicRange = null;
     clearNativeWait(m, cancelled());
     const thread = threads.get(modelKey(m));
     // A peer still loading owns the same native read. Changing one pane's
@@ -126,13 +128,17 @@ const MWNativeNavigation = (() => {
       // finish its old native consumer before the engine dereferences it.
       begin(m, state);
       const generation = state.generation;
+      const token = {};
+      const cancellation = new Promise((_, reject) => { token.reject = reject; });
+      state.publicRange = token;
       state.publicRangeDepth = 1;
       state.depth++;
       let result;
       try { result = resume(); }
       catch (error) { result = Promise.reject(error); }
       finally { state.publicRangeDepth = 0; state.depth--; }
-      return Promise.resolve(result).finally(() => {
+      return Promise.race([Promise.resolve(result), cancellation]).finally(() => {
+        if (state.publicRange === token) state.publicRange = null;
         if (models.get(m) === state && state.generation === generation) {
           state.phase = "idle";
           replay(m, state);
@@ -305,6 +311,8 @@ const MWNativeNavigation = (() => {
         m.mainSeries().dataEvents().completed().subscribe(state, projected);
         m.mainSeries().dataEvents().dataUpdated().subscribe(state, projected);
         const changed = () => {
+          state.publicRange?.reject(cancelled());
+          state.publicRange = null;
           state.generation++;
           state.cursorVersion++;
           state.cursor = null;
@@ -366,6 +374,7 @@ const MWNativeNavigation = (() => {
     unbindModel(m) {
       const state = models.get(m);
       if (!state) return;
+      state.publicRange?.reject(cancelled());
       clearNativeWait(m, cancelled());
       models.delete(m);
       m.timeScale().visibleBarsStrictRangeChanged().unsubscribeAll(state);
@@ -433,6 +442,8 @@ const MWNativeNavigation = (() => {
     },
     cancelAll() {
       for (const [m, state] of models) {
+        state.publicRange?.reject(cancelled());
+        state.publicRange = null;
         state.generation++;
         clearNativeWait(m, cancelled());
         state.phase = "idle";

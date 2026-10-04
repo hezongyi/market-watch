@@ -53,9 +53,14 @@ const continuousV2 = [...continuousV1, previous[12]];
 // runtime bindModel runs. Hook the actual entry rather than that later property.
 const continuousV3 = [...continuousV2, ['_updateTimeScale(e){const{index:t,',
   `_updateTimeScale(e){${navigation}?.timeScaleUpdated(this);const{index:t,`]];
-const replacements = [...continuousV2,
+const continuousV4 = [...continuousV2,
   ['this.lightUpdate()}_getAvailableCurrencies(){',
    `this.lightUpdate();${navigation}?.timeScaleUpdated(this)}_getAvailableCurrencies(){`]];
+const replacements = [...continuousV4,
+  ['setVisibleTimeRange(e,t,i,s,r,o,a,l,c,h){let d=s,',
+   'setVisibleTimeRange(e,t,i,s,r,o,a,l,c,h){const mwVersions=this._mwRangeVersions??=(new Map),mwVersion=(mwVersions.get(e)||0)+1;mwVersions.set(e,mwVersion);let d=s,'],
+  ['const p=()=>{const s=this._studyEngine.sessionTimeScale(e);',
+   'const p=()=>{if(mwVersions.get(e)!==mwVersion)return;const s=this._studyEngine.sessionTimeScale(e);']];
 const legacy = previous.slice(0,6).map(([before, after])=>[before,after]);
 legacy[0][1] = `class h{constructor(e,t){${runtime}?.bindModel(t);this._bars=[],this._invalidated=!0`;
 legacy[1][1] = `destroy(){${runtime}?.unbindModel(this);this._abortController.abort(),this.clearIntervals()`;
@@ -63,7 +68,7 @@ legacy[2][1] = `this._datafeed=e,this._symbolInfo=t,${runtime}?.bindThread(this,
 legacy[3][1] = `destroy(){${runtime}?.unbindThread(this);0!==this._subscribers.length&&this._logWarning`;
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [previous, replacements, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
+  const installed = [previous, replacements, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;

@@ -442,8 +442,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             await widget.chart(m5).setVisibleRange({from:target-1800,to:target+1800});
             return __oldRange;
           },{m5,target});
-          assert.ok(['cancelled','completed'].includes(item.cancelOutcome),
-            'superseded public range must settle without native null failure');
+          assert.equal(item.cancelOutcome,'cancelled','superseded loading public range must reject');
           await settle();
           item.cancelledView=await snapshot();
           assert.ok(item.cancelledView.charts[m5].range.from<=target && item.cancelledView.charts[m5].range.to>=target);

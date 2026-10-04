@@ -117,6 +117,12 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   model.insertStudyWithParams({}); created[2].resolve({}); await run();
   assert.throws(() => model.insertStudyWithParams({}), /预算/, "resolved study remains charged");
   nextStudy.cancel();
+  let finishOld;
+  const oldRange = navigation.prepareRange(model, {}, () =>
+    new Promise(resolve => { finishOld = resolve; })).then(() => 'completed', e => e.code);
+  assert.equal(await navigation.prepareRange(model, {}, () => Promise.resolve('new')), 'new');
+  assert.equal(await oldRange, 'HISTORY_CANCELLED', 'public promise finishes at supersession');
+  finishOld('late'); await run();
   navigation.unbindModel(model); navigation.unbindThread(shared);
   console.log(
     "Continuous navigation: concurrent admission, cancellation, stale callbacks, source purge and release passed",
