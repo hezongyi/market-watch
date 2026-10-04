@@ -64,6 +64,12 @@ function deferLegacyChartSynchronization(widget) {
   return desired;
 }
 
+function restoreHistoricalSpacing(chart, spacing) {
+  const scale=chart.getTimeScale();
+  const centerOffset=scale.rightOffset()-scale.width()/scale.barSpacing()/2;
+  scale.setBarSpacing(spacing);
+  scale.setRightOffset(centerOffset+scale.width()/spacing/2);
+}
 async function restoreChartViewports(widget, viewports, isCurrent) {
   if (!Array.isArray(viewports) || !isCurrent()) return;
   const sync = widget.dateRangeSync(),
@@ -91,6 +97,7 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
       const chart = widget.activeChart(), state = viewports[widget.activeChartIndex()];
       if (state.offset < 0) {
         await chart.setVisibleRange(state.range, { rejectByTimeout: 30000 });
+        restoreHistoricalSpacing(chart,state.spacing);
       } else {
         // A latest viewport is geometry relative to the current last bar.
         // Converting its future margin to dates needlessly starts native
@@ -142,6 +149,10 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
         scale.setRightOffset(state.offset);
       }
       if (!isCurrent()) return;
+      if (state.offset < 0) {
+        // Native fitting rounds bar counts; preserve the saved width and center.
+        restoreHistoricalSpacing(chart,state.spacing);
+      }
     }
   } finally {
     if (isCurrent()) {

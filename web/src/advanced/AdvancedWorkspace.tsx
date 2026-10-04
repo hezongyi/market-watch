@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../api";
+import { api, apiErrorDetails } from "../api";
 import "./advanced.css";
 import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
 import { MaintenanceDialog } from "./MaintenanceDialog";
@@ -420,7 +420,7 @@ export default function AdvancedWorkspace() {
             setStatus("保存已暂停 · 草稿已保留，请复制恢复");
           }
           setError(String(e));
-          reply({ type: "result", id: m.id, error: String(e) });
+          reply({ type: "result", id: m.id, error: String(e), errorDetails:apiErrorDetails(e) });
         }
       } else if (m.type === "account-password") {
         const body = m.query;
@@ -469,7 +469,7 @@ export default function AdvancedWorkspace() {
             ),
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e) });
+          reply({ type: "result", id: m.id, error: String(e), errorDetails:apiErrorDetails(e) });
         }
       } else if (m.type === "market") {
         const q = m.query;
@@ -535,7 +535,7 @@ export default function AdvancedWorkspace() {
             result,
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e) });
+          reply({ type: "result", id: m.id, error: String(e), errorDetails:apiErrorDetails(e) });
         } finally {
           sourceRequests.delete(m.id);
           if (!sourceRequests.size) marketRequests.delete(source);
@@ -576,10 +576,13 @@ export default function AdvancedWorkspace() {
               !Number.isInteger(q.native_reserve.warmup_bars) ||
               q.native_reserve.warmup_bars < 0 || q.native_reserve.warmup_bars > 2000 ||
               Object.keys(q.native_reserve).some(k => !['screen_bars', 'batch_screens', 'warmup_bars'].includes(k)) ||
-              q.indicators?.length || q.history_observation !== undefined)) ||
-          inflight.current >= 8
+              q.indicators?.length || q.history_observation !== undefined))
         ) {
-          reply({ type: "result", id: m.id, error: "请求不在允许范围内" });
+          reply({ type: "result", id: m.id, error: "请求不在允许范围内", errorDetails: {code:q?.series_kind === "provider" && q?.limit > 20000 ? "NATIVE_HISTORY_CAPACITY_EXCEEDED" : "INVALID_HISTORY_REQUEST"} });
+          return;
+        }
+        if (inflight.current >= 8) {
+          reply({type:"result", id:m.id, error:"行情服务繁忙，请稍后重试", errorDetails:{code:"HISTORY_BUSY",status:503}});
           return;
         }
         const controller = new AbortController();
@@ -615,7 +618,7 @@ export default function AdvancedWorkspace() {
             }, controller.signal),
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e) });
+          reply({ type: "result", id: m.id, error: String(e), errorDetails:apiErrorDetails(e) });
         } finally {
           sourceRequests.delete(m.id);
           if (!sourceRequests.size) marketRequests.delete(source);

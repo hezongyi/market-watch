@@ -1,0 +1,64 @@
+{
+  "scope": "isolated Docker actual provider native calendar",
+  "cases": [
+    {
+      "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+      "res": "1D",
+      "range": {
+        "from": 1709856000,
+        "to": 1710374400
+      },
+      "status": 3,
+      "invalid": false,
+      "window": {
+        "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+        "resolution": "1D",
+        "target": 1709856000,
+        "from": 1643639400,
+        "to": 1754055000,
+        "count": 915,
+        "spacing": 6,
+        "viewport": {
+          "from": 1709856000,
+          "to": 1710374400
+        },
+        "seed": null,
+        "replacing": false
+      },
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 1208
+      }
+    },
+    {
+      "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+      "res": "1W",
+      "range": {
+        "from": 1578268800,
+        "to": 1609113600
+      },
+      "status": 3,
+      "invalid": false,
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 975
+      }
+    },
+    {
+      "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+      "res": "1M",
+      "range": {
+        "from": 1577836800,
+        "to": 1609459200
+      },
+      "status": 3,
+      "invalid": false,
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 405
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

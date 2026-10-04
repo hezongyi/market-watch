@@ -108,3 +108,15 @@ assert.equal(ctx.index, 0, "restore primary symbol context after evaluation");
 console.log(
   "Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed",
 );
+
+// Historical Python feeds must retain the native window and plain backend ID.
+context.windowSymbols=[];
+context.PineJS.Std.period=()=> '5';
+vm.runInContext(`const historical=new (pythonStudies(PineJS,catalog)[0].constructor)();
+  historical.init({symbol:{info:{ticker:'MWP:EURUSD'},tickerid:'={"mw-window":"mw-test","symbol":"MWP:EURUSD"}'},
+    new_sym:ticker=>windowSymbols.push(ticker)},index=>[12,26,9][index]);`,context);
+const extended=JSON.parse(context.windowSymbols[0].slice(1));
+assert.equal(extended['mw-window'],'mw-test');
+const payload=JSON.parse(Buffer.from(extended.symbol.slice(5),'base64').toString());
+assert.equal(payload.symbol,'MWP:EURUSD');
+console.log('Python feed retains historical window identity without changing backend symbol');

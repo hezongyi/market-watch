@@ -1,0 +1,403 @@
+{
+  "scope": "Isolated real v31.1 library with synthetic 24x7 OHLC; no production API or user-state writes",
+  "cases": [
+    {
+      "config": {
+        "source": "1W",
+        "peers": [
+          "1D",
+          "240",
+          "5"
+        ],
+        "kind": "crosshair",
+        "ratio": 0.88,
+        "cold": true
+      },
+      "errors": [],
+      "cold": {
+        "status": 3,
+        "invalid": false,
+        "requesting": false
+      },
+      "coldRecovered": {
+        "from": 1635724800,
+        "to": 1795996800
+      },
+      "before": [
+        {
+          "res": "1W",
+          "time": 1786924800,
+          "center": 1757894400,
+          "x": 675,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 675,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1D",
+          "time": 1786924800,
+          "center": 1786147200,
+          "x": 441,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 441,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "240",
+          "time": 1789113600,
+          "center": 1790035200,
+          "x": 3,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 3,
+            "text": "周五 2026-09-11   08:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "5",
+          "time": 1790777400,
+          "center": 1790796600,
+          "x": 3,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 3,
+            "text": "周三 2026-09-30   14:10",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "stationary": [
+        {
+          "res": "1W",
+          "time": 1786924800,
+          "center": 1757894400,
+          "x": 675,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 675,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1D",
+          "time": 1786924800,
+          "center": 1786147200,
+          "x": 441,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 441,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "240",
+          "time": 1786924800,
+          "center": 1786924800,
+          "x": 387,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 387,
+            "text": "周一 2026-08-17   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "5",
+          "time": 1786924800,
+          "center": 1786924800,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2026-08-17   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "afterMove": [
+        {
+          "res": "1W",
+          "time": 1786924800,
+          "center": 1757894400,
+          "x": 675,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 675,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1D",
+          "time": 1786924800,
+          "center": 1786147200,
+          "x": 441,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 441,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "240",
+          "time": 1786924800,
+          "center": 1786924800,
+          "x": 387,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 387,
+            "text": "周一 2026-08-17   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "5",
+          "time": 1786924800,
+          "center": 1786924800,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2026-08-17   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "requests": [
+        {
+          "r": "1W",
+          "stage": "initial",
+          "params": {
+            "from": 1625097600,
+            "to": 1790899200,
+            "countBack": 275,
+            "firstDataRequest": true
+          },
+          "at": 1487.5,
+          "error": "injected HTTP 503"
+        },
+        {
+          "r": "1W",
+          "stage": "initial",
+          "params": {
+            "from": 1619049600,
+            "to": 1790899200,
+            "countBack": 285,
+            "firstDataRequest": true
+          },
+          "at": 1711.6999998092651
+        },
+        {
+          "r": "1D",
+          "stage": "initial",
+          "params": {
+            "from": 1779667200,
+            "to": 1790899200,
+            "countBack": 130,
+            "firstDataRequest": true
+          },
+          "at": 2478.9000000953674
+        },
+        {
+          "r": "240",
+          "stage": "initial",
+          "params": {
+            "from": 1788955261,
+            "to": 1790812861,
+            "countBack": 129,
+            "firstDataRequest": true
+          },
+          "at": 2525.9000000953674
+        },
+        {
+          "r": "5",
+          "stage": "initial",
+          "params": {
+            "from": 1790774161,
+            "to": 1790812861,
+            "countBack": 129,
+            "firstDataRequest": true
+          },
+          "at": 2571.5
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1786809600,
+            "to": 1787001600,
+            "countBack": 640,
+            "firstDataRequest": true
+          },
+          "at": 2922.199999809265
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1786347900,
+            "to": 1787309400,
+            "countBack": 3205,
+            "firstDataRequest": true
+          },
+          "at": 3089.7999997138977
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1785542400,
+            "to": 1787846400,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 3229.699999809265
+        }
+      ],
+      "rejected": []
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,51 @@
+{
+  "scope": "isolated Docker compiled assets; real browser HTTP cache; synthetic 24x7 loading smoke",
+  "errors": [],
+  "assets": {
+    "version": "charting_library_d3b527cf30398910",
+    "originalSHA": "114428b8dde6eb137fd7ef3bc20ef35882189186c4bd092bb743b64d11682be1",
+    "candidateSHA": "d3b527cf30398910c62ecc31b2f3826c4b2980d28c19492e127a3d9acbe133b6",
+    "cacheControl": "public, max-age=31536000, immutable"
+  },
+  "disabled": {
+    "range": {
+      "from": 1791045900,
+      "to": 1791091500
+    },
+    "navigation": {
+      "windows": [],
+      "models": 0,
+      "threads": 0,
+      "pending": 0
+    }
+  },
+  "candidate": {
+    "range": {
+      "from": 1791045900,
+      "to": 1791091500
+    },
+    "navigation": {
+      "windows": [],
+      "models": 1,
+      "threads": 1,
+      "pending": 0
+    }
+  },
+  "passed": true,
+  "request_counts": {
+    "disabled": 105,
+    "candidate": 104
+  },
+  "library_bundle_requests": [
+    {
+      "stage": "disabled",
+      "path": "/charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js",
+      "status": 200
+    },
+    {
+      "stage": "candidate",
+      "path": "/charting_library_d3b527cf30398910/bundles/library.e2f8b3a016c9e1a0b7a5.js",
+      "status": 200
+    }
+  ]
+}

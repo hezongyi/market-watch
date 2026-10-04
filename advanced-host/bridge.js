@@ -132,7 +132,8 @@ function drain() {
     const id = ++seq;
     const timer = setTimeout(() => {
       pending.delete(id);
-      reject(Error("行情请求超时"));
+      send({type:"cancel-request",id});
+      reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
       drain();
     }, 30000);
     const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
@@ -282,7 +283,23 @@ globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen
   return {...page, bars: barsOf(page, resolution, symbol)};
 }, nativeReserveWarmup);
 
-function query(ticker, res, args, expires = Infinity) {
+globalThis.MWNativeNavigation?.configure(async (window, current) => {
+  const prefix = nativeReserveWarmup(window.symbol, window.resolution) + 4;
+  if (window.count + prefix > 20000)
+    throw Object.assign(Error('显示范围过大，请缩小时间范围后重试'), {code:'NATIVE_HISTORY_CAPACITY_EXCEEDED'});
+  const page = await query(window.symbol, window.resolution, {
+    limit:window.count + prefix, countBack:window.count + prefix,
+    from:window.from * 1000, before:window.to * 1000, firstDataRequest:true,
+    client:clientId, native_history:{...nativeHistoryContext(window.symbol, window.resolution), historical_navigation:true},
+  }, Date.now() + 30000, current);
+  if (!page.bars.length) throw Error('目标时间暂无可用历史行情');
+  window.seed = {page, count:window.count + prefix};
+}, (symbol,resolution) => nativeReserveWarmup(symbol,resolution) + 4);
+globalThis.addEventListener('mw-navigation-error', event => {
+  if (event.detail?.code !== 'HISTORY_CANCELLED') send({type:'error',error:String(event.detail)});
+});
+
+function query(ticker, res, args, expires = Infinity, current = () => true) {
   const { symbol, spec, series_kind } = decode(ticker);
   const q = {
     instrument: symbol,
@@ -300,11 +317,11 @@ function query(ticker, res, args, expires = Infinity) {
   const epoch = workspaceEpoch;
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
-  const promise = request(q, "data", () => epoch === workspaceEpoch && Date.now() < expires &&
+  const promise = request(q, "data", () => epoch === workspaceEpoch && current() && Date.now() < expires &&
     (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})))
     .catch(error=>{
       if(epoch===workspaceEpoch && Date.now()>=expires)
-        throw Error('历史复核时间预算已耗尽');
+        throw Object.assign(Error('历史复核时间预算已耗尽'), {code:'HISTORY_TIMEOUT'});
       throw error;
     });
   if (series_kind === 'managed') cache.set(key, { time: Date.now(), promise });
@@ -472,16 +489,18 @@ const feed = {
   getBars: async (s, res, p, cb, err) => {
     const loadEpoch=workspaceEpoch;
     const historyKey=s.ticker+'|'+res;
+    const workKey=historyKey+'|'+(s.mw_window || '');
     const isProvider=decode(s.ticker).series_kind==='provider';
-    const providerWork=isProvider ? (providerHistoryWork.get(historyKey) ||
-      {inflight:0,generation:0,correction:null,reloading:false}) : null;
+    const providerWork=isProvider ? (providerHistoryWork.get(workKey) ||
+      {symbol:s.ticker,res,window:s.mw_window,inflight:0,generation:0,correction:null,reloading:false}) : null;
     if(providerWork) {
-      providerHistoryWork.set(historyKey,providerWork);
+      providerHistoryWork.set(workKey,providerWork);
       providerWork.inflight++;
     }
     const historyDeadline=Date.now()+8000;
     const completeTerminal=rangeGuard?.captureTerminalCompletion?.(
-      chart=>chart.symbol()===s.ticker && chart.resolution()===res);
+      chart=>chart.symbol()===s.ticker && chart.resolution()===res &&
+        (globalThis.MWNativeNavigation?.chartWindow(chart)?.id || '') === (s.mw_window || ''));
     const finishTerminal=()=>{
       // Empty/error loads may never emit native dataReady. Finish only the
       // captured public loading token after the native callback has returned.
@@ -504,7 +523,8 @@ const feed = {
           countBack:p.countBack, from:p.from*1000, before:p.to*1000,
           firstDataRequest:p.firstDataRequest, client:clientId,
           native_history:nativeHistoryContext(s.ticker,res)};
-        let page = await query(s.ticker, res, args);
+        let page = globalThis.MWNativeNavigation?.takeSeed(s, res, p) ||
+          await query(s.ticker, res, args, Infinity, () => !s.mw_window || MWNativeNavigation.hasWindow(s.mw_window));
         if (epoch !== workspaceEpoch) {
           const error = Error("已取消旧图表的历史加载");
           error.code = "HISTORY_CANCELLED"; throw error;
@@ -518,7 +538,7 @@ const feed = {
           const observation={revision:page.cache_revision||0,observed_at:page.as_of||0,
             first:page.bars[0].chart_time,last:page.bars.at(-1).chart_time};
           try {
-            if(Date.now()>=historyDeadline) throw Error('历史复核时间预算已耗尽');
+            if(Date.now()>=historyDeadline) throw Object.assign(Error('历史复核时间预算已耗尽'), {code:'HISTORY_TIMEOUT'});
             const reviewed=await query(s.ticker,res,{...args,history_observation:observation},historyDeadline);
             if(epoch!==workspaceEpoch) throw Object.assign(Error('已取消旧图表的历史加载'),{code:'HISTORY_CANCELLED'});
             if(!reviewed.history_revalidation) throw Error('后端未提供历史复核结果');
@@ -553,7 +573,7 @@ const feed = {
           }
         }
         if (rows.length) {
-          const key = s.ticker+'|'+res;
+          const key = workKey;
           lastHistory.set(key,Math.max(lastHistory.get(key)||0,rows.at(-1).time));
           firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,rows[0].time));
         }
@@ -610,7 +630,7 @@ const feed = {
       cb(rows,{noData:boundary});
       if(!rows.length) finishTerminal();
     } catch (e) {
-      err(String(e));
+      err(isProvider ? e : String(e));
       finishTerminal();
       if (e.code !== "HISTORY_CANCELLED")
         send({ type: "error", error: String(e) });
@@ -627,13 +647,20 @@ const feed = {
     feed.unsubscribeBars(id);
     const identity=decode(s.ticker);
     if(identity.symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) return;
-    const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(s.ticker+'|'+res)||0,revision:null};
+    const historyKey=s.ticker+'|'+res+(identity.series_kind==='provider' ? '|'+(s.mw_window || '') : '');
+    const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(historyKey)||0,revision:null};
     subscriptions.set(id,sub);
+    // Keep history corrections subscribed, but never append a latest tick
+    // across the gap between a historical window and the realtime tail.
+    if (s.mw_window) {
+      sub.window=s.mw_window; sub.historical=MWNativeNavigation.historical(s.mw_window);
+      if (sub.historical) sub.last=MWNativeNavigation.coverage(s.mw_window)?.last || sub.last;
+    }
     if(identity.series_kind==='provider') {
       sub.providerListener=crypto.randomUUID();
       const state=providerHistoryState.get(s.ticker+'|'+res)||{};
       send({type:'provider-subscribe',args:{client:clientId,listener:sub.providerListener,
-        instrument:identity.symbol,timeframe:frames[res],cursor:state.cursor||sub.last,
+        instrument:identity.symbol,timeframe:frames[res],cursor:sub.last,
         revision:state.revision||0,observed_at:state.observed_at||0,
         indicators:identity.spec?[identity.spec]:[]}});
     }
@@ -643,6 +670,10 @@ const feed = {
     if(sub?.providerListener)
       send({type:'provider-unsubscribe',args:{client:clientId,listener:sub.providerListener}});
     subscriptions.delete(id);
+    if (sub?.window && ![...subscriptions.values()].some(other=>other.window===sub.window)) {
+      const key=sub.symbol+'|'+sub.res+'|'+sub.window;
+      providerHistoryWork.delete(key);lastHistory.delete(key);firstHistory.delete(key);
+    }
   },
 };
 let polling = false;
@@ -674,6 +705,13 @@ function hasHistoryViewer(args) {
   }
   return false;
 }
+function providerWindowMatches(chart, work) {
+  return (globalThis.MWNativeNavigation?.chartWindow(chart)?.id || '') === (work.window || '');
+}
+function hasProviderWindowViewer(work) {
+  return ready && Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(
+    chart=>chartUsesSymbol(chart,work.symbol,work.res) && providerWindowMatches(chart,work));
+}
 let historyReloading = false;
 function mergeProviderCorrection(work,generation,verified,original) {
   // A failed/older review cannot erase an earlier confirmed real revision.
@@ -690,11 +728,11 @@ async function refreshProviderHistoryCorrections() {
   // Explicit user recovery uses the existing backend contract. Each click
   // performs one check per pending active sequence, without automatic retries.
   const epoch=workspaceEpoch;
-  for(const [key,work] of providerHistoryWork) {
+  for(const work of providerHistoryWork.values()) {
     const correction=work.correction;
     if(!correction || work.inflight || work.reloading) continue;
-    const split=key.lastIndexOf('|'),symbol=key.slice(0,split),res=key.slice(split+1);
-    if(!hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) continue;
+    const {symbol,res}=work;
+    if(!hasProviderWindowViewer(work)) continue;
     if(!correction.verified && correction.originals.length) {
       work.reloading=true;
       try {
@@ -704,7 +742,7 @@ async function refreshProviderHistoryCorrections() {
           const page=await query(symbol,res,{...original.args,
             history_observation:original.observation},deadline);
           if(epoch!==workspaceEpoch || work.correction!==correction) break;
-          if(!page.history_revalidation || historyOlder(page,providerHistoryState.get(key)))
+          if(!page.history_revalidation || historyOlder(page,providerHistoryState.get(symbol+'|'+res)))
             throw Error('尚未取得最新历史复核结果');
           if(page.history_revalidation.changed) {
             correction.verified=true;
@@ -715,7 +753,7 @@ async function refreshProviderHistoryCorrections() {
         if(epoch!==workspaceEpoch || work.correction!==correction) continue;
         if(!correction.verified && proofs.length===correction.originals.length) {
           if(correction.overflow) throw Error('历史检查积压，请重新打开工作区');
-          const seen=providerHistoryState.get(key);
+          const seen=providerHistoryState.get(symbol+'|'+res);
           if(proofs.some(proof=>historyOlder(proof,seen) || proofs.some(other=>
             historyOlder(proof,{revision:other.cache_revision||0,observed_at:other.as_of||0}))))
             throw Error('历史检查期间出现新版本，请再次刷新历史');
@@ -735,16 +773,16 @@ function historyOlder(page,seen) {
 }
 async function flushProviderCorrections() {
   if(!ready || loading || historyReloading || rangeGuard?.busy() || edgeGuard?.busy()) return;
-  for(const [key,work] of providerHistoryWork) {
+  for(const work of providerHistoryWork.values()) {
     const correction=work.correction;
     if(work.inflight || work.reloading || !correction?.verified || correction.attempts) continue;
-    const split=key.lastIndexOf('|'),symbol=key.slice(0,split),res=key.slice(split+1);
-    if(!hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) continue;
+    const {symbol,res}=work;
+    if(!hasProviderWindowViewer(work)) continue;
     work.reloading=true;
     correction.attempts++;
     const epoch=workspaceEpoch;
     try {
-      const corrected=await reloadHistory(symbol,res);
+      const corrected=await reloadHistory(symbol,res,chart=>providerWindowMatches(chart,work));
       if(corrected && epoch===workspaceEpoch && !work.inflight && work.correction===correction)
         work.correction=null;
       else if(!corrected) send({type:'error',error:'历史更正待处理，请刷新历史'});
@@ -753,28 +791,37 @@ async function flushProviderCorrections() {
   }
 }
 async function reloadHistory(symbol, res, relevant = () => true) {
-  if (!ready || loading || historyReloading || rangeGuard?.busy() || edgeGuard?.busy()) return false;
+  if (!ready || loading || historyReloading || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) return false;
+  if (Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(chart=>
+      chartUsesSymbol(chart,symbol,res) && relevant(chart) && globalThis.MWNativeNavigation?.interacting(chart))) return false;
   historyReloading = true;
   const epoch = workspaceEpoch;
-  let invalidated = false;
+  const invalidated = new Set();
   try {
     for (let i=0;i<widget.chartsCount();i++) {
       const chart=widget.chart(i);
       if (!chartUsesSymbol(chart,symbol,res) || !relevant(chart)) continue;
-      const rangeKey=symbol+'|'+res;
+      const window=globalThis.MWNativeNavigation?.chartWindow(chart)?.id || '';
+      if (window) {
+        // Native resetCache and resetData both mutate the same source. Rebuild
+        // an isolated historical source once, with a fresh validated seed.
+        if (!await MWNativeNavigation.refreshChartWindow(chart)) return false;
+        continue;
+      }
+      const rangeKey=symbol+'|'+res+'|'+window;
       if (chart.getTimeScale().rightOffset()<0)
         refreshingHistoryRanges.set(rangeKey,chart.getVisibleRange());
       let restored;
       try { restored=await refreshChartHistory(widget,chart,()=>{
-        if (invalidated) return;
-        invalidated=true;
+        if (invalidated.has(window)) return;
+        invalidated.add(window);
         let notified=false;
         for (const sub of subscriptions.values()) {
-          if (MWSeries.same(sub.symbol,symbol) && sub.res===res) {
+          if (MWSeries.same(sub.symbol,symbol) && sub.res===res && (sub.window || '')===window) {
             sub.reset();notified=true;
           }
         }
-        if (!notified) widget.resetCache();
+        if (!notified && !window) widget.resetCache();
       },()=>epoch===workspaceEpoch && chartUsesSymbol(chart,symbol,res));
       } finally { refreshingHistoryRanges.delete(rangeKey); }
       if (!restored) return false;
@@ -942,7 +989,7 @@ async function tick() {
 }
 function snapshot(manual = true) {
   if (!ready || loading) return;
-  if (rangeGuard?.busy() || edgeGuard?.busy()) {
+  if (globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
     dirty = true;
     if (manual) manualSavePending = true;
     return;
@@ -1103,7 +1150,7 @@ function boot(
   let initialNativeSave = false;
   let busySaveNoticeShown = false;
   layouts.saveChart = async (data) => {
-    if (viewportRestoring || rangeGuard?.busy() || edgeGuard?.busy()) {
+    if (viewportRestoring || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
       dirty = true;
       if (!busySaveNoticeShown) {
         busySaveNoticeShown = true;
@@ -1217,7 +1264,7 @@ function boot(
     custom_indicators_getter: (PineJS) =>
       Promise.resolve(pythonStudies(PineJS, catalog)),
     container: "chart",
-    library_path: "/charting_library/",
+    library_path: globalThis.MW_CHART_LIBRARY_PATH || "/charting_library/",
     custom_css_url: "/chart-menu.css",
     datafeed: feed,
     widgetbar: {
@@ -1288,6 +1335,7 @@ function boot(
     ],
   });
   widget.onChartReady(async () => {
+    widget.crosshairSync().subscribe(value => MWNativeNavigation.crosshairEnabled(value));
     grid = chartGridPresentation(widget, preferences,
       async value => {
         await prefs.savePreference("setting", "mw.gridStyle", value);
@@ -1537,13 +1585,14 @@ addEventListener("message", async (e) => {
         cursor:Math.max(old?.cursor||0,event.cursor||0)});
     if(event.type==='reset') {
       sub.needsHistoryReload=true;
-      if(await reloadHistory(sub.symbol,sub.res).catch(error=>send({type:'error',error:String(error)})))
+      if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub)).catch(error=>send({type:'error',error:String(error)})))
         sub.needsHistoryReload=false;
     } else if(event.type==='bars') {
       if(sub.needsHistoryReload) {
-        if(await reloadHistory(sub.symbol,sub.res))sub.needsHistoryReload=false;
+        if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub)))sub.needsHistoryReload=false;
         return;
       }
+      if (sub.historical) return;
       const rows=barsOf({bars:event.bars,indicators:event.indicators||[]},sub.res,sub.symbol);
       for(const bar of rows) if(bar.time>=sub.last) {sub.cb({...bar});sub.last=bar.time;}
     } else if(event.type==='error') {
@@ -1557,7 +1606,7 @@ addEventListener("message", async (e) => {
     pending.delete(m.id);
     clearTimeout(p.timer);
     clearTimeout(p.cancellationTimer);
-    m.error ? p.reject(Error(m.error)) : p.resolve(m.result);
+    m.error ? p.reject(Object.assign(Error(m.error),m.errorDetails)) : p.resolve(m.result);
     drain();
   } else if (m.type === "init" && !widget)
     boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol);

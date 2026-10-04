@@ -1,0 +1,32 @@
+{
+  "scope": "Isolated real v31.1 library with synthetic 24x7 OHLC; no production API or user-state writes",
+  "cases": [
+    {
+      "config": {
+        "source": "1W",
+        "peers": [
+          "1D",
+          "240",
+          "5"
+        ],
+        "kind": "crosshair",
+        "ratio": 0.88
+      },
+      "errors": [],
+      "nativeCancellation": [
+        {
+          "kind": "future-margin",
+          "cancelled": true,
+          "hasWindow": false
+        },
+        {
+          "kind": "near-history",
+          "cancelled": true,
+          "hasWindow": false
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "errors": []
+}

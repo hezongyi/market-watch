@@ -1,0 +1,38 @@
+{
+  "baseline": "62488c6035dbea9533699d569a6605f82c684303",
+  "branch": "fix/native-chart-window-sync",
+  "original_licensed_bundle_sha256": "114428b8dde6eb137fd7ef3bc20ef35882189186c4bd092bb743b64d11682be1",
+  "sources": {
+    ".gitignore": "7a438f345c29bfc6b7b37f6090b99ac480f6d005f846bdbcd22dfef190cd3705",
+    "advanced-host/.dockerignore": "f66ad6c254f4e5dea8f26c2156ec1331f9947e27bbca307232e3c6ab04ebd1cd",
+    "advanced-host/Dockerfile": "f4e201f711bf1acf3c1713f5dab8d555dd5294c12cbf81df85677b633b4fd9d3",
+    "advanced-host/bridge.js": "4e297c7692de1c41b6720d4155a04a9756478c6b083a2760c784150b9aba0242",
+    "advanced-host/build-assets.mjs": "abb796b97849d78c6c1d8d28b32bcc593a9151201272b9dc9cc29b0075a7558a",
+    "advanced-host/index.html": "f9471f5f6e0701ce807f44d2b3bb19203522162be7587d55954165fa59b5e22a",
+    "advanced-host/indicators.js": "579aca6272f310142e8403703e6911b76476edd0f357a866ead742502854ac1c",
+    "advanced-host/native-reserve.js": "3681fa14f4760238736099d7510ed772eb892f0692d7509301042145ee490f5c",
+    "advanced-host/nginx.conf": "84c90d4cf30ea3bf91f1a18e6d2bf0f203f043a793aa4b75b44aa7536696aec2",
+    "advanced-host/patch-native-reserve.mjs": "ec02bcd4d3b179b8bdd2bcd602078f8138142f389dcfa7d22439a1c6c67925bd",
+    "advanced-host/viewports.js": "24eac03c1af488b5e33b20007e1bc9c8d049ada9a329635b59fbf2bbd9c729ef",
+    "web/src/advanced/AdvancedWorkspace.tsx": "ef65a9fb404a58440d8bbcac9646a11bb129ed7db1a0189996dea4900aea11f9",
+    "web/src/api.ts": "d432597b82d91cf4c6836378bcba17cbc1fd4177602e840a029f0c702d82e6f9",
+    "web/tests/advanced-provider-history-observation.cjs": "5f3d18bb4bedffbf0edca5a45f883c2e4bad608a81616e1fd9c854cb71cb295a",
+    "web/tests/advanced-provider-request-lifetime.cjs": "35e0055c3230c116edf9c5a15fe7a32d483f17e0a112048550fd0ee788444c93",
+    "web/tests/advanced-python-indicators.cjs": "f815290243b2cea733bb0e14cd885f9fcdcd6484ed4ff3db55ecc5bf87de6435",
+    "advanced-host/native-navigation.js": "58cd4e4ca8b3450cf7f7e3169816565b2a24cf858d7b2c2f491dd2dd018e32ff",
+    "web/tests/advanced-native-cache.browser.cjs": "419f84b5ac2340c95ef8df26743eed91c26036060a8e14ae9e170e496db0c8e2",
+    "web/tests/advanced-native-date-sync.browser.cjs": "f7df4cf57256ece56b6b05df34af8471c72087f9271646e720e471ca91d91d9e",
+    "web/tests/advanced-native-navigation.browser.cjs": "291ec252da7dec3dacadd5986111589edcec97179b0fc2818445ab36044de602",
+    "web/tests/advanced-native-navigation.product.browser.cjs": "4c29645da6248d9d18545764ec0e26cc7c0f2d0a87f56a4859e9443bb846edca",
+    "web/tests/advanced-native-provider-calendar.browser.cjs": "60722d2fc9f1c1a209a451c20dde53ac0f8dd45f5e74b10471d84f51e44f9dd7",
+    "web/tests/advanced-native-hook-contract.cjs": "3f6dd486385fad38766991900931f38fe036a0c37579ad0625e2e3a99131e691"
+  },
+  "private_licensed_distribution_committed": false,
+  "docker_project": "mw-chart-sync-acceptance-20261004",
+  "production_deployed": false,
+  "docker_images": {
+    "chart": "sha256:1665598fed9d95e5929a71a1a03b99f4cc4953178b2b77c880a8f0748108f0e3",
+    "web": "sha256:535b2d2b45a22f1a42e9b9855c85b82f3f321a6d5a04db8787a3d72a32c7be63",
+    "disabled_chart": "sha256:5a8e35c53816b53dac311dfa4632fbef092bca7cf95a5ec5bf3450805d0841a1"
+  }
+}

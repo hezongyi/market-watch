@@ -1,0 +1,1499 @@
+{
+  "scope": "Isolated real v31.1 library with synthetic 24x7 OHLC; no production API or user-state writes",
+  "cases": [
+    {
+      "config": {
+        "source": "1W",
+        "peers": [
+          "1D",
+          "240",
+          "5"
+        ],
+        "kind": "crosshair",
+        "ratio": 0.88
+      },
+      "errors": [],
+      "before": [
+        {
+          "res": "1W",
+          "time": 1786924800,
+          "center": 1757894400,
+          "x": 675,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 675,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1D",
+          "time": 1786924800,
+          "center": 1786147200,
+          "x": 441,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 441,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "240",
+          "time": 1789113600,
+          "center": 1790035200,
+          "x": 3,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 3,
+            "text": "周五 2026-09-11   08:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "5",
+          "time": 1790777400,
+          "center": 1790796600,
+          "x": 3,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 3,
+            "text": "周三 2026-09-30   14:10",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "stationary": [
+        {
+          "res": "1W",
+          "time": 1786924800,
+          "center": 1757894400,
+          "x": 675,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 675,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1D",
+          "time": 1786924800,
+          "center": 1786147200,
+          "x": 441,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 441,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "240",
+          "time": 1786924800,
+          "center": 1786924800,
+          "x": 387,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 387,
+            "text": "周一 2026-08-17   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "5",
+          "time": 1786924800,
+          "center": 1786924800,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2026-08-17   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "afterMove": [
+        {
+          "res": "1W",
+          "time": 1786924800,
+          "center": 1757894400,
+          "x": 675,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 675,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1D",
+          "time": 1786924800,
+          "center": 1786147200,
+          "x": 441,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 441,
+            "text": "周一 2026-08-17",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "240",
+          "time": 1786924800,
+          "center": 1786924800,
+          "x": 387,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 387,
+            "text": "周一 2026-08-17   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "5",
+          "time": 1786924800,
+          "center": 1786924800,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2026-08-17   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "requests": [
+        {
+          "r": "1W",
+          "stage": "initial",
+          "params": {
+            "from": 1625097600,
+            "to": 1790899200,
+            "countBack": 275,
+            "firstDataRequest": true
+          },
+          "at": 1062.5
+        },
+        {
+          "r": "1D",
+          "stage": "initial",
+          "params": {
+            "from": 1779667200,
+            "to": 1790899200,
+            "countBack": 130,
+            "firstDataRequest": true
+          },
+          "at": 1921.7000002861023
+        },
+        {
+          "r": "240",
+          "stage": "initial",
+          "params": {
+            "from": 1788955261,
+            "to": 1790812861,
+            "countBack": 129,
+            "firstDataRequest": true
+          },
+          "at": 2008.2000002861023
+        },
+        {
+          "r": "5",
+          "stage": "initial",
+          "params": {
+            "from": 1790774161,
+            "to": 1790812861,
+            "countBack": 129,
+            "firstDataRequest": true
+          },
+          "at": 2036
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1786809600,
+            "to": 1787001600,
+            "countBack": 640,
+            "firstDataRequest": true
+          },
+          "at": 2302
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1786347900,
+            "to": 1787309400,
+            "countBack": 3205,
+            "firstDataRequest": true
+          },
+          "at": 2384.9000000953674
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1785542400,
+            "to": 1787846400,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 2449.7000002861023
+        }
+      ],
+      "rejected": []
+    },
+    {
+      "config": {
+        "source": "1W",
+        "peers": [
+          "1",
+          "5",
+          "15"
+        ],
+        "kind": "far",
+        "ratio": 0.15
+      },
+      "errors": [],
+      "before": [
+        {
+          "res": "1W",
+          "time": 1730678400,
+          "center": 1757894400,
+          "x": 117,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 117,
+            "text": "周一 2024-11-04",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1790805720,
+          "center": 1790809560,
+          "x": 3,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 3,
+            "text": "周三 2026-09-30   22:02",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1790777400,
+          "center": 1790796600,
+          "x": 3,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 3,
+            "text": "周三 2026-09-30   14:10",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1790706600,
+          "center": 1790764200,
+          "x": 3,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 3,
+            "text": "周二 2026-09-29   18:30",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "stationary": [
+        {
+          "res": "1W",
+          "time": 1730678400,
+          "center": 1757894400,
+          "x": 117,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 117,
+            "text": "周一 2024-11-04",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "afterMove": [
+        {
+          "res": "1W",
+          "time": 1730678400,
+          "center": 1757894400,
+          "x": 117,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 117,
+            "text": "周一 2024-11-04",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "rollback": [
+        {
+          "res": "1W",
+          "time": 1730678400,
+          "center": 1757894400,
+          "x": 117,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 117,
+            "text": "周一 2024-11-04",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1731139500,
+          "center": 1730678400,
+          "x": 0.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 1152.75,
+            "text": "周六 2024-11-09   08:05",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "capacity17000": 17000,
+      "publicRange": [
+        {
+          "res": "1W",
+          "time": 1730678400,
+          "center": 1757894400,
+          "x": 117,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 117,
+            "text": "周一 2024-11-04",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1580691600,
+          "center": 1580688000,
+          "x": 752.64,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 752.64,
+            "text": "周一 2020-02-03   01:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1730678400,
+          "center": 1730678400,
+          "x": 384.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 384.25,
+            "text": "周一 2024-11-04   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "heldNewer": [
+        {
+          "res": "1W",
+          "time": 1719187200,
+          "center": 1757894400,
+          "x": 3,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 3,
+            "text": "周一 2024-06-24",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1730632320,
+          "center": 1730678400,
+          "x": 0.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 0.25,
+            "text": "周日 2024-11-03   11:12",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1580690100,
+          "center": 1580692800,
+          "x": 115.04001024001275,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 115.04001024001275,
+            "text": "周一 2020-02-03   00:35",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1729987200,
+          "center": 1730678400,
+          "x": 0.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 0.25,
+            "text": "周日 2024-10-27   00:00",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "latest": [
+        {
+          "res": "1W",
+          "time": null,
+          "center": 1757894400,
+          "x": 711,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 711,
+            "text": "周一 2026-09-28",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1730724420,
+          "center": 1730678400,
+          "x": 767.75,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 767.75,
+            "text": "周一 2024-11-04   12:47",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1790783100,
+          "center": 1790796600,
+          "x": 117,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 117,
+            "text": "周三 2026-09-30   15:45",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1731368700,
+          "center": 1730678400,
+          "x": 767.75,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 767.75,
+            "text": "周一 2024-11-11   23:45",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "failed": [
+        {
+          "res": "1W",
+          "time": null,
+          "center": 1757894400,
+          "x": 711,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 711,
+            "text": "周一 2026-09-28",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1730724420,
+          "center": 1730678400,
+          "x": 767.75,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 767.75,
+            "text": "周一 2024-11-04   12:47",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1790783100,
+          "center": 1790796600,
+          "x": 117,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 117,
+            "text": "周三 2026-09-30   15:45",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1731368700,
+          "center": 1730678400,
+          "x": 767.75,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 767.75,
+            "text": "周一 2024-11-11   23:45",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "recovered": [
+        {
+          "res": "1W",
+          "time": 1789948800,
+          "center": 1757894400,
+          "x": 705,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 705,
+            "text": "周一 2026-09-21",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "1",
+          "time": 1730724420,
+          "center": 1730678400,
+          "x": 767.75,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 767.75,
+            "text": "周一 2024-11-04   12:47",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 0,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        },
+        {
+          "res": "5",
+          "time": 1790505900,
+          "center": 1790667300,
+          "x": 115.25,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 115.25,
+            "text": "周日 2026-09-27   10:45",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 0,
+            "width": 768,
+            "height": 502
+          }
+        },
+        {
+          "res": "15",
+          "time": 1731368700,
+          "center": 1730678400,
+          "x": 767.75,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 767.75,
+            "text": "周一 2024-11-11   23:45",
+            "visible": true,
+            "width": 768,
+            "alwaysInViewPort": true
+          },
+          "requesting": false,
+          "box": {
+            "x": 826,
+            "y": 532,
+            "width": 768,
+            "height": 501
+          }
+        }
+      ],
+      "requests": [
+        {
+          "r": "1W",
+          "stage": "initial",
+          "params": {
+            "from": 1625097600,
+            "to": 1790899200,
+            "countBack": 275,
+            "firstDataRequest": true
+          },
+          "at": 912.4000000953674
+        },
+        {
+          "r": "1",
+          "stage": "initial",
+          "params": {
+            "from": 1790804881,
+            "to": 1790812861,
+            "countBack": 133,
+            "firstDataRequest": true
+          },
+          "at": 1623.4000000953674
+        },
+        {
+          "r": "5",
+          "stage": "initial",
+          "params": {
+            "from": 1790772961,
+            "to": 1790812861,
+            "countBack": 133,
+            "firstDataRequest": true
+          },
+          "at": 1658
+        },
+        {
+          "r": "15",
+          "stage": "initial",
+          "params": {
+            "from": 1790693161,
+            "to": 1790812861,
+            "countBack": 133,
+            "firstDataRequest": true
+          },
+          "at": 1673.1999998092651
+        },
+        {
+          "r": "1",
+          "stage": "click",
+          "params": {
+            "from": 1730655360,
+            "to": 1730693760,
+            "countBack": 640,
+            "firstDataRequest": true
+          },
+          "at": 1951.5
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1730563200,
+            "to": 1730755200,
+            "countBack": 640,
+            "firstDataRequest": true
+          },
+          "at": 1951.6999998092651
+        },
+        {
+          "r": "15",
+          "stage": "click",
+          "params": {
+            "from": 1730332800,
+            "to": 1730908800,
+            "countBack": 640,
+            "firstDataRequest": true
+          },
+          "at": 1951.9000000953674
+        },
+        {
+          "r": "1",
+          "stage": "click",
+          "params": {
+            "from": 1730563020,
+            "to": 1730755320,
+            "countBack": 3205,
+            "firstDataRequest": true
+          },
+          "at": 2113.300000190735
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1730101500,
+            "to": 1731063000,
+            "countBack": 3205,
+            "firstDataRequest": true
+          },
+          "at": 2114.9000000953674
+        },
+        {
+          "r": "15",
+          "stage": "click",
+          "params": {
+            "from": 1728947700,
+            "to": 1731832200,
+            "countBack": 3205,
+            "firstDataRequest": true
+          },
+          "at": 2122.800000190735
+        },
+        {
+          "r": "1",
+          "stage": "click",
+          "params": {
+            "from": 1730401920,
+            "to": 1730862720,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 2267
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1729296000,
+            "to": 1731600000,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 2271.5
+        },
+        {
+          "r": "15",
+          "stage": "click",
+          "params": {
+            "from": 1726531200,
+            "to": 1733443200,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 2292.699999809265
+        },
+        {
+          "r": "5",
+          "stage": "post-replacement-failure",
+          "params": {
+            "from": 1544918400,
+            "to": 1547222400,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 3284.800000190735,
+          "error": "injected HTTP 503"
+        },
+        {
+          "r": "5",
+          "stage": "post-replacement-failure",
+          "params": {
+            "from": 1544915400,
+            "to": 1547222400,
+            "countBack": 7690,
+            "firstDataRequest": false
+          },
+          "at": 3287
+        },
+        {
+          "r": "5",
+          "stage": "post-replacement-failure",
+          "params": {
+            "from": 1546300800,
+            "to": 1551400800,
+            "countBack": 17000,
+            "firstDataRequest": true
+          },
+          "at": 3453.4000000953674
+        },
+        {
+          "r": "5",
+          "stage": "post-replacement-failure",
+          "params": {
+            "from": 1549788300,
+            "to": 1552092300,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 3644
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1579302000,
+            "to": 1581606000,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 3888.199999809265
+        },
+        {
+          "r": "5",
+          "stage": "click",
+          "params": {
+            "from": 1791050743,
+            "to": 1791088243,
+            "countBack": 125,
+            "firstDataRequest": true
+          },
+          "at": 5199
+        },
+        {
+          "r": "5",
+          "stage": "failure",
+          "params": {
+            "from": 1790474700,
+            "to": 1790685300,
+            "countBack": 702,
+            "firstDataRequest": false
+          },
+          "at": 5557.5,
+          "error": "injected HTTP 503"
+        },
+        {
+          "r": "5",
+          "stage": "recovery",
+          "params": {
+            "from": 1790552100,
+            "to": 1790744100,
+            "countBack": 640,
+            "firstDataRequest": true
+          },
+          "at": 5717.300000190735
+        },
+        {
+          "r": "5",
+          "stage": "recovery",
+          "params": {
+            "from": 1790090400,
+            "to": 1791051900,
+            "countBack": 3205,
+            "firstDataRequest": true
+          },
+          "at": 5747.099999904633
+        },
+        {
+          "r": "5",
+          "stage": "recovery",
+          "params": {
+            "from": 1788784244,
+            "to": 1791088244,
+            "countBack": 7680,
+            "firstDataRequest": true
+          },
+          "at": 5805.699999809265
+        }
+      ],
+      "rejected": []
+    }
+  ],
+  "errors": []
+}
