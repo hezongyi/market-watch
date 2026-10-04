@@ -102,3 +102,32 @@ def test_cancel_during_upstream_fences_uncommitted_page(history, monkeypatch):
     loads.once()
     assert loads.status('owner',ident)['state'] == 'cancelled'
     assert cache.snapshot(cache.identity(META,'M5'),40000000,10)['bars'] == []
+
+
+def test_page_budget_allows_ready_at_exact_last_page(history, monkeypatch):
+    monkeypatch.setattr(settings, 'native_history_task_pages', 8)
+    ident = loads.submit('owner', 'exact-page-limit', body(32000))['load']['id']
+    for _ in range(9):
+        loads.once()
+    assert loads.status('owner', ident)['state'] == 'ready'
+    assert loads.status('owner', ident)['pages'] == 8
+
+
+def test_independent_demands_get_fair_page_turns(history):
+    one = loads.submit('one', 'long', body())['load']['id']
+    other = body().model_copy(update={'instrument': 'OTHER'})
+    two = loads.submit('two', 'short', other)['load']['id']
+    loads.once()
+    loads.once()
+    assert loads.status('one', one)['pages'] == 1
+    assert loads.status('two', two)['pages'] == 1
+
+
+def test_successful_empty_pages_fail_after_bounded_no_progress(history, monkeypatch):
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: {'bars': [], 'history_boundary': False})
+    ident = loads.submit('owner', 'empty-pages', body())['load']['id']
+    for _ in range(3):
+        loads.once()
+    state = loads.status('owner', ident)
+    assert state['state'] == 'failed' and state['pages'] == 3
+    assert state['error']['code'] == 'HISTORY_NO_PROGRESS'

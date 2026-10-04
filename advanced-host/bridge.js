@@ -485,7 +485,7 @@ const feed = {
       providerHistoryWork.set(workKey,providerWork);
       providerWork.inflight++;
     }
-    const historyDeadline=Date.now()+8000;
+    let historyDeadline=Date.now()+8000;
     const completeTerminal=rangeGuard?.captureTerminalCompletion?.(
       chart=>chart.symbol()===s.ticker && chart.resolution()===res &&
         (globalThis.MWNativeNavigation?.chartWindow(chart)?.id || '') === (s.mw_window || ''));
@@ -517,6 +517,7 @@ const feed = {
           const error = Error("已取消旧图表的历史加载");
           error.code = "HISTORY_CANCELLED"; throw error;
         }
+        historyDeadline=Date.now()+30000;
         const seen=providerHistoryState.get(historyKey);
         const older=historyOlder(page,seen);
         if(older && page.bars?.length) {
@@ -710,8 +711,17 @@ function hasProviderWindowViewer(work) {
     chart=>chartUsesSymbol(chart,work.symbol,work.res) && providerWindowMatches(chart,work));
 }
 let historyReloading = false;
+globalThis.setInterval?.(()=>{
+  for(const sub of subscriptions.values())if(sub.reviewPending && !sub.resetReview &&
+     Date.now()>=(sub.reviewRetryAt||0)) {
+    sub.reviewRetryAt=Date.now()+30000;
+    void reviewProviderReset(sub,{revision:sub.resetRevision}).catch(()=>{});
+  }
+},5000);
+
 function reviewProviderReset(sub, event) {
   sub.resetRevision=Math.max(sub.resetRevision||0,event.revision||0);
+  sub.reviewPending=true;
   if(sub.resetReview) return sub.resetReview;
   const epoch=workspaceEpoch;
   const current=()=>epoch===workspaceEpoch &&
@@ -721,7 +731,7 @@ function reviewProviderReset(sub, event) {
       const work=providerHistoryWork.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
       const observation=work?.observation;
       if(!observation) throw Error('历史数据尚未完成观察，请稍后刷新历史');
-      if(sub.resetRevision<=observation.revision) return;
+      if(sub.resetRevision<=observation.revision) {sub.reviewPending=false;return;}
       // Stream gaps do not prove delivered history changed. Verify delivered
       // bars and indicator dependencies before invalidating the native source.
       const page=await query(sub.symbol,sub.res,{
@@ -735,13 +745,14 @@ function reviewProviderReset(sub, event) {
         throw Error('历史更正尚未核实，请刷新历史');
       if(page.history_revalidation.changed) {
         sub.needsHistoryReload=true;
-        if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub)))
-          sub.needsHistoryReload=false;
+        if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub))) {
+          sub.needsHistoryReload=false;sub.reviewPending=false;
+        }
         return;
       }
       if(work.observation!==observation) continue;
       work.observation={...observation,revision:page.cache_revision||0,observed_at:page.as_of||0};
-      if(sub.resetRevision<=work.observation.revision) return;
+      if(sub.resetRevision<=work.observation.revision) {sub.reviewPending=false;return;}
     }
     if(current()) throw Error('历史更正尚未核实，请刷新历史');
   })();

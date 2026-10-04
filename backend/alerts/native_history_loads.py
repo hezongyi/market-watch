@@ -173,7 +173,7 @@ def once():
             .values(state="expired", error_json=error("HISTORY_TIMEOUT", "历史等待已过期，请重试")))
         row = db.scalar(select(NativeHistoryLoad).where(
             NativeHistoryLoad.state.in_(("waiting", "filling")),
-            NativeHistoryLoad.lease_until <= now).order_by(NativeHistoryLoad.created_at)
+            NativeHistoryLoad.lease_until <= now).order_by(NativeHistoryLoad.pages + NativeHistoryLoad.stalls, NativeHistoryLoad.created_at)
             .limit(1).with_for_update(skip_locked=True))
         if row is None:
             db.execute(delete(NativeHistoryLoad).where(NativeHistoryLoad.deadline < now-3600000,
@@ -190,16 +190,25 @@ def once():
                 NativeHistoryLoad.id == ident, NativeHistoryLoad.generation == generation,
                 NativeHistoryLoad.state == "filling", NativeHistoryLoad.lease_until > now_ms(),
                 NativeHistoryLoad.consumer_until > now_ms(), NativeHistoryLoad.deadline > now_ms())))
-    progress = {"attempts": 0, "pages": 0}
+    progress = {"attempts": 0, "pages": 0, "advanced": False}
     state, failure = "waiting", None
     try:
         if pages >= settings.native_history_task_pages:
-            raise CapacityExceeded("历史分页超过任务预算，请减小跨度")
-        with read_context("step", time.monotonic()+settings.provider_request_seconds, progress, valid), lane("chart"):
-            cache.data(DataQuery.model_validate(query))
-        state = "ready"
+            try:
+                read_cached(DataQuery.model_validate(query))
+                state = "ready"
+            except cache.HistoryPending:
+                raise CapacityExceeded("历史分页超过任务预算，请减小跨度") from None
+        else:
+            state = "filling"
+        if state != "ready":
+            with read_context("step", time.monotonic()+settings.provider_request_seconds, progress, valid), lane("chart"):
+                cache.data(DataQuery.model_validate(query))
+            state = "ready"
     except cache.HistoryPending:
-        pass
+        state = "waiting"
+        if not progress["advanced"] and stalls >= 2:
+            state, failure = "failed", error("HISTORY_NO_PROGRESS", "历史分页未推进，请重试")
     except CapacityExceeded as exc:
         state, failure = "failed", error(exc.code, str(exc), 422)
     except TimeoutError:
@@ -213,7 +222,7 @@ def once():
             NativeHistoryLoad.id == ident, NativeHistoryLoad.generation == generation,
             NativeHistoryLoad.state == "filling", NativeHistoryLoad.lease_until > now_ms())
             .values(state=state, error_json=failure, lease_until=0, pages=pages+progress["pages"],
-                    stalls=0 if progress["pages"] else stalls+1))
+                    stalls=0 if progress["advanced"] else stalls+1))
     return True
 
 

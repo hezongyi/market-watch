@@ -1,4 +1,5 @@
 // Isolated full product sync acceptance. The licensed bundle is only observed.
+const {execFileSync}=require("node:child_process");
 const { chromium } = require("@playwright/test");
 const fs = require("node:fs"),
   assert = require("node:assert/strict");
@@ -308,12 +309,10 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           ),
         );
         await frame.evaluate(async () => {
-          await widget
-            .chart(0)
-            .setVisibleRange({
-              from: Date.parse("2025-10-01") / 1000,
-              to: Date.parse("2026-02-01") / 1000,
-            });
+          await widget.chart(0).setVisibleRange({
+            from: Date.parse("2025-10-01") / 1000,
+            to: Date.parse("2026-02-01") / 1000,
+          });
           widget.timeSync().setValue(true);
         });
         const b = await box(0),
@@ -339,6 +338,9 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
         );
         await settle();
         await page.waitForTimeout(250);
+        item.semanticBefore = await frame.evaluate(() =>
+          MWNativeNavigation.diagnostics(),
+        );
         item.stationary = await crosshairs();
         await page.screenshot({
           path: OUT.replace(".json", `-${count}-stationary.png`),
@@ -346,7 +348,11 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
         await page.mouse.move(x + 20, y);
         await page.mouse.move(x, y);
         await page.waitForTimeout(200);
+        await page.waitForTimeout(1000);
         item.afterMove = await crosshairs();
+        item.semanticAfter = await frame.evaluate(() =>
+          MWNativeNavigation.diagnostics(),
+        );
         for (let i = 0; i < count; i++)
           assert.equal(
             item.stationary[i].time,
@@ -397,12 +403,83 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           "hover must not reload historical corridor",
         );
         await page.screenshot({ path: OUT.replace(".json", "-hover.png") });
+        if(process.env.CONTINUOUS_FULL==='1') {
+          await frame.evaluate(()=>widget.timeSync().setValue(false));
+          const m5=item.final.charts.findIndex(c=>c.resolution==='5');
+          const target=Date.parse('2025-12-01')/1000;
+          for(const kind of ['busy','failure']) {
+            phase='recover-'+kind;fault=kind;
+            await frame.evaluate(({m5,target})=>widget.chart(m5).setVisibleRange({from:target-366*86400,to:target-366*86400+3600},{rejectByTimeout:30000}).catch(()=>{}),{m5,target});
+            await settle();
+            await frame.evaluate(({m5,target})=>widget.chart(m5).setVisibleRange({from:target-1800,to:target+1800}),{m5,target});
+            await settle();
+            const state=await snapshot();
+            assert.ok(state.charts[m5].range.from<=target && state.charts[m5].range.to>=target,'fault must allow next navigation');
+          }
+          phase='cancel';fault='delay';
+          item.cancelOutcome=await frame.evaluate(async({m5,target})=>{
+            const old=widget.chart(m5).setVisibleRange({from:target-400*86400,to:target-400*86400+3600},{rejectByTimeout:30000}).then(()=> 'completed',()=> 'cancelled');
+            await new Promise(resolve=>setTimeout(resolve,100));
+            await widget.chart(m5).setVisibleRange({from:target-1800,to:target+1800});
+            return old;
+          },{m5,target});
+          await settle();
+          item.cancelledView=await snapshot();
+          assert.ok(item.cancelledView.charts[m5].range.from<=target && item.cancelledView.charts[m5].range.to>=target);
+          phase='studies';
+          await frame.evaluate(async m5=>{
+            for(const [name,params] of [['Moving Average',{length:200}],['Relative Strength Index',{length:14}],['MACD',{}],['守望 Python SMA',{period:200}]])
+              await widget.chart(m5).createStudy(name,false,false,params);
+            await widget.chart(m5).createShape({time:widget.chart(m5).getVisibleRange().from,price:1.1},{shape:'horizontal_line'});
+          },m5);
+          await settle();await page.waitForTimeout(3000);
+          item.studies=await snapshot();assert.ok(item.studies.charts[m5].studies.length>=4);
+          phase='held-drag';const held=await box(m5),beforeHeld=await snapshot();
+          await page.mouse.move(held.x+held.width*.7,held.y+held.height*.5);await page.mouse.down();
+          await page.mouse.move(held.x+held.width*.2,held.y+held.height*.5,{steps:20});await page.waitForTimeout(200);
+          item.held=await snapshot();await page.mouse.up();await settle();
+          assert.notEqual(item.held.charts[m5].range.from,beforeHeld.charts[m5].range.from,'held drag must move immediately');
+          phase='revision';
+          await frame.evaluate(m5=>{globalThis.__resetCount=0;const chart=widget.chart(m5),original=chart.resetData;chart.resetData=function(...args){__resetCount++;return original.apply(this,args);};},m5);
+          const rangeBefore=await snapshot();
+          if(process.env.NATIVE_REVISION_SCRIPT) {
+            const at=Math.floor((rangeBefore.charts[m5].range.from+rangeBefore.charts[m5].range.to)*500);
+            execFileSync('sg',['docker','-c',`docker compose -f /home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml exec -T api python /private/revise.py ${at}`]);
+            await frame.waitForFunction(()=>__resetCount>0,null,{timeout:60000});await settle();
+            item.revised=await snapshot();item.resetCount=await frame.evaluate(()=>__resetCount);
+            assert.ok(Math.abs(item.revised.charts[m5].range.from-rangeBefore.charts[m5].range.from)<600,'real revision must restore history view');
+          }
+          phase='save-reopen';await frame.evaluate(()=>new Promise((resolve,reject)=>widget.saveChartToServer(resolve,reject)));
+          item.saved=await snapshot();await page.reload();frame=undefined;
+          for(let attempt=0;attempt<200 && !frame;attempt++){frame=page.frames().find(f=>f.url().startsWith(CHART+'/'));if(!frame)await page.waitForTimeout(100);}
+          await settle();item.reopened=await snapshot();
+          assert.equal(item.reopened.charts[m5].studies.length,item.saved.charts[m5].studies.length);
+          assert.equal(item.reopened.charts[m5].shapes.length,item.saved.charts[m5].shapes.length);
+        }
         item.passed = true;
         save();
       } catch (error) {
         item.failure = String(error);
         item.stack = error.stack;
         if (frame) item.failedSnapshot = await snapshot().catch(() => null);
+        if (frame)
+          item.notices = await frame
+            .evaluate(() => activeNotices)
+            .catch(() => null);
+        if (native)
+          item.modelState = await native
+            .evaluate(() =>
+              [...__syncModels.values()]
+                .filter((v) => v.canvas.isConnected)
+                .map(({ m }) => ({
+                  res: m.interval(),
+                  scroll: !!m._scrollingState,
+                  range: !!m._lastGotoTimeRange,
+                  left: m.mainSeries().bars().firstIndex(),
+                  right: m.mainSeries().bars().lastIndex(),
+                })),
+            )
+            .catch(() => null);
         await page
           .screenshot({ path: OUT.replace(".json", "-failed.png") })
           .catch(() => {});

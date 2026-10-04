@@ -159,6 +159,9 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
         interval = next((r for r in ranges if r[0] < before <= r[1]), None)
         preceding = next((r for r in reversed(ranges) if r[1] < before), None)
         readable = interval or preceding
+        window = metadata.metadata_json.get("history_window") or {}
+        window_limit = bool(window.get("retry_at", 0) > now_ms() and
+                            (before <= window.get("left", 0) or readable and readable[0] <= window.get("left", 0)))
         predicate = (ProviderBar.dataset_id == key, ProviderBar.chart_time < before,
                      ProviderBar.chart_time >= (readable[0] if readable else before))
         available = in_range = 0
@@ -177,7 +180,7 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
                 raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
             range_done = native_from is None or bool(readable and readable[0] <= native_from)
             enough = available >= demand + prefix or bool(metadata.earliest and readable and readable[0] == 0)
-            limit = min(capacity() + 1, demand + prefix + reserve + 1) if range_done and enough else 1
+            limit = min(capacity() + 1, demand + prefix + reserve + 1) if (range_done and enough) or window_limit else 1
         records = db.execute(select(ProviderBar.chart_time, ProviderBar.payload).where(*predicate)
                              .order_by(ProviderBar.chart_time.desc()).limit(limit)).all()
         rows = [r.payload for r in reversed(records)]
@@ -283,6 +286,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
         dataset = db.scalar(
             select(ProviderDataset).where(ProviderDataset.id == key).with_for_update()
         )
+        original_coverage = list(dataset.coverage)
+        original_boundary = dataset.earliest
         if (dataset.lease_token, dataset.generation) != lease or dataset.lease_until <= now_ms():
             raise TimeoutError("平台取数租约已失效，请重试")
         if page.get("revalidation") and page.get("coverage"):
@@ -376,6 +381,10 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
             dataset.latest_at = max(dataset.latest_at, observed_at)
         if values:
             dataset.revision += 1
+    progress = PAGE_PROGRESS.get()
+    if progress is not None:
+        progress["advanced"] = bool(dataset.coverage != original_coverage or
+                                    dataset.earliest != original_boundary or latest)
     return changed
 
 

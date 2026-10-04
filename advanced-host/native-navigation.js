@@ -23,20 +23,14 @@ const MWNativeNavigation = (() => {
     return [...models].filter(([m]) => modelKey(m) === thread.mw_key);
   }
   function weight(thread) {
-    return (
-      1 +
-      0.5 *
-        Math.max(
-          0,
-          ...peers(thread).map(
-            ([m]) =>
-              m
-                .allStudies?.(false)
-                .filter(
-                  (study) => study.metaInfo?.().id !== "Volume@tv-basicstudies",
-                ).length || 0,
-          ),
-        )
+    const viewers = peers(thread);
+    // Native time points/studies are per pane even with a shared provider cache.
+    return Math.max(
+      1,
+      viewers.reduce(
+        (sum, [m]) => sum + 1 + 0.5 * (m.allStudies?.(false).length || 0),
+        0,
+      ),
     );
   }
   function admit(thread, amount) {
@@ -242,6 +236,27 @@ const MWNativeNavigation = (() => {
           state.cursor = point ? { point: { ...point }, environment } : null;
           return state.external.call(this, point, environment);
         };
+        const insertStudy=m.insertStudyWithParams;
+        m.insertStudyWithParams=function(...args) {
+          const thread=threads.get(modelKey(this));
+          if(thread) {
+            const projected=[...threads.values()].reduce((sum,t)=>sum+
+              ((t._cache?.bars.length||0)+(reservations.get(t)||0))*weight(t),0)+
+              .5*((thread._cache?.bars.length||0)+(reservations.get(thread)||0));
+            if(projected>limits.workspace_bars) {
+              const error=Object.assign(Error('添加指标超过当前工作区预算，请减小历史跨度'),{code:'NATIVE_HISTORY_CAPACITY_EXCEEDED'});
+              globalThis.dispatchEvent(new CustomEvent('mw-navigation-error',{detail:error}));
+              throw error;
+            }
+          }
+          return insertStudy.apply(this,args);
+        };
+        const updateTimeScale = m._updateTimeScale;
+        m._updateTimeScale = function (...args) {
+          const value = updateTimeScale.apply(this, args);
+          replay(this, state);
+          return value;
+        };
         const projected = () => {
           if (state.phase === "idle") replay(m, state);
         };
@@ -278,6 +293,11 @@ const MWNativeNavigation = (() => {
               args[2] !== this._lastGotoTimeRange
             )
               return;
+            if (
+              (method === "gotoTime" && args[0] === undefined) ||
+              (method === "gotoTimeRange" && args[2])
+            )
+              return original.apply(this, args);
             if (state.depth) return original.apply(this, args);
             begin(this, state);
             const generation = state.generation;
@@ -387,6 +407,20 @@ const MWNativeNavigation = (() => {
     busy: () => [...models.values()].some((state) => state.phase !== "idle"),
     diagnostics: () => ({
       mode: "continuous",
+      cursors: [...models].map(([m, s]) => ({
+        res: m.interval(),
+        phase: s.phase,
+        time: s.cursor?.point.timeStamp,
+        mapped:
+          s.cursor && m.mainSeries().syncModel()
+            ? m
+                .createSyncPoint(
+                  s.cursor.point.syncSourceTarget,
+                  m.mainSeries().syncModel().syncSourceTarget(),
+                )
+                .sourceTimeToTargetTime(s.cursor.point.timeStamp)
+            : null,
+      })),
       windows: [],
       models: models.size,
       threads: threads.size,
