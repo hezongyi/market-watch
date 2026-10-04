@@ -1,0 +1,67 @@
+{
+  "at": "2026-10-04T22:59:16.454Z",
+  "product_commit": "2468143",
+  "scope": "Controlled real EURUSD four-pane weekly click capacity diagnosis; source admission observed without changing policy. Probe passed means rejection and recovery observed, not far target successful. User target date pending.",
+  "probe_target_date": "2025-03-03",
+  "rejections": [
+    {
+      "key": "MWP:EURUSD|5|",
+      "resident": 64653,
+      "requested": 53341,
+      "projectedSource": 117994,
+      "projectedWorkspace": 121316,
+      "limits": {
+        "max_bars": 80000,
+        "workspace_bars": 260000,
+        "response_bytes": 33554432,
+        "task_seconds": 600,
+        "max_pages": 80,
+        "max_inflight": 8,
+        "mode": "continuous",
+        "protocol": 1,
+        "version": "30e5cbb3be1b4cb2"
+      },
+      "rejected": true
+    }
+  ],
+  "charts_after_rejection": [
+    {
+      "symbol": "MWP:EURUSD",
+      "resolution": "1W",
+      "range": {
+        "from": 1738540800,
+        "to": 1743379200
+      },
+      "ready": true
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "resolution": "5",
+      "range": {
+        "from": 1790958000,
+        "to": 1791157500
+      },
+      "ready": true
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "resolution": "240",
+      "range": {
+        "from": 1739973600,
+        "to": 1741770000
+      },
+      "ready": true
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "resolution": "1D",
+      "range": {
+        "from": 1735257600,
+        "to": 1746144000
+      },
+      "ready": true
+    }
+  ],
+  "recovered": true,
+  "errors": []
+}

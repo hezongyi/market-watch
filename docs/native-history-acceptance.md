@@ -1,6 +1,6 @@
 # 原生连续历史候选验收
 
-2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，当前产品提交 `2468143`（API/web 构建 `b3dd20c`）。人工验收待完成，未合并或发布生产。新增核验见 [逐项审计](native-history-completion-audit.md)。
+2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，当前产品提交 `2468143`（API/web 构建 `b3dd20c`）。用户确认原闪烁已消失、各项功能正常；更远周 bar 容量提示仍在核查，未合并或发布生产。新增核验见 [逐项审计](native-history-completion-audit.md)。
 
 ## 访问与运行
 
@@ -79,3 +79,5 @@ web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完�
 `2468143` 的 [最终完整四图](verification/native-history/supplemental-20261005/final-2468143-full.json) 再次通过故障、导航、指标、价格/前缀修订、拖动和保存重开。该轮热 PG 点击至就绪 5.15 秒；同 widget 定位 3 毫秒、历史读取 0。仅真实修订触发一次重载，hover 无额外历史请求。修订试验数据已恢复，人工入口可继续使用；首次冷加载仍参考已有独立空 PG 产品测量，不用热耗时替代。
 
 额外 [源身份及反向同步证据](verification/native-history/supplemental-20261005/interactions-source-identity-reverse-2468143.json)：M5 点击向高周期导航及静止标签、D1→H4 与 EURUSD→XAUUSD 源变更、双 M5 两方向范围同步通过。静止鼠标下源变更可由原生按新 bar 广播，核对新语义时间；不要求屏上光标全部清空。产品镜像不变，本次只补测试与证据。
+
+用户已人工确认“不闪烁，各项功能也正常”。新增反馈是更远周 bar 超容量，单源上限仍为 80,000；2025-03-03 附近受控复现投影 M5 117,994，明确拒绝且可恢复。该日期未得到用户确认，见 [诊断记录](verification/native-history/supplemental-20261005/capacity-far-weekly-2468143.json)。需要扩大支持跨度时重新验证容量，原功能通过不作为任意远历史支持结论。
