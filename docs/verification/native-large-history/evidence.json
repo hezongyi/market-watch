@@ -1,0 +1,3543 @@
+{
+  "date": "2026-10-04",
+  "scope": "Ubuntu isolated PG and original licensed v31.1 Chromium; no production mutation; research capacity/budget bypass only disposable processes",
+  "browser_cases": [
+    {
+      "source": "true-jump",
+      "config": {
+        "size": 20000,
+        "charts": 1,
+        "studies": 0
+      },
+      "summary": {
+        "jumpMs": 345.80000019073486,
+        "maxCountBack": 19862,
+        "returnedBars": 19862,
+        "bytes": 2090030,
+        "parseMs": 9.799999713897705,
+        "callbackSyncMs": 203.80000019073486,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 212,
+          "maxMs": 212
+        },
+        "heapMiB": 35.93867492675781,
+        "nativeBars": [
+          20070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.700000000000273,
+            "maxMs": 33.40000000000009,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 187,
+              "maxMs": 187
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000273,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "true-jump",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 0
+      },
+      "summary": {
+        "jumpMs": 861.5,
+        "maxCountBack": 59861,
+        "returnedBars": 59861,
+        "bytes": 6301202,
+        "parseMs": 27.59999990463257,
+        "callbackSyncMs": 532.6999998092651,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 550,
+          "maxMs": 550
+        },
+        "heapMiB": 68.0453109741211,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.700000000000273,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 517,
+              "maxMs": 517
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999727,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.39999961853027344,
+        "repeatRequests": 0
+      },
+      "cancel": {
+        "replacementMs": 37,
+        "result": {
+          "error": "Error: Rejected by timeout"
+        },
+        "snapshot": {
+          "stage": "replacement",
+          "pending": 0,
+          "requests": 5,
+          "charts": [
+            {
+              "symbol": "REPLACEMENT",
+              "res": "5",
+              "range": {
+                "from": 1791032700,
+                "to": 1791074700
+              },
+              "ready": true,
+              "studies": 0
+            }
+          ]
+        },
+        "native": [
+          {
+            "symbol": "REPLACEMENT",
+            "res": "5",
+            "bars": 208,
+            "first": 0,
+            "last": 207,
+            "spacing": 8.326241134751774,
+            "requesting": false,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1174,
+              "height": 883,
+              "top": 0,
+              "right": 1174,
+              "bottom": 883,
+              "left": 0
+            }
+          }
+        ]
+      },
+      "failure": {
+        "result": {
+          "error": "Error: Rejected by timeout"
+        },
+        "native": [
+          {
+            "symbol": "REPLACEMENT",
+            "res": "5",
+            "bars": 208,
+            "first": 0,
+            "last": 207,
+            "spacing": 8.326241134751774,
+            "requesting": false,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1174,
+              "height": 883,
+              "top": 0,
+              "right": 1174,
+              "bottom": 883,
+              "left": 0
+            }
+          }
+        ],
+        "snapshot": {
+          "stage": "failure",
+          "pending": 0,
+          "requests": 6,
+          "charts": [
+            {
+              "symbol": "REPLACEMENT",
+              "res": "5",
+              "range": {
+                "from": 1791032700,
+                "to": 1791074700
+              },
+              "ready": true,
+              "studies": 0
+            }
+          ]
+        },
+        "next": {
+          "result": {
+            "error": "Error: Value is null"
+          },
+          "native": [
+            {
+              "symbol": "REPLACEMENT",
+              "res": "5",
+              "bars": 208,
+              "first": 0,
+              "last": 207,
+              "spacing": 8.326241134751774,
+              "requesting": false,
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "width": 1174,
+                "height": 883,
+                "top": 0,
+                "right": 1174,
+                "bottom": 883,
+                "left": 0
+              }
+            }
+          ],
+          "snapshot": {
+            "stage": "after-failure",
+            "pending": 0,
+            "requests": 6,
+            "charts": [
+              {
+                "symbol": "REPLACEMENT",
+                "res": "5",
+                "range": {
+                  "from": 1791032700,
+                  "to": 1791074700
+                },
+                "ready": true,
+                "studies": 0
+              }
+            ]
+          },
+          "requests": []
+        }
+      }
+    },
+    {
+      "source": "true-jump",
+      "config": {
+        "size": 200000,
+        "charts": 1,
+        "studies": 0
+      },
+      "summary": {
+        "jumpMs": 2628.5999999046326,
+        "maxCountBack": 199862,
+        "returnedBars": 199862,
+        "bytes": 21031078,
+        "parseMs": 120.39999961853027,
+        "callbackSyncMs": 1627.7000002861023,
+        "longTasks": {
+          "count": 2,
+          "totalMs": 1797,
+          "maxMs": 1675
+        },
+        "heapMiB": 198.64331436157227,
+        "nativeBars": [
+          200070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 33.40000000000009,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 1735,
+              "maxMs": 1735
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "studies",
+      "config": {
+        "size": 20000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 549.0999999046326,
+        "maxCountBack": 19862,
+        "returnedBars": 19862,
+        "bytes": 2090070,
+        "parseMs": 8.699999809265137,
+        "callbackSyncMs": 357.80000019073486,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 369,
+          "maxMs": 369
+        },
+        "heapMiB": 85.9053955078125,
+        "nativeBars": [
+          20070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.799999999999727,
+            "maxMs": 33.36799999999994,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 290,
+              "maxMs": 290
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000273,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.6999998092651367,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "studies",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 1336.7000002861023,
+        "maxCountBack": 59862,
+        "returnedBars": 59862,
+        "bytes": 6301376,
+        "parseMs": 27.299999713897705,
+        "callbackSyncMs": 868.4000000953674,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 891,
+          "maxMs": 891
+        },
+        "heapMiB": 163.40224838256836,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 33.30000000000018,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 855,
+              "maxMs": 855
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.699999999999818,
+            "maxMs": 16.700000000000728,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 6.599999904632568,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "studies",
+      "config": {
+        "size": 200000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 4403.099999904633,
+        "maxCountBack": 199862,
+        "returnedBars": 199862,
+        "bytes": 21031128,
+        "parseMs": 114.40000009536743,
+        "callbackSyncMs": 2814.9000000953674,
+        "longTasks": {
+          "count": 2,
+          "totalMs": 3038,
+          "maxMs": 2922
+        },
+        "heapMiB": 485.77872467041016,
+        "nativeBars": [
+          200070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 2824,
+              "maxMs": 2824
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 33.29999999999927,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 9.200000286102295,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "four-corrected",
+      "config": {
+        "size": 20000,
+        "charts": 4,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 2297.9000000953674,
+        "maxCountBack": 19974,
+        "returnedBars": 79784,
+        "bytes": 8395467,
+        "parseMs": 46.700000286102295,
+        "callbackSyncMs": 1540.5999999046326,
+        "longTasks": {
+          "count": 4,
+          "totalMs": 1570,
+          "maxMs": 610
+        },
+        "heapMiB": 217.83968353271484,
+        "nativeBars": [
+          20070,
+          20070,
+          20070,
+          20070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.30000000000018,
+            "maxMs": 516.6999999999998,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 426,
+              "maxMs": 426
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "four-corrected",
+      "config": {
+        "size": 60000,
+        "charts": 4,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 5759.699999809265,
+        "maxCountBack": 59974,
+        "returnedBars": 239784,
+        "bytes": 25240691,
+        "parseMs": 136.19999885559082,
+        "callbackSyncMs": 4074,
+        "longTasks": {
+          "count": 5,
+          "totalMs": 4204,
+          "maxMs": 1069
+        },
+        "heapMiB": 592.7812194824219,
+        "nativeBars": [
+          60070,
+          60070,
+          60070,
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.20000000000073,
+            "maxMs": 1016.7000000000007,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 888,
+              "maxMs": 888
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.7000002861022949,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "four-corrected",
+      "config": {
+        "size": 200000,
+        "charts": 4,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 19416,
+        "maxCountBack": 199974,
+        "returnedBars": 799784,
+        "bytes": 84159699,
+        "parseMs": 516.8999996185303,
+        "callbackSyncMs": 14180.299999713898,
+        "longTasks": {
+          "count": 9,
+          "totalMs": 15117,
+          "maxMs": 3992
+        },
+        "heapMiB": 1906.564712524414,
+        "nativeBars": [
+          200070,
+          200070,
+          200070,
+          200070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 49.900000000001455,
+            "maxMs": 3933.2000000000007,
+            "over50ms": 2,
+            "longTasks": {
+              "count": 3,
+              "totalMs": 3722,
+              "maxMs": 3577
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 50.10000000000218,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 5.799999713897705,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "four-corrected",
+      "config": {
+        "size": 200000,
+        "charts": 4,
+        "studies": 3,
+        "mixed": true
+      },
+      "summary": {
+        "jumpMs": 5516.39999961853,
+        "maxCountBack": 199862,
+        "returnedBars": 204537,
+        "bytes": 21523003,
+        "parseMs": 97.49999952316284,
+        "callbackSyncMs": 3576.7000002861023,
+        "longTasks": {
+          "count": 3,
+          "totalMs": 3742,
+          "maxMs": 3497
+        },
+        "heapMiB": 496.7694778442383,
+        "nativeBars": [
+          200070,
+          4168,
+          695,
+          99
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.30000000000109,
+            "maxMs": 3933.1000000000004,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 3618,
+              "maxMs": 3618
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.80000000000109,
+            "maxMs": 66.70000000000073,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.8000001907348633,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "million-http",
+      "config": {
+        "size": 1000000,
+        "charts": 1,
+        "studies": 0
+      },
+      "summary": {
+        "jumpMs": 11547.800000190735,
+        "maxCountBack": 999861,
+        "returnedBars": 999861,
+        "bytes": 105217918,
+        "parseMs": 800,
+        "callbackSyncMs": 8410.200000286102,
+        "longTasks": {
+          "count": 6,
+          "totalMs": 9833,
+          "maxMs": 8737
+        },
+        "heapMiB": 940.9595603942871,
+        "nativeBars": [
+          1000070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.29999999999927,
+            "maxMs": 10033,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 10002,
+              "maxMs": 10002
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "cpu4",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 4168.200000286102,
+        "maxCountBack": 59862,
+        "returnedBars": 59862,
+        "bytes": 6301376,
+        "parseMs": 109,
+        "callbackSyncMs": 3195,
+        "longTasks": {
+          "count": 4,
+          "totalMs": 3500,
+          "maxMs": 3266
+        },
+        "heapMiB": 165.0409393310547,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 50.100000000000364,
+            "maxMs": 3949.8999999999996,
+            "over50ms": 7,
+            "longTasks": {
+              "count": 7,
+              "totalMs": 3812,
+              "maxMs": 3426
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 33.39999999999782,
+            "maxMs": 50,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 1.8999996185302734,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "cpu4",
+      "config": {
+        "size": 200000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 12920,
+        "maxCountBack": 199862,
+        "returnedBars": 199862,
+        "bytes": 21031128,
+        "parseMs": 327.30000019073486,
+        "callbackSyncMs": 10200,
+        "longTasks": {
+          "count": 3,
+          "totalMs": 11044,
+          "maxMs": 10459
+        },
+        "heapMiB": 486.18167877197266,
+        "nativeBars": [
+          200070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 50.099999999998545,
+            "maxMs": 12416.2,
+            "over50ms": 7,
+            "longTasks": {
+              "count": 5,
+              "totalMs": 11410,
+              "maxMs": 11156
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 33.400000000001455,
+            "maxMs": 50,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 53,
+              "maxMs": 53
+            }
+          }
+        ],
+        "repeatMs": 1.8000001907348633,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "cpu4-mixed",
+      "config": {
+        "size": 60000,
+        "charts": 4,
+        "studies": 3,
+        "mixed": true
+      },
+      "summary": {
+        "jumpMs": 5088.60000038147,
+        "maxCountBack": 59862,
+        "returnedBars": 61131,
+        "bytes": 6434989,
+        "parseMs": 99.5,
+        "callbackSyncMs": 3516.9000000953674,
+        "longTasks": {
+          "count": 4,
+          "totalMs": 3753,
+          "maxMs": 3519
+        },
+        "heapMiB": 180.19156646728516,
+        "nativeBars": [
+          60070,
+          1251,
+          209,
+          96
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 66.70000000000073,
+            "maxMs": 3733.2000000000007,
+            "over50ms": 11,
+            "longTasks": {
+              "count": 12,
+              "totalMs": 4300,
+              "maxMs": 3327
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 33.400000000001455,
+            "maxMs": 83.40000000000146,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 3,
+              "totalMs": 185,
+              "maxMs": 83
+            }
+          }
+        ],
+        "repeatMs": 1,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "repeats",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 1647.5,
+        "maxCountBack": 59862,
+        "returnedBars": 59862,
+        "bytes": 6301376,
+        "parseMs": 26.40000009536743,
+        "callbackSyncMs": 1199.8000001907349,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 1226,
+          "maxMs": 1226
+        },
+        "heapMiB": 165.11407089233398,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 1033.3999999999996,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 885,
+              "maxMs": 885
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "repeats",
+      "config": {
+        "size": 200000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 3990.5999999046326,
+        "maxCountBack": 199862,
+        "returnedBars": 199862,
+        "bytes": 21031128,
+        "parseMs": 113.59999990463257,
+        "callbackSyncMs": 2853.7999997138977,
+        "longTasks": {
+          "count": 2,
+          "totalMs": 3019,
+          "maxMs": 2904
+        },
+        "heapMiB": 470.40038299560547,
+        "nativeBars": [
+          200070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 3149.9000000000005,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 2821,
+              "maxMs": 2821
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.80000000000109,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5999999046325684,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "repeats",
+      "config": {
+        "size": 60000,
+        "charts": 4,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 4855.400000095367,
+        "maxCountBack": 59974,
+        "returnedBars": 239784,
+        "bytes": 25240691,
+        "parseMs": 162.2999997138977,
+        "callbackSyncMs": 3665.999999523163,
+        "longTasks": {
+          "count": 6,
+          "totalMs": 3841,
+          "maxMs": 1068
+        },
+        "heapMiB": 579.668643951416,
+        "nativeBars": [
+          60070,
+          60070,
+          60070,
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.29999999999927,
+            "maxMs": 966.6000000000004,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 859,
+              "maxMs": 859
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.7000002861022949,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "repeats",
+      "config": {
+        "size": 200000,
+        "charts": 4,
+        "studies": 3,
+        "mixed": true
+      },
+      "summary": {
+        "jumpMs": 4245.599999904633,
+        "maxCountBack": 199862,
+        "returnedBars": 204537,
+        "bytes": 21523003,
+        "parseMs": 121.89999961853027,
+        "callbackSyncMs": 3117.300000667572,
+        "longTasks": {
+          "count": 4,
+          "totalMs": 3292,
+          "maxMs": 3018
+        },
+        "heapMiB": 493.1950492858887,
+        "nativeBars": [
+          200070,
+          4168,
+          695,
+          99
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 3216.5,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 2880,
+              "maxMs": 2880
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.80000000000109,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "repeats",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 1296.1000003814697,
+        "maxCountBack": 59862,
+        "returnedBars": 59862,
+        "bytes": 6301376,
+        "parseMs": 26.59999990463257,
+        "callbackSyncMs": 942.6999998092651,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 962,
+          "maxMs": 962
+        },
+        "heapMiB": 164.91424942016602,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 1016.6000000000004,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 864,
+              "maxMs": 864
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.6999998092651367,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "repeats",
+      "config": {
+        "size": 200000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 4134.60000038147,
+        "maxCountBack": 199862,
+        "returnedBars": 199862,
+        "bytes": 21031128,
+        "parseMs": 122.59999990463257,
+        "callbackSyncMs": 2901.7999997138977,
+        "longTasks": {
+          "count": 3,
+          "totalMs": 3169,
+          "maxMs": 2977
+        },
+        "heapMiB": 477.0925407409668,
+        "nativeBars": [
+          200070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.30000000000018,
+            "maxMs": 3666.5,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 3310,
+              "maxMs": 3310
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 50,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.7000002861022949,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "repeats",
+      "config": {
+        "size": 60000,
+        "charts": 4,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 5028.799999713898,
+        "maxCountBack": 59974,
+        "returnedBars": 239784,
+        "bytes": 25240691,
+        "parseMs": 107.09999990463257,
+        "callbackSyncMs": 3976.199999809265,
+        "longTasks": {
+          "count": 4,
+          "totalMs": 4054,
+          "maxMs": 1161
+        },
+        "heapMiB": 585.4287567138672,
+        "nativeBars": [
+          60070,
+          60070,
+          60070,
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.30000000000018,
+            "maxMs": 966.5999999999985,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 849,
+              "maxMs": 849
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.80000000000109,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5999999046325684,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "repeats",
+      "config": {
+        "size": 200000,
+        "charts": 4,
+        "studies": 3,
+        "mixed": true
+      },
+      "summary": {
+        "jumpMs": 4384.800000190735,
+        "maxCountBack": 199862,
+        "returnedBars": 204537,
+        "bytes": 21523003,
+        "parseMs": 107.89999961853027,
+        "callbackSyncMs": 3088.5,
+        "longTasks": {
+          "count": 5,
+          "totalMs": 3313,
+          "maxMs": 3014
+        },
+        "heapMiB": 504.1724281311035,
+        "nativeBars": [
+          200070,
+          4168,
+          695,
+          99
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.399999999999636,
+            "maxMs": 3183.3,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 2855,
+              "maxMs": 2855
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 16.80000000000109,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 2,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "lifecycle-final",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 0
+      },
+      "summary": {
+        "jumpMs": 944,
+        "maxCountBack": 59862,
+        "returnedBars": 59862,
+        "bytes": 6301312,
+        "parseMs": 44.799999713897705,
+        "callbackSyncMs": 662.8000001907349,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 681,
+          "maxMs": 681
+        },
+        "heapMiB": 68.44635391235352,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 649.9000000000001,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 643,
+              "maxMs": 643
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.6000003814697266,
+        "repeatRequests": 0
+      },
+      "cancel": {
+        "replacementMs": 134,
+        "result": {
+          "error": "Error: Rejected by timeout"
+        },
+        "snapshot": {
+          "stage": "replacement",
+          "pending": 0,
+          "requests": 5,
+          "charts": [
+            {
+              "symbol": "REPLACEMENT",
+              "res": "5",
+              "range": {
+                "from": 1791032700,
+                "to": 1791074700
+              },
+              "ready": true,
+              "studies": 0
+            }
+          ]
+        },
+        "native": [
+          {
+            "symbol": "REPLACEMENT",
+            "res": "5",
+            "bars": 208,
+            "first": 0,
+            "last": 207,
+            "spacing": 8.326241134751774,
+            "requesting": false,
+            "threads": [
+              {
+                "destroyed": false,
+                "requesting": false,
+                "error": null,
+                "cacheBars": 208
+              }
+            ],
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1174,
+              "height": 883,
+              "top": 0,
+              "right": 1174,
+              "bottom": 883,
+              "left": 0
+            }
+          }
+        ]
+      },
+      "failure": {
+        "result": {
+          "error": "Error: Rejected by timeout"
+        },
+        "native": [
+          {
+            "symbol": "REPLACEMENT",
+            "res": "5",
+            "bars": 208,
+            "first": 0,
+            "last": 207,
+            "spacing": 8.326241134751774,
+            "requesting": false,
+            "threads": [
+              {
+                "destroyed": false,
+                "requesting": false,
+                "error": "injected 503",
+                "cacheBars": 208
+              }
+            ],
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1174,
+              "height": 883,
+              "top": 0,
+              "right": 1174,
+              "bottom": 883,
+              "left": 0
+            }
+          }
+        ],
+        "snapshot": {
+          "stage": "failure",
+          "pending": 0,
+          "requests": 6,
+          "charts": [
+            {
+              "symbol": "REPLACEMENT",
+              "res": "5",
+              "range": {
+                "from": 1791032700,
+                "to": 1791074700
+              },
+              "ready": true,
+              "studies": 0
+            }
+          ]
+        },
+        "next": {
+          "result": {
+            "error": "Error: Value is null"
+          },
+          "native": [
+            {
+              "symbol": "REPLACEMENT",
+              "res": "5",
+              "bars": 208,
+              "first": 0,
+              "last": 207,
+              "spacing": 8.326241134751774,
+              "requesting": false,
+              "threads": [
+                {
+                  "destroyed": false,
+                  "requesting": false,
+                  "error": "injected 503",
+                  "cacheBars": 208
+                }
+              ],
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "width": 1174,
+                "height": 883,
+                "top": 0,
+                "right": 1174,
+                "bottom": 883,
+                "left": 0
+              }
+            }
+          ],
+          "snapshot": {
+            "stage": "after-failure",
+            "pending": 0,
+            "requests": 6,
+            "charts": [
+              {
+                "symbol": "REPLACEMENT",
+                "res": "5",
+                "range": {
+                  "from": 1791032700,
+                  "to": 1791074700
+                },
+                "ready": true,
+                "studies": 0
+              }
+            ]
+          },
+          "requests": []
+        }
+      }
+    },
+    {
+      "source": "real-provider-native",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3,
+        "provider": true,
+        "end": 1359676800000,
+        "target": 1334645100
+      },
+      "summary": {
+        "jumpMs": 12260.200000286102,
+        "maxCountBack": 59425,
+        "returnedBars": 59602,
+        "bytes": 11473414,
+        "parseMs": 65,
+        "callbackSyncMs": 892.2000002861023,
+        "longTasks": {
+          "count": 2,
+          "totalMs": 978,
+          "maxMs": 912
+        },
+        "heapMiB": 180.18854904174805,
+        "nativeBars": [
+          58961
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 933.2999999999993,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 833,
+              "maxMs": 833
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.7000002861022949,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "real-provider-200k",
+      "config": {
+        "size": 200000,
+        "charts": 1,
+        "studies": 3,
+        "provider": true,
+        "end": 1233352800000,
+        "target": 1150393200
+      },
+      "summary": {
+        "jumpMs": 36291.7000002861,
+        "maxCountBack": 196919,
+        "returnedBars": 199001,
+        "bytes": 38281525,
+        "parseMs": 234.40000009536743,
+        "callbackSyncMs": 2867.9000000953674,
+        "longTasks": {
+          "count": 3,
+          "totalMs": 3249,
+          "maxMs": 2949
+        },
+        "heapMiB": 511.67494201660156,
+        "nativeBars": [
+          195977
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.799999999995634,
+            "maxMs": 3200,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 2880,
+              "maxMs": 2880
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999995634,
+            "maxMs": 16.80000000000291,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 19.199999809265137,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "reset-final",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3,
+        "reset": true,
+        "delay": 2000
+      },
+      "summary": {
+        "jumpMs": 3316.7000002861023,
+        "maxCountBack": 59862,
+        "returnedBars": 59862,
+        "bytes": 6301376,
+        "parseMs": 26.399999618530273,
+        "callbackSyncMs": 948.8000001907349,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 967,
+          "maxMs": 967
+        },
+        "heapMiB": 171.39170455932617,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 999.9999999999991,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 843,
+              "maxMs": 843
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5999999046325684,
+        "repeatRequests": 0
+      },
+      "reset": {
+        "ms": 292.5,
+        "countBack": [
+          350,
+          141
+        ],
+        "before": {
+          "stage": "repeat-cached",
+          "pending": 0,
+          "requests": 4,
+          "charts": [
+            {
+              "symbol": "RESEARCH-0",
+              "res": "5",
+              "range": {
+                "from": 1773051000,
+                "to": 1773093000
+              },
+              "ready": true,
+              "studies": 3
+            }
+          ]
+        },
+        "after": {
+          "stage": "reset",
+          "pending": 0,
+          "requests": 6,
+          "charts": [
+            {
+              "symbol": "RESEARCH-0",
+              "res": "5",
+              "range": {
+                "from": 1790988000,
+                "to": 1791030000
+              },
+              "ready": true,
+              "studies": 3
+            }
+          ]
+        },
+        "restore_ms": 2251.4000000953674,
+        "restore_countBack": [
+          59788
+        ]
+      },
+      "waiting": {
+        "raf": [
+          14.999999809265091,
+          16.600000000000136,
+          16.699999999999818,
+          16.600000000000136,
+          16.700000000000045,
+          16.59999999999991,
+          16.700000000000045,
+          16.700000000000045,
+          16.59999999999991,
+          16.700000000000045,
+          16.700000000000045,
+          16.699999999999818,
+          16.600000000000136,
+          16.700000000000045,
+          16.699999999999818,
+          16.600000000000136,
+          16.700000000000045,
+          16.699999999999818,
+          16.700000000000045,
+          16.600000000000136,
+          16.699999999999818,
+          16.59999999999991,
+          16.600000000000364,
+          16.699999999999818,
+          16.699999999999818,
+          16.700000000000273,
+          16.59999999999991,
+          16.699999999999818,
+          16.700000000000273,
+          16.699999999999818
+        ],
+        "loadingElements": [
+          "<div data-status=\"loading\" class=\"item-l31H9iuA series-l31H9iuA onlyOneButtonCanBeStick-l31H9iuA eyeLoading-l31H9iuA hideInvisibleHover-l31H9iuA\" data-qa-id=\"legend-series-item\" role=\"toolbar\"><div class=\"noWrapWrapper-l31H9iuA\"><div class=\"titlesWrapper-l31H9iuA\" data-qa-id=\"legend-titles\"><div class=\"titleWrapper-l31H9iuA withDot-l31H9iuA mainTit",
+          "<span class=\"loader-l31H9iuA\"><span class=\"loader-UL6iwcBa static-UL6iwcBa\"><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span></span></span>",
+          "<span class=\"loader-UL6iwcBa static-UL6iwcBa\"><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span></span>",
+          "<div data-status=\"loading\" class=\"item-l31H9iuA study-l31H9iuA eyeLoading-l31H9iuA\" data-qa-id=\"legend-source-item\" data-entity-id=\"IEBrBi\" role=\"toolbar\"><div class=\"noWrapWrapper-l31H9iuA\"><div class=\"titlesWrapper-l31H9iuA\" data-qa-id=\"legend-titles\"><div class=\"titleWrapper-l31H9iuA withDot-l31H9iuA mainTitle-l31H9iuA apply-common-tooltip\" data",
+          "<span class=\"loader-l31H9iuA\"><span class=\"loader-UL6iwcBa static-UL6iwcBa\"><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span></span></span>",
+          "<span class=\"loader-UL6iwcBa static-UL6iwcBa\"><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span></span>",
+          "<div data-status=\"loading\" class=\"item-l31H9iuA study-l31H9iuA eyeLoading-l31H9iuA\" data-qa-id=\"legend-source-item\" data-entity-id=\"vtavJA\" role=\"toolbar\"><div class=\"noWrapWrapper-l31H9iuA\"><div class=\"titlesWrapper-l31H9iuA\" data-qa-id=\"legend-titles\"><div class=\"titleWrapper-l31H9iuA withDot-l31H9iuA mainTitle-l31H9iuA apply-common-tooltip\" data",
+          "<span class=\"loader-l31H9iuA\"><span class=\"loader-UL6iwcBa static-UL6iwcBa\"><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span></span></span>",
+          "<span class=\"loader-UL6iwcBa static-UL6iwcBa\"><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span></span>",
+          "<div data-status=\"loading\" class=\"item-l31H9iuA study-l31H9iuA eyeLoading-l31H9iuA\" data-qa-id=\"legend-source-item\" data-entity-id=\"0uxBz0\" role=\"toolbar\"><div class=\"noWrapWrapper-l31H9iuA\"><div class=\"titlesWrapper-l31H9iuA\" data-qa-id=\"legend-titles\"><div class=\"titleWrapper-l31H9iuA withDot-l31H9iuA mainTitle-l31H9iuA\" data-qa-id=\"title-wrapper",
+          "<span class=\"loader-l31H9iuA\"><span class=\"loader-UL6iwcBa static-UL6iwcBa\"><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span></span></span>",
+          "<span class=\"loader-UL6iwcBa static-UL6iwcBa\"><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span><span class=\"item-UL6iwcBa black-UL6iwcBa small-UL6iwcBa\"></span></span>"
+        ],
+        "snapshot": {
+          "stage": "jump",
+          "pending": 1,
+          "requests": 3,
+          "charts": [
+            {
+              "symbol": "RESEARCH-0",
+              "res": "5",
+              "range": {
+                "from": 1791016200,
+                "to": 1791074700
+              },
+              "ready": true,
+              "studies": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "source": "reset-final",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3,
+        "reset": true,
+        "visibleReset": true
+      },
+      "summary": {
+        "jumpMs": 1391.9000000953674,
+        "maxCountBack": 59862,
+        "returnedBars": 59862,
+        "bytes": 6301376,
+        "parseMs": 27.5,
+        "callbackSyncMs": 963.1999998092651,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 984,
+          "maxMs": 984
+        },
+        "heapMiB": 168.90219497680664,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 983.2999999999997,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 858,
+              "maxMs": 858
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.699999999999818,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.6999998092651367,
+        "repeatRequests": 0
+      },
+      "reset": {
+        "ms": 303.7000002861023,
+        "countBack": [
+          350,
+          141
+        ],
+        "before": {
+          "stage": "repeat-cached",
+          "pending": 0,
+          "requests": 4,
+          "charts": [
+            {
+              "symbol": "RESEARCH-0",
+              "res": "5",
+              "range": {
+                "from": 1773051000,
+                "to": 1773093000
+              },
+              "ready": true,
+              "studies": 3
+            }
+          ]
+        },
+        "after": {
+          "stage": "reset",
+          "pending": 0,
+          "requests": 6,
+          "charts": [
+            {
+              "symbol": "RESEARCH-0",
+              "res": "5",
+              "range": {
+                "from": 1790988000,
+                "to": 1791030000
+              },
+              "ready": true,
+              "studies": 3
+            }
+          ]
+        },
+        "restore_ms": 2263.5,
+        "restore_countBack": [
+          59788
+        ]
+      }
+    },
+    {
+      "source": "redirect",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 0,
+        "redirect": true
+      },
+      "summary": {
+        "jumpMs": 777.9000000953674,
+        "maxCountBack": 59861,
+        "returnedBars": 59861,
+        "bytes": 6301202,
+        "parseMs": 28.09999990463257,
+        "callbackSyncMs": 551.6999998092651,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 568,
+          "maxMs": 568
+        },
+        "heapMiB": 67.73727416992188,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.700000000000273,
+            "maxMs": 516.6999999999998,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 518,
+              "maxMs": 518
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 5.599999904632568,
+        "repeatRequests": 0
+      },
+      "redirect": {
+        "old": {
+          "ok": true
+        },
+        "latest": {
+          "error": "Error: Value is null"
+        },
+        "snapshot": {
+          "stage": "redirect-latest",
+          "pending": 0,
+          "requests": 4,
+          "charts": [
+            {
+              "symbol": "RESEARCH-0",
+              "res": "5",
+              "range": {
+                "from": 1755072000,
+                "to": 1755114000
+              },
+              "ready": true,
+              "studies": 0
+            }
+          ]
+        },
+        "desired": {
+          "from": 1791016200,
+          "to": 1791074700
+        }
+      }
+    },
+    {
+      "source": "two-eight",
+      "config": {
+        "size": 60000,
+        "charts": 2,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 2672.1000003814697,
+        "maxCountBack": 59974,
+        "returnedBars": 119836,
+        "bytes": 12614481,
+        "parseMs": 63.10000038146973,
+        "callbackSyncMs": 1967.6999998092651,
+        "longTasks": {
+          "count": 2,
+          "totalMs": 2002,
+          "maxMs": 1050
+        },
+        "heapMiB": 307.04563903808594,
+        "nativeBars": [
+          60070,
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 33.30000000000018,
+            "maxMs": 1050,
+            "over50ms": 3,
+            "longTasks": {
+              "count": 2,
+              "totalMs": 1001,
+              "maxMs": 941
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.7999997138977051,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "two-eight",
+      "config": {
+        "size": 60000,
+        "charts": 8,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 11578.300000190735,
+        "maxCountBack": 60026,
+        "returnedBars": 480044,
+        "bytes": 50531618,
+        "parseMs": 326.699999332428,
+        "callbackSyncMs": 8943.89999961853,
+        "longTasks": {
+          "count": 10,
+          "totalMs": 9236,
+          "maxMs": 1844
+        },
+        "heapMiB": 1102.8094787597656,
+        "nativeBars": [
+          60070,
+          60070,
+          60070,
+          60070,
+          60070,
+          60070,
+          60070,
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 50,
+            "maxMs": 1166.5999999999985,
+            "over50ms": 4,
+            "longTasks": {
+              "count": 3,
+              "totalMs": 1082,
+              "maxMs": 957
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 33.29999999999927,
+            "maxMs": 50,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 2,
+              "totalMs": 117,
+              "maxMs": 65
+            }
+          }
+        ],
+        "repeatMs": 0.7999997138977051,
+        "repeatRequests": 0
+      }
+    },
+    {
+      "source": "real-provider-hot-final",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3,
+        "provider": true,
+        "end": 1359676800000,
+        "target": 1334645100
+      },
+      "summary": {
+        "jumpMs": 6420.400000095367,
+        "maxCountBack": 58602,
+        "returnedBars": 59002,
+        "bytes": 11357403,
+        "parseMs": 60.799999713897705,
+        "callbackSyncMs": 888.8999996185303,
+        "longTasks": {
+          "count": 2,
+          "totalMs": 1000,
+          "maxMs": 938
+        },
+        "heapMiB": 167.10774612426758,
+        "nativeBars": [
+          58961
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.80000000000109,
+            "maxMs": 983.3999999999996,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 870,
+              "maxMs": 870
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5999999046325684,
+        "repeatRequests": 0
+      },
+      "getBars": [
+        {
+          "stage": "startup",
+          "countBack": 208,
+          "cache_hit": true,
+          "returned": 1208
+        },
+        {
+          "stage": "jump",
+          "countBack": 58602,
+          "cache_hit": true,
+          "returned": 59002
+        },
+        {
+          "stage": "drag-older",
+          "countBack": 59,
+          "cache_hit": true,
+          "returned": 1059
+        }
+      ]
+    },
+    {
+      "source": "real-provider-hot-final",
+      "config": {
+        "size": 200000,
+        "charts": 1,
+        "studies": 3,
+        "provider": true,
+        "end": 1233352800000,
+        "target": 1150393200
+      },
+      "summary": {
+        "jumpMs": 20999.299999713898,
+        "maxCountBack": 196919,
+        "returnedBars": 199001,
+        "bytes": 38281099,
+        "parseMs": 250.19999980926514,
+        "callbackSyncMs": 2840.2999997138977,
+        "longTasks": {
+          "count": 3,
+          "totalMs": 3263,
+          "maxMs": 2905
+        },
+        "heapMiB": 502.1561279296875,
+        "nativeBars": [
+          195977
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 3133.199999999997,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 2796,
+              "maxMs": 2796
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.6999998092651367,
+        "repeatRequests": 0
+      },
+      "getBars": [
+        {
+          "stage": "startup",
+          "countBack": 208,
+          "cache_hit": true,
+          "returned": 1208
+        },
+        {
+          "stage": "jump",
+          "countBack": 196919,
+          "cache_hit": true,
+          "returned": 199001
+        },
+        {
+          "stage": "drag-older",
+          "countBack": 59,
+          "cache_hit": true,
+          "returned": 1059
+        }
+      ]
+    },
+    {
+      "source": "realtime",
+      "config": {
+        "size": 60000,
+        "charts": 1,
+        "studies": 3,
+        "ticks": true
+      },
+      "summary": {
+        "jumpMs": 1266.7000002861023,
+        "maxCountBack": 59862,
+        "returnedBars": 59862,
+        "bytes": 6301376,
+        "parseMs": 26.40000009536743,
+        "callbackSyncMs": 911,
+        "longTasks": {
+          "count": 1,
+          "totalMs": 932,
+          "maxMs": 932
+        },
+        "heapMiB": 162.23906707763672,
+        "nativeBars": [
+          60070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 983.3000000000002,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 875,
+              "maxMs": 875
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.700000000000728,
+            "maxMs": 16.700000000000728,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.40000009536743164,
+        "repeatRequests": 0
+      },
+      "realtime": {
+        "updates": 100,
+        "median_callback_ms": 0.3000001907348633,
+        "max_callback_ms": 1.9000000953674316,
+        "newRequests": 0
+      }
+    },
+    {
+      "source": "realtime",
+      "config": {
+        "size": 200000,
+        "charts": 1,
+        "studies": 3,
+        "ticks": true
+      },
+      "summary": {
+        "jumpMs": 4017.5,
+        "maxCountBack": 199862,
+        "returnedBars": 199862,
+        "bytes": 21031128,
+        "parseMs": 117.2999997138977,
+        "callbackSyncMs": 2847.300000190735,
+        "longTasks": {
+          "count": 3,
+          "totalMs": 3088,
+          "maxMs": 2919
+        },
+        "heapMiB": 484.00709533691406,
+        "nativeBars": [
+          200070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 3183.199999999999,
+            "over50ms": 1,
+            "longTasks": {
+              "count": 1,
+              "totalMs": 2808,
+              "maxMs": 2808
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999272,
+            "maxMs": 16.799999999999272,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5999999046325684,
+        "repeatRequests": 0
+      },
+      "realtime": {
+        "updates": 100,
+        "median_callback_ms": 0.3000001907348633,
+        "max_callback_ms": 3.4000000953674316,
+        "newRequests": 0
+      }
+    },
+    {
+      "source": "small-control",
+      "config": {
+        "size": 1000,
+        "charts": 1,
+        "studies": 3
+      },
+      "summary": {
+        "jumpMs": 107.19999980926514,
+        "maxCountBack": 862,
+        "returnedBars": 862,
+        "bytes": 90617,
+        "parseMs": 0.5,
+        "callbackSyncMs": 32,
+        "longTasks": {
+          "count": 0,
+          "totalMs": 0,
+          "maxMs": 0
+        },
+        "heapMiB": 25.489112854003906,
+        "nativeBars": [
+          1070
+        ],
+        "drags": [
+          {
+            "name": "drag-older",
+            "newRequests": 1,
+            "p95Ms": 16.800000000000182,
+            "maxMs": 33.40000000000009,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          },
+          {
+            "name": "drag-newer",
+            "newRequests": 0,
+            "p95Ms": 16.799999999999727,
+            "maxMs": 16.800000000000182,
+            "over50ms": 0,
+            "longTasks": {
+              "count": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            }
+          }
+        ],
+        "repeatMs": 0.5,
+        "repeatRequests": 0
+      }
+    }
+  ],
+  "provider": {
+    "scope": "Disposable image process, same unmodified provider cache code and isolated chart_sync PG. Capacity and deadline changed only in this process; HTTP/model limits bypassed with model_construct. No client interest.",
+    "cases": [
+      {
+        "case": {
+          "n": 20000,
+          "before": "2011-02-01T00:00:00+00:00"
+        },
+        "repeat": 0,
+        "pages": [],
+        "ms": 1142.3022472299635,
+        "count": 20000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 1091.19,
+          "metadata": 50.95
+        },
+        "first": 1288291500000,
+        "last": 1296518100000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 3853786,
+        "serialize_ms": 48.110156785696745,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 20000,
+          "before": "2011-02-01T00:00:00+00:00"
+        },
+        "repeat": 1,
+        "pages": [],
+        "ms": 1107.160098850727,
+        "count": 20000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 1067.65,
+          "metadata": 30.29
+        },
+        "first": 1288291500000,
+        "last": 1296518100000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 3853786,
+        "serialize_ms": 60.15081284567714,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 20000,
+          "before": "2011-02-01T00:00:00+00:00"
+        },
+        "repeat": 2,
+        "pages": [],
+        "ms": 1111.9386521168053,
+        "count": 20000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 1098.95,
+          "metadata": 3.25
+        },
+        "first": 1288291500000,
+        "last": 1296518100000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 3853785,
+        "serialize_ms": 51.71604920178652,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 60000,
+          "before": "2013-02-01T00:00:00+00:00"
+        },
+        "repeat": 0,
+        "pages": [
+          {
+            "ms": 2442.1979999169707,
+            "count": 4000
+          },
+          {
+            "ms": 597.8937176987529,
+            "count": 4000
+          },
+          {
+            "ms": 1053.1078926287591,
+            "count": 4000
+          },
+          {
+            "ms": 477.6403750292957,
+            "count": 4000
+          },
+          {
+            "ms": 473.8797042518854,
+            "count": 4000
+          },
+          {
+            "ms": 737.3083052225411,
+            "count": 4000
+          },
+          {
+            "ms": 888.9326336793602,
+            "count": 4000
+          },
+          {
+            "ms": 1044.0134732052684,
+            "count": 4000
+          },
+          {
+            "ms": 692.9119708947837,
+            "count": 4000
+          },
+          {
+            "ms": 904.1335307992995,
+            "count": 4000
+          },
+          {
+            "ms": 635.3279971517622,
+            "count": 4000
+          },
+          {
+            "ms": 878.3358610235155,
+            "count": 4000
+          },
+          {
+            "ms": 782.7102732844651,
+            "count": 4000
+          },
+          {
+            "ms": 902.4935681372881,
+            "count": 4000
+          },
+          {
+            "ms": 767.676301766187,
+            "count": 4000
+          }
+        ],
+        "ms": 78198.12185084447,
+        "count": 60000,
+        "cache_hit": false,
+        "timings_ms": {
+          "lease_wait": 2122.84,
+          "upstream_slot": 57.76,
+          "network_connection_connect_tcp": 0.49,
+          "network_http11_send_request_headers": 2.97,
+          "network_http11_send_request_body": 0.51,
+          "network_http11_receive_response_headers": 7708.71,
+          "network_proxy_start_tls": 872.62,
+          "network_http11_receive_response_body": 4013.36,
+          "network_http11_response_closed": 0.23,
+          "upstream_http": 12610.66,
+          "upstream_decode": 132.13,
+          "database_commit": 15080.35,
+          "read_total": 78184.54,
+          "metadata": 2.89
+        },
+        "first": 1334624100000,
+        "last": 1359676500000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 11550659,
+        "serialize_ms": 154.35228683054447,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 60000,
+          "before": "2013-02-01T00:00:00+00:00"
+        },
+        "repeat": 1,
+        "pages": [],
+        "ms": 4116.491908207536,
+        "count": 60000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 4071.14,
+          "metadata": 2.33
+        },
+        "first": 1334624100000,
+        "last": 1359676500000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 11549844,
+        "serialize_ms": 200.40943007916212,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 60000,
+          "before": "2013-02-01T00:00:00+00:00"
+        },
+        "repeat": 2,
+        "pages": [],
+        "ms": 4330.971630755812,
+        "count": 60000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 4284.39,
+          "metadata": 4.42
+        },
+        "first": 1334624100000,
+        "last": 1359676500000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 11549844,
+        "serialize_ms": 182.88937024772167,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 200000,
+          "before": "2009-02-01T00:00:00+00:00"
+        },
+        "repeat": 0,
+        "pages": [
+          {
+            "ms": 1063.070961739868,
+            "count": 4000
+          },
+          {
+            "ms": 642.4089530482888,
+            "count": 4000
+          },
+          {
+            "ms": 719.656815752387,
+            "count": 4000
+          },
+          {
+            "ms": 999.2748280055821,
+            "count": 4000
+          },
+          {
+            "ms": 797.4577280692756,
+            "count": 4000
+          },
+          {
+            "ms": 565.2722911909223,
+            "count": 4000
+          },
+          {
+            "ms": 650.5182785913348,
+            "count": 4000
+          },
+          {
+            "ms": 841.8183117173612,
+            "count": 4000
+          },
+          {
+            "ms": 806.674397084862,
+            "count": 4000
+          },
+          {
+            "ms": 1047.4201827310026,
+            "count": 4000
+          },
+          {
+            "ms": 850.4063389264047,
+            "count": 4000
+          },
+          {
+            "ms": 1116.9210053049028,
+            "count": 4000
+          },
+          {
+            "ms": 633.9559443295002,
+            "count": 4000
+          },
+          {
+            "ms": 1048.8032242283225,
+            "count": 4000
+          },
+          {
+            "ms": 604.6161772683263,
+            "count": 4000
+          },
+          {
+            "ms": 657.3403039947152,
+            "count": 4000
+          },
+          {
+            "ms": 1018.0212683044374,
+            "count": 4000
+          },
+          {
+            "ms": 740.5692120082676,
+            "count": 4000
+          },
+          {
+            "ms": 734.9027288146317,
+            "count": 4000
+          },
+          {
+            "ms": 792.8664018400013,
+            "count": 4000
+          },
+          {
+            "ms": 852.2828239947557,
+            "count": 4000
+          },
+          {
+            "ms": 950.3475287929177,
+            "count": 4000
+          },
+          {
+            "ms": 674.2107896134257,
+            "count": 4000
+          },
+          {
+            "ms": 594.6382209658623,
+            "count": 4000
+          },
+          {
+            "ms": 564.6658167243004,
+            "count": 4000
+          },
+          {
+            "ms": 814.9507702328265,
+            "count": 4000
+          },
+          {
+            "ms": 949.733838904649,
+            "count": 4000
+          },
+          {
+            "ms": 962.1833031997085,
+            "count": 4000
+          },
+          {
+            "ms": 575.3967040218413,
+            "count": 4000
+          },
+          {
+            "ms": 587.8680762834847,
+            "count": 4000
+          },
+          {
+            "ms": 1015.8589030615985,
+            "count": 4000
+          },
+          {
+            "ms": 654.8254969529808,
+            "count": 4000
+          },
+          {
+            "ms": 718.1666130200028,
+            "count": 4000
+          },
+          {
+            "ms": 774.6385741047561,
+            "count": 4000
+          },
+          {
+            "ms": 891.9655280187726,
+            "count": 4000
+          },
+          {
+            "ms": 939.2980947159231,
+            "count": 4000
+          },
+          {
+            "ms": 1566.9455011375248,
+            "count": 4000
+          },
+          {
+            "ms": 1020.0919420458376,
+            "count": 4000
+          },
+          {
+            "ms": 984.8838467150927,
+            "count": 4000
+          },
+          {
+            "ms": 845.5386199057102,
+            "count": 4000
+          },
+          {
+            "ms": 877.2989837452769,
+            "count": 4000
+          },
+          {
+            "ms": 837.7972552552819,
+            "count": 4000
+          }
+        ],
+        "ms": 308136.8302591145,
+        "error": "TimeoutError: \u5e73\u53f0\u53d6\u6570\u7b49\u5f85\u8d85\u8fc7\u9884\u7b97"
+      },
+      {
+        "case": {
+          "n": 200000,
+          "before": "2009-02-01T00:00:00+00:00"
+        },
+        "repeat": 1,
+        "pages": [
+          {
+            "ms": 705.5482030846179,
+            "count": 4000
+          },
+          {
+            "ms": 850.1372979953885,
+            "count": 4000
+          },
+          {
+            "ms": 892.9600049741566,
+            "count": 4000
+          },
+          {
+            "ms": 905.8966259472072,
+            "count": 4000
+          },
+          {
+            "ms": 819.4784950464964,
+            "count": 4000
+          },
+          {
+            "ms": 895.9334339015186,
+            "count": 4000
+          },
+          {
+            "ms": 635.7737970538437,
+            "count": 4000
+          },
+          {
+            "ms": 1421.1195590905845,
+            "count": 4000
+          }
+        ],
+        "ms": 114801.09851900488,
+        "count": 200000,
+        "cache_hit": false,
+        "timings_ms": {
+          "lease_wait": 24.52,
+          "upstream_slot": 30.95,
+          "network_http11_send_request_headers": 1.47,
+          "network_http11_send_request_body": 0.25,
+          "network_http11_receive_response_headers": 4509.55,
+          "network_http11_receive_response_body": 2166.19,
+          "network_http11_response_closed": 0.1,
+          "upstream_http": 6683.5,
+          "upstream_decode": 209.24,
+          "database_commit": 6946.96,
+          "read_total": 114759.45,
+          "metadata": 3.69
+        },
+        "first": 1150372200000,
+        "last": 1233352500000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 38474544,
+        "serialize_ms": 534.0448222123086,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 200000,
+          "before": "2009-02-01T00:00:00+00:00"
+        },
+        "repeat": 2,
+        "pages": [],
+        "ms": 13236.442900262773,
+        "count": 200000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 13104.35,
+          "metadata": 2.37
+        },
+        "first": 1150372200000,
+        "last": 1233352500000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 38473995,
+        "serialize_ms": 723.6469401977956,
+        "passed": true
+      }
+    ]
+  },
+  "provider_followup": {
+    "scope": "Disposable image process, same unmodified provider cache code and isolated chart_sync PG. Capacity and deadline changed only in this process; HTTP/model limits bypassed with model_construct. No client interest.",
+    "cases": [
+      {
+        "case": {
+          "n": 20000,
+          "before": "2010-07-01T00:00:00+00:00"
+        },
+        "repeat": 0,
+        "pages": [
+          {
+            "ms": 1807.4902398511767,
+            "count": 4000
+          },
+          {
+            "ms": 630.3893690928817,
+            "count": 4000
+          },
+          {
+            "ms": 651.3826930895448,
+            "count": 4000
+          },
+          {
+            "ms": 520.3578779473901,
+            "count": 4000
+          },
+          {
+            "ms": 494.76683093234897,
+            "count": 4000
+          }
+        ],
+        "ms": 18133.05374374613,
+        "count": 20000,
+        "cache_hit": false,
+        "timings_ms": {
+          "lease_wait": 16.94,
+          "upstream_slot": 27.29,
+          "network_connection_connect_tcp": 0.57,
+          "network_http11_send_request_headers": 1.15,
+          "network_http11_send_request_body": 0.23,
+          "network_http11_receive_response_headers": 2446.11,
+          "network_proxy_start_tls": 626.1,
+          "network_http11_receive_response_body": 733.49,
+          "network_http11_response_closed": 0.1,
+          "upstream_http": 3812.66,
+          "upstream_decode": 26.0,
+          "database_commit": 5336.64,
+          "read_total": 18088.14,
+          "metadata": 44.74
+        },
+        "first": 1269809700000,
+        "last": 1277942100000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 3855401,
+        "serialize_ms": 45.435750391334295,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 20000,
+          "before": "2010-07-01T00:00:00+00:00"
+        },
+        "repeat": 1,
+        "pages": [],
+        "ms": 1135.5414558202028,
+        "count": 20000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 1110.42,
+          "metadata": 2.34
+        },
+        "first": 1269809700000,
+        "last": 1277942100000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 3854864,
+        "serialize_ms": 64.89109713584185,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 20000,
+          "before": "2010-07-01T00:00:00+00:00"
+        },
+        "repeat": 2,
+        "pages": [],
+        "ms": 1399.3483148515224,
+        "count": 20000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 1385.86,
+          "metadata": 3.54
+        },
+        "first": 1269809700000,
+        "last": 1277942100000,
+        "boundary": false,
+        "indicator_series": 0,
+        "json_bytes": 3854864,
+        "serialize_ms": 52.39149322733283,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 60000,
+          "before": "2013-02-01T00:00:00+00:00",
+          "indicators": [
+            {
+              "name": "SMA",
+              "params": {
+                "period": 200
+              }
+            }
+          ]
+        },
+        "repeat": 0,
+        "pages": [
+          {
+            "ms": 540.9352090209723,
+            "count": 199
+          }
+        ],
+        "ms": 8106.6506030038,
+        "count": 60000,
+        "cache_hit": false,
+        "timings_ms": {
+          "lease_wait": 3.43,
+          "upstream_slot": 3.71,
+          "network_http11_send_request_headers": 0.18,
+          "network_http11_send_request_body": 0.04,
+          "network_http11_receive_response_headers": 532.01,
+          "network_http11_receive_response_body": 0.11,
+          "network_http11_response_closed": 0.01,
+          "upstream_http": 533.0,
+          "upstream_decode": 0.23,
+          "database_commit": 55.84,
+          "read_total": 7939.53,
+          "metadata": 2.53
+        },
+        "first": 1334624100000,
+        "last": 1359676500000,
+        "boundary": false,
+        "indicator_series": 1,
+        "json_bytes": 14523278,
+        "serialize_ms": 244.35617914423347,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 60000,
+          "before": "2013-02-01T00:00:00+00:00",
+          "indicators": [
+            {
+              "name": "SMA",
+              "params": {
+                "period": 200
+              }
+            }
+          ]
+        },
+        "repeat": 1,
+        "pages": [],
+        "ms": 3790.1594298891723,
+        "count": 60000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 3600.47,
+          "metadata": 2.47
+        },
+        "first": 1334624100000,
+        "last": 1359676500000,
+        "boundary": false,
+        "indicator_series": 1,
+        "json_bytes": 14522929,
+        "serialize_ms": 236.76537489518523,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 60000,
+          "before": "2013-02-01T00:00:00+00:00",
+          "indicators": [
+            {
+              "name": "SMA",
+              "params": {
+                "period": 200
+              }
+            }
+          ]
+        },
+        "repeat": 2,
+        "pages": [],
+        "ms": 3676.9196167588234,
+        "count": 60000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 3479.99,
+          "metadata": 2.67
+        },
+        "first": 1334624100000,
+        "last": 1359676500000,
+        "boundary": false,
+        "indicator_series": 1,
+        "json_bytes": 14522929,
+        "serialize_ms": 230.49128986895084,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 200000,
+          "before": "2009-02-01T00:00:00+00:00",
+          "indicators": [
+            {
+              "name": "SMA",
+              "params": {
+                "period": 200
+              }
+            }
+          ]
+        },
+        "repeat": 0,
+        "pages": [
+          {
+            "ms": 440.35120913758874,
+            "count": 199
+          }
+        ],
+        "ms": 24540.701499208808,
+        "count": 200000,
+        "cache_hit": false,
+        "timings_ms": {
+          "lease_wait": 3.39,
+          "upstream_slot": 3.4,
+          "network_http11_send_request_headers": 0.18,
+          "network_http11_send_request_body": 0.03,
+          "network_http11_receive_response_headers": 427.95,
+          "network_http11_receive_response_body": 0.11,
+          "network_http11_response_closed": 0.02,
+          "upstream_http": 429.01,
+          "upstream_decode": 0.27,
+          "database_commit": 81.78,
+          "read_total": 24000.81,
+          "metadata": 2.37
+        },
+        "first": 1150372200000,
+        "last": 1233352500000,
+        "boundary": false,
+        "indicator_series": 1,
+        "json_bytes": 48358483,
+        "serialize_ms": 702.651425730437,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 200000,
+          "before": "2009-02-01T00:00:00+00:00",
+          "indicators": [
+            {
+              "name": "SMA",
+              "params": {
+                "period": 200
+              }
+            }
+          ]
+        },
+        "repeat": 1,
+        "pages": [],
+        "ms": 11934.787251986563,
+        "count": 200000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 11312.84,
+          "metadata": 2.23
+        },
+        "first": 1150372200000,
+        "last": 1233352500000,
+        "boundary": false,
+        "indicator_series": 1,
+        "json_bytes": 48358134,
+        "serialize_ms": 878.3285268582404,
+        "passed": true
+      },
+      {
+        "case": {
+          "n": 200000,
+          "before": "2009-02-01T00:00:00+00:00",
+          "indicators": [
+            {
+              "name": "SMA",
+              "params": {
+                "period": 200
+              }
+            }
+          ]
+        },
+        "repeat": 2,
+        "pages": [],
+        "ms": 11368.169901892543,
+        "count": 200000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 10743.89,
+          "metadata": 2.26
+        },
+        "first": 1150372200000,
+        "last": 1233352500000,
+        "boundary": false,
+        "indicator_series": 1,
+        "json_bytes": 48358134,
+        "serialize_ms": 752.2358451969922,
+        "passed": true
+      }
+    ]
+  },
+  "http": {
+    "hot": [
+      {
+        "n": 20000,
+        "i": 0,
+        "status": 200,
+        "ms": 1737.0935419999998,
+        "receiveResponseMs": 1733.3885579999999,
+        "bodyReadMs": 3.7049839999999676,
+        "bytes": 3854865,
+        "count": 20000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 1136.93,
+          "metadata": 87.08
+        }
+      },
+      {
+        "n": 20000,
+        "i": 1,
+        "status": 200,
+        "ms": 1709.2044640000004,
+        "receiveResponseMs": 1706.106577,
+        "bodyReadMs": 3.0978870000003553,
+        "bytes": 3854864,
+        "count": 20000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 1242.51,
+          "metadata": 3.04
+        }
+      },
+      {
+        "n": 60000,
+        "i": 0,
+        "status": 200,
+        "ms": 5336.539718,
+        "receiveResponseMs": 5326.607155,
+        "bodyReadMs": 9.9325630000003,
+        "bytes": 11549844,
+        "count": 60000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 3941.69,
+          "metadata": 2.28
+        }
+      },
+      {
+        "n": 60000,
+        "i": 1,
+        "status": 200,
+        "ms": 4823.697008000001,
+        "receiveResponseMs": 4814.489877,
+        "bodyReadMs": 9.207131000001027,
+        "bytes": 11549843,
+        "count": 60000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 3480.2,
+          "metadata": 2.18
+        }
+      },
+      {
+        "n": 200000,
+        "i": 0,
+        "status": 200,
+        "ms": 15350.53738,
+        "receiveResponseMs": 15321.074832,
+        "bodyReadMs": 29.462547999999515,
+        "bytes": 38473995,
+        "count": 200000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 10680.36,
+          "metadata": 2.43
+        }
+      },
+      {
+        "n": 200000,
+        "i": 1,
+        "status": 200,
+        "ms": 15252.544449000005,
+        "receiveResponseMs": 15221.216331,
+        "bodyReadMs": 31.328118000004906,
+        "bytes": 38473994,
+        "count": 200000,
+        "cache_hit": true,
+        "timings_ms": {
+          "read_total": 10599.8,
+          "metadata": 2.61
+        }
+      }
+    ],
+    "errors": [],
+    "currentLimits": [
+      {
+        "n": 60000,
+        "status": 422
+      },
+      {
+        "n": 200000,
+        "status": 422
+      }
+    ],
+    "cancel": {
+      "clientResult": "AbortError: This operation was aborted",
+      "clientMs": 810.0800170000002,
+      "next": {
+        "ms": 3313.6580299999987,
+        "status": 200,
+        "count": 401
+      }
+    },
+    "timeout": {
+      "status": 503,
+      "ms": 1009.3804269999964,
+      "next": {
+        "status": 200,
+        "count": 401
+      }
+    },
+    "events": [
+      {
+        "countBack": 20000,
+        "before": 1277942400000,
+        "start": 1791113179.892769,
+        "worker_done": 1791113181.1364315,
+        "count": 20000
+      },
+      {
+        "countBack": 20000,
+        "before": 1277942400000,
+        "start": 1791113181.6444263,
+        "worker_done": 1791113182.8905644,
+        "count": 20000
+      },
+      {
+        "countBack": 60000,
+        "before": 1359676800000,
+        "start": 1791113183.3742871,
+        "worker_done": 1791113187.3188255,
+        "count": 60000
+      },
+      {
+        "countBack": 60000,
+        "before": 1359676800000,
+        "start": 1791113188.8132706,
+        "worker_done": 1791113192.2962503,
+        "count": 60000
+      },
+      {
+        "countBack": 200000,
+        "before": 1233446400000,
+        "start": 1791113193.7468104,
+        "worker_done": 1791113204.430106,
+        "count": 200000
+      },
+      {
+        "countBack": 200000,
+        "before": 1233446400000,
+        "start": 1791113209.453664,
+        "worker_done": 1791113220.0567024,
+        "count": 200000
+      },
+      {
+        "countBack": 20000,
+        "before": 1262304000000,
+        "start": 1791113225.088886,
+        "disconnect": 1791113225.922765,
+        "worker_done": 1791113225.9567478,
+        "error": "TimeoutError"
+      },
+      {
+        "countBack": 1,
+        "before": 1262304000000,
+        "start": 1791113228.893965,
+        "worker_done": 1791113232.1837718,
+        "count": 401
+      },
+      {
+        "countBack": 20000,
+        "before": 1104537600000,
+        "start": 1791113232.2147746,
+        "timeout": 1791113233.2160807,
+        "worker_done": 1791113234.1188152,
+        "error": "TimeoutError"
+      },
+      {
+        "countBack": 1,
+        "before": 1104537600000,
+        "start": 1791113236.2197762,
+        "worker_done": 1791113237.894779,
+        "count": 401
+      }
+    ]
+  },
+  "upstream": {
+    "requested": 5001,
+    "status": 400,
+    "errorMessage": "Maximum value for 'count' exceeded",
+    "count": 0
+  },
+  "window_product": {
+    "passed": true,
+    "errors": [],
+    "rebuilds": 1,
+    "native": [
+      {
+        "res": "1W",
+        "bars": 231
+      },
+      {
+        "res": "1D",
+        "bars": 247
+      },
+      {
+        "res": "5",
+        "bars": 2759
+      },
+      {
+        "res": "240",
+        "bars": 2344
+      }
+    ],
+    "heap_bytes": 47280774,
+    "window_diagnostics": {
+      "windows": [
+        {
+          "id": "mw1",
+          "symbol": "MWP:EURUSD",
+          "resolution": "240",
+          "target": 1780261200,
+          "from": 1770760800,
+          "to": 1786496400,
+          "count": 1093,
+          "spacing": 7.26,
+          "viewport": {
+            "from": 1780261200,
+            "to": 1786496400
+          },
+          "replacing": false
+        },
+        {
+          "id": "mw3",
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "target": 1783292100,
+          "from": 1782866400,
+          "to": 1783472400,
+          "count": 2016,
+          "spacing": 1.194675540765391,
+          "viewport": {
+            "from": 1783292100,
+            "to": 1783472400
+          },
+          "replacing": false
+        },
+        {
+          "id": "mw6",
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "target": 1788739200,
+          "from": 1788313500,
+          "to": 1788907800,
+          "count": 1415,
+          "spacing": 1.194675540765391,
+          "targetDate": 1788739200000,
+          "options": {
+            "targetPointAlignment": "center",
+            "alignIfTargetPointIsVisible": false,
+            "autoscaleAfterScroll": false
+          }
+        },
+        {
+          "id": "mw5",
+          "symbol": "MWP:EURUSD",
+          "resolution": "240",
+          "target": 1788739200,
+          "from": 1779238800,
+          "to": 1794952800,
+          "count": 780,
+          "spacing": 7.26,
+          "targetDate": 1788739200000,
+          "options": {
+            "targetPointAlignment": "center",
+            "alignIfTargetPointIsVisible": false,
+            "autoscaleAfterScroll": false
+          }
+        }
+      ],
+      "models": 4,
+      "threads": 6,
+      "pending": 0
+    },
+    "note": "Already deployed flicker candidate; original saved mixed EURUSD layout, native feed. No added studies. Not matched A/B with synthetic."
+  },
+  "environment": {
+    "logical_cpus": 4,
+    "host_memory_gib": 15.61,
+    "viewport": [
+      1600,
+      1000
+    ],
+    "browser": "Chromium 153.0.8010.12",
+    "normal_cpu_rate": 1,
+    "throttled_rate": 4,
+    "limitations": "Shared server, headless Chromium, native original bundle plus observation-only hooks; no claim for user hardware or all custom studies."
+  },
+  "discarded_tool_failure": {
+    "request": 1000000,
+    "reason": "CDP intercepted response exceeded 100 MiB pipe buffer; real HTTP retry succeeded; not treated as chart failure."
+  }
+}
