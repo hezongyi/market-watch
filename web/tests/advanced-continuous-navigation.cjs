@@ -97,6 +97,7 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
     created = [];
   const series = {
     symbol: () => "MWP:EURUSD",
+    syncModel: () => null,
     dataEvents: () => ({
       completed: event,
       dataUpdated: event,
@@ -273,13 +274,72 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   );
   finishOld("late");
   await run();
-  const cursorSource={...model,_syncCrosshair:()=>model.setExternalPosition({timeStamp:9},{})};
-  navigation.bindModel(cursorSource);await run();
+  const cursorSource = {
+    ...model,
+    _syncCrosshair: () => model.setExternalPosition({ timeStamp: 9 }, {}),
+  };
+  navigation.bindModel(cursorSource);
+  await run();
   cursorSource._syncCrosshair();
   navigation.unbindModel(cursorSource);
-  const sourceClosedCalls=externalCalls;
+  const sourceClosedCalls = externalCalls;
   navigation.timeScaleUpdated(model);
-  assert.equal(externalCalls,sourceClosedCalls,'unloading a cursor source invalidates retained peer replay');
+  assert.equal(
+    externalCalls,
+    sourceClosedCalls,
+    "unloading a cursor source invalidates retained peer replay",
+  );
+  let sourceResolution = "1D",
+    sourceSymbol = "MWP:EURUSD";
+  const intervalHandlers = [],
+    symbolHandlers = [];
+  const sourceEvent = (handlers) => ({
+    subscribe: (_, callback) => handlers.push(callback),
+    unsubscribeAll() {},
+  });
+  const intervalEvent = sourceEvent(intervalHandlers),
+    symbolEvent = sourceEvent(symbolHandlers);
+  const identitySource = {
+    ...model,
+    interval: () => sourceResolution,
+    mainSeries: () => ({
+      ...series,
+      symbol: () => sourceSymbol,
+      onIntervalChanged: () => intervalEvent,
+      symbolResolved: () => symbolEvent,
+    }),
+    _syncCrosshair: () => model.setExternalPosition({ timeStamp: 9 }, {}),
+  };
+  navigation.bindModel(identitySource);
+  await run();
+  for (const kind of ["interval", "symbol"]) {
+    identitySource._syncCrosshair();
+    assert.ok(navigation.diagnostics().cursors.some((c) => c.time === 9));
+    if (kind === "interval") sourceResolution = "240";
+    else sourceSymbol = "MWP:GBPUSD";
+    for (const callback of kind === "interval"
+      ? intervalHandlers
+      : symbolHandlers)
+      callback();
+    const cleared = externalCalls;
+    navigation.timeScaleUpdated(model);
+    await run();
+    await run();
+    assert.equal(
+      externalCalls,
+      cleared,
+      `${kind} identity change invalidates old peer replay`,
+    );
+    assert.ok(
+      navigation.diagnostics().cursors.every((c) => c.time === undefined),
+    );
+  }
+  identitySource._syncCrosshair();
+  assert.ok(
+    navigation.diagnostics().cursors.some((c) => c.time === 9),
+    "fresh native broadcast remains valid after identity change",
+  );
+  navigation.unbindModel(identitySource);
   model.setExternalPosition({ timeStamp: 10 }, {});
   navigation.timeScaleUpdated(model);
   model.setExternalPosition(null);

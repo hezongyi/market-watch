@@ -349,6 +349,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             settle,
             box,
             snapshot,
+            crosshairs,
             item,
             save,
           });
@@ -585,6 +586,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             settle,
             box,
             snapshot,
+            crosshairs,
             item,
             save,
           });

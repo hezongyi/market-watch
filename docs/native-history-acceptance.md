@@ -77,3 +77,5 @@ web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完�
 补充真实交互审计发现关闭源图后仍保留它的光标时间；`97864b5` 清除该源在其他图上的重放记录，`2468143` 将身份初始化放到原生模型构造完成后的挂钩阶段。Ubuntu 人工项目已更新 chart 至 `2468143`，API/web 与容量配置保持原组合。新增 [真实交互证据](verification/native-history/supplemental-20261005/interactions-2468143.json) 包含原四图大请求与 hover、Alt+G 原生日期定位、关闭同步后无外部光标重绘、关闭 D1 源图并卸载后旧光标失效、九个支持周期及双 M5 范围同步。周期检查是真实供应商尾部导航，不代表全部跨周期同步组合。
 
 `2468143` 的 [最终完整四图](verification/native-history/supplemental-20261005/final-2468143-full.json) 再次通过故障、导航、指标、价格/前缀修订、拖动和保存重开。该轮热 PG 点击至就绪 5.15 秒；同 widget 定位 3 毫秒、历史读取 0。仅真实修订触发一次重载，hover 无额外历史请求。修订试验数据已恢复，人工入口可继续使用；首次冷加载仍参考已有独立空 PG 产品测量，不用热耗时替代。
+
+额外 [源身份及反向同步证据](verification/native-history/supplemental-20261005/interactions-source-identity-reverse-2468143.json)：M5 点击向高周期导航及静止标签、D1→H4 与 EURUSD→XAUUSD 源变更、双 M5 两方向范围同步通过。静止鼠标下源变更可由原生按新 bar 广播，核对新语义时间；不要求屏上光标全部清空。产品镜像不变，本次只补测试与证据。
