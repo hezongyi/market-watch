@@ -9,6 +9,7 @@ const MWNativeNavigation = (() => {
     workspace_bars: 80000,
     response_bytes: 33554432,
   };
+  let invokingRange;
   const cancelled = () =>
     Object.assign(Error("已取消旧图表的历史加载"), {
       code: "HISTORY_CANCELLED",
@@ -134,9 +135,11 @@ const MWNativeNavigation = (() => {
       state.publicRangeDepth = 1;
       state.depth++;
       let result;
+      const previousRange = invokingRange;
+      invokingRange = { m, state, generation };
       try { result = resume(); }
       catch (error) { result = Promise.reject(error); }
-      finally { state.publicRangeDepth = 0; state.depth--; }
+      finally { invokingRange = previousRange; state.publicRangeDepth = 0; state.depth--; }
       return Promise.race([Promise.resolve(result), cancellation]).finally(() => {
         if (state.publicRange === token) state.publicRange = null;
         if (models.get(m) === state && state.generation === generation) {
@@ -144,6 +147,11 @@ const MWNativeNavigation = (() => {
           replay(m, state);
         }
       });
+    },
+    engineRangeCurrent() {
+      const range = invokingRange;
+      return !range ? () => true : () =>
+        models.get(range.m) === range.state && range.state.generation === range.generation;
     },
     chartWindow: () => undefined,
     hasWindow: (id) => !id,

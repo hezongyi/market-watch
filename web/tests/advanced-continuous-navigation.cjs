@@ -118,10 +118,13 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   assert.throws(() => model.insertStudyWithParams({}), /预算/, "resolved study remains charged");
   nextStudy.cancel();
   let finishOld;
+  let engineCurrent;
   const oldRange = navigation.prepareRange(model, {}, () =>
-    new Promise(resolve => { finishOld = resolve; })).then(() => 'completed', e => e.code);
+    new Promise(resolve => { finishOld = resolve; engineCurrent = navigation.engineRangeCurrent(); })).then(() => 'completed', e => e.code);
+  assert.ok(engineCurrent());
   assert.equal(await navigation.prepareRange(model, {}, () => Promise.resolve('new')), 'new');
   assert.equal(await oldRange, 'HISTORY_CANCELLED', 'public promise finishes at supersession');
+  assert.equal(engineCurrent(), false, 'engine range application observes model generation');
   finishOld('late'); await run();
   navigation.unbindModel(model); navigation.unbindThread(shared);
   console.log(
