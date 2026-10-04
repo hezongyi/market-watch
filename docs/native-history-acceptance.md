@@ -1,6 +1,6 @@
 # 原生连续历史候选验收
 
-2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，产品提交 `b3dd20c`。人工验收待完成，未合并或发布生产。
+2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，产品提交 `415ae61`（API/web 构建 `b3dd20c`）。人工验收待完成，未合并或发布生产。
 
 ## 访问与运行
 
@@ -32,7 +32,7 @@ sg docker -c 'docker compose -f /home/quant/repos/.acceptance/native-history-imp
 | --- | --- |
 | `mw-native-history-api:b3dd20c` | `1696faa96a669be6f980d2ced2490f58feecb7f8d2de0777c62e5ac7f541da17` |
 | `mw-native-history-web:b3dd20c` | `2ea7e5140b90042e5adc5d0dd175cde232a56d4a95b069f670dbaa96df71a570` |
-| `mw-native-history-chart:b3dd20c` | `00d7c5c22deafafdc93d623263ea4ce3f83f44edb68ab5f81072515d03da173b` |
+| `mw-native-history-chart:415ae61` | `b55bf1e751185f655dd969cce1e3bc1d03724fe7b217a4b77c9ba41433bf5d03` |
 
 web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完整组合通过验收。原生 v31.1 补丁仍固定原始 SHA、唯一锚点和幂等检查；修改库后生成内容版本路径，旧 URL 与本候选不同。
 
@@ -55,7 +55,7 @@ web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完�
 
 后端 provider/task/Yahoo/chart/真实 PG 回归 164 passed；前端构建、原生 hook、导航、观察核实、历史 reset、视区测试通过。Standards/Spec 复核无新增阻断项。尚未覆盖：长时间全进程泄漏压力、所有 Binance/Yahoo/DST 组合、指标模板批量加载、低性能客户端最大负载。80,000 是本候选工程预算，不是所有这些组合的 SLA。
 
-原始证据在 [2/4/8 图](verification/native-history/final-2-4-8.json)、[完整四图](verification/native-history/final-full-4-exact-second.json)、[冷任务](verification/native-history/cold-task-evidence.txt) 和 [hot profile](verification/native-history/hot-profile.txt)。私有目录保存失败轮次及截图，避免覆盖不通过记录。
+原始证据在 [2/4/8 图](verification/native-history/final-2-4-8.json)、[最终完整四图](verification/native-history/final-navigation-latest.json)、[冷任务](verification/native-history/cold-task-evidence.txt) 、[最终 2/8 图](verification/native-history/final-415ae61-2-8.json) 和 [hot profile](verification/native-history/hot-profile.txt)。私有目录保存失败轮次及截图，避免覆盖不通过记录。
 
 ## 人工核对与回退
 
@@ -65,3 +65,5 @@ web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完�
 4. 超过预算时有容量说明，原有图保留；在预算内继续导航可以恢复。不要把任意多年分钟历史当作本候选保证。
 
 停止本项目即可结束验收；保留 PG volume 与旧 `16143/16144` 有限窗口比较实例。旧窗口候选未完整验收，不是生产回退。需要更换整套构建时先停止本项目 worker/消费者，再恢复匹配前后端及配置并重新打开 widget；不在运行图表中热切数据模式。不删除缓存，不触碰 `16243/16244` 其他项目或 Unraid。
+
+最终 `415ae61` 组合另外通过严格范围覆盖与“加载中回最新”：旧公开 Promise 明确 `HISTORY_CANCELLED`，旧 Qf 应用按模型代次失效，延迟结果未改变最新视区；完整四图以及最终 2/8 图均无 JS 错误。

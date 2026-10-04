@@ -446,6 +446,19 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           await settle();
           item.cancelledView=await snapshot();
           assert.ok(item.cancelledView.charts[m5].range.from<=target && item.cancelledView.charts[m5].range.to>=target);
+          phase='return-latest';fault='delay';
+          await frame.evaluate(({m5,target})=>{
+            globalThis.__oldToLatest=widget.chart(m5).setVisibleRange({from:target-80*86400,to:target-80*86400+3600},
+              {rejectByTimeout:30000}).then(()=> 'completed',()=> 'cancelled');
+          },{m5,target});
+          await frame.waitForFunction(()=>MWNativeNavigation.diagnostics().pending>0);
+          await frame.evaluate(m5=>widget.chart(m5).executeActionById('timeScaleReset'),m5);
+          item.returnLatestOutcome=await frame.evaluate(()=>__oldToLatest);
+          assert.equal(item.returnLatestOutcome,'cancelled');
+          await page.waitForTimeout(5500);await settle();
+          item.latestView=await snapshot();
+          assert.ok(item.latestView.charts[m5].range.to>target+100*86400,'old delayed range must not override return to latest');
+          await frame.evaluate(({m5,target})=>widget.chart(m5).setVisibleRange({from:target-1800,to:target+1800}),{m5,target});await settle();
           phase='studies';
           await frame.evaluate(async m5=>{
             for(const [name,params] of [['Moving Average',{length:200}],['Relative Strength Index',{length:14}],['MACD',{}],['守望 Python SMA',{period:200}]])

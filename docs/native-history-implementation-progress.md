@@ -11,7 +11,7 @@ P1 初验：容器依赖环境运行 provider cache/service/Yahoo 和真实 PG �
 
 ## P2～P5 候选实施（2026-10-05）
 
-产品实现提交为 `b3dd20c`（前序 `cc6b935`、`932a4fd`、`d0b8716`）。历史任务逐页写 PG；前端保持一次原生回调，取消旧公开范围请求时结束其原生等待，旧侧追加在原生时间轴更新完成后同步按语义时间重放光标。指标异步创建先预留预算；空页仅在覆盖、边界或有效 bars 变化时计为进展。Standards 与 Spec 复核本次实现均无新阻断项。
+产品实现提交为 `415ae61`（API/web 为 `b3dd20c` 完整构建）（前序 `cc6b935`、`932a4fd`、`d0b8716`）。历史任务逐页写 PG；前端保持一次原生回调，取消旧公开范围请求时结束其原生等待，旧侧追加在原生时间轴更新完成后同步按语义时间重放光标。指标异步创建先预留预算；空页仅在覆盖、边界或有效 bars 变化时计为进展。Standards 与 Spec 复核本次实现均无新阻断项。
 
 Ubuntu 独立候选已运行：`mw-native-history-ubuntu-20261004`。默认产品设置仍保留 20,000；隔离候选经测量收窄为 80,000 bars / 工作区加权 260,000 bars / 32 MiB / 600 秒 / 80 页。Unraid 与生产未改动。
 
@@ -21,4 +21,4 @@ Ubuntu 独立候选已运行：`mw-native-history-ubuntu-20261004`。默认产�
 
 详见 [验收交付](native-history-acceptance.md) 与 [证据目录](verification/native-history/)。人工验收待用户完成；生产发布另行授权。长期泄漏、多商品全源日历与模板批量恢复没有扩大为全部通过。
 
-人工验收入口、容器和预算细节见 `docs/native-history-acceptance.md`；公开范围重叠的验收要求是新范围成功且旧 promise 最终 settled，旧请求若已在切换前完成则允许 `completed`，不得出现原生 `Value is null`。
+人工验收入口、容器和预算细节见 `docs/native-history-acceptance.md`；公开范围重叠须立即拒绝被替代的等待 Promise；Qf 的旧范围应用同时受模型导航代次约束，回最新、切周期与销毁也会使旧应用失效。最终浏览器严格用例核对这一合同。
