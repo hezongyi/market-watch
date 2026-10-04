@@ -50,14 +50,21 @@ function pythonStudies(PineJS, catalog) {
             { title: s.key, histogramBase: 0 },
           ]),
         ),
-        inputs: keys.map((key) => ({
-          id: key,
-          name: key,
-          type: key === "deviation" ? "float" : "integer",
-          defval: meta.params[key],
-          min: key === "deviation" ? 0.1 : 2,
-          max: key === "deviation" ? 10 : 500,
-        })),
+        inputs: keys.map((key) => {
+          const rule =
+            meta.parameter_schema?.[key] ||
+            (key === "deviation"
+              ? { type: "float", min: 0.1, max: 10 }
+              : { type: "integer", min: 2, max: 500 });
+          return {
+            id: key,
+            name: key,
+            type: rule.type,
+            defval: meta.params[key],
+            min: rule.min,
+            max: rule.max,
+          };
+        }),
       },
       constructor: function () {
         this.init = function (ctx, input) {
