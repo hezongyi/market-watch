@@ -153,7 +153,7 @@ def test_revision_migration_backfills_existing_observations_and_preserves_bars(p
     assert cache.snapshot(key, 4000, 3)["bars"] == before
 
 
-def test_history_response_is_one_statement_snapshot_during_revision(provider_pg, monkeypatch):
+def test_history_response_is_repeatable_read_snapshot_during_revision(provider_pg, monkeypatch):
     from sqlalchemy import event
     from test_provider_cache import seed
     _, engine = provider_pg
@@ -167,7 +167,7 @@ def test_history_response_is_one_statement_snapshot_during_revision(provider_pg,
         if threading.get_ident() not in reader_ident or not statement.lstrip().upper().startswith('SELECT'):
             return
         selects.append(statement)
-        if 'LEFT OUTER JOIN' in statement and 'provider_datasets' in statement:
+        if 'provider_datasets' in statement and not read_done.is_set():
             read_done.set()
             assert revision_done.wait(4)
     event.listen(engine, 'after_cursor_execute', pause_after_select)
@@ -182,7 +182,7 @@ def test_history_response_is_one_statement_snapshot_during_revision(provider_pg,
             seed(META, 'M5', 6000, page(5000, 6000, close='5'))
             revision_done.set()
             original = pending.result(timeout=3)
-        assert len(selects) == 1, 'metadata and bars must share one statement, not default transaction isolation'
+        assert len(selects) >= 2, 'metadata and bars use an explicit repeatable-read transaction'
         assert original['as_of'] == 100000 and original['cache_revision'] == 1
         # The changed bar is in the response window; pairing old bars with a
         # new metadata version would incorrectly suppress the subscription reset.

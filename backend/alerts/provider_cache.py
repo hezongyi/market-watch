@@ -12,7 +12,7 @@ import time
 from contextlib import contextmanager
 from contextvars import ContextVar
 
-from sqlalchemy import delete, exists, literal, select, text, true, update
+from sqlalchemy import delete, exists, func, select, text, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.exc import DBAPIError
@@ -133,78 +133,87 @@ def ensure(meta, frame):
 
 
 @contextmanager
-def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=None):
-    """Bars and dataset metadata share one statement snapshot, including empty data.
+def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=None,
+                         native_from=None, prefix=0, reserve=0, planning=False):
+    """One short repeatable-read observation; metadata is decoded exactly once.
 
-    The bounded subquery is independent of coverage; filter it using the coverage
-    returned by that same statement, never a preceding READ COMMITTED SELECT.
+    Planning counts indexed timestamps and reads just the tail while coverage is
+    incomplete. No provider I/O is allowed while this transaction is open.
     """
-    bounded = (
-        select(ProviderBar.chart_time, ProviderBar.payload)
-        .where(ProviderBar.dataset_id == key, ProviderBar.chart_time < before)
-        .order_by(ProviderBar.chart_time.desc())
-        .limit(bounded_limit or count + 1)
-        .subquery()
-    )
-    changed = literal(False)
-    if observation is not None:
-        changed = exists(select(ProviderBar.start).where(
-            ProviderBar.dataset_id == key,
-            ProviderBar.chart_time >= observation.first,
-            ProviderBar.chart_time <= observation.last,
-            ProviderBar.revision > 1,
-            ProviderBar.changed_at > observation.observed_at,
-        ))
-    statement = (
-        select(ProviderDataset.source, ProviderDataset.symbol,
-               ProviderDataset.coverage, ProviderDataset.earliest,
-               ProviderDataset.updated_at, ProviderDataset.latest_at, ProviderDataset.revision,
-               ProviderDataset.metadata_json,
-               bounded.c.chart_time, bounded.c.payload, changed.label("changed"))
-        .select_from(ProviderDataset).outerjoin(bounded, true())
-        .where(ProviderDataset.id == key).order_by(bounded.c.chart_time)
-    )
-    with budget_transaction() as db:
-        records = db.execute(statement).all()
-        if not records:
+    with transaction() as db:
+        if db.get_bind().dialect.name == "postgresql":
+            db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
+        database_budget(db)
+        metadata = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key))
+        if metadata is None:
             raise ValueError("平台缓存已清理，请重试")
-        metadata = records[0]
         ranges = metadata.coverage
         interval = next((r for r in ranges if r[0] < before <= r[1]), None)
         preceding = next((r for r in reversed(ranges) if r[1] < before), None)
         readable = interval or preceding
-        rows = [r.payload for r in records
-                if readable and r.chart_time is not None and r.chart_time >= readable[0]]
-        boundary = bool(readable and metadata.earliest and readable[0] == 0 and len(rows) <= count)
+        predicate = (ProviderBar.dataset_id == key, ProviderBar.chart_time < before,
+                     ProviderBar.chart_time >= (readable[0] if readable else before))
+        available = in_range = 0
+        demand = count
+        limit = bounded_limit or count + 1
+        if planning:
+            if native_from is not None:
+                ranged = select(ProviderBar.chart_time).where(*predicate,
+                    ProviderBar.chart_time >= native_from).limit(CAPACITY + 1).subquery()
+                in_range = db.scalar(select(func.count()).select_from(ranged))
+            demand = max(count, in_range)
+            times = select(ProviderBar.chart_time).where(*predicate).order_by(
+                ProviderBar.chart_time.desc()).limit(min(CAPACITY + 1, demand + prefix + reserve + 1)).subquery()
+            available = db.scalar(select(func.count()).select_from(times))
+            if demand + prefix > CAPACITY:
+                raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
+            range_done = native_from is None or bool(readable and readable[0] <= native_from)
+            enough = available >= demand + prefix or bool(metadata.earliest and readable and readable[0] == 0)
+            limit = min(CAPACITY + 1, demand + prefix + reserve + 1) if range_done and enough else 1
+        records = db.execute(select(ProviderBar.chart_time, ProviderBar.payload).where(*predicate)
+                             .order_by(ProviderBar.chart_time.desc()).limit(limit)).all()
+        rows = [r.payload for r in reversed(records)]
+        if not planning:
+            available = len(rows)
+        boundary = bool(readable and metadata.earliest and readable[0] == 0 and available <= count + (prefix if planning else 0))
         window = metadata.metadata_json.get("history_window") or {}
         window_limit = bool(window.get("retry_at", 0) > now_ms() and
                             (before <= window.get("left", 0) or readable and readable[0] <= window.get("left", 0)))
-        # Access is housekeeping, not part of the published observation version.
-        # Housekeeping skips a busy dataset row instead of blocking delivery.
-        touched = select(ProviderDataset.id).where(ProviderDataset.id == key)
-        if db.get_bind().dialect.name == "postgresql":
-            touched = touched.with_for_update(skip_locked=True)
-        db.execute(update(ProviderDataset).where(ProviderDataset.id.in_(touched))
-                   .values(accessed_at=now_ms()))
+        changed = False
+        if observation is not None:
+            changed = bool(db.scalar(select(exists(select(ProviderBar.start).where(
+                ProviderBar.dataset_id == key,
+                ProviderBar.chart_time >= observation.first,
+                ProviderBar.chart_time <= observation.last,
+                ProviderBar.revision > 1,
+                ProviderBar.changed_at > observation.observed_at,
+            )))) or metadata.metadata_json.get("invalidated_at", 0) > observation.observed_at)
+        # Optional access bookkeeping must not abort a published snapshot after
+        # a concurrent revision. A savepoint contains serialization conflicts.
+        try:
+            with db.begin_nested():
+                touched = select(ProviderDataset.id).where(ProviderDataset.id == key)
+                if db.get_bind().dialect.name == "postgresql":
+                    touched = touched.with_for_update(skip_locked=True)
+                db.execute(update(ProviderDataset).where(ProviderDataset.id.in_(touched))
+                           .values(accessed_at=now_ms()))
+        except DBAPIError as error:
+            if getattr(error.orig, "sqlstate", None) != "40001":
+                raise
         yield db, {
             **volume_metadata(metadata.source, metadata.symbol),
             **({k: metadata.metadata_json.get(k) for k in
                 ("source", "symbol", "adjustment", "price_description", "volume_kind", "volume_unit")}
                if metadata.source == "yahoo" else {}),
-            "window_limit": window_limit,
-            "history_window": window or None,
+            "window_limit": window_limit, "history_window": window or None,
             "availability": "window_limit" if window_limit else "available",
-            "bars": rows[-count:],
-            "history_boundary": boundary,
-            "has_more": not (boundary or window_limit),
-            "as_of": metadata.updated_at,
-            "latest_at": metadata.latest_at,
-            "cache_revision": metadata.revision,
-            "interval": interval,
-            "preceding": preceding,
-            "satisfied": bool(interval and (len(rows) >= count or boundary or window_limit) or window_limit and not rows),
-            **({"history_revalidation": {"changed": bool(metadata.changed or metadata.metadata_json.get("invalidated_at", 0) > observation.observed_at)}}
-               if observation is not None else {}),
+            "bars": rows if planning else rows[-count:],
+            "available_count": available, "range_count": in_range,
+            "history_boundary": boundary, "has_more": not (boundary or window_limit),
+            "as_of": metadata.updated_at, "latest_at": metadata.latest_at,
+            "cache_revision": metadata.revision, "interval": interval, "preceding": preceding,
+            "satisfied": bool(interval and (available >= count or boundary or window_limit) or window_limit and not rows),
+            **({"history_revalidation": {"changed": changed}} if observation is not None else {}),
         }
 
 
@@ -537,11 +546,11 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             raise TimeoutError("平台读取超过时间预算，请重试")
         # One bounded statement discovers the real range demand, prefix and E.
         # No metadata from another observation is attached to these bars.
-        with snapshot_transaction(key, before, CAPACITY + 1,
-                                  observation=body.history_observation,
-                                  bounded_limit=CAPACITY + 1) as (db, state):
+        with snapshot_transaction(key, before, count,
+                                  observation=body.history_observation, native_from=from_time,
+                                  prefix=prefix, reserve=3000, planning=True) as (db, state):
             bars = state["bars"]
-            in_range = sum(b["chart_time"] >= from_time for b in bars) if from_time is not None else 0
+            in_range = state["range_count"]
             demand = max(count, in_range)
             if demand + prefix > CAPACITY:
                 raise CapacityExceeded("原生历史必需数量及计算前缀超过20000根")
@@ -552,7 +561,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             range_done = from_time is None or state["window_limit"] or bool(readable and readable[0] <= from_time)
             boundary = state["history_boundary"] or state["window_limit"]
             mandatory_done = bool(readable and range_done and
-                                  (len(bars) >= demand + prefix or boundary) or state["window_limit"] and not bars)
+                                  (state["available_count"] >= demand + prefix or boundary) or state["window_limit"] and not bars)
             fresh = not latest or now_ms() - state["latest_at"] < fresh_seconds(meta["source"]) * 1000
             if hot is None:
                 hot = mandatory_done and fresh
@@ -591,7 +600,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             attached = 0
         else:
             cursor = connected[0] if connected else before
-            missing = max(1, demand + prefix - (len(bars) if connected else 0))
+            missing = max(1, demand + prefix - (state["available_count"] if connected else 0))
             # Unknown range length is discovered with mandatory pages. When
             # count still needs a page, spare HTTP capacity may include E; it
             # never controls the next page's stopping condition.
@@ -703,5 +712,5 @@ def data(body):
             "has_more": len(page["bars"]) > len(visible) or page["has_more"],
             "history_boundary": len(page["bars"]) <= len(visible) and page["history_boundary"],
         }.items()
-        if k not in ("interval", "preceding", "satisfied")
+        if k not in ("interval", "preceding", "satisfied", "available_count", "range_count")
     }
