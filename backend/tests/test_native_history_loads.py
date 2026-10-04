@@ -113,7 +113,9 @@ def test_page_budget_allows_ready_at_exact_last_page(history, monkeypatch):
     assert loads.status('owner', ident)['pages'] == 8
 
 
-def test_independent_demands_get_fair_page_turns(history):
+def test_independent_demands_get_fair_page_turns(history, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda instrument:
+        {**META, 'symbol': 'OTHER', 'id': 'OTHER'} if instrument == 'OTHER' else META)
     one = loads.submit('one', 'long', body())['load']['id']
     other = body().model_copy(update={'instrument': 'OTHER'})
     two = loads.submit('two', 'short', other)['load']['id']
@@ -121,11 +123,14 @@ def test_independent_demands_get_fair_page_turns(history):
     loads.once()
     assert loads.status('one', one)['pages'] == 1
     assert loads.status('two', two)['pages'] == 1
+    assert cache.identity(META, 'M5') != cache.identity({**META, 'symbol': 'OTHER'}, 'M5')
 
 
-def test_successful_empty_pages_fail_after_bounded_no_progress(history, monkeypatch):
+@pytest.mark.parametrize('latest', [False, True])
+def test_successful_empty_pages_fail_after_bounded_no_progress(history, monkeypatch, latest):
     monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: {'bars': [], 'history_boundary': False})
-    ident = loads.submit('owner', 'empty-pages', body())['load']['id']
+    query = body().model_copy(update={'before': None}) if latest else body()
+    ident = loads.submit('owner', 'empty-pages', query)['load']['id']
     for _ in range(3):
         loads.once()
     state = loads.status('owner', ident)

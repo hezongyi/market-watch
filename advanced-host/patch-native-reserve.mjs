@@ -46,8 +46,16 @@ const previous = [
    'mwRequiredCount(e,t,i){const s=this._symbolInfo;return(0,ee.getPeriodsBetweenDates)(s.session,s.session_holidays,s.corrections,i.letter(),i.multiplier(),e*1e3,t*1e3)}mwDistance(e,t){return(0,te.extrapolateBarsFrontToTime)(this.barBuilder(),e*1e3,t*1e3,20000,!1).count}distance(e,t){if(!this.isValid())return{success:!1};'],
 ];
 // Continuous history keeps only cache delivery, lifetime and recoverable-error
-// hooks. No window identity, range interception, count extrapolation or anchor.
-const replacements = [previous[0],previous[1],previous[2],previous[3],previous[4],previous[5],previous[11],previous[15]];
+// hooks plus public navigation lifetime. No window identity or extrapolation.
+const continuousV1 = [previous[0],previous[1],previous[2],previous[3],previous[4],previous[5],previous[11],previous[15]];
+const continuousV2 = [...continuousV1, previous[12]];
+// The native engine binds _updateTimeScale during model construction, before
+// runtime bindModel runs. Hook the actual entry rather than that later property.
+const continuousV3 = [...continuousV2, ['_updateTimeScale(e){const{index:t,',
+  `_updateTimeScale(e){${navigation}?.timeScaleUpdated(this);const{index:t,`]];
+const replacements = [...continuousV2,
+  ['this.lightUpdate()}_getAvailableCurrencies(){',
+   `this.lightUpdate();${navigation}?.timeScaleUpdated(this)}_getAvailableCurrencies(){`]];
 const legacy = previous.slice(0,6).map(([before, after])=>[before,after]);
 legacy[0][1] = `class h{constructor(e,t){${runtime}?.bindModel(t);this._bars=[],this._invalidated=!0`;
 legacy[1][1] = `destroy(){${runtime}?.unbindModel(this);this._abortController.abort(),this.clearIntervals()`;
@@ -55,7 +63,7 @@ legacy[2][1] = `this._datafeed=e,this._symbolInfo=t,${runtime}?.bindThread(this,
 legacy[3][1] = `destroy(){${runtime}?.unbindThread(this);0!==this._subscribers.length&&this._logWarning`;
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [previous, replacements, legacy].find(candidate=>
+  const installed = [previous, replacements, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;

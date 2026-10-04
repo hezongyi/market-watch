@@ -89,6 +89,35 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   navigation.unbindThread(one);
   navigation.unbindThread(two);
   assert.equal(navigation.diagnostics().threads, 0);
+  // Pending asynchronous creations must be charged before studies appear in
+  // allStudies. Cancellation and rejection release the reservation.
+  const event = () => ({ subscribe() {}, unsubscribeAll() {} });
+  const studies = [], created = [];
+  const series = { symbol: () => "MWP:EURUSD", dataEvents: () => ({
+    completed: event, dataUpdated: event,
+  }), onIntervalChanged: event, symbolResolved: event };
+  const model = { mainSeries: () => series, interval: () => "5",
+    timeScale: () => ({ visibleBarsStrictRangeChanged: event }),
+    setExternalPosition() {}, _updateTimeScale() {}, allStudies: () => studies,
+    insertStudyWithParams() {
+      let resolve, reject;
+      const study = new Promise((ok, fail) => { resolve = ok; reject = fail; });
+      const handle = { study, cancel() {} };
+      created.push({ resolve: value => { studies.push(value); resolve(value); }, reject });
+      return handle;
+    },
+  };
+  const shared = thread(); shared._cache.bars = Array.from({length:80}, (_,time) => ({time}));
+  navigation.bindThread(shared, "5"); navigation.bindModel(model); await run();
+  const firstStudy = model.insertStudyWithParams({});
+  assert.throws(() => model.insertStudyWithParams({}), /预算/, "parallel insertion reserves cost");
+  firstStudy.cancel();
+  const nextStudy = model.insertStudyWithParams({});
+  created[1].reject(Error("study creation failed")); await run();
+  model.insertStudyWithParams({}); created[2].resolve({}); await run();
+  assert.throws(() => model.insertStudyWithParams({}), /预算/, "resolved study remains charged");
+  nextStudy.cancel();
+  navigation.unbindModel(model); navigation.unbindThread(shared);
   console.log(
     "Continuous navigation: concurrent admission, cancellation, stale callbacks, source purge and release passed",
   );

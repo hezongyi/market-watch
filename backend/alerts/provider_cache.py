@@ -282,6 +282,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
     if boundary:
         start = 0
     changed = []
+    useful_bars = False
     with budget_transaction() as db:
         dataset = db.scalar(
             select(ProviderDataset).where(ProviderDataset.id == key).with_for_update()
@@ -332,6 +333,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                 bar = {**bar, "volume": old.payload.get("volume"),
                        "volume_complete": old.payload.get("volume_complete", False)}
             revision = 1
+            useful_bars |= old is None or old.payload != bar
             if old:
                 revision = old.revision + (old.payload != bar)
                 if old.payload != bar:
@@ -384,7 +386,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
     progress = PAGE_PROGRESS.get()
     if progress is not None:
         progress["advanced"] = bool(dataset.coverage != original_coverage or
-                                    dataset.earliest != original_boundary or latest)
+                                    dataset.earliest != original_boundary or useful_bars)
     return changed
 
 

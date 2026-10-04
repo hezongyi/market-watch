@@ -15,7 +15,7 @@ from alerts import provider_cache as cache
 from alerts import provider_chart as upstream
 from alerts import storage
 from alerts.storage import ProviderBar, ProviderDataset
-from sqlalchemy import create_engine, func, inspect, select, text
+from sqlalchemy import create_engine, event, func, inspect, select, text
 from sqlalchemy.orm import sessionmaker
 from test_provider_cache import META, page
 
@@ -432,3 +432,32 @@ def test_concurrent_yahoo_catalog_initialization_is_idempotent(provider_pg, monk
     with factory.begin() as db:
         assert db.scalar(select(func.count()).select_from(MarketCatalog)) == len(ALIASES)
         assert db.get(MarketCatalog, first).metadata_json == {"verified": True}
+
+
+def test_small_native_demand_materializes_bounded_rows_in_large_pg_cache(provider_pg, monkeypatch):
+    from alerts.chart_api import DataQuery
+    from alerts.config import settings
+    _, engine = provider_pg
+    monkeypatch.setattr(settings, 'native_history_max_bars', 80000)
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    key = cache.ensure(META, 'M5')
+    for before in range(4000000, 60000001, 4000000):
+        lease = cache.claim(key)
+        cache.commit_page(key, lease, page(before - 4000000, before), before, cache.now_ms())
+        cache.release(key, lease)
+    # Capture the payload SELECT's explicit limit, not merely response size.
+    statements = []
+    def observe(conn, cursor, statement, parameters, context, executemany):
+        if 'provider_bars.payload' in statement:
+            statements.append((statement, parameters))
+    event.listen(engine, 'before_cursor_execute', observe)
+    try:
+        result = cache.data(DataQuery(instrument=META['id'], series_kind='provider',
+            timeframe='M5', before=60000000, countBack=20, limit=20,
+            native_history={'chart_count': 4}))
+    finally:
+        event.remove(engine, 'before_cursor_execute', observe)
+    assert result['cache_hit'] and result['mandatory_count'] == 20
+    assert len(result['bars']) < 4000
+    assert statements and all('LIMIT' in sql for sql, _ in statements)
+    assert all(p['param_1'] < 4000 for _, p in statements if 'param_1' in p)

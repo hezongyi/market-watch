@@ -164,6 +164,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             typeof ready !== "undefined" &&
             ready &&
             !loading &&
+            !historyReloading &&
             !rangeGuard.busy() &&
             !edgeGuard.busy() &&
             !MWNativeNavigation.busy() &&
@@ -171,7 +172,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
               widget.chart(i).dataReady(),
             ).every(Boolean),
           null,
-          { timeout: 900000 },
+          { timeout: 120000 },
         );
         await page.waitForTimeout(500);
       }
@@ -218,11 +219,13 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             .sort((a, b) => a.box.y - b.box.y || a.box.x - b.box.x),
         );
       }
-      async function box(index) {
+      async function box(index, publicChart = false) {
         const mm = await models(),
           ib = await native.frameElement().then((e) => e.boundingBox());
         assert.equal(mm.length, count);
-        const b = mm[index].box;
+        const id = publicChart ? await frame.evaluate(index =>
+          widget.chart(index)._chartWidget.model().model().id(), index) : null;
+        const b = (publicChart ? mm.find(m => m.id === id) : mm[index]).box;
         return {
           x: b.x + ib.x,
           y: b.y + ib.y,
@@ -261,6 +264,16 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
       }
       try {
         await page.addInitScript(() => {
+          globalThis.__historyPerf = { longTasks: [], maxFrameGap: 0 };
+          new PerformanceObserver(list => {
+            for (const entry of list.getEntries())
+              __historyPerf.longTasks.push({ start: entry.startTime, duration: entry.duration });
+          }).observe({ type: 'longtask', buffered: true });
+          let previous;
+          const tick = at => { if (previous) __historyPerf.maxFrameGap =
+            Math.max(__historyPerf.maxFrameGap, at - previous);
+            previous = at; requestAnimationFrame(tick); };
+          requestAnimationFrame(tick);
           globalThis.__productNotices = [];
           addEventListener("message", (e) => {
             if (e.data?.type === "error") __productNotices.push(e.data.error);
@@ -327,6 +340,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           x = b.x + sourceX,
           y = b.y + b.height * 0.45;
         await page.mouse.move(x, y);
+        const navigationStarted = Date.now();
         await page.mouse.down();
         await page.mouse.up();
         await frame.waitForFunction(
@@ -337,6 +351,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           { timeout: 900000 },
         );
         await settle();
+        item.clickToReadyMs = Date.now() - navigationStarted;
         await page.waitForTimeout(250);
         item.semanticBefore = await frame.evaluate(() =>
           MWNativeNavigation.diagnostics(),
@@ -395,6 +410,8 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
         }
         await page.waitForTimeout(10000);
         item.afterHover = await snapshot();
+        item.performance = await native.evaluate(() => ({ ...__historyPerf,
+          heap: performance.memory?.usedJSHeapSize }));
         item.hoverRequests = item.http.slice(beforeHover);
         assert.ok(
           item.hoverRequests.every(
@@ -434,7 +451,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           },m5);
           await settle();await page.waitForTimeout(3000);
           item.studies=await snapshot();assert.ok(item.studies.charts[m5].studies.length>=4);
-          phase='held-drag';const held=await box(m5),beforeHeld=await snapshot();
+          phase='held-drag';const held=await box(m5,true),beforeHeld=await snapshot();
           await page.mouse.move(held.x+held.width*.7,held.y+held.height*.5);await page.mouse.down();
           await page.mouse.move(held.x+held.width*.2,held.y+held.height*.5,{steps:20});await page.waitForTimeout(200);
           item.held=await snapshot();await page.mouse.up();await settle();
@@ -444,7 +461,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           const rangeBefore=await snapshot();
           if(process.env.NATIVE_REVISION_SCRIPT) {
             const at=Math.floor((rangeBefore.charts[m5].range.from+rangeBefore.charts[m5].range.to)*500);
-            execFileSync('sg',['docker','-c',`docker compose -f /home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml exec -T api python /private/revise.py ${at}`]);
+            execFileSync('sg',['docker','-c',`docker compose -f /home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml exec -T --user 0 api python /private/revise.py ${at}`]);
             await frame.waitForFunction(()=>__resetCount>0,null,{timeout:60000});await settle();
             item.revised=await snapshot();item.resetCount=await frame.evaluate(()=>__resetCount);
             assert.ok(Math.abs(item.revised.charts[m5].range.from-rangeBefore.charts[m5].range.from)<600,'real revision must restore history view');
@@ -462,6 +479,10 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
         item.failure = String(error);
         item.stack = error.stack;
         if (frame) item.failedSnapshot = await snapshot().catch(() => null);
+        if (frame) item.lifecycle = await frame.evaluate(() => ({historyReloading,
+          navigation: MWNativeNavigation.diagnostics(),
+          work: [...providerHistoryWork.values()].map(w=>({symbol:w.symbol,res:w.res,
+            inflight:w.inflight,reloading:w.reloading}))})).catch(()=>null);
         if (frame)
           item.notices = await frame
             .evaluate(() => activeNotices)
