@@ -23,19 +23,19 @@ const MWNativeNavigation = (() => {
   function peers(thread) {
     return [...models].filter(([m]) => modelKey(m) === thread.mw_key);
   }
-  function weight(thread) {
+  function weight(thread, projection) {
     const viewers = peers(thread);
     // Native time points/studies are per pane even with a shared provider cache.
     return Math.max(
       1,
       viewers.reduce(
         (sum, [m, s]) => sum + 1 + 0.5 *
-          ((m.allStudies?.(false).length || 0) + (s.pendingStudies?.size || 0)),
+          ((projection?.model === m ? projection.studies : m.allStudies?.(false).length || 0) + (s.pendingStudies?.size || 0)),
         0,
       ),
     );
   }
-  function admit(thread, amount) {
+  function admit(thread, amount, projection) {
     if (!Number.isSafeInteger(amount) || amount < 0)
       throw Error("无效历史预算");
     const own = (thread._cache?.bars.length || 0) + amount;
@@ -44,7 +44,7 @@ const MWNativeNavigation = (() => {
         sum +
         ((t._cache?.bars.length || 0) +
           (t === thread ? amount : reservations.get(t) || 0)) *
-          weight(t),
+          weight(t, projection),
       0,
     );
     if (own > limits.max_bars || total > limits.workspace_bars)
@@ -268,6 +268,22 @@ const MWNativeNavigation = (() => {
           state.cursor = null;
           state.cursorVersion++;
         }
+    },
+    admitTemplate(model, template) {
+      const thread = threads.get(modelKey(model));
+      if (!thread) return;
+      // Templates restore pane sources directly, bypassing study insertion.
+      // Check the whole replacement before native undo/history mutates panes.
+      const restored = (template.panes || []).reduce((count, pane) => count +
+        (pane.sources || []).filter(source => typeof source.type === 'string' &&
+          source.type.toLowerCase().startsWith('study')).length, 0);
+      const retained = (model.allStudies?.(false) || []).filter(study =>
+        study.isRemovedByStudyTemplates?.() === false).length;
+      try { admit(thread, reservations.get(thread) || 0, {model, studies: restored + retained}); }
+      catch (error) {
+        globalThis.dispatchEvent(new CustomEvent('mw-navigation-error', {detail:error}));
+        throw error;
+      }
     },
     bindModel(m) {
       if (models.has(m)) return;

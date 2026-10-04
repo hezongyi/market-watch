@@ -116,6 +116,10 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   created[1].reject(Error("study creation failed")); await run();
   model.insertStudyWithParams({}); created[2].resolve({}); await run();
   assert.throws(() => model.insertStudyWithParams({}), /预算/, "resolved study remains charged");
+  assert.doesNotThrow(()=>navigation.admitTemplate(model,{panes:[{sources:[
+    {type:'MainSeries'},{type:'LineToolHorzLine'},{type:'Study'}]}]}));
+  assert.throws(()=>navigation.admitTemplate(model,{panes:[{sources:[
+    {type:'Study'},{type:'Study'}]}]}),/预算/,'template replacement is admitted before pane mutation');
   nextStudy.cancel();
   let finishOld;
   let engineCurrent;

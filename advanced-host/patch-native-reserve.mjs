@@ -61,11 +61,14 @@ const continuousV5 = [...continuousV4,
    'setVisibleTimeRange(e,t,i,s,r,o,a,l,c,h){const mwVersions=this._mwRangeVersions??=(new Map),mwVersion=(mwVersions.get(e)||0)+1;mwVersions.set(e,mwVersion);let d=s,'],
   ['const p=()=>{const s=this._studyEngine.sessionTimeScale(e);',
    'const p=()=>{if(mwVersions.get(e)!==mwVersion)return;const s=this._studyEngine.sessionTimeScale(e);']];
-const replacements = [...continuousV4,
+const continuousV6 = [...continuousV4,
   ['setVisibleTimeRange(e,t,i,s,r,o,a,l,c,h){let d=s,',
    `setVisibleTimeRange(e,t,i,s,r,o,a,l,c,h){const mwCurrent=${navigation}?.engineRangeCurrent()||(()=>true),mwVersions=this._mwRangeVersions??=(new Map),mwVersion=(mwVersions.get(e)||0)+1;mwVersions.set(e,mwVersion);let d=s,`],
   ['const p=()=>{const s=this._studyEngine.sessionTimeScale(e);',
    'const p=()=>{if(!mwCurrent()||mwVersions.get(e)!==mwVersion)return;const s=this._studyEngine.sessionTimeScale(e);']];
+const replacements = [...continuousV6,
+  ['applyStudyTemplate(e,t,i){const s=new xl(this._model(),e,t,i);',
+   `applyStudyTemplate(e,t,i){${navigation}?.admitTemplate(this._model(),e);const s=new xl(this._model(),e,t,i);`]];
 const legacy = previous.slice(0,6).map(([before, after])=>[before,after]);
 legacy[0][1] = `class h{constructor(e,t){${runtime}?.bindModel(t);this._bars=[],this._invalidated=!0`;
 legacy[1][1] = `destroy(){${runtime}?.unbindModel(this);this._abortController.abort(),this.clearIntervals()`;
@@ -73,7 +76,7 @@ legacy[2][1] = `this._datafeed=e,this._symbolInfo=t,${runtime}?.bindThread(this,
 legacy[3][1] = `destroy(){${runtime}?.unbindThread(this);0!==this._subscribers.length&&this._logWarning`;
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [previous, replacements, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
+  const installed = [previous, replacements, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;
