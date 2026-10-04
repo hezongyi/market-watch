@@ -318,7 +318,6 @@ const MWNativeNavigation = (() => {
     bindModel(m) {
       if (models.has(m)) return;
       const state = {
-        identity: modelKey(m),
         generation: 0,
         cursorVersion: 0,
         phase: "idle",
@@ -328,6 +327,7 @@ const MWNativeNavigation = (() => {
       models.set(m, state);
       requestAnimationFrame(() => {
         if (models.get(m) !== state) return;
+        state.identity = modelKey(m);
         state.external = m.setExternalPosition;
         m.setExternalPosition = function (point, environment) {
           state.cursorVersion++;
