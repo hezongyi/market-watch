@@ -1,6 +1,6 @@
 # 原生连续历史加载实施方案
 
-日期：2026-10-04。状态：待实施方案。本文件形成技术路线、任务拆分和验收合同，不表示已实现或获得生产发布授权。
+日期：2026-10-04；实施状态更新于 2026-10-05：P1～P4 已形成 Ubuntu 隔离候选，P5 自动验收证据已归档，原用户人工验收待反馈。详见 [逐项审计](native-history-completion-audit.md) 与 [验收交付](native-history-acceptance.md)。本文件保留技术路线和验收合同，未获得生产发布授权。
 
 依据：[独立复评](native-history-decision-reassessment.md)、[性能证据](native-large-history-analysis.md)、[官方合同核查](native-large-history-official-research.md)。原问题规格中的静止光标、失败恢复、交易日历、指标、布局保持要求继续有效；其中“远跳默认有限窗口”的技术路线由本方案替代。
 

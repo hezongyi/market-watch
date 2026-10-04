@@ -10,6 +10,7 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
     Error,
     Number,
     Math,
+    performance: { now: () => Date.now() },
     queueMicrotask,
     setTimeout,
     clearTimeout,
@@ -92,65 +93,209 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   // Pending asynchronous creations must be charged before studies appear in
   // allStudies. Cancellation and rejection release the reservation.
   const event = () => ({ subscribe() {}, unsubscribeAll() {} });
-  const studies = [], created = [];
-  const series = { symbol: () => "MWP:EURUSD", dataEvents: () => ({
-    completed: event, dataUpdated: event,
-  }), onIntervalChanged: event, symbolResolved: event };
-  const model = { mainSeries: () => series, interval: () => "5",
+  const studies = [],
+    created = [];
+  const series = {
+    symbol: () => "MWP:EURUSD",
+    dataEvents: () => ({
+      completed: event,
+      dataUpdated: event,
+    }),
+    onIntervalChanged: event,
+    symbolResolved: event,
+  };
+  let externalCalls = 0;
+  const model = {
+    mainSeries: () => series,
+    interval: () => "5",
+    crosshairSource: () => ({
+      isOnHoveredChartWidget: () => false,
+      appliedIndex: () => 0,
+    }),
     timeScale: () => ({ visibleBarsStrictRangeChanged: event }),
-    setExternalPosition() {}, _updateTimeScale() {}, allStudies: () => studies,
+    setExternalPosition() {
+      externalCalls++;
+    },
+    _updateTimeScale() {},
+    allStudies: () => studies,
     insertStudyWithParams() {
       let resolve, reject;
-      const study = new Promise((ok, fail) => { resolve = ok; reject = fail; });
+      const study = new Promise((ok, fail) => {
+        resolve = ok;
+        reject = fail;
+      });
       const handle = { study, cancel() {} };
-      created.push({ resolve: value => { studies.push(value); resolve(value); }, reject });
+      created.push({
+        resolve: (value) => {
+          studies.push(value);
+          resolve(value);
+        },
+        reject,
+      });
       return handle;
     },
   };
-  const shared = thread(); shared._cache.bars = Array.from({length:80}, (_,time) => ({time}));
-  navigation.bindThread(shared, "5"); navigation.bindModel(model); await run();
+  const shared = thread();
+  shared._cache.bars = Array.from({ length: 80 }, (_, time) => ({ time }));
+  navigation.bindThread(shared, "5");
+  navigation.bindModel(model);
+  await run();
   const firstStudy = model.insertStudyWithParams({});
-  assert.throws(() => model.insertStudyWithParams({}), /预算/, "parallel insertion reserves cost");
+  assert.throws(
+    () => model.insertStudyWithParams({}),
+    /预算/,
+    "parallel insertion reserves cost",
+  );
   firstStudy.cancel();
   const nextStudy = model.insertStudyWithParams({});
-  created[1].reject(Error("study creation failed")); await run();
-  model.insertStudyWithParams({}); created[2].resolve({}); await run();
-  assert.throws(() => model.insertStudyWithParams({}), /预算/, "resolved study remains charged");
-  assert.doesNotThrow(()=>navigation.admitTemplate(model,{panes:[{sources:[
-    {type:'MainSeries'},{type:'LineToolHorzLine'},{type:'Study'}]}]}));
-  assert.throws(()=>navigation.admitTemplate(model,{panes:[{sources:[
-    {type:'Study'},{type:'Study'}]}]}),/预算/,'template replacement is admitted before pane mutation');
-  const light={panes:[{sources:[{type:'Study'}]}]},heavy={panes:[{sources:[{type:'Study'},{type:'Study'}]}]};
-  const templateCommand={_model:model,_initialState:heavy,_templateContent:light};
-  assert.doesNotThrow(()=>navigation.admitHistory(templateCommand,'redo'));
-  assert.throws(()=>navigation.admitHistory({commands:()=>[templateCommand]},'undo'),/预算/,
-    'nested macro preflight rejects before native history pops or runs commands');
-  shared._cache.bars=shared._cache.bars.slice(0,40);studies.length=0;
-  const peerModel={...model,mainSeries:()=>({...series,symbol:()=> 'MWP:GBPUSD'}),allStudies:()=>[]};
-  const peerThread=thread();peerThread._symbolInfo.ticker='MWP:GBPUSD';
-  peerThread._cache.bars=Array.from({length:40},(_,time)=>({time}));
-  navigation.bindThread(peerThread,'5');navigation.bindModel(peerModel);await run();
-  const peerCommand={_model:peerModel,_initialState:heavy,_templateContent:light};
-  assert.doesNotThrow(()=>navigation.admitHistory(templateCommand,'undo'));
-  assert.doesNotThrow(()=>navigation.admitHistory(peerCommand,'undo'));
-  assert.throws(()=>navigation.admitHistory({commands:()=>[templateCommand,peerCommand]},'undo'),/预算/,
-    'macro admission accumulates projected costs across charts before popping');
-  assert.throws(()=>navigation.admitCheckpoint({_commands:[templateCommand,peerCommand]},{}),/预算/,
-    'checkpoint preflight accumulates costs before its first mutation');
-  assert.doesNotThrow(()=>navigation.admitCheckpoint({_commands:[templateCommand,peerCommand]},
-    {lastActualCommand:templateCommand}));
-  navigation.unbindModel(peerModel);navigation.unbindThread(peerThread);
+  created[1].reject(Error("study creation failed"));
+  await run();
+  model.insertStudyWithParams({});
+  created[2].resolve({});
+  await run();
+  assert.throws(
+    () => model.insertStudyWithParams({}),
+    /预算/,
+    "resolved study remains charged",
+  );
+  assert.doesNotThrow(() =>
+    navigation.admitTemplate(model, {
+      panes: [
+        {
+          sources: [
+            { type: "MainSeries" },
+            { type: "LineToolHorzLine" },
+            { type: "Study" },
+          ],
+        },
+      ],
+    }),
+  );
+  assert.throws(
+    () =>
+      navigation.admitTemplate(model, {
+        panes: [{ sources: [{ type: "Study" }, { type: "Study" }] }],
+      }),
+    /预算/,
+    "template replacement is admitted before pane mutation",
+  );
+  const light = { panes: [{ sources: [{ type: "Study" }] }] },
+    heavy = { panes: [{ sources: [{ type: "Study" }, { type: "Study" }] }] };
+  const templateCommand = {
+    _model: model,
+    _initialState: heavy,
+    _templateContent: light,
+  };
+  assert.doesNotThrow(() => navigation.admitHistory(templateCommand, "redo"));
+  assert.throws(
+    () =>
+      navigation.admitHistory({ commands: () => [templateCommand] }, "undo"),
+    /预算/,
+    "nested macro preflight rejects before native history pops or runs commands",
+  );
+  shared._cache.bars = shared._cache.bars.slice(0, 40);
+  studies.length = 0;
+  const peerModel = {
+    ...model,
+    mainSeries: () => ({ ...series, symbol: () => "MWP:GBPUSD" }),
+    allStudies: () => [],
+  };
+  const peerThread = thread();
+  peerThread._symbolInfo.ticker = "MWP:GBPUSD";
+  peerThread._cache.bars = Array.from({ length: 40 }, (_, time) => ({ time }));
+  navigation.bindThread(peerThread, "5");
+  navigation.bindModel(peerModel);
+  await run();
+  const peerCommand = {
+    _model: peerModel,
+    _initialState: heavy,
+    _templateContent: light,
+  };
+  assert.doesNotThrow(() => navigation.admitHistory(templateCommand, "undo"));
+  assert.doesNotThrow(() => navigation.admitHistory(peerCommand, "undo"));
+  assert.throws(
+    () =>
+      navigation.admitHistory(
+        { commands: () => [templateCommand, peerCommand] },
+        "undo",
+      ),
+    /预算/,
+    "macro admission accumulates projected costs across charts before popping",
+  );
+  assert.throws(
+    () =>
+      navigation.admitCheckpoint(
+        { _commands: [templateCommand, peerCommand] },
+        {},
+      ),
+    /预算/,
+    "checkpoint preflight accumulates costs before its first mutation",
+  );
+  assert.doesNotThrow(() =>
+    navigation.admitCheckpoint(
+      { _commands: [templateCommand, peerCommand] },
+      { lastActualCommand: templateCommand },
+    ),
+  );
+  navigation.unbindModel(peerModel);
+  navigation.unbindThread(peerThread);
   nextStudy.cancel();
   let finishOld;
   let engineCurrent;
-  const oldRange = navigation.prepareRange(model, {}, () =>
-    new Promise(resolve => { finishOld = resolve; engineCurrent = navigation.engineRangeCurrent(); })).then(() => 'completed', e => e.code);
+  const oldRange = navigation
+    .prepareRange(
+      model,
+      {},
+      () =>
+        new Promise((resolve) => {
+          finishOld = resolve;
+          engineCurrent = navigation.engineRangeCurrent();
+        }),
+    )
+    .then(
+      () => "completed",
+      (e) => e.code,
+    );
   assert.ok(engineCurrent());
-  assert.equal(await navigation.prepareRange(model, {}, () => Promise.resolve('new')), 'new');
-  assert.equal(await oldRange, 'HISTORY_CANCELLED', 'public promise finishes at supersession');
-  assert.equal(engineCurrent(), false, 'engine range application observes model generation');
-  finishOld('late'); await run();
-  navigation.unbindModel(model); navigation.unbindThread(shared);
+  assert.equal(
+    await navigation.prepareRange(model, {}, () => Promise.resolve("new")),
+    "new",
+  );
+  assert.equal(
+    await oldRange,
+    "HISTORY_CANCELLED",
+    "public promise finishes at supersession",
+  );
+  assert.equal(
+    engineCurrent(),
+    false,
+    "engine range application observes model generation",
+  );
+  finishOld("late");
+  await run();
+  model.setExternalPosition({ timeStamp: 10 }, {});
+  navigation.timeScaleUpdated(model);
+  model.setExternalPosition(null);
+  const clearedCalls = externalCalls;
+  await run();
+  await run();
+  assert.equal(
+    externalCalls,
+    clearedCalls,
+    "cleared semantic cursor cannot replay after time-scale work",
+  );
+  model.setExternalPosition({ timeStamp: 20 }, {});
+  navigation.timeScaleUpdated(model);
+  navigation.unbindModel(model);
+  navigation.unbindThread(shared);
+  const destroyedCalls = externalCalls;
+  await run();
+  await run();
+  assert.equal(
+    externalCalls,
+    destroyedCalls,
+    "destroyed source cannot replay queued cursor",
+  );
   console.log(
     "Continuous navigation: concurrent admission, cancellation, stale callbacks, source purge and release passed",
   );

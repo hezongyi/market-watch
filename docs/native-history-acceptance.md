@@ -1,6 +1,6 @@
 # 原生连续历史候选验收
 
-2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，产品提交 `415ae61`（API/web 构建 `b3dd20c`）。人工验收待完成，未合并或发布生产。
+2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，最终产品提交 `a2f9004`（API/web 构建 `b3dd20c`）。人工验收待完成，未合并或发布生产。新增核验见 [逐项审计](native-history-completion-audit.md)。
 
 ## 访问与运行
 
@@ -32,7 +32,7 @@ sg docker -c 'docker compose -f /home/quant/repos/.acceptance/native-history-imp
 | --- | --- |
 | `mw-native-history-api:b3dd20c` | `1696faa96a669be6f980d2ced2490f58feecb7f8d2de0777c62e5ac7f541da17` |
 | `mw-native-history-web:b3dd20c` | `2ea7e5140b90042e5adc5d0dd175cde232a56d4a95b069f670dbaa96df71a570` |
-| `mw-native-history-chart:415ae61` | `b55bf1e751185f655dd969cce1e3bc1d03724fe7b217a4b77c9ba41433bf5d03` |
+| `mw-native-history-chart:a2f9004` | `28f02be37049bb71848b7393c63df901966b14e8c5a56afea9f73b322c5a51b2` |
 
 web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完整组合通过验收。原生 v31.1 补丁仍固定原始 SHA、唯一锚点和幂等检查；修改库后生成内容版本路径，旧 URL 与本候选不同。
 
@@ -53,7 +53,7 @@ web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完�
 
 完整四图验证：静止光标到 M5 正确、hover 不触发大走廊重建、busy/503 后下一操作恢复、旧公开范围导航取消、MA200/RSI/MACD/Python SMA200、画线、按住拖动、真实 PG 更正经 SSE/review 后一次重载、原生回调具体更正价格、历史视区与柱宽保留、保存重开指标/画线/视区保留。范围外更新及复核失败重试另有模块回归，不能扩大为所有供应商均完成产品验收。
 
-后端 provider/task/Yahoo/chart/真实 PG 回归 164 passed；前端构建、原生 hook、导航、观察核实、历史 reset、视区测试通过。Standards/Spec 复核无新增阻断项。尚未覆盖：长时间全进程泄漏压力、所有 Binance/Yahoo/DST 组合、指标模板批量加载、低性能客户端最大负载。80,000 是本候选工程预算，不是所有这些组合的 SLA。
+后端 provider/task/Yahoo/chart/真实 PG 回归 164 passed；前端构建、原生 hook、导航、观察核实、历史 reset、视区测试通过。Standards/Spec 复核至 `a2f9004` 无新增阻断项。补充验证了指标模板恢复、输入修改、真实计算前缀更正、共享取消、6 轮 2/4/8 布局资源压力、实际浏览器内容版本缓存更新及 OANDA/Binance/Yahoo 的部分高周期日历。未把几分钟受控压力扩大成全天无泄漏、所有商品组合或低性能客户端最大负载保证。80,000 是本候选工程预算，不是所有组合的 SLA。
 
 原始证据在 [2/4/8 图](verification/native-history/final-2-4-8.json)、[最终完整四图](verification/native-history/final-navigation-latest.json)、[冷任务](verification/native-history/cold-task-evidence.txt) 、[最终 2/8 图](verification/native-history/final-415ae61-2-8.json) 和 [hot profile](verification/native-history/hot-profile.txt)。私有目录保存失败轮次及截图，避免覆盖不通过记录。
 
@@ -67,3 +67,9 @@ web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完�
 停止本项目即可结束验收；保留 PG volume 与旧 `16143/16144` 有限窗口比较实例。旧窗口候选未完整验收，不是生产回退。需要更换整套构建时先停止本项目 worker/消费者，再恢复匹配前后端及配置并重新打开 widget；不在运行图表中热切数据模式。不删除缓存，不触碰 `16243/16244` 其他项目或 Unraid。
 
 最终 `415ae61` 组合另外通过严格范围覆盖与“加载中回最新”：旧公开 Promise 明确 `HISTORY_CANCELLED`，旧 Qf 应用按模型代次失效，延迟结果未改变最新视区；完整四图以及最终 2/8 图均无 JS 错误。
+
+`a2f9004` 完整四图再次通过上述导航、故障、指标、价格及前缀修订、保存重开链路。该次热 PG 点击至就绪 6.69 秒；同 widget 已加载区间公开范围定位约 2 毫秒，没有后端历史读取（就绪检查另含约 0.5 秒测试等待）。独立空 PG 的完整产品首次四图加载约 44.27 秒，基于 `415ae61` 同一连续加载链路；不是后端冷任务耗时替代产品计时。
+
+模板恢复曾绕过单指标插入准入，本轮已修复：首次应用、撤销、重做及 checkpoint 在修改前重新检查，宏命令累计各图预算。超额模板保持原图与指标；拒绝撤销保留原生 undo/redo 栈，之后仍可正常操作。真实浏览器、嵌套宏与双图组合模块回归分别归档，未把单图浏览器证据扩大为全部宏的产品矩阵。
+
+冷产品验证额外项目 `mw-native-history-cold-product-20261005` 使用独立 PG volume 和 `16553/16554` 端口，完成后已停止、保留缓存；不作为人工验收入口。私有配置位于 `/home/quant/repos/.acceptance/native-history-cold-product-20261005/compose.yaml`，可按前述 `up -d` / `stop` 命令替换路径复跑。现有 `16343/16344` 验收项目继续运行。
