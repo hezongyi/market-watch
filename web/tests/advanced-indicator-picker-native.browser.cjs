@@ -87,6 +87,14 @@ const OUT =
     await py.getByRole("button", { name: /添加/ }).click();
     await py.getByRole("button", { name: /添加/ }).click();
     await dialog
+      .getByRole("button", { name: "设置刚添加的指标", exact: true })
+      .click();
+    await dialog.waitFor({ state: "hidden" });
+    await ui.locator('[data-name="indicator-properties-dialog"]').waitFor();
+    await page.evaluate(() => widget.closePopupsAndDialogs());
+    await dialog.waitFor();
+    assert.equal(await query.inputValue(), "SMA");
+    await dialog
       .getByRole("button", { name: "当前图表已添加", exact: true })
       .click();
     assert.equal(await dialog.locator("[data-instance-id]").count(), 2);
@@ -290,6 +298,7 @@ const OUT =
             "continuous duplicate additions",
             "instance visibility/removal",
             "native properties return with query",
+            "direct settings after addition",
             "category empty results",
             "Light/Dark",
             "375px category select and no overflow",

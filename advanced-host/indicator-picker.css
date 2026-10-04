@@ -218,3 +218,10 @@
     width: 100%;
   }
 }
+
+.mw-indicator-picker footer {
+  flex-wrap: wrap;
+}
+.mw-indicator-picker footer [role="status"] {
+  flex: 1 1 200px;
+}

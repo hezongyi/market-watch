@@ -92,7 +92,8 @@ function chartIndicatorPicker(chartWidget, catalog, report) {
   let category = "all",
     disposed = false,
     lastFocus,
-    pointerButton;
+    pointerButton,
+    latestAdded;
   const rememberPointer = (event) => {
     if (!dialog.open && !suspended)
       pointerButton = event.target.closest("button, [role=button]");
@@ -130,6 +131,19 @@ function chartIndicatorPicker(chartWidget, catalog, report) {
     };
     return node;
   };
+  const latestSettings = action("设置刚添加的指标", () => {
+    if (!latestAdded) return;
+    const { chart, id } = latestAdded;
+    if (!chart.getAllStudies().some((study) => study.id === id)) {
+      latestAdded = undefined;
+      latestSettings.hidden = true;
+      status.textContent = "该指标已移除";
+      return;
+    }
+    nativeDialog(() => chart.showPropertiesDialog(id));
+  });
+  latestSettings.hidden = true;
+  dialog.querySelector("footer [data-close]").before(latestSettings);
   function theme() {
     dialog.dataset.theme = chartWidget.getTheme().toLowerCase();
   }
@@ -344,6 +358,8 @@ function chartIndicatorPicker(chartWidget, catalog, report) {
             const id = await chart.createStudy(entry.name, false, false);
             if (disposed) return;
             if (id === null) throw Error("指标未添加，请检查图表提示");
+            latestAdded = { chart, id };
+            latestSettings.hidden = false;
             status.textContent = `已添加 ${entry.label}（${entry.source}）`;
           },
           `添加 ${entry.label}（${entry.source}）`,
