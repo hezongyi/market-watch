@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {readFileSync, writeFileSync} from 'node:fs';
 
-const files = ['series.js', 'indicators.js', 'preferences.js', 'chart-style.js', 'chart-autosave.js',
+const files = ['series.js', 'indicators.js', 'indicator-picker.js', 'preferences.js', 'chart-style.js', 'chart-autosave.js',
   'workspaces.js', 'watchlists.js', 'range-sync.js', 'viewports.js',
   'progressive-history.js', 'history-demand.js', 'native-reserve.js', 'chart-account.js', 'chart-menu.js', 'bridge.js'];
 const source = `globalThis.MW_NATIVE_RESERVE_ENABLED=${process.env.NATIVE_RESERVE_ENABLED !== 'false'};\n` +

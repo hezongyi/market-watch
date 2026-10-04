@@ -8,7 +8,7 @@ const pending = new Map();
 // Use public native dialogs. The widget has no public non-modal toast API.
 // Keep acknowledged conditions deduplicated until the parent clears them.
 const acknowledgedNotices = new Set();
-let activeNotices = [], noticeDialogOpen = false, chartMenu;
+let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
@@ -1211,6 +1211,7 @@ function boot(
   progressivePages = undefined;
   managedSessions.clear();
   maintenanceAsked.clear();
+  indicatorPicker?.dispose();
   widget = new TradingView.widget({
     save_load_adapter: { ...prefs.templates, ...layouts },
     settings_adapter: prefs.settings,
@@ -1274,6 +1275,7 @@ function boot(
       "use_localstorage_for_settings",
       "open_account_manager",
       "create_volume_indicator_by_default",
+      "header_indicators",
       ...(readonly
         ? [
             "left_toolbar",
@@ -1320,6 +1322,8 @@ function boot(
     widget
       .headerReady()
       .then(async () => {
+        if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
+          send({type: "error", error: String(e)}));
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
           grid, [

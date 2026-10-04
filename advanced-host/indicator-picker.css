@@ -1,0 +1,220 @@
+.mw-indicator-picker {
+  --mw-surface: #fff;
+  --mw-text: #131722;
+  --mw-muted: #505562;
+  --mw-border: #d1d4dc;
+  --mw-hover: #f0f3fa;
+  --mw-accent: #2962ff;
+  width: min(880px, calc(100vw - 32px));
+  max-width: none;
+  height: min(660px, 80dvh);
+  max-height: 80dvh;
+  padding: 0;
+  border: 1px solid var(--mw-border);
+  border-radius: 8px;
+  color: var(--mw-text);
+  background: var(--mw-surface);
+  font:
+    14px/1.5 Arial,
+    sans-serif;
+  box-sizing: border-box;
+}
+.mw-indicator-picker[data-theme="dark"] {
+  --mw-surface: #131722;
+  --mw-text: #e0e3eb;
+  --mw-muted: #b2b5be;
+  --mw-border: #434651;
+  --mw-hover: #2a2e39;
+  --mw-accent: #90b2ff;
+}
+.mw-indicator-picker[open] {
+  display: flex;
+  flex-direction: column;
+}
+.mw-indicator-picker::backdrop {
+  background: rgb(0 0 0 / 50%);
+}
+.mw-indicator-picker header,
+.mw-indicator-picker footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+.mw-indicator-picker h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.mw-indicator-picker button,
+.mw-indicator-picker input,
+.mw-indicator-picker select {
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--mw-border);
+  border-radius: 4px;
+  background: var(--mw-surface);
+  box-sizing: border-box;
+}
+.mw-indicator-picker button {
+  min-height: 36px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.mw-indicator-picker button:hover,
+.mw-indicator-picker button[aria-current="true"] {
+  background: var(--mw-hover);
+}
+.mw-indicator-picker button[aria-current="true"] {
+  color: var(--mw-accent);
+  font-weight: bold;
+}
+.mw-indicator-picker button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.mw-indicator-picker :focus-visible {
+  outline: 2px solid var(--mw-accent);
+  outline-offset: 2px;
+}
+.mw-indicator-search {
+  padding: 0 20px 16px;
+}
+.mw-indicator-search label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--mw-muted);
+}
+.mw-indicator-search input {
+  width: 100%;
+  padding: 10px 12px;
+  min-height: 44px;
+}
+.mw-indicator-category {
+  display: none;
+  margin: 0 12px 12px;
+  min-height: 44px;
+  padding: 8px;
+}
+.mw-indicator-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  border-block: 1px solid var(--mw-border);
+}
+.mw-indicator-body nav {
+  flex: 0 0 168px;
+  padding: 12px 8px;
+  border-right: 1px solid var(--mw-border);
+}
+.mw-indicator-body nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  margin-bottom: 4px;
+}
+.mw-indicator-results {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 16px;
+}
+.mw-indicator-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--mw-border);
+}
+.mw-indicator-info {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.mw-indicator-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.mw-indicator-info small {
+  display: block;
+  color: var(--mw-muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.mw-indicator-badge {
+  font-size: 12px;
+  color: var(--mw-muted);
+}
+.mw-indicator-info details {
+  margin-top: 4px;
+  color: var(--mw-muted);
+  font-size: 12px;
+}
+.mw-indicator-info summary {
+  cursor: pointer;
+  width: fit-content;
+  min-height: 24px;
+}
+.mw-indicator-info p {
+  margin: 6px 0 0;
+}
+.mw-indicator-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mw-indicator-empty {
+  padding: 24px 0;
+}
+.mw-indicator-empty button {
+  margin-right: 8px;
+}
+.mw-indicator-picker footer [role="status"] {
+  color: var(--mw-muted);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .mw-indicator-picker {
+    width: calc(100vw - 16px);
+    height: 88dvh;
+    max-height: 88dvh;
+  }
+  .mw-indicator-picker header,
+  .mw-indicator-picker footer {
+    padding: 12px;
+  }
+  .mw-indicator-search {
+    padding: 0 12px 12px;
+  }
+  .mw-indicator-body {
+    flex-direction: column;
+  }
+  .mw-indicator-body nav {
+    display: none;
+  }
+  .mw-indicator-category {
+    display: block;
+  }
+  .mw-indicator-info summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .mw-indicator-picker button {
+    min-height: 44px;
+  }
+  .mw-indicator-results {
+    padding: 0 12px;
+  }
+  .mw-indicator-row {
+    flex-wrap: wrap;
+  }
+  .mw-indicator-actions {
+    width: 100%;
+  }
+}
