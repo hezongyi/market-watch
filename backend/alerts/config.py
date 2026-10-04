@@ -41,6 +41,12 @@ class Settings(BaseSettings):
     postgres_bin_dir: str = ""
     provider_request_seconds: float = Field(default=8, ge=1, le=30)
     provider_fresh_seconds: int = Field(default=15, ge=1, le=60)
+    native_history_max_bars: int = Field(default=20000, ge=20000, le=1000000)
+    native_history_workspace_bars: int = Field(default=80000, ge=20000, le=2000000)
+    native_history_response_bytes: int = Field(default=32 * 1024 * 1024, ge=1048576, le=268435456)
+    native_history_task_seconds: int = Field(default=600, ge=30, le=1800)
+    native_history_task_pages: int = Field(default=300, ge=8, le=2000)
+    native_history_tasks_per_owner: int = Field(default=8, ge=1, le=16)
     provider_native_history_buffer: bool = True
     provider_native_cold_extra_bars: int = Field(default=400, ge=0, le=600)
     provider_native_first_extra_bars: int = Field(default=2000, ge=0, le=3000)

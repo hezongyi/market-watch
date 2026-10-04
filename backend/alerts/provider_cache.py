@@ -22,7 +22,7 @@ from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import LANE, lane
 from .provider_capabilities import SOURCES, frames, fresh_seconds, page_capacity, versions
-from .provider_history_policy import CAPACITY, CapacityExceeded, optional_bars
+from .provider_history_policy import CapacityExceeded, capacity, optional_bars
 from .storage import ProviderBar, ProviderDataset, now_ms, transaction, uid
 from .volume import metadata as volume_metadata
 
@@ -30,6 +30,14 @@ _ACTIVE_LOCK = threading.Lock()
 _ACTIVE_READS = {source: 0 for source in SOURCES}
 CANCELLED = ContextVar("provider_request_cancelled", default=None)
 DEADLINE = ContextVar("provider_request_deadline", default=None)
+READ_MODE = ContextVar("provider_history_read_mode", default="normal")
+PAGE_PROGRESS = ContextVar("provider_history_page_progress", default=None)
+WORK_VALID = ContextVar("provider_history_work_valid", default=None)
+
+
+class HistoryPending(Exception):
+    """Coverage needs additional committed pages; never a history boundary."""
+
 log = logging.getLogger(__name__)
 
 
@@ -159,17 +167,17 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
         if planning:
             if native_from is not None:
                 ranged = select(ProviderBar.chart_time).where(*predicate,
-                    ProviderBar.chart_time >= native_from).limit(CAPACITY + 1).subquery()
+                    ProviderBar.chart_time >= native_from).limit(capacity() + 1).subquery()
                 in_range = db.scalar(select(func.count()).select_from(ranged))
             demand = max(count, in_range)
             times = select(ProviderBar.chart_time).where(*predicate).order_by(
-                ProviderBar.chart_time.desc()).limit(min(CAPACITY + 1, demand + prefix + reserve + 1)).subquery()
+                ProviderBar.chart_time.desc()).limit(min(capacity() + 1, demand + prefix + reserve + 1)).subquery()
             available = db.scalar(select(func.count()).select_from(times))
-            if demand + prefix > CAPACITY:
+            if demand + prefix > capacity():
                 raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
             range_done = native_from is None or bool(readable and readable[0] <= native_from)
             enough = available >= demand + prefix or bool(metadata.earliest and readable and readable[0] == 0)
-            limit = min(CAPACITY + 1, demand + prefix + reserve + 1) if range_done and enough else 1
+            limit = min(capacity() + 1, demand + prefix + reserve + 1) if range_done and enough else 1
         records = db.execute(select(ProviderBar.chart_time, ProviderBar.payload).where(*predicate)
                              .order_by(ProviderBar.chart_time.desc()).limit(limit)).all()
         rows = [r.payload for r in reversed(records)]
@@ -373,6 +381,14 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
 
 def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", latest=False,
                optional=0, revalidate=False):
+    progress = PAGE_PROGRESS.get()
+    if READ_MODE.get() == "cache" or READ_MODE.get() == "step" and progress and progress["attempts"] >= 1:
+        raise HistoryPending()
+    if progress is not None:
+        progress["attempts"] += 1
+    valid = WORK_VALID.get()
+    if valid is not None and not valid():
+        raise TimeoutError("历史任务租约或消费者已失效")
     lease_started = time.monotonic()
     while time.monotonic() < deadline:
         check_cancelled()
@@ -406,9 +422,14 @@ def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", lates
             page = upstream.native_page(meta, frame, before, count, deadline=deadline, **kwargs)
         if revalidate:
             page = {**page, "revalidation":True}
+        check_cancelled()
+        if valid is not None and not valid():
+            raise TimeoutError("历史任务租约或消费者已失效")
         commit_started = time.monotonic()
         commit_page(key, lease, page, before, observed_at, latest=latest)
         upstream.record_timing("database_commit", commit_started)
+        if progress is not None:
+            progress["pages"] += 1
         return page
     finally:
         release(key, lease)
@@ -502,6 +523,8 @@ def _observed_read(meta, frame, count, operation):
         attempts = timings.pop("candles_attempts", [])
         return {**result, "candles_http_attempts": attempts,
                 "timings_ms": {name: round(value, 2) for name, value in timings.items()}}
+    except HistoryPending:
+        raise
     except Exception as error:
         log.warning(
             "Provider read failed source=%s frame=%s count=%s type=%s status=%s elapsed_ms=%.2f timings_ms=%s",
@@ -530,17 +553,21 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
     """
     if body.timeframe not in frames(meta["source"]):
         raise ValueError("无效平台周期")
-    if count + prefix > CAPACITY:
-        raise CapacityExceeded("原生历史必需数量及计算前缀超过20000根")
+    if count + prefix > capacity():
+        raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
     if body.from_time is not None and body.from_time >= (body.before or before):
         raise ValueError("原生历史区间须满足from<to")
     from_time = body.from_time if body.from_time is not None and body.from_time < before else None
     deadline = DEADLINE.get() or time.monotonic() + settings.provider_request_seconds
     key = ensure(meta, body.timeframe)
-    revalidate_history(key, meta, body.timeframe, before, count+prefix, deadline)
+    if READ_MODE.get() != "cache":
+        revalidate_history(key, meta, body.timeframe, before, count+prefix, deadline)
     cap = page_capacity(meta["source"])
     hot = None
-    for _ in range(80):
+    no_progress = 0
+    previous = None
+    page_budget = min(settings.native_history_task_pages, (capacity() + cap - 1) // cap + 8)
+    for _ in range(page_budget):
         check_cancelled()
         if time.monotonic() >= deadline:
             raise TimeoutError("平台读取超过时间预算，请重试")
@@ -552,8 +579,8 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             bars = state["bars"]
             in_range = state["range_count"]
             demand = max(count, in_range)
-            if demand + prefix > CAPACITY:
-                raise CapacityExceeded("原生历史必需数量及计算前缀超过20000根")
+            if demand + prefix > capacity():
+                raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
             connected = state["interval"]
             recent_tail = (latest and state["preceding"] and
                            before - state["preceding"][1] <= fresh_seconds(meta["source"]) * 1000)
@@ -592,6 +619,11 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
                 if on_ready:
                     on_ready(db, page)
                 return page
+        observation_progress = (state["interval"], state["available_count"], state["latest_at"], state["cache_revision"])
+        no_progress = no_progress + 1 if observation_progress == previous else 0
+        previous = observation_progress
+        if no_progress >= 3:
+            raise TimeoutError("平台历史分页未推进，请重试")
         tail = latest and bool(bars) and (not fresh or not connected)
         if tail:
             elapsed = max(0, now_ms() - bars[-1]["start"])
@@ -605,7 +637,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             # count still needs a page, spare HTTP capacity may include E; it
             # never controls the next page's stopping condition.
             amount = min(cap, missing if range_done or missing > 1 else cap)
-            attached = min(optional, max(0, cap - amount), max(0, CAPACITY - demand - prefix))
+            attached = min(optional, max(0, cap - amount), max(0, capacity() - demand - prefix))
         fetch_page(key, meta, body.timeframe, cursor, amount, deadline,
                    kind=LANE.get() or "chart", latest=latest and cursor == before,
                    optional=attached)
@@ -708,6 +740,7 @@ def data(body):
         for k, v in {
             **page,
             "bars": visible,
+            "history_dependency_first": page["bars"][0]["chart_time"] if page["bars"] else before,
             "indicators": indicators,
             "has_more": len(page["bars"]) > len(visible) or page["has_more"],
             "history_boundary": len(page["bars"]) <= len(visible) and page["history_boundary"],

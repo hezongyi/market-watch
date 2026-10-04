@@ -542,6 +542,26 @@ class ProviderBar(Base):
     revision: Mapped[int] = mapped_column(default=1)
 
 
+class NativeHistoryLoad(Base):
+    """One owner's cancellable historical demand; pages remain dataset-shared."""
+    __tablename__ = "native_history_loads"
+    __table_args__ = (UniqueConstraint("owner", "request_id"),
+                      Index("ix_native_history_loads_work", "state", "lease_until", "created_at"))
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    owner: Mapped[str] = mapped_column(String(64), index=True)
+    request_id: Mapped[str] = mapped_column(String(100))
+    query_json: Mapped[dict] = mapped_column(JSON)
+    state: Mapped[str] = mapped_column(String(16), default="waiting")
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    deadline: Mapped[int] = mapped_column(BigInteger)
+    consumer_until: Mapped[int] = mapped_column(BigInteger)
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    generation: Mapped[int] = mapped_column(default=0)
+    pages: Mapped[int] = mapped_column(default=0)
+    stalls: Mapped[int] = mapped_column(default=0)
+    error_json: Mapped[dict | None] = mapped_column(JSON)
+
+
 class ProviderInterest(Base):
     """Session-owned finite targets; dataset data/leases are shared globally."""
     __tablename__ = "provider_interests"
