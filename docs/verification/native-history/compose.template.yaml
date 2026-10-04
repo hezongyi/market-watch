@@ -1,0 +1,50 @@
+name: mw-native-history-ubuntu-20261004
+services:
+  pg:
+    image: public.ecr.aws/docker/library/postgres:16-alpine
+    environment:
+      POSTGRES_DB: chart_sync
+      POSTGRES_USER: chart_sync
+      POSTGRES_PASSWORD: ${ACCEPTANCE_PG_PASSWORD:?required}
+    volumes: [sync-pg:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U chart_sync]
+      interval: 2s
+      retries: 30
+  migrate:
+    image: mw-native-history-api:b3dd20c
+    command: [alembic, upgrade, head]
+    env_file: ${ACCEPTANCE_PRIVATE_DIR:?required}/api.env
+    depends_on:
+      pg: {condition: service_healthy}
+  api:
+    volumes: [${ACCEPTANCE_PRIVATE_DIR:?required}:/private:ro]
+    image: mw-native-history-api:b3dd20c
+    env_file: ${ACCEPTANCE_PRIVATE_DIR:?required}/api.env
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz')"]
+      interval: 3s
+      retries: 30
+  history-worker:
+    image: mw-native-history-api:b3dd20c
+    command: [python, -m, alerts.native_history_loads]
+    env_file: ${ACCEPTANCE_PRIVATE_DIR:?required}/api.env
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  web:
+    image: mw-native-history-web:b3dd20c
+    depends_on: [api]
+  chart-origin:
+    image: mw-native-history-chart:b3dd20c
+  tls:
+    image: nginx:1.28-alpine
+    ports: [192.168.7.232:16343:443, 192.168.7.232:16344:444]
+    volumes:
+      - ${ACCEPTANCE_PRIVATE_DIR:?required}/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${ACCEPTANCE_PRIVATE_DIR:?required}/cert.pem:/certs/cert.pem:ro
+      - ${ACCEPTANCE_PRIVATE_DIR:?required}/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+volumes:
+  sync-pg:

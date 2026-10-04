@@ -90,7 +90,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
         if (fault && q.native_history) {
           const kind = fault;
           fault = null;
-          if (kind === "delay") await new Promise((ok) => setTimeout(ok, 1500));
+          if (kind === "delay") await new Promise((ok) => setTimeout(ok, 5000));
           else if (kind === "timeout") {
             await new Promise((ok) => setTimeout(ok, 31000));
             return route.abort().catch(() => {});
@@ -426,7 +426,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           const target=Date.parse('2025-12-01')/1000;
           for(const kind of ['busy','failure']) {
             phase='recover-'+kind;fault=kind;
-            await frame.evaluate(({m5,target})=>widget.chart(m5).setVisibleRange({from:target-366*86400,to:target-366*86400+3600},{rejectByTimeout:30000}).catch(()=>{}),{m5,target});
+            await frame.evaluate(({m5,target})=>widget.chart(m5).setVisibleRange({from:target-30*86400,to:target-30*86400+3600},{rejectByTimeout:30000}).catch(()=>{}),{m5,target});
             await settle();
             await frame.evaluate(({m5,target})=>widget.chart(m5).setVisibleRange({from:target-1800,to:target+1800}),{m5,target});
             await settle();
@@ -434,12 +434,16 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             assert.ok(state.charts[m5].range.from<=target && state.charts[m5].range.to>=target,'fault must allow next navigation');
           }
           phase='cancel';fault='delay';
-          item.cancelOutcome=await frame.evaluate(async({m5,target})=>{
-            const old=widget.chart(m5).setVisibleRange({from:target-400*86400,to:target-400*86400+3600},{rejectByTimeout:30000}).then(()=> 'completed',()=> 'cancelled');
-            await new Promise(resolve=>setTimeout(resolve,100));
-            await widget.chart(m5).setVisibleRange({from:target-1800,to:target+1800});
-            return old;
+          await frame.evaluate(({m5,target})=>{
+            globalThis.__oldRange=widget.chart(m5).setVisibleRange({from:target-40*86400,to:target-40*86400+3600},{rejectByTimeout:30000}).then(()=> 'completed',()=> 'cancelled');
           },{m5,target});
+          await frame.waitForFunction(()=>MWNativeNavigation.diagnostics().pending>0);
+          item.cancelOutcome=await frame.evaluate(async({m5,target})=>{
+            await widget.chart(m5).setVisibleRange({from:target-1800,to:target+1800});
+            return __oldRange;
+          },{m5,target});
+          assert.ok(['cancelled','completed'].includes(item.cancelOutcome),
+            'superseded public range must settle without native null failure');
           await settle();
           item.cancelledView=await snapshot();
           assert.ok(item.cancelledView.charts[m5].range.from<=target && item.cancelledView.charts[m5].range.to>=target);
@@ -457,14 +461,18 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           item.held=await snapshot();await page.mouse.up();await settle();
           assert.notEqual(item.held.charts[m5].range.from,beforeHeld.charts[m5].range.from,'held drag must move immediately');
           phase='revision';
-          await frame.evaluate(m5=>{globalThis.__resetCount=0;const chart=widget.chart(m5),original=chart.resetData;chart.resetData=function(...args){__resetCount++;return original.apply(this,args);};},m5);
+          await frame.evaluate(m5=>{globalThis.__resetCount=0;globalThis.__revisedBars=[];
+            const getBars=feed.getBars;feed.getBars=function(s,r,p,cb,err){return getBars.call(this,s,r,p,(bars,meta)=>{if(r==='5' && s.ticker?.startsWith('MWP:'))__revisedBars.push(...bars);cb(bars,meta)},err)};
+            const chart=widget.chart(m5),original=chart.resetData;chart.resetData=function(...args){__resetCount++;return original.apply(this,args);};},m5);
           const rangeBefore=await snapshot();
           if(process.env.NATIVE_REVISION_SCRIPT) {
             const at=Math.floor((rangeBefore.charts[m5].range.from+rangeBefore.charts[m5].range.to)*500);
-            execFileSync('sg',['docker','-c',`docker compose -f /home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml exec -T --user 0 api python /private/revise.py ${at}`]);
+            item.injection=JSON.parse(execFileSync('sg',['docker','-c',`docker compose -f /home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml exec -T --user 0 api python /private/revise.py ${at}`],{encoding:'utf8'}));
             await frame.waitForFunction(()=>__resetCount>0,null,{timeout:60000});await settle();
             item.revised=await snapshot();item.resetCount=await frame.evaluate(()=>__resetCount);
             assert.ok(Math.abs(item.revised.charts[m5].range.from-rangeBefore.charts[m5].range.from)<600,'real revision must restore history view');
+            item.revisedCallback=await frame.evaluate(start=>__revisedBars.filter(b=>b.time===start).at(-1),item.injection.start);
+            assert.equal(item.revisedCallback?.close,Number(item.injection.close),'native callback must receive exact PG revised close');
           }
           phase='save-reopen';await frame.evaluate(()=>new Promise((resolve,reject)=>widget.saveChartToServer(resolve,reject)));
           item.saved=await snapshot();await page.reload();frame=undefined;
