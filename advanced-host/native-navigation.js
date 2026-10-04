@@ -9,7 +9,7 @@ const MWNativeNavigation = (() => {
     workspace_bars: 80000,
     response_bytes: 33554432,
   };
-  let invokingRange;
+  let invokingRange, cursorSource;
   const cancelled = () =>
     Object.assign(Error("已取消旧图表的历史加载"), {
       code: "HISTORY_CANCELLED",
@@ -75,6 +75,16 @@ const MWNativeNavigation = (() => {
         };
       }),
     );
+  }
+  function clearSourceCursors(source) {
+    for (const [m, state] of models) {
+      if (state.cursor?.source !== source) continue;
+      const environment = state.cursor.environment;
+      state.cursor = null;
+      state.cursorVersion++;
+      if (state.external && !m.crosshairSource().isOnHoveredChartWidget())
+        state.external.call(m, null, environment);
+    }
   }
   function clearNativeWait(m, error) {
     const scrolling = m._scrollingState;
@@ -308,6 +318,7 @@ const MWNativeNavigation = (() => {
     bindModel(m) {
       if (models.has(m)) return;
       const state = {
+        identity: modelKey(m),
         generation: 0,
         cursorVersion: 0,
         phase: "idle",
@@ -320,8 +331,15 @@ const MWNativeNavigation = (() => {
         state.external = m.setExternalPosition;
         m.setExternalPosition = function (point, environment) {
           state.cursorVersion++;
-          state.cursor = point ? { point: { ...point }, environment } : null;
+          state.cursor = point ? { point: { ...point }, environment, source: cursorSource } : null;
           return state.external.call(this, point, environment);
+        };
+        const broadcastCursor = m._syncCrosshair;
+        if (broadcastCursor) m._syncCrosshair = function (...args) {
+          const previous = cursorSource;
+          cursorSource = this;
+          try { return broadcastCursor.apply(this, args); }
+          finally { cursorSource = previous; }
         };
         const insertStudy = m.insertStudyWithParams;
         m.insertStudyWithParams = function (...args) {
@@ -355,6 +373,9 @@ const MWNativeNavigation = (() => {
         m.mainSeries().dataEvents().completed().subscribe(state, projected);
         m.mainSeries().dataEvents().dataUpdated().subscribe(state, projected);
         const changed = () => {
+          const identity = modelKey(m);
+          if (identity !== state.identity) clearSourceCursors(m);
+          state.identity = identity;
           state.publicRange?.reject(cancelled());
           state.publicRange = null;
           state.generation++;
@@ -418,6 +439,7 @@ const MWNativeNavigation = (() => {
     unbindModel(m) {
       const state = models.get(m);
       if (!state) return;
+      clearSourceCursors(m);
       state.publicRange?.reject(cancelled());
       clearNativeWait(m, cancelled());
       models.delete(m);
