@@ -69,11 +69,18 @@ const continuousV6 = [...continuousV4,
 const continuousV7 = [...continuousV6,
   ['applyStudyTemplate(e,t,i){const s=new xl(this._model(),e,t,i);',
    `applyStudyTemplate(e,t,i){${navigation}?.admitTemplate(this._model(),e);const s=new xl(this._model(),e,t,i);`]];
-const replacements = [...continuousV7,
+const continuousV8 = [...continuousV7,
   ['this._initialGroupsState=e.lineToolsGroupModel().state()}redo(){this._model.mainSeries().setSymbolParams(this._newSymbolParams);',
    `this._initialGroupsState=e.lineToolsGroupModel().state()}redo(){${navigation}?.admitTemplate(this._model,this._templateContent);this._model.mainSeries().setSymbolParams(this._newSymbolParams);`],
   ['undo(){this._model.mainSeries().setSymbolParams(this._initialSymbolParams),this._merge(this._initialState,1)',
    `undo(){${navigation}?.admitTemplate(this._model,this._initialState);this._model.mainSeries().setSymbolParams(this._initialSymbolParams),this._merge(this._initialState,1)`]];
+const replacements = [...continuousV8,
+  ['redo:function(){if(s.isEmpty())return!1;const e=s.pop();',
+   `redo:function(){if(s.isEmpty())return!1;${navigation}?.admitHistory(s.head(),"redo");const e=s.pop();`],
+  ['undo:function(){if(i.isEmpty())return!1;const e=i.pop();',
+   `undo:function(){if(i.isEmpty())return!1;${navigation}?.admitHistory(i.head(),"undo");const e=i.pop();`],
+  ['for(;!i.isEmpty()&&e.lastActualCommand!==i.head();)i.pop().undo(r);',
+   `for(;!i.isEmpty()&&e.lastActualCommand!==i.head();){${navigation}?.admitHistory(i.head(),"undo");i.pop().undo(r);}`]];
 const legacy = previous.slice(0,6).map(([before, after])=>[before,after]);
 legacy[0][1] = `class h{constructor(e,t){${runtime}?.bindModel(t);this._bars=[],this._invalidated=!0`;
 legacy[1][1] = `destroy(){${runtime}?.unbindModel(this);this._abortController.abort(),this.clearIntervals()`;
@@ -81,7 +88,7 @@ legacy[2][1] = `this._datafeed=e,this._symbolInfo=t,${runtime}?.bindThread(this,
 legacy[3][1] = `destroy(){${runtime}?.unbindThread(this);0!==this._subscribers.length&&this._logWarning`;
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [previous, replacements, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
+  const installed = [previous, replacements, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;

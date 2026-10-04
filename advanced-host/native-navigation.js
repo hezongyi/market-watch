@@ -269,6 +269,18 @@ const MWNativeNavigation = (() => {
           state.cursorVersion++;
         }
     },
+    admitHistory(command, direction) {
+      // Native undo removes commands before execution. Preflight every template
+      // in a macro before any command changes panes or leaves the history stack.
+      const children = command?.commands?.();
+      if (children) {
+        const ordered = direction === 'undo' ? [...children].reverse() : children;
+        for (const child of ordered) this.admitHistory(child, direction);
+      } else if (command?._templateContent && command?._initialState && command?._model) {
+        this.admitTemplate(command._model, direction === 'undo'
+          ? command._initialState : command._templateContent);
+      }
+    },
     admitTemplate(model, template) {
       const thread = threads.get(modelKey(model));
       if (!thread) return;

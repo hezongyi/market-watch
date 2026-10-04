@@ -120,6 +120,11 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
     {type:'MainSeries'},{type:'LineToolHorzLine'},{type:'Study'}]}]}));
   assert.throws(()=>navigation.admitTemplate(model,{panes:[{sources:[
     {type:'Study'},{type:'Study'}]}]}),/预算/,'template replacement is admitted before pane mutation');
+  const light={panes:[{sources:[{type:'Study'}]}]},heavy={panes:[{sources:[{type:'Study'},{type:'Study'}]}]};
+  const templateCommand={_model:model,_initialState:heavy,_templateContent:light};
+  assert.doesNotThrow(()=>navigation.admitHistory(templateCommand,'redo'));
+  assert.throws(()=>navigation.admitHistory({commands:()=>[templateCommand]},'undo'),/预算/,
+    'nested macro preflight rejects before native history pops or runs commands');
   nextStudy.cancel();
   let finishOld;
   let engineCurrent;
