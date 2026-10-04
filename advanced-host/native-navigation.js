@@ -30,7 +30,7 @@ const MWNativeNavigation = (() => {
       1,
       viewers.reduce(
         (sum, [m, s]) => sum + 1 + 0.5 *
-          ((projection?.model === m ? projection.studies : m.allStudies?.(false).length || 0) + (s.pendingStudies?.size || 0)),
+          ((projection?.has(m) ? projection.get(m) : m.allStudies?.(false).length || 0) + (s.pendingStudies?.size || 0)),
         0,
       ),
     );
@@ -269,19 +269,26 @@ const MWNativeNavigation = (() => {
           state.cursorVersion++;
         }
     },
-    admitHistory(command, direction) {
+    admitCheckpoint(stack, checkpoint) {
+      const projection = new Map();
+      for (const command of [...stack._commands].reverse()) {
+        if (command === checkpoint.lastActualCommand) break;
+        this.admitHistory(command, 'undo', projection);
+      }
+    },
+    admitHistory(command, direction, projection = new Map()) {
       // Native undo removes commands before execution. Preflight every template
       // in a macro before any command changes panes or leaves the history stack.
       const children = command?.commands?.();
       if (children) {
         const ordered = direction === 'undo' ? [...children].reverse() : children;
-        for (const child of ordered) this.admitHistory(child, direction);
+        for (const child of ordered) this.admitHistory(child, direction, projection);
       } else if (command?._templateContent && command?._initialState && command?._model) {
         this.admitTemplate(command._model, direction === 'undo'
-          ? command._initialState : command._templateContent);
+          ? command._initialState : command._templateContent, projection);
       }
     },
-    admitTemplate(model, template) {
+    admitTemplate(model, template, projection = new Map()) {
       const thread = threads.get(modelKey(model));
       if (!thread) return;
       // Templates restore pane sources directly, bypassing study insertion.
@@ -291,7 +298,8 @@ const MWNativeNavigation = (() => {
           source.type.toLowerCase().startsWith('study')).length, 0);
       const retained = (model.allStudies?.(false) || []).filter(study =>
         study.isRemovedByStudyTemplates?.() === false).length;
-      try { admit(thread, reservations.get(thread) || 0, {model, studies: restored + retained}); }
+      projection.set(model, restored + retained);
+      try { admit(thread, reservations.get(thread) || 0, projection); }
       catch (error) {
         globalThis.dispatchEvent(new CustomEvent('mw-navigation-error', {detail:error}));
         throw error;

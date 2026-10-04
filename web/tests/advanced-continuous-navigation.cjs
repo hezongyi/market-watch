@@ -125,6 +125,21 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   assert.doesNotThrow(()=>navigation.admitHistory(templateCommand,'redo'));
   assert.throws(()=>navigation.admitHistory({commands:()=>[templateCommand]},'undo'),/预算/,
     'nested macro preflight rejects before native history pops or runs commands');
+  shared._cache.bars=shared._cache.bars.slice(0,40);studies.length=0;
+  const peerModel={...model,mainSeries:()=>({...series,symbol:()=> 'MWP:GBPUSD'}),allStudies:()=>[]};
+  const peerThread=thread();peerThread._symbolInfo.ticker='MWP:GBPUSD';
+  peerThread._cache.bars=Array.from({length:40},(_,time)=>({time}));
+  navigation.bindThread(peerThread,'5');navigation.bindModel(peerModel);await run();
+  const peerCommand={_model:peerModel,_initialState:heavy,_templateContent:light};
+  assert.doesNotThrow(()=>navigation.admitHistory(templateCommand,'undo'));
+  assert.doesNotThrow(()=>navigation.admitHistory(peerCommand,'undo'));
+  assert.throws(()=>navigation.admitHistory({commands:()=>[templateCommand,peerCommand]},'undo'),/预算/,
+    'macro admission accumulates projected costs across charts before popping');
+  assert.throws(()=>navigation.admitCheckpoint({_commands:[templateCommand,peerCommand]},{}),/预算/,
+    'checkpoint preflight accumulates costs before its first mutation');
+  assert.doesNotThrow(()=>navigation.admitCheckpoint({_commands:[templateCommand,peerCommand]},
+    {lastActualCommand:templateCommand}));
+  navigation.unbindModel(peerModel);navigation.unbindThread(peerThread);
   nextStudy.cancel();
   let finishOld;
   let engineCurrent;
