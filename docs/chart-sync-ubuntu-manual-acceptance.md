@@ -26,3 +26,5 @@ OANDA周日休市，实时变化可用BTCUSDT观察。异常反馈附商品、�
 已有完整修复验收范围和限制见[修复验收文档](chart-cross-period-sync-acceptance.md)。Ubuntu部署的浏览器原始记录保留在上述私有实例目录。
 
 Ubuntu四图完整产品回归已通过：0 JavaScript错误，静止光标、历史窗口隔离、503/取消恢复、Python指标、持续按住10次边界、画线/价格轴/柱宽及保存重开均通过。原始记录为实例目录内 `product-ubuntu-v2.json`。首次记录在最终保存步骤失败，保留记录；同候选串行重跑全部通过。两个入口已从另一台局域网主机确认HTTP200。
+
+人工验收反馈的“平台行情暂不可用”已定位到8秒行情请求预算不足：未缓存18000根EURUSD M5多页请求复现8031ms后503。仅此Ubuntu实例设置 `ALERTS_PROVIDER_REQUEST_SECONDS=25`；另一个未缓存日期18000根请求12547ms成功HTTP200，未缩减储备、未修改生产配置。证据见[预算对照](verification/chart-sync-acceptance/ubuntu-provider-budget.json)。
