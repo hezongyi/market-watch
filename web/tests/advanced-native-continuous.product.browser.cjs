@@ -340,6 +340,23 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           frame.childFrames()[0];
         assert.ok(native);
         item.initial = await snapshot();
+        if (process.env.NATIVE_INTERACTIONS_FAST === "1") {
+          phase = "interactions";
+          await require("./native-continuous-interactions.cjs")({
+            page,
+            frame,
+            native,
+            settle,
+            box,
+            snapshot,
+            item,
+            save,
+          });
+          assert.deepEqual(item.errors, []);
+          item.passed = true;
+          save();
+          continue;
+        }
         if (process.env.NATIVE_TEMPLATE_UNDO === "1") {
           item.undoTemplate = await frame.evaluate(async () => {
             const c = widget.chart(1),
@@ -558,6 +575,24 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             historyReads: reads.length,
           };
           save();
+        }
+        if (process.env.NATIVE_INTERACTIONS === "1") {
+          phase = "interactions";
+          await require("./native-continuous-interactions.cjs")({
+            page,
+            frame,
+            native,
+            settle,
+            box,
+            snapshot,
+            item,
+            save,
+          });
+          assert.deepEqual(
+            item.errors,
+            [],
+            "native interaction operations must not raise JS errors",
+          );
         }
         if (process.env.NATIVE_LIFECYCLE === "1") {
           phase = "lifecycle";

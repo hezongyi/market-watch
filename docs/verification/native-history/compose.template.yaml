@@ -37,7 +37,7 @@ services:
     image: mw-native-history-web:b3dd20c
     depends_on: [api]
   chart-origin:
-    image: mw-native-history-chart:a2f9004
+    image: mw-native-history-chart:2468143
   tls:
     image: nginx:1.28-alpine
     ports: [192.168.7.232:16343:443, 192.168.7.232:16344:444]

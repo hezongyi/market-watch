@@ -1,6 +1,6 @@
 # 原生连续历史候选验收
 
-2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，最终产品提交 `a2f9004`（API/web 构建 `b3dd20c`）。人工验收待完成，未合并或发布生产。新增核验见 [逐项审计](native-history-completion-audit.md)。
+2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，当前产品提交 `2468143`（API/web 构建 `b3dd20c`）。人工验收待完成，未合并或发布生产。新增核验见 [逐项审计](native-history-completion-audit.md)。
 
 ## 访问与运行
 
@@ -32,7 +32,7 @@ sg docker -c 'docker compose -f /home/quant/repos/.acceptance/native-history-imp
 | --- | --- |
 | `mw-native-history-api:b3dd20c` | `1696faa96a669be6f980d2ced2490f58feecb7f8d2de0777c62e5ac7f541da17` |
 | `mw-native-history-web:b3dd20c` | `2ea7e5140b90042e5adc5d0dd175cde232a56d4a95b069f670dbaa96df71a570` |
-| `mw-native-history-chart:a2f9004` | `28f02be37049bb71848b7393c63df901966b14e8c5a56afea9f73b322c5a51b2` |
+| `mw-native-history-chart:2468143` | `37f44549ae5d1380b6c2546b2a6fb41ad56268b8a490770a0dbd781a04e8aaf2` |
 
 web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完整组合通过验收。原生 v31.1 补丁仍固定原始 SHA、唯一锚点和幂等检查；修改库后生成内容版本路径，旧 URL 与本候选不同。
 
@@ -53,7 +53,7 @@ web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完�
 
 完整四图验证：静止光标到 M5 正确、hover 不触发大走廊重建、busy/503 后下一操作恢复、旧公开范围导航取消、MA200/RSI/MACD/Python SMA200、画线、按住拖动、真实 PG 更正经 SSE/review 后一次重载、原生回调具体更正价格、历史视区与柱宽保留、保存重开指标/画线/视区保留。范围外更新及复核失败重试另有模块回归，不能扩大为所有供应商均完成产品验收。
 
-后端 provider/task/Yahoo/chart/真实 PG 回归 164 passed；前端构建、原生 hook、导航、观察核实、历史 reset、视区测试通过。Standards/Spec 复核至 `a2f9004` 无新增阻断项。补充验证了指标模板恢复、输入修改、真实计算前缀更正、共享取消、6 轮 2/4/8 布局资源压力、实际浏览器内容版本缓存更新及 OANDA/Binance/Yahoo 的部分高周期日历。未把几分钟受控压力扩大成全天无泄漏、所有商品组合或低性能客户端最大负载保证。80,000 是本候选工程预算，不是所有组合的 SLA。
+后端 provider/task/Yahoo/chart/真实 PG 回归 164 passed；前端构建、原生 hook、导航、观察核实、历史 reset、视区测试通过。Standards/Spec 复核至 `2468143` 无新增阻断项。补充验证了指标模板恢复、输入修改、真实计算前缀更正、共享取消、6 轮 2/4/8 布局资源压力、实际浏览器内容版本缓存更新及 OANDA/Binance/Yahoo 的部分高周期日历。未把几分钟受控压力扩大成全天无泄漏、所有商品组合或低性能客户端最大负载保证。80,000 是本候选工程预算，不是所有组合的 SLA。
 
 原始证据在 [2/4/8 图](verification/native-history/final-2-4-8.json)、[最终完整四图](verification/native-history/final-navigation-latest.json)、[冷任务](verification/native-history/cold-task-evidence.txt) 、[最终 2/8 图](verification/native-history/final-415ae61-2-8.json) 和 [hot profile](verification/native-history/hot-profile.txt)。私有目录保存失败轮次及截图，避免覆盖不通过记录。
 
@@ -73,3 +73,7 @@ web 镜像复用已构建 P3 前端；随后产品改动均在 API/chart，完�
 模板恢复曾绕过单指标插入准入，本轮已修复：首次应用、撤销、重做及 checkpoint 在修改前重新检查，宏命令累计各图预算。超额模板保持原图与指标；拒绝撤销保留原生 undo/redo 栈，之后仍可正常操作。真实浏览器、嵌套宏与双图组合模块回归分别归档，未把单图浏览器证据扩大为全部宏的产品矩阵。
 
 冷产品验证额外项目 `mw-native-history-cold-product-20261005` 使用独立 PG volume 和 `16553/16554` 端口，完成后已停止、保留缓存；不作为人工验收入口。私有配置位于 `/home/quant/repos/.acceptance/native-history-cold-product-20261005/compose.yaml`，可按前述 `up -d` / `stop` 命令替换路径复跑。现有 `16343/16344` 验收项目继续运行。
+
+补充真实交互审计发现关闭源图后仍保留它的光标时间；`97864b5` 清除该源在其他图上的重放记录，`2468143` 将身份初始化放到原生模型构造完成后的挂钩阶段。Ubuntu 人工项目已更新 chart 至 `2468143`，API/web 与容量配置保持原组合。新增 [真实交互证据](verification/native-history/supplemental-20261005/interactions-2468143.json) 包含原四图大请求与 hover、Alt+G 原生日期定位、关闭同步后无外部光标重绘、关闭 D1 源图并卸载后旧光标失效、九个支持周期及双 M5 范围同步。周期检查是真实供应商尾部导航，不代表全部跨周期同步组合。
+
+`2468143` 的 [最终完整四图](verification/native-history/supplemental-20261005/final-2468143-full.json) 再次通过故障、导航、指标、价格/前缀修订、拖动和保存重开。该轮热 PG 点击至就绪 5.15 秒；同 widget 定位 3 毫秒、历史读取 0。仅真实修订触发一次重载，hover 无额外历史请求。修订试验数据已恢复，人工入口可继续使用；首次冷加载仍参考已有独立空 PG 产品测量，不用热耗时替代。
