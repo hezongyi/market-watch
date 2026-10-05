@@ -1,0 +1,78 @@
+{
+  "backend": {
+    "passed": 453,
+    "skipped": 38,
+    "postgres_executed": false,
+    "note": "Full backend at bacadad; final increment only JavaScript/tests/docs."
+  },
+  "javascript": {
+    "passed": 48,
+    "failed": 0,
+    "suites": [
+      "advanced-autosave-toggle.cjs",
+      "advanced-autosave.cjs",
+      "advanced-capacity-boundary.cjs",
+      "advanced-chart-style.cjs",
+      "advanced-cold-pagination.cjs",
+      "advanced-continuous-navigation.cjs",
+      "advanced-edge-sync.cjs",
+      "advanced-historical-reset.cjs",
+      "advanced-history-boundaries.cjs",
+      "advanced-history-change-range.cjs",
+      "advanced-history-dedup.cjs",
+      "advanced-history-demand.cjs",
+      "advanced-history-loading.cjs",
+      "advanced-history-notice-operation.cjs",
+      "advanced-history-pagination.cjs",
+      "advanced-history-reload.cjs",
+      "advanced-inflight-cancellation.cjs",
+      "advanced-latest-cache.cjs",
+      "advanced-layout-poll-resume.cjs",
+      "advanced-managed-revisions.cjs",
+      "advanced-managed.cjs",
+      "advanced-monthly-cache.cjs",
+      "advanced-native-hook-contract.cjs",
+      "advanced-native-reserve-lifetime.cjs",
+      "advanced-native-reserve-scheduler.cjs",
+      "advanced-native-save-race.cjs",
+      "advanced-native-workspaces.cjs",
+      "advanced-navigation-page.cjs",
+      "advanced-preferences.cjs",
+      "advanced-prewarm-cache.cjs",
+      "advanced-progressive-cache.cjs",
+      "advanced-progressive-indicators.cjs",
+      "advanced-provider-history-observation.cjs",
+      "advanced-provider-request-lifetime.cjs",
+      "advanced-provider-subscriptions.cjs",
+      "advanced-python-indicators.cjs",
+      "advanced-range-sync.cjs",
+      "advanced-refresh-interaction.cjs",
+      "advanced-request-cancellation.cjs",
+      "advanced-series.cjs",
+      "advanced-startup-metadata.cjs",
+      "advanced-sync-snapshot.cjs",
+      "advanced-time.cjs",
+      "advanced-viewports.cjs",
+      "advanced-volume.cjs",
+      "advanced-watchlists.cjs",
+      "advanced-weekly-background.cjs",
+      "advanced-weekly-error.cjs"
+    ]
+  },
+  "native_browser": {
+    "passed": 2,
+    "scope": "Real licensed engine and synthetic 24x7 feed, public navigation; no deployed instance.",
+    "evidence": "shared-boundary.json"
+  },
+  "independent_reviews": {
+    "standards_findings": 0,
+    "spec_findings": 0,
+    "browser_independently_repeated": true
+  },
+  "pending": [
+    "Isolated Ubuntu Docker PostgreSQL14 regression, migration and restore verification",
+    "Isolated Ubuntu Docker full application/provider acceptance",
+    "Merge, annotated v1.8.0 tag, production build and deployment"
+  ],
+  "blocker": "Local Docker socket access returns permission denied. AGENTS.md prohibits using Unraid for testing."
+}

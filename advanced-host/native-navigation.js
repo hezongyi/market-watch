@@ -245,24 +245,50 @@ const MWNativeNavigation = (() => {
     try {
       // Promote through native series delivery, preserving indicator warmup.
       boundary.promoting = true;
-      const waiting = [];
-      for (const {m,state,generation} of captured) {
-        if (models.get(m) !== state || state.generation !== generation) continue;
-        const ts = m.timeScale(), points = ts.points().range().value();
-        const first = points && ts.points().valueAt(points.firstIndex);
-        const hidden = cache.bars.filter(bar => bar.time < first * 1000).length;
-        const prefix = calculationPrefix(thread._symbolInfo.ticker,thread._resolution) + 4;
-        if (hidden > prefix) waiting.push(new Promise((resolve,reject) => {
-          const owner = {}, event = m.mainSeries().dataEvents().completed();
-          const finish = error => {clearTimeout(timer);event.unsubscribeAll(owner);error ? reject(error) : resolve();};
-          const timer = setTimeout(() => finish(Error("图表边界定位超时")),30000);
-          boundary.waiters.set(m, finish);
-          event.subscribe(owner,() => finish());
-          ts.requestMoreHistoryPoints(hidden - prefix);
-        }));
+      while (current()) {
+        if (Date.now() >= boundary.deadline) throw Error("图表边界定位超过时间预算，请重试");
+        const waiting = [], before = new Map();
+        for (const {m,state,generation} of captured) {
+          if (models.get(m) !== state || state.generation !== generation) continue;
+          const ts = m.timeScale(), points = ts.points().range().value();
+          const first = points && ts.points().valueAt(points.firstIndex);
+          const hidden = cache.bars.filter(bar => bar.time < first * 1000).length;
+          const prefix = calculationPrefix(thread._symbolInfo.ticker,thread._resolution) + 4;
+          if (hidden > prefix) {
+            before.set(m, first);
+            waiting.push(new Promise((resolve,reject) => {
+              const owner = {}, event = m.mainSeries().dataEvents().completed();
+              const finish = error => {clearTimeout(timer);event.unsubscribeAll(owner);error ? reject(error) : resolve();};
+              const timer = setTimeout(() => finish(Error("图表边界定位超时")),30000);
+              boundary.waiters.set(m, finish);
+              event.subscribe(owner,() => finish());
+              ts.requestMoreHistoryPoints(hidden - prefix);
+            }));
+          }
+        }
+        if (!current()) throw cancelled();
+        // Cache insertion ran with _requesting set. Resume queued native
+        // subscribers after every pane has installed its completion waiter.
+        thread._processPendingSubscribers?.();
+        if (!waiting.length) break;
+        await Promise.all(waiting);
+        if (!current()) throw cancelled();
+        if (boundary.failed) break;
+        // A queued older wave can finish before the requested promotion wave.
+        // Continue until the real cache prefix is delivered, with no-progress
+        // protection instead of claiming an intermediate point is the limit.
+        const stalled = captured.some(({m,state,generation}) => {
+          if (!before.has(m) || models.get(m) !== state || state.generation !== generation) return false;
+          const ts = m.timeScale(), points = ts.points().range().value();
+          return !points || ts.points().valueAt(points.firstIndex) >= before.get(m);
+        });
+        if (stalled) {
+          boundary.failed = Error("原生图表历史交付没有推进，请重试");
+          break;
+        }
       }
-      if (waiting.length) await Promise.all(waiting);
       if (!current()) throw cancelled();
+      failed ||= boundary.failed;
       for (const {m,state,generation,requested:target} of captured) {
         if (models.get(m) !== state || state.generation !== generation) continue;
         const ts = m.timeScale(), points = ts.points().range().value();
@@ -382,15 +408,15 @@ const MWNativeNavigation = (() => {
         success,
         failure,
       ) => {
-        // A new native consumer on the shared source supersedes bounded fill.
-        // Never let its reservation/cursor compete with another source read.
+        // Native reads supersede HTTP fill, but promotion reads belong to the
+        // existing boundary and must retain its per-pane completion waiters.
         const boundary = boundaries.get(thread);
         // Native promotion can ask for extra warmup after the bounded fill.
         // Its rejected read continues the same operation's accounting only;
         // actual new navigation still invalidates the model generation.
         const continuation = boundary?.promoting ? {...boundary.progress,
           captured:boundary.captured} : undefined;
-        if (boundary) cancelBoundary(thread);
+        if (boundary && !boundary.promoting) cancelBoundary(thread);
         const cache = thread._cache,
           sourceGeneration = thread.mw_sourceGeneration;
         let settled = false;
@@ -407,7 +433,13 @@ const MWNativeNavigation = (() => {
           callback(...args);
         };
         const fail = (error) => {
+          if (!valid()) return;
           thread.mw_boundaryContinuation = error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED" ? continuation : undefined;
+          if (boundary?.promoting && boundaries.get(thread) === boundary) {
+            if (error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED" || error?.code === "HISTORY_CANCELLED")
+              cancelBoundary(thread);
+            else boundary.failed = error;
+          }
           if(error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED") thread.mw_capacityRequest = request;
           thread.mw_failedCursor = thread.mw_requestCursor;
           complete(failure, error);
@@ -682,12 +714,14 @@ const MWNativeNavigation = (() => {
           this.threadKey(thread._symbolInfo, thread._resolution),
       );
       const capacityFailure = error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED";
+      const previous = thread.mw_boundaryContinuation;
       const affected = matches.filter(([m,state]) => state.phase === "loading" ||
+        (capacityFailure && previous?.captured.some(old =>
+          old.m === m && old.state === state && old.generation === state.generation)) ||
         m._scrollingState || m._lastGotoTimeRange || m.timeScale()._requestingMoreData ||
         m.timeScale().visibleBarsStrictRange()?.firstBar() < m.timeScale().points().range().value()?.firstIndex);
       const captured = affected.map(([m,state]) => ({m,state,generation:state.generation,
         requested:state.requested ?? state.cursor?.point.timeStamp ?? thread.mw_capacityRequest?.from}));
-      const previous = thread.mw_boundaryContinuation;
       thread.mw_boundaryContinuation = undefined;
       const continuation = previous && captured.some(item => previous.captured.some(old =>
         old.m === item.m && old.state === item.state && old.generation === item.generation)) ? previous : undefined;
@@ -728,6 +762,9 @@ const MWNativeNavigation = (() => {
         }
       }
       thread._subscribeRealtimeIfNeeded();
+      const boundary = boundaries.get(thread);
+      if (boundary?.promoting && boundary.failed === error)
+        for (const finish of boundary.waiters.values()) finish();
       if (capacityFailure && captured.length && thread._cache.bars.length && !boundaries.has(thread)) {
         const cache = thread._cache, sourceGeneration = thread.mw_sourceGeneration;
         setTimeout(() => {
