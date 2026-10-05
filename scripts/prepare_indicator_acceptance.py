@@ -24,6 +24,7 @@ config = {
     "ALERTS_DELIVERY_ENABLED": "false",
     "ALERTS_PUBLIC_URL": "https://localhost:18443",
     "ALERTS_INITIAL_HISTORY_DAYS": "0",
+    "ALERTS_PROVIDER_REQUEST_SECONDS": "30",
 }
 (root / "api.env").write_text("".join(f"{key}={value}\n" for key, value in config.items()))
 (root / "tls.conf").write_text("""server {

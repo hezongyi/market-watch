@@ -1,0 +1,153 @@
+{
+  "at": "2026-10-04T23:38:27.609672+00:00",
+  "host": "quant-server",
+  "os": "Ubuntu 22.04.5 LTS",
+  "product": "https://localhost:18443",
+  "chartOrigin": "https://localhost:18444",
+  "database": "indicator_acceptance",
+  "deliveryEnabled": false,
+  "containers": [
+    {
+      "name": "mw-indicator-acceptance-pg-1",
+      "image": "postgres:14-bookworm",
+      "imageId": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "exitCode": 0,
+      "health": "healthy",
+      "project": "mw-indicator-acceptance",
+      "networks": [
+        "mw-indicator-acceptance_default"
+      ],
+      "ports": {
+        "5432/tcp": null
+      },
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "mw-indicator-acceptance_indicator-pg",
+          "source": "/var/lib/docker/volumes/mw-indicator-acceptance_indicator-pg/_data",
+          "destination": "/var/lib/postgresql/data"
+        }
+      ]
+    },
+    {
+      "name": "mw-indicator-acceptance-migrate-1",
+      "image": "market-watch-api:indicator-acceptance",
+      "imageId": "sha256:f4dafc776add3815e2e65a4a6f684a05c08629266715d3e42271b3170e8d0c63",
+      "status": "exited",
+      "exitCode": 0,
+      "health": null,
+      "project": "mw-indicator-acceptance",
+      "networks": [
+        "mw-indicator-acceptance_default"
+      ],
+      "ports": {},
+      "mounts": []
+    },
+    {
+      "name": "mw-indicator-acceptance-api-1",
+      "image": "market-watch-api:indicator-acceptance",
+      "imageId": "sha256:f4dafc776add3815e2e65a4a6f684a05c08629266715d3e42271b3170e8d0c63",
+      "status": "running",
+      "exitCode": 0,
+      "health": "healthy",
+      "project": "mw-indicator-acceptance",
+      "networks": [
+        "mw-indicator-acceptance_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      },
+      "mounts": []
+    },
+    {
+      "name": "mw-indicator-acceptance-web-1",
+      "image": "market-watch-web:indicator-acceptance",
+      "imageId": "sha256:d10580918e295763599802efda78886114c0244f0d95cb88d53f1cba0157e702",
+      "status": "running",
+      "exitCode": 0,
+      "health": null,
+      "project": "mw-indicator-acceptance",
+      "networks": [
+        "mw-indicator-acceptance_default"
+      ],
+      "ports": {
+        "80/tcp": null
+      },
+      "mounts": []
+    },
+    {
+      "name": "mw-indicator-acceptance-chart-origin-1",
+      "image": "market-watch-chart-origin:indicator-acceptance",
+      "imageId": "sha256:55ae62aefe5f136d5fa2d9c93e812ed1943e622f27644b267e764cef98e15b66",
+      "status": "running",
+      "exitCode": 0,
+      "health": null,
+      "project": "mw-indicator-acceptance",
+      "networks": [
+        "mw-indicator-acceptance_default"
+      ],
+      "ports": {
+        "80/tcp": null
+      },
+      "mounts": []
+    },
+    {
+      "name": "mw-indicator-acceptance-tls-1",
+      "image": "nginx:1.28-alpine",
+      "imageId": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "exitCode": 0,
+      "health": null,
+      "project": "mw-indicator-acceptance",
+      "networks": [
+        "mw-indicator-acceptance_default"
+      ],
+      "ports": {
+        "443/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "18443"
+          }
+        ],
+        "444/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "18444"
+          }
+        ],
+        "80/tcp": null
+      },
+      "mounts": [
+        {
+          "type": "bind",
+          "name": null,
+          "source": "/tmp/mw-indicator-acceptance/tls.conf",
+          "destination": "/etc/nginx/conf.d/default.conf"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "source": "/tmp/mw-indicator-acceptance/cert.pem",
+          "destination": "/certs/cert.pem"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "source": "/tmp/mw-indicator-acceptance/key.pem",
+          "destination": "/certs/key.pem"
+        }
+      ]
+    }
+  ],
+  "history": {
+    "source": "binance",
+    "symbol": "BTCUSDT",
+    "timeframe": "M5",
+    "count": 2000,
+    "first": 1790555400000,
+    "last": 1791155100000,
+    "seconds": 1.335
+  },
+  "providerRequestSeconds": 30
+}

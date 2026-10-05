@@ -102,6 +102,48 @@ const OUT =
       widget.activeChart().getAllStudies(),
     );
     assert.notEqual(added[0].id, added[1].id);
+    await dialog.getByRole("button", { name: "完成", exact: true }).click();
+    await page.evaluate(() => {
+      globalThis.pickerCrosshairSamples = [];
+      widget
+        .activeChart()
+        .crossHairMoved()
+        .subscribe(null, (sample) => pickerCrosshairSamples.push(sample));
+    });
+    for (let attempt = 0; attempt < 10; attempt++) {
+      await page.mouse.move(700 + attempt * 20, 250);
+      await page.waitForTimeout(150);
+      if (
+        await page.evaluate(
+          (ids) =>
+            pickerCrosshairSamples.some((sample) =>
+              ids.every((id) =>
+                sample.entityValues?.[id]?.values.some((plot) =>
+                  Number.isFinite(Number(plot.value)),
+                ),
+              ),
+            ),
+          added.map((s) => s.id),
+        )
+      )
+        break;
+    }
+    assert.ok(
+      await page.evaluate(
+        (ids) =>
+          pickerCrosshairSamples.some((sample) =>
+            ids.every((id) =>
+              sample.entityValues?.[id]?.values.some((plot) =>
+                Number.isFinite(Number(plot.value)),
+              ),
+            ),
+          ),
+        added.map((s) => s.id),
+      ),
+      "public crosshair event exposes values for both study entities",
+    );
+    await chartUi.getByRole("button", { name: "指标", exact: true }).click();
+    await dialog.waitFor();
     await dialog
       .locator("[data-instance-id]")
       .first()
@@ -296,6 +338,7 @@ const OUT =
             "public header button",
             "Chinese/English search and source",
             "continuous duplicate additions",
+            "public crosshair event values for both study entities",
             "instance visibility/removal",
             "native properties return with query",
             "direct settings after addition",

@@ -1226,7 +1226,15 @@ function boot(
       details: true,
       datawindow: true,
       watchlist_settings: {
-        default_symbols: ["EURUSD", "XAUUSD", "BTCUSDT"].map(symbol=>MWSeries.encode(symbol,"provider")),
+        // Restore the active list before native resolves constructor defaults.
+        // Waiting until onChartReady briefly requests unrelated default symbols.
+        default_symbols: (() => {
+          const stored = preferences.find(p => p.kind === "setting" && p.name === "mw.watchlists.v1")?.content.value;
+          const lists = Array.isArray(stored?.lists) ? stored.lists : [];
+          const list = lists.find(list => list.id === stored.active) || lists[0];
+          return Array.isArray(list?.symbols) ? list.symbols :
+            ["EURUSD", "XAUUSD", "BTCUSDT"].map(symbol => MWSeries.encode(symbol, "provider"));
+        })(),
         readonly,
       },
     },

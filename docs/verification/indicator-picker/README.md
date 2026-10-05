@@ -1,6 +1,6 @@
 # 指标窗口实施与验证记录
 
-日期：2026-10-04。实施基线 `62488c6`（v1.7.0），分支 `feat/indicator-selector`，worktree `/home/quant/repos/market-watch-indicator-dev`。原方案 worktree 与其他任务改动均保留。
+更新：2026-10-05。实施基线 `62488c6`（v1.7.0），分支 `feat/indicator-selector`，worktree `/home/quant/repos/market-watch-indicator-dev`。原方案 worktree 与其他任务改动均保留。
 
 ## 已实施
 
@@ -21,19 +21,28 @@
 | 旧版本布局/模板/样式 | `advanced-indicator-compatibility.browser.cjs` 先使用 git `62488c6` 的旧 Adapter 创建 8 个 study、原生布局与模板，再由当前 Adapter 恢复；原生实体 ID、参数顺序、SMA(60)、BBANDS(25,2.5)、MACD(8,21,5)、颜色/线宽/显隐和 histogram plot2 均通过。证据 `compatibility.json`。合成行情，无服务器，不替代真实环境验收 |
 | Compose | 独立配置的 `docker compose ... config --services` 成功解析；仅有 pg/migrate/api/web/chart-origin/tls，无通知 worker |
 
-浏览器依赖缺失时，仅把 Ubuntu deb 的动态库解压到 `/tmp/mw-indicator-browser-libs`；没有修改系统库。实际浏览器测试不代表完整产品、数据库和真实行情验收。
+浏览器依赖缺失时，仅把 Ubuntu deb 的动态库解压到 `/tmp/mw-indicator-browser-libs`；没有修改系统库。上表中的无服务器测试只证明图表库 Interface，完整产品证据另列于下文。
 
-## 尚未完成的验收与待决事项
+## Ubuntu 真实环境验收
 
-**本任务 Docker 实例尚未部署，无实际可访问验收地址，真实环境验收尚未通过。** 当前执行环境连接 Ubuntu `/var/run/docker.sock` 报 permission denied；`sudo` 也被 no-new-privileges 禁止。已请求用户配置访问权限。禁止切换到 unraid 绕过此限制。
+**2026-10-05 已在 Ubuntu 22.04.5 LTS 主机 `quant-server` 部署本任务独立实例并通过完整验收。** Docker 权限由用户配置 quant 的 docker 组解决，当前旧会话用 `sg docker -c '…'` 执行。API/PostgreSQL 健康、迁移退出 0；资源详情见 [runtime.json](runtime.json)。实例保留运行。
 
-**收藏兼容方案待用户决定。** 本地 v31 `Favorites.indicators` 只提供构造时默认值，公开 Interface 没有运行时收藏读写。原生 UI 经已有 settings_adapter 保存收藏；按[交接方案](../../indicator-system-plan-20261004.md)不能写内部 settings 键或并行维护另一份收藏。候选实现为新窗口“收藏 → 打开原生收藏”，使用同一原生收藏事实来源，关闭原生窗口后返回列表；尚不提供新列表行星标。此项已提出明确选择，未视作用户批准，也尚未完成真实服务器刷新验收。
+- 实际访问：产品 `https://localhost:18443`，图表静态 origin `https://localhost:18444`。仅绑定 Ubuntu loopback，自签 TLS；远程浏览可转发这两个端口。密码仅在 `/tmp/mw-indicator-acceptance/login.json`。
+- 上游取回真实 Binance BTCUSDT M5 2000 根；六个实例 SMA(20)/SMA(60)/EMA/RSI/MACD/BBANDS 全部 10 条曲线都有有限数值，逐根与公开十字光标返回的原生显示值核对，误差不超过 5 位小数显示精度。实际 API 返回每实例至少 100 根；证据 [full-stack.json](full-stack.json) 保存时间范围、参数、实体 ID 和逐点样本。
+- 完整产品脚本 19 项通过：中英文/别名搜索、原生/Python 来源、分类空结果、内置 SMA 添加/移除、连续添加、直接设置与返回、独立实例管理、主题/375px/键盘、多图切换、延迟添加归属、数据库工作区/模板恢复、v1.7.0 旧布局/模板恢复、收藏服务器保存/刷新恢复。旧布局的 8 个实体 ID、参数、颜色/线宽/显隐均保持一致。
+- 真实页面截图 [深色](full-stack-dark.png)、[浅色](full-stack-light.png)、[窄屏](full-stack-narrow.png)。应用 pageerror/console/API 错误为空。库已有的偶发 Google Analytics 加载尝试被既有 CSP 阻止，单独记 `policyBlocks`；不允许成功外连，也不忽略其他错误。
 
-待运行完整产品脚本：真实 BTCUSDT M5 行情、SMA/EMA/RSI/MACD/BBANDS、服务器收藏恢复、实际工作区刷新恢复。`advanced-indicator-picker.browser.cjs` 已准备，尚未执行；不能将准备好的测试当作通过证据。
+**收藏兼容采用用户已授权方案：** 新窗口“收藏 → 打开原生收藏”，沿用原生 settings_adapter 的同一服务器收藏；关闭后返回新窗口。公开 Interface 不提供运行时收藏读写，因此新列表行不另设星标或维护第二份收藏。上述完整产品验收实际验证了星标变化、服务器保存和刷新恢复。
+
+验收过程中修复了 `.dockerignore` 漏掉 picker 文件的问题，以及原生构造先解析默认自选列表、稍后才恢复用户列表导致请求无关品种的问题。构造时现直接使用保存的活动列表。隔离实例只使用公开 Binance 数据，自选列表明确设为 BTCUSDT，不读取生产 OANDA 凭据。
+
+环境限制记录：Docker Hub 直连超时，数据库改用本机已有 `postgres:14-bookworm`，独立数据库与新卷仍从空库迁移。应用镜像按本分支 Dockerfile 正式构建。旧布局恢复同时加载 8 个指标曾碰到上游 8 秒请求期限；仅将验收实例的期限改为允许上限 30 秒，生产默认值未改。
+
+显示值验收不用 `exportData`：本地许可包缺少其 `zh.20866` chunk。改用公开 `crossHairMoved.entityValues`，不访问私有图表对象或修改 vendor 文件。合成行情的 Interface/旧版本兼容测试仍保留，与真实环境证据分别记录。
 
 ## Ubuntu 独立实例启动与停止
 
-以下是**待执行**的启动方式。端口已检查未被占用，但部署前须再次核实。计划访问地址 `https://localhost:18443`（产品）和 `https://localhost:18444`（隔离图表 origin），仅绑定 Ubuntu loopback，使用开发自签 TLS。
+以下为已实际执行的启动方式。当前访问地址 `https://localhost:18443`（产品）和 `https://localhost:18444`（隔离图表 origin），仅绑定 Ubuntu loopback，使用开发自签 TLS。
 
 ```bash
 cd /home/quant/repos/market-watch-indicator-dev
@@ -41,14 +50,22 @@ cd /home/quant/repos/market-watch-indicator-dev
 PYTHONPATH=backend .venv/bin/python scripts/prepare_indicator_acceptance.py
 # 配置存在时脚本退出且保留旧密码；不重新生成。
 docker compose --env-file /tmp/mw-indicator-acceptance/compose.env \
-  -f docs/verification/indicator-picker/compose.yaml up -d --build
+  -f docs/verification/indicator-picker/compose.yaml up -d --build --pull never
 # 导入本任务真实上游行情；脚本断言 pg/indicator_acceptance 数据库及任务标识。
 docker cp scripts/indicator_acceptance_history.py mw-indicator-acceptance-api-1:/tmp/indicator_acceptance_history.py
 docker exec mw-indicator-acceptance-api-1 python /tmp/indicator_acceptance_history.py
 cd web
+export LD_LIBRARY_PATH=/tmp/mw-indicator-browser-libs/root/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+# 先生成旧版 Adapter 的布局/模板工件（无服务器合成行情）：
+INDICATOR_COMPAT_SYMBOL=MWP:BTCUSDT \
+INDICATOR_COMPAT_FIXTURE=/tmp/mw-indicator-acceptance/legacy-fixture.json \
+PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome \
+  node tests/advanced-indicator-compatibility.browser.cjs
 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome \
   node tests/advanced-indicator-picker.browser.cjs
 ```
+
+新 shell 在 docker 组权限生效后可直接运行上面命令；旧 shell 可使用 `sg docker -c 'docker compose …'`。只启动已构建实例可用 `up -d --no-build --pull never`。
 
 私密 `/tmp/mw-indicator-acceptance/` 保存 login.json、api.env、compose.env、TLS key/cert；不提交。独立 Compose project `mw-indicator-acceptance`，网络 `mw-indicator-acceptance_default`，卷 `mw-indicator-acceptance_indicator-pg`，数据库 `indicator_acceptance`，镜像标签 `*:indicator-acceptance`。不复用其他实例或生产目录。
 
@@ -73,16 +90,16 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/ch
 ```
 
 
-## 完成性核对（2026-10-04）
+## 完成性核对（2026-10-05）
 
 | 交接要求 | 当前证据 | 状态 |
 |---|---|---|
-| 隔离 worktree/branch，保留其他任务 | `git worktree list` 与本分支提交 | 已完成 |
-| 搜索、分类、列表、已添加实例、直接参数设置 | 实際 v31 浏览器测试；native.json 与截图 | 实现和接口测试通过，待完整产品验收 |
-| 浅深色、窄屏、键盘、异步添加归属 | native.json 与实际浏览器断言 | 接口测试通过，待完整产品验收 |
-| 收藏星、已有收藏及新入口一致 | 没有公开运行时读写 Interface；候选为打开原生窗口 | 待用户选择，不能认为完整方案已完成 |
-| 目录与算法解耦、预热声明、非法输出错误、参数声明 | 56 项相关后端测试与数值差分 | 已完成本轮计算加固 |
-| 旧 ID/参数/模板/样式恢复 | 从 v1.7.0 Adapter 生成的原生布局/模板实际恢复：compatibility.json | 图表库接口通过；待完整产品数据库路径验收 |
-| Ubuntu 独立 Docker/网络/卷/数据库/端口 | compose.yaml 可解析；socket permission denied | 尚未部署 |
-| 真实行情完整验收与实际地址/操作命令/结果 | 完整脚本已准备，无运行结果 | 未通过，无实际验收地址 |
-| 不扩展新指标或假设接口、不部署生产 | 实施 diff 与本任务运行检查 | 遵守 |
+| 隔离 worktree/branch，保留其他任务 | 本分支提交与独立 Docker labels | 已完成 |
+| 搜索、分类、直接设置、实例管理 | full-stack.json，native.json | 真实产品通过 |
+| 主题、窄屏、键盘、多图、异步添加归属 | full-stack.json 与截图 | 真实产品通过 |
+| 原生收藏事实来源与刷新恢复 | 已授权兼容入口；服务器持久化验收 | 通过，新列表不设独立星标 |
+| 目录/算法解耦、预热/输出契约、参数声明 | 56 项相关后端测试与基线数值差分 | 已完成 |
+| v1.7.0 旧 ID/参数/模板/样式恢复 | compatibility.json；full-stack.json 的真实数据库路径 | 通过 |
+| Ubuntu 独立 project/网络/卷/库/端口 | runtime.json；实际 API/PG healthy | 已运行 |
+| 真实行情全部曲线数值 | full-stack.json 的公开事件与后端逐点核对 | 通过 |
+| 不扩展新指标、不部署生产、保密 | 无新增指标；独立本机资源；提交审计 | 遵守 |

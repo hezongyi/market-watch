@@ -36,6 +36,7 @@ const report = {
   cases: [],
   errors: [],
 };
+const fixtureSymbol = process.env.INDICATOR_COMPAT_SYMBOL || "TEST";
 (async () => {
   const browser = await chromium.launch({
     headless: true,
@@ -62,7 +63,7 @@ const report = {
       const feed={onReady:cb=>setTimeout(()=>cb({supported_resolutions:['5']}),0),
         resolveSymbol:(name,cb)=>setTimeout(()=>cb({name,ticker:name,description:name,exchange:'TEST',type:'crypto',session:'24x7',timezone:'Etc/UTC',minmov:1,pricescale:100,has_intraday:true,supported_resolutions:['5'],volume_precision:0}),0),
         getBars:(symbol,res,period,cb)=>{const bars=[];for(let i=0;i<period.countBack;i++){const time=(period.to-period.countBack*300+i*300)*1000,close=100+Math.sin(i/10)*2;bars.push({time,open:close-1,high:close+2,low:close-2,close,volume:100});}setTimeout(()=>cb(bars,{noData:false}),0);},subscribeBars(){},unsubscribeBars(){}};
-      const widget=new TradingView.widget({container:'chart',library_path:'/charting_library/',datafeed:feed,locale:'zh',symbol:'TEST',interval:'5',autosize:true,theme:'Dark',custom_css_url:'/chart-menu.css',saved_data:savedState||undefined,disabled_features:['header_indicators','use_localstorage_for_settings','create_volume_indicator_by_default'],custom_indicators_getter:async p=>(legacy?baselinePythonStudies:pythonStudies)(p,catalog)});
+      const widget=new TradingView.widget({container:'chart',library_path:'/charting_library/',datafeed:feed,locale:'zh',symbol:${JSON.stringify(fixtureSymbol)},interval:'5',autosize:true,theme:'Dark',custom_css_url:'/chart-menu.css',saved_data:savedState||undefined,disabled_features:['header_indicators','use_localstorage_for_settings','create_volume_indicator_by_default'],custom_indicators_getter:async p=>(legacy?baselinePythonStudies:pythonStudies)(p,catalog)});
       let loaded=false,picker;widget.onChartReady(async()=>{await widget.headerReady();if(!legacy)picker=chartIndicatorPicker(widget,catalog,e=>{throw e;});loaded=true;});
       </script></body></html>`,
       });
@@ -151,6 +152,16 @@ const report = {
         .activeChart()
         .createStudyTemplate({ saveSymbol: true, saveInterval: true }),
     );
+    if (process.env.INDICATOR_COMPAT_FIXTURE)
+      fs.writeFileSync(
+        process.env.INDICATOR_COMPAT_FIXTURE,
+        JSON.stringify({
+          state: savedState,
+          template,
+          signature: original,
+          symbol: fixtureSymbol,
+        }),
+      );
     await page.goto("https://indicator.test/");
     await settle();
     await page.waitForTimeout(500);

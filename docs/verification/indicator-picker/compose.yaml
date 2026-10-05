@@ -2,7 +2,7 @@
 name: mw-indicator-acceptance
 services:
   pg:
-    image: postgres:17-alpine
+    image: postgres:14-bookworm
     environment:
       POSTGRES_DB: indicator_acceptance
       POSTGRES_USER: indicator_acceptance
