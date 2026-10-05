@@ -1,0 +1,920 @@
+{
+  "recorded_on": "2026-10-04",
+  "status": "Diagnosis and isolated prototypes; no production fix deployed",
+  "baseline": {
+    "local": "62488c6",
+    "production_release": "v1.7.0",
+    "release_commit": "e40eaacfb83a759b2c7fdcfaa58dcbf2fb0e9758",
+    "isolated_original_bundle_sha256": "114428b8dde6eb137fd7ef3bc20ef35882189186c4bd092bb743b64d11682be1"
+  },
+  "production": {
+    "scope": "Real Playwright Chromium on trade.kookvv.com:8443/advanced-charts; user-state writes blocked",
+    "history_limit": {
+      "at": "2026-10-03T21:35:08.478Z",
+      "setup": [
+        "H4",
+        "W1",
+        "D1",
+        "M5"
+      ],
+      "action": "One W1 screen drag with time sync on",
+      "request": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "timeframe": "M5",
+        "limit": 60031,
+        "countBack": 60031,
+        "from": 1765607280000,
+        "before": 1790820300000,
+        "firstDataRequest": false,
+        "native_history": {
+          "chart_count": 4,
+          "focused": false,
+          "historical_navigation": false,
+          "screen_bars": 127,
+          "batch_screens": 2
+        }
+      },
+      "reply": "请求不在允许范围内",
+      "matching_backend_http": false,
+      "control": {
+        "action": "Same W1 drag with time sync off",
+        "rejections": 0,
+        "max_m5_limit": 254
+      },
+      "sticky_state": {
+        "thread": {
+          "key": "MWP:EURUSD|5",
+          "error": "Error: 请求不在允许范围内",
+          "requesting": false,
+          "destroyed": false
+        },
+        "time_scale": {
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "requesting": true
+        }
+      }
+    },
+    "stationary_crosshair": {
+      "at": "2026-10-03T21:57:55.147Z",
+      "target_seconds": 1789948800,
+      "target_utc": "2026-09-21T00:00:00Z",
+      "setup": [
+        "H4",
+        "W1",
+        "D1",
+        "M5"
+      ],
+      "time_sync": true,
+      "crosshair_sync": true,
+      "date_range_sync": false,
+      "stationary_ms": 3000,
+      "rejections": 0,
+      "page_errors": [],
+      "stationary": [
+        {
+          "resolution": "1W",
+          "time": 1789948800,
+          "centerTime": 1782691200
+        },
+        {
+          "resolution": "1D",
+          "time": 1790553600,
+          "centerTime": 1789948800
+        },
+        {
+          "resolution": "5",
+          "time": 1789450200,
+          "centerTime": 1789948800
+        },
+        {
+          "resolution": "240",
+          "time": 1790542800,
+          "centerTime": 1789952400
+        }
+      ],
+      "after_mouse_move": [
+        {
+          "resolution": "1W",
+          "time": 1789948800,
+          "centerTime": 1782691200
+        },
+        {
+          "resolution": "1D",
+          "time": 1789948800,
+          "centerTime": 1789948800
+        },
+        {
+          "resolution": "5",
+          "time": 1789948800,
+          "centerTime": 1789948800
+        },
+        {
+          "resolution": "240",
+          "time": 1789938000,
+          "centerTime": 1789952400
+        }
+      ]
+    }
+  },
+  "isolated": {
+    "scope": "Actual licensed v31.1 library, synthetic 24x7 OHLC and countBack>20000 rejection; no production API or persistent user-state writes",
+    "limits": "Monthly synthetic feed approximates calendar months. This is mechanism evidence, not market-calendar or performance acceptance.",
+    "period_matrix": [
+      {
+        "setup": {
+          "source": "1W",
+          "peers": [
+            "1",
+            "5",
+            "15"
+          ],
+          "kind": "far",
+          "ratio": 0.15
+        },
+        "rejected": [
+          {
+            "resolution": "1",
+            "countBack": 1001873,
+            "error": "请求不在允许范围内"
+          },
+          {
+            "resolution": "5",
+            "countBack": 200081,
+            "error": "请求不在允许范围内"
+          },
+          {
+            "resolution": "15",
+            "countBack": 66449,
+            "error": "请求不在允许范围内"
+          }
+        ],
+        "stationary": [
+          {
+            "res": "1W",
+            "time": 1730678400,
+            "center": 1757894400,
+            "requesting": false
+          },
+          {
+            "res": "1",
+            "time": 1790805720,
+            "center": 1790809560,
+            "requesting": true
+          },
+          {
+            "res": "5",
+            "time": 1790777400,
+            "center": 1790796600,
+            "requesting": true
+          },
+          {
+            "res": "15",
+            "time": 1790706600,
+            "center": 1790764200,
+            "requesting": true
+          }
+        ],
+        "after_mouse_move": [
+          {
+            "res": "1W",
+            "time": 1730678400,
+            "center": 1757894400,
+            "requesting": false
+          },
+          {
+            "res": "1",
+            "time": 1790805720,
+            "center": 1790809560,
+            "requesting": true
+          },
+          {
+            "res": "5",
+            "time": 1790777400,
+            "center": 1790796600,
+            "requesting": true
+          },
+          {
+            "res": "15",
+            "time": 1790706600,
+            "center": 1790764200,
+            "requesting": true
+          }
+        ],
+        "page_errors": []
+      },
+      {
+        "setup": {
+          "source": "1W",
+          "peers": [
+            "30",
+            "60",
+            "240"
+          ],
+          "kind": "far",
+          "ratio": 0.15
+        },
+        "rejected": [
+          {
+            "resolution": "30",
+            "countBack": 33041,
+            "error": "请求不在允许范围内"
+          }
+        ],
+        "stationary": [
+          {
+            "res": "1W",
+            "time": 1730678400,
+            "center": 1757894400,
+            "requesting": false
+          },
+          {
+            "res": "30",
+            "time": 1790600400,
+            "center": 1790715600,
+            "requesting": true
+          },
+          {
+            "res": "60",
+            "time": 1730494800,
+            "center": 1730678400,
+            "requesting": false
+          },
+          {
+            "res": "240",
+            "time": 1729944000,
+            "center": 1730678400,
+            "requesting": false
+          }
+        ],
+        "after_mouse_move": [
+          {
+            "res": "1W",
+            "time": 1730678400,
+            "center": 1757894400,
+            "requesting": false
+          },
+          {
+            "res": "30",
+            "time": 1790600400,
+            "center": 1790715600,
+            "requesting": true
+          },
+          {
+            "res": "60",
+            "time": 1730678400,
+            "center": 1730678400,
+            "requesting": false
+          },
+          {
+            "res": "240",
+            "time": 1730678400,
+            "center": 1730678400,
+            "requesting": false
+          }
+        ],
+        "page_errors": []
+      },
+      {
+        "setup": {
+          "source": "1M",
+          "peers": [
+            "1D",
+            "1W",
+            "240"
+          ],
+          "kind": "far",
+          "ratio": 0.12
+        },
+        "rejected": [],
+        "stationary": [
+          {
+            "res": "1M",
+            "time": 1517443200,
+            "center": 1648771200,
+            "requesting": false
+          },
+          {
+            "res": "1D",
+            "time": 1513036800,
+            "center": 1517443200,
+            "requesting": false
+          },
+          {
+            "res": "1W",
+            "time": 1486339200,
+            "center": 1517788800,
+            "requesting": false
+          },
+          {
+            "res": "240",
+            "time": 1516708800,
+            "center": 1517443200,
+            "requesting": false
+          }
+        ],
+        "after_mouse_move": [
+          {
+            "res": "1M",
+            "time": 1517443200,
+            "center": 1648771200,
+            "requesting": false
+          },
+          {
+            "res": "1D",
+            "time": 1517443200,
+            "center": 1517443200,
+            "requesting": false
+          },
+          {
+            "res": "1W",
+            "time": 1517184000,
+            "center": 1517788800,
+            "requesting": false
+          },
+          {
+            "res": "240",
+            "time": 1517443200,
+            "center": 1517443200,
+            "requesting": false
+          }
+        ],
+        "page_errors": []
+      },
+      {
+        "setup": {
+          "source": "1M",
+          "peers": [
+            "30",
+            "60",
+            "240"
+          ],
+          "kind": "far",
+          "ratio": 0.02
+        },
+        "rejected": [
+          {
+            "resolution": "30",
+            "countBack": 170513,
+            "error": "请求不在允许范围内"
+          },
+          {
+            "resolution": "60",
+            "countBack": 85073,
+            "error": "请求不在允许范围内"
+          },
+          {
+            "resolution": "240",
+            "countBack": 20993,
+            "error": "请求不在允许范围内"
+          }
+        ],
+        "stationary": [
+          {
+            "res": "1M",
+            "time": 1483228800,
+            "center": 1648771200,
+            "requesting": false
+          },
+          {
+            "res": "30",
+            "time": 1790600400,
+            "center": 1790715600,
+            "requesting": true
+          },
+          {
+            "res": "60",
+            "time": 1790388000,
+            "center": 1790618400,
+            "requesting": true
+          },
+          {
+            "res": "240",
+            "time": 1789113600,
+            "center": 1790035200,
+            "requesting": true
+          }
+        ],
+        "after_mouse_move": [
+          {
+            "res": "1M",
+            "time": 1483228800,
+            "center": 1648771200,
+            "requesting": false
+          },
+          {
+            "res": "30",
+            "time": 1790600400,
+            "center": 1790715600,
+            "requesting": true
+          },
+          {
+            "res": "60",
+            "time": 1790388000,
+            "center": 1790618400,
+            "requesting": true
+          },
+          {
+            "res": "240",
+            "time": 1789113600,
+            "center": 1790035200,
+            "requesting": true
+          }
+        ],
+        "page_errors": []
+      }
+    ],
+    "cursor_replay": {
+      "baseline_near": {
+        "setup": {
+          "source": "1W",
+          "peers": [
+            "1D",
+            "240",
+            "5"
+          ],
+          "kind": "crosshair",
+          "ratio": 0.88
+        },
+        "rejections": 0,
+        "stationary": [
+          {
+            "res": "1W",
+            "time": 1786924800,
+            "center": 1757894400,
+            "requesting": false
+          },
+          {
+            "res": "1D",
+            "time": 1786924800,
+            "center": 1786147200,
+            "requesting": false
+          },
+          {
+            "res": "240",
+            "time": 1786190400,
+            "center": 1786924800,
+            "requesting": false
+          },
+          {
+            "res": "5",
+            "time": 1786909500,
+            "center": 1786924800,
+            "requesting": false
+          }
+        ],
+        "after_mouse_move": [
+          {
+            "res": "1W",
+            "time": 1786924800,
+            "center": 1757894400,
+            "requesting": false
+          },
+          {
+            "res": "1D",
+            "time": 1786924800,
+            "center": 1786147200,
+            "requesting": false
+          },
+          {
+            "res": "240",
+            "time": 1786924800,
+            "center": 1786924800,
+            "requesting": false
+          },
+          {
+            "res": "5",
+            "time": 1786924800,
+            "center": 1786924800,
+            "requesting": false
+          }
+        ]
+      },
+      "prototype": "Browser-local method wrappers retain original external cursor time and reapply the latest cursor after peer navigation plus two requestAnimationFrame callbacks",
+      "cases": [
+        {
+          "setup": {
+            "source": "1W",
+            "peers": [
+              "30",
+              "60",
+              "240"
+            ],
+            "kind": "far",
+            "ratio": 0.15
+          },
+          "stationary": [
+            {
+              "res": "1W",
+              "time": 1730678400,
+              "center": 1757894400,
+              "requesting": false
+            },
+            {
+              "res": "30",
+              "time": 1790600400,
+              "center": 1790715600,
+              "requesting": true
+            },
+            {
+              "res": "60",
+              "time": 1730678400,
+              "center": 1730678400,
+              "requesting": false
+            },
+            {
+              "res": "240",
+              "time": 1730678400,
+              "center": 1730678400,
+              "requesting": false
+            }
+          ],
+          "after_mouse_move": [
+            {
+              "res": "1W",
+              "time": 1730678400,
+              "center": 1757894400,
+              "requesting": false
+            },
+            {
+              "res": "30",
+              "time": 1790600400,
+              "center": 1790715600,
+              "requesting": true
+            },
+            {
+              "res": "60",
+              "time": 1730678400,
+              "center": 1730678400,
+              "requesting": false
+            },
+            {
+              "res": "240",
+              "time": 1730678400,
+              "center": 1730678400,
+              "requesting": false
+            }
+          ],
+          "replays": [
+            {
+              "res": "60",
+              "sourceTime": 1730678400
+            },
+            {
+              "res": "240",
+              "sourceTime": 1730678400
+            }
+          ],
+          "rejections": 1,
+          "page_errors": []
+        },
+        {
+          "setup": {
+            "source": "1M",
+            "peers": [
+              "1D",
+              "1W",
+              "240"
+            ],
+            "kind": "far",
+            "ratio": 0.12
+          },
+          "stationary": [
+            {
+              "res": "1M",
+              "time": 1517443200,
+              "center": 1648771200,
+              "requesting": false
+            },
+            {
+              "res": "1D",
+              "time": 1517443200,
+              "center": 1517443200,
+              "requesting": false
+            },
+            {
+              "res": "1W",
+              "time": 1517184000,
+              "center": 1517788800,
+              "requesting": false
+            },
+            {
+              "res": "240",
+              "time": 1517443200,
+              "center": 1517443200,
+              "requesting": false
+            }
+          ],
+          "after_mouse_move": [
+            {
+              "res": "1M",
+              "time": 1517443200,
+              "center": 1648771200,
+              "requesting": false
+            },
+            {
+              "res": "1D",
+              "time": 1517443200,
+              "center": 1517443200,
+              "requesting": false
+            },
+            {
+              "res": "1W",
+              "time": 1517184000,
+              "center": 1517788800,
+              "requesting": false
+            },
+            {
+              "res": "240",
+              "time": 1517443200,
+              "center": 1517443200,
+              "requesting": false
+            }
+          ],
+          "replays": [
+            {
+              "res": "1D",
+              "sourceTime": 1517443200
+            },
+            {
+              "res": "1W",
+              "sourceTime": 1517443200
+            },
+            {
+              "res": "240",
+              "sourceTime": 1517443200
+            }
+          ],
+          "rejections": 0,
+          "page_errors": []
+        },
+        {
+          "setup": {
+            "source": "1W",
+            "peers": [
+              "1D",
+              "240",
+              "5"
+            ],
+            "kind": "crosshair",
+            "ratio": 0.88
+          },
+          "stationary": [
+            {
+              "res": "1W",
+              "time": 1786924800,
+              "center": 1757894400,
+              "requesting": false
+            },
+            {
+              "res": "1D",
+              "time": 1786924800,
+              "center": 1786147200,
+              "requesting": false
+            },
+            {
+              "res": "240",
+              "time": 1786924800,
+              "center": 1786924800,
+              "requesting": false
+            },
+            {
+              "res": "5",
+              "time": 1786924800,
+              "center": 1786924800,
+              "requesting": false
+            }
+          ],
+          "after_mouse_move": [
+            {
+              "res": "1W",
+              "time": 1786924800,
+              "center": 1757894400,
+              "requesting": false
+            },
+            {
+              "res": "1D",
+              "time": 1786924800,
+              "center": 1786147200,
+              "requesting": false
+            },
+            {
+              "res": "240",
+              "time": 1786924800,
+              "center": 1786924800,
+              "requesting": false
+            },
+            {
+              "res": "5",
+              "time": 1786924800,
+              "center": 1786924800,
+              "requesting": false
+            }
+          ],
+          "replays": [
+            {
+              "res": "1D",
+              "sourceTime": 1786924800
+            },
+            {
+              "res": "240",
+              "sourceTime": 1786924800
+            },
+            {
+              "res": "5",
+              "sourceTime": 1786924800
+            }
+          ],
+          "rejections": 0,
+          "page_errors": []
+        }
+      ]
+    },
+    "bounded_window": {
+      "setup": {
+        "source": "1W",
+        "peers": [
+          "1",
+          "5",
+          "15"
+        ],
+        "kind": "far",
+        "ratio": 0.15
+      },
+      "prototype": "Scoped reset and source rebuild with numeric initial count and time-range; adapter window first-load anchor set to the requested historical right boundary rather than now. This is a browser-local feasibility probe, not implementation-ready recovery.",
+      "target": {
+        "target": 1730678400,
+        "screen": 128,
+        "startDate": 1730563200,
+        "endDate": 1730697600
+      },
+      "before": [
+        {
+          "res": "1W",
+          "time": 1730678400,
+          "center": 1757894400,
+          "requesting": false
+        },
+        {
+          "res": "1",
+          "time": 1790805720,
+          "center": 1790809560,
+          "requesting": true
+        },
+        {
+          "res": "5",
+          "time": 1790777400,
+          "center": 1790796600,
+          "requesting": true
+        },
+        {
+          "res": "15",
+          "time": 1790706600,
+          "center": 1790764200,
+          "requesting": true
+        }
+      ],
+      "after": [
+        {
+          "res": "1W",
+          "time": 1730678400,
+          "center": 1757894400,
+          "requesting": false
+        },
+        {
+          "res": "1",
+          "time": 1790805720,
+          "center": 1790809560,
+          "requesting": true
+        },
+        {
+          "res": "5",
+          "time": 1730567700,
+          "center": 1730678400,
+          "requesting": false
+        },
+        {
+          "res": "15",
+          "time": 1790706600,
+          "center": 1790764200,
+          "requesting": true
+        }
+      ],
+      "navigation_result": {
+        "timestamp": 1730678400
+      },
+      "held_drag": [
+        {
+          "res": "1W",
+          "time": null,
+          "center": 1757894400,
+          "requesting": false
+        },
+        {
+          "res": "1",
+          "time": null,
+          "center": 1790809560,
+          "requesting": true
+        },
+        {
+          "res": "5",
+          "time": null,
+          "center": 1730569200,
+          "requesting": false
+        },
+        {
+          "res": "15",
+          "time": null,
+          "center": 1790764200,
+          "requesting": true
+        }
+      ],
+      "released_drag": [
+        {
+          "res": "1W",
+          "time": 1730073600,
+          "center": 1757894400,
+          "requesting": false
+        },
+        {
+          "res": "1",
+          "time": 1790805720,
+          "center": 1790809560,
+          "requesting": true
+        },
+        {
+          "res": "5",
+          "time": 1730636400,
+          "center": 1730569200,
+          "requesting": false
+        },
+        {
+          "res": "15",
+          "time": 1790706600,
+          "center": 1790764200,
+          "requesting": true
+        }
+      ],
+      "returned_latest": [
+        {
+          "res": "1W",
+          "time": null,
+          "center": 1757894400,
+          "requesting": false
+        },
+        {
+          "res": "1",
+          "time": null,
+          "center": 1790809560,
+          "requesting": true
+        },
+        {
+          "res": "5",
+          "time": null,
+          "center": 1790748300,
+          "requesting": false
+        },
+        {
+          "res": "15",
+          "time": null,
+          "center": 1790764200,
+          "requesting": true
+        }
+      ],
+      "requests": [
+        {
+          "resolution": "5",
+          "stage": "bounded",
+          "params": {
+            "from": 1730563200,
+            "to": 1730697600,
+            "countBack": 448,
+            "firstDataRequest": true
+          },
+          "error": null
+        },
+        {
+          "resolution": "5",
+          "stage": "latest",
+          "params": {
+            "from": 1790677864,
+            "to": 1790812864,
+            "countBack": 450,
+            "firstDataRequest": true
+          },
+          "error": null
+        }
+      ],
+      "page_errors": [],
+      "not_verified": [
+        "Indicators and drawings preservation",
+        "Same-symbol same-resolution disjoint windows",
+        "Historical newer-side boundary paging",
+        "Realtime ticks and cache-revision corrections",
+        "Timeout/cancellation rollback",
+        "Full OANDA/Binance/Yahoo calendar matrix"
+      ]
+    }
+  }
+}

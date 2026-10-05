@@ -1,0 +1,195 @@
+{
+  "scope": "isolated Docker actual provider native calendar",
+  "cases": [
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "1",
+      "range": {
+        "from": 1710187200,
+        "to": 1710198000
+      },
+      "status": 3,
+      "invalid": false,
+      "window": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1",
+        "target": 1710192720,
+        "from": 1710161580,
+        "to": 1710213480,
+        "count": 865,
+        "spacing": 6.543352601156069,
+        "viewport": {
+          "from": 1710187200,
+          "to": 1710198000
+        },
+        "followViewport": true,
+        "seed": null,
+        "replacing": false
+      },
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 1041
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "5",
+      "range": {
+        "from": 1709854500,
+        "to": 1710375900
+      },
+      "status": 3,
+      "invalid": false,
+      "window": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "target": 1710201300,
+        "from": 1708629900,
+        "to": 1711078500,
+        "count": 5870,
+        "spacing": 0.9642248722316865,
+        "viewport": {
+          "from": 1709856000,
+          "to": 1710374400
+        },
+        "followViewport": true,
+        "seed": null,
+        "replacing": false
+      },
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 5873
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "15",
+      "range": {
+        "from": 1709856000,
+        "to": 1710374400
+      },
+      "status": 3,
+      "invalid": false,
+      "window": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "15",
+        "target": 1709856000,
+        "from": 1705476600,
+        "to": 1712829600,
+        "count": 5870,
+        "spacing": 0.9642248722316865,
+        "viewport": {
+          "from": 1709856000,
+          "to": 1710374400
+        },
+        "seed": null,
+        "replacing": false
+      },
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 5873
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "30",
+      "range": {
+        "from": 1709856000,
+        "to": 1710374400
+      },
+      "status": 3,
+      "invalid": false,
+      "window": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "30",
+        "target": 1709856000,
+        "from": 1706891400,
+        "to": 1711944000,
+        "count": 2005,
+        "spacing": 2.910025706940874,
+        "viewport": {
+          "from": 1709856000,
+          "to": 1710374400
+        },
+        "seed": null,
+        "replacing": false
+      },
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 2397
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "60",
+      "range": {
+        "from": 1709856000,
+        "to": 1710374400
+      },
+      "status": 3,
+      "invalid": false,
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 17621
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "240",
+      "range": {
+        "from": 1709863200,
+        "to": 1710363600
+      },
+      "status": 3,
+      "invalid": false,
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 5908
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "1D",
+      "range": {
+        "from": 1709856000,
+        "to": 1710374400
+      },
+      "status": 3,
+      "invalid": false,
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 2654
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "1W",
+      "range": {
+        "from": 1578268800,
+        "to": 1609113600
+      },
+      "status": 3,
+      "invalid": false,
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 1272
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "1M",
+      "range": {
+        "from": 1577836800,
+        "to": 1609459200
+      },
+      "status": 3,
+      "invalid": false,
+      "points": {
+        "firstIndex": 0,
+        "lastIndex": 292
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

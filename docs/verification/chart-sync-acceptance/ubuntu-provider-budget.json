@@ -1,0 +1,78 @@
+{
+  "scope": "Ubuntu isolated instance provider cold-window request budget",
+  "production_changed": false,
+  "setting": "ALERTS_PROVIDER_REQUEST_SECONDS",
+  "before_seconds": 8,
+  "after_seconds": 25,
+  "cold_request_count": 18000,
+  "before": {
+    "status": 503,
+    "elapsed_ms": 8031,
+    "detail": "平台行情暂不可用，请重试；尚未确认历史边界",
+    "count": null,
+    "first": null,
+    "last": null,
+    "before_time": 1523923200000
+  },
+  "after": {
+    "status": 200,
+    "elapsed_ms": 12547,
+    "detail": null,
+    "count": 18000,
+    "first": 1461576900000,
+    "last": 1469058900000,
+    "before_time": 1469059200000
+  },
+  "current_saved_layout": {
+    "passed": true,
+    "charts": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "240",
+        "range": {
+          "from": 1787533200,
+          "to": 1791277200
+        },
+        "invalid": false
+      },
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1W",
+        "range": {
+          "from": 1789948800,
+          "to": 1799013600
+        },
+        "invalid": false
+      },
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1D",
+        "range": {
+          "from": 1758758400,
+          "to": 1792098000
+        },
+        "invalid": false
+      },
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1790961000,
+          "to": 1791150300
+        },
+        "invalid": false
+      }
+    ],
+    "history_statuses": [
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "errors": []
+  }
+}

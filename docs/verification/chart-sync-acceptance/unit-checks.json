@@ -1,0 +1,80 @@
+[
+  {
+    "test": "advanced-native-reserve-lifetime",
+    "exit_code": 0,
+    "output": "Shared error/miss backoff, bounded retries, viewport restart and stale completion isolation passed",
+    "error": ""
+  },
+  {
+    "test": "advanced-native-reserve-scheduler",
+    "exit_code": 0,
+    "output": "Two reserve lanes, four total lanes and visible-request priority passed",
+    "error": ""
+  },
+  {
+    "test": "advanced-viewports",
+    "exit_code": 0,
+    "output": "Viewport restoration preserves preferences and checks symbol identity",
+    "error": ""
+  },
+  {
+    "test": "advanced-provider-history-observation",
+    "exit_code": 0,
+    "output": "Late native history: backfill, revision, failed/legacy review and inactive correction passed",
+    "error": ""
+  },
+  {
+    "test": "advanced-provider-request-lifetime",
+    "exit_code": 0,
+    "output": "Provider native requests survive period switches and cancel on workspace replacement",
+    "error": ""
+  },
+  {
+    "test": "advanced-provider-subscriptions",
+    "exit_code": 0,
+    "output": "Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed",
+    "error": ""
+  },
+  {
+    "test": "advanced-history-reload",
+    "exit_code": 0,
+    "output": "Grouped polling recovers after failure and prevents overlapping requests\nHistorical reload invalidates matching cache before resetting only matching panes",
+    "error": ""
+  },
+  {
+    "test": "advanced-history-change-range",
+    "exit_code": 0,
+    "output": "Historical views ignore remote latest revisions; visible revisions and initial data still refresh",
+    "error": ""
+  },
+  {
+    "test": "advanced-history-pagination",
+    "exit_code": 0,
+    "output": "Large countBack traverses published pages without truncation or duplicate bars",
+    "error": ""
+  },
+  {
+    "test": "advanced-history-boundaries",
+    "exit_code": 0,
+    "output": "Published pagination preserves latest subscription boundary and earliest revision range",
+    "error": ""
+  },
+  {
+    "test": "advanced-python-indicators",
+    "exit_code": 0,
+    "output": "Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed\nPython feed retains historical window identity without changing backend symbol",
+    "error": ""
+  },
+  {
+    "test": "advanced-inflight-cancellation",
+    "exit_code": 0,
+    "output": "Four obsolete in-flight histories release slots within 180ms; current request starts",
+    "error": ""
+  },
+  {
+    "test": "advanced-native-hook-contract",
+    "exit_code": 0,
+    "output": "Original, legacy, idempotent, partial/tampered, disable and distinct cache URL contracts passed",
+    "error": ""
+  }
+]

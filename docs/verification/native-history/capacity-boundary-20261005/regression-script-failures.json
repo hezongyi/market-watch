@@ -1,0 +1,102 @@
+[
+  {
+    "record": "boundary-full-regression.json",
+    "failure": "TimeoutError: frame.waitForFunction: Timeout 30000ms exceeded.",
+    "cancelOutcome": null,
+    "returnLatestOutcome": null,
+    "saved": false,
+    "reopened": false,
+    "faultRecovery": [
+      {
+        "kind": "busy",
+        "injectedCode": "HISTORY_BUSY",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "failure",
+        "injectedCode": "HISTORY_PROVIDER_FAILED",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "timeout",
+        "injectedCode": "HISTORY_TIMEOUT",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "capacity",
+        "injectedCode": "NATIVE_HISTORY_CAPACITY_EXCEEDED",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      }
+    ]
+  },
+  {
+    "record": "boundary-full-regression-final.json",
+    "failure": "Error: locator.click: Frame was detached\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '图表菜单', exact: true })\u001b[22m\n",
+    "cancelOutcome": "cancelled",
+    "returnLatestOutcome": "cancelled",
+    "saved": true,
+    "reopened": true,
+    "faultRecovery": [
+      {
+        "kind": "busy",
+        "injectedCode": "HISTORY_BUSY",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "failure",
+        "injectedCode": "HISTORY_PROVIDER_FAILED",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "timeout",
+        "injectedCode": "HISTORY_TIMEOUT",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "capacity",
+        "injectedCode": "NATIVE_HISTORY_CAPACITY_EXCEEDED",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      }
+    ]
+  }
+]

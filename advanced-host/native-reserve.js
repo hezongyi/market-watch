@@ -8,8 +8,8 @@ const MWNativeReserve = (() => {
   const enabled = globalThis.MW_NATIVE_RESERVE_ENABLED !== false &&
     new URLSearchParams(location.search).get('native_reserve') !== 'off';
   const now = () => performance.now();
-  const threadKey = t => key(t._symbolInfo?.ticker || t._symbolInfo?.name, t._resolution);
-  const identity = m => key(m.mainSeries().symbol(), m.interval());
+  const threadKey = t => globalThis.MWNativeNavigation?.threadKey(t._symbolInfo, t._resolution) || key(t._symbolInfo?.ticker || t._symbolInfo?.name, t._resolution);
+  const identity = m => globalThis.MWNativeNavigation?.modelKey(m) || key(m.mainSeries().symbol(), m.interval());
   const provider = symbol => typeof symbol === 'string' && symbol.startsWith('MWP:');
   function retryState(thread) {
     // Native reset/purge reuses the thread but replaces its cache object.
@@ -57,8 +57,9 @@ const MWNativeReserve = (() => {
     if (!enabled || !transport || !state || !g) return;
     const symbol = m.mainSeries().symbol(), resolution = m.interval();
     if (!provider(symbol)) return;
-    const k = key(symbol, resolution), thread = threads.get(k);
+    const k = identity(m), thread = threads.get(k);
     if (!thread || thread._destroyed) return;
+    if (globalThis.MWNativeNavigation?.filling(thread)) return;
     if (state.identity !== k) {
       state.identity = k; state.previous = undefined; state.enhancedUntil = 0;
       state.lastAttemptOffset = g.ts.rightOffset();
@@ -97,6 +98,7 @@ const MWNativeReserve = (() => {
       entry.lastAttemptOffset = model.timeScale().rightOffset();
     const cache = thread._cache;
     const current = () => !thread._destroyed && threads.get(k) === thread &&
+      !globalThis.MWNativeNavigation?.filling(thread) &&
       thread._cache === cache && thread._cache.bars[0]?.time === before && !thread._requesting;
     const flight = (async () => {
       try {
@@ -108,6 +110,7 @@ const MWNativeReserve = (() => {
             entry.enhancedUntil = now() + 10000;
         const rows = result.bars.filter(b => b.time < requestBefore);
         if (rows.length) {
+          globalThis.MWNativeNavigation?.admitCached(thread, rows);
           thread._processBars(rows, {noData: result.history_boundary === true});
           retry.failures = 0; retry.misses = 0; retry.retryAt = 0;
         } else if (!rows.length) {
@@ -132,7 +135,7 @@ const MWNativeReserve = (() => {
       for (const m of models.keys()) schedule(m);},
     bindThread(thread, info, resolution) {
       if (enabled) {
-        threads.set(key(info.ticker || info.name, resolution), thread);
+        threads.set(globalThis.MWNativeNavigation?.threadKey(info, resolution) || key(info.ticker || info.name, resolution), thread);
         retryState(thread);
       }
     },
@@ -158,7 +161,8 @@ const MWNativeReserve = (() => {
       if (!enabled || !provider(info.ticker || info.name)) return 0;
       let extra = 0;
       for (const [m, state] of models) {
-        if (identity(m) !== key(info.ticker || info.name, resolution)) continue;
+        if (m.mainSeries().symbol() !== (info.ticker || info.name) || m.interval() !== resolution ||
+            (globalThis.MWNativeNavigation && identity(m) !== MWNativeNavigation.threadKey(info, resolution))) continue;
         const g = geometry(m);
         if (g) extra = Math.max(extra, Math.ceil(g.screen * (state.batch || 1)));
       }
@@ -171,7 +175,8 @@ const MWNativeReserve = (() => {
         (thread._endOfData ? 0 : calculationPrefix(info.ticker || info.name, res))));
     },
     delivered(info, resolution, duration) {
-      for (const [m, state] of models) if (identity(m) === key(info.ticker || info.name, resolution)) {
+      for (const [m, state] of models) if (m.mainSeries().symbol() === (info.ticker || info.name) && m.interval() === resolution &&
+        (!globalThis.MWNativeNavigation || identity(m) === MWNativeNavigation.threadKey(info, resolution))) {
         if (duration >= 800) state.enhancedUntil = now() + 10000;
         schedule(m);
       }

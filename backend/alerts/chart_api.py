@@ -90,9 +90,9 @@ class DataQuery(BaseModel):
     series_kind: SeriesKind = "managed"
     timeframe: str
     before: int | None = Field(default=None, gt=0)
-    limit: int = Field(default=500, ge=1, le=20000)
+    limit: int = Field(default=500, ge=1, le=1000000)
     from_time: int | None = Field(default=None, alias="from", ge=0)
-    count_back: int | None = Field(default=None, alias="countBack", ge=1, le=20000)
+    count_back: int | None = Field(default=None, alias="countBack", ge=1, le=1000000)
     first_data_request: bool = Field(default=False, alias="firstDataRequest")
     client: str | None = Field(default=None, max_length=64)
     indicators: list[dict] = Field(default_factory=list, max_length=12)
@@ -123,6 +123,8 @@ class DataQuery(BaseModel):
             if (self.series_kind != "provider" or self.native_history is None or
                     self.indicators or self.history_observation is not None or self.before is None):
                 raise ValueError("图表储备只适用于带原生上下文的纯平台历史缓存读取")
+        if self.series_kind == "provider" and self.native_history is None and max(self.limit, self.count_back or 0) > 20000:
+            raise ValueError("普通平台单页最多20000根")
         if self.series_kind == "managed" and self.limit > 2000:
             raise ValueError("自建单页最多2000根")
         if self.native_history is not None or self.history_observation is not None:
@@ -133,6 +135,16 @@ class DataQuery(BaseModel):
             if self.from_time is not None and self.before is not None and self.from_time >= self.before:
                 raise ValueError("原生历史区间须满足from<to")
         return self
+
+
+class HistoryLoadQuery(BaseModel):
+    request_id: str = Field(min_length=1, max_length=100, pattern=r"^[a-zA-Z0-9._:-]+$")
+    query: DataQuery
+
+
+class HistoryCapacityWrite(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    max_bars: int
 
 
 class ExportQuery(BaseModel):
@@ -594,6 +606,53 @@ def router(authenticated):
         with transaction() as db:
             db.execute(delete(ChartTemplate).where(ChartTemplate.id == id))
         return {"ok": True}
+
+    @r.get("/history-capabilities")
+    def history_capabilities():
+        from .provider_history_policy import capabilities
+        return capabilities()
+
+    @r.post("/history-capacity")
+    def history_capacity(body: HistoryCapacityWrite):
+        from .provider_history_policy import save_capacity
+        try:
+            return save_capacity(body.max_bars)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
+
+    async def history_operation(operation, *args):
+        from .provider_history_policy import CapacityExceeded
+        import httpx
+        try:
+            return await asyncio.to_thread(operation, *args)
+        except CapacityExceeded as exc:
+            raise HTTPException(422, {"code": exc.code, "message": str(exc), "history_boundary": False}) from None
+        except TimeoutError:
+            raise HTTPException(503, {"code": "HISTORY_TIMEOUT", "message": "历史读取超时，请重试", "history_boundary": False}) from None
+        except httpx.HTTPError:
+            raise HTTPException(503, {"code": "HISTORY_PROVIDER_FAILED", "message": "平台历史暂不可用，请重试", "history_boundary": False}) from None
+        except ValueError as exc:
+            raise HTTPException(422, {"code": "INVALID_HISTORY_REQUEST", "message": str(exc), "history_boundary": False}) from None
+
+    @r.post("/history-loads")
+    async def history_submit(body: HistoryLoadQuery, request: Request):
+        from .native_history_loads import owner_of, submit
+        return await history_operation(submit, owner_of(request), body.request_id, body.query)
+
+    @r.get("/history-loads/{id}")
+    async def history_status(id: str, request: Request):
+        from .native_history_loads import owner_of, status
+        return await history_operation(status, owner_of(request), id)
+
+    @r.get("/history-loads/{id}/result")
+    async def history_result(id: str, request: Request):
+        from .native_history_loads import owner_of, result
+        return await history_operation(result, owner_of(request), id)
+
+    @r.post("/history-loads/{id}/cancel")
+    async def history_cancel(id: str, request: Request):
+        from .native_history_loads import owner_of, status
+        return await history_operation(status, owner_of(request), id, True)
 
     @r.post("/reserve")
     async def reserve(body: DataQuery, request: Request):

@@ -279,6 +279,25 @@ def test_cleanup_removes_expired_coverage_with_data_not_active_interest(database
         )
 
 
+def test_cleanup_protects_active_history_consumer_until_expiry(database, monkeypatch):
+    from alerts.storage import NativeHistoryLoad
+    monkeypatch.setattr(upstream, 'metadata', lambda *a, **k: META)
+    key = seed(META, 'M5', 10000, page(1000, 10000))
+    now = cache.now_ms()
+    with database.begin() as db:
+        db.get(ProviderDataset, key).accessed_at = 0
+        db.add(NativeHistoryLoad(id='protected', owner='owner', request_id='request',
+            query_json={'instrument': META['id'], 'timeframe': 'M5'}, state='waiting',
+            consumer_until=now + 45000, deadline=now + 60000))
+    service.cleanup()
+    with database.begin() as db:
+        assert db.get(ProviderDataset, key).coverage
+        db.get(NativeHistoryLoad, 'protected').consumer_until = 0
+    service.cleanup()
+    with database.begin() as db:
+        assert db.get(ProviderDataset, key) is None
+
+
 def test_unchanged_reobservation_does_not_invalidate_already_loaded_revision(database, monkeypatch):
     clock = [100000]
     monkeypatch.setattr(cache, "now_ms", lambda: clock[0])

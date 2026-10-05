@@ -132,9 +132,10 @@ function drain() {
     const id = ++seq;
     const timer = setTimeout(() => {
       pending.delete(id);
-      reject(Error("行情请求超时"));
+      send({type:"cancel-request",id});
+      reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
       drain();
-    }, 30000);
+    }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
     const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
       reserve: !!query.native_reserve };
     pending.set(id, entry);
@@ -281,8 +282,17 @@ globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen
     throw Error('已丢弃旧版本的图表储备响应');
   return {...page, bars: barsOf(page, resolution, symbol)};
 }, nativeReserveWarmup);
+globalThis.MWNativeNavigation?.configure(nativeReserveWarmup);
 
-function query(ticker, res, args, expires = Infinity) {
+globalThis.addEventListener('mw-navigation-error', event => {
+  if (event.detail?.code === 'NATIVE_HISTORY_CAPACITY_EXCEEDED')
+    send({type:'capacity-notice',epoch:workspaceEpoch,key:'operation',phase:'failed',message:String(event.detail)});
+  else if (event.detail?.code !== 'HISTORY_CANCELLED') send({type:'error',error:String(event.detail)});
+});
+globalThis.addEventListener('mw-capacity-state', event =>
+  send({type:'capacity-notice',epoch:workspaceEpoch,...event.detail}));
+
+function query(ticker, res, args, expires = Infinity, current = () => true) {
   const { symbol, spec, series_kind } = decode(ticker);
   const q = {
     instrument: symbol,
@@ -300,11 +310,11 @@ function query(ticker, res, args, expires = Infinity) {
   const epoch = workspaceEpoch;
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
-  const promise = request(q, "data", () => epoch === workspaceEpoch && Date.now() < expires &&
+  const promise = request(q, "data", () => epoch === workspaceEpoch && current() && Date.now() < expires &&
     (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})))
     .catch(error=>{
       if(epoch===workspaceEpoch && Date.now()>=expires)
-        throw Error('历史复核时间预算已耗尽');
+        throw Object.assign(Error('历史复核时间预算已耗尽'), {code:'HISTORY_TIMEOUT'});
       throw error;
     });
   if (series_kind === 'managed') cache.set(key, { time: Date.now(), promise });
@@ -431,6 +441,8 @@ const feed = {
       cb({
         name: meta.source === "yahoo" ? meta.symbol : MWSeries.display(symbol),
         ticker,
+        // Informational estimate only; actual pagination remains backend-owned.
+        mw_historyPageBars: meta.source === "binance" ? 1000 : 4000,
         description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
@@ -471,17 +483,25 @@ const feed = {
   },
   getBars: async (s, res, p, cb, err) => {
     const loadEpoch=workspaceEpoch;
+    const loadId=crypto.randomUUID();
     const historyKey=s.ticker+'|'+res;
+    const workKey=historyKey+'|'+(s.mw_window || '');
     const isProvider=decode(s.ticker).series_kind==='provider';
-    const providerWork=isProvider ? (providerHistoryWork.get(historyKey) ||
-      {inflight:0,generation:0,correction:null,reloading:false}) : null;
+    if(isProvider) send({type:'native-load-start',id:loadId,epoch:loadEpoch,
+      instrument:decode(s.ticker).symbol,timeframe:frames[res],
+      count:p.countBack,from:p.from*1000,to:p.to*1000,
+      boundaryId:p.mw_boundaryId,batch:p.mw_boundaryBatch,
+      estimatedPages:Math.ceil(p.countBack/(s.mw_historyPageBars || 4000))});
+    const providerWork=isProvider ? (providerHistoryWork.get(workKey) ||
+      {symbol:s.ticker,res,window:s.mw_window,inflight:0,generation:0,correction:null,reloading:false}) : null;
     if(providerWork) {
-      providerHistoryWork.set(historyKey,providerWork);
+      providerHistoryWork.set(workKey,providerWork);
       providerWork.inflight++;
     }
-    const historyDeadline=Date.now()+8000;
+    let historyDeadline=Date.now()+8000;
     const completeTerminal=rangeGuard?.captureTerminalCompletion?.(
-      chart=>chart.symbol()===s.ticker && chart.resolution()===res);
+      chart=>chart.symbol()===s.ticker && chart.resolution()===res &&
+        (globalThis.MWNativeNavigation?.chartWindow(chart)?.id || '') === (s.mw_window || ''));
     const finishTerminal=()=>{
       // Empty/error loads may never emit native dataReady. Finish only the
       // captured public loading token after the native callback has returned.
@@ -500,15 +520,18 @@ const feed = {
         // Native requirements pass unchanged; the backend owns cache policy
         // and provider pagination, including demands larger than one page.
         const epoch = workspaceEpoch, reserveStarted = globalThis.performance?.now() || 0;
-        const args={limit:p.countBack,
+        const args={limit:p.countBack,history_progress_id:loadId,history_progress_epoch:loadEpoch,
+          history_page_bars:s.mw_historyPageBars || 4000,
           countBack:p.countBack, from:p.from*1000, before:p.to*1000,
           firstDataRequest:p.firstDataRequest, client:clientId,
           native_history:nativeHistoryContext(s.ticker,res)};
-        let page = await query(s.ticker, res, args);
+        let page = globalThis.MWNativeNavigation?.takeSeed(s, res, p) ||
+          await query(s.ticker, res, args, Infinity, () => (!s.mw_current || s.mw_current()) && (!s.mw_window || MWNativeNavigation.hasWindow(s.mw_window)));
         if (epoch !== workspaceEpoch) {
           const error = Error("已取消旧图表的历史加载");
           error.code = "HISTORY_CANCELLED"; throw error;
         }
+        historyDeadline=Date.now()+30000;
         const seen=providerHistoryState.get(historyKey);
         const older=historyOlder(page,seen);
         if(older && page.bars?.length) {
@@ -518,7 +541,7 @@ const feed = {
           const observation={revision:page.cache_revision||0,observed_at:page.as_of||0,
             first:page.bars[0].chart_time,last:page.bars.at(-1).chart_time};
           try {
-            if(Date.now()>=historyDeadline) throw Error('历史复核时间预算已耗尽');
+            if(Date.now()>=historyDeadline) throw Object.assign(Error('历史复核时间预算已耗尽'), {code:'HISTORY_TIMEOUT'});
             const reviewed=await query(s.ticker,res,{...args,history_observation:observation},historyDeadline);
             if(epoch!==workspaceEpoch) throw Object.assign(Error('已取消旧图表的历史加载'),{code:'HISTORY_CANCELLED'});
             if(!reviewed.history_revalidation) throw Error('后端未提供历史复核结果');
@@ -536,6 +559,15 @@ const feed = {
           }
         }
         const rows = barsOf(page, res, s.ticker);
+        if(providerWork && page.bars?.length) {
+          const old=providerWork.observation;
+          providerWork.observation={
+            first:Math.min(old?.first ?? Infinity,page.history_dependency_first ?? page.bars[0].chart_time),
+            last:Math.max(old?.last ?? 0,page.bars.at(-1).chart_time),
+            revision:Math.min(old?.revision ?? Infinity,page.cache_revision||0),
+            observed_at:Math.min(old?.observed_at ?? Infinity,page.as_of||0),
+          };
+        }
         if(!historyOlder(page,providerHistoryState.get(historyKey))) {
           const previous=providerHistoryState.get(historyKey);
           providerHistoryState.set(historyKey,{revision:page.cache_revision||0,
@@ -553,11 +585,12 @@ const feed = {
           }
         }
         if (rows.length) {
-          const key = s.ticker+'|'+res;
+          const key = workKey;
           lastHistory.set(key,Math.max(lastHistory.get(key)||0,rows.at(-1).time));
           firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,rows[0].time));
         }
-        cb(rows,{noData:boundary});
+        send({type:'native-load-applying',id:loadId,epoch:loadEpoch,count:rows.length});
+        cb(rows,{noData:boundary,mw_historyPages:page.history_pages || 0});
         if (globalThis.MWNativeReserve)
           requestAnimationFrame(() => MWNativeReserve.delivered(s, res, performance.now() - reserveStarted));
         if(!rows.length) finishTerminal();
@@ -610,11 +643,15 @@ const feed = {
       cb(rows,{noData:boundary});
       if(!rows.length) finishTerminal();
     } catch (e) {
-      err(String(e));
+      err(isProvider ? e : String(e));
       finishTerminal();
-      if (e.code !== "HISTORY_CANCELLED")
+      if (e.code !== "HISTORY_CANCELLED" && e.code !== "NATIVE_HISTORY_CAPACITY_EXCEEDED")
         send({ type: "error", error: String(e) });
     } finally {
+      // Keep the notice through native callback processing and the next paint.
+      // No reset or synthetic barset is introduced for UI feedback.
+      if(isProvider) requestAnimationFrame(()=>requestAnimationFrame(()=>
+        send({type:'native-load-end',id:loadId,epoch:loadEpoch})));
       if(providerWork) {
         providerWork.inflight--;
         if(loadEpoch===workspaceEpoch) setTimeout(()=>flushProviderCorrections(),0);
@@ -627,13 +664,20 @@ const feed = {
     feed.unsubscribeBars(id);
     const identity=decode(s.ticker);
     if(identity.symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) return;
-    const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(s.ticker+'|'+res)||0,revision:null};
+    const historyKey=s.ticker+'|'+res+(identity.series_kind==='provider' ? '|'+(s.mw_window || '') : '');
+    const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(historyKey)||0,revision:null};
     subscriptions.set(id,sub);
+    // Keep history corrections subscribed, but never append a latest tick
+    // across the gap between a historical window and the realtime tail.
+    if (s.mw_window) {
+      sub.window=s.mw_window; sub.historical=MWNativeNavigation.historical(s.mw_window);
+      if (sub.historical) sub.last=MWNativeNavigation.coverage(s.mw_window)?.last || sub.last;
+    }
     if(identity.series_kind==='provider') {
       sub.providerListener=crypto.randomUUID();
       const state=providerHistoryState.get(s.ticker+'|'+res)||{};
       send({type:'provider-subscribe',args:{client:clientId,listener:sub.providerListener,
-        instrument:identity.symbol,timeframe:frames[res],cursor:state.cursor||sub.last,
+        instrument:identity.symbol,timeframe:frames[res],cursor:sub.last,
         revision:state.revision||0,observed_at:state.observed_at||0,
         indicators:identity.spec?[identity.spec]:[]}});
     }
@@ -643,6 +687,10 @@ const feed = {
     if(sub?.providerListener)
       send({type:'provider-unsubscribe',args:{client:clientId,listener:sub.providerListener}});
     subscriptions.delete(id);
+    if (sub?.window && ![...subscriptions.values()].some(other=>other.window===sub.window)) {
+      const key=sub.symbol+'|'+sub.res+'|'+(sub.window || '');
+      providerHistoryWork.delete(key);lastHistory.delete(key);firstHistory.delete(key);
+    }
   },
 };
 let polling = false;
@@ -674,7 +722,62 @@ function hasHistoryViewer(args) {
   }
   return false;
 }
+function providerWindowMatches(chart, work) {
+  return (globalThis.MWNativeNavigation?.chartWindow(chart)?.id || '') === (work.window || '');
+}
+function hasProviderWindowViewer(work) {
+  return ready && Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(
+    chart=>chartUsesSymbol(chart,work.symbol,work.res) && providerWindowMatches(chart,work));
+}
 let historyReloading = false;
+globalThis.setInterval?.(()=>{
+  for(const sub of subscriptions.values())if(sub.reviewPending && !sub.resetReview &&
+     Date.now()>=(sub.reviewRetryAt||0)) {
+    sub.reviewRetryAt=Date.now()+30000;
+    void reviewProviderReset(sub,{revision:sub.resetRevision}).catch(()=>{});
+  }
+},5000);
+
+function reviewProviderReset(sub, event) {
+  sub.resetRevision=Math.max(sub.resetRevision||0,event.revision||0);
+  sub.reviewPending=true;
+  if(sub.resetReview) return sub.resetReview;
+  const epoch=workspaceEpoch;
+  const current=()=>epoch===workspaceEpoch &&
+    [...subscriptions.values()].includes(sub);
+  const task=(async()=>{
+    for(let attempt=0;attempt<3 && current();attempt++) {
+      const work=providerHistoryWork.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
+      const observation=work?.observation;
+      if(!observation) throw Error('历史数据尚未完成观察，请稍后刷新历史');
+      if(sub.resetRevision<=observation.revision) {sub.reviewPending=false;return;}
+      // Stream gaps do not prove delivered history changed. Verify delivered
+      // bars and indicator dependencies before invalidating the native source.
+      const page=await query(sub.symbol,sub.res,{
+        limit:1,countBack:1,before:observation.last+1,
+        native_history:{...nativeHistoryContext(sub.symbol,sub.res),historical_navigation:true},
+        history_observation:{...observation},
+      },Date.now()+30000,current);
+      if(!current()) return;
+      if(!page.history_revalidation || historyOlder(page,{
+        revision:observation.revision,observed_at:observation.observed_at}))
+        throw Error('历史更正尚未核实，请刷新历史');
+      if(page.history_revalidation.changed) {
+        sub.needsHistoryReload=true;
+        if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub))) {
+          sub.needsHistoryReload=false;sub.reviewPending=false;
+        }
+        return;
+      }
+      if(work.observation!==observation) continue;
+      work.observation={...observation,revision:page.cache_revision||0,observed_at:page.as_of||0};
+      if(sub.resetRevision<=work.observation.revision) {sub.reviewPending=false;return;}
+    }
+    if(current()) throw Error('历史更正尚未核实，请刷新历史');
+  })();
+  sub.resetReview=task;
+  return task.finally(()=>{if(sub.resetReview===task)sub.resetReview=null;});
+}
 function mergeProviderCorrection(work,generation,verified,original) {
   // A failed/older review cannot erase an earlier confirmed real revision.
   const originals=[...(work.correction?.originals || [])];
@@ -690,11 +793,11 @@ async function refreshProviderHistoryCorrections() {
   // Explicit user recovery uses the existing backend contract. Each click
   // performs one check per pending active sequence, without automatic retries.
   const epoch=workspaceEpoch;
-  for(const [key,work] of providerHistoryWork) {
+  for(const work of providerHistoryWork.values()) {
     const correction=work.correction;
     if(!correction || work.inflight || work.reloading) continue;
-    const split=key.lastIndexOf('|'),symbol=key.slice(0,split),res=key.slice(split+1);
-    if(!hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) continue;
+    const {symbol,res}=work;
+    if(!hasProviderWindowViewer(work)) continue;
     if(!correction.verified && correction.originals.length) {
       work.reloading=true;
       try {
@@ -704,7 +807,7 @@ async function refreshProviderHistoryCorrections() {
           const page=await query(symbol,res,{...original.args,
             history_observation:original.observation},deadline);
           if(epoch!==workspaceEpoch || work.correction!==correction) break;
-          if(!page.history_revalidation || historyOlder(page,providerHistoryState.get(key)))
+          if(!page.history_revalidation || historyOlder(page,providerHistoryState.get(symbol+'|'+res)))
             throw Error('尚未取得最新历史复核结果');
           if(page.history_revalidation.changed) {
             correction.verified=true;
@@ -715,7 +818,7 @@ async function refreshProviderHistoryCorrections() {
         if(epoch!==workspaceEpoch || work.correction!==correction) continue;
         if(!correction.verified && proofs.length===correction.originals.length) {
           if(correction.overflow) throw Error('历史检查积压，请重新打开工作区');
-          const seen=providerHistoryState.get(key);
+          const seen=providerHistoryState.get(symbol+'|'+res);
           if(proofs.some(proof=>historyOlder(proof,seen) || proofs.some(other=>
             historyOlder(proof,{revision:other.cache_revision||0,observed_at:other.as_of||0}))))
             throw Error('历史检查期间出现新版本，请再次刷新历史');
@@ -735,16 +838,16 @@ function historyOlder(page,seen) {
 }
 async function flushProviderCorrections() {
   if(!ready || loading || historyReloading || rangeGuard?.busy() || edgeGuard?.busy()) return;
-  for(const [key,work] of providerHistoryWork) {
+  for(const work of providerHistoryWork.values()) {
     const correction=work.correction;
     if(work.inflight || work.reloading || !correction?.verified || correction.attempts) continue;
-    const split=key.lastIndexOf('|'),symbol=key.slice(0,split),res=key.slice(split+1);
-    if(!hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) continue;
+    const {symbol,res}=work;
+    if(!hasProviderWindowViewer(work)) continue;
     work.reloading=true;
     correction.attempts++;
     const epoch=workspaceEpoch;
     try {
-      const corrected=await reloadHistory(symbol,res);
+      const corrected=await reloadHistory(symbol,res,chart=>providerWindowMatches(chart,work));
       if(corrected && epoch===workspaceEpoch && !work.inflight && work.correction===correction)
         work.correction=null;
       else if(!corrected) send({type:'error',error:'历史更正待处理，请刷新历史'});
@@ -753,28 +856,37 @@ async function flushProviderCorrections() {
   }
 }
 async function reloadHistory(symbol, res, relevant = () => true) {
-  if (!ready || loading || historyReloading || rangeGuard?.busy() || edgeGuard?.busy()) return false;
+  if (!ready || loading || historyReloading || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) return false;
+  if (Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(chart=>
+      chartUsesSymbol(chart,symbol,res) && relevant(chart) && globalThis.MWNativeNavigation?.interacting(chart))) return false;
   historyReloading = true;
   const epoch = workspaceEpoch;
-  let invalidated = false;
+  const invalidated = new Set();
   try {
     for (let i=0;i<widget.chartsCount();i++) {
       const chart=widget.chart(i);
       if (!chartUsesSymbol(chart,symbol,res) || !relevant(chart)) continue;
-      const rangeKey=symbol+'|'+res;
+      const window=globalThis.MWNativeNavigation?.chartWindow(chart)?.id || '';
+      if (window) {
+        // Native resetCache and resetData both mutate the same source. Rebuild
+        // an isolated historical source once, with a fresh validated seed.
+        if (!await MWNativeNavigation.refreshChartWindow(chart)) return false;
+        continue;
+      }
+      const rangeKey=symbol+'|'+res+'|'+window;
       if (chart.getTimeScale().rightOffset()<0)
         refreshingHistoryRanges.set(rangeKey,chart.getVisibleRange());
       let restored;
       try { restored=await refreshChartHistory(widget,chart,()=>{
-        if (invalidated) return;
-        invalidated=true;
+        if (invalidated.has(window)) return;
+        invalidated.add(window);
         let notified=false;
         for (const sub of subscriptions.values()) {
-          if (MWSeries.same(sub.symbol,symbol) && sub.res===res) {
+          if (MWSeries.same(sub.symbol,symbol) && sub.res===res && (sub.window || '')===window) {
             sub.reset();notified=true;
           }
         }
-        if (!notified) widget.resetCache();
+        if (!notified && !window) widget.resetCache();
       },()=>epoch===workspaceEpoch && chartUsesSymbol(chart,symbol,res));
       } finally { refreshingHistoryRanges.delete(rangeKey); }
       if (!restored) return false;
@@ -942,7 +1054,7 @@ async function tick() {
 }
 function snapshot(manual = true) {
   if (!ready || loading) return;
-  if (rangeGuard?.busy() || edgeGuard?.busy()) {
+  if (globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
     dirty = true;
     if (manual) manualSavePending = true;
     return;
@@ -1103,7 +1215,7 @@ function boot(
   let initialNativeSave = false;
   let busySaveNoticeShown = false;
   layouts.saveChart = async (data) => {
-    if (viewportRestoring || rangeGuard?.busy() || edgeGuard?.busy()) {
+    if (viewportRestoring || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
       dirty = true;
       if (!busySaveNoticeShown) {
         busySaveNoticeShown = true;
@@ -1217,7 +1329,7 @@ function boot(
     custom_indicators_getter: (PineJS) =>
       Promise.resolve(pythonStudies(PineJS, catalog)),
     container: "chart",
-    library_path: "/charting_library/",
+    library_path: globalThis.MW_CHART_LIBRARY_PATH || "/charting_library/",
     custom_css_url: "/chart-menu.css",
     datafeed: feed,
     widgetbar: {
@@ -1288,6 +1400,7 @@ function boot(
     ],
   });
   widget.onChartReady(async () => {
+    widget.crosshairSync().subscribe(value => MWNativeNavigation.crosshairEnabled(value));
     grid = chartGridPresentation(widget, preferences,
       async value => {
         await prefs.savePreference("setting", "mw.gridStyle", value);
@@ -1324,6 +1437,7 @@ function boot(
           send({ type: "error", error: String(e) }),
           grid, [
             {label: "守望主页", run: () => send({type: "workspace-action", action: "home"})},
+            {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
                 const epoch = workspaceEpoch;
@@ -1447,6 +1561,7 @@ function boot(
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
+      send({type:'native-load-reset',epoch:workspaceEpoch});
       for(const [id,sub] of subscriptions) if(sub.providerListener) feed.unsubscribeBars(id);
       providerHistoryState.clear();
       providerHistoryWork.clear();
@@ -1536,14 +1651,15 @@ addEventListener("message", async (e) => {
       providerHistoryState.set(key,{revision:event.revision||0,observed_at:event.as_of||0,
         cursor:Math.max(old?.cursor||0,event.cursor||0)});
     if(event.type==='reset') {
-      sub.needsHistoryReload=true;
-      if(await reloadHistory(sub.symbol,sub.res).catch(error=>send({type:'error',error:String(error)})))
-        sub.needsHistoryReload=false;
+      await reviewProviderReset(sub,event).catch(error=>{
+        if(error.code!=='HISTORY_CANCELLED') send({type:'error',error:'历史检查未完成：'+String(error)});
+      });
     } else if(event.type==='bars') {
       if(sub.needsHistoryReload) {
-        if(await reloadHistory(sub.symbol,sub.res))sub.needsHistoryReload=false;
+        if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub)))sub.needsHistoryReload=false;
         return;
       }
+      if (sub.historical) return;
       const rows=barsOf({bars:event.bars,indicators:event.indicators||[]},sub.res,sub.symbol);
       for(const bar of rows) if(bar.time>=sub.last) {sub.cb({...bar});sub.last=bar.time;}
     } else if(event.type==='error') {
@@ -1557,10 +1673,20 @@ addEventListener("message", async (e) => {
     pending.delete(m.id);
     clearTimeout(p.timer);
     clearTimeout(p.cancellationTimer);
-    m.error ? p.reject(Error(m.error)) : p.resolve(m.result);
+    m.error ? p.reject(Object.assign(Error(m.error),m.errorDetails)) : p.resolve(m.result);
     drain();
-  } else if (m.type === "init" && !widget)
+  } else if (m.type === "history-capabilities") {
+    MWNativeNavigation.setCapabilities(m.capabilities);
+    globalThis.MW_HISTORY_CAPABILITIES=m.capabilities;
+  } else if (m.type === "history-capacity-open") {
+    send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident});
+  } else if (m.type === "cancel-history") {
+    MWNativeNavigation.cancelAll();
+  } else if (m.type === "init" && !widget) {
+    MWNativeNavigation.setCapabilities(m.history_capabilities);
+    globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
     boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol);
+  }
   else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
   else if (m.type === "save") snapshot();
   else if (m.type === "theme" && ready) {

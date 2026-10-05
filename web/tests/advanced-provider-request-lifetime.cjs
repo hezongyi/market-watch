@@ -26,5 +26,7 @@ for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../adv
  vm.runInContext(`globalThis.c=query('MWP:BTCUSDT','1',{limit:1}).catch(error=>error.code);workspaceEpoch++;`,ctx);
  await new Promise(resolve=>setTimeout(resolve,160));
  assert.equal(await ctx.c,'HISTORY_CANCELLED','changing workspace still releases obsolete requests');
+ vm.runInContext(`globalThis.expired=query('MWP:BTCUSDT','1',{limit:1},Date.now()-1).catch(error=>error.code);`,ctx);
+ assert.equal(await ctx.expired,'HISTORY_TIMEOUT','expired history budget retains a structured timeout code');
  console.log('Provider native requests survive period switches and cancel on workspace replacement');
 })().catch(error=>{for(const entry of vm.runInContext('[...pending.values()]',ctx)){clearTimeout(entry.timer);clearTimeout(entry.cancellationTimer)}console.error(error);process.exitCode=1});
