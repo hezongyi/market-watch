@@ -39,6 +39,14 @@ services:
         VITE_ADVANCED_CHART_ORIGIN: https://localhost:18444
     image: market-watch-web:indicator-acceptance
     depends_on: [api]
+  history-worker:
+    image: market-watch-api:indicator-acceptance
+    command: ["python", "-m", "alerts.native_history_loads"]
+    env_file:
+      - path: /tmp/mw-indicator-acceptance/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
   chart-origin:
     build: ../../../advanced-host
     image: market-watch-chart-origin:indicator-acceptance

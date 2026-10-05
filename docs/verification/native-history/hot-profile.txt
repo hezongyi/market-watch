@@ -1,0 +1,57 @@
+{"count": 200, "delivered": 1200, "cache_hit": true, "seconds": 0.1915431353263557}
+         116219 function calls (111542 primitive calls) in 0.181 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1442 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.181    0.181 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:690(data)
+        1    0.000    0.000    0.115    0.115 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:656(native_read)
+        1    0.000    0.000    0.115    0.115 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:523(_observed_read)
+        1    0.000    0.000    0.115    0.115 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:658(<lambda>)
+        1    0.000    0.000    0.114    0.114 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:559(_native_read)
+    53/15    0.000    0.000    0.110    0.007 {built-in method builtins.next}
+        2    0.000    0.000    0.107    0.053 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:143(snapshot_transaction)
+    17/10    0.000    0.000    0.107    0.011 /usr/local/lib/python3.11/contextlib.py:132(__enter__)
+      8/7    0.000    0.000    0.087    0.012 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2201(_execute_internal)
+        2    0.000    0.000    0.083    0.041 /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/result.py:970(all)
+        2    0.000    0.000    0.082    0.041 /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/result.py:1890(_fetchall_impl)
+       10    0.000    0.000    0.082    0.008 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/loading.py:214(chunks)
+      6/5    0.000    0.000    0.079    0.016 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2406(execute)
+        1    0.000    0.000    0.066    0.066 /usr/local/lib/python3.11/site-packages/alerts/provider_chart.py:74(metadata)
+        2    0.000    0.000    0.065    0.032 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:3732(get)
+        2    0.000    0.000    0.065    0.032 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:3907(_get_impl)
+        2    0.000    0.000    0.065    0.032 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/loading.py:535(_load_on_pk_identity)
+        9    0.000    0.000    0.064    0.007 /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1404(execute)
+        9    0.000    0.000    0.064    0.007 /usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:524(_execute_on_connection)
+        9    0.000    0.000    0.064    0.007 /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1618(_execute_clauseelement)
+
+
+
+{"count": 60000, "delivered": 60000, "cache_hit": true, "seconds": 1.090847000014037}
+         1206436 function calls (1206251 primitive calls) in 1.083 seconds
+
+   Ordered by: cumulative time
+   List reduced from 721 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    1.083    1.083 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:690(data)
+        1    0.000    0.000    1.080    1.080 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:656(native_read)
+        1    0.000    0.000    1.080    1.080 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:523(_observed_read)
+        1    0.003    0.003    1.080    1.080 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:658(<lambda>)
+        1    0.002    0.002    1.077    1.077 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:559(_native_read)
+    50/12    0.008    0.000    1.073    0.089 {built-in method builtins.next}
+        2    0.001    0.001    1.064    0.532 /usr/local/lib/python3.11/site-packages/alerts/provider_cache.py:143(snapshot_transaction)
+     16/9    0.000    0.000    1.063    0.118 /usr/local/lib/python3.11/contextlib.py:132(__enter__)
+        2    0.018    0.009    0.893    0.446 /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/result.py:970(all)
+        2    0.007    0.004    0.874    0.437 /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/result.py:1890(_fetchall_impl)
+       10    0.000    0.000    0.867    0.087 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/loading.py:214(chunks)
+        6    0.000    0.000    0.718    0.120 /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/cursor.py:2376(_fetchall_impl)
+        6    0.000    0.000    0.718    0.120 /usr/local/lib/python3.11/site-packages/sqlalchemy/engine/cursor.py:1309(fetchall)
+        6    0.033    0.006    0.718    0.120 /usr/local/lib/python3.11/site-packages/psycopg/cursor.py:274(fetchall)
+    63004    0.056    0.000    0.685    0.000 /usr/local/lib/python3.11/site-packages/psycopg/types/json.py:256(load)
+    63004    0.081    0.000    0.620    0.000 /usr/local/lib/python3.11/json/__init__.py:299(loads)
+    63004    0.080    0.000    0.407    0.000 /usr/local/lib/python3.11/json/decoder.py:332(decode)
+    63004    0.272    0.000    0.272    0.000 /usr/local/lib/python3.11/json/decoder.py:343(raw_decode)
+        2    0.135    0.068    0.149    0.074 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/loading.py:237(<listcomp>)
+      8/7    0.000    0.000    0.142    0.020 /usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2201(_execute_internal)

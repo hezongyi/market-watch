@@ -518,12 +518,23 @@ def warm_step(source, after=None):
 
 def cleanup():
     now = now_ms()
+    from .storage import NativeHistoryLoad
+    # Resolve provider identity outside the cleanup transaction/pool checkout.
+    with transaction() as db:
+        loads = list(db.scalars(select(NativeHistoryLoad.query_json).where(
+            NativeHistoryLoad.state.in_(("waiting", "filling", "ready")),
+            NativeHistoryLoad.consumer_until > now, NativeHistoryLoad.deadline > now)))
+    history_protected = set()
+    for query in loads:
+        from . import provider_chart
+        meta = provider_chart.metadata(query["instrument"], cached_only=True)
+        history_protected.add(cache.identity(meta, query["timeframe"]))
     with transaction() as db:
         db.execute(delete(ProviderInterest).where(ProviderInterest.expires <= now))
         # All finite cross-period targets are owned by their focus interest.
         # Protect those datasets as well as the currently subscribed frame.
         interests = list(db.scalars(select(ProviderInterest).where(ProviderInterest.expires > now)))
-        protected = {row.dataset_id for row in interests}
+        protected = {row.dataset_id for row in interests} | history_protected
         for interest in interests:
             focus = db.get(ProviderDataset, interest.dataset_id)
             for target in interest.targets:

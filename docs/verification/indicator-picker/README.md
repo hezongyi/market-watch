@@ -1,6 +1,6 @@
 # 指标窗口实施与验证记录
 
-更新：2026-10-05。实施基线 `62488c6`（v1.7.0），分支 `feat/indicator-selector`，worktree `/home/quant/repos/market-watch-indicator-dev`。原方案 worktree 与其他任务改动均保留。
+更新：2026-10-06。实施基线 `62488c6`（v1.7.0），分支 `feat/indicator-selector`，worktree `/home/quant/repos/market-watch-indicator-dev`。原方案 worktree 与其他任务改动均保留。
 
 ## 已实施
 
@@ -19,7 +19,7 @@
 | 前端 | `npm run build` 通过；picker 搜索、Python Adapter、progressive-indicators 脚本通过；Ruff 与 diff whitespace 检查通过 |
 | 实际 v31 浏览器 Interface | `advanced-indicator-picker-native.browser.cjs` 使用本地许可库、Playwright 路由提供静态资源及合成行情，无运行服务器。公开按钮、搜索、同名多实例、显隐/移除、原生设置返回、多图、延迟添加、原生 study 保存恢复、浅深色、375px、Tab/Escape/焦点均通过。报告和截图见同目录 `native.json` / `native-*.png` |
 | 旧版本布局/模板/样式 | `advanced-indicator-compatibility.browser.cjs` 先使用 git `62488c6` 的旧 Adapter 创建 8 个 study、原生布局与模板，再由当前 Adapter 恢复；原生实体 ID、参数顺序、SMA(60)、BBANDS(25,2.5)、MACD(8,21,5)、颜色/线宽/显隐和 histogram plot2 均通过。证据 `compatibility.json`。合成行情，无服务器，不替代真实环境验收 |
-| Compose | 独立配置的 `docker compose ... config --services` 成功解析；仅有 pg/migrate/api/web/chart-origin/tls，无通知 worker |
+| Compose | 独立配置的 `docker compose ... config --services` 成功解析；有 pg/migrate/api/web/chart-origin/tls；整合 v1.8.0 后另增独立 history-worker，无通知 worker |
 
 浏览器依赖缺失时，仅把 Ubuntu deb 的动态库解压到 `/tmp/mw-indicator-browser-libs`；没有修改系统库。上表中的无服务器测试只证明图表库 Interface，完整产品证据另列于下文。
 
@@ -39,6 +39,12 @@
 环境限制记录：Docker Hub 直连超时，数据库改用本机已有 `postgres:14-bookworm`，独立数据库与新卷仍从空库迁移。应用镜像按本分支 Dockerfile 正式构建。旧布局恢复同时加载 8 个指标曾碰到上游 8 秒请求期限；仅将验收实例的期限改为允许上限 30 秒，生产默认值未改。
 
 显示值验收不用 `exportData`：本地许可包缺少其 `zh.20866` chunk。改用公开 `crossHairMoved.entityValues`，不访问私有图表对象或修改 vendor 文件。合成行情的 Interface/旧版本兼容测试仍保留，与真实环境证据分别记录。
+
+## 与最新主线的整合验证（2026-10-06）
+
+PR #9 对照主线 `b700911`（v1.8.0）整合。唯一文本冲突位于图表 Dockerfile 的 COPY 行，已同时保留主线 `native-navigation.js` 和本任务 picker JS/CSS；其余文件自动合并。新增本任务独立 `history-worker` 执行主线历史任务协议，验收脚本观察正式 `/charts/history-loads` 的提交/结果响应，同时兼容原 `/charts/data`，不绕过 worker。
+
+整合后前端构建、picker/Python/progressive、原生 hook/导航/容量边界、历史加载/通知脚本通过；相关后端测试含新增原生历史/容量路径共 72 项通过。整合后的 19 项真实产品验收全部通过，pageerror/console/API 错误为空；重验结果记录在 [main-integration.json](main-integration.json)，镜像仍只部署到本任务 Ubuntu 实例；主线生产未操作。
 
 ## Ubuntu 独立实例启动与停止
 

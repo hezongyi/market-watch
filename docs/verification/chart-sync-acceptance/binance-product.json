@@ -1,0 +1,1251 @@
+{
+  "at": "2026-10-04T01:17:36.256Z",
+  "scope": "actual provider OHLC, isolated PostgreSQL, native sync and pointer events",
+  "cases": [
+    {
+      "count": 2,
+      "symbol": "BTCUSDT",
+      "errors": [],
+      "phases": [],
+      "initial": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:BTCUSDT|1W|",
+                "enhancedUntil": 14529,
+                "raf": 0,
+                "previous": {
+                  "at": 4629.099999904633,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 86,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 86,
+                "reserve": 382,
+                "firstTime": 1514160000,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 3092.0999999046326,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 88,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 88,
+                "reserve": 189,
+                "firstTime": 1790996700,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "cache": 770,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "cache": 458,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1745193600,
+              "to": 1796601600
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 516,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1791053400,
+              "to": 1791079500
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "stationary": [
+        {
+          "resolution": "1W",
+          "time": 1764547200,
+          "index": 414,
+          "price": 96967.67047297102,
+          "x": 195,
+          "y": 382.0000000000001,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#3D3D3D",
+            "color": "#ffffff",
+            "coordinate": 195,
+            "text": "周一 2025-12-01",
+            "visible": true,
+            "width": 516,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1771200000,
+          "box": {
+            "x": 56,
+            "y": 42
+          }
+        },
+        {
+          "resolution": "5",
+          "time": 1764547200,
+          "index": 356,
+          "price": 96967.67047297102,
+          "x": 265.0000020000002,
+          "y": -628.8122496792894,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#3D3D3D",
+            "color": "#ffffff",
+            "coordinate": 265.0000020000002,
+            "text": "周一 2025-12-01   00:00",
+            "visible": true,
+            "width": 524,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764547200,
+          "box": {
+            "x": 654,
+            "y": 42
+          }
+        }
+      ],
+      "afterMove": [
+        {
+          "resolution": "1W",
+          "time": 1764547200,
+          "index": 414,
+          "price": 96967.67047297102,
+          "x": 195,
+          "y": 382.0000000000001,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#3D3D3D",
+            "color": "#ffffff",
+            "coordinate": 195,
+            "text": "周一 2025-12-01",
+            "visible": true,
+            "width": 516,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1771200000,
+          "box": {
+            "x": 56,
+            "y": 42
+          }
+        },
+        {
+          "resolution": "5",
+          "time": 1764547200,
+          "index": 356,
+          "price": 96967.67047297102,
+          "x": 265.0000020000002,
+          "y": -628.8122496792894,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#3D3D3D",
+            "color": "#ffffff",
+            "coordinate": 265.0000020000002,
+            "text": "周一 2025-12-01   00:00",
+            "visible": true,
+            "width": 524,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764547200,
+          "box": {
+            "x": 654,
+            "y": 42
+          }
+        }
+      ],
+      "final": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": true,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:BTCUSDT|1W|",
+                "enhancedUntil": 14529,
+                "raf": 0,
+                "previous": {
+                  "at": 4629.099999904633,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 86,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 86,
+                "reserve": 382,
+                "firstTime": 1514160000,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|mw1",
+                "enhancedUntil": 16291.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 6291.599999904633,
+                  "offset": -132.3333336666667
+                },
+                "lastAttemptOffset": 44.5,
+                "screen": 88,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 88,
+                "reserve": 312,
+                "firstTime": 1764440400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "cache": 770,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "cache": 458,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|5|mw1",
+              "cache": 532,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1745193600,
+              "to": 1796601600
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 516,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1764534000,
+              "to": 1764560100
+            },
+            "spacing": 6,
+            "offset": -132.3333336666667,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "samePeriod": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 7449.799999713898,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 88,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 88,
+                "reserve": 296,
+                "firstTime": 1790964600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|mw11",
+                "enhancedUntil": 22080.799999713898,
+                "raf": 0,
+                "previous": {
+                  "at": 12080.799999713898,
+                  "offset": -37
+                },
+                "lastAttemptOffset": 1,
+                "screen": 25,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 25,
+                "reserve": 155,
+                "firstTime": 1670148300,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "cache": 770,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "cache": 458,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|5|mw11",
+              "cache": 217,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1791053400,
+              "to": 1791079500
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1670194800,
+              "to": 1670202000
+            },
+            "spacing": 20.96,
+            "offset": -37,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "afterFailure": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 7449.799999713898,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 88,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 88,
+                "reserve": 296,
+                "firstTime": 1790964600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|mw4",
+                "enhancedUntil": 18550.699999809265,
+                "raf": 0,
+                "previous": {
+                  "at": 8550.699999809265,
+                  "offset": -151
+                },
+                "lastAttemptOffset": 1,
+                "screen": 25,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 25,
+                "reserve": 444,
+                "firstTime": 1732960800,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "cache": 770,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "cache": 458,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|5|mw4",
+              "cache": 620,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1791053400,
+              "to": 1791079500
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1733094000,
+              "to": 1733101200
+            },
+            "spacing": 20.96,
+            "offset": -151,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "retried": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 7449.799999713898,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 88,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 88,
+                "reserve": 296,
+                "firstTime": 1790964600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|mw8",
+                "enhancedUntil": 20129.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 10162,
+                  "offset": -37
+                },
+                "lastAttemptOffset": 1,
+                "screen": 25,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 25,
+                "reserve": 155,
+                "firstTime": 1701597900,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "cache": 770,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "cache": 458,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|5|mw8",
+              "cache": 229,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1791053400,
+              "to": 1791079500
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1701644400,
+              "to": 1701651600
+            },
+            "spacing": 20.96,
+            "offset": -37,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "cancelled": true,
+      "held": {
+        "active": 1,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 7449.799999713898,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 88,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 88,
+                "reserve": 296,
+                "firstTime": 1790964600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|mw11",
+                "enhancedUntil": 22080.799999713898,
+                "raf": 0,
+                "previous": {
+                  "at": 13713.799999713898,
+                  "offset": -23.498092000000014
+                },
+                "lastAttemptOffset": 1,
+                "screen": 25,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 25,
+                "reserve": 123,
+                "firstTime": 1670161800,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "cache": 770,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "cache": 458,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|5|mw11",
+              "cache": 419,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1791053400,
+              "to": 1791079500
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1670198700,
+              "to": 1670206200
+            },
+            "spacing": 20.96,
+            "offset": -23.498092000000014,
+            "width": 524,
+            "studies": [
+              {
+                "name": "Moving Average"
+              }
+            ],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "saved": {
+        "active": 1,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 7449.799999713898,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 88,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 88,
+                "reserve": 296,
+                "firstTime": 1790964600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|mw13",
+                "enhancedUntil": 24308,
+                "raf": 0,
+                "previous": {
+                  "at": 14308,
+                  "offset": -60.5
+                },
+                "lastAttemptOffset": 1,
+                "screen": 25,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 25,
+                "reserve": 131,
+                "firstTime": 1670159400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "cache": 770,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "cache": 458,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|5|mw13",
+              "cache": 417,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1791053400,
+              "to": 1791079500
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1670198700,
+              "to": 1670206200
+            },
+            "spacing": 20.96,
+            "offset": -60.5,
+            "width": 524,
+            "studies": [
+              {
+                "name": "Moving Average"
+              }
+            ],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "restored": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|mw3",
+                "enhancedUntil": 12790.099999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 2790.0999999046326,
+                  "offset": -39
+                },
+                "lastAttemptOffset": 1,
+                "screen": 26,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 26,
+                "reserve": 157,
+                "firstTime": 1670151600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:BTCUSDT",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:BTCUSDT|5|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 2439.5999999046326,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 88,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 88,
+                "reserve": 266,
+                "firstTime": 1790973600,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "cache": 616,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:BTCUSDT|5|mw3",
+              "cache": 422,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1791053400,
+              "to": 1791079500
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 524,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "range": {
+              "from": 1670198700,
+              "to": 1670206200
+            },
+            "spacing": 20.153846153846153,
+            "offset": -39,
+            "width": 524,
+            "studies": [
+              {
+                "name": "Moving Average"
+              }
+            ],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "navigation": {
+        "windows": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "5",
+            "target": 1670202600,
+            "from": 1670179200,
+            "to": 1670218200,
+            "count": 130,
+            "spacing": 20.153846153846153,
+            "viewport": {
+              "from": 1670198700,
+              "to": 1670206200
+            },
+            "followViewport": true
+          }
+        ],
+        "models": 2,
+        "threads": 2,
+        "pending": 0
+      },
+      "passed": true,
+      "http_summary": [
+        {
+          "phase": "initial",
+          "timeframe": "M5",
+          "status": 200,
+          "requests": 4,
+          "max_limit": 444,
+          "max_returned": 620,
+          "historical_navigation_requests": 2
+        },
+        {
+          "phase": "initial",
+          "timeframe": "W1",
+          "status": 200,
+          "requests": 2,
+          "max_limit": 198,
+          "max_returned": 286,
+          "historical_navigation_requests": 0
+        },
+        {
+          "phase": "injected-503",
+          "timeframe": "M5",
+          "status": 503,
+          "requests": 1,
+          "max_limit": 129,
+          "max_returned": 0,
+          "historical_navigation_requests": 1
+        },
+        {
+          "phase": "retry",
+          "timeframe": "M5",
+          "status": 200,
+          "requests": 3,
+          "max_limit": 129,
+          "max_returned": 217,
+          "historical_navigation_requests": 2
+        },
+        {
+          "phase": "cancellation",
+          "timeframe": "M5",
+          "status": 200,
+          "requests": 11,
+          "max_limit": 334,
+          "max_returned": 422,
+          "historical_navigation_requests": 5
+        }
+      ],
+      "representative_http": [
+        {
+          "phase": "initial",
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 444,
+            "countBack": 444,
+            "from": 1764468000000,
+            "firstDataRequest": true,
+            "native_history": {
+              "chart_count": 2,
+              "focused": false,
+              "historical_navigation": true,
+              "screen_bars": 88,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1764600000000,
+            "track_history": false
+          },
+          "count": 532,
+          "mandatory": 444,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ]
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1671326320000,
+            "firstDataRequest": true,
+            "native_history": {
+              "chart_count": 2,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 88,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791076720000,
+            "track_history": false
+          },
+          "count": 286,
+          "mandatory": 198,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ]
+        },
+        {
+          "phase": "injected-503",
+          "status": 503,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 129,
+            "countBack": 129,
+            "from": 1701621900000,
+            "firstDataRequest": true,
+            "native_history": {
+              "chart_count": 2,
+              "focused": true,
+              "historical_navigation": true,
+              "screen_bars": 88,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1701659400000,
+            "track_history": false
+          }
+        },
+        {
+          "phase": "retry",
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 129,
+            "countBack": 129,
+            "from": 1701621900000,
+            "firstDataRequest": true,
+            "native_history": {
+              "chart_count": 2,
+              "focused": true,
+              "historical_navigation": true,
+              "screen_bars": 88,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1701659400000,
+            "track_history": false
+          },
+          "count": 217,
+          "mandatory": 129,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200
+            }
+          ]
+        },
+        {
+          "phase": "cancellation",
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 334,
+            "countBack": 334,
+            "from": 1670179200000,
+            "firstDataRequest": true,
+            "native_history": {
+              "chart_count": 2,
+              "focused": true,
+              "historical_navigation": true,
+              "screen_bars": 88,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1670218200000,
+            "track_history": false
+          },
+          "count": 422,
+          "mandatory": 334,
+          "attempts": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,17 +1,28 @@
+import {
+  loadNativeHistory,
+  type HistoryCapabilities,
+} from "./nativeHistoryLoads";
 import { useEffect, useRef, useState } from "react";
-import { api } from "../api";
+import { api, apiErrorDetails } from "../api";
 import "./advanced.css";
 import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
 import { MaintenanceDialog } from "./MaintenanceDialog";
 import { ExportDialog, type ExportSelection } from "./ExportDialog";
 import { providerSubscriptions } from "./providerSubscriptions";
+import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
+import {
+  HistoryLoadingNotice,
+  HISTORY_NOTICE_DELAY_MS,
+  type NativeLoad,
+  type CapacityNotice,
+} from "./HistoryLoadingNotice";
 
 type Workspace = {
   id: string;
   name: string;
   revision: number;
   document: Record<string, unknown>;
-  initial_symbol?: {ticker: string; metadata: Record<string, unknown>};
+  initial_symbol?: { ticker: string; metadata: Record<string, unknown> };
 };
 const channel = "mw-chart-v1";
 const frames = new Set([
@@ -29,18 +40,34 @@ const frames = new Set([
 export default function AdvancedWorkspace() {
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
-  const [historyPlansOpen,setHistoryPlansOpen] = useState(false);
-  const [maintenanceInstrument,setMaintenanceInstrument] = useState<string | null>(null);
-  const [datasetViews,setDatasetViews] = useState<DatasetViews>({});
+  const [historyPlansOpen, setHistoryPlansOpen] = useState(false);
+  const [maintenanceInstrument, setMaintenanceInstrument] = useState<
+    string | null
+  >(null);
+  const [datasetViews, setDatasetViews] = useState<DatasetViews>({});
   const [frameKey, setFrameKey] = useState(0);
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
-  const [historyProgress,setHistoryProgress] = useState<Record<string,string>>({});
+  const [historyProgress, setHistoryProgress] = useState<
+    Record<string, string>
+  >({});
   const [feedError, setFeedError] = useState("");
   const [syncNotices, setSyncNotices] = useState<Record<string, string>>({});
   const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
   const [chartTheme, setChartTheme] = useState("dark");
   const [nativeReady, setNativeReady] = useState(false);
+  const historyCapabilities = useRef<HistoryCapabilities | null>(null);
+  const nativeLoadEpoch = useRef(0);
+  const [capacityNotices, setCapacityNotices] = useState<
+    Record<string, CapacityNotice>
+  >({});
+  const [nativeLoads, setNativeLoads] = useState<Record<string, NativeLoad>>(
+    {},
+  );
+  const [capacityDialog, setCapacityDialog] = useState<{
+    capabilities: HistoryCapabilities;
+    usage: number;
+  } | null>(null);
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
   const frame = useRef<HTMLIFrameElement>(null),
@@ -82,6 +109,10 @@ export default function AdvancedWorkspace() {
     setNativeReady(false);
     setPollErrors({});
     setHistoryProgress({});
+    setNativeLoads({});
+    setCapacityNotices({});
+    nativeLoadEpoch.current = 0;
+    setCapacityDialog(null);
     setDatasetViews({});
     setSyncNotices({});
     unsaved.current = false;
@@ -98,20 +129,42 @@ export default function AdvancedWorkspace() {
     setStatus("正在加载图表");
   };
   const noticeMessages = [
-    ...(blocked.current ? [{id: "draft", text: "草稿尚未保存，自动保存已暂停。是否复制恢复为独立工作区？", recover: true}] : []),
-    ...(!blocked.current && error ? [{id: "workspace", text: error}] : []),
-    ...(feedError && !(blocked.current && /未保存草稿|保存已暂停/.test(feedError))
-      ? [{id: "feed", text: feedError}] : []),
-    ...Object.entries(pollErrors).map(([id, text]) => ({id: "poll:" + id, text})),
-    ...Object.entries(syncNotices).map(([id, text]) => ({id: "viewport:" + id, text})),
+    ...(blocked.current
+      ? [
+          {
+            id: "draft",
+            text: "草稿尚未保存，自动保存已暂停。是否复制恢复为独立工作区？",
+            recover: true,
+          },
+        ]
+      : []),
+    ...(!blocked.current && error ? [{ id: "workspace", text: error }] : []),
+    ...(feedError &&
+    !(blocked.current && /未保存草稿|保存已暂停/.test(feedError))
+      ? [{ id: "feed", text: feedError }]
+      : []),
+    ...Object.entries(pollErrors).map(([id, text]) => ({
+      id: "poll:" + id,
+      text,
+    })),
+    ...Object.entries(syncNotices).map(([id, text]) => ({
+      id: "viewport:" + id,
+      text,
+    })),
   ];
   const notificationState = JSON.stringify(noticeMessages);
   useEffect(() => {
-    if (nativeReady) post({type: "notifications", notices: JSON.parse(notificationState),
-      draftBlocked: blocked.current});
+    if (nativeReady)
+      post({
+        type: "notifications",
+        notices: JSON.parse(notificationState),
+        draftBlocked: blocked.current,
+      });
   }, [nativeReady, notificationState]);
   async function refresh(limit?: number) {
-    const list = await api<Workspace[]>("/advanced-charts/workspaces"+(limit ? '?limit='+limit : ''));
+    const list = await api<Workspace[]>(
+      "/advanced-charts/workspaces" + (limit ? "?limit=" + limit : ""),
+    );
     setRows(list);
     return list;
   }
@@ -126,10 +179,15 @@ export default function AdvancedWorkspace() {
   }, [mobile]);
   useEffect(() => {
     const save = (event: KeyboardEvent) => {
-      if (mobile || !(event.ctrlKey || event.metaKey) || event.altKey ||
-          event.key.toLowerCase() !== "s") return;
+      if (
+        mobile ||
+        !(event.ctrlKey || event.metaKey) ||
+        event.altKey ||
+        event.key.toLowerCase() !== "s"
+      )
+        return;
       event.preventDefault();
-      post({type: "save"});
+      post({ type: "save" });
     };
     addEventListener("keydown", save);
     return () => removeEventListener("keydown", save);
@@ -150,10 +208,19 @@ export default function AdvancedWorkspace() {
   }, []);
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
-    const provider = providerSubscriptions(api,
-      client => new EventSource('/api/charts/provider/events?client='+encodeURIComponent(client)),
-      event => frame.current?.contentWindow?.postMessage({channel,type:'provider-event',event},origin),
-      error => setError(String(error)));
+    const provider = providerSubscriptions(
+      api,
+      (client) =>
+        new EventSource(
+          "/api/charts/provider/events?client=" + encodeURIComponent(client),
+        ),
+      (event) =>
+        frame.current?.contentWindow?.postMessage(
+          { channel, type: "provider-event", event },
+          origin,
+        ),
+      (error) => setError(String(error)),
+    );
     const listener = async (e: MessageEvent) => {
       if (
         e.source !== frame.current?.contentWindow ||
@@ -165,43 +232,229 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
-      if(m.type==='provider-subscribe' || m.type==='provider-unsubscribe') {
-        const args=m.args;
-        if(!args || !/^[A-Za-z0-9_-]{1,64}$/.test(args.client) ||
-          typeof args.listener!=='string' || args.listener.length>100) return;
+      if (
+        m.type === "provider-subscribe" ||
+        m.type === "provider-unsubscribe"
+      ) {
+        const args = m.args;
+        if (
+          !args ||
+          !/^[A-Za-z0-9_-]{1,64}$/.test(args.client) ||
+          typeof args.listener !== "string" ||
+          args.listener.length > 100
+        )
+          return;
         try {
-          if(m.type==='provider-subscribe') {
+          if (m.type === "provider-subscribe") {
             await provider.subscribe(args);
           } else {
             await provider.unsubscribe(args);
           }
-        }catch(error){setError(String(error));}
+        } catch (error) {
+          setError(String(error));
+        }
         return;
       }
       if (m.type === "history-progress") {
-        const key=String(m.key).slice(0,100),text=String(m.text).slice(0,200);
-        setHistoryProgress(previous=> {
-          const next={...previous};
-          if(text)next[key]=text;else delete next[key];
+        const key = String(m.key).slice(0, 100),
+          text = String(m.text).slice(0, 200);
+        setHistoryProgress((previous) => {
+          const next = { ...previous };
+          if (text) next[key] = text;
+          else delete next[key];
           return next;
         });
         return;
       }
       if (m.type === "history-views" && Array.isArray(m.keys)) {
-        const keys=new Set(m.keys.slice(0,8));
-        setHistoryProgress(previous=>Object.fromEntries(Object.entries(previous).filter(([key])=>keys.has(key))));
+        const keys = new Set(m.keys.slice(0, 8));
+        setHistoryProgress((previous) =>
+          Object.fromEntries(
+            Object.entries(previous).filter(([key]) => keys.has(key)),
+          ),
+        );
         return;
       }
       if (m.type === "history-plans-open") {
-        setHistoryPlansOpen(true); return;
-      }
-      if (m.type === "managed-dataset" && typeof m.dataset?.instrument === "string" && frames.has(m.dataset?.timeframe)) {
-        const dataset=m.dataset;
-        setDatasetViews(previous=>({...previous,[dataset.instrument+'|'+dataset.timeframe]:dataset}));
+        setHistoryPlansOpen(true);
         return;
       }
-      if (m.type === "maintenance-required" && !mobile && typeof m.instrument === "string" && m.instrument.length <= 40) {
-        setMaintenanceInstrument(m.instrument); return;
+      if (m.type === "history-capacity-open") {
+        const epoch = nativeLoadEpoch.current;
+        try {
+          const capabilities = await api<HistoryCapabilities>(
+            "/charts/history-capabilities",
+          );
+          if (
+            source !== frame.current?.contentWindow ||
+            epoch !== nativeLoadEpoch.current
+          )
+            return;
+          historyCapabilities.current = capabilities;
+          reply({ type: "history-capabilities", capabilities });
+          setCapacityDialog({
+            capabilities,
+            usage: Number.isSafeInteger(m.usage) ? Math.max(0, m.usage) : 0,
+          });
+        } catch (e) {
+          if (
+            source === frame.current?.contentWindow &&
+            epoch === nativeLoadEpoch.current
+          )
+            setFeedError(String(e));
+        }
+        return;
+      }
+      if (m.type === "native-load-reset" && Number.isSafeInteger(m.epoch)) {
+        nativeLoadEpoch.current = m.epoch;
+        setNativeLoads({});
+        setCapacityNotices({});
+        setCapacityDialog(null);
+        return;
+      }
+      if (
+        m.type === "capacity-notice" &&
+        m.epoch === nativeLoadEpoch.current &&
+        typeof m.key === "string" &&
+        m.key.length <= 160
+      ) {
+        const periods: Record<string, string> = {
+          "1": "M1",
+          "5": "M5",
+          "15": "M15",
+          "30": "M30",
+          "60": "H1",
+          "240": "H4",
+          "1D": "D1",
+          "1W": "W1",
+          "1M": "MN",
+        };
+        setCapacityNotices((previous) => {
+          const next = { ...previous };
+          if (m.phase === "clear") {
+            if (!next[m.key] || m.id === undefined || next[m.key].id === m.id)
+              delete next[m.key];
+          } else if (
+            ["filling", "limited", "failed"].includes(m.phase) &&
+            typeof m.message === "string"
+          ) {
+            next[m.key] = {
+              id: m.id,
+              instrument:
+                typeof m.symbol === "string"
+                  ? m.symbol.replace(/^MWP:/, "").slice(0, 80)
+                  : "历史容量",
+              timeframe: periods[m.resolution] || "",
+              phase: m.phase,
+              message: m.message.slice(0, 1000),
+              ...(Number.isFinite(m.requested)
+                ? { requested: m.requested }
+                : {}),
+              ...(Number.isFinite(m.actual) ? { actual: m.actual } : {}),
+              ...(Number.isFinite(m.limit) ? { limit: m.limit } : {}),
+              ...(Number.isFinite(m.resident) ? { resident: m.resident } : {}),
+              scope: m.scope,
+              started:Number.isFinite(m.started) ? m.started : previous[m.key]?.started,
+              finished:Number.isFinite(m.finished) ? m.finished : undefined,
+              totalBars:Number.isSafeInteger(m.totalBars) ? m.totalBars : undefined,
+              loadedBars:Number.isSafeInteger(m.loadedBars) ? m.loadedBars : undefined,
+              pages:Number.isSafeInteger(m.pages) ? m.pages : undefined,
+              estimatedPages:Number.isSafeInteger(m.estimatedPages) ? m.estimatedPages : undefined,
+              batch:Number.isSafeInteger(m.batch) ? m.batch : undefined,
+              completedBatch:Number.isSafeInteger(m.completedBatch) ? m.completedBatch : undefined,
+            };
+          }
+          return next;
+        });
+        return;
+      }
+      if (
+        typeof m.id === "string" &&
+        m.id.length <= 100 &&
+        typeof m.type === "string" &&
+        m.type.startsWith("native-load-")
+      ) {
+        if (m.epoch !== nativeLoadEpoch.current) return;
+        if (m.type === "native-load-end") {
+          setNativeLoads((previous) => {
+            const load = previous[m.id];
+            if (!load) return previous;
+            const duration = Date.now() - load.started;
+            if (duration < HISTORY_NOTICE_DELAY_MS || duration >= HISTORY_NOTICE_DELAY_MS + 500) {
+              const next = { ...previous };
+              delete next[m.id];
+              return next;
+            }
+            return { ...previous, [m.id]: { ...load, ended: true } };
+          });
+          setTimeout(
+            () =>
+              setNativeLoads((previous) => {
+                if (!previous[m.id]?.ended) return previous;
+                const next = { ...previous };
+                delete next[m.id];
+                return next;
+              }),
+            750,
+          );
+          return;
+        }
+        setNativeLoads((previous) => {
+          const next = { ...previous };
+          if (
+            m.type === "native-load-start" &&
+            typeof m.instrument === "string" &&
+            m.instrument.length <= 80 &&
+            frames.has(m.timeframe) &&
+            Number.isSafeInteger(m.count) &&
+            m.count > 0 &&
+            Number.isFinite(m.from) &&
+            Number.isFinite(m.to)
+          ) {
+            next[m.id] = {
+              instrument: m.instrument,
+              timeframe: m.timeframe,
+              count: m.count,
+              from: m.from,
+              epoch: m.epoch,
+              to: m.to,
+              started: Date.now(),
+              phase: "queued",
+              ...(Number.isSafeInteger(m.boundaryId) ? {boundaryId:m.boundaryId,batch:m.batch} : {}),
+              ...(Number.isSafeInteger(m.estimatedPages) && m.estimatedPages > 0
+                ? { estimatedPages:m.estimatedPages } : {}),
+            };
+          } else if (m.type === "native-load-applying" && next[m.id]) {
+            next[m.id] = {
+              ...next[m.id],
+              phase: "applying",
+              received: m.count,
+            };
+          }
+          return next;
+        });
+        return;
+      }
+      if (
+        m.type === "managed-dataset" &&
+        typeof m.dataset?.instrument === "string" &&
+        frames.has(m.dataset?.timeframe)
+      ) {
+        const dataset = m.dataset;
+        setDatasetViews((previous) => ({
+          ...previous,
+          [dataset.instrument + "|" + dataset.timeframe]: dataset,
+        }));
+        return;
+      }
+      if (
+        m.type === "maintenance-required" &&
+        !mobile &&
+        typeof m.instrument === "string" &&
+        m.instrument.length <= 40
+      ) {
+        setMaintenanceInstrument(m.instrument);
+        return;
       }
       if (m.type === "cancel-request") {
         marketRequests.get(source)?.get(m.id)?.abort();
@@ -211,11 +464,15 @@ export default function AdvancedWorkspace() {
         await provider.clear();
         try {
           if (!mobile) await api("/advanced-charts/preferences/migrate", {});
-          const [catalog, preferences] = await Promise.all([
-            api("/advanced-charts/catalog"), api("/advanced-charts/preferences"),
+          const [catalog, preferences, capabilities] = await Promise.all([
+            api("/advanced-charts/catalog"),
+            api("/advanced-charts/preferences"),
+            api("/charts/history-capabilities"),
           ]);
+          historyCapabilities.current = capabilities;
           reply({
             type: "init",
+            history_capabilities: capabilities,
             document: current.current?.document || {},
             workspace: current.current,
             readonly: mobile,
@@ -245,9 +502,10 @@ export default function AdvancedWorkspace() {
             if (!mobile && unsaved.current) await flush();
             await api("/logout", {});
             location.assign("/");
-          } catch (e) {setError(String(e));}
-        }
-        else if (!mobile && m.action === "create") await create();
+          } catch (e) {
+            setError(String(e));
+          }
+        } else if (!mobile && m.action === "create") await create();
         else if (!mobile && m.action === "recover") await copy();
       } else if (m.type === "theme-changed") {
         if (typeof m.theme === "string" && /^(dark|light)$/i.test(m.theme))
@@ -255,32 +513,29 @@ export default function AdvancedWorkspace() {
       } else if (m.type === "ready") {
         setNativeReady(true);
         setStatus("已加载 · 行情每15秒检查");
-      }
-      else if (m.type === "viewport-notice") {
+      } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
-        setSyncNotices(previous => {
+        setSyncNotices((previous) => {
           if (m.key === "*") return {};
-          const next = {...previous};
+          const next = { ...previous };
           if (m.text) next[m.key] = String(m.text).slice(0, 500);
           else delete next[m.key];
           return next;
         });
-      }
-      else if (m.type === "feed-poll-state") {
+      } else if (m.type === "feed-poll-state") {
         if (typeof m.key !== "string" || m.key.length > 2000) return;
-        setPollErrors(previous => {
+        setPollErrors((previous) => {
           const next = { ...previous };
           if (m.error) next[m.key] = String(m.error).slice(0, 500);
           else delete next[m.key];
           return next;
         });
-      }
-      else if (m.type === "error") setFeedError(String(m.error).slice(0, 500));
+      } else if (m.type === "error")
+        setFeedError(String(m.error).slice(0, 500));
       else if (m.type === "workspace-dirty") {
         if (!mobile) unsaved.current = true;
         setStatus("布局有未保存更改");
-      }
-      else if (m.type === "native-saving") {
+      } else if (m.type === "native-saving") {
         if (!mobile) unsaved.current = true;
         setStatus("正在保存");
       } else if (m.type === "native-saved") {
@@ -420,18 +675,34 @@ export default function AdvancedWorkspace() {
             setStatus("保存已暂停 · 草稿已保留，请复制恢复");
           }
           setError(String(e));
-          reply({ type: "result", id: m.id, error: String(e) });
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
         }
       } else if (m.type === "account-password") {
         const body = m.query;
-        if (!body || typeof body.current_password !== "string" || typeof body.new_password !== "string" ||
-            [...body.current_password].length > 512 || [...body.new_password].length > 512) {
-          reply({type: "result", id: m.id, error: "无效密码请求"});
+        if (
+          !body ||
+          typeof body.current_password !== "string" ||
+          typeof body.new_password !== "string" ||
+          [...body.current_password].length > 512 ||
+          [...body.new_password].length > 512
+        ) {
+          reply({ type: "result", id: m.id, error: "无效密码请求" });
           return;
         }
         try {
-          reply({type: "result", id: m.id, result: await api("/account/password", body)});
-        } catch (error) {reply({type: "result", id: m.id, error: String(error)});}
+          reply({
+            type: "result",
+            id: m.id,
+            result: await api("/account/password", body),
+          });
+        } catch (error) {
+          reply({ type: "result", id: m.id, error: String(error) });
+        }
       } else if (m.type === "style-template-name") {
         const name = mobile
           ? null
@@ -469,7 +740,12 @@ export default function AdvancedWorkspace() {
             ),
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e) });
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
         }
       } else if (m.type === "market") {
         const q = m.query;
@@ -492,19 +768,28 @@ export default function AdvancedWorkspace() {
           JSON.stringify(q).length > 4000 ||
           (q.op === "retry" &&
             !/^[a-zA-Z0-9-]{1,40}$/.test(String(q.args?.id || ""))) ||
-          inflight.current >= 8
-          || (q.native_history !== undefined &&
-            (q.series_kind !== 'provider' || !q.native_history ||
-              typeof q.native_history !== 'object' || Array.isArray(q.native_history) ||
+          inflight.current >= 8 ||
+          (q.native_history !== undefined &&
+            (q.series_kind !== "provider" ||
+              !q.native_history ||
+              typeof q.native_history !== "object" ||
+              Array.isArray(q.native_history) ||
               !Number.isInteger(q.native_history.chart_count) ||
-              q.native_history.chart_count < 1 || q.native_history.chart_count > 8 ||
-              (q.native_history.focused !== null && typeof q.native_history.focused !== 'boolean') ||
-              typeof q.native_history.historical_navigation !== 'boolean'))
-          || (q.history_observation !== undefined &&
-            (!q.native_history || !q.history_observation ||
-              typeof q.history_observation !== 'object' || Array.isArray(q.history_observation) ||
-              !['revision','observed_at','first','last'].every(field =>
-                Number.isSafeInteger(q.history_observation[field]) && q.history_observation[field] >= 0) ||
+              q.native_history.chart_count < 1 ||
+              q.native_history.chart_count > 8 ||
+              (q.native_history.focused !== null &&
+                typeof q.native_history.focused !== "boolean") ||
+              typeof q.native_history.historical_navigation !== "boolean")) ||
+          (q.history_observation !== undefined &&
+            (!q.native_history ||
+              !q.history_observation ||
+              typeof q.history_observation !== "object" ||
+              Array.isArray(q.history_observation) ||
+              !["revision", "observed_at", "first", "last"].every(
+                (field) =>
+                  Number.isSafeInteger(q.history_observation[field]) &&
+                  q.history_observation[field] >= 0,
+              ) ||
               q.history_observation.first > q.history_observation.last))
         ) {
           reply({ type: "result", id: m.id, error: "无效行情请求" });
@@ -518,24 +803,42 @@ export default function AdvancedWorkspace() {
         try {
           let result;
           if (q.op === "serverTime") {
-            const response = await fetch("/readyz", {signal: controller.signal,
-              credentials: "omit", cache: "no-store"});
+            const response = await fetch("/readyz", {
+              signal: controller.signal,
+              credentials: "omit",
+              cache: "no-store",
+            });
             const health = await response.json();
-            if (!response.ok || !Number.isSafeInteger(health.time) || health.time <= 0)
+            if (
+              !response.ok ||
+              !Number.isSafeInteger(health.time) ||
+              health.time <= 0
+            )
               throw Error("服务器时间暂不可用");
             result = Math.floor(health.time / 1000);
-          } else result = await api(
-            endpoints[q.op] +
-              (q.op === "search" ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
-                : q.op === "retry" ? "/" + encodeURIComponent(q.args.id) : ""),
-            q.op === "search" ? undefined : q.args, controller.signal);
+          } else
+            result = await api(
+              endpoints[q.op] +
+                (q.op === "search"
+                  ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
+                  : q.op === "retry"
+                    ? "/" + encodeURIComponent(q.args.id)
+                    : ""),
+              q.op === "search" ? undefined : q.args,
+              controller.signal,
+            );
           reply({
             type: "result",
             id: m.id,
             result,
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e) });
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
         } finally {
           sourceRequests.delete(m.id);
           if (!sourceRequests.size) marketRequests.delete(source);
@@ -554,11 +857,15 @@ export default function AdvancedWorkspace() {
               JSON.stringify(q.indicators).length > 2000)) ||
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
-          (q.series_kind !== undefined && !["provider", "managed"].includes(q.series_kind)) ||
+          (q.series_kind !== undefined &&
+            !["provider", "managed"].includes(q.series_kind)) ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
-          q.limit > (q.series_kind === "provider" ? 20000 : 2000) ||
+          q.limit >
+            (q.series_kind === "provider"
+              ? historyCapabilities.current?.max_bars || 20000
+              : 2000) ||
           (q.before !== undefined &&
             (!Number.isSafeInteger(q.before) || q.before <= 0)) ||
           (q.revision_before !== undefined &&
@@ -568,18 +875,45 @@ export default function AdvancedWorkspace() {
             (!Number.isSafeInteger(q.revision_after) ||
               q.revision_after < 0)) ||
           (q.native_reserve !== undefined &&
-            (q.series_kind !== 'provider' || !q.native_history || !q.native_reserve ||
-              typeof q.native_reserve !== 'object' || Array.isArray(q.native_reserve) ||
+            (q.series_kind !== "provider" ||
+              !q.native_history ||
+              !q.native_reserve ||
+              typeof q.native_reserve !== "object" ||
+              Array.isArray(q.native_reserve) ||
               !Number.isInteger(q.native_reserve.screen_bars) ||
-              q.native_reserve.screen_bars < 1 || q.native_reserve.screen_bars > 2000 ||
+              q.native_reserve.screen_bars < 1 ||
+              q.native_reserve.screen_bars > 2000 ||
               ![1, 2].includes(q.native_reserve.batch_screens) ||
               !Number.isInteger(q.native_reserve.warmup_bars) ||
-              q.native_reserve.warmup_bars < 0 || q.native_reserve.warmup_bars > 2000 ||
-              Object.keys(q.native_reserve).some(k => !['screen_bars', 'batch_screens', 'warmup_bars'].includes(k)) ||
-              q.indicators?.length || q.history_observation !== undefined)) ||
-          inflight.current >= 8
+              q.native_reserve.warmup_bars < 0 ||
+              q.native_reserve.warmup_bars > 2000 ||
+              Object.keys(q.native_reserve).some(
+                (k) =>
+                  !["screen_bars", "batch_screens", "warmup_bars"].includes(k),
+              ) ||
+              q.indicators?.length ||
+              q.history_observation !== undefined))
         ) {
-          reply({ type: "result", id: m.id, error: "请求不在允许范围内" });
+          reply({
+            type: "result",
+            id: m.id,
+            error: "请求不在允许范围内",
+            errorDetails: {
+              code:
+                q?.series_kind === "provider" && q?.limit > 20000
+                  ? "NATIVE_HISTORY_CAPACITY_EXCEEDED"
+                  : "INVALID_HISTORY_REQUEST",
+            },
+          });
+          return;
+        }
+        if (inflight.current >= 8) {
+          reply({
+            type: "result",
+            id: m.id,
+            error: "行情服务繁忙，请稍后重试",
+            errorDetails: { code: "HISTORY_BUSY", status: 503 },
+          });
           return;
         }
         const controller = new AbortController();
@@ -591,31 +925,85 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            result: await api(q.native_reserve ? "/charts/reserve" : "/charts/data", {
-              instrument: q.instrument,
-              series_kind: q.series_kind || "managed",
-              published: q.series_kind !== "provider",
-              ...(typeof q.dataset_start === 'number' ? {dataset_start:q.dataset_start} : {}),
-              timeframe: q.timeframe,
-              limit: q.limit,
-              ...(q.series_kind === 'provider' ? {countBack:q.countBack,
-                from:q.from,firstDataRequest:q.firstDataRequest === true,client:q.client,
-                ...(q.native_history !== undefined ? {native_history:q.native_history} : {}),
-                ...(q.native_reserve !== undefined ? {native_reserve:q.native_reserve} : {}),
-                ...(q.history_observation !== undefined ? {history_observation:q.history_observation} : {})} : {}),
-              indicators: q.indicators || [],
-              ...(q.before ? { before: q.before } : {}),
-              track_history: q.track_history === true,
-              ...(q.revision_after !== undefined
-                ? { revision_after: q.revision_after }
-                : {}),
-              ...(q.revision_before
-                ? { revision_before: q.revision_before }
-                : {}),
-            }, controller.signal),
+            result: await (
+              q.series_kind === "provider" &&
+                q.native_history &&
+                !q.native_reserve
+                ? (body: unknown, signal: AbortSignal) =>
+                    loadNativeHistory(
+                      body,
+                      signal,
+                      historyCapabilities.current!,
+                      (progress) =>
+                        setNativeLoads((previous) => {
+                          const key = q.history_progress_id;
+                          if (
+                            source !== frame.current?.contentWindow ||
+                            q.history_progress_epoch !==
+                              nativeLoadEpoch.current ||
+                            !previous[key]
+                          )
+                            return previous;
+                          return {
+                            ...previous,
+                            [key]: { ...previous[key], ...progress },
+                          };
+                        }),
+                    )
+                : (body: unknown, signal: AbortSignal) =>
+                    api(
+                      q.native_reserve ? "/charts/reserve" : "/charts/data",
+                      body,
+                      signal,
+                    )
+            )(
+              {
+                instrument: q.instrument,
+                series_kind: q.series_kind || "managed",
+                published: q.series_kind !== "provider",
+                ...(typeof q.dataset_start === "number"
+                  ? { dataset_start: q.dataset_start }
+                  : {}),
+                timeframe: q.timeframe,
+                limit: q.limit,
+                ...(q.series_kind === "provider"
+                  ? {
+                      countBack: q.countBack,
+                      from: q.from,
+                      firstDataRequest: q.firstDataRequest === true,
+                      client: q.client,
+                      ...(q.native_history !== undefined
+                        ? { native_history: q.native_history,
+                            history_page_bars:q.history_page_bars === 1000 ? 1000 : 4000 }
+                        : {}),
+                      ...(q.native_reserve !== undefined
+                        ? { native_reserve: q.native_reserve }
+                        : {}),
+                      ...(q.history_observation !== undefined
+                        ? { history_observation: q.history_observation }
+                        : {}),
+                    }
+                  : {}),
+                indicators: q.indicators || [],
+                ...(q.before ? { before: q.before } : {}),
+                track_history: q.track_history === true,
+                ...(q.revision_after !== undefined
+                  ? { revision_after: q.revision_after }
+                  : {}),
+                ...(q.revision_before
+                  ? { revision_before: q.revision_before }
+                  : {}),
+              },
+              controller.signal,
+            ),
           });
         } catch (e) {
-          reply({ type: "result", id: m.id, error: String(e) });
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
         } finally {
           sourceRequests.delete(m.id);
           if (!sourceRequests.size) marketRequests.delete(source);
@@ -732,12 +1120,53 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
-      {historyPlansOpen && <HistoryPlansDialog onClose={()=>setHistoryPlansOpen(false)} readonly={mobile}
-        onRefresh={()=>post({type:'refresh-managed'})} views={datasetViews}/> }
-      {maintenanceInstrument && <MaintenanceDialog instrument={maintenanceInstrument}
-        onClose={()=>setMaintenanceInstrument(null)} onSubmitted={()=>{
-          setMaintenanceInstrument(null);setHistoryPlansOpen(true);
-        }}/>}
+      {(Object.keys(nativeLoads).length > 0 ||
+        Object.keys(capacityNotices).length > 0) && (
+        <HistoryLoadingNotice
+          loads={nativeLoads}
+          capacities={capacityNotices}
+          onCancel={() => post({ type: "cancel-history" })}
+          onSettings={() => post({ type: "history-capacity-open" })}
+          onDismiss={() =>
+            setCapacityNotices((previous) =>
+              Object.fromEntries(
+                Object.entries(previous).filter(
+                  ([, notice]) => notice.phase === "filling",
+                ),
+              ),
+            )
+          }
+        />
+      )}
+      {capacityDialog && (
+        <HistoryCapacityDialog
+          {...capacityDialog}
+          theme={chartTheme}
+          onClose={() => setCapacityDialog(null)}
+          onSaved={(capabilities) => {
+            historyCapabilities.current = capabilities;
+            post({ type: "history-capabilities", capabilities });
+          }}
+        />
+      )}
+      {historyPlansOpen && (
+        <HistoryPlansDialog
+          onClose={() => setHistoryPlansOpen(false)}
+          readonly={mobile}
+          onRefresh={() => post({ type: "refresh-managed" })}
+          views={datasetViews}
+        />
+      )}
+      {maintenanceInstrument && (
+        <MaintenanceDialog
+          instrument={maintenanceInstrument}
+          onClose={() => setMaintenanceInstrument(null)}
+          onSubmitted={() => {
+            setMaintenanceInstrument(null);
+            setHistoryPlansOpen(true);
+          }}
+        />
+      )}
       {exportSelection && (
         <ExportDialog
           selection={exportSelection}
@@ -754,8 +1183,12 @@ export default function AdvancedWorkspace() {
       </div>
       {!nativeReady && noticeMessages.length > 0 && (
         <div className="advanced-loading-notice" role="alert">
-          {noticeMessages.map(notice => notice.text.replace(/^(?:Error:\s*)+/, "")).join("；")}
-          {blocked.current && !mobile && <button onClick={copy}>复制恢复草稿</button>}
+          {noticeMessages
+            .map((notice) => notice.text.replace(/^(?:Error:\s*)+/, ""))
+            .join("；")}
+          {blocked.current && !mobile && (
+            <button onClick={copy}>复制恢复草稿</button>
+          )}
         </div>
       )}
       {active ? (

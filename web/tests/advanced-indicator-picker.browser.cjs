@@ -108,6 +108,7 @@ const record = (name) => {
     });
     const indicatorResponses = [],
       responseTasks = new Set();
+    const historyQueries = new Map();
     page.on("response", (response) => {
       if (response.url().startsWith("https://www.google-analytics.com/"))
         report.errors.push(
@@ -134,13 +135,29 @@ const record = (name) => {
         responseTasks.add(task);
         task.finally(() => responseTasks.delete(task));
       }
-      if (new URL(response.url()).pathname !== "/api/charts/data") return;
+      const endpoint = new URL(response.url()).pathname;
+      if (
+        endpoint !== "/api/charts/data" &&
+        endpoint !== "/api/charts/history-loads" &&
+        !/^\/api\/charts\/history-loads\/[^/]+\/result$/.test(endpoint)
+      )
+        return;
       const task = (async () => {
-        const input = response.request().postDataJSON();
+        let input, result;
+        if (endpoint === "/api/charts/data") {
+          input = response.request().postDataJSON();
+          if (input?.indicators?.length) result = await response.json();
+        } else {
+          const payload = await response.json();
+          if (endpoint === "/api/charts/history-loads") {
+            input = response.request().postDataJSON()?.query;
+            if (payload.load) historyQueries.set(payload.load.id, input);
+          } else input = historyQueries.get(endpoint.split("/").at(-2));
+          result = payload.result;
+        }
         if (!input?.indicators?.length) return;
         assert.ok(response.ok(), "indicator data HTTP " + response.status());
-        const result = await response.json();
-        indicatorResponses.push({ input, result });
+        if (result) indicatorResponses.push({ input, result });
       })().catch((e) => report.errors.push(e.message));
       responseTasks.add(task);
       task.finally(() => responseTasks.delete(task));

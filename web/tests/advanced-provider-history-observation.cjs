@@ -4,7 +4,8 @@ function setup(){
  const messages=[],handlers=[];
  const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
   location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
-  crypto:{randomUUID:()=> 'listener'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout});
+  crypto:{randomUUID:()=> 'listener'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout,
+  requestAnimationFrame:callback=>setImmediate(callback)});
  for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
  vm.runInContext(`globalThis.delivered=[];globalThis.failures=[];globalThis.reloads=0;
   ready=true;globalThis.currentRes='5';
@@ -62,7 +63,7 @@ function page(revision,at,last=990000,close=2){return {cache_revision:revision,a
     assert.equal(x.ctx.reloads,1,'switching back consumes the correction');
    } else assert.equal(x.ctx.reloads,0,'backfill or unproven review cannot reset historical bars');
    if(['failure','legacy'].includes(scenario)){
-    assert.ok(vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5').correction`,x.ctx));
+    assert.ok(vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5|').correction`,x.ctx));
     assert.ok(x.messages.some(m=>m.type==='error'));
    }
   }finally{x.dispose()}
@@ -101,7 +102,7 @@ function page(revision,at,last=990000,close=2){return {cache_revision:revision,a
   await superseded.respond(userReview,{...page(13,13000,900000),history_revalidation:{changed:true}});
   await refresh;
   assert.equal(superseded.ctx.reloads,1);
-  assert.equal(vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5').correction`,superseded.ctx),null);
+  assert.equal(vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5|').correction`,superseded.ctx),null);
  } finally {superseded.dispose()}
  const multiple=setup();
  try {
@@ -112,7 +113,7 @@ function page(revision,at,last=990000,close=2){return {cache_revision:revision,a
   await multiple.respond(multiple.data().at(-1),null,'first failed');await multiple.ctx.windowA;
   await multiple.respond(b,page(12,12000,990000));
   await multiple.respond(multiple.data().at(-1),null,'second failed');await multiple.ctx.windowB;
-  const correction=vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5').correction`,multiple.ctx);
+  const correction=vm.runInContext(`providerHistoryWork.get('MWP:BTCUSDT|5|').correction`,multiple.ctx);
   assert.equal(correction.originals.length,2,'disjoint unresolved observations must both be kept');
   const recovery=vm.runInContext('refreshProviderHistoryCorrections()',multiple.ctx);
   const firstReview=multiple.data().at(-1);

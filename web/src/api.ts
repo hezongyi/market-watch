@@ -1,4 +1,14 @@
 let csrf = "";
+export class ApiError extends Error {
+  constructor(message: string, public status: number, public code: string) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+export function apiErrorDetails(error: unknown) {
+  return error instanceof ApiError ? {code:error.code, status:error.status} :
+    {code:error instanceof DOMException && error.name === 'AbortError' ? 'HISTORY_CANCELLED' : 'HISTORY_UNAVAILABLE'};
+}
 export function apiResponse(path: string, body: unknown, signal?: AbortSignal) {
   return fetch(`/api${path}`, {
     method: "POST", credentials: "same-origin", signal,
@@ -19,12 +29,15 @@ export async function api<T = any>(path: string, body?: unknown, signal?: AbortS
   });
   const result = await response.json();
   if (!response.ok)
-    throw new Error(
+    throw new ApiError(
       typeof result.detail === "string"
         ? result.detail
         : typeof result.detail?.message === "string"
           ? result.detail.message
           : JSON.stringify(result.detail),
+      response.status,
+      typeof result.detail?.code === 'string' ? result.detail.code :
+        response.status === 503 ? 'HISTORY_BUSY' : 'HISTORY_UNAVAILABLE',
     );
   return result;
 }

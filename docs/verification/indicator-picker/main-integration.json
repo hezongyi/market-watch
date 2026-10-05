@@ -1,0 +1,578 @@
+{
+  "at": "2026-10-05T23:03:43.648Z",
+  "status": "passed",
+  "scope": "Ubuntu Docker full stack, actual provider candles",
+  "cases": [
+    "中英文与别名搜索、原生/Python 来源区分",
+    "分类空结果与全目录搜索",
+    "内置 SMA 经新窗口添加与移除",
+    "添加后直接设置与返回",
+    "连续添加、独立实例 ID 与 SMA(20)/SMA(60)",
+    "显隐、原生参数设置、返回保留查询",
+    "已有 EMA/RSI/MACD/BBANDS 添加",
+    "真实 BTCUSDT M5：六个实例全部曲线非空，公开十字光标值与后端逐点一致",
+    "浅深色、375px、焦点约束与 Escape",
+    "活动图表切换刷新实例列表",
+    "延迟添加时切换活动图表，真实产品实例仍归属发起图表",
+    "移除仅作用于具体实例",
+    "原生指标模板经正式 Adapter 保存到独立数据库",
+    "工作区刷新恢复原 study ID 与参数",
+    "服务器模板刷新恢复参数、曲线样式与显隐",
+    "v1.7.0 旧布局经过真实数据库保存、刷新恢复：8 个实体 ID、参数、样式与显隐一致",
+    "v1.7.0 旧模板在真实产品中恢复 8 个指标参数与样式",
+    "原生收藏服务器持久化、刷新恢复、返回新窗口",
+    "无页面异常"
+  ],
+  "marketData": [
+    {
+      "name": "SMA",
+      "params": {
+        "period": 20
+      },
+      "bars": 507,
+      "first": 1791089400000,
+      "last": 1791241200000,
+      "plots": [
+        "value"
+      ],
+      "studyId": "KDkxNG",
+      "samples": [
+        {
+          "plot": "value",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 85821.056,
+              "backend": 85821.05600000001
+            },
+            {
+              "time": 1791237300,
+              "displayed": 85831.005,
+              "backend": 85831.005
+            },
+            {
+              "time": 1791237600,
+              "displayed": 85841.287,
+              "backend": 85841.287
+            },
+            {
+              "time": 1791237900,
+              "displayed": 85845.795,
+              "backend": 85845.795
+            },
+            {
+              "time": 1791238200,
+              "displayed": 85855.223,
+              "backend": 85855.22299999998
+            },
+            {
+              "time": 1791238500,
+              "displayed": 85865.7515,
+              "backend": 85865.75149999998
+            },
+            {
+              "time": 1791238800,
+              "displayed": 85872.979,
+              "backend": 85872.97899999999
+            },
+            {
+              "time": 1791239100,
+              "displayed": 85881.1355,
+              "backend": 85881.1355
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SMA",
+      "params": {
+        "period": 60
+      },
+      "bars": 507,
+      "first": 1791089400000,
+      "last": 1791241200000,
+      "plots": [
+        "value"
+      ],
+      "studyId": "mJUtsl",
+      "samples": [
+        {
+          "plot": "value",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 85623.89917,
+              "backend": 85623.89916666666
+            },
+            {
+              "time": 1791237300,
+              "displayed": 85634.71567,
+              "backend": 85634.71566666666
+            },
+            {
+              "time": 1791237600,
+              "displayed": 85647.324,
+              "backend": 85647.324
+            },
+            {
+              "time": 1791237900,
+              "displayed": 85657.8205,
+              "backend": 85657.82049999999
+            },
+            {
+              "time": 1791238200,
+              "displayed": 85669.4605,
+              "backend": 85669.4605
+            },
+            {
+              "time": 1791238500,
+              "displayed": 85681.01117,
+              "backend": 85681.01116666666
+            },
+            {
+              "time": 1791238800,
+              "displayed": 85691.08117,
+              "backend": 85691.08116666667
+            },
+            {
+              "time": 1791239100,
+              "displayed": 85701.753,
+              "backend": 85701.75300000001
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EMA",
+      "params": {
+        "period": 20
+      },
+      "bars": 507,
+      "first": 1791089400000,
+      "last": 1791241200000,
+      "plots": [
+        "value"
+      ],
+      "studyId": "HVKqVJ",
+      "samples": [
+        {
+          "plot": "value",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 85825.39025,
+              "backend": 85825.3902490029
+            },
+            {
+              "time": 1791237300,
+              "displayed": 85837.16165,
+              "backend": 85837.16165385977
+            },
+            {
+              "time": 1791237600,
+              "displayed": 85851.70721,
+              "backend": 85851.70721063504
+            },
+            {
+              "time": 1791237900,
+              "displayed": 85852.51319,
+              "backend": 85852.51319057457
+            },
+            {
+              "time": 1791238200,
+              "displayed": 85863.16908,
+              "backend": 85863.16907718651
+            },
+            {
+              "time": 1791238500,
+              "displayed": 85877.63297,
+              "backend": 85877.63297459732
+            },
+            {
+              "time": 1791238800,
+              "displayed": 85884.26602,
+              "backend": 85884.26602463567
+            },
+            {
+              "time": 1791239100,
+              "displayed": 85895.89021,
+              "backend": 85895.8902127656
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RSI",
+      "params": {
+        "period": 14
+      },
+      "bars": 507,
+      "first": 1791089400000,
+      "last": 1791241200000,
+      "plots": [
+        "value"
+      ],
+      "studyId": "2Y5YAC",
+      "samples": [
+        {
+          "plot": "value",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 72.20258,
+              "backend": 72.20257947425318
+            },
+            {
+              "time": 1791237300,
+              "displayed": 68.85944,
+              "backend": 68.8594401500307
+            },
+            {
+              "time": 1791237600,
+              "displayed": 71.87945,
+              "backend": 71.87945151117293
+            },
+            {
+              "time": 1791237900,
+              "displayed": 53.99412,
+              "backend": 53.99412157644738
+            },
+            {
+              "time": 1791238200,
+              "displayed": 62.14471,
+              "backend": 62.14471458588046
+            },
+            {
+              "time": 1791238500,
+              "displayed": 65.35607,
+              "backend": 65.35607204285574
+            },
+            {
+              "time": 1791238800,
+              "displayed": 58.23697,
+              "backend": 58.23696910203404
+            },
+            {
+              "time": 1791239100,
+              "displayed": 62.10976,
+              "backend": 62.109762200920414
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MACD",
+      "params": {
+        "fast": 12,
+        "slow": 26,
+        "signal": 9
+      },
+      "bars": 507,
+      "first": 1791089400000,
+      "last": 1791241200000,
+      "plots": [
+        "macd",
+        "signal",
+        "histogram"
+      ],
+      "studyId": "rj1erQ",
+      "samples": [
+        {
+          "plot": "macd",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 67.5428,
+              "backend": 67.54280138095783
+            },
+            {
+              "time": 1791237300,
+              "displayed": 69.15503,
+              "backend": 69.15502683474915
+            },
+            {
+              "time": 1791237600,
+              "displayed": 72.89275,
+              "backend": 72.89275302407623
+            },
+            {
+              "time": 1791237900,
+              "displayed": 64.64245,
+              "backend": 64.6424501464935
+            },
+            {
+              "time": 1791238200,
+              "displayed": 65.75652,
+              "backend": 65.75651541167463
+            },
+            {
+              "time": 1791238500,
+              "displayed": 69.91965,
+              "backend": 69.919654688827
+            },
+            {
+              "time": 1791238800,
+              "displayed": 66.97921,
+              "backend": 66.97921218870033
+            },
+            {
+              "time": 1791239100,
+              "displayed": 68.62189,
+              "backend": 68.62189442150702
+            }
+          ]
+        },
+        {
+          "plot": "signal",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 57.37769,
+              "backend": 57.377694507636136
+            },
+            {
+              "time": 1791237300,
+              "displayed": 59.73316,
+              "backend": 59.73316097305874
+            },
+            {
+              "time": 1791237600,
+              "displayed": 62.36508,
+              "backend": 62.365079383262234
+            },
+            {
+              "time": 1791237900,
+              "displayed": 62.82055,
+              "backend": 62.82055353590849
+            },
+            {
+              "time": 1791238200,
+              "displayed": 63.40775,
+              "backend": 63.40774591106172
+            },
+            {
+              "time": 1791238500,
+              "displayed": 64.71013,
+              "backend": 64.71012766661477
+            },
+            {
+              "time": 1791238800,
+              "displayed": 65.16394,
+              "backend": 65.16394457103188
+            },
+            {
+              "time": 1791239100,
+              "displayed": 65.85553,
+              "backend": 65.8555345411269
+            }
+          ]
+        },
+        {
+          "plot": "histogram",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 10.16511,
+              "backend": 10.16510687332169
+            },
+            {
+              "time": 1791237300,
+              "displayed": 9.42187,
+              "backend": 9.421865861690414
+            },
+            {
+              "time": 1791237600,
+              "displayed": 10.52767,
+              "backend": 10.527673640813994
+            },
+            {
+              "time": 1791237900,
+              "displayed": 1.8219,
+              "backend": 1.8218966105850143
+            },
+            {
+              "time": 1791238200,
+              "displayed": 2.34877,
+              "backend": 2.34876950061291
+            },
+            {
+              "time": 1791238500,
+              "displayed": 5.20953,
+              "backend": 5.209527022212228
+            },
+            {
+              "time": 1791238800,
+              "displayed": 1.81527,
+              "backend": 1.8152676176684537
+            },
+            {
+              "time": 1791239100,
+              "displayed": 2.76636,
+              "backend": 2.766359880380122
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BBANDS",
+      "params": {
+        "period": 20,
+        "deviation": 2
+      },
+      "bars": 507,
+      "first": 1791089400000,
+      "last": 1791241200000,
+      "plots": [
+        "upper",
+        "middle",
+        "lower"
+      ],
+      "studyId": "jLNUuq",
+      "samples": [
+        {
+          "plot": "upper",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 85954.93008,
+              "backend": 85954.93008462626
+            },
+            {
+              "time": 1791237300,
+              "displayed": 85971.68284,
+              "backend": 85971.68284114645
+            },
+            {
+              "time": 1791237600,
+              "displayed": 85996.13873,
+              "backend": 85996.13873405485
+            },
+            {
+              "time": 1791237900,
+              "displayed": 85997.29748,
+              "backend": 85997.29748405259
+            },
+            {
+              "time": 1791238200,
+              "displayed": 86011.53085,
+              "backend": 86011.53084607935
+            },
+            {
+              "time": 1791238500,
+              "displayed": 86034.81322,
+              "backend": 86034.8132248066
+            },
+            {
+              "time": 1791238800,
+              "displayed": 86043.0024,
+              "backend": 86043.0024017253
+            },
+            {
+              "time": 1791239100,
+              "displayed": 86060.07776,
+              "backend": 86060.07775524276
+            }
+          ]
+        },
+        {
+          "plot": "middle",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 85821.056,
+              "backend": 85821.05600000001
+            },
+            {
+              "time": 1791237300,
+              "displayed": 85831.005,
+              "backend": 85831.005
+            },
+            {
+              "time": 1791237600,
+              "displayed": 85841.287,
+              "backend": 85841.287
+            },
+            {
+              "time": 1791237900,
+              "displayed": 85845.795,
+              "backend": 85845.795
+            },
+            {
+              "time": 1791238200,
+              "displayed": 85855.223,
+              "backend": 85855.22299999998
+            },
+            {
+              "time": 1791238500,
+              "displayed": 85865.7515,
+              "backend": 85865.75149999998
+            },
+            {
+              "time": 1791238800,
+              "displayed": 85872.979,
+              "backend": 85872.97899999999
+            },
+            {
+              "time": 1791239100,
+              "displayed": 85881.1355,
+              "backend": 85881.1355
+            }
+          ]
+        },
+        {
+          "plot": "lower",
+          "matched": [
+            {
+              "time": 1791237000,
+              "displayed": 85687.18192,
+              "backend": 85687.18191537376
+            },
+            {
+              "time": 1791237300,
+              "displayed": 85690.32716,
+              "backend": 85690.32715885356
+            },
+            {
+              "time": 1791237600,
+              "displayed": 85686.43527,
+              "backend": 85686.43526594514
+            },
+            {
+              "time": 1791237900,
+              "displayed": 85694.29252,
+              "backend": 85694.29251594741
+            },
+            {
+              "time": 1791238200,
+              "displayed": 85698.91515,
+              "backend": 85698.91515392062
+            },
+            {
+              "time": 1791238500,
+              "displayed": 85696.68978,
+              "backend": 85696.68977519337
+            },
+            {
+              "time": 1791238800,
+              "displayed": 85702.9556,
+              "backend": 85702.95559827468
+            },
+            {
+              "time": 1791239100,
+              "displayed": 85702.19324,
+              "backend": 85702.19324475725
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "policyBlocks": [],
+  "errors": [],
+  "chartValueInterface": "public crossHairMoved.entityValues (5 decimal study precision)"
+}

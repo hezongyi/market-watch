@@ -1,0 +1,56 @@
+{
+  "project": "mw-native-history-ubuntu-20261004",
+  "branch": "fix/native-chart-window-sync",
+  "product_chart_commit": "2468143",
+  "human_acceptance": "original flicker and existing functions confirmed resolved; farther weekly capacity report under investigation",
+  "services": [
+    {
+      "Service": "api",
+      "Image": "mw-native-history-api:b3dd20c",
+      "Health": "healthy",
+      "State": "running",
+      "Networks": "mw-native-history-ubuntu-20261004_default",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Service": "chart-origin",
+      "Image": "mw-native-history-chart:2468143",
+      "Health": "",
+      "State": "running",
+      "Networks": "mw-native-history-ubuntu-20261004_default",
+      "Ports": "80/tcp"
+    },
+    {
+      "Service": "history-worker",
+      "Image": "mw-native-history-api:b3dd20c",
+      "Health": "",
+      "State": "running",
+      "Networks": "mw-native-history-ubuntu-20261004_default",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Service": "pg",
+      "Image": "public.ecr.aws/docker/library/postgres:16-alpine",
+      "Health": "healthy",
+      "State": "running",
+      "Networks": "mw-native-history-ubuntu-20261004_default",
+      "Ports": "5432/tcp"
+    },
+    {
+      "Service": "tls",
+      "Image": "nginx:1.28-alpine",
+      "Health": "",
+      "State": "running",
+      "Networks": "mw-native-history-ubuntu-20261004_default",
+      "Ports": "80/tcp, 192.168.7.232:16343->443/tcp, 192.168.7.232:16344->444/tcp"
+    },
+    {
+      "Service": "web",
+      "Image": "mw-native-history-web:b3dd20c",
+      "Health": "",
+      "State": "running",
+      "Networks": "mw-native-history-ubuntu-20261004_default",
+      "Ports": "80/tcp"
+    }
+  ]
+}

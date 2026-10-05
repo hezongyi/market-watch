@@ -2,7 +2,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const messages=[],handlers=[];
 const ctx=vm.createContext({URL,URLSearchParams,Map,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
- crypto:{randomUUID:()=> 'test'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout});
+ crypto:{randomUUID:()=> 'test'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout,
+ requestAnimationFrame:callback=>setImmediate(callback)});
 for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
 (async()=>{
  vm.runInContext(`globalThis.delivered=[];globalThis.failures=[];
@@ -26,5 +27,7 @@ for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../adv
  vm.runInContext(`globalThis.c=query('MWP:BTCUSDT','1',{limit:1}).catch(error=>error.code);workspaceEpoch++;`,ctx);
  await new Promise(resolve=>setTimeout(resolve,160));
  assert.equal(await ctx.c,'HISTORY_CANCELLED','changing workspace still releases obsolete requests');
+ vm.runInContext(`globalThis.expired=query('MWP:BTCUSDT','1',{limit:1},Date.now()-1).catch(error=>error.code);`,ctx);
+ assert.equal(await ctx.expired,'HISTORY_TIMEOUT','expired history budget retains a structured timeout code');
  console.log('Provider native requests survive period switches and cancel on workspace replacement');
 })().catch(error=>{for(const entry of vm.runInContext('[...pending.values()]',ctx)){clearTimeout(entry.timer);clearTimeout(entry.cancellationTimer)}console.error(error);process.exitCode=1});

@@ -540,6 +540,8 @@ def test_native_history_rejects_number_and_time_coercion(field, value):
 
 
 def test_native_capacity_error_is_structured_and_never_no_data(database, monkeypatch):
+    from alerts.config import settings
+    monkeypatch.setattr(settings, 'native_history_max_bars', 20000)
     monkeypatch.setattr(provider, 'metadata', lambda _: META)
     monkeypatch.setattr(provider, 'native_page', lambda *a, **k: pytest.fail('known N+H capacity failure must not fetch'))
     api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'

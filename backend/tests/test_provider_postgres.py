@@ -15,7 +15,7 @@ from alerts import provider_cache as cache
 from alerts import provider_chart as upstream
 from alerts import storage
 from alerts.storage import ProviderBar, ProviderDataset
-from sqlalchemy import create_engine, func, inspect, select, text
+from sqlalchemy import create_engine, event, func, inspect, select, text
 from sqlalchemy.orm import sessionmaker
 from test_provider_cache import META, page
 
@@ -153,7 +153,7 @@ def test_revision_migration_backfills_existing_observations_and_preserves_bars(p
     assert cache.snapshot(key, 4000, 3)["bars"] == before
 
 
-def test_history_response_is_one_statement_snapshot_during_revision(provider_pg, monkeypatch):
+def test_history_response_is_repeatable_read_snapshot_during_revision(provider_pg, monkeypatch):
     from sqlalchemy import event
     from test_provider_cache import seed
     _, engine = provider_pg
@@ -167,7 +167,7 @@ def test_history_response_is_one_statement_snapshot_during_revision(provider_pg,
         if threading.get_ident() not in reader_ident or not statement.lstrip().upper().startswith('SELECT'):
             return
         selects.append(statement)
-        if 'LEFT OUTER JOIN' in statement and 'provider_datasets' in statement:
+        if 'provider_datasets' in statement and not read_done.is_set():
             read_done.set()
             assert revision_done.wait(4)
     event.listen(engine, 'after_cursor_execute', pause_after_select)
@@ -182,7 +182,7 @@ def test_history_response_is_one_statement_snapshot_during_revision(provider_pg,
             seed(META, 'M5', 6000, page(5000, 6000, close='5'))
             revision_done.set()
             original = pending.result(timeout=3)
-        assert len(selects) == 1, 'metadata and bars must share one statement, not default transaction isolation'
+        assert len(selects) >= 2, 'metadata and bars use an explicit repeatable-read transaction'
         assert original['as_of'] == 100000 and original['cache_revision'] == 1
         # The changed bar is in the response window; pairing old bars with a
         # new metadata version would incorrectly suppress the subscription reset.
@@ -195,6 +195,27 @@ def test_history_response_is_one_statement_snapshot_during_revision(provider_pg,
     finally:
         revision_done.set()
         event.remove(engine, 'after_cursor_execute', pause_after_select)
+
+
+def test_snapshot_statement_timeout_preserves_error_type_and_recovers(provider_pg):
+    from test_provider_cache import seed
+
+    _, engine = provider_pg
+    key = seed(META, "M5", 10000, page(1000, 10000))
+
+    def delay_bars(conn, cursor, statement, parameters, context, many):
+        if statement.lstrip().upper().startswith("SELECT") and "provider_bars" in statement:
+            cursor.execute("SELECT pg_sleep(1)")
+
+    event.listen(engine, "before_cursor_execute", delay_bars)
+    token = cache.DEADLINE.set(time.monotonic() + 0.1)
+    try:
+        with pytest.raises(TimeoutError, match="数据库读取超过时间预算"):
+            cache.snapshot(key, 10000, 5)
+    finally:
+        cache.DEADLINE.reset(token)
+        event.remove(engine, "before_cursor_execute", delay_bars)
+    assert len(cache.snapshot(key, 10000, 5)["bars"]) == 5
 
 
 @pytest.mark.parametrize('replace', [False, True])
@@ -345,6 +366,27 @@ def test_ready_history_activation_reuses_snapshot_connection(provider_pg, monkey
     assert result['cache_hit'] and len(result['bars']) >= 3
 
 
+def test_native_capacity_policy_never_checks_out_inside_snapshot(provider_pg, monkeypatch):
+    from alerts.chart_api import DataQuery
+    from test_provider_cache import seed
+    _, engine = provider_pg
+    # Use the same private test schema with only one connection available.
+    with engine.connect() as db:
+        schema = db.scalar(text("SELECT current_schema()"))
+    single = create_engine(engine.url, connect_args={"options": f"-csearch_path={schema}"},
+                           pool_size=1, max_overflow=0, pool_timeout=0.2)
+    monkeypatch.setattr(storage, "Session", sessionmaker(single, expire_on_commit=False))
+    try:
+        seed(META, 'M5', 100000, page(90000, 100000))
+        monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+        monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('cached demand'))
+        result = cache.data(DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
+            before=100000, countBack=3, native_history={'chart_count':1,'focused':True}))
+        assert result['cache_hit'] and len(result['bars']) >= 3
+    finally:
+        single.dispose()
+
+
 def test_expired_pool_waiter_executes_no_provider_statement(provider_pg):
     from sqlalchemy import event
     from test_provider_cache import seed
@@ -432,3 +474,32 @@ def test_concurrent_yahoo_catalog_initialization_is_idempotent(provider_pg, monk
     with factory.begin() as db:
         assert db.scalar(select(func.count()).select_from(MarketCatalog)) == len(ALIASES)
         assert db.get(MarketCatalog, first).metadata_json == {"verified": True}
+
+
+def test_small_native_demand_materializes_bounded_rows_in_large_pg_cache(provider_pg, monkeypatch):
+    from alerts.chart_api import DataQuery
+    from alerts.config import settings
+    _, engine = provider_pg
+    monkeypatch.setattr(settings, 'native_history_max_bars', 80000)
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    key = cache.ensure(META, 'M5')
+    for before in range(4000000, 60000001, 4000000):
+        lease = cache.claim(key)
+        cache.commit_page(key, lease, page(before - 4000000, before), before, cache.now_ms())
+        cache.release(key, lease)
+    # Capture the payload SELECT's explicit limit, not merely response size.
+    statements = []
+    def observe(conn, cursor, statement, parameters, context, executemany):
+        if 'provider_bars.payload' in statement:
+            statements.append((statement, parameters))
+    event.listen(engine, 'before_cursor_execute', observe)
+    try:
+        result = cache.data(DataQuery(instrument=META['id'], series_kind='provider',
+            timeframe='M5', before=60000000, countBack=20, limit=20,
+            native_history={'chart_count': 4}))
+    finally:
+        event.remove(engine, 'before_cursor_execute', observe)
+    assert result['cache_hit'] and result['mandatory_count'] == 20
+    assert len(result['bars']) < 4000
+    assert statements and all('LIMIT' in sql for sql, _ in statements)
+    assert all(p['param_1'] < 4000 for _, p in statements if 'param_1' in p)

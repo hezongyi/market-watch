@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-04T23:38:27.609672+00:00",
+  "at": "2026-10-05T23:04:45.862288+00:00",
   "host": "quant-server",
   "os": "Ubuntu 22.04.5 LTS",
   "product": "https://localhost:18443",
@@ -33,7 +33,7 @@
     {
       "name": "mw-indicator-acceptance-migrate-1",
       "image": "market-watch-api:indicator-acceptance",
-      "imageId": "sha256:f4dafc776add3815e2e65a4a6f684a05c08629266715d3e42271b3170e8d0c63",
+      "imageId": "sha256:6d559667cdc35b6aa9393322e49f927b75e466c79b66a892cb100009ab9fda61",
       "status": "exited",
       "exitCode": 0,
       "health": null,
@@ -47,7 +47,7 @@
     {
       "name": "mw-indicator-acceptance-api-1",
       "image": "market-watch-api:indicator-acceptance",
-      "imageId": "sha256:f4dafc776add3815e2e65a4a6f684a05c08629266715d3e42271b3170e8d0c63",
+      "imageId": "sha256:6d559667cdc35b6aa9393322e49f927b75e466c79b66a892cb100009ab9fda61",
       "status": "running",
       "exitCode": 0,
       "health": "healthy",
@@ -63,7 +63,7 @@
     {
       "name": "mw-indicator-acceptance-web-1",
       "image": "market-watch-web:indicator-acceptance",
-      "imageId": "sha256:d10580918e295763599802efda78886114c0244f0d95cb88d53f1cba0157e702",
+      "imageId": "sha256:8ae09db6f7fff21365dd993d7f601a0a26633452edd6951d71c61ab3d3ec9608",
       "status": "running",
       "exitCode": 0,
       "health": null,
@@ -79,7 +79,7 @@
     {
       "name": "mw-indicator-acceptance-chart-origin-1",
       "image": "market-watch-chart-origin:indicator-acceptance",
-      "imageId": "sha256:55ae62aefe5f136d5fa2d9c93e812ed1943e622f27644b267e764cef98e15b66",
+      "imageId": "sha256:ccb7f2012a677f90307a0952623368639b9867a602423833ee71b729cc0a5257",
       "status": "running",
       "exitCode": 0,
       "health": null,
@@ -138,6 +138,22 @@
           "destination": "/certs/key.pem"
         }
       ]
+    },
+    {
+      "name": "mw-indicator-acceptance-history-worker-1",
+      "image": "market-watch-api:indicator-acceptance",
+      "imageId": "sha256:6d559667cdc35b6aa9393322e49f927b75e466c79b66a892cb100009ab9fda61",
+      "status": "running",
+      "exitCode": 0,
+      "health": null,
+      "project": "mw-indicator-acceptance",
+      "networks": [
+        "mw-indicator-acceptance_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      },
+      "mounts": []
     }
   ],
   "history": {
@@ -149,5 +165,7 @@
     "last": 1791155100000,
     "seconds": 1.335
   },
-  "providerRequestSeconds": 30
+  "providerRequestSeconds": 30,
+  "integratedMain": "b700911",
+  "applicationVersion": "1.8.0"
 }

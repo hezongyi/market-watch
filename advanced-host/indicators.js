@@ -68,16 +68,26 @@ function pythonStudies(PineJS, catalog) {
       },
       constructor: function () {
         this.init = function (ctx, input) {
-          const symbol = PineJS.Std.ticker(ctx).replace(/^Market Watch:/, "");
+          // Native tickerid may be an encoded window symbol. Keep our backend
+          // identity plain and carry only the internal window on the study feed.
+          const symbol = (ctx.symbol.info?.ticker || PineJS.Std.ticker(ctx)).replace(/^Market Watch:/, "");
+          let window = ctx.symbol.info?.mw_window;
+          if (!window && ctx.symbol.tickerid?.startsWith('=')) {
+            try {
+              let extended=JSON.parse(ctx.symbol.tickerid.slice(1));
+              while(typeof extended.symbol !== 'string') extended=extended.symbol;
+              window=extended['mw-window'];
+            } catch { /* Keep ordinary symbol behavior for non-encoded tickers. */ }
+          }
           const spec = {
             name,
             params: Object.fromEntries(keys.map((k, i) => [k, input(i)])),
           };
-          for (const s of series)
-            ctx.new_sym(
-              "MWPY_" + btoa(JSON.stringify({ symbol, spec, key: s.key })),
-              PineJS.Std.period(ctx),
-            );
+          for (const s of series) {
+            const ticker="MWPY_" + btoa(JSON.stringify({ symbol, spec, key: s.key }));
+            ctx.new_sym(window ? '='+JSON.stringify({symbol:ticker,'mw-window':window}) : ticker,
+              PineJS.Std.period(ctx));
+          }
         };
         this.main = function (ctx) {
           ctx.select_sym(0);

@@ -326,6 +326,7 @@ def test_native_cold_range_requires_more_than_count_back(database, monkeypatch):
 
 def test_native_capacity_exact_limit_and_one_over(database, monkeypatch):
     from alerts.provider_history_policy import CapacityExceeded
+    monkeypatch.setattr(settings, 'native_history_max_bars', 20000)
     monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
     monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
     # Commit in legal upstream chunks, not one oversized PostgreSQL insert.

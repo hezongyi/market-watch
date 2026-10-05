@@ -1,0 +1,35 @@
+count 60000 hot True
+         3473085 function calls (3468667 primitive calls) in 4.400 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1415 to 28 due to restriction <28>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    4.400    4.400 provider_cache.py:640(data)
+        1    0.000    0.000    4.337    4.337 provider_cache.py:606(native_read)
+        1    0.000    0.000    4.337    4.337 provider_cache.py:484(_observed_read)
+        1    0.006    0.006    4.337    4.337 provider_cache.py:608(<lambda>)
+        1    0.005    0.005    4.331    4.331 provider_cache.py:518(_native_read)
+    47/15    0.108    0.002    4.323    0.288 {built-in method builtins.next}
+        2    0.009    0.004    4.211    2.106 provider_cache.py:135(snapshot_transaction)
+    16/10    0.000    0.000    4.211    0.421 contextlib.py:132(__enter__)
+        2    0.013    0.006    3.677    1.838 result.py:970(all)
+        2    0.010    0.005    3.664    1.832 result.py:1890(_fetchall_impl)
+        6    0.000    0.000    3.654    0.609 loading.py:214(chunks)
+        4    0.000    0.000    3.535    0.884 cursor.py:2376(_fetchall_impl)
+        4    0.000    0.000    3.535    0.884 cursor.py:1309(fetchall)
+        5    0.118    0.024    3.535    0.707 cursor.py:274(fetchall)
+   186007    0.164    0.000    3.418    0.000 json.py:256(load)
+   186007    0.231    0.000    3.226    0.000 __init__.py:299(loads)
+   186007    0.321    0.000    2.601    0.000 decoder.py:332(decode)
+   186007    2.111    0.000    2.111    0.000 decoder.py:343(raw_decode)
+      6/5    0.000    0.000    0.512    0.102 session.py:2406(execute)
+      6/5    0.000    0.000    0.512    0.102 session.py:2201(_execute_internal)
+        5    0.000    0.000    0.489    0.098 base.py:1404(execute)
+        5    0.000    0.000    0.489    0.098 elements.py:524(_execute_on_connection)
+        5    0.000    0.000    0.489    0.098 base.py:1618(_execute_clauseelement)
+        4    0.000    0.000    0.485    0.121 context.py:306(orm_execute_statement)
+       25    0.321    0.013    0.454    0.018 connection.py:479(wait)
+       12    0.000    0.000    0.452    0.038 cursor.py:100(execute)
+        8    0.000    0.000    0.450    0.056 base.py:1767(_execute_context)
+        8    0.000    0.000    0.449    0.056 base.py:1826(_exec_single_context)
