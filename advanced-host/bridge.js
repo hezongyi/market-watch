@@ -8,7 +8,7 @@ const pending = new Map();
 // Use public native dialogs. The widget has no public non-modal toast API.
 // Keep acknowledged conditions deduplicated until the parent clears them.
 const acknowledgedNotices = new Set();
-let activeNotices = [], noticeDialogOpen = false, chartMenu;
+let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
@@ -1323,6 +1323,7 @@ function boot(
   progressivePages = undefined;
   managedSessions.clear();
   maintenanceAsked.clear();
+  indicatorPicker?.dispose();
   widget = new TradingView.widget({
     save_load_adapter: { ...prefs.templates, ...layouts },
     settings_adapter: prefs.settings,
@@ -1337,7 +1338,15 @@ function boot(
       details: true,
       datawindow: true,
       watchlist_settings: {
-        default_symbols: ["EURUSD", "XAUUSD", "BTCUSDT"].map(symbol=>MWSeries.encode(symbol,"provider")),
+        // Restore the active list before native resolves constructor defaults.
+        // Waiting until onChartReady briefly requests unrelated default symbols.
+        default_symbols: (() => {
+          const stored = preferences.find(p => p.kind === "setting" && p.name === "mw.watchlists.v1")?.content.value;
+          const lists = Array.isArray(stored?.lists) ? stored.lists : [];
+          const list = lists.find(list => list.id === stored.active) || lists[0];
+          return Array.isArray(list?.symbols) ? list.symbols :
+            ["EURUSD", "XAUUSD", "BTCUSDT"].map(symbol => MWSeries.encode(symbol, "provider"));
+        })(),
         readonly,
       },
     },
@@ -1386,6 +1395,7 @@ function boot(
       "use_localstorage_for_settings",
       "open_account_manager",
       "create_volume_indicator_by_default",
+      "header_indicators",
       ...(readonly
         ? [
             "left_toolbar",
@@ -1433,6 +1443,8 @@ function boot(
     widget
       .headerReady()
       .then(async () => {
+        if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
+          send({type: "error", error: String(e)}));
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
           grid, [
