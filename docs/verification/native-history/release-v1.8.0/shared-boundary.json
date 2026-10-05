@@ -1,0 +1,418 @@
+{
+  "scope": "real native engine, synthetic bars, public operations; no deployed instance",
+  "cases": [
+    {
+      "passed": true,
+      "supplierFailure": false,
+      "before": {
+        "diag": {
+          "mode": "continuous",
+          "cursors": [
+            {
+              "res": "5",
+              "phase": "idle",
+              "mapped": null
+            },
+            {
+              "res": "5",
+              "phase": "idle",
+              "mapped": null
+            }
+          ],
+          "windows": [],
+          "models": 2,
+          "threads": 1,
+          "pending": 0,
+          "resident": 329,
+          "limits": {
+            "protocol": 1,
+            "mode": "continuous",
+            "max_bars": 20000,
+            "workspace_bars": 80000,
+            "response_bytes": 134217728,
+            "task_seconds": 30
+          }
+        },
+        "target": 1788126300
+      },
+      "after": {
+        "diag": {
+          "mode": "continuous",
+          "cursors": [
+            {
+              "res": "5",
+              "phase": "idle",
+              "mapped": null
+            },
+            {
+              "res": "5",
+              "phase": "idle",
+              "boundaryAt": 1791058200,
+              "mapped": null
+            }
+          ],
+          "windows": [],
+          "models": 2,
+          "threads": 1,
+          "pending": 0,
+          "resident": 529,
+          "limits": {
+            "protocol": 1,
+            "mode": "continuous",
+            "max_bars": 529,
+            "workspace_bars": 2116,
+            "response_bytes": 134217728,
+            "task_seconds": 30
+          }
+        },
+        "cacheFirst": 1791057600,
+        "pendingSubscribers": 0,
+        "ranges": [
+          {
+            "from": 1791197400,
+            "to": 1791219000
+          },
+          {
+            "from": 1791058200,
+            "to": 1791088200
+          }
+        ],
+        "notices": [
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "phase": "clear"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "phase": "clear"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "filling",
+            "requested": 1788126300,
+            "started": 1791216451795,
+            "totalBars": 200,
+            "loadedBars": 0,
+            "pages": 0,
+            "batch": 0,
+            "completedBatch": 0,
+            "estimatedPages": 1,
+            "scope": "source",
+            "limit": 529,
+            "resident": 329,
+            "message": "已超过容量，正在加载可到达的最早位置"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "filling",
+            "requested": 1788126300,
+            "started": 1791216451795,
+            "totalBars": 200,
+            "loadedBars": 0,
+            "pages": 0,
+            "batch": 1,
+            "completedBatch": 0,
+            "estimatedPages": 1,
+            "scope": "source",
+            "limit": 529,
+            "resident": 329,
+            "message": "已超过容量，正在加载可到达的最早位置"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "filling",
+            "requested": 1788126300,
+            "started": 1791216451795,
+            "totalBars": 200,
+            "loadedBars": 200,
+            "pages": 0,
+            "batch": 1,
+            "completedBatch": 1,
+            "estimatedPages": 1,
+            "scope": "source",
+            "limit": 529,
+            "resident": 529,
+            "message": "已超过容量，正在加载可到达的最早位置"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "limited",
+            "requested": 1788126300,
+            "actual": 1791058200,
+            "started": 1791216451795,
+            "finished": 1791216451842,
+            "totalBars": 200,
+            "loadedBars": 200,
+            "pages": 0,
+            "batch": 1,
+            "scope": "source",
+            "limit": 529,
+            "resident": 529,
+            "message": "已定位到当前容量可到达的最早位置"
+          }
+        ],
+        "trace": [
+          {
+            "from": 1791126360,
+            "to": 1791216360,
+            "countBack": 301,
+            "firstDataRequest": true
+          },
+          {
+            "from": 1791117600,
+            "to": 1791126000,
+            "countBack": 28,
+            "firstDataRequest": false
+          },
+          {
+            "from": 1791117599,
+            "to": 1791117600,
+            "countBack": 200,
+            "firstDataRequest": false,
+            "mw_boundaryId": 1,
+            "mw_boundaryBatch": 1
+          }
+        ]
+      }
+    },
+    {
+      "passed": true,
+      "supplierFailure": true,
+      "before": {
+        "diag": {
+          "mode": "continuous",
+          "cursors": [
+            {
+              "res": "5",
+              "phase": "idle",
+              "mapped": null
+            },
+            {
+              "res": "5",
+              "phase": "idle",
+              "mapped": null
+            }
+          ],
+          "windows": [],
+          "models": 2,
+          "threads": 1,
+          "pending": 0,
+          "resident": 329,
+          "limits": {
+            "protocol": 1,
+            "mode": "continuous",
+            "max_bars": 20000,
+            "workspace_bars": 80000,
+            "response_bytes": 134217728,
+            "task_seconds": 30
+          }
+        },
+        "target": 1788126300
+      },
+      "after": {
+        "diag": {
+          "mode": "continuous",
+          "cursors": [
+            {
+              "res": "5",
+              "phase": "idle",
+              "mapped": null
+            },
+            {
+              "res": "5",
+              "phase": "idle",
+              "boundaryAt": 1791114600,
+              "mapped": null
+            }
+          ],
+          "windows": [],
+          "models": 2,
+          "threads": 1,
+          "pending": 0,
+          "resident": 339,
+          "limits": {
+            "protocol": 1,
+            "mode": "continuous",
+            "max_bars": 529,
+            "workspace_bars": 2116,
+            "response_bytes": 134217728,
+            "task_seconds": 30
+          }
+        },
+        "cacheFirst": 1791114600,
+        "pendingSubscribers": 0,
+        "ranges": [
+          {
+            "from": 1791197400,
+            "to": 1791219000
+          },
+          {
+            "from": 1791114600,
+            "to": 1791144600
+          }
+        ],
+        "notices": [
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "phase": "clear"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "phase": "clear"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "filling",
+            "requested": 1788126300,
+            "started": 1791216453669,
+            "totalBars": 200,
+            "loadedBars": 0,
+            "pages": 0,
+            "batch": 0,
+            "completedBatch": 0,
+            "estimatedPages": 1,
+            "scope": "source",
+            "limit": 529,
+            "resident": 329,
+            "message": "已超过容量，正在加载可到达的最早位置"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "filling",
+            "requested": 1788126300,
+            "started": 1791216453669,
+            "totalBars": 200,
+            "loadedBars": 0,
+            "pages": 0,
+            "batch": 1,
+            "completedBatch": 0,
+            "estimatedPages": 1,
+            "scope": "source",
+            "limit": 529,
+            "resident": 329,
+            "message": "已超过容量，正在加载可到达的最早位置"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "filling",
+            "requested": 1788126300,
+            "started": 1791216453669,
+            "totalBars": 200,
+            "loadedBars": 10,
+            "pages": 0,
+            "batch": 1,
+            "completedBatch": 1,
+            "estimatedPages": 1,
+            "scope": "source",
+            "limit": 529,
+            "resident": 339,
+            "message": "已超过容量，正在加载可到达的最早位置"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "filling",
+            "requested": 1788126300,
+            "started": 1791216453669,
+            "totalBars": 200,
+            "loadedBars": 10,
+            "pages": 0,
+            "batch": 2,
+            "completedBatch": 1,
+            "estimatedPages": 1,
+            "scope": "source",
+            "limit": 529,
+            "resident": 339,
+            "message": "已超过容量，正在加载可到达的最早位置"
+          },
+          {
+            "key": "MWP:EURUSD|5|",
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "id": 1,
+            "phase": "limited",
+            "requested": 1788126300,
+            "actual": 1791114600,
+            "started": 1791216453669,
+            "finished": 1791216453746,
+            "totalBars": 200,
+            "loadedBars": 10,
+            "pages": 0,
+            "batch": 2,
+            "scope": "source",
+            "limit": 529,
+            "resident": 339,
+            "message": "已定位到现有数据边界；补齐剩余容量未完成：Error: boundary supplier unavailable"
+          }
+        ],
+        "trace": [
+          {
+            "from": 1791126360,
+            "to": 1791216360,
+            "countBack": 301,
+            "firstDataRequest": true
+          },
+          {
+            "from": 1791117600,
+            "to": 1791126000,
+            "countBack": 28,
+            "firstDataRequest": false
+          },
+          {
+            "from": 1791117599,
+            "to": 1791117600,
+            "countBack": 200,
+            "firstDataRequest": false,
+            "mw_boundaryId": 1,
+            "mw_boundaryBatch": 1
+          },
+          {
+            "from": 1791114599,
+            "to": 1791114600,
+            "countBack": 190,
+            "firstDataRequest": false,
+            "mw_boundaryId": 1,
+            "mw_boundaryBatch": 2
+          },
+          {
+            "from": 1791078600,
+            "to": 1791114600,
+            "countBack": 120,
+            "firstDataRequest": false
+          }
+        ]
+      }
+    }
+  ]
+}

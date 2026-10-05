@@ -5,6 +5,8 @@ from alerts import provider_chart as upstream
 from alerts.chart_api import DataQuery
 from alerts.config import settings
 from alerts.storage import NativeHistoryLoad
+from sqlalchemy import event
+from sqlalchemy.exc import DBAPIError
 from test_provider_cache import META, page, seed
 
 
@@ -136,3 +138,43 @@ def test_successful_empty_pages_fail_after_bounded_no_progress(history, monkeypa
     state = loads.status('owner', ident)
     assert state['state'] == 'failed' and state['pages'] == 3
     assert state['error']['code'] == 'HISTORY_NO_PROGRESS'
+
+
+@pytest.mark.parametrize("sqlstate", ["57014", "55P03"])
+def test_snapshot_database_timeout_is_structured_and_next_request_recovers(history, sqlstate):
+    from fastapi.testclient import TestClient
+    from alerts import api as api_module
+
+    class DatabaseTimeout(Exception):
+        pass
+
+    original = DatabaseTimeout("fixture database timeout")
+    original.sqlstate = sqlstate
+    engine = history.kw["bind"]
+    seed(META, "M5", 40000000, page(39990000, 40000000))
+
+    def interrupt_snapshot(conn, cursor, statement, parameters, context, many):
+        if statement.lstrip().upper().startswith("SELECT") and "provider_bars" in statement:
+            raise DBAPIError(statement, parameters, original)
+
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app, raise_server_exceptions=False) as client:
+            event.listen(engine, "before_cursor_execute", interrupt_snapshot)
+            try:
+                response = client.post("/api/charts/history-loads", json={
+                    "request_id": "snapshot-timeout", "query": body(5).model_dump(by_alias=True),
+                })
+                assert response.status_code == 503
+                assert response.json()["detail"]["code"] == "HISTORY_TIMEOUT"
+                assert response.json()["detail"]["history_boundary"] is False
+            finally:
+                event.remove(engine, "before_cursor_execute", interrupt_snapshot)
+            recovered = client.post("/api/charts/history-loads", json={
+                "request_id": "after-timeout", "query": body(5).model_dump(by_alias=True),
+            })
+            assert recovered.status_code == 200
+            assert len(recovered.json()["result"]["bars"]) >= 5
+            assert recovered.json()["result"]["bars"][-1]["chart_time"] == 39999000
+    finally:
+        api_module.app.dependency_overrides.clear()

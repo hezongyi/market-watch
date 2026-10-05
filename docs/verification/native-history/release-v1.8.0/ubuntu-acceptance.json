@@ -1,0 +1,212 @@
+{
+  "tested_source": "45844fdbf171c253a889582aac07b373303be5c8",
+  "environment": "Ubuntu local Docker",
+  "project": "mw-release-v180-20261006",
+  "website": "https://192.168.7.232:16643",
+  "chart_origin": "https://192.168.7.232:16644",
+  "postgres_major": 14,
+  "postgres_tests_passed": 35,
+  "postgres_skipped": 0,
+  "migration": {
+    "from": "q18_yahoo_catalog",
+    "to": "r19_native_history_loads",
+    "old_tables_preserved": 35,
+    "user_state_fingerprints_preserved": 6,
+    "new_history_table_empty": true
+  },
+  "backup_restore": {
+    "verified": true,
+    "tables": 36,
+    "sha256": "031a071e35bec728c66c11f34f395c01f529549030abcf3f69bfa8159cd446a2"
+  },
+  "full_product": {
+    "passed": true,
+    "count": 4,
+    "symbol": "EURUSD",
+    "clickToReadyMs": 6940,
+    "hoverRequests": [],
+    "sameWidgetCache": {
+      "rangeReadyMs": 2,
+      "settledMs": 511,
+      "range": {
+        "from": 1764545100,
+        "to": 1764548700
+      },
+      "historyReads": 0
+    },
+    "faultRecovery": [
+      {
+        "kind": "busy",
+        "injectedCode": "HISTORY_BUSY",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "failure",
+        "injectedCode": "HISTORY_PROVIDER_FAILED",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "timeout",
+        "injectedCode": "HISTORY_TIMEOUT",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      },
+      {
+        "kind": "capacity",
+        "injectedCode": "NATIVE_HISTORY_CAPACITY_EXCEEDED",
+        "injection": "isolated HTTP error response",
+        "recovered": true,
+        "range": {
+          "from": 1764545400,
+          "to": 1764549000
+        }
+      }
+    ],
+    "cancelOutcome": "cancelled",
+    "returnLatestOutcome": "cancelled",
+    "resetCount": 1,
+    "revisedCallback": {
+      "time": 1764549000000,
+      "open": 1.16009,
+      "high": 1.16032,
+      "low": 1.16008,
+      "close": 1.16019,
+      "volume": 452,
+      "isLastBar": false,
+      "isBarClosed": true
+    }
+  },
+  "revision_viewports": {
+    "before": {
+      "from": 1764547200,
+      "to": 1764550800
+    },
+    "after": {
+      "from": 1764547200,
+      "to": 1764550800
+    },
+    "spacing_before": 41.07692307692308,
+    "spacing_after": 41.07692307692308
+  },
+  "saved_reopen": {
+    "study_counts": [
+      0,
+      4,
+      0,
+      0
+    ],
+    "reopened_study_counts": [
+      0,
+      4,
+      0,
+      0
+    ],
+    "shape_counts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "reopened_shape_counts": [
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "failed_probe_history": [
+    {
+      "failure": "Fixed fault target was already cached; injector did not execute",
+      "change": "Choose uncached date from actual first native point"
+    },
+    {
+      "failure": "Revision viewport sampled before native drag inertia ended",
+      "change": "Wait for stable public range, then inject revision",
+      "product_change": false
+    }
+  ],
+  "production_changed": false,
+  "boundary_product": {
+    "passed": true,
+    "count": 4,
+    "scope": "real OANDA W1/M5/H4/D1 and MA200/RSI/MACD; capacity boundary and lowered quota, same-source idle pane preserves viewport",
+    "details": {
+      "clickToReadyMs": 8984,
+      "hoverReads": [
+        {
+          "phase": "capacity-boundary",
+          "status": 200,
+          "url": "https://192.168.7.232:16643/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 176,
+            "countBack": 176,
+            "firstDataRequest": false,
+            "client": "414edec2-ffcd-4413-ba88-069294840092",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 88,
+              "batch_screens": 2
+            },
+            "history_page_bars": 4000,
+            "native_reserve": {
+              "screen_bars": 88,
+              "batch_screens": 2,
+              "warmup_bars": 200
+            },
+            "indicators": [],
+            "before": 1757389800000,
+            "track_history": false
+          },
+          "count": 376,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        }
+      ]
+    }
+  },
+  "reusable_product_harness_passed": true,
+  "images": {
+    "api": {
+      "tag": "mw-release-v180-api:45844fd",
+      "id": "sha256:eb41f3703dc77e1b0bc59d19aefb4d8622780104c8652670c07a9017c1e1c280",
+      "source_revision": "45844fdbf171c253a889582aac07b373303be5c8"
+    },
+    "web": {
+      "tag": "mw-release-v180-web:45844fd",
+      "id": "sha256:d4ba99fa8cc290463caad5b61757c65c54a040abec1c3e65d1333d0586ebe80e",
+      "source_revision": "45844fdbf171c253a889582aac07b373303be5c8"
+    },
+    "chart": {
+      "tag": "mw-release-v180-chart:45844fd",
+      "id": "sha256:b1759336a35176cc0e2435f9c14209f637da066f0fccc2b74b7f42ba76fe626a",
+      "source_revision": "45844fdbf171c253a889582aac07b373303be5c8"
+    },
+    "backup": {
+      "tag": "mw-release-v180-backup:45844fd",
+      "id": "sha256:44cff1c0a67b76a2afe4f2edfcf40ace08ef2741e5ed2bbc6dbbda7b0e24fb5e",
+      "source_revision": "45844fdbf171c253a889582aac07b373303be5c8"
+    }
+  }
+}

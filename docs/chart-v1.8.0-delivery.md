@@ -1,0 +1,33 @@
+# v1.8.0 连续历史加载发布
+
+本版本包含已合入 main 的 PR #7 连续历史、可调容量、超限真实边界定位和加载提示，以及合并后审查发现的共享取消与 PostgreSQL 超时修复。版本按兼容新增功能升至 1.8.0；正式发布使用不覆盖的附注标签。
+
+## 本次修复
+
+- 图表导航代次只解除该图自己的边界消费者；同来源的其他有效图表继续补齐。消费者离开时同时释放其原生交付等待，只在最后消费者离开时取消整个任务。回最新的图不被其他图的完成结果反向移动。原生补读保留已有定位消费者；填充释放请求标记后恢复排队订阅，并持续原生交付至实际缓存前缀，防止把中间一次完成当作最终边界。供应商故障保留现有数据边界和补齐未完成的反馈。
+- PostgreSQL 快照仍使用 REPEATABLE READ，并通过统一数据库预算事务将 SQLSTATE `57014` / `55P03` 转为超时。历史加载接口返回 503 / `HISTORY_TIMEOUT` / `history_boundary:false`，超时后可继续正常读取。
+- 三项原有 VM 回归补充 `requestAnimationFrame`，恢复历史观察、请求生命周期与行情系列检查。
+
+确定性边界回归覆盖共享补齐、单图回最新、另一图真实定位、原生交付等待、排队订阅、多轮交付、成功/失败补读及原有取消/卸载/预热路径。`web/tests/advanced-shared-boundary.browser.cjs` 使用真实许可原生引擎、合成24×7数据与公开导航/回最新接口，证明双图补齐与供应商失败，不替代 Ubuntu 容器和真实供应商验收。接口回归在真实读取查询处注入 SQLSTATE，验证错误及恢复；真实 PostgreSQL 用例通过 `pg_sleep` 触发 statement timeout，须在独立 Ubuntu Docker 数据库执行后记录结果。
+
+## 发布要求
+
+Ubuntu 是开发和验收环境；Unraid 仅用于用户已授权的正式发布。采用独立 worktree、Compose project、网络、volume、数据库及端口，保留现有候选与其他任务。生产正式切换前核对受测源码、许可钩子安装和内容版本、包版本、逐服务镜像 ID 及源码提交。
+
+生产基线为 `v1.7.0` / `q18_yahoo_catalog`。本次先停止本项目写入并生成新数据库及私密配置备份，核对 SHA 和实际恢复，再执行兼容迁移 `r19_native_history_loads`；迁移前后原业务表计数和用户状态指纹保持一致，新表为空。不删除行情缓存，不修改用户布局、密码、通知配置或 Yahoo 开关。
+
+启动匹配的 API/web/chart/backup 镜像，新增独立服务 `native-history-worker`，命令为 `python -m alerts.native_history_loads`，关闭该服务的业务通知投递。原 `chart-history-worker`、`chart-aggregation-worker`、实时与通知服务保持职责。默认单源 200,000 根、工作区加权 800,000 根，服务端页数、响应与时间保护同时生效。能力上限并不保证任意指标组合或低配置设备性能。
+
+切换后检查 schema、实际镜像、API 健康、历史 worker、行情/通知心跳和队列进展，通过正式域名执行只读登录、页面和原生图表检查。生产验证不创建预警、不改密码、不发送测试通知、不保存用户布局。结果和构建映射归档至 `deploy/releases/v1.8.0-production.json`。
+
+## 回退
+
+保留 v1.7.0 镜像、standalone Compose、active-release 和备份脚本。新版本异常时先停止本项目写入及新历史 worker，备份当前状态，恢复旧服务组合并重启 web。`r19` 只新增任务表，旧版本可保留该表读取原数据；回退不自动 downgrade 或恢复旧数据覆盖用户新增状态。正式发布所需临时备份/回滚实例在稳定确认后按准确项目归属清理，保留数据库备份与旧镜像。
+
+## 执行状态
+
+本文件记录发布合同；合并、标签、镜像、Ubuntu 实例验证和生产切换是否完成，以实际 GitHub/Git、构建输出、运行服务和发布清单为准，不由本文推断。
+
+已完成的复审证据见 [检查记录](verification/native-history/release-v1.8.0/checks.json) 与 [原生双图浏览器结果](verification/native-history/release-v1.8.0/shared-boundary.json)。两轴独立复审均为0项具体问题；后端453通过、38跳过，48项前端模块套件通过，真实引擎合成浏览器2项通过。权限恢复后，独立 Ubuntu Docker PG14 的35项真实数据库回归、q18→r19迁移和36表备份实际恢复通过；真实OANDA四图完整产品回归通过。详见 [Ubuntu 验收记录](verification/native-history/release-v1.8.0/ubuntu-acceptance.json)。
+
+Ubuntu 验收实例 project `mw-release-v180-20261006`，独立 PG14、网络和卷，访问地址 `https://192.168.7.232:16643/advanced-charts`、图表来源 `16644`。启动/停止：`sg docker -c 'docker compose -f /home/quant/repos/.acceptance/release-v1.8.0-20261006/compose.yaml up -d'` / 将 `up -d` 替换为 `stop`。通知投递和Yahoo关闭。私有登录/env/许可资源保存在该目录，不进入Git。旧验收项目和生产未用于本次测试。

@@ -197,6 +197,27 @@ def test_history_response_is_repeatable_read_snapshot_during_revision(provider_p
         event.remove(engine, 'after_cursor_execute', pause_after_select)
 
 
+def test_snapshot_statement_timeout_preserves_error_type_and_recovers(provider_pg):
+    from test_provider_cache import seed
+
+    _, engine = provider_pg
+    key = seed(META, "M5", 10000, page(1000, 10000))
+
+    def delay_bars(conn, cursor, statement, parameters, context, many):
+        if statement.lstrip().upper().startswith("SELECT") and "provider_bars" in statement:
+            cursor.execute("SELECT pg_sleep(1)")
+
+    event.listen(engine, "before_cursor_execute", delay_bars)
+    token = cache.DEADLINE.set(time.monotonic() + 0.1)
+    try:
+        with pytest.raises(TimeoutError, match="数据库读取超过时间预算"):
+            cache.snapshot(key, 10000, 5)
+    finally:
+        cache.DEADLINE.reset(token)
+        event.remove(engine, "before_cursor_execute", delay_bars)
+    assert len(cache.snapshot(key, 10000, 5)["bars"]) == 5
+
+
 @pytest.mark.parametrize('replace', [False, True])
 def test_old_warmer_cannot_overwrite_expanded_or_recreated_task(provider_pg, monkeypatch, replace):
     from alerts import provider_service as service
