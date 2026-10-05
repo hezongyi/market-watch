@@ -46,6 +46,16 @@ PR #9 对照主线 `b700911`（v1.8.0）整合。唯一文本冲突位于图表 
 
 整合后前端构建、picker/Python/progressive、原生 hook/导航/容量边界、历史加载/通知脚本通过；相关后端测试含新增原生历史/容量路径共 72 项通过。整合后的 19 项真实产品验收全部通过，pageerror/console/API 错误为空；重验结果记录在 [main-integration.json](main-integration.json)，镜像仍只部署到本任务 Ubuntu 实例；主线生产未操作。
 
+## 正式 Review 与修复后重验（2026-10-06）
+
+按 code-review 技能分开完成 Standards 与 Spec 两轴独立审查。Standards 发现 P2：嵌套 series/schema 的额外 callable 可令整个目录 API 序列化失败；现明确投影公开字段，增加 JSON、认证 API、禁止调用算法和副本隔离回归。Spec 发现 P3：详情缺少各指标用途与计算说明；现补齐既有 8 个 Python 指标的可靠说明，原生条目继续只展示公开 API 能确认的字段。两轴复审均无剩余发现，详见 [review.md](review.md)。
+
+受测功能提交 `fcd9ac8`；最终整合提交 `0ca7af3` 仅合入最新 main `2ee5cb7` 的生产交付文档，与受测功能提交的运行代码、测试及构建输入一致。75 项相关后端测试、picker 搜索、前端构建、Ruff 和差异检查通过。仅重建本任务 Ubuntu project，完整产品新增详情断言后共 **20 项通过**，全部 10 条真实行情曲线逐点核对通过，pageerror/console/API 错误为空；结果与截图为 [review-integration.json](review-integration.json) / review-integration-*.png。当前实际镜像 ID 与源码关系已刷新到 runtime.json。
+
+容器重建首次访问因 TLS 代理仍缓存旧 API 容器地址返回登录 502；只重启本任务 tls 服务后完整重验通过。未修改其他实例或生产；此前主线整合与失败/限制记录保留。
+
+建议后续正式 tag 为 `v1.9.0`（兼容新增功能）。本轮仅完成分支修复与合并就绪确认，未合并 PR、创建 tag 或发布生产；包版本仍为 1.8.0，正式发布前须同步 Python/web/锁文件及 CHANGELOG。
+
 ## Ubuntu 独立实例启动与停止
 
 以下为已实际执行的启动方式。当前访问地址 `https://localhost:18443`（产品）和 `https://localhost:18444`（隔离图表 origin），仅绑定 Ubuntu loopback，使用开发自签 TLS。

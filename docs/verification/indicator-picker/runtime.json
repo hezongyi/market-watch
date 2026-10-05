@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-05T23:04:45.862288+00:00",
+  "at": "2026-10-05T23:22:46.074750+00:00",
   "host": "quant-server",
   "os": "Ubuntu 22.04.5 LTS",
   "product": "https://localhost:18443",
@@ -33,7 +33,7 @@
     {
       "name": "mw-indicator-acceptance-migrate-1",
       "image": "market-watch-api:indicator-acceptance",
-      "imageId": "sha256:6d559667cdc35b6aa9393322e49f927b75e466c79b66a892cb100009ab9fda61",
+      "imageId": "sha256:b302cfacf283077deb5e5295caf5f3b3b8c7d5c860cd7d4ae602e3deac0c061b",
       "status": "exited",
       "exitCode": 0,
       "health": null,
@@ -47,7 +47,7 @@
     {
       "name": "mw-indicator-acceptance-api-1",
       "image": "market-watch-api:indicator-acceptance",
-      "imageId": "sha256:6d559667cdc35b6aa9393322e49f927b75e466c79b66a892cb100009ab9fda61",
+      "imageId": "sha256:b302cfacf283077deb5e5295caf5f3b3b8c7d5c860cd7d4ae602e3deac0c061b",
       "status": "running",
       "exitCode": 0,
       "health": "healthy",
@@ -63,7 +63,7 @@
     {
       "name": "mw-indicator-acceptance-web-1",
       "image": "market-watch-web:indicator-acceptance",
-      "imageId": "sha256:8ae09db6f7fff21365dd993d7f601a0a26633452edd6951d71c61ab3d3ec9608",
+      "imageId": "sha256:28a383373348cb6e68d5934bc1f90e78ca610967da0d5e5f4085988c38ce6665",
       "status": "running",
       "exitCode": 0,
       "health": null,
@@ -79,7 +79,7 @@
     {
       "name": "mw-indicator-acceptance-chart-origin-1",
       "image": "market-watch-chart-origin:indicator-acceptance",
-      "imageId": "sha256:ccb7f2012a677f90307a0952623368639b9867a602423833ee71b729cc0a5257",
+      "imageId": "sha256:f6d5fc32c22fddbbddb216f5269d02853be31ea5d3185334fe94ff96f1857851",
       "status": "running",
       "exitCode": 0,
       "health": null,
@@ -142,7 +142,7 @@
     {
       "name": "mw-indicator-acceptance-history-worker-1",
       "image": "market-watch-api:indicator-acceptance",
-      "imageId": "sha256:6d559667cdc35b6aa9393322e49f927b75e466c79b66a892cb100009ab9fda61",
+      "imageId": "sha256:b302cfacf283077deb5e5295caf5f3b3b8c7d5c860cd7d4ae602e3deac0c061b",
       "status": "running",
       "exitCode": 0,
       "health": null,
@@ -167,5 +167,6 @@
   },
   "providerRequestSeconds": 30,
   "integratedMain": "b700911",
-  "applicationVersion": "1.8.0"
+  "applicationVersion": "1.8.0",
+  "reviewBuildSource": "fcd9ac8b1deb21f1fd1972bbeb10488132afefd0"
 }
