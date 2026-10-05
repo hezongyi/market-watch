@@ -1,7 +1,7 @@
-# v1.8.0 production bundle; expand MARKET_WATCH_IMAGE_SUFFIX to the verified immutable build suffix.
+# v1.8.0 production bundle; immutable source b700911cff0b6f8448ac54e4355524891238efa8.
 name: trading-alerts
 x-app: &app
-  image: trading-alerts-api:${MARKET_WATCH_IMAGE_SUFFIX:?Set the verified v1.8.0 build suffix}
+  image: trading-alerts-api:v1.8.0-b700911
   env_file: .env
   environment:
     ALERTS_DATABASE_POOL_SIZE: "2"
@@ -73,17 +73,17 @@ services:
     depends_on:
       api: {condition: service_healthy}
   web:
-    image: trading-alerts-web:${MARKET_WATCH_IMAGE_SUFFIX:?Set the verified v1.8.0 build suffix}
+    image: trading-alerts-web:v1.8.0-b700911
     ports: ["192.168.7.33:18080:80"]
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
   chart-origin:
-    image: trading-alerts-chart-origin:${MARKET_WATCH_IMAGE_SUFFIX:?Set the verified v1.8.0 build suffix}
+    image: trading-alerts-chart-origin:v1.8.0-b700911
     ports: ["192.168.7.33:18083:80"]
     restart: unless-stopped
   backup:
-    image: trading-alerts-backup:${MARKET_WATCH_IMAGE_SUFFIX:?Set the verified v1.8.0 build suffix}
+    image: trading-alerts-backup:v1.8.0-b700911
     env_file: .env
     environment:
       ALERTS_POSTGRES_BIN_DIR: /usr/local/bin
