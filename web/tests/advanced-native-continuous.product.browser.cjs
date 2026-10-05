@@ -5,6 +5,9 @@ const fs = require("node:fs"),
   assert = require("node:assert/strict");
 const APP = process.env.NATIVE_SYNC_APP || "https://192.168.7.232:16343",
   CHART = process.env.NATIVE_SYNC_CHART || "https://192.168.7.232:16344";
+const COMPOSE = process.env.NATIVE_SYNC_COMPOSE ||
+  "/home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml";
+const shellQuote = value => "'" + value.replaceAll("'", "'\\''") + "'";
 const OUT =
   process.env.NATIVE_SYNC_OUTPUT ||
   "/tmp/mw-chart-sync-acceptance/product.json";
@@ -728,6 +731,10 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           for (const kind of ["busy", "failure", "timeout", "capacity"]) {
             phase = "recover-" + kind;
             fault = kind;
+            const faultTarget = await frame.evaluate(m5 => {
+              const ts = widget.chart(m5)._chartWidget.model().model().timeScale();
+              return ts.points().valueAt(ts.points().range().value().firstIndex) - 7 * 86400;
+            }, m5);
             await frame.evaluate(
               ({ m5, target }) =>
                 widget
@@ -740,7 +747,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
                     { rejectByTimeout: 30000 },
                   )
                   .catch(() => {}),
-              { m5, target },
+              { m5, target: faultTarget + 30 * 86400 },
             );
             await settle();
             await frame.evaluate(
@@ -916,6 +923,16 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             beforeHeld.charts[m5].range.from,
             "held drag must move immediately",
           );
+          // Native drag inertia continues after data loading settles. Let the
+          // public range stop moving before measuring correction restoration.
+          let previousRange;
+          for (let attempt = 0, stable = 0; stable < 5; attempt++) {
+            assert.ok(attempt < 100, "drag geometry must settle before revision");
+            const range = await frame.evaluate(m5 => widget.chart(m5).getVisibleRange(), m5);
+            stable = previousRange?.from === range.from && previousRange?.to === range.to ? stable + 1 : 0;
+            previousRange = range;
+            await page.waitForTimeout(200);
+          }
           phase = "revision";
           await frame.evaluate((m5) => {
             globalThis.__resetCount = 0;
@@ -943,6 +960,8 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             };
           }, m5);
           const rangeBefore = await snapshot();
+          item.rangeBeforeRevision = rangeBefore;
+          save();
           if (process.env.NATIVE_REVISION_SCRIPT) {
             const at = Math.floor(
               (rangeBefore.charts[m5].range.from +
@@ -955,7 +974,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
                 [
                   "docker",
                   "-c",
-                  `docker compose -f /home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml exec -T --user 0 api python /private/revise.py ${at}`,
+                  `docker compose -f ${shellQuote(COMPOSE)} exec -T --user 0 api python /private/revise.py ${at}`,
                 ],
                 { encoding: "utf8" },
               ),

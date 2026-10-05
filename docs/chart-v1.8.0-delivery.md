@@ -28,4 +28,6 @@ Ubuntu 是开发和验收环境；Unraid 仅用于用户已授权的正式发布
 
 本文件记录发布合同；合并、标签、镜像、Ubuntu 实例验证和生产切换是否完成，以实际 GitHub/Git、构建输出、运行服务和发布清单为准，不由本文推断。
 
-已完成的复审证据见 [检查记录](verification/native-history/release-v1.8.0/checks.json) 与 [原生双图浏览器结果](verification/native-history/release-v1.8.0/shared-boundary.json)。两轴独立复审均为0项具体问题；后端453通过、38跳过，48项前端模块套件通过，真实引擎合成浏览器2项通过。当前本机 Docker socket 返回 permission denied，真实PG与完整容器验收未执行，发布步骤仍待这些检查完成。
+已完成的复审证据见 [检查记录](verification/native-history/release-v1.8.0/checks.json) 与 [原生双图浏览器结果](verification/native-history/release-v1.8.0/shared-boundary.json)。两轴独立复审均为0项具体问题；后端453通过、38跳过，48项前端模块套件通过，真实引擎合成浏览器2项通过。权限恢复后，独立 Ubuntu Docker PG14 的35项真实数据库回归、q18→r19迁移和36表备份实际恢复通过；真实OANDA四图完整产品回归通过。详见 [Ubuntu 验收记录](verification/native-history/release-v1.8.0/ubuntu-acceptance.json)。
+
+Ubuntu 验收实例 project `mw-release-v180-20261006`，独立 PG14、网络和卷，访问地址 `https://192.168.7.232:16643/advanced-charts`、图表来源 `16644`。启动/停止：`sg docker -c 'docker compose -f /home/quant/repos/.acceptance/release-v1.8.0-20261006/compose.yaml up -d'` / 将 `up -d` 替换为 `stop`。通知投递和Yahoo关闭。私有登录/env/许可资源保存在该目录，不进入Git。旧验收项目和生产未用于本次测试。

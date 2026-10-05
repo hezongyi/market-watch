@@ -2,8 +2,9 @@
   "backend": {
     "passed": 453,
     "skipped": 38,
-    "postgres_executed": false,
-    "note": "Full backend at bacadad; final increment only JavaScript/tests/docs."
+    "postgres_executed": true,
+    "note": "PG14 regressions now executed in independent Ubuntu Docker database; previous 38 skips also include optional dependency tests.",
+    "postgres_passed": 35
   },
   "javascript": {
     "passed": 48,
@@ -70,9 +71,7 @@
     "browser_independently_repeated": true
   },
   "pending": [
-    "Isolated Ubuntu Docker PostgreSQL14 regression, migration and restore verification",
-    "Isolated Ubuntu Docker full application/provider acceptance",
     "Merge, annotated v1.8.0 tag, production build and deployment"
   ],
-  "blocker": "Local Docker socket access returns permission denied. AGENTS.md prohibits using Unraid for testing."
+  "ubuntu_acceptance": "ubuntu-acceptance.json"
 }
