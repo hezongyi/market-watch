@@ -113,9 +113,9 @@ const MWNativeNavigation = (() => {
   function begin(m, state) {
     state.boundaryAt = undefined;
     state.generation++;
-    const activeBoundary = boundaries.get(threads.get(modelKey(m)));
-    if (activeBoundary)
-      cancelBoundary(threads.get(modelKey(m)));
+    // A boundary is source-shared, but each captured pane owns its own intent.
+    // The new generation detaches this pane; keep filling for any live peer.
+    releaseBoundaryConsumer(m);
     const sourceThread = threads.get(modelKey(m));
     if (sourceThread && !boundaries.has(sourceThread)) capacityState(sourceThread,{phase:"clear"});
     state.publicRange?.reject(cancelled());
@@ -151,15 +151,25 @@ const MWNativeNavigation = (() => {
     reservations.delete(thread);
     thread._requesting = false;
     boundary.reject?.(cancelled());
-    for (const finish of boundary.waiters || []) finish(cancelled());
+    for (const finish of boundary.waiters.values()) finish(cancelled());
     for (const {m,state,generation} of boundary.captured)
       if (models.get(m) === state && state.generation === generation) state.phase = "idle";
     capacityState(thread, {id:boundary.id, phase:"clear"});
   }
+  function releaseBoundaryConsumer(m) {
+    for (const [thread, boundary] of boundaries) {
+      if (!boundary.captured.some(item => item.m === m)) continue;
+      // A superseded pane cannot leave a promotion waiter blocking its peer.
+      boundary.waiters.get(m)?.();
+      if (!boundary.captured.some(({m:peer,state,generation}) =>
+        models.get(peer) === state && state.generation === generation && modelKey(peer) === thread.mw_key))
+        cancelBoundary(thread);
+    }
+  }
   async function fillBoundary(thread, error, captured, continuation) {
     if (boundaries.has(thread)) return;
     const cache = thread._cache, sourceGeneration = thread.mw_sourceGeneration, id = ++boundarySequence;
-    const boundary = {id,captured,waiters:[],deadline:Date.now() + (limits.task_seconds || 600) * 1000};
+    const boundary = {id,captured,waiters:new Map(),deadline:Date.now() + (limits.task_seconds || 600) * 1000};
     boundaries.set(thread, boundary);
     const current = () => !thread._destroyed && threads.get(thread.mw_key) === thread &&
       thread._cache === cache && thread.mw_sourceGeneration === sourceGeneration && boundaries.get(thread) === boundary &&
@@ -246,7 +256,7 @@ const MWNativeNavigation = (() => {
           const owner = {}, event = m.mainSeries().dataEvents().completed();
           const finish = error => {clearTimeout(timer);event.unsubscribeAll(owner);error ? reject(error) : resolve();};
           const timer = setTimeout(() => finish(Error("图表边界定位超时")),30000);
-          boundary.waiters.push(finish);
+          boundary.waiters.set(m, finish);
           event.subscribe(owner,() => finish());
           ts.requestMoreHistoryPoints(hidden - prefix);
         }));
@@ -276,7 +286,7 @@ const MWNativeNavigation = (() => {
         started,finished:Date.now(),totalBars,loadedBars,pages,batch,
         message:`容量边界定位未完成：${String(failure)}`});
     } finally {
-      for (const finish of boundary.waiters) finish();
+      for (const finish of boundary.waiters.values()) finish();
       for (const {m,state,generation} of captured)
         if (models.get(m) === state && state.generation === generation) state.phase = "idle";
       if (boundaries.get(thread) === boundary) boundaries.delete(thread);
@@ -579,9 +589,7 @@ const MWNativeNavigation = (() => {
           state.publicRange?.reject(cancelled());
           state.publicRange = null;
           state.generation++;
-          for (const [thread,boundary] of boundaries)
-            if (!boundary.captured.some(item => models.get(item.m) === item.state && item.state.generation === item.generation))
-              cancelBoundary(thread);
+          releaseBoundaryConsumer(m);
           state.cursorVersion++;
           state.cursor = null;
           state.phase = "idle";
@@ -651,9 +659,7 @@ const MWNativeNavigation = (() => {
       const sourceThread = threads.get(state.identity);
       if (sourceThread && !peers(sourceThread).length)
         capacityState(sourceThread, {phase:"clear"});
-      for (const [thread,boundary] of boundaries)
-        if (!boundary.captured.some(item => models.get(item.m) === item.state && item.state.generation === item.generation))
-          cancelBoundary(thread);
+      releaseBoundaryConsumer(m);
       m.timeScale().visibleBarsStrictRangeChanged().unsubscribeAll(state);
       m.mainSeries().onIntervalChanged().unsubscribeAll(state);
       m.mainSeries().symbolResolved().unsubscribeAll(state);

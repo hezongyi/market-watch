@@ -63,9 +63,11 @@ def database_budget(db):
 
 
 @contextmanager
-def budget_transaction():
+def budget_transaction(*, isolation_level=None):
     try:
         with transaction() as db:
+            if isolation_level and db.get_bind().dialect.name == "postgresql":
+                db.connection(execution_options={"isolation_level": isolation_level})
             database_budget(db)
             yield db
     except DBAPIError as error:
@@ -150,10 +152,7 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
     """
     if planning and history_limit is None:
         history_limit = capacity()
-    with transaction() as db:
-        if db.get_bind().dialect.name == "postgresql":
-            db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
-        database_budget(db)
+    with budget_transaction(isolation_level="REPEATABLE READ") as db:
         metadata = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key))
         if metadata is None:
             raise ValueError("平台缓存已清理，请重试")

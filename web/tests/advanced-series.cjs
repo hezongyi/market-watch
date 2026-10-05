@@ -5,6 +5,7 @@ const events = [];
 const ctx = vm.createContext({URL, URLSearchParams, Map, Promise, Date, Intl, Error,
   location:{search:"?parent=http://localhost"},parent:{postMessage:m=>events.push(m)},
   crypto:{randomUUID:()=>"test"},addEventListener(){},setTimeout,clearTimeout,queueMicrotask,
+  requestAnimationFrame:callback=>setImmediate(callback),
   atob:s=>Buffer.from(s,"base64").toString("utf8"),btoa:s=>Buffer.from(s).toString("base64")});
 for (const file of ["series.js","bridge.js","indicators.js"])
   vm.runInContext(fs.readFileSync("../advanced-host/"+file,"utf8"),ctx);
