@@ -49,6 +49,8 @@
 .history-loading-row { margin-top: 12px; display: grid; gap: 4px; overflow-wrap: anywhere; }
 .history-loading-row span { color: #c6cbd4; }
 .advanced-loading-notice button { min-height: 40px; }
+.history-notice-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.history-capacity-result { border-bottom: 1px solid #737c8c; padding-bottom: 12px; }
 .advanced-workspace[data-theme="light"] .advanced-loading-notice { background: #fff; color: #131722; border-color: #b2b5be; }
 .advanced-workspace[data-theme="light"] .history-loading-row span { color: #434651; }
 .history-capacity-dialog input[type="number"] { box-sizing: border-box; width: 100%; min-height: 40px; background: #222936; color: #f1f3f7; border: 1px solid #737c8c; padding: 8px; }

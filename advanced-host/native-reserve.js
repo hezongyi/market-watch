@@ -59,6 +59,7 @@ const MWNativeReserve = (() => {
     if (!provider(symbol)) return;
     const k = identity(m), thread = threads.get(k);
     if (!thread || thread._destroyed) return;
+    if (globalThis.MWNativeNavigation?.filling(thread)) return;
     if (state.identity !== k) {
       state.identity = k; state.previous = undefined; state.enhancedUntil = 0;
       state.lastAttemptOffset = g.ts.rightOffset();
@@ -97,6 +98,7 @@ const MWNativeReserve = (() => {
       entry.lastAttemptOffset = model.timeScale().rightOffset();
     const cache = thread._cache;
     const current = () => !thread._destroyed && threads.get(k) === thread &&
+      !globalThis.MWNativeNavigation?.filling(thread) &&
       thread._cache === cache && thread._cache.bars[0]?.time === before && !thread._requesting;
     const flight = (async () => {
       try {

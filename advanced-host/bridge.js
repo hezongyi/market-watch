@@ -282,10 +282,15 @@ globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen
     throw Error('已丢弃旧版本的图表储备响应');
   return {...page, bars: barsOf(page, resolution, symbol)};
 }, nativeReserveWarmup);
+globalThis.MWNativeNavigation?.configure(nativeReserveWarmup);
 
 globalThis.addEventListener('mw-navigation-error', event => {
-  if (event.detail?.code !== 'HISTORY_CANCELLED') send({type:'error',error:String(event.detail)});
+  if (event.detail?.code === 'NATIVE_HISTORY_CAPACITY_EXCEEDED')
+    send({type:'capacity-notice',epoch:workspaceEpoch,key:'operation',phase:'failed',message:String(event.detail)});
+  else if (event.detail?.code !== 'HISTORY_CANCELLED') send({type:'error',error:String(event.detail)});
 });
+globalThis.addEventListener('mw-capacity-state', event =>
+  send({type:'capacity-notice',epoch:workspaceEpoch,...event.detail}));
 
 function query(ticker, res, args, expires = Infinity, current = () => true) {
   const { symbol, spec, series_kind } = decode(ticker);
@@ -635,7 +640,7 @@ const feed = {
     } catch (e) {
       err(isProvider ? e : String(e));
       finishTerminal();
-      if (e.code !== "HISTORY_CANCELLED")
+      if (e.code !== "HISTORY_CANCELLED" && e.code !== "NATIVE_HISTORY_CAPACITY_EXCEEDED")
         send({ type: "error", error: String(e) });
     } finally {
       // Keep the notice through native callback processing and the next paint.
@@ -1668,6 +1673,8 @@ addEventListener("message", async (e) => {
   } else if (m.type === "history-capabilities") {
     MWNativeNavigation.setCapabilities(m.capabilities);
     globalThis.MW_HISTORY_CAPABILITIES=m.capabilities;
+  } else if (m.type === "history-capacity-open") {
+    send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident});
   } else if (m.type === "cancel-history") {
     MWNativeNavigation.cancelAll();
   } else if (m.type === "init" && !widget) {

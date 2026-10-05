@@ -1,5 +1,7 @@
 # 可调连续历史容量与加载反馈（2026-10-05）
 
+后续授权已实现“超限定位到实际边界”，取代下文原位置策略，见 [边界方案](history-capacity-boundary-plan.md) 与 [当前验收](history-capacity-boundary-acceptance.md)。本文件保留首次容量候选的设计记录。
+
 基线 `54be695`，独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`。用户认可汉堡菜单调整容量、默认 200,000 根的连续加载方案，并要求右下角历史加载提示稳定、信息完整。Ubuntu 为唯一开发验收环境；不操作 Unraid/生产。
 
 ## 已授权实现

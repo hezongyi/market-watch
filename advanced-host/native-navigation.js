@@ -3,13 +3,16 @@
 const MWNativeNavigation = (() => {
   const models = new Map(),
     threads = new Map(),
-    reservations = new Map();
+    reservations = new Map(),
+    boundaries = new Map();
   let limits = {
     max_bars: 20000,
     workspace_bars: 80000,
     response_bytes: 33554432,
   };
   let invokingRange, cursorSource;
+  let boundarySequence = 0;
+  let calculationPrefix = () => 0;
   const cancelled = () =>
     Object.assign(Error("已取消旧图表的历史加载"), {
       code: "HISTORY_CANCELLED",
@@ -108,7 +111,13 @@ const MWNativeNavigation = (() => {
     m.timeScale()._requestingMoreData = false;
   }
   function begin(m, state) {
+    state.boundaryAt = undefined;
     state.generation++;
+    const activeBoundary = boundaries.get(threads.get(modelKey(m)));
+    if (activeBoundary)
+      cancelBoundary(threads.get(modelKey(m)));
+    const sourceThread = threads.get(modelKey(m));
+    if (sourceThread && !boundaries.has(sourceThread)) capacityState(sourceThread,{phase:"clear"});
     state.publicRange?.reject(cancelled());
     state.publicRange = null;
     clearNativeWait(m, cancelled());
@@ -122,6 +131,135 @@ const MWNativeNavigation = (() => {
       thread.mw_read.cancel();
     state.phase = "loading";
   }
+  function remaining(thread) {
+    const resident = thread._cache?.bars.length || 0;
+    const used = [...threads.values()].reduce((sum, t) => sum +
+      ((t._cache?.bars.length || 0) + (reservations.get(t) || 0)) * weight(t), 0);
+    return Math.max(0, Math.min(limits.max_bars - resident,
+      Math.floor((limits.workspace_bars - used) / weight(thread))));
+  }
+  function capacityState(thread, value) {
+    globalThis.dispatchEvent(new CustomEvent("mw-capacity-state", {detail: {
+      key: thread.mw_key, symbol:thread._symbolInfo.ticker,
+      resolution:thread._resolution, ...value,
+    }}));
+  }
+  function cancelBoundary(thread) {
+    const boundary = boundaries.get(thread);
+    if (!boundary) return;
+    boundaries.delete(thread);
+    reservations.delete(thread);
+    thread._requesting = false;
+    boundary.reject?.(cancelled());
+    for (const finish of boundary.waiters || []) finish(cancelled());
+    for (const {m,state,generation} of boundary.captured)
+      if (models.get(m) === state && state.generation === generation) state.phase = "idle";
+    capacityState(thread, {id:boundary.id, phase:"clear"});
+  }
+  async function fillBoundary(thread, error, captured) {
+    if (boundaries.has(thread)) return;
+    const cache = thread._cache, sourceGeneration = thread.mw_sourceGeneration, id = ++boundarySequence;
+    const boundary = {id,captured,waiters:[],deadline:Date.now() + (limits.task_seconds || 600) * 1000};
+    boundaries.set(thread, boundary);
+    const current = () => !thread._destroyed && threads.get(thread.mw_key) === thread &&
+      thread._cache === cache && thread.mw_sourceGeneration === sourceGeneration && boundaries.get(thread) === boundary &&
+      captured.some(({m,state,generation}) => models.get(m) === state &&
+        state.generation === generation && modelKey(m) === thread.mw_key);
+    const requested = captured.find(item => Number.isFinite(item.requested))?.requested;
+    capacityState(thread, {id,phase:"filling",requested,scope:error.budget_scope,
+      limit:error.max_bars || limits.max_bars,message:"已超过容量，正在加载可到达的最早位置"});
+    let failed;
+    try {
+      thread._requesting = true;
+      for (const {m,state,generation} of captured)
+        if (models.get(m) === state && state.generation === generation) {
+          state.phase = "loading";
+          if (state.cursor) state.external.call(m,null,state.cursor.environment);
+          state.cursor = null; state.cursorVersion++;
+        }
+      // Separate bounded fill: never a partial success of the rejected read.
+      // Only extend the existing native cache; do not reset the model.
+      while (current() && !thread._endOfData) {
+        if (Date.now() >= boundary.deadline) throw Error("边界历史加载超过时间预算，请重试");
+        const room = remaining(thread);
+        if (!room) break;
+        const before = thread._dealignTime(cache.bars[0]?.time);
+        if (!Number.isFinite(before)) break;
+        const amount = Math.min(room,20000,Math.max(1,Math.floor(limits.response_bytes / 1024) || 20000));
+        reservations.set(thread, amount);
+        const result = await new Promise((resolve, reject) => {
+          boundary.reject = reject;
+          thread.mw_originalFeed.getBars({...thread._symbolInfo,mw_current:current},thread._resolution,
+            {from:before / 1000 - 1,to:before / 1000,countBack:amount,firstDataRequest:false},
+            (bars,meta) => resolve({bars,meta}),reject);
+        });
+        boundary.reject = undefined;
+        if (!current()) throw cancelled();
+        reservations.delete(thread);
+        const rows = result.bars.filter(bar => bar.time < before).slice(-amount);
+        if (!rows.length) {
+          if (result.meta?.noData === true) { thread._setEndOfData?.(); break; }
+          throw Error("平台未返回更早数据，剩余容量尚未补齐，请重试");
+        }
+        admit(thread, rows.length);
+        thread._processBars(rows,{...result.meta,noData:result.meta?.noData === true && rows.length === result.bars.length});
+        if (cache.bars[0]?.time >= before) throw Error("边界历史加载没有推进，请重试");
+      }
+    } catch (failure) { failed = failure; }
+    finally {
+      if (boundaries.get(thread) === boundary) {
+        reservations.delete(thread);
+        thread._requesting = false;
+      }
+    }
+    if (!current()) { if (boundaries.get(thread) === boundary) cancelBoundary(thread); return; }
+    try {
+      // Promote through native series delivery, preserving indicator warmup.
+      const waiting = [];
+      for (const {m,state,generation} of captured) {
+        if (models.get(m) !== state || state.generation !== generation) continue;
+        const ts = m.timeScale(), points = ts.points().range().value();
+        const first = points && ts.points().valueAt(points.firstIndex);
+        const hidden = cache.bars.filter(bar => bar.time < first * 1000).length;
+        const prefix = calculationPrefix(thread._symbolInfo.ticker,thread._resolution) + 4;
+        if (hidden > prefix) waiting.push(new Promise((resolve,reject) => {
+          const owner = {}, event = m.mainSeries().dataEvents().completed();
+          const finish = error => {clearTimeout(timer);event.unsubscribeAll(owner);error ? reject(error) : resolve();};
+          const timer = setTimeout(() => finish(Error("图表边界定位超时")),30000);
+          boundary.waiters.push(finish);
+          event.subscribe(owner,() => finish());
+          ts.requestMoreHistoryPoints(hidden - prefix);
+        }));
+      }
+      if (waiting.length) await Promise.all(waiting);
+      if (!current()) throw cancelled();
+      for (const {m,state,generation,requested:target} of captured) {
+        if (models.get(m) !== state || state.generation !== generation) continue;
+        const ts = m.timeScale(), points = ts.points().range().value();
+        if (!points) continue;
+        const actual = ts.points().valueAt(points.firstIndex);
+        // Left-align real first point; centering would request older data again.
+        ts.setRightOffset(points.firstIndex + screen(m) - 1 - ts.baseIndex());
+        state.boundaryAt = actual;
+        if (state.cursor) state.external.call(m,null,state.cursor.environment);
+        state.cursor = null; state.cursorVersion++; state.phase = "idle";
+        m.fullUpdate?.();
+        const scope = cache.bars.length >= limits.max_bars ? "source" :
+          remaining(thread) === 0 ? "workspace" : error.budget_scope;
+        capacityState(thread,{id,phase:"limited",requested:target,actual,
+          scope,limit:scope === "workspace" ? limits.workspace_bars : limits.max_bars,resident:cache.bars.length,
+          message:failed ? `已定位到现有数据边界；补齐剩余容量未完成：${String(failed)}` : "已定位到当前容量可到达的最早位置"});
+      }
+    } catch (failure) {
+      if (failure.code !== "HISTORY_CANCELLED") capacityState(thread,{id,phase:"failed",requested,
+        message:`容量边界定位未完成：${String(failure)}`});
+    } finally {
+      for (const finish of boundary.waiters) finish();
+      for (const {m,state,generation} of captured)
+        if (models.get(m) === state && state.generation === generation) state.phase = "idle";
+      if (boundaries.get(thread) === boundary) boundaries.delete(thread);
+    }
+  }
   return {
     setCapabilities(value) {
       if (
@@ -133,7 +271,8 @@ const MWNativeNavigation = (() => {
         throw Error("历史能力配置不匹配，请刷新工作区");
       limits = { ...value };
     },
-    configure() {},
+    configure(prefix = () => 0) { calculationPrefix = prefix; },
+    filling: (thread) => boundaries.has(thread),
     enabled: () => true,
     modelKey,
     threadKey: (info, resolution) => key(info.ticker || info.name, resolution),
@@ -148,6 +287,7 @@ const MWNativeNavigation = (() => {
       // The public API reaches the engine before gotoTimeRange. Cancel and
       // finish its old native consumer before the engine dereferences it.
       begin(m, state);
+      state.requested = _range.from;
       const generation = state.generation;
       const token = {};
       const cancellation = new Promise((_, reject) => { token.reject = reject; });
@@ -201,6 +341,7 @@ const MWNativeNavigation = (() => {
       threads.set(thread.mw_key, thread);
       thread.mw_sourceGeneration = 0;
       const original = thread._datafeed;
+      thread.mw_originalFeed = original;
       thread._datafeed = Object.create(original);
       thread._datafeed.getBars = (
         info,
@@ -209,6 +350,9 @@ const MWNativeNavigation = (() => {
         success,
         failure,
       ) => {
+        // A new native consumer on the shared source supersedes bounded fill.
+        // Never let its reservation/cursor compete with another source read.
+        if (boundaries.has(thread)) cancelBoundary(thread);
         const cache = thread._cache,
           sourceGeneration = thread.mw_sourceGeneration;
         let settled = false;
@@ -225,6 +369,7 @@ const MWNativeNavigation = (() => {
           callback(...args);
         };
         const fail = (error) => {
+          if(error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED") thread.mw_capacityRequest = request;
           thread.mw_failedCursor = thread.mw_requestCursor;
           complete(failure, error);
         };
@@ -262,6 +407,8 @@ const MWNativeNavigation = (() => {
       };
       const purge = thread._purgeCache;
       thread._purgeCache = function () {
+        cancelBoundary(this);
+        if (threads.get(this.mw_key) === this) capacityState(this, {phase:"clear"});
         this.mw_read?.cancel();
         this.mw_sourceGeneration++;
         this._requesting = false;
@@ -269,9 +416,13 @@ const MWNativeNavigation = (() => {
       };
     },
     unbindThread(thread) {
+      cancelBoundary(thread);
       thread.mw_read?.cancel();
       reservations.delete(thread);
-      if (threads.get(thread.mw_key) === thread) threads.delete(thread.mw_key);
+      if (threads.get(thread.mw_key) === thread) {
+        capacityState(thread, {phase:"clear"});
+        threads.delete(thread.mw_key);
+      }
     },
     admitCached(thread, bars) {
       const resident = new Set(
@@ -341,6 +492,10 @@ const MWNativeNavigation = (() => {
         state.identity = modelKey(m);
         state.external = m.setExternalPosition;
         m.setExternalPosition = function (point, environment) {
+          if (point && Number.isFinite(state.boundaryAt) && point.timeStamp < state.boundaryAt) {
+            state.cursor = null; state.cursorVersion++;
+            return state.external.call(this,null,environment);
+          }
           state.cursorVersion++;
           state.cursor = point ? { point: { ...point }, environment, source: cursorSource } : null;
           return state.external.call(this, point, environment);
@@ -384,12 +539,20 @@ const MWNativeNavigation = (() => {
         m.mainSeries().dataEvents().completed().subscribe(state, projected);
         m.mainSeries().dataEvents().dataUpdated().subscribe(state, projected);
         const changed = () => {
+          const previousThread = threads.get(state.identity);
+          state.boundaryAt = undefined;
+          state.requested = undefined;
           const identity = modelKey(m);
           if (identity !== state.identity) clearSourceCursors(m);
           state.identity = identity;
+          if (previousThread && !peers(previousThread).length)
+            capacityState(previousThread, {phase:"clear"});
           state.publicRange?.reject(cancelled());
           state.publicRange = null;
           state.generation++;
+          for (const [thread,boundary] of boundaries)
+            if (!boundary.captured.some(item => models.get(item.m) === item.state && item.state.generation === item.generation))
+              cancelBoundary(thread);
           state.cursorVersion++;
           state.cursor = null;
           state.phase = "idle";
@@ -423,6 +586,8 @@ const MWNativeNavigation = (() => {
               return original.apply(this, args);
             if (state.depth) return original.apply(this, args);
             begin(this, state);
+            state.requested = method === "syncTimeWithModel" ? args[1] / 1000 :
+              method === "gotoTime" || method === "gotoTimeRange" ? args[0] / 1000 : undefined;
             const generation = state.generation;
             state.depth++;
             let result;
@@ -454,6 +619,12 @@ const MWNativeNavigation = (() => {
       state.publicRange?.reject(cancelled());
       clearNativeWait(m, cancelled());
       models.delete(m);
+      const sourceThread = threads.get(state.identity);
+      if (sourceThread && !peers(sourceThread).length)
+        capacityState(sourceThread, {phase:"clear"});
+      for (const [thread,boundary] of boundaries)
+        if (!boundary.captured.some(item => models.get(item.m) === item.state && item.state.generation === item.generation))
+          cancelBoundary(thread);
       m.timeScale().visibleBarsStrictRangeChanged().unsubscribeAll(state);
       m.mainSeries().onIntervalChanged().unsubscribeAll(state);
       m.mainSeries().symbolResolved().unsubscribeAll(state);
@@ -475,6 +646,12 @@ const MWNativeNavigation = (() => {
           this.modelKey(m) ===
           this.threadKey(thread._symbolInfo, thread._resolution),
       );
+      const capacityFailure = error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED";
+      const affected = matches.filter(([m,state]) => state.phase === "loading" ||
+        m._scrollingState || m._lastGotoTimeRange || m.timeScale()._requestingMoreData ||
+        m.timeScale().visibleBarsStrictRange()?.firstBar() < m.timeScale().points().range().value()?.firstIndex);
+      const captured = affected.map(([m,state]) => ({m,state,generation:state.generation,
+        requested:state.requested ?? state.cursor?.point.timeStamp ?? thread.mw_capacityRequest?.from}));
       for (const [m, state] of matches) {
         const ts = m.timeScale();
         ts._requestingMoreData = false;
@@ -512,12 +689,20 @@ const MWNativeNavigation = (() => {
         }
       }
       thread._subscribeRealtimeIfNeeded();
-      globalThis.dispatchEvent(
-        new CustomEvent("mw-navigation-error", { detail: error }),
-      );
+      if (capacityFailure && captured.length && thread._cache.bars.length && !boundaries.has(thread)) {
+        const cache = thread._cache, sourceGeneration = thread.mw_sourceGeneration;
+        setTimeout(() => {
+          if (thread._cache === cache && thread.mw_sourceGeneration === sourceGeneration &&
+            threads.get(thread.mw_key) === thread && !thread._destroyed &&
+            captured.some(({m,state,generation}) => models.get(m) === state && state.generation === generation))
+            fillBoundary(thread,error,captured);
+        },0);
+      } else if (!capacityFailure || !boundaries.has(thread))
+        globalThis.dispatchEvent(new CustomEvent("mw-navigation-error", {detail:error}));
       return true;
     },
     cancelAll() {
+      for (const thread of boundaries.keys()) cancelBoundary(thread);
       for (const [m, state] of models) {
         state.publicRange?.reject(cancelled());
         state.publicRange = null;
@@ -537,6 +722,7 @@ const MWNativeNavigation = (() => {
       cursors: [...models].map(([m, s]) => ({
         res: m.interval(),
         phase: s.phase,
+        boundaryAt:s.boundaryAt,
         time: s.cursor?.point.timeStamp,
         mapped:
           s.cursor && m.mainSeries().syncModel()

@@ -1,0 +1,4315 @@
+{
+  "at": "2026-10-05T03:28:41.251Z",
+  "scope": "actual provider OHLC, isolated PostgreSQL, native sync and pointer events",
+  "cases": [
+    {
+      "count": 4,
+      "symbol": "EURUSD",
+      "errors": [],
+      "http": [
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1791111583000,
+            "firstDataRequest": true,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 198,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791170983000,
+            "track_history": false
+          },
+          "count": 396,
+          "mandatory": 198,
+          "cache_hit": true
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 197,
+            "countBack": 197,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 197,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 197,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1790879100000,
+            "track_history": false
+          },
+          "count": 197,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 198,
+            "countBack": 198,
+            "from": 1671420585000,
+            "firstDataRequest": true,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791170985000,
+            "track_history": false
+          },
+          "count": 287,
+          "mandatory": 198,
+          "cache_hit": true
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 91,
+            "countBack": 91,
+            "from": 1789336425000,
+            "firstDataRequest": true,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791170985000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 91,
+          "cache_hit": true
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 91,
+            "countBack": 91,
+            "from": 1780198185000,
+            "firstDataRequest": true,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791170985000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 91,
+          "cache_hit": true
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1789347600000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1780272000000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1787547600000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1769472000000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1758499200000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 1117,
+            "countBack": 1117,
+            "from": 1763228880000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1785747600000,
+            "track_history": false
+          },
+          "count": 1117,
+          "mandatory": 1117,
+          "cache_hit": true
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 33719,
+            "countBack": 33719,
+            "from": 1776658020000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1790820000000,
+            "track_history": false
+          },
+          "count": 33957,
+          "mandatory": 33957,
+          "cache_hit": true
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1747699200000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1762927200000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 28802,
+            "countBack": 28802,
+            "from": 1764561180000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 2
+            },
+            "indicators": [],
+            "before": 1776658020000,
+            "track_history": false
+          },
+          "count": 28802,
+          "mandatory": 28802,
+          "cache_hit": true
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 178,
+            "countBack": 178,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 2
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 2,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1736899200000,
+            "track_history": false
+          },
+          "count": 178,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 178,
+            "countBack": 178,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 2
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 2,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1761123600000,
+            "track_history": false
+          },
+          "count": 178,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "initial",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 178,
+            "countBack": 178,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 2
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 2,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1736899200000,
+            "track_history": false
+          },
+          "count": 178,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "recover-busy",
+          "status": 409,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 5391,
+            "countBack": 5391,
+            "from": 1761955200000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1764219300000,
+            "track_history": false
+          }
+        },
+        {
+          "phase": "recover-failure",
+          "status": 503,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 5391,
+            "countBack": 5391,
+            "from": 1761955200000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1764219300000,
+            "track_history": false
+          }
+        },
+        {
+          "phase": "recover-timeout",
+          "status": 408,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 5391,
+            "countBack": 5391,
+            "from": 1761955200000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1764219300000,
+            "track_history": false
+          }
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 400,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 5391,
+            "countBack": 5391,
+            "from": 1761955200000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1764219300000,
+            "track_history": false
+          }
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 20000,
+            "countBack": 20000,
+            "from": 1764219299000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1764219300000,
+            "track_history": false
+          },
+          "count": 20000,
+          "mandatory": 20000,
+          "cache_hit": true
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 20000,
+            "countBack": 20000,
+            "from": 1755795899000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1755795900000,
+            "track_history": false
+          },
+          "count": 20000,
+          "mandatory": 20000,
+          "cache_hit": true
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 20000,
+            "countBack": 20000,
+            "from": 1747376099000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1747376100000,
+            "track_history": false
+          },
+          "count": 20000,
+          "mandatory": 20000,
+          "cache_hit": true
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 20000,
+            "countBack": 20000,
+            "from": 1738959299000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1738959300000,
+            "track_history": false
+          },
+          "count": 20000,
+          "mandatory": 20000,
+          "cache_hit": true
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 20000,
+            "countBack": 20000,
+            "from": 1730363099000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1730363100000,
+            "track_history": false
+          },
+          "count": 20000,
+          "mandatory": 20000,
+          "cache_hit": true
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 20000,
+            "countBack": 20000,
+            "from": 1721942999000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1721943000000,
+            "track_history": false
+          },
+          "count": 20000,
+          "mandatory": 20000,
+          "cache_hit": true
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 16648,
+            "countBack": 16648,
+            "from": 1713522899000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1713522900000,
+            "track_history": false
+          },
+          "count": 16648,
+          "mandatory": 16648,
+          "cache_hit": true
+        },
+        {
+          "phase": "recover-capacity",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 26,
+            "countBack": 26,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 2
+            },
+            "native_reserve": {
+              "screen_bars": 13,
+              "batch_screens": 2,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1706630700000,
+            "track_history": false
+          },
+          "count": 26,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "studies",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 209,
+            "countBack": 209,
+            "from": 1706568000000,
+            "firstDataRequest": false,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1706630700000,
+            "track_history": false
+          },
+          "count": 209,
+          "mandatory": 209,
+          "cache_hit": true
+        },
+        {
+          "phase": "studies",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 201288,
+            "countBack": 201288,
+            "from": 1706630400000,
+            "firstDataRequest": true,
+            "client": "64dc2f2c-f206-4223-9fcf-647b29c6a04c",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [
+              {
+                "name": "SMA",
+                "params": {
+                  "period": 200
+                }
+              }
+            ],
+            "before": 1791171044000,
+            "track_history": false
+          },
+          "load": {
+            "id": "8f30c898-cacd-4420-83df-9bf559d52928",
+            "state": "waiting",
+            "pages": 0,
+            "deadline": 1791171588146,
+            "error": null
+          }
+        },
+        {
+          "phase": "studies",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads/8f30c898-cacd-4420-83df-9bf559d52928",
+          "load": {
+            "id": "8f30c898-cacd-4420-83df-9bf559d52928",
+            "state": "filling",
+            "pages": 0,
+            "deadline": 1791171588146,
+            "error": null
+          }
+        },
+        {
+          "phase": "held-drag",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads/8f30c898-cacd-4420-83df-9bf559d52928",
+          "load": {
+            "id": "8f30c898-cacd-4420-83df-9bf559d52928",
+            "state": "filling",
+            "pages": 0,
+            "deadline": 1791171588146,
+            "error": null
+          }
+        },
+        {
+          "phase": "held-drag",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads/8f30c898-cacd-4420-83df-9bf559d52928",
+          "load": {
+            "id": "8f30c898-cacd-4420-83df-9bf559d52928",
+            "state": "filling",
+            "pages": 0,
+            "deadline": 1791171588146,
+            "error": null
+          }
+        },
+        {
+          "phase": "held-drag",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads/8f30c898-cacd-4420-83df-9bf559d52928",
+          "load": {
+            "id": "8f30c898-cacd-4420-83df-9bf559d52928",
+            "state": "filling",
+            "pages": 0,
+            "deadline": 1791171588146,
+            "error": null
+          }
+        },
+        {
+          "phase": "revision",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads/8f30c898-cacd-4420-83df-9bf559d52928",
+          "load": {
+            "id": "8f30c898-cacd-4420-83df-9bf559d52928",
+            "state": "filling",
+            "pages": 0,
+            "deadline": 1791171588146,
+            "error": null
+          }
+        },
+        {
+          "phase": "revision",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads/8f30c898-cacd-4420-83df-9bf559d52928",
+          "load": {
+            "id": "8f30c898-cacd-4420-83df-9bf559d52928",
+            "state": "filling",
+            "pages": 0,
+            "deadline": 1791171588146,
+            "error": null
+          }
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 223,
+            "countBack": 223,
+            "from": 1791104154000,
+            "firstDataRequest": true,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 14,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791171054000,
+            "track_history": false
+          },
+          "count": 223,
+          "mandatory": 223,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 19,
+            "countBack": 19,
+            "from": 1779679854000,
+            "firstDataRequest": true,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 18,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791171054000,
+            "track_history": false
+          },
+          "count": 37,
+          "mandatory": 19,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 95,
+            "countBack": 95,
+            "from": 1779679854000,
+            "firstDataRequest": true,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 91,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791171054000,
+            "track_history": false
+          },
+          "count": 95,
+          "mandatory": 95,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 95,
+            "countBack": 95,
+            "from": 1789255854000,
+            "firstDataRequest": true,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 91,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1791171054000,
+            "track_history": false
+          },
+          "count": 95,
+          "mandatory": 95,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 15,
+            "countBack": 15,
+            "from": 1791166554000,
+            "firstDataRequest": true,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 14,
+              "batch_screens": 1
+            },
+            "indicators": [
+              {
+                "name": "SMA",
+                "params": {
+                  "period": 200
+                }
+              }
+            ],
+            "before": 1791171054000,
+            "track_history": false
+          },
+          "count": 15,
+          "mandatory": 15,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 9,
+            "countBack": 9,
+            "from": 1790928300000,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1790931000000,
+            "track_history": false
+          },
+          "count": 9,
+          "mandatory": 9,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 91,
+            "countBack": 91,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 91,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 91,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1779753600000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 17,
+            "countBack": 17,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 17,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 17,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1769385600000,
+            "track_history": false
+          },
+          "count": 17,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 9,
+            "countBack": 9,
+            "from": 1791163800000,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [
+              {
+                "name": "SMA",
+                "params": {
+                  "period": 200
+                }
+              }
+            ],
+            "before": 1791166500000,
+            "track_history": false
+          },
+          "count": 9,
+          "mandatory": 9,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 91,
+            "countBack": 91,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 91,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 91,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1789117200000,
+            "track_history": false
+          },
+          "count": 91,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 16,
+            "countBack": 16,
+            "from": 1759708800000,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 17,
+              "batch_screens": 2
+            },
+            "indicators": [],
+            "before": 1769385600000,
+            "track_history": false
+          },
+          "count": 50,
+          "mandatory": 16,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1768780800000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1787288400000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "W1",
+            "limit": 34,
+            "countBack": 34,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 17,
+              "batch_screens": 2
+            },
+            "native_reserve": {
+              "screen_bars": 17,
+              "batch_screens": 2,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1739145600000,
+            "track_history": false
+          },
+          "count": 34,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 63022,
+            "countBack": 63022,
+            "from": 1764484500000,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1790928300000,
+            "track_history": false
+          },
+          "count": 63022,
+          "mandatory": 63022,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 63374,
+            "countBack": 63374,
+            "from": 1764546900000,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "indicators": [
+              {
+                "name": "SMA",
+                "params": {
+                  "period": 200
+                }
+              }
+            ],
+            "before": 1791163800000,
+            "track_history": false
+          },
+          "count": 63374,
+          "mandatory": 63374,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "M5",
+            "limit": 13,
+            "countBack": 13,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 13,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 13,
+              "batch_screens": 1,
+              "warmup_bars": 200
+            },
+            "indicators": [],
+            "before": 1790928300000,
+            "track_history": false
+          },
+          "count": 213,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/history-loads",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 1088,
+            "countBack": 1088,
+            "from": 1763560800000,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "indicators": [],
+            "before": 1785488400000,
+            "track_history": false
+          },
+          "count": 1088,
+          "mandatory": 1088,
+          "cache_hit": true
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 90,
+            "countBack": 90,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 90,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 90,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1763431200000,
+            "track_history": false
+          },
+          "count": 90,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 90,
+            "countBack": 90,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 90,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 90,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1757635200000,
+            "track_history": false
+          },
+          "count": 90,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "H4",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1761613200000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "phase": "save-reopen",
+          "status": 200,
+          "url": "https://192.168.7.232:16343/api/charts/reserve",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "timeframe": "D1",
+            "limit": 89,
+            "countBack": 89,
+            "firstDataRequest": false,
+            "client": "9f71d5a7-68e3-4ca0-9857-1fad0ad8b810",
+            "native_history": {
+              "chart_count": 4,
+              "focused": false,
+              "historical_navigation": false,
+              "screen_bars": 89,
+              "batch_screens": 1
+            },
+            "native_reserve": {
+              "screen_bars": 89,
+              "batch_screens": 1,
+              "warmup_bars": 0
+            },
+            "indicators": [],
+            "before": 1746748800000,
+            "track_history": false
+          },
+          "count": 89,
+          "mandatory": 0,
+          "cache_hit": true,
+          "reserve_status": "ready",
+          "attempts": []
+        }
+      ],
+      "phases": [],
+      "initial": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 3338.5999999046326,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 89,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 208,
+                "firstTime": 1618185600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 2698.4000000953674,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 89,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 275,
+                "firstTime": 1790891700,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 3672,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 89,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 190,
+                "firstTime": 1785747600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 3722.0999999046326,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 89,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 190,
+                "firstTime": 1758499200,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 593,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 287,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 269,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 269,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1743984000,
+              "to": 1797199200
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790974200,
+              "to": 1791173700
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1789520400,
+              "to": 1791306000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1781654400,
+              "to": 1792357200
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "clickToReadyMs": 5341,
+      "semanticBefore": {
+        "mode": "continuous",
+        "cursors": [
+          {
+            "res": "1W",
+            "phase": "idle",
+            "mapped": null
+          },
+          {
+            "res": "5",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764547200,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764547200,
+              "at": 9602.099999904633
+            }
+          },
+          {
+            "res": "240",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764540000,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764540000,
+              "at": 9729.699999809265
+            }
+          },
+          {
+            "res": "1D",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764540000,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764547200,
+              "at": 9648.199999809265
+            }
+          }
+        ],
+        "windows": [],
+        "models": 4,
+        "threads": 4,
+        "pending": 0,
+        "resident": 65739,
+        "limits": {
+          "max_bars": 200000,
+          "workspace_bars": 800000,
+          "min_bars": 20000,
+          "hard_max_bars": 1000000,
+          "default_bars": 200000,
+          "response_bytes": 134217728,
+          "task_seconds": 600,
+          "max_pages": 300,
+          "max_inflight": 8,
+          "mode": "continuous",
+          "protocol": 1,
+          "version": "01cac1254a994dcc"
+        }
+      },
+      "stationary": [
+        {
+          "id": "3ddf38a6-8b9d-4eb3-b0c0-95c11393c500",
+          "resolution": "1W",
+          "time": 1764547200,
+          "index": 242,
+          "price": 1.1820032875894988,
+          "x": 267,
+          "y": 183.9999999999999,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 267,
+            "text": "周一 2025-12-01",
+            "visible": true,
+            "width": 534,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764547200,
+          "box": {
+            "x": 56,
+            "y": 42
+          }
+        },
+        {
+          "id": "d963b987-e51e-4d52-92dd-41efbf405ca0",
+          "resolution": "240",
+          "time": 1764540000,
+          "index": 343,
+          "price": 1.1820032875894988,
+          "x": 264,
+          "y": -202.9034591194959,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 264,
+            "text": "周日 2025-11-30   22:00",
+            "visible": true,
+            "width": 534,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764554400,
+          "box": {
+            "x": 654,
+            "y": 42
+          }
+        },
+        {
+          "id": "ab0c080d-2a13-409a-8bda-0f0e74d1e412",
+          "resolution": "5",
+          "time": 1764547200,
+          "index": 517,
+          "price": 1.1820032875894988,
+          "x": 270,
+          "y": -2544.9662279911267,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 270,
+            "text": "周一 2025-12-01   00:00",
+            "visible": true,
+            "width": 534,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764547200,
+          "box": {
+            "x": 56,
+            "y": 482
+          }
+        },
+        {
+          "id": "e0514d1e-d059-4a6b-9310-e7f56ad45567",
+          "resolution": "1D",
+          "time": 1764547200,
+          "index": 228,
+          "price": 1.1820032875894988,
+          "x": 270,
+          "y": 183.55017899761322,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 270,
+            "text": "周一 2025-12-01",
+            "visible": true,
+            "width": 534,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764547200,
+          "box": {
+            "x": 654,
+            "y": 482
+          }
+        }
+      ],
+      "afterMove": [
+        {
+          "id": "3ddf38a6-8b9d-4eb3-b0c0-95c11393c500",
+          "resolution": "1W",
+          "time": 1764547200,
+          "index": 242,
+          "price": 1.1820032875894988,
+          "x": 267,
+          "y": 183.9999999999999,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 267,
+            "text": "周一 2025-12-01",
+            "visible": true,
+            "width": 534,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764547200,
+          "box": {
+            "x": 56,
+            "y": 42
+          }
+        },
+        {
+          "id": "d963b987-e51e-4d52-92dd-41efbf405ca0",
+          "resolution": "240",
+          "time": 1764540000,
+          "index": 343,
+          "price": 1.1820032875894988,
+          "x": 264,
+          "y": -202.9034591194959,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 264,
+            "text": "周日 2025-11-30   22:00",
+            "visible": true,
+            "width": 534,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764554400,
+          "box": {
+            "x": 654,
+            "y": 42
+          }
+        },
+        {
+          "id": "ab0c080d-2a13-409a-8bda-0f0e74d1e412",
+          "resolution": "5",
+          "time": 1764547200,
+          "index": 517,
+          "price": 1.1820032875894988,
+          "x": 270,
+          "y": -2544.9662279911267,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 270,
+            "text": "周一 2025-12-01   00:00",
+            "visible": true,
+            "width": 534,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764547200,
+          "box": {
+            "x": 56,
+            "y": 482
+          }
+        },
+        {
+          "id": "e0514d1e-d059-4a6b-9310-e7f56ad45567",
+          "resolution": "1D",
+          "time": 1764547200,
+          "index": 406,
+          "price": 1.1820032875894988,
+          "x": 270,
+          "y": 183.55017899761322,
+          "pane": true,
+          "visible": true,
+          "label": {
+            "background": "#0F0F0F",
+            "color": "#ffffff",
+            "coordinate": 270,
+            "text": "周一 2025-12-01",
+            "visible": true,
+            "width": 534,
+            "alwaysInViewPort": true
+          },
+          "centerTime": 1764547200,
+          "box": {
+            "x": 654,
+            "y": 482
+          }
+        }
+      ],
+      "semanticAfter": {
+        "mode": "continuous",
+        "cursors": [
+          {
+            "res": "1W",
+            "phase": "idle",
+            "mapped": null
+          },
+          {
+            "res": "5",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764547200,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764547200,
+              "at": 9602.099999904633
+            }
+          },
+          {
+            "res": "240",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764540000,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764540000,
+              "at": 9729.699999809265
+            }
+          },
+          {
+            "res": "1D",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764540000,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764547200,
+              "at": 10722.199999809265
+            }
+          }
+        ],
+        "windows": [],
+        "models": 4,
+        "threads": 4,
+        "pending": 0,
+        "resident": 65917,
+        "limits": {
+          "max_bars": 200000,
+          "workspace_bars": 800000,
+          "min_bars": 20000,
+          "hard_max_bars": 1000000,
+          "default_bars": 200000,
+          "response_bytes": 134217728,
+          "task_seconds": 600,
+          "max_pages": 300,
+          "max_inflight": 8,
+          "mode": "continuous",
+          "protocol": 1,
+          "version": "01cac1254a994dcc"
+        }
+      },
+      "final": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": true,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4742,
+                  "offset": -36
+                },
+                "lastAttemptOffset": 10,
+                "screen": 17,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 17,
+                "reserve": 234,
+                "firstTime": 1618185600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 19582.199999809265,
+                "raf": 0,
+                "previous": {
+                  "at": 9601.900000095367,
+                  "offset": -62790.5
+                },
+                "lastAttemptOffset": 10,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 472,
+                "firstTime": 1764219300,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 19664.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 9701.5,
+                  "offset": -1264.5
+                },
+                "lastAttemptOffset": -1264.5,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 299,
+                "firstTime": 1757523600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 17354.900000095367,
+                "raf": 0,
+                "previous": {
+                  "at": 10705.599999904633,
+                  "offset": -174.5
+                },
+                "lastAttemptOffset": -174.5,
+                "screen": 89,
+                "batch": 2,
+                "timer": 0,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 361,
+                "firstTime": 1715126400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 63352,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 287,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 1653,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 625,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1759708800,
+              "to": 1769385600
+            },
+            "spacing": 31.41176470588235,
+            "offset": -36,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1764360900,
+              "to": 1764560400
+            },
+            "spacing": 6,
+            "offset": -62790.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1763560800,
+              "to": 1765360800
+            },
+            "spacing": 6,
+            "offset": -1264.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1759104000,
+              "to": 1770076800
+            },
+            "spacing": 6,
+            "offset": -174.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "navigation": {
+        "mode": "continuous",
+        "cursors": [
+          {
+            "res": "1W",
+            "phase": "idle",
+            "mapped": null
+          },
+          {
+            "res": "5",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764547200,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764547200,
+              "at": 9602.099999904633
+            }
+          },
+          {
+            "res": "240",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764540000,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764540000,
+              "at": 9729.699999809265
+            }
+          },
+          {
+            "res": "1D",
+            "phase": "idle",
+            "time": 1764547200,
+            "mapped": 1764540000,
+            "lastReplay": {
+              "time": 1764547200,
+              "appliedTime": 1764547200,
+              "at": 10722.199999809265
+            }
+          }
+        ],
+        "windows": [],
+        "models": 4,
+        "threads": 4,
+        "pending": 0,
+        "resident": 65917,
+        "limits": {
+          "max_bars": 200000,
+          "workspace_bars": 800000,
+          "min_bars": 20000,
+          "hard_max_bars": 1000000,
+          "default_bars": 200000,
+          "response_bytes": 134217728,
+          "task_seconds": 600,
+          "max_pages": 300,
+          "max_inflight": 8,
+          "mode": "continuous",
+          "protocol": 1,
+          "version": "01cac1254a994dcc"
+        }
+      },
+      "afterHover": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": true,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4742,
+                  "offset": -36
+                },
+                "lastAttemptOffset": 10,
+                "screen": 17,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 17,
+                "reserve": 234,
+                "firstTime": 1618185600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 19582.199999809265,
+                "raf": 0,
+                "previous": {
+                  "at": 9601.900000095367,
+                  "offset": -62790.5
+                },
+                "lastAttemptOffset": 10,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 472,
+                "firstTime": 1764219300,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 19664.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 9701.5,
+                  "offset": -1264.5
+                },
+                "lastAttemptOffset": -1264.5,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 299,
+                "firstTime": 1757523600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 17354.900000095367,
+                "raf": 0,
+                "previous": {
+                  "at": 10705.599999904633,
+                  "offset": -174.5
+                },
+                "lastAttemptOffset": -174.5,
+                "screen": 89,
+                "batch": 2,
+                "timer": 0,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 361,
+                "firstTime": 1715126400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 63352,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 287,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 1653,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 625,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1759708800,
+              "to": 1769385600
+            },
+            "spacing": 31.41176470588235,
+            "offset": -36,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1764360900,
+              "to": 1764560400
+            },
+            "spacing": 6,
+            "offset": -62790.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1763560800,
+              "to": 1765360800
+            },
+            "spacing": 6,
+            "offset": -1264.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1759104000,
+              "to": 1770076800
+            },
+            "spacing": 6,
+            "offset": -174.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "performance": {
+        "longTasks": [
+          {
+            "start": 243.7000002861023,
+            "duration": 236
+          },
+          {
+            "start": 481.80000019073486,
+            "duration": 185
+          },
+          {
+            "start": 999.1000003814697,
+            "duration": 105
+          },
+          {
+            "start": 6515.300000190735,
+            "duration": 52
+          },
+          {
+            "start": 6656.200000286102,
+            "duration": 561
+          },
+          {
+            "start": 8682.200000286102,
+            "duration": 775
+          }
+        ],
+        "maxFrameGap": 0,
+        "heap": 81063736
+      },
+      "hoverRequests": [],
+      "sameWidgetCache": {
+        "rangeReadyMs": 3,
+        "settledMs": 533,
+        "range": {
+          "from": 1764545100,
+          "to": 1764548700
+        },
+        "historyReads": 0
+      },
+      "faultRecovery": [
+        {
+          "kind": "busy",
+          "injectedCode": "HISTORY_BUSY",
+          "injection": "isolated HTTP error response",
+          "recovered": true,
+          "range": {
+            "from": 1764545400,
+            "to": 1764549000
+          }
+        },
+        {
+          "kind": "failure",
+          "injectedCode": "HISTORY_PROVIDER_FAILED",
+          "injection": "isolated HTTP error response",
+          "recovered": true,
+          "range": {
+            "from": 1764545400,
+            "to": 1764549000
+          }
+        },
+        {
+          "kind": "timeout",
+          "injectedCode": "HISTORY_TIMEOUT",
+          "injection": "isolated HTTP error response",
+          "recovered": true,
+          "range": {
+            "from": 1764545400,
+            "to": 1764549000
+          }
+        },
+        {
+          "kind": "capacity",
+          "injectedCode": "NATIVE_HISTORY_CAPACITY_EXCEEDED",
+          "injection": "isolated HTTP error response",
+          "recovered": true,
+          "range": {
+            "from": 1764545400,
+            "to": 1764549000
+          }
+        }
+      ],
+      "cancelOutcome": "cancelled",
+      "cancelledView": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4742,
+                  "offset": -36
+                },
+                "lastAttemptOffset": 10,
+                "screen": 17,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 17,
+                "reserve": 234,
+                "firstTime": 1618185600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 61464.5,
+                "raf": 0,
+                "previous": {
+                  "at": 54103.199999809265,
+                  "offset": -62828
+                },
+                "lastAttemptOffset": -199987,
+                "screen": 13,
+                "batch": 2,
+                "timer": 0,
+                "failures": 1,
+                "misses": 0,
+                "retryAt": 54086.40000009537,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 13,
+                "reserve": 137159,
+                "firstTime": 1706630700,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 19664.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 9701.5,
+                  "offset": -1264.5
+                },
+                "lastAttemptOffset": -1264.5,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 299,
+                "firstTime": 1757523600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 17354.900000095367,
+                "raf": 0,
+                "previous": {
+                  "at": 10705.599999904633,
+                  "offset": -174.5
+                },
+                "lastAttemptOffset": -174.5,
+                "screen": 89,
+                "batch": 2,
+                "timer": 0,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 361,
+                "firstTime": 1715126400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 200000,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 287,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 1653,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 625,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1759708800,
+              "to": 1769385600
+            },
+            "spacing": 31.41176470588235,
+            "offset": -36,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1764545400,
+              "to": 1764549000
+            },
+            "spacing": 41.07692307692308,
+            "offset": -62828,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1763560800,
+              "to": 1765360800
+            },
+            "spacing": 6,
+            "offset": -1264.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1759104000,
+              "to": 1770076800
+            },
+            "spacing": 6,
+            "offset": -174.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "returnLatestOutcome": "cancelled",
+      "latestView": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4742,
+                  "offset": -36
+                },
+                "lastAttemptOffset": 10,
+                "screen": 17,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 17,
+                "reserve": 234,
+                "firstTime": 1618185600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 61464.5,
+                "raf": 0,
+                "previous": {
+                  "at": 55855.59999990463,
+                  "offset": 10
+                },
+                "lastAttemptOffset": -199987,
+                "screen": 89,
+                "batch": 2,
+                "timer": 0,
+                "failures": 1,
+                "misses": 0,
+                "retryAt": 54086.40000009537,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 199921,
+                "firstTime": 1706630700,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 19664.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 9701.5,
+                  "offset": -1264.5
+                },
+                "lastAttemptOffset": -1264.5,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 299,
+                "firstTime": 1757523600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 17354.900000095367,
+                "raf": 0,
+                "previous": {
+                  "at": 10705.599999904633,
+                  "offset": -174.5
+                },
+                "lastAttemptOffset": -174.5,
+                "screen": 89,
+                "batch": 2,
+                "timer": 0,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 361,
+                "firstTime": 1715126400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 200000,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 287,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 1653,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 625,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1759708800,
+              "to": 1769385600
+            },
+            "spacing": 31.41176470588235,
+            "offset": -36,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790974200,
+              "to": 1791173700
+            },
+            "spacing": 6,
+            "offset": 10,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1763560800,
+              "to": 1765360800
+            },
+            "spacing": 6,
+            "offset": -1264.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1759104000,
+              "to": 1770076800
+            },
+            "spacing": 6,
+            "offset": -174.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [],
+            "ready": true
+          }
+        ]
+      },
+      "studies": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4742,
+                  "offset": -36
+                },
+                "lastAttemptOffset": 10,
+                "screen": 17,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 17,
+                "reserve": 234,
+                "firstTime": 1618185600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 74165.09999990463,
+                "raf": 0,
+                "previous": {
+                  "at": 64780,
+                  "offset": -62828
+                },
+                "lastAttemptOffset": -199987,
+                "screen": 13,
+                "batch": 2,
+                "timer": 0,
+                "failures": 1,
+                "misses": 0,
+                "retryAt": 54086.40000009537,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 13,
+                "reserve": 137159,
+                "firstTime": 1706630700,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 19664.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 9701.5,
+                  "offset": -1264.5
+                },
+                "lastAttemptOffset": -1264.5,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 299,
+                "firstTime": 1757523600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 17354.900000095367,
+                "raf": 0,
+                "previous": {
+                  "at": 10705.599999904633,
+                  "offset": -174.5
+                },
+                "lastAttemptOffset": -174.5,
+                "screen": 89,
+                "batch": 2,
+                "timer": 0,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 361,
+                "firstTime": 1715126400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 200209,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 287,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 1653,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 625,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV1A6RVVSVVNEIiwic3BlYyI6eyJuYW1lIjoiU01BIiwicGFyYW1zIjp7InBlcmlvZCI6MjAwfX0sImtleSI6InZhbHVlIn0=|5|",
+              "cache": 0,
+              "requesting": true,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1759708800,
+              "to": 1769385600
+            },
+            "spacing": 31.41176470588235,
+            "offset": -36,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1764545400,
+              "to": 1764549000
+            },
+            "spacing": 41.07692307692308,
+            "offset": -62828,
+            "width": 526,
+            "studies": [
+              {
+                "id": "M37qry",
+                "name": "守望 Python SMA"
+              },
+              {
+                "id": "AGiOcO",
+                "name": "Moving Average"
+              },
+              {
+                "id": "l9H2HU",
+                "name": "Relative Strength Index"
+              },
+              {
+                "id": "04fc65",
+                "name": "MACD"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1763560800,
+              "to": 1765360800
+            },
+            "spacing": 6,
+            "offset": -1264.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1759104000,
+              "to": 1770076800
+            },
+            "spacing": 6,
+            "offset": -174.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          }
+        ]
+      },
+      "held": {
+        "active": 1,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4742,
+                  "offset": -36
+                },
+                "lastAttemptOffset": 10,
+                "screen": 17,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 17,
+                "reserve": 234,
+                "firstTime": 1618185600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 74165.09999990463,
+                "raf": 0,
+                "previous": {
+                  "at": 67025.69999980927,
+                  "offset": -62822.254682
+                },
+                "lastAttemptOffset": -199987,
+                "screen": 13,
+                "batch": 2,
+                "timer": 0,
+                "failures": 1,
+                "misses": 0,
+                "retryAt": 54086.40000009537,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 13,
+                "reserve": 137165,
+                "firstTime": 1706630700,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 19664.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 9701.5,
+                  "offset": -1264.5
+                },
+                "lastAttemptOffset": -1264.5,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 299,
+                "firstTime": 1757523600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 17354.900000095367,
+                "raf": 0,
+                "previous": {
+                  "at": 10705.599999904633,
+                  "offset": -174.5
+                },
+                "lastAttemptOffset": -174.5,
+                "screen": 89,
+                "batch": 2,
+                "timer": 0,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 361,
+                "firstTime": 1715126400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 200209,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 287,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 1653,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 625,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV1A6RVVSVVNEIiwic3BlYyI6eyJuYW1lIjoiU01BIiwicGFyYW1zIjp7InBlcmlvZCI6MjAwfX0sImtleSI6InZhbHVlIn0=|5|",
+              "cache": 0,
+              "requesting": true,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1759708800,
+              "to": 1769385600
+            },
+            "spacing": 31.41176470588235,
+            "offset": -36,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1764547200,
+              "to": 1764550800
+            },
+            "spacing": 41.07692307692308,
+            "offset": -62822.254682,
+            "width": 526,
+            "studies": [
+              {
+                "id": "M37qry",
+                "name": "守望 Python SMA"
+              },
+              {
+                "id": "AGiOcO",
+                "name": "Moving Average"
+              },
+              {
+                "id": "l9H2HU",
+                "name": "Relative Strength Index"
+              },
+              {
+                "id": "04fc65",
+                "name": "MACD"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1763560800,
+              "to": 1765360800
+            },
+            "spacing": 6,
+            "offset": -1264.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1759104000,
+              "to": 1770076800
+            },
+            "spacing": 6,
+            "offset": -174.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          }
+        ]
+      },
+      "saved": {
+        "active": 1,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4742,
+                  "offset": -36
+                },
+                "lastAttemptOffset": 10,
+                "screen": 17,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 17,
+                "reserve": 234,
+                "firstTime": 1618185600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 74165.09999990463,
+                "raf": 0,
+                "previous": {
+                  "at": 67025.69999980927,
+                  "offset": -62822.254682
+                },
+                "lastAttemptOffset": -199987,
+                "screen": 13,
+                "batch": 2,
+                "timer": 0,
+                "failures": 1,
+                "misses": 0,
+                "retryAt": 54086.40000009537,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 13,
+                "reserve": 137165,
+                "firstTime": 1706630700,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 19664.599999904633,
+                "raf": 0,
+                "previous": {
+                  "at": 9701.5,
+                  "offset": -1264.5
+                },
+                "lastAttemptOffset": -1264.5,
+                "screen": 89,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 299,
+                "firstTime": 1757523600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 17354.900000095367,
+                "raf": 0,
+                "previous": {
+                  "at": 10705.599999904633,
+                  "offset": -174.5
+                },
+                "lastAttemptOffset": -174.5,
+                "screen": 89,
+                "batch": 2,
+                "timer": 0,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 361,
+                "firstTime": 1715126400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 200209,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 287,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 1653,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 625,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV1A6RVVSVVNEIiwic3BlYyI6eyJuYW1lIjoiU01BIiwicGFyYW1zIjp7InBlcmlvZCI6MjAwfX0sImtleSI6InZhbHVlIn0=|5|",
+              "cache": 0,
+              "requesting": true,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1759708800,
+              "to": 1769385600
+            },
+            "spacing": 31.41176470588235,
+            "offset": -36,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1764547200,
+              "to": 1764550800
+            },
+            "spacing": 41.07692307692308,
+            "offset": -62822.254682,
+            "width": 526,
+            "studies": [
+              {
+                "id": "M37qry",
+                "name": "守望 Python SMA"
+              },
+              {
+                "id": "AGiOcO",
+                "name": "Moving Average"
+              },
+              {
+                "id": "l9H2HU",
+                "name": "Relative Strength Index"
+              },
+              {
+                "id": "04fc65",
+                "name": "MACD"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1763560800,
+              "to": 1765360800
+            },
+            "spacing": 6,
+            "offset": -1264.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1759104000,
+              "to": 1770076800
+            },
+            "spacing": 6,
+            "offset": -174.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          }
+        ]
+      },
+      "reopened": {
+        "active": 0,
+        "sync": {
+          "crosshair": true,
+          "time": false,
+          "date": false
+        },
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "5",
+              "state": {
+                "identity": "MWP:EURUSD|5|",
+                "enhancedUntil": 24820.700000286102,
+                "raf": 0,
+                "previous": {
+                  "at": 17627.5,
+                  "offset": -62846
+                },
+                "lastAttemptOffset": 0,
+                "screen": 13,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 13,
+                "reserve": 44,
+                "firstTime": 1764354300,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "240",
+              "state": {
+                "identity": "MWP:EURUSD|240|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 18455.700000286102,
+                  "offset": -1264.5
+                },
+                "lastAttemptOffset": -1264.5,
+                "screen": 89,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 188,
+                "firstTime": 1759813200,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1D",
+              "state": {
+                "identity": "MWP:EURUSD|1D|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 18455.800000190735,
+                  "offset": -174.5
+                },
+                "lastAttemptOffset": -174.5,
+                "screen": 89,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 89,
+                "reserve": 190,
+                "firstTime": 1736121600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWP:EURUSD",
+              "resolution": "1W",
+              "state": {
+                "identity": "MWP:EURUSD|1W|",
+                "enhancedUntil": 15428.800000190735,
+                "raf": 0,
+                "previous": {
+                  "at": 5447.10000038147,
+                  "offset": -36
+                },
+                "lastAttemptOffset": -36,
+                "screen": 17,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 17,
+                "reserve": 68,
+                "firstTime": 1718582400,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:EURUSD|5|",
+              "cache": 63255,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|240|",
+              "cache": 1542,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "cache": 454,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "cache": 121,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV1A6RVVSVVNEIiwic3BlYyI6eyJuYW1lIjoiU01BIiwicGFyYW1zIjp7InBlcmlvZCI6MjAwfX0sImtleSI6InZhbHVlIn0=|5|",
+              "cache": 63399,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        },
+        "charts": [
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1759708800,
+              "to": 1769385600
+            },
+            "spacing": 31.41176470588235,
+            "offset": -36,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1764540300,
+              "to": 1764543900
+            },
+            "spacing": 41.07692307692308,
+            "offset": -62846,
+            "width": 526,
+            "studies": [
+              {
+                "id": "M37qry",
+                "name": "守望 Python SMA"
+              },
+              {
+                "id": "AGiOcO",
+                "name": "Moving Average"
+              },
+              {
+                "id": "l9H2HU",
+                "name": "Relative Strength Index"
+              },
+              {
+                "id": "04fc65",
+                "name": "MACD"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1763560800,
+              "to": 1765360800
+            },
+            "spacing": 6,
+            "offset": -1264.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          },
+          {
+            "priceMode": 0,
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1759104000,
+              "to": 1770076800
+            },
+            "spacing": 6,
+            "offset": -174.5,
+            "width": 534,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "X43STz",
+                "name": "horizontal_line"
+              }
+            ],
+            "ready": true
+          }
+        ]
+      },
+      "passed": true
+    }
+  ]
+}

@@ -339,7 +339,35 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             .find((f) => f.url().includes("charting_library")) ||
           frame.childFrames()[0];
         assert.ok(native);
+        if (process.env.CONTINUOUS_FULL === "1" &&
+          await frame.evaluate(() => MWNativeNavigation.diagnostics().limits.max_bars !== 200000)) {
+          await native.getByRole("button", {name:"图表菜单",exact:true}).click();
+          await native.getByRole("button", {name:"历史数据容量",exact:true}).click();
+          const initialCapacity = page.locator(".history-capacity-dialog");
+          await initialCapacity.waitFor();
+          await initialCapacity.getByLabel("单源容量（根）").fill("200000");
+          await initialCapacity.getByRole("button", {name:"保存",exact:true}).click();
+          await initialCapacity.waitFor({state:"hidden"});
+          await frame.waitForFunction(() => MWNativeNavigation.diagnostics().limits.max_bars === 200000);
+        }
         item.initial = await snapshot();
+        if (process.env.NATIVE_BOUNDARY_ONLY === "1") {
+          phase = "capacity-boundary";
+          await require("./native-capacity-boundary.cjs")({
+            page,
+            frame,
+            native,
+            settle,
+            box,
+            snapshot,
+            item,
+            save,
+          });
+          assert.deepEqual(item.errors, []);
+          item.passed = true;
+          save();
+          continue;
+        }
         if (process.env.NATIVE_CAPACITY_NOTICE_ONLY === "1") {
           phase = "capacity-notice";
           await require("./native-capacity-notice.cjs")({
@@ -748,14 +776,31 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
             });
             save();
           }
+          // Capacity fallback now fills available residency. Cancellation must
+          // target genuinely uncached history with room for a new request.
+          const capacityDialog = page.locator(".history-capacity-dialog");
+          const changeCapacity = async (value) => {
+            await native.getByRole("button", {name:"图表菜单",exact:true}).click();
+            await native.getByRole("button", {name:"历史数据容量",exact:true}).click();
+            await capacityDialog.waitFor();
+            await capacityDialog.getByLabel("单源容量（根）").fill(String(value));
+            await capacityDialog.getByRole("button", {name:"保存",exact:true}).click();
+            await capacityDialog.waitFor({state:"hidden"});
+            await frame.waitForFunction(n => MWNativeNavigation.diagnostics().limits.max_bars === n, value);
+          };
+          await changeCapacity(400000);
+          const cancelTarget = await frame.evaluate((m5) => {
+            const ts = widget.chart(m5)._chartWidget.model().model().timeScale();
+            return ts.points().valueAt(ts.points().range().value().firstIndex) - 14 * 86400;
+          },m5);
           phase = "cancel";
           fault = "delay";
           await frame.evaluate(
-            ({ m5, target }) => {
+            ({ m5, cancelTarget }) => {
               globalThis.__oldRange = widget
                 .chart(m5)
                 .setVisibleRange(
-                  { from: target - 40 * 86400, to: target - 40 * 86400 + 3600 },
+                  { from: cancelTarget, to: cancelTarget + 3600 },
                   { rejectByTimeout: 30000 },
                 )
                 .then(
@@ -763,7 +808,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
                   () => "cancelled",
                 );
             },
-            { m5, target },
+            { m5, cancelTarget },
           );
           await frame.waitForFunction(
             () => MWNativeNavigation.diagnostics().pending > 0,
@@ -791,11 +836,11 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           phase = "return-latest";
           fault = "delay";
           await frame.evaluate(
-            ({ m5, target }) => {
+            ({ m5, cancelTarget }) => {
               globalThis.__oldToLatest = widget
                 .chart(m5)
                 .setVisibleRange(
-                  { from: target - 80 * 86400, to: target - 80 * 86400 + 3600 },
+                  { from: cancelTarget - 14 * 86400, to: cancelTarget - 14 * 86400 + 3600 },
                   { rejectByTimeout: 30000 },
                 )
                 .then(
@@ -803,7 +848,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
                   () => "cancelled",
                 );
             },
-            { m5, target },
+            { m5, cancelTarget },
           );
           await frame.waitForFunction(
             () => MWNativeNavigation.diagnostics().pending > 0,
@@ -938,6 +983,7 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
               "native callback must receive exact PG revised close",
             );
           }
+          await changeCapacity(200000);
           phase = "save-reopen";
           await frame.evaluate(
             () =>

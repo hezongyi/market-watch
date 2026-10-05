@@ -10,7 +10,11 @@ import { MaintenanceDialog } from "./MaintenanceDialog";
 import { ExportDialog, type ExportSelection } from "./ExportDialog";
 import { providerSubscriptions } from "./providerSubscriptions";
 import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
-import { HistoryLoadingNotice, type NativeLoad } from "./HistoryLoadingNotice";
+import {
+  HistoryLoadingNotice,
+  type NativeLoad,
+  type CapacityNotice,
+} from "./HistoryLoadingNotice";
 
 type Workspace = {
   id: string;
@@ -53,6 +57,9 @@ export default function AdvancedWorkspace() {
   const [nativeReady, setNativeReady] = useState(false);
   const historyCapabilities = useRef<HistoryCapabilities | null>(null);
   const nativeLoadEpoch = useRef(0);
+  const [capacityNotices, setCapacityNotices] = useState<
+    Record<string, CapacityNotice>
+  >({});
   const [nativeLoads, setNativeLoads] = useState<Record<string, NativeLoad>>(
     {},
   );
@@ -102,6 +109,7 @@ export default function AdvancedWorkspace() {
     setPollErrors({});
     setHistoryProgress({});
     setNativeLoads({});
+    setCapacityNotices({});
     nativeLoadEpoch.current = 0;
     setCapacityDialog(null);
     setDatasetViews({});
@@ -299,7 +307,56 @@ export default function AdvancedWorkspace() {
       if (m.type === "native-load-reset" && Number.isSafeInteger(m.epoch)) {
         nativeLoadEpoch.current = m.epoch;
         setNativeLoads({});
+        setCapacityNotices({});
         setCapacityDialog(null);
+        return;
+      }
+      if (
+        m.type === "capacity-notice" &&
+        m.epoch === nativeLoadEpoch.current &&
+        typeof m.key === "string" &&
+        m.key.length <= 160
+      ) {
+        const periods: Record<string, string> = {
+          "1": "M1",
+          "5": "M5",
+          "15": "M15",
+          "30": "M30",
+          "60": "H1",
+          "240": "H4",
+          "1D": "D1",
+          "1W": "W1",
+          "1M": "MN",
+        };
+        setCapacityNotices((previous) => {
+          const next = { ...previous };
+          if (m.phase === "clear") {
+            if (!next[m.key] || m.id === undefined || next[m.key].id === m.id)
+              delete next[m.key];
+          } else if (
+            ["filling", "limited", "failed"].includes(m.phase) &&
+            typeof m.message === "string"
+          ) {
+            next[m.key] = {
+              id: m.id,
+              instrument:
+                typeof m.symbol === "string"
+                  ? m.symbol.replace(/^MWP:/, "").slice(0, 80)
+                  : "历史容量",
+              timeframe: periods[m.resolution] || "",
+              phase: m.phase,
+              message: m.message.slice(0, 1000),
+              ...(Number.isFinite(m.requested)
+                ? { requested: m.requested }
+                : {}),
+              ...(Number.isFinite(m.actual) ? { actual: m.actual } : {}),
+              ...(Number.isFinite(m.limit) ? { limit: m.limit } : {}),
+              ...(Number.isFinite(m.resident) ? { resident: m.resident } : {}),
+              scope: m.scope,
+            };
+          }
+          return next;
+        });
         return;
       }
       if (
@@ -1050,10 +1107,22 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
-      {Object.keys(nativeLoads).length > 0 && (
+      {(Object.keys(nativeLoads).length > 0 ||
+        Object.keys(capacityNotices).length > 0) && (
         <HistoryLoadingNotice
           loads={nativeLoads}
+          capacities={capacityNotices}
           onCancel={() => post({ type: "cancel-history" })}
+          onSettings={() => post({ type: "history-capacity-open" })}
+          onDismiss={() =>
+            setCapacityNotices((previous) =>
+              Object.fromEntries(
+                Object.entries(previous).filter(
+                  ([, notice]) => notice.phase === "filling",
+                ),
+              ),
+            )
+          }
         />
       )}
       {capacityDialog && (

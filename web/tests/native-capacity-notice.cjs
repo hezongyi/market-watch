@@ -79,13 +79,10 @@ module.exports = async ({
     await page.mouse.up();
   };
   await click();
-  await frame.waitForFunction(
-    () =>
-      activeNotices.some(
-        (entry) => entry.text.includes("容量") && entry.text.includes("80,000"),
-      ),
+  await page.waitForFunction(
+    () => document.querySelector(".history-capacity-result")?.textContent.includes("实际已定位至"),
     null,
-    { timeout: 15000 },
+    { timeout: 120000 },
   );
   item.capacityRejected = {
     view: await snapshot(),
@@ -96,11 +93,9 @@ module.exports = async ({
     !item.capacityRejected.view.charts[1].range ||
       item.capacityRejected.view.charts[1].range.from > target,
   );
-  // Close the native notice, then raise via the actual menu/dialog.
-  const closeNotice = native
-    .getByRole("button", { name: /^(确定|确认|OK)$/ })
-    .first();
-  if (await closeNotice.count()) await closeNotice.click();
+  assert.ok(!item.capacityRejected.notices.some((entry) => entry.text.includes("容量")),
+    "capacity result belongs to the bottom-right historical notice");
+  await page.getByRole("button", { name: "关闭提示", exact: true }).click();
   await capacity(200000);
   const events = [];
   await page.exposeFunction("recordCapacityNotice", (value) =>
