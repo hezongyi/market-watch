@@ -441,6 +441,8 @@ const feed = {
       cb({
         name: meta.source === "yahoo" ? meta.symbol : MWSeries.display(symbol),
         ticker,
+        // Informational estimate only; actual pagination remains backend-owned.
+        mw_historyPageBars: meta.source === "binance" ? 1000 : 4000,
         description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
@@ -487,7 +489,8 @@ const feed = {
     const isProvider=decode(s.ticker).series_kind==='provider';
     if(isProvider) send({type:'native-load-start',id:loadId,epoch:loadEpoch,
       instrument:decode(s.ticker).symbol,timeframe:frames[res],
-      count:p.countBack,from:p.from*1000,to:p.to*1000});
+      count:p.countBack,from:p.from*1000,to:p.to*1000,
+      estimatedPages:Math.ceil(p.countBack/(s.mw_historyPageBars || 4000))});
     const providerWork=isProvider ? (providerHistoryWork.get(workKey) ||
       {symbol:s.ticker,res,window:s.mw_window,inflight:0,generation:0,correction:null,reloading:false}) : null;
     if(providerWork) {
@@ -517,6 +520,7 @@ const feed = {
         // and provider pagination, including demands larger than one page.
         const epoch = workspaceEpoch, reserveStarted = globalThis.performance?.now() || 0;
         const args={limit:p.countBack,history_progress_id:loadId,history_progress_epoch:loadEpoch,
+          history_page_bars:s.mw_historyPageBars || 4000,
           countBack:p.countBack, from:p.from*1000, before:p.to*1000,
           firstDataRequest:p.firstDataRequest, client:clientId,
           native_history:nativeHistoryContext(s.ticker,res)};

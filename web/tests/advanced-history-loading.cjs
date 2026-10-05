@@ -76,8 +76,26 @@ function loader(api) {
     ["checking", "waiting", "filling", "delivering", "delivering"],
   );
   assert.equal(coldProgress.at(-1).pages, 3);
+  assert.equal(coldProgress.at(-1).estimatedPages, 3);
   assert.equal(coldProgress.at(-1).received, 3);
   assert.ok(paths.at(-1).endsWith("/cancel"));
+  const estimated = [];
+  const estimates = loader(async (path) => path.endsWith("/cancel") ? {} :
+    {load:{id:"estimate",state:"waiting",pages:4}});
+  const estimatedController = new AbortController();
+  await assert.rejects(estimates({countBack:12000,history_page_bars:1000},
+    estimatedController.signal,cap,p => {
+      estimated.push(p); if(p.phase === "filling") estimatedController.abort();
+    }), {name:"AbortError"});
+  assert.equal(estimated.at(-1).estimatedPages,12,
+    "estimate uses this provider's page capacity rather than a fixed denominator");
+  const exceededController = new AbortController();
+  let adjusted;
+  await assert.rejects(estimates({countBack:12000,history_page_bars:4000},
+    exceededController.signal,cap,p => {
+      if(p.phase === "filling") { adjusted=p.estimatedPages; exceededController.abort(); }
+    }), {name:"AbortError"});
+  assert.equal(adjusted,5,"unfinished reads expand an estimate exceeded by real committed pages");
   const cancelPaths = [],
     cancelProgress = [],
     controller = new AbortController();

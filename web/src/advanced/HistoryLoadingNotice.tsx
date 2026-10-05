@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { HistoryProgress } from "./nativeHistoryLoads";
 
+export const HISTORY_NOTICE_DELAY_MS = 5000;
+
 export type NativeLoad = HistoryProgress & {
   instrument: string;
   timeframe: string;
@@ -55,7 +57,9 @@ export function HistoryLoadingNotice({
   }, [hasLoads]);
   const groups = new Map<string, NativeLoad[]>();
   for (const load of Object.values(loads)) {
-    if (now - load.started < 250) continue;
+    const capacity = Object.values(capacities).some((notice) =>
+      notice.instrument === load.instrument && notice.timeframe === load.timeframe);
+    if (now - load.started < HISTORY_NOTICE_DELAY_MS && !capacity) continue;
     const key = load.instrument + "|" + load.timeframe;
     groups.set(key, [...(groups.get(key) || []), load]);
   }
@@ -122,7 +126,11 @@ export function HistoryLoadingNotice({
               </span>
               <span>
                 请求 {count.toLocaleString()} 根
-                {pages ? ` · 已缓存 ${pages} 页` : ""}
+                {load.phase === "waiting" || load.phase === "filling"
+                  ? ` · 本次新增缓存 ${pages} 页 / 预计总共约 ${Math.max(pages, load.estimatedPages || 1)} 页`
+                  : pages ? ` · 本次新增缓存共 ${pages} 页`
+                    : ["queued", "checking"].includes(load.phase) && load.estimatedPages
+                      ? ` · 预计缓存总共约 ${load.estimatedPages} 页` : ""}
                 {load.received !== undefined
                   ? ` · 已收到 ${load.received.toLocaleString()} 根`
                   : ""}

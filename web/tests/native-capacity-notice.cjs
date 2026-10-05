@@ -143,7 +143,7 @@ module.exports = async ({
     })),
   };
   save();
-  assert.ok(
+  if (item.capacityRaised.clickToReadyMs >= 5500) assert.ok(
     events.some(
       (e) =>
         e.text.includes("EURUSD") &&
@@ -151,7 +151,7 @@ module.exports = async ({
         e.text.includes("请求") &&
         e.text.includes("UTC"),
     ),
-    "long hot-cache loading must have complete notice",
+    "loading lasting over five seconds must have complete notice",
   );
   assert.ok(
     item.capacityRaised.view.charts.every(

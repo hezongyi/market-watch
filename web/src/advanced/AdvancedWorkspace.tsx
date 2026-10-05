@@ -12,6 +12,7 @@ import { providerSubscriptions } from "./providerSubscriptions";
 import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
 import {
   HistoryLoadingNotice,
+  HISTORY_NOTICE_DELAY_MS,
   type NativeLoad,
   type CapacityNotice,
 } from "./HistoryLoadingNotice";
@@ -371,7 +372,7 @@ export default function AdvancedWorkspace() {
             const load = previous[m.id];
             if (!load) return previous;
             const duration = Date.now() - load.started;
-            if (duration < 250 || duration >= 750) {
+            if (duration < HISTORY_NOTICE_DELAY_MS || duration >= HISTORY_NOTICE_DELAY_MS + 500) {
               const next = { ...previous };
               delete next[m.id];
               return next;
@@ -411,6 +412,8 @@ export default function AdvancedWorkspace() {
               to: m.to,
               started: Date.now(),
               phase: "queued",
+              ...(Number.isSafeInteger(m.estimatedPages) && m.estimatedPages > 0
+                ? { estimatedPages:m.estimatedPages } : {}),
             };
           } else if (m.type === "native-load-applying" && next[m.id]) {
             next[m.id] = {

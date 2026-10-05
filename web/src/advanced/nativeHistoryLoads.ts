@@ -17,6 +17,7 @@ export type HistoryProgress = {
   phase:
     "queued" | "checking" | "waiting" | "filling" | "delivering" | "applying";
   pages?: number;
+  estimatedPages?: number;
   received?: number;
 };
 
@@ -29,8 +30,11 @@ export async function loadNativeHistory(
 ) {
   let handle: string | undefined;
   const deadline = Date.now() + capabilities.task_seconds * 1000;
+  const demand = query as { countBack?: number; limit?: number; history_page_bars?: number };
+  const pageBars = demand.history_page_bars === 1000 ? 1000 : 4000;
+  const estimate = Math.max(1, Math.ceil((demand.countBack || demand.limit || 1) / pageBars));
   try {
-    progress({ phase: "checking" });
+    progress({ phase: "checking", estimatedPages: estimate });
     let reply = await api(
       "/charts/history-loads",
       { request_id: crypto.randomUUID(), query },
@@ -72,6 +76,7 @@ export async function loadNativeHistory(
               ? "filling"
               : "waiting",
         pages: state?.pages || 0,
+        estimatedPages: state?.state === "ready" ? state.pages || 0 : Math.max(estimate, (state?.pages || 0) + 1),
       });
       if (state?.state === "ready")
         reply = await api(
@@ -102,6 +107,7 @@ export async function loadNativeHistory(
         progress({
           phase: "delivering",
           pages: state?.pages || 0,
+          estimatedPages: state?.pages || 0,
           received: reply.result.bars?.length || 0,
         });
         return reply.result;
