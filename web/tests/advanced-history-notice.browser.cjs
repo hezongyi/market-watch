@@ -52,10 +52,26 @@ const fs = require("node:fs"), assert = require("node:assert/strict");
     assert.ok((await page.locator(".advanced-loading-notice").textContent()).includes("请求 12,000 根"),
       "capacity-associated loading detail bypasses the five-second gate");
     await send({type:"native-load-end",id:"capacity-timing"});
+    const started=Date.now()-12000;
+    await send({type:"capacity-notice",key:"MWP:EURUSD|5|",id:101,symbol:"MWP:EURUSD",resolution:"5",
+      phase:"filling",message:"正在补齐边界",started,totalBars:60000,loadedBars:20000,
+      estimatedPages:15,pages:5,batch:2,completedBatch:1});
+    const result=page.locator(".history-capacity-result");
+    await result.filter({hasText:"预计补齐 60,000 根"}).waitFor();
+    const elapsedBefore=await result.textContent();
+    await page.waitForTimeout(1600);
+    const elapsedAfter=await result.textContent();
+    assert.notEqual(elapsedBefore,elapsedAfter,"boundary clock keeps ticking with no live getBars batch");
+    await send({...base,id:"second-batch",boundaryId:101,batch:2,count:20000,estimatedPages:5});
+    assert.ok((await result.textContent()).includes("预计总共约 15 页"));
+    assert.ok((await result.textContent()).includes("累计新增缓存 5 页"));
+    await send({type:"native-load-end",id:"second-batch"});
     await send({type:"capacity-notice",key:"MWP:EURUSD|5|",id:101,phase:"clear"});
     await page.locator(".advanced-loading-notice").waitFor({state:"hidden",timeout:2000});
     const report={passed:true,scope:"trusted iframe notice messages; actual UI visibility, not provider performance",
-      hiddenBeforeFiveSeconds:true,estimateText:text,capacityImmediate:true,cleanup:true};
+      hiddenBeforeFiveSeconds:true,estimateText:text,capacityImmediate:true,
+      boundaryElapsedBefore:elapsedBefore,boundaryElapsedAfter:elapsedAfter,
+      operationTotalsSeparateFromBatches:true,cleanup:true};
     if(process.env.NATIVE_SYNC_OUTPUT)fs.writeFileSync(process.env.NATIVE_SYNC_OUTPUT,JSON.stringify(report,null,2));
     console.log("History notice: five-second delay, estimated pages, immediate capacity detail and cleanup passed");
   } finally { await browser.close(); }

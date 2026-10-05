@@ -354,6 +354,14 @@ export default function AdvancedWorkspace() {
               ...(Number.isFinite(m.limit) ? { limit: m.limit } : {}),
               ...(Number.isFinite(m.resident) ? { resident: m.resident } : {}),
               scope: m.scope,
+              started:Number.isFinite(m.started) ? m.started : previous[m.key]?.started,
+              finished:Number.isFinite(m.finished) ? m.finished : undefined,
+              totalBars:Number.isSafeInteger(m.totalBars) ? m.totalBars : undefined,
+              loadedBars:Number.isSafeInteger(m.loadedBars) ? m.loadedBars : undefined,
+              pages:Number.isSafeInteger(m.pages) ? m.pages : undefined,
+              estimatedPages:Number.isSafeInteger(m.estimatedPages) ? m.estimatedPages : undefined,
+              batch:Number.isSafeInteger(m.batch) ? m.batch : undefined,
+              completedBatch:Number.isSafeInteger(m.completedBatch) ? m.completedBatch : undefined,
             };
           }
           return next;
@@ -412,6 +420,7 @@ export default function AdvancedWorkspace() {
               to: m.to,
               started: Date.now(),
               phase: "queued",
+              ...(Number.isSafeInteger(m.boundaryId) ? {boundaryId:m.boundaryId,batch:m.batch} : {}),
               ...(Number.isSafeInteger(m.estimatedPages) && m.estimatedPages > 0
                 ? { estimatedPages:m.estimatedPages } : {}),
             };
@@ -964,7 +973,8 @@ export default function AdvancedWorkspace() {
                       firstDataRequest: q.firstDataRequest === true,
                       client: q.client,
                       ...(q.native_history !== undefined
-                        ? { native_history: q.native_history }
+                        ? { native_history: q.native_history,
+                            history_page_bars:q.history_page_bars === 1000 ? 1000 : 4000 }
                         : {}),
                       ...(q.native_reserve !== undefined
                         ? { native_reserve: q.native_reserve }

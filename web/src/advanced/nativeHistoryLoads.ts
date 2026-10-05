@@ -45,7 +45,7 @@ export async function loadNativeHistory(
         phase: "delivering",
         received: reply.result.bars?.length || 0,
       });
-      return reply.result;
+      return {...reply.result,history_pages:0};
     }
     handle = reply.load?.id;
     if (!handle) throw Error("历史加载协议不匹配，请刷新工作区");
@@ -110,7 +110,7 @@ export async function loadNativeHistory(
           estimatedPages: state?.pages || 0,
           received: reply.result.bars?.length || 0,
         });
-        return reply.result;
+        return {...reply.result,history_pages:state?.pages || 0};
       }
     }
   } finally {

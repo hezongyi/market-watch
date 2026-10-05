@@ -44,6 +44,7 @@ function loader(api) {
     progress.push(p),
   );
   assert.equal(result.bars.length, 2);
+  assert.equal(result.history_pages,0,"hot-cache delivery must not count an upstream cache page");
   assert.equal(calls, 1);
   assert.deepEqual(
     progress.map((p) => p.phase),
@@ -68,7 +69,7 @@ function loader(api) {
     paths.push(path);
     return replies.shift();
   });
-  await cold(body, new AbortController().signal, cap, (p) =>
+  const coldResult = await cold(body, new AbortController().signal, cap, (p) =>
     coldProgress.push(p),
   );
   assert.deepEqual(
@@ -76,6 +77,7 @@ function loader(api) {
     ["checking", "waiting", "filling", "delivering", "delivering"],
   );
   assert.equal(coldProgress.at(-1).pages, 3);
+  assert.equal(coldResult.history_pages,3,"committed task pages survive delivery into the native batch result");
   assert.equal(coldProgress.at(-1).estimatedPages, 3);
   assert.equal(coldProgress.at(-1).received, 3);
   assert.ok(paths.at(-1).endsWith("/cancel"));

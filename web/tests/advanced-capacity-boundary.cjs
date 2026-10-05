@@ -147,7 +147,7 @@ const turn = () => new Promise((r) => setImmediate(r));
   );
   pending[0].cb(
     Array.from({ length: 40 }, (_, i) => ({ time: (960 + i) * 1000 })),
-    { noData: false },
+    { noData: false, mw_historyPages:2 },
   );
   await turn();
   await turn();
@@ -169,6 +169,12 @@ const turn = () => new Promise((r) => setImmediate(r));
         e.detail.actual === 960,
     ),
   );
+  const finalNotice = events.filter(e => e.type === "mw-capacity-state" && e.detail.phase === "limited").at(-1).detail;
+  assert.equal(finalNotice.totalBars,40);
+  assert.equal(finalNotice.loadedBars,40);
+  assert.equal(finalNotice.pages,2,"completed batch pages accumulate in the boundary operation");
+  assert.equal(finalNotice.started,events.find(e => e.type === "mw-capacity-state" && e.detail.phase === "filling").detail.started,
+    "operation start remains stable throughout batch progress and completion");
   bars = Array.from({ length: 60 }, (_, i) => ({ time: (1000 + i) * 1000 }));
   t._cache.bars = bars;
   m._scrollingState = { targetDate: 800000, deferred: { reject() {} } };
@@ -331,6 +337,26 @@ const turn = () => new Promise((r) => setImmediate(r));
     "superseded fill must not delete new request reservation",
   );
   t.mw_read.cancel();
+  const originalPoints = ts.points;
+  ts.points = () => ({...originalPoints(),range:() => ({value:() => ({firstIndex:10,lastIndex:bars.length-1})})});
+  ts.requestMoreHistoryPoints = () => {
+    ts.points = originalPoints;
+    ts._requestingMoreData = true;
+    t._datafeed.getBars(t._symbolInfo,"5",{countBack:100,from:700,to:1000},
+      () => assert.fail("promotion oversized"),e => nav.historyFailure(t,e));
+  };
+  const promotionStart = events.length;
+  m._scrollingState = {targetDate:800000,deferred:{reject(){}}};
+  t._datafeed.getBars(t._symbolInfo,"5",{countBack:100,from:800,to:1000},
+    () => assert.fail("oversized"),e => nav.historyFailure(t,e));
+  await new Promise(r => setTimeout(r,5));
+  pending.at(-1).cb(Array.from({length:40},(_,i)=>({time:(960+i)*1000})),{noData:false,mw_historyPages:2});
+  await new Promise(r => setTimeout(r,10));
+  const promotionEvents = events.slice(promotionStart).filter(e => e.type === "mw-capacity-state");
+  const promotionDone = promotionEvents.filter(e => e.detail.phase === "limited").at(-1).detail;
+  assert.equal(promotionDone.started,promotionEvents.find(e => e.detail.phase === "filling").detail.started);
+  assert.equal(promotionDone.loadedBars,40,"native promotion preserves already completed operation bars");
+  assert.equal(promotionDone.pages,2,"native promotion preserves accumulated pages");
   const beforePurge = pending.length;
   m._scrollingState = { targetDate: 800000, deferred: { reject() {} } };
   t._datafeed.getBars(

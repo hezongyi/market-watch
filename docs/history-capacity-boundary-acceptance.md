@@ -39,8 +39,8 @@ API 仍为容量候选，web/chart 更新后已 reload tls nginx。私有 `compo
 | 镜像 | SHA256 |
 | --- | --- |
 | `mw-native-history-api:capacity-notice-20261005` | `fcb39f454ef71112d1c2cc3a699ca5791a73526c1805cfa8bfbff4e6e92f935a` |
-| `mw-native-history-web:notice-5s-20261005` | `47b5b97e2fd7fad1d71765181ab025cfca1e61ac7a563fc77fe453047e3b3f5f` |
-| `mw-native-history-chart:notice-5s-20261005` | `a3fef10be1499331783c8a17d22601dd18d8240bd0b17d8cdb776df5d2b8f482` |
+| `mw-native-history-web:notice-operation-20261005` | `8bbbb13f156b926806798d2481706d40b9ae7097f13898adab64c2e0f84acb6d` |
+| `mw-native-history-chart:notice-operation-20261005` | `057713ce4b6e280013d81e6af01b0c12e8665e3947746af050551036491642d1` |
 
 人工核对：刷新后原四周期开启时间及十字线同步，先设置 80,000，再点 W1 2025-07-14。M5 应移动到自身边界；多个周期超限时各自移动。右下角核对请求/实际日期、限制及已加载量，关闭和调整容量可用。再提高容量重试，应能继续加载；已有历史范围仍能导航，hover 不应引起反复重建。验收后建议恢复默认 200,000。
 
@@ -49,3 +49,13 @@ API 仍为容量候选，web/chart 更新后已 reload tls nginx。私有 `compo
 用户要求普通历史提示持续超过 5 秒才显示，超限立即显示；允许总缓存页数采用预估。本次请求按原生 countBack / 来源单页容量向上取整（OANDA/Yahoo 4,000、Binance 1,000），显示“本次新增缓存 N 页 / 预计总共约 M 页”。待补数时实际页数接近估算会向上调整，完成后显示实际新增缓存页数。该值不是整个 PG 库页数，也不是准确剩余页数或完成百分比：已有缓存、区间实际需求、指标前缀、短页及共享补数都可能改变数量；不影响后台加载或容量策略。
 
 [浏览器提示时序](verification/native-history/notice-five-second-20261005/notice-timing.json) 验证 4.4 秒仍隐藏、5 秒后出现、超限关联详情立即出现及清理，使用可信 iframe 模拟消息，仅证明 UI 契约。[真实四图专项](verification/native-history/notice-five-second-20261005/four-chart-capacity-loading.json) 验证实际超限定位、提高容量继续加载、缓存导航及工作区切换通过。普通进度 VM 增加来源页容量估算与最终实际页数验证；构建通过。Ubuntu 已更新 web/chart 并 reload tls，偏好仍为 200k，私有旧组合保留 compose.pre-notice-5s-20261005.yaml。
+
+## 整次边界补齐进度与计时修复
+
+用户报告 EURUSD 每次都是 20,000 根/预计 5 页、等待计时不正确。确定性组件回归先实际失败：第二批已等待显示 5 秒，整次从起点已过 15 秒。根因是只展示最近 getBars 批次、起点跟随批次更换，且仅存在边界操作而没有活动请求时 ticker 停止。修复为原导航边界操作保存 start/finish、计划补齐量、累计实际补齐根数与已完成批次页数；在途批次按来源/操作 ID/批号加入累计页数，已归入操作的批次不再重复累计。整次时钟在批次间及原生定位期间继续，结束冻结耗时。当前批次仍标明最多 20k，不能把每批 5 页当总量。批次 `from` 是 countBack 补数的控制边界，原 1 秒区间显示容易误读；现在明确“从本批边界向更早历史补数”。
+
+[浏览器时序证据](verification/native-history/notice-operation-20261005/operation-clock-ui.json) 确认无请求空档计时继续、整体 60k/15 页与当前批次分开、普通 5 秒门槛及超限立即显示仍通过。该项模拟可信 iframe 消息，不是供应商性能证据。[真实四图多批证据](verification/native-history/notice-operation-20261005/multi-batch-product.json) 中 M5 计划 29,657 根，分两批补齐 20,000+9,657，整体估算 8 页，开始时间一致且累计量单调，最终结果保持同一起点与 29,657 根累计量；PG 热命中，两批实际新增页数为 0。多周期边界、同源闲置 pane 保持视区、结果关闭与设置入口通过。加载模块验证冷任务实际页数可经结果/callback归入操作；hot 返回不计新增页。来源单页容量现在完整传到父级 loadNativeHistory，不再在父级构造 query 时丢失。组件、边界生命周期、普通加载与连续导航 VM 通过，镜像构建通过。
+
+Ubuntu web/chart 已更新并 reload tls，API 未改、容量仍默认 200k；私有旧组合保留 compose.pre-notice-operation-20261005.yaml。整次汇总针对容量边界操作，普通原生 getBars 仍显示各自实际请求与请求等待时间，不声称任意多次原生调用共享一次业务跳转 ID。
+
+真实产品初轮还发现指标预热 promotion 会引发后续超限 read，之前按新边界任务重置统计。最终镜像将相同模型导航代次下这段原生内部收尾沿用 start/total/loaded/pages/batch；新的用户导航仍失效旧操作，缓存 purge 不继承。VM 模拟 promotion 后超限，确认计时、40 根与两页累计保留；最终真实产品再次运行通过，完成结果不再归零。

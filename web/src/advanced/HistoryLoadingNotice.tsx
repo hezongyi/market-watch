@@ -12,6 +12,8 @@ export type NativeLoad = HistoryProgress & {
   started: number;
   ended?: boolean;
   epoch: number;
+  boundaryId?: number;
+  batch?: number;
 };
 export type CapacityNotice = {
   id?: number;
@@ -24,6 +26,14 @@ export type CapacityNotice = {
   limit?: number;
   scope?: string;
   resident?: number;
+  started?: number;
+  finished?: number;
+  totalBars?: number;
+  loadedBars?: number;
+  pages?: number;
+  estimatedPages?: number;
+  batch?: number;
+  completedBatch?: number;
 };
 const phases = {
   queued: "正在排队",
@@ -35,6 +45,14 @@ const phases = {
 };
 const date = (value: number) =>
   new Date(value).toISOString().slice(0, 16).replace("T", " ");
+function operationPages(notice: CapacityNotice, loads: Record<string, NativeLoad>) {
+  const current = notice.phase === "filling" ? Object.values(loads)
+    .filter(load => load.boundaryId === notice.id &&
+      load.instrument === notice.instrument && load.timeframe === notice.timeframe &&
+      (load.batch || 0) > (notice.completedBatch || 0))
+    .reduce((sum, load) => sum + (load.pages || 0), 0) : 0;
+  return (notice.pages || 0) + current;
+}
 export function HistoryLoadingNotice({
   loads,
   onCancel,
@@ -49,7 +67,8 @@ export function HistoryLoadingNotice({
   onSettings: () => void;
 }) {
   const [now, setNow] = useState(Date.now());
-  const hasLoads = Object.keys(loads).length > 0;
+  const hasLoads = Object.keys(loads).length > 0 ||
+    Object.values(capacities).some(notice => notice.phase === "filling");
   useEffect(() => {
     if (!hasLoads) return;
     const timer = setInterval(() => setNow(Date.now()), 200);
@@ -85,6 +104,20 @@ export function HistoryLoadingNotice({
               {notice.timeframe ? ` · ${notice.timeframe}` : ""}
             </b>
             <span>{notice.message}</span>
+            {notice.totalBars !== undefined && (
+              <span>预计补齐 {notice.totalBars.toLocaleString()} 根 · 已补齐 {(notice.loadedBars || 0).toLocaleString()} 根</span>
+            )}
+            {notice.pages !== undefined && (
+              <span>
+                累计新增缓存 {operationPages(notice,loads).toLocaleString()} 页
+                {notice.phase === "filling" && notice.estimatedPages !== undefined
+                  ? ` / 预计总共约 ${Math.max(notice.estimatedPages,operationPages(notice,loads)).toLocaleString()} 页` : ""}
+              </span>
+            )}
+            {notice.started !== undefined && <span>
+              {notice.finished !== undefined ? "本次补齐耗时" : "本次补齐已等待"}{" "}
+              {Math.max(0,Math.floor(((notice.finished ?? now) - notice.started) / 1000))} 秒
+            </span>}
             {Number.isFinite(notice.requested) && (
               <span>请求日期 {date(notice.requested! * 1000)} UTC</span>
             )}
@@ -125,10 +158,10 @@ export function HistoryLoadingNotice({
                 {rows.length > 1 ? "（下列为最近活动请求）" : ""}
               </span>
               <span>
-                请求 {count.toLocaleString()} 根
+                {load.boundaryId !== undefined ? "当前批次请求" : "当前请求"} {count.toLocaleString()} 根
                 {load.phase === "waiting" || load.phase === "filling"
-                  ? ` · 本次新增缓存 ${pages} 页 / 预计总共约 ${Math.max(pages, load.estimatedPages || 1)} 页`
-                  : pages ? ` · 本次新增缓存共 ${pages} 页`
+                  ? ` · ${load.boundaryId !== undefined ? "本批" : "本请求"}新增缓存 ${pages} 页 / 预计约 ${Math.max(pages, load.estimatedPages || 1)} 页`
+                  : pages ? ` · ${load.boundaryId !== undefined ? "本批" : "本请求"}新增缓存共 ${pages} 页`
                     : ["queued", "checking"].includes(load.phase) && load.estimatedPages
                       ? ` · 预计缓存总共约 ${load.estimatedPages} 页` : ""}
                 {load.received !== undefined
@@ -136,20 +169,22 @@ export function HistoryLoadingNotice({
                   : ""}
               </span>
               <span>
-                请求范围 {date(load.from)} — {date(load.to)} UTC
+                {load.boundaryId !== undefined
+                  ? `当前批次从 ${date(load.to)} UTC 向更早历史补数`
+                  : `请求范围 ${date(load.from)} — ${date(load.to)} UTC`}
               </span>
             </div>
           );
         })}
       </div>
-      {Object.keys(loads).length > 0 && (
+      {Object.values(loads).some(load => load.boundaryId === undefined) && (
         <p className="history-loading-elapsed">
           已等待{" "}
           {Math.max(
             0,
             Math.floor(
               (now -
-                Math.min(...Object.values(loads).map((load) => load.started))) /
+                Math.min(...Object.values(loads).filter(load => load.boundaryId === undefined).map((load) => load.started))) /
                 1000,
             ),
           )}{" "}

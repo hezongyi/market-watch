@@ -490,6 +490,7 @@ const feed = {
     if(isProvider) send({type:'native-load-start',id:loadId,epoch:loadEpoch,
       instrument:decode(s.ticker).symbol,timeframe:frames[res],
       count:p.countBack,from:p.from*1000,to:p.to*1000,
+      boundaryId:p.mw_boundaryId,batch:p.mw_boundaryBatch,
       estimatedPages:Math.ceil(p.countBack/(s.mw_historyPageBars || 4000))});
     const providerWork=isProvider ? (providerHistoryWork.get(workKey) ||
       {symbol:s.ticker,res,window:s.mw_window,inflight:0,generation:0,correction:null,reloading:false}) : null;
@@ -589,7 +590,7 @@ const feed = {
           firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,rows[0].time));
         }
         send({type:'native-load-applying',id:loadId,epoch:loadEpoch,count:rows.length});
-        cb(rows,{noData:boundary});
+        cb(rows,{noData:boundary,mw_historyPages:page.history_pages || 0});
         if (globalThis.MWNativeReserve)
           requestAnimationFrame(() => MWNativeReserve.delivered(s, res, performance.now() - reserveStarted));
         if(!rows.length) finishTerminal();

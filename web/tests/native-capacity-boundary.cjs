@@ -92,6 +92,17 @@ module.exports = async ({
     .at(-1);
   assert.ok(done, JSON.stringify(events));
   assert.equal(done.requested, target);
+  const progress = events.filter(e => e.id === done.id && e.resolution === "5" && e.phase === "filling");
+  assert.ok(progress.length > 0);
+  const firstProgress = events.find(e => e.resolution === "5" && e.phase === "filling");
+  assert.equal(done.started,firstProgress.started,
+    "native indicator promotion continues the original boundary operation timer");
+  assert.ok(progress.every(e => e.started === done.started),
+    "real multi-batch operation preserves its own start time");
+  assert.equal(done.loadedBars,done.totalBars,
+    "real remaining-capacity fill reports aggregate bars rather than the last 20k batch");
+  assert.ok(progress.every((e,i) => i === 0 || e.loadedBars >= progress[i-1].loadedBars),
+    "operation progress does not restart on a new native batch");
   assert.ok(done.actual > target);
   assert.equal(
     done.resident,
