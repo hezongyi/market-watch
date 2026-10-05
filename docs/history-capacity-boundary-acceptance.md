@@ -43,7 +43,7 @@ API 仍为容量候选，web/chart 更新后已 reload tls nginx。私有 `compo
 | 镜像 | SHA256 |
 | --- | --- |
 | `mw-native-history-api:capacity-notice-20261005` | `fcb39f454ef71112d1c2cc3a699ca5791a73526c1805cfa8bfbff4e6e92f935a` |
-| `mw-native-history-web:notice-operation-20261005` | `8bbbb13f156b926806798d2481706d40b9ae7097f13898adab64c2e0f84acb6d` |
+| `mw-native-history-web:pr-final-20261005` | `68f74f39cd74f535f8ca1fccd27e1b7d25e746150cafc816462067c964096f29` |
 | `mw-native-history-chart:notice-operation-20261005` | `057713ce4b6e280013d81e6af01b0c12e8665e3947746af050551036491642d1` |
 
 人工核对：刷新后原四周期开启时间及十字线同步，先设置 80,000，再点 W1 2025-07-14。M5 应移动到自身边界；多个周期超限时各自移动。右下角核对请求/实际日期、限制及已加载量，关闭和调整容量可用。再提高容量重试，应能继续加载；已有历史范围仍能导航，hover 不应引起反复重建。验收后建议恢复默认 200,000。
@@ -63,3 +63,9 @@ API 仍为容量候选，web/chart 更新后已 reload tls nginx。私有 `compo
 Ubuntu web/chart 已更新并 reload tls，API 未改、容量仍默认 200k；私有旧组合保留 compose.pre-notice-operation-20261005.yaml。整次汇总针对容量边界操作，普通原生 getBars 仍显示各自实际请求与请求等待时间，不声称任意多次原生调用共享一次业务跳转 ID。
 
 真实产品初轮还发现指标预热 promotion 会引发后续超限 read，之前按新边界任务重置统计。最终镜像将相同模型导航代次下这段原生内部收尾沿用 start/total/loaded/pages/batch；新的用户导航仍失效旧操作，缓存 purge 不继承。VM 模拟 promotion 后超限，确认计时、40 根与两页累计保留；最终真实产品再次运行通过，完成结果不再归零。
+
+## 合并前最终复核（2026-10-05）
+
+用户在人工验收后授权提交并合并PR。固定主线基线 `62488c6`，产品主修复 `30dce45`、验收状态 `6fafbf0`。最终 Standards 0项硬性违反/新增实质性问题；Spec唯一剩余P2是逐秒计时置于live region，现改为仅阶段消息播报。JSX实际树断言秒数不处于任何polite区域、累计统计/导航/加载回归与前端构建通过；[最终浏览器提示检查](verification/native-history/notice-operation-20261005/pr-final-notice-ui.json)验证5秒门槛、超限立即、跨批空档计时和清理通过。该无障碍增量不改变数据/导航策略。Ubuntu只更新web至上述pr-final镜像并reload tls，chart/API仍为前述匹配镜像。全分支扫描未包含凭据私钥或许可库路径；性能profile仅移除尾部多余空行，测量内容未改。
+
+合并不等于生产发布；后续发布需 `r19_native_history_loads` 迁移、专用历史worker及匹配API/web/chart/能力配置，既有PG行情缓存保留。

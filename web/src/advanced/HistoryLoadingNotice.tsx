@@ -93,7 +93,7 @@ export function HistoryLoadingNotice({
         {busy ? "正在加载历史数据" : "历史数据定位结果"}
         {groups.size > 1 ? ` · ${groups.size} 个品种周期` : ""}
       </strong>
-      <div role="status" aria-live="polite">
+      <div>
         {results.map(([key, notice]) => (
           <div
             className="history-loading-row history-capacity-result"
@@ -103,7 +103,7 @@ export function HistoryLoadingNotice({
               {notice.instrument}
               {notice.timeframe ? ` · ${notice.timeframe}` : ""}
             </b>
-            <span>{notice.message}</span>
+            <span role="status" aria-live="polite">{notice.message}</span>
             {notice.totalBars !== undefined && (
               <span>预计补齐 {notice.totalBars.toLocaleString()} 根 · 已补齐 {(notice.loadedBars || 0).toLocaleString()} 根</span>
             )}
@@ -150,7 +150,7 @@ export function HistoryLoadingNotice({
               <b>
                 {load.instrument} · {load.timeframe}
               </b>
-              <span>
+              <span role="status" aria-live="polite">
                 {rows.every((row) => row.ended)
                   ? "本次历史处理已结束"
                   : phases[load.phase]}

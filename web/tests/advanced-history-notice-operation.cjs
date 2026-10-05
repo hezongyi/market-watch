@@ -15,6 +15,13 @@ const load={instrument:"EURUSD",timeframe:"M5",phase:"filling",count:20000,start
   estimatedPages:5,pages:2,from:1000,to:2000,epoch:1,boundaryId:1,batch:2};
 const props={capacities:{source:notice},loads:{current:load},onCancel(){},onDismiss(){},onSettings(){}};
 let rendered=text(ctx.exports.HistoryLoadingNotice(props));
+const liveRegions = node => Array.isArray(node) ? node.flatMap(liveRegions) :
+  node && typeof node === "object" ? [
+    ...(node.props?.["aria-live"] === "polite" ? [text(node)] : []),
+    ...liveRegions(node.props?.children),
+  ] : [];
+assert.ok(liveRegions(ctx.exports.HistoryLoadingNotice(props)).every(value => !/\d+\s*秒/.test(value)),
+  "elapsed ticker must not announce seconds repeatedly through a live region");
 assert.match(rendered,/已等待\s*15\s*秒/,
   "elapsed must span the full boundary operation, not restart with its second 20k batch");
 assert.match(rendered,/预计补齐 60,000 根/);
