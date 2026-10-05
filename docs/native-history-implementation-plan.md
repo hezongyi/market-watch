@@ -1,6 +1,6 @@
 # 原生连续历史加载实施方案
 
-日期：2026-10-04；实施状态更新于 2026-10-05：P1～P4 已形成 Ubuntu 隔离候选，P5 自动验收证据已归档，原用户人工验收待反馈。详见 [逐项审计](native-history-completion-audit.md) 与 [验收交付](native-history-acceptance.md)。本文件保留技术路线和验收合同，未获得生产发布授权。
+日期：2026-10-04；实施状态更新于 2026-10-05：P1～P5 开发与验收已收口。用户确认原闪烁及功能正常，并对最新 `30dce45` 容量边界/提示候选反馈“我验收感觉可以”。详见 [逐项审计](native-history-completion-audit.md) 与 [最新验收](history-capacity-boundary-acceptance.md)。下文保留原实施合同；超限原位置交互已由用户后续授权的边界定位方案取代。未合并或发布生产。
 
 依据：[独立复评](native-history-decision-reassessment.md)、[性能证据](native-large-history-analysis.md)、[官方合同核查](native-large-history-official-research.md)。原问题规格中的静止光标、失败恢复、交易日历、指标、布局保持要求继续有效；其中“远跳默认有限窗口”的技术路线由本方案替代。
 
