@@ -8,6 +8,16 @@ export type HistoryCapabilities = {
   workspace_bars: number;
   response_bytes: number;
   task_seconds: number;
+  min_bars: number;
+  hard_max_bars: number;
+  default_bars: number;
+};
+
+export type HistoryProgress = {
+  phase:
+    "queued" | "checking" | "waiting" | "filling" | "delivering" | "applying";
+  pages?: number;
+  received?: number;
 };
 
 /** One final datafeed result; progress belongs to the host UI, not getBars. */
@@ -15,17 +25,24 @@ export async function loadNativeHistory(
   query: unknown,
   signal: AbortSignal,
   capabilities: HistoryCapabilities,
-  progress: (text: string) => void,
+  progress: (state: HistoryProgress) => void,
 ) {
   let handle: string | undefined;
   const deadline = Date.now() + capabilities.task_seconds * 1000;
   try {
+    progress({ phase: "checking" });
     let reply = await api(
       "/charts/history-loads",
       { request_id: crypto.randomUUID(), query },
       signal,
     );
-    if (reply.result) return reply.result;
+    if (reply.result) {
+      progress({
+        phase: "delivering",
+        received: reply.result.bars?.length || 0,
+      });
+      return reply.result;
+    }
     handle = reply.load?.id;
     if (!handle) throw Error("历史加载协议不匹配，请刷新工作区");
     let delay = 200;
@@ -47,11 +64,15 @@ export async function loadNativeHistory(
           error?.code || "HISTORY_UNAVAILABLE",
         );
       }
-      progress(
-        state?.pages
-          ? `正在加载历史，已缓存 ${state.pages} 页`
-          : "正在等待历史数据",
-      );
+      progress({
+        phase:
+          state?.state === "ready"
+            ? "delivering"
+            : state?.state === "filling" || state?.pages
+              ? "filling"
+              : "waiting",
+        pages: state?.pages || 0,
+      });
       if (state?.state === "ready")
         reply = await api(
           `/charts/history-loads/${handle}/result`,
@@ -77,10 +98,16 @@ export async function loadNativeHistory(
         };
         delay = Math.min(1500, delay * 1.4);
       }
-      if (reply.result) return reply.result;
+      if (reply.result) {
+        progress({
+          phase: "delivering",
+          pages: state?.pages || 0,
+          received: reply.result.bars?.length || 0,
+        });
+        return reply.result;
+      }
     }
   } finally {
-    progress("");
     if (handle)
       await api(
         `/charts/history-loads/${handle}/cancel`,

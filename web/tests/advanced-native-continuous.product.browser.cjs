@@ -340,6 +340,23 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
           frame.childFrames()[0];
         assert.ok(native);
         item.initial = await snapshot();
+        if (process.env.NATIVE_CAPACITY_NOTICE_ONLY === "1") {
+          phase = "capacity-notice";
+          await require("./native-capacity-notice.cjs")({
+            page,
+            frame,
+            native,
+            settle,
+            box,
+            snapshot,
+            item,
+            save,
+          });
+          assert.deepEqual(item.errors, []);
+          item.passed = true;
+          save();
+          continue;
+        }
         if (process.env.NATIVE_INTERACTIONS_FAST === "1") {
           phase = "interactions";
           await require("./native-continuous-interactions.cjs")({

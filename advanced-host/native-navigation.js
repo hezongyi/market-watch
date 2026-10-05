@@ -35,9 +35,11 @@ const MWNativeNavigation = (() => {
       ),
     );
   }
-  function admit(thread, amount, projection) {
+  function admit(thread, amount, projection, retained = false) {
     if (!Number.isSafeInteger(amount) || amount < 0)
       throw Error("无效历史预算");
+    // Lowering capacity preserves already loaded data and cached navigation.
+    if (amount === 0 && retained) return;
     const own = (thread._cache?.bars.length || 0) + amount;
     const total = [...threads.values()].reduce(
       (sum, t) =>
@@ -47,11 +49,19 @@ const MWNativeNavigation = (() => {
           weight(t, projection),
       0,
     );
-    if (own > limits.max_bars || total > limits.workspace_bars)
+    if (projection && amount === 0 && [...projection].every(([m, count]) =>
+      count <= (m.allStudies?.(false).length || 0))) return;
+    const sourceExceeded = own > limits.max_bars;
+    if (sourceExceeded || total > limits.workspace_bars) {
+      const resolution = thread._resolution || thread.mw_key.split("|")[1];
+      const period = ({"1":"M1","5":"M5","15":"M15","30":"M30","60":"H1","240":"H4","1D":"D1","1W":"W1","1M":"MN"})[resolution] || resolution;
+      const projected = sourceExceeded ? own : total;
+      const limit = sourceExceeded ? limits.max_bars : limits.workspace_bars;
       throw Object.assign(
-        Error("历史数据超过当前工作区预算，请提高周期或减小跨度"),
-        { code: "NATIVE_HISTORY_CAPACITY_EXCEEDED" },
+        Error(`${sourceExceeded ? period + " 历史数据" : "工作区图表及指标合计（加权）"}超过容量：预计 ${projected.toLocaleString("en-US")} 根，上限 ${limit.toLocaleString("en-US")} 根。当前图表已保留，可在汉堡菜单 → 历史数据容量中调整，或提高周期、选择更近日期`),
+        { code: "NATIVE_HISTORY_CAPACITY_EXCEEDED", budget_scope: sourceExceeded ? "source" : "workspace", projected_bars: projected, max_bars: limit },
       );
+    }
   }
   function replay(m, state) {
     const generation = state.generation,
@@ -241,7 +251,7 @@ const MWNativeNavigation = (() => {
                 (n, bar) => n + !resident.has(bar.time),
                 0,
               );
-              admit(thread, extra);
+              admit(thread, extra, undefined, true);
               complete(success, bars, meta);
             } catch (error) {
               fail(error);
@@ -270,6 +280,7 @@ const MWNativeNavigation = (() => {
       admit(
         thread,
         bars.reduce((n, b) => n + !resident.has(b.time), 0),
+        undefined, true,
       );
     },
     crosshairEnabled(value) {

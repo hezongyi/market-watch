@@ -9,6 +9,8 @@ import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
 import { MaintenanceDialog } from "./MaintenanceDialog";
 import { ExportDialog, type ExportSelection } from "./ExportDialog";
 import { providerSubscriptions } from "./providerSubscriptions";
+import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
+import { HistoryLoadingNotice, type NativeLoad } from "./HistoryLoadingNotice";
 
 type Workspace = {
   id: string;
@@ -50,7 +52,14 @@ export default function AdvancedWorkspace() {
   const [chartTheme, setChartTheme] = useState("dark");
   const [nativeReady, setNativeReady] = useState(false);
   const historyCapabilities = useRef<HistoryCapabilities | null>(null);
-  const [nativeLoads, setNativeLoads] = useState<Record<string, string>>({});
+  const nativeLoadEpoch = useRef(0);
+  const [nativeLoads, setNativeLoads] = useState<Record<string, NativeLoad>>(
+    {},
+  );
+  const [capacityDialog, setCapacityDialog] = useState<{
+    capabilities: HistoryCapabilities;
+    usage: number;
+  } | null>(null);
   const [status, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
   const frame = useRef<HTMLIFrameElement>(null),
@@ -92,6 +101,9 @@ export default function AdvancedWorkspace() {
     setNativeReady(false);
     setPollErrors({});
     setHistoryProgress({});
+    setNativeLoads({});
+    nativeLoadEpoch.current = 0;
+    setCapacityDialog(null);
     setDatasetViews({});
     setSyncNotices({});
     unsaved.current = false;
@@ -256,6 +268,102 @@ export default function AdvancedWorkspace() {
       }
       if (m.type === "history-plans-open") {
         setHistoryPlansOpen(true);
+        return;
+      }
+      if (m.type === "history-capacity-open") {
+        const epoch = nativeLoadEpoch.current;
+        try {
+          const capabilities = await api<HistoryCapabilities>(
+            "/charts/history-capabilities",
+          );
+          if (
+            source !== frame.current?.contentWindow ||
+            epoch !== nativeLoadEpoch.current
+          )
+            return;
+          historyCapabilities.current = capabilities;
+          reply({ type: "history-capabilities", capabilities });
+          setCapacityDialog({
+            capabilities,
+            usage: Number.isSafeInteger(m.usage) ? Math.max(0, m.usage) : 0,
+          });
+        } catch (e) {
+          if (
+            source === frame.current?.contentWindow &&
+            epoch === nativeLoadEpoch.current
+          )
+            setFeedError(String(e));
+        }
+        return;
+      }
+      if (m.type === "native-load-reset" && Number.isSafeInteger(m.epoch)) {
+        nativeLoadEpoch.current = m.epoch;
+        setNativeLoads({});
+        setCapacityDialog(null);
+        return;
+      }
+      if (
+        typeof m.id === "string" &&
+        m.id.length <= 100 &&
+        typeof m.type === "string" &&
+        m.type.startsWith("native-load-")
+      ) {
+        if (m.epoch !== nativeLoadEpoch.current) return;
+        if (m.type === "native-load-end") {
+          setNativeLoads((previous) => {
+            const load = previous[m.id];
+            if (!load) return previous;
+            const duration = Date.now() - load.started;
+            if (duration < 250 || duration >= 750) {
+              const next = { ...previous };
+              delete next[m.id];
+              return next;
+            }
+            return { ...previous, [m.id]: { ...load, ended: true } };
+          });
+          setTimeout(
+            () =>
+              setNativeLoads((previous) => {
+                if (!previous[m.id]?.ended) return previous;
+                const next = { ...previous };
+                delete next[m.id];
+                return next;
+              }),
+            750,
+          );
+          return;
+        }
+        setNativeLoads((previous) => {
+          const next = { ...previous };
+          if (
+            m.type === "native-load-start" &&
+            typeof m.instrument === "string" &&
+            m.instrument.length <= 80 &&
+            frames.has(m.timeframe) &&
+            Number.isSafeInteger(m.count) &&
+            m.count > 0 &&
+            Number.isFinite(m.from) &&
+            Number.isFinite(m.to)
+          ) {
+            next[m.id] = {
+              instrument: m.instrument,
+              timeframe: m.timeframe,
+              count: m.count,
+              from: m.from,
+              epoch: m.epoch,
+              to: m.to,
+              started: Date.now(),
+              phase: "queued",
+            };
+          } else if (m.type === "native-load-applying" && next[m.id]) {
+            next[m.id] = {
+              ...next[m.id],
+              phase: "applying",
+              received: m.count,
+            };
+          }
+          return next;
+        });
         return;
       }
       if (
@@ -757,12 +865,20 @@ export default function AdvancedWorkspace() {
                       body,
                       signal,
                       historyCapabilities.current!,
-                      (text) =>
+                      (progress) =>
                         setNativeLoads((previous) => {
-                          const next = { ...previous };
-                          if (text) next[String(m.id)] = text;
-                          else delete next[String(m.id)];
-                          return next;
+                          const key = q.history_progress_id;
+                          if (
+                            source !== frame.current?.contentWindow ||
+                            q.history_progress_epoch !==
+                              nativeLoadEpoch.current ||
+                            !previous[key]
+                          )
+                            return previous;
+                          return {
+                            ...previous,
+                            [key]: { ...previous[key], ...progress },
+                          };
                         }),
                     )
                 : (body: unknown, signal: AbortSignal) =>
@@ -935,16 +1051,21 @@ export default function AdvancedWorkspace() {
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
       {Object.keys(nativeLoads).length > 0 && (
-        <div className="advanced-loading-notice" role="status">
-          {Object.values(nativeLoads).join("；")}
-          <button
-            onClick={() => {
-              post({ type: "cancel-history" });
-            }}
-          >
-            取消历史加载
-          </button>
-        </div>
+        <HistoryLoadingNotice
+          loads={nativeLoads}
+          onCancel={() => post({ type: "cancel-history" })}
+        />
+      )}
+      {capacityDialog && (
+        <HistoryCapacityDialog
+          {...capacityDialog}
+          theme={chartTheme}
+          onClose={() => setCapacityDialog(null)}
+          onSaved={(capabilities) => {
+            historyCapabilities.current = capabilities;
+            post({ type: "history-capabilities", capabilities });
+          }}
+        />
       )}
       {historyPlansOpen && (
         <HistoryPlansDialog

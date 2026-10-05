@@ -1,5 +1,7 @@
 # 原生连续历史候选验收
 
+**后续候选（2026-10-05）：** 当前 Ubuntu 人工入口已更新为默认 200,000 根、可调容量与完整加载提示，具体配置、镜像及验证见 [容量与提示验收](history-capacity-loading-acceptance.md)。下文80k预算/旧镜像为之前候选记录，不能作为当前运行配置。
+
 2026-10-05；独立 worktree `market-watch-chart-sync`，分支 `fix/native-chart-window-sync`，当前产品提交 `2468143`（API/web 构建 `b3dd20c`）。用户确认原闪烁已消失、各项功能正常；更远周 bar 容量提示仍在核查，未合并或发布生产。新增核验见 [逐项审计](native-history-completion-audit.md)。
 
 ## 访问与运行

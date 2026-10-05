@@ -476,9 +476,13 @@ const feed = {
   },
   getBars: async (s, res, p, cb, err) => {
     const loadEpoch=workspaceEpoch;
+    const loadId=crypto.randomUUID();
     const historyKey=s.ticker+'|'+res;
     const workKey=historyKey+'|'+(s.mw_window || '');
     const isProvider=decode(s.ticker).series_kind==='provider';
+    if(isProvider) send({type:'native-load-start',id:loadId,epoch:loadEpoch,
+      instrument:decode(s.ticker).symbol,timeframe:frames[res],
+      count:p.countBack,from:p.from*1000,to:p.to*1000});
     const providerWork=isProvider ? (providerHistoryWork.get(workKey) ||
       {symbol:s.ticker,res,window:s.mw_window,inflight:0,generation:0,correction:null,reloading:false}) : null;
     if(providerWork) {
@@ -507,7 +511,7 @@ const feed = {
         // Native requirements pass unchanged; the backend owns cache policy
         // and provider pagination, including demands larger than one page.
         const epoch = workspaceEpoch, reserveStarted = globalThis.performance?.now() || 0;
-        const args={limit:p.countBack,
+        const args={limit:p.countBack,history_progress_id:loadId,history_progress_epoch:loadEpoch,
           countBack:p.countBack, from:p.from*1000, before:p.to*1000,
           firstDataRequest:p.firstDataRequest, client:clientId,
           native_history:nativeHistoryContext(s.ticker,res)};
@@ -575,6 +579,7 @@ const feed = {
           lastHistory.set(key,Math.max(lastHistory.get(key)||0,rows.at(-1).time));
           firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,rows[0].time));
         }
+        send({type:'native-load-applying',id:loadId,epoch:loadEpoch,count:rows.length});
         cb(rows,{noData:boundary});
         if (globalThis.MWNativeReserve)
           requestAnimationFrame(() => MWNativeReserve.delivered(s, res, performance.now() - reserveStarted));
@@ -633,6 +638,10 @@ const feed = {
       if (e.code !== "HISTORY_CANCELLED")
         send({ type: "error", error: String(e) });
     } finally {
+      // Keep the notice through native callback processing and the next paint.
+      // No reset or synthetic barset is introduced for UI feedback.
+      if(isProvider) requestAnimationFrame(()=>requestAnimationFrame(()=>
+        send({type:'native-load-end',id:loadId,epoch:loadEpoch})));
       if(providerWork) {
         providerWork.inflight--;
         if(loadEpoch===workspaceEpoch) setTimeout(()=>flushProviderCorrections(),0);
@@ -1418,6 +1427,7 @@ function boot(
           send({ type: "error", error: String(e) }),
           grid, [
             {label: "守望主页", run: () => send({type: "workspace-action", action: "home"})},
+            {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
                 const epoch = workspaceEpoch;
@@ -1541,6 +1551,7 @@ function boot(
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
+      send({type:'native-load-reset',epoch:workspaceEpoch});
       for(const [id,sub] of subscriptions) if(sub.providerListener) feed.unsubscribeBars(id);
       providerHistoryState.clear();
       providerHistoryWork.clear();
@@ -1654,6 +1665,9 @@ addEventListener("message", async (e) => {
     clearTimeout(p.cancellationTimer);
     m.error ? p.reject(Object.assign(Error(m.error),m.errorDetails)) : p.resolve(m.result);
     drain();
+  } else if (m.type === "history-capabilities") {
+    MWNativeNavigation.setCapabilities(m.capabilities);
+    globalThis.MW_HISTORY_CAPABILITIES=m.capabilities;
   } else if (m.type === "cancel-history") {
     MWNativeNavigation.cancelAll();
   } else if (m.type === "init" && !widget) {

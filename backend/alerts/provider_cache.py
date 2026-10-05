@@ -142,12 +142,14 @@ def ensure(meta, frame):
 
 @contextmanager
 def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=None,
-                         native_from=None, prefix=0, reserve=0, planning=False):
+                         native_from=None, prefix=0, reserve=0, planning=False, history_limit=None):
     """One short repeatable-read observation; metadata is decoded exactly once.
 
     Planning counts indexed timestamps and reads just the tail while coverage is
     incomplete. No provider I/O is allowed while this transaction is open.
     """
+    if planning and history_limit is None:
+        history_limit = capacity()
     with transaction() as db:
         if db.get_bind().dialect.name == "postgresql":
             db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
@@ -170,17 +172,17 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
         if planning:
             if native_from is not None:
                 ranged = select(ProviderBar.chart_time).where(*predicate,
-                    ProviderBar.chart_time >= native_from).limit(capacity() + 1).subquery()
+                    ProviderBar.chart_time >= native_from).limit(history_limit + 1).subquery()
                 in_range = db.scalar(select(func.count()).select_from(ranged))
             demand = max(count, in_range)
             times = select(ProviderBar.chart_time).where(*predicate).order_by(
-                ProviderBar.chart_time.desc()).limit(min(capacity() + 1, demand + prefix + reserve + 1)).subquery()
+                ProviderBar.chart_time.desc()).limit(min(history_limit + 1, demand + prefix + reserve + 1)).subquery()
             available = db.scalar(select(func.count()).select_from(times))
-            if demand + prefix > capacity():
-                raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
+            if demand + prefix > history_limit:
+                raise CapacityExceeded(f"历史请求及指标前缀需要 {demand + prefix:,} 根，上限 {history_limit:,} 根。请在汉堡菜单 → 历史数据容量中调整")
             range_done = native_from is None or bool(readable and readable[0] <= native_from)
             enough = available >= demand + prefix or bool(metadata.earliest and readable and readable[0] == 0)
-            limit = min(capacity() + 1, demand + prefix + reserve + 1) if (range_done and enough) or window_limit else 1
+            limit = min(history_limit + 1, demand + prefix + reserve + 1) if (range_done and enough) or window_limit else 1
         records = db.execute(select(ProviderBar.chart_time, ProviderBar.payload).where(*predicate)
                              .order_by(ProviderBar.chart_time.desc()).limit(limit)).all()
         rows = [r.payload for r in reversed(records)]
@@ -564,7 +566,8 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
     """
     if body.timeframe not in frames(meta["source"]):
         raise ValueError("无效平台周期")
-    if count + prefix > capacity():
+    history_limit = capacity()
+    if count + prefix > history_limit:
         raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
     if body.from_time is not None and body.from_time >= (body.before or before):
         raise ValueError("原生历史区间须满足from<to")
@@ -577,20 +580,22 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
     hot = None
     no_progress = 0
     previous = None
-    page_budget = min(settings.native_history_task_pages, (capacity() + cap - 1) // cap + 8)
+    page_budget = min(settings.native_history_task_pages, (history_limit + cap - 1) // cap + 8)
     for _ in range(page_budget):
         check_cancelled()
         if time.monotonic() >= deadline:
             raise TimeoutError("平台读取超过时间预算，请重试")
         # One bounded statement discovers the real range demand, prefix and E.
         # No metadata from another observation is attached to these bars.
+        history_limit = capacity()
         with snapshot_transaction(key, before, count,
                                   observation=body.history_observation, native_from=from_time,
-                                  prefix=prefix, reserve=3000, planning=True) as (db, state):
+                                  prefix=prefix, reserve=3000, planning=True,
+                                  history_limit=history_limit) as (db, state):
             bars = state["bars"]
             in_range = state["range_count"]
             demand = max(count, in_range)
-            if demand + prefix > capacity():
+            if demand + prefix > history_limit:
                 raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
             connected = state["interval"]
             recent_tail = (latest and state["preceding"] and
@@ -610,6 +615,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
                 cold_extra=settings.provider_native_cold_extra_bars,
                 first_extra=settings.provider_native_first_extra_bars,
                 history_extra=settings.provider_native_history_extra_bars,
+                history_limit=history_limit,
             )
             if mandatory_done and fresh:
                 # Prefix is immediately before D. E never changes Python inputs.
@@ -648,7 +654,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             # count still needs a page, spare HTTP capacity may include E; it
             # never controls the next page's stopping condition.
             amount = min(cap, missing if range_done or missing > 1 else cap)
-            attached = min(optional, max(0, cap - amount), max(0, capacity() - demand - prefix))
+            attached = min(optional, max(0, cap - amount), max(0, history_limit - demand - prefix))
         fetch_page(key, meta, body.timeframe, cursor, amount, deadline,
                    kind=LANE.get() or "chart", latest=latest and cursor == before,
                    optional=attached)

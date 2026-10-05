@@ -37,8 +37,10 @@ def admit(body):
     for spec in body.indicators:
         validate(spec)
     prefix = max((history_requirement(spec) for spec in body.indicators), default=0)
-    if max(body.limit, body.count_back or 0) + prefix > capacity():
-        raise CapacityExceeded("历史必需量与指标前缀超过预算，请提高周期或减小跨度")
+    limit = capacity()
+    required = max(body.limit, body.count_back or 0) + prefix
+    if required > limit:
+        raise CapacityExceeded(f"历史请求及指标前缀需要 {required:,} 根，上限 {limit:,} 根。请在汉堡菜单 → 历史数据容量中调整，或提高周期、减小跨度")
 
 
 @contextmanager

@@ -142,6 +142,11 @@ class HistoryLoadQuery(BaseModel):
     query: DataQuery
 
 
+class HistoryCapacityWrite(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    max_bars: int
+
+
 class ExportQuery(BaseModel):
     instrument: str = Field(max_length=80)
     series_kind: SeriesKind = "managed"
@@ -606,6 +611,14 @@ def router(authenticated):
     def history_capabilities():
         from .provider_history_policy import capabilities
         return capabilities()
+
+    @r.post("/history-capacity")
+    def history_capacity(body: HistoryCapacityWrite):
+        from .provider_history_policy import save_capacity
+        try:
+            return save_capacity(body.max_bars)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
 
     async def history_operation(operation, *args):
         from .provider_history_policy import CapacityExceeded

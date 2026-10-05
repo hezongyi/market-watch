@@ -345,6 +345,27 @@ def test_ready_history_activation_reuses_snapshot_connection(provider_pg, monkey
     assert result['cache_hit'] and len(result['bars']) >= 3
 
 
+def test_native_capacity_policy_never_checks_out_inside_snapshot(provider_pg, monkeypatch):
+    from alerts.chart_api import DataQuery
+    from test_provider_cache import seed
+    _, engine = provider_pg
+    # Use the same private test schema with only one connection available.
+    with engine.connect() as db:
+        schema = db.scalar(text("SELECT current_schema()"))
+    single = create_engine(engine.url, connect_args={"options": f"-csearch_path={schema}"},
+                           pool_size=1, max_overflow=0, pool_timeout=0.2)
+    monkeypatch.setattr(storage, "Session", sessionmaker(single, expire_on_commit=False))
+    try:
+        seed(META, 'M5', 100000, page(90000, 100000))
+        monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+        monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('cached demand'))
+        result = cache.data(DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
+            before=100000, countBack=3, native_history={'chart_count':1,'focused':True}))
+        assert result['cache_hit'] and len(result['bars']) >= 3
+    finally:
+        single.dispose()
+
+
 def test_expired_pool_waiter_executes_no_provider_statement(provider_pg):
     from sqlalchemy import event
     from test_provider_cache import seed

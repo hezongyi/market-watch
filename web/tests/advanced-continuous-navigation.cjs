@@ -90,6 +90,83 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   navigation.unbindThread(one);
   navigation.unbindThread(two);
   assert.equal(navigation.diagnostics().threads, 0);
+  const bounded = thread();
+  bounded._cache.bars = Array.from({ length: 80 }, (_, time) => ({ time }));
+  navigation.bindThread(bounded, "5");
+  let budgetError;
+  bounded._datafeed.getBars(
+    bounded._symbolInfo,
+    "5",
+    { countBack: 21 },
+    () => {},
+    (e) => {
+      budgetError = e;
+    },
+  );
+  await run();
+  assert.equal(budgetError.budget_scope, "source");
+  assert.equal(budgetError.projected_bars, 101);
+  assert.equal(budgetError.max_bars, 100);
+  assert.match(budgetError.message, /M5.*101.*100.*更近日期/);
+  assert.equal(navigation.diagnostics().pending, 0);
+  const callsBefore = pending.length;
+  bounded._datafeed.getBars(
+    bounded._symbolInfo,
+    "5",
+    { countBack: 10 },
+    () => {},
+    () => {},
+  );
+  assert.equal(
+    pending.length,
+    callsBefore + 1,
+    "in-budget uncached read proceeds after real admission rejection",
+  );
+  bounded.mw_read.cancel();
+  navigation.setCapabilities({
+    protocol: 1,
+    mode: "continuous",
+    max_bars: 120,
+    workspace_bars: 200,
+  });
+  const raisedCalls = pending.length;
+  bounded._datafeed.getBars(
+    bounded._symbolInfo,
+    "5",
+    { countBack: 21 },
+    () => {},
+    (e) => {
+      if (e.code !== "HISTORY_CANCELLED") throw e;
+    },
+  );
+  assert.equal(
+    pending.length,
+    raisedCalls + 1,
+    "raising capacity admits the previously rejected request without reset",
+  );
+  bounded.mw_read.cancel();
+  navigation.setCapabilities({
+    protocol: 1,
+    mode: "continuous",
+    max_bars: 50,
+    workspace_bars: 100,
+  });
+  assert.doesNotThrow(
+    () => navigation.admitCached(bounded, [{ time: 1 }]),
+    "lowering capacity preserves navigation in resident data",
+  );
+  assert.throws(
+    () => navigation.admitCached(bounded, [{ time: 81 }]),
+    /容量/,
+    "lowered limit still rejects new growth",
+  );
+  navigation.setCapabilities({
+    protocol: 1,
+    mode: "continuous",
+    max_bars: 100,
+    workspace_bars: 150,
+  });
+  navigation.unbindThread(bounded);
   // Pending asynchronous creations must be charged before studies appear in
   // allStudies. Cancellation and rejection release the reservation.
   const event = () => ({ subscribe() {}, unsubscribeAll() {} });
@@ -144,7 +221,7 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   const firstStudy = model.insertStudyWithParams({});
   assert.throws(
     () => model.insertStudyWithParams({}),
-    /预算/,
+    /容量/,
     "parallel insertion reserves cost",
   );
   firstStudy.cancel();
@@ -156,9 +233,25 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   await run();
   assert.throws(
     () => model.insertStudyWithParams({}),
-    /预算/,
+    /容量/,
     "resolved study remains charged",
   );
+  navigation.setCapabilities({
+    protocol: 1,
+    mode: "continuous",
+    max_bars: 50,
+    workspace_bars: 100,
+  });
+  assert.doesNotThrow(
+    () => navigation.admitTemplate(model, { panes: [] }),
+    "lowering capacity must still allow reducing indicator load",
+  );
+  navigation.setCapabilities({
+    protocol: 1,
+    mode: "continuous",
+    max_bars: 100,
+    workspace_bars: 150,
+  });
   assert.doesNotThrow(() =>
     navigation.admitTemplate(model, {
       panes: [
@@ -177,7 +270,7 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
       navigation.admitTemplate(model, {
         panes: [{ sources: [{ type: "Study" }, { type: "Study" }] }],
       }),
-    /预算/,
+    /容量/,
     "template replacement is admitted before pane mutation",
   );
   const light = { panes: [{ sources: [{ type: "Study" }] }] },
@@ -191,7 +284,7 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
   assert.throws(
     () =>
       navigation.admitHistory({ commands: () => [templateCommand] }, "undo"),
-    /预算/,
+    /容量/,
     "nested macro preflight rejects before native history pops or runs commands",
   );
   shared._cache.bars = shared._cache.bars.slice(0, 40);
@@ -220,7 +313,7 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
         { commands: () => [templateCommand, peerCommand] },
         "undo",
       ),
-    /预算/,
+    /容量/,
     "macro admission accumulates projected costs across charts before popping",
   );
   assert.throws(
@@ -229,7 +322,7 @@ const run = () => new Promise((resolve) => setImmediate(resolve));
         { _commands: [templateCommand, peerCommand] },
         {},
       ),
-    /预算/,
+    /容量/,
     "checkpoint preflight accumulates costs before its first mutation",
   );
   assert.doesNotThrow(() =>
