@@ -1,0 +1,33 @@
+{
+  "version": "1.9.0",
+  "release_tag": "v1.9.0",
+  "release_scope": "Source publication only; no runtime switch, production deployment, container build or relabeling.",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/9",
+  "tested_branch_commit": "716ad583da52d59bc4e119127cdb4f60e2000348",
+  "tested_functional_commit": "fcd9ac8b1deb21f1fd1972bbeb10488132afefd0",
+  "integrated_main": "2ee5cb7327dd525a0ab64d983d2d9db8ea4f45d7",
+  "source_commit_resolution": "Resolve v1.9.0^{commit} for final main merge commit; annotated tag must point to that commit.",
+  "previous_source_tag": "v1.8.0",
+  "delivery_document": "docs/chart-v1.9.0-source-delivery.md",
+  "verification": "docs/verification/indicator-picker/release-audit.json",
+  "functional_acceptance": {
+    "backend_tests": 75,
+    "full_product_cases": 20,
+    "real_provider": "Binance BTCUSDT M5",
+    "numerical_plots": 10,
+    "review": "docs/verification/indicator-picker/review.md",
+    "browser": "docs/verification/indicator-picker/review-integration.json"
+  },
+  "schema": "r19_native_history_loads",
+  "new_migrations": [],
+  "dependencies_changed": false,
+  "images": {},
+  "acceptance_runtime": "docs/verification/indicator-picker/runtime.json",
+  "acceptance_image_version": "1.8.0",
+  "tag_relation": "Runtime, tests and dependencies identical to accepted implementation; root versions and release documentation updated separately.",
+  "notifications_sent": false,
+  "rollback": {
+    "previous_source_tag": "v1.8.0",
+    "runtime_effect": "Source publication does not switch running instances; production rollback follows its existing backup and image manifest."
+  }
+}
