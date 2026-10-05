@@ -86,7 +86,33 @@ _ALIASES = {
     "ATR": ["Average True Range"],
     "STOCH": ["Stochastic", "随机指标"],
 }
+_DETAILS = {
+    "SMA": ("平滑价格，观察趋势。", "取最近 period 根收盘价的算术平均值。"),
+    "EMA": ("观察更重视近期价格的趋势。", "对收盘价递归加权，近期价格权重更高。"),
+    "LWMA": ("观察更重视近期价格的趋势。", "对最近 period 根收盘价线性加权，越近权重越高。"),
+    "BBANDS": (
+        "观察价格相对均线的位置与波动范围。",
+        "中轨为简单均线，上下轨为中轨加减 deviation 倍标准差。",
+    ),
+    "RSI": (
+        "比较近期上涨与下跌幅度，观察价格动量。",
+        "按 period 平滑平均涨跌幅，换算为 0 至 100 的相对强弱值。",
+    ),
+    "MACD": (
+        "观察快慢趋势差异及动量变化。",
+        "快线 EMA 减慢线 EMA 得到 MACD，signal 为其 EMA，柱线为两者之差。",
+    ),
+    "ATR": (
+        "衡量波动幅度，不表示涨跌方向。",
+        "真实波幅取当根高低差及相对前收盘价差的最大值，再按 period 平滑。",
+    ),
+    "STOCH": (
+        "观察收盘价在近期高低区间的位置。",
+        "以 k 根高低区间计算位置比例，依次用 smooth 和 d 简单均线得到 K、D。",
+    ),
+}
 for _name, _meta in CATALOG.items():
+    _meta["description"], _meta["calculation"] = _DETAILS[_name]
     _meta["series"] = [
         {"key": key, "type": "histogram" if key == "histogram" else "line"}
         for key in _OUTPUTS.get(_name, ("value",))
@@ -107,6 +133,9 @@ def _validate_metadata(name, meta):
         raise ValueError(f"{name}: metadata must be a dictionary")
     if not isinstance(meta.get("label"), str) or not meta["label"]:
         raise ValueError(f"{name}: label must be a nonempty string")
+    for field in ("description", "calculation"):
+        if field in meta and not isinstance(meta[field], str):
+            raise ValueError(f"{name}: {field} must be a string")
     if not isinstance(meta.get("aliases", []), list) or any(
         not isinstance(alias, str) for alias in meta.get("aliases", [])
     ):
@@ -183,10 +212,15 @@ for _name, _meta in CATALOG.items():
 
 def public_catalog():
     """Only serializable display/contract fields; never invoke calculators."""
-    fields = ("label", "aliases", "pane", "params", "parameter_schema", "series", "levels")
+    fields = ("label", "aliases", "pane", "params", "levels", "description", "calculation")
     return {
         name: {
             **deepcopy({key: meta[key] for key in fields if key in meta}),
+            "series": [{key: item[key] for key in ("key", "type")} for item in meta["series"]],
+            "parameter_schema": {
+                parameter: {key: rule[key] for key in ("type", "min", "max", "default")}
+                for parameter, rule in meta["parameter_schema"].items()
+            },
             "version": "1",
             "source": "Python",
         }

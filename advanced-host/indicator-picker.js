@@ -325,6 +325,10 @@ function chartIndicatorPicker(chartWidget, catalog, report) {
         );
         const details = el("details");
         details.append(el("summary", "详情"));
+        if (entry.meta?.description)
+          details.append(el("p", `用途：${entry.meta.description}`));
+        if (entry.meta?.calculation)
+          details.append(el("p", `计算：${entry.meta.calculation}`));
         details.ontoggle = () => {
           if (!details.open || details.dataset.loaded) return;
           details.dataset.loaded = "true";
