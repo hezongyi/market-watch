@@ -71,7 +71,15 @@
     "browser_independently_repeated": true
   },
   "pending": [
-    "Merge, annotated v1.8.0 tag, production build and deployment"
+    "Authenticated formal-domain browser and native chart verification requires the current production administrator credential. Existing private local credentials returned 401; no password reset or authentication bypass performed."
   ],
-  "ubuntu_acceptance": "ubuntu-acceptance.json"
+  "ubuntu_acceptance": "ubuntu-acceptance.json",
+  "release_status": {
+    "repair_pr": 8,
+    "merged": true,
+    "annotated_tag_pushed": "v1.8.0",
+    "production_deployed": true,
+    "production_browser_authenticated": false,
+    "production_manifest": "deploy/releases/v1.8.0-production.json"
+  }
 }
