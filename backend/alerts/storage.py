@@ -251,6 +251,58 @@ class PricingOwner(Base):
     error: Mapped[str | None] = mapped_column(String(32))
 
 
+class RealtimeMapping(Base):
+    __tablename__ = "market_realtime_mappings"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    target_dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"))
+    permission_scope: Mapped[str] = mapped_column(String(80))
+    match: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class MarketComposite(Base):
+    __tablename__ = "market_composites"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), unique=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    mapping_id: Mapped[str] = mapped_column(ForeignKey("market_realtime_mappings.id"))
+    permission_scope: Mapped[str] = mapped_column(String(80))
+    rules: Mapped[dict] = mapped_column(JSON)
+    active_revision_id: Mapped[str | None] = mapped_column(String(36))
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class CompositeRevision(Base):
+    __tablename__ = "market_composite_revisions"
+    __table_args__ = (UniqueConstraint("composite_id", "request_id"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    composite_id: Mapped[str] = mapped_column(ForeignKey("market_composites.id"), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"))
+    mapping_id: Mapped[str] = mapped_column(ForeignKey("market_realtime_mappings.id"))
+    parent_revision_id: Mapped[str | None] = mapped_column(String(36))
+    seam: Mapped[int] = mapped_column(BigInteger)
+    rules: Mapped[dict] = mapped_column(JSON)
+    request_id: Mapped[str] = mapped_column(String(100))
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    activated_at: Mapped[int | None] = mapped_column(BigInteger)
+
+
+class CompositePreparation(Base):
+    __tablename__ = "market_composite_preparations"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    status: Mapped[str] = mapped_column(String(24), default="pending")
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    cutoff: Mapped[int] = mapped_column(BigInteger)
+    confirmed_end: Mapped[int] = mapped_column(BigInteger, default=0)
+    input_revision: Mapped[int] = mapped_column(BigInteger, default=0)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(40))
+    state: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
 class LiveState(Base):
     __tablename__ = "market_live_states"
     dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
@@ -303,11 +355,22 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Historical snapshots cannot be deleted by runtime writers")
         if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)):
             raise ValueError("Explicit dataset/source bindings cannot be removed by runtime writers")
+        if isinstance(row, (RealtimeMapping, MarketComposite, CompositeRevision)):
+            raise ValueError("Composite identities and revisions cannot be removed by runtime writers")
         if isinstance(row, Instrument) and db.scalar(
                 select(MarketDataset.id).where(MarketDataset.instrument_id == row.id)):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
+        if isinstance(row, RealtimeMapping) and any(attr.history.has_changes() for attr in state.attrs):
+            raise ValueError("Realtime mappings are immutable; save a new mapping version")
+        if isinstance(row, MarketComposite) and any(state.attrs[key].history.has_changes() for key in (
+                "id", "instrument_id", "dataset_id", "mapping_id", "permission_scope", "rules", "created_at")):
+            raise ValueError("Composite definitions are immutable")
+        if isinstance(row, CompositeRevision) and any(state.attrs[key].history.has_changes() for key in (
+                "id", "composite_id", "history_version_id", "mapping_id", "parent_revision_id", "seam", "rules",
+                "request_id", "created_at")):
+            raise ValueError("Composite baseline, seam and rules are immutable")
         if isinstance(row, HistoryReadAttempt):
             previous = state.attrs.finished_at.history
             completed = (bool(previous.deleted and previous.deleted[0] is not None) or

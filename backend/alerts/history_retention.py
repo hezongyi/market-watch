@@ -19,6 +19,7 @@ from .storage import (
     ChartPublicationJob,
     ChartPublishedBar,
     ChartWorkspace,
+    CompositeRevision,
     DatasetMaintenance,
     DatasetReclamation,
     HistoryArtifact,
@@ -29,9 +30,11 @@ from .storage import (
     HistoryVersion,
     ImportJob,
     LiveState,
+    MarketComposite,
     MarketCoverage,
     MarketDataset,
     MarketDemand,
+    RealtimeMapping,
     Replay,
     SignalRow,
     SourceBlob,
@@ -59,6 +62,12 @@ def reference_values(row):
     if isinstance(row, Replay):
         return {"instrument_id": row.instrument_id, "dataset_version": row.dataset_version,
                 "input_manifest": row.input_manifest}
+    if isinstance(row, RealtimeMapping):
+        return {"dataset_id": row.dataset_id, "target_dataset_id": row.target_dataset_id}
+    if isinstance(row, MarketComposite):
+        return {"dataset_id": row.dataset_id}
+    if isinstance(row, CompositeRevision):
+        return {"history_version_id": row.history_version_id}
     if isinstance(row, Watch):
         return {"instrument_id": row.instrument_id, "rule": row.rule}
     if isinstance(row, ChartAlertVersion):
@@ -100,7 +109,7 @@ def lock_reference_values(db, document):
         if isinstance(value, dict):
             for key, child in value.items():
                 if key in {"version_id", "dataset_version", "parent_version_id", "parent_version",
-                           "derived_from_version", "history_version_id", "dataset_id", "dataset"} and isinstance(child, str):
+                           "derived_from_version", "history_version_id", "dataset_id", "target_dataset_id", "dataset"} and isinstance(child, str):
                     yield child
                 yield from declared_refs(child)
         elif isinstance(value, (tuple, list)):
