@@ -7,6 +7,7 @@ the first-use command for a saved, eligible composite candidate.
 import hashlib
 import json
 from datetime import datetime, timezone
+from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, select
@@ -32,7 +33,8 @@ from .storage import (
 def composite_definition(db, ident):
     composite = db.get(MarketComposite, ident)
     if composite and composite.permission_scope == "workspace:default":
-        return composite.dataset_id, composite.mapping_id, composite
+        revision = db.get(CompositeRevision, composite.active_revision_id)
+        return db.get(HistoryVersion, revision.history_version_id).dataset_id, revision.mapping_id, composite
     for mapping in db.scalars(select(RealtimeMapping).where(
             RealtimeMapping.permission_scope == "workspace:default")):
         try:
@@ -81,7 +83,8 @@ def metadata(db, ident, kind):
     return {"id": ident, "symbol": dataset.logical_symbol, "name": inst.label,
         "series_kind": kind, "source": dataset.identity["source"] if kind == "history" else "composite",
         "historical_source": dataset.identity["source"], "basis": inst.basis,
-        "calendar": inst.calendar, "precision": max(inst.precision, target.precision) if kind == "composite" else inst.precision,
+        "calendar": revision.rules["aggregation_calendar"] if kind == "composite" and composite else inst.calendar,
+        "precision": max(inst.precision, target.precision) if kind == "composite" else inst.precision,
         "frames": [frame for frame in FRAMES if frame in frames], "volume_kind": volume_kind,
         "volume_unit": volume_unit, **binding}
 
@@ -102,7 +105,7 @@ def chart_data(db, body):
         inst = db.get(Instrument, db.get(MarketDataset, parent.dataset_id).instrument_id)
     else:
         dataset, mapping, composite = composite_definition(db, body.instrument)
-        if body.client:
+        if body.client and not composite:
             composite = first_use(db, dataset, mapping)
             if composite.id != body.instrument:
                 raise ValueError("首次使用身份与候选不一致")
@@ -111,9 +114,15 @@ def chart_data(db, body):
         page = composite_page(db, composite.id, body.timeframe, before=body.before, count=body.limit,
             revision_id=body.composite_revision_id, input_revision=body.input_revision,
             provisional=body.provisional and body.input_revision is None, now=stamp)
-        inst = db.get(Instrument, composite.instrument_id)
+        selected = db.get(CompositeRevision, page["revision_id"])
+        parent = db.get(HistoryVersion, selected.history_version_id)
+        meta["calendar"] = selected.rules["aggregation_calendar"]
+        meta["history_version_id"], meta["mapping_id"] = parent.id, selected.mapping_id
+        meta["dataset_id"], meta["seam"] = parent.dataset_id, selected.seam
+        target_inst = db.get(Instrument, db.get(MarketDataset, db.get(RealtimeMapping, selected.mapping_id).target_dataset_id).instrument_id)
+        inst = SimpleNamespace(id=composite.instrument_id, calendar=meta["calendar"], calendar_profile=target_inst.calendar_profile)
         if body.client:
-            renew_demand(db, body.client, inst)
+            renew_demand(db, body.client, db.get(Instrument, composite.instrument_id))
     for bar in page["bars"]:
         if body.timeframe in ("D1", "W1", "MN"):
             bar["chart_time"] = fixed_label(bar, body.timeframe, meta["calendar"])

@@ -8,6 +8,7 @@ import {
 import { api, type Bar } from "../api";
 import Chart from "../Chart";
 import { Feedback, Pager } from "./Center";
+import { CompositeRevisions } from "./CompositeRevisions";
 import { useSnapshot } from "./useSnapshot";
 import { frames, names, phase, time, type Dataset, type Page } from "./types";
 
@@ -811,6 +812,7 @@ export function CompositeDetail() {
           )}
           {section === "seam" && (
             <>
+              <CompositeRevisions key={id} id={id!} active={row.active_revision_id} onChanged={()=>setRefresh(value=>value+1)}/>
               <h2>固定分段归属</h2>
               <div className="table-scroll">
                 <table>

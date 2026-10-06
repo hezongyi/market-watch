@@ -11,7 +11,7 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "ai36_composite_alerts"
+HEAD = "aj37_composite_revision_changes"
 
 
 def configuration():

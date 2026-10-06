@@ -38,6 +38,8 @@
 .dc-tabs button[aria-pressed="true"] { color: var(--green); box-shadow: inset 0 -3px var(--green); font-weight: 600; }
 .data-center form.dc-form { display: grid; gap: 24px; max-width: 760px; }
 .data-center form.dc-form > label { display: grid; gap: 8px; }
+.data-center form.dc-form > label.dc-inline-check { display: flex; flex-direction: row; align-items: center; gap: 12px; }
+.data-center .dc-inline-check input { width: 20px; min-height: 20px; flex: 0 0 20px; }
 .data-center form.dc-form textarea { min-height: 100px; font: inherit; width: 100%; }
 .dc-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin: 0; }
 .dc-facts div { min-width: 0; }

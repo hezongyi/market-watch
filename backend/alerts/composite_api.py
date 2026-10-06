@@ -48,6 +48,62 @@ def use(db, body):
 def router(authenticated):
     routes = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
 
+    from .composite_revisions import ActivationRequest, RevisionRequest
+
+    @routes.get("/composites/{composite_id}/revision-options")
+    def revision_options(composite_id: str):
+        from .composite_revisions import options
+
+        return invoke(options, composite_id)
+
+    @routes.get("/composites/{composite_id}/revisions")
+    def revisions(composite_id: str, page: int = 1, page_size: int = 25, request_id: str | None = None):
+        from sqlalchemy import func, select
+
+        from .composite_revisions import owned, report
+        from .storage import CompositeRevision
+
+        def read(db):
+            owned(db, composite_id)
+            if page < 1 or not 1 <= page_size <= 100 or request_id is not None and len(request_id) > 100:
+                raise ValueError("无效修订分页")
+            query = select(CompositeRevision).where(CompositeRevision.composite_id == composite_id)
+            if request_id is not None:
+                query = query.where(CompositeRevision.request_id == request_id)
+            total = db.scalar(select(func.count()).select_from(query.subquery()))
+            rows = db.scalars(query.order_by(CompositeRevision.created_at.desc(), CompositeRevision.id)
+                .offset((page - 1) * page_size).limit(page_size))
+            return {"items": [report(db, composite_id, row.id) for row in rows],
+                "total": total, "page": page, "page_size": page_size}
+
+        return invoke(read)
+
+    @routes.get("/composites/{composite_id}/revisions/{revision_id}")
+    def get_revision(composite_id: str, revision_id: str):
+        from .composite_revisions import report
+
+        return invoke(report, composite_id, revision_id)
+
+    @routes.post("/composites/{composite_id}/revisions", status_code=201)
+    def create_revision(composite_id: str, body: RevisionRequest):
+        from .composite_revisions import create, report
+
+        def command(db):
+            revision = create(db, composite_id, body)
+            return report(db, composite_id, revision.id)
+
+        return invoke(command)
+
+    @routes.post("/composites/{composite_id}/revisions/{revision_id}/activate")
+    def activate_revision(composite_id: str, revision_id: str, body: ActivationRequest):
+        from .composite_revisions import activate, report
+
+        def command(db):
+            activate(db, composite_id, revision_id, body)
+            return report(db, composite_id, revision_id)
+
+        return invoke(command)
+
     @routes.get("/center/composites")
     def composites(query: str = "", page: int = 1, page_size: int = 25):
         return invoke(list_composites, query=query, page=page, page_size=page_size)

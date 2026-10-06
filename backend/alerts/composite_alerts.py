@@ -60,12 +60,14 @@ def bind(db, config):
         raise ValueError("组合指标须从固定历史版本起点初始化")
     inst = db.get(Instrument, composite.instrument_id)
     return {"instrument": composite.id, "instrument_id": inst.id, "series_kind": "composite",
-        "source": "composite", "symbol": db.get(MarketDataset, composite.dataset_id).logical_symbol,
+        "source": "composite", "symbol": db.get(MarketDataset, version.dataset_id).logical_symbol,
         "basis": inst.basis, "calendar": revision.rules["aggregation_calendar"],
-        "timeframe": config.timeframe, "precision": inst.precision,
+        "timeframe": config.timeframe, "precision": max(
+            db.get(Instrument, db.get(MarketDataset, version.dataset_id).instrument_id).precision,
+            db.get(Instrument, target.instrument_id).precision),
         "composite_id": composite.id, "composite_revision_id": revision.id,
         "history_version_id": version.id, "history_checksum": version.manifest["checksum"],
-        "history_start": version.start, "dataset_id": composite.dataset_id,
+        "history_start": version.start, "dataset_id": version.dataset_id,
         "mapping_id": mapping.id, "target_dataset_id": target.id, "target_identity": target.identity,
         "seam": revision.seam, "rules": revision.rules, "seam_policy": config.seam_policy,
         "calculation_algorithm": ALGORITHM, "contract": CONTRACT,
@@ -188,7 +190,7 @@ def evaluate(db, alert, version, config, now):
     # Evidence writers/reference protection take exclusive dataset locks. Take
     # them in order before shared artifact reads, avoiding reader lock upgrades.
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
-        sorted({composite.dataset_id, target.id}))).order_by(MarketDataset.id).with_for_update()))
+        sorted({identity["dataset_id"], target.id}))).order_by(MarketDataset.id).with_for_update()))
     prep = db.get(CompositePreparation, revision.id)
     value = prep.input_revision
     runtime.update(composite_revision_id=revision.id, input_revision=value,

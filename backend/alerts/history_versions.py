@@ -390,6 +390,7 @@ def main():
             if not version_id:
                 from .composite_aggregates import aggregate_tick
                 from .composite_preparation import preparation_tick
+                from .composite_revisions import preparation_tick as revision_tick
                 from .fixed_indicators import indicator_tick
                 from .history_maintenance import schedule_tick
 
@@ -397,6 +398,7 @@ def main():
                 preparation_tick(adapter)
                 aggregated = aggregate_tick()
                 indicated = indicator_tick()
+                revision_tick()
             else:
                 aggregated = False
                 indicated = False

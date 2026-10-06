@@ -321,6 +321,34 @@ class CompositePreparation(Base):
     state: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
+class CompositeRevisionChange(Base):
+    __tablename__ = "market_composite_revision_changes"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    request_hash: Mapped[str] = mapped_column(String(64))
+    reason: Mapped[str] = mapped_column(String(1000))
+    manifest: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class CompositeActivation(Base):
+    __tablename__ = "market_composite_activations"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    previous_revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"))
+    request_id: Mapped[str] = mapped_column(String(100))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    event_boundary: Mapped[int] = mapped_column(BigInteger)
+    at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    evidence: Mapped[dict] = mapped_column(JSON)
+
+
+@event.listens_for(CompositeRevisionChange, "before_update")
+@event.listens_for(CompositeRevisionChange, "before_delete")
+@event.listens_for(CompositeActivation, "before_update")
+@event.listens_for(CompositeActivation, "before_delete")
+def immutable_composite_change(mapper, connection, target):
+    raise ValueError("Composite revision requests and activation evidence are immutable")
+
+
 class CompositeInputEvent(Base):
     __tablename__ = "market_composite_input_events"
     __table_args__ = (UniqueConstraint("revision_id", "input_revision"),)

@@ -50,10 +50,10 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
     composite = db.get(MarketComposite, composite_id)
     if not composite or composite.permission_scope != permission_scope:
         raise ValueError("组合行情不存在或不属于当前权限范围")
-    dataset = db.get(MarketDataset, composite.dataset_id)
     inst = db.get(Instrument, composite.instrument_id)
     revision = db.get(CompositeRevision, composite.active_revision_id)
     history = db.get(HistoryVersion, revision.history_version_id)
+    dataset = db.get(MarketDataset, history.dataset_id)
     prep = db.get(CompositePreparation, revision.id)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     state = db.get(LiveState, mapping.target_dataset_id)
@@ -89,7 +89,7 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         "preparing" if prep.status != "queried" else "inactive" if not active else
         "receiving" if confirmed_ready else "recovering")
     return {"id": composite.id, "instrument_id": composite.instrument_id,
-        "dataset_id": composite.dataset_id, "logical_symbol": dataset.logical_symbol,
+        "dataset_id": dataset.id, "logical_symbol": dataset.logical_symbol,
         "precision": inst.precision, "calendar": revision.rules["aggregation_calendar"],
         "historical_source": dataset.identity["source"], "live_source": "oanda",
         "basis": inst.basis, "status": status, "created_at": composite.created_at,

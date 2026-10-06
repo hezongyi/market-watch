@@ -5,6 +5,7 @@ from sqlalchemy import or_, select
 from .storage import (
     ChartAlert,
     ChartAlertVersion,
+    CompositeRevision,
     MarketComposite,
     MarketDemand,
     RealtimeMapping,
@@ -27,7 +28,8 @@ def wanted_instruments(db, *, now=None):
 
 def composite_targets(db, wanted):
     targets = set(db.scalars(select(RealtimeMapping.target_dataset_id).join(
-        MarketComposite, MarketComposite.mapping_id == RealtimeMapping.id
+        CompositeRevision, CompositeRevision.mapping_id == RealtimeMapping.id).join(
+        MarketComposite, MarketComposite.active_revision_id == CompositeRevision.id
     ).where(MarketComposite.instrument_id.in_(wanted)))) if wanted else set()
     # Running rules may remain on an older revision/mapping after explicit
     # activation for charts; keep that exact target subscribed independently.
