@@ -68,8 +68,7 @@ context.catalog = {
 };
 context.PineJS = {
   Std: {
-    max_series_default_size: 10001,
-    time: (c) => (c.index === 0 ? 3000 : c.sourceTime),
+    time: (c) => (c.index === 0 ? 3000 : 2000),
     volume: (c) => (c.valid ? 1 : 0),
     close: () => 0,
   },
@@ -81,7 +80,6 @@ const study = vm.runInContext(
 const alignment = [];
 const ctx = {
   index: 0,
-  sourceTime: 2000,
   valid: false,
   select_sym(i) {
     this.index = i;
@@ -89,8 +87,6 @@ const ctx = {
   new_var(value) {
     return {
       value,
-      get: () => value,
-      indexOf: () => 0,
       adopt(source, target, mode) {
         alignment.push([source.value, target.value, mode]);
         return value;
@@ -103,11 +99,10 @@ assert.ok(
   "warmup must reach native plot as NaN",
 );
 ctx.valid = true;
-assert.ok(Number.isNaN(study.main(ctx)[0]), "a valid older sample cannot fill the latest primary bar");
-ctx.sourceTime = 3000;
 assert.equal(study.main(ctx)[0], 0, "real zero must reach native plot as zero");
 assert.deepEqual(alignment, [
-  [3000, 3000, 1],
+  [2000, 3000, 1],
+  [2000, 3000, 1],
 ]);
 assert.equal(ctx.index, 0, "restore primary symbol context after evaluation");
 console.log(

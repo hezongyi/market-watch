@@ -237,11 +237,8 @@ def renew(client):
 
 
 def events(client, cursors):
-    """Snapshot inputs, then calculate without retaining a database connection."""
+    """Snapshot only: SSE never fetches upstream or holds DB during its wait."""
     result = []
-    calculations = []
-    next_cursors = dict(cursors)
-    prefixes = {}
     now = now_ms()
     with transaction() as db:
         rows = list(
@@ -256,7 +253,7 @@ def events(client, cursors):
         for interest in rows:
             dataset = db.get(ProviderDataset, interest.dataset_id)
             if interest.error:
-                if next_cursors.get(interest.listener + ":error") != interest.error:
+                if cursors.get(interest.listener + ":error") != interest.error:
                     result.append(
                         {
                             "listener": interest.listener,
@@ -265,10 +262,10 @@ def events(client, cursors):
                             "reason": interest.error,
                         }
                     )
-                    next_cursors[interest.listener + ":error"] = interest.error
+                    cursors[interest.listener + ":error"] = interest.error
             else:
-                next_cursors.pop(interest.listener + ":error", None)
-            last, revision = next_cursors.get(interest.listener, (interest.cursor, interest.revision))
+                cursors.pop(interest.listener + ":error", None)
+            last, revision = cursors.get(interest.listener, (interest.cursor, interest.revision))
             if dataset.revision == revision:
                 continue
             bars = list(
@@ -292,7 +289,7 @@ def events(client, cursors):
                         ProviderBar.chart_time < last,
                         ProviderBar.revision > 1,
                         ProviderBar.changed_at
-                        > next_cursors.get(interest.listener + ":at", interest.accessed_at),
+                        > cursors.get(interest.listener + ":at", interest.accessed_at),
                     )
                     .limit(1)
                 )
@@ -302,31 +299,29 @@ def events(client, cursors):
                 result.append({"listener":interest.listener, "type":"reset", "bars":[],
                                "indicators":[], "revision":dataset.revision, "cursor":last,
                                "as_of":dataset.updated_at})
-                next_cursors[interest.listener] = (last, dataset.revision)
+                cursors[interest.listener] = (last, dataset.revision)
             if bars:
                 new_last = bars[-1].chart_time
                 connected = any(a <= last and new_last < b for a, b in dataset.coverage)
                 kind = (
                     "reset"
                     if old_changed or dataset.metadata_json.get("invalidated_at", 0) >
-                    next_cursors.get(interest.listener + ":at", interest.accessed_at)
+                    cursors.get(interest.listener + ":at", interest.accessed_at)
                     or len(bars) > 2000 or (last and not connected)
                     else "bars"
                 )
                 indicators = []
-                inputs_by_spec = []
                 if kind == "bars" and interest.indicators:
-                    prefix_key = (dataset.id, new_last)
-                    if prefix_key not in prefixes:
-                        prefixes[prefix_key] = db.execute(
-                            select(ProviderBar.chart_time, ProviderBar.start, ProviderBar.payload)
+                    prefix = list(
+                        db.scalars(
+                            select(ProviderBar)
                             .where(
                                 ProviderBar.dataset_id == dataset.id,
                                 ProviderBar.chart_time <= new_last,
                             )
-                            .order_by(ProviderBar.chart_time)
-                        ).all()
-                    prefix = prefixes[prefix_key]
+                            .order_by(ProviderBar.chart_time.desc())
+                        )
+                    )[::-1]
                     prefix_connected = bool(prefix) and any(
                         a <= prefix[0].chart_time and new_last < b
                         for a, b in dataset.coverage
@@ -338,12 +333,26 @@ def events(client, cursors):
                         inputs=[row.payload for row in prefix if origin is None or row.start>=origin]
                         if inputs and origin is not None and inputs[0]["start"] != origin:
                             kind="reset"
-                            inputs_by_spec=[]
+                            indicators=[]
                             break
-                        inputs_by_spec.append((spec, inputs))
-                if inputs_by_spec:
-                    calculations.append((indicators, inputs_by_spec,
-                                         dict(dataset.metadata_json), bars[0].start))
+                        calculated = calculate(calculation_rows(inputs, dataset.metadata_json,
+                                                                dataset.metadata_json["id"]), spec, provisional=True)
+                        indicators.append(
+                            {
+                                **calculated,
+                                "series": [
+                                    {
+                                        **series,
+                                        "values": [
+                                            v
+                                            for v in series["values"]
+                                            if v["time"] >= bars[0].start
+                                        ],
+                                    }
+                                    for series in calculated["series"]
+                                ],
+                            }
+                        )
                 result.append(
                     {
                         "listener": interest.listener,
@@ -355,23 +364,8 @@ def events(client, cursors):
                         "as_of": dataset.updated_at,
                     }
                 )
-                next_cursors[interest.listener] = (new_last, dataset.revision)
-                next_cursors[interest.listener + ":at"] = dataset.updated_at
-    # Long prefixes and several Python plots can occupy both API pool slots.
-    # Detached payloads keep the observed values while CPU work releases SQL.
-    for indicators, inputs_by_spec, metadata, first in calculations:
-        for spec, inputs in inputs_by_spec:
-            calculated = calculate(calculation_rows(inputs, metadata, metadata["id"]),
-                                   spec, provisional=True)
-            indicators.append({
-                **calculated,
-                "series": [{**series, "values": [v for v in series["values"]
-                                                  if v["time"] >= first]}
-                           for series in calculated["series"]],
-            })
-    # A failed calculation must not consume updates that the client never saw.
-    cursors.clear()
-    cursors.update(next_cursors)
+                cursors[interest.listener] = (new_last, dataset.revision)
+                cursors[interest.listener + ":at"] = dataset.updated_at
     return result
 
 

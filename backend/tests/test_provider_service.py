@@ -56,36 +56,6 @@ def test_registration_gap_and_python_indicator_use_cached_bars(database, monkeyp
     assert service.events("other", {}) == []
 
 
-def test_live_plots_share_prefix_rows_within_one_update(database, monkeypatch):
-    from alerts import storage
-    from sqlalchemy import event
-
-    seed(META, "M5", 10000, page(1000, 10000))
-    state = cache.snapshot(cache.identity(META, "M5"), 10000, 3)
-    for listener, period in [("short", 3), ("long", 5)]:
-        subscribed(monkeypatch, "shared-prefix", listener, 9000,
-                   state["cache_revision"], state["as_of"],
-                   [{"name": "SMA", "params": {"period": period}}])
-    seed(META, "M5", 12000, page(9000, 12000, close="4"))
-    statements = []
-    engine = storage.Session.kw["bind"]
-
-    def observe(_connection, _cursor, statement, *_args):
-        if statement.startswith("SELECT provider_bars.chart_time, provider_bars.start, provider_bars.payload"):
-            statements.append(statement)
-
-    event.listen(engine, "before_cursor_execute", observe)
-    try:
-        updates = service.events("shared-prefix", {})
-    finally:
-        event.remove(engine, "before_cursor_execute", observe)
-    assert len(statements) == 1, "different plots over the same source use one prefix observation"
-    by_listener = {row["listener"]: row for row in updates}
-    short = by_listener["short"]["indicators"][0]["series"][0]["values"][-1]["value"]
-    long = by_listener["long"]["indicators"][0]["series"][0]["values"][-1]["value"]
-    assert short == 4 and long == 3.2, "sharing payloads retains independently calculated periods"
-
-
 def test_new_history_does_not_reset_but_old_revision_does(database, monkeypatch):
     clock = [100000]
     monkeypatch.setattr(cache, "now_ms", lambda: clock[0])

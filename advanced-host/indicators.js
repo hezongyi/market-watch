@@ -98,16 +98,6 @@ function pythonStudies(PineJS, catalog) {
             const value = ctx.new_var(
               PineJS.Std.volume(ctx) > 0 ? PineJS.Std.close(ctx) : NaN,
             );
-            // Timestamp lookup allocates the native bounded default history,
-            // rather than the two slots that precise adopt initially requests.
-            // A late secondary update also needs the preceding primary time.
-            const offset = target.indexOf(source.get(0));
-            // All plots are emitted at the selected primary timestamp. A
-            // still-lagging plot must stay empty, even after earlier live ticks.
-            if (Number.isFinite(target.get(0)) &&
-                (source.get(0) < target.get(0) || offset < 0 ||
-                 offset >= PineJS.Std.max_series_default_size - 1))
-              return NaN;
             return value.adopt(source, target, 1);
           });
           ctx.select_sym(0);

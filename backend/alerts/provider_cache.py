@@ -744,11 +744,11 @@ def data(body):
         # One source prefix for all pages and live updates. A viewport's
         # warmup window cannot define a recursive EMA/RSI/MACD seed.
         with transaction() as db:
-            prefix = list(db.scalars(select(ProviderBar.payload).where(
+            prefix = [row.payload for row in db.scalars(select(ProviderBar).where(
                 ProviderBar.dataset_id == page["dataset_id"],
                 ProviderBar.start <= prefix[-1]["start"],
                 ProviderBar.start >= (body.calculation_origin or 0),
-            ).order_by(ProviderBar.start)))
+            ).order_by(ProviderBar.start))]
         if prefix and body.calculation_origin is not None and prefix[0]["start"] != body.calculation_origin:
             raise ValueError("指标固定历史起点缺失，请刷新并核对数据集")
         prefix = calculation_rows(prefix, meta, body.instrument)
