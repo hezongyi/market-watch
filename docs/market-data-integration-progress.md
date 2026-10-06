@@ -339,3 +339,17 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
   该窗口不回填到规则创建时间，不替换04:04浏览器窗口，后者PID2266365继续运行。
 - `rule_close_to_poll_upper_bound`包含15秒轮询，不能当成后端执行耗时，也不证明跳变中间的每次计算。
   合并评估时仍保留后端分母、阶段审计及实际每规则状态。两交易日与来源会话适用性未完成。
+
+### 2026-10-06 04:49 UTC：报价更新率与实际分母
+
+- 补齐方案要求的报价更新率：后端按完整源分钟累计接受、去重的stream更新；总体与小时分组
+  均输出updates/elapsed_seconds/updates_per_second。未知/闭市/无观测分钟均保留在经过秒数分母。
+- 浏览器单独输出可见更新率，要求明确的一个started窗口，从启动到最后完整block计时，
+  包含失败/无心跳块与间隙。多个窗口不拼接速率；SSE一秒合并与重载首报价重复计数不能当作全tick。
+- [14个统计回归](verification/data-integration/update-rate-tests.txt)通过；Ruff、diff检查通过。
+  原浏览器工具未修改/重启，只改事后摘要；两个systemd进程仍运行。
+- [实际后端快照](verification/data-integration/sustained-live-report-checkpoint.json)：43完整分钟，
+  XAU3697次/2580s=1.433/s，EUR988次/2580s=0.383/s；两品种各43根M1确认，missing/fail均0。
+  [实际浏览器](verification/data-integration/browser-sustained-checkpoint.json)：87块errors0，
+  XAU约0.727/s、EUR约0.273/s；不能把不同分母相除推算漏tick。
+- 此次补齐计量产出，尚未达到长期窗口或来源会话适用性门槛，目标保持active。

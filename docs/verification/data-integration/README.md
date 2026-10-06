@@ -131,6 +131,13 @@ sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -
 `--until` 可限制时段，但分钟级期望、尝试及报价累计仍是采样时数据库中的最终状态，
 不能把该参数当完整的历史事件重建。首次实际报告见
 [有界持续快照](sustained-live-report-checkpoint.json)，短窗口仍不代表两交易日验收。
+后端 `accepted_quote_update_rate` 按已接受、去重的stream更新计数除以完整源分钟的经过秒数，
+分母包含闭市、unknown和无观测分钟；总体与每小时/观察时段均输出，不从成功报价筛选分母。
+浏览器 `visible_quote_update_rate` 单独记录：仅有一个明确started窗口时才输出速率，
+从started到最后完整block的经过秒数包含启动、失败/无心跳块和记录间隙；多个窗口不会拼接速率。
+一秒快照可能合并多个源更新，每次重新加载的首条报价可能被重新计数，浏览器可见更新率
+因此不能替代上游更新率，更不能当全tick频率。实际统计与分母回归见
+[更新率测试](update-rate-tests.txt)。
 浏览器计划结束为10月8日04:04:14UTC；持续规则的48小时计算窗口至少到04:09UTC后独立检查，
 不能将创建前的几分钟回填成实际规则执行。
 

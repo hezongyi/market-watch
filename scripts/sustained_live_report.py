@@ -71,6 +71,8 @@ def summarize(starts, observations, audits, evaluation_since, cutoff):
     quote_ages = Counter()
     for row in rows:
         quote_ages.update({int(bucket): count for bucket, count in row["age_histogram"].items()})
+    quote_count = sum(row["quote_count"] for row in rows)
+    elapsed_seconds = len(starts) * 60
     eligible = [row for row in live if evaluation_since is not None
                 and row["start"] + MINUTE >= evaluation_since]
     evaluation = []
@@ -101,7 +103,10 @@ def summarize(starts, observations, audits, evaluation_since, cutoff):
         "failed_attempts": sum(row["failures"] for row in rows),
         "confirmation": percentiles(delays),
         "source_to_receiver": histogram_percentiles(quote_ages),
-        "quotes": sum(row["quote_count"] for row in rows),
+        "quotes": quote_count,
+        "accepted_quote_update_rate": {"updates": quote_count, "elapsed_seconds": elapsed_seconds,
+            "updates_per_second": quote_count / elapsed_seconds if elapsed_seconds else None,
+            "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"},
         "max_interarrival_ms": max((row["max_interarrival"] for row in rows), default=0),
         "ingestion_and_watch_phase": {"eligible_live_minutes": len(eligible),
             "minutes_without_target_confirmation_audit": len(eligible) - len(evaluation),

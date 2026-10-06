@@ -7,11 +7,7 @@ from collections import Counter
 from pathlib import Path
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("file", type=Path)
-    parser.add_argument("--since", type=int, default=0, help="UTC ms for an explicitly recorded observation segment")
-    args = parser.parse_args()
+def summarize(records, since=0):
     totals = {}
     starts, finishes = [], []
     deployments = []
@@ -21,9 +17,8 @@ def main():
     prior_records = 0
     silent_blocks = 0
     max_block_interval = 0
-    for line in args.file.read_text().splitlines():
-        record = json.loads(line)
-        if record.get("at", 0) < args.since:
+    for record in records:
+        if record.get("at", 0) < since:
             prior_records += 1
             continue
         if record["event"] == "started":
@@ -55,7 +50,17 @@ def main():
                 total["quality_counts"].update(item["quality_counts"])
                 for key in ("receive_to_browser_ms", "source_to_browser_ms"):
                     total[key].update(item[key])
+    # A rate requires one explicitly recorded window. Never stitch restarts or
+    # silently infer a denominator from the first successful snapshot.
+    duration_ms = (last - starts[0]["at"] if len(starts) == 1 and first is not None
+                   and first >= starts[0]["at"] else None)
+    elapsed_seconds = duration_ms / 1000 if duration_ms is not None and duration_ms > 0 else None
     for total in totals.values():
+        total["visible_quote_update_rate"] = {
+            "updates": total["unique_quotes"], "elapsed_seconds": elapsed_seconds,
+            "updates_per_second": total["unique_quotes"] / elapsed_seconds if elapsed_seconds else None,
+            "meaning": "distinct quote keys within each SSE subscription; reload can recount its first quote; includes startup, silent/error blocks and gaps; 1s snapshots can omit source updates",
+            "denominator_status": "single_recorded_window" if elapsed_seconds else "requires_single_recorded_window"}
         for key in ("receive_to_browser_ms", "source_to_browser_ms"):
             raw = total.pop(key)
             histogram = {}
@@ -77,15 +82,25 @@ def main():
                         break
                 result[f"p{int(fraction * 100)}_ms"] = value
             total[key] = result
-    print(json.dumps({"starts": starts, "finishes": finishes, "deployments": deployments,
+    return {"starts": starts, "finishes": finishes, "deployments": deployments,
         "session_renewals": renewals,
-        "measurement_since": args.since, "prior_records_retained_in_original": prior_records,
+        "measurement_since": since, "prior_records_retained_in_original": prior_records,
         "contains_deployment": bool(deployments), "first_block": first, "last_block": last,
         "blocks": blocks, "snapshots": snapshots, "heartbeats": heartbeats, "errors": errors,
         "zero_heartbeat_blocks": silent_blocks, "max_block_interval_ms": max_block_interval,
         "opened": opened, "symbols": totals,
         "meaning": "quote keys observed through browser SSE; invalid timings separate; 1s snapshots can omit upstream updates",
-        "source_clock_offset_verified": False, "two_trading_days_verified": False}, indent=2))
+        "source_clock_offset_verified": False, "two_trading_days_verified": False}
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file", type=Path)
+    parser.add_argument("--since", type=int, default=0, help="UTC ms for an explicitly recorded observation segment")
+    args = parser.parse_args()
+    with args.file.open() as source:
+        result = summarize((json.loads(line) for line in source), args.since)
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

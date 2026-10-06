@@ -106,6 +106,19 @@ def test_negative_source_delays_retained_and_nearest_rank():
     assert report.percentiles([])["p50_ms"] is None
 
 
+def test_update_rate_keeps_unknown_closed_and_unobserved_minutes_in_elapsed_denominator():
+    observations = {0: row(0, quote_count=120), 60_000: row(60_000, expected=None,
+        expectation="unknown_session", quote_count=0), 120_000: row(120_000,
+        expected=False, expectation="reviewed_source_closure", quote_count=0)}
+    rate = report.summarize([0, 60_000, 120_000, 180_000], observations, {}, 60_000, 240_000)[
+        "accepted_quote_update_rate"]
+    assert rate["updates"] == 120
+    assert rate["elapsed_seconds"] == 240
+    assert rate["updates_per_second"] == 0.5
+    assert report.summarize([], {}, {}, None, 0)["accepted_quote_update_rate"][
+        "updates_per_second"] is None
+
+
 def test_observation_phases_follow_local_dst_without_certifying_market_hours():
     def stamp(value):
         return int(datetime.fromisoformat(value).replace(tzinfo=UTC).timestamp() * 1000)
