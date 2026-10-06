@@ -13,6 +13,7 @@ import {
   type Task,
 } from "./types";
 import { useSnapshot } from "./useSnapshot";
+import { NativeConfigure } from "./NativeConfigure";
 
 export function Feedback({
   error,
@@ -366,6 +367,11 @@ function CenterList() {
                               打开平台图表
                             </Link>
                           )}
+                          {p.available && p.source === "oanda" && (
+                            <Link to={`/market-data/platform/configure?instrument=${encodeURIComponent(p.id)}`}>
+                              配置原生参数
+                            </Link>
+                          )}
                           {p.capabilities.history_m1 &&
                             (!p.logical_symbol || p.logical_symbol.length <= 10) && (
                             <Link
@@ -445,6 +451,7 @@ export default function Center() {
   return (
     <Routes>
       <Route index element={<CenterList />} />
+      <Route path="platform/configure" element={<NativeConfigure />} />
       <Route path="datasets/new" element={<DatasetCreate />} />
       <Route path="datasets/:id" element={<DatasetDetail />} />
       <Route path="datasets/:id/mapping" element={<MappingForm />} />

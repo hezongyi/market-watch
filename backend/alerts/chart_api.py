@@ -22,6 +22,7 @@ from .chart_indicators import CATALOG, calculate, validate
 from .chart_series import SeriesKind, decode, is_gold
 from .domain import calendar_for
 from .managed_dataset import data as published_data
+from .native_series import OandaParameters
 from .storage import (
     Bar,
     ChartTemplate,
@@ -37,6 +38,12 @@ from .volume import metadata as volume_metadata
 
 class Create(BaseModel):
     name: str = Field(min_length=1, max_length=100)
+
+
+class NativeConfiguration(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    instrument: str = Field(min_length=1, max_length=40)
+    parameters: OandaParameters
 
 
 class Save(Create):
@@ -336,6 +343,17 @@ _RESULT_CACHE = OrderedDict()
 
 def router(authenticated):
     r = APIRouter(prefix="/api/charts", dependencies=[Depends(authenticated)])
+
+    @r.post("/provider/configure")
+    def native_configuration(body: NativeConfiguration):
+        from .chart_series import encode
+        from .native_series import register
+        from .provider_chart import metadata
+        try:
+            meta = register(metadata(body.instrument), body.parameters.model_dump())
+            return {"ticker": encode(meta["id"], "provider"), "metadata": meta}
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
 
     @r.post("/provider/subscribe")
     def provider_subscribe(body: ProviderSubscription):

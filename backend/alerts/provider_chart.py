@@ -72,6 +72,12 @@ def warm_clients():
 
 
 def metadata(ident, *, deadline=None, cached_only=False):
+    if ident.startswith("NATIVE:"):
+        from .native_series import configured_metadata
+        try:
+            return configured_metadata("NATIVE:" + ident[7:].lower())
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
     if ident.startswith("DUKA:"):
         from .provider_dukascopy import metadata as dukascopy_metadata
         return dukascopy_metadata(ident)
@@ -109,7 +115,7 @@ def metadata(ident, *, deadline=None, cached_only=False):
             raise HTTPException(404, "未知品种，请刷新品种目录")
     if source not in ("oanda", "binance") or calendar not in ("ny17", "utc0"):
         raise HTTPException(422, "该品种的平台周期或交易日历尚未接入")
-    return {
+    result = {
         "id": ident,
         "symbol": symbol,
         "name": label,
@@ -121,6 +127,10 @@ def metadata(ident, *, deadline=None, cached_only=False):
         "series_kind": "provider",
         **volume_metadata(source, symbol),
     }
+    if source == "oanda":
+        from .native_series import DEFAULTS
+        result["native_parameters"] = dict(DEFAULTS)
+    return result
 
 
 def label(start, frame, calendar):
@@ -234,6 +244,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             count - len(rows) + optional + (3 if frame in ("D1", "W1", "MN") else 0),
         )
         if source == "oanda":
+            from .native_series import chart_label, interval_end, parameters
+            native = parameters(meta)
             if not settings.oanda_token:
                 raise ValueError("OANDA认证未配置")
             payload = _request(
@@ -241,13 +253,10 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
                 f"https://api-fxpractice.oanda.com/v3/instruments/{meta['symbol']}/candles",
                 params={
                     "granularity": OANDA_FRAMES[frame],
-                    "price": "B",
-                    "smooth": "false",
+                    **native,
+                    "smooth": str(native["smooth"]).lower(),
                     "count": batch_count,
                     "to": str(Decimal(cursor) / 1000),
-                    "dailyAlignment": 17,
-                    "alignmentTimezone": "America/New_York",
-                    "weeklyAlignment": "Sunday",
                 },
                 headers={
                     "Authorization": "Bearer " + settings.oanda_token,
@@ -259,12 +268,12 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             batch = []
             for candle in candles:
                 start = int(Decimal(candle["time"]) * 1000)
-                prices = candle["bid"]
+                prices = candle[{"B": "bid", "A": "ask", "M": "mid"}[native["price"]]]
                 batch.append(
                     {
                         "start": start,
-                        "end": _end(start, frame, meta["calendar"]),
-                        "chart_time": label(start, frame, meta["calendar"]),
+                        "end": interval_end(start, frame, native),
+                        "chart_time": chart_label(start, frame, native),
                         "complete": bool(candle["complete"]),
                         "volume": encoded(candle.get("volume"), tick=True),
                         "volume_complete": bool(candle["complete"] and candle.get("volume") is not None),
@@ -330,6 +339,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
         "series_kind": "provider",
         **volume_metadata(source, meta["symbol"]),
         "basis": meta["basis"],
+        **({"native_parameters": native} if source == "oanda" else {}),
         "calendar": meta["calendar"],
         "precision": meta["precision"],
         "indicators": [],
@@ -405,6 +415,14 @@ def quote_page(meta):
 
 def quote_previous_close(meta, latest):
     """Previous completed native session close, with the same price basis."""
+    if meta["source"] == "oanda":
+        from .native_series import chart_label, parameters, session_start
+        native = parameters(meta)
+        current_label = chart_label(session_start(latest["start"], native), "D1", native)
+        session_boundary = session_start(latest["start"], native)
+        page = cached_page(meta, "D1", current_label, 2, quote=True, cache_seconds=300)
+        complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= session_boundary]
+        return Decimal(complete[-1]["close"]) if complete else None
     current_label = label(latest["start"], "D1", meta["calendar"])
     session_start = (latest["start"] // 86400000 * 86400000 if meta["source"] == "dukascopy" else
         ms(session_bounds(instant(latest["start"]), Calendar(meta["calendar"]))[0]))
@@ -426,7 +444,7 @@ def earliest_m1(meta, *, client=None):
     """Probe the actual first native M1; never infer it from an empty time slice."""
     from .market_resources import lane
 
-    if meta["source"] in ("yahoo", "dukascopy"):
+    if meta.get("native_series_id") or meta["source"] in ("yahoo", "dukascopy"):
         raise ValueError("此平台身份不建立自建维护任务，请在数据中心明确添加来源历史")
     namespace = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()

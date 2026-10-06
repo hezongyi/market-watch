@@ -48,7 +48,8 @@ def collection_identity(identity):
 
 
 def platform_identity(identity, *, timeframe, daily_alignment=17,
-                      alignment_timezone="America/New_York", weekly_alignment="Sunday"):
+                      alignment_timezone="America/New_York", weekly_alignment="Sunday",
+                      price="B", smooth=False):
     """Native-period identity includes all price parameters, not pagination."""
     source = collection_identity(identity)
     if source.source != "oanda":
@@ -57,16 +58,12 @@ def platform_identity(identity, *, timeframe, daily_alignment=17,
 
     if timeframe not in OANDA_FRAMES:
         raise ValueError("来源不支持此原生周期")
-    if not 0 <= daily_alignment <= 23 or weekly_alignment not in (
-            "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"):
-        raise ValueError("无效来源对齐参数")
-    from zoneinfo import ZoneInfo
-
-    ZoneInfo(alignment_timezone)
-    return SourceIdentity(**source.model_dump(exclude={"parameters"}), parameters={
-        "granularity": OANDA_FRAMES[timeframe], "price": "B", "smooth": False,
+    from .native_series import BASES, OandaParameters
+    native = OandaParameters.model_validate({"price": price, "smooth": smooth,
         "dailyAlignment": daily_alignment, "alignmentTimezone": alignment_timezone,
-        "weeklyAlignment": weekly_alignment})
+        "weeklyAlignment": weekly_alignment}).model_dump()
+    return SourceIdentity(**source.model_dump(exclude={"parameters", "basis"}), basis=BASES[price],
+        parameters={"granularity": OANDA_FRAMES[timeframe], **native})
 
 
 def capabilities(source: str):
@@ -83,9 +80,11 @@ def capabilities(source: str):
                 "history_range": "provider_observations; per-symbol range requires querying",
                 "volume_kind": "quantity", "volume_unit": "source_quantity"}
     if source == "oanda":
+        from .native_series import DEFAULTS
         return {"source": source, "native_periods": list(FRAMES), "native_status": "supported",
                 "history_m1": True, "confirmation_m1": True, "stream": True,
                 "channel": "v20", "environment": "practice", "bases": ["bid"],
+                "native_bases": ["bid", "ask", "mid"], "native_parameters": dict(DEFAULTS),
                 "history_range": "account/product dependent; per-symbol range requires querying",
                 "volume_kind": "price_count", "volume_unit": "quotes"}
     if source == "binance":

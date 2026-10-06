@@ -133,6 +133,7 @@ def market_identity(db, config: AlertConfig, dataset_id=None):
             "source": dataset.source, "symbol": dataset.symbol, "basis": meta["basis"],
             "calendar": meta["calendar"], "precision": meta["precision"],
             "timeframe": dataset.timeframe, "alignment_version": versions(meta)[0],
+            **({"native_parameters": meta["native_parameters"]} if meta.get("native_series_id") else {}),
             "adjustment": meta.get("adjustment")}
 
 

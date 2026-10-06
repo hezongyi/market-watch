@@ -582,12 +582,14 @@ def router(authenticated):
                     continue
                 page = quote_page(meta)
                 latest = page["bars"][-1] if page["bars"] else None
-                values = {"short_name": display_symbol(meta["symbol"]), "description": display_symbol(meta["symbol"]) + " · 平台行情",
+                values = {"short_name": display_symbol(meta["symbol"]), "description": display_symbol(meta["symbol"]) + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
                           "exchange": meta["source"].upper()}
                 if latest:
                     values["lp"] = float(latest["close"])
                     if meta["basis"] == "bid":
                         values["bid"] = values["lp"]
+                    elif meta["basis"] == "ask":
+                        values["ask"] = values["lp"]
                     # Missing prior-session data must not hide a valid last price.
                     try:
                         previous = quote_previous_close(meta, latest)

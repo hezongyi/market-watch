@@ -26,7 +26,7 @@ def decode(ticker: str) -> tuple[str, SeriesKind]:
     symbol = ticker[len(PROVIDER_PREFIX) :] if kind == "provider" else ticker
     if not re.fullmatch(r"[A-Za-z0-9:_-]{1,40}", symbol):
         raise ValueError("无效品种标识")
-    if re.fullmatch(r"(?:YAHOO|DUKA):[A-Fa-f0-9]{32}", symbol):
+    if re.fullmatch(r"(?:YAHOO|DUKA|NATIVE):[A-Fa-f0-9]{32}", symbol):
         prefix, key = symbol.split(":", 1)
         symbol = prefix + ":" + key.lower()
     return symbol, kind

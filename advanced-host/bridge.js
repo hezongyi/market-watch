@@ -458,7 +458,7 @@ const feed = {
       );
       alertSourceMetadata.set(MWSeries.encode(symbol,series_kind),meta);
       while(alertSourceMetadata.size>250) alertSourceMetadata.delete(alertSourceMetadata.keys().next().value);
-      if(['yahoo','dukascopy'].includes(meta.source) || ['history','composite'].includes(series_kind)) {
+      if(meta.native_series_id || ['yahoo','dukascopy'].includes(meta.source) || ['history','composite'].includes(series_kind)) {
         symbolPresentations.set(symbol,meta);
         while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       }
