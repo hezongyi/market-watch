@@ -15,6 +15,41 @@ class Empty(Input):
     pass
 
 
+class ManagedListQuery(Input):
+    query: str = Field(default="", max_length=100)
+    source: str | None = Field(default=None, max_length=32)
+    calendar: Literal["ny17", "utc0"] | None = None
+    asset_class: Literal["forex", "metal", "crypto", "index", "other", "unspecified"] | None = None
+    status: Literal["all", "available", "preparing", "attention", "paused", "archived"] = "all"
+    page: int = Field(default=1, ge=1)
+    page_size: int = Field(default=25, ge=1, le=100)
+
+
+class ManagedDatasetQuery(Input):
+    dataset_id: str = Field(min_length=64, max_length=64)
+
+
+class ManagedVersionQuery(Input):
+    version_id: str = Field(min_length=1, max_length=36)
+
+
+class ManagedBarsQuery(ManagedVersionQuery):
+    timeframe: Literal["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"] = "M1"
+    before: int | None = Field(default=None, ge=0)
+    count: int = Field(default=2000, ge=1, le=5000)
+
+
+class ManagedCoverageQuery(ManagedVersionQuery):
+    page: int = Field(default=1, ge=1)
+    page_size: int = Field(default=25, ge=1, le=100)
+
+
+class ManagedTasksQuery(Input):
+    dataset_id: str | None = Field(default=None, min_length=64, max_length=64)
+    page: int = Field(default=1, ge=1)
+    page_size: int = Field(default=25, ge=1, le=100)
+
+
 class PageQuery(Input):
     limit: int = Field(default=100, ge=1, le=500)
     offset: int = Field(default=0, ge=0, le=100000)

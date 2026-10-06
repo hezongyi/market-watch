@@ -181,7 +181,7 @@ def references(db, dataset_id):
         add("demand", dataset.instrument_id, "图表持续维护计划")
     # New FK-backed modules (e.g. composites) cannot be accidentally omitted.
     owned = {DatasetMaintenance.__table__.name, DatasetReclamation.__table__.name,
-             HistoryVersion.__table__.name, HistoryRun.__table__.name}
+             HistoryVersion.__table__.name, HistoryRun.__table__.name, "market_history_read_attempts"}
     for table in MarketDataset.metadata.sorted_tables:
         if table.name in owned:
             continue

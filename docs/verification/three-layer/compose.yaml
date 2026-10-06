@@ -18,7 +18,7 @@ services:
     labels:
       market-watch.purpose: three-layer-acceptance
   verify: &backend
-    image: market-watch-data-integration:dev
+    image: market-watch-three-layer:dev
     restart: "no"
     mem_limit: 768m
     cpus: 2
@@ -53,6 +53,7 @@ services:
       ALERTS_PUBLIC_URL: http://127.0.0.1:16629
       ALERTS_OANDA_STREAM_ENABLED: "false"
       ALERTS_OANDA_RESIDENT_SYMBOLS: ""
+      ALERTS_MCP_ENABLED: "true"
     depends_on:
       migrate: {condition: service_completed_successfully}
     healthcheck:

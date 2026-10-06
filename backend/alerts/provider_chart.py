@@ -82,6 +82,8 @@ def metadata(ident, *, deadline=None, cached_only=False):
         if db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == ident)):
             raise HTTPException(422, "显式数据集仅支持自建系列，不转换为平台原生身份")
         entry = db.get(MarketCatalog, ident)
+        if entry and entry.id.startswith("HC:"):
+            raise HTTPException(422, "自建来源目录仅用于登记历史，不作为平台原生身份")
         inst = db.get(Instrument, ident)
         if entry:
             if not entry.available:

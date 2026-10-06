@@ -142,6 +142,23 @@ class HistoryChunk(Base):
     unknown: Mapped[list] = mapped_column(JSON, default=list)
 
 
+class HistoryReadAttempt(Base):
+    """Durable bounded M1 read facts, including failures before later success."""
+    __tablename__ = "market_history_read_attempts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    started_at: Mapped[int] = mapped_column(BigInteger)
+    finished_at: Mapped[int | None] = mapped_column(BigInteger)
+    read_kind: Mapped[str] = mapped_column(String(24), default="pending")
+    result: Mapped[str] = mapped_column(String(40), default="started")
+    checkpoint: Mapped[int | None] = mapped_column(BigInteger)
+    observed_at: Mapped[int | None] = mapped_column(BigInteger)
+    observations: Mapped[int | None] = mapped_column()
+    accepted: Mapped[bool] = mapped_column(default=False)
+
+
 class DatasetMaintenance(Base):
     __tablename__ = "market_dataset_maintenance"
     dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
@@ -282,7 +299,7 @@ def immutable_dataset_identity(db, flush_context, instances):
 
     for row in db.deleted:
         if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob, HistoryArtifactBlock, HistoryArtifact,
-                            HistoryReclamation, DatasetReclamation)):
+                            HistoryReclamation, DatasetReclamation, HistoryReadAttempt)):
             raise ValueError("Historical snapshots cannot be deleted by runtime writers")
         if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)):
             raise ValueError("Explicit dataset/source bindings cannot be removed by runtime writers")
@@ -291,6 +308,16 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
+        if isinstance(row, HistoryReadAttempt):
+            previous = state.attrs.finished_at.history
+            completed = (bool(previous.deleted and previous.deleted[0] is not None) or
+                         not previous.has_changes() and row.finished_at is not None)
+            if completed and any(
+                        attr.history.has_changes() for attr in state.attrs):
+                raise ValueError("Completed historical request evidence is immutable")
+            if any(state.attrs[key].history.has_changes() for key in (
+                    "id", "version_id", "start", "end", "started_at")):
+                raise ValueError("Historical request identity is immutable")
         if isinstance(row, (HistoryChunk, SourceBlob, HistoryArtifactBlock, HistoryReclamation, DatasetReclamation)) and any(attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Historical snapshot chunks are immutable")
         if isinstance(row, (HistoryVersion, HistoryArtifact)):

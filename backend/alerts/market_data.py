@@ -53,7 +53,8 @@ DAY = 86400000
 def refresh_catalog():
     items = fetch_oanda_catalog()
     with transaction() as db:
-        for old in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda")):
+        for old in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
+                ~MarketCatalog.id.startswith("HC:"))):
             old.available = False
         for item in items:
             symbol = item["name"]
@@ -74,6 +75,8 @@ def refresh_catalog():
 def resolve(db, ident):
     inst = db.get(Instrument, ident)
     entry = db.get(MarketCatalog, ident)
+    if entry and entry.id.startswith("HC:"):
+        raise HTTPException(422, "自建来源目录仅用于登记历史，不作为平台或实时身份")
     if entry and entry.source == "yahoo":
         raise HTTPException(422, "Yahoo 品种仅支持平台系列，不创建历史维护任务")
     if entry and not entry.available:
@@ -889,7 +892,7 @@ def instrument_catalog(query: str = ""):
         # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
         term = query.strip().upper()
         with transaction() as db:
-            local = list(db.scalars(select(MarketCatalog))) + list(db.scalars(select(Instrument)))
+            local = list(db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))) + list(db.scalars(select(Instrument)))
             known = any(
                 term in {x.symbol.upper(), x.label.upper(),
                          (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
@@ -916,7 +919,7 @@ def instrument_catalog(query: str = ""):
                 "currency": (x.metadata_json or {}).get("currency"),
                 "search_status": search_status,
             }
-            for x in db.scalars(select(MarketCatalog))
+            for x in db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))
         }
         for inst in db.scalars(
             select(Instrument).where(Instrument.source.in_(["oanda", "binance"]))

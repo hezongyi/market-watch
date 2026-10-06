@@ -27,12 +27,11 @@ def resolve_calendar(asset_class, calendar=None):
     return DEFAULTS[asset_class]
 
 
-def register_history_dataset(db, *, logical_symbol, provider_symbol, asset_class, precision,
-                             aggregation_calendar=None, source="dukascopy"):
+def history_dataset_identity(*, provider_symbol, asset_class, aggregation_calendar=None, source="dukascopy"):
+    """Resolve immutable registration identity without consulting mutable catalogues."""
     calendar = resolve_calendar(asset_class, aggregation_calendar)
     if source == "dukascopy":
         channel, environment, scope = "python", "historical", "public"
-        volume_kind, volume_unit = "quantity", "source_quantity"
     elif source == "oanda":
         import re
 
@@ -44,12 +43,24 @@ def register_history_dataset(db, *, logical_symbol, provider_symbol, asset_class
             raise ValueError("请选择准确的OANDA品种代码")
         channel, environment = "v20", "practice"
         scope = "sha256:" + hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
-        volume_kind, volume_unit = "price_count", "quotes"
     else:
         raise ValueError("此来源尚未支持自建历史版本")
-    identity = DatasetIdentity(source=source, channel=channel, environment=environment,
+    return DatasetIdentity(source=source, channel=channel, environment=environment,
         account_scope=scope, provider_symbol=provider_symbol, basis="bid",
         calendar_version=f"user-{asset_class}-{calendar}-v1")
+
+
+def register_history_dataset(db, *, logical_symbol, provider_symbol, asset_class, precision,
+                             aggregation_calendar=None, source="dukascopy", catalog_id=None):
+    identity = history_dataset_identity(provider_symbol=provider_symbol, asset_class=asset_class,
+        aggregation_calendar=aggregation_calendar, source=source)
+    if catalog_id:
+        from .history_catalog import validate_selection
+
+        validate_selection(db, catalog_id=catalog_id, source=source, provider_symbol=provider_symbol,
+            logical_symbol=logical_symbol, asset_class=asset_class, precision=precision)
+    calendar = resolve_calendar(asset_class, aggregation_calendar)
+    volume_kind, volume_unit = ("price_count", "quotes") if source == "oanda" else ("quantity", "source_quantity")
     inst = register_dataset(db, identity, logical_symbol=logical_symbol, label=logical_symbol,
         calendar=calendar, precision=precision, volume_kind=volume_kind,
         volume_unit=volume_unit, asset_class=asset_class)

@@ -2,6 +2,18 @@ import { useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { frames, names, phase, time, type Dataset } from "./types";
+import { useSnapshot } from "./useSnapshot";
+import { Feedback, Pager } from "./Center";
+
+type CatalogItem = {
+  catalog_id: string;
+  provider_symbol: string;
+  logical_symbol: string;
+  label: string;
+  asset_class: string;
+  precision: number | null;
+  precision_status: string;
+};
 
 export function DatasetCreate() {
   const [params] = useSearchParams(),
@@ -23,6 +35,39 @@ export function DatasetCreate() {
   // Resolve dates on the backend using the selected aggregation calendar. A
   // browser's local timezone must not reinterpret a NY17 trading date.
   const [boundary, setBoundary] = useState<number | null>(null);
+  const [catalogQuery, setCatalogQuery] = useState("");
+  const [catalogPage, setCatalogPage] = useState(1),
+    [catalogRefresh, setCatalogRefresh] = useState(0);
+  const [selected, setSelected] = useState<CatalogItem | null>(null);
+  const catalog = useSnapshot<{
+    items: CatalogItem[];
+    total: number;
+    requires_refresh: boolean;
+  }>(
+    step === 1
+      ? `/market-data/history-catalog?source=${source}&query=${encodeURIComponent(catalogQuery)}&page=${catalogPage}&page_size=10`
+      : null,
+    catalogRefresh,
+  );
+  function choose(item: CatalogItem) {
+    setSelected(item);
+    setSymbol(item.provider_symbol);
+    setLogical(item.logical_symbol);
+    changeAsset(item.asset_class);
+    setPrecision(item.precision == null ? "" : String(item.precision));
+  }
+  async function refreshCatalog() {
+    setBusy(true);
+    setError("");
+    try {
+      await api("/market-data/history-catalog/refresh", {});
+      setCatalogRefresh((v) => v + 1);
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
   function changeAsset(value: string) {
     setAsset(value);
     setCalendar(
@@ -38,6 +83,10 @@ export function DatasetCreate() {
     setError("");
     if (step === 1 && (!logical || !symbol)) {
       setError("请填写逻辑品种和准确来源代码。");
+      return;
+    }
+    if (step === 1 && !/^(?:[0-9]|10)$/.test(precision)) {
+      setError("目录未提供价格精度，请在高级登记中明确填写0–10的小数位数。");
       return;
     }
     if (step === 2) {
@@ -77,6 +126,7 @@ export function DatasetCreate() {
             asset_class: asset,
             precision: Number(precision),
             aggregation_calendar: calendar,
+            ...(selected ? { catalog_id: selected.catalog_id } : {}),
           },
           maintenance: {
             target_start: boundary,
@@ -115,15 +165,113 @@ export function DatasetCreate() {
         <div className="dc-fields">
           <label>
             来源
-            <select value={source} onChange={(e) => setSource(e.target.value)}>
+            <select
+              value={source}
+              onChange={(e) => {
+                setSource(e.target.value);
+                setSelected(null);
+                setLogical("");
+                setSymbol("");
+                setCatalogPage(1);
+                setCatalogQuery("");
+              }}
+            >
               <option value="dukascopy">Dukascopy</option>
               <option value="oanda">OANDA Practice</option>
             </select>
           </label>
           <label>
+            搜索来源目录
+            <input
+              value={catalogQuery}
+              onChange={(e) => {
+                setCatalogQuery(e.target.value);
+                setCatalogPage(1);
+              }}
+              placeholder="来源代码或品种名称"
+            />
+          </label>
+          {source === "oanda" && (
+            <button disabled={busy} onClick={() => void refreshCatalog()}>
+              刷新当前账户目录
+            </button>
+          )}
+          <Feedback
+            error={catalog.error}
+            loading={catalog.loading}
+            empty={!catalog.data}
+          />
+          {catalog.data && (
+            <>
+              {catalog.data.items.length > 0 ? (
+                <div className="dc-table">
+                  <table>
+                    <caption>可选择的来源品种；实际M1覆盖在维护时核实</caption>
+                    <thead>
+                      <tr>
+                        <th>准确来源代码</th>
+                        <th>类别与精度</th>
+                        <th>选择</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {catalog.data.items.map((item) => (
+                        <tr key={item.provider_symbol}>
+                          <td>
+                            {item.provider_symbol}
+                            <span>{item.label}</span>
+                          </td>
+                          <td>
+                            {(
+                              {
+                                forex: "外汇",
+                                metal: "金属",
+                                crypto: "加密",
+                                index: "指数",
+                                other: "其他",
+                              } as Record<string, string>
+                            )[item.asset_class] || item.asset_class}{" "}
+                            ·{" "}
+                            {item.precision == null
+                              ? "精度待填写"
+                              : `${item.precision}位小数`}
+                          </td>
+                          <td>
+                            <button
+                              aria-pressed={
+                                selected?.provider_symbol ===
+                                item.provider_symbol
+                              }
+                              onClick={() => choose(item)}
+                            >
+                              选择 {item.provider_symbol}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>
+                  {catalog.data.requires_refresh
+                    ? "尚无当前账户目录，请主动刷新，或在下方手工登记。"
+                    : "未找到品种；可调整搜索或手工登记。"}
+                </p>
+              )}
+              <Pager
+                total={catalog.data.total}
+                page={catalogPage}
+                size={10}
+                change={setCatalogPage}
+              />
+            </>
+          )}
+          <label>
             逻辑品种
             <input
               value={logical}
+              readOnly={selected !== null}
               onChange={(e) => setLogical(e.target.value.toUpperCase())}
               placeholder="例如 EURUSD"
               maxLength={10}
@@ -133,13 +281,18 @@ export function DatasetCreate() {
             准确来源代码
             <input
               value={symbol}
+              readOnly={selected !== null}
               onChange={(e) => setSymbol(e.target.value)}
               placeholder={source === "oanda" ? "例如 EUR_USD" : "例如 EUR/USD"}
             />
           </label>
           <label>
             资产类别
-            <select value={asset} onChange={(e) => changeAsset(e.target.value)}>
+            <select
+              value={asset}
+              disabled={selected !== null}
+              onChange={(e) => changeAsset(e.target.value)}
+            >
               <option value="forex">外汇</option>
               <option value="metal">金属</option>
               <option value="crypto">加密</option>
@@ -147,7 +300,10 @@ export function DatasetCreate() {
               <option value="other">其他</option>
             </select>
           </label>
-          <details>
+          {selected && (
+            <button onClick={() => setSelected(null)}>改为手工登记</button>
+          )}
+          <details open={selected?.precision === null || undefined}>
             <summary>高级登记：价格精度</summary>
             <label>
               小数位数
@@ -156,11 +312,14 @@ export function DatasetCreate() {
                 min={0}
                 max={10}
                 value={precision}
+                readOnly={selected?.precision != null}
                 onChange={(e) => setPrecision(e.target.value)}
               />
             </label>
             <p>
-              手工登记尚未验证来源产品与精度；真实下载时校验，不能据此认定来源已可用。
+              {selected?.precision != null
+                ? "精度来自当前账户目录，准确代码与类别已带入。"
+                : "目录不足或手工登记时需明确精度；真实下载时校验，不能据此认定来源已可用。"}
             </p>
           </details>
           <p>

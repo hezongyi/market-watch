@@ -10,14 +10,19 @@ from pathlib import Path
 from sqlalchemy import select
 
 from .history_maintenance import bounded_refresh, on_publish, reusable_page
+from .history_request_evidence import attempt_id
+from .history_request_evidence import finish as finish_read
+from .history_request_evidence import snapshot as read_snapshot
+from .history_request_evidence import start as start_read
 from .history_sources import HistoryConfigurationError, HistorySources, history_identity, page_end
-from .market_contracts import DatasetIdentity
+from .market_contracts import DatasetIdentity, failed_request
 from .market_datasets import PricePrecisionError, register_dataset
 from .market_resources import cooldown, lane
 from .source_history_store import AcquisitionBusy, raw_chunk, shared_page, store_blob
 from .source_registry import collection_identity
 from .storage import (
     HistoryChunk,
+    HistoryReadAttempt,
     HistoryReclamation,
     HistoryRun,
     HistoryVersion,
@@ -88,9 +93,10 @@ def claim(version_id=None):
         version.lease_token = uid()
         version.lease_until = stamp + 60000
         dataset = db.get(MarketDataset, version.dataset_id)
-        return (version.id, version.lease_token, version.cursor,
-                bounded_refresh(db, version, page_end(dataset.identity, version.cursor,
-                         min(version.end, month_end(version.cursor)))), dataset.identity)
+        end = bounded_refresh(db, version, page_end(dataset.identity, version.cursor,
+                         min(version.end, month_end(version.cursor))))
+        start_read(db, version.id, version.lease_token, version.cursor, end)
+        return (version.id, version.lease_token, version.cursor, end, dataset.identity)
 
 
 def publish(db, version):
@@ -123,6 +129,7 @@ def publish(db, version):
         "rows": count, "unknown_minutes": unknown_minutes,
         "coverage": "observed_only; unobserved intervals remain unknown",
         "checksum": checksum.hexdigest(), "chunks": manifest_chunks,
+        "request_evidence": read_snapshot(db, version.id),
         **({"provenance": version.manifest["provenance"]} if version.manifest.get("provenance") else {}),
         **({"maintenance": version.manifest["maintenance"]} if version.manifest.get("maintenance") else {}),
     }
@@ -170,17 +177,23 @@ def import_page(adapter, *, version_id=None):
     if ownership is None:
         return False
     ident, token, start, end, raw_identity = ownership
+    read_id = attempt_id(token)
     batch = None
+    evidence = {}
     try:
         with transaction() as db:
             version = lock_version(db, ident)
             if version.lease_token != token or version.lease_until <= now_ms():
                 return True
             if controlled_stop(db, version):
+                finish_read(db.get(HistoryReadAttempt, read_id), "discarded")
                 return True
             fresh_after = version.created_at
             reuse = reusable_page(db, version, db.get(HistoryRun, ident))
             if reuse:
+                attempt = db.get(HistoryReadAttempt, read_id)
+                attempt.checkpoint, attempt.observed_at, attempt.observations = reuse.end, reuse.observed_at, reuse.count
+                finish_read(attempt, "inherited", read_kind="parent_reuse", accepted=True)
                 db.add(reuse)
                 version.cursor = reuse.end
                 version.lease_token, version.lease_until = None, 0
@@ -191,7 +204,7 @@ def import_page(adapter, *, version_id=None):
                 return True
         with lane("history"):
             batch = shared_page(adapter, DatasetIdentity.model_validate(raw_identity), start, end,
-                                fresh_after=fresh_after)
+                                fresh_after=fresh_after, evidence=evidence)
         if not batch.result.successful:
             if batch.result.status == "rate_limited" and raw_identity["source"] != "oanda":
                 seconds = max(1, (batch.result.retry_at - now_ms()) / 1000) if batch.result.retry_at else None
@@ -213,8 +226,12 @@ def import_page(adapter, *, version_id=None):
             version = lock_version(db, ident)
             if (version.lease_token != token or version.cursor != start
                     or version.lease_until <= now_ms()):
+                finish_read(db.get(HistoryReadAttempt, read_id), "discarded", batch=batch,
+                            read_kind=evidence.get("read_kind"))
                 return True
             if controlled_stop(db, version):
+                finish_read(db.get(HistoryReadAttempt, read_id), "discarded", batch=batch,
+                            read_kind=evidence.get("read_kind"))
                 return True
             dataset = db.get(MarketDataset, version.dataset_id)
             from .market import ingest
@@ -232,6 +249,8 @@ def import_page(adapter, *, version_id=None):
             version.attempts = 0
             version.error = None
             version.next_at = now_ms()
+            finish_read(db.get(HistoryReadAttempt, read_id), batch.result.status, batch=batch,
+                        read_kind=evidence.get("read_kind"), accepted=True)
             db.flush()
             if version.cursor == version.end:
                 publish(db, version)
@@ -241,6 +260,7 @@ def import_page(adapter, *, version_id=None):
     except AcquisitionBusy:
         with transaction() as db:
             version = lock_version(db, ident)
+            finish_read(db.get(HistoryReadAttempt, read_id), "shared_busy", read_kind=evidence.get("read_kind"))
             if version.lease_token == token:
                 version.status, version.next_at = "pending", now_ms() + 1000
                 version.lease_token, version.lease_until = None, 0
@@ -249,16 +269,22 @@ def import_page(adapter, *, version_id=None):
         with transaction() as db:
             version = lock_version(db, ident)
             if version.lease_token != token:
+                finish_read(db.get(HistoryReadAttempt, read_id), "discarded", batch=batch,
+                            read_kind=evidence.get("read_kind"))
                 return True
             if controlled_stop(db, version):
+                finish_read(db.get(HistoryReadAttempt, read_id), "discarded", batch=batch,
+                            read_kind=evidence.get("read_kind"))
                 return True
             version.attempts += 1
-            result = batch.result if batch and not batch.result.successful else None
+            result = batch.result if batch and not batch.result.successful else failed_request(error, observed_at=now_ms())
             metadata_failure = isinstance(error, PricePrecisionError)
             configuration_failure = isinstance(error, HistoryConfigurationError)
             version.error = "price_precision_overflow" if metadata_failure else (
                 "history_source_configuration" if configuration_failure else
                 result.status if result else "invalid_payload")
+            finish_read(db.get(HistoryReadAttempt, read_id), version.error, batch=batch,
+                        read_kind=evidence.get("read_kind"))
             version.next_at = (result.retry_at if result and result.retry_at else
                                now_ms() + min(900000, 1000 * 2 ** min(version.attempts, 10)))
             version.status = "configuration_error" if metadata_failure or configuration_failure or (

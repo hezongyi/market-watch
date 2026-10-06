@@ -59,6 +59,28 @@ export function DatasetDetail() {
   );
   const before = params.get("before");
   const coveragePage = Math.max(1, Number(params.get("coverage_page")) || 1);
+  const requestPage = Math.max(1, Number(params.get("request_page")) || 1);
+  const requests = useSnapshot<{
+    items: {
+      id: string;
+      start: number;
+      end: number;
+      started_at: number;
+      finished_at: number | null;
+      result: string;
+      read_kind: string;
+      accepted: boolean;
+      observations: number | null;
+    }[];
+    total: number;
+    failed: number;
+    evidence_available: boolean;
+  }>(
+    selectedVersion && section === "coverage"
+      ? `/market-data/versions/${selectedVersion}/requests?page=${requestPage}&page_size=25`
+      : null,
+    refresh,
+  );
   const coverage = useSnapshot<{
     items: {
       start: number;
@@ -68,6 +90,15 @@ export function DatasetDetail() {
       unknown_minutes: number;
       observed_intervals: number[][];
       unknown_intervals: number[][];
+      confirmed_closed_minutes: number;
+      confirmed_closed_intervals: number[][];
+      conflict_minutes: number;
+      conflict_intervals: number[][];
+      session_evidence: {
+        source: string;
+        kind: string;
+        applicability?: string;
+      }[];
     }[];
     total: number;
   }>(
@@ -265,12 +296,37 @@ export function DatasetDetail() {
           {section === "coverage" && (
             <>
               <h2>已发布 M1 覆盖</h2>
+              <label>
+                覆盖固定版本
+                <select
+                  value={selectedVersion || ""}
+                  onChange={(e) => {
+                    const next = new URLSearchParams(params);
+                    next.set("version", e.target.value);
+                    next.delete("coverage_page");
+                    next.delete("request_page");
+                    setParams(next);
+                  }}
+                >
+                  {versions.data
+                    ?.filter(
+                      (v) =>
+                        v.status === "published" &&
+                        v.payload_available !== false,
+                    )
+                    .map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {time(v.start)} — {time(v.end)}
+                      </option>
+                    ))}
+                </select>
+              </label>
               <p>
                 {time(dataset.available_start)} 至 {time(dataset.available_end)}
               </p>
               <p>
-                未知区间合计：{dataset.unknown_minutes ?? "尚未发布"}{" "}
-                分钟。空响应不证明闭市；范围摘要不代表中间连续。
+                最新M1清单未观测分钟：{dataset.unknown_minutes ?? "尚未发布"}{" "}
+                分钟。下表按所选固定版本的来源证据区分未知与已证实闭市；空响应不证明闭市。
               </p>
               <p>
                 各周期完整性按该父版本与来源会话证据判断。下列未知区间保存查询事实，不推断闭市或补造价格。
@@ -289,6 +345,8 @@ export function DatasetDetail() {
                           <th>已查询分区</th>
                           <th>实际观测</th>
                           <th>未知区间</th>
+                          <th>已证实闭市</th>
+                          <th>证据冲突</th>
                           <th>查询时间</th>
                         </tr>
                       </thead>
@@ -325,6 +383,53 @@ export function DatasetDetail() {
                                 )}
                               </details>
                             </td>
+                            <td>
+                              {c.confirmed_closed_minutes} 分钟
+                              <details>
+                                <summary>查看闭市区间与依据</summary>
+                                {c.confirmed_closed_intervals.length ? (
+                                  c.confirmed_closed_intervals.map(([l, r]) => (
+                                    <p key={l}>
+                                      {time(l)} 至 {time(r)}
+                                    </p>
+                                  ))
+                                ) : (
+                                  <p>无已证实闭市区间</p>
+                                )}
+                                {c.session_evidence.map((e, i) => (
+                                  <p key={i}>
+                                    <a
+                                      href={e.source}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      来源依据
+                                    </a>
+                                    {e.applicability
+                                      ? ` · ${e.applicability}`
+                                      : ""}
+                                  </p>
+                                ))}
+                              </details>
+                            </td>
+                            <td>
+                              {c.conflict_minutes} 分钟
+                              <details>
+                                <summary>查看观测冲突</summary>
+                                {c.conflict_intervals.length ? (
+                                  c.conflict_intervals.map(([l, r]) => (
+                                    <p key={l}>
+                                      {time(l)} 至 {time(r)}
+                                    </p>
+                                  ))
+                                ) : (
+                                  <p>无已知冲突</p>
+                                )}
+                                <p>
+                                  来源观测与闭市依据不一致时保留价格，不能据此认定完整覆盖。
+                                </p>
+                              </details>
+                            </td>
                             <td>{time(c.observed_at)}</td>
                           </tr>
                         ))}
@@ -339,6 +444,92 @@ export function DatasetDetail() {
                   />
                 </>
               )}
+              <h2>历史读取记录</h2>
+              <p>
+                请求失败范围与最终覆盖分别记录；重试成功不会抹去失败，失败不额外计入未知分钟。
+              </p>
+              <Feedback
+                error={requests.error}
+                loading={requests.loading}
+                empty={!requests.data}
+              />
+              {requests.data &&
+                (requests.data.evidence_available ? (
+                  <>
+                    <p>
+                      共 {requests.data.total} 次读取，其中失败{" "}
+                      {requests.data.failed}{" "}
+                      次。共享缓存、父版本复用与上游请求分别标明。
+                    </p>
+                    <div className="dc-table">
+                      <table>
+                        <caption>所选固定版本的历史读取与请求失败证据</caption>
+                        <thead>
+                          <tr>
+                            <th>请求范围</th>
+                            <th>方式</th>
+                            <th>结果</th>
+                            <th>实际接纳</th>
+                            <th>记录时间</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {requests.data.items.map((r) => (
+                            <tr key={r.id}>
+                              <td>
+                                {time(r.start)}
+                                <span>至 {time(r.end)}</span>
+                              </td>
+                              <td>
+                                {{
+                                  supplier_request: "上游请求",
+                                  shared_cache: "共享缓存",
+                                  parent_reuse: "父版本复用",
+                                  shared_wait: "等待共享读取",
+                                  pending: "尚未读取",
+                                }[r.read_kind] || r.read_kind}
+                              </td>
+                              <td>
+                                {{
+                                  data: "返回数据",
+                                  empty_success: "成功空响应",
+                                  inherited: "继承父版本",
+                                  timeout: "超时",
+                                  rate_limited: "请求限流",
+                                  unauthorized: "授权异常",
+                                  unavailable: "来源不可用",
+                                  invalid_payload: "数据校验失败",
+                                  price_precision_overflow: "价格精度不符",
+                                  history_source_configuration: "来源配置异常",
+                                  shared_busy: "共享读取未完成",
+                                  discarded: "结果未接纳",
+                                  interrupted: "进程中断，结果未知",
+                                  started: "读取中",
+                                }[r.result] || r.result}
+                              </td>
+                              <td>
+                                {r.accepted
+                                  ? `${r.observations ?? "继承"} · 已接纳`
+                                  : "未接纳"}
+                              </td>
+                              <td>{time(r.finished_at ?? r.started_at)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <Pager
+                      total={requests.data.total}
+                      page={requestPage}
+                      size={25}
+                      change={(p) => select("request_page", String(p))}
+                    />
+                  </>
+                ) : (
+                  <p>
+                    该版本没有历史读取证据记录；不能据此认定曾经没有请求失败。
+                  </p>
+                ))}
             </>
           )}
           {section === "versions" && (

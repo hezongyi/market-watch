@@ -6,7 +6,7 @@ from alerts.data_center import dataset_detail, dataset_list, task_list
 from alerts.history_artifacts import artifact_tick
 from alerts.history_maintenance import configure, create_run
 from alerts.history_versions import import_page
-from alerts.storage import DatasetMaintenance, MarketDataset, MarketDemand
+from alerts.storage import DatasetMaintenance, HistoryVersion, MarketDataset, MarketDemand
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from test_history_maintenance import Adapter
@@ -99,6 +99,43 @@ def test_new_m1_publication_preserves_previous_period_usability(database):
         assert detail["usable_timeframes"] == ["H4", "M1"]
         assert all(p["available_version_id"] == parent for p in detail["periods"])
         assert dataset_list(db, status="available")["total"] == 1
+
+
+@pytest.mark.parametrize("use_catalog", [False, True])
+def test_create_retry_uses_fixed_request_before_mutable_catalogue(database, monkeypatch, use_catalog):
+    from alerts import history_catalog
+
+    body = {"request_id": "catalogue-retry", "dataset": {"logical_symbol": "EURUSD",
+        "provider_symbol": "EUR/USD", "asset_class": "forex", "precision": 5},
+        "maintenance": {"target_start": 0, "timeframes": ["M1"]}}
+    if use_catalog:
+        with database.begin() as db:
+            item = history_catalog.catalog(db, source="dukascopy", query="EURUSD")["items"][0]
+        body["dataset"]["catalog_id"] = item["catalog_id"]
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            created = client.post("/api/market-data/center/datasets", json=body)
+            assert created.status_code == 201
+            ident = created.json()["task"]["id"]
+            with database.begin() as db:
+                request = db.get(HistoryVersion, ident).manifest["maintenance"]["creation_request"]
+                if not use_catalog:
+                    # Shape of manifests published before catalogue selection existed.
+                    assert "catalog_id" not in request["dataset"]
+            def unavailable(*args, **kwargs):
+                raise ValueError("来源目录已变化")
+            monkeypatch.setattr(history_catalog, "validate_selection", unavailable)
+            retry = client.post("/api/market-data/center/datasets", json=body)
+            assert retry.status_code == 201 and retry.json()["task"]["id"] == ident
+            changed = client.post("/api/market-data/center/datasets", json={**body,
+                "dataset": {**body["dataset"], "precision": 3}})
+            assert changed.status_code == 422 and "创建配置" in changed.text
+            if use_catalog:
+                new = client.post("/api/market-data/center/datasets", json={**body, "request_id": "new"})
+                assert new.status_code == 422 and "来源目录" in new.text
+    finally:
+        api.app.dependency_overrides.clear()
 
 
 def test_chart_api_pins_period_and_exclusive_cursor_to_selected_version(database):

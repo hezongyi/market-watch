@@ -39,6 +39,7 @@ class DatasetRequest(BaseModel):
     asset_class: AssetClass
     precision: int = Field(ge=0, le=10, strict=True)
     aggregation_calendar: AggregationCalendar | None = None
+    catalog_id: str | None = Field(default=None, max_length=64)
 
 
 class AggregationRequest(BaseModel):
@@ -92,6 +93,15 @@ class ManagedRequest(BaseModel):
     request_id: str = Field(min_length=1, max_length=100)
 
 
+def _creation_request(body):
+    # Old manifests predate optional catalogue selection. Missing and null mean
+    # the same manual request; preserve every other field in retry comparison.
+    dataset = dict(body.get("dataset", {}))
+    if dataset.get("catalog_id") is None:
+        dataset.pop("catalog_id", None)
+    return {**body, "dataset": dataset}
+
+
 def dataset_report(row, inst):
     return {"id": row.id, "instrument_id": row.instrument_id,
             "logical_symbol": row.logical_symbol, "identity": row.identity,
@@ -141,7 +151,7 @@ def router(authenticated):
         if page < 1 or not 1 <= page_size <= 100:
             raise HTTPException(422, "无效的目录分页")
         with transaction() as db:
-            rows = select(MarketCatalog)
+            rows = select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:"))
             if query:
                 rows = rows.where(or_(MarketCatalog.symbol.contains(query[:100], autoescape=True),
                                       MarketCatalog.label.contains(query[:100], autoescape=True)))
@@ -196,38 +206,33 @@ def router(authenticated):
             with transaction() as db:
                 # Acquire a source-level registration lock before any instrument
                 # insert. It serializes concurrent first registration as well.
+                from .aggregation_policy import history_dataset_identity
                 from .source_registry import _insert
                 from .storage import SourceSeries
 
-                source = body.dataset.source
-                import hashlib
-
-                from .config import settings
-                from .market_contracts import DatasetIdentity
-
-                raw = DatasetIdentity(source=source, channel="v20" if source == "oanda" else "python",
-                    environment="practice" if source == "oanda" else "historical",
-                    account_scope="sha256:" + hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
-                        if source == "oanda" else "public", provider_symbol=body.dataset.provider_symbol,
-                    basis="bid", calendar_version="registration-lock")
+                raw = history_dataset_identity(source=body.dataset.source,
+                    provider_symbol=body.dataset.provider_symbol, asset_class=body.dataset.asset_class,
+                    aggregation_calendar=body.dataset.aggregation_calendar)
                 identity = collection_identity(raw)
                 db.execute(_insert(db)(SourceSeries).values(id=identity.key, identity=identity.model_dump())
                     .on_conflict_do_nothing(index_elements=["id"]))
                 db.scalar(select(SourceSeries).where(SourceSeries.id == identity.key).with_for_update())
-                row, _ = register_history_dataset(db, **body.dataset.model_dump())
                 from .storage import HistoryRun
 
-                previous = db.scalar(select(HistoryRun).where(HistoryRun.dataset_id == row.id,
+                request = _creation_request(body.model_dump())
+                previous = db.scalar(select(HistoryRun).where(HistoryRun.dataset_id == raw.key,
                     HistoryRun.request_id == body.request_id))
                 if previous:
                     version = db.get(HistoryVersion, previous.version_id)
-                    if version.manifest.get("maintenance", {}).get("creation_request") != body.model_dump():
+                    original = version.manifest.get("maintenance", {}).get("creation_request", {})
+                    if _creation_request(original) != request:
                         raise ValueError("相同提交标识不能更改创建配置")
-                    return {"dataset": dataset_detail(db, row.id), "task": version_report(db, version.id)}
+                    return {"dataset": dataset_detail(db, raw.key), "task": version_report(db, version.id)}
+                row, _ = register_history_dataset(db, **body.dataset.model_dump())
                 configure(db, row.id, **body.maintenance.model_dump())
                 version = create_run(db, row.id, request_id=body.request_id)
                 version.manifest = {**version.manifest, "maintenance": {
-                    **version.manifest["maintenance"], "creation_request": body.model_dump()}}
+                    **version.manifest["maintenance"], "creation_request": request}}
                 return {"dataset": dataset_detail(db, row.id), "task": version_report(db, version.id)}
         except (ValueError, KeyError) as error:
             raise HTTPException(422, str(error)) from None
@@ -237,6 +242,37 @@ def router(authenticated):
         from .source_registry import capabilities
 
         return [capabilities(source) for source in ("dukascopy", "oanda", "binance", "yahoo")]
+
+    @routes.get("/history-catalog")
+    def history_catalog(source: str, query: str = "", page: int = 1, page_size: int = 25):
+        from .history_catalog import catalog
+
+        try:
+            with transaction() as db:
+                return catalog(db, source=source, query=query, page=page, page_size=page_size)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.get("/versions/{version_id}/requests")
+    def history_requests(version_id: str, page: int = 1, page_size: int = 25):
+        from .history_request_evidence import report
+
+        try:
+            with transaction() as db:
+                return report(db, version_id, page=page, page_size=page_size)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.post("/history-catalog/refresh")
+    def refresh_history_catalog():
+        from .history_catalog import refresh_oanda
+
+        try:
+            return refresh_oanda()
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+        except Exception:
+            raise HTTPException(502, "OANDA来源目录刷新失败；原目录保留，请检查连接") from None
 
     @routes.get("/datasets/{dataset_id}/source")
     def collection(dataset_id: str):

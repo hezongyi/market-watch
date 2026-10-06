@@ -63,7 +63,8 @@ def store_blob(db, source_id, raw):
     return key, checksum
 
 
-def shared_page(adapter, identity, start, end, *, fresh_after):
+def shared_page(adapter, identity, start, end, *, fresh_after, evidence=None):
+    evidence = evidence if evidence is not None else {}
     source = collection_identity(identity)
     key = hashlib.sha256(f"{source.key}|{start}|{end}".encode()).hexdigest()
     with transaction() as db:
@@ -75,6 +76,7 @@ def shared_page(adapter, identity, start, end, *, fresh_after):
                    .on_conflict_do_nothing(index_elements=["id"]))
         fetch = db.scalar(select(SourceFetch).where(SourceFetch.id == key).with_for_update())
         if fetch.content_id and fetch.fetched_at > fresh_after:
+            evidence["read_kind"] = "shared_cache"
             blob = db.get(SourceBlob, fetch.content_id)
             raw = gzip.decompress(blob.content)
             if hashlib.sha256(raw).hexdigest() != blob.checksum or blob.source_id != source.key:
@@ -86,10 +88,12 @@ def shared_page(adapter, identity, start, end, *, fresh_after):
                 volume_kind="price_count" if identity.source == "oanda" else "quantity",
                 volume_unit="quotes" if identity.source == "oanda" else "source_quantity")
         if fetch.lease_until > now_ms():
+            evidence["read_kind"] = "shared_wait"
             raise AcquisitionBusy("source_page_in_progress")
         token = uid()
         fetch.lease_token, fetch.lease_until = token, now_ms() + 60000
     try:
+        evidence["read_kind"] = "supplier_request"
         batch = adapter.page(identity, start, end)
         expected_volume = ("price_count", "quotes") if identity.source == "oanda" else ("quantity", "source_quantity")
         if (batch.volume_kind, batch.volume_unit) != expected_volume:

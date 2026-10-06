@@ -125,6 +125,7 @@ def task_list(db, *, dataset_id=None, page=1, page_size=25):
 def coverage_report(db, version_id, *, page=1, page_size=25):
     import json
 
+    from .history_quality import classify
     from .source_history_store import raw_chunk
     from .storage import HistoryChunk, HistoryReclamation
 
@@ -142,14 +143,6 @@ def coverage_report(db, version_id, *, page=1, page_size=25):
     items = []
     for chunk in db.scalars(query.order_by(HistoryChunk.start).offset((page - 1) * page_size).limit(page_size)):
         rows = json.loads(raw_chunk(db, chunk))
-        observed = []
-        for row in rows:
-            if observed and observed[-1][1] == row["timestamp"]:
-                observed[-1][1] += 60000
-            else:
-                observed.append([row["timestamp"], row["timestamp"] + 60000])
         items.append({"start": chunk.start, "end": chunk.end, "observed_at": chunk.observed_at,
-            "observed_minutes": chunk.count, "result": chunk.result,
-            "observed_intervals": observed, "unknown_intervals": chunk.unknown,
-            "unknown_minutes": sum((right - left) // 60000 for left, right in chunk.unknown)})
+            "result": chunk.result, **classify(version, rows, chunk.unknown)})
     return {"version_id": version.id, "items": items, "total": total, "page": page, "page_size": page_size}

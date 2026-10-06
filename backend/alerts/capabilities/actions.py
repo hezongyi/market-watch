@@ -330,6 +330,7 @@ def ack(ctx, query, db):
 
 def build_registry():
     from .drawings import drawings, workspaces
+    from .history import register_history
 
     registry = Registry()
     definitions = [
@@ -453,4 +454,5 @@ def build_registry():
                 handler,
             )
         )
+    register_history(registry)
     return registry.freeze()
