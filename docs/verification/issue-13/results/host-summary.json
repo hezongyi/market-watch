@@ -1,0 +1,194 @@
+{
+  "backfill-1": {
+    "samples": 18,
+    "load_mean": [
+      17.511338975694443,
+      17.460340711805557,
+      16.648844401041668
+    ],
+    "host_busy_percent": 99.7069960692642,
+    "iowait_percent": 0.11047689191677408,
+    "steal_percent": 2.476923939061587,
+    "swap_in_pages": 6,
+    "swap_out_pages": 20,
+    "db_docker_cpu_mean": 13.219444444444445,
+    "minimum_disk_free": 2735595520,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "backfill-2": {
+    "samples": 17,
+    "load_mean": [
+      18.962689568014707,
+      18.01416015625,
+      17.1318359375
+    ],
+    "host_busy_percent": 99.86249726127787,
+    "iowait_percent": 0.049863630525607994,
+    "steal_percent": 4.239919613783516,
+    "swap_in_pages": 8,
+    "swap_out_pages": 8,
+    "db_docker_cpu_mean": 14.911764705882353,
+    "minimum_disk_free": 2807377920,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "backfill-3": {
+    "samples": 15,
+    "load_mean": [
+      26.507747395833334,
+      24.489680989583334,
+      20.467122395833332
+    ],
+    "host_busy_percent": 99.92673751450845,
+    "iowait_percent": 0.038689177731497104,
+    "steal_percent": 3.125591656308394,
+    "swap_in_pages": 14,
+    "swap_out_pages": 13,
+    "db_docker_cpu_mean": 11.456,
+    "minimum_disk_free": 2885836800,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "idle-1": {
+    "samples": 19,
+    "load_mean": [
+      18.37412623355263,
+      16.176295230263158,
+      14.923853824013158
+    ],
+    "host_busy_percent": 99.29719693144617,
+    "iowait_percent": 0.08388031988533642,
+    "steal_percent": 2.385295698486897,
+    "swap_in_pages": 26,
+    "swap_out_pages": 30,
+    "db_docker_cpu_mean": 9.624210526315789,
+    "minimum_disk_free": 2830106624,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "idle-2": {
+    "samples": 19,
+    "load_mean": [
+      17.71157997532895,
+      17.466616981907894,
+      15.898206208881579
+    ],
+    "host_busy_percent": 99.26999949655138,
+    "iowait_percent": 0.04782761919146151,
+    "steal_percent": 1.969323197234389,
+    "swap_in_pages": 29,
+    "swap_out_pages": 16,
+    "db_docker_cpu_mean": 12.009473684210526,
+    "minimum_disk_free": 2837938176,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "idle-3": {
+    "samples": 20,
+    "load_mean": [
+      13.7458251953125,
+      15.1833251953125,
+      15.3770263671875
+    ],
+    "host_busy_percent": 98.88573479509266,
+    "iowait_percent": 0.04649569303054033,
+    "steal_percent": 4.4317736883320284,
+    "swap_in_pages": 228,
+    "swap_out_pages": 242,
+    "db_docker_cpu_mean": 10.8095,
+    "minimum_disk_free": 2905944064,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "live-1": {
+    "samples": 20,
+    "load_mean": [
+      12.7957763671875,
+      13.8763671875,
+      14.7675048828125
+    ],
+    "host_busy_percent": 99.16594884707129,
+    "iowait_percent": 0.0397561622051418,
+    "steal_percent": 1.7476146302676916,
+    "swap_in_pages": 8,
+    "swap_out_pages": 0,
+    "db_docker_cpu_mean": 14.189,
+    "minimum_disk_free": 2906677248,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "live-2": {
+    "samples": 16,
+    "load_mean": [
+      18.070343017578125,
+      15.852691650390625,
+      15.260284423828125
+    ],
+    "host_busy_percent": 99.66204661313702,
+    "iowait_percent": 0.06189025879900324,
+    "steal_percent": 2.9006987084480205,
+    "swap_in_pages": 5,
+    "swap_out_pages": 9,
+    "db_docker_cpu_mean": 8.56375,
+    "minimum_disk_free": 2894417920,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "live-3": {
+    "samples": 18,
+    "load_mean": [
+      18.773111979166668,
+      18.088731553819443,
+      16.47097439236111
+    ],
+    "host_busy_percent": 99.4899074546382,
+    "iowait_percent": 0.06558332726080303,
+    "steal_percent": 5.16488943946497,
+    "swap_in_pages": 24,
+    "swap_out_pages": 15,
+    "db_docker_cpu_mean": 12.197777777777777,
+    "minimum_disk_free": 2885160960,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "revision-1": {
+    "samples": 20,
+    "load_mean": [
+      16.00693359375,
+      20.76025390625,
+      20.286572265625
+    ],
+    "host_busy_percent": 93.68833818266948,
+    "iowait_percent": 2.6913815591451793,
+    "steal_percent": 5.187953580147821,
+    "swap_in_pages": 4134,
+    "swap_out_pages": 2310,
+    "db_docker_cpu_mean": 17.9895,
+    "minimum_disk_free": 5346983936,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "revision-2": {
+    "samples": 25,
+    "load_mean": [
+      5.10474609375,
+      11.82783203125,
+      16.6516015625
+    ],
+    "host_busy_percent": 65.94021644914436,
+    "iowait_percent": 1.1936897892468858,
+    "steal_percent": 5.104963801315866,
+    "swap_in_pages": 60,
+    "swap_out_pages": 0,
+    "db_docker_cpu_mean": 15.465200000000001,
+    "minimum_disk_free": 7518945280,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  },
+  "revision-3": {
+    "samples": 25,
+    "load_mean": [
+      6.62193359375,
+      7.996953125,
+      13.54630859375
+    ],
+    "host_busy_percent": 75.39168197761818,
+    "iowait_percent": 0.8009019542341741,
+    "steal_percent": 3.1501586771337897,
+    "swap_in_pages": 8,
+    "swap_out_pages": 123,
+    "db_docker_cpu_mean": 17.4508,
+    "minimum_disk_free": 21654671360,
+    "limitations": "Host interval covers sampled boundaries only; database Docker CPU is sampled, not continuous"
+  }
+}

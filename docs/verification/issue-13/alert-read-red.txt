@@ -1,0 +1,26 @@
+{
+  "scenario": "published_alert",
+  "rows": 60,
+  "staging_correction_hidden": true,
+  "stored_rows_queries": {
+    "sql": 6,
+    "staging_reads": 1,
+    "published_reads": 1
+  },
+  "evaluate_queries": {
+    "sql": 25,
+    "staging_reads": 3,
+    "published_reads": 3
+  },
+  "evaluate_repetitions": 3,
+  "elapsed": 0.03983962070196867,
+  "scope": "SQLite logic and duplicate read evidence only; not PostgreSQL CPU attribution"
+}
+Traceback (most recent call last):
+  File "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/alert_read_probe.py", line 76, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/alert_read_probe.py", line 73, in main
+    assert input_counts.get('staging_reads',0)==0 and counts.get('staging_reads',0)==0,'BUG: published alert reads and discards staging history'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: BUG: published alert reads and discards staging history

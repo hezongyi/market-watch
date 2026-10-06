@@ -1,0 +1,1165 @@
+{
+  "at": "2026-10-06T23:45:43.577808+00:00",
+  "host": "quant-server",
+  "daemon": "Ubuntu 22.04.5 LTS",
+  "containers": [
+    {
+      "name": "market-watch-three-layer-history-worker-1",
+      "id": "8222264b5bf5",
+      "project": "market-watch-three-layer",
+      "service": "history-worker",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "market-watch-three-layer:dev",
+      "image_id": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T22:30:20.857944717Z",
+      "status": "running",
+      "started": "2026-10-06T23:26:42.03371369Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration",
+          "Destination": "/app",
+          "RW": false
+        }
+      ],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-three-layer-composite-aggregate-worker-1",
+      "id": "66d91b0bf383",
+      "project": "market-watch-three-layer",
+      "service": "composite-aggregate-worker",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "market-watch-three-layer:dev",
+      "image_id": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T22:30:20.642250333Z",
+      "status": "running",
+      "started": "2026-10-06T23:05:28.957741674Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration",
+          "Destination": "/app",
+          "RW": false
+        }
+      ],
+      "resources": {
+        "NanoCpus": 1000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 402653184,
+        "MemorySwap": 805306368
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "mw-issue13-p0-postgres-1",
+      "id": "b2c3d8407046",
+      "project": "mw-issue13-p0",
+      "service": "postgres",
+      "working_dir": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13",
+      "config_files": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/compose.yaml",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T22:23:05.610845609Z",
+      "status": "exited",
+      "started": "2026-10-06T23:40:48.321961793Z",
+      "exit_code": 0,
+      "ports": {},
+      "networks": [
+        "mw-issue13-p0_default"
+      ],
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "mw-issue13-p0_pgdata",
+          "Source": "/var/lib/docker/volumes/mw-issue13-p0_pgdata/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "RW": true
+        }
+      ],
+      "resources": {
+        "NanoCpus": 750000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 536870912,
+        "MemorySwap": 1073741824
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-three-layer-native-history-worker-1",
+      "id": "025d2df59ca8",
+      "project": "market-watch-three-layer",
+      "service": "native-history-worker",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "market-watch-three-layer:dev",
+      "image_id": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T21:51:25.340303776Z",
+      "status": "running",
+      "started": "2026-10-06T23:42:15.524997267Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration",
+          "Destination": "/app",
+          "RW": false
+        }
+      ],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-three-layer-chart-origin-1",
+      "id": "689a1333987d",
+      "project": "market-watch-three-layer",
+      "service": "chart-origin",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "mw-range-main-chart:horizontal-labels1",
+      "image_id": "sha256:4abd9b251ae2dcec56ec20cb36bfd054e364c67cf5e5fdb985136af7e2f17eb2",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T17:48:05.454076066Z",
+      "status": "running",
+      "started": "2026-10-06T17:48:50.692953926Z",
+      "exit_code": 0,
+      "ports": {
+        "80/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "16630"
+          }
+        ]
+      },
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration/advanced-host",
+          "Destination": "/usr/share/nginx/html",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/chart-origin-assets/charting_library",
+          "Destination": "/usr/share/nginx/html/charting_library",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration/advanced-host/nginx.conf",
+          "Destination": "/etc/nginx/conf.d/default.conf",
+          "RW": false
+        }
+      ],
+      "resources": {
+        "NanoCpus": 0,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 134217728,
+        "MemorySwap": 268435456
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-three-layer-pricing-worker-1",
+      "id": "9a9387c6dccc",
+      "project": "market-watch-three-layer",
+      "service": "pricing-worker",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "market-watch-three-layer:dev",
+      "image_id": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T16:33:58.225242992Z",
+      "status": "running",
+      "started": "2026-10-06T23:26:34.170503651Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration",
+          "Destination": "/app",
+          "RW": false
+        }
+      ],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-three-layer-api-1",
+      "id": "92645ab9bdac",
+      "project": "market-watch-three-layer",
+      "service": "api",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "market-watch-three-layer:dev",
+      "image_id": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T15:20:26.761669088Z",
+      "status": "running",
+      "started": "2026-10-06T23:42:06.765725629Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration",
+          "Destination": "/app",
+          "RW": false
+        }
+      ],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-three-layer-migrate-1",
+      "id": "e344bdb3edfc",
+      "project": "market-watch-three-layer",
+      "service": "migrate",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "market-watch-three-layer:dev",
+      "image_id": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T15:20:24.72505214Z",
+      "status": "exited",
+      "started": "2026-10-06T23:05:12.931580256Z",
+      "exit_code": 0,
+      "ports": {},
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration",
+          "Destination": "/app",
+          "RW": false
+        }
+      ],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-three-layer-web-1",
+      "id": "6a89353acbde",
+      "project": "market-watch-three-layer",
+      "service": "web",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "market-watch-data-integration-web:dev",
+      "image_id": "sha256:417b45c88cb7c26f7676b5afdba00b25a8309dd2c7c11d373151cfb205c4f23b",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T13:58:29.626494351Z",
+      "status": "running",
+      "started": "2026-10-06T13:58:56.743752955Z",
+      "exit_code": 0,
+      "ports": {
+        "80/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "16629"
+          }
+        ]
+      },
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration/web/dist",
+          "Destination": "/usr/share/nginx/html",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-data-integration/web/nginx.conf",
+          "Destination": "/etc/nginx/conf.d/default.conf",
+          "RW": false
+        }
+      ],
+      "resources": {
+        "NanoCpus": 0,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 134217728,
+        "MemorySwap": 268435456
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-three-layer-postgres-1",
+      "id": "623e8edcaed7",
+      "project": "market-watch-three-layer",
+      "service": "postgres",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/three-layer/compose.yaml",
+      "image": "postgres:14-bookworm",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T12:54:45.027094656Z",
+      "status": "running",
+      "started": "2026-10-06T12:54:45.496089904Z",
+      "exit_code": 0,
+      "ports": {
+        "5432/tcp": null
+      },
+      "networks": [
+        "market-watch-three-layer_default"
+      ],
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "market-watch-three-layer_three-layer-postgres",
+          "Source": "/var/lib/docker/volumes/market-watch-three-layer_three-layer-postgres/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "RW": true
+        }
+      ],
+      "resources": {
+        "NanoCpus": 0,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 536870912,
+        "MemorySwap": 1073741824
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-data-integration-api-1",
+      "id": "030ca18b1100",
+      "project": "market-watch-data-integration",
+      "service": "api",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration/compose.yaml",
+      "image": "market-watch-data-integration:dev",
+      "image_id": "sha256:1ff7548c52b3c25e3d0901abe10a5cfb50d3c063ae579774b77434926857e3d7",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T05:01:03.324622983Z",
+      "status": "running",
+      "started": "2026-10-06T05:01:15.58543702Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-data-integration_default"
+      ],
+      "mounts": [],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-data-integration-history-worker-1",
+      "id": "a46a03670bab",
+      "project": "market-watch-data-integration",
+      "service": "history-worker",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration/compose.yaml",
+      "image": "market-watch-data-integration:dev",
+      "image_id": "sha256:454f75edb49bbf76dcd96ab45f62f6e06ea824d2a406b6f03e3d809e10771417",
+      "image_revision": null,
+      "image_missing": true,
+      "created": "2026-10-06T03:45:41.972483712Z",
+      "status": "running",
+      "started": "2026-10-06T03:46:26.703445724Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-data-integration_default"
+      ],
+      "mounts": [],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-data-integration-oanda-worker-1",
+      "id": "645b5113f1fc",
+      "project": "market-watch-data-integration",
+      "service": "oanda-worker",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration/compose.yaml",
+      "image": "market-watch-data-integration:dev",
+      "image_id": "sha256:4b052ec4b8e594252c12240048cb8105a7091e3485c36b3f22584824c183aac1",
+      "image_revision": null,
+      "image_missing": true,
+      "created": "2026-10-06T03:41:00.387308401Z",
+      "status": "running",
+      "started": "2026-10-06T03:41:15.982844507Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-data-integration_default"
+      ],
+      "mounts": [],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-data-integration-aggregation-worker-1",
+      "id": "bc909bee1879",
+      "project": "market-watch-data-integration",
+      "service": "aggregation-worker",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration/compose.yaml",
+      "image": "market-watch-data-integration:dev",
+      "image_id": "sha256:49239660cf653e3322818bd7f4a905430d97e0beb710e25db634ff6279b612ae",
+      "image_revision": null,
+      "image_missing": true,
+      "created": "2026-10-06T03:25:24.880721533Z",
+      "status": "running",
+      "started": "2026-10-06T03:25:37.048646166Z",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "market-watch-data-integration_default"
+      ],
+      "mounts": [],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-data-integration-migrate-1",
+      "id": "47da0b29c3fd",
+      "project": "market-watch-data-integration",
+      "service": "migrate",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration/compose.yaml",
+      "image": "market-watch-data-integration:dev",
+      "image_id": "sha256:1444bd2776f64c270384455aa7e14a701d14eb39f6e07ad01ad65efe02f00c7e",
+      "image_revision": null,
+      "image_missing": true,
+      "created": "2026-10-06T02:42:29.19829119Z",
+      "status": "exited",
+      "started": "2026-10-06T03:13:39.231837403Z",
+      "exit_code": 0,
+      "ports": {},
+      "networks": [
+        "market-watch-data-integration_default"
+      ],
+      "mounts": [],
+      "resources": {
+        "NanoCpus": 2000000000,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-data-integration-web-1",
+      "id": "6f4e8e814bd2",
+      "project": "market-watch-data-integration",
+      "service": "web",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration/compose.yaml",
+      "image": "market-watch-data-integration-web:dev",
+      "image_id": "sha256:417b45c88cb7c26f7676b5afdba00b25a8309dd2c7c11d373151cfb205c4f23b",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T02:23:34.238667306Z",
+      "status": "running",
+      "started": "2026-10-06T02:23:35.245224363Z",
+      "exit_code": 0,
+      "ports": {
+        "80/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "16589"
+          }
+        ]
+      },
+      "networks": [
+        "market-watch-data-integration_default"
+      ],
+      "mounts": [],
+      "resources": {
+        "NanoCpus": 0,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 201326592,
+        "MemorySwap": 402653184
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    },
+    {
+      "name": "market-watch-data-integration-postgres-1",
+      "id": "af4060babedb",
+      "project": "market-watch-data-integration",
+      "service": "postgres",
+      "working_dir": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration",
+      "config_files": "/home/quant/repos/market-watch-data-integration/docs/verification/data-integration/compose.yaml",
+      "image": "postgres:14-bookworm",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "image_revision": null,
+      "image_missing": false,
+      "created": "2026-10-06T01:48:39.889591016Z",
+      "status": "running",
+      "started": "2026-10-06T01:48:40.019096826Z",
+      "exit_code": 0,
+      "ports": {
+        "5432/tcp": null
+      },
+      "networks": [
+        "market-watch-data-integration_default"
+      ],
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "market-watch-data-integration_integration-postgres",
+          "Source": "/var/lib/docker/volumes/market-watch-data-integration_integration-postgres/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "RW": true
+        }
+      ],
+      "resources": {
+        "NanoCpus": 0,
+        "CpuQuota": 0,
+        "CpuPeriod": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "Memory": 805306368,
+        "MemorySwap": 1610612736
+      },
+      "ownership": "Compose labels establish configuration origin; task completion/idle state unverified; retain"
+    }
+  ],
+  "samples": [
+    {
+      "at": "2026-10-06T23:45:37.348931+00:00",
+      "containers": [
+        {
+          "BlockIO": "1.05MB / 0B",
+          "CPUPerc": "0.00%",
+          "Container": "8222264b5bf512c0a3b32170b005dc58f62379cecf40acabc0e7642d006361a5",
+          "ID": "8222264b5bf5",
+          "MemPerc": "12.00%",
+          "MemUsage": "92.17MiB / 768MiB",
+          "Name": "market-watch-three-layer-history-worker-1",
+          "NetIO": "1.09MB / 785kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "1.97MB / 0B",
+          "CPUPerc": "0.39%",
+          "Container": "66d91b0bf383908dc92348957bc09d8ec81d0ce14e964b614ffaf0ae696167bd",
+          "ID": "66d91b0bf383",
+          "MemPerc": "26.29%",
+          "MemUsage": "100.9MiB / 384MiB",
+          "Name": "market-watch-three-layer-composite-aggregate-worker-1",
+          "NetIO": "87.5MB / 6.83MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "90.1kB / 0B",
+          "CPUPerc": "0.29%",
+          "Container": "025d2df59ca845e3daec8b6515073ea19b6a8edb1ad3838fd201014f8c5d0171",
+          "ID": "025d2df59ca8",
+          "MemPerc": "13.39%",
+          "MemUsage": "102.8MiB / 768MiB",
+          "Name": "market-watch-three-layer-native-history-worker-1",
+          "NetIO": "194kB / 212kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "102MB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "689a1333987dfad2f754b50e020c0468cb527b521008e49109219f0b16b137cc",
+          "ID": "689a1333987d",
+          "MemPerc": "3.93%",
+          "MemUsage": "5.027MiB / 128MiB",
+          "Name": "market-watch-three-layer-chart-origin-1",
+          "NetIO": "7.95MB / 129MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "102MB / 0B",
+          "CPUPerc": "0.52%",
+          "Container": "9a9387c6dccc7f3080fe4b52566bfebc30b6f35a61e6c1251c3c00587f0cace0",
+          "ID": "9a9387c6dccc",
+          "MemPerc": "15.32%",
+          "MemUsage": "117.7MiB / 768MiB",
+          "Name": "market-watch-three-layer-pricing-worker-1",
+          "NetIO": "65.2MB / 1.9MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "15.5MB / 0B",
+          "CPUPerc": "1.91%",
+          "Container": "92645ab9bdac8699bed0a2db20fce3d0912ee6a67688e857b24159b2ab4f786b",
+          "ID": "92645ab9bdac",
+          "MemPerc": "21.00%",
+          "MemUsage": "161.3MiB / 768MiB",
+          "Name": "market-watch-three-layer-api-1",
+          "NetIO": "3.99MB / 2.45MB",
+          "PIDs": "17"
+        },
+        {
+          "BlockIO": "25MB / 41kB",
+          "CPUPerc": "0.00%",
+          "Container": "6a89353acbde9ae333384305273c1932266a05479c637f6f6d3115dcca4277a5",
+          "ID": "6a89353acbde",
+          "MemPerc": "4.22%",
+          "MemUsage": "5.406MiB / 128MiB",
+          "Name": "market-watch-three-layer-web-1",
+          "NetIO": "111MB / 165MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "301MB / 13.6GB",
+          "CPUPerc": "6.80%",
+          "Container": "623e8edcaed735fd481241376667aa0f1e41620e6987c3da5769da05817fc938",
+          "ID": "623e8edcaed7",
+          "MemPerc": "35.92%",
+          "MemUsage": "183.9MiB / 512MiB",
+          "Name": "market-watch-three-layer-postgres-1",
+          "NetIO": "659MB / 2.53GB",
+          "PIDs": "13"
+        },
+        {
+          "BlockIO": "5.61GB / 7.62MB",
+          "CPUPerc": "2.04%",
+          "Container": "030ca18b110041895ca674f57cd7476b80e1fcaf35e8563eaa0261a9bd0aef01",
+          "ID": "030ca18b1100",
+          "MemPerc": "18.56%",
+          "MemUsage": "142.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-api-1",
+          "NetIO": "5.83GB / 2.97GB",
+          "PIDs": "16"
+        },
+        {
+          "BlockIO": "127MB / 23.7MB",
+          "CPUPerc": "0.00%",
+          "Container": "a46a03670babb856ee8193a5c56e0288d7bb6fc8e749f1b111eb72928a701079",
+          "ID": "a46a03670bab",
+          "MemPerc": "34.57%",
+          "MemUsage": "265.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-history-worker-1",
+          "NetIO": "159MB / 265MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "5.49GB / 3.17MB",
+          "CPUPerc": "0.22%",
+          "Container": "645b5113f1fcdaf80b5514b5cb0f2c319a281cb0844a1953f73640fd9af69786",
+          "ID": "645b5113f1fc",
+          "MemPerc": "13.51%",
+          "MemUsage": "103.8MiB / 768MiB",
+          "Name": "market-watch-data-integration-oanda-worker-1",
+          "NetIO": "1.92GB / 673MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "3.09GB / 4.6MB",
+          "CPUPerc": "86.69%",
+          "Container": "bc909bee1879ef611a307af0f086168da2dcacd3e1b1f9502188bb9230c1a24d",
+          "ID": "bc909bee1879",
+          "MemPerc": "23.37%",
+          "MemUsage": "179.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-aggregation-worker-1",
+          "NetIO": "235GB / 2.33GB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "1.2GB / 1.75MB",
+          "CPUPerc": "0.02%",
+          "Container": "6f4e8e814bd29e04a8c90eabc3630804d9f92e33e18423f3b4a79cf9d7ddeed2",
+          "ID": "6f4e8e814bd2",
+          "MemPerc": "2.46%",
+          "MemUsage": "4.727MiB / 192MiB",
+          "Name": "market-watch-data-integration-web-1",
+          "NetIO": "2.81GB / 2.84GB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "287GB / 80.4GB",
+          "CPUPerc": "8.24%",
+          "Container": "af4060babedbb6bbe0d9439795ed65ae2d5f7aae47557bead5d09a60240f70c8",
+          "ID": "af4060babedb",
+          "MemPerc": "82.94%",
+          "MemUsage": "636.9MiB / 768MiB",
+          "Name": "market-watch-data-integration-postgres-1",
+          "NetIO": "8.32GB / 269GB",
+          "PIDs": "15"
+        }
+      ]
+    },
+    {
+      "at": "2026-10-06T23:45:39.482778+00:00",
+      "containers": [
+        {
+          "BlockIO": "1.05MB / 0B",
+          "CPUPerc": "0.83%",
+          "Container": "8222264b5bf512c0a3b32170b005dc58f62379cecf40acabc0e7642d006361a5",
+          "ID": "8222264b5bf5",
+          "MemPerc": "12.00%",
+          "MemUsage": "92.17MiB / 768MiB",
+          "Name": "market-watch-three-layer-history-worker-1",
+          "NetIO": "1.09MB / 789kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "1.97MB / 0B",
+          "CPUPerc": "0.37%",
+          "Container": "66d91b0bf383908dc92348957bc09d8ec81d0ce14e964b614ffaf0ae696167bd",
+          "ID": "66d91b0bf383",
+          "MemPerc": "26.29%",
+          "MemUsage": "100.9MiB / 384MiB",
+          "Name": "market-watch-three-layer-composite-aggregate-worker-1",
+          "NetIO": "87.5MB / 6.84MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "90.1kB / 0B",
+          "CPUPerc": "0.27%",
+          "Container": "025d2df59ca845e3daec8b6515073ea19b6a8edb1ad3838fd201014f8c5d0171",
+          "ID": "025d2df59ca8",
+          "MemPerc": "13.39%",
+          "MemUsage": "102.8MiB / 768MiB",
+          "Name": "market-watch-three-layer-native-history-worker-1",
+          "NetIO": "196kB / 214kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "102MB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "689a1333987dfad2f754b50e020c0468cb527b521008e49109219f0b16b137cc",
+          "ID": "689a1333987d",
+          "MemPerc": "3.93%",
+          "MemUsage": "5.027MiB / 128MiB",
+          "Name": "market-watch-three-layer-chart-origin-1",
+          "NetIO": "7.95MB / 129MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "102MB / 0B",
+          "CPUPerc": "0.56%",
+          "Container": "9a9387c6dccc7f3080fe4b52566bfebc30b6f35a61e6c1251c3c00587f0cace0",
+          "ID": "9a9387c6dccc",
+          "MemPerc": "15.32%",
+          "MemUsage": "117.7MiB / 768MiB",
+          "Name": "market-watch-three-layer-pricing-worker-1",
+          "NetIO": "65.3MB / 1.9MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "15.5MB / 0B",
+          "CPUPerc": "1.46%",
+          "Container": "92645ab9bdac8699bed0a2db20fce3d0912ee6a67688e857b24159b2ab4f786b",
+          "ID": "92645ab9bdac",
+          "MemPerc": "21.00%",
+          "MemUsage": "161.3MiB / 768MiB",
+          "Name": "market-watch-three-layer-api-1",
+          "NetIO": "4.01MB / 2.46MB",
+          "PIDs": "17"
+        },
+        {
+          "BlockIO": "25MB / 41kB",
+          "CPUPerc": "0.00%",
+          "Container": "6a89353acbde9ae333384305273c1932266a05479c637f6f6d3115dcca4277a5",
+          "ID": "6a89353acbde",
+          "MemPerc": "4.22%",
+          "MemUsage": "5.406MiB / 128MiB",
+          "Name": "market-watch-three-layer-web-1",
+          "NetIO": "111MB / 165MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "301MB / 13.6GB",
+          "CPUPerc": "1.55%",
+          "Container": "623e8edcaed735fd481241376667aa0f1e41620e6987c3da5769da05817fc938",
+          "ID": "623e8edcaed7",
+          "MemPerc": "35.92%",
+          "MemUsage": "183.9MiB / 512MiB",
+          "Name": "market-watch-three-layer-postgres-1",
+          "NetIO": "659MB / 2.53GB",
+          "PIDs": "13"
+        },
+        {
+          "BlockIO": "5.61GB / 7.62MB",
+          "CPUPerc": "1.99%",
+          "Container": "030ca18b110041895ca674f57cd7476b80e1fcaf35e8563eaa0261a9bd0aef01",
+          "ID": "030ca18b1100",
+          "MemPerc": "18.56%",
+          "MemUsage": "142.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-api-1",
+          "NetIO": "5.83GB / 2.97GB",
+          "PIDs": "16"
+        },
+        {
+          "BlockIO": "127MB / 23.7MB",
+          "CPUPerc": "0.00%",
+          "Container": "a46a03670babb856ee8193a5c56e0288d7bb6fc8e749f1b111eb72928a701079",
+          "ID": "a46a03670bab",
+          "MemPerc": "34.57%",
+          "MemUsage": "265.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-history-worker-1",
+          "NetIO": "159MB / 265MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "5.49GB / 3.17MB",
+          "CPUPerc": "0.28%",
+          "Container": "645b5113f1fcdaf80b5514b5cb0f2c319a281cb0844a1953f73640fd9af69786",
+          "ID": "645b5113f1fc",
+          "MemPerc": "13.51%",
+          "MemUsage": "103.8MiB / 768MiB",
+          "Name": "market-watch-data-integration-oanda-worker-1",
+          "NetIO": "1.92GB / 673MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "3.09GB / 4.6MB",
+          "CPUPerc": "63.02%",
+          "Container": "bc909bee1879ef611a307af0f086168da2dcacd3e1b1f9502188bb9230c1a24d",
+          "ID": "bc909bee1879",
+          "MemPerc": "23.37%",
+          "MemUsage": "179.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-aggregation-worker-1",
+          "NetIO": "235GB / 2.33GB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "1.2GB / 1.75MB",
+          "CPUPerc": "0.03%",
+          "Container": "6f4e8e814bd29e04a8c90eabc3630804d9f92e33e18423f3b4a79cf9d7ddeed2",
+          "ID": "6f4e8e814bd2",
+          "MemPerc": "2.46%",
+          "MemUsage": "4.723MiB / 192MiB",
+          "Name": "market-watch-data-integration-web-1",
+          "NetIO": "2.81GB / 2.84GB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "287GB / 80.4GB",
+          "CPUPerc": "10.34%",
+          "Container": "af4060babedbb6bbe0d9439795ed65ae2d5f7aae47557bead5d09a60240f70c8",
+          "ID": "af4060babedb",
+          "MemPerc": "82.93%",
+          "MemUsage": "636.9MiB / 768MiB",
+          "Name": "market-watch-data-integration-postgres-1",
+          "NetIO": "8.32GB / 269GB",
+          "PIDs": "15"
+        }
+      ]
+    },
+    {
+      "at": "2026-10-06T23:45:41.533970+00:00",
+      "containers": [
+        {
+          "BlockIO": "1.05MB / 0B",
+          "CPUPerc": "0.00%",
+          "Container": "8222264b5bf512c0a3b32170b005dc58f62379cecf40acabc0e7642d006361a5",
+          "ID": "8222264b5bf5",
+          "MemPerc": "12.00%",
+          "MemUsage": "92.17MiB / 768MiB",
+          "Name": "market-watch-three-layer-history-worker-1",
+          "NetIO": "1.09MB / 789kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "1.97MB / 0B",
+          "CPUPerc": "0.49%",
+          "Container": "66d91b0bf383908dc92348957bc09d8ec81d0ce14e964b614ffaf0ae696167bd",
+          "ID": "66d91b0bf383",
+          "MemPerc": "26.29%",
+          "MemUsage": "100.9MiB / 384MiB",
+          "Name": "market-watch-three-layer-composite-aggregate-worker-1",
+          "NetIO": "87.5MB / 6.84MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "90.1kB / 0B",
+          "CPUPerc": "0.31%",
+          "Container": "025d2df59ca845e3daec8b6515073ea19b6a8edb1ad3838fd201014f8c5d0171",
+          "ID": "025d2df59ca8",
+          "MemPerc": "13.39%",
+          "MemUsage": "102.8MiB / 768MiB",
+          "Name": "market-watch-three-layer-native-history-worker-1",
+          "NetIO": "198kB / 216kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "102MB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "689a1333987dfad2f754b50e020c0468cb527b521008e49109219f0b16b137cc",
+          "ID": "689a1333987d",
+          "MemPerc": "3.93%",
+          "MemUsage": "5.027MiB / 128MiB",
+          "Name": "market-watch-three-layer-chart-origin-1",
+          "NetIO": "7.95MB / 129MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "102MB / 0B",
+          "CPUPerc": "0.52%",
+          "Container": "9a9387c6dccc7f3080fe4b52566bfebc30b6f35a61e6c1251c3c00587f0cace0",
+          "ID": "9a9387c6dccc",
+          "MemPerc": "15.32%",
+          "MemUsage": "117.7MiB / 768MiB",
+          "Name": "market-watch-three-layer-pricing-worker-1",
+          "NetIO": "65.4MB / 1.9MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "15.5MB / 0B",
+          "CPUPerc": "1.43%",
+          "Container": "92645ab9bdac8699bed0a2db20fce3d0912ee6a67688e857b24159b2ab4f786b",
+          "ID": "92645ab9bdac",
+          "MemPerc": "21.00%",
+          "MemUsage": "161.3MiB / 768MiB",
+          "Name": "market-watch-three-layer-api-1",
+          "NetIO": "4.03MB / 2.47MB",
+          "PIDs": "17"
+        },
+        {
+          "BlockIO": "25MB / 41kB",
+          "CPUPerc": "0.01%",
+          "Container": "6a89353acbde9ae333384305273c1932266a05479c637f6f6d3115dcca4277a5",
+          "ID": "6a89353acbde",
+          "MemPerc": "4.22%",
+          "MemUsage": "5.406MiB / 128MiB",
+          "Name": "market-watch-three-layer-web-1",
+          "NetIO": "111MB / 165MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "301MB / 13.6GB",
+          "CPUPerc": "0.69%",
+          "Container": "623e8edcaed735fd481241376667aa0f1e41620e6987c3da5769da05817fc938",
+          "ID": "623e8edcaed7",
+          "MemPerc": "35.92%",
+          "MemUsage": "183.9MiB / 512MiB",
+          "Name": "market-watch-three-layer-postgres-1",
+          "NetIO": "659MB / 2.53GB",
+          "PIDs": "13"
+        },
+        {
+          "BlockIO": "5.61GB / 7.62MB",
+          "CPUPerc": "15.63%",
+          "Container": "030ca18b110041895ca674f57cd7476b80e1fcaf35e8563eaa0261a9bd0aef01",
+          "ID": "030ca18b1100",
+          "MemPerc": "18.56%",
+          "MemUsage": "142.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-api-1",
+          "NetIO": "5.83GB / 2.97GB",
+          "PIDs": "16"
+        },
+        {
+          "BlockIO": "127MB / 23.7MB",
+          "CPUPerc": "0.00%",
+          "Container": "a46a03670babb856ee8193a5c56e0288d7bb6fc8e749f1b111eb72928a701079",
+          "ID": "a46a03670bab",
+          "MemPerc": "34.57%",
+          "MemUsage": "265.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-history-worker-1",
+          "NetIO": "159MB / 265MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "5.49GB / 3.17MB",
+          "CPUPerc": "0.21%",
+          "Container": "645b5113f1fcdaf80b5514b5cb0f2c319a281cb0844a1953f73640fd9af69786",
+          "ID": "645b5113f1fc",
+          "MemPerc": "13.51%",
+          "MemUsage": "103.8MiB / 768MiB",
+          "Name": "market-watch-data-integration-oanda-worker-1",
+          "NetIO": "1.92GB / 673MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "3.09GB / 4.6MB",
+          "CPUPerc": "95.05%",
+          "Container": "bc909bee1879ef611a307af0f086168da2dcacd3e1b1f9502188bb9230c1a24d",
+          "ID": "bc909bee1879",
+          "MemPerc": "23.37%",
+          "MemUsage": "179.5MiB / 768MiB",
+          "Name": "market-watch-data-integration-aggregation-worker-1",
+          "NetIO": "235GB / 2.33GB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "1.2GB / 1.75MB",
+          "CPUPerc": "0.37%",
+          "Container": "6f4e8e814bd29e04a8c90eabc3630804d9f92e33e18423f3b4a79cf9d7ddeed2",
+          "ID": "6f4e8e814bd2",
+          "MemPerc": "2.46%",
+          "MemUsage": "4.727MiB / 192MiB",
+          "Name": "market-watch-data-integration-web-1",
+          "NetIO": "2.81GB / 2.84GB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "287GB / 80.4GB",
+          "CPUPerc": "3.73%",
+          "Container": "af4060babedbb6bbe0d9439795ed65ae2d5f7aae47557bead5d09a60240f70c8",
+          "ID": "af4060babedb",
+          "MemPerc": "82.95%",
+          "MemUsage": "637MiB / 768MiB",
+          "Name": "market-watch-data-integration-postgres-1",
+          "NetIO": "8.32GB / 269GB",
+          "PIDs": "15"
+        }
+      ]
+    }
+  ]
+}

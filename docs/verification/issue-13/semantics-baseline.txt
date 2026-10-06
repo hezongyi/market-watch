@@ -1,0 +1,20 @@
+{
+  "same_visible_snapshot": true,
+  "queues": [
+    0,
+    0
+  ],
+  "cycles": 9,
+  "aggregation_work": 0,
+  "publication_claims": 9,
+  "queries": {
+    "sql_total": 121,
+    "coverage_reads": 18,
+    "candle_reads": 19,
+    "published_count_queries": 1,
+    "publication_updates": 1
+  }
+}
+{"scenario": "observation_only", "price_changes": 0, "volume_changes": 0, "publication_jobs": 0}
+{"scenario": "publish_observation", "return_value": false, "old_observed": 1790555405000, "new_observed": 1790555407000, "old_revision": 1, "new_revision": 2}
+{"scenario": "publish_correction", "return_value": false, "close": "20.0000000000", "old_revision": 2, "new_revision": 3, "remaining_jobs": 0}

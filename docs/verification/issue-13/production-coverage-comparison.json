@@ -1,0 +1,96 @@
+{
+  "scope": "Local Ubuntu interval comparison of one read-only official production snapshot, no modifications",
+  "records": {
+    "audits": 62522,
+    "coverage": 27939,
+    "instruments": 2
+  },
+  "targets": [
+    {
+      "instrument": "EURUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "formats": {
+        "audits_total": 31138,
+        "current_basis": 31138,
+        "fractional_minute_span": 30913,
+        "missing_range_start": 197,
+        "missing_range_end": 197,
+        "structured_all_sources": 13971
+      },
+      "audit_union": [
+        [
+          1775062620000,
+          1791327720000
+        ]
+      ],
+      "compatibility_union": [
+        [
+          1775062620000,
+          1791327720000
+        ]
+      ],
+      "structured_union": [
+        [
+          1790960460000,
+          1791327720000
+        ]
+      ],
+      "compatibility_minus_structured": [
+        [
+          1775062620000,
+          1790960460000
+        ]
+      ],
+      "structured_minus_compatibility": [],
+      "missing_minutes": 264964,
+      "old_reader_error_possible": false
+    },
+    {
+      "instrument": "XAUUSD",
+      "source": "oanda",
+      "basis": "bid",
+      "formats": {
+        "audits_total": 31384,
+        "current_basis": 31384,
+        "fractional_minute_span": 30914,
+        "missing_range_start": 198,
+        "missing_range_end": 198,
+        "structured_all_sources": 13968
+      },
+      "audit_union": [
+        [
+          1774990800000,
+          1791327660000
+        ]
+      ],
+      "compatibility_union": [
+        [
+          1774990800000,
+          1791327660000
+        ]
+      ],
+      "structured_union": [
+        [
+          1790960460000,
+          1791327660000
+        ]
+      ],
+      "compatibility_minus_structured": [
+        [
+          1774990800000,
+          1790960460000
+        ]
+      ],
+      "structured_minus_compatibility": [],
+      "missing_minutes": 266161,
+      "old_reader_error_possible": false
+    }
+  ],
+  "anomalous_records": [],
+  "limitations": [
+    "Invalid records are quarantined locally; current reader may throw instead of returning this valid subset",
+    "Old audit read does not enforce source; accepted explicit wrong-source evidence remains marked, not endorsed",
+    "Snapshot equality does not prove concurrent catch-up, downstream OHLC/complete/revision equivalence or migration rollback"
+  ]
+}

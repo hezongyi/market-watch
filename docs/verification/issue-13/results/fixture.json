@@ -1,0 +1,27 @@
+{
+  "seed": 13,
+  "start": 1785542400000,
+  "now": 1789382405000,
+  "identities": [
+    "EURUSD",
+    "XAUUSD",
+    "BTCUSDT",
+    "SYNTH00",
+    "SYNTH01",
+    "SYNTH02",
+    "SYNTH03",
+    "SYNTH04",
+    "SYNTH05",
+    "SYNTH06"
+  ],
+  "source": "synthetic only",
+  "m1_per_identity": 64000,
+  "audit_expected": 388895,
+  "python": "3.11.16",
+  "files": {
+    "backend/alerts/managed_dataset.py": "79afcc77125e83689708421acbe7ede2b58a8e6fc3ee642ee0281aee6b544ace",
+    "backend/alerts/market.py": "e0d57d7263577ae019de5a6b8e669227b67cb0af1f3ba2a74ae9a7d44b43e097",
+    "backend/alerts/chart_data.py": "c0d956ae6d4e3d697ee7a824b1d6450e814352baa933e194ece44c6e1ccba6d5",
+    "requirements.lock": "70619d05e1e8b964dbbb71b393cd2a1c5fb140669d6ced92ec498d7660212239"
+  }
+}

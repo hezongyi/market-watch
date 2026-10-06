@@ -63,11 +63,12 @@ def stored_rows(db, version, config, now):
             or instrument.calendar != version.market_identity["calendar"]
             or instrument.calendar_profile != version.market_identity["calendar_profile"]):
         raise ValueError("持久行情身份已改变，需显式编辑告警")
-    rows = chart_rows(db, instrument, config.timeframe, now + 1, 100_000, now, observed=True)
     if config.published:
         from .managed_dataset import read_rows
         rows = read_rows(db, instrument, config.timeframe, now + 1, 100_000,
                          dataset_start=config.calculation_origin)
+    else:
+        rows = chart_rows(db, instrument, config.timeframe, now + 1, 100_000, now, observed=True)
     rows = [{**row, "chart_time": managed_label(row, config.timeframe, config.instrument),
              "observed_at": row.get("observed_at", 0)} for row in rows]
     return rows, version.market_identity

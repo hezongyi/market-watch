@@ -1,0 +1,1906 @@
+{
+  "scenario": "live",
+  "repetition": 2,
+  "duration": 300.50149480672553,
+  "process_cpu_seconds": 69.350455901,
+  "process_cpu_percent": 23.078239908791254,
+  "cpu_scope": "worker + injection + verification in one capped process",
+  "queries": {
+    "total": 10576,
+    "audit_reads": 184,
+    "coverage_reads": 1389,
+    "candle_reads": 1555,
+    "publication_updates": 505,
+    "snapshot_insert_statements": 111
+  },
+  "worker_sql_seconds": 72.59943954180926,
+  "cycles": 489,
+  "cycle_p50": 0.37160944379866123,
+  "cycle_p95": 1.3387395231984556,
+  "cycle_p99": 2.2585623688064516,
+  "events": [
+    {
+      "instrument": "XAUUSD",
+      "start": 1789382400000,
+      "expected_close": "101.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 0.19486853387206793,
+      "latency_seconds": 39.406451324000955
+    },
+    {
+      "instrument": "BTCUSDT",
+      "start": 1789382340000,
+      "expected_observed": 1789382525000,
+      "kind": "observation",
+      "committed_seconds": 10.660903124138713,
+      "latency_seconds": 38.36920246575028
+    },
+    {
+      "instrument": "SYNTH00",
+      "start": 1789382400000,
+      "expected_close": "103.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 20.826672434806824,
+      "latency_seconds": 41.973872715141624
+    },
+    {
+      "instrument": "SYNTH01",
+      "start": 1789382340000,
+      "expected_observed": 1789382645000,
+      "kind": "observation",
+      "committed_seconds": 31.022039968986064,
+      "latency_seconds": 38.60256129084155
+    },
+    {
+      "instrument": "SYNTH02",
+      "start": 1789382400000,
+      "expected_close": "105.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 41.31076697772369,
+      "latency_seconds": 32.70859718229622
+    },
+    {
+      "instrument": "SYNTH03",
+      "start": 1789382340000,
+      "expected_observed": 1789382765000,
+      "kind": "observation",
+      "committed_seconds": 51.605918768793344,
+      "latency_seconds": 29.600177786312997
+    },
+    {
+      "instrument": "SYNTH04",
+      "start": 1789382400000,
+      "expected_close": "107.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 62.16312067210674,
+      "latency_seconds": 24.665895245969296
+    },
+    {
+      "instrument": "SYNTH05",
+      "start": 1789382340000,
+      "expected_observed": 1789382885000,
+      "kind": "observation",
+      "committed_seconds": 72.38093114178628,
+      "latency_seconds": 20.44351838203147
+    },
+    {
+      "instrument": "SYNTH06",
+      "start": 1789382400000,
+      "expected_close": "109.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 83.01250365516171,
+      "latency_seconds": 15.08857423486188
+    },
+    {
+      "instrument": "XAUUSD",
+      "start": 1789382460000,
+      "expected_close": "101.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 104.72011286672205,
+      "latency_seconds": 3.3136263922788203
+    },
+    {
+      "instrument": "BTCUSDT",
+      "start": 1789382340000,
+      "expected_observed": 1789383125000,
+      "kind": "observation",
+      "committed_seconds": 114.87187766702846,
+      "latency_seconds": 4.748253426980227
+    },
+    {
+      "instrument": "EURUSD",
+      "start": 1789382340000,
+      "expected_observed": 1789383005000,
+      "kind": "observation",
+      "committed_seconds": 93.76119054993615,
+      "latency_seconds": 31.346431924030185
+    },
+    {
+      "instrument": "SYNTH00",
+      "start": 1789382460000,
+      "expected_close": "103.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 125.27078835805878,
+      "latency_seconds": 11.17705063894391
+    },
+    {
+      "instrument": "SYNTH01",
+      "start": 1789382340000,
+      "expected_observed": 1789383245000,
+      "kind": "observation",
+      "committed_seconds": 135.4860497759655,
+      "latency_seconds": 6.651636499911547
+    },
+    {
+      "instrument": "SYNTH02",
+      "start": 1789382460000,
+      "expected_close": "105.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 145.68494169972837,
+      "latency_seconds": 1.9959183232858777
+    },
+    {
+      "instrument": "SYNTH03",
+      "start": 1789382340000,
+      "expected_observed": 1789383365000,
+      "kind": "observation",
+      "committed_seconds": 156.3371612248011,
+      "latency_seconds": 49.212013881187886
+    },
+    {
+      "instrument": "SYNTH04",
+      "start": 1789382460000,
+      "expected_close": "107.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 166.59024620288983,
+      "latency_seconds": 43.09407322993502
+    },
+    {
+      "instrument": "SYNTH05",
+      "start": 1789382340000,
+      "expected_observed": 1789383485000,
+      "kind": "observation",
+      "committed_seconds": 177.73408639105037,
+      "latency_seconds": 37.6072348728776
+    },
+    {
+      "instrument": "SYNTH06",
+      "start": 1789382460000,
+      "expected_close": "109.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 189.54357992392033,
+      "latency_seconds": 29.333347296807915
+    },
+    {
+      "instrument": "XAUUSD",
+      "start": 1789382520000,
+      "expected_close": "101.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 210.10989193012938,
+      "latency_seconds": 12.510921003762633
+    },
+    {
+      "instrument": "BTCUSDT",
+      "start": 1789382340000,
+      "expected_observed": 1789383725000,
+      "kind": "observation",
+      "committed_seconds": 220.72698372788727,
+      "latency_seconds": 10.065554732922465
+    },
+    {
+      "instrument": "EURUSD",
+      "start": 1789382340000,
+      "expected_observed": 1789383605000,
+      "kind": "observation",
+      "committed_seconds": 199.78767759911716,
+      "latency_seconds": 36.06738301599398
+    },
+    {
+      "instrument": "SYNTH00",
+      "start": 1789382520000,
+      "expected_close": "103.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 230.9649210749194,
+      "latency_seconds": 12.667080095037818
+    },
+    {
+      "instrument": "SYNTH01",
+      "start": 1789382340000,
+      "expected_observed": 1789383845000,
+      "kind": "observation",
+      "committed_seconds": 241.40675789490342,
+      "latency_seconds": 6.646753436885774
+    },
+    {
+      "instrument": "SYNTH02",
+      "start": 1789382520000,
+      "expected_close": "105.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 251.4752218159847,
+      "latency_seconds": 0.9753145431168377
+    }
+  ],
+  "unpublished_events": [
+    {
+      "instrument": "SYNTH03",
+      "start": 1789382340000,
+      "expected_observed": 1789383965000,
+      "kind": "observation",
+      "committed_seconds": 261.50033384701237
+    },
+    {
+      "instrument": "SYNTH04",
+      "start": 1789382520000,
+      "expected_close": "107.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 271.6324246530421
+    },
+    {
+      "instrument": "SYNTH05",
+      "start": 1789382340000,
+      "expected_observed": 1789384085000,
+      "kind": "observation",
+      "committed_seconds": 281.7041871328838
+    },
+    {
+      "instrument": "SYNTH06",
+      "start": 1789382520000,
+      "expected_close": "109.0000000000",
+      "kind": "new_bar",
+      "committed_seconds": 291.97679586615413
+    }
+  ],
+  "latency_p50": 24.665895245969296,
+  "latency_p95": 41.973872715141624,
+  "latency_p99": 43.09407322993502,
+  "longest_target_wait": 73.96701255487278,
+  "before": {
+    "publications": [
+      {
+        "instrument": "BTCUSDT",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "D1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H4",
+        "start": 1789275600000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M30",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 27,
+        "revision": 1,
+        "initialized": false
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "MN",
+        "start": 1790802000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "W1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "D1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "H4",
+        "start": 1789275600000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M30",
+        "start": 1789336800000,
+        "end": 1789382400000,
+        "count": 25,
+        "revision": 1,
+        "initialized": false
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "MN",
+        "start": 1790802000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "W1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      }
+    ],
+    "published_bars": 26290,
+    "aggregation_jobs": 0,
+    "publication_jobs": 0
+  },
+  "after": {
+    "publications": [
+      {
+        "instrument": "BTCUSDT",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "D1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H4",
+        "start": 1789275600000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M30",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 27,
+        "revision": 1,
+        "initialized": false
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "MN",
+        "start": 1790802000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "W1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382580000,
+        "count": 0,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382580000,
+        "count": 32,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382580000,
+        "count": 7,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382580000,
+        "count": 2003,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382580000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382580000,
+        "count": 66,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382580000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382580000,
+        "count": 0,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382580000,
+        "count": 0,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382580000,
+        "count": 32,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382580000,
+        "count": 7,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382580000,
+        "count": 2003,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382580000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382580000,
+        "count": 66,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382580000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382580000,
+        "count": 0,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382520000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382520000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382520000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382520000,
+        "count": 2002,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382520000,
+        "count": 132,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382520000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382520000,
+        "count": 400,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382520000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382520000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382520000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382520000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382520000,
+        "count": 2002,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382520000,
+        "count": 132,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382520000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382520000,
+        "count": 400,
+        "revision": 3,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382520000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "D1",
+        "start": 1789333200000,
+        "end": 1789382580000,
+        "count": 0,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382580000,
+        "count": 32,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "H4",
+        "start": 1789275600000,
+        "end": 1789382580000,
+        "count": 7,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382580000,
+        "count": 2003,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382580000,
+        "count": 132,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M30",
+        "start": 1789336800000,
+        "end": 1789382580000,
+        "count": 25,
+        "revision": 6,
+        "initialized": false
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382580000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "MN",
+        "start": 1790802000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "W1",
+        "start": 1789333200000,
+        "end": 1789382580000,
+        "count": 0,
+        "revision": 6,
+        "initialized": true
+      }
+    ],
+    "published_bars": 26338,
+    "aggregation_jobs": 0,
+    "publication_jobs": 6
+  },
+  "visible_unchanged": false,
+  "backfill_bars_per_second": 0.1597329824627738,
+  "limitation": "No API/alert/browser process; synthetic sources, warm cache; host contention sampled separately",
+  "cgroup_before": {
+    "cpu.stat": "usage_usec 1101448\nuser_usec 998441\nsystem_usec 103007\nnr_periods 21\nnr_throttled 5\nthrottled_usec 110455\n",
+    "memory.current": "93790208\n",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n",
+    "io.stat": ""
+  },
+  "cgroup_after": {
+    "cpu.stat": "usage_usec 70462603\nuser_usec 68001983\nsystem_usec 2460620\nnr_periods 2919\nnr_throttled 26\nthrottled_usec 290748\n",
+    "memory.current": "113455104\n",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n",
+    "io.stat": "252:0 rbytes=212992 wbytes=479232 rios=13 wios=117 dbytes=0 dios=0\n253:0 rbytes=212992 wbytes=479232 rios=13 wios=117 dbytes=0 dios=0\n"
+  }
+}
