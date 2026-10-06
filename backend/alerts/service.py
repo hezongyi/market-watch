@@ -8,10 +8,11 @@ from sqlalchemy import select
 from .calendar_profile import closures_from
 from .chart_series import is_gold
 from .domain import (
-    Calendar,
     Signal,
     State,
     advance,
+    calendar_for,
+    calendar_from,
     crossed,
     has_trading_gap,
     previous_session,
@@ -41,7 +42,7 @@ from .storage import (
 def previous_day(db, instrument, bar, *, day_cache=None):
     session_start, session_end = previous_session(
         bar.start,
-        Calendar(instrument.calendar),
+        calendar_for(instrument),
         gold=is_gold(instrument.id),
         closures=closures_from(instrument.calendar_profile),
     )
@@ -137,7 +138,7 @@ def create_watch(db, instrument_id, name, rule_dict, *, armed_at=None, use_histo
             if state.previous and has_trading_gap(
                 state.previous.end,
                 row.candle().start,
-                Calendar(instrument.calendar),
+                calendar_for(instrument),
                 gold=is_gold(instrument.id),
                 closures=closures_from(instrument.calendar_profile),
             ):
@@ -181,7 +182,7 @@ def rewarm_watch(db, watch, *, until):
             state = State(last_event=instant(row.end))
             continue
         if state.previous and has_trading_gap(state.previous.end, instant(row.start),
-                Calendar(instrument.calendar), gold=is_gold(instrument.id),
+                calendar_for(instrument), gold=is_gold(instrument.id),
                 closures=closures_from(instrument.calendar_profile)):
             state = State()
         day = previous_day(db, instrument, row.candle()) if rule.kind == "previous_day" else None
@@ -229,7 +230,7 @@ def evaluate_watch(db, watch_id, *, emit_after=None):
         if state.previous and has_trading_gap(
             state.previous.end,
             row.candle().start,
-            Calendar(instrument.calendar),
+            calendar_for(instrument),
             gold=is_gold(instrument.id),
             closures=closures_from(instrument.calendar_profile),
         ):
@@ -271,9 +272,9 @@ def acknowledge(db, notification_id):
     return note
 
 
-def replay_day(days, bar, calendar, *, gold=False, profile=None):
+def replay_day(days, bar, calendar, *, gold=False, profile=None, explicit=False):
     start, end = previous_session(
-        bar.start, Calendar(calendar), gold=gold, closures=closures_from(profile)
+        bar.start, calendar_from(calendar, profile, explicit=explicit), gold=gold, closures=closures_from(profile)
     )
     candidates = [d for d in days if d["start"] == ms(start) and d["end"] == ms(end)]
     latest = max(candidates, key=lambda d: d["end"]) if candidates else None
@@ -305,7 +306,7 @@ def add_replay_watch(run, name, rule_dict, calendar, *, use_history=True):
         if state.previous and has_trading_gap(
             state.previous.end,
             b.start,
-            Calendar(calendar),
+            calendar_from(calendar, run.calendar_profile, explicit=bool(run.dataset_version)),
             gold=is_gold(run.instrument_id),
             closures=closures_from(run.calendar_profile),
         ):
@@ -320,6 +321,7 @@ def add_replay_watch(run, name, rule_dict, calendar, *, use_history=True):
                 calendar,
                 gold=is_gold(run.instrument_id),
                 profile=run.calendar_profile,
+                explicit=bool(run.dataset_version),
             )
             if rule.kind == "previous_day"
             else None,
@@ -361,7 +363,7 @@ def replay_step(run, calendar, count=1):
             if state.previous and has_trading_gap(
                 state.previous.end,
                 b.start,
-                Calendar(calendar),
+                calendar_from(calendar, run.calendar_profile, explicit=bool(run.dataset_version)),
                 gold=is_gold(run.instrument_id),
                 closures=closures_from(run.calendar_profile),
             ):
@@ -374,6 +376,7 @@ def replay_step(run, calendar, count=1):
                 calendar,
                 gold=is_gold(run.instrument_id),
                 profile=run.calendar_profile,
+                explicit=bool(run.dataset_version),
             )
             if rule.kind == "previous_day" and day is None:
                 w["status"] = "paused"

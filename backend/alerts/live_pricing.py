@@ -13,6 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
+from .calendar_profile import session_from
 from .config import settings
 from .market_contracts import DatasetIdentity, QuoteEvent
 from .market_datasets import register_dataset
@@ -52,7 +53,8 @@ def ensure_catalog(items, account):
                 calendar_version=settings.oanda_calendar_version)
             inst = register_dataset(db, identity, logical_symbol=logical,
                 label=meta.get("displayName", symbol), calendar="ny17", precision=meta["displayPrecision"],
-                volume_kind="price_count", volume_unit="quotes")
+                volume_kind="price_count", volume_unit="quotes",
+                calendar_profile=settings.oanda_calendar_profiles.get(symbol))
             if symbol in resident:
                 inst.enabled = True
             if not db.get(LiveState, identity.key):
@@ -327,8 +329,19 @@ def _minute_observation(db, identity, state, start, stamp, cache=None):
     # A tradeable source observation proves this minute has data. One
     # nontradeable quote proves only that instant, never a whole-minute closure.
     expected = True if fresh and quote["tradeable"] and quote.get("bid") is not None else None
+    expectation = "fresh_source_tradeable" if expected else "unknown_session"
+    if expected is None:
+        from .calendar_profile import closures_from
+        from .domain import calendar_for, scheduled_open
+        from .storage import instant
+
+        dataset = db.get(MarketDataset, identity.key)
+        inst = db.get(Instrument, dataset.instrument_id)
+        if not scheduled_open(instant(start), calendar_for(inst), closures=closures_from(inst.calendar_profile)):
+            expected = False
+            expectation = "reviewed_source_closure"
     metric = LiveMinute(dataset_id=identity.key, start=start, expected=expected,
-        expectation="fresh_source_tradeable" if expected else "unknown_session", first_attempt=0,
+        expectation=expectation, first_attempt=0,
         last_attempt=0, attempts=0, failures=0, last_result="pending")
     db.add(metric)
     if cache is not None:
@@ -390,7 +403,7 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
             observation = _minute_observation(db, batch.identity, state, start, stamp, observations)
             if observation.confirmed_at is None:
                 observation.confirmed_at = written_at
-            if observation.expected is None:
+            if observation.expected is not True:
                 observation.expected = True
                 observation.expectation = ("recovery_source_complete"
                     if start + 60000 < state.recovery_started - 30000 else "observed_source_complete")
@@ -470,6 +483,8 @@ def snapshots(*, now=None):
             if state.epoch == 0 or state.connection == "inactive":
                 continue
             dataset = db.get(MarketDataset, state.dataset_id)
+            inst = db.get(Instrument, dataset.instrument_id)
+            session = session_from(inst.calendar_profile)
             quote = state.quote
             age = stamp - quote["source_time"] if quote else None
             connected = state.connection != "disconnected" and (
@@ -486,13 +501,17 @@ def snapshots(*, now=None):
                 "quality": quality, "connection": state.connection, "connection_epoch": state.epoch,
                 "heartbeat_at": state.heartbeat_at, "last_confirmed_m1": state.confirmed_end,
                 "recovery_ready": state.ready, "error": state.error,
-                "calendar_verified": settings.oanda_calendar_verified,
+                "calendar_verified": bool(session and int(session.reviewed_start.timestamp() * 1000) <= stamp
+                    < int(session.reviewed_end.timestamp() * 1000)),
+                "calendar_revision": inst.calendar_profile.get("revision", dataset.identity["calendar_version"]),
+                "session_evidence": ({"url": session.evidence_url, "applicability": session.applicability,
+                    "reviewed_start": session.reviewed_start.isoformat(), "reviewed_end": session.reviewed_end.isoformat()}
+                    if session else None),
                 "fallback_ready": False, "selection_epoch": state.epoch,
                 "received_at": state.received_at, "quote_age_ms": age})
             result[-1]["quote_ready"] = bool(connected and valid_quote and quote["tradeable"]
                 and age is not None and 0 <= age <= 15000)
-            result[-1]["candle_ready"] = state.ready and not state.error
-            inst = db.get(Instrument, dataset.instrument_id)
+            result[-1]["candle_ready"] = bool(connected and state.ready and not state.error)
             result[-1]["precision"] = inst.precision
             result[-1]["alert_readiness"] = [{"watch_id": watch.id, "reason": watch.paused_reason,
                 "status": watch.status} for watch in db.scalars(select(Watch).where(
@@ -527,6 +546,8 @@ def measurements(dataset_id, *, since=0):
         return {"dataset_id": dataset_id, "expected": len(expected), "unknown": sum(
             row.expected is None for row in rows), "not_tradeable": sum(row.expected is False for row in rows),
             "confirmed": len(delays), "missing": sum(row.confirmed_at is None for row in expected),
+            "confirmed_closures": sum(row.expected is False and row.expectation == "reviewed_source_closure"
+                                      for row in rows),
             "late_over_30s": sum(value > 30000 for value in delays),
             "failed_attempts": sum(row.failures for row in rows),
             "recovery_confirmed": sum(row.confirmed_at is not None for row in recovered),

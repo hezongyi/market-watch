@@ -169,6 +169,35 @@ Ubuntu 接收机重新读取 systemd NTP：offset −12.298ms、root distance 22
 十年任务在 03:06 UTC 左右推进到 EURUSD 70.27%、XAUUSD 68.84%，仍保留检查点继续运行。
 目标保持 active；日历账户归属待用户说明，未知与故障分母继续保留。
 
+## 来源会话与十年精度修正（2026-10-06 03:25 UTC 起）
+
+- 来源会话单独绑定 provider/channel/environment/account/product、IANA 时区和有限复核日期。
+  候选 NY17 只保留聚合相位，不能认证周末或黄金暂停为闭市。真实 M1 冲突仍保留、记录 audit，
+  冲突会话不能减少该桶缺失分母。profile/precision 不在既有身份原位修改；见 ADR0002 和 runbook。
+- 真实十年 EURUSD 页面有 57 条非零六位价格，原五位推断只覆盖采样范围。
+  [精度证据](verification/data-integration/dukascopy-eurusd-six-decimal-page.json)。父任务隔离，
+  新 `ny17-observed-v2` 六位身份复用原始 685 chunks / 2,986,089 M1，从原 cursor 继续。
+  [实际派生](verification/data-integration/history-precision-derivation.json)保留 parent/checksum，
+  无取整、无 staging 复制、无重复下载前缀；观测 coverage 已幂等补齐，见 [覆盖修复](verification/data-integration/history-derivation-coverage.json)。
+- XAUUSD 十年已发布。逐块 checksum/UTC 顺序/重复/OHLC/三位精度/unknown 全 partition 审计通过，
+  814 chunks、3,540,725 observed / 1,718,155 unknown。
+  [全量审计](verification/data-integration/history-ten-year-integrity.json)。unknown 不是已核实闭市。
+- history graceful/crash 证据已保存；新增精度异常明确 `price_precision_overflow`，暂停为配置故障，
+  不继续普通网络重试。原五位任务及已发布小时快照保持原样。
+- 全量后端 **612 passed / 48 skipped**，其中新 PostgreSQL 文件在本地跳过；实际 Compose suite
+  **144 passed**，新增来源会话容器 **20 passed**，批量撤销的实际 PostgreSQL **8 passed**；
+  最后来源/图表/历史定向 **27 passed**。最后一处黄金 W1/MN 改为使用显式来源会话，无旧黄金
+  closure 的额外前提，由定向及容器检查覆盖。
+- API/OANDA 新镜像已加载 worktree live module，
+  [代码核对](verification/data-integration/container-calendar-code.json)。epoch49 双品种 healthy
+  已实际观察。原 Chromium PID1670521 未重启；部署开始/恢复事件写入长窗口，全部 SSE 错误保留。
+  [当前浏览器摘要](verification/data-integration/browser-sustained-checkpoint.json)不是两交易日最终结果。
+- 旧候选聚合完整性正在有界逐页核对与撤销，保留 M1 原值及 immutable history/replay 输入；
+  未完成前不声称所有存量已重算。真实账户 source_session 仍未启用，法律实体/地区与历史例外
+  尚无充分适用证据。
+- [逐项 completion audit](verification/data-integration/completion-audit.md)明确完成和剩余门槛。
+  两日窗口未达到时长，EUR 十年最终版本和长期时效仍待审计；目标保持 active。
+
 ## 基线审计与实现
 
 - 原方案引用 v1.7.0；新基线增加了平台原生历史缓存、后台任务、指标契约，managed M1 的来源字段

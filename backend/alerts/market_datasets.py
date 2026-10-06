@@ -4,14 +4,31 @@ from decimal import Decimal
 
 from sqlalchemy import func, select
 
+from .calendar_profile import closures_from, normalized_profile, session_from
 from .chart_series import display_symbol
 from .market_contracts import CandleBatch, DatasetIdentity, MarketRequestError, RequestResult
 from .storage import Bar, Instrument, MarketDataset
 
 
+class PricePrecisionError(ValueError):
+    """Valid source observations exceed immutable registered price precision."""
+
+
 def register_dataset(db, identity, *, logical_symbol, label, calendar, precision,
-                     volume_kind, volume_unit):
+                     volume_kind, volume_unit, calendar_profile=None):
     identity = DatasetIdentity.model_validate(identity)
+    profile = normalized_profile(calendar_profile) if calendar_profile else {}
+    if profile and profile["revision"] != identity.calendar_version:
+        raise ValueError("Calendar profile revision must match the dataset calendar identity")
+    session = session_from(profile)
+    if profile.get("closures") and session is None:
+        raise ValueError("Explicit closure profiles require source/account applicability evidence")
+    if session and any(not session.reviewed_start <= closure.start < closure.end <= session.reviewed_end
+                       for closure in closures_from(profile)):
+        raise ValueError("Closures must remain inside the finite session review interval")
+    if session and any(getattr(session, key) != getattr(identity, key) for key in (
+            "source", "channel", "environment", "provider_symbol", "account_scope")):
+        raise ValueError("Source session applicability does not match this dataset identity")
     if display_symbol(logical_symbol) != logical_symbol or not logical_symbol.isalnum():
         raise ValueError("Logical symbol must be a canonical display code")
     if len(logical_symbol) > 10 or not 0 <= precision <= 10:
@@ -27,7 +44,7 @@ def register_dataset(db, identity, *, logical_symbol, label, calendar, precision
     row = db.get(MarketDataset, identity.key)
     if row:
         inst = db.get(Instrument, row.instrument_id)
-        if (row.logical_symbol != logical_symbol or inst.calendar != calendar
+        if (row.logical_symbol != logical_symbol or inst.calendar != calendar or inst.calendar_profile != profile
                 or inst.precision != precision
                 or (row.volume_kind, row.volume_unit) != (volume_kind, volume_unit)):
             raise ValueError("Existing dataset metadata cannot be reinterpreted")
@@ -38,7 +55,7 @@ def register_dataset(db, identity, *, logical_symbol, label, calendar, precision
     inst = Instrument(id=ident, label=label, source=identity.source,
                       symbol=identity.provider_symbol, basis=identity.basis,
                       calendar=calendar, precision=precision, enabled=False,
-                      calendar_profile={})
+                      calendar_profile=profile)
     db.add(inst)
     db.flush()
     db.add(MarketDataset(id=identity.key, instrument_id=ident, logical_symbol=logical_symbol,
@@ -80,7 +97,7 @@ def validate_ingestion(db, inst, payload):
         for field in ("open", "high", "low", "close"):
             value = Decimal(getattr(candle, field))
             if value != value.quantize(Decimal(1).scaleb(-inst.precision)):
-                raise ValueError("Price exceeds dataset precision")
+                raise PricePrecisionError("Price exceeds dataset precision")
     return batch
 
 

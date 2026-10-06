@@ -3,7 +3,7 @@
 实际环境：Ubuntu 22.04.5，本机 Docker Compose project `market-watch-data-integration`。
 网页地址：http://127.0.0.1:16589/market-data 。API 与 PostgreSQL 不向宿主发布端口。
 数据库为 PostgreSQL 14.24，独立网络、`integration-postgres` volume 和 `integration` 数据库。
-`integration_restore` 也是本任务的备份恢复校验数据库。未使用 unraid。
+`integration_restore` 也是本任务的备份恢复校验数据库。未在 unraid 创建验收实例。
 
 ## 启动与停止
 
@@ -98,3 +98,44 @@ systemctl --user stop market-watch-data-integration-browser.service
 持续采集尚未达到两个交易日，价龄没有独立时钟偏差校准。
 短样本与故障恢复结果不代表完整 P0–P2 验收已通过；最终状态见
 [接续开发记录](../../market-data-integration-progress.md)。
+
+## 来源会话与不可变元数据
+
+`ny17`/`utc0` 只定义聚合相位。显式数据集没有经过核实的来源会话时，未观测分钟保持 unknown，
+周末或黄金暂停不能仅凭相位判成闭市。真实来源 M1 与会话冲突时保留原值、记录审计，并阻止
+用冲突会话证明该聚合桶完整。旧非显式品种保持既有规则。
+
+OANDA 配置 `ALERTS_OANDA_CALENDAR_PROFILES` 是按 `EUR_USD`/`XAU_USD` 索引的 JSON 对象。
+每个 profile 的 `revision` 必须与新的 `ALERTS_OANDA_CALENDAR_VERSION` 一致。profile 含
+`source_session`，字段如下；凭据和账户完整 ID 均不属于 profile：
+
+| 字段 | 要求 |
+| --- | --- |
+| source/channel/environment/provider_symbol | 精确匹配数据集，如 oanda/v20/practice/XAU_USD |
+| account_scope | public 或既有数据集的 sha256 指纹，不能借另一账户的会话 |
+| timezone | IANA 时区，例如 America/New_York；按当地周规则跟随 DST |
+| reviewed_start/reviewed_end | 有限、含时区的整分钟日期范围；范围外继续 unknown |
+| evidence_url/applicability | HTTPS 一手来源和该账户产品、地区、期间的适用性说明 |
+| weekly_closures | 有序且不重叠的 `{start,end}`，当地周一 00:00 起算分钟，范围 0–10080 |
+
+`weekly_closures` 应只包含已经核实的完整闭市分钟内部，公告边界与已有真实柱冲突时保留边界。
+跨周区间拆为两个区间。额外 `closures` 也必须有来源适用证据且位于 reviewed 日期范围内。
+当前账户地区/法律实体及十年历史例外仍未核实，实际运行未启用经过认证的 source_session。
+
+身份、精度、volume 和 profile 一经绑定不能原位改写。得到新证据后注册新 calendar_version；
+历史修正可用 `history_derivation.derive_version/derive_page` 从已校验的不可变原分块派生，禁止
+从可修订 staging Bar 复制。未完成父任务必须停止写入、等待租约结束并带明确原因隔离。
+分块、M1、观测覆盖与检查点逐页提交，崩溃后从提交位置恢复；发布保留 parent/checksum provenance。
+精度溢出明确为 `price_precision_overflow` 配置故障，不取整、跳页或无限网络重试。
+
+本实例 EURUSD 六位精度修正脚本是幂等工具，运行后保留原五位任务与已发布小时版本：
+
+```bash
+sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml run --rm --no-deps -T api python -' < scripts/derive_precision_acceptance.py
+
+# 撤销既有候选聚合中缺乏观测证据的 complete；保留 M1、价格、历史分块和固定回放。
+sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml run --rm --no-deps -T api python -' < scripts/revalidate_candidate_acceptance.py
+```
+
+长观察期间部署必须在 `sustained-observation-window.json` 添加分段和实际恢复时间；浏览器
+原进程继续采集 SSE 断连与状态，不能把部署前后拼成同一代码版本的无中断验收。

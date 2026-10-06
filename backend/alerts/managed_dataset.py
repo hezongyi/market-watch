@@ -15,7 +15,7 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from .chart_data import FRAMES, bounds, chart_rows
 from .coverage import covers_interval
-from .domain import NY, Calendar, bucket_bounds
+from .domain import NY, Calendar, bucket_bounds, calendar_for
 from .storage import (
     Bar,
     ChartAggregationJob,
@@ -125,7 +125,7 @@ def _source(frame):
 
 
 def _bounds(at, frame, inst):
-    calendar = Calendar(inst.calendar)
+    calendar = calendar_for(inst)
     return (bounds if frame in ("M30", "W1", "MN") else bucket_bounds)(instant(at), frame, calendar)
 
 

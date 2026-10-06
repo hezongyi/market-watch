@@ -17,5 +17,40 @@
   "source_clock_offset_verified": false,
   "two_trading_days_verified": false,
   "mt4_deferred": true,
-  "scope": "Future observation window; no elapsed-time acceptance claim from merely starting the process"
+  "scope": "Future observation window; no elapsed-time acceptance claim from merely starting the process",
+  "deployments": [
+    {
+      "event": "deployment_started",
+      "at": 1791258046610,
+      "services": [
+        "api",
+        "oanda-worker"
+      ],
+      "reason": "finite source session evidence, candidate completeness and precise history errors",
+      "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
+      "scope": "separate implementation segment; retain browser SSE errors and quote recovery states"
+    },
+    {
+      "event": "deployment_recovered",
+      "at": 1791258324640,
+      "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
+      "live": [
+        {
+          "logical_symbol": "XAUUSD",
+          "quality": "healthy",
+          "connection_epoch": 49,
+          "calendar_verified": false,
+          "error": null
+        },
+        {
+          "logical_symbol": "EURUSD",
+          "quality": "healthy",
+          "connection_epoch": 49,
+          "calendar_verified": false,
+          "error": null
+        }
+      ],
+      "observer_pid": 1670521
+    }
+  ]
 }

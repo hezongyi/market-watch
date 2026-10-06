@@ -6,13 +6,14 @@ import hashlib
 import json
 import time
 from datetime import UTC, datetime
+from pathlib import Path
 
 from sqlalchemy import select
 
 from .config import settings
 from .dukascopy_history import DukascopyHistory
 from .market_contracts import DatasetIdentity
-from .market_datasets import register_dataset
+from .market_datasets import PricePrecisionError, register_dataset
 from .market_resources import cooldown, lane
 from .storage import (
     HistoryChunk,
@@ -103,13 +104,16 @@ def publish(db, version):
     if cursor != version.end:
         raise ValueError("Historical query partition is incomplete")
     dataset = db.get(MarketDataset, version.dataset_id)
+    instrument = db.get(Instrument, dataset.instrument_id)
     version.manifest = {
         "dataset_version": version.id, "identity": dataset.identity,
         "start": version.start, "end": version.end,
         "volume_kind": dataset.volume_kind, "volume_unit": dataset.volume_unit,
+        "aggregation_calendar": instrument.calendar, "calendar_profile": instrument.calendar_profile,
         "rows": count, "unknown_minutes": unknown_minutes,
         "coverage": "observed_only; unobserved intervals remain unknown",
         "checksum": checksum.hexdigest(), "chunks": manifest_chunks,
+        **({"provenance": version.manifest["provenance"]} if version.manifest.get("provenance") else {}),
     }
     version.status = "published"
     version.published_at = now_ms()
@@ -179,10 +183,13 @@ def import_page(adapter, *, version_id=None):
                 return True
             version.attempts += 1
             result = batch.result if batch and not batch.result.successful else None
-            version.error = result.status if result else "invalid_payload"
+            metadata_failure = isinstance(error, PricePrecisionError)
+            version.error = "price_precision_overflow" if metadata_failure else (
+                result.status if result else "invalid_payload")
             version.next_at = (result.retry_at if result and result.retry_at else
                                now_ms() + min(900000, 1000 * 2 ** min(version.attempts, 10)))
-            version.status = "configuration_error" if result and result.status == "unauthorized" else "retrying"
+            version.status = "configuration_error" if metadata_failure or (
+                result and result.status == "unauthorized") else "retrying"
             version.lease_token = None
             version.lease_until = 0
         # Exceptions are captured as structured safe types, not supplier bodies.
@@ -227,6 +234,7 @@ def main():
     parser.add_argument("--start")
     parser.add_argument("--end")
     parser.add_argument("--calendar-version")
+    parser.add_argument("--calendar-profile", type=Path)
     parser.add_argument("--precision", type=int)
     parser.add_argument("--version")
     parser.add_argument("--once", action="store_true")
@@ -245,7 +253,8 @@ def main():
         with transaction() as db:
             inst = register_dataset(db, identity, logical_symbol=args.create, label=args.create,
                 calendar="ny17", precision=args.precision, volume_kind="quantity",
-                volume_unit="source_quantity")
+                volume_unit="source_quantity", calendar_profile=(json.loads(args.calendar_profile.read_text())
+                    if args.calendar_profile else None))
             version_id = create_version(db, identity.key, start, end)
             print(json.dumps({"version": version_id, "instrument": inst.id}))
     if args.report:

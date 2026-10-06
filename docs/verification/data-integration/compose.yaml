@@ -49,7 +49,7 @@ services:
     environment:
       <<: *environment
       TEST_POSTGRES_URL: postgresql+psycopg://integration:${MW_DATA_TEST_PASSWORD:?Set isolated test password}@postgres/integration
-    command: ["python", "-m", "pytest", "backend/tests/test_market_contracts.py", "backend/tests/test_market_datasets.py", "backend/tests/test_market_datasets_postgres.py", "backend/tests/test_dukascopy_history.py", "backend/tests/test_history_versions.py", "backend/tests/test_history_replay.py", "backend/tests/test_history_snapshots_migration.py", "backend/tests/test_history_replay_migration.py", "backend/tests/test_oanda_stream.py", "backend/tests/test_live_pricing.py", "backend/tests/test_live_pricing_postgres.py", "backend/tests/test_live_pricing_migration.py", "backend/tests/test_live_api.py", "-q", "-p", "no:cacheprovider"]
+    command: ["python", "-m", "pytest", "backend/tests/test_market_contracts.py", "backend/tests/test_market_datasets.py", "backend/tests/test_market_datasets_postgres.py", "backend/tests/test_dukascopy_history.py", "backend/tests/test_history_versions.py", "backend/tests/test_history_derivation.py", "backend/tests/test_source_calendar.py", "backend/tests/test_source_history_postgres.py", "backend/tests/test_history_replay.py", "backend/tests/test_history_snapshots_migration.py", "backend/tests/test_history_replay_migration.py", "backend/tests/test_oanda_stream.py", "backend/tests/test_live_pricing.py", "backend/tests/test_live_pricing_postgres.py", "backend/tests/test_live_pricing_migration.py", "backend/tests/test_live_api.py", "-q", "-p", "no:cacheprovider"]
     profiles: [verify]
     depends_on:
       migrate: {condition: service_completed_successfully}

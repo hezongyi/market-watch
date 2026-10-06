@@ -108,3 +108,18 @@ def test_expired_import_owner_cannot_publish_after_replacement(database):
 def test_month_windows_and_fixed_past_cutoff():
     at = int(datetime(2024, 2, 10, tzinfo=UTC).timestamp() * 1000)
     assert history.month_end(at) == int(datetime(2024, 3, 1, tzinfo=UTC).timestamp() * 1000)
+
+
+def test_precision_metadata_failure_is_quarantined_without_advancing_or_retrying(database):
+    ident, _ = create(database)
+    history.import_page(Adapter([batch(rows=(minute(close="1.111111"),),
+        checkpoint=120000)]), version_id=ident)
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        assert version.status == "configuration_error"
+        assert version.error == "price_precision_overflow"
+        assert version.cursor == version.start
+        assert not version.lease_token and not version.lease_until
+        assert db.scalar(select(HistoryChunk)) is None
+        assert db.scalar(select(Bar)) is None
+    assert not history.import_page(Adapter([]), version_id=ident)

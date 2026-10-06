@@ -1,0 +1,47 @@
+{
+  "worktree_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
+  "observed_at": 1791258189070,
+  "containers": [
+    {
+      "service": "api",
+      "sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
+      "live": [
+        {
+          "logical_symbol": "XAUUSD",
+          "quality": "stale",
+          "connection_epoch": 49,
+          "calendar_verified": false,
+          "error": null
+        },
+        {
+          "logical_symbol": "EURUSD",
+          "quality": "healthy",
+          "connection_epoch": 49,
+          "calendar_verified": false,
+          "error": null
+        }
+      ]
+    },
+    {
+      "service": "oanda-worker",
+      "sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
+      "live": [
+        {
+          "logical_symbol": "XAUUSD",
+          "quality": "healthy",
+          "connection_epoch": 49,
+          "calendar_verified": false,
+          "error": null
+        },
+        {
+          "logical_symbol": "EURUSD",
+          "quality": "healthy",
+          "connection_epoch": 49,
+          "calendar_verified": false,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "all_code_matches": true
+}

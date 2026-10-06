@@ -13,6 +13,7 @@ def main():
     args = parser.parse_args()
     totals = {}
     starts, finishes = [], []
+    deployments = []
     first = last = None
     blocks = snapshots = heartbeats = errors = opened = 0
     for line in args.file.read_text().splitlines():
@@ -21,6 +22,8 @@ def main():
             starts.append(record)
         elif record["event"] in ("finished", "failed"):
             finishes.append(record)
+        elif record["event"].startswith("deployment_"):
+            deployments.append(record)
         elif record["event"] == "block":
             first = min(first or record["at"], record["at"])
             last = max(last or record["at"], record["at"])
@@ -62,7 +65,8 @@ def main():
                         break
                 result[f"p{int(fraction * 100)}_ms"] = value
             total[key] = result
-    print(json.dumps({"starts": starts, "finishes": finishes, "first_block": first, "last_block": last,
+    print(json.dumps({"starts": starts, "finishes": finishes, "deployments": deployments,
+        "contains_deployment": bool(deployments), "first_block": first, "last_block": last,
         "blocks": blocks, "snapshots": snapshots, "heartbeats": heartbeats, "errors": errors,
         "opened": opened, "symbols": totals,
         "meaning": "quote keys observed through browser SSE; invalid timings separate; 1s snapshots can omit upstream updates",

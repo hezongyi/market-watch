@@ -1,0 +1,331 @@
+{
+  "observed_at": 1791258478126,
+  "host": "Ubuntu local isolated Docker",
+  "project": "market-watch-data-integration",
+  "live": [
+    {
+      "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "logical_symbol": "EURUSD",
+      "quality": "healthy",
+      "connection_epoch": 49,
+      "last_confirmed_m1": 1791258420000,
+      "calendar_verified": false,
+      "error": null
+    },
+    {
+      "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "logical_symbol": "XAUUSD",
+      "quality": "healthy",
+      "connection_epoch": 49,
+      "last_confirmed_m1": 1791258420000,
+      "calendar_verified": false,
+      "error": null
+    }
+  ],
+  "measurement_since": 1791256020000,
+  "measurements": [
+    {
+      "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "expected": 40,
+      "unknown": 0,
+      "not_tradeable": 0,
+      "confirmed": 40,
+      "missing": 0,
+      "confirmed_closures": 0,
+      "late_over_30s": 1,
+      "failed_attempts": 0,
+      "recovery_confirmed": 0,
+      "p95_ms": 8817,
+      "p99_ms": 61423,
+      "percentile_method": "nearest_rank",
+      "quotes": {
+        "samples": 945,
+        "p50_age_ms": 320,
+        "p95_age_ms": 660,
+        "p99_age_ms": 1070,
+        "max_interarrival_ms": 36083,
+        "histogram_resolution_ms": 10,
+        "clock_offset_verified": false
+      },
+      "meaning": "Live missing/late/failure denominators; historical recovery and unknown sessions are separate"
+    },
+    {
+      "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "expected": 40,
+      "unknown": 0,
+      "not_tradeable": 0,
+      "confirmed": 40,
+      "missing": 0,
+      "confirmed_closures": 0,
+      "late_over_30s": 1,
+      "failed_attempts": 0,
+      "recovery_confirmed": 0,
+      "p95_ms": 8128,
+      "p99_ms": 38642,
+      "percentile_method": "nearest_rank",
+      "quotes": {
+        "samples": 4213,
+        "p50_age_ms": 270,
+        "p95_age_ms": 630,
+        "p99_age_ms": 1060,
+        "max_interarrival_ms": 13309,
+        "histogram_resolution_ms": 10,
+        "clock_offset_verified": false
+      },
+      "meaning": "Live missing/late/failure denominators; historical recovery and unknown sessions are separate"
+    }
+  ],
+  "evaluation_timing": {
+    "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a": {
+      "samples": 38,
+      "delays_p95_ms": 8119,
+      "delays_p99_ms": 8132,
+      "processing_p95_ms": 588,
+      "processing_p99_ms": 739
+    },
+    "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764": {
+      "samples": 38,
+      "delays_p95_ms": 8732,
+      "delays_p99_ms": 8822,
+      "processing_p95_ms": 779,
+      "processing_p99_ms": 899
+    }
+  },
+  "history_versions": [
+    {
+      "id": "1671ad4f-5c22-46f2-b739-6173d5867ce5",
+      "dataset_id": "a53157b5df6ad178d83a163e9d3469236a4253e303eb0cd58bd98809ce752e30",
+      "start": 1791162000000,
+      "end": 1791165600000,
+      "cursor": 1791165600000,
+      "status": "published",
+      "error": null,
+      "attempts": 0,
+      "next_at": 0,
+      "progress": 1.0
+    },
+    {
+      "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+      "dataset_id": "a7da737a76d6e21dd242e74f8468a0d74d0cdb5acd9e3708e01f6053765b0ebd",
+      "start": 1475712000000,
+      "end": 1791244800000,
+      "cursor": 1791244800000,
+      "status": "published",
+      "error": null,
+      "attempts": 0,
+      "next_at": 1791257212405,
+      "progress": 1.0
+    },
+    {
+      "id": "30b7f7ba-cdea-42df-9738-1193e29574b8",
+      "dataset_id": "1da5d39b1d15f8359cd271abc5480e0d081ead7e59edc46e27a7f9d407cdf029",
+      "start": 1475712000000,
+      "end": 1791244800000,
+      "cursor": 1738360800000,
+      "status": "pending",
+      "error": null,
+      "attempts": 0,
+      "next_at": 1791258472075,
+      "progress": 0.832398
+    },
+    {
+      "id": "820d3dc7-1c7a-403e-9c8d-a9765262172c",
+      "dataset_id": "a7da737a76d6e21dd242e74f8468a0d74d0cdb5acd9e3708e01f6053765b0ebd",
+      "start": 1791162000000,
+      "end": 1791165600000,
+      "cursor": 1791165600000,
+      "status": "published",
+      "error": null,
+      "attempts": 0,
+      "next_at": 1791255208102,
+      "progress": 1.0
+    },
+    {
+      "id": "844fb514-ed13-4258-8f1c-cab43f55c06b",
+      "dataset_id": "a7da737a76d6e21dd242e74f8468a0d74d0cdb5acd9e3708e01f6053765b0ebd",
+      "start": 1791162000000,
+      "end": 1791165600000,
+      "cursor": 1791165600000,
+      "status": "published",
+      "error": null,
+      "attempts": 0,
+      "next_at": 0,
+      "progress": 1.0
+    },
+    {
+      "id": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+      "dataset_id": "a53157b5df6ad178d83a163e9d3469236a4253e303eb0cd58bd98809ce752e30",
+      "start": 1475712000000,
+      "end": 1791244800000,
+      "cursor": 1728514980000,
+      "status": "configuration_error",
+      "error": "precision_overflow_verified",
+      "attempts": 9,
+      "next_at": 0,
+      "progress": 0.801194
+    }
+  ],
+  "datasets": [
+    {
+      "id": "a53157b5df6ad178d83a163e9d3469236a4253e303eb0cd58bd98809ce752e30",
+      "instrument": "MD:a53157b5df6ad178d83a163e9:EURUSD",
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "EUR/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "a7da737a76d6e21dd242e74f8468a0d74d0cdb5acd9e3708e01f6053765b0ebd",
+      "instrument": "MD:a7da737a76d6e21dd242e74f8:XAUUSD",
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "XAU/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "1da5d39b1d15f8359cd271abc5480e0d081ead7e59edc46e27a7f9d407cdf029",
+      "instrument": "MD:1da5d39b1d15f8359cd271abc:EURUSD",
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "EUR/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-observed-v2"
+      }
+    }
+  ],
+  "legacy_inventory": [
+    {
+      "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "source": "oanda",
+      "provider_symbol": "XAU_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 2005,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:1da5d39b1d15f8359cd271abc:EURUSD",
+      "source": "dukascopy",
+      "provider_symbol": "EUR/USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 3101146,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:2d35563c8a5dcc26a1f55a8a4:USDJPY",
+      "source": "oanda",
+      "provider_symbol": "USD_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1941,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:48f368cd34ffe7fe6632bd871:GBPUSD",
+      "source": "oanda",
+      "provider_symbol": "GBP_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1999,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:5b4e85672a128b6d5ab12478f:USDCHF",
+      "source": "oanda",
+      "provider_symbol": "USD_CHF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1941,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:5b9998f9442808e9e3ef51dbb:AUDUSD",
+      "source": "oanda",
+      "provider_symbol": "AUD_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1944,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "source": "oanda",
+      "provider_symbol": "EUR_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 2077,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a0c2a769811f385e008b75f8e:EURGBP",
+      "source": "oanda",
+      "provider_symbol": "EUR_GBP",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1931,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a53157b5df6ad178d83a163e9:EURUSD",
+      "source": "dukascopy",
+      "provider_symbol": "EUR/USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 3445376,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a7da737a76d6e21dd242e74f8:XAUUSD",
+      "source": "dukascopy",
+      "provider_symbol": "XAU/USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 3599160,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:d86eada43edb5df78ac84069c:USDCAD",
+      "source": "oanda",
+      "provider_symbol": "USD_CAD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1943,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:e68295232055716f486750f25:EURJPY",
+      "source": "oanda",
+      "provider_symbol": "EUR_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1941,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:f4a073f810ad9fe46de9269ba:NZDUSD",
+      "source": "oanda",
+      "provider_symbol": "NZD_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1939,
+      "mapping": "explicit"
+    }
+  ],
+  "two_trading_days_verified": false,
+  "clock_offset_verified": false,
+  "mt4_deferred": true
+}

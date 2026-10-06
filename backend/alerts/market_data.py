@@ -11,7 +11,13 @@ from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
 from .chart_series import SeriesKind, decode, display_symbol, is_gold
 from .coverage import covers_interval
-from .domain import Calendar, bucket_bounds, has_trading_gap, scheduled_open, session_bounds
+from .domain import (
+    bucket_bounds,
+    calendar_for,
+    has_trading_gap,
+    scheduled_open,
+    session_bounds,
+)
 from .market import stored_coverage
 from .market_names import chinese_name
 from .providers import fetch_oanda_catalog
@@ -196,7 +202,7 @@ def viewport_session(inst, start, end):
     """Distinguish a scheduled closure from missing price history, using canonical calendar."""
     if not 0 < end - start <= 31 * DAY:
         raise HTTPException(422, "视区范围必须在31天以内")
-    calendar = Calendar(inst.calendar)
+    calendar = calendar_for(inst)
     closures = closures_from(inst.calendar_profile)
     options = dict(gold=is_gold(inst.id), closures=closures)
     if has_trading_gap(instant(start), instant(end), calendar, **options):
@@ -281,7 +287,7 @@ def read_cached_history(body: HistoryQuery):
         # Return a contiguous observed suffix. Do not join cached islands across
         # a trading interval whose provider coverage has not been established.
         contiguous = []
-        calendar = Calendar(inst.calendar)
+        calendar = calendar_for(inst)
         closures = closures_from(inst.calendar_profile)
         for row in reversed(usable):
             if contiguous:
@@ -314,7 +320,7 @@ def plan_history(body: HistoryQuery):
     left = max(0, right - span)
     with transaction() as db:
         inst = resolve(db, body.instrument)
-        calendar = Calendar(inst.calendar)
+        calendar = calendar_for(inst)
         if body.timeframe == "MN":
             # Monthly charts are an explicit cache-only view. Opening one
             # must not plan dedicated M1 downloads, even for a large countBack.
@@ -602,7 +608,7 @@ def router(authenticated):
                 age = max(0, observed_now - bar.end)
                 is_open = scheduled_open(
                     instant(observed_now),
-                    Calendar(inst.calendar),
+                    calendar_for(inst),
                     gold=is_gold(inst.id),
                     closures=closures_from(inst.calendar_profile),
                 )
@@ -615,7 +621,7 @@ def router(authenticated):
                 values["description"] += (
                     " · " + label + " · " + instant(bar.end).strftime("%Y-%m-%d %H:%M UTC")
                 )
-                session_start = ms(session_bounds(instant(bar.start), Calendar(inst.calendar))[0])
+                session_start = ms(session_bounds(instant(bar.start), calendar_for(inst))[0])
                 previous = db.scalar(
                     select(Bar)
                     .where(
@@ -636,7 +642,7 @@ def router(authenticated):
                     and not has_trading_gap(
                         instant(previous.end),
                         instant(session_start),
-                        Calendar(inst.calendar),
+                        calendar_for(inst),
                         gold=is_gold(inst.id),
                         closures=closures_from(inst.calendar_profile),
                     )

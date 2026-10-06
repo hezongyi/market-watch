@@ -1,0 +1,78 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "market-watch-data-integration",
+  "fault": "real history worker SIGKILL",
+  "passed": true,
+  "before": {
+    "at": 1791256293935,
+    "versions": [
+      {
+        "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+        "cursor": 1710529500000,
+        "status": "pending",
+        "chunks": 603,
+        "rows": 2635093,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "932e811f303ff690c2e5e8d6a44a4e0dab97b040fa3d58502b50cacfc08c3c71"
+      },
+      {
+        "id": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+        "cursor": 1714430760000,
+        "status": "running",
+        "chunks": 646,
+        "rows": 2818719,
+        "lease_until": 1791256352096,
+        "chunk_prefix_sha256": "d70e88e453864495de33216242d732a0931d45dab34b716f25845b86af524e06"
+      }
+    ]
+  },
+  "in_flight_task_at_pre_kill_sample": true,
+  "halted": {
+    "at": 1791256297028,
+    "versions": [
+      {
+        "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+        "cursor": 1710529500000,
+        "status": "pending",
+        "chunks": 603,
+        "rows": 2635093,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "932e811f303ff690c2e5e8d6a44a4e0dab97b040fa3d58502b50cacfc08c3c71"
+      },
+      {
+        "id": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+        "cursor": 1714521600000,
+        "status": "pending",
+        "chunks": 647,
+        "rows": 2820230,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "53ffeaa871412518b90644df8a945d61aaf41ecd242b1ca761342d77dc3b49ac"
+      }
+    ]
+  },
+  "after": {
+    "at": 1791256320893,
+    "versions": [
+      {
+        "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+        "cursor": 1711504200000,
+        "status": "pending",
+        "chunks": 605,
+        "rows": 2645093,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "24ee9577c6085883f6f207eb9064b6352474b479ef5b4a448f0ba8ba18b47c32"
+      },
+      {
+        "id": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+        "cursor": 1714995720000,
+        "status": "running",
+        "chunks": 648,
+        "rows": 2825230,
+        "lease_until": 1791256379210,
+        "chunk_prefix_sha256": "c24a1cc1e23e92836aca284846340e94236a39a7ac9d329090456768ab6aa2db"
+      }
+    ]
+  },
+  "resume_seconds": 16.781,
+  "finished_at": 1791256321195
+}

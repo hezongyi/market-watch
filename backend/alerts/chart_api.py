@@ -20,7 +20,7 @@ from .chart_data import FRAMES, chart_rows, future_grid
 from .chart_history_plan import bucket_has_trading
 from .chart_indicators import CATALOG, calculate, validate
 from .chart_series import SeriesKind, is_gold
-from .domain import Calendar
+from .domain import calendar_for
 from .managed_dataset import data as published_data
 from .storage import (
     Bar,
@@ -428,7 +428,7 @@ def router(authenticated):
                                      "Cache-Control": "no-store"})
         with transaction() as db:
             inst = resolve(db, body.instrument)
-            calendar = Calendar(inst.calendar)
+            calendar = calendar_for(inst)
             boundary = bounds if body.timeframe in ("M30", "W1", "MN") else bucket_bounds
             left = ms(boundary(instant(body.start), body.timeframe, calendar)[0])
             right = min(
@@ -804,7 +804,7 @@ def router(authenticated):
                         row["gap_before"] = bucket_has_trading(
                             instant(prev["end"]),
                             instant(row["start"]),
-                            Calendar(inst.calendar),
+                            calendar_for(inst),
                             gold=is_gold(inst.id),
                             closures=closures,
                         )

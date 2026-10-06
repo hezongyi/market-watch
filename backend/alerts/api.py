@@ -18,7 +18,7 @@ from sqlalchemy import delete, func, select
 from .calendar_profile import closures_from
 from .chart_series import is_gold
 from .config import settings
-from .domain import TIMEFRAMES, Calendar, previous_session, scheduled_open
+from .domain import TIMEFRAMES, calendar_for, previous_session, scheduled_open
 from .notify import DEFAULTS
 from .replay_history import history_rows, pack_history
 from .service import acknowledge, add_replay_watch, create_watch, replay_step
@@ -274,7 +274,7 @@ def instruments():
                         else "closed"
                         if not scheduled_open(
                             instant(now_ms()),
-                            Calendar(inst.calendar),
+                            calendar_for(inst),
                             gold=is_gold(inst.id),
                             closures=closures_from(inst.calendar_profile),
                         )
@@ -335,7 +335,7 @@ def session_range(instrument: str, at: int | None = None):
             raise HTTPException(404, "品种不存在")
         left, right = previous_session(
             instant(at or now_ms()),
-            Calendar(inst.calendar),
+            calendar_for(inst),
             gold=is_gold(inst.id),
             closures=closures_from(inst.calendar_profile),
         )

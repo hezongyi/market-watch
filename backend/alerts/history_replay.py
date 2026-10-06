@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from .calendar_profile import closures_from
 from .chart_series import is_gold
-from .domain import Calendar, Candle, aggregate, bucket_bounds, scheduled_open
+from .domain import Candle, aggregate, bucket_bounds, calendar_for, scheduled_open
 from .history_versions import snapshot_rows
 from .replay_history import pack_history
 from .storage import HistoryVersion, MarketDataset, Replay, candle_dict, instant, ms
@@ -14,7 +14,7 @@ from .storage import HistoryVersion, MarketDataset, Replay, candle_dict, instant
 def version_candles(db, version_id, instrument, frame, end):
     from datetime import timedelta
 
-    calendar = Calendar(instrument.calendar)
+    calendar = calendar_for(instrument)
     closures = closures_from(instrument.calendar_profile)
     members = []
     active = None
@@ -22,9 +22,11 @@ def version_candles(db, version_id, instrument, frame, end):
     def output(bounds, values):
         left, right = bounds
         expected = set()
+        conflicted = any(not scheduled_open(value.start, calendar, gold=is_gold(instrument.id),
+                                            closures=closures) for value in values)
         cursor = left
         while cursor < right:
-            if scheduled_open(cursor, calendar, gold=is_gold(instrument.id), closures=closures):
+            if conflicted or scheduled_open(cursor, calendar, gold=is_gold(instrument.id), closures=closures):
                 expected.add(cursor)
             cursor += timedelta(minutes=1)
         result = aggregate(values, left, right, expected_starts=expected)

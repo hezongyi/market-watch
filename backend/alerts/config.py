@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     oanda_resident_symbols: str = "EUR_USD,XAU_USD"
     oanda_calendar_version: str = "ny17-candidate-v1"
     oanda_calendar_verified: bool = False
+    oanda_calendar_profiles: dict[str, dict] = Field(default_factory=dict)
     oanda_recovery_minutes: int = Field(default=1500, ge=120, le=20000)
     oanda_stream_lease_seconds: int = Field(default=30, ge=20, le=90)
     session_hours: int = 24

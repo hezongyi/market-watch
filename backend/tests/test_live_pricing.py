@@ -102,6 +102,17 @@ def test_heartbeat_does_not_prove_quotes_or_minute_readiness(running):
     assert all(row["quote"] == {} for row in states)
 
 
+def test_expired_connection_cannot_report_candle_judgment_ready(running):
+    _, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
+    live.publish_event(ownership, epoch, quote(identity, epoch), identities, now=125000)
+    state = next(row for row in live.snapshots(now=150000) if row["dataset_id"] == identity.key)
+    assert state["quality"] == "unavailable"
+    assert not state["quote_ready"]
+    assert not state["candle_ready"]
+
+
 def test_recovery_and_confirmation_restore_source_state_without_historical_notifications(running):
     db_factory, ownership, epoch, identities = running
     identity = identities["EUR_USD"]
