@@ -790,7 +790,7 @@ export default function AdvancedWorkspace() {
       } else if (m.type === "market") {
         const q = m.query;
         const endpoints: Record<string, string> = {
-          search: "/market-data/catalog",
+          search: "/market-data/series/search",
           resolve: "/market-data/resolve",
           viewport: "/market-data/viewport-session",
           history: "/market-data/history",
@@ -898,7 +898,7 @@ export default function AdvancedWorkspace() {
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
           (q.series_kind !== undefined &&
-            !["provider", "managed"].includes(q.series_kind)) ||
+            !["provider", "managed", "history", "composite"].includes(q.series_kind)) ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
@@ -1001,6 +1001,8 @@ export default function AdvancedWorkspace() {
                 instrument: q.instrument,
                 series_kind: q.series_kind || "managed",
                 published: q.series_kind !== "provider",
+                ...(q.series_kind === "composite" ? {client:q.client,
+                  composite_revision_id:q.composite_revision_id,input_revision:q.input_revision} : {}),
                 ...(typeof q.dataset_start === "number"
                   ? { dataset_start: q.dataset_start }
                   : {}),

@@ -19,7 +19,7 @@ from .calendar_profile import closures_from
 from .chart_data import FRAMES, chart_rows, future_grid
 from .chart_history_plan import bucket_has_trading
 from .chart_indicators import CATALOG, calculate, validate
-from .chart_series import SeriesKind, is_gold
+from .chart_series import SeriesKind, decode, is_gold
 from .domain import calendar_for
 from .managed_dataset import data as published_data
 from .storage import (
@@ -103,6 +103,8 @@ class DataQuery(BaseModel):
     dataset_start: int | None = Field(default=None, ge=0)
     calculation_origin: int | None = Field(default=None, ge=0)
     provisional: bool = True
+    composite_revision_id: str | None = Field(default=None, max_length=36)
+    input_revision: int | None = Field(default=None, ge=0)
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
     native_reserve: NativeReserve | None = None
@@ -127,7 +129,7 @@ class DataQuery(BaseModel):
                 raise ValueError("图表储备只适用于带原生上下文的纯平台历史缓存读取")
         if self.series_kind == "provider" and self.native_history is None and max(self.limit, self.count_back or 0) > 20000:
             raise ValueError("普通平台单页最多20000根")
-        if self.series_kind == "managed" and self.limit > 2000:
+        if self.series_kind != "provider" and self.limit > 2000:
             raise ValueError("自建单页最多2000根")
         if self.native_history is not None or self.history_observation is not None:
             if self.series_kind != "provider":
@@ -157,6 +159,8 @@ class ExportQuery(BaseModel):
     start: int = Field(ge=0)
     end: int = Field(gt=0)
     indicators: list[dict] = Field(default_factory=list, max_length=12)
+    composite_revision_id: str | None = Field(default=None, max_length=36)
+    input_revision: int | None = Field(default=None, ge=0)
 
 
 class ProviderSubscription(BaseModel):
@@ -211,6 +215,14 @@ def checked(document):
     with transaction() as db:
         managed_symbols = {"EURUSD", "XAUUSD", "BTCUSDT"}
         managed_symbols.update(db.scalars(select(MarketDataset.instrument_id)))
+        from .history_retention import string_values
+        from .series_access import metadata
+
+        for value in string_values(document):
+            if value.startswith(("MWH:", "MWC:")):
+                ident, kind = decode(value)
+                metadata(db, ident, kind)
+                managed_symbols.add(value)
     if len(json.dumps(document, allow_nan=False)) > 2_000_000:
         raise ValueError("工作区过大")
     if document.get("schemaVersion") != 1:
@@ -380,6 +392,9 @@ def router(authenticated):
             sources = [{"id": row.instrument_id, "symbol": row.logical_symbol,
                         "source": row.identity["source"], "environment": row.identity["environment"]}
                        for row in db.scalars(select(MarketDataset))]
+            from .series_access import search
+            sources += [{"id": row["ticker"], "symbol": row["symbol"], "source": row["source"],
+                "environment": row["description"], "series_kind": row["series_kind"]} for row in search(db)]
         return {"frames": FRAMES, "indicators": CATALOG, "managed_sources": sources}
 
     @r.post("/export")
@@ -402,6 +417,24 @@ def router(authenticated):
         try:
             for spec in body.indicators:
                 validate(spec)
+        except (ValueError, TypeError, KeyError, AttributeError) as error:
+            raise HTTPException(422, str(error)) from error
+        try:
+            if body.instrument.startswith(("MWH:", "MWC:")):
+                ident, kind = decode(body.instrument)
+                if body.series_kind not in ("managed", kind):
+                    raise ValueError("行情标识与指定类型不一致")
+                body = body.model_copy(update={"instrument": ident, "series_kind": kind})
+            if body.series_kind in ("history", "composite"):
+                from .chart_series import encode
+                from .series_access import export_page
+
+                with transaction() as db:
+                    page = export_page(db, body)
+                return Response(chart_csv(page, instrument=encode(body.instrument, body.series_kind),
+                        timeframe=body.timeframe), media_type="text/csv; charset=utf-8",
+                        headers={"Content-Disposition": 'attachment; filename="market-watch.csv"',
+                                 "Cache-Control": "no-store"})
         except (ValueError, TypeError, KeyError, AttributeError) as error:
             raise HTTPException(422, str(error)) from error
         if body.series_kind == "provider":
@@ -692,8 +725,18 @@ def router(authenticated):
 
 def data_sync(body: DataQuery):
     try:
+        ident, kind = decode(body.instrument) if body.instrument.startswith(("MWH:", "MWC:")) else (body.instrument, body.series_kind)
+        if kind in ("history", "composite"):
+            if body.series_kind not in ("managed", kind):
+                raise ValueError("行情标识与指定类型不一致")
+            body = body.model_copy(update={"instrument": ident, "series_kind": kind})
         for spec in body.indicators:
             validate(spec)
+        if body.series_kind in ("history", "composite"):
+            from .series_access import chart_data
+
+            with transaction() as db:
+                return chart_data(db, body)
         if body.series_kind == "provider":
             import httpx
 

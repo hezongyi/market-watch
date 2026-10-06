@@ -49,6 +49,7 @@ def main():
                  "count": 2, "timeframe": "H4"}
         chart_path = f"composites/{composite}/chart?revision_id={revision}&input_revision={inputs}&count=2&timeframe=H4"
         cases = {
+            "series_search": ({"query": "EURUSD"}, "series/search?query=EURUSD"),
             "composite_list": ({}, "center/composites"),
             "composite_list_candidates": ({"query": "EURUSD"}, "center/composite-candidates?query=EURUSD"),
             "composite_get_mappings": ({"dataset_id": dataset}, f"datasets/{dataset}/mappings"),
@@ -62,7 +63,9 @@ def main():
             assert tools[name]["annotations"]["readOnlyHint"]
             result = rpc("tools/call", {"name": name, "arguments": arguments})
             assert not result["isError"], name
-            assert stable_read(result["structuredContent"]) == stable_read(get(path)), name
+            browser = get(path)
+            expected = {"items": browser} if name == "series_search" else browser
+            assert stable_read(result["structuredContent"]) == stable_read(expected), name
             records.append({"tool": name, "browser_parity": True})
         page = get(chart_path)
         assert page["bars"] and page["revision_id"] == revision and page["input_revision"] == inputs

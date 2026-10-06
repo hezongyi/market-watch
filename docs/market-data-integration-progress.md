@@ -587,3 +587,20 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
 - [本批行为、实际启停及剩余范围](verification/three-layer/composite-center-stage.md)。
   Ubuntu 16629 管理实例健康，pricing-worker 保持停止，旧观察不变；未推送/PR/生产操作。
   本批真实浏览器使用 OANDA→OANDA，不宣称 Dukascopy→OANDA 或完整 C/D/E、质量观察通过。
+
+### 2026-10-07：三层统一搜索、固定输入主图表与 CSV
+
+- 新 qualified 身份 MWH/MWC 保留固定历史版本和组合定义，旧 bare/MD/MC/MWP 含义不变。
+  原生库大写 UUID/hash 在解析及引用保护规范化；保存偏好/观察列表也保护版本回收。
+- 普通/原生主图表及只读 MCP series_search 接统一选品，搜索/解析不创建组合；
+  首次实际组合图表请求幂等使用，单次多页固定输入，固定历史不触发旧维护。
+- 修复观察列表单条解析失败阻挡整个有效主图表的弹窗；错误由请求控件显示，
+  保存的不可用来源身份不改写。原生标题显示 EURUSD，完整身份仍保存。
+- 固定历史/组合 CSV 共用读取器，保留版本、输入修订和分段来源，不创建采集需求。
+  指标完整预热未完成时明确拒绝页面截断计算，不将当前可画图当作策略就绪。
+- 最终全量 883 passed / 131 skipped / 228.89s，实际 PostgreSQL 32 passed / 130.76s，
+  JS 五脚本、前端构建、Ruff/diff、真实七工具 HTTP/MCP 和加强浏览器八项通过。
+  [实际环境、启停、问题证据及剩余范围](verification/three-layer/series-access-stage.md)。
+- Ubuntu 16629 API 健康，16630 独立许可库 origin 已运行；pricing-worker 停止，旧观察不变。
+  持久尾部聚合、修订缓存修复、完整指标/组合策略、显式修订、原生 Dukascopy、
+  回测周期输入及真实跨源/并发/长期质量仍待交付；没有推送/PR/生产操作。

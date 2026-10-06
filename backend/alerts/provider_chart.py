@@ -82,7 +82,13 @@ def metadata(ident, *, deadline=None, cached_only=False):
         if db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == ident)):
             raise HTTPException(422, "显式数据集仅支持自建系列，不转换为平台原生身份")
         entry = db.get(MarketCatalog, ident)
-        if entry and entry.id.startswith("HC:"):
+        if entry is None and ident.startswith("OANDA:"):
+            from .history_catalog import account_scope
+            entry = next((row for row in db.scalars(select(MarketCatalog).where(
+                MarketCatalog.source == "oanda", MarketCatalog.symbol == ident[6:],
+                MarketCatalog.id.startswith("HC:")))
+                if row.metadata_json.get("history_account_scope") == account_scope()), None)
+        if entry and entry.id.startswith("HC:") and not ident.startswith("OANDA:"):
             raise HTTPException(422, "自建来源目录仅用于登记历史，不作为平台原生身份")
         inst = db.get(Instrument, ident)
         if entry:

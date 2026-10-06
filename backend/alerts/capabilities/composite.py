@@ -17,6 +17,12 @@ class CompositeListQuery(Input):
     page_size: int = Field(default=25, ge=1, le=100)
 
 
+class SeriesSearchQuery(Input):
+    query: str = Field(default="", max_length=100)
+    kind: Literal["all", "provider", "history", "composite"] = "all"
+    limit: int = Field(default=100, ge=1, le=250)
+
+
 class CompositeQuery(Input):
     composite_id: str = Field(min_length=64, max_length=64)
 
@@ -36,6 +42,12 @@ class CompositeBarsQuery(CompositeQuery):
 
 
 def register_composite(registry):
+    from ..market_data import search_series
+
+    registry.register(Capability("series_search",
+        "Unified qualified platform, fixed published history and eligible composite candidates. Search and resolve do not create a composite or live demand; history ticker fixes a version.",
+        SeriesSearchQuery, Record, frozenset({"market:read"}), "read",
+        lambda ctx, q: {"items": search_series(**q.model_dump())}))
     entries = [
         ("composite_list", "Pure paginated saved composites; no creation, demand or supplier request.", CompositeListQuery,
          lambda ctx, q: invoke(list_composites, **q.model_dump())),

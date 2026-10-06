@@ -11,6 +11,14 @@ const MWSeries = (() => {
         throw Error("指标行情系列不一致");
       return { ...base, spec: payload.spec, key: payload.key };
     }
+    for (const [prefix, series_kind, pattern] of [
+      ["MWH:", "history", /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/],
+      ["MWC:", "composite", /^[a-f0-9]{64}$/],
+    ]) if (ticker.startsWith(prefix)) {
+      const symbol = ticker.slice(prefix.length).toLowerCase();
+      if (!pattern.test(symbol)) throw Error("无效固定行情标识");
+      return {symbol, series_kind, ticker};
+    }
     const series_kind = ticker.startsWith(prefix) ? "provider" : "managed";
     let symbol = series_kind === "provider" ? ticker.slice(prefix.length) : ticker;
     if (/^YAHOO:[A-Fa-f0-9]{32}$/.test(symbol)) symbol = "YAHOO:" + symbol.slice(6).toLowerCase();
@@ -18,6 +26,11 @@ const MWSeries = (() => {
     return { symbol, series_kind, ticker };
   }
   function encode(symbol, series_kind = "managed") {
+    if (["history", "composite"].includes(series_kind)) {
+      const ticker = (series_kind === "history" ? "MWH:" : "MWC:") + symbol;
+      decode(ticker);
+      return ticker;
+    }
     if (!["provider", "managed"].includes(series_kind)) throw Error("未知行情系列");
     if (decode(symbol).series_kind !== "managed") throw Error("需要基础品种标识");
     const canonical = decode(symbol).symbol;

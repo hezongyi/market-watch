@@ -11,6 +11,7 @@ import re
 from sqlalchemy import delete, func, or_, select
 
 from .storage import (
+    AdvancedPreference,
     AdvancedWorkspace,
     Bar,
     ChartAlertVersion,
@@ -48,6 +49,9 @@ from .storage import (
 def string_values(value):
     if isinstance(value, str):
         yield value
+        if value.startswith("MWH:"):
+            from .chart_series import decode
+            yield decode(value)[0]
     elif isinstance(value, dict):
         for key, child in value.items():
             yield key
@@ -74,6 +78,8 @@ def reference_values(row):
         return {"config": row.config, "market_identity": row.market_identity, "dataset_id": row.dataset_id}
     if isinstance(row, (ChartWorkspace, AdvancedWorkspace)):
         return row.document
+    if isinstance(row, AdvancedPreference):
+        return row.content
     if isinstance(row, SignalRow):
         return {"instrument_id": row.instrument_id, "evidence": row.evidence}
     if isinstance(row, HistoryVersion):
@@ -117,12 +123,15 @@ def lock_reference_values(db, document):
                 yield from declared_refs(child)
 
     declared = set(declared_refs(document))
-    version_ids = {v for v in declared if re.fullmatch(r"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}", v)}
+    fixed_ids = {v[4:].lower() for v in values if v.startswith("MWH:")}
+    version_ids = {v for v in declared | fixed_ids if re.fullmatch(r"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}", v)}
     series_ids = {v for v in values if v.startswith("MD:")}
     series_ids.update(v for v in declared if re.fullmatch(r"[a-f0-9]{64}", v))
     if not version_ids and not series_ids:
         return
     versions = list(db.scalars(select(HistoryVersion).where(HistoryVersion.id.in_(version_ids)))) if version_ids else []
+    if fixed_ids and len({row.id for row in versions} & fixed_ids) != len(fixed_ids):
+        raise ValueError("所引用固定历史版本不存在")
     dataset_ids = {v.dataset_id for v in versions}
     dataset_ids.update(db.scalars(select(MarketDataset.id).where(
         or_(MarketDataset.id.in_(series_ids), MarketDataset.instrument_id.in_(series_ids)))))
@@ -152,6 +161,7 @@ def references(db, dataset_id):
     for watch in db.scalars(select(Watch).where(Watch.instrument_id == dataset.instrument_id)):
         add("strategy", watch.id, f"策略（{watch.status}）")
     for model, kind, label in ((ChartAlertVersion, "chart_alert", "预警版本与审计"),
+                               (AdvancedPreference, "workspace", "保存的图表自选与偏好"),
                                (ChartWorkspace, "workspace", "保存的图表工作区"),
                                (AdvancedWorkspace, "workspace", "保存的高级工作区"),
                                (SignalRow, "signal", "历史策略事件")):

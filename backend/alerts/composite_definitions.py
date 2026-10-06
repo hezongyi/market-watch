@@ -141,8 +141,9 @@ def baseline(db, dataset_id, calendar):
     return version, seam
 
 
-def first_use(db, dataset_id, mapping_id, *, permission_scope="workspace:default"):
-    dataset = db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
+def definition(db, dataset_id, mapping_id, *, permission_scope="workspace:default"):
+    """Pure identity computation for saved mappings and uncreated candidates."""
+    dataset = db.get(MarketDataset, dataset_id)
     mapping = db.get(RealtimeMapping, mapping_id)
     if (not dataset or not mapping or mapping.dataset_id != dataset_id or
             mapping.permission_scope != permission_scope):
@@ -156,6 +157,13 @@ def first_use(db, dataset_id, mapping_id, *, permission_scope="workspace:default
     identity = DatasetIdentity.model_validate(target.identity)
     if identity.account_scope != account_scope():
         raise ValueError("实时映射属于其他账户，请明确保存新映射")
+    return dataset, mapping, source, target, identity, rules, ident
+
+
+def first_use(db, dataset_id, mapping_id, *, permission_scope="workspace:default"):
+    db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
+    dataset, mapping, source, target, identity, rules, ident = definition(
+        db, dataset_id, mapping_id, permission_scope=permission_scope)
     existing = db.get(MarketComposite, ident)
     if existing:
         fixed = db.get(CompositeRevision, existing.active_revision_id)

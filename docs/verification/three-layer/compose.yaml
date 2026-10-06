@@ -95,6 +95,17 @@ services:
       api: {condition: service_healthy}
     labels:
       market-watch.purpose: three-layer-acceptance
+  chart-origin:
+    image: mw-range-main-chart:horizontal-labels1
+    restart: "no"
+    mem_limit: 128m
+    ports: ["127.0.0.1:16630:80"]
+    volumes:
+      - ../../../advanced-host:/usr/share/nginx/html:ro
+      - ../../../artifacts/data-integration/chart-origin-assets/charting_library:/usr/share/nginx/html/charting_library:ro
+      - ../../../advanced-host/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    labels:
+      market-watch.purpose: three-layer-acceptance
 volumes:
   three-layer-postgres:
     labels:

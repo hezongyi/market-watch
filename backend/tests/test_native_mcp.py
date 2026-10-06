@@ -101,7 +101,7 @@ def test_initialize_discovery_and_call(mcp):
     assert response.status_code == 200
     assert response.json()["result"]["serverInfo"]["name"] == "Market Watch"
     tools = rpc(client, token, "tools/list").json()["result"]["tools"]
-    assert len(tools) == 27
+    assert len(tools) == 28
     assert all(
         t["inputSchema"]["type"] == "object" and t["outputSchema"]["type"] == "object"
         for t in tools
@@ -321,7 +321,7 @@ def test_registration_schema_and_automatic_protocol_exposure(mcp, monkeypatch):
     assert not asyncio.run(run()).is_error
     with pytest.raises(ValueError, match="frozen"):
         registry.register(cap)
-    assert len(build_registry().visible(frozenset(SCOPES))) == 27
+    assert len(build_registry().visible(frozenset(SCOPES))) == 28
 
 
 def test_host_origin_body_quota_and_disable(mcp, monkeypatch):

@@ -299,6 +299,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   const q = {
     instrument: symbol,
     series_kind,
+    ...(series_kind === 'composite' ? {client:clientId} : {}),
     timeframe: frames[res],
     ...(spec && series_kind === 'provider' && alertCalculationOrigins.has(MWSeries.encode(symbol,series_kind)+'|'+res)
       ? {calculation_origin:alertCalculationOrigins.get(MWSeries.encode(symbol,series_kind)+'|'+res)} : {}),
@@ -355,11 +356,14 @@ function historyQuery(args) {
   promise.then(remove, remove);
   return promise;
 }
-function yahooPresentationRows(symbols) {
+function seriesPresentationRows(symbols) {
   return symbols.flatMap(ticker => {
-    const meta = symbolPresentations.get(decode(ticker).symbol);
+    const identity = decode(ticker);
+    const meta = symbolPresentations.get(identity.symbol);
     return meta ? [{s:"ok",n:ticker,v:{short_name:meta.symbol,
-      description:meta.name + " · Yahoo 市场报价",exchange:meta.exchange}}] : [];
+      description:meta.name + (meta.source === 'yahoo' ? " · Yahoo 市场报价" :
+        identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情"),
+      exchange:meta.exchange || meta.source?.toUpperCase()}}] : [];
   });
 }
 const feed = {
@@ -384,13 +388,16 @@ const feed = {
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
     const all=[...new Set([...symbols, ...fastSymbols])];
     quoteSubscriptions.set(id, {symbols:all,cb});
-    const yahoo=all.filter(ticker=>decode(ticker).symbol.startsWith("YAHOO:"));
-    if(yahoo.length) {
+    const presented=all.filter(ticker=>{
+      const identity=decode(ticker);
+      return identity.symbol.startsWith("YAHOO:") || ['history','composite'].includes(identity.series_kind);
+    });
+    if(presented.length) {
       // Give native details its resolved human name while the real market
       // snapshot loads. No price, change or quote time is invented here.
-      const named=yahooPresentationRows(yahoo);
+      const named=seriesPresentationRows(presented);
       if(named.length) setTimeout(()=>{if(quoteSubscriptions.has(id)) cb(named)},0);
-      feed.getQuotes(yahoo,rows=>{if(quoteSubscriptions.has(id)) cb(rows)},
+      feed.getQuotes(presented,rows=>{if(quoteSubscriptions.has(id)) cb(rows)},
         error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}));
     }
   },
@@ -415,9 +422,9 @@ const feed = {
       cb(
         rows.map(s => ({
           symbol: s.symbol,
-          ticker: MWSeries.encode(s.id, "provider"),
-          description: s.label + " · 平台行情" +
-            (s.supported ? "" : " · 日历待接入"),
+          ticker: s.ticker || MWSeries.encode(s.id, "provider"),
+          description: s.label + " · " + (s.description || "平台行情") +
+            (s.series_kind && s.series_kind !== 'provider' || s.supported ? "" : " · 日历待接入"),
           exchange: s.exchange || s.source.toUpperCase(),
           type: ({CRYPTO:"crypto", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[s.asset_type] || "forex",
         })),
@@ -445,16 +452,16 @@ const feed = {
       );
       alertSourceMetadata.set(MWSeries.encode(symbol,series_kind),meta);
       while(alertSourceMetadata.size>250) alertSourceMetadata.delete(alertSourceMetadata.keys().next().value);
-      if(meta.source === "yahoo") {
+      if(meta.source === "yahoo" || ['history','composite'].includes(series_kind)) {
         symbolPresentations.set(symbol,meta);
         while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       }
       cb({
-        name: meta.source === "yahoo" ? meta.symbol : MWSeries.display(symbol),
+        name: meta.symbol || MWSeries.display(symbol),
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
         mw_historyPageBars: meta.source === "binance" ? 1000 : 4000,
-        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
+        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
         type: ({INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
@@ -489,7 +496,9 @@ const feed = {
       },0);
     } catch (e) {
       err(String(e));
-      send({ type: "error", error: String(e) });
+      // The library also resolves watchlist entries. Its error callback marks
+      // an unavailable entry (or chart symbol) at the requesting surface;
+      // escalating it to a workspace modal blocks unrelated valid charts.
     }
   },
   getBars: async (s, res, p, cb, err) => {
@@ -608,6 +617,34 @@ const feed = {
         return;
       }
       const identity = decode(s.ticker), symbol=identity.symbol;
+      if (['history','composite'].includes(identity.series_kind)) {
+        const requested = Math.max(1, Math.ceil(p.countBack));
+        if (!Number.isSafeInteger(requested) || requested > 20000) throw Error('固定行情单次最多请求20000根');
+        let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
+        let rows=[], boundary=false, fixed={};
+        for (let partition=0; rows.length<requested && partition<32; partition++) {
+          const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed});
+          rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
+          if (page.revision_id) fixed={composite_revision_id:page.revision_id,input_revision:page.input_revision};
+          boundary=!page.has_more;
+          if (page.pending?.length) {
+            send({type:'status',text:page.pending.join('；')});
+            boundary=false; break;
+          }
+          if (boundary) break;
+          const next=page.next_before;
+          if (!(next<before)) throw Error('固定行情分页未推进');
+          before=next;
+        }
+        rows=[...new Map(rows.map(bar=>[bar.time,bar])).values()].sort((a,b)=>a.time-b.time);
+        if(rows.length) {
+          firstHistory.set(historyKey,Math.min(firstHistory.get(historyKey)??Infinity,rows[0].time));
+          lastHistory.set(historyKey,Math.max(lastHistory.get(historyKey)||0,rows.at(-1).time));
+        }
+        cb(rows,{noData:boundary});
+        if(!rows.length) finishTerminal();
+        return;
+      }
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error('无效历史根数');
       const key=symbol+'|'+res, epoch=workspaceEpoch;
@@ -1416,6 +1453,7 @@ function boot(
       "header_layouttoggle",
       "disable_resolution_rebuild",
       "prefer_quote_short_name",
+      "use_symbol_name_for_header_toolbar",
       "study_templates",
       "items_favoriting",
       "chart_template_storage",
@@ -1574,7 +1612,7 @@ function boot(
         (error) =>
           send({ type: "error", error: "时间范围同步失败：" + String(error) }),
         async (chart, target) => {
-          if (decode(chart.symbol()).series_kind === "provider") return target;
+          if (decode(chart.symbol()).series_kind !== "managed") return target;
           const symbol = decode(chart.symbol()).symbol;
           if (target.to - target.from > 31 * 86400) return target;
           // An actual observed candle inside the target proves this is not

@@ -501,6 +501,10 @@ class VolumeControlQuery(BaseModel):
 def router(authenticated):
     r = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
 
+    @r.get("/series/search")
+    def series_search(query: str = "", kind: str = "all", limit: int = 100):
+        return search_series(query, kind=kind, limit=limit)
+
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
         result = []
@@ -514,6 +518,18 @@ def router(authenticated):
                 raise HTTPException(422, str(error)) from error
             if kind == "managed":
                 managed.append(ident)
+                continue
+            if kind in ("history", "composite"):
+                from .series_access import metadata
+                with transaction() as db:
+                    try:
+                        meta = metadata(db, ident, kind)
+                        values = {"short_name": meta["symbol"], "description": meta["name"] + (
+                            " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
+                        # Watchlist metadata is pure, never a first-use command.
+                        result.append({"s": "ok", "n": ticker, "v": values})
+                    except ValueError:
+                        result.append({"s": "error", "n": ticker, "v": {"description": "行情不可用，请查看数据中心"}})
                 continue
             from .provider_chart import metadata, quote_page, quote_previous_close
 
@@ -685,6 +701,13 @@ def router(authenticated):
             from .provider_chart import metadata
 
             return metadata(body.instrument)
+        if body.series_kind in ("history", "composite"):
+            from .series_access import metadata
+            with transaction() as db:
+                try:
+                    return metadata(db, body.instrument, body.series_kind)
+                except ValueError as error:
+                    raise HTTPException(422, str(error)) from None
         with transaction() as db:
             inst = resolve(db, body.instrument)
             return {
@@ -706,6 +729,15 @@ def router(authenticated):
     @r.post("/activity")
     def activity(body: Activity):
         with transaction() as db:
+            ident, kind = decode(body.instrument)
+            if kind == "history":
+                return {"ok": True}
+            if kind == "composite":
+                from .series_access import composite_definition
+                _, _, composite = composite_definition(db, ident)
+                if composite:
+                    renew_demand(db, body.client, db.get(Instrument, composite.instrument_id))
+                return {"ok": True}
             inst = resolve(db, body.instrument)
             renew_demand(db, body.client, inst)
         return {"ok": True}
@@ -881,6 +913,41 @@ def router(authenticated):
         return {"ok": True}
 
     return r
+
+
+def search_series(query="", *, kind="all", limit=100):
+    if kind not in ("all", "provider", "history", "composite") or not 1 <= limit <= 250:
+        raise HTTPException(422, "无效行情搜索范围")
+    result = []
+    if kind in ("all", "provider"):
+        from .chart_series import encode
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+            for row in instrument_catalog(query) if not row["id"].startswith("MD:")]
+        from .history_catalog import account_scope
+        with transaction() as db:
+            for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
+                    MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True))):
+                if row.metadata_json.get("history_account_scope") != account_scope():
+                    continue
+                if query.strip().upper() not in (row.symbol + row.symbol.replace("_", "") + row.label).upper():
+                    continue
+                ident = "OANDA:" + row.symbol
+                if any(item["id"] == ident for item in result):
+                    continue
+                result.append({"id": ident, "symbol": row.symbol, "label": row.label,
+                    "series_kind": "provider", "ticker": encode(ident, "provider"),
+                    "source": "oanda", "asset_type": row.asset_type, "available": True,
+                    "supported": row.calendar in ("ny17", "utc0"), "precision": row.precision,
+                    "description": "平台 · OANDA Practice · Bid · 原生周期"})
+    if kind != "provider":
+        from .series_access import search
+        with transaction() as db:
+            fixed = search(db, query, kind=kind, limit=limit)
+        if kind == "all" and fixed:
+            result = result[:max(1, limit // 3)]
+        result += fixed
+    return result[:limit]
 
 
 def instrument_catalog(query: str = ""):

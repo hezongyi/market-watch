@@ -57,7 +57,8 @@ function chartDemandReporter(widget, client, submit, onError, clock = () => Date
       const work = [];
       for (let i = 0; i < widget.chartsCount(); i++) {
         const chart = widget.chart(i), timeframe = frames[chart.resolution()];
-        if (!timeframe || chart.symbol().startsWith('MWPY_') || chart.symbol().startsWith('MWP:')) continue;
+        if (!timeframe || chart.symbol().startsWith('MWPY_') ||
+          ['MWP:', 'MWH:', 'MWC:'].some(prefix=>chart.symbol().startsWith(prefix))) continue;
         if (!ids.has(chart)) ids.set(chart, `${client}:${++sequence}`);
         const id = ids.get(chart);
         if (inFlight.has(id)) continue;
