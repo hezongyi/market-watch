@@ -171,6 +171,27 @@ systemctl --user stop market-watch-data-integration-rules.service
 该窗口是额外48小时逐规则观察，不能向前回填到04:08规则创建时刻，也不重置原浏览器窗口。
 此service无自动重启或开机启用，每次start/finish都追加记录；不把多个片段拼成无中断窗口。
 
+## 05:01 UTC 健康状态接口更新
+
+实时快照新增 `cooldown_until`：共享来源REST预算的活动冷却截止UTC毫秒，没有活动冷却时为null。
+它不表示stream报价失效，也不取代报价/完成柱独立就绪状态。小数毫秒向上取整，其他来源的
+冷却不混入OANDA快照；SSE签名包含该字段，冷却开始/到期即使没有新报价也能发布。
+
+[修正验证](cooldown-health-tests.txt)28项通过；Ubuntu Docker中
+[12项验证](cooldown-health-container-tests.txt)包括独立PostgreSQL临时schema的读取和过期测试。
+[运行记录](cooldown-health-runtime.json)保存仅API重新创建和认证GET核对；
+从部署准备到API验证共28.998秒，**不是纯HTTP不可用时长**。
+两个观察PID、OANDA/历史/聚合worker及数据库/web容器ID均保持不变，上游仍为epoch49。
+[代码核对](cooldown-health-code.json)确认API已更新，保留worker的采集、租约、确认函数逐一相同，
+只有未被worker调用的快照函数版本不同。后续启动新worker会使用已构建的新镜像。
+
+浏览器与规则JSONL均追加deployment_started/finished，两个窗口元数据保留部署分段与代码指纹。
+不能再称这些窗口全程采用同一API代码或HTTP无中断。
+[浏览器恢复](cooldown-health-browser-recovery.json)保留3次SSE错误；
+[规则恢复](cooldown-health-rules-recovery.json)保留2次502采样失败，恢复后两watch继续推进新的M1。
+逐规则摘要保留部署事件，额外[8项回归](rule-deployment-summary-tests.txt)通过。
+原始错误不删除、不重启窗口来掩盖；计划结束时间保持原值，最终按实际分段和全量失败分母评估。
+
 ## 当前结果与限制
 
 后端与 PostgreSQL 测试记录、截图、容器快照与故障 JSON 位于本目录。

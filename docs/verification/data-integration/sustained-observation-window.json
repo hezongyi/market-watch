@@ -18,7 +18,30 @@
   "two_trading_days_verified": false,
   "mt4_deferred": true,
   "scope": "New complete window after proven authentication renewal; all earlier interrupted records retained",
-  "deployments": [],
+  "deployments": [
+    {
+      "event": "deployment_started",
+      "at": 1791262860351,
+      "phase": "sustained",
+      "action": "api_recreate_for_cooldown_health",
+      "commit": "42ec05176b80b46e370d6a630fee78f1c20b3937",
+      "scope": "Ubuntu acceptance API only",
+      "started_at_utc": "2026-10-06T05:01:00.351000+00:00",
+      "completed_at": 1791262889349,
+      "runtime_live_module_sha256": "c73dcb17c3f73a580ecca426e90e262c4bbbeb58b99a27388511f1633c855419",
+      "live_api_sha256": "a9a6bd32c5cafdb5f963a1346b9226c196633d00f276570f16c533dad3aa8fa7",
+      "before_api": "9718cde30004",
+      "observer_pids": {
+        "market-watch-data-integration-browser.service": 2266365,
+        "market-watch-data-integration-rules.service": 2669988
+      },
+      "completed_at_utc": "2026-10-06T05:01:29.349000+00:00",
+      "after_api": "030ca18b1100",
+      "observer_pids_unchanged": true,
+      "worker_ids_unchanged": true,
+      "upstream_epochs_unchanged": true
+    }
+  ],
   "observer_pid": 2266365,
   "previous_interrupted_window": "sustained-observation-window-interrupted.json",
   "previous_interrupted_windows": [

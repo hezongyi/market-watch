@@ -9,6 +9,7 @@ from pathlib import Path
 
 def summarize(records, since):
     starts, finishes, clocks, authentications, failures = [], [], [], [], []
+    deployments = []
     watches, last = {}, {}
     samples = 0
     first_sample = last_sample = None
@@ -28,6 +29,8 @@ def summarize(records, since):
             authentications.append(record)
         elif event == "poll_failed":
             failures.append(record)
+        elif event.startswith("deployment_"):
+            deployments.append(record)
         elif event == "poll_clock":
             max_interval = max(max_interval, record["interval_ms"])
             max_clock_step = max(max_clock_step, abs(record["wall_minus_monotonic_ms"]))
@@ -86,6 +89,7 @@ def summarize(records, since):
             **{f"p{percent}_ms": values[math.ceil(len(values) * percent / 100) - 1]
                if values else None for percent in (50, 95, 99)}}
     return {"measurement_since": since, "starts": starts, "finishes": finishes,
+        "deployments": deployments, "contains_deployment": bool(deployments),
         "samples": samples, "first_sample": first_sample, "last_sample": last_sample,
         "failed_polls": failures, "authentications": authentications, "receiver_clocks": clocks,
         "max_poll_interval_ms": max_interval, "max_request_duration_ms": max_request_duration,

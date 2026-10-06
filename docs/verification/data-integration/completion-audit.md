@@ -17,6 +17,7 @@ MT4 实时留到后续；OANDA 故障只降级，不切源。目标仍 active。
 | 固定历史版本与回放不变 | 两品种十年 API 与浏览器均通过 | [十年回放](ten-year-replays.json)验证数百万根预热、step/seek 与同源再导入不改 pinned input；[浏览器](ten-year-browser.json)验证版本选择、恢复及未来隐藏 |
 | 实际 practice 账户和共享流 | 已验证双品种及十品种 | [账户采样](oanda-stream-probe.json)、[十品种 50 completed M1](load-ten-symbols.json)；无外部通知投递 |
 | 断线、401/429、单品种、浏览器恢复 | 已验证 | fault-pause-30s/120s、fault-restart、fault-unauthorized、fault-rate_limited、fault-single_symbol、browser-acceptance |
+| REST共享冷却的实时健康接口 | 已修正并部署Ubuntu验收API | [真实API](cooldown-health-runtime.json)、[28项回归](cooldown-health-tests.txt)、[含PG的12项验证](cooldown-health-container-tests.txt)；SSE感知冷却开始/到期，报价就绪独立 |
 | 真实规则到本地 signal/notification/outbox | 单样本已验证 | [561ms 本地信号](live-signal-runtime.json)，保持一个信号；外部 delivery disabled |
 | 持续完成柱规则计算 | 已建立，实际逐分钟推进；长期未完成 | [规则起点](sustained-m1-watches-start.json)、[当前规则](sustained-m1-watches-checkpoint.json)；04:08 起真实存在，不能回填之前无规则的时段 |
 | 持续逐规则状态观察 | 工具真实验证通过，独立48小时窗口已开始 | [24次采样含续期](rule-observer-validation.json)，两watch各推进2次；[新规则窗口](rules-observation-window.json)04:42:50UTC开始，每15秒只读采样，状态/暂停/缺失/跳变/失败均保留；首值不计执行，尚未满时长 |
@@ -41,3 +42,10 @@ M1确认 p95 为 XAU 7.638s、EUR 11.237s，p99 为 XAU 10.485s、EUR 11.624s。
 EUR接受988次（0.383/s）；各43根完成M1均已确认，missing/fail均0。
 独立浏览器87块、errors0，在2612.741秒内可见XAU1899次（0.727/s）、EUR714次（0.273/s）。
 两个窗口分母不同，不以它们相除推算漏tick率；一秒快照合并、首次订阅/重载重新计数的限制均需保留。
+
+05:01UTC仅更新验收API，窗口已记录部署分段与新代码指纹；上游epoch49、worker容器ID、
+两个观察PID保持不变。[代码核对](cooldown-health-code.json)确认采集/租约/确认函数未改变。
+[实际恢复](cooldown-health-browser-recovery.json)保留3次SSE错误，
+[逐规则恢复](cooldown-health-rules-recovery.json)保留2次502采样失败且恢复后推进新M1。
+不能把此窗口称为HTTP全程无中断，也不能把部署前后说成同一API代码版本。
+部署准备到认证GET验证耗时28.998秒，不当作纯HTTP不可用时长。完整时长与来源会话仍未通过。

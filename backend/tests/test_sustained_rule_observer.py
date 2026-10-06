@@ -100,3 +100,12 @@ def test_clock_jumps_and_long_poll_gaps_retained():
         "interval_ms": 40_000, "wall_minus_monotonic_ms": -2000}], 0)
     assert result["max_poll_interval_ms"] == 40_000
     assert result["max_wall_minus_monotonic_ms"] == 2000
+
+
+def test_api_deployment_events_are_retained_in_rule_summary():
+    records = [sample(70_000, 60_000), {"event": "deployment_started", "at": 80_000},
+               {"event": "deployment_finished", "at": 100_000}, sample(130_000, 120_000)]
+    result = summary.summarize(records, 0)
+    assert result["contains_deployment"] is True
+    assert len(result["deployments"]) == 2
+    assert result["watches"]["owned"]["observed_advancements"] == 1

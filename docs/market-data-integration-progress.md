@@ -353,3 +353,22 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
   [实际浏览器](verification/data-integration/browser-sustained-checkpoint.json)：87块errors0，
   XAU约0.727/s、EUR约0.273/s；不能把不同分母相除推算漏tick。
 - 此次补齐计量产出，尚未达到长期窗口或来源会话适用性门槛，目标保持active。
+
+### 2026-10-06 05:03 UTC：共享REST冷却健康字段
+
+- 对照正式方案Health契约，发现额度模块已执行cooldown_until但实时快照未返回。新增活动冷却
+  UTC毫秒/null字段，按来源读取共享预算，每次快照仅每来源一次读取；小数毫秒向外取整。
+  不把活动REST冷却等同stream报价失效，也不更改来源身份、价格、预警判断或确认调度。
+- SSE签名加入cooldown_until，冷却开始和过期时没有新报价/新世代也能发布。新增回归先验证
+  缺字段/缺签名函数失败，然后实现修正；[28项回归](verification/data-integration/cooldown-health-tests.txt)
+  通过，[Docker12项](verification/data-integration/cooldown-health-container-tests.txt)包含独立PG临时schema。
+- 实现提交42ec051；05:01UTC只重新创建Ubuntu验收API，其他worker/db/web容器ID及两observer PID
+  均保持，upstream epoch49不变。[运行核对](verification/data-integration/cooldown-health-runtime.json)
+  验证新字段与现有独立就绪状态；28.998s是部署准备到API验证包络，不是纯HTTP不可用时长。
+- [容器代码核对](verification/data-integration/cooldown-health-code.json)：API已加载新版本；保留worker
+  只有snapshots函数不同，其采集、租约、确认所有函数逐一相同，不需要为这个API读字段重启流。
+- 两原窗口记录部署分段，JSONL追加开始/完成事件。[浏览器](verification/data-integration/cooldown-health-browser-recovery.json)
+  117块含3次SSE错误；[规则](verification/data-integration/cooldown-health-rules-recovery.json)80次采样含2次502失败，
+  恢复后两watch继续推进新M1。不能改称全程HTTP无中断或全程同一API代码。
+- 逐规则摘要补齐部署事件保留，[8项回归](verification/data-integration/rule-deployment-summary-tests.txt)通过；
+  Ruff、diff和文档链接检查通过。时长计划保持，所有故障分母保留；来源会话适用性仍未证明。
