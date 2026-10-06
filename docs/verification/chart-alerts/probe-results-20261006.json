@@ -1,6 +1,6 @@
 {
   "date": "2026-10-06",
-  "environment": "Ubuntu quant-server, process-local browser fixture; no deployed Docker instance",
+  "environment": "Ubuntu 22.04.5 quant-server; independent running Docker Compose mw-chart-alerts-acceptance; process-local fixtures listed separately",
   "native": {
     "scope": "actual licensed chart / in-process routed synthetic fixture; no deployed instance",
     "cases": [
@@ -127,13 +127,171 @@
     "errors": []
   },
   "external_notifications_sent": false,
-  "postgres_validation": "three migration/concurrency cases pending Docker permission; backup and instance validation not run",
-  "deployed_acceptance": "not started",
+  "postgres_validation": {
+    "passed": 3,
+    "scope": "actual isolated PostgreSQL 17.11 migration/concurrency tests; populated full legacy migration chain"
+  },
+  "deployed_acceptance": {
+    "browser": {
+      "scope": "actual Ubuntu Docker application, native widget and authenticated parent API; real Binance source",
+      "cases": [
+        "actual HTTPS login and platform native chart load",
+        "native toolbar opens real unified form; source snapshot, finite count and message persist via authenticated API",
+        "actual panel pause/resume uses persisted lifecycle; copying only opens a draft",
+        "actual native drawing geometry saves through authenticated parent and generates a new persisted version",
+        "actual mouse drag against deployed application previews without writes and commits exactly once on release",
+        "real-source linear trend and reversed log ray persist native bar-index geometry and reach ready autonomous evaluation",
+        "four actual native studies create parameter/history snapshots through authenticated parent and reach ready on real provider data",
+        "actual page refresh restores backend drawing; explicit deletion pauses the persisted rule"
+      ],
+      "price_alert": "5abf8703-e25a-4156-97ee-2a0ce2469439",
+      "drawing_alert": "b81a01d7-3ff6-4199-9c10-17e031354fc3",
+      "drag": {
+        "alert": "0f3da863-183a-4ff7-ba74-c619e7561ce7",
+        "writes_during_pointer_down": 0,
+        "edits_on_release": 1,
+        "version": 2
+      },
+      "sloping_alerts": [
+        {
+          "id": "215fa44a-62f9-4daf-be59-c133801b2e17",
+          "kind": "trend_line",
+          "scale": "linear",
+          "health": "ready"
+        },
+        {
+          "id": "10d75d70-d561-46ab-9f5b-cfa5d3ee3ffb",
+          "kind": "ray",
+          "scale": "log",
+          "health": "ready"
+        }
+      ],
+      "indicator_alerts": [
+        {
+          "id": "301cdefc-0b88-4b09-8d85-acff0c67c798",
+          "name": "SMA",
+          "calculation_origin": 1791018360000,
+          "health": "ready"
+        },
+        {
+          "id": "38ff1ece-d3e1-4c2d-b580-6b4f594914ef",
+          "name": "EMA",
+          "calculation_origin": 1791018360000,
+          "health": "ready"
+        },
+        {
+          "id": "10ca8318-8e3c-4c5e-8e6a-805761aed086",
+          "name": "RSI",
+          "calculation_origin": 1791018360000,
+          "health": "ready"
+        },
+        {
+          "id": "de56e307-b3c6-4eb8-9e01-b2b7b935a6ec",
+          "name": "MACD",
+          "calculation_origin": 1790962560000,
+          "health": "ready"
+        }
+      ],
+      "errors": [],
+      "credentials_sent_to_chart": []
+    },
+    "synthetic_api_worker": {
+      "scope": "running Ubuntu Compose API/worker/PostgreSQL; synthetic fixture observations",
+      "cases": [
+        "running autonomous worker initializes baseline without firing",
+        "1/2/3 triggers stop at limit; sustained/equal/released same-candle observations obey counts",
+        "isolated notification sink accepts events after retry; acknowledging one leaves other events independent",
+        "price interval skips unobserved jump across range; counts only actual entries",
+        "real persisted history revision blocks indicator evaluation; explicit rebaseline preserves run/count without duplicate events"
+      ],
+      "external_notifications_sent": false,
+      "notification_delivery_attempts": [
+        1,
+        1,
+        2
+      ],
+      "notification_alert": "5bb17ba6-76a5-4a48-8e01-68583bfdc743",
+      "finite_alerts": [
+        "cc0aafa2-aaf3-41d4-ae09-826e294f2a7e",
+        "f22a72a4-219f-41f4-9263-5d9e631ee58a",
+        "cb27ccc4-e681-4ee6-927e-ba66334deb26",
+        "5bb17ba6-76a5-4a48-8e01-68583bfdc743"
+      ],
+      "additional_alerts": [
+        "cfc69d2b-bc21-490a-9d87-0f7fea763511",
+        "7791b6f3-2d2f-4258-a8c8-dd06cbea790a"
+      ]
+    },
+    "synthetic_faults": {
+      "scope": "deployed autonomous worker; synthetic data, gaps, stale timestamps and generated rule epoch",
+      "cases": [
+        "gap fences persisted checkpoint; actual backfill yields exactly two ordered late events",
+        "container restart consumes queued bars once, preserves prior two events and completes at three",
+        "stale intrabar observation is rejected; fresh source restores ready baseline without firing"
+      ],
+      "verified": true,
+      "close_alert": "c907f457-844c-46e5-bfd9-f4c93757570c",
+      "intrabar_alert": "e90a3ab2-7e3a-4a10-a579-fe1f5ba59b5f"
+    },
+    "restart": {
+      "verified": true,
+      "container_recreated": true,
+      "api_ip_changed": true,
+      "web_restarted": false,
+      "proxy_and_https_login_recovered": true,
+      "durable_configuration_counts_and_records_preserved": true,
+      "runtime_checkpoints_excluded_because_worker_continues": true,
+      "rule_count": 35,
+      "event_count": 34,
+      "recovery_seconds": 33.12
+    },
+    "no_browser_real_source": {
+      "scope": "deployed API alert/provider loops and real Binance; zero live browser interests",
+      "verified": true,
+      "alert_id": "e293db85-9ddd-437a-aebe-7f8e2ad2ecbe",
+      "before": {
+        "provider_latest_at": 1791259512523,
+        "checkpoint": 1791259512523,
+        "health": "ready",
+        "count": 0,
+        "live_browser_interests": 0,
+        "cached_bars": 4020
+      },
+      "after": {
+        "provider_latest_at": 1791259527659,
+        "checkpoint": 1791259527659,
+        "health": "ready",
+        "count": 0,
+        "live_browser_interests": 0,
+        "cached_bars": 4020
+      }
+    },
+    "postgres_backup_restore": {
+      "verified": true,
+      "postgres_version": "postgres (PostgreSQL) 17.11",
+      "sha256": "e13929587f360119919b79fd51a7b965b96778f081dad0b7c74620ecda82426e",
+      "bytes": 1300125,
+      "alert_table_counts": {
+        "chart_alerts": 10,
+        "chart_alert_versions": 10,
+        "signals": 20,
+        "notifications": 20,
+        "outbox": 6
+      },
+      "full_alert_payloads_equal": true,
+      "migration_head": "s20_chart_alerts",
+      "temporary_restore_database_removed": true
+    },
+    "project": "mw-chart-alerts-acceptance",
+    "web_address": "https://localhost:19443",
+    "chart_origin": "https://127.0.0.1:19444",
+    "evidence_limits": "Real-source browser verifies native/authenticated integration and ready evaluation; per-bar numeric equivalence uses actual licensed widget in controlled process-local fixture. Synthetic fault inputs stay in task-owned DB. Notification accepted is not device delivery."
+  },
   "backend_regression": {
-    "passed": 547,
+    "passed": 548,
     "skipped": 41,
-    "duration_seconds": 201.71,
-    "scope": "Ubuntu local Python venv; three chart-alert PostgreSQL tests and other environment tests skipped; deployed-instance verification still pending"
+    "duration_seconds": 130.55,
+    "scope": "Ubuntu local Python venv; actual PostgreSQL three tests executed separately"
   },
   "bridge_regression": {
     "passed": 7,

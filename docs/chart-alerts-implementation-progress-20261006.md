@@ -137,3 +137,12 @@ docker compose --env-file /tmp/mw-chart-alerts-acceptance/compose.env -p mw-char
 迁移补充验证：真实Alembic从初始版本迁移到r19，写入完整旧Watch/Signal/Notification/Outbox重试记录，再升级s20；旧身份、证据、外键及重试进度保留，新告警产生3次事件，存在告警后拒绝破坏性降级。SQLite链路已通过；同一用例已接入任务独立PostgreSQL schema，尚未运行。迁移后SQLite备份核对全部规则/版本/检查点/事件/通知/Outbox字段与原库一致；仍不等于PostgreSQL备份恢复通过。
 
 本轮最终回归：**547 passed、41 skipped**，201.71秒；提示为既有Starlette/httpx及Alembic配置弃用。前端生产build通过（既有>500KB bundle提示），Ruff、Prettier、git diff检查及Compose含notification-test profile静态解析通过。跳过项包括3项本任务真实PostgreSQL用例。Docker权限仍未就绪，所有产品访问地址仍未运行，不标记正式交付或目标完成。
+
+
+## 实际实例验收交付（最新状态）
+
+本任务已在Ubuntu本机真实运行并完成方案合同验收。运行地址 **https://localhost:19443**，图表origin **https://127.0.0.1:19444**。许可资源、凭据及私钥留私有目录；不连接unraid、不发送真实通知。完整环境、启动/停止、各项证据与边界见 [真实实例记录](verification/chart-alerts/runtime-acceptance-20261006.md)，去敏结果见 [摘要](verification/chart-alerts/probe-results-20261006.json)。上文Docker无权限及未部署均为早期历史状态，当前已用 `sg docker -c` 解决。
+
+最新结果：全量后端 **548 passed / 41 skipped**，130.55秒；另实际PG迁移/并发三项通过。实际浏览器8场景通过，含真实鼠标拖动只在释放提交1次、线性趋势线/未来端点反向对数射线、四指标创建及后台ready，errors与图表凭据泄露均为空。真实Binance在全部兴趣自然过期至零后继续采集并推进checkpoint。合成task数据验证有限次数、区间跳空、缺口补数late、陈旧恢复、历史修订及rebaseline、重启待判不漏不重；实际容器IP改变后web无需重启登录恢复。隔离通知实际attempts `[1,1,2]`、逐事件确认通过；仅服务accepted。实际PG备份恢复全部告警字段相等，恢复DB已删除。
+
+真实行情接入与可控数值fixture分层记录；不把browser ready当作真实provider逐根数值验收。双轴补审发现的失败恢复、配置刷新及结果记录问题已修。开发分支可审阅；未合并、推送或生产发布。本次交付保持本任务实例运行供验收，启动停止方式及登录文件位置已提供。
