@@ -79,7 +79,7 @@ def main():
     before = snapshot()
     started = time.monotonic()
     holder = PROJECT + "-ip-reservation-" + uuid.uuid4().hex[:8]
-    held = False
+    holder_attempted = False
     disconnected = False
     recreated = False
     try:
@@ -95,6 +95,7 @@ def main():
             )
             docker("network", "disconnect", PROJECT + "_default", PROJECT + "-api-1")
             disconnected = True
+            holder_attempted = True
             docker(
                 "run",
                 "-d",
@@ -115,7 +116,6 @@ def main():
                 ),
                 "120",
             )
-            held = True
         docker(
             "compose",
             "--env-file",
@@ -132,10 +132,28 @@ def main():
         )
         recreated = True
     finally:
-        if held:
-            docker("rm", "-f", holder)
+        cleanup_errors = []
+        if holder_attempted:
+            try:
+                owned = docker(
+                    "ps",
+                    "-aq",
+                    "--filter",
+                    "name=^/" + holder + "$",
+                    "--filter",
+                    "label=com.docker.compose.project=" + PROJECT,
+                )
+                if owned:
+                    docker("rm", "-f", holder)
+            except Exception as exc:
+                cleanup_errors.append(exc)
         if disconnected and not recreated:
-            docker("network", "connect", PROJECT + "_default", PROJECT + "-api-1")
+            try:
+                docker("network", "connect", PROJECT + "_default", PROJECT + "-api-1")
+            except Exception as exc:
+                cleanup_errors.append(exc)
+        if cleanup_errors:
+            raise ExceptionGroup("Acceptance cleanup or network recovery failed", cleanup_errors)
     new_container = docker("inspect", "--format", "{{.Id}}", PROJECT + "-api-1")
     new_ip = docker(
         "inspect",

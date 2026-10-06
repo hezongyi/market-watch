@@ -754,7 +754,7 @@ def data(body):
         prefix = calculation_rows(prefix, meta, body.instrument)
     indicators = []
     for spec in body.indicators:
-        result = calculate(prefix, spec, provisional=True)
+        result = calculate(prefix, spec, provisional=body.provisional)
         indicators.append(
             {
                 **result,

@@ -49,6 +49,8 @@ class BarsQuery(QuoteQuery):
 
 
 class IndicatorsQuery(BarsQuery):
+    provisional: bool = Field(default=False, description="Opt in to recomputed last incomplete candle; values are marked provisional")
+    calculation_origin: int | None = Field(default=None, ge=0, description="Reuse the returned provider calculation_origin to pin recursive history")
     indicators: list[IndicatorSpec] = Field(min_length=1, max_length=12)
 
 
@@ -139,6 +141,7 @@ class BarResult(Record):
 class ValuePoint(BaseModel):
     time: int
     value: float | None
+    provisional: bool = False
 
 
 class IndicatorSeries(Record):

@@ -591,7 +591,7 @@ def data(body):
     rows = calculation_rows(rows, calculation_meta, body.instrument)
     indicators = []
     for spec in body.indicators:
-        result = calculate(rows, spec, provisional=True)
+        result = calculate(rows, spec, provisional=body.provisional)
         start = visible[0]["start"] if visible else before
         indicators.append(
             {

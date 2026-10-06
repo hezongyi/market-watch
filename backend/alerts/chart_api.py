@@ -102,6 +102,7 @@ class DataQuery(BaseModel):
     published: bool = False
     dataset_start: int | None = Field(default=None, ge=0)
     calculation_origin: int | None = Field(default=None, ge=0)
+    provisional: bool = True
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
     native_reserve: NativeReserve | None = None
@@ -788,13 +789,14 @@ def data_sync(body: DataQuery):
                 name,
                 spec.get("version", "1"),
                 json.dumps(params, sort_keys=True),
+                body.provisional,
             )
             with _CACHE_LOCK:
                 cached_result = _RESULT_CACHE.get(result_key)
             if cached_result and time.monotonic() - cached_result[0] < 15:
                 result = cached_result[1]
             else:
-                result = calculate(all_rows, spec, provisional=True)
+                result = calculate(all_rows, spec, provisional=body.provisional)
                 weight = sum(len(series["values"]) for series in result["series"])
                 with _CACHE_LOCK:
                     _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)

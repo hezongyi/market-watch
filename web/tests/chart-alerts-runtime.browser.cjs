@@ -6,6 +6,21 @@ const APP = process.env.APP_ORIGIN || "https://localhost:19443";
 const CHART = process.env.CHART_ORIGIN || "https://127.0.0.1:19444";
 const PRIVATE =
   process.env.MW_ALERT_PRIVATE_DIR || "/tmp/mw-chart-alerts-acceptance";
+const ENVIRONMENTS = {
+  "/tmp/mw-chart-alerts-acceptance": [
+    "https://localhost:19443",
+    "https://127.0.0.1:19444",
+  ],
+  "/tmp/mw-chart-alerts-integration": [
+    "https://localhost:19543",
+    "https://127.0.0.1:19544",
+  ],
+};
+assert.deepEqual(
+  ENVIRONMENTS[PRIVATE],
+  [APP, CHART],
+  "Only corresponding named local acceptance endpoints and credentials are allowed",
+);
 (async () => {
   const browser = await chromium.launch({
     headless: true,

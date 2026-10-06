@@ -130,3 +130,11 @@ docker compose --env-file /tmp/mw-native-mcp-acceptance/compose.env \
 验收 EURUSD 来源明确为 `acceptance-fixture`。真实网页画线使用独立 `MCPFIXTURE` 已发布合成快照；该品种名称明确标为 SYNTHETIC，无上游品种映射，`binance` 仅用于既有按需路由识别，不代表它的价格来自 Binance。画线报告同时保存 `synthetic_market_data=true` 与 `data_source=acceptance-fixture`。实际 Binance 验收另读 `BTCUSDT provider`，不混用这两份数据。
 
 实际 SDK HTTPS、浏览器数据库保存和 Codex 调用均已通过，证据见 [验收记录](verification/native-mcp/acceptance.md)。Codex 脚本检查成功调用、无工具错误、EURUSD H1/H4 非空、后台指标、已保存画线及最终征询问题，以 0600 保存事件/错误日志；精确指标由 `indicators_calculate` 计算，时间/价位引用与事实/计算/推断区分仍需人工核对。未实施生产发布。
+
+### 图表告警集成后的指标合同
+
+`indicators_calculate` 默认 `provisional=false`，未收盘最后根的指标值为 null。明确传 `provisional=true` 可计算当前临时 K 线；对应数值点含 `provisional:true`，收盘前可能改变。网页图表仍默认实时显示临时最后根。
+
+provider 查询可传 `calculation_origin` 固定递归历史起点；从响应 `page.calculation_origin` 读取并在后续分页/轮询复用，避免更早缓存回填改变EMA/RSI等的起点。managed published仍使用 `dataset_start` 对齐其已发布历史。
+
+共用信号查询现在同时返回旧策略与图表告警事件：旧策略的 `watch_id` 有值、`chart_alert_id` 为空；图表事件相反。逐事件通知确认不改变告警次数、规则版本或运行轮次。MCP `alerts_create`/`alerts_cancel` 保持原有旧策略接口，不推断它们可以创建或编辑新版图表规则。

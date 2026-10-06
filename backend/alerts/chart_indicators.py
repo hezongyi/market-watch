@@ -296,7 +296,8 @@ def _run(name, h, low, c, params):
 def calculate(rows, spec, *, provisional=False):
     # The live last candle is recomputed from the confirmed prefix. Never
     # mutate the caller's rows or advance a recursive accumulator on a tick.
-    if provisional and rows and not rows[-1]["complete"]:
+    provisional_time = rows[-1]["start"] if provisional and rows and not rows[-1]["complete"] else None
+    if provisional_time is not None:
         rows = [*rows[:-1], {**rows[-1], "complete": True}]
     name, p = validate(spec)
     arrays = {
@@ -329,7 +330,8 @@ def calculate(rows, spec, *, provisional=False):
                     item["type"] for item in CATALOG[name]["series"] if item["key"] == key
                 ),
                 "values": [
-                    {"time": row["start"], "value": float(v) if math.isfinite(v) else None}
+                    {"time": row["start"], "value": float(v) if math.isfinite(v) else None,
+                     **({"provisional": True} if row["start"] == provisional_time else {})}
                     for row, v in zip(rows, values)
                 ],
             }
