@@ -102,6 +102,14 @@ const base = 'http://127.0.0.1:16629';
     expect(exported.headers()['content-type']).toContain('text/csv');
     expect(await exported.text()).toContain(history.id);
     checks.push('actual fixed-history CSV export retains the selected immutable version');
+    const reviewed=await page.request.post(base+'/api/charts/data',{
+      headers:{'X-CSRF-Token':csrf},data:{instrument:composite.id,series_kind:'composite',
+        timeframe:'H4',limit:3,track_history:true,provisional:false}});
+    expect(reviewed.status()).toBe(200);
+    const review=await reviewed.json();
+    expect(review.history_check.before).toBe(review.bars.at(-1).start);
+    expect(review.history_check.revision).toMatch(/^[a-f0-9]{64}$/);
+    checks.push('actual composite history review uses fixed input and raw UTC bucket boundaries');
     checks.push('unavailable saved watchlist entries retain their identities without blocking the valid chart');
     checks.push('composite human name preserves the qualified ticker without fabricating a quote');
     const normal=await page.evaluate(async instrument=>{

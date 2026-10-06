@@ -66,6 +66,7 @@ const lastHistory = new Map();
 const providerHistoryState = new Map();
 const providerHistoryWork = new Map();
 const firstHistory = new Map();
+const fixedHistoryStarts = new Map();
 const coldHistory = new Set();
 const refreshingHistoryRanges = new Map();
 const pendingHistory = new Map();
@@ -624,6 +625,8 @@ const feed = {
         let rows=[], boundary=false, fixed={};
         for (let partition=0; rows.length<requested && partition<32; partition++) {
           const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed});
+          if(page.bars?.length)
+            fixedHistoryStarts.set(historyKey,Math.min(fixedHistoryStarts.get(historyKey)??Infinity,page.bars[0].start));
           rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
           if (page.revision_id) fixed={composite_revision_id:page.revision_id,input_revision:page.input_revision};
           boundary=!page.has_more;
@@ -1055,7 +1058,8 @@ async function tick() {
         const result = await query(first.symbol, first.res, {
           limit: 3,
           track_history: true,
-          revision_after: firstHistory.get(first.symbol + "|" + first.res),
+          revision_after: (['history','composite'].includes(identity.series_kind) ? fixedHistoryStarts : firstHistory)
+            .get(first.symbol + "|" + first.res),
           ...(first.historyBefore
             ? { revision_before: first.historyBefore }
             : {}),
@@ -1653,6 +1657,7 @@ function boot(
       providerHistoryWork.clear();
       lastHistory.clear();
       firstHistory.clear();
+      fixedHistoryStarts.clear();
       indicatorHistoryNeeds.clear();
       alertCalculationOrigins.clear();
       managedSessions.clear();

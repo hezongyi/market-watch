@@ -9,12 +9,13 @@ import json
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from .chart_data import FRAMES, future_grid
 from .chart_series import encode
 from .composite_definitions import baseline, definition, first_use
 from .storage import (
+    CompositeMinuteInput,
     CompositeRevision,
     DatasetMaintenance,
     HistoryArtifact,
@@ -122,10 +123,47 @@ def chart_data(db, body):
             if body.timeframe == "MN":
                 date = date.replace(day=1)
             bar["chart_time"] = int(datetime.combine(date, datetime.min.time(), timezone.utc).timestamp() * 1000)
-    return {**page, "basis": meta["basis"], "calendar": meta["calendar"], "precision": meta["precision"],
+    check = history_check(db, page, body, meta)
+    return {**page, "history_check": check, "basis": meta["basis"], "calendar": meta["calendar"], "precision": meta["precision"],
         "volume_kind": meta["volume_kind"], "volume_unit": meta["volume_unit"],
         "indicators": [], "future": future_grid(inst, body.timeframe, page["bars"][-1]["end"]) if page["bars"] else [],
         "bounded_history": True, "as_of": now_ms(), "series_kind": body.series_kind, "symbol": meta["symbol"]}
+
+
+def history_check(db, page, body, meta):
+    """Index-backed correction stamp for loaded closed buckets, excluding tail appends.
+
+    The max immutable input revision in a bounded prefix changes on any accepted
+    correction or gap fill there. Changes in the forming/latest bucket stay on
+    the realtime path. No long M1 history reconstruction is needed to poll.
+    """
+    if not body.track_history or not page["bars"]:
+        return None
+    from .composite_series import period
+
+    next_before = page["bars"][-1]["start"]
+    before = body.revision_before or next_before
+    after = body.revision_after
+
+    def fingerprint(boundary):
+        if body.series_kind == "history":
+            facts = [page["input_manifest"], page["rule_version"], body.timeframe]
+        else:
+            # A minute correction in the excluded bucket must not invalidate
+            # earlier buckets merely because its minute precedes a UTC label.
+            cutoff = period(boundary, body.timeframe, meta["calendar"])[0]
+            floor = period(after, body.timeframe, meta["calendar"])[0] if after is not None else 0
+            changed = db.scalar(select(func.max(CompositeMinuteInput.input_revision)).where(
+                CompositeMinuteInput.revision_id == page["revision_id"],
+                CompositeMinuteInput.input_revision <= page["input_revision"],
+                CompositeMinuteInput.start >= max(0, floor), CompositeMinuteInput.start < cutoff))
+            facts = [page["revision_id"], page["history_version_id"], page["rule_version"],
+                     body.timeframe, changed or 0]
+        return hashlib.sha256(json.dumps(facts, sort_keys=True).encode()).hexdigest()
+
+    revision = fingerprint(before)
+    return {"before": before, "after": after, "revision": revision, "next_before": next_before,
+            "next_revision": revision if next_before == before else fingerprint(next_before)}
 
 
 def export_page(db, body):
