@@ -217,7 +217,8 @@ function Shell({ logout }: { logout: () => void }) {
     if (
       sound &&
       known.current &&
-      signals.some((s) => !known.current!.has(s.id)) &&
+      signals.some((s) => !known.current!.has(s.id) &&
+        (!s.evidence?.chart_alert || s.evidence.config.notify_web)) &&
       audio.current
     ) {
       playAlertTone(audio.current);
@@ -825,7 +826,8 @@ function Signals({
               </h2>
               <div className="signal-prices">
                 <span>
-                  触发价格<strong>{Number(s.price)}</strong>
+                  {s.evidence?.chart_alert && s.evidence.unit !== "price" ? "触发指标值" : "触发价格"}
+                  <strong>{Number(s.evidence?.chart_alert ? s.evidence.left : s.price)}</strong>
                 </span>
                 <span>
                   比较阈值<strong>{Number(s.threshold)}</strong>
@@ -839,10 +841,22 @@ function Signals({
                         ? "已确认"
                         : s.notification_status === "delivery_error"
                           ? "投递失败，等待重试"
-                          : "等待投递"}
+                          : s.notification_status === "web_only"
+                            ? "仅网页通知"
+                            : s.notification_status === "late_suppressed"
+                              ? "迟到事件，仅记录"
+                              : "等待投递"}
                   </strong>
                 </span>
               </div>
+              {s.evidence?.chart_alert && (
+                <details>
+                  <summary>查看告警事件证据</summary>
+                  <p>来源 {s.evidence.market_identity.source} · 周期 {s.evidence.config.timeframe} · 规则版本 {s.evidence.rule_version} · 第 {s.evidence.ordinal} 次</p>
+                  <p>市场价格 {Number(s.price)} · 检测时间 {date(s.evidence.detected_at)}{s.evidence.late ? " · 迟到事件" : ""}</p>
+                  <pre>{JSON.stringify(s.evidence.observation, null, 2)}</pre>
+                </details>
+              )}
               {s.evidence?.trigger_bar && (
                 <details>
                   <summary>查看触发时的 K 线记录</summary>

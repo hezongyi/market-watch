@@ -1,0 +1,83 @@
+# Ubuntu local Docker only; credentials and TLS material live outside Git.
+name: mw-chart-alerts-acceptance
+services:
+  pg:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: chart_alerts_acceptance
+      POSTGRES_USER: chart_alerts_acceptance
+      POSTGRES_PASSWORD: ${MW_CHART_ALERTS_DB_PASSWORD:?Run prepare_chart_alert_acceptance.py}
+    volumes: ["chart-alerts-pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chart_alerts_acceptance"]
+      interval: 2s
+      retries: 30
+  migrate:
+    build: ../../..
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["alembic", "upgrade", "head"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      pg: {condition: service_healthy}
+  api:
+    image: market-watch-api:chart-alerts-acceptance
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz')"]
+      interval: 3s
+      retries: 30
+  market-worker:
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.market", "--instrument", "BTCUSDT"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  history-worker:
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.native_history_loads"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  web:
+    build:
+      context: ../../../web
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: https://localhost:19444
+    image: market-watch-web:chart-alerts-acceptance
+    depends_on: [api]
+  chart-origin:
+    build: ../../../advanced-host
+    image: market-watch-chart-origin:chart-alerts-acceptance
+  tls:
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:19443:443", "127.0.0.1:19444:444"]
+    volumes:
+      - /tmp/mw-chart-alerts-acceptance/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - /tmp/mw-chart-alerts-acceptance/cert.pem:/certs/cert.pem:ro
+      - /tmp/mw-chart-alerts-acceptance/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+  verify:
+    profiles: [verify]
+    build:
+      context: ../../..
+      dockerfile: docs/verification/chart-alerts/Dockerfile.verify
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - 'export CHART_ALERT_TEST_DATABASE_URL="$$ALERTS_DATABASE_URL"; PYTHONPATH=backend pytest -q backend/tests/test_chart_alert_postgres.py'
+    depends_on:
+      pg: {condition: service_healthy}
+volumes:
+  chart-alerts-pg:

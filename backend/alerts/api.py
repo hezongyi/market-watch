@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import delete, func, select
 
 from .calendar_profile import closures_from
+from .chart_alert_message import signal_message
 from .config import settings
 from .domain import TIMEFRAMES, Calendar, previous_session, scheduled_open
 from .notify import DEFAULTS
@@ -818,10 +819,13 @@ def sync_device(device_id=Depends(device_auth)):
                     "id": n.id,
                     "signal_id": s.id,
                     "title": f"{s.instrument_id} · {s.reason}",
-                    "message": f"价格 {s.price} / 阈值 {s.threshold}",
+                    "message": signal_message(s) if s.evidence.get("chart_alert") else f"价格 {s.price} / 阈值 {s.threshold}",
                     "occurred_at": s.occurred_at,
                 }
                 for n, s in pending
+                if not s.evidence.get("chart_alert") or (
+                    s.evidence["config"].get("notify_ntfy") and n.status != "late_suppressed"
+                )
             ],
         }
 
@@ -1157,3 +1161,7 @@ app.include_router(advanced_router(authenticated))
 from .market_data import router as market_data_router  # noqa: E402
 
 app.include_router(market_data_router(authenticated))
+
+from .chart_alert_api import router as chart_alert_router  # noqa: E402
+
+app.include_router(chart_alert_router(authenticated))
