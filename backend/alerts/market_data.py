@@ -947,13 +947,38 @@ def search_series(query="", *, kind="all", limit=100):
         if kind == "all" and fixed:
             result = result[:max(1, limit // 3)]
         result += fixed
+    if kind == "provider":
+        result = _rank_catalog(result, query)
     return result[:limit]
+
+
+def _rank_catalog(rows, query):
+    """Prefer code matches; interleave equal-ranked sources to avoid starvation."""
+    from collections import defaultdict
+
+    term = query.strip().casefold()
+    groups = defaultdict(lambda: defaultdict(list))
+    for row in rows:
+        codes = [row.get("symbol", "").casefold(), row.get("logical_symbol", "").casefold(),
+                 row.get("symbol", "").replace("_", "").replace("/", "").casefold()]
+        rank = 0 if term and term in codes else 1 if term and any(c.startswith(term) for c in codes) else 2
+        groups[rank][row["source"]].append(row)
+    result = []
+    for rank in sorted(groups):
+        sources = groups[rank]
+        for index in range(max(map(len, sources.values()))):
+            for rows in sources.values():
+                if index < len(rows):
+                    result.append(rows[index])
+    return result
 
 
 def instrument_catalog(query: str = ""):
     from .config import settings
+    from .provider_dukascopy import catalog as dukascopy_catalog
     from .yahoo_catalog import search, seed
     seed()
+    dukascopy = dukascopy_catalog(query)
     search_status = "local"
     if query.strip() and settings.yahoo_enabled:
         # Exact codes/names and known Chinese aliases remain local. A
@@ -961,7 +986,8 @@ def instrument_catalog(query: str = ""):
         term = query.strip().upper()
         with transaction() as db:
             local = list(db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))) + list(db.scalars(select(Instrument)))
-            known = any(
+            known = any(term in {row["symbol"].upper(), row["logical_symbol"]}
+                        for row in dukascopy) or any(
                 term in {x.symbol.upper(), x.label.upper(),
                          (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
                 or not term.isascii() and term in
@@ -1022,8 +1048,11 @@ def instrument_catalog(query: str = ""):
             entry['managed_status'] = ('未维护' if plan is None else
                 '失败，已发布历史保留' if entry['id'] in failures else
                 '部分已发布，范围见历史任务' if entry['id'] in published else '处理中')
-        return [
+        result = [
             x
             for x in entries.values()
             if x["available"] and query.upper() in (x["id"] + x["label"] + x["symbol"] + x.get("english_name", "")).upper()
-        ][:250]
+        ]
+    for row in dukascopy:
+        row["search_status"] = search_status
+    return _rank_catalog(result + dukascopy, query)[:250]

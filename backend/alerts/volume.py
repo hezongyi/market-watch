@@ -39,4 +39,6 @@ def metadata(source, symbol):
         return dict(volume_kind='base', volume_unit='BTC' if symbol == 'BTCUSDT' else 'base asset')
     if source == 'oanda':
         return dict(volume_kind='tick', volume_unit='quotes')
+    if source == 'dukascopy':
+        return dict(volume_kind='quantity', volume_unit='source_quantity')
     return dict(volume_kind='unavailable', volume_unit=None)

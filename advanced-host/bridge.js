@@ -367,6 +367,7 @@ function seriesPresentationRows(symbols) {
     const meta = symbolPresentations.get(identity.symbol);
     return meta ? [{s:"ok",n:ticker,v:{short_name:meta.symbol,
       description:meta.name + (meta.source === 'yahoo' ? " · Yahoo 市场报价" :
+        identity.series_kind === 'provider' ? " · 平台原生行情" :
         identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情"),
       exchange:meta.exchange || meta.source?.toUpperCase()}}] : [];
   });
@@ -457,7 +458,7 @@ const feed = {
       );
       alertSourceMetadata.set(MWSeries.encode(symbol,series_kind),meta);
       while(alertSourceMetadata.size>250) alertSourceMetadata.delete(alertSourceMetadata.keys().next().value);
-      if(meta.source === "yahoo" || ['history','composite'].includes(series_kind)) {
+      if(['yahoo','dukascopy'].includes(meta.source) || ['history','composite'].includes(series_kind)) {
         symbolPresentations.set(symbol,meta);
         while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       }
@@ -465,11 +466,11 @@ const feed = {
         name: meta.symbol || MWSeries.display(symbol),
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
-        mw_historyPageBars: meta.source === "binance" ? 1000 : 4000,
-        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
+        mw_historyPageBars: meta.native_page_capacity || (meta.source === "binance" ? 1000 : 4000),
+        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
-        type: ({INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
+        type: ({CRYPTO:"crypto", METAL:"commodity", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures", OTHER:"commodity"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
         session: meta.session || (meta.source === "yahoo" ? "0000-0000:23456" : meta.calendar === "utc0" ? "24x7" : "1700-1700:23456"),
         timezone: meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York"),
         minmov: 1,

@@ -199,7 +199,17 @@ export default function AdvancedWorkspace() {
   }, [mobile]);
   useEffect(() => {
     let cancelled = false;
-    refresh(1)
+    const platform = new URLSearchParams(location.search).get("platform");
+    const opening = platform
+      ? api<Workspace>("/advanced-charts/workspaces", {
+          name: "平台行情",
+          symbol: platform,
+        }).then((row) => {
+          history.replaceState(null, "", location.pathname);
+          return [row];
+        })
+      : refresh(1);
+    opening
       .then((list) => {
         if (!cancelled) {
           if (list[0]) select(list[0]);

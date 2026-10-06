@@ -24,7 +24,7 @@ export function DatasetCreate() {
     [logical, setLogical] = useState("");
   const [asset, setAsset] = useState("forex"),
     [calendar, setCalendar] = useState("ny17");
-  const [precision, setPrecision] = useState(params.get("precision") || "5"),
+  const [precision, setPrecision] = useState(params.get("precision") || ""),
     [day, setDay] = useState("");
   const [periods, setPeriods] = useState(["M1", "H4", "D1"]),
     [frequency, setFrequency] = useState("daily");

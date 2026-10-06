@@ -6,7 +6,7 @@ import json
 from .chart_data import FRAMES
 from .config import settings
 
-SOURCES = ("oanda", "binance", "yahoo")
+SOURCES = ("oanda", "binance", "yahoo", "dukascopy")
 YAHOO_INTERVALS = {
     "M1": "1m",
     "M5": "5m",
@@ -29,7 +29,7 @@ def frames(source):
 
 
 def page_capacity(source):
-    return 4000 if source in ("oanda", "yahoo") else 1000
+    return 4000 if source in ("oanda", "yahoo", "dukascopy") else 1000
 
 
 def fresh_seconds(source):
@@ -41,6 +41,8 @@ def poll_seconds(source):
 
 
 def versions(meta):
+    if meta["source"] == "dukascopy":
+        return ("dukascopy-json3-bid-utc-splits-stocks-v1", "dukascopy-native-quantity-v1")
     if meta["source"] == "yahoo":
         rules = hashlib.sha256(json.dumps([meta.get("timezone"), meta.get("session")]).encode()).hexdigest()[:16]
         return ("yahoo-exchange-label-v1:" + meta["adjustment"] + ":" + rules, "yahoo-volume-v1")

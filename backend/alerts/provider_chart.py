@@ -72,6 +72,9 @@ def warm_clients():
 
 
 def metadata(ident, *, deadline=None, cached_only=False):
+    if ident.startswith("DUKA:"):
+        from .provider_dukascopy import metadata as dukascopy_metadata
+        return dukascopy_metadata(ident)
     if ident.startswith("YAHOO:"):
         from .provider_cache import DEADLINE
         from .yahoo_catalog import chart_metadata
@@ -211,6 +214,9 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     if meta["source"] == "yahoo":
         from .provider_yahoo import native_page as yahoo_page
         return yahoo_page(meta, frame, before, count, deadline=deadline, optional=optional)
+    if meta["source"] == "dukascopy":
+        from .provider_dukascopy import native_page as dukascopy_page
+        return dukascopy_page(meta, frame, before, count, client=client, deadline=deadline, optional=optional)
     if frame not in source_frames(meta["source"]) or not 1 <= count <= (4000 if meta["source"] == "oanda" else 1000):
         raise ValueError("无效平台周期或根数")
     source = meta["source"]
@@ -336,7 +342,7 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
     namespace = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
         if meta["source"] == "oanda"
-        else "yahoo-anonymous" if meta["source"] == "yahoo" else "binance-public"
+        else "yahoo-anonymous" if meta["source"] == "yahoo" else meta["source"] + "-public"
     )
     key = (
         meta["source"],
@@ -400,7 +406,8 @@ def quote_page(meta):
 def quote_previous_close(meta, latest):
     """Previous completed native session close, with the same price basis."""
     current_label = label(latest["start"], "D1", meta["calendar"])
-    session_start = ms(session_bounds(instant(latest["start"]), Calendar(meta["calendar"]))[0])
+    session_start = (latest["start"] // 86400000 * 86400000 if meta["source"] == "dukascopy" else
+        ms(session_bounds(instant(latest["start"]), Calendar(meta["calendar"]))[0]))
     page = cached_page(meta, "D1", current_label, 2, quote=True, cache_seconds=300)
     complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= session_start]
     return Decimal(complete[-1]["close"]) if complete else None
@@ -419,8 +426,8 @@ def earliest_m1(meta, *, client=None):
     """Probe the actual first native M1; never infer it from an empty time slice."""
     from .market_resources import lane
 
-    if meta["source"] == "yahoo":
-        raise ValueError("Yahoo 品种仅支持平台系列，不建立自建维护任务")
+    if meta["source"] in ("yahoo", "dukascopy"):
+        raise ValueError("此平台身份不建立自建维护任务，请在数据中心明确添加来源历史")
     namespace = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
         if meta["source"] == "oanda"

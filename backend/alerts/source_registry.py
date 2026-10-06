@@ -75,9 +75,11 @@ def capabilities(source: str):
     from .provider_capabilities import YAHOO_INTERVALS
 
     if source == "dukascopy":
-        return {"source": source, "native_periods": [], "native_status": "adapter_pending",
+        return {"source": source, "native_periods": list(FRAMES), "native_status": "supported",
                 "history_m1": True, "confirmation_m1": True, "stream": False,
                 "channel": "python", "environment": "historical", "bases": ["bid"],
+                "native_confirmation": "not_supplied",
+                "native_completion": "elapsed_native_interval",
                 "history_range": "provider_observations; per-symbol range requires querying",
                 "volume_kind": "quantity", "volume_unit": "source_quantity"}
     if source == "oanda":

@@ -87,7 +87,7 @@ def test_management_reads_are_authenticated_and_do_not_create_demand(database):
         try:
             for _ in range(2):
                 sources = client.get("/api/market-data/sources").json()
-                assert next(s for s in sources if s["source"] == "dukascopy")["native_status"] == "adapter_pending"
+                assert next(s for s in sources if s["source"] == "dukascopy")["native_status"] == "supported"
                 report = client.get(f"/api/market-data/datasets/{identity().key}/source")
                 assert report.status_code == 200
                 assert report.json()["source_id"] == collection_identity(identity()).key

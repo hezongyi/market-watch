@@ -354,13 +354,22 @@ function CenterList() {
                         <td>
                           {p.capabilities.native_periods.join(" · ") ||
                             "尚未接入"}
+                          {p.capabilities.native_confirmation === "not_supplied" && (
+                            <span>来源未提供确认标记；按周期结束时间显示</span>
+                          )}
                         </td>
                         <td>{p.capabilities.history_m1 ? "支持" : "未开放"}</td>
                         <td>{time(p.updated_at)}</td>
                         <td>
-                          {p.capabilities.history_m1 && (
+                          {p.available && p.capabilities.native_periods.length > 0 && (
+                            <Link to={`/advanced-charts?platform=${encodeURIComponent(`MWP:${p.id}`)}`}>
+                              打开平台图表
+                            </Link>
+                          )}
+                          {p.capabilities.history_m1 &&
+                            (!p.logical_symbol || p.logical_symbol.length <= 10) && (
                             <Link
-                              to={`/market-data/datasets/new?source=${p.source}&symbol=${encodeURIComponent(p.provider_symbol)}&precision=${p.precision}`}
+                              to={`/market-data/datasets/new?source=${p.source}&symbol=${encodeURIComponent(p.provider_symbol)}${p.history_precision == null ? "" : `&precision=${p.history_precision}`}`}
                             >
                               添加为自建行情
                             </Link>

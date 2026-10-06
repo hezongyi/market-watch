@@ -69,6 +69,14 @@ services:
         format: raw
     depends_on:
       api: {condition: service_healthy}
+  native-history-worker:
+    <<: *backend
+    command: ["python", "-m", "alerts.native_history_loads"]
+    env_file:
+      - path: ../../../artifacts/data-integration/three-layer-runtime.env
+        format: raw
+    depends_on:
+      api: {condition: service_healthy}
   pricing-worker:
     <<: *backend
     profiles: ["realtime"]

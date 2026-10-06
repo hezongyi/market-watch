@@ -131,28 +131,13 @@ def router(authenticated):
 
     @routes.get("/center/platform")
     def center_platform(query: str = "", source: str | None = None, page: int = 1, page_size: int = 25):
-        from sqlalchemy import func, or_
+        from .platform_catalog import catalog
 
-        from .source_registry import capabilities
-        from .storage import MarketCatalog
-
-        if page < 1 or not 1 <= page_size <= 100:
-            raise HTTPException(422, "无效的目录分页")
-        with transaction() as db:
-            rows = select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:"))
-            if query:
-                rows = rows.where(or_(MarketCatalog.symbol.contains(query[:100], autoescape=True),
-                                      MarketCatalog.label.contains(query[:100], autoescape=True)))
-            if source:
-                rows = rows.where(MarketCatalog.source == source)
-            total = db.scalar(select(func.count()).select_from(rows.subquery()))
-            items = [{"id": r.id, "source": r.source, "provider_symbol": r.symbol,
-                "label": r.label, "asset_class": r.asset_type, "precision": r.precision,
-                "available": r.available, "updated_at": r.updated_at,
-                "capabilities": capabilities(r.source)} for r in db.scalars(rows.order_by(
-                    MarketCatalog.symbol, MarketCatalog.source, MarketCatalog.id)
-                    .offset((page - 1) * page_size).limit(page_size))]
-            return {"items": items, "total": total, "page": page, "page_size": page_size}
+        try:
+            with transaction() as db:
+                return catalog(db, query=query, source=source, page=page, page_size=page_size)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
 
     @routes.get("/center/datasets/{dataset_id}")
     def center_detail(dataset_id: str):

@@ -86,7 +86,7 @@ def identity(meta, frame):
     environment = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
         if meta["source"] == "oanda"
-        else "yahoo-anonymous" if meta["source"] == "yahoo" else "binance-public"
+        else "yahoo-anonymous" if meta["source"] == "yahoo" else meta["source"] + "-public"
     )
     return hashlib.sha256(
         json.dumps(
@@ -216,8 +216,9 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
         yield db, {
             **volume_metadata(metadata.source, metadata.symbol),
             **({k: metadata.metadata_json.get(k) for k in
-                ("source", "symbol", "adjustment", "price_description", "volume_kind", "volume_unit")}
-               if metadata.source == "yahoo" else {}),
+                ("source", "symbol", "adjustment", "price_description", "volume_kind", "volume_unit",
+                 "completion_basis", "session_verified")}
+               if metadata.source in ("yahoo", "dukascopy") else {}),
             "window_limit": window_limit, "history_window": window or None,
             "availability": "window_limit" if window_limit else "available",
             "bars": rows if planning else rows[-count:],

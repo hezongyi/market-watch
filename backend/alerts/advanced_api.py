@@ -10,7 +10,7 @@ from sqlalchemy import delete, select, update
 
 from .chart_api import Create, Revision, Save, serialized
 from .chart_indicators import public_catalog
-from .chart_series import decode
+from .chart_series import decode, encode
 from .storage import AdvancedPreference, AdvancedWorkspace, Preference, now_ms, transaction
 
 
@@ -20,6 +20,10 @@ class PreferenceWrite(BaseModel):
     tool: str = Field(default="", max_length=100)
     content: dict
     revision: int = Field(default=0, ge=0)
+
+
+class WorkspaceCreate(Create):
+    symbol: str | None = Field(default=None, max_length=80)
 
 
 class NativeChartWrite(BaseModel):
@@ -277,10 +281,22 @@ def router(authenticated):
         return rows
 
     @r.post("/workspaces")
-    def create(body: Create):
+    def create(body: WorkspaceCreate):
+        ticker = "MWP:XAUUSD"
+        if body.symbol is not None:
+            try:
+                ident, kind = decode(body.symbol)
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from None
+            if kind != "provider":
+                raise HTTPException(422, "指定入口仅支持平台原生系列")
+            from .provider_chart import metadata
+
+            metadata(ident)
+            ticker = encode(ident, kind)
         with transaction() as db:
             row = AdvancedWorkspace(name=body.name, document={"engine": "tv31", "schemaVersion": 1,
-                                                           "symbol": "MWP:XAUUSD", "series_kind": "provider"})
+                                                           "symbol": ticker, "series_kind": "provider"})
             db.add(row)
             db.flush()
             return serialized(row)

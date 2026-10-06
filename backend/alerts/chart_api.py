@@ -743,6 +743,7 @@ def data_sync(body: DataQuery):
             import httpx
 
             from .provider_chart import data as provider_data
+            from .provider_dukascopy import NativeDataError
             from .provider_yahoo import YahooError
 
             try:
@@ -750,6 +751,9 @@ def data_sync(body: DataQuery):
             except YahooError as error:
                 raise HTTPException(503, {"message":str(error), "status":error.status,
                                           "history_boundary":False}) from None
+            except NativeDataError as error:
+                raise HTTPException(503, {"message": str(error), "status": error.status,
+                                          "history_boundary": False}) from None
             except (httpx.HTTPError, TimeoutError) as error:
                 raise HTTPException(503, "平台行情暂不可用，请重试；尚未确认历史边界") from error
         if body.published:
