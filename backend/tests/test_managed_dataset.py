@@ -207,6 +207,29 @@ def test_staging_revision_does_not_replace_published_candles_until_aggregation(d
         assert float(read_rows(db, inst, "M5", end, 100)[0]["close"]) == 20
 
 
+def test_publication_keeps_observation_time_with_its_own_price_snapshot(database):
+    from decimal import Decimal
+
+    from alerts.storage import Bar
+    end = START + 10 * MINUTE
+    with database.begin() as db:
+        inst = db.get(Instrument, "BTCUSDT")
+        plan = join(db, inst, START, end + 5000)
+        market.ingest(db, inst, payload(START, 10, 9), received_at=end + 5000)
+        publish_frame(db, inst, plan, "M1", end + 5000)
+        before = read_rows(db, inst, "M1", end, 1)[0]
+        assert before["observed_at"] == end + 5000
+        bar = db.scalar(select(Bar).where(Bar.instrument_id == inst.id,
+                                        Bar.timeframe == "M1", Bar.start == end - MINUTE))
+        bar.close = bar.high = Decimal(11)
+        bar.observed_at = end + 6000
+        assert read_rows(db, inst, "M1", end, 1)[0] == before
+        db.flush()
+        publish_frame(db, inst, plan, "M1", end + 6000)
+        after = read_rows(db, inst, "M1", end, 1)[0]
+        assert float(after["close"]) == 11 and after["observed_at"] == end + 6000
+
+
 def test_published_internal_revision_outside_tail_is_eventually_visible(database):
     from alerts.storage import Bar, MarketCoverage
 

@@ -156,7 +156,7 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
     if not jobs:
         return
     queued = {job.start: job for job in jobs}
-    rows = chart_rows(db, inst, frame, jobs[0].end, BATCH, now)
+    rows = chart_rows(db, inst, frame, jobs[0].end, BATCH, now, observed=True)
     existing = {row.start: row for row in db.scalars(select(ChartPublishedBar).where(
         ChartPublishedBar.instrument_id == inst.id,
         ChartPublishedBar.timeframe == frame,
@@ -225,8 +225,8 @@ def publish_frame(db, inst, plan, frame, now):
         safe_left = max(safe_left, max(ms(_bounds(j.end - 1, frame, inst)[1]) for j in pending))
     # Read bounded pages at the historical edge and at the live edge. Source
     # OHLC can change in staging without mutating the published snapshot.
-    tail = chart_rows(db, inst, frame, right, BATCH, now)
-    older = chart_rows(db, inst, frame, pub.start, BATCH, now) if pub else []
+    tail = chart_rows(db, inst, frame, right, BATCH, now, observed=True)
+    older = chart_rows(db, inst, frame, pub.start, BATCH, now, observed=True) if pub else []
     candidates = {row["start"]: row for row in older + tail}
     rows = []
     for row in sorted(candidates.values(), key=lambda r: r["start"]):
@@ -550,6 +550,7 @@ def published_history_check(db, inst, pub, visible, body):
 
 
 def data(body):
+    from .chart_calculation_history import calculation_rows
     from .chart_data import future_grid
     from .chart_indicators import calculate
 
@@ -586,9 +587,11 @@ def data(body):
         basis, calendar, precision = inst.basis, inst.calendar, inst.precision
         future = future_grid(inst, body.timeframe, visible[-1]["end"]) if visible else []
         history_check = published_history_check(db, inst, pub, visible, body)
+        calculation_meta = {"calendar": inst.calendar, "calendar_profile": inst.calendar_profile}
+    rows = calculation_rows(rows, calculation_meta, body.instrument)
     indicators = []
     for spec in body.indicators:
-        result = calculate(rows, spec)
+        result = calculate(rows, spec, provisional=body.provisional)
         start = visible[0]["start"] if visible else before
         indicators.append(
             {

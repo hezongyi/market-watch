@@ -5,12 +5,16 @@
 整体目标保持 active。实现通过不表示长期性能、供应商日历或生产发布已经通过。
 
 验收范围：Dukascopy Python 历史与固定版本回放、OANDA practice 实时，首批EURUSD/XAUUSD。
+用户明确的聚合口径：历史BID M1由本系统按纽约当地17:00切H4/D1，随DST转换；
+不要求与Dukascopy原生高周期K线一致。会话证据另用于缺失分钟与完整性判断。
 MT4实时互备延期；OANDA故障时降级与暂停依赖缺失数据的判断。保留Binance/yfinance既有能力。
 
 实际环境：Ubuntu本机隔离Docker project `market-watch-data-integration`，
 PostgreSQL14、API、历史/实时/聚合worker及web。访问 http://127.0.0.1:16589/market-data 。
 代码位于 `/home/quant/repos/market-watch-data-integration`，分支 `feat/market-data-integration`，
-业务基线3c18f60，最后业务修改42ec051；后续为验收工具与记录。
+已验收运行实例业务基线3c18f60、最后部署业务修改42ec051。
+本地worktree另已整合origin/main 826d316（v1.11），[兼容检查](main-compatibility.json)
+记录回归及迁移合头；这部分未部署到后台观察实例，PR按用户最新指示暂缓。
 启动、停止及复现见[runbook](README.md)。没有生产迁移、发布、下单或外部通知送达验收。
 
 | 实现要求 | 结论及直接证据 |

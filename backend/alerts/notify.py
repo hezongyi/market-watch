@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from sqlalchemy import or_, select
 
+from .chart_alert_message import signal_message
 from .config import settings
 from .storage import (
     AckGrant,
@@ -108,7 +109,7 @@ def claim():
         body = {
             "topic": settings.ntfy_topic,
             "title": f"{signal.instrument_id} · {signal.reason}",
-            "message": f"价格 {signal.price} / 阈值 {signal.threshold}\n发生时间 {occurred}\n信号 {signal.id}\n请使用“确认”停止后续提醒。",
+            "message": signal_message(signal) if signal.evidence.get("chart_alert") else f"价格 {signal.price} / 阈值 {signal.threshold}\n发生时间 {occurred}\n信号 {signal.id}\n请使用“确认”停止后续提醒。",
             "priority": 1 if config["mode"] == "companion" else config["priority"],
             "click": f"{settings.public_url}/signals?signal={signal.id}",
             "actions": [

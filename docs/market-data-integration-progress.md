@@ -439,3 +439,30 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
   两活跃交易日来自方案第10节，并非SDK官方要求；质量窗口不作为提交PR前提。
   [实现报告](verification/data-integration/implementation-acceptance.md)保持通过，
   [质量报告](verification/data-integration/quality-acceptance.md)仍未通过，保留来源证据、迟到与失败限制。
+
+### 用户最新调整：暂缓PR，先修改实现
+
+- 用户要求先不提交PR，存在待修改项；尚未推送或创建PR，不合并或生产发布。
+- 当前下载Dukascopy BID M1；高周期沿用项目原Node接入链路使用的后端NY17聚合，
+  并非直接使用dukascopy-node内部高周期结果。日界/DST、周月边界、闰年已有回归；
+  来源会话认证及与供应商原生高周期逐根一致仍未证明。
+- 为准备PR已开始整合origin/main（826d316，v1.11）；本地完成冲突解决与兼容回归后保留，
+  不推送、不重新部署观察实例。原实例与后台两个service继续运行其已记录版本。
+
+### 用户明确聚合标准：NY17 H4/D1
+
+- 用户不要求高周期与Dukascopy数据一致，明确要求按NY17切H4/D1；现有实现沿用该口径。
+  纽约当地17:00换日，H4日界锚点每四小时分桶，DST由America/New_York转换；
+  供应商高周期一致性不属于目标，来源会话证明仅用于缺失分钟归因/complete判断。
+- 已同步方案、实现与质量报告；暂缓推送和创建PR的决定仍有效。
+
+### 本地主线兼容整理完成（未推送、未部署）
+
+- 整合origin/main 826d316（v1.11），保留共享browser/MCP业务接口、显式来源watch ID与live状态、
+  原生图表observed_at/provisional语义、来源日历与需求续期；依赖保留MCP与Dukascopy Python。
+- 新增w24_merge_market_data将v23行情与u22图表预警两head合一；覆盖两条已部署head升级及历史版本保留。
+- 首次全量748 passed/57 skipped，3个测试fixture/旧预期失败已修正；最终相关19项全部通过，
+  NY17日界/DST/周月/历史计划及预警迁移45项通过，前端构建与8项web单测通过。
+  [证据与限制](verification/data-integration/main-compatibility.json)保留初次失败与最终结果；
+  全仓Ruff29项均在与origin/main字节相同的文件中，改动文件Ruff通过。
+- 未重建/更新后台观察容器，未推送、未创建PR、未合并到主线、未生产发布。

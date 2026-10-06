@@ -116,3 +116,44 @@ async def test_sse_publishes_cooldown_start_and_expiry_with_unchanged_revision(m
         if event.startswith("event: snapshot"):
             snapshots.append(json.loads(event.split("data: ")[1])[0])
     assert [row["cooldown_until"] for row in snapshots] == [None, 200000, None]
+
+
+def test_source_watch_uses_shared_browser_business_schema(running):
+    factory, _, _, _ = running
+    from alerts import business
+    from alerts.storage import Watch
+
+    with factory.begin() as db:
+        dataset = db.scalar(select(MarketDataset).where(MarketDataset.logical_symbol == "EURUSD"))
+        instrument = dataset.instrument_id
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            response = client.post("/api/watches", json={"instrument_id": instrument,
+                "name": "source integration", "kind": "price", "timeframe": "M1", "level": "1.25",
+                "use_history": False})
+            assert response.status_code == 201
+            assert response.json()["instrument_id"] == instrument
+        with factory.begin() as db:
+            assert db.get(Watch, response.json()["id"]).instrument_id == instrument
+        assert instrument in {row["id"] for row in business.instruments()}
+    finally:
+        api_module.app.dependency_overrides.clear()
+
+
+def test_shared_chart_query_renews_source_demand(running):
+    factory, _, _, _ = running
+    with factory.begin() as db:
+        dataset = db.scalar(select(MarketDataset).where(MarketDataset.logical_symbol == "GBPUSD"))
+        instrument = dataset.instrument_id
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+    try:
+        with TestClient(api_module.app) as client:
+            response = client.post("/api/charts/data", json={"instrument": instrument,
+                "series_kind": "managed", "timeframe": "M1", "client": "merged-source-chart"})
+            assert response.status_code == 200
+        with factory.begin() as db:
+            assert db.scalar(select(MarketDemand).where(
+                MarketDemand.instrument_id == instrument)) is not None
+    finally:
+        api_module.app.dependency_overrides.clear()

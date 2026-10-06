@@ -88,7 +88,7 @@ export type Signal = {
   device_delivery: "received" | "unknown";
   ack_at: number | null;
   evidence?: {
-    rule_version?: string;
+    rule_version?: string | number;
     indicator?: string;
     indicator_version?: string;
     indicator_params?: {fast?: number; slow?: number};
@@ -97,7 +97,17 @@ export type Signal = {
     trigger_bar?: { start: string; end: string; open: string; high: string; low: string; close: string; revision: number };
     previous_bar?: { high: string; low: string; close: string; revision: number };
     previous_day?: { high: string; low: string; revision: number } | null;
-  };
+  } & ({
+    chart_alert: true;
+    unit: "price" | "price_delta" | "rsi";
+    left: string;
+    ordinal: number;
+    detected_at: number;
+    late: boolean;
+    config: {notify_web: boolean; timeframe: string};
+    market_identity: {source: string};
+    observation: Record<string, unknown>;
+  } | {chart_alert?: false});
 };
 export const date = (n: number) =>
   new Date(n).toLocaleString("zh-CN", { hour12: false });

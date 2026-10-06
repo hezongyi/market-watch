@@ -8,7 +8,7 @@ const pending = new Map();
 // Use public native dialogs. The widget has no public non-modal toast API.
 // Keep acknowledged conditions deduplicated until the parent clears them.
 const acknowledgedNotices = new Set();
-let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker;
+let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
@@ -60,6 +60,8 @@ const frames = {
 const subscriptions = new Map();
 const quoteSubscriptions = new Map();
 const symbolPresentations = new Map();
+const alertSourceMetadata = new Map();
+const alertCalculationOrigins = new Map();
 const lastHistory = new Map();
 const providerHistoryState = new Map();
 const providerHistoryWork = new Map();
@@ -298,6 +300,8 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
     instrument: symbol,
     series_kind,
     timeframe: frames[res],
+    ...(spec && series_kind === 'provider' && alertCalculationOrigins.has(MWSeries.encode(symbol,series_kind)+'|'+res)
+      ? {calculation_origin:alertCalculationOrigins.get(MWSeries.encode(symbol,series_kind)+'|'+res)} : {}),
     ...(series_kind === 'managed' ? {published:true,
       ...(managedSessions.get(symbol+'|'+res)?.start != null
         ? {dataset_start:managedSessions.get(symbol+'|'+res).start} : {})} : {}),
@@ -312,6 +316,11 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   // does not cancel a getBars callback that it can reuse when switching back.
   const promise = request(q, "data", () => epoch === workspaceEpoch && current() && Date.now() < expires &&
     (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})))
+    .then(page=>{
+      if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
+        alertCalculationOrigins.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.calculation_origin ?? page.origin);
+      return page;
+    })
     .catch(error=>{
       if(epoch===workspaceEpoch && Date.now()>=expires)
         throw Object.assign(Error('历史复核时间预算已耗尽'), {code:'HISTORY_TIMEOUT'});
@@ -434,6 +443,8 @@ const feed = {
         { op: "resolve", args: { instrument: symbol, series_kind, timeframe: "M1" } },
         "market",
       );
+      alertSourceMetadata.set(MWSeries.encode(symbol,series_kind),meta);
+      while(alertSourceMetadata.size>250) alertSourceMetadata.delete(alertSourceMetadata.keys().next().value);
       if(meta.source === "yahoo") {
         symbolPresentations.set(symbol,meta);
         while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
@@ -679,7 +690,7 @@ const feed = {
       send({type:'provider-subscribe',args:{client:clientId,listener:sub.providerListener,
         instrument:identity.symbol,timeframe:frames[res],cursor:sub.last,
         revision:state.revision||0,observed_at:state.observed_at||0,
-        indicators:identity.spec?[identity.spec]:[]}});
+        indicators:identity.spec?[{...identity.spec,calculation_origin:alertCalculationOrigins.get(MWSeries.encode(identity.symbol,identity.series_kind)+'|'+res) ?? null}]:[]}});
     }
   },
   unsubscribeBars: id => {
@@ -1097,7 +1108,7 @@ function snapshot(manual = true) {
       document: {
         engine: "tv31",
         schemaVersion: 1,
-        state,
+        state: {...state, _mwDrawingProjection: captureDrawingProjection(widget)},
         theme: savedDoc.theme || "Dark",
         templates: savedDoc.templates || {},
       },
@@ -1146,6 +1157,7 @@ function boot(
     delete chartState._mwViewports;
     delete chartState._mwSync;
     delete chartState._mwGridStyle;
+    delete chartState._mwDrawingProjection;
   }
   let viewportRestoring = false;
   const restoreViewports = async () => {
@@ -1194,6 +1206,15 @@ function boot(
   nativeMode = true;
   nativeReadonly = readonly;
   let currentNativeWorkspace = workspace;
+  alertBridge?.destroy();
+  alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
+    getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
+    metadata:ticker=>alertSourceMetadata.get(ticker),frames,
+    calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(ticker+'|'+res) ??
+      (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
+    rpc:query=>request(query,"chart-alert-rpc"),send,
+    fail:error=>send({type:"error",error:String(error)})});
+  alertBridge.reset(chartState || {});
   const layouts = nativeWorkspaces(
     workspace,
     (op, args) => request({ op, args }, "workspace"),
@@ -1235,7 +1256,13 @@ function boot(
     if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
     const revision = editRevision, epoch = workspaceEpoch;
     const state = await captureChartLayout(widget);
+    alertBridge.persist(state);
     state._mwGridStyle = grid.value;
+    state._mwDrawingProjection = captureDrawingProjection(widget);
+    if (epoch !== workspaceEpoch || editRevision !== revision) {
+      dirty = true;
+      throw new Error("图表在保存期间已修改，请重试保存");
+    }
     // Native save metadata uses the resolved display name, which omits MWP:
     // and can belong to a different active pane. Pin it to the captured first
     // chart's public identity so list/load metadata retains the series kind.
@@ -1288,8 +1315,10 @@ function boot(
         throw Error("当前布局有未保存更改，请先保存布局再打开其他布局");
       }
       const state = JSON.parse(await loadContent(id));
+      alertBridge.reset(state);
       grid.restore(state._mwGridStyle);
       delete state._mwGridStyle;
+      delete state._mwDrawingProjection;
       pendingViewports = state._mwViewports;
       pendingSync = state._mwSync;
       prepareLegacyViewports(state);
@@ -1325,6 +1354,7 @@ function boot(
   maintenanceAsked.clear();
   indicatorPicker?.dispose();
   widget = new TradingView.widget({
+    context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
     settings_adapter: prefs.settings,
     custom_indicators_getter: (PineJS) =>
@@ -1445,10 +1475,16 @@ function boot(
       .then(async () => {
         if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
           send({type: "error", error: String(e)}));
+        alertBridge.attach();
+        if (!readonly) {
+          const button = widget.createButton(); button.textContent = "创建告警";
+          button.setAttribute("title","在当前图表创建告警"); button.addEventListener("click",()=>alertBridge.create());
+        }
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
           grid, [
             {label: "守望主页", run: () => send({type: "workspace-action", action: "home"})},
+            {label: "告警与日志", run: () => send({type:"chart-alert-open"})},
             {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
@@ -1580,6 +1616,7 @@ function boot(
       lastHistory.clear();
       firstHistory.clear();
       indicatorHistoryNeeds.clear();
+      alertCalculationOrigins.clear();
       managedSessions.clear();
       maintenanceAsked.clear();
       viewportRestoring = false;
@@ -1601,6 +1638,7 @@ function boot(
       rangeGuard = rangeSyncLoadingGuard(widget);
       bindEdgeSync();
       bindViewports();
+      alertBridge.refresh();
     });
     rangeGuard = rangeSyncLoadingGuard(widget);
     bindEdgeSync();
@@ -1610,6 +1648,7 @@ function boot(
       rangeGuard?.refresh();
       edgeGuard?.refresh();
       bindViewports();
+      alertBridge.refresh();
     });
     widget.drawOnAllChartsEnabled().setValue(true);
     widget.subscribe("onAutoSaveNeeded", () => {
@@ -1642,6 +1681,10 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if (m.type === "chart-alert-create" && ready && !loading) {void alertBridge?.create(); return;}
+  if (m.type === "chart-alert-drawing-action" && typeof m.alert_id === "string" && ["retry","restore"].includes(m.action) && ready && !loading) {void alertBridge?.drawingAction(m.alert_id,m.action); return;}
+  if (m.type === "chart-alert-rows" && Array.isArray(m.rows)) {alertBridge?.setRows(m.rows); return;}
+  if (m.type === "chart-alert-locate" && m.row && JSON.stringify(m.row).length < 20_000 && ready && !loading) {void alertBridge?.locate(m.row,m.event); return;}
   if (m.type === "notifications" && Array.isArray(m.notices) && ready) {
     activeNotices = m.notices.slice(0, 24).filter(entry =>
       typeof entry.id === "string" && entry.id.length <= 2100 &&

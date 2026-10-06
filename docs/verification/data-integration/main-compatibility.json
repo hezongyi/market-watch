@@ -1,0 +1,42 @@
+{
+  "captured_at_utc": "2026-10-06T11:05:52.219128+00:00",
+  "main_commit": "826d31695ba6afd4a2c83b312316f8ed7867e471",
+  "main_version": "v1.11.0",
+  "scope": "Local worktree integration only; no push, PR, deployment or observer restart",
+  "merge_intents": [
+    "Keep shared browser/MCP business interface with explicit MD source watch IDs and live snapshots",
+    "Keep shared cancellable chart query, native observed_at/provisional indicator semantics, source calendar and chart demand renewal",
+    "Join v23_live_pricing and u22_chart_alert_actions into one w24_merge_market_data migration head",
+    "Retain both mcp==2.3.0 and dukascopy-python==4.0.1 dependencies"
+  ],
+  "checks": {
+    "initial_full_backend": {
+      "passed": 748,
+      "skipped": 57,
+      "failed": 3,
+      "duration_seconds": 279.18,
+      "failures": "Test expectations/fixtures: nonresident disabled GBP catalog assumption; partial guarded downgrade left alert head; backup fixture needed rejoining full schema. All three cases passed in final targeted run."
+    },
+    "final_targeted": {
+      "passed": 19,
+      "failed": 0,
+      "evidence": "main-compatibility-tests.txt"
+    },
+    "ny17_and_calendar_boundaries_plus_alert_migrations": {
+      "passed": 45,
+      "failed": 0,
+      "evidence": "ny17-boundary-tests.txt"
+    },
+    "frontend_build": "tsc and vite passed; existing bundle size warning",
+    "web_unit_tests": {
+      "passed": 8,
+      "failed": 0
+    },
+    "changed_files_ruff": "passed",
+    "broad_ruff": "29 diagnostics; every affected file byte-identical to origin/main, retained without unrelated edits",
+    "single_alembic_head": "w24_merge_market_data",
+    "postgres_for_merged_code": "not rerun; previous deployed implementation evidence retained separately"
+  },
+  "user_aggregation_requirement": "Use NY17 for H4/D1 with America/New_York DST; provider native higher-timeframe equality is not required",
+  "runtime": "Existing Ubuntu isolated instance remains on recorded pre-merge code; no claim that this merged worktree is deployed"
+}

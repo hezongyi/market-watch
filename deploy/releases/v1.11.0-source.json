@@ -1,0 +1,43 @@
+{
+  "version": "1.11.0",
+  "release_tag": "v1.11.0",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/11",
+  "tested_functional_commit": "bf1e3431622322518087abf0e268305b25f08f24",
+  "source_commit_resolution": "Resolve v1.11.0^{commit} for the final main merge commit; annotated tag must point to that commit.",
+  "previous_source_tag": "v1.10.0",
+  "release_scope": "Source publication; Ubuntu acceptance images built and verified, no production deployment.",
+  "delivery_document": "docs/chart-alerts-v1.11.0-source-delivery.md",
+  "verification": "docs/verification/chart-alerts/review-release-results-20261006.json",
+  "source_input_manifest": "docs/verification/chart-alerts/release-source-inputs-20261006.json",
+  "functional_acceptance": {
+    "backend_passed": 586,
+    "backend_skipped": 46,
+    "postgres_passed": 8,
+    "browser_cases": 8,
+    "mcp_checks": 15,
+    "review_fix_runtime_cases": 4,
+    "fault_cases": 3,
+    "bridge_tests": 7
+  },
+  "schema": "u22_chart_alert_actions",
+  "new_migrations": [
+    "s20_chart_alerts",
+    "t21_merge_alerts_mcp",
+    "u22_chart_alert_actions"
+  ],
+  "dependencies_changed_from_v1_10_0": false,
+  "acceptance_images": {
+    "api": "sha256:22fffffc5d3870433c3001fb0ed76acb01d8de23b4ecd531456390e562616719",
+    "web": "sha256:174ce371c34322a907540498ac39a4f88e834163ffc2bf7fee2a0daad426047e",
+    "chart_origin": "sha256:4a93bd99ea18f73129eccf34b8c72c191a17e0c08ae07744c26ce29b5b393be4"
+  },
+  "acceptance_image_version": "1.11.0",
+  "running_api_inputs_matched": 165,
+  "tag_relation": "Tracked runtime, tests, migrations, dependencies and build input hashes must match the tested commit; later commits only add release evidence.",
+  "external_notifications_sent": false,
+  "production_operated": false,
+  "rollback": {
+    "previous_source_tag": "v1.10.0",
+    "runtime_effect": "Source publication does not switch production. u22/t21 downgrade refuses populated alerts/actions/multiple events; restore verified pre-upgrade backup for a schema rollback. Keep current post-upgrade backup to preserve new event/action evidence."
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "version": "1.10.0",
+  "release_tag": "v1.10.0",
+  "release_scope": "Source publication only; no runtime switch, production deployment, container build or relabeling.",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/10",
+  "tested_functional_commit": "8792b99713e25b58a71d56e3056fafe31ed2439d",
+  "source_commit_resolution": "Resolve v1.10.0^{commit} for the final main merge commit; annotated tag must point to that commit.",
+  "previous_source_tag": "v1.9.0",
+  "delivery_document": "docs/native-mcp-v1.10.0-source-delivery.md",
+  "verification": "docs/verification/native-mcp/release-audit.json",
+  "functional_acceptance": {
+    "backend_passed": 497,
+    "backend_skipped": 38,
+    "targeted_passed": 40,
+    "real_provider": "Binance BTCUSDT provider H1",
+    "client": "Codex CLI 0.160.0 over HTTPS",
+    "record": "docs/verification/native-mcp/acceptance.md"
+  },
+  "schema": "s20_agent_capabilities",
+  "new_migrations": ["s20_agent_capabilities"],
+  "dependencies_changed": true,
+  "mcp_default_enabled": false,
+  "images": {},
+  "acceptance_runtime": "docs/verification/native-mcp/environment.json",
+  "acceptance_image_version": "1.9.0",
+  "tag_relation": "Runtime, tests, dependencies and migrations identical to accepted implementation; root versions and release documentation updated separately.",
+  "notifications_sent": false,
+  "rollback": {
+    "previous_source_tag": "v1.9.0",
+    "runtime_effect": "Source publication does not switch running instances. Production rollback requires its existing image and backup manifest; do not delete credential, idempotency or audit records merely to revert source."
+  }
+}
