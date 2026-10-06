@@ -632,6 +632,56 @@ class Watch(Base):
     warmup_start: Mapped[int | None] = mapped_column(BigInteger)
 
 
+class CompositeWatchBinding(Base):
+    """Fixed strategy input, separate from the legacy domain rule and state."""
+    __tablename__ = "market_composite_watch_bindings"
+    watch_id: Mapped[str] = mapped_column(ForeignKey("watches.id"), primary_key=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    market_identity: Mapped[dict] = mapped_column(JSON)
+    use_history: Mapped[bool] = mapped_column(Boolean)
+    health: Mapped[str] = mapped_column(String(16), default="warming")
+    health_reason: Mapped[str | None] = mapped_column(String(250))
+    runtime: Mapped[dict] = mapped_column(JSON, default=dict)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms, index=True)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+@event.listens_for(CompositeWatchBinding, "before_update")
+def immutable_composite_watch_binding(mapper, connection, target):
+    from sqlalchemy import inspect
+
+    state = inspect(target)
+    if any(state.attrs[key].history.has_changes() for key in (
+            "watch_id", "revision_id", "history_version_id", "market_identity", "use_history", "created_at")):
+        raise ValueError("组合策略输入不可变；请保留旧策略并新建规则")
+
+
+@event.listens_for(CompositeWatchBinding, "before_delete")
+def preserve_composite_watch_binding(mapper, connection, target):
+    raise ValueError("组合策略输入和引用须保留用于审计")
+
+
+class CompositeWatchJudgment(Base):
+    __tablename__ = "market_composite_watch_judgments"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    watch_id: Mapped[str] = mapped_column(ForeignKey("watches.id"), index=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    event_time: Mapped[int] = mapped_column(BigInteger)
+    outcome: Mapped[str] = mapped_column(String(32))
+    signal_id: Mapped[str | None] = mapped_column(ForeignKey("signals.id"))
+    evidence: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+@event.listens_for(CompositeWatchJudgment, "before_update")
+@event.listens_for(CompositeWatchJudgment, "before_delete")
+def preserve_composite_watch_judgment(mapper, connection, target):
+    raise ValueError("组合策略判断证据不可变")
+
+
 class ChartAlert(Base):
     """Durable alert owner; browser interests never own this lifecycle."""
     __tablename__ = "chart_alerts"

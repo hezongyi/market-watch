@@ -58,6 +58,9 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         MarketDemand.instrument_id == composite.instrument_id, MarketDemand.expires > stamp))
     watch_count = db.scalar(select(func.count()).select_from(Watch).where(
         Watch.instrument_id == composite.instrument_id, Watch.status == "active"))
+    from .composite_watches import affected
+
+    active_watches = affected(db, composite.id)
     active_alerts = [row for row in db.execute(
         select(ChartAlertVersion, ChartAlert).join(ChartAlert, (ChartAlertVersion.alert_id == ChartAlert.id) & (
             ChartAlertVersion.version == ChartAlert.version)).where(ChartAlert.status == "active",
@@ -99,11 +102,16 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
             "confirmed_tail_ready": confirmed_ready, "quote_age_ms": quote_age,
             "source_confirmed_end": state.confirmed_end if state else 0,
             "strategy_readiness": "no_strategies" if watch_count + alert_count == 0 else
-                "ready" if active_alerts and all(row.health == "ready" for _, row in active_alerts) and not watch_count else "pending_dependency_validation",
+                "ready" if len(active_watches) == watch_count and
+                    all(row.health == "ready" for _, row in active_alerts) and
+                    all(binding.health == "ready" for binding, _ in active_watches) else "pending_dependency_validation",
             "rules": [{"id": row.id, "name": row.name, "health": row.health, "reason": row.health_reason,
                 "revision_id": version.market_identity["composite_revision_id"],
                 "seam_policy": version.market_identity["seam_policy"], "readiness": row.runtime.get("readiness", {})}
-                for version, row in active_alerts],
+                for version, row in active_alerts] + [{"id": watch.id, "name": watch.name,
+                    "health": binding.health, "reason": binding.health_reason,
+                    "revision_id": binding.revision_id, "seam_policy": binding.market_identity["seam_policy"],
+                    "readiness": binding.runtime.get("readiness", {})} for binding, watch in active_watches],
             "coverage": "per-bar; query completion and newest M1 are not complete indicator dependencies"}}
 
 

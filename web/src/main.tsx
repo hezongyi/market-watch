@@ -551,15 +551,16 @@ function Dashboard({
                 <div className="watch-name">
                   <strong>{w.name}</strong>
                   <span>
-                    {w.instrument_id} · {w.rule.timeframe} ·{" "}
+                    {w.market_identity ? `${w.market_identity.symbol} · 组合 · ${w.market_identity.calendar === "ny17" ? "NY17" : "UTC 00:00"}` : w.instrument_id} · {w.rule.timeframe} ·{" "}
                     {names[w.rule.kind]}
                   </span>
-                  {w.paused_reason && (
+                  {w.market_identity && <small>固定修订 {w.market_identity.composite_revision_id.slice(0, 8)} · {w.market_identity.seam_policy === "accept_raw" ? "接受原价接缝依赖" : "完整同源依赖"} · {w.health === "ready" ? "可判断" : "等待依赖或恢复"}</small>}
+                  {w.status === "active" && w.paused_reason && (
                     <small className="warning">{w.paused_reason}</small>
                   )}
                 </div>
                 <span className={`status ${w.status}`}>
-                  {w.paused_reason ? "数据暂停" : statusNames[w.status]}
+                  {w.status === "active" && w.paused_reason ? "数据暂停" : statusNames[w.status]}
                 </span>
                 {w.status === "active" && (
                   <button className="text-button" onClick={() => cancel(w.id)}>
@@ -584,6 +585,7 @@ function Dashboard({
       {open && (
         <WatchDialog
           instrument={selected}
+          liveInput
           onClose={() => setOpen(false)}
           onSave={async (data) => {
             await api("/watches", data);
@@ -601,13 +603,19 @@ function WatchDialog({
   onClose,
   onSave,
   timeframe,
+  liveInput = false,
 }: {
   instrument: string;
   onClose: () => void;
   onSave: (data: any) => Promise<void>;
   timeframe?: string;
+  liveInput?: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const [inputKind, setInputKind] = useState(liveInput ? "composite" : "legacy");
+  const [series, setSeries] = useState<QualifiedSeries | null>(null);
+  const [seamPolicy, setSeamPolicy] = useState("reject");
+  const selectedInput = inputKind === "composite" ? series?.id ?? "" : instrument;
   const [kind, setKind] = useState("pullback"),
     [direction, setDirection] = useState("both"),
     [frame, setFrame] = useState(timeframe || "H4"),
@@ -628,8 +636,9 @@ function WatchDialog({
     setError("");
     try {
       await onSave({
-        instrument_id: instrument,
-        name: name || `${instrument} · ${names[kind]}`,
+        instrument_id: selectedInput,
+        ...(liveInput ? {series_kind: inputKind, ...(inputKind === "composite" ? {seam_policy: seamPolicy} : {})} : {}),
+        name: name || `${series && inputKind === "composite" ? series.symbol : instrument} · ${names[kind]}`,
         kind,
         timeframe: frame,
         direction,
@@ -661,15 +670,27 @@ function WatchDialog({
             ×
           </button>
         </div>
-        <div className="instrument-tag">
+        {liveInput && <label>行情输入<select value={inputKind} onChange={e => setInputKind(e.target.value)}>
+          <option value="composite">组合行情（历史基线 + OANDA 接续）</option>
+          <option value="legacy">兼容旧行情与旧绑定</option>
+        </select></label>}
+        {inputKind === "composite" ? <>
+          <SeriesPicker kind="composite" selected={series} onSelect={setSeries} />
+          <label>接缝依赖政策<select value={seamPolicy} onChange={e => setSeamPolicy(e.target.value)}>
+            <option value="reject">使用完整同源窗口建立新准备状态</option>
+            <option value="accept_raw">接受原价接缝对历史指标及跨源日线的影响</option>
+          </select></label>
+          <p>提交时固定历史基线、组合修订与切日规则。后台完成完整依赖检查后才开始判断；后续图表切换修订不改变这条策略。</p>
+          <p>接缝两侧不判断穿越；断线、修订及恢复期间不补发过期信号。实时触价使用抽样 Bid，可能漏掉短暂触价。</p>
+        </> : <div className="instrument-tag">
           {instrument} <span>一次性监控 · 触发后关闭</span>
-        </div>
+        </div>}
         <label>
           预警名称
           <input
             value={name}
             maxLength={100}
-            placeholder={`${instrument} · ${names[kind]}`}
+            placeholder={`${series && inputKind === "composite" ? series.symbol : instrument} · ${names[kind]}`}
             onChange={(e) => setName(e.target.value)}
           />
         </label>
@@ -775,7 +796,7 @@ function WatchDialog({
           <button type="button" className="secondary" onClick={onClose}>
             取消
           </button>
-          <button className="primary" disabled={busy}>
+          <button className="primary" disabled={busy || !selectedInput}>
             {busy ? "正在开启…" : "开启监控"}
             <ArrowRight size={16} />
           </button>

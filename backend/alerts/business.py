@@ -13,6 +13,7 @@ from .service import acknowledge, create_watch
 from .storage import (
     Audit,
     Bar,
+    CompositeWatchBinding,
     DeviceReceipt,
     Instrument,
     Notification,
@@ -29,7 +30,9 @@ from .storage import (
 
 
 def watch_dict(w):
-    return {
+    from sqlalchemy.orm import object_session
+
+    result = {
         k: getattr(w, k)
         for k in (
             "id",
@@ -43,10 +46,20 @@ def watch_dict(w):
             "warmup_start",
         )
     }
+    db = object_session(w)
+    binding = db.get(CompositeWatchBinding, w.id) if db else None
+    if binding:
+        from .composite_watches import describe
+
+        result.update(describe(binding))
+    return result
 
 
 class WatchInput(BaseModel):
-    instrument_id: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z0-9:_-]+$")
+    instrument_id: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9:_-]+$")
+    series_kind: Literal["legacy", "composite"] = "legacy"
+    composite_revision_id: str | None = Field(default=None, min_length=36, max_length=36)
+    seam_policy: Literal["reject", "accept_raw"] = "reject"
     name: str = Field(min_length=1, max_length=100)
     kind: Literal["pullback", "previous_day", "price", "indicator"]
     timeframe: str = "H4"
@@ -78,6 +91,8 @@ class WatchInput(BaseModel):
     @model_validator(mode="after")
     def check_rule(self):
         rule_from(self.rule())
+        if self.series_kind == "legacy" and (self.composite_revision_id or self.seam_policy != "reject"):
+            raise ValueError("固定组合修订和接缝政策只适用于组合行情")
         return self
 
 
@@ -208,6 +223,11 @@ def new_watch(body: WatchInput):
 
 def new_watch_in(db, body):
     try:
+        if body.series_kind == "composite":
+            from .composite_watches import create
+
+            return watch_dict(create(db, body.instrument_id, body.name, body.rule(),
+                revision_id=body.composite_revision_id, seam_policy=body.seam_policy, use_history=body.use_history))
         return watch_dict(
             create_watch(
                 db, body.instrument_id, body.name, body.rule(), use_history=body.use_history

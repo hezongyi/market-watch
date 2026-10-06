@@ -21,6 +21,7 @@ from .storage import (
     ChartPublishedBar,
     ChartWorkspace,
     CompositeRevision,
+    CompositeWatchBinding,
     DatasetMaintenance,
     DatasetReclamation,
     FixedIndicatorBlock,
@@ -80,6 +81,8 @@ def reference_values(row):
         return {"history_version_id": row.history_version_id} if not inspect(row).persistent else None
     if isinstance(row, Watch):
         return {"instrument_id": row.instrument_id, "rule": row.rule}
+    if isinstance(row, CompositeWatchBinding):
+        return row.market_identity
     if isinstance(row, ChartAlertVersion):
         return {"config": row.config, "market_identity": row.market_identity, "dataset_id": row.dataset_id}
     if isinstance(row, (ChartWorkspace, AdvancedWorkspace)):
@@ -166,14 +169,15 @@ def references(db, dataset_id):
         add("replay", ident, "固定版本回测")
     for watch in db.scalars(select(Watch).where(Watch.instrument_id == dataset.instrument_id)):
         add("strategy", watch.id, f"策略（{watch.status}）")
-    for model, kind, label in ((ChartAlertVersion, "chart_alert", "预警版本与审计"),
+    for model, kind, label in ((CompositeWatchBinding, "strategy", "固定组合策略输入"),
+                               (ChartAlertVersion, "chart_alert", "预警版本与审计"),
                                (AdvancedPreference, "workspace", "保存的图表自选与偏好"),
                                (ChartWorkspace, "workspace", "保存的图表工作区"),
                                (AdvancedWorkspace, "workspace", "保存的高级工作区"),
                                (SignalRow, "signal", "历史策略事件")):
         for row in db.scalars(select(model).execution_options(yield_per=100)):
             if keys.intersection(string_values(reference_values(row))):
-                add(kind, row.id, label)
+                add(kind, row.watch_id if isinstance(row, CompositeWatchBinding) else row.id, label)
     for version in db.scalars(select(HistoryVersion).where(HistoryVersion.dataset_id != dataset_id)):
         if set(versions).intersection(string_values(version.manifest)):
             add("derivation", version.id, "其他数据集派生版本")

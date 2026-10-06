@@ -70,6 +70,8 @@ def create_watch(db, instrument_id, name, rule_dict, *, armed_at=None, use_histo
     )
     if not instrument:
         raise ValueError("Unknown instrument")
+    if instrument.source == "composite":
+        raise ValueError("组合策略须明确选择组合行情类型并固定输入修订")
     rule = rule_from(rule_dict)
     rule_dict = {
         **rule_dict,
@@ -404,7 +406,7 @@ def replay_step(run, calendar, count=1):
     return len(rows)
 
 
-def record_signal(db, watch, instrument, signal):
+def record_signal(db, watch, instrument, signal, *, event_key=None):
     from .storage import LiveState, MarketDataset
 
     provenance = {}
@@ -414,6 +416,7 @@ def record_signal(db, watch, instrument, signal):
         provenance = {"dataset_identity": dataset.identity, "dataset_id": dataset.id,
                       "selection_epoch": state.epoch if state else None}
     record = SignalRow(
+        **({"event_key": event_key} if event_key else {}),
         watch_id=watch.id,
         instrument_id=watch.instrument_id,
         occurred_at=ms(signal.occurred_at),

@@ -65,6 +65,10 @@ export type Instrument = {
   error: string | null;
 };
 export type Watch = {
+  market_identity?: Record<string, any>;
+  health?: string;
+  health_reason?: string | null;
+  runtime?: Record<string, any>;
   id: string;
   instrument_id: string;
   name: string;

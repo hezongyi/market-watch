@@ -11,7 +11,7 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "aj37_composite_revision_changes"
+HEAD = "ak38_composite_watch_bindings"
 
 
 def configuration():
