@@ -621,8 +621,9 @@ def router(authenticated):
             raise HTTPException(422, str(exc)) from None
 
     async def history_operation(operation, *args):
-        from .provider_history_policy import CapacityExceeded
         import httpx
+
+        from .provider_history_policy import CapacityExceeded
         try:
             return await asyncio.to_thread(operation, *args)
         except CapacityExceeded as exc:
@@ -662,205 +663,209 @@ def router(authenticated):
 
     @r.post("/data")
     async def data(body: DataQuery, request: Request):
-        if body.series_kind != "provider":
-            return await asyncio.to_thread(data_sync, body)
-        from .config import settings
-        from .provider_cache import CANCELLED, DEADLINE
-
-        cancelled = threading.Event()
-        token = CANCELLED.set(cancelled)
-        deadline = time.monotonic() + settings.provider_request_seconds
-        deadline_token = DEADLINE.set(deadline)
-        task = asyncio.create_task(asyncio.to_thread(data_sync, body))
-        try:
-            while not task.done():
-                if await request.is_disconnected():
-                    cancelled.set()
-                remaining = deadline - time.monotonic()
-                if remaining <= 0:
-                    raise HTTPException(503, "平台行情暂不可用，请重试；尚未确认历史边界")
-                await asyncio.wait({task}, timeout=min(0.05, remaining))
-            return await task
-        finally:
-            cancelled.set()
-            CANCELLED.reset(token)
-            DEADLINE.reset(deadline_token)
-            if not task.done():
-                # An already sent page can still populate the shared cache;
-                # observe its exception even if the HTTP waiter disappeared.
-                task.add_done_callback(lambda done: done.exception() if not done.cancelled() else None)
-
-    def data_sync(body: DataQuery):
-        try:
-            for spec in body.indicators:
-                validate(spec)
-            if body.series_kind == "provider":
-                import httpx
-
-                from .provider_chart import data as provider_data
-                from .provider_yahoo import YahooError
-
-                try:
-                    return provider_data(body)
-                except YahooError as error:
-                    raise HTTPException(503, {"message":str(error), "status":error.status,
-                                              "history_boundary":False}) from None
-                except (httpx.HTTPError, TimeoutError) as error:
-                    raise HTTPException(503, "平台行情暂不可用，请重试；尚未确认历史边界") from error
-            if body.published:
-                return published_data(body)
-            with transaction() as db:
-                inst = db.get(Instrument, body.instrument)
-                if not inst:
-                    raise HTTPException(404, "品种不存在")
-                before = body.before or now_ms() + 1
-                # All persisted source history is the common recursive indicator prefix.
-                # New bars never move its origin; backfill/revisions deliberately invalidate it.
-                source = (
-                    "M15"
-                    if body.timeframe == "M30"
-                    else "D1"
-                    if body.timeframe in ("W1", "MN")
-                    else body.timeframe
-                )
-                if not body.indicators:
-                    # Ordinary chart pagination must not materialize all available history.
-                    page = chart_rows(db, inst, body.timeframe, before, body.limit + 1, now_ms())
-                    visible = page[-body.limit :]
-                    revision_at = db.scalar(
-                        select(func.sum(Bar.revision + Bar.volume_revision)).where(
-                            Bar.instrument_id == inst.id, Bar.timeframe == source
-                        )
-                    )
-                    return {
-                        "history_check": history_check(db, inst, source, visible, body),
-                        "history_revision": str(revision_at or 0),
-                        "bars": visible,
-                        "indicators": [],
-                        "has_more": len(page) > body.limit,
-                        "origin": db.scalar(
-                            select(func.min(Bar.start)).where(
-                                Bar.instrument_id == inst.id, Bar.timeframe == source
-                            )
-                        ),
-                        "bounded_history": False,
-                        "future": future_grid(inst, body.timeframe, visible[-1]["end"])
-                        if visible
-                        else [],
-                        "basis": inst.basis,
-                        **volume_metadata(inst.source, inst.symbol),
-                        "calendar": inst.calendar,
-                        "precision": inst.precision,
-                        "as_of": now_ms(),
-                    }
-                stamp = db.execute(
-                    select(
-                        func.count(Bar.id),
-                        func.max(Bar.received_at),
-                        func.sum(Bar.revision + Bar.volume_revision),
-                        func.min(Bar.start),
-                        func.max(Bar.start),
-                    ).where(Bar.instrument_id == inst.id, Bar.timeframe == source)
-                ).one()
-                key = (
-                    str(db.get_bind().url),
-                    inst.id,
-                    body.timeframe,
-                    tuple(stamp),
-                    json.dumps(inst.calendar_profile, sort_keys=True),
-                )
-                with _CACHE_LOCK:
-                    cached = _CACHE.get(key)
-                cache_hit = bool(cached and time.monotonic() - cached[0] < 15)
-                if cache_hit:
-                    all_rows = cached[1]
-                else:
-                    all_rows = chart_rows(
-                        db, inst, body.timeframe, now_ms() + 1, max(1, stamp[0]), now_ms()
-                    )
-                visible = [x for x in all_rows if x["start"] < before][-body.limit :]
-                history_snapshot = history_check(db, inst, source, visible, body)
-                # No lazy ORM reads during CPU work after returning the connection.
-                db.expunge(inst)
-            if not cache_hit:
-                closures = closures_from(inst.calendar_profile)
-                for prev, row in zip(all_rows, all_rows[1:]):
-                    if prev["end"] < row["start"]:
-                        row["gap_before"] = bucket_has_trading(
-                            instant(prev["end"]),
-                            instant(row["start"]),
-                            Calendar(inst.calendar),
-                            gold=inst.id == "XAUUSD",
-                            closures=closures,
-                        )
-                with _CACHE_LOCK:
-                    _CACHE[key] = (time.monotonic(), all_rows)
-                    while len(_CACHE) > 16 or sum(len(v[1]) for v in _CACHE.values()) > 200_000:
-                        _CACHE.popitem(last=False)
-            visible = [x for x in all_rows if x["start"] < before][-body.limit :]
-            start = visible[0]["start"] if visible else before
-            end = visible[-1]["start"] if visible else before
-            indicators = []
-            for spec in body.indicators:
-                name, params = validate(spec)
-                result_key = (
-                    key,
-                    name,
-                    spec.get("version", "1"),
-                    json.dumps(params, sort_keys=True),
-                )
-                with _CACHE_LOCK:
-                    cached_result = _RESULT_CACHE.get(result_key)
-                if cached_result and time.monotonic() - cached_result[0] < 15:
-                    result = cached_result[1]
-                else:
-                    result = calculate(all_rows, spec)
-                    weight = sum(len(series["values"]) for series in result["series"])
-                    with _CACHE_LOCK:
-                        _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)
-                        while (
-                            len(_RESULT_CACHE) > 64
-                            or sum(v[2] for v in _RESULT_CACHE.values()) > 250_000
-                        ):
-                            _RESULT_CACHE.popitem(last=False)
-                indicators.append(
-                    {
-                        **result,
-                        "id": spec.get("id", spec["name"]),
-                        "series": [
-                            {
-                                **series,
-                                "values": [
-                                    v for v in series["values"] if start <= v["time"] <= end
-                                ],
-                            }
-                            for series in result["series"]
-                        ],
-                    }
-                )
-            return {
-                "history_check": history_snapshot,
-                "history_revision": hashlib.sha256(
-                    json.dumps(
-                        [stamp[0], stamp[2], stamp[3], inst.calendar_profile], sort_keys=True
-                    ).encode()
-                ).hexdigest(),
-                "bars": visible,
-                "indicators": indicators,
-                "has_more": bool(visible and any(x["start"] < start for x in all_rows)),
-                "origin": all_rows[0]["start"] if all_rows else None,
-                "bounded_history": False,
-                "future": future_grid(inst, body.timeframe, all_rows[-1]["end"])
-                if all_rows
-                else [],
-                "basis": inst.basis,
-                        **volume_metadata(inst.source, inst.symbol),
-                "calendar": inst.calendar,
-                "precision": inst.precision,
-                "as_of": now_ms(),
-            }
-        except (ValueError, TypeError, KeyError, AttributeError) as e:
-            detail = {"code": e.code, "message": str(e)} if hasattr(e, "code") else str(e)
-            raise HTTPException(422, detail) from e
+        return await query_chart(body, request.is_disconnected)
 
     return r
+
+
+def data_sync(body: DataQuery):
+    try:
+        for spec in body.indicators:
+            validate(spec)
+        if body.series_kind == "provider":
+            import httpx
+
+            from .provider_chart import data as provider_data
+            from .provider_yahoo import YahooError
+
+            try:
+                return provider_data(body)
+            except YahooError as error:
+                raise HTTPException(503, {"message":str(error), "status":error.status,
+                                          "history_boundary":False}) from None
+            except (httpx.HTTPError, TimeoutError) as error:
+                raise HTTPException(503, "平台行情暂不可用，请重试；尚未确认历史边界") from error
+        if body.published:
+            return published_data(body)
+        with transaction() as db:
+            inst = db.get(Instrument, body.instrument)
+            if not inst:
+                raise HTTPException(404, "品种不存在")
+            before = body.before or now_ms() + 1
+            # All persisted source history is the common recursive indicator prefix.
+            # New bars never move its origin; backfill/revisions deliberately invalidate it.
+            source = (
+                "M15"
+                if body.timeframe == "M30"
+                else "D1"
+                if body.timeframe in ("W1", "MN")
+                else body.timeframe
+            )
+            stamp = db.execute(
+                select(
+                    func.count(Bar.id),
+                    func.max(Bar.received_at),
+                    func.sum(Bar.revision + Bar.volume_revision),
+                    func.min(Bar.start),
+                    func.max(Bar.start),
+                ).where(Bar.instrument_id == inst.id, Bar.timeframe == source)
+            ).one()
+            revision = hashlib.sha256(
+                json.dumps([list(stamp), inst.calendar_profile], sort_keys=True).encode()
+            ).hexdigest()
+            if not body.indicators:
+                # Ordinary chart pagination must not materialize all available history.
+                page = chart_rows(db, inst, body.timeframe, before, body.limit + 1, now_ms())
+                visible = page[-body.limit :]
+                return {
+                    "history_check": history_check(db, inst, source, visible, body),
+                    "history_revision": revision,
+                    "bars": visible,
+                    "indicators": [],
+                    "has_more": len(page) > body.limit,
+                    "origin": db.scalar(
+                        select(func.min(Bar.start)).where(
+                            Bar.instrument_id == inst.id, Bar.timeframe == source
+                        )
+                    ),
+                    "bounded_history": False,
+                    "future": future_grid(inst, body.timeframe, visible[-1]["end"])
+                    if visible
+                    else [],
+                    "basis": inst.basis,
+                    **volume_metadata(inst.source, inst.symbol),
+                    "calendar": inst.calendar,
+                    "precision": inst.precision,
+                    "as_of": now_ms(),
+                }
+            key = (
+                str(db.get_bind().url),
+                inst.id,
+                body.timeframe,
+                tuple(stamp),
+                json.dumps(inst.calendar_profile, sort_keys=True),
+            )
+            with _CACHE_LOCK:
+                cached = _CACHE.get(key)
+            cache_hit = bool(cached and time.monotonic() - cached[0] < 15)
+            if cache_hit:
+                all_rows = cached[1]
+            else:
+                all_rows = chart_rows(
+                    db, inst, body.timeframe, now_ms() + 1, max(1, stamp[0]), now_ms()
+                )
+            visible = [x for x in all_rows if x["start"] < before][-body.limit :]
+            history_snapshot = history_check(db, inst, source, visible, body)
+            # No lazy ORM reads during CPU work after returning the connection.
+            db.expunge(inst)
+        if not cache_hit:
+            closures = closures_from(inst.calendar_profile)
+            for prev, row in zip(all_rows, all_rows[1:]):
+                if prev["end"] < row["start"]:
+                    row["gap_before"] = bucket_has_trading(
+                        instant(prev["end"]),
+                        instant(row["start"]),
+                        Calendar(inst.calendar),
+                        gold=inst.id == "XAUUSD",
+                        closures=closures,
+                    )
+            with _CACHE_LOCK:
+                _CACHE[key] = (time.monotonic(), all_rows)
+                while len(_CACHE) > 16 or sum(len(v[1]) for v in _CACHE.values()) > 200_000:
+                    _CACHE.popitem(last=False)
+        visible = [x for x in all_rows if x["start"] < before][-body.limit :]
+        start = visible[0]["start"] if visible else before
+        end = visible[-1]["start"] if visible else before
+        indicators = []
+        for spec in body.indicators:
+            name, params = validate(spec)
+            result_key = (
+                key,
+                name,
+                spec.get("version", "1"),
+                json.dumps(params, sort_keys=True),
+            )
+            with _CACHE_LOCK:
+                cached_result = _RESULT_CACHE.get(result_key)
+            if cached_result and time.monotonic() - cached_result[0] < 15:
+                result = cached_result[1]
+            else:
+                result = calculate(all_rows, spec)
+                weight = sum(len(series["values"]) for series in result["series"])
+                with _CACHE_LOCK:
+                    _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)
+                    while (
+                        len(_RESULT_CACHE) > 64
+                        or sum(v[2] for v in _RESULT_CACHE.values()) > 250_000
+                    ):
+                        _RESULT_CACHE.popitem(last=False)
+            indicators.append(
+                {
+                    **result,
+                    "id": spec.get("id", spec["name"]),
+                    "series": [
+                        {
+                            **series,
+                            "values": [
+                                v for v in series["values"] if start <= v["time"] <= end
+                            ],
+                        }
+                        for series in result["series"]
+                    ],
+                }
+            )
+        return {
+            "history_check": history_snapshot,
+            "history_revision": revision,
+            "bars": visible,
+            "indicators": indicators,
+            "has_more": bool(visible and any(x["start"] < start for x in all_rows)),
+            "origin": all_rows[0]["start"] if all_rows else None,
+            "bounded_history": False,
+            "future": future_grid(inst, body.timeframe, all_rows[-1]["end"])
+            if all_rows
+            else [],
+            "basis": inst.basis,
+                    **volume_metadata(inst.source, inst.symbol),
+            "calendar": inst.calendar,
+            "precision": inst.precision,
+            "as_of": now_ms(),
+        }
+    except (ValueError, TypeError, KeyError, AttributeError) as e:
+        detail = {"code": e.code, "message": str(e)} if hasattr(e, "code") else str(e)
+        raise HTTPException(422, detail) from e
+
+
+async def query_chart(body: DataQuery, disconnected=None, deadline=None, retain_work=False):
+    """One cancellable query path shared by browser and MCP adapters."""
+    from .config import settings
+    from .provider_cache import CANCELLED, DEADLINE
+
+    cancelled = threading.Event()
+    token = CANCELLED.set(cancelled)
+    deadline = min(deadline or float("inf"), time.monotonic() + settings.provider_request_seconds)
+    deadline_token = DEADLINE.set(deadline)
+    task = asyncio.create_task(asyncio.to_thread(data_sync, body))
+    try:
+        while not task.done():
+            if disconnected and await disconnected():
+                cancelled.set()
+                raise asyncio.CancelledError()
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise HTTPException(503, "行情查询超过时间预算；尚未确认历史边界")
+            await asyncio.wait({task}, timeout=min(0.05, remaining))
+        return await task
+    finally:
+        cancelled.set()
+        CANCELLED.reset(token)
+        DEADLINE.reset(deadline_token)
+        if not task.done():
+            # MCP retains its compute slot while its transport returns a budget error.
+            # Browser waiters keep the established immediate deadline response.
+            if retain_work:
+                try:
+                    await asyncio.shield(task)
+                except (Exception, asyncio.CancelledError):
+                    pass
+            task.add_done_callback(lambda done: done.exception() if not done.cancelled() else None)

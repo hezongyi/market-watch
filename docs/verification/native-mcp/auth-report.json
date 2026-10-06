@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "transport": "HTTPS",
+  "checks": [
+    "expired rejected",
+    "revoked rejected",
+    "scope discovery filtering",
+    "direct hidden tool call forbidden"
+  ]
+}

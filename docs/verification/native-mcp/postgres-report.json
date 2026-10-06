@@ -1,0 +1,21 @@
+{
+  "postgresql": true,
+  "migration": "s20_agent_capabilities",
+  "audit_count": 73,
+  "operation_count": 7,
+  "create_count": 3,
+  "codex_successful_actions": {
+    "charts_get_drawings": 11,
+    "alerts_list": 3,
+    "market_get_bars": 8,
+    "indicators_calculate": 2
+  },
+  "checks": [
+    "concurrent retries share one resource",
+    "operation and audit persistence",
+    "notification acknowledgement persisted",
+    "credential plaintext absent from audit",
+    "Codex successful actions audited"
+  ],
+  "after_project_stop_start": true
+}

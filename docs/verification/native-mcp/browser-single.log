@@ -1,0 +1,5 @@
+DRAWING_PROJECTION {"version":1,"charts":[{"chart_id":"0","symbol":"MWP:BTCUSDT","resolution":"240","drawings":[{"id":"JW2lQp","name":"horizontal_line","points":[{"time":1790769600,"price":101}]},{"id":"6WQKO7","name":"trend_line","points":[{"time":1790740800,"price":100},{"time":1790755200,"price":102}]},{"id":"boXl2I","name":"rectangle","points":[{"time":1790740800,"price":100},{"time":1790755200,"price":102}]}],"status":"supported"}]}
+{"case":"single-provider","phase":"saved","expected":[{"symbol":"MWP:BTCUSDT","resolution":"240"}],"metadata":"MWP:BTCUSDT","mainSeries":[["MWP:BTCUSDT"]]}
+{"case":"single-provider","phase":"refreshed","restored":[{"symbol":"MWP:BTCUSDT","resolution":"240"}]}
+{"case":"single-provider","passed":true,"charts":1,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+Layout save/refresh retains each chart series, resolution and drawings.

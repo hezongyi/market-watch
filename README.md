@@ -1,14 +1,16 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码与生产版本 **v1.7.0**，支持 Yahoo 原生七周期行情、延迟报价和平台品种中文搜索，保留独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲、专业图表菜单、账户及工作区操作。源码发布、启用方法及上游限制见[v1.6.0源码交付记录](docs/yahoo-v1.6.0-source-delivery.md)，操作及既有系列规则见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.10.0**，支持 Yahoo 原生七周期行情、延迟报价和平台品种中文搜索，保留独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲、专业图表菜单、账户及工作区操作。源码发布、启用方法及上游限制见[v1.6.0源码交付记录](docs/yahoo-v1.6.0-source-delivery.md)，操作及既有系列规则见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+
+v1.10.0 新增原生 HTTP MCP，默认关闭，使用独立 agent 凭据并提供 13 项能力。接入见[原生 MCP 使用文档](docs/native-mcp-usage.md)，源码发布和真实验收来源见[v1.10.0 交付](docs/native-mcp-v1.10.0-source-delivery.md)。本次只发布源码；生产状态以[v1.8.0 生产记录](docs/chart-v1.8.0-delivery.md)为准。
 
 v1.7.0 增加原生视窗历史储备，并修复缓存重置及 Yahoo PG-only 储备边界。功能要求见 [实施计划](docs/native-viewport-history-buffer-plan.md)，发布与部署记录见 [v1.7.0 交付](docs/chart-v1.7.0-delivery.md)。
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。后续功能选项见[图表能力清单](docs/advanced-charts-v31-future-integration-capability-research.md)，MT4 接入路线见[Windows 桥接研究](docs/mt4-live-trading-bridge-research.md)。
 
-PR #6 已合入 main，附注标签 `v1.7.0` 指向 `e40eaac` 并已推送。Unraid 生产已从 v1.5.0 升级；四类镜像由该标签源码构建，实际镜像、备份恢复与验收见 [v1.7.0-production.json](deploy/releases/v1.7.0-production.json)。
+历史 v1.7.0 发布：PR #6 已合入 main，附注标签 `v1.7.0` 指向 `e40eaac` 并已推送。Unraid 生产已从 v1.5.0 升级；四类镜像由该标签源码构建，实际镜像、备份恢复与验收见 [v1.7.0-production.json](deploy/releases/v1.7.0-production.json)。
 
-源码主目录：`/home/quant/repos/market-watch`；独立开发工作树继续保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。既有隔离实例与历史镜像保留原清单；当前生产以 v1.7.0 清单为准。生产已应用 `p17_volume`→`q18_yahoo_catalog` 加法迁移，仅增加目录元数据；Yahoo 默认及当前生产仍关闭，启用需配置后端代理。历史量partial限制及既有Volume迁移/回退见[v1.3.3本机交付](docs/chart-v1.3.3-delivery.md)，账户回退要求见[v1.5.0源码交付](docs/chart-v1.5.0-source-delivery.md)。
+源码主目录：`/home/quant/repos/market-watch`；独立开发工作树继续保留。Python发行包名为`market-watch`，导入路径继续使用`alerts`。生产服务、数据库、部署和备份路径保留`trading-alerts`相关名称。既有隔离实例与历史镜像保留原清单；生产的后续升级以 v1.8.0 生产清单为准。生产已应用 `p17_volume`→`q18_yahoo_catalog` 加法迁移，仅增加目录元数据；Yahoo 默认及当前生产仍关闭，启用需配置后端代理。历史量partial限制及既有Volume迁移/回退见[v1.3.3本机交付](docs/chart-v1.3.3-delivery.md)，账户回退要求见[v1.5.0源码交付](docs/chart-v1.5.0-source-delivery.md)。
 
 ## 当前实例
 
@@ -90,4 +92,8 @@ TA-Lib Python（BSD-2-Clause）、NumPy（BSD-3-Clause）、FastAPI（MIT）、R
 
 从工作台导航进入独立图表页面，支持多工作区、多图同步、八种画线和Python指标。
 [操作与维护](docs/chart-workspace-implementation.md) · [验收记录](docs/chart-workspace-acceptance.md)。
-专业图表已在 Unraid 生产部署；当前版本与验收以 v1.7.0 生产清单为准。
+专业图表已在 Unraid 生产部署；当前版本与验收以 v1.8.0 生产清单为准。
+
+## 原生 MCP（开发分支）
+
+为 Codex 等受控 agent 提供同进程 Streamable HTTP `/mcp`，通过注册表开放行情、指标、告警及已保存画线。默认关闭；使用独立可撤销 Bearer 凭据。实现、Codex 配置和隔离验收步骤见 [原生 MCP 使用与开发](docs/native-mcp-usage.md)。本分支 Docker/Codex 真实环境验收仍待完成。

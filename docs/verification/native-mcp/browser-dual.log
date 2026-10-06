@@ -1,0 +1,5 @@
+DRAWING_PROJECTION {"version":1,"charts":[{"chart_id":"0","symbol":"MWP:XAUUSD","resolution":"240","drawings":[{"id":"3RKpms","name":"horizontal_line","points":[{"time":1790769600,"price":101}]},{"id":"qO5z8l","name":"trend_line","points":[{"time":1790740800,"price":100},{"time":1790755200,"price":102}]},{"id":"DowKCT","name":"rectangle","points":[{"time":1790740800,"price":100},{"time":1790755200,"price":102}]}],"status":"supported"},{"chart_id":"1","symbol":"MWP:EURUSD","resolution":"60","drawings":[],"status":"supported"}]}
+{"case":"two-provider","phase":"saved","expected":[{"symbol":"MWP:XAUUSD","resolution":"240"},{"symbol":"MWP:EURUSD","resolution":"60"}],"metadata":"MWP:XAUUSD","mainSeries":[["MWP:XAUUSD"],["MWP:EURUSD"]]}
+{"case":"two-provider","phase":"refreshed","restored":[{"symbol":"MWP:XAUUSD","resolution":"240"},{"symbol":"MWP:EURUSD","resolution":"60"}]}
+{"case":"two-provider","passed":true,"charts":2,"legacy_formats":["raw","envelope"],"native_load":true,"drawings":true}
+Layout save/refresh retains each chart series, resolution and drawings.

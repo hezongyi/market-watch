@@ -640,3 +640,27 @@ class VolumeBackfillSegment(Base):
     end: Mapped[int] = mapped_column(BigInteger)
     status: Mapped[str] = mapped_column(String(24))
     detail: Mapped[str | None] = mapped_column(String(250))
+
+
+class AgentCredential(Base):
+    __tablename__ = "agent_credentials"
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    agent_id: Mapped[str] = mapped_column(String(80), index=True)
+    scopes: Mapped[list] = mapped_column(JSON)
+    expires_at: Mapped[int] = mapped_column(BigInteger)
+    revoked_at: Mapped[int | None] = mapped_column(BigInteger)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    quota_start: Mapped[int] = mapped_column(BigInteger, default=0)
+    quota_count: Mapped[int] = mapped_column(default=0)
+
+
+class AgentOperation(Base):
+    __tablename__ = "agent_operations"
+    __table_args__ = (UniqueConstraint("agent_id", "capability", "key"),)
+    id: Mapped[str] = mapped_column(String(40), primary_key=True, default=uid)
+    agent_id: Mapped[str] = mapped_column(String(80))
+    capability: Mapped[str] = mapped_column(String(80))
+    key: Mapped[str] = mapped_column(String(100))
+    intent_hash: Mapped[str] = mapped_column(String(64))
+    result: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
