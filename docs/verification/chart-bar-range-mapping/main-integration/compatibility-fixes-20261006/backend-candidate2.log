@@ -1,0 +1,17 @@
+........................s............................................... [ 11%]
+...................ssssssss............................................. [ 22%]
+....................................................s................... [ 34%]
+.......................................................sssss............ [ 45%]
+........................................................................ [ 56%]
+...........................ss.....................sssss................. [ 68%]
+....................................................................ssss [ 79%]
+ssssssssssssssss........................................................ [ 91%]
+....................................................ssss                 [100%]
+=============================== warnings summary ===============================
+backend/tests/test_alerts_mcp_migration.py: 17 warnings
+backend/tests/test_chart_alert_migration.py: 6 warnings
+  /home/quant/repos/market-watch-alerts/.venv/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+586 passed, 47 skipped, 23 warnings in 184.45s (0:03:04)
