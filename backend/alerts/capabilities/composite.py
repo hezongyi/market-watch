@@ -42,6 +42,7 @@ class CompositeBarsQuery(CompositeQuery):
 
 
 def register_composite(registry):
+    from ..composite_quotes import get_snapshot
     from ..market_data import search_series
 
     registry.register(Capability("series_search",
@@ -49,6 +50,8 @@ def register_composite(registry):
         SeriesSearchQuery, Record, frozenset({"market:read"}), "read",
         lambda ctx, q: {"items": search_series(**q.model_dump())}))
     entries = [
+        ("composite_get_quote", "Stored composite price: fresh owner-fenced sampled Bid, otherwise saved confirmed M1 close. Exact price, fixed revision, source evidence and separate quote/tail readiness. No creation, live demand or supplier IO.", CompositeQuery,
+         lambda ctx, q: invoke(get_snapshot, q.composite_id)),
         ("composite_list", "Pure paginated saved composites; no creation, demand or supplier request.", CompositeListQuery,
          lambda ctx, q: invoke(list_composites, **q.model_dump())),
         ("composite_list_candidates", "Pure managed history candidates with explicit saved mapping status. Search never creates a composite.", CompositeListQuery,

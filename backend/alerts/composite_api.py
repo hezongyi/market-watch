@@ -134,6 +134,12 @@ def router(authenticated):
     def requests(composite_id: str, page: int = 1, page_size: int = 25):
         return invoke(read_attempts, composite_id, page=page, page_size=page_size)
 
+    @routes.get("/composites/{composite_id}/quote")
+    def composite_quote(composite_id: str):
+        from .composite_quotes import get_snapshot
+
+        return invoke(get_snapshot, composite_id)
+
     @routes.get("/composites/{composite_id}/chart")
     def bars(composite_id: str, timeframe: str = "M1", before: int | None = None, count: int = 300,
              revision_id: str | None = None, input_revision: int | None = None, provisional: bool = False):

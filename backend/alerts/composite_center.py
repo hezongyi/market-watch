@@ -1,13 +1,9 @@
 """Pure composite management, mapping candidates and separate readiness facts."""
 
-from decimal import Decimal
-
 from sqlalchemy import func, or_, select
 
 from .composite_definitions import baseline
-from .config import settings
 from .history_catalog import account_scope
-from .live_pricing import account_key
 from .market_usage import wanted_instruments
 from .storage import (
     ChartAlert,
@@ -21,7 +17,6 @@ from .storage import (
     MarketComposite,
     MarketDataset,
     MarketDemand,
-    PricingOwner,
     RealtimeMapping,
     Watch,
     now_ms,
@@ -72,18 +67,15 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         select(ChartAlertVersion).join(ChartAlert, (ChartAlertVersion.alert_id == ChartAlert.id) & (
             ChartAlertVersion.version == ChartAlert.version)).where(ChartAlert.status == "active",
                 or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp))))
-    current_account = mapping.match["target_identity"]["account_scope"] == account_scope()
+    from .composite_quotes import live_snapshot
+
+    live = live_snapshot(db, revision, now=stamp)
+    current_account = live["current_account"]
     active = composite.instrument_id in wanted
-    connection = state.connection if state else "inactive"
-    owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
-    owned = bool(current_account and owner and owner.token and owner.expires > stamp and state
-                 and state.epoch == owner.epoch and connection in ("connected", "recovering")
-                 and max(state.heartbeat_at, state.received_at) >= stamp - 15000)
-    quote = state.quote if state else {}
-    quote_age = stamp - quote["source_time"] if quote else None
-    quote_ready = bool(owned and quote.get("bid") and quote.get("ask") and quote.get("tradeable")
-        and Decimal(quote["ask"]) >= Decimal(quote["bid"]) and quote_age is not None and 0 <= quote_age <= 15000)
-    confirmed_ready = bool(owned and state.ready and not state.error)
+    connection = live["connection"]
+    quote_age = live["quote_age_ms"]
+    quote_ready = live["quote_ready"]
+    confirmed_ready = live["confirmed_tail_ready"]
     from .composite_aggregates import report
     status = "account_changed" if not current_account else "attention" if prep.error else (
         "preparing" if prep.status != "queried" else "inactive" if not active else

@@ -526,8 +526,28 @@ def router(authenticated):
                         meta = metadata(db, ident, kind)
                         values = {"short_name": meta["symbol"], "description": meta["name"] + (
                             " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
+                        facts = None
+                        if kind == "composite":
+                            from .composite_quotes import snapshot
+                            from .series_access import composite_definition
+
+                            _, _, composite = composite_definition(db, ident)
+                            if composite:
+                                facts = snapshot(db, composite)
+                                if facts["price"] is not None:
+                                    values["lp"] = float(facts["price"])
+                                    if facts["price_type"] == "sampled_bid":
+                                        values["bid"] = values["lp"]
+                                values.update(quote_time=facts["observed_at"], price_type=facts["price_type"],
+                                    quote_ready=facts["quote_ready"], confirmed_tail_ready=facts["confirmed_tail_ready"],
+                                    quality=facts["quality"])
+                                values["description"] += " · " + ("抽样Bid" if facts["price_type"] == "sampled_bid" else
+                                    "保存的确认M1收盘" if facts["price"] is not None else "等待报价")
+                                if facts["observed_at"] is not None:
+                                    values["description"] += " · " + instant(facts["observed_at"]).strftime("%Y-%m-%d %H:%M UTC")
                         # Watchlist metadata is pure, never a first-use command.
-                        result.append({"s": "ok", "n": ticker, "v": values})
+                        result.append({"s": "ok", "n": ticker, "v": values,
+                                       **({"snapshot": facts} if facts else {})})
                     except ValueError:
                         result.append({"s": "error", "n": ticker, "v": {"description": "行情不可用，请查看数据中心"}})
                 continue

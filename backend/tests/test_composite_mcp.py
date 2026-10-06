@@ -14,6 +14,7 @@ def test_composite_mcp_matches_browser_and_never_creates_live_demand(mcp, monkey
     catalog = prepare(factory, monkeypatch)
     publish(factory)
     monkeypatch.setattr("alerts.composite_definitions.now_ms", lambda: 165725000)
+    monkeypatch.setattr("alerts.composite_quotes.now_ms", lambda: 165725000)
     with factory.begin() as db:
         mapping = save_mapping(db, identity().key, catalog, PROOF)
         composite = first_use(db, identity().key, mapping.id)
@@ -23,6 +24,7 @@ def test_composite_mcp_matches_browser_and_never_creates_live_demand(mcp, monkey
         "composite_list_candidates": ({}, "/center/composite-candidates"),
         "composite_get_mappings": ({"dataset_id": identity().key}, f"/datasets/{identity().key}/mappings"),
         "composite_get": ({"composite_id": ident}, f"/composites/{ident}"),
+        "composite_get_quote": ({"composite_id": ident}, f"/composites/{ident}/quote"),
         "composite_get_requests": ({"composite_id": ident}, f"/composites/{ident}/requests"),
         "composite_get_bars": ({"composite_id": ident, "before": 165600000, "count": 2},
                                f"/composites/{ident}/chart?before=165600000&count=2"),
