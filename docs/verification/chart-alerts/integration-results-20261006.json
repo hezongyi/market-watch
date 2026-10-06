@@ -1,0 +1,232 @@
+{
+  "environment": {
+    "host": "quant-server",
+    "os": "Ubuntu 22.04.5 LTS",
+    "compose_project": "mw-chart-alerts-integration",
+    "app": "https://localhost:19543",
+    "chart_origin": "https://127.0.0.1:19544",
+    "mcp": "https://localhost:19543/mcp",
+    "original_project_retained": "mw-chart-alerts-acceptance"
+  },
+  "baseline": {
+    "main": "79fb796",
+    "merge": "bbfc409",
+    "alembic_head": "t21_merge_alerts_mcp",
+    "review_fixes": "ab1b702"
+  },
+  "backend": {
+    "passed": 575,
+    "skipped": 45,
+    "seconds": 209.21
+  },
+  "postgres_tests": {
+    "passed": 7,
+    "seconds": 11.98,
+    "upgrade_paths": [
+      "fresh",
+      "r19",
+      "s20_chart_alerts",
+      "s20_agent_capabilities"
+    ]
+  },
+  "production_operated": false,
+  "external_notifications_sent": false,
+  "runtime": {
+    "scope": "running Ubuntu Compose API/worker/PostgreSQL; synthetic fixture observations",
+    "cases": [
+      "running autonomous worker initializes baseline without firing",
+      "1/2/3 triggers stop at limit; sustained/equal/released same-candle observations obey counts",
+      "isolated notification sink accepts events after retry; acknowledging one leaves other events independent",
+      "price interval skips unobserved jump across range; counts only actual entries",
+      "real persisted history revision blocks indicator evaluation; explicit rebaseline preserves run/count without duplicate events"
+    ],
+    "external_notifications_sent": false,
+    "notification_delivery_attempts": [
+      1,
+      1,
+      2
+    ]
+  },
+  "alert_browser": {
+    "scope": "actual Ubuntu Docker application, native widget and authenticated parent API; real Binance source",
+    "cases": [
+      "actual HTTPS login and platform native chart load",
+      "native toolbar opens real unified form; source snapshot, finite count and message persist via authenticated API",
+      "actual panel pause/resume uses persisted lifecycle; copying only opens a draft",
+      "actual native drawing geometry saves through authenticated parent and generates a new persisted version",
+      "actual mouse drag against deployed application previews without writes and commits exactly once on release",
+      "real-source linear trend and reversed log ray persist native bar-index geometry and reach ready autonomous evaluation",
+      "four actual native studies create parameter/history snapshots through authenticated parent and reach ready on real provider data",
+      "actual page refresh restores backend drawing; explicit deletion pauses the persisted rule"
+    ],
+    "errors": [],
+    "credentials_sent_to_chart": [],
+    "drag": {
+      "writes_during_pointer_down": 0,
+      "edits_on_release": 1,
+      "version": 2
+    },
+    "sloping_alerts": [
+      {
+        "kind": "trend_line",
+        "scale": "linear",
+        "health": "ready"
+      },
+      {
+        "kind": "ray",
+        "scale": "log",
+        "health": "ready"
+      }
+    ],
+    "indicator_alerts": [
+      {
+        "name": "SMA",
+        "calculation_origin": 1790977380000,
+        "health": "ready"
+      },
+      {
+        "name": "EMA",
+        "calculation_origin": 1790977380000,
+        "health": "ready"
+      },
+      {
+        "name": "RSI",
+        "calculation_origin": 1790977380000,
+        "health": "ready"
+      },
+      {
+        "name": "MACD",
+        "calculation_origin": 1790977380000,
+        "health": "ready"
+      }
+    ]
+  },
+  "mcp_https": {
+    "transport": "Streamable HTTP over HTTPS",
+    "source": "acceptance-fixture",
+    "synthetic_market_data": true,
+    "checks": [
+      "initialize",
+      "tools/list",
+      "schema discovery",
+      "authentication rejection",
+      "web/MCP quote parity",
+      "web/MCP OHLC parity",
+      "web/MCP indicator parity",
+      "revision parity",
+      "saved projection",
+      "unknown drawing rejection",
+      "concurrent first create",
+      "notification ack retry",
+      "idempotent create retry",
+      "same-key intent conflict",
+      "cancel"
+    ],
+    "versions": {
+      "mcp": "2.3.0",
+      "fastapi": "0.141.1",
+      "starlette": "1.7.0",
+      "pydantic": "2.13.5"
+    },
+    "protocol_version": "2025-11-25",
+    "tools": [
+      "market_list_instruments",
+      "market_get_quote",
+      "market_get_bars",
+      "indicators_list",
+      "indicators_calculate",
+      "alerts_list",
+      "alerts_get_signals",
+      "system_get_status",
+      "charts_list_workspaces",
+      "charts_get_drawings",
+      "alerts_create",
+      "alerts_cancel",
+      "notifications_ack"
+    ]
+  },
+  "mcp_browser": {
+    "passed": true,
+    "synthetic_market_data": true,
+    "data_source": "acceptance-fixture",
+    "checks": [
+      "real chart public coordinates",
+      "PostgreSQL saved revision",
+      "HTTP MCP projection parity",
+      "unsaved edits invisible",
+      "subsequent save visible",
+      "page refresh persists drawing identities"
+    ]
+  },
+  "combined_events": {
+    "scope": "actual combined Ubuntu Docker HTTPS API/MCP, synthetic task event evidence",
+    "cases": [
+      "MCP and browser return identical chart and legacy events without requiring legacy watch IDs",
+      "read-only MCP denies acknowledgement and leaves all event records unchanged",
+      "authorized MCP acknowledges one chart event idempotently without changing other events or rule count/run/version"
+    ],
+    "external_notifications_sent": false,
+    "verified": true,
+    "chart_event_count": 20,
+    "legacy_event_count": 1
+  },
+  "faults": {
+    "scope": "deployed autonomous worker; synthetic data, gaps, stale timestamps and generated rule epoch",
+    "cases": [
+      "gap fences persisted checkpoint; actual backfill yields exactly two ordered late events",
+      "container restart consumes queued bars once, preserves prior two events and completes at three",
+      "stale intrabar observation is rejected; fresh source restores ready baseline without firing"
+    ],
+    "verified": true
+  },
+  "restart": {
+    "verified": true,
+    "container_recreated": true,
+    "api_ip_changed": true,
+    "web_restarted": false,
+    "proxy_and_https_login_recovered": true,
+    "durable_configuration_counts_and_records_preserved": true,
+    "runtime_checkpoints_excluded_because_worker_continues": true,
+    "rule_count": 40,
+    "event_count": 24,
+    "recovery_seconds": 35.62
+  },
+  "backup": {
+    "verified": true,
+    "postgres_version": "postgres (PostgreSQL) 17.11",
+    "sha256": "52b414d7f1ef456a729fd3b5fafc8e1a20e60e1d922308086f9fcc691ab64b44",
+    "bytes": 1388264,
+    "alert_table_counts": {
+      "chart_alerts": 40,
+      "chart_alert_versions": 46,
+      "signals": 24,
+      "notifications": 24,
+      "outbox": 7,
+      "agent_credentials": 2,
+      "agent_operations": 7
+    },
+    "full_alert_payloads_equal": true,
+    "migration_head": "t21_merge_alerts_mcp",
+    "temporary_restore_database_removed": true
+  },
+  "no_browser_real_source": {
+    "scope": "deployed API alert/provider loops and real Binance; zero live browser interests",
+    "verified": true,
+    "before": {
+      "provider_latest_at": 1791265546976,
+      "checkpoint": 1791265531268,
+      "health": "ready",
+      "count": 0,
+      "live_browser_interests": 0,
+      "cached_bars": 4803
+    },
+    "after": {
+      "provider_latest_at": 1791265562805,
+      "checkpoint": 1791265546976,
+      "health": "ready",
+      "count": 0,
+      "live_browser_interests": 0,
+      "cached_bars": 4804
+    }
+  }
+}

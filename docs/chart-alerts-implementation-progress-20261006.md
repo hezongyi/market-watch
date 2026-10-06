@@ -1,6 +1,6 @@
 # 图表告警接续开发记录
 
-2026-10-06。目标保持完整：按 [正式方案](advanced-charts-alert-system-plan-20261006.md) 开发并真实验收后交付。最新已实际运行独立Ubuntu实例并完成主要验收。下面早期章节保留当时状态；**当前环境、结果与启动停止以 [真实实例验收记录](verification/chart-alerts/runtime-acceptance-20261006.md) 为准**。原Docker权限阻碍已通过系统既有docker组及 `sg docker -c` 解决。
+2026-10-06。目标保持完整：按 [正式方案](advanced-charts-alert-system-plan-20261006.md) 开发并真实验收后交付。最新已实际运行独立Ubuntu实例并完成主要验收。下面早期章节保留当时状态；**当前组合环境、结果与启动停止以 [MCP 集成验收记录](verification/chart-alerts/integration-acceptance-20261006.md) 为准**。原Docker权限阻碍已通过系统既有docker组及 `sg docker -c` 解决。
 
 ## 工作区与基线
 
@@ -146,3 +146,12 @@ docker compose --env-file /tmp/mw-chart-alerts-acceptance/compose.env -p mw-char
 最新结果：全量后端 **548 passed / 41 skipped**，130.55秒；另实际PG迁移/并发三项通过。实际浏览器8场景通过，含真实鼠标拖动只在释放提交1次、线性趋势线/未来端点反向对数射线、四指标创建及后台ready，errors与图表凭据泄露均为空。真实Binance在全部兴趣自然过期至零后继续采集并推进checkpoint。合成task数据验证有限次数、区间跳空、缺口补数late、陈旧恢复、历史修订及rebaseline、重启待判不漏不重；实际容器IP改变后web无需重启登录恢复。隔离通知实际attempts `[1,1,2]`、逐事件确认通过；仅服务accepted。实际PG备份恢复全部告警字段相等，恢复DB已删除。
 
 真实行情接入与可控数值fixture分层记录；不把browser ready当作真实provider逐根数值验收。双轴补审发现的失败恢复、配置刷新及结果记录问题已修。开发分支可审阅；未合并、推送或生产发布。本次交付保持本任务实例运行供验收，启动停止方式及登录文件位置已提供。
+
+
+## main / MCP 集成（当前交付）
+
+PR #11 合入 main `79fb796`，合并提交 `bbfc409`；汇合迁移 `t21_merge_alerts_mcp` 保留两条 s20 分支，SQLite/真实 PostgreSQL 验证 fresh、r19、alert-only、MCP-only 四条升级路径。共享行情/指标查询、图表资源、DNS 代理和 MCP 图表事件读取均保持兼容。双轴审查发现的 MCP 临时值默认及计算起点问题已修，回归覆盖默认完整 K 线、显式临时标记及固定 provider 起点。
+
+新独立 Ubuntu Compose project `mw-chart-alerts-integration`，网页 **https://localhost:19543**、图表 **https://127.0.0.1:19544**；原 19443/19444 实例保留。组合后端 **575 passed / 45 skipped**；真实 PG **7 passed**。最终 API 上告警浏览器 **8 场景**、MCP HTTPS **15 checks**、原生画线保存/刷新投影及图表事件独立确认通过。环境、其余恢复验收、操作命令与证据边界见 [集成验收记录](verification/chart-alerts/integration-acceptance-20261006.md)。
+
+上文“尚未推送/未部署”是历史检查点。最终 PR 状态以 GitHub 为准；本任务没有授权或执行生产发布、合并 PR、真实通知外发。
