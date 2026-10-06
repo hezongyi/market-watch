@@ -329,6 +329,10 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
         }
         assert.ok(frame);
         await settle();
+        item.runningHostAsset = await frame.evaluate(() =>
+          [...document.scripts].map((s) => s.src)
+            .find((src) => /\/host\.[a-f0-9]+\.js$/.test(src))?.split("/").at(-1),
+        );
         await frame.evaluate((count) => {
           widget.timeSync().setValue(false);
           widget.dateRangeSync().setValue(false);

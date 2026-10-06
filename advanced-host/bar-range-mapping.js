@@ -119,12 +119,24 @@ function chartBarRangeMapping({
     const live = new Map(),
       current = new Set();
     for (const retained of globalThis.MWNativeReserve?.acceptedRanges() || []) {
-      if (typeof MWSeries !== "undefined" && MWSeries.decode?.(retained.symbol)?.spec) continue;
+      if (
+        typeof MWSeries !== "undefined" &&
+        MWSeries.decode?.(retained.symbol)?.spec
+      )
+        continue;
       const k = key(retained.symbol, retained.resolution, retained.window);
       if (Number.isFinite(retained.from) && Number.isFinite(retained.to)) {
         current.add(k);
         const old = live.get(k);
-        live.set(k,old ? {from:Math.min(old.from,retained.from),to:Math.max(old.to,retained.to)} : retained);
+        live.set(
+          k,
+          old
+            ? {
+                from: Math.min(old.from, retained.from),
+                to: Math.max(old.to, retained.to),
+              }
+            : retained,
+        );
       }
     }
     for (const chart of bindings.keys()) {
@@ -295,20 +307,28 @@ function chartBarRangeMapping({
     if (!rail || !source || !config.priceLabels) return;
     const high = scale.priceToCoordinate(source.high, value),
       low = scale.priceToCoordinate(source.low, value);
-    const text = (price, y, name) =>
-      name +
-      " " +
-      chart.priceFormatter().format(price) +
-      (y < 0 || y > pane.height() ? "（" + name + "价在屏外）" : "");
+    const text = (price, y, name) => ({
+      price: name + " " + chart.priceFormatter().format(price),
+      hint: y < 0 || y > pane.height() ? "（" + name + "价在屏外）" : "",
+    });
     const lines = [text(source.high, high, "高"), text(source.low, low, "低")];
-    if (rail.textContent !== lines.join("")) {
+    if (
+      rail.textContent !== lines.map((line) => line.price + line.hint).join("")
+    ) {
       rail.replaceChildren(
-        ...lines.map((text) => {
+        ...lines.map(({ price, hint }) => {
           const e = rail.ownerDocument.createElement("div");
-          e.textContent = text;
-          e.style.cssText =
-            "white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
-          e.title = text;
+          e.style.cssText = "display:flex;white-space:nowrap;overflow:hidden";
+          const value = rail.ownerDocument.createElement("span");
+          value.dataset.name = "mw-range-price-value";
+          value.textContent = price;
+          value.style.flexShrink = "0";
+          const note = rail.ownerDocument.createElement("span");
+          note.textContent = hint;
+          note.style.cssText =
+            "min-width:0;overflow:hidden;text-overflow:ellipsis";
+          e.append(value, note);
+          e.title = price + hint;
           return e;
         }),
       );
@@ -320,11 +340,7 @@ function chartBarRangeMapping({
   function fillColor(value = config) {
     const dark = widget().getTheme().toLowerCase() === "dark";
     const hex =
-      value.colorMode === "custom"
-        ? value.color
-        : dark
-          ? "#FFFFFF"
-          : "#6B7280";
+      value.colorMode === "custom" ? value.color : dark ? "#FFFFFF" : "#6B7280";
     const alpha =
       1 -
       (value.transparencyMode === "custom"
@@ -601,8 +617,8 @@ function chartBarRangeMapping({
         high: source.high,
         low: source.low,
       },
-      bindings:bindings.size,
-      rails:rails.size,
+      bindings: bindings.size,
+      rails: rails.size,
       stores: [...stores].map(([key, s]) => ({
         key,
         size: s.rows.size,

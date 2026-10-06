@@ -76,7 +76,7 @@ module.exports = async function rangeFixture({ browser, report, APP, CHART }) {
           widget.chart(i).dataReady(),
         ).every(Boolean),
       null,
-      { timeout: 60000 },
+      { timeout: Number(process.env.RANGE_SETTLE_TIMEOUT || 60000) },
     ); } catch (error) {
       report.settleFailure = await host.evaluate(() => ({
         ready, loading, historyReloading, dirty, nativeSaving,
@@ -96,6 +96,12 @@ module.exports = async function rangeFixture({ browser, report, APP, CHART }) {
     }
   };
   await settle();
+  report.runningHostAsset = await host.evaluate(() =>
+    [...document.scripts]
+      .map((s) => s.src)
+      .find((src) => /\/host\.[a-f0-9]+\.js$/.test(src))
+      ?.split("/").at(-1),
+  );
   await host.evaluate(() => {
     widget.timeSync().setValue(false);
     widget.dateRangeSync().setValue(false);

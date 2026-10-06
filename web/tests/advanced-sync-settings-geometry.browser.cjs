@@ -62,6 +62,16 @@ const report = {
             width: e.clientWidth,
             textWidth: e.scrollWidth,
             height: e.getBoundingClientRect().height,
+            price: (() => {
+              const v = e.querySelector('[data-name="mw-range-price-value"]');
+              return (
+                v && {
+                  width: v.clientWidth,
+                  textWidth: v.scrollWidth,
+                  right: v.getBoundingClientRect().right,
+                }
+              );
+            })(),
           }));
           return {
             i,
@@ -73,6 +83,9 @@ const report = {
             lines,
             high: c.priceFormatter().format(source.high),
             low: c.priceFormatter().format(source.low),
+            railFont: cw.ownerDocument().defaultView.getComputedStyle(rail)
+              .font,
+            railWidth: rail.clientWidth,
             leftScales: c
               .getPanes()
               .find((p) => p.hasMainSeries())
@@ -83,6 +96,10 @@ const report = {
               .getRightPriceScales().length,
           };
         });
+      });
+      report.lastGeometry = { name, rows };
+      await page.screenshot({
+        path: OUT.replace(".json", "-" + name + ".png"),
       });
       for (const row of rows) {
         assert.ok(
@@ -107,11 +124,20 @@ const report = {
             row.lines.reduce((sum, l) => sum + l.height, 0) <=
               row.rail.height - 4,
           );
-          for (const line of row.lines)
+          for (const line of row.lines) {
+            assert.ok(
+              line.price && line.price.textWidth <= line.price.width,
+              "price digits must stay fully visible",
+            );
+            assert.ok(
+              line.price.right <= row.rail.x + row.rail.width - 8,
+              "numeric value must fit its rail",
+            );
             assert.ok(
               line.textWidth <= line.width,
               "price text clipped in supported geometry",
             );
+          }
         }
       }
       report.cases.push({ name, rows });
@@ -166,6 +192,19 @@ const report = {
       mobile: false,
       screenWidth: 1100,
       screenHeight: 800,
+    });
+    // Force real prices outside the target price viewport so long offscreen
+    // hints are measured consistently, independent of a live source candle.
+    await host.evaluate(() => {
+      for (let i = 1; i < widget.chartsCount(); i++) {
+        const scale = widget
+          .chart(i)
+          .getPanes()
+          .find((p) => p.hasMainSeries())
+          .getMainSourcePriceScale();
+        scale.setAutoScale(false);
+        scale.setVisiblePriceRange({ from: 1, to: 2 });
+      }
     });
     await check("eight-125pct-equivalent-metrics");
     await host.evaluate(() => {
