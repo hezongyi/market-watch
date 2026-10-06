@@ -1,0 +1,40 @@
+{
+  "version": "1.12.0",
+  "release_tag": "v1.12.0",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/12",
+  "implementation_merge": "77834e5f51e90710141aadc8c115e151a802ccea",
+  "tested_functional_commit": "462ffe09aaebef70b2ccb5714b954715ff0f19a6",
+  "source_commit_resolution": "Resolve v1.12.0^{commit}; annotated tag points to the final main merge of the release metadata PR.",
+  "previous_source_tag": "v1.11.0",
+  "release_scope": "Source publication only; no production deployment or acceptance image retagging.",
+  "delivery_document": "docs/chart-range-v1.12.0-source-delivery.md",
+  "verification": "docs/verification/chart-bar-range-mapping/main-integration/horizontal-labels/summary.json",
+  "source_input_manifest": "docs/verification/chart-bar-range-mapping/main-integration/v1.12.0-source-inputs.json",
+  "source_input_count": 153,
+  "functional_acceptance": {
+    "browser_cases": 54,
+    "browser_groups": 4,
+    "exterior_unit_cases": 21,
+    "page_errors": 0,
+    "open_P1_P2": 0,
+    "bar_width_user_acceptance": "passed",
+    "horizontal_labels_user_acceptance": "not separately recorded; user authorized merge and tag"
+  },
+  "schema": "u22_chart_alert_actions",
+  "new_migrations": [],
+  "dependencies_changed_from_v1_11_0": false,
+  "acceptance_chart_image": {
+    "tag": "mw-range-main-chart:horizontal-labels1",
+    "id": "sha256:4abd9b251ae2dcec56ec20cb36bfd054e364c67cf5e5fdb985136af7e2f17eb2",
+    "asset": "host.c457e1eb70767468.js",
+    "source_manifest": "docs/verification/chart-bar-range-mapping/main-integration/horizontal-labels/runtime.json"
+  },
+  "ubuntu_project": "mw-range-main-20261006",
+  "application": "https://192.168.7.232:16843/advanced-charts",
+  "production_operated": false,
+  "rollback": {
+    "previous_source_tag": "v1.11.0",
+    "new_schema_changes": false,
+    "runtime_effect": "Source publication does not switch production; production rollback requires its actual release manifest."
+  }
+}
