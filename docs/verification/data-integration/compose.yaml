@@ -2,7 +2,7 @@
 name: market-watch-data-integration
 x-backend: &backend
   build: ../../..
-  image: market-watch-data-integration:p0
+  image: market-watch-data-integration:dev
   restart: "no"
   environment: &environment
     ALERTS_DATABASE_URL: postgresql+psycopg://integration:${MW_DATA_TEST_PASSWORD:?Set isolated test password}@postgres/integration
@@ -38,7 +38,7 @@ services:
     environment:
       <<: *environment
       TEST_POSTGRES_URL: postgresql+psycopg://integration:${MW_DATA_TEST_PASSWORD:?Set isolated test password}@postgres/integration
-    command: ["python", "-m", "pytest", "backend/tests/test_market_contracts.py", "backend/tests/test_market_datasets.py", "backend/tests/test_market_datasets_postgres.py", "-q"]
+    command: ["python", "-m", "pytest", "backend/tests/test_market_contracts.py", "backend/tests/test_market_datasets.py", "backend/tests/test_market_datasets_postgres.py", "backend/tests/test_dukascopy_history.py", "backend/tests/test_history_versions.py", "backend/tests/test_history_replay.py", "backend/tests/test_history_snapshots_migration.py", "backend/tests/test_history_replay_migration.py", "backend/tests/test_oanda_stream.py", "-q"]
     depends_on:
       migrate: {condition: service_completed_successfully}
 volumes:

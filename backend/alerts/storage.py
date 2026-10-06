@@ -70,11 +70,46 @@ class MarketDataset(Base):
     volume_unit: Mapped[str | None] = mapped_column(String(40))
 
 
+class HistoryVersion(Base):
+    __tablename__ = "market_history_versions"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    published_at: Mapped[int | None] = mapped_column(BigInteger)
+    manifest: Mapped[dict] = mapped_column(JSON, default=dict)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    attempts: Mapped[int] = mapped_column(default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(40))
+
+
+class HistoryChunk(Base):
+    __tablename__ = "market_history_chunks"
+    __table_args__ = (UniqueConstraint("version_id", "start"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    observed_at: Mapped[int] = mapped_column(BigInteger)
+    count: Mapped[int]
+    checksum: Mapped[str] = mapped_column(String(64))
+    content: Mapped[bytes] = mapped_column(LargeBinary)
+    result: Mapped[str] = mapped_column(String(20))
+    unknown: Mapped[list] = mapped_column(JSON, default=list)
+
+
 @event.listens_for(ORMSession, "before_flush")
 def immutable_dataset_identity(db, flush_context, instances):
     from sqlalchemy import inspect, select
 
     for row in db.deleted:
+        if isinstance(row, (HistoryChunk, HistoryVersion)):
+            raise ValueError("Historical snapshots cannot be deleted by runtime writers")
         if isinstance(row, MarketDataset):
             raise ValueError("Explicit dataset bindings cannot be removed by runtime writers")
         if isinstance(row, Instrument) and db.scalar(
@@ -82,6 +117,14 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
+        if isinstance(row, HistoryChunk) and any(attr.history.has_changes() for attr in state.attrs):
+            raise ValueError("Historical snapshot chunks are immutable")
+        if isinstance(row, HistoryVersion):
+            old = state.attrs.status.history.deleted
+            if (row.status == "published" and not state.attrs.status.history.has_changes()
+                    or "published" in old):
+                if any(attr.history.has_changes() for attr in state.attrs):
+                    raise ValueError("Published historical versions are immutable")
         if isinstance(row, MarketDataset) and any(
             attr.history.has_changes() for attr in state.attrs
         ):
@@ -272,6 +315,8 @@ class Replay(Base):
     __tablename__ = "replays"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     instrument_id: Mapped[str]
+    dataset_version: Mapped[str | None] = mapped_column(String(36))
+    input_manifest: Mapped[dict] = mapped_column(JSON, default=dict, server_default="{}")
     calendar_profile: Mapped[dict] = mapped_column(JSON, default=dict, server_default="{}")
     timeframe: Mapped[str]
     start: Mapped[int] = mapped_column(BigInteger)

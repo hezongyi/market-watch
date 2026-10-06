@@ -195,7 +195,7 @@ def watch_dict(w):
 
 
 class WatchInput(BaseModel):
-    instrument_id: Literal["EURUSD", "XAUUSD", "BTCUSD", "BTCUSDT"]
+    instrument_id: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z0-9:_-]+$")
     name: str = Field(min_length=1, max_length=100)
     kind: Literal["pullback", "previous_day", "price", "indicator"]
     timeframe: str = "H4"
@@ -854,7 +854,8 @@ def device_ack(notification_id: str, device_id=Depends(device_auth)):
 
 
 class ReplayInput(BaseModel):
-    instrument_id: Literal["EURUSD", "XAUUSD", "BTCUSD", "BTCUSDT"]
+    instrument_id: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z0-9:_-]+$")
+    dataset_version: str | None = Field(default=None, max_length=36)
     timeframe: str = "H4"
     start: int
     end: int
@@ -870,6 +871,12 @@ def create_import(body: ReplayInput):
     ):
         raise HTTPException(422, "历史范围须在过去且不超过一年")
     with transaction() as db:
+        from .storage import MarketDataset
+
+        if not db.get(Instrument, body.instrument_id):
+            raise HTTPException(404, "未知品种")
+        if db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == body.instrument_id)):
+            raise HTTPException(422, "显式历史数据集使用版本化导入入口")
         job = ImportJob(
             instrument_id=body.instrument_id, start=body.start, end=body.end, cursor=body.start
         )
@@ -964,6 +971,8 @@ def replay_dict(run, *, full_history=False):
         "warmup_bar_count": run.warmup_count or 0,
         "chart_history_limited": (run.warmup_count or 0) > 500 or len(visible) > 2000,
         "calendar_profile": run.calendar_profile or {},
+        "dataset_version": run.dataset_version,
+        "input_manifest": run.input_manifest or {},
         "finished": not any(run.cursor < b["end"] <= run.end for b in run.bars),
     }
 
@@ -1010,6 +1019,22 @@ def new_replay(body: ReplayInput):
     if body.timeframe not in TIMEFRAMES or body.end <= body.start:
         raise HTTPException(422, "请选择有效的周期与日期范围")
     with transaction() as db:
+        from .history_replay import create_replay
+        from .storage import MarketDataset
+
+        instrument = db.get(Instrument, body.instrument_id)
+        if not instrument:
+            raise HTTPException(404, "未知品种")
+        explicit = db.scalar(select(MarketDataset.id).where(
+            MarketDataset.instrument_id == body.instrument_id))
+        if explicit or body.dataset_version:
+            if not body.dataset_version:
+                raise HTTPException(422, "显式数据集回测必须指定不可变历史版本")
+            try:
+                run = create_replay(db, instrument, body.dataset_version, body.timeframe, body.start, body.end)
+                return replay_dict(run)
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from None
         # Warmup bars precede selected range, but future is never sent to the browser.
         bars = db.scalars(
             select(Bar)
@@ -1129,6 +1154,8 @@ def seek(run_id: str, body: SeekInput):
             raise HTTPException(422, "定位时间超出范围")
         run = Replay(
             instrument_id=old.instrument_id,
+            dataset_version=old.dataset_version,
+            input_manifest=old.input_manifest,
             calendar_profile=old.calendar_profile,
             timeframe=old.timeframe,
             start=old.start,
@@ -1158,3 +1185,7 @@ app.include_router(advanced_router(authenticated))
 from .market_data import router as market_data_router  # noqa: E402
 
 app.include_router(market_data_router(authenticated))
+
+from .history_api import router as history_router  # noqa: E402
+
+app.include_router(history_router(authenticated))

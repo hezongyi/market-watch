@@ -52,6 +52,7 @@ def acquire(source, kind, now):
         else:
             allowed = (
             not repair
+            and values.get("cooldown_until", 0) <= now
             and sum(e["kind"] == kind for e in active) < capacity
             and sum(e["kind"] == kind for e in requests) < capacity
         )

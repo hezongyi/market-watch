@@ -10,6 +10,59 @@
 只读单一 Dukascopy 数据集。MT4 在其活跃终端验收后才可参与互备。保留 Binance、yfinance 的既有能力。
 当前完成 P0 首批代码及离线验证，尚未达到 P0 运行验收门槛；P1/P2/P3 尚未实施。
 
+本会话范围更新：用户要求完全实现并真实验收；随后明确 **MT4 实时接入留到后续**。
+当前目标为 P0–P2 全部实现与验收，P3 不列入本次完成门槛。下面初始 P0 记录保留作历史，
+本节更新为最新状态。
+
+## P1 与 P2 接续实现（2026-10-06）
+
+- 新增 `dukascopy_history.DukascopyHistory`，锁定 SDK 4.0.1；复用其请求构造、JSONP 解码和
+  行迭代，以独立 SDK 模块实例绑定传输。每次调用最多 5000 行、一个实际请求、明确 start/end；
+  不调用无终点 fetch、不积累无界 DataFrame、不修改全局 requests/SDK。
+- SDK 原始 `_stream` 的第二页空数组索引及隐式重试问题由有界传输停止处理；HTTP 失败直接返回
+  结构化结果，不由 SDK 重试或转成空成功。Decimal 精确解码，UTC 半开裁剪，页检查点递增。
+- `history_versions` 建立月窗口固定截止任务、持久检查点、带 token/到期验证的任务租约、退避及
+  共享冷却。每个已提交页面与 managed M1 同事务写入 gzip 不可变分块；失败不推进 cursor。
+  成功空页允许记录查询进度，但未知分钟写入分块，不认证观测覆盖或休市。
+- 发布时验证分块连续查询分区与 SHA-256 内容清单；ORM 禁止删除/修改分块及已发布版本。
+  新导入修订产生新版本，旧版本内容不变。`t21_history_snapshots` 迁移已有数据时拒绝破坏性降级。
+- `/api/market-data/datasets|inventory|versions` 增加经过现有认证的查询/任务入口。
+  `/api/replays` 支持来源限定品种，显式数据集必须指定已发布 `dataset_version`；历史聚合、
+  warmup、前日数据均从所选版本读取，seek 保留版本及 manifest；`u22_replay_dataset_version`
+  增加来源信息，已有 pinned replay 时拒绝丢弃 manifest 的降级。仍需前端提供版本选择界面。
+- `OandaPractice` 使用独立 REST/stream 客户端。账户范围 BID/smooth=false/complete M1，
+  五秒收盘保护，严格数据窗口与账户指纹校验；NDJSON 增量 UTF-8 解码支持跨 chunk、多行、
+  单侧无流动性、心跳及大小上限，不使用 stream 消息数当 volume。
+- 修复 `market_resources.acquire` 对非 Yahoo 来源没有执行已写入 cooldown 的问题；
+  所有来源/通道现均在冷却期拒绝新请求，历史任务与实时请求仍共享既有预算。
+- 最近全量后端回归 573 passed、39 skipped；随后新增 SDK 预算超时和 replay 迁移保护，
+  对应定向回归 20 passed。两个新增迁移均为单头；Ruff、diff 空白检查及 Compose 静态解析通过。
+
+## 本轮真实只读探测证据
+
+这些是 Ubuntu 本机有限只读 SDK/API 探测，没有启动开发服务、Docker 实例、通知或交易。
+脚本复用后端配置，仅输出公共行情与品种规格，不复制/提交 `.env`、账号标识、token 或代理地址。
+
+- [Dukascopy 两品种采样](verification/data-integration/dukascopy-samples.json)：EURUSD/XAUUSD
+  分别查询近月、2016 年、跨年、DST 周四个 15 分钟窗口。六个窗口各 15 根；两个跨年窗口
+  成功空页，保持 unknown。实际非零价格位数为 EURUSD 5、XAUUSD 3；原始 JSON 有六位尾零。
+  这证明选定 SDK 与这几段真实数据可用，不证明十年完整性、来源全部日历或全量吞吐。
+- [OANDA practice 探测](verification/data-integration/oanda-stream-probe.json)：实际账户目录有
+  EUR_USD/XAU_USD，displayPrecision 分别 5/3；账户范围 candles 各返回 5 根完整 M1。
+  一条共享 stream 75.045 秒返回 EURUSD 32、XAUUSD 169 个价格、14 次心跳，两品种 tradeable。
+  来源到接收价龄 p50/p95/p99 为 EURUSD 269/538/581ms、XAUUSD 231/393/436ms。
+  尚未校准独立时钟误差，不将该短样本称为 SLA、两交易日或 M1 收盘延迟验收。
+
+## 最新未完成项
+
+- Docker socket 仍无权限，未启动 PostgreSQL 验收库，也未完成升级/备份恢复的真实验证。
+- 尚无后台 OANDA 采集拥有者租约与世代 fencing、常驻/需求订阅并集、REST 收盘确认重试调度、
+  断线恢复、同源指标预热、恢复期间不补发过期通知、共享防重及故障降级运行链路。
+- 尚未完成浏览器来源/环境/确认/降级状态、SSE 快照与断连恢复、历史版本选择及原生图表接入。
+- 尚未全量下载约十年历史、验证源日历/精度元数据、清点实际存量；两交易日并发/时效测量与
+  401/429、断线、进程重启等故障注入尚未执行。目标保持 active，不能按短时探测标记完成。
+- MT4 按用户指令留待后续；本次故障行为应是 OANDA 降级，不接入备用。
+
 ## 基线审计与实现
 
 - 原方案引用 v1.7.0；新基线增加了平台原生历史缓存、后台任务、指标契约，managed M1 的来源字段

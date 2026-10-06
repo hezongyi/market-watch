@@ -11,6 +11,7 @@ dependencies = [
   "psycopg[binary]>=3.2,<4", "pydantic-settings>=2.6,<3",
   "httpx>=0.28,<1", "argon2-cffi>=23,<26", "alembic>=1.14,<2",
   "TA-Lib==0.6.8", "numpy==2.4.6", "yfinance==1.7.0",
+  "dukascopy-python==4.0.1",
 ]
 
 [project.optional-dependencies]
