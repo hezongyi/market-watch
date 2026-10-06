@@ -27,10 +27,10 @@ from test_market_contracts import identity
 from test_market_datasets import register
 
 
-def prepared(database):
+def prepared(database, frames=("M1", "H4")):
     with database.begin() as db:
         inst = register(db)
-        configure(db, identity().key, target_start=0, timeframes=["M1", "H4"])
+        configure(db, identity().key, target_start=0, timeframes=list(frames))
         ident = create_run(db, identity().key, end=120000, request_id="initial").id
         instrument = inst.id
     import_page(Adapter(), version_id=ident)
@@ -77,7 +77,7 @@ def test_reclaim_preserves_identity_manifest_and_retries_but_not_old_payload(dat
 
 
 def test_saved_replay_and_workspace_block_reclamation(database):
-    ident, instrument = prepared(database)
+    ident, instrument = prepared(database, frames=("M1", "H4", "D1"))
     with database.begin() as db:
         create_replay(db, db.get(Instrument, instrument), ident, "M1", 0, 120000)
         db.add(ChartWorkspace(name="saved", document={"panels": [{"instrument": instrument}]}))

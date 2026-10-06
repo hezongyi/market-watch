@@ -61,6 +61,9 @@ def test_api_registers_crypto_utc_and_keeps_index_undecided(database):
 def test_changed_phase_reuses_original_m1_and_preserves_pinned_replay(database):
     parent, old_inst = create(database)
     import_page(Adapter([batch(checkpoint=120000)]), version_id=parent)
+    from test_history_replay import finish_periods
+
+    finish_periods(database, parent)
     with database.begin() as db:
         original = db.get(HistoryVersion, parent)
         source = original.dataset_id

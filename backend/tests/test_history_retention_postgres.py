@@ -33,7 +33,7 @@ def test_reclamation_wins_then_new_replay_reference_is_rejected(provider_pg, mon
     import alerts.history_retention as retention
 
     factory, _ = provider_pg
-    ident, instrument = contracts.prepared(factory)
+    ident, instrument = contracts.prepared(factory, frames=("M1", "H4", "D1"))
     held, release, replay_started = threading.Event(), threading.Event(), threading.Event()
     original = retention.references
 
@@ -67,7 +67,7 @@ def test_reclamation_wins_then_new_replay_reference_is_rejected(provider_pg, mon
 
 def test_new_reference_wins_then_reclamation_is_rejected(provider_pg):
     factory, _ = provider_pg
-    ident, instrument = contracts.prepared(factory)
+    ident, instrument = contracts.prepared(factory, frames=("M1", "H4", "D1"))
     held, release, clear_started = threading.Event(), threading.Event(), threading.Event()
 
     def reference():

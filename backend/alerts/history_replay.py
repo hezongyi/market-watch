@@ -1,68 +1,24 @@
-"""Aggregate replay inputs exclusively from the selected immutable M1 version."""
+"""Fixed replay inputs read the same immutable period artifacts as charts."""
 
 from collections import deque
-from decimal import Decimal
 
 from sqlalchemy import select
 
-from .calendar_profile import closures_from
-from .chart_series import is_gold
-from .domain import Candle, aggregate, bucket_bounds, calendar_for, scheduled_open
-from .history_versions import snapshot_rows
+from .history_artifacts import iter_artifact, published_artifact
 from .replay_history import pack_history
 from .storage import (
     HistoryReclamation,
     HistoryVersion,
     MarketDataset,
     Replay,
-    candle_dict,
-    instant,
-    ms,
 )
 
 
-def version_candles(db, version_id, instrument, frame, end):
-    from datetime import timedelta
-
-    calendar = calendar_for(instrument)
-    closures = closures_from(instrument.calendar_profile)
-    members = []
-    active = None
-
-    def output(bounds, values):
-        left, right = bounds
-        expected = set()
-        conflicted = any(not scheduled_open(value.start, calendar, gold=is_gold(instrument.id),
-                                            closures=closures) for value in values)
-        cursor = left
-        while cursor < right:
-            if conflicted or scheduled_open(cursor, calendar, gold=is_gold(instrument.id), closures=closures):
-                expected.add(cursor)
-            cursor += timedelta(minutes=1)
-        result = aggregate(values, left, right, expected_starts=expected)
-        return result if result and right <= instant(end) else None
-
-    version = db.get(HistoryVersion, version_id)
-    for row in snapshot_rows(db, version_id, end=min(end, version.end)):
-        start = instant(row["timestamp"])
-        candle = Candle(start, start + timedelta(minutes=1),
-            *(Decimal(row[key]) for key in ("open", "high", "low", "close")),
-            volume=Decimal(row["volume"]) if row["volume"] is not None else None)
-        if frame == "M1":
-            yield candle
-            continue
-        pair = bucket_bounds(start, frame, calendar)
-        if active is not None and pair != active:
-            result = output(active, members)
-            if result:
-                yield result
-            members = []
-        active = pair
-        members.append(candle)
-    if active:
-        result = output(active, members)
-        if result:
-            yield result
+def version_records(db, version_id, frame, end):
+    """Same published bars as charts, excluding buckets beyond replay cutoff."""
+    for row in iter_artifact(db, version_id, frame, end=end):
+        if row["end"] <= end:
+            yield {**row, "revision": 1}
 
 
 def create_replay(db, instrument, version_id, frame, start, end):
@@ -79,13 +35,14 @@ def create_replay(db, instrument, version_id, frame, start, end):
         raise ValueError("回测版本与品种身份不匹配")
     if not version.start <= start < end <= version.end:
         raise ValueError("历史版本未覆盖所选查询区间")
+    periods = {period: dict(published_artifact(db, version_id, period).manifest)
+               for period in dict.fromkeys((frame, "D1"))}
     context = deque(maxlen=500)
     events = []
 
     def warmup():
-        for candle in version_candles(db, version_id, instrument, frame, end):
-            record = candle_dict(candle)
-            if ms(candle.end) <= start:
+        for record in version_records(db, version_id, frame, end):
+            if record["end"] <= start:
                 context.append(record)
                 yield record
             else:
@@ -96,9 +53,10 @@ def create_replay(db, instrument, version_id, frame, start, end):
     packed, count = pack_history(warmup())
     if not events:
         raise ValueError("所选版本区间没有历史观测，不能替换来源或填造数据")
-    days = [candle_dict(candle) for candle in version_candles(db, version_id, instrument, "D1", end)]
+    days = list(version_records(db, version_id, "D1", end))
     run = Replay(instrument_id=instrument.id, dataset_version=version.id,
-        input_manifest=version.manifest, calendar_profile=instrument.calendar_profile,
+        input_manifest={**version.manifest, "replay_input_method": "published_period_artifacts_v1",
+            "period_artifacts": periods}, calendar_profile=instrument.calendar_profile,
         timeframe=frame, start=start, end=end, cursor=start, bars=[*context, *events],
         warmup_snapshot=packed, warmup_count=count, days=days, watches=[], signals=[])
     db.add(run)

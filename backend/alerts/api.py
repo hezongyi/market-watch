@@ -851,7 +851,9 @@ def export_replay(run_id: str):
 
 @app.post("/api/replays", dependencies=[Depends(authenticated)], status_code=201)
 def new_replay(body: ReplayInput):
-    if body.timeframe not in TIMEFRAMES or body.end <= body.start:
+    from .chart_data import FRAMES
+
+    if body.timeframe not in (FRAMES if body.dataset_version else TIMEFRAMES) or body.end <= body.start:
         raise HTTPException(422, "请选择有效的周期与日期范围")
     with transaction() as db:
         from .history_replay import create_replay

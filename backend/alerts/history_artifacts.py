@@ -202,9 +202,8 @@ def artifact_report(db, version_id):
                            .order_by(HistoryArtifact.timeframe))]
 
 
-def read_artifact(db, version_id, frame, *, start=None, end=None, limit=2000, newest_first=False):
-    if not 1 <= limit <= 20000:
-        raise ValueError("周期查询数量必须是1–20000")
+def published_artifact(db, version_id, frame):
+    """Lock payload lifetime and validate the immutable parent/period contract."""
     parent = db.get(HistoryVersion, version_id)
     if not parent:
         raise ValueError("历史版本不存在")
@@ -215,13 +214,23 @@ def read_artifact(db, version_id, frame, *, start=None, end=None, limit=2000, ne
     artifact = db.scalar(select(HistoryArtifact).where(HistoryArtifact.version_id == version_id,
                                                       HistoryArtifact.timeframe == frame))
     if not artifact or artifact.status != "published":
-        raise ValueError("该周期产物尚未发布")
+        raise ValueError(f"{frame} 该周期产物尚未发布，请在数据中心准备该版本周期")
+    manifest = artifact.manifest
+    if (parent.status != "published" or manifest.get("parent_version_id") != version_id
+            or manifest.get("parent_checksum") != parent.manifest.get("checksum")
+            or manifest.get("timeframe") != frame or manifest.get("rule_version") != artifact.rule_version):
+        raise ValueError("Published timeframe artifact parent/manifest mismatch")
+    return artifact
+
+
+def iter_artifact(db, version_id, frame, *, start=None, end=None, newest_first=False):
+    """Stream verified immutable period blocks; at most one block in memory."""
+    artifact = published_artifact(db, version_id, frame)
     query = select(HistoryArtifactBlock).where(HistoryArtifactBlock.artifact_id == artifact.id)
     if start is not None:
         query = query.where(HistoryArtifactBlock.end > start)
     if end is not None:
         query = query.where(HistoryArtifactBlock.start < end)
-    output = []
     ordering = HistoryArtifactBlock.start.desc() if newest_first else HistoryArtifactBlock.start
     for block in db.scalars(query.order_by(ordering).execution_options(yield_per=1)):
         raw = gzip.decompress(block.content)
@@ -230,9 +239,16 @@ def read_artifact(db, version_id, frame, *, start=None, end=None, limit=2000, ne
         rows = json.loads(raw)
         for row in reversed(rows) if newest_first else rows:
             if (start is None or row["start"] >= start) and (end is None or row["start"] < end):
-                output.append(row)
-                if len(output) == limit:
-                    return output[::-1] if newest_first else output
+                yield row
+
+
+def read_artifact(db, version_id, frame, *, start=None, end=None, limit=2000, newest_first=False):
+    if not 1 <= limit <= 20000:
+        raise ValueError("周期查询数量必须是1–20000")
+    from itertools import islice
+
+    output = list(islice(iter_artifact(db, version_id, frame, start=start, end=end,
+                                     newest_first=newest_first), limit))
     return output[::-1] if newest_first else output
 
 

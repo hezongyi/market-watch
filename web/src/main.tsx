@@ -909,6 +909,22 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
   const [historyVersions,setHistoryVersions]=useState<any[]>([]);
   const [historyDatasets,setHistoryDatasets]=useState<any[]>([]);
   const [datasetVersion,setDatasetVersion]=useState(new URLSearchParams(location.search).get('dataset_version') ?? '');
+  const [historyPeriods,setHistoryPeriods]=useState<any[]>([]);
+  const [periodsLoading,setPeriodsLoading]=useState(false);
+  const [periodsError,setPeriodsError]=useState('');
+  const [preparingPeriods,setPreparingPeriods]=useState(false);
+  const [periodRefresh,setPeriodRefresh]=useState(0);
+  useEffect(()=>{
+    setHistoryPeriods([]);setPeriodsError('');setPeriodsLoading(!!datasetVersion);
+    if(!datasetVersion)return;
+    let active=true,loading=false;
+    const load=async()=>{if(loading)return;loading=true;try{
+      const rows=await api(`/market-data/versions/${datasetVersion}/artifacts`);
+      if(active){setHistoryPeriods(rows);setPeriodsError('')}
+    }catch(e){if(active)setPeriodsError(String(e))}finally{loading=false;if(active)setPeriodsLoading(false)}};
+    load();const timer=setInterval(load,10000);
+    return()=>{active=false;clearInterval(timer)};
+  },[datasetVersion,periodRefresh]);
   useEffect(()=>{let active=true;Promise.all([api('/market-data/versions'),api('/market-data/datasets')]).then(([v,d])=>{
     if(!active)return;setHistoryVersions(v.filter((row:any)=>row.status==='published'&&row.payload_available!==false));setHistoryDatasets(d);
     const wanted=new URLSearchParams(location.search).get('dataset_version');
@@ -933,6 +949,20 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
     [open, setOpen] = useState(false),
     [seek, setSeek] = useState("");
   const locked = useRef(false);
+  const fixedDataset=historyDatasets.find(d=>d.instrument_id===instrument);
+  function replayLabel(id:string){
+    const source=historyDatasets.find(d=>d.instrument_id===id);
+    return source?`${source.logical_symbol} · ${source.identity.source==='oanda'?'OANDA':source.identity.source==='dukascopy'?'Dukascopy':source.identity.source} · ${source.aggregation_calendar==='ny17'?'NY17':'UTC 00:00'}`:id;
+  }
+  const requiredPeriods=Array.from(new Set([frame,'D1']));
+  const missingPeriods=requiredPeriods.filter(f=>!historyPeriods.some(p=>p.version_id===datasetVersion&&p.timeframe===f&&p.status==='published'));
+  const fixedReady=!!datasetVersion&&!periodsLoading&&!periodsError&&!missingPeriods.length;
+  async function prepareReplayPeriods(){
+    if(!datasetVersion||preparingPeriods)return;
+    setPreparingPeriods(true);setPeriodsError('');
+    try{await api(`/market-data/versions/${datasetVersion}/artifacts`,{timeframes:requiredPeriods});setPeriodRefresh(n=>n+1)}
+    catch(e){setPeriodsError(String(e))}finally{setPreparingPeriods(false)}
+  }
   function inputTime(value:number) {
     return new Date(value-new Date(value).getTimezoneOffset()*60000).toISOString().slice(0,16);
   }
@@ -1005,7 +1035,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
         </div>
         <span className="pill">模拟环境</span>
       </div>
-      {savedRuns.length>0&&<section className="panel"><div className="panel-heading"><h2>继续已有演练</h2></div><div className="replay-controls"><label>已保存的演练<select defaultValue="" onChange={e=>{if(e.target.value)resumeReplay(e.target.value)}}><option value="">选择演练</option>{savedRuns.map(r=><option key={r.id} value={r.id}>{r.instrument_id} · {r.timeframe} · {date(r.cursor)} · {r.id.slice(0,6)}</option>)}</select></label></div></section>}
+      {savedRuns.length>0&&<section className="panel"><div className="panel-heading"><h2>继续已有演练</h2></div><div className="replay-controls"><label>已保存的演练<select defaultValue="" onChange={e=>{if(e.target.value)resumeReplay(e.target.value)}}><option value="">选择演练</option>{savedRuns.map(r=><option key={r.id} value={r.id}>{replayLabel(r.instrument_id)} · {r.timeframe} · {date(r.cursor)} · {r.id.slice(0,6)}</option>)}</select></label></div></section>}
       <section className="panel replay-setup">
         <form onSubmit={create}>
           <label>
@@ -1017,14 +1047,14 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
               {instruments.map((i) => (
                 <option key={i.id}>{i.id}</option>
               ))}
-              {historyDatasets.filter(d=>d.identity.source==='dukascopy'&&!instruments.some(i=>i.id===d.instrument_id)).map(d=><option key={d.instrument_id} value={d.instrument_id}>{d.logical_symbol} · Dukascopy 历史</option>)}
+              {historyDatasets.filter(d=>historyVersions.some(v=>v.dataset_id===d.id)&&!instruments.some(i=>i.id===d.instrument_id)).map(d=><option key={d.instrument_id} value={d.instrument_id}>{d.logical_symbol} · {d.identity.source==='oanda'?'OANDA':d.identity.source==='dukascopy'?'Dukascopy':d.identity.source} · {d.aggregation_calendar==='ny17'?'NY17':'UTC 00:00'} 历史</option>)}
             </select>
           </label>
           {historyDatasets.some(d=>d.instrument_id===instrument)&&<label>不可变历史版本<select required value={datasetVersion} onChange={e=>{setDatasetVersion(e.target.value);const version=historyVersions.find(v=>v.id===e.target.value);if(version){setStart(inputTime(version.start));setEnd(inputTime(version.end))}}}><option value="">选择已发布版本</option>{historyVersions.filter(v=>historyDatasets.find(d=>d.id===v.dataset_id)?.instrument_id===instrument).map(v=><option key={v.id} value={v.id}>{date(v.start)} — {date(v.end)} · {v.id.slice(0,8)}</option>)}</select></label>}
           <label>
             周期
             <select value={frame} onChange={(e) => setFrame(e.target.value)}>
-              {frames.map((f) => (
+              {(fixedDataset?['M1','M5','M15','M30','H1','H4','D1','W1','MN']:frames).map((f) => (
                 <option key={f}>{f}</option>
               ))}
             </select>
@@ -1047,11 +1077,17 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
               onChange={(e) => setEnd(e.target.value)}
             />
           </label>
-          <button className="primary" disabled={busy}>
+          <button className="primary" disabled={busy||!!fixedDataset&&!fixedReady}>
             {busy ? "正在准备…" : "创建演练"}
           </button>
-          <button type="button" className="secondary" disabled={busy||!start||!end||!!datasetVersion} onClick={importHistory}>补齐所选历史</button>
+          <button type="button" className="secondary" disabled={busy||!start||!end||!!fixedDataset||!!datasetVersion} onClick={importHistory}>补齐所选历史</button>
         </form>
+        {fixedDataset&&<div aria-live="polite">
+          <p>固定历史 · {fixedDataset.identity.source==='oanda'?'OANDA':fixedDataset.identity.source==='dukascopy'?'Dukascopy':fixedDataset.identity.source} · {fixedDataset.aggregation_calendar==='ny17'?'NY17':'UTC 00:00'}。演练保留所选版本和周期；未观察区间仍可能存在缺口。</p>
+          {datasetVersion&&(periodsLoading?<p>正在核对回测周期…</p>:periodsError?<p role="alert">{periodsError}</p>:missingPeriods.length?<p>等待准备：{missingPeriods.join('、')}。D1 用于前日数据。</p>:<p>回测周期与前日数据已发布。</p>)}
+          {datasetVersion&&missingPeriods.length>0&&!periodsLoading&&<button type="button" className="secondary" disabled={preparingPeriods} onClick={prepareReplayPeriods}>{preparingPeriods?'正在提交…':'准备回测周期'}</button>}
+          <a href={`/market-data/datasets/${fixedDataset.id}`}>查看历史覆盖与维护</a>
+        </div>}
       </section>
       {jobSummary?.weekly_requests?.length>0&&<section className="panel">
         <div className="panel-heading"><h2>周线后台需求</h2><small>优先保障日线及以下周期，最多显示 30 项</small></div>
@@ -1074,22 +1110,23 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
             <div className="panel-heading">
               <div>
                 <h2>
-                  {run.instrument_id} · {run.timeframe}
+                  {replayLabel(run.instrument_id)} · {run.timeframe}
                 </h2>
                 <p>虚拟时间 {date(run.cursor)}</p>
                 {run.chart_history_limited && <p>图表只显示最近 {run.chart_bar_limit} 根以内的可见 K 线；策略使用完整开启前历史，导出保留已走过的数据。</p>}
                 <a className="text-button" href={`/api/replays/${run.id}/export`}>导出演练记录</a>
               </div>
-              <button className="secondary" onClick={() => setOpen(true)}>
+              <button className="secondary" disabled={!frames.includes(run.timeframe)} onClick={() => setOpen(true)}>
                 <Plus size={16} />
                 在此刻开启预警
               </button>
             </div>
+            {!frames.includes(run.timeframe)&&<p>该周期支持价格回放；现有模拟预警支持 M1、M5、M15、H1、H4、D1。</p>}
             <Chart
               bars={run.bars}
               markers={run.signals}
               precision={
-                instruments.find((i) => i.id === run.instrument_id)?.precision
+                instruments.find((i) => i.id === run.instrument_id)?.precision ?? historyDatasets.find(d=>d.instrument_id===run.instrument_id)?.precision
               }
             />
             <div className="replay-controls">
