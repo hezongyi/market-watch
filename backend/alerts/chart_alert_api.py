@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from .chart_alert_domain import Contract
+from .chart_alert_geometry import GeometryQuery, geometry
 from .chart_alert_message import condition_label, signal_message
 from .chart_alert_service import (
     AlertConfig,
@@ -17,7 +18,51 @@ from .chart_alert_service import (
     edit,
     lifecycle,
 )
-from .storage import ChartAlert, ChartAlertVersion, Notification, Outbox, SignalRow, transaction
+from .storage import (
+    ChartAlert,
+    ChartAlertVersion,
+    Instrument,
+    Notification,
+    Outbox,
+    SignalRow,
+    transaction,
+)
+
+
+class CapabilityQuery(Contract):
+    instrument: str = Field(min_length=1, max_length=40)
+    series_kind: Literal["managed", "provider"]
+    timeframe: str
+
+
+def capabilities(body):
+    from .chart_data import FRAMES
+    from .provider_capabilities import frames, poll_seconds
+    if body.timeframe not in FRAMES:
+        raise ValueError("未知判定周期")
+    with transaction() as db:
+        instrument = db.get(Instrument, body.instrument)
+        managed = ({"source": instrument.source, "series_kind": "managed", "basis": instrument.basis,
+                    "calendar": instrument.calendar, "enabled": instrument.enabled}
+                   if instrument else None)
+    from .provider_chart import metadata
+    try:
+        native = metadata(body.instrument, cached_only=True)
+        provider = {"source": native["source"], "series_kind": "provider", "basis": native["basis"],
+                    "calendar": native["calendar"], "enabled": body.timeframe in frames(native["source"])}
+    except (HTTPException, ValueError):
+        provider = None
+    sources = [row for row in (managed, provider) if row]
+    for row in sources:
+        reason = ("此来源尚未确认告警交易日历" if row["calendar"] not in ("ny17", "utc0")
+                  else "来源或周期暂不可用" if not row["enabled"] else None)
+        row["available"], row["reason"] = reason is None, reason
+        seconds = poll_seconds(row["source"]) if row["series_kind"] == "provider" else 15
+        row["observation_basis"] = f"抽样 K 线当前收盘值，约每 {seconds} 秒观察；不重建未观测路径"
+    return {"instrument": body.instrument, "timeframe": body.timeframe, "sources": sources,
+            "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD"],
+            "relations": ["cross", "cross_up", "cross_down", "above", "below", "enter", "exit", "break_upper", "break_lower"],
+            "line_mapping": "必须核对原生 K 线序号和价格轴；未匹配端点时等待数据"}
 
 
 class Create(Contract):
@@ -32,7 +77,7 @@ class Edit(Contract):
 
 class Action(Contract):
     version: int = Field(ge=1)
-    action: Literal["pause", "resume", "restart", "archive", "drawing_deleted"]
+    action: Literal["pause", "resume", "restart", "rebaseline", "archive", "drawing_deleted"]
 
 
 def dataset_for(config):
@@ -69,6 +114,22 @@ def error(exc):
 
 def router(authenticated):
     api = APIRouter(prefix="/api/chart-alerts", dependencies=[Depends(authenticated)])
+
+    @api.post("/capabilities")
+    def capability(body: CapabilityQuery):
+        try:
+            return capabilities(body)
+        except ValueError as exc:
+            raise error(exc) from exc
+
+    @api.post("/geometry")
+    def drawing_geometry(body: GeometryQuery):
+        try:
+            key = dataset_for(body)
+            with transaction() as db:
+                return geometry(db, body, dataset_id=key)
+        except ValueError as exc:
+            raise error(exc) from exc
 
     @api.get("")
     def listing(instrument: str | None = None, status: str | None = None, search: str = ""):

@@ -588,7 +588,7 @@ def data(body):
         history_check = published_history_check(db, inst, pub, visible, body)
     indicators = []
     for spec in body.indicators:
-        result = calculate(rows, spec)
+        result = calculate(rows, spec, provisional=True)
         start = visible[0]["start"] if visible else before
         indicators.append(
             {

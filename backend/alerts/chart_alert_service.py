@@ -36,6 +36,8 @@ class Association(Contract):
     generation: str = Field(min_length=1, max_length=100)
     object_id: str | None = Field(default=None, max_length=100)
     object_kind: Literal["drawing", "indicator"] | None = None
+    native_object_id: str | None = Field(default=None, max_length=100)
+    chart_index: int | None = Field(default=None, ge=0, le=7)
 
 
 class AlertConfig(Contract):
@@ -54,6 +56,7 @@ class AlertConfig(Contract):
     late_delivery: Literal["log_only", "notify"] = "log_only"
     association: Association | None = None
     calculation_version: Literal["chart-python-v1"] = "chart-python-v1"
+    calculation_origin: int | None = Field(default=None, ge=0)
 
     @model_validator(mode="after")
     def frame(self):
@@ -87,6 +90,8 @@ def market_identity(db, config: AlertConfig, dataset_id=None):
         instrument = db.get(Instrument, config.instrument)
         if not instrument or not instrument.enabled or instrument.source != config.source:
             raise ValueError("品种或行情来源已改变，请刷新图表后重试")
+        if instrument.calendar not in ("ny17", "utc0"):
+            raise ValueError("此来源的告警交易日历尚未确认")
         if dataset_id:
             raise ValueError("自建系列不能使用平台数据集")
         return {"instrument": instrument.id, "series_kind": "managed",
@@ -99,6 +104,8 @@ def market_identity(db, config: AlertConfig, dataset_id=None):
     if not dataset:
         raise ValueError("平台数据集尚未注册")
     meta = dataset.metadata_json
+    if meta["calendar"] not in ("ny17", "utc0"):
+        raise ValueError("此来源的告警交易日历尚未确认")
     if (dataset.source != config.source or dataset.timeframe != config.timeframe
             or meta["id"] != config.instrument or config.timeframe not in frames(dataset.source)):
         raise ValueError("平台行情身份不匹配")
@@ -179,7 +186,7 @@ def lifecycle(db, alert_id, expected_version, action, *, at=None):
         if alert.status == "active":
             alert.status = "paused"
             alert.health_reason = "关联画线已明确删除" if action == "drawing_deleted" else "用户暂停"
-    elif action in ("resume", "restart"):
+    elif action in ("resume", "restart", "rebaseline"):
         if alert.expires_at is not None and alert.expires_at <= at:
             raise ValueError("告警已到期，请先修改到期时间")
         if action == "restart":
@@ -187,7 +194,9 @@ def lifecycle(db, alert_id, expected_version, action, *, at=None):
             alert.count = 0
         elif alert.count >= alert.max_triggers:
             raise ValueError("已达到次数上限，请明确重新启用")
-        elif alert.status == "active":
+        elif action == "rebaseline" and alert.health != "blocked":
+            raise ValueError("仅等待核对的告警可重建基准")
+        elif alert.status == "active" and action != "rebaseline":
             return alert
         alert.status, alert.state, alert.runtime, alert.effective_at = "active", {}, {}, at
         alert.health, alert.health_reason = "warming", "等待重新建立基准"

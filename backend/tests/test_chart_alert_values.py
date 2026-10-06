@@ -62,3 +62,26 @@ def test_incomplete_history_and_known_gap_restart_recursive_warmup():
     assert operand_values(rows([10, 12, 14, 16, 18, 20], gap=3), spec) == [
         None, None, D(12), None, None, D(18),
     ]
+
+
+def test_shared_calculation_reuses_all_macd_outputs_and_invalidates_on_live_change(monkeypatch):
+    from alerts import chart_alert_values
+    original = chart_alert_values.calculate
+    calls = []
+
+    def calculate(*args, **options):
+        calls.append(1)
+        return original(*args, **options)
+
+    monkeypatch.setattr(chart_alert_values, "calculate", calculate)
+    history = rows([10+i % 7 for i in range(50)], incomplete=49)
+    cache = {}
+    left = indicator("MACD", fast=3, slow=5, signal=2)
+    right = Operand(kind="indicator", indicator={"name": "MACD", "params": {"fast": 3, "slow": 5, "signal": 2}, "output": "signal"})
+    operand_values(history, left, provisional=True, cache=cache)
+    operand_values(history, right, provisional=True, cache=cache)
+    assert len(calls) == 1
+    history[-1]["close"] = "30"
+    actual = operand_values(history, left, provisional=True, cache=cache)
+    assert len(calls) == 2
+    assert actual == operand_values(history, left, provisional=True)

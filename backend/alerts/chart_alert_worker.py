@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 from decimal import Decimal
+from types import SimpleNamespace
 
 from sqlalchemy import select
 
@@ -11,8 +12,9 @@ from .calendar_profile import closures_from
 from .chart_alert_domain import Observation
 from .chart_alert_service import AlertConfig, consume, current_version
 from .chart_alert_values import operand_values
-from .chart_data import chart_rows
-from .chart_history_plan import bucket_has_trading
+from .chart_calculation_history import calculation_rows
+from .chart_data import chart_rows, future_grid
+from .chart_labels import managed_label
 from .domain import Calendar, scheduled_open
 from .storage import (
     Bar,
@@ -26,6 +28,7 @@ from .storage import (
 )
 
 log = logging.getLogger(__name__)
+_VALUE_CACHE = {}
 
 
 def fingerprint(rows):
@@ -43,6 +46,9 @@ def health(alert, state, reason=None):
 def stored_rows(db, version, config, now):
     if version.dataset_id:
         dataset = db.get(ProviderDataset, version.dataset_id)
+        from .provider_cache import identity
+        if not dataset or identity(dataset.metadata_json, config.timeframe) != version.dataset_id:
+            raise ValueError("平台账户或数据集身份已改变，需显式编辑告警")
         records = list(db.scalars(select(ProviderBar).where(
             ProviderBar.dataset_id == version.dataset_id,
         ).order_by(ProviderBar.start)))
@@ -57,17 +63,40 @@ def stored_rows(db, version, config, now):
             or instrument.calendar_profile != version.market_identity["calendar_profile"]):
         raise ValueError("持久行情身份已改变，需显式编辑告警")
     rows = chart_rows(db, instrument, config.timeframe, now + 1, 100_000, now)
-    stamps = {r.start: r.observed_at or r.received_at for r in db.scalars(select(Bar).where(
-        Bar.instrument_id == config.instrument, Bar.timeframe == config.timeframe,
-    ))}
-    rows = [{**row, "observed_at": stamps.get(row["start"], 0)} for row in rows]
+    if config.calculation_origin is not None and config.indicators():
+        from .managed_dataset import read_rows
+        rows = read_rows(db, instrument, config.timeframe, now + 1, 100_000,
+                         dataset_start=config.calculation_origin)
+    source = "M15" if config.timeframe == "M30" else "D1" if config.timeframe in ("W1", "MN") else config.timeframe
+    source_bars = list(db.scalars(select(Bar).where(
+        Bar.instrument_id == config.instrument, Bar.timeframe == source,
+    ).order_by(Bar.start)))
+    stamps = {r.start: r.observed_at or r.received_at for r in source_bars}
+    if source != config.timeframe:
+        cursor = 0
+        for row in rows:
+            observed = 0
+            while cursor < len(source_bars) and source_bars[cursor].start < row["end"]:
+                member = source_bars[cursor]
+                if member.start >= row["start"]:
+                    observed = max(observed, member.observed_at or member.received_at)
+                cursor += 1
+            stamps[row["start"]] = observed
+    rows = [{**row, "chart_time": managed_label(row, config.timeframe, config.instrument),
+             "observed_at": stamps.get(row["start"], 0)} for row in rows]
     return rows, version.market_identity
 
 
-def geometry_indices(rows, line):
+def geometry_indices(rows, line, *, meta=None, config=None):
     if line.kind == "horizontal_line":
         return list(range(len(rows)))
     labels = {row.get("chart_time", row["start"]): i for i, row in enumerate(rows)}
+    if rows and meta and config and any(p.time > max(labels) for p in line.points):
+        from .provider_chart import label
+        instrument = SimpleNamespace(calendar=meta["calendar"], calendar_profile=meta.get("calendar_profile", {}), id=config.instrument)
+        for i, slot in enumerate(future_grid(instrument, config.timeframe, rows[-1]["end"], 500), len(rows)):
+            time = label(slot["start"], config.timeframe, meta["calendar"]) if config.series_kind == "provider" else managed_label(slot, config.timeframe, config.instrument)
+            labels[time] = i
     first = line.points[0]
     if first.time not in labels:
         raise ValueError("画线端点尚未映射到实际 K 线；等待历史或未来端点验证")
@@ -78,7 +107,7 @@ def geometry_indices(rows, line):
     return [origin + i for i in range(len(rows))]
 
 
-def evaluate(db, alert_id, *, now=None):
+def evaluate(db, alert_id, *, now=None, values_cache=None):
     """Lock the run before reading its data; absent/incomplete data never advances it."""
     now = now_ms() if now is None else now
     alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update(skip_locked=True))
@@ -89,16 +118,17 @@ def evaluate(db, alert_id, *, now=None):
         return []
     version = current_version(db, alert)
     config = AlertConfig.model_validate(version.config)
-    rows, meta = stored_rows(db, version, config, now)
+    try:
+        rows, meta = stored_rows(db, version, config, now)
+    except ValueError as exc:
+        health(alert, "blocked", str(exc))
+        return []
     if meta["calendar"] not in ("ny17", "utc0"):
         health(alert, "blocked", "此来源的交易日历尚未通过告警一致性验证")
         return []
     calendar = Calendar(meta["calendar"])
     closures = closures_from(meta.get("calendar_profile"))
-    for previous, row in zip(rows, rows[1:]):
-        if row["start"] > previous["end"]:
-            row["gap_before"] = bucket_has_trading(instant(previous["end"]), instant(row["start"]),
-                                                   calendar, config.instrument == "XAUUSD", closures)
+    rows = calculation_rows(rows, meta, config.instrument)
     if not rows:
         health(alert, "warming", "等待首个有效行情样本")
         return []
@@ -106,7 +136,9 @@ def evaluate(db, alert_id, *, now=None):
     if "origin" not in runtime:
         closed_before = [r for r in rows if r["complete"] and r["end"] <= alert.effective_at]
         baseline_rows = closed_before[-(config.warmup() + 2):]
-        runtime["origin"] = baseline_rows[0]["start"] if baseline_rows else rows[0]["start"]
+        runtime["origin"] = (config.calculation_origin if config.calculation_origin is not None and config.indicators()
+                             else rows[0]["start"] if config.indicators()
+                             else baseline_rows[0]["start"] if baseline_rows else rows[0]["start"])
         if config.condition.right and config.condition.right.line:
             endpoint = min(p.time for p in config.condition.right.line.points)
             before_line = [r for r in rows if r.get("chart_time", r["start"]) <= endpoint]
@@ -122,15 +154,15 @@ def evaluate(db, alert_id, *, now=None):
     if runtime.get("fingerprint") and fingerprint(committed) != runtime["fingerprint"]:
         health(alert, "blocked", "已判历史发生修订，等待核对及重建；未重复发送历史事件")
         return []
-    left = operand_values(rows, config.condition.left, provisional=config.mode == "intrabar")
+    left = operand_values(rows, config.condition.left, provisional=config.mode == "intrabar", cache=values_cache)
     line = config.condition.right.line if config.condition.right else None
     try:
-        indices = geometry_indices(rows, line) if line else None
+        indices = geometry_indices(rows, line, meta=meta, config=config) if line else None
     except ValueError as exc:
         health(alert, "blocked", str(exc))
         return []
     right = operand_values(rows, config.condition.right, provisional=config.mode == "intrabar",
-                           indices=indices) if config.condition.right else [None] * len(rows)
+                           indices=indices, cache=values_cache) if config.condition.right else [None] * len(rows)
     results = []
     if config.mode == "intrabar":
         i = len(rows) - 1
@@ -185,7 +217,7 @@ def step(*, now=None):
     for ident in ids:
         try:
             with transaction() as db:
-                evaluate(db, ident, now=now)
+                evaluate(db, ident, now=now, values_cache=_VALUE_CACHE)
         except Exception as exc:
             log.exception("Chart alert evaluation failed for %s", ident)
             with transaction() as db:

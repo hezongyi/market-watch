@@ -194,7 +194,9 @@ def _future_grid(calendar, closures, gold, frame, after, count):
 
     cursor = instant(after)
     result = []
-    for _ in range(count * 12):
+    # A small request at Friday close still needs to cross the whole weekend;
+    # count * 12 alone yields no future M1/H1 slots in that case.
+    for _ in range(count * 12 + 7 * 24 * 60):
         if frame in ("M30", "W1", "MN"):
             left, right = bounds(cursor, frame, calendar)
         else:

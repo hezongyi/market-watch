@@ -101,6 +101,7 @@ class DataQuery(BaseModel):
     revision_after: int | None = Field(default=None, ge=0)
     published: bool = False
     dataset_start: int | None = Field(default=None, ge=0)
+    calculation_origin: int | None = Field(default=None, ge=0)
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
     native_reserve: NativeReserve | None = None
@@ -327,6 +328,9 @@ def router(authenticated):
         try:
             for spec in body.indicators:
                 validate(spec)
+                origin = spec.get("calculation_origin")
+                if origin is not None and (type(origin) is not int or origin < 0):
+                    raise ValueError("指标固定历史起点须为非负整数")
             return subscribe(body.client, body.listener, body.instrument, body.timeframe,
                              body.cursor, body.revision, body.observed_at, body.indicators)
         except ValueError as exc:
@@ -621,8 +625,9 @@ def router(authenticated):
             raise HTTPException(422, str(exc)) from None
 
     async def history_operation(operation, *args):
-        from .provider_history_policy import CapacityExceeded
         import httpx
+
+        from .provider_history_policy import CapacityExceeded
         try:
             return await asyncio.to_thread(operation, *args)
         except CapacityExceeded as exc:
@@ -814,7 +819,7 @@ def router(authenticated):
                 if cached_result and time.monotonic() - cached_result[0] < 15:
                     result = cached_result[1]
                 else:
-                    result = calculate(all_rows, spec)
+                    result = calculate(all_rows, spec, provisional=True)
                     weight = sum(len(series["values"]) for series in result["series"])
                     with _CACHE_LOCK:
                         _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)

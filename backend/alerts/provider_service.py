@@ -14,6 +14,7 @@ from sqlalchemy import delete, func, select, text
 
 from . import provider_cache as cache
 from . import provider_chart as upstream
+from .chart_calculation_history import calculation_rows
 from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import lane
@@ -311,7 +312,6 @@ def events(client, cursors):
                 )
                 indicators = []
                 if kind == "bars" and interest.indicators:
-                    extra = max(history_requirement(spec) for spec in interest.indicators)
                     prefix = list(
                         db.scalars(
                             select(ProviderBar)
@@ -320,7 +320,6 @@ def events(client, cursors):
                                 ProviderBar.chart_time <= new_last,
                             )
                             .order_by(ProviderBar.chart_time.desc())
-                            .limit(len(bars) + extra)
                         )
                     )[::-1]
                     prefix_connected = bool(prefix) and any(
@@ -330,7 +329,14 @@ def events(client, cursors):
                     if not prefix_connected:
                         kind = "reset"
                     for spec in interest.indicators if prefix_connected else []:
-                        calculated = calculate([row.payload for row in prefix], spec)
+                        origin=spec.get("calculation_origin")
+                        inputs=[row.payload for row in prefix if origin is None or row.start>=origin]
+                        if inputs and origin is not None and inputs[0]["start"] != origin:
+                            kind="reset"
+                            indicators=[]
+                            break
+                        calculated = calculate(calculation_rows(inputs, dataset.metadata_json,
+                                                                dataset.metadata_json["id"]), spec, provisional=True)
                         indicators.append(
                             {
                                 **calculated,
@@ -382,6 +388,8 @@ def realtime_step(source=None):
             dataset = db.get(ProviderDataset, row.dataset_id)
             if source and dataset.source != source:
                 continue
+            if cache.identity(dataset.metadata_json, dataset.timeframe) != dataset.id:
+                continue
             extra = max((history_requirement(spec) for spec in row.indicators), default=0)
             old = groups.get(dataset.id)
             groups[dataset.id] = (
@@ -403,6 +411,9 @@ def realtime_step(source=None):
             )
         ):
             if source and dataset.source != source:
+                continue
+            if cache.identity(dataset.metadata_json, dataset.timeframe) != dataset.id:
+                alert.health, alert.health_reason = "blocked", "平台账户或数据集身份已改变，需显式编辑告警"
                 continue
             if alert.expires_at is not None and alert.expires_at <= now:
                 alert.status = "expired"

@@ -1,6 +1,6 @@
 # 图表告警接续开发记录
 
-2026-10-06。目标保持完整：按 [正式方案](advanced-charts-alert-system-plan-20261006.md) 开发并真实验收后交付。当前是后台基础实现检查点，**尚未达到交付门槛**。
+2026-10-06。目标保持完整：按 [正式方案](advanced-charts-alert-system-plan-20261006.md) 开发并真实验收后交付。当前是前后端接入及真实许可库探针检查点，**尚未达到完整实例交付门槛**。
 
 ## 工作区与基线
 
@@ -76,3 +76,33 @@ docker compose --env-file /tmp/mw-chart-alerts-acceptance/compose.env -p mw-char
 | 旧规则/事件兼容 | 原 service/notify定向及一次全量回归 | 最终全量回归、实际 PostgreSQL旧记录迁移、产品回归 |
 
 下一阶段从上述产品入口、上下文与指标/几何探针继续；Docker权限阻碍不取消总范围。正式交付仍需满足完整合同、最终 review和实际运行验收。当前目标保持 active。
+
+## 后续实施与探针更新
+
+以下覆盖上表中的旧检查点描述；未部署实例、未运行 PostgreSQL验收的边界仍然不变。
+
+- 新增创建/编辑表单、消息子页、告警/日志侧栏、筛选、暂停恢复、复制草稿、逐事件确认、证据和定位。表单创建默认单次，多次选择 2/3；失败及取消保留草稿和原幂等 request ID。保存反馈区分 warming 与 ready。
+- 工具栏、图表空白价格右键、画线/指标菜单和 plus 事件接入同一表单。公开菜单记录发起图表上下文/代次；父页校验 channel/origin/window 并执行鉴权 RPC，画线写入限定持久 workspace/chart/object。
+- 拖动时不写入，释放后串行提交；版本更新不被较旧轮询覆盖。超时读回真实版本，失败保留本地位置并提供重试/恢复后台画线。显式删除才暂停；切品种/周期、布局及来源变化受到身份检查。
+- 刷新按后台快照恢复或核对画线；布局保存不是告警保存的依赖。指标参数及计算起点不同显示提示，后台不自动改规则。显式切换规则来源解除旧图形关联及旧计算起点。
+- 几何接口将公开 timestamps 映射到实际 bar 序号及最多 500 个已核对未来日历位置。managed D/W/M 使用与 native feed 一致的交易日期标签。修复少量未来网格请求无法越过周末的问题；倒序斜线端点的原生延伸属性转为实际左右方向。
+- managed 图表创建的指标告警固定使用已发布快照及计算 origin；provider 图表与实时订阅固定相同 source prefix。计算共享 gap segmentation 和临时最后一根 K 线处理，MACD多个输出及相同输入告警复用计算，缓存有容量上限。
+- 增加明确 `rebaseline` 操作：用户核对后保留次数、轮次及旧事件，从当前时间重新建立基准，不重发修订历史。OANDA账户身份变化阻止旧数据集采集/判定；聚合周期盘中观察时间取实际底层行情更新时间。
+
+可复现进程内探针见 [结果摘要](verification/chart-alerts/probe-results-20261006.json)，均运行在 Ubuntu quant-server。Playwright使用真实安装许可库及实际 React组件，HTTP数据以进程内 route fixture提供，不创建监听服务、不部署产品实例、不读取生产配置。
+
+真实 native 探针验证：四种画线名称/端点/属性；跨周末 56 小时对应 8 根实际 bar；反向射线方向；刷新恢复后台快照不重复图形且不写入后台；主价格右键价格预填；对数价格 100/400 端点中点与价格 200 的实际参考线相交；SMA/EMA/RSI/MACD各 463 根原生 study 输出与后台告警值完全相等（含临时最后一根）；实际双图拥有不同业务 ID，切品种更新代次而保持图表业务 ID。
+
+UI探针验证：默认单次、2次配置、消息子页仅应用草稿；保存失败/取消恢复同幂等请求；warming提示；暂停恢复、复制不提前创建；逐事件确认；暗亮主题、modal焦点及Escape。额外桥接4项回归覆盖连续拖动版本串行、超时已提交、失败显式恢复和生命周期隔离。
+
+复现（在 `web` 执行；浏览器及共享库路径属于本机已安装工具）：
+
+```bash
+node --test tests/chart-alerts-bridge.test.cjs
+LD_LIBRARY_PATH=/tmp/mw-indicator-browser-libs/root/usr/lib/x86_64-linux-gnu PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome node tests/chart-alerts-native.probe.cjs
+LD_LIBRARY_PATH=/tmp/mw-indicator-browser-libs/root/usr/lib/x86_64-linux-gnu PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome node tests/chart-alerts-ui.probe.cjs
+```
+
+原始 JSON和截图在 `/tmp/mw-chart-alerts-acceptance`；仓库只记录摘要与探针脚本，不提交许可库、凭据、TLS私钥。原许可包公开 `exportData` 入口引用缺失的 chunk；本探针因此直接观测实际 custom-study `main` 返回值，不修改许可资源，也不把未运行的 export API记为通过。
+
+新增后端计算合同/几何等定向回归已通过；一次较新全量回归为 **537 passed、40 skipped**（176.97秒），随后聚合盘中时间及共享计算补充测试17项通过。最新最终检查结果将在下面更新。所有运行依然没有产品访问地址。剩余完整门槛：真实 PostgreSQL迁移/并发/恢复；独立Compose运行；关闭全部网页后的持续采集；真实故障注入、原生拖动/布局/撤销等完整矩阵及隔离通知端到端，修复审查发现的问题。必须在这些验收通过后才可交付。

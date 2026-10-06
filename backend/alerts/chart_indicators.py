@@ -293,7 +293,11 @@ def _run(name, h, low, c, params):
     return values
 
 
-def calculate(rows, spec):
+def calculate(rows, spec, *, provisional=False):
+    # The live last candle is recomputed from the confirmed prefix. Never
+    # mutate the caller's rows or advance a recursive accumulator on a tick.
+    if provisional and rows and not rows[-1]["complete"]:
+        rows = [*rows[:-1], {**rows[-1], "complete": True}]
     name, p = validate(spec)
     arrays = {
         key: np.array([float(r[key]) if r["complete"] else np.nan for r in rows])

@@ -103,6 +103,22 @@ def test_intrabar_samples_can_rearm_multiple_times_in_one_candle(database):
         assert list(db.scalars(select(SignalRow.occurred_at).order_by(SignalRow.occurred_at))) == [60_010, 60_030]
 
 
+def test_intrabar_aggregated_frame_uses_latest_source_observation_time(database):
+    with database.begin() as db:
+        for i, price in enumerate((9, 9)):
+            db.add(Bar(instrument_id="BTCUSDT", timeframe="M15", start=i*900_000, end=(i+1)*900_000,
+                       open=D(price), high=D(price), low=D(price), close=D(price),
+                       complete=False, observed_at=1_700_000+i))
+        ident = create(db, "aggregate-intrabar", config(timeframe="M30", mode="intrabar"), at=1_600_000).id
+        evaluate(db, ident, now=1_700_002)
+        assert db.get(ChartAlert, ident).state["sequence"] == 1_700_001
+    with database.begin() as db:
+        bar = db.scalar(select(Bar).where(Bar.timeframe == "M15", Bar.start == 900_000))
+        bar.close = bar.high = D(11)
+        bar.observed_at = 1_700_010
+        assert len(evaluate(db, ident, now=1_700_011)) == 1
+
+
 def test_provider_demands_survive_absent_browser_and_protect_dataset(database, monkeypatch):
     meta = {"id": "BTCUSDT", "source": "binance", "symbol": "BTCUSDT",
             "basis": "last", "calendar": "utc0", "precision": 2}

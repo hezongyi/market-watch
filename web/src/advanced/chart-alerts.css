@@ -1,0 +1,245 @@
+.chart-alert-panel,
+.chart-alert-dialog {
+  --alert-bg: #171b23;
+  --alert-surface: #222834;
+  --alert-text: #eef1f6;
+  --alert-muted: #bbc4d3;
+  --alert-border: #647087;
+  --alert-accent: #84b5ff;
+  --alert-error: #ffb3ac;
+  background: var(--alert-bg);
+  color: var(--alert-text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.chart-alert-panel[data-theme="light"],
+.chart-alert-dialog[data-theme="light"] {
+  --alert-bg: #fff;
+  --alert-surface: #f1f4f8;
+  --alert-text: #172033;
+  --alert-muted: #47546a;
+  --alert-border: #75839b;
+  --alert-accent: #174fb4;
+  --alert-error: #a52a24;
+}
+.chart-alert-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: min(360px, 100vw);
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--alert-border);
+  box-shadow: -8px 0 24px #0003;
+}
+.chart-alert-panel header,
+.chart-alert-dialog header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+}
+.chart-alert-panel h2,
+.chart-alert-dialog h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.chart-alert-panel h3 {
+  margin: 0;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.chart-alert-panel button,
+.chart-alert-dialog button,
+.chart-alert-panel select,
+.chart-alert-dialog select,
+.chart-alert-panel input,
+.chart-alert-dialog input,
+.chart-alert-dialog textarea {
+  font: inherit;
+  min-height: 36px;
+  border: 1px solid var(--alert-border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: var(--alert-text);
+  background: var(--alert-surface);
+  box-sizing: border-box;
+}
+.chart-alert-panel button,
+.chart-alert-dialog button {
+  cursor: pointer;
+}
+.chart-alert-panel button:hover,
+.chart-alert-dialog button:hover {
+  border-color: var(--alert-accent);
+}
+.chart-alert-panel button:disabled,
+.chart-alert-dialog button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.chart-alert-panel :focus-visible,
+.chart-alert-dialog :focus-visible {
+  outline: 2px solid var(--alert-accent);
+  outline-offset: 2px;
+}
+.chart-alert-panel label,
+.chart-alert-dialog label {
+  display: grid;
+  gap: 4px;
+  color: var(--alert-muted);
+}
+.chart-alert-panel input,
+.chart-alert-dialog input,
+.chart-alert-dialog select,
+.chart-alert-dialog textarea {
+  width: 100%;
+}
+.alert-panel-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid var(--alert-border);
+}
+.alert-panel-tabs [aria-selected="true"] {
+  color: var(--alert-accent);
+  border-color: var(--alert-accent);
+}
+.alert-panel-filters {
+  display: grid;
+  gap: 8px;
+  padding: 12px 16px;
+}
+.alert-panel-content {
+  overflow: auto;
+  min-height: 0;
+  flex: 1;
+  padding: 0 16px 16px;
+}
+.chart-alert-card {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--alert-border);
+}
+.chart-alert-card p {
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+.chart-alert-card pre {
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 240px;
+  overflow: auto;
+}
+.alert-inline-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.alert-health {
+  color: var(--alert-muted);
+}
+.alert-health-error,
+.alert-health-blocked,
+.alert-error {
+  color: var(--alert-error);
+}
+.alert-error,
+.alert-feedback {
+  margin: 8px 16px;
+}
+.alert-feedback {
+  color: var(--alert-accent);
+}
+.chart-alert-dialog {
+  border: 1px solid var(--alert-border);
+  border-radius: 8px;
+  padding: 0;
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+}
+.chart-alert-dialog::backdrop {
+  background: #000a;
+}
+.chart-alert-dialog form {
+  display: grid;
+  gap: 16px;
+  padding: 0 20px 20px;
+}
+.chart-alert-dialog header {
+  padding: 16px 0 0;
+}
+.chart-alert-dialog p {
+  margin: 0;
+  color: var(--alert-muted);
+  font-size: 13px;
+}
+.chart-alert-dialog .alert-error {
+  color: var(--alert-error);
+}
+.chart-alert-dialog fieldset {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--alert-border);
+  display: grid;
+  gap: 12px;
+}
+.chart-alert-dialog legend {
+  padding: 0 6px;
+}
+.chart-alert-dialog .alert-indicator-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.alert-two-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.alert-context-summary {
+  background: var(--alert-surface);
+  padding: 12px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+.chart-alert-dialog footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid var(--alert-border);
+}
+.chart-alert-dialog footer button:last-child {
+  border-color: var(--alert-accent);
+  color: var(--alert-accent);
+}
+.chart-alert-dialog .alert-check,
+.chart-alert-panel .alert-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.alert-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+}
+.alert-message-text {
+  white-space: pre-wrap;
+}
+@media (max-width: 700px) {
+  .chart-alert-dialog input,
+  .chart-alert-dialog select,
+  .chart-alert-dialog textarea {
+    font-size: 16px;
+  }
+  .chart-alert-panel button,
+  .chart-alert-dialog button {
+    min-height: 40px;
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-06",
+  "environment": "Ubuntu quant-server, process-local browser fixture; no deployed Docker instance",
+  "native": {
+    "scope": "actual licensed chart / in-process routed synthetic fixture; no deployed instance",
+    "cases": [
+      "actual widget ready",
+      "native public time scale matches eight actual bar indices",
+      "native refresh restores backend snapshot without duplicate shapes or authenticated writes",
+      "actual native context menu prefills clicked main-series price",
+      "native log trend midpoint crosses geometric 200-price reference, not arithmetic 250",
+      "four actual native custom studies return alert-identical values including provisional last candle",
+      "actual two-chart layout retains distinct business identities and fences symbol generations"
+    ],
+    "weekend_elapsed_hours": 56.0,
+    "actual_bar_indices": 8.000000000010914,
+    "refresh": {
+      "restored": true,
+      "shapeCountStable": true,
+      "restoredPrice": 101,
+      "writes": 0
+    },
+    "log_midpoint_pixels": {
+      "red_y": 280.11764705882354,
+      "blue_y": 280.5
+    },
+    "indicators": [
+      {
+        "name": "SMA",
+        "compared_bars": 463,
+        "algorithm": {
+          "name": "SMA",
+          "version": "1",
+          "params": {
+            "period": 20
+          },
+          "output": "value"
+        },
+        "includes_provisional_last_candle": true,
+        "exact_equality": true
+      },
+      {
+        "name": "EMA",
+        "compared_bars": 463,
+        "algorithm": {
+          "name": "EMA",
+          "version": "1",
+          "params": {
+            "period": 20
+          },
+          "output": "value"
+        },
+        "includes_provisional_last_candle": true,
+        "exact_equality": true
+      },
+      {
+        "name": "RSI",
+        "compared_bars": 463,
+        "algorithm": {
+          "name": "RSI",
+          "version": "1",
+          "params": {
+            "period": 14
+          },
+          "output": "value"
+        },
+        "includes_provisional_last_candle": true,
+        "exact_equality": true
+      },
+      {
+        "name": "MACD",
+        "compared_bars": 463,
+        "algorithm": {
+          "name": "MACD",
+          "version": "1",
+          "params": {
+            "fast": 12,
+            "slow": 26,
+            "signal": 9
+          },
+          "output": "macd"
+        },
+        "includes_provisional_last_candle": true,
+        "exact_equality": true
+      }
+    ],
+    "multi_chart_business_identity_distinct": true,
+    "symbol_generation_changed": true,
+    "errors": []
+  },
+  "ui": {
+    "scope": "actual React components / synthetic routed API, no deployed instance",
+    "cases": [
+      "message subpage applies only to draft; creation defaults to one trigger",
+      "failed save and cancellation preserve draft and idempotent request; warming displayed accurately",
+      "pause/resume lifecycle; copy remains draft; event acknowledgement independent",
+      "dark/light render; modal keyboard focus and Escape cancellation"
+    ],
+    "errors": []
+  },
+  "external_notifications_sent": false,
+  "postgres_validation": "pending Docker permission",
+  "deployed_acceptance": "not started"
+}

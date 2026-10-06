@@ -1,6 +1,6 @@
 FROM node:22-bookworm-slim AS assets
 WORKDIR /assets
-COPY index.html build-assets.mjs patch-native-reserve.mjs native-reserve.js native-navigation.js series.js bridge.js indicators.js indicator-picker.js indicator-picker.css preferences.js chart-style.js chart-autosave.js workspaces.js watchlists.js range-sync.js viewports.js history-demand.js progressive-history.js chart-account.js chart-menu.js chart-menu.css ./
+COPY index.html build-assets.mjs patch-native-reserve.mjs native-reserve.js native-navigation.js series.js bridge.js chart-alerts.js indicators.js indicator-picker.js indicator-picker.css preferences.js chart-style.js chart-autosave.js workspaces.js watchlists.js range-sync.js viewports.js history-demand.js progressive-history.js chart-account.js chart-menu.js chart-menu.css ./
 COPY charting_library/ ./charting_library/
 ARG NATIVE_RESERVE_ENABLED=true
 ENV NATIVE_RESERVE_ENABLED=${NATIVE_RESERVE_ENABLED}

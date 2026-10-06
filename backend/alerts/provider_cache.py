@@ -18,6 +18,7 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.exc import DBAPIError
 
 from . import provider_chart as upstream
+from .chart_calculation_history import calculation_rows
 from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import LANE, lane
@@ -738,9 +739,22 @@ def data(body):
     output_count = page.get("mandatory_count", count)
     visible = page["bars"] if native and not body.indicators else page["bars"][-output_count:]
     first = visible[0]["start"] if visible else before
+    prefix = page["bars"]
+    if body.indicators and prefix:
+        # One source prefix for all pages and live updates. A viewport's
+        # warmup window cannot define a recursive EMA/RSI/MACD seed.
+        with transaction() as db:
+            prefix = [row.payload for row in db.scalars(select(ProviderBar).where(
+                ProviderBar.dataset_id == page["dataset_id"],
+                ProviderBar.start <= prefix[-1]["start"],
+                ProviderBar.start >= (body.calculation_origin or 0),
+            ).order_by(ProviderBar.start))]
+        if prefix and body.calculation_origin is not None and prefix[0]["start"] != body.calculation_origin:
+            raise ValueError("指标固定历史起点缺失，请刷新并核对数据集")
+        prefix = calculation_rows(prefix, meta, body.instrument)
     indicators = []
     for spec in body.indicators:
-        result = calculate(page["bars"], spec)
+        result = calculate(prefix, spec, provisional=True)
         indicators.append(
             {
                 **result,
@@ -756,7 +770,8 @@ def data(body):
         for k, v in {
             **page,
             "bars": visible,
-            "history_dependency_first": page["bars"][0]["chart_time"] if page["bars"] else before,
+            "history_dependency_first": upstream.label(prefix[0]["start"], body.timeframe, meta["calendar"]) if prefix else before,
+            "calculation_origin": body.calculation_origin if body.calculation_origin is not None else prefix[0]["start"] if prefix else None,
             "indicators": indicators,
             "has_more": len(page["bars"]) > len(visible) or page["has_more"],
             "history_boundary": len(page["bars"]) <= len(visible) and page["history_boundary"],
