@@ -302,34 +302,52 @@ function chartBarRangeMapping({
       const w = Math.ceil(context.measureText(text).width) + pad*2;
       const topEdge = boundary <= (kind === "high" ? b : a);
       const y = topEdge ? boundary-gap-tagHeight : boundary+gap;
-      const x = Math.max(2, Math.min(width-w-2, extreme.x-w/2));
+      const preferredX = Math.max(2, Math.min(width-w-2, extreme.x-w/2));
+      let x = preferredX;
       item.box = { x, y, width:w, height:tagHeight };
-      const leaderStart = topEdge ? y+tagHeight : boundary+3;
-      const leaderEnd = topEdge ? boundary-3 : y;
-      item.leader = { x:extreme.x-0.5, y:leaderStart, width:1, height:leaderEnd-leaderStart };
       if (y < 2 || y+tagHeight > height-2 || w+4 > width || boundary < 0 || boundary > height) {
         item.reason = "outside-pane"; continue;
       }
-      // Never move a label onto a different bar to find space. Check every
-      // loaded visible wick under its box, including bars outside the mapping.
-      const occupied = rect => overlaps(x,y,w,tagHeight,rect)
-        || overlaps(item.leader.x,item.leader.y,item.leader.width,item.leader.height,rect);
-      if (candles.some(occupied)
-        || obstacles.some(occupied)
-        || labels.some(other=>other!==item && other.visible && overlaps(x,y,w,tagHeight,
-          {left:other.box.x,right:other.box.x+other.box.width,top:other.box.y,bottom:other.box.y+other.box.height}))) {
-        item.reason = "occupied"; continue;
+      const blockers = [...candles, ...obstacles];
+      for (const other of labels) if (other !== item && other.visible) {
+        blockers.push({left:other.box.x,right:other.box.x+other.box.width,
+          top:other.box.y,bottom:other.box.y+other.box.height});
+        blockers.push(...other.leaders.map(line=>({left:line.x,right:line.x+line.width,
+          top:line.y,bottom:line.y+line.height})));
       }
-      item.visible = true; item.reason = "";
+      // Keep the vertical position fixed. Candidate edges describe all gaps
+      // at this height; try the closest left/right position first.
+      const candidates = new Set([preferredX]);
+      for (const rect of blockers) if (y < rect.bottom+2 && y+tagHeight > rect.top-2) {
+        candidates.add(rect.left-3-w); candidates.add(rect.right+3);
+      }
+      const positions = [...candidates].filter(value=>value>=2 && value+w<=width-2)
+        .sort((a,b)=>Math.abs(a-preferredX)-Math.abs(b-preferredX) || a-b);
+      const edgeY = topEdge ? y+tagHeight : y;
+      const anchorY = topEdge ? boundary-3 : boundary+3;
+      const bendY = topEdge ? boundary-5 : boundary+5;
+      const segment = (ax,ay,bx,by) => ({x:Math.min(ax,bx)-0.5,y:Math.min(ay,by)-0.5,
+        width:Math.max(1,Math.abs(bx-ax)+1),height:Math.max(1,Math.abs(by-ay)+1)});
+      for (const candidate of positions) {
+        const attachX = Math.max(candidate+pad,Math.min(candidate+w-pad,extreme.x));
+        const leaders = [segment(extreme.x,anchorY,extreme.x,bendY),
+          segment(extreme.x,bendY,attachX,bendY),segment(attachX,bendY,attachX,edgeY)];
+        if (blockers.some(rect=>overlaps(candidate,y,w,tagHeight,rect)
+          || leaders.some(line=>overlaps(line.x,line.y,line.width,line.height,rect)))) continue;
+        x = candidate; item.box.x = x; item.leaders = leaders; item.attachX = attachX;
+        item.visible = true; item.reason = ""; break;
+      }
+      if (!item.visible) { item.reason = "occupied"; continue; }
       context.fillStyle = dark ? "#1F1F1F" : "#FFFFFF";
       context.fillRect(x,y,w,tagHeight);
       context.strokeStyle = dark ? "#5A91FF" : "#2962FF";
       context.lineWidth = 1; context.strokeRect(x+0.5,y+0.5,w-1,tagHeight-1);
       context.fillStyle = dark ? "#DBDBDB" : "#131722";
       context.fillText(text,x+pad,y+tagHeight/2);
-      // Both the label and its short leader have passed the collision checks.
-      context.beginPath(); context.moveTo(extreme.x,topEdge?y+tagHeight:y);
-      context.lineTo(extreme.x,topEdge?boundary-3:boundary+3); context.stroke();
+      // The elbow identifies the original bar after a horizontal retreat.
+      context.beginPath(); context.moveTo(extreme.x,anchorY);
+      context.lineTo(extreme.x,bendY); context.lineTo(item.attachX,bendY);
+      context.lineTo(item.attachX,edgeY); context.stroke();
     }
     labelPaints.set(pane, labels);
   }
@@ -585,7 +603,8 @@ function chartBarRangeMapping({
     hide,
     // Retain the installed height hook contract without reserving a bottom rail.
     railHeight: () => 0,
-    labels: (chart) => (labelPaints.get(mainPane(chart)) || []).map(label => ({ ...label, box: label.box && { ...label.box } })),
+    labels: (chart) => (labelPaints.get(mainPane(chart)) || []).map(label => ({ ...label,
+      box: label.box && { ...label.box }, leaders: label.leaders?.map(line=>({...line})) })),
     defaults: () => ({ ...defaults }),
     fillColor,
 

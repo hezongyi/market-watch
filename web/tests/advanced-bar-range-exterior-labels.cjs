@@ -365,11 +365,40 @@ check("vertical viewport disjoint hides all", (f) => {
   noTagPaint(f);
 }, { project: (price) => 400 - price });
 
-check("actual legend bounds hide tags", (f) => {
-  assert.equal(label(f, "high").visible, false);
-  assert.equal(label(f, "high").reason, "occupied");
-  assert.ok(!f.paint.texts.some(([text]) => text.startsWith("高 ")));
+check("actual legend bounds cause horizontal retreat", (f) => {
+  const high=label(f,"high");assert.equal(high.visible,true);
+  assert.equal(high.box.y,22);assert.equal(high.box.x,93);assert.equal(high.barX,40);
 }, { legend: { left: 0, right: 90, top: 18, bottom: 40 } });
+
+check("retreat left keeps both prices at their original heights", (f) => {
+  const high=label(f,"high"),low=label(f,"low");
+  assert.ok(high.visible&&low.visible);assert.equal(high.box.y,22);assert.equal(low.box.y,158);
+  assert.equal(high.barX,100);assert.equal(high.box.x,59);assert.equal(low.box.x,75);
+  const before=f.labels();f.draw();assert.deepEqual(f.labels(),before);
+}, {origin:100,spacing:20,sourceEnd:1000,rowCount:2,targetRows:[
+  {chart_time:0,start:0,end:1000,high:100,low:0},
+  {chart_time:1000,start:1000,end:2000,high:120,low:115}]});
+
+check("retreat right retains an elbow to the actual extreme bar", (f) => {
+  const high=label(f,"high"),low=label(f,"low");
+  assert.ok(high.visible&&low.visible);assert.equal(high.box.y,22);assert.equal(low.box.y,158);
+  assert.equal(high.barX,120);assert.equal(high.box.x,111);assert.equal(high.barTime,1000);
+  assert.equal(f.paint.leaders[0][0][0],120);assert.equal(f.paint.leaders[0].at(-1)[0],high.attachX);
+}, {origin:100,spacing:20,sourceStart:1000,sourceEnd:2000,rowCount:2,targetRows:[
+  {chart_time:0,start:0,end:1000,high:120,low:115},
+  {chart_time:1000,start:1000,end:2000,high:100,low:0}]});
+
+check("inverted scale retreat never changes label height", (f) => {
+  const high=label(f,"high"),low=label(f,"low");
+  assert.ok(high.visible&&low.visible);assert.equal(high.box.y,158);assert.equal(low.box.y,22);
+  assert.ok(high.box.x<75);assert.equal(high.barX,100);
+}, {origin:100,spacing:20,sourceEnd:1000,rowCount:2,project:price=>50+price,height:230,targetRows:[
+  {chart_time:0,start:0,end:1000,high:100,low:0},
+  {chart_time:1000,start:1000,end:2000,high:120,low:115}]});
+
+check("full-width obstruction hides without vertical fallback", (f) => {
+  assert.equal(label(f,"high").visible,false);assert.equal(label(f,"high").reason,"occupied");
+}, {legend:{left:0,right:200,top:18,bottom:40}});
 
 check("dense adjacent candle occupying only leader hides tag", (f) => {
   const high = label(f, "high");
@@ -377,7 +406,6 @@ check("dense adjacent candle occupying only leader hides tag", (f) => {
   // the short leader even though neither matching candle nor text box does.
   const neighbour = { left: 99.5, right: 101.5, top: 45, bottom: 130 };
   assert.equal(intersects(high.box, neighbour), false);
-  assert.equal(intersects(high.leader, neighbour), true);
   assert.equal(high.visible, false);
   assert.equal(high.reason, "occupied");
   assert.ok(!f.paint.texts.some(([text]) => text.startsWith("高 ")));
@@ -396,7 +424,6 @@ check("legend occupying only leader hides tag", (f) => {
   const high = label(f, "high");
   const obstacle = { left: 98, right: 102, top: 45, bottom: 47 };
   assert.equal(intersects(high.box, obstacle), false);
-  assert.equal(intersects(high.leader, obstacle), true);
   assert.equal(high.visible, false);
   assert.equal(high.reason, "occupied");
   assert.ok(!f.paint.texts.some(([text]) => text.startsWith("高 ")));

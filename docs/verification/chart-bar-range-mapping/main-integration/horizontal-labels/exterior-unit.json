@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "count": 21,
+  "sourceSHA256": "42c7262290ec31f26bfacfb912ec007fce257316a7faad9187f62e5c70bc448e",
+  "cases": [
+    {
+      "name": "earliest exact matching visible extrema"
+    },
+    {
+      "name": "hide and redraw cannot resurrect labels"
+    },
+    {
+      "name": "unmatched extrema hide"
+    },
+    {
+      "name": "metadata without native candles cannot anchor"
+    },
+    {
+      "name": "mismatched native candles cannot anchor"
+    },
+    {
+      "name": "offscreen earliest bar excluded"
+    },
+    {
+      "name": "inverted scale exterior sides"
+    },
+    {
+      "name": "vertical viewport disjoint hides all"
+    },
+    {
+      "name": "actual legend bounds cause horizontal retreat"
+    },
+    {
+      "name": "retreat left keeps both prices at their original heights"
+    },
+    {
+      "name": "retreat right retains an elbow to the actual extreme bar"
+    },
+    {
+      "name": "inverted scale retreat never changes label height"
+    },
+    {
+      "name": "full-width obstruction hides without vertical fallback"
+    },
+    {
+      "name": "dense adjacent candle occupying only leader hides tag"
+    },
+    {
+      "name": "legend occupying only leader hides tag"
+    },
+    {
+      "name": "zero-width half-open time intersection excluded"
+    },
+    {
+      "name": "canvas restoration on thrown rendering"
+    },
+    {
+      "name": "configure and dispose clean label state"
+    },
+    {
+      "name": "one-tick earlier high cannot replace exact high"
+    },
+    {
+      "name": "nearby tick without exact high hides"
+    },
+    {
+      "name": "one-tick earlier low cannot replace exact low"
+    }
+  ]
+}
