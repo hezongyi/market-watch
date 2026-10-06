@@ -1,0 +1,34 @@
+{
+  "host": "Ubuntu local Chromium, built web at 127.0.0.1:16619",
+  "scope": "UI fixture API; backend separately verified with actual API/SQLite and isolated PostgreSQL",
+  "passed": true,
+  "checks": [
+    "defaults",
+    "index requires choice",
+    "registration",
+    "select phase",
+    "reuse original M1 request",
+    "new dataset selected",
+    "mobile overflow",
+    "page errors"
+  ],
+  "requests": [
+    {
+      "path": "/api/market-data/datasets",
+      "body": {
+        "logical_symbol": "BTCUSD",
+        "provider_symbol": "BTC/USD",
+        "asset_class": "crypto",
+        "precision": 6,
+        "aggregation_calendar": "utc0"
+      }
+    },
+    {
+      "path": "/api/market-data/datasets/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/aggregation",
+      "body": {
+        "aggregation_calendar": "utc0",
+        "version_id": "original"
+      }
+    }
+  ]
+}

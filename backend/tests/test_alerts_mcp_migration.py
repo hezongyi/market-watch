@@ -7,11 +7,11 @@ from alembic import command
 from alembic.config import Config
 from alembic.script import ScriptDirectory
 from alerts.config import settings
-from alerts.storage import HistoryVersion, Instrument, MarketDataset
+from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "w24_merge_market_data"
+HEAD = "x25_dataset_asset_class"
 
 
 def configuration():
@@ -41,9 +41,9 @@ def verify_upgrade_paths(engine, monkeypatch, initial):
                 connection.execute(Instrument.__table__.insert().values(
                     id="MD:kept-history", label="kept", symbol="EURUSD",
                     calendar="ny17", precision=6))
-                connection.execute(MarketDataset.__table__.insert().values(
-                    id="kept-dataset", instrument_id="MD:kept-history", logical_symbol="EURUSD",
-                    identity={"source": "dukascopy"}, volume_kind="quantity"))
+                connection.execute(text("INSERT INTO market_datasets "
+                    "(id,instrument_id,logical_symbol,identity,volume_kind) VALUES "
+                    "('kept-dataset','MD:kept-history','EURUSD','{}','quantity')"))
                 connection.execute(HistoryVersion.__table__.insert().values(
                     id="kept-version", dataset_id="kept-dataset", start=0, end=60000,
                     cursor=60000, status="published", manifest={"checksum": "kept"}))

@@ -15,7 +15,9 @@ class PricePrecisionError(ValueError):
 
 
 def register_dataset(db, identity, *, logical_symbol, label, calendar, precision,
-                     volume_kind, volume_unit, calendar_profile=None):
+                     volume_kind, volume_unit, calendar_profile=None, asset_class="unspecified"):
+    if asset_class not in ("forex", "metal", "crypto", "index", "other", "unspecified"):
+        raise ValueError("Unsupported asset class")
     identity = DatasetIdentity.model_validate(identity)
     profile = normalized_profile(calendar_profile) if calendar_profile else {}
     if profile and profile["revision"] != identity.calendar_version:
@@ -44,7 +46,7 @@ def register_dataset(db, identity, *, logical_symbol, label, calendar, precision
     row = db.get(MarketDataset, identity.key)
     if row:
         inst = db.get(Instrument, row.instrument_id)
-        if (row.logical_symbol != logical_symbol or inst.calendar != calendar or inst.calendar_profile != profile
+        if (row.asset_class != asset_class or row.logical_symbol != logical_symbol or inst.calendar != calendar or inst.calendar_profile != profile
                 or inst.precision != precision
                 or (row.volume_kind, row.volume_unit) != (volume_kind, volume_unit)):
             raise ValueError("Existing dataset metadata cannot be reinterpreted")
@@ -60,7 +62,7 @@ def register_dataset(db, identity, *, logical_symbol, label, calendar, precision
     db.flush()
     db.add(MarketDataset(id=identity.key, instrument_id=ident, logical_symbol=logical_symbol,
                          identity=identity.model_dump(), volume_kind=volume_kind,
-                         volume_unit=volume_unit))
+                         volume_unit=volume_unit, asset_class=asset_class))
     db.flush()
     return inst
 

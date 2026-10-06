@@ -5,7 +5,9 @@
 整体目标保持 active。实现通过不表示长期性能、供应商日历或生产发布已经通过。
 
 验收范围：Dukascopy Python 历史与固定版本回放、OANDA practice 实时，首批EURUSD/XAUUSD。
-用户明确的聚合口径：历史BID M1由本系统按纽约当地17:00切H4/D1，随DST转换；
+用户明确的聚合口径：外汇/金属历史BID M1默认按纽约当地17:00切H4/D1，随DST转换；
+加密默认UTC0，指数待定，各数据集可配置覆盖。新的[可调配置交付](configurable-aggregation.md)
+已完成本地与独立PG验证，尚未部署到持续观察实例；
 不要求与Dukascopy原生高周期K线一致。会话证据另用于缺失分钟与完整性判断。
 MT4实时互备延期；OANDA故障时降级与暂停依赖缺失数据的判断。保留Binance/yfinance既有能力。
 

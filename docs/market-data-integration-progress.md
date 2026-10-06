@@ -466,3 +466,15 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
   [证据与限制](verification/data-integration/main-compatibility.json)保留初次失败与最终结果；
   全仓Ruff29项均在与origin/main字节相同的文件中，改动文件Ruff通过。
 - 未重建/更新后台观察容器，未推送、未创建PR、未合并到主线、未生产发布。
+
+### 可调聚合日界：类别默认、单数据集覆盖与版本保留
+
+- 用户要求Dukascopy Python外汇/金属默认NY17，加密默认UTC，指数未定。
+  已加入注册API/页面资产类别与日界配置；指数无默认必须选择，既有系列保留当前日界。
+- 改日界建立新身份，可选择已发布原M1版本分块派生；worker处理派生，不重新下载、
+  不覆盖原版本或固定回放。记录类别的x25迁移不猜测旧类别或变更历史切分。
+- [交付/证据](verification/data-integration/configurable-aggregation.md)：86项本地回归、
+  实际Ubuntu PostgreSQL2项、前端构建和Chromium交互通过；浏览器使用fixture API，
+  实际后端API/PG证据另列。未更新长期观察实例，未推送或提PR。
+- 用户询问Dukascopy历史+OANDA近期的组合源；当前保持独立两源，组合视图尚未实现，
+  本轮先分析价值/边界，不把咨询推断为新增开发授权。

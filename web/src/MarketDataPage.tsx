@@ -16,6 +16,8 @@ type Dataset = {
   instrument_id: string;
   logical_symbol: string;
   precision: number;
+  asset_class: string;
+  aggregation_calendar: "ny17" | "utc0";
   identity: {
     source: string;
     environment: string;
@@ -77,6 +79,13 @@ export default function MarketDataPage() {
     [end, setEnd] = useState("");
   const [level, setLevel] = useState(""),
     [timeframe, setTimeframe] = useState("M1");
+  const [newSymbol, setNewSymbol] = useState(""),
+    [providerSymbol, setProviderSymbol] = useState(""),
+    [assetClass, setAssetClass] = useState("forex"),
+    [precision, setPrecision] = useState("6"),
+    [registrationCalendar, setRegistrationCalendar] = useState("ny17"),
+    [calendarOverride, setCalendarOverride] = useState(""),
+    [reuseVersion, setReuseVersion] = useState("");
   const generation = useRef(0);
   const client = useRef(`md-${crypto.randomUUID()}`);
   async function load() {
@@ -204,14 +213,91 @@ export default function MarketDataPage() {
     (row) =>
       row.identity.source === "dukascopy" && row.identity.channel === "python",
   );
+  const selectedHistory = history.find((row) => row.id === historyDataset);
+  const calendar =
+    calendarOverride || selectedHistory?.aggregation_calendar || "";
+  const calendarName = (value: string) =>
+    value === "ny17"
+      ? "NY17 · 纽约17:00"
+      : value === "utc0"
+        ? "UTC · 00:00"
+        : "待选择";
+  async function registerDataset(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const row = await api<Dataset>("/market-data/datasets", {
+        logical_symbol: newSymbol.trim().toUpperCase(),
+        provider_symbol: providerSymbol.trim(),
+        asset_class: assetClass,
+        precision: Number(precision),
+        aggregation_calendar: registrationCalendar || null,
+      });
+      await load();
+      setHistoryDataset(row.id);
+      setCalendarOverride("");
+      setReuseVersion("");
+      setNotice(
+        `已注册 ${row.logical_symbol}，日界 ${calendarName(row.aggregation_calendar)}。`,
+      );
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function configureCalendar(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedHistory || !calendar) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const result = await api<{ dataset: Dataset; version: Version | null }>(
+        `/market-data/datasets/${selectedHistory.id}/aggregation`,
+        {
+          aggregation_calendar: calendar,
+          version_id: reuseVersion || null,
+        },
+      );
+      await load();
+      setHistoryDataset(result.dataset.id);
+      setCalendarOverride("");
+      setReuseVersion("");
+      setNotice(
+        result.version
+          ? "新日界版本已创建，后台复用原始M1；原版本和演练保持原口径。"
+          : "新日界数据集已保存，可创建历史版本；原数据集保持原口径。",
+      );
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
   async function createVersion(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError("");
     setNotice("");
     try {
+      let datasetId = historyDataset;
+      if (
+        selectedHistory &&
+        calendar !== selectedHistory.aggregation_calendar
+      ) {
+        const result = await api<{ dataset: Dataset }>(
+          `/market-data/datasets/${historyDataset}/aggregation`,
+          { aggregation_calendar: calendar },
+        );
+        datasetId = result.dataset.id;
+        setHistoryDataset(datasetId);
+        setCalendarOverride("");
+      }
       await api("/market-data/versions", {
-        dataset_id: historyDataset,
+        dataset_id: datasetId,
         start: new Date(start).getTime(),
         end: new Date(end).getTime(),
       });
@@ -425,49 +511,181 @@ export default function MarketDataPage() {
         <div className="panel-heading">
           <h2>Dukascopy 历史导入</h2>
         </div>
+        <details>
+          <summary>添加历史品种</summary>
+          <form className="replay-controls" onSubmit={registerDataset}>
+            <label>
+              显示代码
+              <input
+                required
+                maxLength={10}
+                value={newSymbol}
+                placeholder="例如 EURUSD、BTCUSD"
+                onChange={(e) => setNewSymbol(e.target.value)}
+              />
+            </label>
+            <label>
+              Dukascopy 品种代码
+              <input
+                required
+                maxLength={64}
+                value={providerSymbol}
+                placeholder="来源准确代码，例如 EUR/USD"
+                onChange={(e) => setProviderSymbol(e.target.value)}
+              />
+            </label>
+            <label>
+              资产类别
+              <select
+                value={assetClass}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setAssetClass(value);
+                  setRegistrationCalendar(
+                    value === "crypto"
+                      ? "utc0"
+                      : value === "forex" || value === "metal"
+                        ? "ny17"
+                        : "",
+                  );
+                }}
+              >
+                <option value="forex">外汇</option>
+                <option value="metal">金属</option>
+                <option value="crypto">加密</option>
+                <option value="index">指数（默认待定）</option>
+                <option value="other">其他（默认待定）</option>
+              </select>
+            </label>
+            <label>
+              聚合日界
+              <select
+                required
+                value={registrationCalendar}
+                onChange={(e) => setRegistrationCalendar(e.target.value)}
+              >
+                <option value="">请选择日界</option>
+                <option value="ny17">NY17 · 纽约17:00</option>
+                <option value="utc0">UTC · 00:00</option>
+              </select>
+            </label>
+            <label>
+              价格小数位
+              <input
+                type="number"
+                min="0"
+                max="10"
+                step="1"
+                required
+                value={precision}
+                onChange={(e) => setPrecision(e.target.value)}
+              />
+            </label>
+            <button disabled={busy || !registrationCalendar}>
+              注册历史品种
+            </button>
+          </form>
+          <p className="muted">
+            外汇、金属默认NY17，加密默认UTC；指数明确选择后再注册。各品种可覆盖默认日界。
+          </p>
+        </details>
         {!history.length ? (
           <p className="muted">
             尚未注册历史数据集。后台验证品种精度与日历规则后，可创建导入版本。
           </p>
         ) : (
-          <form className="replay-controls" onSubmit={createVersion}>
-            <label>
-              历史品种
-              <select
-                required
-                value={historyDataset}
-                onChange={(e) => setHistoryDataset(e.target.value)}
-              >
-                <option value="">选择历史数据集</option>
-                {history.map((row) => (
-                  <option key={row.id} value={row.id}>
-                    {row.logical_symbol} · Dukascopy BID
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              开始时间（本地）
-              <input
-                type="datetime-local"
-                required
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-              />
-            </label>
-            <label>
-              截止时间（本地）
-              <input
-                type="datetime-local"
-                required
-                value={end}
-                onChange={(e) => setEnd(e.target.value)}
-              />
-            </label>
-            <button className="primary" disabled={busy}>
-              创建历史版本
-            </button>
-          </form>
+          <>
+            <form className="replay-controls" onSubmit={createVersion}>
+              <label>
+                历史品种
+                <select
+                  required
+                  value={historyDataset}
+                  onChange={(e) => {
+                    setHistoryDataset(e.target.value);
+                    setCalendarOverride("");
+                    setReuseVersion("");
+                  }}
+                >
+                  <option value="">选择历史数据集</option>
+                  {history.map((row) => (
+                    <option key={row.id} value={row.id}>
+                      {row.logical_symbol} · Dukascopy BID ·{" "}
+                      {calendarName(row.aggregation_calendar)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                H4 / D1 聚合日界
+                <select
+                  required
+                  value={calendar}
+                  onChange={(e) => {
+                    setCalendarOverride(e.target.value);
+                    setReuseVersion("");
+                  }}
+                >
+                  <option value="">请选择日界</option>
+                  <option value="ny17">NY17 · 纽约17:00</option>
+                  <option value="utc0">UTC · 00:00</option>
+                </select>
+              </label>
+              <label>
+                开始时间（本地）
+                <input
+                  type="datetime-local"
+                  required
+                  value={start}
+                  onChange={(e) => setStart(e.target.value)}
+                />
+              </label>
+              <label>
+                截止时间（本地）
+                <input
+                  type="datetime-local"
+                  required
+                  value={end}
+                  onChange={(e) => setEnd(e.target.value)}
+                />
+              </label>
+              <button className="primary" disabled={busy || !calendar}>
+                创建历史版本
+              </button>
+            </form>
+            {selectedHistory &&
+              calendar !== selectedHistory.aggregation_calendar && (
+                <form className="replay-controls" onSubmit={configureCalendar}>
+                  <label>
+                    复用已有M1版本
+                    <select
+                      value={reuseVersion}
+                      onChange={(e) => setReuseVersion(e.target.value)}
+                    >
+                      <option value="">仅保存新日界数据集</option>
+                      {versions
+                        .filter(
+                          (row) =>
+                            row.dataset_id === historyDataset &&
+                            row.status === "published",
+                        )
+                        .map((row) => (
+                          <option key={row.id} value={row.id}>
+                            {date(row.start)} — {date(row.end)} ·{" "}
+                            {row.id.slice(0, 8)}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                  <button disabled={busy || !calendar}>
+                    保存新日界{reuseVersion ? "并复用M1" : ""}
+                  </button>
+                </form>
+              )}
+            <p className="muted">
+              NY17随纽约夏令/冬令时换日，UTC固定00:00。改变日界生成新数据集，原历史版本和演练保持原口径。
+            </p>
+          </>
         )}
         <p className="muted">
           每个版本保留原始观测与内容校验。未知区间不会由实时源补平；后续修订发布新版本。
@@ -481,6 +699,13 @@ export default function MarketDataPage() {
               </strong>
               <p>
                 {date(version.start)} — {date(version.end)}
+              </p>
+              <p>
+                日界：
+                {calendarName(
+                  datasets.find((row) => row.id === version.dataset_id)
+                    ?.aggregation_calendar ?? "",
+                )}
               </p>
               <p>
                 状态：{version.status} · 查询进度{" "}

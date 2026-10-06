@@ -1,9 +1,16 @@
 """Authenticated source identities, import controls and immutable version reports."""
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
+from .aggregation_policy import (
+    DEFAULTS,
+    AggregationCalendar,
+    AssetClass,
+    change_aggregation,
+    register_history_dataset,
+)
 from .history_versions import create_version, version_report
 from .market_datasets import legacy_inventory
 from .storage import HistoryVersion, Instrument, MarketDataset, transaction
@@ -15,17 +22,63 @@ class VersionRequest(BaseModel):
     end: int = Field(gt=0)
 
 
+class DatasetRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    logical_symbol: str = Field(pattern=r"^[A-Z0-9]{1,10}$")
+    provider_symbol: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9/_.-]+$")
+    asset_class: AssetClass
+    precision: int = Field(ge=0, le=10, strict=True)
+    aggregation_calendar: AggregationCalendar | None = None
+
+
+class AggregationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    aggregation_calendar: AggregationCalendar
+    version_id: str | None = Field(default=None, min_length=1, max_length=36)
+
+
+def dataset_report(row, inst):
+    return {"id": row.id, "instrument_id": row.instrument_id,
+            "logical_symbol": row.logical_symbol, "identity": row.identity,
+            "volume_kind": row.volume_kind, "volume_unit": row.volume_unit,
+            "precision": inst.precision, "asset_class": row.asset_class,
+            "aggregation_calendar": inst.calendar}
+
+
 def router(authenticated):
     routes = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
 
     @routes.get("/datasets")
     def datasets():
         with transaction() as db:
-            return [{"id": row.id, "instrument_id": row.instrument_id,
-                     "logical_symbol": row.logical_symbol, "identity": row.identity,
-                     "volume_kind": row.volume_kind, "volume_unit": row.volume_unit,
-                     "precision": db.get(Instrument, row.instrument_id).precision}
+            return [dataset_report(row, db.get(Instrument, row.instrument_id))
                     for row in db.scalars(select(MarketDataset).order_by(MarketDataset.logical_symbol))]
+
+    @routes.get("/aggregation-options")
+    def options():
+        return {"defaults": DEFAULTS, "calendars": ["ny17", "utc0"],
+                "unresolved_asset_classes": ["index", "other", "unspecified"]}
+
+    @routes.post("/datasets", status_code=201)
+    def register(body: DatasetRequest):
+        try:
+            with transaction() as db:
+                row, inst = register_history_dataset(db, **body.model_dump())
+                return dataset_report(row, inst)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.post("/datasets/{dataset_id}/aggregation", status_code=201)
+    def configure(dataset_id: str, body: AggregationRequest):
+        try:
+            with transaction() as db:
+                row, inst, version = change_aggregation(db, dataset_id,
+                    body.aggregation_calendar, version_id=body.version_id)
+                return {"dataset": dataset_report(row, inst),
+                        "version": version_report(db, version.id) if version else None}
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
 
     @routes.get("/inventory")
     def inventory():

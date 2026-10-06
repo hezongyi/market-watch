@@ -109,7 +109,7 @@ def publish(db, version):
         "dataset_version": version.id, "identity": dataset.identity,
         "start": version.start, "end": version.end,
         "volume_kind": dataset.volume_kind, "volume_unit": dataset.volume_unit,
-        "aggregation_calendar": instrument.calendar, "calendar_profile": instrument.calendar_profile,
+        "asset_class": dataset.asset_class, "aggregation_calendar": instrument.calendar, "calendar_profile": instrument.calendar_profile,
         "rows": count, "unknown_minutes": unknown_minutes,
         "coverage": "observed_only; unobserved intervals remain unknown",
         "checksum": checksum.hexdigest(), "chunks": manifest_chunks,
@@ -123,6 +123,15 @@ def publish(db, version):
 
 
 def import_page(adapter, *, version_id=None):
+    with transaction() as db:
+        query = select(HistoryVersion.id).where(HistoryVersion.status == "deriving")
+        if version_id:
+            query = query.where(HistoryVersion.id == version_id)
+        deriving = db.scalar(query.order_by(HistoryVersion.created_at).limit(1))
+    if deriving:
+        from .history_derivation import derive_page
+
+        return derive_page(deriving)
     ownership = claim(version_id)
     if ownership is None:
         return False
@@ -230,7 +239,10 @@ def snapshot_rows(db, ident, *, start=None, end=None):
 
 def main():
     parser = argparse.ArgumentParser(description="Source-isolated Dukascopy historical versions")
-    parser.add_argument("--create", choices=("EURUSD", "XAUUSD"))
+    parser.add_argument("--create", help="Canonical logical symbol, e.g. EURUSD or BTCUSD")
+    parser.add_argument("--provider-symbol", help="Exact Dukascopy symbol, e.g. EUR/USD")
+    parser.add_argument("--asset-class", choices=("forex", "metal", "crypto", "index", "other"))
+    parser.add_argument("--aggregation-calendar", choices=("ny17", "utc0"))
     parser.add_argument("--start")
     parser.add_argument("--end")
     parser.add_argument("--calendar-version")
@@ -247,12 +259,19 @@ def main():
             parser.error("Create requires explicit start/end, reviewed calendar version and precision")
         start, end = [int(datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp() * 1000)
                       for value in (args.start, args.end)]
+        from .aggregation_policy import resolve_calendar
+
+        if not args.asset_class:
+            parser.error("Create requires --asset-class; indices also require --aggregation-calendar")
+        calendar = resolve_calendar(args.asset_class, args.aggregation_calendar)
+        if not args.provider_symbol:
+            parser.error("Create requires the exact --provider-symbol")
         identity = DatasetIdentity(source="dukascopy", channel="python", environment="historical",
-            account_scope="public", provider_symbol=args.create[:3] + "/" + args.create[3:],
+            account_scope="public", provider_symbol=args.provider_symbol,
             basis="bid", calendar_version=args.calendar_version)
         with transaction() as db:
             inst = register_dataset(db, identity, logical_symbol=args.create, label=args.create,
-                calendar="ny17", precision=args.precision, volume_kind="quantity",
+                calendar=calendar, asset_class=args.asset_class, precision=args.precision, volume_kind="quantity",
                 volume_unit="source_quantity", calendar_profile=(json.loads(args.calendar_profile.read_text())
                     if args.calendar_profile else None))
             version_id = create_version(db, identity.key, start, end)

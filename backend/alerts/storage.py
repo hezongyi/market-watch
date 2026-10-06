@@ -62,6 +62,7 @@ class Instrument(Base):
 
 class MarketDataset(Base):
     __tablename__ = "market_datasets"
+    asset_class: Mapped[str] = mapped_column(String(16), default="unspecified", server_default="unspecified")
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), unique=True)
     logical_symbol: Mapped[str] = mapped_column(String(10))
