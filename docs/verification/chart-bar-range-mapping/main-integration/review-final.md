@@ -1,4 +1,13 @@
-# 最新 main 集成只读审核
+# 范围收口后的只读复核
+
+2026-10-06，用户指定 gpt-6.1-sol/max，既有 Spec/Standards reviewer 复核撤回提交 `31e1e39`。本轮仅范围映射、同步设置和柱宽同步；下方早先的历史/指标修复建议已由用户范围决定取代，不是本PR当前阻塞。
+
+- **Spec：0未解决P1/P2。** 产品源码 `advanced-host web/src backend scripts` 与已审 `fd4dcad` 一致；后端和 `indicators.js` 与 main 一致。范围映射、互斥同步、实际用户缩放来源无需焦点以及完整价格数字仍符合需求。
+- **Standards：0违规、0新增P1/P2。** 范围外修复已完全撤回；epoch/editRevision保护、独立价格数字span和22模块构建完整。保留的Python脚本变化只适配隔离验收目标与DB端口，不是后端产品修复。
+- 两位reviewer独立读取HTTPS实际宿主并核验22模块逐字节一致；资产 `host.d0a96d61fcfcc340.js`，Ubuntu Docker chart候选2/API候选1镜像匹配。新5组专项及用户人工验收由最终证据另行记录，不从旧结果推定本轮完成。
+- 历史前缀和指标问题独立跟进，不阻塞本次功能收口。人工验收前不合并，未生产部署。
+
+# 早先扩大范围的兼容检查点（历史记录）
 
 2026-10-06。用户指定 `gpt-6.1-sol / max`，既有 Spec/Standards agent 只读复审。
 

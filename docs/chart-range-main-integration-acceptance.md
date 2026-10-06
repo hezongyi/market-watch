@@ -24,9 +24,9 @@ sg docker -c 'docker compose --env-file /home/quant/repos/.acceptance/range-main
 
 ## 自动验证
 
-已完成候选2范围/同步169项、14组，均绑定 `host.d0a96d61fcfcc340.js`，无页面异常；[原始汇总](verification/chart-bar-range-mapping/main-integration/summary.json)保留原候选结果。撤回范围外修复后，以同一候选运行同步设置、逐帧稳定性、映射、生命周期和导航5组专项；最终记录单独存于 `verification/chart-bar-range-mapping/main-integration/scoped-final/`，不覆盖旧证据。
+已完成候选2范围/同步169项、14组，均绑定 `host.d0a96d61fcfcc340.js`，无页面异常；[原始汇总](verification/chart-bar-range-mapping/main-integration/summary.json)保留原候选结果。撤回范围外修复后，同候选的同步设置31项、逐帧稳定性9项、映射39项、生命周期6项、导航8项共93项/5组全部通过，未记录页面异常；[最新汇总](verification/chart-bar-range-mapping/main-integration/scoped-final/summary.json)单独归档，不覆盖旧证据。
 
-候选2逐帧稳定性9项通过：真实 provider W1/M5/H4/D1，M5保留89,178根走廊，静止鼠标历史加载采集122帧，检查K线像素、model/chart身份以及来源、公开光标、日期标签。时间按来源真实 `[start,end)` 验证；周线标签日期可以与实际纽约17点交易周开始时间不同，小周期十字线时间须落在同一真实区间，跨周期标签不要求文字相同。有限采样不代表任意设备、任意操作绝无闪烁。
+恢复部署后的逐帧稳定性9项通过：真实 provider W1/M5/H4/D1，M5保留89,199根走廊，最新行情采集303帧、静止鼠标历史加载采集118帧，检查K线像素、model/chart身份以及来源、公开光标、日期标签。时间按来源真实 `[start,end)` 验证；周线标签日期可以与实际纽约17点交易周开始时间不同，小周期十字线时间须落在同一真实区间，跨周期标签不要求文字相同。有限采样不代表任意设备、任意操作绝无闪烁。
 
 旧布局迁移使用2万根容量；导航维持20万根和原目标日期，等待预算180秒，其他组默认60秒。未降低定位、就绪或时间断言。四图容量边界已通过，作为范围映射可达边界检查，不扩展为历史更新修复。
 
