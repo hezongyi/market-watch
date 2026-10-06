@@ -1,60 +1,39 @@
 {
-  "event": "started",
-  "at": 1791261770960,
+  "host": "Ubuntu local isolated Docker; host Chromium/rule observers",
+  "project": "market-watch-data-integration",
   "phase": "sustained",
-  "started_at": 1791261770867,
-  "planned_end": 1791434570867,
+  "event": "new_independent_window_after_disk_cleanup",
+  "started_at": 1791283668874,
+  "planned_end": 1791456468874,
+  "started_at_utc": "2026-10-06T10:47:48.874000+00:00",
+  "planned_end_utc": "2026-10-08T10:47:48.874000+00:00",
+  "observer_pid": 2233614,
   "planned_minutes": 2880,
-  "poll_interval_seconds": 15,
-  "authentication_renewal_minutes": 720,
-  "owned": {
-    "67575ffc-5d15-4e73-aa6b-f9b075700626": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
-    "cab0a0df-6f35-4cad-a6a3-b989656cee7e": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD"
-  },
-  "host": "Ubuntu host observing local isolated Docker API",
-  "url": "http://127.0.0.1:16589",
-  "source_clock_offset_verified": false,
-  "started_at_utc": "2026-10-06T04:42:50.867000+00:00",
-  "planned_end_utc": "2026-10-08T04:42:50.867000+00:00",
-  "service": "market-watch-data-integration-rules.service",
-  "service_at_record": {
-    "MainPID": "2669988",
-    "ActiveState": "active",
-    "SubState": "running"
-  },
-  "branch": "feat/market-data-integration",
-  "implementation_base_commit": "cae7bf8cedea35e2673f256729b1b7e75895da82",
-  "observer_sha256": "f01cde69742c72960b6aab5f22adb89aa417d3544dead24c13aa951290c61317",
-  "summarizer_sha256": "398bd4863d83ebfea14b380f053f9a4fbaa227b8755263bd30d2c20476a73e63",
-  "raw": "artifacts/data-integration/rules-sustained.jsonl (ignored)",
-  "browser_window_preserved": "sustained-observation-window.json",
-  "scope": "additional independent 48-hour sampled rule observation; not backfilled to watch creation",
+  "raw": "artifacts/data-integration/rules-sustained.jsonl",
+  "code_commit": "64282253f6db892b1e4cfb03331030004f6af292",
+  "prior_disk_interrupted_window": "rules-observation-window-disk-interrupted.json",
+  "old_raw_preserved": "observation-restart-archives.json",
+  "previous_duration_not_counted": true,
   "two_trading_days_verified": false,
+  "source_clock_offset_verified": false,
+  "calendar_verified": false,
   "mt4_deferred": true,
-  "deployments": [
-    {
-      "event": "deployment_started",
-      "at": 1791262860351,
-      "phase": "sustained",
-      "action": "api_recreate_for_cooldown_health",
-      "commit": "42ec05176b80b46e370d6a630fee78f1c20b3937",
-      "scope": "Ubuntu acceptance API only",
-      "started_at_utc": "2026-10-06T05:01:00.351000+00:00",
-      "completed_at": 1791262889349,
-      "runtime_live_module_sha256": "c73dcb17c3f73a580ecca426e90e262c4bbbeb58b99a27388511f1633c855419",
-      "live_api_sha256": "a9a6bd32c5cafdb5f963a1346b9226c196633d00f276570f16c533dad3aa8fa7",
-      "before_api": "9718cde30004",
-      "observer_pids": {
-        "market-watch-data-integration-browser.service": 2266365,
-        "market-watch-data-integration-rules.service": 2669988
-      },
-      "completed_at_utc": "2026-10-06T05:01:29.349000+00:00",
-      "after_api": "030ca18b1100",
-      "observer_pids_unchanged": true,
-      "worker_ids_unchanged": true,
-      "upstream_epochs_unchanged": true
-    }
-  ],
-  "latest_summary_sha256": "b06c8dc43bd5b80918c4383e661b8e7780c8f29742242d8482fa5552dfe020bd",
-  "latest_summary_scope": "Deployment events retained in post-deployment summary; live observer process unchanged"
+  "start_record": {
+    "event": "started",
+    "at": 1791283669037,
+    "phase": "sustained",
+    "started_at": 1791283668874,
+    "planned_end": 1791456468874,
+    "planned_minutes": 2880,
+    "poll_interval_seconds": 15,
+    "authentication_renewal_minutes": 720,
+    "owned": {
+      "67575ffc-5d15-4e73-aa6b-f9b075700626": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "cab0a0df-6f35-4cad-a6a3-b989656cee7e": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD"
+    },
+    "host": "Ubuntu host observing local isolated Docker API",
+    "url": "http://127.0.0.1:16589",
+    "source_clock_offset_verified": false
+  },
+  "evaluation_since": 1791283680000
 }

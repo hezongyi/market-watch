@@ -1,52 +1,32 @@
 {
-  "host": "Ubuntu local Docker API/worker/PostgreSQL and host Chromium acceptance tool",
+  "host": "Ubuntu local isolated Docker; host Chromium/rule observers",
   "project": "market-watch-data-integration",
-  "branch": "feat/market-data-integration",
-  "implementation_commit": "dfb272128b3320a6064dda1901238a4642ecf4ba",
-  "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
-  "observer_sha256": "56112e9c5f25d02f656ae3db68c657e0def5cf927604eb2635a87403741a7a61",
-  "started_at": 1791259454900,
-  "started_at_utc": "2026-10-06T04:04:14.900000+00:00",
-  "m1_measurement_since": 1791259500000,
-  "planned_end_at_utc": "2026-10-08T04:04:14.900000+00:00",
+  "phase": "sustained",
+  "event": "new_independent_window_after_disk_cleanup",
+  "started_at": 1791283673719,
+  "planned_end": 1791456473719,
+  "started_at_utc": "2026-10-06T10:47:53.719000+00:00",
+  "planned_end_utc": "2026-10-08T10:47:53.719000+00:00",
+  "observer_pid": 2233613,
   "planned_minutes": 2880,
-  "service": "market-watch-data-integration-browser.service",
-  "service_status_at_record": "active",
-  "raw_browser_records": "artifacts/data-integration/browser-sustained.jsonl (ignored)",
-  "calendar_status": "candidate; account division and historical exceptions not yet verified",
-  "source_clock_offset_verified": false,
+  "raw": "artifacts/data-integration/browser-sustained.jsonl",
+  "code_commit": "64282253f6db892b1e4cfb03331030004f6af292",
+  "prior_disk_interrupted_window": "sustained-observation-window-disk-interrupted.json",
+  "old_raw_preserved": "observation-restart-archives.json",
+  "previous_duration_not_counted": true,
   "two_trading_days_verified": false,
+  "source_clock_offset_verified": false,
+  "calendar_verified": false,
   "mt4_deferred": true,
-  "scope": "New complete window after proven authentication renewal; all earlier interrupted records retained",
-  "deployments": [
-    {
-      "event": "deployment_started",
-      "at": 1791262860351,
-      "phase": "sustained",
-      "action": "api_recreate_for_cooldown_health",
-      "commit": "42ec05176b80b46e370d6a630fee78f1c20b3937",
-      "scope": "Ubuntu acceptance API only",
-      "started_at_utc": "2026-10-06T05:01:00.351000+00:00",
-      "completed_at": 1791262889349,
-      "runtime_live_module_sha256": "c73dcb17c3f73a580ecca426e90e262c4bbbeb58b99a27388511f1633c855419",
-      "live_api_sha256": "a9a6bd32c5cafdb5f963a1346b9226c196633d00f276570f16c533dad3aa8fa7",
-      "before_api": "9718cde30004",
-      "observer_pids": {
-        "market-watch-data-integration-browser.service": 2266365,
-        "market-watch-data-integration-rules.service": 2669988
-      },
-      "completed_at_utc": "2026-10-06T05:01:29.349000+00:00",
-      "after_api": "030ca18b1100",
-      "observer_pids_unchanged": true,
-      "worker_ids_unchanged": true,
-      "upstream_epochs_unchanged": true
-    }
-  ],
-  "observer_pid": 2266365,
-  "previous_interrupted_window": "sustained-observation-window-interrupted.json",
-  "previous_interrupted_windows": [
-    "sustained-observation-window-interrupted.json",
-    "sustained-observation-window-pre-renewal.json"
-  ],
-  "authentication_renewal_minutes": 720
+  "start_record": {
+    "event": "started",
+    "at": 1791283673719,
+    "phase": "sustained",
+    "planned_minutes": 2880,
+    "host": "Ubuntu local Chromium",
+    "url": "http://127.0.0.1:16589/market-data",
+    "receiver_browser_same_host_clock": true,
+    "clock_scope": "same host; source clock offset remains unverified"
+  },
+  "first_full_source_minute": 1791283680000
 }

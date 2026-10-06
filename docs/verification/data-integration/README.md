@@ -6,10 +6,11 @@
 `integration_restore` 也是本任务的备份恢复校验数据库。未在 unraid 创建验收实例。
 
 当前分别交付[实现验收](implementation-acceptance.md)（通过）和
-[质量验收](quality-acceptance.md)（未通过）。2026-10-06 06:41/06:42UTC两个宿主观察进程
-失败退出，规则日志明确ENOSPC；六个实例容器仍运行。
-原质量收口时间失效，原JSONL及未完成尾记录保留，不直接继续追加以损坏证据。
-下面的窗口和PID说明是中断前记录；恢复观察须另建明确新窗口，不能称原窗口持续运行。
+[质量验收](quality-acceptance.md)（未通过，后台观察中）。实现先提交PR，后续问题另提交修复PR。
+2026-10-06 06:41/06:42UTC两个旧宿主观察进程失败退出，规则日志明确ENOSPC；
+六个实例容器仍运行。经授权清理已完成实例与缓存后，已恢复新的独立窗口，
+预计10月8日18:47（新加坡时间）结束观察。原JSONL、未完成尾记录及窗口元数据已归档，
+不将旧时长拼接为新窗口。连续48小时是工程观察方式，不是SDK官方要求或提交PR的前提。
 
 ## 启动与停止
 
@@ -106,16 +107,18 @@ systemctl --user stop market-watch-data-integration-browser.service
 [原窗口](sustained-observation-window-interrupted.json)及原 JSONL。工具补齐 15s 心跳超时重连，
 真实 Chromium 本地 502→恢复验证见 [重连证据](observer-reconnect.json)。
 03:50 窗口为工具续期修正而停止，[该窗口](sustained-observation-window-pre-renewal.json)保留。
-最终完整窗口于 **2026-10-06 04:04:14.900 UTC** 启动，计划至 **2026-10-08 04:04:14.900 UTC**。
-窗口起点/代码版本/状态见 [窗口记录](sustained-observation-window.json)；每次中断或重启都在 JSONL 追加
-事件，不能拼接成没有中断的窗口。工具每 12 小时重新登录并重载真实页面，保留续期事件；
+04:04窗口后来因宿主磁盘写入失败退出；[旧窗口](sustained-observation-window-disk-interrupted.json)
+及[原始归档](observation-restart-archives.json)保留，不拼接旧时长。
+当前新窗口于 **2026-10-06 10:47:53.719UTC** 启动，计划至 **2026-10-08 10:47:53.719UTC**。
+浏览器PID2233613；起点/代码版本见[窗口记录](sustained-observation-window.json)。
+工具每 12 小时重新登录并重载真实页面，保留续期事件；
 默认账户会话为 24 小时。[实际续期验证](observer-auth-renewal.json)在续期后继续收到 55 个心跳，
 无 SSE 错误。此 service 不设置自动重启或开机启用。实例停止前也应停止观察。
 小时版本再导入固定 replay 的证据、生产备份 Ubuntu 恢复与源日历适用性研究都在本目录，私密
 原始备份只存忽略目录，生产机器只读检查，不在那里创建验收实例。
 
-当前窗口摘要使用 `summarize_browser_observation.py ... --since 1791259454900`，
-后端 M1 完整分钟起点为 `1791259500000`。不将原窗口空白或部署迟到混成新窗口正常样本。
+当前窗口摘要使用 `summarize_browser_observation.py ... --since 1791283673719`，
+后端 M1 完整分钟起点为 `1791283680000`。不将原窗口空白或部署迟到混成新窗口正常样本。
 持续 M1 验收规则于 04:08 UTC 建立；其 armed_at 与首次 last_event 独立记录，
 预警计算验收从规则真实存在并完成首次判断后统计，不能回填到浏览器窗口起点。
 规则使用远离市场的价位保持 M1 计算活跃，不人为制造信号；先前真实触发样本另有证据。
@@ -123,7 +126,7 @@ systemctl --user stop market-watch-data-integration-browser.service
 按 UTC 小时与欧美观察时段输出有界持续验收报告，无需构建镜像或重启服务：
 
 ```bash
-sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml exec -T api python - --since 1791259500000 --evaluation-since 1791259740000' < scripts/sustained_live_report.py
+sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml exec -T api python - --since 1791283680000 --evaluation-since 1791283680000' < scripts/sustained_live_report.py
 ```
 
 该工具使用 PostgreSQL 只读 repeatable-read 快照，最多查询72小时，保留每个完整分钟的分母，
@@ -151,7 +154,7 @@ sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -
 一秒快照可能合并多个源更新，每次重新加载的首条报价可能被重新计数，浏览器可见更新率
 因此不能替代上游更新率，更不能当全tick频率。实际统计与分母回归见
 [更新率测试](update-rate-tests.txt)。
-浏览器计划结束为10月8日04:04:14UTC；持续规则的48小时计算窗口至少到04:09UTC后独立检查，
+当前浏览器计划结束为10月8日10:47:53UTC；持续规则计算自新窗口10:48UTC起独立统计，
 不能将创建前的几分钟回填成实际规则执行。
 
 ## 持续逐规则只读观察
@@ -181,7 +184,8 @@ systemctl --user stop market-watch-data-integration-rules.service
 两分钟真实工具验证含一次认证续期、实际规则推进和NTP采样，见
 [规则观察工具验证](rule-observer-validation.json)。正式窗口起点/计划结束及PID见
 [规则窗口](rules-observation-window.json)，[当前摘要](rules-sustained-checkpoint.json)保留短窗口进展。
-该窗口是额外48小时逐规则观察，不能向前回填到04:08规则创建时刻，也不重置原浏览器窗口。
+当前规则PID2233614，窗口10月6日10:47:48UTC至10月8日10:47:48UTC；旧窗口已归档。
+该窗口不回填到04:08规则创建时刻，不拼接磁盘中断前的时长。
 此service无自动重启或开机启用，每次start/finish都追加记录；不把多个片段拼成无中断窗口。
 
 ## 05:01 UTC 健康状态接口更新

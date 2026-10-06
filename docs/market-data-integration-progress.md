@@ -423,3 +423,19 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
   逐规则313次采样保留2次部署502失败，两规则各观察79次推进、无暂停或回退。
 - 验收实例六个服务仍running，API/PG健康；Ubuntu宿主可用磁盘约2GB，
   本任务ignored artifacts约58MB。不重新构建、不删除其他任务资源；继续真实窗口及来源适用性核实。
+
+### 2026-10-06 10:48 UTC：容量恢复、独立后台观察与实现PR
+
+- 用户授权分析并直接清理已完成实例与已统计缓存。按精确Compose标签清理8个已完成/被新候选
+  替代的项目，数据库先pg_dump并以pg_restore --list校验备份目录；未另建实例恢复验证。
+  备份位于ignored artifacts目录，源码/验收记录保留；活动项目、生产环境未删除，无全局prune。
+- 下载/编译缓存已清理，系统journal因权限不足未清理，未删除镜像或build cache。
+  [清理结果](verification/data-integration/ubuntu-cleanup-result.json)记录精确名称、备份hash与文件系统余量，
+  可用空间恢复至约16GiB；净变化含其他任务并发，不能等同单独镜像层释放量。
+- 原中断JSONL按[清单](verification/data-integration/observation-restart-archives.json)保留字节/hash，
+  新raw另建；浏览器PID2233613、规则PID2233614 active/running，记录继续追加。
+  新窗口10月6日10:47UTC起，计划10月8日18:47新加坡时间结束；不拼接旧时长，不自动判通过。
+- 用户决定实现先推PR，质量验收后台继续，有问题再提交修复PR。48小时方式来自工程实现，
+  两活跃交易日来自方案第10节，并非SDK官方要求；质量窗口不作为提交PR前提。
+  [实现报告](verification/data-integration/implementation-acceptance.md)保持通过，
+  [质量报告](verification/data-integration/quality-acceptance.md)仍未通过，保留来源证据、迟到与失败限制。
