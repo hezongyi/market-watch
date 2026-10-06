@@ -2,7 +2,7 @@
   "starts": [
     {
       "event": "started",
-      "at": 1791258658841,
+      "at": 1791259454900,
       "phase": "sustained",
       "planned_minutes": 2880,
       "host": "Ubuntu local Chromium",
@@ -13,66 +13,69 @@
   ],
   "finishes": [],
   "deployments": [],
-  "measurement_since": 1791258658841,
-  "prior_records_retained_in_original": 92,
+  "session_renewals": [],
+  "measurement_since": 1791259454900,
+  "prior_records_retained_in_original": 118,
   "contains_deployment": false,
-  "first_block": 1791258689229,
-  "last_block": 1791258719241,
-  "blocks": 2,
-  "snapshots": 53,
-  "heartbeats": 59,
+  "first_block": 1791259485335,
+  "last_block": 1791260866328,
+  "blocks": 47,
+  "snapshots": 1104,
+  "heartbeats": 1363,
   "errors": 0,
+  "zero_heartbeat_blocks": 0,
+  "max_block_interval_ms": 30115,
   "opened": 1,
   "symbols": {
-    "XAUUSD": {
-      "unique_quotes": 51,
+    "EURUSD": {
+      "unique_quotes": 337,
       "negative_delays": 0,
       "missing_quote_snapshots": 0,
       "epoch_changes": 0,
       "quality_counts": {
-        "healthy": 53
+        "healthy": 1009,
+        "stale": 95
       },
       "receive_to_browser_ms": {
-        "samples": 51,
+        "samples": 337,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 310,
-        "p95_ms": 1010,
-        "p99_ms": 1260
+        "p50_ms": 460,
+        "p95_ms": 1040,
+        "p99_ms": 1210
       },
       "source_to_browser_ms": {
-        "samples": 51,
+        "samples": 337,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 610,
-        "p95_ms": 1330,
-        "p99_ms": 1420
+        "p50_ms": 850,
+        "p95_ms": 1600,
+        "p99_ms": 1870
       }
     },
-    "EURUSD": {
-      "unique_quotes": 8,
+    "XAUUSD": {
+      "unique_quotes": 974,
       "negative_delays": 0,
       "missing_quote_snapshots": 0,
       "epoch_changes": 0,
       "quality_counts": {
-        "healthy": 48,
-        "stale": 5
+        "healthy": 1104
       },
       "receive_to_browser_ms": {
-        "samples": 8,
+        "samples": 974,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 360,
-        "p95_ms": 1020,
-        "p99_ms": 1020
+        "p50_ms": 380,
+        "p95_ms": 980,
+        "p99_ms": 1090
       },
       "source_to_browser_ms": {
-        "samples": 8,
+        "samples": 974,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 660,
-        "p95_ms": 1310,
-        "p99_ms": 1310
+        "p50_ms": 700,
+        "p95_ms": 1340,
+        "p99_ms": 1700
       }
     }
   },

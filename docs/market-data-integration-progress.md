@@ -211,6 +211,34 @@ Ubuntu 接收机重新读取 systemd NTP：offset −12.298ms、root distance 22
 M1 since **1791258660000**。按明确 since 统计新窗口，原 JSONL 不删除。
 当前尚不能宣称两交易日已通过，目标保持 active。
 
+## 十年最终内容与长期验收工具（2026-10-06 04:00 UTC 起）
+
+- 两品种十年固定区间已全部发布并真实逐块校验：EURUSD **3,724,278 observed /
+  1,534,602 unknown /859 chunks**；XAUUSD **3,540,725 observed /1,718,155 unknown /814 chunks**。
+  [最终审计](verification/data-integration/history-ten-year-integrity.json)额外检查 manifest chunk 索引、
+  完成时间与 volume 非负；EUR 原 685 chunks/2,986,089 M1 和派生前缀逐块原值一致。
+  整体 unknown 不借来源日历重分类成确定闭市。
+- [旧候选聚合](verification/data-integration/calendar-revalidation.json)核对结束：520,262 个完整标记，
+  撤销 116 个 XAUUSD 缺观测依据的标记；M1、immutable history/replay 不变。
+- 真实认证 API 已验证 EUR 十年版本回放、seek 和实际同源十分钟再导入，前后 replay/manifest
+  保持一致；XAU 对应验证亦通过（约284万根预热/439.491s），见
+  [十年回放](verification/data-integration/ten-year-replays.json)。约 299 万根 EUR 历史预热创建耗时 **410.863s**，
+  这是同步全历史预热的使用限制，不能用小时样本声称十年回放立即可用。
+- 24h 默认登录期限短于 48h 长观察；工具新增每12h真实重新登录/页面重连，记录每次续期。
+  [实际2min工具验证](verification/data-integration/observer-auth-renewal.json)续期后55个心跳、errors0。
+  03:50窗口主动结束，旧记录全部保留；最终工具 **PID2266365** 的窗口为
+  **2026-10-06 04:04:14.900 UTC → 2026-10-08 04:04:14.900 UTC**，M1 since **1791259500000**。
+  systemd KillMode=mixed 使停止时先只通知父进程，避免提前关闭 Chromium 子进程。
+- 两品种持续 M1 验收规则于04:08UTC通过真实API建立，首次 last_event 已推进至04:09，
+  无signal。[规则起点](verification/data-integration/sustained-m1-watches-start.json)保留armed_at，
+  不能把此前无规则的 ingestion时刻包装为已执行预警计算。规则仅属Ubuntu验收，外部投递关闭。
+- 两活跃交易日、实际maintenance/recovery及实际来源会话适用性仍未完成；目标保持active。
+
+两品种十年 API 验收最后均通过；[真实浏览器](verification/data-integration/ten-year-browser.json)
+也确认版本选择、恢复已保存回放、501根可见柱和未来隐藏，无页面异常。工具最初对“品种”标签
+使用 exact 匹配而失败；实际 DOM 品种和版本值正确，改为正常标签匹配后通过。
+当前长期观察与 M1 规则仍运行，所有实际状态包括 stale/unknown 都保留。
+
 ## 基线审计与实现
 
 - 原方案引用 v1.7.0；新基线增加了平台原生历史缓存、后台任务、指标契约，managed M1 的来源字段

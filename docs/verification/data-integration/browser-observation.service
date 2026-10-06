@@ -9,5 +9,6 @@ Environment=MW_OBSERVE_PHASE=sustained
 Environment=LD_LIBRARY_PATH=/home/quant/.local/share/playwright-deps-jammy/usr/lib/x86_64-linux-gnu
 ExecStart=/usr/bin/node tests/data-integration.observe.cjs
 Restart=no
+KillMode=mixed
 TimeoutStopSec=40
 MemoryMax=640M

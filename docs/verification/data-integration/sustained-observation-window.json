@@ -2,13 +2,13 @@
   "host": "Ubuntu local Docker API/worker/PostgreSQL and host Chromium acceptance tool",
   "project": "market-watch-data-integration",
   "branch": "feat/market-data-integration",
-  "implementation_commit": "1cadd88",
+  "implementation_commit": "dfb272128b3320a6064dda1901238a4642ecf4ba",
   "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
-  "observer_sha256": "4bc1151a742f58fea9dc96529d8331fb1b4a08b7ee176857be6dc0a57b0e8d1a",
-  "started_at": 1791258658841,
-  "started_at_utc": "2026-10-06T03:50:58.841000+00:00",
-  "m1_measurement_since": 1791258660000,
-  "planned_end_at_utc": "2026-10-08T03:50:58.841000+00:00",
+  "observer_sha256": "56112e9c5f25d02f656ae3db68c657e0def5cf927604eb2635a87403741a7a61",
+  "started_at": 1791259454900,
+  "started_at_utc": "2026-10-06T04:04:14.900000+00:00",
+  "m1_measurement_since": 1791259500000,
+  "planned_end_at_utc": "2026-10-08T04:04:14.900000+00:00",
   "planned_minutes": 2880,
   "service": "market-watch-data-integration-browser.service",
   "service_status_at_record": "active",
@@ -17,8 +17,13 @@
   "source_clock_offset_verified": false,
   "two_trading_days_verified": false,
   "mt4_deferred": true,
-  "scope": "New observation window after watchdog repair; old interrupted records retained in same JSONL",
+  "scope": "New complete window after proven authentication renewal; all earlier interrupted records retained",
   "deployments": [],
-  "observer_pid": 2127966,
-  "previous_interrupted_window": "sustained-observation-window-interrupted.json"
+  "observer_pid": 2266365,
+  "previous_interrupted_window": "sustained-observation-window-interrupted.json",
+  "previous_interrupted_windows": [
+    "sustained-observation-window-interrupted.json",
+    "sustained-observation-window-pre-renewal.json"
+  ],
+  "authentication_renewal_minutes": 720
 }

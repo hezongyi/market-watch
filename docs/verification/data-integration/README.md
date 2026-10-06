@@ -57,6 +57,17 @@ LD_LIBRARY_PATH=/home/quant/.local/share/playwright-deps-jammy/usr/lib/x86_64-li
 
 # 原始已发布版本内容/精度/unknown 分区审计；十年版本发布后可加 --minimum-years 9。
 sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml exec -T api python -' < scripts/verify_history_snapshot.py
+
+# 已发布十年版本的真实 API 回放、步进/定位和同源再导入固定输入校验。
+.venv/bin/python scripts/verify_ten_year_replays.py
+# 恢复上述真实已保存十年回放并核对图表和未来隐藏。
+cd web
+LD_LIBRARY_PATH=/home/quant/.local/share/playwright-deps-jammy/usr/lib/x86_64-linux-gnu node tests/data-integration.ten-year.cjs
+cd ..
+
+# 两品种持续 M1 规则；结束窗口后只取消本工具拥有的规则。
+.venv/bin/python scripts/sustained_m1_watches.py status
+.venv/bin/python scripts/sustained_m1_watches.py cancel
 ```
 
 API 镜像更新会短暂中断 HTTP；在开始正常负载/长观测窗口前完成部署并等待 readyz 与采集恢复。
@@ -88,19 +99,26 @@ systemctl --user stop market-watch-data-integration-browser.service
 原 03:06 UTC 窗口因 API 部署触发观察工具 EventSource CLOSED 而中断，保留
 [原窗口](sustained-observation-window-interrupted.json)及原 JSONL。工具补齐 15s 心跳超时重连，
 真实 Chromium 本地 502→恢复验证见 [重连证据](observer-reconnect.json)。新完整窗口于
-**2026-10-06 03:50:58.841 UTC** 启动，计划至 **2026-10-08 03:50:58.841 UTC**。
+03:50 窗口为工具续期修正而停止，[该窗口](sustained-observation-window-pre-renewal.json)保留。
+最终完整窗口于 **2026-10-06 04:04:14.900 UTC** 启动，计划至 **2026-10-08 04:04:14.900 UTC**。
 窗口起点/代码版本/状态见 [窗口记录](sustained-observation-window.json)；每次中断或重启都在 JSONL 追加
-事件，不能拼接成没有中断的窗口。此 service 不设置自动重启或开机启用。实例停止前也应停止观察。
+事件，不能拼接成没有中断的窗口。工具每 12 小时重新登录并重载真实页面，保留续期事件；
+默认账户会话为 24 小时。[实际续期验证](observer-auth-renewal.json)在续期后继续收到 55 个心跳，
+无 SSE 错误。此 service 不设置自动重启或开机启用。实例停止前也应停止观察。
 小时版本再导入固定 replay 的证据、生产备份 Ubuntu 恢复与源日历适用性研究都在本目录，私密
 原始备份只存忽略目录，生产机器只读检查，不在那里创建验收实例。
 
-当前窗口摘要使用 `summarize_browser_observation.py ... --since 1791258658841`，
-后端 M1 完整分钟起点为 `1791258660000`。不将原窗口空白或部署迟到混成新窗口正常样本。
+当前窗口摘要使用 `summarize_browser_observation.py ... --since 1791259454900`，
+后端 M1 完整分钟起点为 `1791259500000`。不将原窗口空白或部署迟到混成新窗口正常样本。
+持续 M1 验收规则于 04:08 UTC 建立；其 armed_at 与首次 last_event 独立记录，
+预警计算验收从规则真实存在并完成首次判断后统计，不能回填到浏览器窗口起点。
+规则使用远离市场的价位保持 M1 计算活跃，不人为制造信号；先前真实触发样本另有证据。
 
 ## 当前结果与限制
 
 后端与 PostgreSQL 测试记录、截图、容器快照与故障 JSON 位于本目录。
-十年导入仍在后台运行；当前源日历是 `ny17-candidate-v1`，保持未核实。
+两品种十年版本已发布且全量原始内容校验通过。EURUSD 新版 `ny17-observed-v2` 为六位精度，
+XAUUSD 为三位精度；来源会话均保持未核实。
 持续采集尚未达到两个交易日，价龄没有独立时钟偏差校准。
 短样本与故障恢复结果不代表完整 P0–P2 验收已通过；最终状态见
 [接续开发记录](../../market-data-integration-progress.md)。

@@ -23,6 +23,13 @@ def verify(db, version):
     cursor = version.start
     rows = volume_present = volume_nonzero = gaps = gap_minutes = chunks = 0
     boundary_samples = []
+    actual_precision = Counter()
+    manifest = version.manifest
+    manifest_chunks = manifest["chunks"]
+    provenance = manifest.get("provenance")
+    parent = db.get(HistoryVersion, provenance["derived_from_version"]) if provenance else None
+    prefix_digest = hashlib.sha256()
+    prefix_chunks = prefix_rows = 0
     for chunk in db.scalars(select(HistoryChunk).where(HistoryChunk.version_id == version.id)
                             .order_by(HistoryChunk.start).execution_options(yield_per=1)):
         if chunk.start != cursor or chunk.end <= cursor:
@@ -34,15 +41,30 @@ def verify(db, version):
         content = json.loads(raw)
         if len(content) != chunk.count:
             raise ValueError("Chunk row count mismatch")
+        if chunks >= len(manifest_chunks) or manifest_chunks[chunks] != {
+                "id": chunk.id, "start": chunk.start, "end": chunk.end,
+                "count": chunk.count, "checksum": chunk.checksum}:
+            raise ValueError("Manifest chunk index mismatch")
+        if provenance and chunk.start < provenance["original_cursor"]:
+            original = db.scalar(select(HistoryChunk).where(HistoryChunk.version_id == parent.id,
+                                                           HistoryChunk.start == chunk.start))
+            if not original or any(getattr(original, key) != getattr(chunk, key) for key in (
+                    "end", "count", "checksum", "content", "unknown", "result", "observed_at")):
+                raise ValueError("Derived prefix differs from immutable parent")
+            prefix_digest.update(chunk.checksum.encode())
+            prefix_chunks += 1
+            prefix_rows += chunk.count
         prior = chunk.start - 60000
         observed = set()
         for row in content:
             stamp = row["timestamp"]
-            if stamp <= prior or stamp % 60000 or not chunk.start <= stamp < chunk.end:
+            if type(stamp) is not int or stamp <= prior or stamp % 60000 or not chunk.start <= stamp < chunk.end:
                 raise ValueError("Rows are duplicate, disordered or outside their UTC minute partition")
             prior = stamp
             observed.add(stamp)
             prices = {key: Decimal(row[key]) for key in ("open", "high", "low", "close")}
+            if row.get("complete") is not True or stamp + 60000 > chunk.observed_at - 5000:
+                raise ValueError("Source row lacks completed-minute finality")
             if any(not price.is_finite() or price <= 0 or price != price.quantize(precision)
                    for price in prices.values()):
                 raise ValueError("Invalid source price/precision")
@@ -50,6 +72,10 @@ def verify(db, version):
                     prices["open"], prices["close"]) <= prices["high"]:
                 raise ValueError("Invalid OHLC envelope")
             volume = Decimal(row["volume"]) if row["volume"] is not None else None
+            if volume is not None and (not volume.is_finite() or volume < 0):
+                raise ValueError("Invalid original volume")
+            for price in prices.values():
+                actual_precision[str(max(0, -price.normalize().as_tuple().exponent))] += 1
             volume_present += volume is not None
             volume_nonzero += volume is not None and volume > 0
             date = datetime.fromtimestamp(stamp / 1000, UTC)
@@ -81,10 +107,13 @@ def verify(db, version):
         rows += len(content)
         chunks += 1
         cursor = chunk.end
-    manifest = version.manifest
     if (cursor != version.end or rows != manifest["rows"] or gap_minutes != manifest["unknown_minutes"]
-            or digest.hexdigest() != manifest["checksum"]):
+            or digest.hexdigest() != manifest["checksum"] or chunks != len(manifest_chunks)):
         raise ValueError("Manifest totals/checksum/range mismatch")
+    if provenance and (parent.cursor != provenance["original_cursor"]
+            or prefix_chunks != provenance["copied_chunks"] or prefix_rows != provenance["copied_minutes"]
+            or prefix_digest.hexdigest() != provenance["original_prefix_checksum"]):
+        raise ValueError("Derivation provenance count/checksum mismatch")
     return {"version": version.id, "logical_symbol": dataset.logical_symbol, "identity": dataset.identity,
             "start": version.start, "end": version.end, "chunks": chunks,
             "checksum": digest.hexdigest(), "all_checks_passed": True,
@@ -93,6 +122,11 @@ def verify(db, version):
                       for year in sorted(set(years) | set(gaps_by_year))},
             "largest_unknown_intervals": largest_gaps,
             "precision": instrument.precision, "volume_kind": dataset.volume_kind,
+            "observed_ohlc_nonzero_decimal_places": dict(sorted(actual_precision.items())),
+            "completed_minute_finality_checked": True, "volume_nonnegative_checked": True,
+            "manifest_chunk_index_checked": True,
+            "derivation_provenance_verified": bool(provenance),
+            "derived_prefix_chunks": prefix_chunks, "derived_prefix_minutes": prefix_rows,
             "volume_unit": dataset.volume_unit, "volume_present": volume_present,
             "volume_nonzero": volume_nonzero, "month_utc_boundary_samples": boundary_samples,
             "calendar_status": "candidate; no unknown interval is relabeled as proven closure",

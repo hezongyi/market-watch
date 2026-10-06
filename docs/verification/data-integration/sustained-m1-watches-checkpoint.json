@@ -1,0 +1,70 @@
+{
+  "host": "Ubuntu isolated Docker",
+  "observed_at": 1791260874622,
+  "command": "status",
+  "external_delivery": "disabled by acceptance Compose",
+  "watches": [
+    {
+      "id": "67575ffc-5d15-4e73-aa6b-f9b075700626",
+      "instrument_id": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "name": "Ubuntu sustained M1 acceptance XAUUSD",
+      "status": "active",
+      "armed_at": 1791259733075,
+      "paused_reason": null,
+      "state": {
+        "previous": {
+          "start": 1791260760000,
+          "end": 1791260820000,
+          "open": "4126.8550000000",
+          "high": "4127.2850000000",
+          "low": "4126.4550000000",
+          "close": "4127.1850000000",
+          "complete": true,
+          "revision": 1,
+          "volume": "70.000000000000000000",
+          "volume_complete": true
+        },
+        "last_event": 1791260820000,
+        "indicator_closes": [],
+        "indicator_reading": null,
+        "down_count": 0,
+        "up_count": 1,
+        "buy_ready": true,
+        "sell_ready": true
+      }
+    },
+    {
+      "id": "cab0a0df-6f35-4cad-a6a3-b989656cee7e",
+      "instrument_id": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "name": "Ubuntu sustained M1 acceptance EURUSD",
+      "status": "active",
+      "armed_at": 1791259733032,
+      "paused_reason": null,
+      "state": {
+        "previous": {
+          "start": 1791260760000,
+          "end": 1791260820000,
+          "open": "1.1217800000",
+          "high": "1.1218600000",
+          "low": "1.1217200000",
+          "close": "1.1218600000",
+          "complete": true,
+          "revision": 1,
+          "volume": "66.000000000000000000",
+          "volume_complete": true
+        },
+        "last_event": 1791260820000,
+        "indicator_closes": [],
+        "indicator_reading": null,
+        "down_count": 0,
+        "up_count": 1,
+        "buy_ready": true,
+        "sell_ready": true
+      }
+    }
+  ],
+  "signal_counts": {
+    "67575ffc-5d15-4e73-aa6b-f9b075700626": 0,
+    "cab0a0df-6f35-4cad-a6a3-b989656cee7e": 0
+  }
+}

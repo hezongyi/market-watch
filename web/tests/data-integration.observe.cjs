@@ -9,9 +9,12 @@ const path = require("node:path");
   const base = "http://127.0.0.1:16589";
   const minutes = Number(process.env.MW_OBSERVE_MINUTES || 2880);
   const phase = process.env.MW_OBSERVE_PHASE || "sustained";
+  const renewalMinutes = Number(process.env.MW_OBSERVE_REAUTH_MINUTES || 720);
   if (!["sustained", "tool-validation"].includes(phase)) throw Error("Invalid observation phase");
   if (!Number.isFinite(minutes) || minutes < 1 || minutes > 4320)
     throw Error("Observation must be 1–4320 minutes");
+  if (!Number.isFinite(renewalMinutes) || renewalMinutes < 1 || renewalMinutes > 720)
+    throw Error("Authentication renewal must be 1–720 minutes");
   const directory = path.join(root, "artifacts/data-integration");
   const output = path.join(directory, `browser-${phase}.jsonl`);
   const browser = await chromium.launch({ headless: true });
@@ -20,6 +23,7 @@ const path = require("node:path");
   const login = await context.request.post(base + "/api/login", { data: credential });
   if (!login.ok()) throw Error("Isolated observation login failed");
   const page = await context.newPage();
+  let authenticatedAt = Date.now();
   const start = Date.now();
   let stopped = false;
   process.on("SIGINT", () => { stopped = true; });
@@ -30,7 +34,7 @@ const path = require("node:path");
     clock_scope: "same host; source clock offset remains unverified" });
   try {
     await page.goto(base + "/market-data");
-    await page.evaluate((start) => {
+    const observe = async () => page.evaluate((start) => {
       const empty = () => ({ snapshots: 0, heartbeats: 0, errors: 0, opened: 0, symbols: {} });
       window.marketObservation = empty();
       window.marketObservationEmpty = empty;
@@ -89,14 +93,26 @@ const path = require("node:path");
         if (Date.now() - received > 15000 && navigator.onLine) connect();
       }, 1000);
     }, start);
+    await observe();
     while (!stopped && Date.now() - start < minutes * 60000) {
       await new Promise((resolve) => setTimeout(resolve, 30000));
+      if (stopped) break;
       const block = await page.evaluate(() => {
         const current = window.marketObservation;
         window.marketObservation = window.marketObservationEmpty();
         return current;
       });
       append({ event: "block", at: Date.now(), phase, ...block });
+      if (Date.now() - authenticatedAt >= renewalMinutes * 60000) {
+        const renewed = await context.request.post(base + "/api/login", { data: credential });
+        if (!renewed.ok()) throw Error("Observation authentication renewal failed");
+        authenticatedAt = Date.now();
+        // Real page boot obtains the new session CSRF. Record the reload and
+        // its pause explicitly; it does not restart the upstream source.
+        await page.reload();
+        await observe();
+        append({ event: "session_renewed", at: Date.now(), phase });
+      }
     }
     append({ event: "finished", at: Date.now(), interrupted: stopped });
   } catch (error) {

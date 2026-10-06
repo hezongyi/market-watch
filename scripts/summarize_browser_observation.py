@@ -15,9 +15,12 @@ def main():
     totals = {}
     starts, finishes = [], []
     deployments = []
+    renewals = []
     first = last = None
     blocks = snapshots = heartbeats = errors = opened = 0
     prior_records = 0
+    silent_blocks = 0
+    max_block_interval = 0
     for line in args.file.read_text().splitlines():
         record = json.loads(line)
         if record.get("at", 0) < args.since:
@@ -29,7 +32,11 @@ def main():
             finishes.append(record)
         elif record["event"].startswith("deployment_"):
             deployments.append(record)
+        elif record["event"] == "session_renewed":
+            renewals.append(record)
         elif record["event"] == "block":
+            silent_blocks += int(record["heartbeats"] == 0)
+            max_block_interval = max(max_block_interval, record["at"] - last if last else 0)
             first = min(first or record["at"], record["at"])
             last = max(last or record["at"], record["at"])
             blocks += 1
@@ -71,9 +78,11 @@ def main():
                 result[f"p{int(fraction * 100)}_ms"] = value
             total[key] = result
     print(json.dumps({"starts": starts, "finishes": finishes, "deployments": deployments,
+        "session_renewals": renewals,
         "measurement_since": args.since, "prior_records_retained_in_original": prior_records,
         "contains_deployment": bool(deployments), "first_block": first, "last_block": last,
         "blocks": blocks, "snapshots": snapshots, "heartbeats": heartbeats, "errors": errors,
+        "zero_heartbeat_blocks": silent_blocks, "max_block_interval_ms": max_block_interval,
         "opened": opened, "symbols": totals,
         "meaning": "quote keys observed through browser SSE; invalid timings separate; 1s snapshots can omit upstream updates",
         "source_clock_offset_verified": False, "two_trading_days_verified": False}, indent=2))
