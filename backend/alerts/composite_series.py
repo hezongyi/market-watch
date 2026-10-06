@@ -117,7 +117,9 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
     revision = db.get(CompositeRevision, revision_id or composite.active_revision_id)
     if not revision or revision.composite_id != composite.id:
         raise ValueError("Composite revision does not belong to this definition")
-    if not 0 <= start < end or start % 60000 or end % 60000 or end - start > 32 * 86400000:
+    # A week/month containing the Unix epoch may have a negative bucket start;
+    # actual source timestamps remain nonnegative and history reads clamp below.
+    if not start < end or start % 60000 or end % 60000 or end - start > 32 * 86400000:
         raise ValueError("Use a bounded UTC minute partition of at most 32 days")
     if provisional and input_revision is not None:
         raise ValueError("Fixed confirmed input cannot include mutable stream observations")

@@ -1,6 +1,7 @@
 """Saved mapping, pure management, immutable first use and fixed publication."""
 
 import pytest
+from alerts.chart_data import FRAMES
 from alerts.composite_definitions import ProductMatch, first_use, save_mapping
 from alerts.config import settings
 from alerts.history_artifacts import artifact_tick
@@ -10,6 +11,7 @@ from alerts.history_versions import create_version, import_page
 from alerts.storage import (
     CompositePreparation,
     CompositeRevision,
+    HistoryArtifact,
     Instrument,
     MarketCatalog,
     MarketComposite,
@@ -17,7 +19,7 @@ from alerts.storage import (
     MarketDemand,
     RealtimeMapping,
 )
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from test_history_versions import Adapter
 from test_market_contracts import batch, identity, minute
 from test_market_datasets import register
@@ -93,6 +95,10 @@ def test_first_use_fixes_baseline_and_seam_and_daily_publish_does_not_replace_it
         assert original.history_version_id == parent and original.seam == 165600000
         assert db.get(CompositePreparation, original.id).cursor == original.seam
         assert first_use(db, identity().key, mapping.id).id == composite.id
+        # A pre-upgrade composite may only have requested M1. Reopening must
+        # backfill period tasks on its fixed parent without adopting daily head.
+        db.execute(delete(HistoryArtifact).where(HistoryArtifact.version_id == parent,
+            HistoryArtifact.timeframe != "M1", HistoryArtifact.status == "pending"))
         assert db.scalar(select(func.count()).select_from(MarketComposite)) == 1
         assert db.scalar(select(MarketDemand)) is None
         assert references(db, identity().key)["items"]
@@ -104,6 +110,8 @@ def test_first_use_fixes_baseline_and_seam_and_daily_publish_does_not_replace_it
         assert repeated.active_revision_id == original.id
         assert db.get(CompositeRevision, original.id).history_version_id == parent
         assert db.get(CompositeRevision, original.id).seam == 165600000
+        assert set(db.scalars(select(HistoryArtifact.timeframe).where(
+            HistoryArtifact.version_id == parent))) == set(FRAMES)
     with pytest.raises(ValueError, match="immutable"):
         with database.begin() as db:
             db.get(CompositeRevision, original.id).seam += 60000

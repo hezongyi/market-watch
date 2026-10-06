@@ -11,9 +11,10 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 from sqlalchemy import select
 
+from .chart_data import FRAMES
 from .config import settings
 from .domain import session_bounds
-from .history_artifacts import chart_page
+from .history_artifacts import chart_page, request_artifacts
 from .history_catalog import account_scope, asset_class
 from .history_sources import history_identity
 from .market_contracts import DatasetIdentity
@@ -123,6 +124,23 @@ def save_mapping(db, dataset_id, catalog_id, match, *, permission_scope="workspa
     return mapping
 
 
+def baseline(db, dataset_id, calendar):
+    """Pure fixed-baseline eligibility shared by candidate reads and first use."""
+    version = db.scalar(select(HistoryVersion).join(HistoryArtifact).where(
+        HistoryVersion.dataset_id == dataset_id, HistoryVersion.status == "published",
+        HistoryArtifact.timeframe == "M1", HistoryArtifact.status == "published", HistoryArtifact.count > 0,
+        ~select(HistoryReclamation.version_id).where(HistoryReclamation.version_id == HistoryVersion.id).exists())
+        .order_by(HistoryVersion.published_at.desc(), HistoryVersion.id.desc()).limit(1))
+    if not version:
+        raise ValueError("组合需要已有可用的固定M1历史及周期产物，请先维护")
+    newest = chart_page(db, version.id, "M1", count=1)["bars"][-1]
+    cutoff = min(version.end, newest["end"])
+    seam = ms(session_bounds(instant(cutoff), calendar)[0])
+    if seam <= version.start:
+        raise ValueError("日界拼接点之前没有历史基线，请先维护更早历史；不会自动改成非日界拼接")
+    return version, seam
+
+
 def first_use(db, dataset_id, mapping_id, *, permission_scope="workspace:default"):
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
     mapping = db.get(RealtimeMapping, mapping_id)
@@ -140,19 +158,10 @@ def first_use(db, dataset_id, mapping_id, *, permission_scope="workspace:default
         raise ValueError("实时映射属于其他账户，请明确保存新映射")
     existing = db.get(MarketComposite, ident)
     if existing:
+        fixed = db.get(CompositeRevision, existing.active_revision_id)
+        request_artifacts(db, db.get(HistoryVersion, fixed.history_version_id), FRAMES)
         return existing  # Daily publication never moves the original baseline/T.
-    version = db.scalar(select(HistoryVersion).join(HistoryArtifact).where(
-        HistoryVersion.dataset_id == dataset_id, HistoryVersion.status == "published",
-        HistoryArtifact.timeframe == "M1", HistoryArtifact.status == "published", HistoryArtifact.count > 0,
-        ~select(HistoryReclamation.version_id).where(HistoryReclamation.version_id == HistoryVersion.id).exists())
-        .order_by(HistoryVersion.published_at.desc(), HistoryVersion.id.desc()).limit(1))
-    if not version:
-        raise ValueError("组合需要已有可用的固定M1历史及周期产物，请先维护")
-    newest = chart_page(db, version.id, "M1", count=1)["bars"][-1]
-    cutoff = min(version.end, newest["end"])
-    seam = ms(session_bounds(instant(cutoff), source.calendar)[0])
-    if seam <= version.start:
-        raise ValueError("日界拼接点之前没有历史基线，请先维护更早历史；不会自动改成非日界拼接")
+    version, seam = baseline(db, dataset_id, source.calendar)
     ticker = "MC:" + ident[:25] + ":" + dataset.logical_symbol
     instrument = Instrument(id=ticker, label=dataset.logical_symbol, source="composite",
         symbol=dataset.logical_symbol, basis="bid", calendar=source.calendar,
@@ -169,6 +178,7 @@ def first_use(db, dataset_id, mapping_id, *, permission_scope="workspace:default
     db.add(revision)
     db.flush()
     composite.active_revision_id = revision.id
+    request_artifacts(db, version, FRAMES)
     db.add(CompositePreparation(revision_id=revision.id, cursor=seam,
         cutoff=(now_ms() - 5000) // 60000 * 60000, state={"stage": "confirm_recent_m1",
             "historical_input": {"version_id": version.id, "checksum": version.manifest["checksum"],

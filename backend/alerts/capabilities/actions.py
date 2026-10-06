@@ -455,4 +455,7 @@ def build_registry():
             )
         )
     register_history(registry)
+    from .composite import register_composite
+
+    register_composite(registry)
     return registry.freeze()

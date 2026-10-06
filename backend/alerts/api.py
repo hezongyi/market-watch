@@ -1025,6 +1025,10 @@ from .history_api import router as history_router  # noqa: E402
 
 app.include_router(history_router(authenticated))
 
+from .composite_api import router as composite_router  # noqa: E402
+
+app.include_router(composite_router(authenticated))
+
 from .live_api import router as live_router  # noqa: E402
 
 app.include_router(live_router(authenticated))

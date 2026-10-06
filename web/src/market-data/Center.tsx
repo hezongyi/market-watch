@@ -3,6 +3,7 @@ import { Link, Route, Routes, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { DatasetDetail } from "./DatasetDetail";
 import { DatasetCreate } from "./DatasetCreate";
+import { CompositeDetail, CompositeList, MappingForm } from "./Composites";
 import {
   names,
   phase,
@@ -79,7 +80,7 @@ function CenterList() {
   const endpoint =
     tab === "tasks" ? "tasks" : tab === "platform" ? "platform" : "datasets";
   const result = useSnapshot<Page<any>>(
-    `/market-data/center/${endpoint}?${key}`,
+    tab === "composite" ? null : `/market-data/center/${endpoint}?${key}`,
     refresh,
   );
   const sources = useSnapshot<any[]>("/market-data/sources");
@@ -197,9 +198,7 @@ function CenterList() {
       )}
       {notice && <p role="status">{notice}</p>}
       {tab === "composite" ? (
-        <p>
-          组合接续正在开发；当前未建立组合，不启动实时采集。已有历史可在自建行情中查看。
-        </p>
+        <CompositeList />
       ) : (
         <>
           <Feedback
@@ -439,6 +438,8 @@ export default function Center() {
       <Route index element={<CenterList />} />
       <Route path="datasets/new" element={<DatasetCreate />} />
       <Route path="datasets/:id" element={<DatasetDetail />} />
+      <Route path="datasets/:id/mapping" element={<MappingForm />} />
+      <Route path="composites/:id" element={<CompositeDetail />} />
     </Routes>
   );
 }
