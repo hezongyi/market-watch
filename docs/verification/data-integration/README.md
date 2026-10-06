@@ -197,6 +197,12 @@ systemctl --user stop market-watch-data-integration-rules.service
 不能用SSE errors没有增加推断全程没有观察空白。同期宿主压力作为上下文记录，未证明为根因；
 两个观察进程和规则计算仍在运行，未重启或清理其他任务资源。
 
+05:27UTC[完整分钟快照](sustained-live-pressure-checkpoint.json)记录EUR首个超过30秒的M1确认，
+当前82个确认样本的p99为32.005s，超过候选30s目标；两品种missing/fail均0。
+[迟到明细](m1-first-late-detail.json)保留源收盘、REST接收、入库及计算阶段flush时间。
+这些时间不足以区分供应商可用性、请求调度和网络耗时，不能借同期宿主压力推断原因。
+最终验收必须保留该迟到样本及整个已知应存在分母；当前短样本不代表最终长期结果。
+
 ## 当前结果与限制
 
 后端与 PostgreSQL 测试记录、截图、容器快照与故障 JSON 位于本目录。

@@ -382,3 +382,14 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
 - 同期宿主4核load与CPU/memory/IO pressure明显上升，但未证明空白块原因，不据此修改业务判断。
   没有重启观察、覆盖原JSONL、终止其他任务或清理资源；此窗口不再声称无心跳块0。
 - 长期分母继续包含该块和观测间隙；完整两交易日及来源会话适用性仍待完成。
+
+### 2026-10-06 05:28 UTC：首个超过30秒的已知M1确认
+
+- [真实82分钟快照](verification/data-integration/sustained-live-pressure-checkpoint.json)：两品种各82个
+  预期分钟全部确认，missing/fail0；EUR over30s1、p95 11.624s、p99 **32.005s**，短窗口当前p99超标。
+  XAU over30s0、p95 9.300s、p99 25.987s；未知/无观测0，分母未裁剪。
+- [逐项迟到明细](verification/data-integration/m1-first-late-detail.json)：EUR05:23UTC收盘，
+  REST接收+29.009s、入库flush再+2.996s、计算阶段再+0.467s，保持epoch49、真实tradeable期望。
+  后续重叠请求共3次、请求失败0，不把这根改划为历史补数来减少实时迟到分母。
+- 请求开始时间未保存，不能区分供应商可用性、网络、调度及宿主压力根因；同一宿主压力证据只是伴随。
+  不宣称已经修复或完整达标，保留真实窗口继续观察，结束后计算全窗口分布与故障计数。
