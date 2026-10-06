@@ -7,7 +7,7 @@ from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alerts.market import ingest
 from alerts.storage import Bar, MarketDataset
-from sqlalchemy import inspect, select
+from sqlalchemy import inspect, select, text
 from test_market_contracts import batch
 from test_market_datasets import register
 from test_provider_postgres import provider_pg as _provider_pg
@@ -26,6 +26,11 @@ def test_postgres_dataset_registration_ingestion_and_rollback_guard(provider_pg)
     migration = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration)
     with engine.begin() as conn:
+        # Reproduce the actual r19 predecessor schema, rather than dropping a
+        # parent table while later migrations' foreign keys still reference it.
+        for table in ("market_live_minutes", "market_live_states", "market_history_chunks",
+                      "market_history_versions"):
+            conn.execute(text(f"DROP TABLE {table}"))
         migration.op = Operations(MigrationContext.configure(conn))
         migration.downgrade()
         migration.upgrade()

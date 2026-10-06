@@ -60,6 +60,7 @@ export type ChartData = {
   as_of: number;
 };
 export type Catalog = {
+  managed_sources?: {id: string; symbol: string; source: string; environment: string}[];
   frames: string[];
   indicators: Record<
     string,

@@ -103,6 +103,56 @@ class HistoryChunk(Base):
     unknown: Mapped[list] = mapped_column(JSON, default=list)
 
 
+class PricingOwner(Base):
+    __tablename__ = "market_pricing_owners"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    token: Mapped[str | None] = mapped_column(String(36))
+    expires: Mapped[int] = mapped_column(BigInteger, default=0)
+    epoch: Mapped[int] = mapped_column(default=0)
+    connected_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    failures: Mapped[int] = mapped_column(default=0)
+    error: Mapped[str | None] = mapped_column(String(32))
+
+
+class LiveState(Base):
+    __tablename__ = "market_live_states"
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
+    epoch: Mapped[int] = mapped_column(default=0)
+    revision: Mapped[int] = mapped_column(BigInteger, default=0)
+    connection: Mapped[str] = mapped_column(String(20), default="disconnected")
+    heartbeat_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    quote: Mapped[dict] = mapped_column(JSON, default=dict)
+    forming: Mapped[dict] = mapped_column(JSON, default=dict)
+    confirmed_end: Mapped[int] = mapped_column(BigInteger, default=0)
+    recovery_cursor: Mapped[int] = mapped_column(BigInteger, default=0)
+    recovery_started: Mapped[int] = mapped_column(BigInteger, default=0)
+    ready: Mapped[bool] = mapped_column(default=False)
+    next_confirm_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    attempts: Mapped[int] = mapped_column(default=0)
+    error: Mapped[str | None] = mapped_column(String(32))
+    received_at: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
+class LiveMinute(Base):
+    __tablename__ = "market_live_minutes"
+    __table_args__ = (UniqueConstraint("dataset_id", "start"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger, index=True)
+    expected: Mapped[bool | None]
+    expectation: Mapped[str] = mapped_column(String(64))
+    attempts: Mapped[int] = mapped_column(default=0)
+    failures: Mapped[int] = mapped_column(default=0)
+    last_result: Mapped[str] = mapped_column(String(32), default="pending")
+    confirmed_at: Mapped[int | None] = mapped_column(BigInteger)
+    first_attempt: Mapped[int] = mapped_column(BigInteger)
+    last_attempt: Mapped[int] = mapped_column(BigInteger)
+    quote_count: Mapped[int] = mapped_column(default=0)
+    age_histogram: Mapped[dict] = mapped_column(JSON, default=dict)
+    max_interarrival: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
 @event.listens_for(ORMSession, "before_flush")
 def immutable_dataset_identity(db, flush_context, instances):
     from sqlalchemy import inspect, select

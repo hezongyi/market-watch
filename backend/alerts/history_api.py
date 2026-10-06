@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from .history_versions import create_version, version_report
 from .market_datasets import legacy_inventory
-from .storage import HistoryVersion, MarketDataset, transaction
+from .storage import HistoryVersion, Instrument, MarketDataset, transaction
 
 
 class VersionRequest(BaseModel):
@@ -23,7 +23,8 @@ def router(authenticated):
         with transaction() as db:
             return [{"id": row.id, "instrument_id": row.instrument_id,
                      "logical_symbol": row.logical_symbol, "identity": row.identity,
-                     "volume_kind": row.volume_kind, "volume_unit": row.volume_unit}
+                     "volume_kind": row.volume_kind, "volume_unit": row.volume_unit,
+                     "precision": db.get(Instrument, row.instrument_id).precision}
                     for row in db.scalars(select(MarketDataset).order_by(MarketDataset.logical_symbol))]
 
     @routes.get("/inventory")

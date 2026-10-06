@@ -12,6 +12,12 @@
   --card: #fff;
   --danger: #a74732;
 }
+.market-data-facts {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;padding:20px 24px}
+.market-data-facts dt {color:var(--muted);font-size:14px}
+.market-data-facts dd {margin:8px 0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;text-align:left}
+.market-data-versions {display:grid;gap:12px;margin-top:20px}
+.market-data-versions article {padding:16px;border:1px solid var(--line);border-radius:12px}
+.market-data-versions p {overflow-wrap:anywhere}
 * {
   box-sizing: border-box;
 }

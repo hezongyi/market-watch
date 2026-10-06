@@ -160,7 +160,43 @@ def create_watch(db, instrument_id, name, rule_dict, *, armed_at=None, use_histo
     return watch
 
 
-def evaluate_watch(db, watch_id):
+def rewarm_watch(db, watch, *, until):
+    """Rebuild same-source judgment state, suppressing every historical signal."""
+    rule = rule_from(watch.rule)
+    if rule.timeframe == "tick":
+        watch.state = {}
+        watch.paused_reason = None
+        return
+    instrument = db.get(Instrument, watch.instrument_id)
+    state = State()
+    from .indicators import get_indicator
+
+    lookback = (get_indicator(rule.indicator, rule.indicator_version).lookback(rule.indicator_params) + 2
+                if rule.kind == "indicator" else rule.consecutive + 2)
+    rows = list(db.scalars(select(Bar).where(Bar.instrument_id == watch.instrument_id,
+            Bar.timeframe == rule.timeframe, Bar.end <= until).order_by(Bar.start.desc())
+            .limit(lookback)))
+    for row in reversed(rows):
+        if not row.complete or shortened_h4(row.candle(), rule.timeframe, closures_from(instrument.calendar_profile)):
+            state = State(last_event=instant(row.end))
+            continue
+        if state.previous and has_trading_gap(state.previous.end, instant(row.start),
+                Calendar(instrument.calendar), gold=is_gold(instrument.id),
+                closures=closures_from(instrument.calendar_profile)):
+            state = State()
+        day = previous_day(db, instrument, row.candle()) if rule.kind == "previous_day" else None
+        if rule.kind == "previous_day" and day is None:
+            state = State(last_event=instant(row.end))
+            continue
+        advance(rule, state, row.candle(), previous_day=day)
+    watch.state = state_dict(state)
+    watch.paused_reason = (
+        "指标同源预热数据不足" if rule.kind == "indicator" and state.indicator_reading is None
+        else "等待完整的同源判断前态" if state.previous is None else None
+    )
+
+
+def evaluate_watch(db, watch_id, *, emit_after=None):
     watch = db.scalar(select(Watch).where(Watch.id == watch_id).with_for_update())
     if not watch or watch.status != "active":
         return None
@@ -208,7 +244,13 @@ def evaluate_watch(db, watch_id):
             rule, state, row.candle(), previous_day=day, armed_at=instant(watch.armed_at)
         )
         watch.state = state_dict(state)
+        if rule.kind == "indicator" and state.indicator_reading is None:
+            watch.paused_reason = "指标同源预热数据不足"
         if signal:
+            if emit_after is not None and row.end <= emit_after:
+                db.add(Audit(kind="recovery_signal_suppressed", details={"watch_id": watch.id,
+                    "instrument": instrument.id, "end": row.end, "reason": "expired_realtime_event"}))
+                continue
             return record_signal(db, watch, instrument, signal)
     return None
 
@@ -360,6 +402,14 @@ def replay_step(run, calendar, count=1):
 
 
 def record_signal(db, watch, instrument, signal):
+    from .storage import LiveState, MarketDataset
+
+    provenance = {}
+    dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == instrument.id))
+    if dataset:
+        state = db.get(LiveState, dataset.id)
+        provenance = {"dataset_identity": dataset.identity, "dataset_id": dataset.id,
+                      "selection_epoch": state.epoch if state else None}
     record = SignalRow(
         watch_id=watch.id,
         instrument_id=watch.instrument_id,
@@ -374,6 +424,7 @@ def record_signal(db, watch, instrument, signal):
             "source": instrument.source,
             "basis": instrument.basis,
             "calendar_profile": instrument.calendar_profile,
+            **provenance,
         },
     )
     db.add(record)
@@ -408,6 +459,7 @@ def evaluate_quote(db, instrument, at, bid, ask):
         prior = watch.state.get("quote")
         prior_at = watch.state.get("quote_at")
         watch.state = {"quote": str(bid), "quote_at": at}
+        watch.paused_reason = None
         if prior is None:
             continue
         for up in (True, False):

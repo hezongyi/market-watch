@@ -204,6 +204,11 @@ def history_check(db, inst, source, visible, body):
 
 
 def checked(document):
+    from .storage import MarketDataset
+
+    with transaction() as db:
+        managed_symbols = {"EURUSD", "XAUUSD", "BTCUSDT"}
+        managed_symbols.update(db.scalars(select(MarketDataset.instrument_id)))
     if len(json.dumps(document, allow_nan=False)) > 2_000_000:
         raise ValueError("工作区过大")
     if document.get("schemaVersion") != 1:
@@ -243,7 +248,7 @@ def checked(document):
             or view["from"] >= view["to"]
         ):
             raise ValueError("无效时间视区")
-        if p.get("instrument") not in ("EURUSD", "XAUUSD", "BTCUSDT"):
+        if p.get("instrument") not in managed_symbols:
             raise ValueError("未知品种")
         if p.get("timeframe") not in FRAMES:
             raise ValueError("未知周期")
@@ -256,7 +261,7 @@ def checked(document):
         raise ValueError("画线数量超出限制")
     for symbol, objects in drawings.items():
         if (
-            symbol not in ("EURUSD", "XAUUSD", "BTCUSDT")
+            symbol not in managed_symbols
             or not isinstance(objects, list)
             or not all(isinstance(o, dict) for o in objects)
         ):
@@ -364,7 +369,13 @@ def router(authenticated):
 
     @r.get("/catalog")
     def catalog():
-        return {"frames": FRAMES, "indicators": CATALOG}
+        from .storage import MarketDataset
+
+        with transaction() as db:
+            sources = [{"id": row.instrument_id, "symbol": row.logical_symbol,
+                        "source": row.identity["source"], "environment": row.identity["environment"]}
+                       for row in db.scalars(select(MarketDataset))]
+        return {"frames": FRAMES, "indicators": CATALOG, "managed_sources": sources}
 
     @r.post("/export")
     def export(body: ExportQuery):
@@ -714,6 +725,9 @@ def router(authenticated):
                 inst = db.get(Instrument, body.instrument)
                 if not inst:
                     raise HTTPException(404, "品种不存在")
+                if body.client:
+                    from .market_data import renew_demand
+                    renew_demand(db, body.client, inst)
                 before = body.before or now_ms() + 1
                 # All persisted source history is the common recursive indicator prefix.
                 # New bars never move its origin; backfill/revisions deliberately invalidate it.

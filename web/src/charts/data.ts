@@ -2,12 +2,14 @@ import { api } from "../api";
 import type { Panel, ChartData } from "./types";
 const pending = new Map<string, Promise<ChartData>>();
 const cache = new Map<string, { at: number; data: ChartData }>();
+const client = `cw-${crypto.randomUUID()}`;
 export function chartData(
   panel: Panel,
   before?: number,
   limit = 500,
 ): Promise<ChartData> {
   const query = {
+    client,
     instrument: panel.instrument,
     timeframe: panel.timeframe,
     indicators: panel.indicators.map(({ name, version, params }) => ({

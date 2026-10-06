@@ -68,7 +68,7 @@ def claim(version_id=None):
             HistoryVersion.lease_until <= stamp, HistoryVersion.next_at <= stamp)
         if version_id:
             query = query.where(HistoryVersion.id == version_id)
-        version = db.scalar(query.order_by(HistoryVersion.created_at)
+        version = db.scalar(query.order_by(HistoryVersion.next_at, HistoryVersion.created_at)
                             .with_for_update(skip_locked=True).limit(1))
         if not version:
             return None
@@ -164,6 +164,7 @@ def import_page(adapter, *, version_id=None):
             version.lease_until = 0
             version.attempts = 0
             version.error = None
+            version.next_at = now_ms()
             db.flush()
             if version.cursor == version.end:
                 publish(db, version)

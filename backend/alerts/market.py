@@ -480,6 +480,9 @@ def queue_initial_history(db, *, end=None):
 def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=None):
     fetch = fetcher or fetch_source
     with transaction() as db:
+        from .storage import MarketDataset
+
+        explicit = set(db.scalars(select(MarketDataset.instrument_id)))
         viewers = set()
         if include_viewers:
             from .storage import ChartHistoryPlan, ChartViewportDemand, MarketDemand
@@ -492,7 +495,7 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
         instruments = [
             (i.id, i.symbol, i.source)
             for i in db.scalars(select(Instrument).order_by(Instrument.enabled.desc(), Instrument.id))
-            if (i.id == symbol if symbol else i.enabled or i.id in viewers)
+            if i.id not in explicit and (i.id == symbol if symbol else i.enabled or i.id in viewers)
         ]
     for instrument_id, provider_symbol, source in instruments:
         with transaction() as db:

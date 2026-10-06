@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     oanda_token: str = Field(default="", repr=False)
     oanda_account_id: str = Field(default="", repr=False)
     oanda_proxy: str = ""
+    oanda_stream_enabled: bool = False
+    oanda_resident_symbols: str = "EUR_USD,XAU_USD"
+    oanda_calendar_version: str = "ny17-candidate-v1"
+    oanda_calendar_verified: bool = False
+    oanda_recovery_minutes: int = Field(default=1500, ge=120, le=20000)
+    oanda_stream_lease_seconds: int = Field(default=30, ge=20, le=90)
     session_hours: int = 24
     market_poll_seconds: int = 15
     import_poll_seconds: int = 30

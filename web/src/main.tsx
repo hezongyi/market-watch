@@ -38,6 +38,7 @@ import {
 } from "./api";
 import "./style.css";
 import AdvancedWorkspacePage from "./advanced/AdvancedWorkspace";
+import MarketDataPage from "./MarketDataPage";
 
 const names: Record<string, string> = {
   pullback: "回落 / 反弹结束",
@@ -250,6 +251,7 @@ function Shell({ logout }: { logout: () => void }) {
             ["/advanced-charts", "专业图表（验证版）", Square],
             ["/signals", "信号中心", Bell],
             ["/replay", "历史演练", Clock3],
+            ["/market-data", "行情接入", Radio],
             ["/settings", "提醒与设置", Settings2],
           ].map(([path, label, Icon]: any) => (
             <NavLink key={path} end={path === "/"} to={path}>
@@ -285,7 +287,7 @@ function Shell({ logout }: { logout: () => void }) {
           <span>
             工作台 <ChevronRight size={14} />
             <strong>
-              {location.pathname === "/replay"
+              {location.pathname === "/market-data" ? "行情接入" : location.pathname === "/replay"
                 ? "历史演练"
                 : location.pathname === "/signals"
                   ? "信号中心"
@@ -319,6 +321,7 @@ function Shell({ logout }: { logout: () => void }) {
             </div>
           )}
           <Routes>
+            <Route path="/market-data" element={<MarketDataPage/>}/>
             <Route
               path="/"
               element={
@@ -888,6 +891,15 @@ function Signals({
 }
 
 function ReplayPage({ instruments }: { instruments: Instrument[] }) {
+  const location=useLocation();
+  const [historyVersions,setHistoryVersions]=useState<any[]>([]);
+  const [historyDatasets,setHistoryDatasets]=useState<any[]>([]);
+  const [datasetVersion,setDatasetVersion]=useState(new URLSearchParams(location.search).get('dataset_version') ?? '');
+  useEffect(()=>{let active=true;Promise.all([api('/market-data/versions'),api('/market-data/datasets')]).then(([v,d])=>{
+    if(!active)return;setHistoryVersions(v.filter((row:any)=>row.status==='published'));setHistoryDatasets(d);
+    const wanted=new URLSearchParams(location.search).get('dataset_version');
+    if(wanted){const version=v.find((row:any)=>row.id===wanted);const source=d.find((row:any)=>row.id===version?.dataset_id);if(source){setInstrument(source.instrument_id);setDatasetVersion(wanted);setStart(inputTime(version.start));setEnd(inputTime(version.end));setFrame('M1')}}
+  }).catch(e=>{if(active)setError(String(e))});return()=>{active=false}},[location.search]);
   const generation=useRef(0);
   const [savedRuns,setSavedRuns]=useState<any[]>([]);
   useEffect(()=>{api('/replays').then(setSavedRuns).catch(()=>{})},[]);
@@ -907,6 +919,9 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
     [open, setOpen] = useState(false),
     [seek, setSeek] = useState("");
   const locked = useRef(false);
+  function inputTime(value:number) {
+    return new Date(value-new Date(value).getTimezoneOffset()*60000).toISOString().slice(0,16);
+  }
   async function create(e: React.FormEvent) {
     e.preventDefault();
     const g=++generation.current;
@@ -916,6 +931,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
     try {
       const result=await api("/replays", {
           instrument_id: instrument,
+          dataset_version: datasetVersion || undefined,
           timeframe: frame,
           start: new Date(start).getTime(),
           end: new Date(end).getTime(),
@@ -982,13 +998,15 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
             品种
             <select
               value={instrument}
-              onChange={(e) => setInstrument(e.target.value)}
+              onChange={(e) => {setInstrument(e.target.value);setDatasetVersion('')}}
             >
               {instruments.map((i) => (
                 <option key={i.id}>{i.id}</option>
               ))}
+              {historyDatasets.filter(d=>d.identity.source==='dukascopy'&&!instruments.some(i=>i.id===d.instrument_id)).map(d=><option key={d.instrument_id} value={d.instrument_id}>{d.logical_symbol} · Dukascopy 历史</option>)}
             </select>
           </label>
+          {historyDatasets.some(d=>d.instrument_id===instrument)&&<label>不可变历史版本<select required value={datasetVersion} onChange={e=>{setDatasetVersion(e.target.value);const version=historyVersions.find(v=>v.id===e.target.value);if(version){setStart(inputTime(version.start));setEnd(inputTime(version.end))}}}><option value="">选择已发布版本</option>{historyVersions.filter(v=>historyDatasets.find(d=>d.id===v.dataset_id)?.instrument_id===instrument).map(v=><option key={v.id} value={v.id}>{date(v.start)} — {date(v.end)} · {v.id.slice(0,8)}</option>)}</select></label>}
           <label>
             周期
             <select value={frame} onChange={(e) => setFrame(e.target.value)}>
@@ -1018,7 +1036,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
           <button className="primary" disabled={busy}>
             {busy ? "正在准备…" : "创建演练"}
           </button>
-          <button type="button" className="secondary" disabled={busy||!start||!end} onClick={importHistory}>补齐所选历史</button>
+          <button type="button" className="secondary" disabled={busy||!start||!end||!!datasetVersion} onClick={importHistory}>补齐所选历史</button>
         </form>
       </section>
       {jobSummary?.weekly_requests?.length>0&&<section className="panel">

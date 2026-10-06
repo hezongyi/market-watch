@@ -232,6 +232,9 @@ class WatchInput(BaseModel):
 
 @app.get("/api/instruments", dependencies=[Depends(authenticated)])
 def instruments():
+    from .live_pricing import snapshots
+
+    live = {row["instrument_id"]: row for row in snapshots()}
     with transaction() as db:
         result = []
         for inst in db.scalars(
@@ -291,6 +294,14 @@ def instruments():
                     quality="receiving" if now_ms() - quote.at < 120_000 else "stale",
                     age_seconds=(now_ms() - quote.at) // 1000,
                 )
+            if inst.id in live:
+                snapshot = live[inst.id]
+                bid = snapshot["quote"].get("bid")
+                result[-1].update(logical_symbol=snapshot["logical_symbol"],
+                    label=f'{snapshot["logical_symbol"]} · OANDA practice',
+                    dataset_identity=snapshot["identity"], quality=snapshot["quality"],
+                    live_status=snapshot, price=bid or result[-1]["price"],
+                    price_at=snapshot["quote"].get("source_time") or result[-1]["price_at"])
         return result
 
 
@@ -1189,3 +1200,7 @@ app.include_router(market_data_router(authenticated))
 from .history_api import router as history_router  # noqa: E402
 
 app.include_router(history_router(authenticated))
+
+from .live_api import router as live_router  # noqa: E402
+
+app.include_router(live_router(authenticated))

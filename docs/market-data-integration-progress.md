@@ -8,7 +8,7 @@
 
 主历史采用 dukascopy-python；实时为 OANDA practice；首批 EURUSD/XAUUSD；外汇/黄金回测
 只读单一 Dukascopy 数据集。MT4 在其活跃终端验收后才可参与互备。保留 Binance、yfinance 的既有能力。
-当前完成 P0 首批代码及离线验证，尚未达到 P0 运行验收门槛；P1/P2/P3 尚未实施。
+最初完成 P0 首批代码及离线验证；下文最新 P2 章节记录当前实现与运行状态。
 
 本会话范围更新：用户要求完全实现并真实验收；随后明确 **MT4 实时接入留到后续**。
 当前目标为 P0–P2 全部实现与验收，P3 不列入本次完成门槛。下面初始 P0 记录保留作历史，
@@ -53,15 +53,50 @@
   来源到接收价龄 p50/p95/p99 为 EURUSD 269/538/581ms、XAUUSD 231/393/436ms。
   尚未校准独立时钟误差，不将该短样本称为 SLA、两交易日或 M1 收盘延迟验收。
 
-## 最新未完成项
+## P2 实现与 Ubuntu 容器验收（最新状态）
 
-- Docker socket 仍无权限，未启动 PostgreSQL 验收库，也未完成升级/备份恢复的真实验证。
-- 尚无后台 OANDA 采集拥有者租约与世代 fencing、常驻/需求订阅并集、REST 收盘确认重试调度、
-  断线恢复、同源指标预热、恢复期间不补发过期通知、共享防重及故障降级运行链路。
-- 尚未完成浏览器来源/环境/确认/降级状态、SSE 快照与断连恢复、历史版本选择及原生图表接入。
-- 尚未全量下载约十年历史、验证源日历/精度元数据、清点实际存量；两交易日并发/时效测量与
-  401/429、断线、进程重启等故障注入尚未执行。目标保持 active，不能按短时探测标记完成。
-- MT4 按用户指令留待后续；本次故障行为应是 OANDA 降级，不接入备用。
+- `live_pricing` 与 `oanda_worker` 已实现账户级共享 stream、跨进程拥有者租约、连接世代 fencing、
+  常驻与监控/浏览器需求并集、独立 REST 确认与租约续期线程、恢复预热与过期信号抑制。
+  断线只降级与暂停，MT4 未参与。本次新增 `v23_live_pricing`；显式数据集不会走旧采集入口。
+- 账户目录未采集品种不显示故障；订阅需求过期的非驻留品种退出采集；单侧缺失或倒挂报价不报告 tick 就绪。
+- 每个已观测分钟持久记录确认请求、失败、缺失/未知分母；报价价龄使用 10ms 分桶直方图，
+  同时保留更新次数与最大到达间隔。历史预热与实时确认延迟分开，时钟偏差尚未校准。
+- 新页面 `/market-data` 展示来源、practice 环境、Bid/Ask、临时与确认柱、恢复及监控就绪状态，
+  支持同源预警和历史版本任务；浏览器通过 SSE 消费快照，不创建上游 stream。
+  演练可选择已发布不可变版本；图表工作区目录与保存允许来源限定身份，不改写旧系列。
+- Docker 组权限现已可用，通过新的组会话 `sg docker` 访问 Ubuntu 本机 Docker。
+  项目 `market-watch-data-integration` 的 PostgreSQL、API、web、OANDA/history/aggregation worker
+  已实际启动。PostgreSQL 17 镜像拉取超时后改用本机已有 **14.24 / postgres:14-bookworm**。
+  独立网络/volume/数据库，网页仅绑定 `127.0.0.1:16589`；没有改动其他实例或 unraid。
+- 已在 r19 前置结构完成 `pg_dump -Fc` 与独立 `integration_restore` 数据库恢复，再升级至 head。
+  [备份恢复记录](verification/data-integration/backup-restore-baseline.txt)仅证明本隔离库的结构恢复，
+  不证明生产存量或生产备份已清点。
+- PostgreSQL 容器定向测试 **116 passed**，包含真实竞争拥有者/旧世代 fencing、身份迁移及快照回放。
+  [测试记录](verification/data-integration/postgres-tests-p2.txt)。本地全量回归为 **592 passed、40 skipped**，
+  [全量记录](verification/data-integration/backend-tests-p2.txt)。前端生产构建通过。
+- 两个小时样本版本分别发布 60 根 M1、0 未观测分钟；两个固定十年区间
+  `2016-10-06T00:00Z` 至 `2026-10-06T00:00Z` 已启动后台导入，尚未完成。
+  [任务身份](verification/data-integration/history-import-seed.json)。任务有持久检查点、重试和公平轮转。
+- 实际 OANDA 双品种采集及 REST 确认已运行；30 秒暂停后两品种降级，13.2 秒恢复，
+  2 分钟暂停后约 14.3 秒恢复，进程重启约 36.6 秒恢复。见 [30秒](verification/data-integration/fault-pause-30s.json)、
+  [2分钟](verification/data-integration/fault-pause-120s.json)、
+  [进程重启](verification/data-integration/fault-restart.json)。暂停的是本任务 worker，未操纵生产网络。
+- 浏览器实测包含桌面/390px 手机、三个浏览器并发、不可变历史版本选择和真实回放入口。
+  首次截图发现浏览器需求 client 超出 40 字符，已缩短并增加错误断言；复测通过。
+  [浏览器结果](verification/data-integration/browser-acceptance.json)还验证断网重连、三品种共享采集、
+  实际创建/取消同源监控并随真实 M1 推进，固定版本演练推进一根，
+  现有图表工作区使用来源限定身份读取真实 M1，续期共享订阅。
+  [桌面截图](verification/data-integration/market-data-desktop.png)、[手机截图](verification/data-integration/market-data-mobile.png)。
+
+## 当前尚未完成的验收门槛
+
+- 十年导入仍在运行；最终 manifest、缺口/休市归因、跨年/DST/精度全量报告尚待形成。
+- 两交易日持续实测尚未达到，不能把短样本价龄当成 SLA。接收机 NTP 状态已采样：offset +1.699ms、root distance 22.2ms、jitter 10.491ms；
+  [时钟记录](verification/data-integration/receiver-clock-sync.txt)不证明供应商时钟偏差。三品种采集已通过，待扩至10品种负载、
+  401/429、单品种停更与完整通知链路的故障验收。
+- OANDA/Dukascopy 的候选 NY17 日历尚未获得账户产品与历史区间的完整核实，UI 保持“待核实”；
+  真实生产存量来源清点与备份恢复尚未执行。
+- MT4 按用户指令留待后续；本次完成门槛为 P0–P2，目标仍 active，尚不能宣称全体验收通过。
 
 ## 基线审计与实现
 
@@ -93,7 +128,7 @@
 已有显式映射时降级主动拒绝删除身份，必须停写并恢复本实例的迁移前备份。
 不得以删除绑定、修改旧 source 或继续启动旧 Adapter 来绕过保护；新版本日历也应注册为新身份。
 
-## 实际验证与环境
+## 初始 P0 验证记录（历史）
 
 - 实际主机：Ubuntu 22.04.5 LTS。本 worktree 新建 `.venv`，按 `requirements.lock` 安装依赖；
   测试使用 `PYTHONPATH=backend`，不从其他工作区导入业务代码。旧主工作区 venv 缺 yfinance 的初次
@@ -107,7 +142,7 @@
 - Ubuntu Docker socket 实际返回 `permission denied`；当前策略不允许申请提权，已请求用户配置本机
   权限。没有启动容器、运行迁移到服务数据库或连接 OANDA 账户；没有服务访问地址。
 
-## 已准备的隔离验收命令（尚未运行）
+## 初始 P0 验收准备（已由上文运行记录取代）
 
 [Compose](verification/data-integration/compose.yaml) 使用项目 `market-watch-data-integration`，
 独立默认网络、`integration-postgres` volume、PostgreSQL 数据库；不发布端口、不加载生产 env，
@@ -123,9 +158,9 @@ docker compose -p market-watch-data-integration -f docs/verification/data-integr
 停止命令保留该项目 volume；重复启动须使用相同测试密码。仅在确认归属且已不再需要验收数据时，
 可对这个明确的项目执行 `down --volumes`。不得全局 prune，不能转到 unraid 运行这些实例。
 
-## 下一阶段
+## 接续验收
 
-先完成上述本机 PostgreSQL 验收与实际存量映射审计；再接入 P1 的真实 Python SDK 分页 Adapter、
-持久检查点和不可变回测版本，并在 P2 复用契约接入共享 practice stream 和 REST 完成柱。
-P2 需另核对已有后端配置是否齐备、账户目录和长连接网络；本轮没有读取或复制凭据。
-十年完整历史、两交易日实时测量及 MT4 活跃互备仍是后续验收工作，不能以本轮合成测试替代。
+保持本任务隔离实例运行，持续采集并完成两个十年任务。最终按正式方案汇总观察覆盖、
+unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证据；生产存量清点需独立只读核对。
+当前目标仍 active，MT4 不在本轮范围。服务启动/停止与凭据位置见
+[实例说明](verification/data-integration/README.md)。
