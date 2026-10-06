@@ -11,6 +11,13 @@ class Settings(BaseSettings):
     database_max_overflow: int = Field(default=0, ge=0, le=20)
     database_pool_timeout: int = Field(default=15, ge=1, le=120)
     database_application_name: str = "market-watch"
+    mcp_enabled: bool = False
+    mcp_allowed_hosts: list[str] = ["localhost", "localhost:*", "127.0.0.1", "127.0.0.1:*", "[::1]", "[::1]:*"]
+    mcp_allowed_origins: list[str] = ["http://localhost", "http://localhost:*", "http://127.0.0.1", "http://127.0.0.1:*"]
+    mcp_max_body_bytes: int = Field(default=65536, ge=1024, le=1048576)
+    mcp_call_seconds: int = Field(default=20, ge=1, le=60)
+    mcp_calls_per_minute: int = Field(default=60, ge=1, le=600)
+    mcp_concurrency: int = Field(default=4, ge=1, le=16)
     public_url: str = "http://localhost:8000"
     admin_password_hash: str = Field(default="", repr=False)
     cookie_secure: bool = True

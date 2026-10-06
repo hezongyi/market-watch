@@ -1,0 +1,27 @@
+{
+  "version": "1.10.0",
+  "tested_functional_commit": "8792b99713e25b58a71d56e3056fafe31ed2439d",
+  "non_release_tracked_files_checked": 1818,
+  "all_non_release_inputs_identical": true,
+  "input_digest": "ae9afe112b5da2260c4d6878ec66f0d470b58798a77b4ca262a8ae5d760e23fc",
+  "release_only_changes": [
+    "CHANGELOG.md",
+    "README.md",
+    "docs/versioning.md",
+    "pyproject.toml",
+    "web/package-lock.json",
+    "web/package.json"
+  ],
+  "dependency_and_lock_semantics_identical": true,
+  "versions_consistent": true,
+  "wheel": {
+    "file": "market_watch-1.10.0-py3-none-any.whl",
+    "version": "1.10.0",
+    "sha256": "ed9c2af8059cd0a038520b53b7b28551bee11f156d0c1510b6a0bf39d9435744",
+    "package_files_match_source": true
+  },
+  "container_rebuilt": false,
+  "production_deployed": false,
+  "acceptance_image_version": "1.9.0",
+  "source_tag_resolution": "v1.10.0^{commit}"
+}

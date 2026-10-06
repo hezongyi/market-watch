@@ -9,15 +9,13 @@ import argparse
 import json
 import time
 import uuid
-from pathlib import Path
 
 from alerts.chart_alert_service import AlertConfig, create
 from alerts.storage import ChartAlert, ProviderBar, ProviderDataset, ProviderInterest
+from chart_alert_acceptance_environment import DATABASE, ROOT
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
-
-ROOT = Path("/tmp/mw-chart-alerts-acceptance")
 
 
 def main():
@@ -28,7 +26,7 @@ def main():
         line.split("=", 1) for line in (ROOT / "api.env").read_text().splitlines() if "=" in line
     )
     url = make_url(values["ALERTS_DATABASE_URL"]).set(host=args.database_host)
-    if url.database != "chart_alerts_acceptance" or url.username != "chart_alerts_acceptance":
+    if url.database != DATABASE or url.username != DATABASE:
         raise ValueError("Only task-owned database allowed")
     engine = create_engine(url)
     factory = sessionmaker(engine, expire_on_commit=False)

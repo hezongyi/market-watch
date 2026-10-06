@@ -57,6 +57,8 @@ async function rpc(m) {
       workspace: row,
       catalog: {},
       preferences,
+      history_capabilities: {protocol: 1, mode: "continuous", max_bars: 200000,
+        workspace_bars: 4000000, response_bytes: 134217728},
     };
   if (m.id == null) return;
   const q = m.query,
@@ -274,10 +276,34 @@ const cases = [
             { shape: "horizontal_line" },
           ),
       );
+      const extraShapes = await frame.evaluate(async () => {
+        const chart = widget.chart(0), range = chart.getVisibleRange();
+        const anchors = [{price: 100, time: range.to - 3600 * 8}, {price: 102, time: range.to - 3600 * 4}];
+        const trend = await chart.createMultipointShape(anchors, {shape: "trend_line"});
+        const region = await chart.createMultipointShape(anchors, {shape: "rectangle"});
+        return [trend, region];
+      });
       await frame.evaluate(
         () => new Promise((ok, fail) => widget.saveChartToServer(ok, fail)),
       );
       const expected = await current(frame);
+      const projection = row.document.state._mwDrawingProjection;
+      assert.equal(projection.version, 1);
+      assert.equal(projection.charts.length, expected.length);
+      assert.deepEqual(projection.charts.map(c => ({symbol: c.symbol, resolution: c.resolution})), expected);
+      const projectedShape = projection.charts[0].drawings.find(s => s.id === shape);
+      assert.ok(projectedShape, "saved projection preserves native object identity");
+      assert.deepEqual(projectedShape.points, await frame.evaluate(id =>
+        widget.chart(0).getShapeById(id).getPoints().map(p => ({time: p.time ?? null, price: p.price})), shape));
+      for (const id of extraShapes) {
+        const projected = projection.charts[0].drawings.find(s => s.id === id);
+        assert.ok(projected);
+        assert.deepEqual(projected.points, await frame.evaluate(id =>
+          widget.chart(0).getShapeById(id).getPoints().map(p => ({time: p.time ?? null, price: p.price})), id));
+      }
+      console.log("DRAWING_PROJECTION", JSON.stringify(projection));
+      if (process.env.MW_DRAWING_PROJECTION_OUTPUT)
+        fs.writeFileSync(process.env.MW_DRAWING_PROJECTION_OUTPUT, JSON.stringify(row.document));
       console.log(
         JSON.stringify({
           case: item.name,

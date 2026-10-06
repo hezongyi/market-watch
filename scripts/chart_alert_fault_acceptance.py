@@ -11,17 +11,13 @@ import subprocess
 import time
 import uuid
 from decimal import Decimal
-from pathlib import Path
 
 import httpx
 from alerts.storage import Bar, ChartAlert, Instrument
+from chart_alert_acceptance_environment import APP, COMPOSE, DATABASE, PROJECT, ROOT
 from sqlalchemy import create_engine, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
-
-ROOT = Path("/tmp/mw-chart-alerts-acceptance")
-PROJECT = "mw-chart-alerts-acceptance"
-COMPOSE = Path(__file__).resolve().parents[1] / "docs/verification/chart-alerts/compose.yaml"
 
 
 def compose(*args):
@@ -71,7 +67,7 @@ def main():
         line.split("=", 1) for line in (ROOT / "api.env").read_text().splitlines() if "=" in line
     )
     url = make_url(values["ALERTS_DATABASE_URL"]).set(host=args.database_host)
-    if url.database != "chart_alerts_acceptance" or url.username != "chart_alerts_acceptance":
+    if url.database != DATABASE or url.username != DATABASE:
         raise ValueError("Only task-owned database allowed")
     engine = create_engine(url)
     factory = sessionmaker(engine, expire_on_commit=False)
@@ -115,9 +111,7 @@ def main():
         for i in range(80):
             bar(db, epoch - (80 - i) * 60_000, 9)
     try:
-        with httpx.Client(
-            base_url="https://localhost:19443", verify=False, trust_env=False, timeout=5
-        ) as client:
+        with httpx.Client(base_url=APP, verify=False, trust_env=False, timeout=5) as client:
 
             def login():
                 r = client.post("/api/login", json=json.loads((ROOT / "login.json").read_text()))

@@ -2,6 +2,10 @@ const { chromium } = require("@playwright/test");
 const { execFileSync } = require("node:child_process");
 const fs = require("fs"),
   assert = require("node:assert/strict");
+const APP = process.env.APP_ORIGIN || "https://localhost:19443";
+const CHART = process.env.CHART_ORIGIN || "https://127.0.0.1:19444";
+const PRIVATE =
+  process.env.MW_ALERT_PRIVATE_DIR || "/tmp/mw-chart-alerts-acceptance";
 (async () => {
   const browser = await chromium.launch({
     headless: true,
@@ -22,7 +26,7 @@ const fs = require("fs"),
     leaked = [];
   page.on("request", (r) => {
     if (
-      r.url().startsWith("https://127.0.0.1:19444/") &&
+      r.url().startsWith(CHART + "/") &&
       (r.headers().cookie || r.headers().authorization)
     )
       leaked.push(new URL(r.url()).pathname);
@@ -31,20 +35,16 @@ const fs = require("fs"),
   try {
     for (let i = 0; i < 120; i++) {
       const ready = await context.request
-        .get("https://localhost:19443/readyz")
+        .get(APP + "/readyz")
         .catch(() => null);
       if (ready?.status() === 200) break;
       if (i === 119) throw Error("deployed HTTPS API readiness timeout");
       await page.waitForTimeout(500);
     }
-    await page.goto("https://localhost:19443/");
+    await page.goto(APP + "/");
     await page
       .getByLabel("管理员密码")
-      .fill(
-        JSON.parse(
-          fs.readFileSync("/tmp/mw-chart-alerts-acceptance/login.json"),
-        ).password,
-      );
+      .fill(JSON.parse(fs.readFileSync(PRIVATE + "/login.json")).password);
     const response = page.waitForResponse(
       (r) => r.url().endsWith("/api/login") && r.request().method() === "POST",
     );
@@ -79,15 +79,13 @@ const fs = require("fs"),
       });
     });
     fs.writeFileSync(
-      "/tmp/mw-chart-alerts-acceptance/runtime-workspace.json",
+      PRIVATE + "/runtime-workspace.json",
       JSON.stringify({ id: workspace.id }),
     );
-    await page.goto("https://localhost:19443/advanced-charts");
+    await page.goto(APP + "/advanced-charts");
     const frame = await new Promise(async (resolve, reject) => {
       for (let i = 0; i < 100; i++) {
-        const f = page
-          .frames()
-          .find((f) => f.url().startsWith("https://127.0.0.1:19444/"));
+        const f = page.frames().find((f) => f.url().startsWith(CHART + "/"));
         if (f) return resolve(f);
         await page.waitForTimeout(300);
       }
@@ -285,7 +283,7 @@ const fs = require("fs"),
       (id) => alertBridge.diagnostics().rows.some((r) => r.id === id),
       dragRow.id,
     );
-    const dragShot = "/tmp/mw-chart-alerts-acceptance/runtime-drag-before.png";
+    const dragShot = PRIVATE + "/runtime-drag-before.png";
     await page.screenshot({ path: dragShot });
     const box = await page
       .locator('iframe[title="专业图表工作区"]')
@@ -467,9 +465,7 @@ print(sum(ys)/len(ys))
     await page.locator('iframe[title="专业图表工作区"]').waitFor();
     const restoredFrame = await new Promise(async (resolve, reject) => {
       for (let i = 0; i < 100; i++) {
-        const f = page
-          .frames()
-          .find((f) => f.url().startsWith("https://127.0.0.1:19444/"));
+        const f = page.frames().find((f) => f.url().startsWith(CHART + "/"));
         if (f) return resolve(f);
         await page.waitForTimeout(250);
       }
@@ -521,23 +517,23 @@ print(sum(ys)/len(ys))
     assert.deepEqual(leaked, []);
     assert.deepEqual(errors, []);
     fs.writeFileSync(
-      "/tmp/mw-chart-alerts-acceptance/runtime-browser.json",
+      PRIVATE + "/runtime-browser.json",
       JSON.stringify(report, null, 2),
     );
     console.log(JSON.stringify(report));
 
     await page.screenshot({
-      path: "/tmp/mw-chart-alerts-acceptance/runtime-bootstrap.png",
+      path: PRIVATE + "/runtime-bootstrap.png",
     });
   } catch (error) {
-    fs.rmSync("/tmp/mw-chart-alerts-acceptance/runtime-browser.json", {
+    fs.rmSync(PRIVATE + "/runtime-browser.json", {
       force: true,
     });
     await page.screenshot({
-      path: "/tmp/mw-chart-alerts-acceptance/runtime-browser-failure.png",
+      path: PRIVATE + "/runtime-browser-failure.png",
     });
     fs.writeFileSync(
-      "/tmp/mw-chart-alerts-acceptance/runtime-browser-failure.txt",
+      PRIVATE + "/runtime-browser-failure.txt",
       await page.locator("body").innerText(),
     );
     throw error;

@@ -78,3 +78,9 @@ def test_postgres_populated_legacy_upgrade_preserves_foreign_keys(postgres_alert
 
 def test_postgres_full_legacy_migration_retains_queue_and_multiple_events(postgres_alerts, monkeypatch):
     full_legacy_upgrade(postgres_alerts, monkeypatch)
+
+
+@pytest.mark.parametrize("initial", [None, "r19_native_history_loads", "s20_chart_alerts", "s20_agent_capabilities"])
+def test_postgres_alerts_and_mcp_upgrade_paths(postgres_alerts, monkeypatch, initial):
+    from test_alerts_mcp_migration import verify_upgrade_paths
+    verify_upgrade_paths(postgres_alerts, monkeypatch, initial)

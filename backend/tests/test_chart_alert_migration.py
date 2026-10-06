@@ -125,7 +125,7 @@ def full_legacy_upgrade(engine, monkeypatch):
     with pytest.raises(RuntimeError, match="backup"):
         command.downgrade(alembic, "r19_native_history_loads")
     with engine.connect() as connection:
-        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == "s20_chart_alerts"
+        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == "t21_merge_alerts_mcp"
         assert connection.execute(text("SELECT count(*) FROM signals")).scalar() == 4
 
 

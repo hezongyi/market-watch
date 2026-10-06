@@ -1,0 +1,54 @@
+# Ubuntu local acceptance only. All resources belong to mw-native-mcp-acceptance.
+name: mw-native-mcp-acceptance
+services:
+  pg:
+    image: postgres:14-bookworm
+    environment:
+      POSTGRES_DB: native_mcp_acceptance
+      POSTGRES_USER: native_mcp_acceptance
+      POSTGRES_PASSWORD: ${MW_MCP_DB_PASSWORD:?Run prepare_native_mcp_acceptance.py}
+    volumes: ["native-mcp-pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U native_mcp_acceptance"]
+      interval: 2s
+      retries: 30
+  migrate:
+    build: ../../..
+    image: market-watch-api:native-mcp-acceptance
+    command: ["alembic", "upgrade", "head"]
+    env_file:
+      - path: /tmp/mw-native-mcp-acceptance/api.env
+        format: raw
+    depends_on:
+      pg: {condition: service_healthy}
+  api:
+    image: market-watch-api:native-mcp-acceptance
+    env_file:
+      - path: /tmp/mw-native-mcp-acceptance/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 3s
+      retries: 30
+  web:
+    build:
+      context: ../../../web
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: https://localhost:18544
+    image: market-watch-web:native-mcp-acceptance
+    depends_on: [api]
+  chart-origin:
+    build: ../../../advanced-host
+    image: market-watch-chart:native-mcp-acceptance
+  tls:
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:18543:443", "127.0.0.1:18544:444"]
+    volumes:
+      - /tmp/mw-native-mcp-acceptance/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - /tmp/mw-native-mcp-acceptance/cert.pem:/certs/cert.pem:ro
+      - /tmp/mw-native-mcp-acceptance/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+volumes:
+  native-mcp-pg:

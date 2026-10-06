@@ -10,15 +10,13 @@ import json
 import time
 import uuid
 from decimal import Decimal
-from pathlib import Path
 
 import httpx
 from alerts.storage import Bar, ChartAlert, Instrument, Outbox
+from chart_alert_acceptance_environment import APP, DATABASE, ROOT
 from sqlalchemy import create_engine, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
-
-ROOT = Path("/tmp/mw-chart-alerts-acceptance")
 
 
 def main():
@@ -29,7 +27,7 @@ def main():
         line.split("=", 1) for line in (ROOT / "api.env").read_text().splitlines() if "=" in line
     )
     url = make_url(values["ALERTS_DATABASE_URL"])
-    if url.database != "chart_alerts_acceptance" or url.username != "chart_alerts_acceptance":
+    if url.database != DATABASE or url.username != DATABASE:
         raise ValueError("Only the dedicated chart-alert acceptance database is allowed")
     engine = create_engine(url.set(host=args.database_host))
     factory = sessionmaker(engine, expire_on_commit=False)
@@ -80,9 +78,7 @@ def main():
         raise AssertionError("Timed out: " + description)
 
     try:
-        with httpx.Client(
-            base_url="https://localhost:19443", verify=False, timeout=40, trust_env=False
-        ) as client:
+        with httpx.Client(base_url=APP, verify=False, timeout=40, trust_env=False) as client:
             r = client.post("/api/login", json=json.loads((ROOT / "login.json").read_text()))
             r.raise_for_status()
             csrf = client.get("/api/session").json()["csrf"]

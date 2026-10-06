@@ -6,16 +6,12 @@ import shlex
 import subprocess
 import time
 import uuid
-from pathlib import Path
 
 import httpx
 from alerts.storage import ChartAlert, ChartAlertVersion, Notification, Outbox, SignalRow
+from chart_alert_acceptance_environment import APP, COMPOSE, DATABASE, PROJECT, ROOT
 from sqlalchemy import create_engine, select
 from sqlalchemy.engine import make_url
-
-ROOT = Path("/tmp/mw-chart-alerts-acceptance")
-COMPOSE = Path(__file__).resolve().parents[1] / "docs/verification/chart-alerts/compose.yaml"
-PROJECT = "mw-chart-alerts-acceptance"
 
 
 def docker(*args):
@@ -40,7 +36,7 @@ def main():
         line.split("=", 1) for line in (ROOT / "api.env").read_text().splitlines() if "=" in line
     )
     url = make_url(values["ALERTS_DATABASE_URL"]).set(host=args.database_host)
-    if url.database != "chart_alerts_acceptance" or url.username != "chart_alerts_acceptance":
+    if url.database != DATABASE or url.username != DATABASE:
         raise ValueError("Only dedicated acceptance DB allowed")
     engine = create_engine(url)
 
@@ -112,7 +108,11 @@ def main():
                 "com.docker.compose.project=" + PROJECT,
                 "--entrypoint",
                 "sleep",
-                "market-watch-api:chart-alerts-acceptance",
+                (
+                    "market-watch-api:chart-alerts-acceptance"
+                    if PROJECT == "mw-chart-alerts-acceptance"
+                    else "market-watch-api:chart-alerts-integration"
+                ),
                 "120",
             )
             held = True
@@ -146,9 +146,7 @@ def main():
     assert new_container != old_container
     if args.force_ip_change:
         assert new_ip != old_ip
-    with httpx.Client(
-        base_url="https://localhost:19443", verify=False, trust_env=False, timeout=5
-    ) as client:
+    with httpx.Client(base_url=APP, verify=False, trust_env=False, timeout=5) as client:
         while time.monotonic() - started < 60:
             try:
                 if client.get("/readyz").status_code == 200:

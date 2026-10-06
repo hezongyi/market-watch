@@ -11,15 +11,19 @@ import os
 import shlex
 import subprocess
 import uuid
-from pathlib import Path
 
-from alerts.storage import ChartAlert, ChartAlertVersion, Notification, Outbox, SignalRow
+from alerts.storage import (
+    AgentCredential,
+    AgentOperation,
+    ChartAlert,
+    ChartAlertVersion,
+    Notification,
+    Outbox,
+    SignalRow,
+)
+from chart_alert_acceptance_environment import COMPOSE, DATABASE, PROJECT, ROOT
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.engine import make_url
-
-ROOT = Path("/tmp/mw-chart-alerts-acceptance")
-PROJECT = "mw-chart-alerts-acceptance"
-COMPOSE = Path(__file__).resolve().parents[1] / "docs/verification/chart-alerts/compose.yaml"
 
 
 def docker(*args, **options):
@@ -69,7 +73,7 @@ def main():
         line.split("=", 1) for line in (ROOT / "api.env").read_text().splitlines() if "=" in line
     )
     url = make_url(values["ALERTS_DATABASE_URL"]).set(host=args.database_host)
-    if url.database != "chart_alerts_acceptance" or url.username != "chart_alerts_acceptance":
+    if url.database != DATABASE or url.username != DATABASE:
         raise ValueError("Refusing any other source database")
     engine = create_engine(url, isolation_level="AUTOCOMMIT")
     restored_name = "chart_alerts_restore_" + uuid.uuid4().hex
@@ -77,6 +81,8 @@ def main():
     restored = None
     created = False
     tables = (ChartAlert, ChartAlertVersion, SignalRow, Notification, Outbox)
+    if PROJECT == "mw-chart-alerts-integration":
+        tables += (AgentCredential, AgentOperation)
 
     def contents(db):
         with db.connect() as connection:
@@ -84,7 +90,7 @@ def main():
                 model.__tablename__: [
                     dict(row)
                     for row in connection.execute(
-                        select(model.__table__).order_by(model.__table__.c.id)
+                        select(model.__table__).order_by(*model.__table__.primary_key.columns)
                     ).mappings()
                 ]
                 for model in tables
@@ -99,9 +105,9 @@ def main():
         payload = pg(
             "pg_dump",
             "-U",
-            "chart_alerts_acceptance",
+            DATABASE,
             "-d",
-            "chart_alerts_acceptance",
+            DATABASE,
             "--format=custom",
             "--no-owner",
         ).stdout
@@ -115,7 +121,7 @@ def main():
         pg(
             "pg_restore",
             "-U",
-            "chart_alerts_acceptance",
+            DATABASE,
             "--dbname",
             restored_name,
             "--exit-on-error",
@@ -128,9 +134,10 @@ def main():
             "Restored rules, versions, evidence, checkpoints, or outbox differ"
         )
         with restored.connect() as connection:
-            assert (
-                connection.scalar(text("SELECT version_num FROM alembic_version"))
-                == "s20_chart_alerts"
+            assert connection.scalar(text("SELECT version_num FROM alembic_version")) == (
+                "s20_chart_alerts"
+                if PROJECT == "mw-chart-alerts-acceptance"
+                else "t21_merge_alerts_mcp"
             )
         result = {
             "verified": True,
@@ -139,7 +146,9 @@ def main():
             "bytes": len(payload),
             "alert_table_counts": {name: len(rows) for name, rows in expected.items()},
             "full_alert_payloads_equal": True,
-            "migration_head": "s20_chart_alerts",
+            "migration_head": "s20_chart_alerts"
+            if PROJECT == "mw-chart-alerts-acceptance"
+            else "t21_merge_alerts_mcp",
             "temporary_restore_database_removed": True,
         }
     finally:

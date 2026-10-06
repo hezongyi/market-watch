@@ -15,13 +15,15 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import delete, func, select
 
+from . import business
+from .business import WatchInput
 from .calendar_profile import closures_from
 from .chart_alert_message import signal_message
 from .config import settings
-from .domain import TIMEFRAMES, Calendar, previous_session, scheduled_open
+from .domain import TIMEFRAMES, Calendar, previous_session
 from .notify import DEFAULTS
 from .replay_history import history_rows, pack_history
-from .service import acknowledge, add_replay_watch, create_watch, replay_step
+from .service import acknowledge, add_replay_watch, replay_step
 from .storage import (
     AckGrant,
     Audit,
@@ -34,16 +36,13 @@ from .storage import (
     Notification,
     Outbox,
     Preference,
-    Quote,
     Replay,
     SignalRow,
-    Watch,
     WeeklyHistoryRequest,
     bootstrap,
     candle_dict,
     instant,
     now_ms,
-    rule_from,
     transaction,
 )
 
@@ -58,8 +57,22 @@ async def lifespan(app):
     from .provider_cache import interactive_busy
     from .provider_transport import start as start_transport
     start_transport(interactive_busy)
+    app.router.routes[:] = [r for r in app.router.routes if getattr(r, "name", "") != "native_mcp"]
     try:
-        yield
+        if settings.mcp_enabled:
+            from .mcp.server import create_server
+            server, endpoint, adapter = create_server()
+            # Restartable TestClient lifespans install exactly one route pair.
+            app.add_route("/mcp", endpoint, methods=["GET", "POST", "DELETE", "OPTIONS"], name="native_mcp")
+            app.add_route("/mcp/", endpoint, methods=["GET", "POST", "DELETE", "OPTIONS"], name="native_mcp")
+            try:
+                async with server.session_manager.run():
+                    yield
+            finally:
+                await adapter.close()
+                app.router.routes[:] = [r for r in app.router.routes if getattr(r, "name", "") != "native_mcp"]
+        else:
+            yield
     finally:
         await asyncio.to_thread(stop)
         from .provider_chart import close_clients
@@ -177,143 +190,23 @@ def change_password(body: PasswordChange, request: Request):
     return {"ok": True}
 
 
-def watch_dict(w):
-    return {
-        k: getattr(w, k)
-        for k in (
-            "id",
-            "instrument_id",
-            "name",
-            "rule",
-            "state",
-            "status",
-            "armed_at",
-            "paused_reason",
-            "warmup_start",
-        )
-    }
 
 
-class WatchInput(BaseModel):
-    instrument_id: Literal["EURUSD", "XAUUSD", "BTCUSD", "BTCUSDT"]
-    name: str = Field(min_length=1, max_length=100)
-    kind: Literal["pullback", "previous_day", "price", "indicator"]
-    timeframe: str = "H4"
-    direction: Literal["buy", "sell", "both"] = "both"
-    consecutive: int = Field(default=2, ge=2, le=100)
-    level: str | None = None
-    touch: bool = False
-    use_history: bool = True
-    indicator: str = "sma_cross"
-    indicator_version: str = "1"
-    indicator_params: dict = Field(default_factory=dict)
-
-    def rule(self):
-        return {
-            k: getattr(self, k)
-            for k in [
-                "kind",
-                "timeframe",
-                "direction",
-                "consecutive",
-                "level",
-                "touch",
-                "indicator",
-                "indicator_version",
-                "indicator_params",
-            ]
-        }
-
-    @model_validator(mode="after")
-    def check_rule(self):
-        rule_from(self.rule())
-        return self
 
 
 @app.get("/api/instruments", dependencies=[Depends(authenticated)])
 def instruments():
-    with transaction() as db:
-        result = []
-        for inst in db.scalars(
-            select(Instrument).where(Instrument.enabled.is_(True)).order_by(Instrument.id)
-        ):
-            latest = db.scalar(
-                select(Bar)
-                .where(Bar.instrument_id == inst.id, Bar.timeframe == "M1")
-                .order_by(Bar.start.desc())
-                .limit(1)
-            )
-            result.append(
-                {
-                    **{
-                        k: getattr(inst, k)
-                        for k in [
-                            "id",
-                            "label",
-                            "source",
-                            "basis",
-                            "calendar",
-                            "calendar_profile",
-                            "precision",
-                            "quality",
-                            "last_received",
-                            "error",
-                        ]
-                    },
-                    "price": str(latest.close) if latest else None,
-                    "price_at": latest.end if latest else None,
-                    "price_type": "M1 close",
-                    "quality": (
-                        "error"
-                        if inst.error
-                        else "waiting"
-                        if latest is None
-                        else "closed"
-                        if not scheduled_open(
-                            instant(now_ms()),
-                            Calendar(inst.calendar),
-                            gold=inst.id == "XAUUSD",
-                            closures=closures_from(inst.calendar_profile),
-                        )
-                        else "stale"
-                        if now_ms() - latest.end > 180_000
-                        else "receiving"
-                    ),
-                    "age_seconds": (now_ms() - latest.end) // 1000 if latest else None,
-                }
-            )
-            quote = db.get(Quote, inst.id)
-            if quote and (not latest or quote.at > latest.end):
-                result[-1].update(
-                    price=str(quote.bid),
-                    price_at=quote.at,
-                    price_type="last trade" if inst.basis == "last" else "bid quote",
-                    quality="receiving" if now_ms() - quote.at < 120_000 else "stale",
-                    age_seconds=(now_ms() - quote.at) // 1000,
-                )
-        return result
+    return business.instruments()
 
 
 @app.get("/api/candles", dependencies=[Depends(authenticated)])
 def candles(instrument: str, timeframe: str = "H4", before: int | None = None, limit: int = 300):
-    if timeframe not in TIMEFRAMES or not 1 <= limit <= 2000:
-        raise HTTPException(422, "周期或数量不正确")
-    with transaction() as db:
-        q = select(Bar).where(
-            Bar.instrument_id == instrument,
-            Bar.timeframe == timeframe,
-            Bar.start < (before if before is not None else now_ms()),
-        )
-        return [
-            candle_dict(b.candle())
-            for b in reversed(db.scalars(q.order_by(Bar.start.desc()).limit(limit)).all())
-        ]
+    return business.candles(instrument, timeframe, before, limit)
 
 
 @app.get("/api/watches", dependencies=[Depends(authenticated)])
 def watches():
-    with transaction() as db:
-        return [watch_dict(w) for w in db.scalars(select(Watch).order_by(Watch.created_at.desc()))]
+    return business.watches()
 
 
 @app.get("/api/session-range", dependencies=[Depends(authenticated)])
@@ -347,74 +240,17 @@ def session_range(instrument: str, at: int | None = None):
 
 @app.post("/api/watches", dependencies=[Depends(authenticated)], status_code=201)
 def new_watch(body: WatchInput):
-    with transaction() as db:
-        try:
-            return watch_dict(
-                create_watch(
-                    db, body.instrument_id, body.name, body.rule(), use_history=body.use_history
-                )
-            )
-        except ValueError as e:
-            raise HTTPException(422, str(e))
+    return business.new_watch(body)
 
 
 @app.post("/api/watches/{watch_id}/cancel", dependencies=[Depends(authenticated)])
 def cancel_watch(watch_id: str):
-    with transaction() as db:
-        w = db.scalar(select(Watch).where(Watch.id == watch_id).with_for_update())
-        if not w:
-            raise HTTPException(404, "监控不存在")
-        if w.status == "active":
-            w.status = "cancelled"
-            db.add(Audit(kind="watch_cancelled", details={"watch_id": watch_id}))
-        return watch_dict(w)
+    return business.cancel_watch(watch_id)
 
 
 @app.get("/api/signals", dependencies=[Depends(authenticated)])
 def signals():
-    with transaction() as db:
-        rows = db.execute(
-            select(SignalRow, Notification)
-            .join(Notification, Notification.signal_id == SignalRow.id)
-            .order_by(SignalRow.created_at.desc())
-            .limit(500)
-        ).all()
-        received_ids = set(
-            db.scalars(
-                select(DeviceReceipt.notification_id).where(
-                    DeviceReceipt.notification_id.in_([n.id for _, n in rows])
-                )
-            )
-        )
-        return [
-            {
-                **{
-                    k: getattr(s, k)
-                    for k in [
-                        "id",
-                        "watch_id",
-                        "instrument_id",
-                        "occurred_at",
-                        "created_at",
-                        "direction",
-                        "reason",
-                        "evidence",
-                    ]
-                },
-                "price": str(s.price),
-                "threshold": str(s.threshold),
-                "notification_id": n.id,
-                "notification_status": n.status,
-                "ack_at": n.ack_at,
-                "device_delivery": "received" if n.id in received_ids else "unknown",
-                "retry_available": db.scalar(
-                    select(Outbox.status).where(Outbox.notification_id == n.id)
-                )
-                == "blocked"
-                and n.ack_at is None,
-            }
-            for s, n in rows
-        ]
+    return business.signals()
 
 
 @app.post("/api/notifications/{notification_id}/retry", dependencies=[Depends(authenticated)])
@@ -440,12 +276,7 @@ def retry_notification(notification_id: str):
 
 @app.post("/api/notifications/{notification_id}/ack", dependencies=[Depends(authenticated)])
 def ack(notification_id: str):
-    with transaction() as db:
-        try:
-            n = acknowledge(db, notification_id)
-            return {"id": n.id, "status": n.status}
-        except ValueError:
-            raise HTTPException(404, "通知不存在")
+    return business.ack(notification_id)
 
 
 @app.post("/api/notification-actions/{notification_id}/ack")

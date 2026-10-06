@@ -1,5 +1,14 @@
 # 更新日志
 
+## [1.10.0] - 2026-10-06
+
+- 新增默认关闭的原生 Streamable HTTP MCP `/mcp`，固定官方 SDK 版本，通过显式注册自动生成能力 schema、发现与调用；首期 13 个工具覆盖行情、后台指标、告警/信号、状态、已保存画线及受控业务写入。
+- 网页和 MCP 共用业务查询；agent 凭据仅存摘要，支持 scope、过期、撤销、配额、并发/耗时预算、事务幂等与审计。新增 `s20_agent_capabilities` 增量迁移。
+- 原生图表通过公开 API 在保存时生成画线只读投影，保留对象身份、锚点及 revision；未保存改动不可见，未知对象不支持，旧文档需重新保存。
+- 修复 provider 日/周/月分页坐标、Yahoo 未知日历缺口判断、已发布指标历史预算，以及删除与修订抵消造成的共享 history revision 漏变更。
+- Ubuntu 独立 Docker/PostgreSQL 14、真实 HTTPS SDK、网页画线保存、实际 Codex 和 Binance provider 验收通过；完整后端回归 497 passed、38 skipped。来源及证据边界见 docs/verification/native-mcp/acceptance.md。
+- 同步 Python/web/锁文件版本，以 PR #10 和附注标签 v1.10.0 发布源码；运行验收镜像仍保留实际构建来源，不改标或切换生产。本期没有内部计划 CRUD、形态扫描或交易工具。
+
 ## [1.9.0] - 2026-10-06
 
 - 新增专业图表指标窗口：中文、名称、别名与 ID 搜索，来源分类、Python 指标用途/计算详情、深浅色与窄屏布局，支持键盘和连续添加。

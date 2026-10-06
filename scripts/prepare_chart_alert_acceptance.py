@@ -4,11 +4,11 @@ import json
 import os
 import secrets
 import subprocess
-from pathlib import Path
 
 from argon2 import PasswordHasher
+from chart_alert_acceptance_environment import APP, DATABASE, ROOT
 
-root = Path("/tmp/mw-chart-alerts-acceptance")
+root = ROOT
 root.mkdir(mode=0o700, exist_ok=True)
 os.chmod(root, 0o700)
 (root / "tls.conf").write_text("""resolver 127.0.0.11 valid=5s ipv6=off;
@@ -36,12 +36,12 @@ password, db_password = secrets.token_urlsafe(24), secrets.token_urlsafe(24)
 (root / "login.json").write_text(json.dumps({"password": password}))
 (root / "compose.env").write_text("MW_CHART_ALERTS_DB_PASSWORD=" + db_password + "\n")
 config = {
-    "ALERTS_DATABASE_URL": f"postgresql+psycopg://chart_alerts_acceptance:{db_password}@pg/chart_alerts_acceptance",
-    "ALERTS_DATABASE_APPLICATION_NAME": "mw-chart-alerts-acceptance",
+    "ALERTS_DATABASE_URL": f"postgresql+psycopg://{DATABASE}:{db_password}@pg/{DATABASE}",
+    "ALERTS_DATABASE_APPLICATION_NAME": ROOT.name,
     "ALERTS_ADMIN_PASSWORD_HASH": PasswordHasher().hash(password),
     "ALERTS_COOKIE_SECURE": "true",
     "ALERTS_DELIVERY_ENABLED": "false",
-    "ALERTS_PUBLIC_URL": "https://localhost:19443",
+    "ALERTS_PUBLIC_URL": APP,
     "ALERTS_INITIAL_HISTORY_DAYS": "0",
     "ALERTS_PROVIDER_REQUEST_SECONDS": "30",
 }
