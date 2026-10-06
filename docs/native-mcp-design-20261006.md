@@ -190,3 +190,7 @@ HTTP/ASGI 集成需要验证：
 - Codex CLI 0.160.0 的 HTTP URL 和 bearer-token-env-var 配置已本机核实；官方 OpenAI MCP 网页与 Markdown 请求仍为 403。实际 Codex HTTP 调用还未运行。
 
 完整运行/扩展合同、私密配置准备、独立 Compose 和待执行验收命令见 [原生 MCP 使用与开发](native-mcp-usage.md)；逐项证据见 [验收记录](verification/native-mcp/acceptance.md)。本条记录不构成生产发布授权，未操作 unraid。
+
+### 后续复核
+
+2026-10-06 第二次继续核实：Docker socket 权限仍拒绝，验收实例仍未部署。新增协议回归复现并修正 Yahoo gap calendar、published indicator budget、provider D/W/M cursor 三处合同错误；Yahoo 休市间隔现在显式标记 calendar unverified，provider 分页 cursor 保留 native chart time。补充真实浏览器保存/PG/MCP 验收脚本和 Codex 成功数据调用检查；这些环境脚本尚未运行，不能据此升级真实验收状态。

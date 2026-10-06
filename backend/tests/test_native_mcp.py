@@ -675,3 +675,130 @@ def test_real_native_projection_document(mcp):
         [{"time": p["time"] * 1000, "price": str(p["price"])} for p in r["points"]]
         for r in expected
     ]
+
+
+def test_yahoo_session_breaks_do_not_claim_missing_trading_bars(mcp, monkeypatch):
+    from alerts import provider_chart
+
+    client, token, _ = mcp
+    monkeypatch.setattr(
+        provider_chart,
+        "metadata",
+        lambda *a, **k: {
+            "source": "yahoo",
+            "calendar": "yahoo",
+            "basis": "adjusted",
+            "precision": 8,
+        },
+    )
+    rows = [
+        {
+            "start": start,
+            "end": start + 3600000,
+            "open": "100",
+            "high": "101",
+            "low": "99",
+            "close": "100",
+            "complete": True,
+        }
+        for start in (3600000, 86400000)
+    ]
+    monkeypatch.setattr(
+        provider_chart,
+        "data",
+        lambda body: {
+            "bars": rows,
+            "indicators": [],
+            "has_more": False,
+            "as_of": 90000000,
+            "cache_revision": 1,
+            "basis": "adjusted",
+            "calendar": "yahoo",
+        },
+    )
+    result = call(
+        client,
+        token,
+        "market_get_bars",
+        {"instrument": "YAHOO:" + "a" * 32, "series_kind": "provider", "timeframe": "H1"},
+    )
+    assert not result.get("isError"), result
+    data = result["structuredContent"]
+    assert data["gap_assessment"] == "unknown_calendar"
+    assert data["gaps"] == []
+    assert data["interval_breaks"] == [{"start": 7200000, "end": 86400000}]
+    assert data["quality"] == "calendar_unverified"
+
+
+def test_published_indicator_budget_counts_published_snapshot(mcp, monkeypatch):
+    from alerts.capabilities import actions
+
+    client, token, _ = mcp
+    queried_tables = []
+
+    class Counter:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def scalar(self, query):
+            queried_tables.extend(str(table) for table in query.get_final_froms())
+            return 200001
+
+    # Only intercept the capability history guard, not auth or audit transactions.
+    monkeypatch.setattr(actions, "transaction", Counter)
+    result = call(
+        client,
+        token,
+        "indicators_calculate",
+        {"instrument": "EURUSD", "published": True, "indicators": [{"name": "EMA"}]},
+    )
+    assert result["isError"]
+    assert result["structuredContent"]["error"]["code"] == "RESOURCE_LIMIT"
+    assert queried_tables == ["chart_published_bars"]
+
+
+def test_native_daily_pagination_uses_chart_labels(mcp, monkeypatch):
+    from alerts import provider_chart
+
+    client, token, _ = mcp
+    monkeypatch.setattr(
+        provider_chart,
+        "metadata",
+        lambda *a, **k: {"source": "oanda", "calendar": "ny17", "basis": "bid", "precision": 5},
+    )
+    label = 1791244800000
+    row = {
+        "start": label - 3 * 3600000,
+        "end": label + 21 * 3600000,
+        "chart_time": label,
+        "open": "1.1",
+        "high": "1.2",
+        "low": "1",
+        "close": "1.1",
+        "complete": True,
+    }
+    monkeypatch.setattr(
+        provider_chart,
+        "data",
+        lambda body: {
+            "bars": [row],
+            "indicators": [],
+            "has_more": True,
+            "as_of": label + 86400000,
+            "cache_revision": 1,
+            "basis": "bid",
+            "calendar": "ny17",
+        },
+    )
+    result = call(
+        client,
+        token,
+        "market_get_bars",
+        {"instrument": "EURUSD", "series_kind": "provider", "timeframe": "D1"},
+    )
+    assert not result.get("isError"), result
+    assert result["structuredContent"]["next_before"] == label
+    assert result["structuredContent"]["cursor_coordinate"] == "native_chart_time_ms"

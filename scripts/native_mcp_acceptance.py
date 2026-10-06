@@ -146,7 +146,10 @@ async def main(args):
                     report["checks"] += ["concurrent first create", "notification ack retry"]
                     cancelled = await call(
                         "alerts_cancel",
-                        {"idempotency_key": "https-cancel-fixture", "watch_id": created["id"]},
+                        {
+                            "idempotency_key": "https-cancel-" + created["id"],
+                            "watch_id": created["id"],
+                        },
                     )
                     assert cancelled["status"] == "cancelled"
                     report["checks"] += [

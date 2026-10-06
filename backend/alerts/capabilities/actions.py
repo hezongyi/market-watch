@@ -8,7 +8,7 @@ from .. import business
 from ..chart_api import DataQuery, query_chart
 from ..chart_indicators import public_catalog
 from ..config import settings
-from ..storage import Bar, Instrument, SignalRow, Watch, now_ms, transaction
+from ..storage import Bar, ChartPublishedBar, Instrument, SignalRow, Watch, now_ms, transaction
 from .context import CapabilityError
 from .models import (
     AckNotification,
@@ -100,11 +100,14 @@ async def bars(ctx, query):
                 if query.timeframe in ("W1", "MN")
                 else query.timeframe
             )
+            model = ChartPublishedBar if query.published else Bar
+            if query.published:
+                frame = query.timeframe
             with transaction() as db:
                 return db.scalar(
                     select(func.count())
-                    .select_from(Bar)
-                    .where(Bar.instrument_id == query.instrument, Bar.timeframe == frame)
+                    .select_from(model)
+                    .where(model.instrument_id == query.instrument, model.timeframe == frame)
                 )
 
         if await asyncio.to_thread(history_size) > 200000:
@@ -140,20 +143,39 @@ async def bars(ctx, query):
     from ..domain import Calendar
     from ..storage import instant
 
-    gaps = [
+    interval_breaks = [
         {"start": prev["end"], "end": row["start"]}
         for prev, row in zip(page["bars"], page["bars"][1:])
         if prev["end"] < row["start"]
-        and bucket_has_trading(
-            instant(prev["end"]),
-            instant(row["start"]),
-            Calendar(meta["calendar"]),
-            gold=query.instrument == "XAUUSD",
-            closures=closures_from(meta.get("calendar_profile", {})),
-        )
     ]
+    # Yahoo exchange calendars cannot be classified by the NY17/UTC0 rules.
+    # A session close is an interval break, not proof of missing trading bars.
+    known_calendar = meta["calendar"] in {calendar.value for calendar in Calendar}
+    gaps = (
+        [
+            gap
+            for gap in interval_breaks
+            if bucket_has_trading(
+                instant(gap["start"]),
+                instant(gap["end"]),
+                Calendar(meta["calendar"]),
+                gold=query.instrument == "XAUUSD",
+                closures=closures_from(meta.get("calendar_profile", {})),
+            )
+        ]
+        if known_calendar
+        else []
+    )
     incomplete_count = sum(not row["complete"] for row in page["bars"])
-    quality = "gapped" if gaps else "incomplete" if incomplete_count else "complete"
+    quality = (
+        "gapped"
+        if gaps
+        else "incomplete"
+        if incomplete_count
+        else "calendar_unverified"
+        if not known_calendar
+        else "complete"
+    )
     return {
         "instrument": query.instrument,
         "series_kind": query.series_kind,
@@ -162,10 +184,21 @@ async def bars(ctx, query):
         "price_type": meta["basis"] + " OHLC",
         "queried_at": now_ms(),
         "quality": quality,
-        "next_before": page["bars"][0]["start"] if page["has_more"] else None,
+        "next_before": (
+            page["bars"][0].get("chart_time", page["bars"][0]["start"])
+            if query.series_kind == "provider"
+            else page["bars"][0]["start"]
+        )
+        if page["has_more"]
+        else None,
+        "cursor_coordinate": "native_chart_time_ms"
+        if query.series_kind == "provider"
+        else "utc_ms",
         "page": page,
         "incomplete_count": incomplete_count,
         "gaps": gaps,
+        "interval_breaks": interval_breaks,
+        "gap_assessment": "trading_calendar" if known_calendar else "unknown_calendar",
     }
 
 
@@ -318,7 +351,7 @@ def build_registry():
         ),
         (
             "market_get_bars",
-            "OHLC strings and chart quality/revision/coverage metadata. UTC milliseconds. Default 300, max 2000. Bounded cache fill only; no persistent history subscription.",
+            "OHLC strings and chart quality/revision/coverage metadata. UTC bar start/end; next_before follows cursor_coordinate (provider native chart labels). Default 300, max 2000. Bounded cache fill only; no persistent history subscription.",
             BarsQuery,
             BarsResult,
             "market:read",

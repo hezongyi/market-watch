@@ -45,3 +45,22 @@ node web/tests/advanced-layout-refresh.browser.cjs --case=single-provider
 - 交付启动/停止命令已在 [使用文档](../../native-mcp-usage.md) 列出，但须启动成功后记录主机、实际地址、container labels 和状态，才能声称部署交付。
 
 未 commit 凭据、TLS 私钥、浏览器完整状态或许可库。没有操作 unraid、没有生产发布、没有实盘交易。
+
+## 第二次继续核对（2026-10-06）
+
+上一次为实施和测试进展。本轮再次 `docker info` 仍确认 Docker socket 权限拒绝，没有已运行的验收实例或可轮询部署句柄。
+
+- 新的 protocol 回归先复现三处问题：Yahoo exchange-calendar 间隔返回 INTERNAL_ERROR；published 指标预算错误统计 candles；provider D1 分页错误返回 UTC start 而非 native chart label。现已修正并保留显式 calendar/cursor 合同。
+- 相关 MCP/provider/Yahoo/managed 回归 **141 passed**（36.73 秒）；随后全量后端回归 **496 passed、38 skipped**（134.25 秒），日志 `/tmp/native-mcp-followup-full.log`。新增合同修复全部纳入该次全量结果。
+- `scripts/seed_native_mcp_acceptance.py` 增加 H1/H4 已发布快照；只在临时隔离 SQLite 验证 published bars/EMA 与 dataset readiness，未部署。
+- 新 `web/tests/native-mcp-drawings.browser.cjs` 定义真正网页/原生对象保存/PostgreSQL/HTTP MCP 验收路径，检查对象身份、保存 revision、锚点、未保存不可见、随后保存可见及刷新；只完成语法检查，尚未运行。
+- Codex trace verifier 现在拒绝失败调用、工具业务错误、缺 H1/H4 数据、缺指定已存画线与缺征询问题；本轮仅对合成事件检查 verifier 正反例，未冒称实际 Codex 接入通过。诊断 stderr 与 trace 以 0600 保存。
+- HTTPS script 的取消幂等键改为与本次新建 watch 绑定，避免重复验收时同键不同对象冲突。
+
+仍须用户恢复 Ubuntu 本机 Docker 权限才能开始 PostgreSQL/HTTPS/Codex 验收。原 `b16cf81` 后的修复提交不代表整体目标完成；不变更 unraid。
+
+## 第三次继续核对（2026-10-06）
+
+全量回归进程已正常结束（496 passed、38 skipped）。复核实际网页保存事件后，浏览器验收脚本改用真实 Ctrl+S 保存路径，同时等待持久化响应和 dirty 状态清除；JS 语法检查、修改文件 Ruff 和 `git diff --check` 通过。该脚本仍未在部署实例运行。
+
+再次核对 Ubuntu 本机 Docker，socket 为 `660 nobody:nogroup`，当前 `quant` 会话虽列出 `nogroup`，`docker info` 仍返回 permission denied。18543/18544 没有监听，尚未启动本任务 Compose 服务。之前请求的 Docker 权限配置尚未完成；剩余 PostgreSQL、HTTPS、浏览器和实际 Codex gate 均依赖该环境，目标因此阻塞，不能标记完成。

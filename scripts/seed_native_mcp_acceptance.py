@@ -7,6 +7,8 @@ from alerts.config import settings
 from alerts.storage import (
     AdvancedWorkspace,
     Bar,
+    ChartPublication,
+    ChartPublishedBar,
     Instrument,
     Notification,
     Outbox,
@@ -31,17 +33,50 @@ with transaction() as db:
         for index in range(count):
             start = end - (count - index) * width
             value = Decimal("1.10000") + Decimal(index % 40) / 100000
+            candle = Bar(
+                instrument_id="EURUSD",
+                timeframe=frame,
+                start=start,
+                end=start + width,
+                open=value,
+                high=value + Decimal(".00030"),
+                low=value - Decimal(".00020"),
+                close=value + Decimal(".00010"),
+                complete=True,
+            )
+            db.add(candle)
+            if frame != "M1":
+                db.add(
+                    ChartPublishedBar(
+                        instrument_id=inst.id,
+                        timeframe=frame,
+                        start=start,
+                        end=start + width,
+                        complete=True,
+                        revision=1,
+                        payload={
+                            "start": start,
+                            "end": start + width,
+                            "open": str(value),
+                            "high": str(value + Decimal(".00030")),
+                            "low": str(value - Decimal(".00020")),
+                            "close": str(value + Decimal(".00010")),
+                            "complete": True,
+                            "revision": 1,
+                            "volume": None,
+                            "volume_complete": False,
+                        },
+                    )
+                )
+        if frame != "M1":
             db.add(
-                Bar(
-                    instrument_id="EURUSD",
+                ChartPublication(
+                    instrument_id=inst.id,
                     timeframe=frame,
-                    start=start,
-                    end=start + width,
-                    open=value,
-                    high=value + Decimal(".00030"),
-                    low=value - Decimal(".00020"),
-                    close=value + Decimal(".00010"),
-                    complete=True,
+                    start=end - count * width,
+                    end=end,
+                    complete_count=count,
+                    initialized=True,
                 )
             )
     from alerts.business import WatchInput

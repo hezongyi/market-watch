@@ -38,7 +38,11 @@ class IndicatorSpec(Input):
 
 class BarsQuery(QuoteQuery):
     timeframe: Literal["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"] = "H1"
-    before: int | None = Field(default=None, gt=0, description="Exclusive UTC millisecond cursor")
+    before: int | None = Field(
+        default=None,
+        gt=0,
+        description="Exclusive millisecond cursor: managed UTC start, provider native chart time",
+    )
     limit: int = Field(default=300, ge=1, le=2000)
     published: bool = False
     dataset_start: int | None = Field(default=None, ge=0)
@@ -171,9 +175,12 @@ class BarsResult(BaseModel):
     queried_at: int
     quality: str
     next_before: int | None
+    cursor_coordinate: Literal["utc_ms", "native_chart_time_ms"] = "utc_ms"
     coverage_scope: str = "returned_page"
     incomplete_count: int = 0
     gaps: list[dict[str, int]] = Field(default_factory=list)
+    interval_breaks: list[dict[str, int]] = Field(default_factory=list)
+    gap_assessment: Literal["trading_calendar", "unknown_calendar"] = "trading_calendar"
     page: ChartPage
 
 
