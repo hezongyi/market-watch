@@ -1,0 +1,47 @@
+{
+  "captured_at": 1791269974772,
+  "host": "Ubuntu local isolated Docker / host observers",
+  "project": "market-watch-data-integration",
+  "terminal_services": {
+    "browser": {
+      "pid": 0,
+      "result": "exit-code",
+      "exit_status": 1,
+      "exit_utc": "2026-10-06T06:41:44Z"
+    },
+    "rules": {
+      "pid": 0,
+      "result": "exit-code",
+      "exit_status": 1,
+      "exit_utc": "2026-10-06T06:42:06Z"
+    }
+  },
+  "rule_error": "OSError: [Errno 28] No space left on device",
+  "browser_error": "Browser observation failed; sanitized failure record, exact original cause not retained",
+  "disk_available_bytes_after_exit": 614379520,
+  "raw_files_preserved": true,
+  "observers_restarted": false,
+  "instances_running": true,
+  "records": {
+    "browser": {
+      "last_complete_record_at": 1791268904730,
+      "invalid_records": [],
+      "summary": "browser-disk-interrupted-summary.json"
+    },
+    "rules": {
+      "last_complete_record_at": 1791268926569,
+      "invalid_records": [
+        {
+          "line": 961,
+          "bytes": 116,
+          "newline_terminated": false,
+          "sha256": "b49dd327065ef8ba89b5fea2ed1455379cc99ecdcaa8ae5d7b0e5b9815d20fb1",
+          "error": "Unterminated string starting at"
+        }
+      ],
+      "summary": "rules-disk-interrupted-summary.json"
+    }
+  },
+  "interpretation": "Rule observer failure is proved to be disk ENOSPC. Browser failed 22 seconds earlier; concurrent failure alone does not independently prove its cause. Epoch 50 and recovered quotes/rules observed in live API. No uninterrupted two-day quality acceptance can be claimed.",
+  "implementation_acceptance_effect": "Published history and previously exercised feature behavior remain separate evidence; ongoing host stability is a quality gate."
+}

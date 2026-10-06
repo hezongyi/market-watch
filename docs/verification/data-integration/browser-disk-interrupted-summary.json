@@ -1,0 +1,131 @@
+{
+  "starts": [
+    {
+      "event": "started",
+      "at": 1791259454900,
+      "phase": "sustained",
+      "planned_minutes": 2880,
+      "host": "Ubuntu local Chromium",
+      "url": "http://127.0.0.1:16589/market-data",
+      "receiver_browser_same_host_clock": true,
+      "clock_scope": "same host; source clock offset remains unverified"
+    }
+  ],
+  "finishes": [
+    {
+      "event": "failed",
+      "at": 1791268904730,
+      "error_type": "Error"
+    }
+  ],
+  "deployments": [
+    {
+      "event": "deployment_started",
+      "at": 1791262860351,
+      "phase": "sustained",
+      "action": "api_recreate_for_cooldown_health",
+      "commit": "42ec05176b80b46e370d6a630fee78f1c20b3937",
+      "scope": "Ubuntu acceptance API only"
+    },
+    {
+      "event": "deployment_finished",
+      "at": 1791262889349,
+      "phase": "sustained",
+      "action": "api_recreate_for_cooldown_health",
+      "commit": "42ec05176b80b46e370d6a630fee78f1c20b3937",
+      "elapsed_ms": 28998
+    }
+  ],
+  "session_renewals": [],
+  "measurement_since": 1791259454900,
+  "prior_records_retained_in_original": 118,
+  "contains_deployment": true,
+  "first_block": 1791259485335,
+  "last_block": 1791268874709,
+  "blocks": 310,
+  "snapshots": 7893,
+  "heartbeats": 8920,
+  "errors": 3,
+  "zero_heartbeat_blocks": 1,
+  "max_block_interval_ms": 58502,
+  "opened": 4,
+  "symbols": {
+    "EURUSD": {
+      "unique_quotes": 3255,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 0,
+      "quality_counts": {
+        "healthy": 7525,
+        "stale": 368
+      },
+      "visible_quote_update_rate": {
+        "updates": 3255,
+        "elapsed_seconds": 9419.809,
+        "updates_per_second": 0.3455484076163328,
+        "meaning": "distinct quote keys within each SSE subscription; reload can recount its first quote; includes startup, silent/error blocks and gaps; 1s snapshots can omit source updates",
+        "denominator_status": "single_recorded_window"
+      },
+      "receive_to_browser_ms": {
+        "samples": 3255,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 470,
+        "p95_ms": 1050,
+        "p99_ms": 3070
+      },
+      "source_to_browser_ms": {
+        "samples": 3255,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 890,
+        "p95_ms": 1810,
+        "p99_ms": 4820
+      }
+    },
+    "XAUUSD": {
+      "unique_quotes": 7321,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 0,
+      "quality_counts": {
+        "healthy": 7883,
+        "stale": 6,
+        "degraded": 4
+      },
+      "visible_quote_update_rate": {
+        "updates": 7321,
+        "elapsed_seconds": 9419.809,
+        "updates_per_second": 0.7771919791579639,
+        "meaning": "distinct quote keys within each SSE subscription; reload can recount its first quote; includes startup, silent/error blocks and gaps; 1s snapshots can omit source updates",
+        "denominator_status": "single_recorded_window"
+      },
+      "receive_to_browser_ms": {
+        "samples": 7321,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 320,
+        "p95_ms": 1010,
+        "p99_ms": 2780
+      },
+      "source_to_browser_ms": {
+        "samples": 7321,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 660,
+        "p95_ms": 1440,
+        "p99_ms": 3720
+      }
+    }
+  },
+  "meaning": "quote keys observed through browser SSE; invalid timings separate; 1s snapshots can omit upstream updates",
+  "source_clock_offset_verified": false,
+  "two_trading_days_verified": false,
+  "raw_integrity": {
+    "sha256": "db7586caeb4da28229ab81bc801425a8bb91285a25fd15c17d485765164d488a",
+    "bytes": 397558,
+    "invalid_records": [],
+    "meaning": "Only successfully parsed records summarized; invalid tail explicitly counted, original raw bytes preserved."
+  },
+  "quality_acceptance": "interrupted; not a completed 48-hour window"
+}

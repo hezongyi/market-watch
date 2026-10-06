@@ -14,6 +14,21 @@
 当前目标为 P0–P2 全部实现与验收，P3 不列入本次完成门槛。下面初始 P0 记录保留作历史，
 本节更新为最新状态。
 
+## 当前交付状态（2026-10-06更新）
+
+用户要求实现与质量分别验收。**[实现验收通过](verification/data-integration/implementation-acceptance.md)**，
+P0–P2功能有独立证据，可以先交付；**[质量验收未通过](verification/data-integration/quality-acceptance.md)**，
+整体目标仍active。两份报告分别列出门槛，不以功能通过代替长期验收或来源会话认证。
+
+06:41:44UTC浏览器观察与06:42:06UTC规则观察失败退出，后者明确ENOSPC。
+原JSONL及116字节未完成尾记录完整保留；六个验收容器仍运行，API/PG健康。
+原定10月8日12:42新加坡时间的质量收口时间失效，恢复后须明确新窗口及实际覆盖。
+后续章节为开发历史，包含已完成十年导入之前的旧状态，以此处及两份验收报告为准。
+
+10:27UTC复核上述状态未恢复：观察MainPID0/failed，六个实例容器running、API/PG健康，
+宿主余量约429MB。本任务主要日志约6MB、ignored验收文件58MB，未删除原数据或其他任务资源。
+已请求Ubuntu容量恢复/另一个本地数据目录；质量收口时间须在恢复后重排。
+
 ## P1 与 P2 接续实现（2026-10-06）
 
 - 新增 `dukascopy_history.DukascopyHistory`，锁定 SDK 4.0.1；复用其请求构造、JSONP 解码和
@@ -53,7 +68,7 @@
   来源到接收价龄 p50/p95/p99 为 EURUSD 269/538/581ms、XAUUSD 231/393/436ms。
   尚未校准独立时钟误差，不将该短样本称为 SLA、两交易日或 M1 收盘延迟验收。
 
-## P2 实现与 Ubuntu 容器验收（最新状态）
+## P2 实现与 Ubuntu 容器验收（阶段记录）
 
 - `live_pricing` 与 `oanda_worker` 已实现账户级共享 stream、跨进程拥有者租约、连接世代 fencing、
   常驻与监控/浏览器需求并集、独立 REST 确认与租约续期线程、恢复预热与过期信号抑制。
@@ -88,7 +103,7 @@
   现有图表工作区使用来源限定身份读取真实 M1，续期共享订阅。
   [桌面截图](verification/data-integration/market-data-desktop.png)、[手机截图](verification/data-integration/market-data-mobile.png)。
 
-## 当前尚未完成的验收门槛
+## 02:30UTC之前尚未完成的验收门槛（历史记录）
 
 - 十年导入仍在运行；最终 manifest、缺口/休市归因、跨年/DST/精度全量报告尚待形成。
 - 两交易日持续实测尚未达到，不能把短样本价龄当成 SLA。接收机 NTP 状态已采样：offset +1.699ms、root distance 22.2ms、jitter 10.491ms；

@@ -5,6 +5,12 @@
 数据库为 PostgreSQL 14.24，独立网络、`integration-postgres` volume 和 `integration` 数据库。
 `integration_restore` 也是本任务的备份恢复校验数据库。未在 unraid 创建验收实例。
 
+当前分别交付[实现验收](implementation-acceptance.md)（通过）和
+[质量验收](quality-acceptance.md)（未通过）。2026-10-06 06:41/06:42UTC两个宿主观察进程
+失败退出，规则日志明确ENOSPC；六个实例容器仍运行。
+原质量收口时间失效，原JSONL及未完成尾记录保留，不直接继续追加以损坏证据。
+下面的窗口和PID说明是中断前记录；恢复观察须另建明确新窗口，不能称原窗口持续运行。
+
 ## 启动与停止
 
 命令从 `/home/quant/repos/market-watch-data-integration` 执行。
