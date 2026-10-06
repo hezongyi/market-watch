@@ -3,12 +3,22 @@
 from collections import deque
 from decimal import Decimal
 
+from sqlalchemy import select
+
 from .calendar_profile import closures_from
 from .chart_series import is_gold
 from .domain import Candle, aggregate, bucket_bounds, calendar_for, scheduled_open
 from .history_versions import snapshot_rows
 from .replay_history import pack_history
-from .storage import HistoryVersion, MarketDataset, Replay, candle_dict, instant, ms
+from .storage import (
+    HistoryReclamation,
+    HistoryVersion,
+    MarketDataset,
+    Replay,
+    candle_dict,
+    instant,
+    ms,
+)
 
 
 def version_candles(db, version_id, instrument, frame, end):
@@ -59,6 +69,11 @@ def create_replay(db, instrument, version_id, frame, start, end):
     version = db.get(HistoryVersion, version_id)
     if not version or version.status != "published":
         raise ValueError("请选择已发布的历史数据集版本")
+    # Serialize the reference before scanning history, using the same row as
+    # reclamation. This avoids reading disappearing chunks before final flush.
+    db.scalar(select(MarketDataset).where(MarketDataset.id == version.dataset_id).with_for_update())
+    if db.get(HistoryReclamation, version_id):
+        raise ValueError("所选历史版本已回收，请选择可用版本")
     dataset = db.get(MarketDataset, version.dataset_id)
     if dataset.instrument_id != instrument.id:
         raise ValueError("回测版本与品种身份不匹配")

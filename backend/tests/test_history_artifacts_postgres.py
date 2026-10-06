@@ -16,6 +16,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
     artifacts.test_m1_publication_does_not_claim_other_frames_ready,
     artifacts.test_large_bucket_build_resumes_without_holding_all_minutes,
     artifacts.test_published_artifacts_and_blocks_are_immutable,
+    artifacts.test_fixed_chart_pages_newest_first_without_overlap_or_price_filling,
     center.test_dataset_available_only_after_period_publication_and_pause_keeps_it,
     center.test_server_pagination_and_literal_filters,
 ], ids=lambda contract: contract.__name__)

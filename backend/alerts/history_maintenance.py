@@ -19,6 +19,7 @@ from .storage import (
     DatasetMaintenance,
     HistoryArtifact,
     HistoryChunk,
+    HistoryReclamation,
     HistoryRun,
     HistoryVersion,
     MarketDataset,
@@ -40,7 +41,9 @@ def next_daily(stamp, minute, timezone):
 
 def latest_version(db, dataset_id):
     return db.scalar(select(HistoryVersion).where(HistoryVersion.dataset_id == dataset_id,
-        HistoryVersion.status == "published").order_by(HistoryVersion.end.desc(),
+        HistoryVersion.status == "published",
+        ~select(HistoryReclamation.version_id).where(HistoryReclamation.version_id == HistoryVersion.id).exists())
+        .order_by(HistoryVersion.end.desc(),
             HistoryVersion.published_at.desc(), HistoryVersion.id).limit(1))
 
 
@@ -264,10 +267,14 @@ def schedule_tick():
         if unfinished and finish_run(db, unfinished):
             return True
         controlled = db.scalar(select(HistoryVersion).join(HistoryRun,
-            HistoryRun.version_id == HistoryVersion.id).where(HistoryRun.desired_state != "running",
+            HistoryRun.version_id == HistoryVersion.id).join(MarketDataset,
+            MarketDataset.id == HistoryVersion.dataset_id).where(HistoryRun.desired_state != "running",
             HistoryVersion.status.in_(("pending", "running", "retrying")),
-            HistoryVersion.lease_until <= now_ms()).with_for_update(skip_locked=True, of=HistoryVersion).limit(1))
+            HistoryVersion.lease_until <= now_ms()).with_for_update(skip_locked=True, of=MarketDataset).limit(1))
         if controlled:
+            from .history_versions import lock_version
+
+            controlled = lock_version(db, controlled.id)
             controlled.status = db.get(HistoryRun, controlled.id).desired_state
             controlled.lease_token, controlled.lease_until = None, 0
             if controlled.status == "cancelled":

@@ -21,6 +21,7 @@ from .storage import (
     Audit,
     Bar,
     HistoryChunk,
+    HistoryReclamation,
     HistoryVersion,
     Instrument,
     MarketCoverage,
@@ -32,10 +33,16 @@ from .storage import (
 
 
 def derive_version(db, original_id, destination_dataset, *, quarantine_reason=None):
-    parent = db.scalar(select(HistoryVersion).where(HistoryVersion.id == original_id).with_for_update())
+    parent = db.get(HistoryVersion, original_id)
     destination = db.get(MarketDataset, destination_dataset)
     if not parent or not destination:
         raise ValueError("Known parent version and destination dataset are required")
+    list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
+        (parent.dataset_id, destination_dataset))).order_by(MarketDataset.id).with_for_update()))
+    parent = db.scalar(select(HistoryVersion).where(HistoryVersion.id == original_id)
+                       .with_for_update().execution_options(populate_existing=True))
+    if db.get(HistoryReclamation, original_id):
+        raise ValueError("原始版本价格数据已回收，不能继续派生")
     original = db.get(MarketDataset, parent.dataset_id)
     source = DatasetIdentity.model_validate(original.identity)
     target = DatasetIdentity.model_validate(destination.identity)
@@ -66,8 +73,15 @@ def derive_version(db, original_id, destination_dataset, *, quarantine_reason=No
 
 def derive_page(ident):
     with transaction() as db:
-        version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident).with_for_update())
+        version = db.get(HistoryVersion, ident)
         if not version or version.status != "deriving":
+            return False
+        parent = db.get(HistoryVersion, version.manifest["provenance"]["derived_from_version"])
+        list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
+            (parent.dataset_id, version.dataset_id))).order_by(MarketDataset.id).with_for_update()))
+        version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident)
+                            .with_for_update().execution_options(populate_existing=True))
+        if version.status != "deriving":
             return False
         proof = version.manifest["provenance"]
         parent = db.get(HistoryVersion, proof["derived_from_version"])

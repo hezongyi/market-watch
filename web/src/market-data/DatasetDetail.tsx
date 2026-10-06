@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Link,
   useNavigate,
@@ -10,7 +10,8 @@ import Chart from "../Chart";
 import { Feedback, Pager } from "./Center";
 import { useSnapshot } from "./useSnapshot";
 import { MaintenanceSettings } from "./MaintenanceSettings";
-import { names, phase, time, type Dataset } from "./types";
+import { DatasetReferences } from "./DatasetReferences";
+import { names, phase, time, type Dataset, type Period } from "./types";
 
 export function DatasetDetail() {
   const navigate = useNavigate();
@@ -40,6 +41,23 @@ export function DatasetDetail() {
       ? dataset?.periods.find((p) => p.timeframe === frame)
           ?.available_version_id
       : dataset?.latest_version_id);
+  useEffect(() => {
+    if (section === "chart" && selectedVersion && !params.get("version")) {
+      const next = new URLSearchParams(params);
+      next.set("version", selectedVersion);
+      setParams(next, { replace: true });
+    }
+  }, [section, selectedVersion, params, setParams]);
+  const selectedPeriods = useSnapshot<Period[]>(
+    selectedVersion && section === "chart"
+      ? `/market-data/versions/${selectedVersion}/artifacts`
+      : null,
+    refresh,
+  );
+  const frameReady = selectedPeriods.data?.some(
+    (p) => p.timeframe === frame && p.status === "published" && p.rows > 0,
+  );
+  const before = params.get("before");
   const coveragePage = Math.max(1, Number(params.get("coverage_page")) || 1);
   const coverage = useSnapshot<{
     items: {
@@ -58,15 +76,16 @@ export function DatasetDetail() {
       : null,
     refresh,
   );
-  const bars = useSnapshot<{ bars: Bar[] }>(
-    selectedVersion && section === "chart"
-      ? `/market-data/versions/${selectedVersion}/bars?timeframe=${frame}&limit=2000`
+  const bars = useSnapshot<{ bars: Bar[]; next_before: number | null }>(
+    selectedVersion && section === "chart" && frameReady
+      ? `/market-data/versions/${selectedVersion}/chart?timeframe=${frame}&count=2000${before !== null ? `&before=${encodeURIComponent(before)}` : ""}`
       : null,
     refresh,
   );
   function select(name: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(name, value);
+    if (name === "version" || name === "frame") next.delete("before");
     setParams(next);
   }
   async function act(path: string, body: unknown) {
@@ -151,6 +170,13 @@ export function DatasetDetail() {
             <div className="dc-actions">
               {dataset.usable_timeframes.length > 0 && (
                 <Link to={`?section=chart`}>打开历史图表</Link>
+              )}
+              {dataset.latest_version_id && (
+                <Link
+                  to={`/replay?dataset_version=${dataset.latest_version_id}`}
+                >
+                  用于回测
+                </Link>
               )}
               {dataset.maintenance.configured && (
                 <button
@@ -339,19 +365,24 @@ export function DatasetDetail() {
                           {time(v.start)}
                           <span>至 {time(v.end)}</span>
                         </td>
-                        <td>{names[v.status] || v.status}</td>
+                        <td>
+                          {v.payload_available === false
+                            ? "价格已回收 · 清单保留"
+                            : names[v.status] || v.status}
+                        </td>
                         <td>
                           {v.manifest?.rows ?? "—"} /{" "}
                           {v.manifest?.unknown_minutes ?? "—"}
                         </td>
                         <td>
-                          {v.status === "published" && (
-                            <Link
-                              to={`?section=chart&version=${v.id}&frame=M1`}
-                            >
-                              查看固定版本
-                            </Link>
-                          )}
+                          {v.status === "published" &&
+                            v.payload_available !== false && (
+                              <Link
+                                to={`?section=chart&version=${v.id}&frame=M1`}
+                              >
+                                查看固定版本
+                              </Link>
+                            )}
                         </td>
                       </tr>
                     ))}
@@ -456,9 +487,12 @@ export function DatasetDetail() {
             </div>
           )}
           {section === "references" && (
-            <p>
-              已发布历史保留固定版本引用。组合映射与引用管理正在接入，当前不启动实时采集。
-            </p>
+            <DatasetReferences
+              key={id}
+              id={id!}
+              refresh={refresh}
+              onDone={() => setRefresh((r) => r + 1)}
+            />
           )}
           {section === "chart" && (
             <>
@@ -469,8 +503,26 @@ export function DatasetDetail() {
                     value={frame}
                     onChange={(e) => select("frame", e.target.value)}
                   >
-                    {dataset.usable_timeframes.map((f) => (
-                      <option key={f}>{f}</option>
+                    {!selectedPeriods.data?.some(
+                      (p) => p.timeframe === frame,
+                    ) && (
+                      <option value={frame} disabled>
+                        {frame} · 尚未发布
+                      </option>
+                    )}
+                    {selectedPeriods.data?.map((p) => (
+                      <option
+                        key={p.timeframe}
+                        value={p.timeframe}
+                        disabled={p.status !== "published" || p.rows === 0}
+                      >
+                        {p.timeframe}
+                        {p.status !== "published"
+                          ? " · 准备中"
+                          : p.rows === 0
+                            ? " · 无观测"
+                            : ""}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -481,7 +533,11 @@ export function DatasetDetail() {
                     onChange={(e) => select("version", e.target.value)}
                   >
                     {versions.data
-                      ?.filter((v) => v.status === "published")
+                      ?.filter(
+                        (v) =>
+                          v.status === "published" &&
+                          v.payload_available !== false,
+                      )
                       .map((v) => (
                         <option key={v.id} value={v.id}>
                           {time(v.end)}
@@ -491,13 +547,59 @@ export function DatasetDetail() {
                 </label>
               </div>
               <Feedback
+                error={selectedPeriods.error}
+                loading={selectedPeriods.loading}
+                empty={!selectedPeriods.data}
+              />
+              {selectedPeriods.data && !frameReady && (
+                <p role="status">
+                  所选固定版本的该周期尚未发布或没有观测，请选择可用周期。
+                </p>
+              )}
+              <Feedback
                 error={bars.error}
                 loading={bars.loading}
-                empty={!bars.data}
+                empty={Boolean(frameReady) && !bars.data}
               />
-              <p>当前读取固定版本；最多显示所选版本前 2000 根。</p>
+              <p>
+                当前读取固定版本；每页最多 2000
+                根，默认显示最新观测。切换周期保留固定版本。
+              </p>
+              <div className="dc-actions">
+                <button
+                  disabled={bars.loading || bars.data?.next_before == null}
+                  onClick={() =>
+                    select("before", String(bars.data?.next_before))
+                  }
+                >
+                  更早历史
+                </button>
+                {before !== null && (
+                  <button
+                    onClick={() => {
+                      const next = new URLSearchParams(params);
+                      next.delete("before");
+                      setParams(next);
+                    }}
+                  >
+                    返回最新
+                  </button>
+                )}
+                {selectedVersion && (
+                  <Link to={`/replay?dataset_version=${selectedVersion}`}>
+                    用此版本回测
+                  </Link>
+                )}
+              </div>
+              {bars.data?.bars.length ? (
+                <p>
+                  {time(bars.data.bars[0].start)} —{" "}
+                  {time(bars.data.bars[bars.data.bars.length - 1].end)}
+                </p>
+              ) : null}
               {bars.data?.bars && (
                 <Chart
+                  key={`${selectedVersion}:${frame}:${before ?? "latest"}`}
                   bars={bars.data.bars.map((b) => ({ ...b, revision: 1 }))}
                   precision={dataset.precision}
                 />

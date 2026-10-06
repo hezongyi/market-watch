@@ -99,3 +99,30 @@ def test_new_m1_publication_preserves_previous_period_usability(database):
         assert detail["usable_timeframes"] == ["H4", "M1"]
         assert all(p["available_version_id"] == parent for p in detail["periods"])
         assert dataset_list(db, status="available")["total"] == 1
+
+
+def test_chart_api_pins_period_and_exclusive_cursor_to_selected_version(database):
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1", "H4"])
+        parent = create_run(db, identity().key, end=180000, request_id="initial").id
+    import_page(Adapter(), version_id=parent)
+    while artifact_tick(parent):
+        pass
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            path = f"/api/market-data/versions/{parent}/chart"
+            newest = client.get(path, params={"timeframe": "M1", "count": 2})
+            assert newest.status_code == 200
+            assert [r["start"] for r in newest.json()["bars"]] == [60000, 120000]
+            before = newest.json()["next_before"]
+            older = client.get(path, params={"before": before, "count": 2}).json()
+            assert [r["start"] for r in older["bars"]] == [0]
+            assert older["version_id"] == parent and older["next_before"] is None
+            assert client.get(path, params={"count": 5001}).status_code == 422
+            assert client.get(path, params={"timeframe": "D1"}).status_code == 422
+        with database.begin() as db:
+            assert db.scalar(select(MarketDemand)) is None
+    finally:
+        api.app.dependency_overrides.clear()

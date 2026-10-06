@@ -910,7 +910,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
   const [historyDatasets,setHistoryDatasets]=useState<any[]>([]);
   const [datasetVersion,setDatasetVersion]=useState(new URLSearchParams(location.search).get('dataset_version') ?? '');
   useEffect(()=>{let active=true;Promise.all([api('/market-data/versions'),api('/market-data/datasets')]).then(([v,d])=>{
-    if(!active)return;setHistoryVersions(v.filter((row:any)=>row.status==='published'));setHistoryDatasets(d);
+    if(!active)return;setHistoryVersions(v.filter((row:any)=>row.status==='published'&&row.payload_available!==false));setHistoryDatasets(d);
     const wanted=new URLSearchParams(location.search).get('dataset_version');
     if(wanted){const version=v.find((row:any)=>row.id===wanted);const source=d.find((row:any)=>row.id===version?.dataset_id);if(source){setInstrument(source.instrument_id);setDatasetVersion(wanted);setStart(inputTime(version.start));setEnd(inputTime(version.end));setFrame('M1')}}
   }).catch(e=>{if(active)setError(String(e))});return()=>{active=false}},[location.search]);

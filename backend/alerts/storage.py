@@ -204,6 +204,24 @@ class HistoryArtifactBlock(Base):
     content: Mapped[bytes] = mapped_column(LargeBinary)
 
 
+class HistoryReclamation(Base):
+    """Retained identity/manifest tombstone after unreferenced payload deletion."""
+    __tablename__ = "market_history_reclamations"
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), primary_key=True)
+    request_id: Mapped[str] = mapped_column(String(100))
+    reclaimed_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class DatasetReclamation(Base):
+    __tablename__ = "market_dataset_reclamations"
+    __table_args__ = (UniqueConstraint("dataset_id", "request_id"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    request_id: Mapped[str] = mapped_column(String(100))
+    reclaimed_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    summary: Mapped[dict] = mapped_column(JSON)
+
+
 class PricingOwner(Base):
     __tablename__ = "market_pricing_owners"
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
@@ -258,8 +276,13 @@ class LiveMinute(Base):
 def immutable_dataset_identity(db, flush_context, instances):
     from sqlalchemy import inspect, select
 
+    from .history_retention import guard_reference_writes
+
+    guard_reference_writes(db)
+
     for row in db.deleted:
-        if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob, HistoryArtifactBlock, HistoryArtifact)):
+        if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob, HistoryArtifactBlock, HistoryArtifact,
+                            HistoryReclamation, DatasetReclamation)):
             raise ValueError("Historical snapshots cannot be deleted by runtime writers")
         if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)):
             raise ValueError("Explicit dataset/source bindings cannot be removed by runtime writers")
@@ -268,7 +291,7 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
-        if isinstance(row, (HistoryChunk, SourceBlob, HistoryArtifactBlock)) and any(attr.history.has_changes() for attr in state.attrs):
+        if isinstance(row, (HistoryChunk, SourceBlob, HistoryArtifactBlock, HistoryReclamation, DatasetReclamation)) and any(attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Historical snapshot chunks are immutable")
         if isinstance(row, (HistoryVersion, HistoryArtifact)):
             old = state.attrs.status.history.deleted

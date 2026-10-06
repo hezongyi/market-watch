@@ -20,6 +20,7 @@ from .storage import (
     HistoryArtifact,
     HistoryArtifactBlock,
     HistoryChunk,
+    HistoryReclamation,
     HistoryRun,
     HistoryVersion,
     Instrument,
@@ -38,6 +39,9 @@ def request_artifacts(db, version, frames):
         raise ValueError("请选择支持的自建周期")
     if version.status != "published":
         raise ValueError("周期产物需要已发布M1父版本")
+    db.scalar(select(MarketDataset).where(MarketDataset.id == version.dataset_id).with_for_update())
+    if db.get(HistoryReclamation, version.id):
+        raise ValueError("历史版本价格数据已回收，不能重新派生产物")
     from sqlalchemy.dialects.postgresql import insert as postgres_insert
     from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
@@ -198,9 +202,16 @@ def artifact_report(db, version_id):
                            .order_by(HistoryArtifact.timeframe))]
 
 
-def read_artifact(db, version_id, frame, *, start=None, end=None, limit=2000):
+def read_artifact(db, version_id, frame, *, start=None, end=None, limit=2000, newest_first=False):
     if not 1 <= limit <= 20000:
         raise ValueError("周期查询数量必须是1–20000")
+    parent = db.get(HistoryVersion, version_id)
+    if not parent:
+        raise ValueError("历史版本不存在")
+    db.scalar(select(MarketDataset.id).where(MarketDataset.id == parent.dataset_id)
+              .with_for_update(read=True))
+    if db.get(HistoryReclamation, version_id):
+        raise ValueError("历史版本价格数据已回收")
     artifact = db.scalar(select(HistoryArtifact).where(HistoryArtifact.version_id == version_id,
                                                       HistoryArtifact.timeframe == frame))
     if not artifact or artifact.status != "published":
@@ -211,13 +222,27 @@ def read_artifact(db, version_id, frame, *, start=None, end=None, limit=2000):
     if end is not None:
         query = query.where(HistoryArtifactBlock.start < end)
     output = []
-    for block in db.scalars(query.order_by(HistoryArtifactBlock.start).execution_options(yield_per=1)):
+    ordering = HistoryArtifactBlock.start.desc() if newest_first else HistoryArtifactBlock.start
+    for block in db.scalars(query.order_by(ordering).execution_options(yield_per=1)):
         raw = gzip.decompress(block.content)
         if hashlib.sha256(raw).hexdigest() != block.checksum:
             raise ValueError("Published timeframe artifact checksum mismatch")
-        for row in json.loads(raw):
+        rows = json.loads(raw)
+        for row in reversed(rows) if newest_first else rows:
             if (start is None or row["start"] >= start) and (end is None or row["start"] < end):
                 output.append(row)
                 if len(output) == limit:
-                    return output
-    return output
+                    return output[::-1] if newest_first else output
+    return output[::-1] if newest_first else output
+
+
+def chart_page(db, version_id, frame, *, before=None, count=2000):
+    """Index-backed fixed-version chart pagination, including partial last bars."""
+    if not 1 <= count <= 5000 or before is not None and before < 0:
+        raise ValueError("无效的历史图表分页范围")
+    rows = read_artifact(db, version_id, frame, end=before, limit=count + 1, newest_first=True)
+    more = len(rows) > count
+    bars = rows[-count:]
+    return {"version_id": version_id, "timeframe": frame, "bars": bars,
+            "next_before": bars[0]["start"] if more else None,
+            "rule_version": RULE_VERSION}

@@ -116,6 +116,10 @@ class Ingestion:
 
 def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False, report_changes=False):
     # Serialize bounded writes for one instrument across live and history workers.
+    from .storage import MarketDataset
+
+    if instrument.id.startswith("MD:"):
+        db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == instrument.id).with_for_update())
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
     batch = validate_ingestion(db, instrument, payload)
     if batch and payload.get("coverage"):

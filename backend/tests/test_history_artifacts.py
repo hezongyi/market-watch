@@ -7,6 +7,7 @@ import pytest
 from alerts.history_artifacts import (
     artifact_report,
     artifact_tick,
+    chart_page,
     read_artifact,
     request_artifacts,
 )
@@ -132,3 +133,48 @@ def test_incremental_artifact_reuses_old_buckets_and_keeps_new_parent_reference(
         assert len(rows) == 6002 and all(r["parent_version_id"] == child for r in rows)
         assert [r["close"] for r in rows[-3:]] == ["1.11", "1.10", "1.10"]
         assert json.dumps(db.get(HistoryVersion, parent).manifest, sort_keys=True) == old_manifest
+
+
+def test_fixed_chart_pages_newest_first_without_overlap_or_price_filling(database):
+    # Enough observations for multiple compressed blocks, plus unknown holes.
+    end = 6005 * 60000
+    observed = [at for at in range(0, end, 60000) if at not in (60000, 3000 * 60000)]
+    ident, _ = publish(database, end=end, rows=tuple(minute(at) for at in observed))
+    finish(ident)
+    with database.begin() as db:
+        pages, before = [], None
+        while True:
+            page = chart_page(db, ident, "M1", before=before, count=2000)
+            assert all(row["parent_version_id"] == ident for row in page["bars"])
+            assert [r["start"] for r in page["bars"]] == sorted(r["start"] for r in page["bars"])
+            pages.insert(0, page["bars"])
+            before = page["next_before"]
+            if before is None:
+                break
+        assert [row["start"] for page in pages for row in page] == observed
+        assert len(pages) == 4
+        assert chart_page(db, ident, "M1", before=0)["bars"] == []
+        with pytest.raises(ValueError, match="分页"):
+            chart_page(db, ident, "M1", count=5001)
+
+
+def test_chart_reads_only_newest_required_blocks_and_keeps_old_period_identity(database, monkeypatch):
+    import alerts.history_artifacts as artifacts
+
+    end = 6001 * 60000
+    ident, _ = publish(database, end=end, rows=tuple(minute(at) for at in range(0, end, 60000)))
+    finish(ident)
+    decompress, touched = artifacts.gzip.decompress, []
+
+    def tracked(content):
+        touched.append(len(content))
+        return decompress(content)
+
+    monkeypatch.setattr(artifacts.gzip, "decompress", tracked)
+    with database.begin() as db:
+        page = chart_page(db, ident, "M1", count=2)
+        assert [row["start"] for row in page["bars"]] == [5999 * 60000, 6000 * 60000]
+        assert len(touched) == 1  # Does not decompress the older 4,999-bar block.
+        request_artifacts(db, db.get(HistoryVersion, ident), ["H4"])
+        with pytest.raises(ValueError, match="尚未发布"):
+            chart_page(db, ident, "H4")

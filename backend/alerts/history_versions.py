@@ -18,6 +18,7 @@ from .source_history_store import AcquisitionBusy, raw_chunk, shared_page, store
 from .source_registry import collection_identity
 from .storage import (
     HistoryChunk,
+    HistoryReclamation,
     HistoryRun,
     HistoryVersion,
     Instrument,
@@ -48,6 +49,14 @@ def create_version(db, dataset_id, start, end):
     return version.id
 
 
+def lock_version(db, ident):
+    parent = db.get(HistoryVersion, ident)
+    if parent:
+        db.scalar(select(MarketDataset.id).where(MarketDataset.id == parent.dataset_id).with_for_update())
+    return db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident)
+                     .with_for_update().execution_options(populate_existing=True))
+
+
 def _unknown(rows, start, end):
     result = []
     cursor = start
@@ -70,8 +79,9 @@ def claim(version_id=None):
                 HistoryRun.desired_state != "running").exists())
         if version_id:
             query = query.where(HistoryVersion.id == version_id)
-        version = db.scalar(query.order_by(HistoryVersion.next_at, HistoryVersion.created_at)
-                            .with_for_update(skip_locked=True).limit(1))
+        candidate = db.scalar(query.join(MarketDataset).order_by(HistoryVersion.next_at, HistoryVersion.created_at)
+                            .with_for_update(skip_locked=True, of=MarketDataset).limit(1))
+        version = lock_version(db, candidate.id) if candidate else None
         if not version:
             return None
         version.status = "running"
@@ -163,7 +173,7 @@ def import_page(adapter, *, version_id=None):
     batch = None
     try:
         with transaction() as db:
-            version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident).with_for_update())
+            version = lock_version(db, ident)
             if version.lease_token != token or version.lease_until <= now_ms():
                 return True
             if controlled_stop(db, version):
@@ -200,8 +210,7 @@ def import_page(adapter, *, version_id=None):
         content = json.dumps([row.model_dump() for row in batch.rows],
                              sort_keys=True, separators=(",", ":")).encode()
         with transaction() as db:
-            version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident)
-                                .with_for_update())
+            version = lock_version(db, ident)
             if (version.lease_token != token or version.cursor != start
                     or version.lease_until <= now_ms()):
                 return True
@@ -231,15 +240,14 @@ def import_page(adapter, *, version_id=None):
         return True
     except AcquisitionBusy:
         with transaction() as db:
-            version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident).with_for_update())
+            version = lock_version(db, ident)
             if version.lease_token == token:
                 version.status, version.next_at = "pending", now_ms() + 1000
                 version.lease_token, version.lease_until = None, 0
         return True
     except Exception as error:
         with transaction() as db:
-            version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident)
-                                .with_for_update())
+            version = lock_version(db, ident)
             if version.lease_token != token:
                 return True
             if controlled_stop(db, version):
@@ -273,6 +281,7 @@ def version_report(db, ident):
     return {"id": version.id, "dataset_id": version.dataset_id, "start": version.start,
             "end": version.end, "cursor": version.cursor, "status": version.status,
             "error": version.error, "attempts": version.attempts, "next_at": version.next_at,
+            "payload_available": db.get(HistoryReclamation, ident) is None,
             "manifest": version.manifest, "task_kind": run.kind if run else "import",
             "desired_state": run.desired_state if run else None,
             "task_status": task_status(db, version),
@@ -286,6 +295,10 @@ def snapshot_rows(db, ident, *, start=None, end=None):
     version = db.get(HistoryVersion, ident)
     if not version or version.status != "published":
         raise ValueError("A published historical dataset version is required")
+    db.scalar(select(MarketDataset.id).where(MarketDataset.id == version.dataset_id)
+              .with_for_update(read=True))
+    if db.get(HistoryReclamation, ident):
+        raise ValueError("该历史版本价格数据已回收；版本身份与发布清单保留")
     left = version.start if start is None else start
     right = version.end if end is None else end
     if not version.start <= left < right <= version.end:

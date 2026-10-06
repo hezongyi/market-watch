@@ -23,9 +23,10 @@ def dataset_detail(db, dataset_id):
     maintenance = plan_report(db, dataset.id)
     published = maintenance.get("latest_version_id")
     if not published:
-        published = db.scalar(select(HistoryVersion.id).where(HistoryVersion.dataset_id == dataset.id,
-            HistoryVersion.status == "published").order_by(HistoryVersion.end.desc(),
-                HistoryVersion.published_at.desc()).limit(1))
+        from .history_maintenance import latest_version
+
+        latest = latest_version(db, dataset.id)
+        published = latest.id if latest else None
     version = db.get(HistoryVersion, published) if published else None
     periods = artifact_report(db, published) if published else []
     # A newer M1 version does not hide the previously published H4/D1 while
@@ -125,11 +126,15 @@ def coverage_report(db, version_id, *, page=1, page_size=25):
     import json
 
     from .source_history_store import raw_chunk
-    from .storage import HistoryChunk
+    from .storage import HistoryChunk, HistoryReclamation
 
     version = db.get(HistoryVersion, version_id)
     if not version or version.status != "published":
         raise ValueError("覆盖详情需要已发布历史版本")
+    db.scalar(select(MarketDataset.id).where(MarketDataset.id == version.dataset_id)
+              .with_for_update(read=True))
+    if db.get(HistoryReclamation, version_id):
+        raise ValueError("历史版本价格数据已回收；覆盖清单仍保留在发布记录中")
     if page < 1 or not 1 <= page_size <= 100:
         raise ValueError("无效的覆盖分页")
     query = select(HistoryChunk).where(HistoryChunk.version_id == version.id)

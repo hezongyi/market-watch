@@ -80,6 +80,11 @@ class ArtifactRequest(BaseModel):
     timeframes: list[str] = Field(min_length=1, max_length=9)
 
 
+class ReclamationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    request_id: str = Field(min_length=1, max_length=100)
+
+
 class ManagedRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     dataset: DatasetRequest
@@ -160,6 +165,26 @@ def router(authenticated):
                 return dataset_detail(db, dataset_id)
         except ValueError as error:
             raise HTTPException(404, str(error)) from None
+
+    @routes.get("/datasets/{dataset_id}/references")
+    def dataset_references(dataset_id: str):
+        from .history_retention import references
+
+        try:
+            with transaction() as db:
+                return references(db, dataset_id)
+        except ValueError as error:
+            raise HTTPException(404, str(error)) from None
+
+    @routes.post("/datasets/{dataset_id}/reclaim")
+    def reclaim_history(dataset_id: str, body: ReclamationRequest):
+        from .history_retention import reclaim
+
+        try:
+            with transaction() as db:
+                return reclaim(db, dataset_id, body.request_id)
+        except ValueError as error:
+            raise HTTPException(409, str(error)) from None
 
     @routes.post("/center/datasets", status_code=201)
     def create_managed(body: ManagedRequest):
@@ -390,6 +415,16 @@ def router(authenticated):
             with transaction() as db:
                 rows = read_artifact(db, ident, timeframe, start=start, end=end, limit=limit)
                 return {"version_id": ident, "timeframe": timeframe, "bars": rows}
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.get("/versions/{ident}/chart")
+    def historical_chart(ident: str, timeframe: str = "M1", before: int | None = None, count: int = 2000):
+        from .history_artifacts import chart_page
+
+        try:
+            with transaction() as db:
+                return chart_page(db, ident, timeframe, before=before, count=count)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 

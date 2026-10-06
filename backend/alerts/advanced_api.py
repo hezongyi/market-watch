@@ -229,6 +229,12 @@ def router(authenticated):
                     "series_kind": decode(body.symbol)[1],
                     "interval": body.resolution,
                 }
+                from .history_retention import lock_reference_values
+
+                try:
+                    lock_reference_values(db, document)
+                except ValueError as error:
+                    raise HTTPException(409, str(error)) from None
                 result = db.execute(
                     update(AdvancedWorkspace)
                     .where(
@@ -293,6 +299,12 @@ def router(authenticated):
         if not valid:
             raise HTTPException(422, "无效图表文档或超过4MB")
         with transaction() as db:
+            from .history_retention import lock_reference_values
+
+            try:
+                lock_reference_values(db, d)
+            except ValueError as error:
+                raise HTTPException(409, str(error)) from None
             res = db.execute(
                 update(AdvancedWorkspace)
                 .where(AdvancedWorkspace.id == id, AdvancedWorkspace.revision == body.revision)

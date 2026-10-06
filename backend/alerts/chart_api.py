@@ -554,6 +554,12 @@ def router(authenticated):
         with transaction() as db:
             if not db.get(ChartWorkspace, id):
                 raise HTTPException(404, "工作区不存在")
+            from .history_retention import lock_reference_values
+
+            try:
+                lock_reference_values(db, body.document)
+            except ValueError as error:
+                raise HTTPException(409, str(error)) from None
             res = db.execute(
                 update(ChartWorkspace)
                 .where(ChartWorkspace.id == id, ChartWorkspace.revision == body.revision)
