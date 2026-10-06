@@ -1,0 +1,91 @@
+{
+  "at": "2026-10-04T19:46:13.787691+00:00",
+  "host": {
+    "os": "Ubuntu",
+    "address": "192.168.7.232",
+    "deployment": "local Docker; no SSH forwarding"
+  },
+  "composeProject": "mw-sync-settings-ubuntu-20261004",
+  "composeFile": "/home/quant/repos/.acceptance/market-watch-sync-settings/compose.yaml",
+  "app": "https://192.168.7.232:16243/advanced-charts",
+  "chart": "https://192.168.7.232:16244",
+  "branch": "feat/chart-bar-range-mapping",
+  "candidate": "candidate9",
+  "implementationBase": "279b1ef",
+  "preImplementationDocumentationCommit": "873b9c88368361dcfedc12fc67d7fbf13db4f30b",
+  "services": {
+    "chart-origin": {
+      "name": "mw-sync-settings-ubuntu-20261004-chart-origin-1",
+      "image": "mw-sync-settings-chart:candidate9",
+      "imageID": "sha256:a7c81c0a704c0062935005093d4f2c581417cee417cefbddd78aa7a4a4a98215",
+      "startedAt": "2026-10-04T19:31:08.441119669Z",
+      "status": "running",
+      "networks": [
+        "mw-sync-settings-ubuntu-20261004_default"
+      ]
+    },
+    "web": {
+      "name": "mw-sync-settings-ubuntu-20261004-web-1",
+      "image": "mw-sync-settings-web:stage-a",
+      "imageID": "sha256:692e26af4202ffb4c12ffadfb5a97a8dfcd59bd4106097f8f9d36d3f30bf5b25",
+      "startedAt": "2026-10-04T13:54:15.542636817Z",
+      "status": "running",
+      "networks": [
+        "mw-sync-settings-ubuntu-20261004_default"
+      ]
+    },
+    "api": {
+      "name": "mw-sync-settings-ubuntu-20261004-api-1",
+      "image": "trading-alerts-api:v1.7.0-e40eaac",
+      "imageID": "sha256:87bda6cb2b14ddfcce0d58985ddcc45adb8e0e2a577e0a8cbeabc6152e5c2851",
+      "startedAt": "2026-10-04T13:54:15.352820426Z",
+      "status": "running",
+      "networks": [
+        "mw-sync-settings-ubuntu-20261004_default"
+      ]
+    },
+    "pg": {
+      "name": "mw-sync-settings-ubuntu-20261004-pg-1",
+      "image": "postgres:14-bookworm",
+      "imageID": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "startedAt": "2026-10-04T13:54:10.472482458Z",
+      "status": "running",
+      "networks": [
+        "mw-sync-settings-ubuntu-20261004_default"
+      ]
+    },
+    "tls": {
+      "name": "mw-sync-settings-ubuntu-20261004-tls-1",
+      "image": "nginx:1.28-alpine",
+      "imageID": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "startedAt": "2026-10-04T13:54:15.709077161Z",
+      "status": "running",
+      "networks": [
+        "mw-sync-settings-ubuntu-20261004_default"
+      ]
+    }
+  },
+  "nativeBundle": {
+    "originalSHA256": "114428b8dde6eb137fd7ef3bc20ef35882189186c4bd092bb743b64d11682be1",
+    "deployedSHA256": "ce9af2eb0c291b582d3bb81f6b4dd5596bc37809476b58c89a826288914ee8e3",
+    "path": "charting_library_ce9af2eb0c291b58"
+  },
+  "combinedHost": {
+    "file": "host.0046aa12497a61ec.js",
+    "sha256": "0046aa12497a61ec56f14f1cc372c4351fa219171be383473a15a0c482008190",
+    "matchesCurrentSource": true
+  },
+  "browser": {
+    "engine": "Chromium",
+    "installation": "chromium-1243",
+    "viewport": {
+      "width": 1600,
+      "height": 1000
+    },
+    "dprGeometry": [
+      2,
+      2.5
+    ]
+  },
+  "secrets": "Login, environment, TLS private keys and licensed bundles excluded."
+}

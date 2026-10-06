@@ -1,0 +1,115 @@
+{
+  "at": "2026-10-06T00:06:22.606Z",
+  "APP": "https://192.168.7.232:16743",
+  "CHART": "https://192.168.7.232:16744",
+  "cases": [
+    {
+      "name": "date actual menu click/Enter and paused native Undo/Redo",
+      "enabled": {
+        "logic": {
+          "date": true,
+          "barWidth": false,
+          "time": false
+        },
+        "date": true,
+        "time": false,
+        "undo": {
+          "enableUndo": true,
+          "undoCommandCount": 6,
+          "undoText": "日期范围锁定",
+          "enableRedo": false,
+          "redoCommandCount": 0,
+          "originalUndoText": "date range lock"
+        },
+        "dirty": true,
+        "nativeDirty": true
+      },
+      "final": {
+        "logic": {
+          "date": true,
+          "barWidth": false,
+          "time": false
+        },
+        "date": true,
+        "time": false,
+        "undo": {
+          "enableUndo": true,
+          "undoCommandCount": 8,
+          "undoText": "日期范围锁定",
+          "enableRedo": false,
+          "redoCommandCount": 0,
+          "originalUndoText": "date range lock"
+        },
+        "dirty": true,
+        "nativeDirty": true
+      }
+    },
+    {
+      "name": "time actual menu click/Enter and paused native Undo/Redo",
+      "enabled": {
+        "logic": {
+          "date": false,
+          "barWidth": false,
+          "time": true
+        },
+        "date": false,
+        "time": true,
+        "undo": {
+          "enableUndo": true,
+          "undoCommandCount": 9,
+          "undoText": "跟踪时间",
+          "enableRedo": false,
+          "redoCommandCount": 0,
+          "originalUndoText": "track time"
+        },
+        "dirty": true,
+        "nativeDirty": true
+      },
+      "final": {
+        "logic": {
+          "date": false,
+          "barWidth": false,
+          "time": true
+        },
+        "date": false,
+        "time": true,
+        "undo": {
+          "enableUndo": true,
+          "undoCommandCount": 11,
+          "undoText": "跟踪时间",
+          "enableRedo": false,
+          "redoCommandCount": 0,
+          "originalUndoText": "track time"
+        },
+        "dirty": true,
+        "nativeDirty": true
+      }
+    },
+    {
+      "name": "time Undo/Redo preserves independent bar width mode",
+      "mixed": {
+        "logic": {
+          "date": false,
+          "barWidth": true,
+          "time": true
+        },
+        "date": false,
+        "time": true,
+        "undo": {
+          "enableUndo": true,
+          "undoCommandCount": 12,
+          "undoText": "跟踪时间",
+          "enableRedo": false,
+          "redoCommandCount": 0,
+          "originalUndoText": "track time"
+        },
+        "dirty": true,
+        "nativeDirty": true
+      }
+    },
+    {
+      "name": "date/bar width mutual exclusion leaves time enabled"
+    }
+  ],
+  "errors": []
+}

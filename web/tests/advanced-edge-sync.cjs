@@ -70,16 +70,18 @@ function pane(to, offset = 10) {
     b = pane(3700, -100),
     c = pane(3700);
   const failures = [];
+  let active = a;
   let blocked = false,
     finish;
   let delayPreparation = false, finishPreparation;
   const widget = {
     dateRangeSync: () => range,
     timeSync: () => time,
-    activeChart: () => a,
+    activeChart: () => active,
     chartsCount: () => 3,
     chart: (i) => [a, b, c][i],
   };
+  require("./fixtures/sync-coordinator.cjs")(context,widget);
   const guard = context.edgeRangeSync(
     widget,
     () => blocked,
@@ -104,6 +106,71 @@ function pane(to, offset = 10) {
   assert.equal(range.value(), true);
   assert.equal(time.value(), true);
   assert.equal(guard.busy(), false);
+  // A successful native range call may stop at a capacity boundary. Its
+  // asynchronous range event must not start the same correction forever.
+  let clampedWrites = 0;
+  const initialB = b.setVisibleRange;
+  b.setVisibleRange = async () => {
+    clampedWrites++;
+    await initialB({from:400,to:3700});
+  };
+  await initialB({from:400,to:3700});
+  b.fire(); await flush();
+  for (let n=0;n<5;n++) { b.fire(); await flush(); }
+  assert.equal(clampedWrites,1,'unchanged capacity clamp is reconciled once');
+  guard.retry(); b.fire(); await flush();
+  assert.equal(clampedWrites,2,'capacity/reset change permits the same target again');
+  b.setVisibleRange = initialB;
+  guard.retry(); b.fire(); await flush();
+  let capacityBoundary;
+  context.MWNativeNavigation = {rangeBoundary: peer => peer === b ? capacityBoundary : undefined};
+  clampedWrites = 0;
+  await initialB({from:400,to:3700});
+  b.setVisibleRange = async () => {
+    clampedWrites++;
+    await initialB({from:400,to:3700});
+    capacityBoundary = 400;
+    throw Object.assign(Error('capacity'),{code:'NATIVE_HISTORY_CAPACITY_EXCEEDED'});
+  };
+  guard.retry(); b.fire(); await flush();
+  for(let n=0;n<5;n++) { b.fire(); await flush(); }
+  assert.equal(clampedWrites,1,'rejected capacity call uses the confirmed native boundary');
+  assert.equal(failures.length,0,'capacity notice belongs to native history');
+  capacityBoundary = undefined;
+  b.setVisibleRange = initialB;
+  guard.retry(); b.fire(); await flush();
+  // Capacity/reset can change while a session lookup is still in flight.
+  await initialB({from:400,to:3700});
+  await c.setVisibleRange({from:400,to:3700});
+  delayPreparation = true;
+  finishPreparation = undefined;
+  a.fire();
+  const interrupted = flush();
+  for(let n=0;n<30 && !finishPreparation;n++) await Promise.resolve();
+  assert.equal(typeof finishPreparation,'function');
+  guard.retry();
+  finishPreparation();
+  await interrupted;
+  delayPreparation = false;
+  assert.equal(guard.busy(),true,'inflight retry must remain scheduled');
+  await flush();
+  assert.equal(c.getVisibleRange().to,1000,'remaining peer eventually receives current range');
+  await initialB({from:400,to:3700});
+  await c.setVisibleRange({from:400,to:3700});
+  delayPreparation = true; finishPreparation = undefined;
+  a.fire(); const changedSource = flush();
+  for(let n=0;n<30 && !finishPreparation;n++) await Promise.resolve();
+  active = b;
+  await initialB({from:800,to:3700});
+  guard.retry(); b.fire(); finishPreparation();
+  await changedSource; delayPreparation = false;
+  assert.equal(guard.busy(),true,'new active source survives an inflight retry');
+  await flush();
+  assert.equal(a.getVisibleRange().to,3700);
+  assert.equal(c.getVisibleRange().to,3700);
+  active = a;
+  await a.setVisibleRange({from:100,to:1000});
+  guard.retry(); a.fire(); await flush();
   // Wheel zoom can leave the right boundary fixed while moving only the left.
   await a.setVisibleRange({from:700,to:1000});
   a.fire();

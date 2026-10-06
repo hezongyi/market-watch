@@ -9,6 +9,7 @@ assert.ok(wrapperStart >= 0 && wrapperEnd > wrapperStart);
 const dirtyStart = bridge.indexOf('function markWorkspaceDirty()');
 const dirtyEnd = bridge.indexOf('const resolutions', dirtyStart);
 const context = vm.createContext({
+  barRangeMapping: {snapshot:()=>({version:1,enabled:true,style:'rectangle'})},
   layouts: {}, viewportRestoring: false, rangeGuard: null, edgeGuard: null,
   busySaveNoticeShown: false, initialNativeSave: false, workspace: {id:'example'},
   editRevision: 0, workspaceEpoch: 0, dirty: true, nativeReadonly: false,
@@ -25,6 +26,8 @@ vm.runInContext(`
     timeSync:()=>sync,save:callback=> {globalThis.finishCapture = callback;}};
   const saveLayout = async data => {globalThis.saved = data; return 'example';};
 `, context);
+context.__widget=vm.runInContext('widget',context);
+require('./fixtures/sync-coordinator.cjs')(context,context.__widget);
 vm.runInContext(fs.readFileSync(repo + '/advanced-host/viewports.js', 'utf8'), context);
 vm.runInContext(bridge.slice(dirtyStart, dirtyEnd), context);
 vm.runInContext(bridge.slice(wrapperStart, wrapperEnd), context);
@@ -42,6 +45,7 @@ vm.runInContext(bridge.slice(wrapperStart, wrapperEnd), context);
   console.log(JSON.stringify({saved_offset:savedOffset,current_offset:context.offset,
     dirty:context.dirty,messages:context.messages,bug_reproduced:savedOffset!==context.offset&&wronglyClean}));
   assert.equal(savedOffset,10);
+  assert.deepEqual(JSON.parse(context.saved.content)._mwBarRangeMapping,{version:1,enabled:true,style:'rectangle'});
   assert.equal(context.offset,20);
   assert.equal(context.dirty,true,'viewport edit during capture must remain dirty');
   assert.equal(wronglyClean,false,'stale snapshot cannot acknowledge the newer viewport');

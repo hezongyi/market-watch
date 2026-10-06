@@ -17,7 +17,12 @@ const MWNativeNavigation = (() => {
     Object.assign(Error("已取消旧图表的历史加载"), {
       code: "HISTORY_CANCELLED",
     });
-  const key = (symbol, resolution) => `${symbol}|${resolution}|`;
+  const canonicalSymbol = symbol => {
+    if (typeof MWSeries === "undefined") return symbol;
+    const identity = MWSeries.decode(symbol);
+    return identity.spec ? symbol : MWSeries.encode(identity.symbol, identity.series_kind);
+  };
+  const key = (symbol, resolution) => `${canonicalSymbol(symbol)}|${resolution}|`;
   const screen = (m) =>
     Math.ceil(m.timeScale().width() / m.timeScale().barSpacing());
   function modelKey(m) {
@@ -297,6 +302,7 @@ const MWNativeNavigation = (() => {
         // Left-align real first point; centering would request older data again.
         ts.setRightOffset(points.firstIndex + screen(m) - 1 - ts.baseIndex());
         state.boundaryAt = actual;
+        state.boundaryLimited = remaining(thread) === 0;
         if (state.cursor) state.external.call(m,null,state.cursor.environment);
         state.cursor = null; state.cursorVersion++; state.phase = "idle";
         m.fullUpdate?.();
@@ -328,6 +334,7 @@ const MWNativeNavigation = (() => {
       )
         throw Error("历史能力配置不匹配，请刷新工作区");
       limits = { ...value };
+      for (const state of models.values()) state.boundaryAt = undefined;
     },
     configure(prefix = () => 0) { calculationPrefix = prefix; },
     filling: (thread) => boundaries.has(thread),
@@ -370,6 +377,19 @@ const MWNativeNavigation = (() => {
       const range = invokingRange;
       return !range ? () => true : () =>
         models.get(range.m) === range.state && range.state.generation === range.generation;
+    },
+    acceptedRange(chart) {
+      const thread = threads.get(modelKey(chart._chartWidget.model().model()));
+      return thread?._cache.bars.length ? {
+        from: thread._dealignTime(thread._cache.bars[0].time),
+        to: thread._dealignTime(thread._cache.bars.at(-1).time),
+      } : undefined;
+    },
+    rangeBoundary(chart) {
+      const m = chart._chartWidget.model().model(), state = models.get(m);
+      const thread = threads.get(modelKey(m));
+      return state?.phase === "idle" && state.boundaryLimited && thread && remaining(thread) === 0
+        ? state.boundaryAt : undefined;
     },
     chartWindow: () => undefined,
     hasWindow: (id) => !id,
@@ -426,11 +446,12 @@ const MWNativeNavigation = (() => {
           thread._cache === cache &&
           thread.mw_sourceGeneration === sourceGeneration;
         const complete = (callback, ...args) => {
-          if (!valid()) return;
+          if (!valid()) return false;
           settled = true;
           reservations.delete(thread);
           thread.mw_read = null;
           callback(...args);
+          return true;
         };
         const fail = (error) => {
           if (!valid()) return;
@@ -457,7 +478,7 @@ const MWNativeNavigation = (() => {
           resolution,
           request,
           (bars, meta) => {
-            if (!valid()) return;
+            if (!valid()) return false;
             try {
               // Exact union check immediately before synchronous native handling.
               const resident = new Set(
@@ -468,9 +489,10 @@ const MWNativeNavigation = (() => {
                 0,
               );
               admit(thread, extra, undefined, true);
-              complete(success, bars, meta);
+              return complete(success, bars, meta);
             } catch (error) {
               fail(error);
+              return false;
             }
           },
           fail,
@@ -483,7 +505,9 @@ const MWNativeNavigation = (() => {
         this.mw_read?.cancel();
         this.mw_sourceGeneration++;
         this._requesting = false;
-        return purge.call(this);
+        const result = purge.call(this);
+        globalThis.MWBarRangeMapping?.cachePurged();
+        return result;
       };
     },
     unbindThread(thread) {

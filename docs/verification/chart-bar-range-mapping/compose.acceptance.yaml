@@ -1,0 +1,41 @@
+# Ubuntu Docker only. Never deploy this acceptance project on unraid.
+name: mw-range-mapping-ubuntu-20261004
+services:
+  pg:
+    image: postgres:14-bookworm
+    environment: {POSTGRES_DB: range_mapping, POSTGRES_USER: range_mapping, POSTGRES_PASSWORD: "${RANGE_PG_PASSWORD:?set an isolated database password}"}
+    volumes: [range-pg:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U range_mapping]
+      interval: 2s
+      retries: 30
+  migrate:
+    image: trading-alerts-api:v1.7.0-e40eaac
+    command: [alembic, upgrade, head]
+    env_file: api.env
+    depends_on:
+      pg: {condition: service_healthy}
+  api:
+    image: trading-alerts-api:v1.7.0-e40eaac
+    env_file: api.env
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz')"]
+      interval: 3s
+      retries: 30
+  web:
+    image: mw-range-mapping-web:ubuntu-e91f29e
+    depends_on: [api]
+  chart-origin:
+    image: mw-range-mapping-chart:20261004
+  tls:
+    image: nginx:1.28-alpine
+    ports: ["${RANGE_BIND_IP:-127.0.0.1}:16043:443", "${RANGE_BIND_IP:-127.0.0.1}:16044:444"]
+    volumes:
+      - ./tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./cert.pem:/certs/cert.pem:ro
+      - ./key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+volumes:
+  range-pg:

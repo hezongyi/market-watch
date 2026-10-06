@@ -1,0 +1,117 @@
+[
+  {
+    "name": "advanced-sync-coordinator",
+    "exit": 0,
+    "output": "Sync coordinator input, coalescing, cancellation, exclusion, nested/latest/old pauses and cleanup: PASS\n"
+  },
+  {
+    "name": "advanced-sync-native-choices",
+    "exit": 0,
+    "output": "Native logical choices, paused Undo/Redo, disabled dates, old workspace and native Save cleanup: PASS\n"
+  },
+  {
+    "name": "advanced-range-sync",
+    "exit": 0,
+    "output": "Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed\n"
+  },
+  {
+    "name": "advanced-sync-snapshot",
+    "exit": 0,
+    "output": "Public snapshots defer synchronized startup while retaining user choices and vendor content\n"
+  },
+  {
+    "name": "advanced-viewports",
+    "exit": 0,
+    "output": "Viewport restoration preserves preferences and checks symbol identity\n"
+  },
+  {
+    "name": "advanced-edge-sync",
+    "exit": 0,
+    "output": "Edge range synchronization: alignment, loading, user toggle and disposal passed\n"
+  },
+  {
+    "name": "advanced-bar-range-mapping",
+    "exit": 0,
+    "output": "Range rules, validation, configuration, invalidation and disposal passed\nFractional pixel bounds, price projection, identity filtering and realtime invalidation passed\nCanonical Yahoo series identity passed\n"
+  },
+  {
+    "name": "advanced-bar-range-lifecycle",
+    "exit": 0,
+    "output": "Unchanged reset preserves mapping; confirmed revision invalidates metadata and pending tickets during busy navigation\n"
+  },
+  {
+    "name": "advanced-native-save-race",
+    "exit": 0,
+    "output": "{\"saved_offset\":10,\"current_offset\":20,\"dirty\":true,\"messages\":[{\"type\":\"workspace-dirty\"}],\"bug_reproduced\":false}\nNative save preserves edits and workspace switches during async capture; unchanged snapshot acknowledges.\n"
+  },
+  {
+    "name": "advanced-native-reserve-lifetime",
+    "exit": 0,
+    "output": "Shared error/miss backoff, bounded retries, viewport restart and stale completion isolation passed\n"
+  },
+  {
+    "name": "advanced-native-reserve-scheduler",
+    "exit": 0,
+    "output": "Two reserve lanes, four total lanes and visible-request priority passed\n"
+  },
+  {
+    "name": "advanced-native-hook-contract",
+    "exit": 0,
+    "output": "Original, legacy, idempotent, partial/tampered, disable and distinct cache URL contracts passed\n"
+  },
+  {
+    "name": "advanced-native-workspaces",
+    "exit": 0,
+    "output": "native workspace adapter: conflict, serialized saves and readonly passed\n"
+  },
+  {
+    "name": "advanced-provider-history-observation",
+    "exit": 0,
+    "output": "Late native history: backfill, revision, failed/legacy review and inactive correction passed\n"
+  },
+  {
+    "name": "advanced-provider-request-lifetime",
+    "exit": 0,
+    "output": "Provider native requests survive period switches and cancel on workspace replacement\n"
+  },
+  {
+    "name": "advanced-continuous-navigation",
+    "exit": 0,
+    "output": "Continuous navigation: concurrent admission, cancellation, stale callbacks, source purge and release passed\n"
+  },
+  {
+    "name": "advanced-capacity-boundary",
+    "exit": 0,
+    "output": "Capacity boundary: fill remaining quota, separate failed navigation, actual earliest viewport and notice passed\n"
+  },
+  {
+    "name": "native-continuous-interactions",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "name": "native-continuous-lifecycle",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "name": "native-capacity-boundary",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "name": "native-capacity-notice",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "name": "native-prefix-revision",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "name": "advanced-historical-reset",
+    "exit": 0,
+    "output": "Historical reset: latest gaps, real corrections, failures, coalescing and obsolete windows passed\n"
+  }
+]

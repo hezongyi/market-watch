@@ -1,0 +1,597 @@
+{
+  "at": "2026-10-04T19:38:45.932Z",
+  "cases": [
+    {
+      "phase": "drawing-undo-preserved",
+      "before": {
+        "undo": {
+          "enableUndo": true,
+          "undoCommandCount": 8,
+          "undoText": "创建水平线",
+          "enableRedo": false,
+          "redoCommandCount": 0,
+          "originalUndoText": "create LineToolHorzLine"
+        },
+        "charts": [
+          [
+            {
+              "id": "KcCByc",
+              "points": [
+                {
+                  "price": 1.12539,
+                  "time": 1790971200
+                }
+              ]
+            }
+          ],
+          [
+            {
+              "id": "KcCByc",
+              "points": [
+                {
+                  "price": 1.12539,
+                  "time": 1790971200
+                }
+              ]
+            }
+          ]
+        ]
+      },
+      "after": {
+        "undo": {
+          "enableUndo": true,
+          "undoCommandCount": 8,
+          "undoText": "创建水平线",
+          "enableRedo": false,
+          "redoCommandCount": 0,
+          "originalUndoText": "create LineToolHorzLine"
+        },
+        "charts": [
+          [
+            {
+              "id": "KcCByc",
+              "points": [
+                {
+                  "price": 1.12539,
+                  "time": 1790971200
+                }
+              ]
+            }
+          ],
+          [
+            {
+              "id": "KcCByc",
+              "points": [
+                {
+                  "price": 1.12539,
+                  "time": 1790971200
+                }
+              ]
+            }
+          ]
+        ]
+      },
+      "historyBefore": 14,
+      "historyAfter": 14
+    },
+    {
+      "phase": "hover-during-save",
+      "dirty": false
+    },
+    {
+      "phase": "save-as-config",
+      "config": {
+        "version": 2,
+        "enabled": true,
+        "style": "rectangle",
+        "colorMode": "theme",
+        "color": "#FFFFFF",
+        "transparencyMode": "theme",
+        "transparency": 88,
+        "priceLabels": true
+      }
+    },
+    {
+      "phase": "native-load-cleared",
+      "state": {
+        "mapper": {
+          "epoch": 35,
+          "bindings": 2,
+          "rails": 2,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1|",
+              "size": 176,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 176,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13050.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13092.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13107.699999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13289.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13298.199999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13342.199999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 16542.299999713898
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              81.29999999999995,
+              360,
+              665.6600000000001
+            ],
+            "at": 20907.099999904633
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": false,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790690400,
+              "to": 1791180000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1198258714659135,
+              "to": 1.1399776606676082
+            },
+            "shapes": [
+              {
+                "id": "KcCByc",
+                "name": "horizontal_line"
+              }
+            ]
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1",
+            "range": {
+              "from": 1790970060,
+              "to": 1791148140
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.124792292461617,
+              "to": 1.1260121344229788
+            },
+            "shapes": [
+              {
+                "id": "KcCByc",
+                "name": "horizontal_line"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "phase": "reset-during-real-held-drag",
+      "state": {
+        "mapper": {
+          "epoch": 37,
+          "bindings": 2,
+          "rails": 2,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1|",
+              "size": 354,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13050.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13092.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13107.699999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13289.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13298.199999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13342.199999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 16542.299999713898
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              81.29999999999995,
+              360,
+              665.6600000000001
+            ],
+            "at": 20907.099999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              81.29999999999995,
+              360,
+              665.6600000000001
+            ],
+            "at": 25439.699999809265
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790827200,
+              "to": 1791316800
+            },
+            "spacing": 6,
+            "offset": 48,
+            "price": {
+              "from": 1.1203085467055254,
+              "to": 1.1344343166180932
+            },
+            "shapes": [
+              {
+                "id": "KcCByc",
+                "name": "horizontal_line"
+              }
+            ]
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1",
+            "range": {
+              "from": 1790970060,
+              "to": 1791148140
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.124792292461617,
+              "to": 1.1260121344229788
+            },
+            "shapes": [
+              {
+                "id": "KcCByc",
+                "name": "horizontal_line"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "phase": "module-suspend-cleared",
+      "state": {
+        "mapper": {
+          "epoch": 40,
+          "bindings": 2,
+          "rails": 2,
+          "stores": []
+        },
+        "paints": [
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13050.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13092.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13107.699999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13289.599999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13298.199999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 13342.199999809265
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              0,
+              360,
+              849
+            ],
+            "at": 16542.299999713898
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              81.29999999999995,
+              360,
+              665.6600000000001
+            ],
+            "at": 20907.099999904633
+          },
+          {
+            "id": "654b615c-2323-4d3e-9e6a-0ee0ff570de9",
+            "resolution": "1",
+            "rect": [
+              114,
+              81.29999999999995,
+              360,
+              665.6600000000001
+            ],
+            "at": 25439.699999809265
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790827200,
+              "to": 1791316800
+            },
+            "spacing": 6,
+            "offset": 48,
+            "price": {
+              "from": 1.1203085467055254,
+              "to": 1.1344343166180932
+            },
+            "shapes": [
+              {
+                "id": "KcCByc",
+                "name": "horizontal_line"
+              }
+            ]
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1",
+            "range": {
+              "from": 1790970060,
+              "to": 1791148140
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.124792292461617,
+              "to": 1.1260121344229788
+            },
+            "shapes": [
+              {
+                "id": "KcCByc",
+                "name": "horizontal_line"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "errors": []
+}

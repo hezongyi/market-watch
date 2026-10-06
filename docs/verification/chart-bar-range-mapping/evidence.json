@@ -1,0 +1,1187 @@
+{
+  "date": "2026-10-04",
+  "baseline": "62488c6035dbea9533699d569a6605f82c684303",
+  "scope": "Isolated v31.1 library; synthetic 24x7 UTC bars; no product or production changes",
+  "method": {
+    "browser": "Playwright Chromium",
+    "library": "Installed licensed v31.1, browser response observation hook only",
+    "library_original_sha256": "114428b8dde6eb137fd7ef3bc20ef35882189186c4bd092bb743b64d11682be1",
+    "origin": "https://range-mapping-prototype.test",
+    "external_network": "Blocked",
+    "simulated_now": "2026-10-04T10:00:00Z",
+    "feed": "Synthetic 24x7 UTC OHLC",
+    "time_and_date_sync": false,
+    "crosshair_sync": true,
+    "product_changes": false,
+    "production_access": false,
+    "temporary_probe": "/tmp/mw-range-mapping-prototype/probe.cjs",
+    "temporary_probe_sha256": "fb2b98e4208ffb506edbd5f59724e89cda6b14de1c4596e618ed0a68996504d5"
+  },
+  "static_cases": [
+    {
+      "config": {
+        "source": "1D",
+        "mode": "background",
+        "theme": "Light"
+      },
+      "semantic": {
+        "from": 1791072000,
+        "to": 1791158400,
+        "now": 1791108000,
+        "high": 103.06782769536564,
+        "low": 100.06782769536564
+      },
+      "shapes": [
+        {
+          "i": 1,
+          "r": "240",
+          "points": [
+            {
+              "price": 103.06782769536564,
+              "time": 1791072000
+            },
+            {
+              "price": 100.06782769536564,
+              "time": 1791158400
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        },
+        {
+          "i": 2,
+          "r": "5",
+          "points": [
+            {
+              "price": 103.06782769536564,
+              "time": 1791072000
+            },
+            {
+              "price": 100.06782769536564,
+              "time": 1791158400
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        }
+      ],
+      "viewport_before": [
+        {
+          "res": "1D",
+          "range": {
+            "from": 1782345600,
+            "to": 1791936000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29406276193542,
+            "to": 103.85713478857801
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_after": [
+        {
+          "res": "1D",
+          "range": {
+            "from": 1782345600,
+            "to": 1791936000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29406276193542,
+            "to": 103.85713478857801
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_unchanged": true,
+      "saved_non_main_sources": 0,
+      "shape_count_after_manual_remove": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "screenshot": "d1-background-light.png"
+    },
+    {
+      "config": {
+        "source": "1D",
+        "mode": "rectangle",
+        "theme": "Light"
+      },
+      "semantic": {
+        "from": 1791072000,
+        "to": 1791158400,
+        "now": 1791108000,
+        "high": 103.06782769536564,
+        "low": 100.06782769536564
+      },
+      "shapes": [
+        {
+          "i": 1,
+          "r": "240",
+          "points": [
+            {
+              "price": 103.06782769536564,
+              "time": 1791072000
+            },
+            {
+              "price": 100.06782769536564,
+              "time": 1791158400
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        },
+        {
+          "i": 2,
+          "r": "5",
+          "points": [
+            {
+              "price": 103.06782769536564,
+              "time": 1791072000
+            },
+            {
+              "price": 100.06782769536564,
+              "time": 1791158400
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        }
+      ],
+      "viewport_before": [
+        {
+          "res": "1D",
+          "range": {
+            "from": 1782345600,
+            "to": 1791936000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29406276193542,
+            "to": 103.85713478857801
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_after": [
+        {
+          "res": "1D",
+          "range": {
+            "from": 1782345600,
+            "to": 1791936000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29406276193542,
+            "to": 103.85713478857801
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_unchanged": true,
+      "saved_non_main_sources": 0,
+      "shape_count_after_manual_remove": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "screenshot": "d1-rectangle-light.png"
+    },
+    {
+      "config": {
+        "source": "1D",
+        "mode": "background",
+        "theme": "Dark"
+      },
+      "semantic": {
+        "from": 1791072000,
+        "to": 1791158400,
+        "now": 1791108000,
+        "high": 103.06782769536564,
+        "low": 100.06782769536564
+      },
+      "shapes": [
+        {
+          "i": 1,
+          "r": "240",
+          "points": [
+            {
+              "price": 103.06782769536564,
+              "time": 1791072000
+            },
+            {
+              "price": 100.06782769536564,
+              "time": 1791158400
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        },
+        {
+          "i": 2,
+          "r": "5",
+          "points": [
+            {
+              "price": 103.06782769536564,
+              "time": 1791072000
+            },
+            {
+              "price": 100.06782769536564,
+              "time": 1791158400
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        }
+      ],
+      "viewport_before": [
+        {
+          "res": "1D",
+          "range": {
+            "from": 1782345600,
+            "to": 1791936000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29406276193542,
+            "to": 103.85713478857801
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_after": [
+        {
+          "res": "1D",
+          "range": {
+            "from": 1782345600,
+            "to": 1791936000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29406276193542,
+            "to": 103.85713478857801
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_unchanged": true,
+      "saved_non_main_sources": 0,
+      "shape_count_after_manual_remove": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "screenshot": "d1-background-dark.png"
+    },
+    {
+      "config": {
+        "source": "1W",
+        "mode": "background",
+        "theme": "Light"
+      },
+      "semantic": {
+        "from": 1790553600,
+        "to": 1791158400,
+        "now": 1791108000,
+        "high": 102.91618002749821,
+        "low": 99.91618002749821
+      },
+      "shapes": [
+        {
+          "i": 1,
+          "r": "240",
+          "points": [
+            {
+              "price": 102.91618002749821,
+              "time": 1790553600
+            },
+            {
+              "price": 99.91618002749821,
+              "time": 1791158400
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        },
+        {
+          "i": 2,
+          "r": "5",
+          "points": [
+            {
+              "price": 102.91618002749821,
+              "time": 1790553600
+            },
+            {
+              "price": 99.91618002749821,
+              "time": 1791158400
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        }
+      ],
+      "viewport_before": [
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478638585475,
+            "to": 103.85763718642286
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_after": [
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478638585475,
+            "to": 103.85763718642286
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_unchanged": true,
+      "saved_non_main_sources": 0,
+      "shape_count_after_manual_remove": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "screenshot": null
+    },
+    {
+      "config": {
+        "source": "1M",
+        "mode": "background",
+        "theme": "Light"
+      },
+      "semantic": {
+        "from": 1790812800,
+        "to": 1793491200,
+        "now": 1791108000,
+        "high": 99.99291396999942,
+        "low": 96.99291396999942
+      },
+      "shapes": [
+        {
+          "i": 1,
+          "r": "240",
+          "points": [
+            {
+              "price": 99.99291396999942,
+              "time": 1790812800
+            },
+            {
+              "price": 96.99291396999942,
+              "time": 1793491200
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        },
+        {
+          "i": 2,
+          "r": "5",
+          "points": [
+            {
+              "price": 99.99291396999942,
+              "time": 1790812800
+            },
+            {
+              "price": 96.99291396999942,
+              "time": 1791108000
+            }
+          ],
+          "saving": false,
+          "selectable": false,
+          "objectTree": false
+        }
+      ],
+      "viewport_before": [
+        {
+          "res": "1M",
+          "range": {
+            "from": 1525132800,
+            "to": 1817078400
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29403616104487,
+            "to": 103.85732564607511
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_after": [
+        {
+          "res": "1M",
+          "range": {
+            "from": 1525132800,
+            "to": 1817078400
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29403616104487,
+            "to": 103.85732564607511
+          },
+          "autoScale": true
+        },
+        {
+          "res": "240",
+          "range": {
+            "from": 1789646400,
+            "to": 1791244800
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29356775568873,
+            "to": 103.85792049846833
+          },
+          "autoScale": true
+        },
+        {
+          "res": "5",
+          "range": {
+            "from": 1791077700,
+            "to": 1791111000
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 99.48763934229302,
+            "to": 103.43943039552155
+          },
+          "autoScale": true
+        },
+        {
+          "res": "1W",
+          "range": {
+            "from": 1729468800,
+            "to": 1796601600
+          },
+          "spacing": 6,
+          "offset": 10,
+          "width": 668,
+          "priceRange": {
+            "from": 96.29478271598913,
+            "to": 103.85764177375488
+          },
+          "autoScale": true
+        }
+      ],
+      "viewport_unchanged": true,
+      "saved_non_main_sources": 0,
+      "shape_count_after_manual_remove": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "screenshot": null
+    }
+  ],
+  "clipped_cases": [
+    {
+      "config": {
+        "offset": 10,
+        "mode": "background",
+        "monthDelta": 0
+      },
+      "semantic": {
+        "from": 1790812800,
+        "to": 1793491200,
+        "high": 99.99291396999942,
+        "low": 96.99291396999942
+      },
+      "visible": {
+        "from": 1791077700,
+        "to": 1791111000
+      },
+      "clipped": {
+        "from": 1791077700,
+        "to": 1791111000
+      },
+      "coordinate_times": [
+        1791077700,
+        null
+      ],
+      "skipped": false,
+      "points": [
+        {
+          "price": 99.99291396999942,
+          "time": 1791077700
+        },
+        {
+          "price": 96.99291396999942,
+          "time": 1791111000
+        }
+      ],
+      "actual_right_offset": 10,
+      "viewport_unchanged": true,
+      "screenshot": null
+    },
+    {
+      "config": {
+        "offset": 10,
+        "mode": "rectangle",
+        "monthDelta": 0
+      },
+      "semantic": {
+        "from": 1790812800,
+        "to": 1793491200,
+        "high": 99.99291396999942,
+        "low": 96.99291396999942
+      },
+      "visible": {
+        "from": 1791077700,
+        "to": 1791111000
+      },
+      "clipped": {
+        "from": 1791077700,
+        "to": 1791111000
+      },
+      "coordinate_times": [
+        1791077700,
+        null
+      ],
+      "skipped": false,
+      "points": [
+        {
+          "price": 99.99291396999942,
+          "time": 1791077700
+        },
+        {
+          "price": 96.99291396999942,
+          "time": 1791111000
+        }
+      ],
+      "actual_right_offset": 10,
+      "viewport_unchanged": true,
+      "screenshot": null
+    },
+    {
+      "config": {
+        "offset": 500,
+        "mode": "background",
+        "monthDelta": 0
+      },
+      "semantic": {
+        "from": 1790812800,
+        "to": 1793491200,
+        "high": 99.99291396999942,
+        "low": 96.99291396999942
+      },
+      "visible": {
+        "from": 1791107700,
+        "to": 1791141000
+      },
+      "clipped": {
+        "from": 1791107700,
+        "to": 1791141000
+      },
+      "coordinate_times": [
+        1791107700,
+        null
+      ],
+      "skipped": false,
+      "points": [
+        {
+          "price": 99.99291396999942,
+          "time": 1791107700
+        },
+        {
+          "price": 96.99291396999942,
+          "time": 1791141000
+        }
+      ],
+      "actual_right_offset": 109.33333333333333,
+      "viewport_unchanged": true,
+      "screenshot": "mn-clipped-future-m5.png"
+    },
+    {
+      "config": {
+        "offset": 10,
+        "mode": "background",
+        "monthDelta": -1
+      },
+      "semantic": {
+        "from": 1788220800,
+        "to": 1790812800,
+        "high": 101.79839956168694,
+        "low": 98.79839956168694
+      },
+      "visible": {
+        "from": 1791077700,
+        "to": 1791111000
+      },
+      "clipped": {
+        "from": 1791077700,
+        "to": 1790812800
+      },
+      "coordinate_times": [
+        1791077700,
+        null
+      ],
+      "skipped": true,
+      "points": null,
+      "actual_right_offset": 10,
+      "viewport_unchanged": true,
+      "screenshot": null
+    }
+  ],
+  "cursor_events": [
+    {
+      "i": 0,
+      "r": "1D",
+      "time": 1791072000,
+      "x": 605,
+      "y": 267.00000000000034,
+      "hovered": true
+    },
+    {
+      "i": 1,
+      "r": "240",
+      "time": 1791072000,
+      "x": 593,
+      "y": 746.5074104329622,
+      "hovered": false
+    },
+    {
+      "i": 2,
+      "r": "5",
+      "time": 1791077700,
+      "x": 725,
+      "y": 425.15333809848437,
+      "hovered": false
+    },
+    {
+      "i": 3,
+      "r": "1W",
+      "time": 1790553600,
+      "x": 1331,
+      "y": 746.5352404746473,
+      "hovered": false
+    }
+  ],
+  "history_requests": [
+    {
+      "r": "1D",
+      "phase": "setup",
+      "params": {
+        "from": 1770249600,
+        "to": 1791158400,
+        "countBack": 242,
+        "firstDataRequest": true
+      }
+    },
+    {
+      "r": "240",
+      "phase": "setup",
+      "params": {
+        "from": 1789437661,
+        "to": 1791108061,
+        "countBack": 116,
+        "firstDataRequest": true
+      }
+    },
+    {
+      "r": "5",
+      "phase": "setup",
+      "params": {
+        "from": 1791073261,
+        "to": 1791108061,
+        "countBack": 116,
+        "firstDataRequest": true
+      }
+    },
+    {
+      "r": "1W",
+      "phase": "setup",
+      "params": {
+        "from": 1720915200,
+        "to": 1791158400,
+        "countBack": 117,
+        "firstDataRequest": true
+      }
+    },
+    {
+      "r": "1M",
+      "phase": "setup-source",
+      "params": {
+        "from": 1157068800,
+        "to": 1791158400,
+        "countBack": 241,
+        "firstDataRequest": true
+      }
+    }
+  ],
+  "page_errors": [],
+  "screenshots": {
+    "d1-background-light.png": "12419f3af991e0db0d7ebf889622a3029c84978d7db687b6b249dd1edbca06f8",
+    "d1-rectangle-light.png": "9f154e37dd076d353cc9d6cb7511482eab2797613d067df01550588bf0e8bc92",
+    "d1-background-dark.png": "ed0c6468493bea78c2c46be3d974b5b50406e62ce8f960bb149efd012fd72c37",
+    "mn-clipped-future-m5.png": "9c4e8c2993efc28caaf1b3f12390c7cac6563d14010b4dae55aec0c627e5f2c5"
+  },
+  "limitations": [
+    "Static drawings and manually invoked clipping only; no product or realtime range-mapping controller exists.",
+    "Native MN-to-M5 full future endpoint snapped to the last bar; authoritative interval must remain separate.",
+    "Clipping confirmed only on visible near-future UTC range; requested rightOffset=500 was natively clamped to about 109.33.",
+    "No traversal of M5 viewport to the month-end; real exchange calendars, DST and future boundary projection not validated.",
+    "Actual source switching, immediate leave/disable clearing, race handling, in-place update performance, 2/8 charts, menu integration and workspace persistence not validated.",
+    "Only public selection/save/object-tree flags and explicit shape cleanup checked; pointer interaction, undo and autosave dirty events not validated."
+  ]
+}

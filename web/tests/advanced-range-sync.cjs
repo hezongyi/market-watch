@@ -52,11 +52,13 @@ function chart() {
 const a = chart(),
   b = chart();
 let charts = [a, b];
-const guard = context.rangeSyncLoadingGuard({
+const widget = {
   dateRangeSync: () => toggle,
   chartsCount: () => charts.length,
   chart: (i) => charts[i],
-});
+};
+require("./fixtures/sync-coordinator.cjs")(context,widget);
+const guard=context.rangeSyncLoadingGuard(widget);
 assert.equal(
   writes,
   0,
@@ -107,6 +109,7 @@ assert.equal(value, false, "preserve disabled user preference");
 toggle.setValue(true);
 b.symbols.emit();
 charts = [a];
+widget._mwSyncCoordinator.refreshCharts();
 guard.refresh();
 assert.equal(value, true);
 assert.equal(b.symbols.listeners.size, 0);
@@ -120,6 +123,7 @@ assert.equal(
 );
 const disposedEmpty = guard.captureTerminalCompletion(() => true);
 guard.dispose();
+widget._mwSyncCoordinator.dispose();
 disposedEmpty();
 a.callbacks.shift()();
 assert.equal(value, true, "disposed callback cannot change old workspace");

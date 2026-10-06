@@ -1,0 +1,1699 @@
+{
+  "scope": "Actual provider candles, native calendar, actual mouse and recorded paint bounds",
+  "at": "2026-10-04T09:21:03.721Z",
+  "cases": [
+    {
+      "date": "2024-03-01",
+      "source": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1M",
+        "chartTime": 1709251200000,
+        "start": 1709244000000,
+        "end": 1711918800000,
+        "high": 1.09806,
+        "low": 1.07671
+      },
+      "before": {
+        "mapper": {
+          "epoch": 9,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw1",
+              "size": 449,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw3",
+              "size": 459,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 106.8,
+            "offset": -29,
+            "price": {
+              "from": 1.055695369928401,
+              "to": 1.1098707875894989
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.6875,
+            "offset": -146,
+            "price": {
+              "from": 1.0698671415754533,
+              "to": 1.1012010730306836
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1709164800,
+              "to": 1709510400
+            },
+            "spacing": 10.89795918367347,
+            "offset": -129,
+            "price": {
+              "from": 1.0789428878281624,
+              "to": 1.0862638902147972
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 29.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 1.055695338237933,
+              "to": 1.109870827202584
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1709251200000,
+            "start": 1709244000000,
+            "end": 1711918800000,
+            "high": 1.09806,
+            "low": 1.07671
+          },
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw1",
+              "size": 449,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw3",
+              "size": 459,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              83.4375,
+              0,
+              350.4375,
+              409
+            ],
+            "at": 10177.5
+          },
+          {
+            "id": "edb64d9c-9e79-426c-a80e-f83bf736e1d2",
+            "resolution": "60",
+            "rect": [
+              239.75510204081633,
+              0,
+              294.2448979591837,
+              410
+            ],
+            "at": 10179.5
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 106.8,
+            "offset": -29,
+            "price": {
+              "from": 1.055695369928401,
+              "to": 1.1098707875894989
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.6875,
+            "offset": -146,
+            "price": {
+              "from": 1.0698671415754533,
+              "to": 1.1012010730306836
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1709164800,
+              "to": 1709510400
+            },
+            "spacing": 10.89795918367347,
+            "offset": -129,
+            "price": {
+              "from": 1.0789428878281624,
+              "to": 1.0862638902147972
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 29.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 1.055695338237933,
+              "to": 1.109870827202584
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1709251200000,
+            "start": 1709244000000,
+            "end": 1711918800000,
+            "high": 1.09806,
+            "low": 1.07671
+          },
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw1",
+              "size": 449,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw3",
+              "size": 459,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              83.4375,
+              0,
+              350.4375,
+              409
+            ],
+            "at": 10177.5
+          },
+          {
+            "id": "edb64d9c-9e79-426c-a80e-f83bf736e1d2",
+            "resolution": "60",
+            "rect": [
+              239.75510204081633,
+              0,
+              294.2448979591837,
+              410
+            ],
+            "at": 10179.5
+          },
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              83.4375,
+              0,
+              350.4375,
+              409
+            ],
+            "at": 10401.099999904633
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 106.8,
+            "offset": -29,
+            "price": {
+              "from": 1.055695369928401,
+              "to": 1.1098707875894989
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.6875,
+            "offset": -146,
+            "price": {
+              "from": 1.0698671415754533,
+              "to": 1.1012010730306836
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1709164800,
+              "to": 1709510400
+            },
+            "spacing": 10.89795918367347,
+            "offset": -129,
+            "price": {
+              "from": 1.0789428878281624,
+              "to": 1.0862638902147972
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 29.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 1.055695338237933,
+              "to": 1.109870827202584
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2020-02-01",
+      "source": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1M",
+        "chartTime": 1580515200000,
+        "start": 1580508000000,
+        "end": 1583013600000,
+        "high": 1.10946,
+        "low": 1.07773
+      },
+      "before": {
+        "mapper": {
+          "epoch": 13,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw6",
+              "size": 164,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw8",
+              "size": 249,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw9",
+              "size": 184,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 133.5,
+            "offset": -79,
+            "price": {
+              "from": 1.055072124105012,
+              "to": 1.1596648448687352
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.8,
+            "offset": -33,
+            "price": {
+              "from": 1.0720858538190083,
+              "to": 1.1424651827262395
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1580428800,
+              "to": 1580774400
+            },
+            "spacing": 10.89795918367347,
+            "offset": -49,
+            "price": {
+              "from": 1.1008857756563246,
+              "to": 1.1104152804295941
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 31.41176470588235,
+            "offset": -18,
+            "price": {
+              "from": 1.0550720629224237,
+              "to": 1.1596649213469705
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 13,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1580515200000,
+            "start": 1580508000000,
+            "end": 1583013600000,
+            "high": 1.10946,
+            "low": 1.07773
+          },
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw6",
+              "size": 164,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw8",
+              "size": 249,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw9",
+              "size": 184,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              88.99999999999997,
+              0,
+              356.0000000000001,
+              409
+            ],
+            "at": 13444.900000095367
+          },
+          {
+            "id": "edb64d9c-9e79-426c-a80e-f83bf736e1d2",
+            "resolution": "60",
+            "rect": [
+              239.75510204081633,
+              0,
+              294.2448979591837,
+              410
+            ],
+            "at": 13446.299999713898
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 133.5,
+            "offset": -79,
+            "price": {
+              "from": 1.055072124105012,
+              "to": 1.1596648448687352
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.8,
+            "offset": -33,
+            "price": {
+              "from": 1.0720858538190083,
+              "to": 1.1424651827262395
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1580428800,
+              "to": 1580774400
+            },
+            "spacing": 10.89795918367347,
+            "offset": -49,
+            "price": {
+              "from": 1.1008857756563246,
+              "to": 1.1104152804295941
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 31.41176470588235,
+            "offset": -18,
+            "price": {
+              "from": 1.0550720629224237,
+              "to": 1.1596649213469705
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 13,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1580515200000,
+            "start": 1580508000000,
+            "end": 1583013600000,
+            "high": 1.10946,
+            "low": 1.07773
+          },
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw6",
+              "size": 164,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw8",
+              "size": 249,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw9",
+              "size": 184,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              88.99999999999997,
+              0,
+              356.0000000000001,
+              409
+            ],
+            "at": 13444.900000095367
+          },
+          {
+            "id": "edb64d9c-9e79-426c-a80e-f83bf736e1d2",
+            "resolution": "60",
+            "rect": [
+              239.75510204081633,
+              0,
+              294.2448979591837,
+              410
+            ],
+            "at": 13446.299999713898
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 133.5,
+            "offset": -79,
+            "price": {
+              "from": 1.055072124105012,
+              "to": 1.1596648448687352
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.8,
+            "offset": -33,
+            "price": {
+              "from": 1.0720858538190083,
+              "to": 1.1424651827262395
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1580428800,
+              "to": 1580774400
+            },
+            "spacing": 10.89795918367347,
+            "offset": -49,
+            "price": {
+              "from": 1.1008857756563246,
+              "to": 1.1104152804295941
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 31.41176470588235,
+            "offset": -18,
+            "price": {
+              "from": 1.0550720629224237,
+              "to": 1.1596649213469705
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2023-12-01",
+      "source": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1M",
+        "chartTime": 1701388800000,
+        "start": 1701381600000,
+        "end": 1704060000000,
+        "high": 1.11388,
+        "low": 1.07227
+      },
+      "before": {
+        "mapper": {
+          "epoch": 15,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw11",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw12",
+              "size": 249,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw13",
+              "size": 174,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 133.5,
+            "offset": -33,
+            "price": {
+              "from": 1.038007446300716,
+              "to": 1.122333192124105
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 17.8,
+            "offset": -28,
+            "price": {
+              "from": 1.068198347389198,
+              "to": 1.1189695657635026
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1701302400,
+              "to": 1701648000
+            },
+            "spacing": 10.89795918367347,
+            "offset": -49,
+            "price": {
+              "from": 1.0812813365155132,
+              "to": 1.1002183293556085
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 29.666666666666668,
+            "offset": -16,
+            "price": {
+              "from": 1.038007396973503,
+              "to": 1.122333253783121
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 15,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1701388800000,
+            "start": 1701381600000,
+            "end": 1704060000000,
+            "high": 1.11388,
+            "low": 1.07227
+          },
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw11",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw12",
+              "size": 249,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw13",
+              "size": 174,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              88.99999999999997,
+              0,
+              356.0000000000001,
+              409
+            ],
+            "at": 16374.199999809265
+          },
+          {
+            "id": "edb64d9c-9e79-426c-a80e-f83bf736e1d2",
+            "resolution": "60",
+            "rect": [
+              239.75510204081633,
+              0,
+              294.2448979591837,
+              410
+            ],
+            "at": 16375.400000095367
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 133.5,
+            "offset": -33,
+            "price": {
+              "from": 1.038007446300716,
+              "to": 1.122333192124105
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 17.8,
+            "offset": -28,
+            "price": {
+              "from": 1.068198347389198,
+              "to": 1.1189695657635026
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1701302400,
+              "to": 1701648000
+            },
+            "spacing": 10.89795918367347,
+            "offset": -49,
+            "price": {
+              "from": 1.0812813365155132,
+              "to": 1.1002183293556085
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 29.666666666666668,
+            "offset": -16,
+            "price": {
+              "from": 1.038007396973503,
+              "to": 1.122333253783121
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 15,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1701388800000,
+            "start": 1701381600000,
+            "end": 1704060000000,
+            "high": 1.11388,
+            "low": 1.07227
+          },
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw11",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw12",
+              "size": 249,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw13",
+              "size": 174,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              88.99999999999997,
+              0,
+              356.0000000000001,
+              409
+            ],
+            "at": 16374.199999809265
+          },
+          {
+            "id": "edb64d9c-9e79-426c-a80e-f83bf736e1d2",
+            "resolution": "60",
+            "rect": [
+              239.75510204081633,
+              0,
+              294.2448979591837,
+              410
+            ],
+            "at": 16375.400000095367
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 133.5,
+            "offset": -33,
+            "price": {
+              "from": 1.038007446300716,
+              "to": 1.122333192124105
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 17.8,
+            "offset": -28,
+            "price": {
+              "from": 1.068198347389198,
+              "to": 1.1189695657635026
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1701302400,
+              "to": 1701648000
+            },
+            "spacing": 10.89795918367347,
+            "offset": -49,
+            "price": {
+              "from": 1.0812813365155132,
+              "to": 1.1002183293556085
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 29.666666666666668,
+            "offset": -16,
+            "price": {
+              "from": 1.038007396973503,
+              "to": 1.122333253783121
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2024-12-01",
+      "source": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1M",
+        "chartTime": 1733011200000,
+        "start": 1733004000000,
+        "end": 1735682400000,
+        "high": 1.06293,
+        "low": 1.03422
+      },
+      "before": {
+        "mapper": {
+          "epoch": 17,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw14",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw16",
+              "size": 94,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw17",
+              "size": 289,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 133.5,
+            "offset": -21,
+            "price": {
+              "from": 1.0082545584725535,
+              "to": 1.126159301909308
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 17.225806451612904,
+            "offset": -26,
+            "price": {
+              "from": 1.0183462001315866,
+              "to": 1.0678972498355164
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1733090400,
+              "to": 1733270400
+            },
+            "spacing": 10.470588235294118,
+            "offset": -76,
+            "price": {
+              "from": 1.04489754176611,
+              "to": 1.0582705727923627
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 31.41176470588235,
+            "offset": -18,
+            "price": {
+              "from": 1.0096919462886536,
+              "to": 1.109672567139183
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 17,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1733011200000,
+            "start": 1733004000000,
+            "end": 1735682400000,
+            "high": 1.06293,
+            "low": 1.03422
+          },
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw14",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw16",
+              "size": 94,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw17",
+              "size": 289,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              86.12903225806453,
+              0,
+              361.741935483871,
+              409
+            ],
+            "at": 19832.400000095367
+          },
+          {
+            "id": "edb64d9c-9e79-426c-a80e-f83bf736e1d2",
+            "resolution": "60",
+            "rect": [
+              1.3322676295501878e-14,
+              0,
+              534,
+              410
+            ],
+            "at": 19834.099999904633
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 133.5,
+            "offset": -21,
+            "price": {
+              "from": 1.0082545584725535,
+              "to": 1.126159301909308
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 17.225806451612904,
+            "offset": -26,
+            "price": {
+              "from": 1.0183462001315866,
+              "to": 1.0678972498355164
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1733090400,
+              "to": 1733270400
+            },
+            "spacing": 10.470588235294118,
+            "offset": -76,
+            "price": {
+              "from": 1.04489754176611,
+              "to": 1.0582705727923627
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 31.41176470588235,
+            "offset": -18,
+            "price": {
+              "from": 1.0096919462886536,
+              "to": 1.109672567139183
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 17,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1733011200000,
+            "start": 1733004000000,
+            "end": 1735682400000,
+            "high": 1.06293,
+            "low": 1.03422
+          },
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|mw14",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|mw16",
+              "size": 94,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|60|mw17",
+              "size": 289,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aadef289-cee9-4b3a-b58e-1af38b52a1b0",
+            "resolution": "1D",
+            "rect": [
+              86.12903225806453,
+              0,
+              361.741935483871,
+              409
+            ],
+            "at": 19832.400000095367
+          },
+          {
+            "id": "edb64d9c-9e79-426c-a80e-f83bf736e1d2",
+            "resolution": "60",
+            "rect": [
+              1.3322676295501878e-14,
+              0,
+              534,
+              410
+            ],
+            "at": 19834.099999904633
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 133.5,
+            "offset": -21,
+            "price": {
+              "from": 1.0082545584725535,
+              "to": 1.126159301909308
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 17.225806451612904,
+            "offset": -26,
+            "price": {
+              "from": 1.0183462001315866,
+              "to": 1.0678972498355164
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1733090400,
+              "to": 1733270400
+            },
+            "spacing": 10.470588235294118,
+            "offset": -76,
+            "price": {
+              "from": 1.04489754176611,
+              "to": 1.0582705727923627
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 31.41176470588235,
+            "offset": -18,
+            "price": {
+              "from": 1.0096919462886536,
+              "to": 1.109672567139183
+            },
+            "shapes": []
+          }
+        ]
+      }
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,126 @@
+{
+  "at": "2026-10-04T19:33:57.879313+00:00",
+  "cases": [
+    {
+      "name": "advanced-sync-coordinator",
+      "exit": 0,
+      "output": "Sync coordinator input, coalescing, cancellation, exclusion, nested/latest/old pauses and cleanup: PASS\n"
+    },
+    {
+      "name": "advanced-sync-native-choices",
+      "exit": 0,
+      "output": "Native logical choices, paused Undo/Redo, disabled dates, old workspace and native Save cleanup: PASS\n"
+    },
+    {
+      "name": "advanced-range-sync",
+      "exit": 0,
+      "output": "Range sync guard: concurrent loads, stale callbacks, disabled preference, removed panes and disposal passed\n"
+    },
+    {
+      "name": "advanced-sync-snapshot",
+      "exit": 0,
+      "output": "Public snapshots defer synchronized startup while retaining user choices and vendor content\n"
+    },
+    {
+      "name": "advanced-viewports",
+      "exit": 0,
+      "output": "Viewport restoration preserves preferences and checks symbol identity\n"
+    },
+    {
+      "name": "advanced-edge-sync",
+      "exit": 0,
+      "output": "Edge range synchronization: alignment, loading, user toggle and disposal passed\n"
+    },
+    {
+      "name": "advanced-bar-range-mapping",
+      "exit": 0,
+      "output": "Range rules, validation, configuration, invalidation and disposal passed\nFractional pixel bounds, price projection, identity filtering and realtime invalidation passed\nCanonical Yahoo series identity passed\n"
+    },
+    {
+      "name": "advanced-bar-range-lifecycle",
+      "exit": 0,
+      "output": "Provider reset immediately invalidates metadata and pending tickets during busy navigation\n"
+    },
+    {
+      "name": "advanced-native-save-race",
+      "exit": 0,
+      "output": "{\"saved_offset\":10,\"current_offset\":20,\"dirty\":true,\"messages\":[{\"type\":\"workspace-dirty\"}],\"bug_reproduced\":false}\nNative save preserves edits and workspace switches during async capture; unchanged snapshot acknowledges.\n"
+    },
+    {
+      "name": "advanced-native-reserve-lifetime",
+      "exit": 0,
+      "output": "Shared error/miss backoff, bounded retries, viewport restart and stale completion isolation passed\n"
+    },
+    {
+      "name": "advanced-native-reserve-scheduler",
+      "exit": 0,
+      "output": "Two reserve lanes, four total lanes and visible-request priority passed\n"
+    },
+    {
+      "name": "advanced-native-hook-contract",
+      "exit": 0,
+      "output": "Original, legacy, idempotent, partial/tampered, disable and distinct cache URL contracts passed\n"
+    },
+    {
+      "name": "advanced-native-workspaces",
+      "exit": 0,
+      "output": "native workspace adapter: conflict, serialized saves and readonly passed\n"
+    },
+    {
+      "name": "advanced-provider-history-observation",
+      "exit": 0,
+      "output": "Late native history: backfill, revision, failed/legacy review and inactive correction passed\n"
+    }
+  ],
+  "diffCheck": {
+    "exit": 0,
+    "output": ""
+  },
+  "syntax": [
+    {
+      "name": "sync-coordinator.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "sync-settings.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "bar-range-mapping.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "bridge.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "viewports.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "range-sync.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "patch-native-reserve.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "build-assets.mjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "name": "chart-menu.js",
+      "exit": 0,
+      "output": ""
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "at": "2026-10-04T20:01:25.062129+00:00",
+  "candidate": "candidate9",
+  "imageID": "sha256:a7c81c0a704c0062935005093d4f2c581417cee417cefbddd78aa7a4a4a98215",
+  "groups": [
+    {
+      "file": "final9-choices.json",
+      "cases": 4,
+      "passed": true,
+      "sha256": "26b452e31487b5988097d493544867d66b4146a583c3edc6db5ad81c82e371a5"
+    },
+    {
+      "file": "final9-extended.json",
+      "cases": 20,
+      "passed": true,
+      "sha256": "b66551a104ec3f2fc91efdb2c1e7c0a6ce4c3957954b12771e35fce265b9ee41"
+    },
+    {
+      "file": "final9-geometry.json",
+      "cases": 5,
+      "passed": true,
+      "sha256": "17e4f2cb39b0839e927d4deaac250a6140b751f246828f66e7a7c4e971a52b23"
+    },
+    {
+      "file": "final9-legacy.json",
+      "cases": 6,
+      "passed": true,
+      "sha256": "35961d44eef672fa36487bee686f3d9310d4ac48baf6ec086358d8ff062a3491"
+    },
+    {
+      "file": "final9-main.json",
+      "cases": 30,
+      "passed": true,
+      "sha256": "330d49754e08391785f53c12910f78b4049acc591f79cb867cd3a06570d46bc8"
+    },
+    {
+      "file": "final9-menu.json",
+      "cases": 6,
+      "passed": true,
+      "sha256": "c22396bbfa598a87084675aa902573ce9075eb31a0b61dbcd77af0bdc7a2e4f8"
+    },
+    {
+      "file": "final9-modal.json",
+      "cases": 5,
+      "passed": true,
+      "sha256": "860756c4ac30d7ecdd4084f96ac1139310642dc9d74aefadac21a3efb29ef11d"
+    },
+    {
+      "file": "final9-modules.json",
+      "cases": 14,
+      "passed": true,
+      "sha256": "1f8a962870450e082070d1a77b90f1e39bb792bebe7bab8b9fd4696728e3b4f6"
+    },
+    {
+      "file": "final9-native-date.json",
+      "cases": 0,
+      "passed": true,
+      "sha256": "7942e6e4f27522fd7806a96c96fbfcfc570b02aaa10fa334b23f4280d95a4498"
+    },
+    {
+      "file": "final9-regression-calendar.json",
+      "cases": 4,
+      "passed": true,
+      "sha256": "c7c42cdb9ec43e86574395a3516f346afa1a708ab51dfd2c9a30a98f61d9a3b8"
+    },
+    {
+      "file": "final9-regression-lifecycle.json",
+      "cases": 6,
+      "passed": true,
+      "sha256": "410300fb6fae060772817652a2635496570c35de4adad982fb590b7a9d5c3d0c"
+    },
+    {
+      "file": "final9-regression-mapping.json",
+      "cases": 38,
+      "passed": true,
+      "sha256": "18df3f61df02081d6926b4d00933ea8848a5f77e014a2442e989312807022c7c"
+    },
+    {
+      "file": "final9-regression-matrix.json",
+      "cases": 19,
+      "passed": true,
+      "sha256": "1228e3cc1eb7cff3b785c1db34bb9f2ebdfc9885aa6a083d1f12ff20ff8c90d9"
+    },
+    {
+      "file": "final9-regression-navigation.json",
+      "cases": 8,
+      "passed": true,
+      "sha256": "3c4d92e3980f27591f2345e124ebec12f7396fd31fd9efcdc7b357a4980f6c53"
+    },
+    {
+      "file": "final9-touch.json",
+      "cases": 6,
+      "passed": true,
+      "sha256": "12cb2428f6cf1a3451a27b2b2472efbb0fefd2feafbb50b9dcf89f93e5717f50"
+    }
+  ],
+  "browserCases": 157,
+  "nativeDateRestorationPassed": true,
+  "moduleScripts": 14,
+  "syntaxFiles": 9,
+  "build": {
+    "command": "npm run build",
+    "exit": 0,
+    "warning": "Existing >500 kB chunk size notice"
+  }
+}

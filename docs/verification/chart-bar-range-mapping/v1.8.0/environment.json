@@ -1,0 +1,19 @@
+{
+  "host": "quant-server",
+  "os": "Ubuntu 22.04.5 LTS",
+  "compose_project": "mw-range-v180-20261006",
+  "app": "https://192.168.7.232:16743/advanced-charts",
+  "chart": "https://192.168.7.232:16744",
+  "database": "range_v180",
+  "database_port": "127.0.0.1:16732",
+  "volume": "mw-range-v180-20261006_range-pg",
+  "network": "mw-range-v180-20261006_default",
+  "delivery_enabled": false,
+  "yahoo_enabled": false,
+  "images": {
+    "mw-range-v180-web:candidate1": "sha256:dcbf1348e993e2b58b20c6ab6ce9b0338d3fd64a4fb5c7b9240b223ef167cc77",
+    "mw-release-v180-api:45844fd": "sha256:eb41f3703dc77e1b0bc59d19aefb4d8622780104c8652670c07a9017c1e1c280",
+    "postgres:14-bookworm": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "mw-range-v180-chart:candidate12": "sha256:b6c0a2823d15aea05751e420274d1a9b17b97a7fb7cb9de3a55f721015a22a24"
+  }
+}

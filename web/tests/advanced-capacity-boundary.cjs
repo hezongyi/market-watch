@@ -172,6 +172,12 @@ const turn = () => new Promise((r) => setImmediate(r));
   const finalNotice = events.filter(e => e.type === "mw-capacity-state" && e.detail.phase === "limited").at(-1).detail;
   assert.equal(finalNotice.totalBars,40);
   assert.equal(finalNotice.loadedBars,40);
+  const chart = {_chartWidget:{model:()=>({model:()=>m})}};
+  assert.equal(nav.rangeBoundary(chart),960,'full native boundary can stop edge retries');
+  const fullCache = t._cache.bars;
+  t._cache.bars = fullCache.slice(40);
+  assert.equal(nav.rangeBoundary(chart),undefined,'released capacity allows retry without changing configured limit');
+  t._cache.bars = fullCache;
   assert.equal(finalNotice.pages,2,"completed batch pages accumulate in the boundary operation");
   assert.equal(finalNotice.started,events.find(e => e.type === "mw-capacity-state" && e.detail.phase === "filling").detail.started,
     "operation start remains stable throughout batch progress and completion");
