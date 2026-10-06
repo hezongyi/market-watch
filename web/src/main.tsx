@@ -38,7 +38,7 @@ import {
 } from "./api";
 import "./style.css";
 import AdvancedWorkspacePage from "./advanced/AdvancedWorkspace";
-import MarketDataPage from "./MarketDataPage";
+import MarketDataPage from "./market-data/Center";
 
 const names: Record<string, string> = {
   pullback: "回落 / 反弹结束",
@@ -252,7 +252,7 @@ function Shell({ logout }: { logout: () => void }) {
             ["/advanced-charts", "专业图表（验证版）", Square],
             ["/signals", "信号中心", Bell],
             ["/replay", "历史演练", Clock3],
-            ["/market-data", "行情接入", Radio],
+            ["/market-data", "数据中心", Radio],
             ["/settings", "提醒与设置", Settings2],
           ].map(([path, label, Icon]: any) => (
             <NavLink key={path} end={path === "/"} to={path}>
@@ -288,7 +288,7 @@ function Shell({ logout }: { logout: () => void }) {
           <span>
             工作台 <ChevronRight size={14} />
             <strong>
-              {location.pathname === "/market-data" ? "行情接入" : location.pathname === "/replay"
+              {location.pathname.startsWith("/market-data") ? "数据中心" : location.pathname === "/replay"
                 ? "历史演练"
                 : location.pathname === "/signals"
                   ? "信号中心"
@@ -322,7 +322,7 @@ function Shell({ logout }: { logout: () => void }) {
             </div>
           )}
           <Routes>
-            <Route path="/market-data" element={<MarketDataPage/>}/>
+            <Route path="/market-data/*" element={<MarketDataPage/>}/>
             <Route
               path="/"
               element={

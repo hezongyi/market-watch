@@ -17,7 +17,7 @@ services:
       retries: 20
     labels:
       market-watch.purpose: three-layer-acceptance
-  verify:
+  verify: &backend
     image: market-watch-data-integration:dev
     restart: "no"
     mem_limit: 768m
@@ -25,7 +25,7 @@ services:
     working_dir: /app
     volumes:
       - ../../..:/app:ro
-    environment:
+    environment: &environment
       PYTHONPATH: /app/backend
       PYTHONDONTWRITEBYTECODE: "1"
       ALERTS_DATABASE_URL: postgresql+psycopg://three_layer:${MW_THREE_LAYER_TEST_PASSWORD}@postgres/three_layer
@@ -36,6 +36,48 @@ services:
     command: ["python", "-m", "pytest", "backend/tests/test_source_registry_postgres.py", "-q", "-p", "no:cacheprovider"]
     depends_on:
       postgres: {condition: service_healthy}
+    labels:
+      market-watch.purpose: three-layer-acceptance
+  migrate:
+    <<: *backend
+    command: ["alembic", "upgrade", "head"]
+  api:
+    <<: *backend
+    command: ["uvicorn", "alerts.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    env_file:
+      - path: ../../../artifacts/data-integration/three-layer-runtime.env
+        format: raw
+    environment:
+      <<: *environment
+      ALERTS_COOKIE_SECURE: "false"
+      ALERTS_PUBLIC_URL: http://127.0.0.1:16629
+      ALERTS_OANDA_STREAM_ENABLED: "false"
+      ALERTS_OANDA_RESIDENT_SYMBOLS: ""
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 30
+  history-worker:
+    <<: *backend
+    command: ["python", "-m", "alerts.history_versions"]
+    env_file:
+      - path: ../../../artifacts/data-integration/three-layer-runtime.env
+        format: raw
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    image: market-watch-data-integration-web:dev
+    restart: "no"
+    mem_limit: 128m
+    ports: ["127.0.0.1:16629:80"]
+    volumes:
+      - ../../../web/dist:/usr/share/nginx/html:ro
+      - ../../../web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      api: {condition: service_healthy}
     labels:
       market-watch.purpose: three-layer-acceptance
 volumes:

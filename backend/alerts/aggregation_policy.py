@@ -95,4 +95,15 @@ def change_aggregation(db, dataset_id, calendar, *, version_id=None):
 
             ident = derive_version(db, original.id, target.key)
             version = db.get(HistoryVersion, ident)
+    from .storage import DatasetMaintenance
+
+    maintenance = db.get(DatasetMaintenance, source.id)
+    if maintenance and not db.get(DatasetMaintenance, target.key):
+        from .history_maintenance import configure
+
+        plan = configure(db, target.key, target_start=maintenance.target_start,
+            timeframes=maintenance.timeframes, frequency=maintenance.frequency,
+            timezone=maintenance.timezone, daily_minute=maintenance.daily_minute,
+            overlap_minutes=maintenance.overlap_minutes)
+        plan.paused = True  # A derived copy does not silently enable daily work.
     return db.get(MarketDataset, target.key), destination, version

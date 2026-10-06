@@ -29,6 +29,8 @@ def test_postgres_dataset_registration_ingestion_and_rollback_guard(provider_pg)
         # Reproduce the actual r19 predecessor schema, rather than dropping a
         # parent table while later migrations' foreign keys still reference it.
         for table in ("market_live_minutes", "market_live_states", "market_history_chunks",
+                      "market_history_artifact_blocks", "market_history_artifacts",
+                      "market_history_runs", "market_dataset_maintenance",
                       "market_history_versions", "market_source_fetches", "market_source_blobs",
                       "market_dataset_sources", "market_source_series"):
             conn.execute(text(f"DROP TABLE {table}"))

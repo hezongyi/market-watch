@@ -15,7 +15,14 @@ from .aggregation_policy import (
 )
 from .history_versions import create_version, version_report
 from .market_datasets import legacy_inventory
-from .storage import HistoryVersion, Instrument, MarketDataset, transaction
+from .storage import (
+    DatasetMaintenance,
+    HistoryVersion,
+    Instrument,
+    MarketDataset,
+    now_ms,
+    transaction,
+)
 
 
 class VersionRequest(BaseModel):
@@ -40,6 +47,46 @@ class AggregationRequest(BaseModel):
     version_id: str | None = Field(default=None, min_length=1, max_length=36)
 
 
+class MaintenanceRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    target_start: int = Field(ge=0, strict=True)
+    timeframes: list[str] = Field(min_length=1, max_length=9)
+    frequency: Literal["daily", "once"] = "daily"
+    timezone: str = Field(default="UTC", min_length=1, max_length=64)
+    daily_minute: int = Field(default=15, ge=0, lt=1440, strict=True)
+    overlap_minutes: int = Field(default=2880, ge=0, le=44640, strict=True)
+
+
+class RunRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    request_id: str = Field(min_length=1, max_length=100)
+    kind: Literal["update", "backfill", "recheck"] = "update"
+    start: int | None = Field(default=None, ge=0, strict=True)
+    end: int | None = Field(default=None, gt=0, strict=True)
+
+
+class MaintenanceControl(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    action: Literal["pause", "resume", "archive", "unarchive"]
+
+
+class TaskControl(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    action: Literal["pause", "resume", "retry", "cancel"]
+
+
+class ArtifactRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    timeframes: list[str] = Field(min_length=1, max_length=9)
+
+
+class ManagedRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    dataset: DatasetRequest
+    maintenance: MaintenanceRequest
+    request_id: str = Field(min_length=1, max_length=100)
+
+
 def dataset_report(row, inst):
     return {"id": row.id, "instrument_id": row.instrument_id,
             "logical_symbol": row.logical_symbol, "identity": row.identity,
@@ -56,6 +103,109 @@ def router(authenticated):
         with transaction() as db:
             return [dataset_report(row, db.get(Instrument, row.instrument_id))
                     for row in db.scalars(select(MarketDataset).order_by(MarketDataset.logical_symbol))]
+
+    @routes.get("/center/datasets")
+    def center_datasets(query: str = "", source: str | None = None, calendar: str | None = None,
+                        asset_class: str | None = None, status: str = "all", page: int = 1, page_size: int = 25):
+        from .data_center import dataset_list
+
+        try:
+            with transaction() as db:
+                return dataset_list(db, query=query, source=source, calendar=calendar,
+                    asset_class=asset_class, status=status, page=page, page_size=page_size)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.get("/center/tasks")
+    def center_tasks(dataset_id: str | None = None, page: int = 1, page_size: int = 25):
+        from .data_center import task_list
+
+        try:
+            with transaction() as db:
+                return task_list(db, dataset_id=dataset_id, page=page, page_size=page_size)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.get("/center/platform")
+    def center_platform(query: str = "", source: str | None = None, page: int = 1, page_size: int = 25):
+        from sqlalchemy import func, or_
+
+        from .source_registry import capabilities
+        from .storage import MarketCatalog
+
+        if page < 1 or not 1 <= page_size <= 100:
+            raise HTTPException(422, "无效的目录分页")
+        with transaction() as db:
+            rows = select(MarketCatalog)
+            if query:
+                rows = rows.where(or_(MarketCatalog.symbol.contains(query[:100], autoescape=True),
+                                      MarketCatalog.label.contains(query[:100], autoescape=True)))
+            if source:
+                rows = rows.where(MarketCatalog.source == source)
+            total = db.scalar(select(func.count()).select_from(rows.subquery()))
+            items = [{"id": r.id, "source": r.source, "provider_symbol": r.symbol,
+                "label": r.label, "asset_class": r.asset_type, "precision": r.precision,
+                "available": r.available, "updated_at": r.updated_at,
+                "capabilities": capabilities(r.source)} for r in db.scalars(rows.order_by(
+                    MarketCatalog.symbol, MarketCatalog.source, MarketCatalog.id)
+                    .offset((page - 1) * page_size).limit(page_size))]
+            return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+    @routes.get("/center/datasets/{dataset_id}")
+    def center_detail(dataset_id: str):
+        from .data_center import dataset_detail
+
+        try:
+            with transaction() as db:
+                return dataset_detail(db, dataset_id)
+        except ValueError as error:
+            raise HTTPException(404, str(error)) from None
+
+    @routes.post("/center/datasets", status_code=201)
+    def create_managed(body: ManagedRequest):
+        from .data_center import dataset_detail
+        from .history_maintenance import configure, create_run
+        from .source_registry import collection_identity
+
+        try:
+            with transaction() as db:
+                # Acquire a source-level registration lock before any instrument
+                # insert. It serializes concurrent first registration as well.
+                from .source_registry import _insert
+                from .storage import SourceSeries
+
+                source = body.dataset.source
+                import hashlib
+
+                from .config import settings
+                from .market_contracts import DatasetIdentity
+
+                raw = DatasetIdentity(source=source, channel="v20" if source == "oanda" else "python",
+                    environment="practice" if source == "oanda" else "historical",
+                    account_scope="sha256:" + hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
+                        if source == "oanda" else "public", provider_symbol=body.dataset.provider_symbol,
+                    basis="bid", calendar_version="registration-lock")
+                identity = collection_identity(raw)
+                db.execute(_insert(db)(SourceSeries).values(id=identity.key, identity=identity.model_dump())
+                    .on_conflict_do_nothing(index_elements=["id"]))
+                db.scalar(select(SourceSeries).where(SourceSeries.id == identity.key).with_for_update())
+                row, _ = register_history_dataset(db, **body.dataset.model_dump())
+                from .storage import HistoryRun
+
+                previous = db.scalar(select(HistoryRun).where(HistoryRun.dataset_id == row.id,
+                    HistoryRun.request_id == body.request_id))
+                if previous:
+                    version = db.get(HistoryVersion, previous.version_id)
+                    if version.manifest.get("maintenance", {}).get("creation_request") != body.model_dump():
+                        raise ValueError("相同提交标识不能更改创建配置")
+                    return {"dataset": dataset_detail(db, row.id), "task": version_report(db, version.id)}
+                configure(db, row.id, **body.maintenance.model_dump())
+                version = create_run(db, row.id, request_id=body.request_id)
+                version.manifest = {**version.manifest, "maintenance": {
+                    **version.manifest["maintenance"], "creation_request": body.model_dump()}}
+                return {"dataset": dataset_detail(db, row.id), "task": version_report(db, version.id)}
+        except (ValueError, KeyError) as error:
+            raise HTTPException(422, str(error)) from None
 
     @routes.get("/sources")
     def sources():
@@ -77,6 +227,75 @@ def router(authenticated):
     def options():
         return {"defaults": DEFAULTS, "calendars": ["ny17", "utc0"],
                 "unresolved_asset_classes": ["index", "other", "unspecified"]}
+
+    @routes.get("/date-boundary")
+    def date_boundary(date: str, calendar: AggregationCalendar):
+        from types import SimpleNamespace
+
+        from .managed_dataset import date_start
+
+        try:
+            return {"start": date_start(SimpleNamespace(calendar=calendar), date), "calendar": calendar}
+        except ValueError:
+            raise HTTPException(422, "无效的交易日期") from None
+
+    @routes.get("/datasets/{dataset_id}/maintenance")
+    def maintenance(dataset_id: str):
+        from .history_maintenance import plan_report
+
+        with transaction() as db:
+            if not db.get(MarketDataset, dataset_id):
+                raise HTTPException(404, "数据集不存在")
+            return plan_report(db, dataset_id)
+
+    @routes.post("/datasets/{dataset_id}/maintenance")
+    def configure_maintenance(dataset_id: str, body: MaintenanceRequest):
+        from .history_maintenance import configure, plan_report
+
+        try:
+            with transaction() as db:
+                configure(db, dataset_id, **body.model_dump())
+                return plan_report(db, dataset_id)
+        except (ValueError, KeyError) as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.post("/datasets/{dataset_id}/maintenance/control")
+    def control_maintenance(dataset_id: str, body: MaintenanceControl):
+        from .history_maintenance import plan_report
+
+        with transaction() as db:
+            db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
+            plan = db.get(DatasetMaintenance, dataset_id)
+            if not plan:
+                raise HTTPException(404, "维护计划不存在")
+            if body.action in ("pause", "resume"):
+                plan.paused = body.action == "pause"
+            else:
+                plan.archived = body.action == "archive"
+            plan.updated_at = now_ms()
+            return plan_report(db, dataset_id)
+
+    @routes.post("/datasets/{dataset_id}/tasks", status_code=201)
+    def submit_task(dataset_id: str, body: RunRequest):
+        from .history_maintenance import create_run
+
+        try:
+            with transaction() as db:
+                version = create_run(db, dataset_id, **body.model_dump())
+                return version_report(db, version.id)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.post("/tasks/{version_id}/control")
+    def control_task(version_id: str, body: TaskControl):
+        from .history_maintenance import task_control
+
+        try:
+            with transaction() as db:
+                task_control(db, version_id, body.action)
+                return version_report(db, version_id)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
 
     @routes.post("/datasets", status_code=201)
     def register(body: DatasetRequest):
@@ -128,5 +347,50 @@ def router(authenticated):
                 return version_report(db, ident)
         except ValueError as error:
             raise HTTPException(404, str(error)) from None
+
+    @routes.get("/versions/{ident}/artifacts")
+    def artifacts(ident: str):
+        from .history_artifacts import artifact_report
+
+        with transaction() as db:
+            if not db.get(HistoryVersion, ident):
+                raise HTTPException(404, "历史版本不存在")
+            return artifact_report(db, ident)
+
+    @routes.get("/versions/{ident}/coverage")
+    def coverage(ident: str, page: int = 1, page_size: int = 25):
+        from .data_center import coverage_report
+
+        try:
+            with transaction() as db:
+                return coverage_report(db, ident, page=page, page_size=page_size)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.post("/versions/{ident}/artifacts", status_code=202)
+    def prepare_artifacts(ident: str, body: ArtifactRequest):
+        from .history_artifacts import artifact_report, request_artifacts
+
+        try:
+            with transaction() as db:
+                version = db.get(HistoryVersion, ident)
+                if not version:
+                    raise HTTPException(404, "历史版本不存在")
+                request_artifacts(db, version, body.timeframes)
+                return artifact_report(db, ident)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.get("/versions/{ident}/bars")
+    def published_bars(ident: str, timeframe: str = "M1", start: int | None = None,
+                       end: int | None = None, limit: int = 2000):
+        from .history_artifacts import read_artifact
+
+        try:
+            with transaction() as db:
+                rows = read_artifact(db, ident, timeframe, start=start, end=end, limit=limit)
+                return {"version_id": ident, "timeframe": timeframe, "bars": rows}
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
 
     return routes

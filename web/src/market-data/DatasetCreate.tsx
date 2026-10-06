@@ -1,0 +1,286 @@
+import { useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { api } from "../api";
+import { frames, names, phase, time, type Dataset } from "./types";
+
+export function DatasetCreate() {
+  const [params] = useSearchParams(),
+    navigate = useNavigate();
+  const [step, setStep] = useState(1),
+    [source, setSource] = useState(params.get("source") || "dukascopy");
+  const [symbol, setSymbol] = useState(params.get("symbol") || ""),
+    [logical, setLogical] = useState("");
+  const [asset, setAsset] = useState("forex"),
+    [calendar, setCalendar] = useState("ny17");
+  const [precision, setPrecision] = useState(params.get("precision") || "5"),
+    [day, setDay] = useState("");
+  const [periods, setPeriods] = useState(["M1", "H4", "D1"]),
+    [frequency, setFrequency] = useState("daily");
+  const [error, setError] = useState(""),
+    [busy, setBusy] = useState(false);
+  const request = useRef(crypto.randomUUID());
+  const errorBox = useRef<HTMLParagraphElement>(null);
+  // Resolve dates on the backend using the selected aggregation calendar. A
+  // browser's local timezone must not reinterpret a NY17 trading date.
+  const [boundary, setBoundary] = useState<number | null>(null);
+  function changeAsset(value: string) {
+    setAsset(value);
+    setCalendar(
+      value === "crypto"
+        ? "utc0"
+        : ["forex", "metal"].includes(value)
+          ? "ny17"
+          : "",
+    );
+    setBoundary(null);
+  }
+  async function next() {
+    setError("");
+    if (step === 1 && (!logical || !symbol)) {
+      setError("请填写逻辑品种和准确来源代码。");
+      return;
+    }
+    if (step === 2) {
+      if (!day || !calendar || !periods.length) {
+        setError("请选择起始交易日期、日界和所需周期。");
+        return;
+      }
+      setBusy(true);
+      try {
+        const value = await api<{ start: number }>(
+          `/market-data/date-boundary?date=${day}&calendar=${calendar}`,
+        );
+        setBoundary(value.start);
+        setStep(3);
+      } catch (e) {
+        setError(String(e));
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+    setStep(step + 1);
+  }
+  async function submit() {
+    if (boundary === null) return;
+    setBusy(true);
+    setError("");
+    try {
+      const result = await api<{ dataset: Dataset }>(
+        "/market-data/center/datasets",
+        {
+          request_id: request.current,
+          dataset: {
+            source,
+            logical_symbol: logical,
+            provider_symbol: symbol,
+            asset_class: asset,
+            precision: Number(precision),
+            aggregation_calendar: calendar,
+          },
+          maintenance: {
+            target_start: boundary,
+            timeframes: periods,
+            frequency,
+            timezone: "UTC",
+            daily_minute: 15,
+          },
+        },
+      );
+      navigate(`/market-data/datasets/${result.dataset.id}`);
+    } catch (e) {
+      setError(String(e));
+      requestAnimationFrame(() => errorBox.current?.focus());
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <section className="data-center dc-form">
+      <Link to="/market-data">返回自建行情</Link>
+      <h1>添加自建行情</h1>
+      <ol className="dc-steps" aria-label="创建步骤">
+        {["选择来源品种", "配置历史", "核对并创建"].map((label, i) => (
+          <li key={label} aria-current={step === i + 1 ? "step" : undefined}>
+            {i + 1}. {label}
+          </li>
+        ))}
+      </ol>
+      {error && (
+        <p ref={errorBox} tabIndex={-1} role="alert" className="error">
+          {error}
+        </p>
+      )}
+      {step === 1 && (
+        <div className="dc-fields">
+          <label>
+            来源
+            <select value={source} onChange={(e) => setSource(e.target.value)}>
+              <option value="dukascopy">Dukascopy</option>
+              <option value="oanda">OANDA Practice</option>
+            </select>
+          </label>
+          <label>
+            逻辑品种
+            <input
+              value={logical}
+              onChange={(e) => setLogical(e.target.value.toUpperCase())}
+              placeholder="例如 EURUSD"
+              maxLength={10}
+            />
+          </label>
+          <label>
+            准确来源代码
+            <input
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value)}
+              placeholder={source === "oanda" ? "例如 EUR_USD" : "例如 EUR/USD"}
+            />
+          </label>
+          <label>
+            资产类别
+            <select value={asset} onChange={(e) => changeAsset(e.target.value)}>
+              <option value="forex">外汇</option>
+              <option value="metal">金属</option>
+              <option value="crypto">加密</option>
+              <option value="index">指数</option>
+              <option value="other">其他</option>
+            </select>
+          </label>
+          <details>
+            <summary>高级登记：价格精度</summary>
+            <label>
+              小数位数
+              <input
+                type="number"
+                min={0}
+                max={10}
+                value={precision}
+                onChange={(e) => setPrecision(e.target.value)}
+              />
+            </label>
+            <p>
+              手工登记尚未验证来源产品与精度；真实下载时校验，不能据此认定来源已可用。
+            </p>
+          </details>
+          <p>
+            原始 M1 · Bid。OANDA 使用后端配置的 Practice
+            账户；凭据不会保存到公开数据集信息。
+          </p>
+        </div>
+      )}
+      {step === 2 && (
+        <div className="dc-fields">
+          <label>
+            起始交易日期
+            <input
+              type="date"
+              value={day}
+              onChange={(e) => {
+                setDay(e.target.value);
+                setBoundary(null);
+              }}
+            />
+          </label>
+          <label>
+            聚合日界
+            <select
+              value={calendar}
+              onChange={(e) => {
+                setCalendar(e.target.value);
+                setBoundary(null);
+              }}
+            >
+              <option value="">请选择日界</option>
+              <option value="ny17">纽约当地 17:00（随夏令时）</option>
+              <option value="utc0">UTC 00:00</option>
+            </select>
+          </label>
+          <p>
+            {calendar === "ny17"
+              ? "交易日期从前一天纽约当地 17:00 开始。"
+              : "交易日期从当日 UTC 00:00 开始。"}
+            任务固定创建时的历史截止点。
+          </p>
+          <fieldset>
+            <legend>需要的周期</legend>
+            <div className="dc-checks">
+              {frames.map((frame) => (
+                <label key={frame}>
+                  <input
+                    type="checkbox"
+                    checked={periods.includes(frame)}
+                    disabled={frame === "M1"}
+                    onChange={(e) =>
+                      setPeriods(
+                        e.target.checked
+                          ? [...periods, frame]
+                          : periods.filter((p) => p !== frame),
+                      )
+                    }
+                  />
+                  {frame}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <label>
+            维护计划
+            <select
+              value={frequency}
+              onChange={(e) => setFrequency(e.target.value)}
+            >
+              <option value="daily">每日 00:15 UTC</option>
+              <option value="once">仅本次维护</option>
+            </select>
+          </label>
+        </div>
+      )}
+      {step === 3 && (
+        <div className="dc-review">
+          <h2>
+            {logical} · {names[source]} · Bid · {phase(calendar)}
+          </h2>
+          <p>
+            准确代码：{symbol}；精度：{precision} 位
+          </p>
+          <p>
+            起始日期：{day}，对应 {time(boundary)}
+          </p>
+          <p>
+            周期：{periods.join(" · ")}；维护：
+            {frequency === "daily" ? "每日 00:15 UTC" : "一次性"}
+          </p>
+          <p>
+            后台下载、校验并派生各周期。提交成功后可离开页面；组合在首次实际使用时建立。
+          </p>
+        </div>
+      )}
+      <div className="dc-actions">
+        {step > 1 && (
+          <button disabled={busy} onClick={() => setStep(step - 1)}>
+            上一步
+          </button>
+        )}
+        <Link to="/market-data">取消</Link>
+        {step < 3 ? (
+          <button
+            className="primary"
+            disabled={busy}
+            onClick={() => void next()}
+          >
+            {busy ? "核对中…" : "下一步"}
+          </button>
+        ) : (
+          <button
+            className="primary"
+            disabled={busy}
+            onClick={() => void submit()}
+          >
+            {busy ? "正在提交…" : "创建并开始维护"}
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}

@@ -9,6 +9,7 @@ from pathlib import Path
 
 from sqlalchemy import select
 
+from .history_maintenance import bounded_refresh, on_publish, reusable_page
 from .history_sources import HistoryConfigurationError, HistorySources, history_identity, page_end
 from .market_contracts import DatasetIdentity
 from .market_datasets import PricePrecisionError, register_dataset
@@ -17,6 +18,7 @@ from .source_history_store import AcquisitionBusy, raw_chunk, shared_page, store
 from .source_registry import collection_identity
 from .storage import (
     HistoryChunk,
+    HistoryRun,
     HistoryVersion,
     Instrument,
     MarketDataset,
@@ -63,7 +65,9 @@ def claim(version_id=None):
         stamp = now_ms()
         query = select(HistoryVersion).where(
             HistoryVersion.status.in_(("pending", "running", "retrying")),
-            HistoryVersion.lease_until <= stamp, HistoryVersion.next_at <= stamp)
+            HistoryVersion.lease_until <= stamp, HistoryVersion.next_at <= stamp,
+            ~select(HistoryRun.version_id).where(HistoryRun.version_id == HistoryVersion.id,
+                HistoryRun.desired_state != "running").exists())
         if version_id:
             query = query.where(HistoryVersion.id == version_id)
         version = db.scalar(query.order_by(HistoryVersion.next_at, HistoryVersion.created_at)
@@ -75,8 +79,8 @@ def claim(version_id=None):
         version.lease_until = stamp + 60000
         dataset = db.get(MarketDataset, version.dataset_id)
         return (version.id, version.lease_token, version.cursor,
-                page_end(dataset.identity, version.cursor,
-                         min(version.end, month_end(version.cursor))), dataset.identity)
+                bounded_refresh(db, version, page_end(dataset.identity, version.cursor,
+                         min(version.end, month_end(version.cursor)))), dataset.identity)
 
 
 def publish(db, version):
@@ -110,12 +114,36 @@ def publish(db, version):
         "coverage": "observed_only; unobserved intervals remain unknown",
         "checksum": checksum.hexdigest(), "chunks": manifest_chunks,
         **({"provenance": version.manifest["provenance"]} if version.manifest.get("provenance") else {}),
+        **({"maintenance": version.manifest["maintenance"]} if version.manifest.get("maintenance") else {}),
     }
     version.status = "published"
     version.published_at = now_ms()
     version.lease_token = None
     version.lease_until = 0
     version.error = None
+    on_publish(db, version)
+    from .history_artifacts import request_artifacts
+    from .storage import DatasetMaintenance
+
+    plan = db.get(DatasetMaintenance, version.dataset_id)
+    frames = version.manifest.get("maintenance", {}).get("timeframes",
+        plan.timeframes if plan else ["M1"])
+    request_artifacts(db, version, frames)
+
+
+def controlled_stop(db, version):
+    run = db.get(HistoryRun, version.id)
+    if not run or run.desired_state == "running":
+        return False
+    version.status = run.desired_state
+    version.lease_token, version.lease_until = None, 0
+    if version.status == "cancelled":
+        from .storage import DatasetMaintenance
+
+        plan = db.get(DatasetMaintenance, version.dataset_id)
+        if plan.active_version_id == version.id:
+            plan.active_version_id = None
+    return True
 
 
 def import_page(adapter, *, version_id=None):
@@ -135,7 +163,22 @@ def import_page(adapter, *, version_id=None):
     batch = None
     try:
         with transaction() as db:
-            fresh_after = db.get(HistoryVersion, ident).created_at
+            version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident).with_for_update())
+            if version.lease_token != token or version.lease_until <= now_ms():
+                return True
+            if controlled_stop(db, version):
+                return True
+            fresh_after = version.created_at
+            reuse = reusable_page(db, version, db.get(HistoryRun, ident))
+            if reuse:
+                db.add(reuse)
+                version.cursor = reuse.end
+                version.lease_token, version.lease_until = None, 0
+                version.status = "pending"
+                db.flush()
+                if version.cursor == version.end:
+                    publish(db, version)
+                return True
         with lane("history"):
             batch = shared_page(adapter, DatasetIdentity.model_validate(raw_identity), start, end,
                                 fresh_after=fresh_after)
@@ -161,6 +204,8 @@ def import_page(adapter, *, version_id=None):
                                 .with_for_update())
             if (version.lease_token != token or version.cursor != start
                     or version.lease_until <= now_ms()):
+                return True
+            if controlled_stop(db, version):
                 return True
             dataset = db.get(MarketDataset, version.dataset_id)
             from .market import ingest
@@ -197,6 +242,8 @@ def import_page(adapter, *, version_id=None):
                                 .with_for_update())
             if version.lease_token != token:
                 return True
+            if controlled_stop(db, version):
+                return True
             version.attempts += 1
             result = batch.result if batch and not batch.result.successful else None
             metadata_failure = isinstance(error, PricePrecisionError)
@@ -220,10 +267,18 @@ def version_report(db, ident):
     version = db.get(HistoryVersion, ident)
     if not version:
         raise ValueError("Unknown dataset version")
+    run = db.get(HistoryRun, version.id)
+    from .history_maintenance import task_status
+
     return {"id": version.id, "dataset_id": version.dataset_id, "start": version.start,
             "end": version.end, "cursor": version.cursor, "status": version.status,
             "error": version.error, "attempts": version.attempts, "next_at": version.next_at,
-            "manifest": version.manifest}
+            "manifest": version.manifest, "task_kind": run.kind if run else "import",
+            "desired_state": run.desired_state if run else None,
+            "task_status": task_status(db, version),
+            "completed_at": run.completed_at if run else None,
+            "parent_version_id": run.parent_version_id if run else None,
+            "refresh_start": run.refresh_start if run else None, "refresh_end": run.refresh_end if run else None}
 
 
 def snapshot_rows(db, ident, *, start=None, end=None):
@@ -290,6 +345,13 @@ def main():
     adapter = HistorySources()
     try:
         while True:
+            from .history_artifacts import artifact_tick
+
+            artifact_tick(version_id)
+            if not version_id:
+                from .history_maintenance import schedule_tick
+
+                schedule_tick()
             worked = import_page(adapter, version_id=version_id)
             if args.once:
                 return
