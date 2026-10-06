@@ -91,3 +91,7 @@ TA-Lib Python（BSD-2-Clause）、NumPy（BSD-3-Clause）、FastAPI（MIT）、R
 从工作台导航进入独立图表页面，支持多工作区、多图同步、八种画线和Python指标。
 [操作与维护](docs/chart-workspace-implementation.md) · [验收记录](docs/chart-workspace-acceptance.md)。
 专业图表已在 Unraid 生产部署；当前版本与验收以 v1.7.0 生产清单为准。
+
+## 原生 MCP（开发分支）
+
+为 Codex 等受控 agent 提供同进程 Streamable HTTP `/mcp`，通过注册表开放行情、指标、告警及已保存画线。默认关闭；使用独立可撤销 Bearer 凭据。实现、Codex 配置和隔离验收步骤见 [原生 MCP 使用与开发](docs/native-mcp-usage.md)。本分支 Docker/Codex 真实环境验收仍待完成。

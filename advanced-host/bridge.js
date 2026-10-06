@@ -1097,7 +1097,7 @@ function snapshot(manual = true) {
       document: {
         engine: "tv31",
         schemaVersion: 1,
-        state,
+        state: {...state, _mwDrawingProjection: captureDrawingProjection(widget)},
         theme: savedDoc.theme || "Dark",
         templates: savedDoc.templates || {},
       },
@@ -1146,6 +1146,7 @@ function boot(
     delete chartState._mwViewports;
     delete chartState._mwSync;
     delete chartState._mwGridStyle;
+    delete chartState._mwDrawingProjection;
   }
   let viewportRestoring = false;
   const restoreViewports = async () => {
@@ -1236,6 +1237,11 @@ function boot(
     const revision = editRevision, epoch = workspaceEpoch;
     const state = await captureChartLayout(widget);
     state._mwGridStyle = grid.value;
+    state._mwDrawingProjection = captureDrawingProjection(widget);
+    if (epoch !== workspaceEpoch || editRevision !== revision) {
+      dirty = true;
+      throw new Error("图表在保存期间已修改，请重试保存");
+    }
     // Native save metadata uses the resolved display name, which omits MWP:
     // and can belong to a different active pane. Pin it to the captured first
     // chart's public identity so list/load metadata retains the series kind.
@@ -1290,6 +1296,7 @@ function boot(
       const state = JSON.parse(await loadContent(id));
       grid.restore(state._mwGridStyle);
       delete state._mwGridStyle;
+      delete state._mwDrawingProjection;
       pendingViewports = state._mwViewports;
       pendingSync = state._mwSync;
       prepareLegacyViewports(state);

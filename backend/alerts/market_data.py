@@ -657,81 +657,7 @@ def router(authenticated):
 
     @r.get("/catalog")
     def catalog(query: str = ""):
-        from .config import settings
-        from .yahoo_catalog import search, seed
-        seed()
-        search_status = "local"
-        if query.strip() and settings.yahoo_enabled:
-            # Exact codes/names and known Chinese aliases remain local. A
-            # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
-            term = query.strip().upper()
-            with transaction() as db:
-                local = list(db.scalars(select(MarketCatalog))) + list(db.scalars(select(Instrument)))
-                known = any(
-                    term in {x.symbol.upper(), x.label.upper(),
-                             (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
-                    or not term.isascii() and term in
-                    (x.label + (chinese_name(x.source, x.symbol) or "")).upper()
-                    for x in local
-                )
-            if not known:
-                search_status = search(query)
-        with transaction() as db:
-            entries = {
-                x.id: {
-                    "id": x.id,
-                    "symbol": x.symbol,
-                    "label": x.label,
-                    "source": x.source,
-                    "asset_type": x.asset_type,
-                    "precision": x.precision,
-                    "supported": bool(x.calendar),
-                    "available": x.available and (x.source != "yahoo" or settings.yahoo_enabled),
-                    "series_kinds": ["provider"] if x.source == "yahoo" else ["provider", "managed"],
-                    "english_name": (x.metadata_json or {}).get("english_name", ""),
-                    "exchange": (x.metadata_json or {}).get("exchange"),
-                    "currency": (x.metadata_json or {}).get("currency"),
-                    "search_status": search_status,
-                }
-                for x in db.scalars(select(MarketCatalog))
-            }
-            for inst in db.scalars(
-                select(Instrument).where(Instrument.source.in_(["oanda", "binance"]))
-            ):
-                entries.setdefault(
-                    inst.id,
-                    {
-                        "id": inst.id,
-                        "symbol": inst.symbol,
-                        "label": inst.label,
-                        "source": inst.source,
-                        "asset_type": "CRYPTO" if inst.source == "binance" else "CURRENCY",
-                        "precision": inst.precision,
-                        "supported": True,
-                        "available": True,
-                    },
-                )
-            from .storage import ChartPublication
-            plans = {p.instrument_id: p for p in db.scalars(select(ChartHistoryPlan))}
-            published = {p.instrument_id for p in db.scalars(select(ChartPublication).where(
-                ChartPublication.complete_count > 0))}
-            failures = set(db.scalars(select(ImportJob.instrument_id).where(
-                ImportJob.chart_plan.is_(True), ImportJob.status == 'failed')))
-            for entry in entries.values():
-                localized = chinese_name(entry['source'], entry['symbol'])
-                entry['chinese_name'] = localized or ''
-                if localized:
-                    entry['english_name'] = entry.get('english_name') or entry['label']
-                    entry['label'] = localized
-                plan = plans.get(entry['id'])
-                entry['managed_status'] = ('未维护' if plan is None else
-                    '失败，已发布历史保留' if entry['id'] in failures else
-                    '部分已发布，范围见历史任务' if entry['id'] in published else '处理中')
-            return [
-                x
-                for x in entries.values()
-                if x["available"] and query.upper() in (x["id"] + x["label"] + x["symbol"] + x.get("english_name", "")).upper()
-            ][:250]
+        return instrument_catalog(query)
 
     @r.post("/catalog/refresh")
     def sync_catalog():
@@ -939,3 +865,82 @@ def router(authenticated):
         return {"ok": True}
 
     return r
+
+
+def instrument_catalog(query: str = ""):
+    from .config import settings
+    from .yahoo_catalog import search, seed
+    seed()
+    search_status = "local"
+    if query.strip() and settings.yahoo_enabled:
+        # Exact codes/names and known Chinese aliases remain local. A
+        # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
+        term = query.strip().upper()
+        with transaction() as db:
+            local = list(db.scalars(select(MarketCatalog))) + list(db.scalars(select(Instrument)))
+            known = any(
+                term in {x.symbol.upper(), x.label.upper(),
+                         (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
+                or not term.isascii() and term in
+                (x.label + (chinese_name(x.source, x.symbol) or "")).upper()
+                for x in local
+            )
+        if not known:
+            search_status = search(query)
+    with transaction() as db:
+        entries = {
+            x.id: {
+                "id": x.id,
+                "symbol": x.symbol,
+                "label": x.label,
+                "source": x.source,
+                "asset_type": x.asset_type,
+                "precision": x.precision,
+                "supported": bool(x.calendar),
+                "available": x.available and (x.source != "yahoo" or settings.yahoo_enabled),
+                "series_kinds": ["provider"] if x.source == "yahoo" else ["provider", "managed"],
+                "english_name": (x.metadata_json or {}).get("english_name", ""),
+                "exchange": (x.metadata_json or {}).get("exchange"),
+                "currency": (x.metadata_json or {}).get("currency"),
+                "search_status": search_status,
+            }
+            for x in db.scalars(select(MarketCatalog))
+        }
+        for inst in db.scalars(
+            select(Instrument).where(Instrument.source.in_(["oanda", "binance"]))
+        ):
+            entries.setdefault(
+                inst.id,
+                {
+                    "id": inst.id,
+                    "symbol": inst.symbol,
+                    "label": inst.label,
+                    "source": inst.source,
+                    "asset_type": "CRYPTO" if inst.source == "binance" else "CURRENCY",
+                    "series_kinds": ["provider", "managed"],
+                    "precision": inst.precision,
+                    "supported": True,
+                    "available": True,
+                },
+            )
+        from .storage import ChartPublication
+        plans = {p.instrument_id: p for p in db.scalars(select(ChartHistoryPlan))}
+        published = {p.instrument_id for p in db.scalars(select(ChartPublication).where(
+            ChartPublication.complete_count > 0))}
+        failures = set(db.scalars(select(ImportJob.instrument_id).where(
+            ImportJob.chart_plan.is_(True), ImportJob.status == 'failed')))
+        for entry in entries.values():
+            localized = chinese_name(entry['source'], entry['symbol'])
+            entry['chinese_name'] = localized or ''
+            if localized:
+                entry['english_name'] = entry.get('english_name') or entry['label']
+                entry['label'] = localized
+            plan = plans.get(entry['id'])
+            entry['managed_status'] = ('未维护' if plan is None else
+                '失败，已发布历史保留' if entry['id'] in failures else
+                '部分已发布，范围见历史任务' if entry['id'] in published else '处理中')
+        return [
+            x
+            for x in entries.values()
+            if x["available"] and query.upper() in (x["id"] + x["label"] + x["symbol"] + x.get("english_name", "")).upper()
+        ][:250]
