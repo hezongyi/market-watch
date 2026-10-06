@@ -49,3 +49,9 @@ EUR接受988次（0.383/s）；各43根完成M1均已确认，missing/fail均0�
 [逐规则恢复](cooldown-health-rules-recovery.json)保留2次502采样失败且恢复后推进新M1。
 不能把此窗口称为HTTP全程无中断，也不能把部署前后说成同一API代码版本。
 部署准备到认证GET验证耗时28.998秒，不当作纯HTTP不可用时长。完整时长与来源会话仍未通过。
+
+05:21:25UTC出现首个浏览器无心跳块；前后实际块间隔48.907s/47.207s，后续有一次SSE打开，
+恢复29个snapshot/30个heartbeat。[异常上下文](observer-silent-block.json)保留空白块、前后记录、
+两个仍存活PID与真实规则状态。05:24UTC两规则仍active、未暂停、同源epoch49、last_event推进至05:24。
+同期4核宿主load/CPU/memory/IO pressure明显上升，但这些只是伴随证据，未证明空白块根因。
+不能再宣称当前窗口无心跳块始终为0；不重启窗口、不删除该块，也不因本任务删除其他任务资源。

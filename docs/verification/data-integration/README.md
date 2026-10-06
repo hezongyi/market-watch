@@ -192,6 +192,11 @@ systemctl --user stop market-watch-data-integration-rules.service
 逐规则摘要保留部署事件，额外[8项回归](rule-deployment-summary-tests.txt)通过。
 原始错误不删除、不重启窗口来掩盖；计划结束时间保持原值，最终按实际分段和全量失败分母评估。
 
+05:21UTC的首个无心跳块及后续SSE重新打开/恢复见
+[观察空白块上下文](observer-silent-block.json)。当前摘要保留zero_heartbeat_blocks和最大块间隔，
+不能用SSE errors没有增加推断全程没有观察空白。同期宿主压力作为上下文记录，未证明为根因；
+两个观察进程和规则计算仍在运行，未重启或清理其他任务资源。
+
 ## 当前结果与限制
 
 后端与 PostgreSQL 测试记录、截图、容器快照与故障 JSON 位于本目录。

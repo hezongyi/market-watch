@@ -372,3 +372,13 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
   恢复后两watch继续推进新M1。不能改称全程HTTP无中断或全程同一API代码。
 - 逐规则摘要补齐部署事件保留，[8项回归](verification/data-integration/rule-deployment-summary-tests.txt)通过；
   Ruff、diff和文档链接检查通过。时长计划保持，所有故障分母保留；来源会话适用性仍未证明。
+
+### 2026-10-06 05:24 UTC：观察空白块保留
+
+- 原PID2266365/2669988仍active/running；浏览器05:21:25UTC有首个heartbeats0/snapshots0块，
+  前后间隔48.907s/47.207s，随后opened1且恢复29snapshot/30heartbeat，后续继续采样。
+- [上下文证据](verification/data-integration/observer-silent-block.json)保留异常、相邻计数、服务状态，
+  同时记录两规则active/paused_reason null、last_event05:24、epoch49。
+- 同期宿主4核load与CPU/memory/IO pressure明显上升，但未证明空白块原因，不据此修改业务判断。
+  没有重启观察、覆盖原JSONL、终止其他任务或清理资源；此窗口不再声称无心跳块0。
+- 长期分母继续包含该块和观测间隙；完整两交易日及来源会话适用性仍待完成。
