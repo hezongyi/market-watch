@@ -122,8 +122,15 @@ sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -
 
 该工具使用 PostgreSQL 只读 repeatable-read 快照，最多查询72小时，保留每个完整分钟的分母，
 分别报告未知、有记录但未确认、没有观测记录、失败、迟到和补数。源到接收时差的直方图精度为10ms；
-成功确认的 p50/p95/p99 使用 nearest rank，与缺失/失败分母同时输出。`--evaluation-since`
-表示首根合格柱的**收盘时刻**，还会按验收规则真实 armed_at 限制；没有本工具规则时不输出计算样本。
+成功确认的 p50/p95/p99 使用 nearest rank，与缺失/失败分母同时输出。
+
+`attempts`/`failed_attempts`按请求覆盖的每个分钟记录累计；一次三分钟重叠请求可增加三条记录，
+不能当作独立REST请求数。失败过的分钟后来确认成功仍保留失败计数；其last_result会被成功覆盖，
+不能用最终值重建失败类型或发生时刻。实际已恢复失败分钟见
+[06:03UTC快照](sustained-live-recovered-failures-checkpoint.json)与[明细](m1-recovered-failed-minutes.json)。
+
+`--evaluation-since` 表示首根合格柱的**收盘时刻**，还会按验收规则真实 armed_at 限制；
+没有本工具规则时不输出计算样本。
 现有审计仅证明入库与规则计算阶段完成，不包含逐规则执行记录，也不能独立证明规则一直活跃。
 当前规则状态/last_event、[规则起点](sustained-m1-watches-start.json)和观察记录需共同评估。
 

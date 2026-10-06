@@ -393,3 +393,18 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
   后续重叠请求共3次、请求失败0，不把这根改划为历史补数来减少实时迟到分母。
 - 请求开始时间未保存，不能区分供应商可用性、网络、调度及宿主压力根因；同一宿主压力证据只是伴随。
   不宣称已经修复或完整达标，保留真实窗口继续观察，结束后计算全窗口分布与故障计数。
+
+### 2026-10-06 06:05 UTC：接续核对与已恢复失败分钟
+
+- 已重读原交接、方案及AGENTS，确认继续现有隔离worktree/branch；HEAD477d7d1，
+  未重建工作树或重启观察。浏览器PID2266365与规则PID2669988仍active/running。
+- [06:03UTC只读快照](verification/data-integration/sustained-live-recovered-failures-checkpoint.json)：
+  两品种各118个预期分钟全部确认，missing/unknown/unobserved0；XAU失败分钟计数3、EUR0。
+  [明细](verification/data-integration/m1-recovered-failed-minutes.json)保留XAU05:28/05:29/05:30收盘柱，
+  均已成功确认。失败按请求覆盖的分钟累计，不等于独立失败请求数；成功覆盖last_result，
+  不凭这些记录推断失败类型或发生时刻。无需为已恢复的计数重启采集或修改来源身份。
+- XAU确认p95/p99为10.485s/23.438s，EUR为11.671s/18.165s，EUR超过30秒仍1；
+  样本增长后的分布变化不构成迟到修复证明。浏览器230块仍保留3个SSE错误、1个无心跳块，
+  逐规则313次采样保留2次部署502失败，两规则各观察79次推进、无暂停或回退。
+- 验收实例六个服务仍running，API/PG健康；Ubuntu宿主可用磁盘约2GB，
+  本任务ignored artifacts约58MB。不重新构建、不删除其他任务资源；继续真实窗口及来源适用性核实。
