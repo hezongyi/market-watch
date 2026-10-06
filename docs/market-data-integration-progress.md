@@ -154,6 +154,21 @@
 十年导入在 02:56 UTC 左右达到 EURUSD 60.55%、XAUUSD 58.44%；尚未完成。新的长观察窗口需在
 本轮部署与故障结束后明确保存起点、代码版本与浏览器进程状态，不能回填为过去已发生的持续验收。
 
+### 已启动的持续观察
+
+最后修复已提交为 `1af4b5d`，实际 API 与常规采集 worker 已部署该模块。负载临时需求自然到期后
+两品种恢复 healthy、epoch43。真实 Chromium 用户 service 已于 **2026-10-06 03:06:00.756 UTC**
+启动，计划观察至 **2026-10-08 03:06:00.756 UTC**；没有开机启用或自动重启。
+[窗口起点与代码摘要](verification/data-integration/sustained-observation-window.json) 保存 backend/observer
+SHA256，M1 统计从下一完整分钟 `03:07 UTC` 开始；接收到浏览器记录从实际启动起计。
+首个观测块已真实写出，没有 SSE 错误，不能据此声称两日验收已通过。
+
+Ubuntu 接收机重新读取 systemd NTP：offset −12.298ms、root distance 22.155ms、jitter 8.720ms，
+[窗口时钟状态](verification/data-integration/receiver-clock-sync-window.txt)；供应商时钟误差仍未独立证明。
+浏览器/API 共用主机时钟，记录范围区别于源到接收的时钟误差。
+十年任务在 03:06 UTC 左右推进到 EURUSD 70.27%、XAUUSD 68.84%，仍保留检查点继续运行。
+目标保持 active；日历账户归属待用户说明，未知与故障分母继续保留。
+
 ## 基线审计与实现
 
 - 原方案引用 v1.7.0；新基线增加了平台原生历史缓存、后台任务、指标契约，managed M1 的来源字段

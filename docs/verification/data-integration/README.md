@@ -85,7 +85,8 @@ systemctl --user stop market-watch-data-integration-browser.service
 .venv/bin/python scripts/summarize_browser_observation.py artifacts/data-integration/browser-sustained.jsonl
 ```
 
-最终窗口起点/代码版本/状态见 `sustained-observation-window.json`；每次中断或重启都在 JSONL 追加
+本轮窗口实际于 2026-10-06 03:06 UTC 启动，计划至 2026-10-08 03:06 UTC。
+窗口起点/代码版本/状态见 [窗口记录](sustained-observation-window.json)；每次中断或重启都在 JSONL 追加
 事件，不能拼接成没有中断的窗口。此 service 不设置自动重启或开机启用。实例停止前也应停止观察。
 小时版本再导入固定 replay 的证据、生产备份 Ubuntu 恢复与源日历适用性研究都在本目录，私密
 原始备份只存忽略目录，生产机器只读检查，不在那里创建验收实例。
