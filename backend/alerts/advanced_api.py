@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import delete, select, update
 
 from .chart_api import Create, Revision, Save, serialized
-from .chart_indicators import CATALOG, calculate
+from .chart_indicators import public_catalog
 from .chart_series import decode
 from .storage import AdvancedPreference, AdvancedWorkspace, Preference, now_ms, transaction
 
@@ -167,16 +167,7 @@ def router(authenticated):
 
     @r.get("/catalog")
     def catalog():
-        return {
-            name: {
-                **meta,
-                "series": [
-                    {"key": s["key"], "type": s["type"]}
-                    for s in calculate([], {"name": name})["series"]
-                ],
-            }
-            for name, meta in CATALOG.items()
-        }
+        return public_catalog()
 
     @r.get("/native-charts")
     def native_charts():

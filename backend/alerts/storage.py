@@ -122,10 +122,64 @@ class Watch(Base):
     warmup_start: Mapped[int | None] = mapped_column(BigInteger)
 
 
+class ChartAlert(Base):
+    """Durable alert owner; browser interests never own this lifecycle."""
+    __tablename__ = "chart_alerts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    request_id: Mapped[str] = mapped_column(String(100), unique=True)
+    request_hash: Mapped[str] = mapped_column(String(64))
+    name: Mapped[str] = mapped_column(String(100))
+    status: Mapped[str] = mapped_column(String(16), default="active", index=True)
+    health: Mapped[str] = mapped_column(String(16), default="warming")
+    health_reason: Mapped[str | None] = mapped_column(String(250))
+    version: Mapped[int] = mapped_column(default=1)
+    control_revision: Mapped[int] = mapped_column(default=1, server_default="1")
+    run: Mapped[int] = mapped_column(default=1)
+    count: Mapped[int] = mapped_column(default=0)
+    max_triggers: Mapped[int] = mapped_column(default=1)
+    effective_at: Mapped[int] = mapped_column(BigInteger)
+    expires_at: Mapped[int | None] = mapped_column(BigInteger)
+    state: Mapped[dict] = mapped_column(JSON, default=dict)
+    runtime: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class ChartAlertAction(Base):
+    """Committed lifecycle request identities; retries never repeat transitions."""
+    __tablename__ = "chart_alert_actions"
+    alert_id: Mapped[str] = mapped_column(ForeignKey("chart_alerts.id"), primary_key=True)
+    request_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    request_hash: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class ChartAlertVersion(Base):
+    """Immutable configuration and normalized source identity for each revision."""
+    __tablename__ = "chart_alert_versions"
+    __table_args__ = (UniqueConstraint("alert_id", "version"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    alert_id: Mapped[str] = mapped_column(ForeignKey("chart_alerts.id"), index=True)
+    version: Mapped[int]
+    config: Mapped[dict] = mapped_column(JSON)
+    market_identity: Mapped[dict] = mapped_column(JSON)
+    dataset_id: Mapped[str | None] = mapped_column(String(64), index=True)
+    effective_at: Mapped[int] = mapped_column(BigInteger)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+@event.listens_for(ChartAlertVersion, "before_update")
+@event.listens_for(ChartAlertVersion, "before_delete")
+def immutable_chart_alert_version(mapper, connection, target):
+    raise ValueError("告警规则版本不可变；请生成新版本并保留历史证据")
+
+
 class SignalRow(Base):
     __tablename__ = "signals"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    watch_id: Mapped[str] = mapped_column(ForeignKey("watches.id"), unique=True)
+    watch_id: Mapped[str | None] = mapped_column(ForeignKey("watches.id"), index=True)
+    chart_alert_id: Mapped[str | None] = mapped_column(ForeignKey("chart_alerts.id"), index=True)
+    event_key: Mapped[str] = mapped_column(String(100), unique=True, default=uid)
     instrument_id: Mapped[str]
     occurred_at: Mapped[int] = mapped_column(BigInteger)
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
@@ -640,3 +694,27 @@ class VolumeBackfillSegment(Base):
     end: Mapped[int] = mapped_column(BigInteger)
     status: Mapped[str] = mapped_column(String(24))
     detail: Mapped[str | None] = mapped_column(String(250))
+
+
+class AgentCredential(Base):
+    __tablename__ = "agent_credentials"
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    agent_id: Mapped[str] = mapped_column(String(80), index=True)
+    scopes: Mapped[list] = mapped_column(JSON)
+    expires_at: Mapped[int] = mapped_column(BigInteger)
+    revoked_at: Mapped[int | None] = mapped_column(BigInteger)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    quota_start: Mapped[int] = mapped_column(BigInteger, default=0)
+    quota_count: Mapped[int] = mapped_column(default=0)
+
+
+class AgentOperation(Base):
+    __tablename__ = "agent_operations"
+    __table_args__ = (UniqueConstraint("agent_id", "capability", "key"),)
+    id: Mapped[str] = mapped_column(String(40), primary_key=True, default=uid)
+    agent_id: Mapped[str] = mapped_column(String(80))
+    capability: Mapped[str] = mapped_column(String(80))
+    key: Mapped[str] = mapped_column(String(100))
+    intent_hash: Mapped[str] = mapped_column(String(64))
+    result: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)

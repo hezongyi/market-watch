@@ -1,0 +1,681 @@
+{
+  "version": "1.8.0",
+  "deployed": true,
+  "accepted": true,
+  "acceptance_status": "passed",
+  "release_tag": "v1.8.0",
+  "release_tag_object": "2e38c11f69252c5cef7a6e91126ec5f79a996d93",
+  "source_commit": "b700911cff0b6f8448ac54e4355524891238efa8",
+  "reviewed_product_commit": "45844fdbf171c253a889582aac07b373303be5c8",
+  "product_files_equal_to_tested_revision": true,
+  "pr": {
+    "number": 8,
+    "url": "https://github.com/hezongyi/market-watch/pull/8",
+    "merged_at": "2026-10-05T22:52:36Z",
+    "merged": true
+  },
+  "cutover_at": "2026-10-05T23:03:39.372817+00:00",
+  "recorded_at": "2026-10-05T23:50:37.767622+00:00",
+  "host": "unraid",
+  "project": "trading-alerts",
+  "release_directory": "/mnt/user/appdata/trading-alerts/releases/v1.8.0-b700911",
+  "active_release": "releases/v1.8.0-b700911",
+  "compose": "deploy/releases/v1.8.0-production.yaml",
+  "previous_runtime_version": "1.7.0",
+  "website": "https://trade.kookvv.com:8443",
+  "chart_origin": "https://charts.kookvv.com:8443",
+  "source_archive_sha256": "2297f89bacd9f82b96a21700f55d788c92e3e0db6d4e30cc0814becaa03992e2",
+  "images": {
+    "api": {
+      "tag": "trading-alerts-api:v1.8.0-b700911",
+      "id": "sha256:37d8cd3b733a1b092203ffdd97fac5bedae1beee9717ab06522c892ea632800e",
+      "source_revision": "b700911cff0b6f8448ac54e4355524891238efa8"
+    },
+    "web": {
+      "tag": "trading-alerts-web:v1.8.0-b700911",
+      "id": "sha256:38c0c86e83661e538cce6bdaa327c11fb11639c1ef788d08e469a1e3b309eeaf",
+      "source_revision": "b700911cff0b6f8448ac54e4355524891238efa8"
+    },
+    "chart-origin": {
+      "tag": "trading-alerts-chart-origin:v1.8.0-b700911",
+      "id": "sha256:6c0c98da50f7490be5ffec97fe48d174600a7c7110e76eab6640da6b3f1d0275",
+      "source_revision": "b700911cff0b6f8448ac54e4355524891238efa8"
+    },
+    "backup": {
+      "tag": "trading-alerts-backup:v1.8.0-b700911",
+      "id": "sha256:49c93ebac77a61c6ae35beb477aa95f48ad58fe16f00cd730399d5f3b3ae6122",
+      "source_revision": "b700911cff0b6f8448ac54e4355524891238efa8"
+    }
+  },
+  "services": [
+    {
+      "service": "api",
+      "image": "trading-alerts-api:v1.8.0-b700911",
+      "image_id": "sha256:37d8cd3b733a1b092203ffdd97fac5bedae1beee9717ab06522c892ea632800e",
+      "running": true,
+      "restart_count": 0,
+      "health": "healthy",
+      "command": [
+        "uvicorn",
+        "alerts.api:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "started_at": "2026-10-05T23:03:21.323495667Z",
+      "delivery_enabled": "true",
+      "database_pool_size": "2",
+      "database_max_overflow": "0"
+    },
+    {
+      "service": "realtime-worker",
+      "image": "trading-alerts-api:v1.8.0-b700911",
+      "image_id": "sha256:37d8cd3b733a1b092203ffdd97fac5bedae1beee9717ab06522c892ea632800e",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck",
+      "command": [
+        "python",
+        "-m",
+        "alerts.realtime_worker"
+      ],
+      "started_at": "2026-10-05T23:03:37.742712899Z",
+      "delivery_enabled": "false",
+      "database_pool_size": "2",
+      "database_max_overflow": "0"
+    },
+    {
+      "service": "chart-history-worker",
+      "image": "trading-alerts-api:v1.8.0-b700911",
+      "image_id": "sha256:37d8cd3b733a1b092203ffdd97fac5bedae1beee9717ab06522c892ea632800e",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck",
+      "command": [
+        "python",
+        "-m",
+        "alerts.chart_history_worker"
+      ],
+      "started_at": "2026-10-05T23:03:37.590856459Z",
+      "delivery_enabled": "false",
+      "database_pool_size": "2",
+      "database_max_overflow": "0"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image": "trading-alerts-api:v1.8.0-b700911",
+      "image_id": "sha256:37d8cd3b733a1b092203ffdd97fac5bedae1beee9717ab06522c892ea632800e",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck",
+      "command": [
+        "python",
+        "-m",
+        "alerts.chart_aggregation_worker"
+      ],
+      "started_at": "2026-10-05T23:03:37.58346464Z",
+      "delivery_enabled": "false",
+      "database_pool_size": "2",
+      "database_max_overflow": "0"
+    },
+    {
+      "service": "native-history-worker",
+      "image": "trading-alerts-api:v1.8.0-b700911",
+      "image_id": "sha256:37d8cd3b733a1b092203ffdd97fac5bedae1beee9717ab06522c892ea632800e",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck",
+      "command": [
+        "python",
+        "-m",
+        "alerts.native_history_loads"
+      ],
+      "started_at": "2026-10-05T23:03:37.380458443Z",
+      "delivery_enabled": "false",
+      "database_pool_size": "2",
+      "database_max_overflow": "0"
+    },
+    {
+      "service": "notify-worker",
+      "image": "trading-alerts-api:v1.8.0-b700911",
+      "image_id": "sha256:37d8cd3b733a1b092203ffdd97fac5bedae1beee9717ab06522c892ea632800e",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck",
+      "command": [
+        "python",
+        "-m",
+        "alerts.notify"
+      ],
+      "started_at": "2026-10-05T23:03:37.229631988Z",
+      "delivery_enabled": "true",
+      "database_pool_size": "2",
+      "database_max_overflow": "0"
+    },
+    {
+      "service": "web",
+      "image": "trading-alerts-web:v1.8.0-b700911",
+      "image_id": "sha256:38c0c86e83661e538cce6bdaa327c11fb11639c1ef788d08e469a1e3b309eeaf",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck",
+      "command": [
+        "nginx",
+        "-g",
+        "daemon off;"
+      ],
+      "started_at": "2026-10-05T23:03:38.508927012Z"
+    },
+    {
+      "service": "chart-origin",
+      "image": "trading-alerts-chart-origin:v1.8.0-b700911",
+      "image_id": "sha256:6c0c98da50f7490be5ffec97fe48d174600a7c7110e76eab6640da6b3f1d0275",
+      "running": true,
+      "restart_count": 0,
+      "health": "no healthcheck",
+      "command": [
+        "nginx",
+        "-g",
+        "daemon off;"
+      ],
+      "started_at": "2026-10-05T23:03:19.110783646Z"
+    }
+  ],
+  "schema": {
+    "before": "q18_yahoo_catalog",
+    "after": "r19_native_history_loads",
+    "business_table_counts_unchanged": 35,
+    "user_state_fingerprints_unchanged": 6,
+    "new_native_history_loads_at_migration": 0,
+    "provider_cache_bars_preserved_at_migration": 958948
+  },
+  "reviews": {
+    "standards_findings": 0,
+    "spec_findings": 0
+  },
+  "verification": {
+    "source_checks": "docs/verification/native-history/release-v1.8.0/checks.json",
+    "ubuntu_acceptance": "docs/verification/native-history/release-v1.8.0/ubuntu-acceptance.json",
+    "backend_passed": 453,
+    "backend_skipped": 38,
+    "independent_postgres_passed": 35,
+    "javascript_suites_passed": 48,
+    "synthetic_native_engine_browser_passed": 2,
+    "oanda_four_chart_full_product_browser": "passed on independent Ubuntu Docker; see ubuntu_acceptance",
+    "production_unauthenticated_entry": {
+      "passed": true,
+      "checkedAt": "2026-10-05T23:11:09.625Z",
+      "formalWebsiteHttp": 200,
+      "loginFormVisible": true,
+      "unauthenticatedSessionHttp": 401,
+      "chartOriginHttp": 200,
+      "chartOriginApiHttp": 404,
+      "chartCspConnectNone": true,
+      "mobileLoginOverflow": false,
+      "pageErrors": [],
+      "authenticatedBrowserVerification": "passed; see production_authenticated_browser"
+    },
+    "production_authenticated_browser": {
+      "passed": true,
+      "checkedAt": "2026-10-05T23:49:12.414Z",
+      "secureCookie": true,
+      "httpOnlyCookie": true,
+      "errors": [],
+      "failures": [],
+      "chartCredentialLeaks": [],
+      "mobileOverflow": false,
+      "productionWorkspaceCount": 1,
+      "productionPreferences": 21,
+      "workerStatus": {
+        "market_heartbeat": "running",
+        "notify_heartbeat": "running",
+        "import_heartbeat": "stale"
+      },
+      "nativeDiagnostics": {
+        "enabled": true,
+        "models": 1,
+        "threads": 1,
+        "charts": 1,
+        "navigation": {
+          "mode": "continuous",
+          "cursors": [
+            {
+              "res": "240",
+              "phase": "idle",
+              "mapped": null
+            }
+          ],
+          "windows": [],
+          "models": 1,
+          "threads": 1,
+          "pending": 0,
+          "resident": 286,
+          "limits": {
+            "max_bars": 200000,
+            "workspace_bars": 800000,
+            "min_bars": 20000,
+            "hard_max_bars": 1000000,
+            "default_bars": 200000,
+            "response_bytes": 134217728,
+            "task_seconds": 600,
+            "max_pages": 300,
+            "max_inflight": 8,
+            "mode": "continuous",
+            "protocol": 1,
+            "version": "01cac1254a994dcc"
+          }
+        },
+        "allReady": true
+      },
+      "reserveResponses": [
+        {
+          "status": 200,
+          "mandatory": 0,
+          "optional": 5,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "status": 200,
+          "mandatory": 0,
+          "optional": 17,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "status": 200,
+          "mandatory": 0,
+          "optional": 10,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "status": 200,
+          "mandatory": 0,
+          "optional": 34,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "status": 200,
+          "mandatory": 0,
+          "optional": 194,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "status": 200,
+          "mandatory": 0,
+          "optional": 144,
+          "reserve_status": "ready",
+          "attempts": []
+        },
+        {
+          "status": 200,
+          "mandatory": 0,
+          "optional": 144,
+          "reserve_status": "ready",
+          "attempts": []
+        }
+      ],
+      "nativeReadOnly": true,
+      "emptyWorkspaceEntry": false,
+      "actualPasswordChanged": false,
+      "notificationTestSent": false,
+      "logoutVerified": true,
+      "credential_file_removed": true,
+      "script_sha256": "4e53f6784f4e9a1644edd569ed5f8e9a1add8b9ef2a7ee62f697f78c7af6b71b",
+      "scope": "Formal-domain login, replay/settings pages, existing saved native chart in readonly mobile mode, 390px home, credential isolation and logout; no production mutation or failure injection.",
+      "history_jobs_released_after_navigation": 4,
+      "active_history_jobs_after_browser": 0
+    },
+    "production_readonly_state": {
+      "at": 1791244182608,
+      "schema": "r19_native_history_loads",
+      "user_state_preserved": {
+        "advanced_chart_workspaces": true,
+        "advanced_chart_preferences": true,
+        "watches": true
+      },
+      "account_credential_unchanged": true,
+      "notification_settings_unchanged": true,
+      "notification_test_events_added": 0,
+      "password_change_events_added": 0,
+      "market_and_notify_heartbeats_fresh": true,
+      "worker_progress_counts": {
+        "import_jobs": 759,
+        "chart_published_bars": 40454,
+        "chart_aggregation_jobs": 0,
+        "chart_publication_jobs": 11,
+        "provider_bars": 962626,
+        "native_history_loads": 4
+      },
+      "native_history_task_states": {
+        "cancelled": 4
+      },
+      "yahoo_enabled": false,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    "managed_publication": {
+      "pre_cutover_dump_restored_on_ubuntu": true,
+      "pre_cutover_schema": "q18_yahoo_catalog",
+      "initial_publication_queue_count": 6,
+      "queue_observed_cleared_at": 1791242110230,
+      "queue_observed_cleared_count": 0,
+      "published_bars_before": 35403,
+      "published_bars_after_recovery": 39329,
+      "all_imports_complete": 759,
+      "continuous_coverage_recovered": true,
+      "current_continuous_coverage": {
+        "BTCUSDT": [
+          [
+            1790960460000,
+            1791242220000
+          ]
+        ],
+        "EURUSD": [
+          [
+            1790024400000,
+            1791242220000
+          ]
+        ],
+        "XAUUSD": [
+          [
+            1790024400000,
+            1791242220000
+          ]
+        ]
+      },
+      "publication_watermark_comparison": [
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "D1",
+          "pre_cutover_end": 1790967600000,
+          "post_cutover_end": 1790967600000,
+          "advanced": false
+        },
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "H1",
+          "pre_cutover_end": 1791048300000,
+          "post_cutover_end": 1791048300000,
+          "advanced": false
+        },
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "H4",
+          "pre_cutover_end": 1790967600000,
+          "post_cutover_end": 1790967600000,
+          "advanced": false
+        },
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "M1",
+          "pre_cutover_end": 1791048300000,
+          "post_cutover_end": 1791048300000,
+          "advanced": false
+        },
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "M15",
+          "pre_cutover_end": 1791048300000,
+          "post_cutover_end": 1791048300000,
+          "advanced": false
+        },
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "M30",
+          "pre_cutover_end": 1791048300000,
+          "post_cutover_end": 1791048300000,
+          "advanced": false
+        },
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "M5",
+          "pre_cutover_end": 1791048300000,
+          "post_cutover_end": 1791048300000,
+          "advanced": false
+        },
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "MN",
+          "pre_cutover_end": 1790967600000,
+          "post_cutover_end": 1790967600000,
+          "advanced": false
+        },
+        {
+          "instrument": "BTCUSDT",
+          "timeframe": "W1",
+          "pre_cutover_end": 1790967600000,
+          "post_cutover_end": 1790967600000,
+          "advanced": false
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "D1",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "H1",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "H4",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "M1",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "M15",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "M30",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "M5",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "MN",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "EURUSD",
+          "timeframe": "W1",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "D1",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "H1",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "H4",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "M1",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "M15",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "M30",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "M5",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "MN",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        },
+        {
+          "instrument": "XAUUSD",
+          "timeframe": "W1",
+          "pre_cutover_end": 1791150420000,
+          "post_cutover_end": 1791242040000,
+          "advanced": true
+        }
+      ],
+      "latest_snapshot": {
+        "at": 1791242276436,
+        "publication_queue_count": 2,
+        "worker_errors_last_15_minutes": 0
+      },
+      "note": "Initial disjoint managed coverage recovered through normal production workers. The dirty publication queue was observed empty and is replenished by normal live forming buckets; an instantaneous zero is not a permanent-empty guarantee."
+    }
+  },
+  "backups": {
+    "directory": "/mnt/user/backup/trading-alerts",
+    "restore_environment": "Ubuntu local Docker PG14; dedicated mw-release-v180-20261006 project, network, volume and database",
+    "before": {
+      "file": "alerts-20261005T225831403168Z.dump",
+      "schema": "q18_yahoo_catalog",
+      "sha256": "798665d5efc675ecccae45910870c372d09726e80cb8f577615ef070235f7606",
+      "bytes": 58875170,
+      "restored": true,
+      "tables": 35,
+      "counts_match_manifest": true,
+      "note": "Prior schema restored without migration; all 35 actual business tables compared to the prior-schema manifest."
+    },
+    "after": {
+      "file": "alerts-20261005T230453983832Z.dump",
+      "schema": "r19_native_history_loads",
+      "sha256": "a27cafd4ad1e7967b56a41eb73ce8a3dd176201b48b4e3a0e3b0b1a552aa8c37",
+      "bytes": 58890441,
+      "restored": true,
+      "tables": 36,
+      "counts_match_manifest": true,
+      "note": "Standard alerts.backup --restore-check restored all 36 business tables."
+    },
+    "configuration": [
+      {
+        "stage": "before",
+        "file": "config-20261005T225843Z-ufJZ5E.tar.gz",
+        "sha256": "b8eaa3d7168f81baafe939328f2ed98b2c0ee640424b5e329ab15bcaa31b8453",
+        "checksum_verified": true,
+        "isolated_extract_verified": true,
+        "env_matches_production": true,
+        "env_mode": "0600",
+        "compose_config_quiet_passed": true,
+        "restore_services_started": false,
+        "temporary_extract_removed": true
+      },
+      {
+        "stage": "after",
+        "file": "config-20261005T230506Z-mU6C1x.tar.gz",
+        "sha256": "e2a5ad236d7f934ed4736dcce8e95422a459b80c1d5db66857feb95e9c2d3e02",
+        "checksum_verified": true,
+        "isolated_extract_verified": true,
+        "env_matches_production": true,
+        "env_mode": "0600",
+        "compose_config_quiet_passed": true,
+        "restore_services_started": false,
+        "temporary_extract_removed": true
+      }
+    ],
+    "temporary_restore_databases_remaining": 0,
+    "cron": "0 3 * * * /mnt/user/appdata/trading-alerts/deploy/unraid-backup.sh",
+    "cron_verified_installed": true,
+    "next_scheduled_execution_observed": false
+  },
+  "ubuntu_instance": {
+    "project": "mw-release-v180-20261006",
+    "website": "https://192.168.7.232:16643/advanced-charts",
+    "chart_origin": "https://192.168.7.232:16644",
+    "postgres_port": "127.0.0.1:16632",
+    "directory": "/home/quant/repos/.acceptance/release-v1.8.0-20261006",
+    "left_running_for_review": true,
+    "start": "sg docker -c 'docker compose -f /home/quant/repos/.acceptance/release-v1.8.0-20261006/compose.yaml up -d'",
+    "stop": "sg docker -c 'docker compose -f /home/quant/repos/.acceptance/release-v1.8.0-20261006/compose.yaml stop'"
+  },
+  "rollback": {
+    "version": "1.7.0",
+    "images_retained": true,
+    "configuration_directory": "/mnt/user/appdata/trading-alerts/releases/v1.8.0-b700911/validation/rollback",
+    "schema_downgrade_required": false,
+    "restore_old_data_automatically": false,
+    "instructions": "Stop this project writers including native-history-worker, back up current state, restore prior standalone Compose/active-release/backup scripts, start prior services and restart web. Retain additive r19 schema; never automatically overwrite new user data."
+  },
+  "pending": [],
+  "limitations": [
+    "Managed history recovery completed and publication queue was observed cleared; live forming buckets continue to replenish the queue normally. Measurements describe the recorded observation window.",
+    "No production password/layout/preference/watch mutation or test notification; no notification delivery or whole-host reboot retest.",
+    "Backups and private configuration verified on Ubuntu; this does not establish whole-machine rebuild or off-host disaster recovery.",
+    "Full product and failure injection tests ran only on independent Ubuntu Docker; no development or temporary testing instance created on Unraid.",
+    "Legacy import_heartbeat remains stale because dedicated chart-history-worker does not emit the former importer metric; dedicated worker process and actual import/publication progress were checked independently."
+  ],
+  "cleanup": {
+    "release_temporary_run_containers_remaining": 0,
+    "temporary_restore_databases_remaining": 0,
+    "temporary_configuration_extracts_removed": true,
+    "obsolete_restore_wait_marker_removed": true,
+    "ubuntu_acceptance_preserved": true,
+    "existing_other_task_instances_preserved": true,
+    "prior_release_images_backups_and_rollback_preserved": true,
+    "verification_credential_file_removed": true,
+    "verification_login_session_logged_out": true
+  }
+}

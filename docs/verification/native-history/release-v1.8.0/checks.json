@@ -70,8 +70,15 @@
     "spec_findings": 0,
     "browser_independently_repeated": true
   },
-  "pending": [
-    "Merge, annotated v1.8.0 tag, production build and deployment"
-  ],
-  "ubuntu_acceptance": "ubuntu-acceptance.json"
+  "pending": [],
+  "ubuntu_acceptance": "ubuntu-acceptance.json",
+  "release_status": {
+    "repair_pr": 8,
+    "merged": true,
+    "annotated_tag_pushed": "v1.8.0",
+    "production_deployed": true,
+    "production_browser_authenticated": true,
+    "production_manifest": "deploy/releases/v1.8.0-production.json",
+    "production_acceptance_complete": true
+  }
 }

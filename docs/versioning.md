@@ -1,8 +1,22 @@
 # Git与版本维护
 
+## v1.11.0 图表告警源码发布
+
+PR #11 新增 Advanced Charts 后台持久告警并与原生 MCP 汇合，采用兼容功能次版本 1.11.0。独立控制修订号、生命周期持久幂等及 published 观察时间绑定等七项审阅发现已修复，两轴复审无剩余阻断。完整后端 586 passed / 46 skipped、真实 PG 8 passed、最终 Ubuntu 浏览器 8 场景及 HTTPS MCP 15 checks 通过；新增 t21 汇合与 u22 请求身份迁移。按用户授权在最终 main 合并提交创建、推送附注标签，保留全部旧标签；受测输入、实际镜像与交付边界见 deploy/releases/v1.11.0-source.json 和 docs/chart-alerts-v1.11.0-source-delivery.md。本次不部署生产，schema 回退须恢复验证过的备份。
+
+## v1.10.0 原生 MCP 源码发布
+
+PR #10 新增原生 HTTP MCP 与注册式 agent 能力，采用兼容功能次版本 1.10.0。Python/web/锁文件根包及 CHANGELOG 同步，用户授权合并 PR 并在最终 main 合并提交上创建、推送附注标签 v1.10.0；不移动旧标签。实际 Ubuntu 独立环境和 Codex 验收已通过，源码清单见 deploy/releases/v1.10.0-source.json，验收与发布输入边界见 docs/native-mcp-v1.10.0-source-delivery.md。新增 `s20_agent_capabilities` 迁移及官方 MCP SDK 依赖；MCP 默认关闭。此次源码发布不重建或改标已有验收镜像、不切换生产、不执行生产迁移。
+
+## v1.9.0 指标窗口源码发布
+
+PR #9 新增兼容的指标搜索窗口及 Python 声明契约，使用次版本 1.9.0。同步 Python/web/锁文件根包版本与 CHANGELOG；两轴独立 review 及修复复审通过，75 项后端测试和 Ubuntu 独立实例20项真实产品验收通过。按用户授权合并 PR 并以最终 main 合并提交创建、推送附注标签 v1.9.0；不移动旧标签。源码清单为 deploy/releases/v1.9.0-source.json，构建与验收来源边界见 docs/chart-v1.9.0-source-delivery.md。无新增迁移或依赖，本次不构建或改标容器、不切换实例或部署生产。
+
 ## v1.8.0 连续历史加载发布
 
-PR #7 的原生连续历史、持久加载任务、容量设置和边界提示属于兼容新增功能，使用次版本 1.8.0。合并后发现的共享取消及数据库超时问题在独立 `fix/native-history-release-v1.8.0` 分支修复；同步 Python/web/锁文件版本并执行回归、规范与需求审查后合并 main，创建及推送不覆盖的附注标签。生产 Compose 需展开为逐服务固定镜像标签，新增专用 native-history-worker，应用 r19 增量迁移，保留原行情缓存和 v1.7.0 回退点。执行状态和验证边界见 docs/chart-v1.8.0-delivery.md；实际运行与镜像清单另行归档，不将未执行的部署或镜像称为完成。
+PR #7 的原生连续历史、持久加载任务、容量设置和边界提示属于兼容新增功能，使用次版本 1.8.0。共享取消及数据库超时问题在独立修复分支完成，两轴复审无剩余问题，Python/web/锁文件版本同步。修复 PR #8 已合并，附注标签 v1.8.0 指向 main 合并提交 `b700911` 并已推送；四类镜像以该标签源码另行构建，2026-10-06 已切换 Unraid 正式生产。
+
+固定配置和实际镜像映射见 deploy/releases/v1.8.0-production.yaml/json；新增专用 native-history-worker，应用 r19 增量迁移，保留原行情缓存和 v1.7.0 回退点。升级前后备份在 Ubuntu 独立 PG14 实际恢复通过；正式登录、既有原生图表和退出登录的只读验收已通过，验收后用户状态保持一致。执行状态和验证边界见 docs/chart-v1.8.0-delivery.md。后续证据提交只更新文档，不移动 v1.8.0。
 
 ## v1.7.0 原生视窗储备发布
 

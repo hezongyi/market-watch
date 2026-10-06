@@ -1,0 +1,250 @@
+{
+  "tested_functional_commit": "bf1e3431622322518087abf0e268305b25f08f24",
+  "environment": {
+    "host": "quant-server",
+    "os": "Ubuntu 22.04.5 LTS",
+    "compose_project": "mw-chart-alerts-integration",
+    "app": "https://localhost:19543",
+    "chart_origin": "https://127.0.0.1:19544",
+    "mcp": "https://localhost:19543/mcp",
+    "original_project_retained": "mw-chart-alerts-acceptance"
+  },
+  "backend": {
+    "passed": 586,
+    "skipped": 46,
+    "seconds": 152.0
+  },
+  "postgres_tests": {
+    "passed": 8,
+    "seconds": 18.71
+  },
+  "migration_head": "u22_chart_alert_actions",
+  "runtime_review_fixes": {
+    "verified": true,
+    "scope": "actual Ubuntu HTTPS API/autonomous worker/PostgreSQL; synthetic task fixture",
+    "cases": [
+      "staging observation does not advance published price checkpoint",
+      "matching published value/time produces exactly one intrabar crossing",
+      "stale lifecycle revision conflicts; replay cannot undo newer resume",
+      "restart retry preserves one new run; reused identity with changed intent conflicts"
+    ],
+    "external_notifications_sent": false
+  },
+  "alert_browser": {
+    "scope": "actual Ubuntu Docker application, native widget and authenticated parent API; real Binance source",
+    "cases": [
+      "actual HTTPS login and platform native chart load",
+      "native toolbar opens real unified form; source snapshot, finite count and message persist via authenticated API",
+      "actual panel pause/resume uses persisted lifecycle; copying only opens a draft",
+      "actual native drawing geometry saves through authenticated parent and generates a new persisted version",
+      "actual mouse drag against deployed application previews without writes and commits exactly once on release",
+      "real-source linear trend and reversed log ray persist native bar-index geometry and reach ready autonomous evaluation",
+      "four actual native studies create parameter/history snapshots through authenticated parent and reach ready on real provider data",
+      "actual page refresh restores backend drawing; explicit deletion pauses the persisted rule"
+    ],
+    "price_alert": "c7188a12-0d33-4236-b7a2-3b3d2bbe5c6f",
+    "drawing_alert": "7bf7cff8-641c-4f1a-a2c5-6b86bd1eb1e6",
+    "drag": {
+      "alert": "5474cd9e-22fb-4d69-aa55-1c69e5f36a4e",
+      "writes_during_pointer_down": 0,
+      "edits_on_release": 1,
+      "version": 2
+    },
+    "sloping_alerts": [
+      {
+        "id": "148eab55-a96a-4995-84de-179c272e760b",
+        "kind": "trend_line",
+        "scale": "linear",
+        "health": "ready"
+      },
+      {
+        "id": "b5f9f8e1-55f0-45de-b9d6-ca47208899be",
+        "kind": "ray",
+        "scale": "log",
+        "health": "ready"
+      }
+    ],
+    "indicator_alerts": [
+      {
+        "id": "544fd46b-b2b0-4796-a7ca-0005ba77d151",
+        "name": "SMA",
+        "calculation_origin": 1790971140000,
+        "health": "ready"
+      },
+      {
+        "id": "542f3eef-794c-40c9-b03b-3f0423b41e6c",
+        "name": "EMA",
+        "calculation_origin": 1790971140000,
+        "health": "ready"
+      },
+      {
+        "id": "81e2d557-52d4-49aa-b1e0-b41f3a6246e8",
+        "name": "RSI",
+        "calculation_origin": 1790971140000,
+        "health": "ready"
+      },
+      {
+        "id": "aa52962a-98f2-41d6-b993-c0978fb923fd",
+        "name": "MACD",
+        "calculation_origin": 1790971140000,
+        "health": "ready"
+      }
+    ],
+    "errors": [],
+    "credentials_sent_to_chart": []
+  },
+  "mcp": {
+    "url": "https://localhost:19543/mcp",
+    "transport": "Streamable HTTP over HTTPS",
+    "source": "acceptance-fixture",
+    "synthetic_market_data": true,
+    "checks": [
+      "initialize",
+      "tools/list",
+      "schema discovery",
+      "authentication rejection",
+      "web/MCP quote parity",
+      "web/MCP OHLC parity",
+      "web/MCP indicator parity",
+      "revision parity",
+      "saved projection",
+      "unknown drawing rejection",
+      "concurrent first create",
+      "notification ack retry",
+      "idempotent create retry",
+      "same-key intent conflict",
+      "cancel"
+    ],
+    "versions": {
+      "mcp": "2.3.0",
+      "fastapi": "0.141.1",
+      "starlette": "1.7.0",
+      "pydantic": "2.13.5"
+    },
+    "protocol_version": "2025-11-25",
+    "tools": [
+      "market_list_instruments",
+      "market_get_quote",
+      "market_get_bars",
+      "indicators_list",
+      "indicators_calculate",
+      "alerts_list",
+      "alerts_get_signals",
+      "system_get_status",
+      "charts_list_workspaces",
+      "charts_get_drawings",
+      "alerts_create",
+      "alerts_cancel",
+      "notifications_ack"
+    ],
+    "sample": {
+      "quote": {
+        "instrument": "EURUSD",
+        "source": "acceptance-fixture",
+        "series_kind": "managed",
+        "basis": "bid",
+        "price": "1.1001000000",
+        "price_type": "M1 close",
+        "observed_at": 1791262800000,
+        "queried_at": 1791268628306,
+        "quality": "stale",
+        "age_seconds": 5828,
+        "calendar": "ny17",
+        "precision": 5,
+        "market_open": true,
+        "is_stale": true
+      },
+      "range": [
+        1791154800000,
+        1791262800000
+      ],
+      "history_revision": "db08fe32f2bc30bf835ab968df413b36f8e210f90e43df29175113448c07c847"
+    },
+    "alert_count_before": 3,
+    "alert_count_after": 4
+  },
+  "combined_mcp": {
+    "scope": "actual combined Ubuntu Docker HTTPS API/MCP, synthetic task event evidence",
+    "cases": [
+      "MCP and browser return identical chart and legacy events without requiring legacy watch IDs",
+      "read-only MCP denies acknowledgement and leaves all event records unchanged",
+      "authorized MCP acknowledges one chart event idempotently without changing other events or rule count/run/version"
+    ],
+    "external_notifications_sent": false,
+    "verified": true,
+    "chart_event_count": 27,
+    "legacy_event_count": 1
+  },
+  "fault": {
+    "scope": "deployed autonomous worker; synthetic data, gaps, stale timestamps and generated rule epoch",
+    "cases": [
+      "gap fences persisted checkpoint; actual backfill yields exactly two ordered late events",
+      "container restart consumes queued bars once, preserves prior two events and completes at three",
+      "stale intrabar observation is rejected; fresh source restores ready baseline without firing"
+    ],
+    "verified": true,
+    "close_alert": "982286ce-7914-4918-a454-68de5eee8487",
+    "intrabar_alert": "39a91357-262c-430c-8a57-5bfa2f8677d5"
+  },
+  "backup_restore": {
+    "verified": true,
+    "postgres_version": "postgres (PostgreSQL) 17.11",
+    "sha256": "2a0c6f7eedb16d2a59b037d667806f3d7c09e37a5dbbf9b01d7c8336994db117",
+    "bytes": 1439075,
+    "alert_table_counts": {
+      "chart_alerts": 62,
+      "chart_alert_versions": 72,
+      "signals": 28,
+      "notifications": 28,
+      "outbox": 7,
+      "agent_credentials": 2,
+      "agent_operations": 10,
+      "chart_alert_actions": 10
+    },
+    "full_alert_payloads_equal": true,
+    "migration_head": "u22_chart_alert_actions",
+    "temporary_restore_database_removed": true
+  },
+  "review": {
+    "standards_remaining_blockers": 0,
+    "spec_remaining_blockers": 0,
+    "resolved_findings": 7
+  },
+  "running_api_input_hashes_matched": 165,
+  "images": {
+    "api": "sha256:22fffffc5d3870433c3001fb0ed76acb01d8de23b4ecd531456390e562616719",
+    "web": "sha256:174ce371c34322a907540498ac39a4f88e834163ffc2bf7fee2a0daad426047e",
+    "chart_origin": "sha256:4a93bd99ea18f73129eccf34b8c72c191a17e0c08ae07744c26ce29b5b393be4"
+  },
+  "workers_restored": true,
+  "external_notifications_sent": false,
+  "production_operated": false,
+  "previous_runs": {
+    "backend_downgrade_guard_failure": "2 failed / 582 passed / 46 skipped; fixed before final run",
+    "publisher_test_fixture_failure": "int lacked Decimal API; fixture corrected, no runtime defect",
+    "first_release_browser_failure": "refresh waited for history fill while task history worker paused; rerun after worker restoration passed",
+    "migration_wait": "pre-u22 backup retained; stale sessions 4129/4137 in task DB terminated, u22 upgrade succeeded",
+    "initial_review_runtime_attempt": "502 during API startup; rerun after readiness passed"
+  },
+  "no_browser_real_source": {
+    "scope": "deployed API alert/provider loops and real Binance; zero live browser interests",
+    "verified": true,
+    "alert_id": "d2ecb10d-e17a-43c7-a26b-f5db9211f959",
+    "before": {
+      "provider_latest_at": 1791270387214,
+      "checkpoint": 1791270387214,
+      "health": "ready",
+      "count": 0,
+      "live_browser_interests": 0,
+      "cached_bars": 4988
+    },
+    "after": {
+      "provider_latest_at": 1791270402748,
+      "checkpoint": 1791270402748,
+      "health": "ready",
+      "count": 0,
+      "live_browser_interests": 0,
+      "cached_bars": 4988
+    }
+  }
+}

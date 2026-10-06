@@ -1,0 +1,128 @@
+# Ubuntu local Docker only; credentials and TLS material live outside Git.
+name: mw-chart-alerts-acceptance
+services:
+  pg:
+    image: public.ecr.aws/docker/library/postgres:17-alpine
+    environment:
+      POSTGRES_DB: chart_alerts_acceptance
+      POSTGRES_USER: chart_alerts_acceptance
+      POSTGRES_PASSWORD: ${MW_CHART_ALERTS_DB_PASSWORD:?Run prepare_chart_alert_acceptance.py}
+    volumes: ["chart-alerts-pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chart_alerts_acceptance"]
+      interval: 2s
+      retries: 30
+  migrate:
+    build: ../../..
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["alembic", "upgrade", "head"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      pg: {condition: service_healthy}
+  api:
+    image: market-watch-api:chart-alerts-acceptance
+    networks: [default, notification-fixture]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz')"]
+      interval: 3s
+      retries: 30
+  market-worker:
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.market", "--instrument", "BTCUSDT"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  history-worker:
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.native_history_loads"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  managed-history-worker:
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.chart_history_worker"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      api: {condition: service_healthy}
+  aggregation-worker:
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.chart_aggregation_worker"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    build:
+      context: ../../../web
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: https://127.0.0.1:19444
+    image: market-watch-web:chart-alerts-acceptance
+    depends_on: [api]
+  chart-origin:
+    build: ../../../advanced-host
+    image: market-watch-chart-origin:chart-alerts-acceptance
+  tls:
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:19443:443", "127.0.0.1:19444:444"]
+    volumes:
+      - /tmp/mw-chart-alerts-acceptance/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - /tmp/mw-chart-alerts-acceptance/cert.pem:/certs/cert.pem:ro
+      - /tmp/mw-chart-alerts-acceptance/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+  verify:
+    profiles: [verify]
+    build:
+      context: ../../..
+      dockerfile: docs/verification/chart-alerts/Dockerfile.verify
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - 'export CHART_ALERT_TEST_DATABASE_URL="$$ALERTS_DATABASE_URL"; PYTHONPATH=backend pytest -q -p no:cacheprovider backend/tests/test_chart_alert_postgres.py'
+    depends_on:
+      pg: {condition: service_healthy}
+  notification-sink:
+    profiles: [notification-test]
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "/fixture/notification_sink.py"]
+    volumes:
+      - ./notification_sink.py:/fixture/notification_sink.py:ro
+    networks: [notification-fixture]
+    environment:
+      SINK_INITIAL_FAILURES: "1"
+  notification-worker:
+    profiles: [notification-test]
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.notify"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    environment:
+      ALERTS_DELIVERY_ENABLED: "true"
+      ALERTS_NTFY_URL: http://notification-sink:8080
+      ALERTS_NTFY_TOPIC: chart-alerts-acceptance-fixture
+      ALERTS_NTFY_TOKEN: ""
+    networks: [default, notification-fixture]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      notification-sink: {condition: service_started}
+volumes:
+  chart-alerts-pg:
+networks:
+  notification-fixture:
+    internal: true

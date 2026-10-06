@@ -1,6 +1,26 @@
 # Unraid 生产部署与升级
 
-## 当前 v1.7.0（2026-10-03）
+## 当前 v1.8.0（2026-10-06）
+
+生产为 v1.8.0，schema `r19_native_history_loads`，发布源码及固定附注标签为 `b700911` / `v1.8.0`。实际四类镜像 ID、八个常驻服务、迁移和备份恢复证据见 [生产清单](releases/v1.8.0-production.json)，固定 standalone 配置见 [Compose](releases/v1.8.0-production.yaml)。新增 `native-history-worker` 执行 `python -m alerts.native_history_loads`，通知投递关闭；其他服务、pool size=2 / overflow=0 和既有 Yahoo 关闭配置保留。
+
+网站为 `https://trade.kookvv.com:8443`，独立图表来源为 `https://charts.kookvv.com:8443`。正式服务启动/停止方式：
+
+```bash
+cd /mnt/user/appdata/trading-alerts
+./tools/docker-compose -f compose.release.yaml config --quiet
+./tools/docker-compose -f compose.release.yaml up -d --no-build
+# 正式维护时停止本项目服务：
+./tools/docker-compose -f compose.release.yaml stop
+```
+
+仅使用项目根目录 standalone 文件，不与其他 Compose 叠加。active-release 为 `releases/v1.8.0-b700911`。API healthy、八个常驻服务无重启；35张原业务表和6项用户指纹迁移不变，行情缓存保留。升级前35表和升级后36表备份均在 Ubuntu 独立 PG14 实际恢复，私密配置归档已在 Ubuntu 解包核对；不在 Unraid 创建测试实例、不提升生产账号的建库权限。
+
+正式登录及原生图表只读验收通过：既有单图数据就绪、continuous模式、Secure/HttpOnly Cookie、图表来源凭据隔离、390px主页和退出登录均已核对，无脚本／接口错误。临时凭据文件已删除，验收后用户布局、偏好、预警、密码和通知设置一致。上线初期自建历史覆盖缺口已由正常任务补齐，759个导入任务完成、三品种覆盖恢复连续，发布队列曾清至0且已发布柱数／终点推进；实时形成桶会继续补充队列。M1采集与行情／通知心跳继续推进；旧 import_heartbeat stale 状态由专用worker进程和实际进展检查补充。验证限制、Ubuntu验收地址与控制命令见 [v1.8.0交付](../docs/chart-v1.8.0-delivery.md)。
+
+旧 v1.7.0 四类镜像及本次发布目录 `validation/rollback/` 配置保留。回退前停止本项目写入（包括 native-history-worker），备份当前状态，再恢复旧 standalone Compose、active-release 与备份脚本，启动并重启 web。兼容新增的 r19 表可以保留；不自动降级或用旧备份覆盖用户新数据。每日03:00 cron已核对，尚未观察新镜像下一次定时运行。
+
+## v1.7.0历史记录（2026-10-03）
 
 生产为 v1.7.0，schema `q18_yahoo_catalog`，发布源码 `e40eaac`。实际四类镜像和恢复证据见 [生产清单](releases/v1.7.0-production.json)，固定 standalone 配置见 [Compose](releases/v1.7.0-production.yaml)。API、四个 worker、web、独立 chart-origin 常驻；迁移服务退出 0。web 仍为 192.168.7.33:18080，chart-origin 为 :18083。数据库池 size=2、overflow=0 保留，行情／图表 worker 投递关闭，notify 保留既有生产配置。
 
@@ -20,7 +40,7 @@ cd /mnt/user/appdata/trading-alerts
 
 ## 2026-09-29 历史记录
 
-下文保留旧部署来源及演练记录。当前运行和命令以上方 v1.7.0 清单为准。
+下文保留旧部署来源及演练记录。当前运行和命令以上方 v1.8.0 清单为准。
 
 ## 当前部署
 

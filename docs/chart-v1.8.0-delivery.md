@@ -26,8 +26,20 @@ Ubuntu 是开发和验收环境；Unraid 仅用于用户已授权的正式发布
 
 ## 执行状态
 
-本文件记录发布合同；合并、标签、镜像、Ubuntu 实例验证和生产切换是否完成，以实际 GitHub/Git、构建输出、运行服务和发布清单为准，不由本文推断。
+修复 PR [#8](https://github.com/hezongyi/market-watch/pull/8) 已于 2026-10-05 22:52:36 UTC 合并，main 合并提交为 `b700911cff0b6f8448ac54e4355524891238efa8`。附注标签 `v1.8.0` 已推送并固定指向该提交；标签对象为 `2e38c11f69252c5cef7a6e91126ec5f79a996d93`。后续证据提交只更新文档，不移动标签。
 
 已完成的复审证据见 [检查记录](verification/native-history/release-v1.8.0/checks.json) 与 [原生双图浏览器结果](verification/native-history/release-v1.8.0/shared-boundary.json)。两轴独立复审均为0项具体问题；后端453通过、38跳过，48项前端模块套件通过，真实引擎合成浏览器2项通过。权限恢复后，独立 Ubuntu Docker PG14 的35项真实数据库回归、q18→r19迁移和36表备份实际恢复通过；真实OANDA四图完整产品回归通过。详见 [Ubuntu 验收记录](verification/native-history/release-v1.8.0/ubuntu-acceptance.json)。
 
 Ubuntu 验收实例 project `mw-release-v180-20261006`，独立 PG14、网络和卷，访问地址 `https://192.168.7.232:16643/advanced-charts`、图表来源 `16644`。启动/停止：`sg docker -c 'docker compose -f /home/quant/repos/.acceptance/release-v1.8.0-20261006/compose.yaml up -d'` / 将 `up -d` 替换为 `stop`。通知投递和Yahoo关闭。私有登录/env/许可资源保存在该目录，不进入Git。旧验收项目和生产未用于本次测试。
+
+## 正式生产结果（2026-10-06，新加坡时间）
+
+生产在 07:03:39 完成切换。正式网站为 `https://trade.kookvv.com:8443`，独立图表来源为 `https://charts.kookvv.com:8443`；运行主机为 Unraid，项目 `trading-alerts`，active-release 为 `releases/v1.8.0-b700911`。四类正式镜像均由标签提交另行构建，源码标签、版本、镜像 ID 和八个常驻服务的实际核对见 [生产清单](../deploy/releases/v1.8.0-production.json)，固定部署配置见 [Compose](../deploy/releases/v1.8.0-production.yaml)。API healthy，常驻服务重启计数为0；专用 native-history-worker 运行且通知投递关闭，既有生产通知配置保留。启动/停止在服务器项目根目录执行 `./tools/docker-compose -f compose.release.yaml up -d --no-build` / `./tools/docker-compose -f compose.release.yaml stop`；停止会中断生产服务，仅用于正式维护。
+
+迁移前后的35张业务表记录数和6项用户状态指纹保持一致，新增 native_history_loads 表为空。958,948根供应商缓存保留。上线后复查布局、偏好、预警、账户凭据和通知设置一致，没有新增改密码或测试通知事件。市场与通知心跳新鲜，M1采集推进。上线初期自建历史有不连续覆盖，随后正常恢复任务补齐；759个导入任务全部完成，三品种覆盖恢复连续，发布队列曾清至0，已发布柱数从35,403增至39,329，发布终点推进。实时形成桶会继续加入队列，不将一次空队列视作长期无积压保证。
+
+升级前 `alerts-20261005T225831403168Z.dump` 的35表、升级后 `alerts-20261005T230453983832Z.dump` 的36表均在 Ubuntu 独立 PG14 实际恢复并与清单一致。前者按原 q18 schema 核对实际表，不迁移恢复库；后者运行标准 `alerts.backup --restore-check`。两份私密配置归档均完成 SHA-256、Ubuntu 隔离解包、`.env` 与生产一致/0600、Compose `config --quiet` 检查；没有启动恢复出的生产服务，临时恢复库和解包目录已清理。v1.7.0 镜像、回退配置和备份保留；每日03:00 cron已核对，尚未观察新版下一次定时运行。
+
+正式域名的未登录浏览器检查通过：登录表单可见、网站和图表域名200、未认证session401、图表域名API404、CSP禁止图表来源网络连接，390px登录页无横向溢出或脚本错误。2026-10-06 07:49:12 新加坡时间，使用用户提供的当前凭据完成正式登录后只读浏览器验收：Secure/HttpOnly Cookie、历史演练和设置页面、既有单图布局原生数据就绪、continuous 模式、390px主页无溢出、图表来源无凭据泄漏，脚本／接口错误均为0。原生储备读取均200且无供应商HTTP尝试；实际单源200,000／工作区800,000容量配置已核对。
+
+验收会话已退出，随后session返回401；临时凭据文件已删除。验收后只读复查布局、偏好、预警、密码和通知设置保持一致，8个常驻服务无重启、API健康、市场／通知心跳新鲜。旧 import_heartbeat 仍为 stale，专用图表历史worker不发该旧指标；实际进程及导入／发布进展已单独核对。生产只读验收完成；四图大历史、取消、修订和故障注入的完整产品回归仍以此前 Ubuntu 隔离实例证据为准。最终结果见生产清单。

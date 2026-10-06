@@ -194,7 +194,8 @@ def test_indicator_plugin_and_gap():
     try:
         register(
             name,
-            {"label": "偏离", "pane": "sub", "params": {}},
+            {"label": "偏离", "pane": "sub", "params": {},
+             "series": [{"key": "value", "type": "line"}]},
             lambda h, low, c, p: {"value": c - c.mean() if len(c) else c},
         )
         rows = [

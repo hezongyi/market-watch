@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "checks": [
+    "real Binance provider HTTP/web parity",
+    "source unavailable returns error",
+    "synthetic gap visible",
+    "synthetic revision invalidates result",
+    "stale quote explicit"
+  ],
+  "live": {
+    "source": "binance",
+    "synthetic": false,
+    "range": [
+      1791241200000,
+      1791259200000
+    ],
+    "cache_revision": 2,
+    "quality": "incomplete"
+  },
+  "unavailable": {
+    "error": {
+      "code": "DATA_UNAVAILABLE",
+      "message": "\u5e73\u53f0\u884c\u60c5\u6682\u4e0d\u53ef\u7528\uff0c\u8bf7\u91cd\u8bd5\uff1b\u5c1a\u672a\u786e\u8ba4\u5386\u53f2\u8fb9\u754c",
+      "retryable": true,
+      "context": {}
+    }
+  },
+  "synthetic_revision": {
+    "before": "bc71cc42707130a52a16acc99ffba16be2383c5c7510778b4aa4ce6d65febe35",
+    "after": "35b6d329c530d4137913a526c4208f3004e7b3a1a0fcd05c3cc65a087933d3da",
+    "gaps": [
+      {
+        "start": 1791244800000,
+        "end": 1791248400000
+      }
+    ]
+  },
+  "stale": {
+    "source": "acceptance-fixture",
+    "is_stale": true,
+    "age_seconds": 2387
+  }
+}
