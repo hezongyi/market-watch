@@ -281,13 +281,38 @@ function chartAlertBridge({
       frames[chart.resolution()] === row.config.timeframe
     );
   }
+  function sameLine(a, b) {
+    // JSON key order and Decimal formatting are not drawing edits. Compare
+    // geometry as exposed by the native Number-valued drawing interface.
+    return (
+      !!a &&
+      !!b &&
+      ["kind", "scale", "extend_left", "extend_right", "mapping_version"].every(
+        (key) => a[key] === b[key],
+      ) &&
+      a.points.length === b.points.length &&
+      a.points.every((point, i) => {
+        const other = b.points[i];
+        return (
+          point.time === other.time &&
+          point.index === other.index &&
+          Number(point.price) === Number(other.price)
+        );
+      })
+    );
+  }
   async function submitDrawing(row, chart, nativeId) {
     const context = snapshot(chart),
       a = row.config.association;
     const next = await geometry(chart, context, nativeId);
-    if (
-      JSON.stringify(next) === JSON.stringify(row.config.condition.right?.line)
-    ) {
+    if (next.scale !== row.config.condition.right?.line?.scale) {
+      associationNotice(
+        row,
+        "图表价格轴与告警快照不同；请切回原价格轴，或明确保存新坐标条件",
+      );
+      return;
+    }
+    if (sameLine(next, row.config.condition.right?.line)) {
       failedEdits.delete(row.id);
       associationNotice(row, "");
       return;
@@ -315,8 +340,7 @@ function chartAlertBridge({
         replace(saved);
         if (
           saved.version > row.version &&
-          JSON.stringify(saved.config.condition.right?.line) ===
-            JSON.stringify(next)
+          sameLine(saved.config.condition.right?.line, next)
         ) {
           failedEdits.delete(row.id);
           associationNotice(saved, "");
@@ -405,6 +429,36 @@ function chartAlertBridge({
       }
     }
   }
+  function drawingHistoryEvent() {
+    if (readonly || suppress || disposed || isLoading()) return;
+    // Native undo/redo can change drawings without points_changed. Defer until
+    // the history action has finished, and fence pane/workspace transitions.
+    const pending = rows.map((row) => {
+      const chart = associatedChart(row.config.association, row);
+      return { row, chart, epoch: generation(chart) };
+    });
+    setTimeout(() => {
+      for (const { row, chart, epoch } of pending) {
+        const a = row.config.association;
+        if (
+          disposed ||
+          isLoading() ||
+          !chart ||
+          !matches(chart, row) ||
+          generation(chart) !== epoch ||
+          a?.object_kind !== "drawing" ||
+          failedEdits.has(row.id) ||
+          !chart.dataReady()
+        )
+          continue;
+        const id = objects.get(row.id) || a.native_object_id;
+        const exists = chart
+          .getAllShapes()
+          .some((shape) => String(shape.id) === String(id));
+        drawingEvent(id, exists ? "points_changed" : "remove", chart);
+      }
+    }, 0);
+  }
   function attach() {
     if (attached || disposed) return;
     attached = true;
@@ -413,6 +467,8 @@ function chartAlertBridge({
       return [];
     });
     getWidget().subscribe("drawing_event", drawingEvent);
+    getWidget().subscribe("undo", drawingHistoryEvent);
+    getWidget().subscribe("redo", drawingHistoryEvent);
     getWidget().subscribe("mouse_down", () => {
       pointerDown = true;
       pointerChart = getWidget().activeChart();

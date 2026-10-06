@@ -17,7 +17,8 @@ function fixture() {
     source = "binance",
     epoch = 1,
     loading = false,
-    nextId = 0;
+    nextId = 0,
+    priceScaleMode = 0;
   const event = () => {
     let fn;
     return {
@@ -57,7 +58,9 @@ function fixture() {
     getAllShapes: () => [...shapes].map(([id, s]) => ({ id, name: s.name })),
     getShapeById: (id) => shapes.get(id),
     getAllStudies: () => [],
-    getPanes: () => [{ getMainSourcePriceScale: () => ({ getMode: () => 0 }) }],
+    getPanes: () => [
+      { getMainSourcePriceScale: () => ({ getMode: () => priceScaleMode }) },
+    ],
     onSymbolChanged: () => symbolEvent,
     onIntervalChanged: () => intervalEvent,
     createShape: async (point) => {
@@ -107,9 +110,9 @@ function fixture() {
       if (q.op === "geometry")
         return {
           kind: "horizontal_line",
-          scale: "linear",
-          extend_left: false,
-          extend_right: false,
+          scale: q.args.scale,
+          extend_left: q.args.extend_left,
+          extend_right: q.args.extend_right,
           mapping_version: "bar-index-v1",
           points: q.args.points.map((p) => ({ ...p, index: 0 })),
         };
@@ -192,6 +195,7 @@ function fixture() {
       intervalEvent.fire();
     },
     switchSource: () => (source = "oanda"),
+    switchScale: (value) => (priceScaleMode = value),
     layoutLoad: () => {
       loading = true;
       epoch++;
@@ -297,4 +301,77 @@ test("source changes fence drawing edits and menu contexts are captured at open"
   source.api.drawingEvent("native-one", "points_changed");
   await tick();
   assert.equal(source.calls.filter((c) => c.op === "edit").length, 0);
+});
+test("style changes preserve the rule when serialized geometry order or price formatting differs", async () => {
+  const f = fixture();
+  await tick();
+  const line = f.row.config.condition.right.line;
+  f.row.config.condition.right.line = {
+    points: line.points.map((p) => ({
+      price: "100.00",
+      index: p.index,
+      time: p.time,
+    })),
+    mapping_version: line.mapping_version,
+    extend_right: line.extend_right,
+    scale: line.scale,
+    kind: line.kind,
+    extend_left: line.extend_left,
+  };
+  f.api.setRows([structuredClone(f.row)]);
+  await tick();
+  f.api.drawingEvent("native-one", "properties_changed");
+  await tick();
+  await tick();
+  assert.equal(f.calls.filter((q) => q.op === "edit").length, 0);
+  assert.equal(f.row.version, 1);
+});
+test("native history events submit restored geometry without resuming a paused alert", async () => {
+  const f = fixture();
+  await tick();
+  f.move(102);
+  f.api.drawingEvent("native-one", "points_changed");
+  await tick();
+  await tick();
+  f.row.status = "paused";
+  f.api.setRows([structuredClone(f.row)]);
+  await tick();
+  f.move(100);
+  f.subscriptions.undo?.();
+  await tick();
+  await tick();
+  assert.equal(f.row.version, 3);
+  assert.equal(f.row.config.condition.right.line.points[0].price, "100");
+  assert.equal(f.row.status, "paused");
+  f.move(102);
+  f.subscriptions.redo?.();
+  await tick();
+  await tick();
+  assert.equal(f.row.version, 4);
+  assert.equal(f.row.config.condition.right.line.points[0].price, "102");
+  assert.equal(f.row.status, "paused");
+  assert.equal(f.calls.filter((q) => q.op === "lifecycle").length, 0);
+});
+
+test("price-axis presentation changes cannot silently replace the saved coordinate system", async () => {
+  const f = fixture();
+  await tick();
+  f.switchScale(1);
+  f.api.drawingEvent("native-one", "properties_changed");
+  await tick();
+  await tick();
+  assert.equal(f.calls.filter((q) => q.op === "edit").length, 0);
+  assert.equal(f.row.config.condition.right.line.scale, "linear");
+  assert.ok(
+    f.messages.some(
+      (m) => m.type === "chart-alert-association" && m.text.includes("价格轴"),
+    ),
+  );
+  f.switchScale(0);
+  f.move(102);
+  f.api.drawingEvent("native-one", "points_changed");
+  await tick();
+  await tick();
+  assert.equal(f.row.version, 2);
+  assert.equal(f.row.config.condition.right.line.points[0].price, "102");
 });

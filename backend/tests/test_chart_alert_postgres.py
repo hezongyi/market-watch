@@ -7,9 +7,10 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 from alerts.chart_alert_service import consume, create
 from alerts.storage import ChartAlert, Notification, Outbox, SignalRow, bootstrap
-from sqlalchemy import create_engine, event, func, select, text
+from sqlalchemy import create_engine, func, select, text
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
-from test_chart_alert_migration import legacy, migration
+from test_chart_alert_migration import full_legacy_upgrade, legacy, migration
 from test_chart_alert_service import config, sample
 
 
@@ -24,16 +25,9 @@ def postgres_alerts():
     schema = "chart_alert_test_" + uuid.uuid4().hex
     with administration.begin() as connection:
         connection.execute(text('CREATE SCHEMA "' + schema + '"'))
-    engine = create_engine(url)
-
-    @event.listens_for(engine, "connect")
-    def scoped_connection(connection, record):
-        # A committed search_path prevents rollback from restoring public.
-        previous = connection.autocommit
-        connection.autocommit = True
-        with connection.cursor() as cursor:
-            cursor.execute('SET search_path TO "' + schema + '"')
-        connection.autocommit = previous
+    # Independent Alembic engines must retain the same task-owned search_path.
+    scoped_url = make_url(url).update_query_dict({"options": "-csearch_path=" + schema})
+    engine = create_engine(scoped_url)
 
     try:
         yield engine
@@ -80,3 +74,7 @@ def test_postgres_populated_legacy_upgrade_preserves_foreign_keys(postgres_alert
         assert connection.execute(text("SELECT * FROM notifications")).one() == ("old-note", "old-signal")
         module.downgrade()
         assert connection.execute(text("SELECT id, watch_id FROM signals")).one() == ("old-signal", "old-watch")
+
+
+def test_postgres_full_legacy_migration_retains_queue_and_multiple_events(postgres_alerts, monkeypatch):
+    full_legacy_upgrade(postgres_alerts, monkeypatch)

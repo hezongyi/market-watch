@@ -121,3 +121,19 @@ docker compose --env-file /tmp/mw-chart-alerts-acceptance/compose.env -p mw-char
 以上sink记录只证明本地服务接受，不能显示为设备接收。完整结束时用本project的 `--profile notification-test down`停止profile及常规服务；保留数据库volume，不清理其他项目。
 
 最新审查修复后的全量后端回归：**545 passed、40 skipped**，134.69秒；一个既有Starlette/httpx弃用提示。最新前端build、Ruff、diff检查及Compose静态解析通过，native/UI探针摘要已同步。2026-10-06再次实际执行docker info仍返回socket permission denied，未启动实例；此结果不构成最终交付验收。
+
+## 真实原生生命周期补充（进程内探针）
+
+继续以实际许可widget及隔离route fixture验证，不部署服务，不向外发送通知。
+
+- 真实鼠标拖动：按住时无写入，释放后只提交一个版本。
+- 确认原生undo/redo仅发出全局事件，没有points_changed。Adapter已订阅undo/redo，动作结束后按固定图表身份/代次核对，使用串行版本提交；不会恢复已暂停监控。
+- 修复几何比较依赖JSON键顺序/Decimal文本的问题：现在比较实际几何字段，样式编辑不因相同数值的不同序列化产生版本及基准重建。超时读回也使用相同比较。
+- 切价格轴不是显式保存新坐标条件；检测到linear/log与已存快照不同只提示，保留已生效条件。
+- 实際切品种、H1/H2切周期及往返没有编辑或暂停；实际widget保存/加载布局后恢复业务chart IDs及一条后台画线，不重复、不写入。
+- 显式删除实际原生对象只暂停一次；原生撤销恢复画线但不恢复告警。
+- Native探针累计12场景通过；Adapter回归7项通过。真实父页API/容器/行情端到端仍待实例验收，不能由这些fixture结果替代。
+
+迁移补充验证：真实Alembic从初始版本迁移到r19，写入完整旧Watch/Signal/Notification/Outbox重试记录，再升级s20；旧身份、证据、外键及重试进度保留，新告警产生3次事件，存在告警后拒绝破坏性降级。SQLite链路已通过；同一用例已接入任务独立PostgreSQL schema，尚未运行。迁移后SQLite备份核对全部规则/版本/检查点/事件/通知/Outbox字段与原库一致；仍不等于PostgreSQL备份恢复通过。
+
+本轮最终回归：**547 passed、41 skipped**，201.71秒；提示为既有Starlette/httpx及Alembic配置弃用。前端生产build通过（既有>500KB bundle提示），Ruff、Prettier、git diff检查及Compose含notification-test profile静态解析通过。跳过项包括3项本任务真实PostgreSQL用例。Docker权限仍未就绪，所有产品访问地址仍未运行，不标记正式交付或目标完成。

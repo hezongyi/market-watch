@@ -78,11 +78,20 @@ print(json.dumps(dict(catalog=catalog,outputs=outputs,expected=expected)))
       globalThis.probeBars=bars;
       globalThis.probeIndicatorFixture=${JSON.stringify(indicatorFixture)};
       globalThis.probeRenderedIndicators={};
-      const feed={onReady:cb=>setTimeout(()=>cb({supported_resolutions:['60'],supports_time:true,supports_marks:false,supports_timescale_marks:false}),0),resolveSymbol:(name,cb)=>setTimeout(()=>cb({name,ticker:name,description:name,type:'crypto',session:'24x7',timezone:'Etc/UTC',minmov:1,pricescale:100000,has_intraday:true,supported_resolutions:['60'],has_weekly_and_monthly:false,volume_precision:0}),0),getBars:(symbol,res,p,cb)=>setTimeout(()=>{
+      const feed={onReady:cb=>setTimeout(()=>cb({supported_resolutions:['60','120'],supports_time:true,supports_marks:false,supports_timescale_marks:false}),0),resolveSymbol:(name,cb)=>setTimeout(()=>cb({name,ticker:name,description:name,type:'crypto',session:'24x7',timezone:'Etc/UTC',minmov:1,pricescale:100000,has_intraday:true,supported_resolutions:['60','120'],has_weekly_and_monthly:false,volume_precision:0}),0),getBars:(symbol,res,p,cb)=>setTimeout(()=>{
         let rows=bars;
         if(symbol.ticker.startsWith('MWPY_')){
           const {spec,key}=MWSeries.decode(symbol.ticker), values=probeIndicatorFixture.outputs[spec.name][key];
           rows=bars.map((b,i)=>({time:b.time,open:values[i].value??0,high:values[i].value??0,low:values[i].value??0,close:values[i].value??0,volume:Number(values[i].value!==null)}));
+        }
+        if (res === '120') {
+          const buckets = new Map();
+          for (const b of rows) {
+            const time = Math.floor(b.time / 7200000) * 7200000, old = buckets.get(time);
+            if (old) {old.high=Math.max(old.high,b.high);old.low=Math.min(old.low,b.low);old.close=b.close;old.volume+=b.volume;}
+            else buckets.set(time,{...b,time});
+          }
+          rows=[...buckets.values()];
         }
         rows=rows.filter(b=>b.time/1000<p.to);cb(rows.slice(-p.countBack),{noData:!rows.length});},0),subscribeBars:()=>{},unsubscribeBars:()=>{},getServerTime:cb=>cb(bars.at(-1).time/1000+3600)};
       const studies=PineJS=>pythonStudies(PineJS,probeIndicatorFixture.catalog).map(study=>{
@@ -217,14 +226,17 @@ print(json.dumps(dict(catalog=catalog,outputs=outputs,expected=expected)))
         messages = [],
         writes = [];
       globalThis.probeMessages = messages;
+      globalThis.probeWrites = writes;
+      globalThis.probeEpoch = 1;
+      globalThis.probeLoading = false;
       globalThis.probeAdapter = chartAlertBridge({
         getWidget: () => widget,
         getWorkspace: () => ({ id: "fixture" }),
-        getEpoch: () => 1,
-        isLoading: () => false,
+        getEpoch: () => probeEpoch,
+        isLoading: () => probeLoading,
         readonly: false,
         metadata: () => ({ source: "binance" }),
-        frames: { 60: "H1" },
+        frames: { 60: "H1", 120: "H2" },
         calculationOrigin: () => probeBars[0].time,
         send: (m) => messages.push(m),
         fail: (e) => {
@@ -232,11 +244,57 @@ print(json.dumps(dict(catalog=catalog,outputs=outputs,expected=expected)))
         },
         rpc: async (q) => {
           writes.push(q);
-          if (q.op === "geometry") return q.args;
-          throw Error("unexpected authenticated write");
+          if (q.op === "geometry") {
+            const a = q.args;
+            const first = probeBars.findIndex(
+              (b) => b.time === a.points[0].time,
+            );
+            return {
+              kind: a.kind,
+              scale: a.scale,
+              extend_left: a.extend_left,
+              extend_right: a.extend_right,
+              mapping_version: "bar-index-v1",
+              points: a.points.map((p) => ({
+                ...p,
+                index: probeBars.findIndex((b) => b.time === p.time) - first,
+              })),
+            };
+          }
+          if (q.op === "read") return structuredClone(probeBackendRow);
+          if (q.op === "edit") {
+            if (q.version !== probeBackendRow.version)
+              throw Error("fixture version conflict");
+            probeBackendRow = {
+              ...probeBackendRow,
+              version: q.version + 1,
+              config: {
+                ...probeBackendRow.config,
+                condition: { right: { line: q.line } },
+              },
+            };
+            return structuredClone(probeBackendRow);
+          }
+          if (q.op === "lifecycle") {
+            probeBackendRow = {
+              ...probeBackendRow,
+              status: "paused",
+              health_reason: "关联画线已明确删除",
+            };
+            return structuredClone(probeBackendRow);
+          }
+          throw Error("unexpected fixture request");
         },
       });
       probeAdapter.attach();
+      widget.subscribe("chart_load_requested", () => {
+        probeLoading = true;
+        probeEpoch++;
+      });
+      widget.subscribe("chart_loaded", () => {
+        probeLoading = false;
+        probeAdapter.refresh();
+      });
       const reverseId = chart
         .getAllShapes()
         .filter((s) => s.name === "ray")[1].id;
@@ -276,6 +334,7 @@ print(json.dumps(dict(catalog=catalog,outputs=outputs,expected=expected)))
               line: {
                 kind: "horizontal_line",
                 scale: "linear",
+                mapping_version: "bar-index-v1",
                 points: [point],
                 extend_left: false,
                 extend_right: false,
@@ -284,6 +343,7 @@ print(json.dumps(dict(catalog=catalog,outputs=outputs,expected=expected)))
           },
         },
       };
+      globalThis.probeBackendRow = structuredClone(row);
       probeAdapter.setRows([row]);
       const wait = async () => {
         for (
@@ -311,6 +371,7 @@ print(json.dumps(dict(catalog=catalog,outputs=outputs,expected=expected)))
       // version is authoritative, without submitting a phantom user edit.
       row.version = 2;
       row.config.condition.right.line.points[0].price = "101";
+      globalThis.probeBackendRow = structuredClone(row);
       messages.length = 0;
       probeAdapter.setRows([row]);
       await wait();
@@ -327,6 +388,113 @@ print(json.dumps(dict(catalog=catalog,outputs=outputs,expected=expected)))
     assert.equal(report.adapter.writes, 0);
     report.cases.push(
       "native refresh restores backend snapshot without duplicate shapes or authenticated writes",
+    );
+    // Exercise actual native pointer events, not a manually emitted adapter event.
+    await page.evaluate(() => {
+      const chart = widget.activeChart();
+      const point = probeBackendRow.config.condition.right.line.points[0];
+      const target = chart
+        .getAllShapes()
+        .find(
+          (s) =>
+            s.name === "horizontal_line" &&
+            chart.getShapeById(s.id).getPoints()[0].time === point.time / 1000,
+        );
+      globalThis.probeDragId = target.id;
+      chart
+        .getShapeById(target.id)
+        .setProperties({ linecolor: "#00cc00", linewidth: 4 });
+      probeWrites.length = 0;
+      globalThis.probeNativeEvents = [];
+      widget.subscribe("drawing_event", (id, type) =>
+        probeNativeEvents.push({ id, type }),
+      );
+      widget.subscribe("mouse_down", (p) =>
+        probeNativeEvents.push({ type: "mouse_down", p }),
+      );
+      widget.subscribe("mouse_up", (p) =>
+        probeNativeEvents.push({ type: "mouse_up", p }),
+      );
+      widget.subscribe("undo", () => probeNativeEvents.push({ type: "undo" }));
+      widget.subscribe("redo", () => probeNativeEvents.push({ type: "redo" }));
+    });
+    await page.waitForTimeout(150);
+    const dragShot = output.replace(/\.json$/, ".drag-before.png");
+    await page.screenshot({ path: dragShot });
+    const dragY = Number(
+      execFileSync(
+        "python",
+        [
+          "-c",
+          `
+import sys
+from PIL import Image
+im=Image.open(sys.argv[1]).convert('RGB')
+ys=[y for y in range(50,im.height-70) for x in range(795,806) if (lambda r,g,b:r<30 and 150<g<230 and b<30)(*im.getpixel((x,y)))]
+assert ys, 'associated native horizontal line must be visible'
+print(sum(ys)/len(ys))
+`,
+          dragShot,
+        ],
+        { encoding: "utf8" },
+      ),
+    );
+    await page.mouse.move(800, dragY);
+    await page.mouse.down();
+    await page.mouse.move(800, dragY - 35, { steps: 12 });
+    await page.waitForTimeout(100);
+    assert.equal(
+      await page.evaluate(
+        () => probeWrites.filter((q) => q.op === "edit").length,
+      ),
+      0,
+      "actual pointer drag must remain a preview until release",
+    );
+    await page.mouse.up();
+    await page.waitForTimeout(300);
+    await page.screenshot({
+      path: output.replace(/\.json$/, ".drag-after.png"),
+    });
+    await page.waitForFunction(
+      () => probeWrites.some((q) => q.op === "edit"),
+      null,
+      { timeout: 5000 },
+    );
+    report.drag = await page.evaluate(() => ({
+      version: probeBackendRow.version,
+      price: probeBackendRow.config.condition.right.line.points[0].price,
+      edits: probeWrites.filter((q) => q.op === "edit").length,
+      events: probeNativeEvents,
+    }));
+    assert.equal(report.drag.version, 3);
+    assert.equal(report.drag.edits, 1);
+    assert.notEqual(Number(report.drag.price), 101);
+    report.cases.push(
+      "actual native mouse drag previews without writes and commits one version on release",
+    );
+    await page.keyboard.press("Control+z");
+    await page.waitForTimeout(300);
+    await page.waitForFunction(() => probeBackendRow.version === 4, null, {
+      timeout: 5000,
+    });
+    assert.equal(
+      await page.evaluate(() =>
+        Number(probeBackendRow.config.condition.right.line.points[0].price),
+      ),
+      101,
+    );
+    await page.keyboard.press("Control+y");
+    await page.waitForFunction(() => probeBackendRow.version === 5, null, {
+      timeout: 5000,
+    });
+    assert.equal(
+      await page.evaluate(() =>
+        Number(probeBackendRow.config.condition.right.line.points[0].price),
+      ),
+      Number(report.drag.price),
+    );
+    report.cases.push(
+      "native undo and redo submit new geometry versions while preserving monitoring lifecycle",
     );
     await page.mouse.click(700, 75, { button: "right" });
     const nativeFrame = page
@@ -580,6 +748,132 @@ print(json.dumps(dict(red_y=sum(red)/len(red),blue_y=sum(blue)/len(blue))))
     );
     report.cases.push(
       "actual two-chart layout retains distinct business identities and fences symbol generations",
+    );
+    report.transitions = await page.evaluate(async () => {
+      widget.setActiveChart(0);
+      const chart = widget.chart(0);
+      for (const study of chart.getAllStudies()) chart.removeEntity(study.id);
+      probeWrites.length = 0;
+      await new Promise((ok) => chart.setSymbol("ETHUSDT", ok));
+      await new Promise((ok) => chart.setSymbol("BTCUSDT", ok));
+      await new Promise((ok) => chart.setResolution("120", ok));
+      await new Promise((ok) => chart.setResolution("60", ok));
+      await new Promise((r) => setTimeout(r, 100));
+      return {
+        status: probeBackendRow.status,
+        version: probeBackendRow.version,
+        writes: probeWrites.filter((q) => ["edit", "lifecycle"].includes(q.op)),
+      };
+    });
+    assert.equal(report.transitions.status, "active");
+    assert.equal(report.transitions.version, 5);
+    assert.deepEqual(report.transitions.writes, []);
+    report.cases.push(
+      "native symbol and interval round trips leave the saved alert active and unchanged",
+    );
+    await page.evaluate(async () => {
+      const state = await new Promise((ok) => widget.save(ok));
+      probeAdapter.persist(state);
+      globalThis.probePersistedCharts = state._mwAlertCharts;
+      probeAdapter.reset(state);
+      widget.load(state);
+    });
+    await page.waitForFunction(
+      () => !probeLoading && widget.chart(0).dataReady(),
+      null,
+      { timeout: 5000 },
+    );
+    await page.evaluate(() =>
+      probeAdapter.setRows([structuredClone(probeBackendRow)]),
+    );
+    await page.waitForFunction(
+      () =>
+        widget
+          .chart(0)
+          .getAllShapes()
+          .some(
+            (s) =>
+              s.name === "horizontal_line" &&
+              Number(
+                widget.chart(0).getShapeById(s.id).getPoints()[0].price,
+              ) ===
+                Number(
+                  probeBackendRow.config.condition.right.line.points[0].price,
+                ),
+          ),
+      null,
+      { timeout: 5000 },
+    );
+    report.layout = await page.evaluate(() => {
+      const chart = widget.chart(0),
+        price = Number(
+          probeBackendRow.config.condition.right.line.points[0].price,
+        );
+      const shapes = chart
+        .getAllShapes()
+        .filter(
+          (s) =>
+            s.name === "horizontal_line" &&
+            Number(chart.getShapeById(s.id).getPoints()[0].price) === price,
+        );
+      globalThis.probeDragId = shapes[0].id;
+      return {
+        status: probeBackendRow.status,
+        version: probeBackendRow.version,
+        restoredCount: shapes.length,
+        identities: probeAdapter.diagnostics().charts,
+        savedIdentities: probePersistedCharts,
+        writes: probeWrites.filter((q) => ["edit", "lifecycle"].includes(q.op)),
+      };
+    });
+    assert.equal(report.layout.status, "active");
+    assert.equal(report.layout.version, 5);
+    assert.equal(report.layout.restoredCount, 1);
+    assert.deepEqual(report.layout.identities, report.layout.savedIdentities);
+    assert.deepEqual(report.layout.writes, []);
+    report.cases.push(
+      "native saved-layout reload restores chart identities and one backend drawing without writes or pauses",
+    );
+    report.deletion = await page.evaluate(async () => {
+      widget.setActiveChart(0);
+      const chart = widget.chart(0);
+      chart.removeEntity(probeDragId);
+      for (let i = 0; i < 100 && probeBackendRow.status !== "paused"; i++)
+        await new Promise((r) => setTimeout(r, 20));
+      return {
+        status: probeBackendRow.status,
+        reason: probeBackendRow.health_reason,
+        lifecycle: probeWrites.filter((q) => q.op === "lifecycle"),
+      };
+    });
+    assert.equal(report.deletion.status, "paused");
+    assert.equal(report.deletion.lifecycle.length, 1);
+    assert.equal(report.deletion.lifecycle[0].action, "drawing_deleted");
+    // The keyboard must target the native iframe after the preceding API calls.
+    await page
+      .frames()
+      .find((f) => f !== page.mainFrame())
+      .locator("body")
+      .press("Control+z");
+    await page.waitForFunction(
+      () =>
+        widget
+          .chart(0)
+          .getAllShapes()
+          .some((s) => s.id === probeDragId),
+      null,
+      { timeout: 5000 },
+    );
+    await page.waitForTimeout(100);
+    assert.equal(await page.evaluate(() => probeBackendRow.status), "paused");
+    assert.equal(
+      await page.evaluate(
+        () => probeWrites.filter((q) => q.op === "lifecycle").length,
+      ),
+      1,
+    );
+    report.cases.push(
+      "native explicit deletion pauses once; undo restores the drawing without resuming the alert",
     );
     report.errors = errors;
     assert.deepEqual(errors, []);

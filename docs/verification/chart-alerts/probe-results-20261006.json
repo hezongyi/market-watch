@@ -7,10 +7,15 @@
       "actual widget ready",
       "native public time scale matches eight actual bar indices",
       "native refresh restores backend snapshot without duplicate shapes or authenticated writes",
+      "actual native mouse drag previews without writes and commits one version on release",
+      "native undo and redo submit new geometry versions while preserving monitoring lifecycle",
       "actual native context menu prefills clicked main-series price",
       "native log trend midpoint crosses geometric 200-price reference, not arithmetic 250",
       "four actual native custom studies return alert-identical values including provisional last candle",
-      "actual two-chart layout retains distinct business identities and fences symbol generations"
+      "actual two-chart layout retains distinct business identities and fences symbol generations",
+      "native symbol and interval round trips leave the saved alert active and unchanged",
+      "native saved-layout reload restores chart identities and one backend drawing without writes or pauses",
+      "native explicit deletion pauses once; undo restores the drawing without resuming the alert"
     ],
     "weekend_elapsed_hours": 56.0,
     "actual_bar_indices": 8.000000000010914,
@@ -86,7 +91,30 @@
     ],
     "multi_chart_business_identity_distinct": true,
     "symbol_generation_changed": true,
-    "errors": []
+    "errors": [],
+    "drag": {
+      "writes_during_pointer_down": 0,
+      "edits_on_release": 1,
+      "saved_version": 3
+    },
+    "transitions": {
+      "status": "active",
+      "version": 5,
+      "writes": []
+    },
+    "layout": {
+      "status": "active",
+      "version": 5,
+      "restoredCount": 1,
+      "writes": [],
+      "business_chart_ids_restored": true
+    },
+    "deletion": {
+      "status": "paused",
+      "reason": "关联画线已明确删除",
+      "pause_requests": 1,
+      "undo_does_not_resume": true
+    }
   },
   "ui": {
     "scope": "actual React components / synthetic routed API, no deployed instance",
@@ -99,12 +127,16 @@
     "errors": []
   },
   "external_notifications_sent": false,
-  "postgres_validation": "pending Docker permission",
+  "postgres_validation": "three migration/concurrency cases pending Docker permission; backup and instance validation not run",
   "deployed_acceptance": "not started",
   "backend_regression": {
-    "passed": 545,
-    "skipped": 40,
-    "duration_seconds": 134.69,
-    "scope": "Ubuntu local Python venv; PostgreSQL and deployed-instance verification still pending"
+    "passed": 547,
+    "skipped": 41,
+    "duration_seconds": 201.71,
+    "scope": "Ubuntu local Python venv; three chart-alert PostgreSQL tests and other environment tests skipped; deployed-instance verification still pending"
+  },
+  "bridge_regression": {
+    "passed": 7,
+    "scope": "native adapter public boundary; includes semantic geometry comparison, undo/redo, and coordinate snapshot fencing"
   }
 }
