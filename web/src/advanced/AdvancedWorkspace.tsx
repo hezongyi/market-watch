@@ -9,6 +9,8 @@ import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
 import { MaintenanceDialog } from "./MaintenanceDialog";
 import { ExportDialog, type ExportSelection } from "./ExportDialog";
 import { providerSubscriptions } from "./providerSubscriptions";
+import { ChartAlertsPanel } from "./ChartAlertsPanel";
+import { validAlertContext, type AlertContext } from "./chartAlerts";
 import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
 import {
   HistoryLoadingNotice,
@@ -56,6 +58,9 @@ export default function AdvancedWorkspace() {
   const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
   const [chartTheme, setChartTheme] = useState("dark");
   const [nativeReady, setNativeReady] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  const [alertContext, setAlertContext] = useState<AlertContext | null>(null);
+  const [alertAssociations, setAlertAssociations] = useState<Record<string, string>>({});
   const historyCapabilities = useRef<HistoryCapabilities | null>(null);
   const nativeLoadEpoch = useRef(0);
   const [capacityNotices, setCapacityNotices] = useState<
@@ -232,6 +237,41 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if (m.type === "chart-alert-context") {
+        if (mobile || !validAlertContext(m.context, current.current?.id)) return;
+        setAlertContext(m.context); setAlertsOpen(true);
+        return;
+      }
+      if (m.type === "chart-alert-open") {setAlertsOpen(true); return;}
+      if (m.type === "chart-alert-association") {
+        if (m.workspace_id === current.current?.id && typeof m.alert_id === "string" && /^[a-f0-9-]{36}$/.test(m.alert_id) && typeof m.text === "string" && m.text.length <= 1000)
+          setAlertAssociations(previous => ({...previous, [m.alert_id]: m.text}));
+        return;
+      }
+      if (m.type === "chart-alert-rpc") {
+        const q = m.query;
+        const requestWorkspace = current.current?.id;
+        if (mobile || !Number.isSafeInteger(m.id) || m.id <= 0 || !q ||
+            JSON.stringify(q).length > 20_000 || !["geometry", "edit", "read", "lifecycle"].includes(q.op)) return;
+        try {
+          let result;
+          if (q.op === "geometry") result = await api("/chart-alerts/geometry", q.args);
+          else if (typeof q.alert_id === "string" && /^[a-f0-9-]{36}$/.test(q.alert_id)) {
+            if (q.op === "read") result = await api(`/chart-alerts/${q.alert_id}`);
+            else {
+              // A drawing message may only affect the persisted object from this
+              // workspace; it cannot replace an arbitrary alert configuration.
+              const row = await api(`/chart-alerts/${q.alert_id}`), a = row.config.association;
+              if (!a || requestWorkspace !== current.current?.id || q.workspace_id !== requestWorkspace || a.workspace_id !== requestWorkspace || a.object_id !== q.object_id || a.chart_id !== q.chart_id) throw Error("告警图表关联已改变");
+              if (q.op === "lifecycle" && q.action === "drawing_deleted") result = await api(`/chart-alerts/${q.alert_id}/lifecycle`, {version: q.version, control_revision: q.control_revision, request_id: q.request_id, action: "drawing_deleted"});
+              else if (q.op === "edit" && q.line && a.object_kind === "drawing") result = await api(`/chart-alerts/${q.alert_id}/edit`, {version: q.version, config: {...row.config, condition: {...row.config.condition, right: {kind: "line", line: q.line}}, association: {...a, generation: q.generation}}});
+              else throw Error("不允许的画线告警操作");
+            }
+          } else throw Error("无效告警请求");
+          reply({type: "result", id: m.id, result});
+        } catch (e) {reply({type: "result", id: m.id, error: String(e), errorDetails: apiErrorDetails(e)});}
+        return;
+      }
       if (
         m.type === "provider-subscribe" ||
         m.type === "provider-unsubscribe"
@@ -1212,6 +1252,12 @@ export default function AdvancedWorkspace() {
           </button>
         </section>
       )}
+      {active && <ChartAlertsPanel key={active.id} workspaceId={active.id} context={alertContext?.association.workspace_id === active.id ? alertContext : null}
+        open={alertsOpen} theme={chartTheme} readonly={mobile} associationNotices={alertAssociations} onClose={() => setAlertsOpen(false)}
+        onRequest={() => post({type: "chart-alert-create"})}
+        onLocate={(row, event) => post({type: "chart-alert-locate", row, event})}
+        onDrawingAction={(row, action) => post({type: "chart-alert-drawing-action", alert_id:row.id,action})}
+        onRows={rows => post({type: "chart-alert-rows", rows})} />}
     </main>
   );
 }

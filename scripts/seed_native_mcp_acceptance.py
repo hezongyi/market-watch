@@ -83,8 +83,8 @@ def seed_chart_fixture(db):
         )
 
 
-if settings.database_application_name != "mw-native-mcp-acceptance":
-    raise SystemExit("Refusing to seed a database outside mw-native-mcp-acceptance")
+if settings.database_application_name not in ("mw-native-mcp-acceptance", "mw-chart-alerts-integration"):
+    raise SystemExit("Refusing to seed a database outside the named isolated acceptance projects")
 bootstrap()
 with transaction() as db:
     if db.get(Preference, "acceptance.native-mcp.fixture"):

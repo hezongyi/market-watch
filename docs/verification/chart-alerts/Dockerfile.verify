@@ -1,0 +1,5 @@
+ARG API_IMAGE=market-watch-api:chart-alerts-acceptance
+FROM ${API_IMAGE}
+USER root
+RUN pip install --no-cache-dir pytest==9.1.1
+USER app

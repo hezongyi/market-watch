@@ -1,5 +1,9 @@
 # Git与版本维护
 
+## v1.11.0 图表告警源码发布
+
+PR #11 新增 Advanced Charts 后台持久告警并与原生 MCP 汇合，采用兼容功能次版本 1.11.0。独立控制修订号、生命周期持久幂等及 published 观察时间绑定等七项审阅发现已修复，两轴复审无剩余阻断。完整后端 586 passed / 46 skipped、真实 PG 8 passed、最终 Ubuntu 浏览器 8 场景及 HTTPS MCP 15 checks 通过；新增 t21 汇合与 u22 请求身份迁移。按用户授权在最终 main 合并提交创建、推送附注标签，保留全部旧标签；受测输入、实际镜像与交付边界见 deploy/releases/v1.11.0-source.json 和 docs/chart-alerts-v1.11.0-source-delivery.md。本次不部署生产，schema 回退须恢复验证过的备份。
+
 ## v1.10.0 原生 MCP 源码发布
 
 PR #10 新增原生 HTTP MCP 与注册式 agent 能力，采用兼容功能次版本 1.10.0。Python/web/锁文件根包及 CHANGELOG 同步，用户授权合并 PR 并在最终 main 合并提交上创建、推送附注标签 v1.10.0；不移动旧标签。实际 Ubuntu 独立环境和 Codex 验收已通过，源码清单见 deploy/releases/v1.10.0-source.json，验收与发布输入边界见 docs/native-mcp-v1.10.0-source-delivery.md。新增 `s20_agent_capabilities` 迁移及官方 MCP SDK 依赖；MCP 默认关闭。此次源码发布不重建或改标已有验收镜像、不切换生产、不执行生产迁移。

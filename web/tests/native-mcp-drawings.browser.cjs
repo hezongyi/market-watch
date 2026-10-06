@@ -8,56 +8,68 @@ const CHART = process.env.CHART_ORIGIN || 'https://localhost:18544';
 const PRIVATE = process.env.MW_MCP_PRIVATE_DIR || '/tmp/mw-native-mcp-acceptance';
 const OUT = process.env.MW_MCP_DRAWING_OUTPUT || '/tmp/native-mcp-browser-runtime.json';
 const INSTRUMENT = 'MCPFIXTURE';
+const allowedTargets = [
+  ['https://localhost:18543', 'https://localhost:18544', '/tmp/mw-native-mcp-acceptance'],
+  ['https://localhost:19543', 'https://127.0.0.1:19544', '/tmp/mw-chart-alerts-integration'],
+];
+assert.ok(allowedTargets.some(([app, chart, directory]) =>
+  APP === app && CHART === chart && PRIVATE === directory), 'Only named local acceptance targets allowed');
 (async () => {
   const browser = await chromium.launch({ headless: true,
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? {executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE} : {}) });
-  const context = await browser.newContext({ignoreHTTPSErrors: true, viewport: {width: 1600, height: 950}});
-  const page = await context.newPage();
-  page.on('dialog', dialog => dialog.type() === 'beforeunload' ? dialog.accept() : dialog.dismiss());
-  const errors = [];
-  page.on('pageerror', e => errors.push(e.message));
-  page.on('requestfailed', request => console.error('Request failed:', request.url(), request.failure()?.errorText));
-  const token = fs.readFileSync(path.join(PRIVATE, 'agent-read.token'), 'utf8').trim();
-  const login = await context.request.post(APP + '/api/login', {data: JSON.parse(fs.readFileSync(path.join(PRIVATE, 'login.json'), 'utf8'))});
-  assert.ok(login.ok(), 'browser login');
-  const {csrf} = await login.json();
-  async function api(route, body) {
-    const response = body ? await context.request.post(APP + '/api/' + route,
-      {headers: {'X-CSRF-Token': csrf}, data: body}) : await context.request.get(APP + '/api/' + route);
-    assert.ok(response.ok(), `${route}: HTTP ${response.status()}`);
-    return response.json();
-  }
-  async function rpc(method, params) {
-    const response = await context.request.post(APP + '/mcp', {
-      headers: {Authorization: 'Bearer ' + token, Accept: 'application/json, text/event-stream', 'MCP-Protocol-Version': '2025-11-25'},
-      data: {jsonrpc: '2.0', id: 1, method, params},
-    });
-    assert.ok(response.ok(), `MCP HTTP ${response.status()}`);
-    const body = await response.json();
-    assert.ok(!body.error, JSON.stringify(body.error));
-    return body.result;
-  }
-  async function drawings(workspaceId) {
-    const result = await rpc('tools/call', {name: 'charts_get_drawings', arguments: {workspace_id: workspaceId}});
-    assert.ok(!result.isError, JSON.stringify(result));
-    return result.structuredContent;
-  }
-  async function save(frame) {
-    const responsePromise = page.waitForResponse(response =>
-      response.url() === APP + '/api/advanced-charts/native-charts/save' &&
-      response.request().method() === 'POST', {timeout: 60000});
-    // Use the actual save shortcut and observe its persisted response. The
-    // vendor's delayed onAutoSaveNeeded event can mark dirty again after saving.
-    await page.keyboard.press('Control+s');
-    const response = await responsePromise;
-    assert.ok(response.ok(), `native save: HTTP ${response.status()}`);
-    const row = await response.json();
-    assert.equal(row.id, workspace.id, 'native save targets this isolated workspace');
-    await frame.waitForFunction(() => !nativeSaving, null, {timeout: 60000});
-    return api('advanced-charts/native-charts/' + row.id);
-  }
-  let workspace;
   try {
+    const context = await browser.newContext({ignoreHTTPSErrors: true, viewport: {width: 1600, height: 950}});
+    const page = await context.newPage();
+    page.on('dialog', dialog => dialog.type() === 'beforeunload' ? dialog.accept() : dialog.dismiss());
+    const errors = [];
+    page.on('pageerror', e => errors.push(e.message));
+    page.on('requestfailed', request => console.error('Request failed:', request.url(), request.failure()?.errorText));
+    const token = fs.readFileSync(path.join(PRIVATE, 'agent-read.token'), 'utf8').trim();
+    for(let i=0;i<120;i++){
+      const result=await context.request.get(APP+'/readyz').catch(()=>null);
+      if(result?.status()===200)break;
+      if(i===119)throw Error('HTTPS readiness timeout');
+      await page.waitForTimeout(500);
+    }
+    const login = await context.request.post(APP + '/api/login', {data: JSON.parse(fs.readFileSync(path.join(PRIVATE, 'login.json'), 'utf8'))});
+    assert.ok(login.ok(), 'browser login');
+    const {csrf} = await login.json();
+    async function api(route, body) {
+      const response = body ? await context.request.post(APP + '/api/' + route,
+        {headers: {'X-CSRF-Token': csrf}, data: body}) : await context.request.get(APP + '/api/' + route);
+      assert.ok(response.ok(), `${route}: HTTP ${response.status()}`);
+      return response.json();
+    }
+    async function rpc(method, params) {
+      const response = await context.request.post(APP + '/mcp', {
+        headers: {Authorization: 'Bearer ' + token, Accept: 'application/json, text/event-stream', 'MCP-Protocol-Version': '2025-11-25'},
+        data: {jsonrpc: '2.0', id: 1, method, params},
+      });
+      assert.ok(response.ok(), `MCP HTTP ${response.status()}`);
+      const body = await response.json();
+      assert.ok(!body.error, JSON.stringify(body.error));
+      return body.result;
+    }
+    async function drawings(workspaceId) {
+      const result = await rpc('tools/call', {name: 'charts_get_drawings', arguments: {workspace_id: workspaceId}});
+      assert.ok(!result.isError, JSON.stringify(result));
+      return result.structuredContent;
+    }
+    async function save(frame) {
+      const responsePromise = page.waitForResponse(response =>
+        response.url() === APP + '/api/advanced-charts/native-charts/save' &&
+        response.request().method() === 'POST', {timeout: 60000});
+      // Use the actual save shortcut and observe its persisted response. The
+      // vendor's delayed onAutoSaveNeeded event can mark dirty again after saving.
+      await page.keyboard.press('Control+s');
+      const response = await responsePromise;
+      assert.ok(response.ok(), `native save: HTTP ${response.status()}`);
+      const row = await response.json();
+      assert.equal(row.id, workspace.id, 'native save targets this isolated workspace');
+      await frame.waitForFunction(() => !nativeSaving, null, {timeout: 60000});
+      return api('advanced-charts/native-charts/' + row.id);
+    }
+    let workspace;
     const initialized = await rpc('initialize', {protocolVersion: '2025-11-25', capabilities: {}, clientInfo: {name: 'browser-drawings-acceptance', version: '1'}});
     assert.equal(initialized.serverInfo.name, 'Market Watch');
     workspace = await api('advanced-charts/workspaces', {name: 'MCP real native drawing ' + Date.now()});

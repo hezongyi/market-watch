@@ -274,7 +274,7 @@ async def quote(ctx, query):
 def indicators(ctx, query):
     return {
         "indicators": public_catalog(),
-        "policy": "Python version 1; complete candles; gaps reset state; null is unavailable. "
+        "policy": "Python version 1; complete candles by default; opt in with provisional=true for the last incomplete candle, whose values are marked provisional. Gaps reset state; null is unavailable. "
         "Managed full persisted prefix; provider warmup as returned by shared chart query.",
     }
 

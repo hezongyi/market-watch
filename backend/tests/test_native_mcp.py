@@ -821,3 +821,90 @@ def test_bars_revision_changes_when_deletion_offsets_revision_increment(mcp):
     assert original["history_revision"] != updated["history_revision"]
     web = client.post("/api/charts/data", json={**query, "track_history": True}).json()
     assert updated["history_revision"] == web["history_revision"]
+
+
+def test_chart_alert_events_share_mcp_browser_signals_and_independent_ack(mcp):
+    from alerts.chart_alert_service import consume, create
+    from test_chart_alert_service import config, sample
+
+    client, token, database = mcp
+    with database.begin() as db:
+        alert = create(db, 'combined-chart-rule', config(), at=0)
+        consume(db, alert.id, sample(0, 9), detected_at=0)
+        first = consume(db, alert.id, sample(1, 11), detected_at=300_000)
+        consume(db, alert.id, sample(2, 9), detected_at=600_000)
+        second = consume(db, alert.id, sample(3, 11), detected_at=900_000)
+        alert_id, event_ids = alert.id, {first.id, second.id}
+    result = call(client, token, 'alerts_get_signals', {})
+    assert not result.get('isError'), result
+    listed = result['structuredContent']['items']
+    browser = client.get('/api/signals').json()
+    assert listed == browser
+    assert {r['id'] for r in listed} == event_ids
+    assert all(r['watch_id'] is None and r['chart_alert_id'] == alert_id for r in listed)
+    note_id = listed[0]['notification_id']
+    acknowledged = call(client, token, 'notifications_ack', {
+        'idempotency_key': 'combined-ack-one', 'notification_id': note_id,
+    })
+    assert not acknowledged.get('isError'), acknowledged
+    updated = client.get('/api/signals').json()
+    assert sum(r['notification_status'] == 'acknowledged' for r in updated) == 1
+    with database() as db:
+        assert db.get(storage.ChartAlert, alert_id).count == 2
+    # Legacy creation/cancellation remains its original one-shot watch contract.
+    assert client.get('/api/watches').json() == []
+
+
+def test_mcp_provisional_indicator_is_explicit_and_matches_browser_when_opted_in(mcp):
+    client, token, database = mcp
+    start = seed_bars(database)
+    with database.begin() as db:
+        last = db.scalar(select(storage.Bar).where(storage.Bar.timeframe == 'H1').order_by(storage.Bar.start.desc()))
+        last.complete = False
+        last.close = last.high = Decimal('99')
+    query = {'instrument':'EURUSD','timeframe':'H1','limit':3,
+             'indicators':[{'name':'SMA','params':{'period':3}}]}
+    default = call(client,token,'indicators_calculate',query)
+    assert not default.get('isError'),default
+    assert default['structuredContent']['page']['indicators'][0]['series'][0]['values'][-1]['value'] is None
+    opted = call(client,token,'indicators_calculate',{**query,'provisional':True})
+    assert not opted.get('isError'),opted
+    page = opted['structuredContent']['page']
+    point = page['indicators'][0]['series'][0]['values'][-1]
+    assert point['value'] is not None and point['provisional'] is True
+    web = client.post('/api/charts/data',json=query).json()
+    assert page['indicators'] == web['indicators']
+    assert page['bars'] == web['bars']
+    assert page['origin'] == start
+
+
+def test_mcp_provider_fixed_origin_matches_browser_after_earlier_backfill(mcp, monkeypatch):
+    from alerts import provider_cache, provider_chart
+    from alerts.chart_api import DataQuery
+    from alerts.storage import ProviderBar
+
+    client, token, database = mcp
+    meta = {'id':'BTCUSDT','source':'binance','symbol':'BTCUSDT','basis':'last',
+            'calendar':'utc0','precision':2,'calendar_profile':{}}
+    monkeypatch.setattr(provider_chart,'metadata',lambda *args,**kwargs:meta)
+    key = provider_cache.ensure(meta,'M1')
+    history = [{'start':i*60000,'end':(i+1)*60000,'open':str(10+i),'high':str(10+i),
+                'low':str(10+i),'close':str(10+i),'complete':True} for i in range(40)]
+    def read(*args,**kwargs):
+        return {'dataset_id':key,'bars':history[-10:],'has_more':True,'basis':'last',
+                'calendar':'utc0','precision':2,'as_of':2400000}
+    monkeypatch.setattr(provider_cache,'read',read)
+    with database.begin() as db:
+        for row in history:
+            db.add(ProviderBar(dataset_id=key,start=row['start'],chart_time=row['start'],
+                               complete=True,payload=row,observed_at=2400000))
+    query={'instrument':'BTCUSDT','series_kind':'provider','timeframe':'M1','before':2400000,
+           'limit':5,'calculation_origin':600000,'indicators':[{'name':'EMA','params':{'period':3}}]}
+    from alerts.chart_api import data_sync
+    web = data_sync(DataQuery(**query))
+    result=call(client,token,'indicators_calculate',query)
+    assert not result.get('isError'),result
+    page=result['structuredContent']['page']
+    assert page['calculation_origin']==600000
+    assert page['indicators']==web['indicators']
+    assert page['bars']==web['bars']

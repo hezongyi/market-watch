@@ -14,12 +14,22 @@ from sqlalchemy import delete, func, select, text
 
 from . import provider_cache as cache
 from . import provider_chart as upstream
+from .chart_calculation_history import calculation_rows
 from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import lane
 from .provider_capabilities import enabled_sources, page_capacity, poll_seconds
 from .provider_capabilities import frames as source_frames
-from .storage import ProviderBar, ProviderDataset, ProviderInterest, now_ms, transaction, uid
+from .storage import (
+    ChartAlert,
+    ChartAlertVersion,
+    ProviderBar,
+    ProviderDataset,
+    ProviderInterest,
+    now_ms,
+    transaction,
+    uid,
+)
 
 PERIODS = ("D1", "W1", "H4", "M5", "M1", "MN", "H1", "M30", "M15")
 _STOP = threading.Event()
@@ -302,7 +312,6 @@ def events(client, cursors):
                 )
                 indicators = []
                 if kind == "bars" and interest.indicators:
-                    extra = max(history_requirement(spec) for spec in interest.indicators)
                     prefix = list(
                         db.scalars(
                             select(ProviderBar)
@@ -311,7 +320,6 @@ def events(client, cursors):
                                 ProviderBar.chart_time <= new_last,
                             )
                             .order_by(ProviderBar.chart_time.desc())
-                            .limit(len(bars) + extra)
                         )
                     )[::-1]
                     prefix_connected = bool(prefix) and any(
@@ -321,7 +329,14 @@ def events(client, cursors):
                     if not prefix_connected:
                         kind = "reset"
                     for spec in interest.indicators if prefix_connected else []:
-                        calculated = calculate([row.payload for row in prefix], spec)
+                        origin=spec.get("calculation_origin")
+                        inputs=[row.payload for row in prefix if origin is None or row.start>=origin]
+                        if inputs and origin is not None and inputs[0]["start"] != origin:
+                            kind="reset"
+                            indicators=[]
+                            break
+                        calculated = calculate(calculation_rows(inputs, dataset.metadata_json,
+                                                                dataset.metadata_json["id"]), spec, provisional=True)
                         indicators.append(
                             {
                                 **calculated,
@@ -373,6 +388,8 @@ def realtime_step(source=None):
             dataset = db.get(ProviderDataset, row.dataset_id)
             if source and dataset.source != source:
                 continue
+            if cache.identity(dataset.metadata_json, dataset.timeframe) != dataset.id:
+                continue
             extra = max((history_requirement(spec) for spec in row.indicators), default=0)
             old = groups.get(dataset.id)
             groups[dataset.id] = (
@@ -381,6 +398,37 @@ def realtime_step(source=None):
                 max(extra + 3, old[2] if old else 3),
             )
             row.next_poll = now + poll_seconds(dataset.source) * 1000
+        # Database-owned demands outlive browser subscription expiry. They share
+        # the same source/dataset acquisition turn and existing source budgets.
+        from .chart_alert_service import AlertConfig
+        for alert, version, dataset in db.execute(
+            select(ChartAlert, ChartAlertVersion, ProviderDataset).join(
+                ChartAlertVersion,
+                (ChartAlertVersion.alert_id == ChartAlert.id)
+                & (ChartAlertVersion.version == ChartAlert.version),
+            ).join(ProviderDataset, ProviderDataset.id == ChartAlertVersion.dataset_id).where(
+                ChartAlert.status == "active",
+            )
+        ):
+            if source and dataset.source != source:
+                continue
+            if cache.identity(dataset.metadata_json, dataset.timeframe) != dataset.id:
+                alert.health, alert.health_reason = "blocked", "平台账户或数据集身份已改变，需显式编辑告警"
+                continue
+            if alert.expires_at is not None and alert.expires_at <= now:
+                # The locked alert evaluator owns lifecycle transitions. This
+                # acquisition snapshot may race an edit extending expiry.
+                continue
+            if dataset.latest_at + poll_seconds(dataset.source) * 1000 > now:
+                continue
+            config = AlertConfig.model_validate(version.config)
+            checkpoint = alert.state.get("sequence", alert.effective_at)
+            missing = max(0, now - checkpoint) // upstream.FRAME_MS[dataset.timeframe] + 3
+            old = groups.get(dataset.id)
+            groups[dataset.id] = (
+                dataset.metadata_json, dataset.timeframe,
+                max(min(20_000, config.warmup() + missing), old[2] if old else 3),
+            )
     for key, (meta, frame, count) in groups.items():
         if meta["source"] == "yahoo" and not settings.yahoo_enabled:
             continue
@@ -535,6 +583,13 @@ def cleanup():
         # Protect those datasets as well as the currently subscribed frame.
         interests = list(db.scalars(select(ProviderInterest).where(ProviderInterest.expires > now)))
         protected = {row.dataset_id for row in interests} | history_protected
+        protected.update(db.scalars(
+            select(ChartAlertVersion.dataset_id).join(
+                ChartAlert, (ChartAlert.id == ChartAlertVersion.alert_id)
+                & (ChartAlert.version == ChartAlertVersion.version),
+            ).where(ChartAlert.status.in_(["active", "paused"]),
+                    ChartAlertVersion.dataset_id.is_not(None))
+        ))
         for interest in interests:
             focus = db.get(ProviderDataset, interest.dataset_id)
             for target in interest.targets:
@@ -569,7 +624,7 @@ def start():
     _STOP.clear()
     from .yahoo_catalog import seed
     seed()
-    _EXECUTOR = ThreadPoolExecutor(max_workers=2*len(enabled_sources())+1, thread_name_prefix="provider")
+    _EXECUTOR = ThreadPoolExecutor(max_workers=2*len(enabled_sources())+2, thread_name_prefix="provider")
 
     def warmer(source):
         after = None
@@ -600,9 +655,19 @@ def start():
                 log.exception("Provider cache cleanup failed")
             _STOP.wait(60)
 
+    def alerts():
+        from .chart_alert_worker import step
+        while not _STOP.is_set():
+            try:
+                step()
+            except Exception:
+                log.exception("Chart alert monitor iteration failed")
+            _STOP.wait(1)
+
     _FUTURES = [_EXECUTOR.submit(warmer, source) for source in enabled_sources()]
     _FUTURES.extend(_EXECUTOR.submit(live, source) for source in enabled_sources())
     _FUTURES.append(_EXECUTOR.submit(janitor))
+    _FUTURES.append(_EXECUTOR.submit(alerts))
 
 
 def stop():

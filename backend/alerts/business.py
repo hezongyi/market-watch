@@ -238,6 +238,7 @@ def signals():
                     for k in [
                         "id",
                         "watch_id",
+                        "chart_alert_id",
                         "instrument_id",
                         "occurred_at",
                         "created_at",
