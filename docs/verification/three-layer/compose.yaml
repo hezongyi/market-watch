@@ -63,10 +63,17 @@ services:
       retries: 30
   history-worker:
     <<: *backend
-    command: ["python", "-m", "alerts.history_versions"]
+    command: ["python", "-m", "alerts.history_versions", "--without-composite-aggregates"]
     env_file:
       - path: ../../../artifacts/data-integration/three-layer-runtime.env
         format: raw
+    depends_on:
+      api: {condition: service_healthy}
+  composite-aggregate-worker:
+    <<: *backend
+    command: ["python", "-m", "alerts.composite_aggregate_worker"]
+    mem_limit: 384m
+    cpus: 1
     depends_on:
       api: {condition: service_healthy}
   native-history-worker:

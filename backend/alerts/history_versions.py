@@ -351,6 +351,8 @@ def main():
     parser.add_argument("--precision", type=int)
     parser.add_argument("--version")
     parser.add_argument("--once", action="store_true")
+    parser.add_argument("--without-composite-aggregates", action="store_true",
+                        help="Use a separate composite aggregate worker; keep legacy default otherwise")
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
     bootstrap()
@@ -396,7 +398,7 @@ def main():
 
                 schedule_tick()
                 preparation_tick(adapter)
-                aggregated = aggregate_tick()
+                aggregated = False if args.without_composite_aggregates else aggregate_tick()
                 indicated = indicator_tick()
                 revision_tick()
             else:
