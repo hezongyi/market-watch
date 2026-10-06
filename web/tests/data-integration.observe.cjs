@@ -35,11 +35,10 @@ const path = require("node:path");
       window.marketObservation = empty();
       window.marketObservationEmpty = empty;
       const last = {};
-      const stream = new EventSource("/api/market-data/live/events");
-      stream.onopen = () => { window.marketObservation.opened += 1; };
-      stream.onerror = () => { window.marketObservation.errors += 1; };
-      stream.addEventListener("heartbeat", () => { window.marketObservation.heartbeats += 1; });
-      stream.addEventListener("snapshot", (event) => {
+      let stream;
+      let received = Date.now();
+      const snapshot = (event) => {
+        received = Date.now();
         const at = Date.now();
         const stats = window.marketObservation;
         stats.snapshots += 1;
@@ -71,8 +70,24 @@ const path = require("node:path");
             item[field][bucket] = (item[field][bucket] || 0) + 1;
           }
         }
-      });
-      window.marketObservationStream = stream;
+      };
+      const connect = () => {
+        stream?.close();
+        received = Date.now();
+        stream = new EventSource("/api/market-data/live/events");
+        stream.onopen = () => { window.marketObservation.opened += 1; };
+        stream.onerror = () => { window.marketObservation.errors += 1; };
+        stream.addEventListener("heartbeat", () => {
+          received = Date.now();
+          window.marketObservation.heartbeats += 1;
+        });
+        stream.addEventListener("snapshot", snapshot);
+        window.marketObservationStream = stream;
+      };
+      connect();
+      window.marketObservationWatchdog = setInterval(() => {
+        if (Date.now() - received > 15000 && navigator.onLine) connect();
+      }, 1000);
     }, start);
     while (!stopped && Date.now() - start < minutes * 60000) {
       await new Promise((resolve) => setTimeout(resolve, 30000));

@@ -2,13 +2,13 @@
   "host": "Ubuntu local Docker API/worker/PostgreSQL and host Chromium acceptance tool",
   "project": "market-watch-data-integration",
   "branch": "feat/market-data-integration",
-  "implementation_commit": "1af4b5d6d1d3c1e73bc24b7e53868822d8785a8c",
-  "live_module_sha256": "bb9ead8f4c986db74cd21423bd156d79841ba9f08957bc944876ab1bf793b8a9",
-  "observer_sha256": "75b44beffc3863a5fa5f8f76bb59496cdac1c70ad41e358efc367a338508cdaa",
-  "started_at": 1791255960756,
-  "started_at_utc": "2026-10-06T03:06:00.756000+00:00",
-  "m1_measurement_since": 1791256020000,
-  "planned_end_at_utc": "2026-10-08T03:06:00.756000+00:00",
+  "implementation_commit": "1cadd88",
+  "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
+  "observer_sha256": "4bc1151a742f58fea9dc96529d8331fb1b4a08b7ee176857be6dc0a57b0e8d1a",
+  "started_at": 1791258658841,
+  "started_at_utc": "2026-10-06T03:50:58.841000+00:00",
+  "m1_measurement_since": 1791258660000,
+  "planned_end_at_utc": "2026-10-08T03:50:58.841000+00:00",
   "planned_minutes": 2880,
   "service": "market-watch-data-integration-browser.service",
   "service_status_at_record": "active",
@@ -17,40 +17,8 @@
   "source_clock_offset_verified": false,
   "two_trading_days_verified": false,
   "mt4_deferred": true,
-  "scope": "Future observation window; no elapsed-time acceptance claim from merely starting the process",
-  "deployments": [
-    {
-      "event": "deployment_started",
-      "at": 1791258046610,
-      "services": [
-        "api",
-        "oanda-worker"
-      ],
-      "reason": "finite source session evidence, candidate completeness and precise history errors",
-      "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
-      "scope": "separate implementation segment; retain browser SSE errors and quote recovery states"
-    },
-    {
-      "event": "deployment_recovered",
-      "at": 1791258324640,
-      "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
-      "live": [
-        {
-          "logical_symbol": "XAUUSD",
-          "quality": "healthy",
-          "connection_epoch": 49,
-          "calendar_verified": false,
-          "error": null
-        },
-        {
-          "logical_symbol": "EURUSD",
-          "quality": "healthy",
-          "connection_epoch": 49,
-          "calendar_verified": false,
-          "error": null
-        }
-      ],
-      "observer_pid": 1670521
-    }
-  ]
+  "scope": "New observation window after watchdog repair; old interrupted records retained in same JSONL",
+  "deployments": [],
+  "observer_pid": 2127966,
+  "previous_interrupted_window": "sustained-observation-window-interrupted.json"
 }

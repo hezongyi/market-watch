@@ -198,6 +198,19 @@ Ubuntu 接收机重新读取 systemd NTP：offset −12.298ms、root distance 22
 - [逐项 completion audit](verification/data-integration/completion-audit.md)明确完成和剩余门槛。
   两日窗口未达到时长，EUR 十年最终版本和长期时效仍待审计；目标保持 active。
 
+### 持续观察工具部署故障修复
+
+原 03:06 窗口部署 API 后，上游行情恢复，但独立观察工具 EventSource 收到 HTTP 502 后
+进入 CLOSED，没有自动重连，产生零心跳/零样本块。产品页面原已有 watchdog；本次补齐观察
+工具的 15s 心跳超时重连。[真实 Chromium 502 接缝](verification/data-integration/observer-reconnect.json)
+修复前 calls1/beats0/CLOSED，修复后重新连接并收到 heartbeat。
+旧窗口及失败/空白记录全部保留，见
+[中断窗口](verification/data-integration/sustained-observation-window-interrupted.json)。
+用户 service 已停止旧进程并启动新的 **PID2127966**；新完整窗口
+**2026-10-06 03:50:58.841 UTC → 2026-10-08 03:50:58.841 UTC**，
+M1 since **1791258660000**。按明确 since 统计新窗口，原 JSONL 不删除。
+当前尚不能宣称两交易日已通过，目标保持 active。
+
 ## 基线审计与实现
 
 - 原方案引用 v1.7.0；新基线增加了平台原生历史缓存、后台任务、指标契约，managed M1 的来源字段

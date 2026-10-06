@@ -85,11 +85,17 @@ systemctl --user stop market-watch-data-integration-browser.service
 .venv/bin/python scripts/summarize_browser_observation.py artifacts/data-integration/browser-sustained.jsonl
 ```
 
-本轮窗口实际于 2026-10-06 03:06 UTC 启动，计划至 2026-10-08 03:06 UTC。
+原 03:06 UTC 窗口因 API 部署触发观察工具 EventSource CLOSED 而中断，保留
+[原窗口](sustained-observation-window-interrupted.json)及原 JSONL。工具补齐 15s 心跳超时重连，
+真实 Chromium 本地 502→恢复验证见 [重连证据](observer-reconnect.json)。新完整窗口于
+**2026-10-06 03:50:58.841 UTC** 启动，计划至 **2026-10-08 03:50:58.841 UTC**。
 窗口起点/代码版本/状态见 [窗口记录](sustained-observation-window.json)；每次中断或重启都在 JSONL 追加
 事件，不能拼接成没有中断的窗口。此 service 不设置自动重启或开机启用。实例停止前也应停止观察。
 小时版本再导入固定 replay 的证据、生产备份 Ubuntu 恢复与源日历适用性研究都在本目录，私密
 原始备份只存忽略目录，生产机器只读检查，不在那里创建验收实例。
+
+当前窗口摘要使用 `summarize_browser_observation.py ... --since 1791258658841`，
+后端 M1 完整分钟起点为 `1791258660000`。不将原窗口空白或部署迟到混成新窗口正常样本。
 
 ## 当前结果与限制
 

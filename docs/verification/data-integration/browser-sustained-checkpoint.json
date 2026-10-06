@@ -2,7 +2,7 @@
   "starts": [
     {
       "event": "started",
-      "at": 1791255960756,
+      "at": 1791258658841,
       "phase": "sustained",
       "planned_minutes": 2880,
       "host": "Ubuntu local Chromium",
@@ -12,103 +12,67 @@
     }
   ],
   "finishes": [],
-  "deployments": [
-    {
-      "event": "deployment_started",
-      "at": 1791258046610,
-      "services": [
-        "api",
-        "oanda-worker"
-      ],
-      "reason": "finite source session evidence, candidate completeness and precise history errors",
-      "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
-      "scope": "separate implementation segment; retain browser SSE errors and quote recovery states"
-    },
-    {
-      "event": "deployment_recovered",
-      "at": 1791258324640,
-      "live_module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
-      "live": [
-        {
-          "logical_symbol": "XAUUSD",
-          "quality": "healthy",
-          "connection_epoch": 49,
-          "calendar_verified": false,
-          "error": null
-        },
-        {
-          "logical_symbol": "EURUSD",
-          "quality": "healthy",
-          "connection_epoch": 49,
-          "calendar_verified": false,
-          "error": null
-        }
-      ],
-      "observer_pid": 1670521
-    }
-  ],
-  "contains_deployment": true,
-  "first_block": 1791255991268,
-  "last_block": 1791258333596,
-  "blocks": 79,
-  "snapshots": 1806,
-  "heartbeats": 2048,
-  "errors": 2,
+  "deployments": [],
+  "measurement_since": 1791258658841,
+  "prior_records_retained_in_original": 92,
+  "contains_deployment": false,
+  "first_block": 1791258689229,
+  "last_block": 1791258719241,
+  "blocks": 2,
+  "snapshots": 53,
+  "heartbeats": 59,
+  "errors": 0,
   "opened": 1,
   "symbols": {
     "XAUUSD": {
-      "unique_quotes": 1671,
+      "unique_quotes": 51,
       "negative_delays": 0,
       "missing_quote_snapshots": 0,
-      "epoch_changes": 2,
+      "epoch_changes": 0,
       "quality_counts": {
-        "healthy": 1747,
-        "unavailable": 19,
-        "recovering": 40
+        "healthy": 53
       },
       "receive_to_browser_ms": {
-        "samples": 1671,
+        "samples": 51,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
         "p50_ms": 310,
-        "p95_ms": 930,
-        "p99_ms": 1050
+        "p95_ms": 1010,
+        "p99_ms": 1260
       },
       "source_to_browser_ms": {
-        "samples": 1671,
+        "samples": 51,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
         "p50_ms": 610,
-        "p95_ms": 1260,
-        "p99_ms": 1500
+        "p95_ms": 1330,
+        "p99_ms": 1420
       }
     },
     "EURUSD": {
-      "unique_quotes": 585,
+      "unique_quotes": 8,
       "negative_delays": 0,
       "missing_quote_snapshots": 0,
-      "epoch_changes": 2,
+      "epoch_changes": 0,
       "quality_counts": {
-        "healthy": 1650,
-        "stale": 96,
-        "unavailable": 19,
-        "recovering": 41
+        "healthy": 48,
+        "stale": 5
       },
       "receive_to_browser_ms": {
-        "samples": 585,
+        "samples": 8,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 430,
-        "p95_ms": 1030,
-        "p99_ms": 1140
+        "p50_ms": 360,
+        "p95_ms": 1020,
+        "p99_ms": 1020
       },
       "source_to_browser_ms": {
-        "samples": 585,
+        "samples": 8,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 780,
-        "p95_ms": 1450,
-        "p99_ms": 1670
+        "p50_ms": 660,
+        "p95_ms": 1310,
+        "p99_ms": 1310
       }
     }
   },

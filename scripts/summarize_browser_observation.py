@@ -10,14 +10,19 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("file", type=Path)
+    parser.add_argument("--since", type=int, default=0, help="UTC ms for an explicitly recorded observation segment")
     args = parser.parse_args()
     totals = {}
     starts, finishes = [], []
     deployments = []
     first = last = None
     blocks = snapshots = heartbeats = errors = opened = 0
+    prior_records = 0
     for line in args.file.read_text().splitlines():
         record = json.loads(line)
+        if record.get("at", 0) < args.since:
+            prior_records += 1
+            continue
         if record["event"] == "started":
             starts.append(record)
         elif record["event"] in ("finished", "failed"):
@@ -66,6 +71,7 @@ def main():
                 result[f"p{int(fraction * 100)}_ms"] = value
             total[key] = result
     print(json.dumps({"starts": starts, "finishes": finishes, "deployments": deployments,
+        "measurement_since": args.since, "prior_records_retained_in_original": prior_records,
         "contains_deployment": bool(deployments), "first_block": first, "last_block": last,
         "blocks": blocks, "snapshots": snapshots, "heartbeats": heartbeats, "errors": errors,
         "opened": opened, "symbols": totals,

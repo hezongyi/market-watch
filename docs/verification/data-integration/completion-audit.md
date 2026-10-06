@@ -17,7 +17,7 @@ MT4 实时留到后续；OANDA 故障只降级，不切源。目标仍 active。
 | 实际 practice 账户和共享流 | 已验证双品种及十品种 | [账户采样](oanda-stream-probe.json)、[十品种 50 completed M1](load-ten-symbols.json)；无外部通知投递 |
 | 断线、401/429、单品种、浏览器恢复 | 已验证 | fault-pause-30s/120s、fault-restart、fault-unauthorized、fault-rate_limited、fault-single_symbol、browser-acceptance |
 | 真实规则到本地 signal/notification/outbox | 单样本已验证 | [561ms 本地信号](live-signal-runtime.json)，保持一个信号；外部 delivery disabled |
-| 两活跃交易日、欧美段、跨日和黄金暂停/恢复 | 尚未达到时长 | [03:06 UTC 起始窗口](sustained-observation-window.json)，计划至 2026-10-08；部署必须分段且保留错误 |
+| 两活跃交易日、欧美段、跨日和黄金暂停/恢复 | 尚未达到时长 | [03:50:58 UTC 新窗口](sustained-observation-window.json)，计划至 2026-10-08；[原中断窗口](sustained-observation-window-interrupted.json)保留错误 |
 | 全窗口 p50/p95/p99 与缺失/失败/迟到分母 | 等待持续窗口 | backend receive、Chromium receive→browser、M1→confirmation/evaluation 分别记录；短负载不代替长期结果 |
 | 时钟误差说明 | 接收机 NTP 已采样；供应商时钟偏差未独立证明 | [窗口时钟](receiver-clock-sync-window.txt)，同主机 browser/backend；不将源时间差宣称为纯传输延迟 |
 
