@@ -10,17 +10,14 @@ from .aggregation_policy import (
     DEFAULTS,
     AggregationCalendar,
     AssetClass,
-    change_aggregation,
     register_history_dataset,
 )
 from .history_versions import create_version, version_report
 from .market_datasets import legacy_inventory
 from .storage import (
-    DatasetMaintenance,
     HistoryVersion,
     Instrument,
     MarketDataset,
-    now_ms,
     transaction,
 )
 
@@ -91,15 +88,6 @@ class ManagedRequest(BaseModel):
     dataset: DatasetRequest
     maintenance: MaintenanceRequest
     request_id: str = Field(min_length=1, max_length=100)
-
-
-def _creation_request(body):
-    # Old manifests predate optional catalogue selection. Missing and null mean
-    # the same manual request; preserve every other field in retry comparison.
-    dataset = dict(body.get("dataset", {}))
-    if dataset.get("catalog_id") is None:
-        dataset.pop("catalog_id", None)
-    return {**body, "dataset": dataset}
 
 
 def dataset_report(row, inst):
@@ -198,42 +186,11 @@ def router(authenticated):
 
     @routes.post("/center/datasets", status_code=201)
     def create_managed(body: ManagedRequest):
-        from .data_center import dataset_detail
-        from .history_maintenance import configure, create_run
-        from .source_registry import collection_identity
+        from .history_commands import create_managed as command
 
         try:
             with transaction() as db:
-                # Acquire a source-level registration lock before any instrument
-                # insert. It serializes concurrent first registration as well.
-                from .aggregation_policy import history_dataset_identity
-                from .source_registry import _insert
-                from .storage import SourceSeries
-
-                raw = history_dataset_identity(source=body.dataset.source,
-                    provider_symbol=body.dataset.provider_symbol, asset_class=body.dataset.asset_class,
-                    aggregation_calendar=body.dataset.aggregation_calendar)
-                identity = collection_identity(raw)
-                db.execute(_insert(db)(SourceSeries).values(id=identity.key, identity=identity.model_dump())
-                    .on_conflict_do_nothing(index_elements=["id"]))
-                db.scalar(select(SourceSeries).where(SourceSeries.id == identity.key).with_for_update())
-                from .storage import HistoryRun
-
-                request = _creation_request(body.model_dump())
-                previous = db.scalar(select(HistoryRun).where(HistoryRun.dataset_id == raw.key,
-                    HistoryRun.request_id == body.request_id))
-                if previous:
-                    version = db.get(HistoryVersion, previous.version_id)
-                    original = version.manifest.get("maintenance", {}).get("creation_request", {})
-                    if _creation_request(original) != request:
-                        raise ValueError("相同提交标识不能更改创建配置")
-                    return {"dataset": dataset_detail(db, raw.key), "task": version_report(db, version.id)}
-                row, _ = register_history_dataset(db, **body.dataset.model_dump())
-                configure(db, row.id, **body.maintenance.model_dump())
-                version = create_run(db, row.id, request_id=body.request_id)
-                version.manifest = {**version.manifest, "maintenance": {
-                    **version.manifest["maintenance"], "creation_request": request}}
-                return {"dataset": dataset_detail(db, row.id), "task": version_report(db, version.id)}
+                return command(db, body)
         except (ValueError, KeyError) as error:
             raise HTTPException(422, str(error)) from None
 
@@ -311,50 +268,41 @@ def router(authenticated):
 
     @routes.post("/datasets/{dataset_id}/maintenance")
     def configure_maintenance(dataset_id: str, body: MaintenanceRequest):
-        from .history_maintenance import configure, plan_report
+        from .history_commands import configure_maintenance as command
 
         try:
             with transaction() as db:
-                configure(db, dataset_id, **body.model_dump())
-                return plan_report(db, dataset_id)
+                return command(db, dataset_id, body)
         except (ValueError, KeyError) as error:
             raise HTTPException(422, str(error)) from None
 
     @routes.post("/datasets/{dataset_id}/maintenance/control")
     def control_maintenance(dataset_id: str, body: MaintenanceControl):
-        from .history_maintenance import plan_report
+        from .history_commands import control_maintenance
 
         with transaction() as db:
-            db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
-            plan = db.get(DatasetMaintenance, dataset_id)
-            if not plan:
-                raise HTTPException(404, "维护计划不存在")
-            if body.action in ("pause", "resume"):
-                plan.paused = body.action == "pause"
-            else:
-                plan.archived = body.action == "archive"
-            plan.updated_at = now_ms()
-            return plan_report(db, dataset_id)
+            try:
+                return control_maintenance(db, dataset_id, body.action)
+            except ValueError as error:
+                raise HTTPException(404, str(error)) from None
 
     @routes.post("/datasets/{dataset_id}/tasks", status_code=201)
     def submit_task(dataset_id: str, body: RunRequest):
-        from .history_maintenance import create_run
+        from .history_commands import submit_task as command
 
         try:
             with transaction() as db:
-                version = create_run(db, dataset_id, **body.model_dump())
-                return version_report(db, version.id)
+                return command(db, dataset_id, body)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
     @routes.post("/tasks/{version_id}/control")
     def control_task(version_id: str, body: TaskControl):
-        from .history_maintenance import task_control
+        from .history_commands import control_task as command
 
         try:
             with transaction() as db:
-                task_control(db, version_id, body.action)
-                return version_report(db, version_id)
+                return command(db, version_id, body.action)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
@@ -369,12 +317,10 @@ def router(authenticated):
 
     @routes.post("/datasets/{dataset_id}/aggregation", status_code=201)
     def configure(dataset_id: str, body: AggregationRequest):
+        from .history_commands import change_aggregation
         try:
             with transaction() as db:
-                row, inst, version = change_aggregation(db, dataset_id,
-                    body.aggregation_calendar, version_id=body.version_id)
-                return {"dataset": dataset_report(row, inst),
-                        "version": version_report(db, version.id) if version else None}
+                return change_aggregation(db, dataset_id, body)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
@@ -430,15 +376,14 @@ def router(authenticated):
 
     @routes.post("/versions/{ident}/artifacts", status_code=202)
     def prepare_artifacts(ident: str, body: ArtifactRequest):
-        from .history_artifacts import artifact_report, request_artifacts
+        from .history_commands import request_artifacts
 
         try:
             with transaction() as db:
                 version = db.get(HistoryVersion, ident)
                 if not version:
                     raise HTTPException(404, "历史版本不存在")
-                request_artifacts(db, version, body.timeframes)
-                return artifact_report(db, ident)
+                return request_artifacts(db, version.id, body.timeframes)["periods"]
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 

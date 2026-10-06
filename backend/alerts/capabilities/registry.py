@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from .context import CapabilityError
 
-SCOPES = frozenset({"market:read", "analysis:read", "charts:read", "alerts:read", "alerts:write"})
+SCOPES = frozenset({"market:read", "market:write", "analysis:read", "charts:read", "alerts:read", "alerts:write"})
 
 
 @dataclass(frozen=True)

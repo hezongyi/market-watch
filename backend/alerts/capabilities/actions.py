@@ -455,6 +455,9 @@ def build_registry():
             )
         )
     register_history(registry)
+    from .history_writes import register_history_writes
+
+    register_history_writes(registry)
     from .composite import register_composite
 
     register_composite(registry)
