@@ -140,6 +140,57 @@ def test_empty_success_cannot_restore_open_market_and_failed_attempts_remain_in_
     assert not state["recovery_ready"]
 
 
+def test_confirmation_timing_records_completed_ingestion_and_evaluation(running, monkeypatch):
+    from alerts.storage import LiveMinute
+
+    db_factory, ownership, epoch, identities = running
+    clock = iter((125000, 125050, 125120))
+    monkeypatch.setattr(live, "now_ms", lambda: next(clock))
+    live.commit_confirmation(ownership, epoch, candles(identities["EUR_USD"]))
+    with db_factory.begin() as db:
+        minute_row = db.scalar(select(LiveMinute).where(LiveMinute.start == 60000))
+        audit = db.scalar(select(Audit).where(Audit.kind == "pricing_confirmed"))
+        assert minute_row.confirmed_at == 125050
+        assert audit.details["transport_received_at"] == 125000
+        assert audit.details["write_completed_at"] == 125050
+        assert audit.details["evaluation_completed_at"] == 125120
+        assert audit.details["m1_to_evaluation_ms"] == 5120
+        assert audit.details["processing_ms"] == 120
+
+
+def test_nontradeable_quote_cannot_certify_a_whole_closed_minute(running):
+    from alerts.storage import LiveMinute
+
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    live.publish_event(ownership, epoch, quote(identity, epoch, source=65000, tradeable=False),
+                       identities, now=125000)
+    live.commit_confirmation(ownership, epoch,
+        candles(identity, rows=(), result=RequestResult(status="empty_success")), now=125000)
+    with factory.begin() as db:
+        metric = db.scalar(select(LiveMinute).where(LiveMinute.start == 60000))
+        assert metric.expected is None
+        assert not db.get(LiveState, identity.key).ready
+    assert live.measurements(identity.key)["not_tradeable"] == 0
+
+
+def test_small_latency_samples_do_not_hide_the_slowest_confirmation(running, monkeypatch):
+    from alerts.storage import LiveMinute
+
+    factory, _, _, identities = running
+    monkeypatch.setattr(live, "now_ms", lambda: 400000)
+    with factory.begin() as db:
+        for index, delay in enumerate((1000, 2000, 3000, 4000, 50000)):
+            start = index * 60000
+            db.add(LiveMinute(dataset_id=identities["EUR_USD"].key, start=start,
+                expected=True, expectation="observed_source_tradeable", quote_count=1,
+                confirmed_at=start + 60000 + delay, first_attempt=start + 65000,
+                last_attempt=start + 65000))
+    result = live.measurements(identities["EUR_USD"].key)
+    assert result["p95_ms"] == result["p99_ms"] == 50000
+    assert result["late_over_30s"] == 1
+
+
 def test_tick_recovery_seeds_fresh_baseline_and_does_not_invent_gap_crossing(running):
     db_factory, ownership, epoch, identities = running
     identity = identities["EUR_USD"]
@@ -179,6 +230,26 @@ def test_single_symbol_quote_gap_cannot_create_fake_crossing(running):
     live.publish_event(ownership, epoch, quote(identity, epoch, source=126000, bid="1.10"), identities, now=126000)
     live.publish_event(ownership, epoch, quote(identity, epoch, seq=2, source=150000, bid="1.30"), identities, now=150000)
     with db_factory.begin() as db:
+        assert db.scalar(select(SignalRow)) is None
+
+
+def test_invalid_spread_breaks_tick_judgment_continuity(running):
+    from alerts.storage import MarketDataset
+
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    with factory.begin() as db:
+        instrument = db.get(MarketDataset, identity.key).instrument_id
+        create_watch(db, instrument, "invalid spread continuity", {"kind": "price", "timeframe": "tick",
+            "direction": "buy", "level": "1.25"}, armed_at=0)
+    live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
+    live.publish_event(ownership, epoch, quote(identity, epoch, source=126000, bid="1.10"),
+                       identities, now=126000)
+    live.publish_event(ownership, epoch, quote(identity, epoch, seq=2, source=127000,
+                       bid="1.15", ask="1.00"), identities, now=127000)
+    live.publish_event(ownership, epoch, quote(identity, epoch, seq=3, source=128000, bid="1.30"),
+                       identities, now=128000)
+    with factory.begin() as db:
         assert db.scalar(select(SignalRow)) is None
 
 

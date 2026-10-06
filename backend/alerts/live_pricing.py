@@ -5,6 +5,7 @@ checks the account lease token, connection epoch and expiry before touching stat
 """
 
 import hashlib
+import math
 import random
 from decimal import Decimal
 
@@ -251,6 +252,7 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         inst.last_received = event.received_at
         inst.quality = "receiving" if state.ready else "recovering"
         if (not event.tradeable or event.bid is None or event.ask is None or
+                event.ask is not None and event.bid is not None and Decimal(event.ask) < Decimal(event.bid) or
                 previous and event.source_time - previous["source_time"] > 15000):
             for watch in db.scalars(select(Watch).where(Watch.instrument_id == inst.id,
                                                        Watch.status == "active")):
@@ -322,9 +324,11 @@ def _minute_observation(db, identity, state, start, stamp, cache=None):
     # A fresh source assertion is evidence of an open market; old assertions
     # cannot certify an entire disconnect or historical maintenance window.
     fresh = bool(quote) and start <= quote["source_time"] < start + 90000
-    expected = quote["tradeable"] if fresh else None
+    # A tradeable source observation proves this minute has data. One
+    # nontradeable quote proves only that instant, never a whole-minute closure.
+    expected = True if fresh and quote["tradeable"] and quote.get("bid") is not None else None
     metric = LiveMinute(dataset_id=identity.key, start=start, expected=expected,
-        expectation="fresh_source_tradeable" if fresh else "unknown_session", first_attempt=0,
+        expectation="fresh_source_tradeable" if expected else "unknown_session", first_attempt=0,
         last_attempt=0, attempts=0, failures=0, last_result="pending")
     db.add(metric)
     if cache is not None:
@@ -375,27 +379,35 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
             getattr(previous_rows[row.timestamp], name) != Decimal(getattr(row, name))
             for name in ("open", "high", "low", "close")) for row in batch.rows)
         ingest(db, inst, batch.ingestion_payload())
+        # Measure completed ingestion, rather than the entry into the fenced
+        # transaction. An explicit test clock remains deterministic.
+        db.flush()
+        written_at = now_ms() if now is None else stamp
         confirmed = {row.timestamp for row in batch.rows}
         for start in range(batch.window_start, batch.window_end, 60000):
             _minute_observation(db, batch.identity, state, start, stamp, observations)
         for start in confirmed:
             observation = _minute_observation(db, batch.identity, state, start, stamp, observations)
             if observation.confirmed_at is None:
-                observation.confirmed_at = stamp
+                observation.confirmed_at = written_at
             if observation.expected is None:
                 observation.expected = True
                 observation.expectation = ("recovery_source_complete"
                     if start + 60000 < state.recovery_started - 30000 else "observed_source_complete")
             observation.last_result = "data"
+        confirmation_audit = None
         if batch.rows:
             state.confirmed_end = max(state.confirmed_end, batch.rows[-1].timestamp + 60000)
-            db.add(Audit(kind="pricing_confirmed", details={"dataset": batch.identity.key,
+            confirmation_audit = Audit(kind="pricing_confirmed", details={"dataset": batch.identity.key,
                 "epoch": epoch, "window_start": batch.window_start, "window_end": batch.window_end,
                 "confirmed": len(batch.rows), "observed_at": stamp,
-                "last_confirmed_end": state.confirmed_end}))
+                "transport_received_at": batch.observed_at,
+                "write_completed_at": written_at,
+                "last_confirmed_end": state.confirmed_end})
+            db.add(confirmation_audit)
         if not state.ready:
             state.recovery_cursor = batch.window_end
-        # Only confirmed target bars or an explicit non-tradeable assertion allow
+        # Only confirmed target bars or an independently proven closure allow
         # the current open-market gate to recover. Empty success alone never does.
         current_confirmed = target in confirmed
         if not state.ready and batch.window_end >= (stamp - 5000) // 60000 * 60000:
@@ -425,6 +437,14 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
                     if revised:
                         rewarm_watch(db, watch, until=emit_after)
                     evaluate_watch(db, watch.id, emit_after=emit_after)
+        if confirmation_audit is not None:
+            db.flush()
+            evaluated_at = now_ms() if now is None else stamp
+            confirmation_audit.details = {**confirmation_audit.details,
+                "evaluation_completed_at": evaluated_at,
+                "m1_to_evaluation_ms": evaluated_at - batch.window_end,
+                "processing_ms": evaluated_at - stamp,
+                "timing_scope": "ingestion and watch computation flushed; excludes transaction commit and delivery"}
         if current_confirmed or metric.expected is False:
             state.attempts = 0
             state.error = None
@@ -510,8 +530,9 @@ def measurements(dataset_id, *, since=0):
             "late_over_30s": sum(value > 30000 for value in delays),
             "failed_attempts": sum(row.failures for row in rows),
             "recovery_confirmed": sum(row.confirmed_at is not None for row in recovered),
-            "p95_ms": delays[int((len(delays)-1)*0.95)] if delays else None,
-            "p99_ms": delays[int((len(delays)-1)*0.99)] if delays else None,
+            "p95_ms": delays[math.ceil(len(delays)*0.95)-1] if delays else None,
+            "p99_ms": delays[math.ceil(len(delays)*0.99)-1] if delays else None,
+            "percentile_method": "nearest_rank",
             "quotes": {"samples": samples, "p50_age_ms": percentile(0.5),
                 "p95_age_ms": percentile(0.95), "p99_age_ms": percentile(0.99),
                 "max_interarrival_ms": max((row.max_interarrival for row in rows), default=0),

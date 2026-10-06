@@ -1,0 +1,13 @@
+[Unit]
+Description=Market data integration Ubuntu browser observation (48 hours)
+
+[Service]
+Type=simple
+WorkingDirectory=/home/quant/repos/market-watch-data-integration/web
+Environment=MW_OBSERVE_MINUTES=2880
+Environment=MW_OBSERVE_PHASE=sustained
+Environment=LD_LIBRARY_PATH=/home/quant/.local/share/playwright-deps-jammy/usr/lib/x86_64-linux-gnu
+ExecStart=/usr/bin/node tests/data-integration.observe.cjs
+Restart=no
+TimeoutStopSec=40
+MemoryMax=640M

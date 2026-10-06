@@ -92,11 +92,67 @@
 
 - 十年导入仍在运行；最终 manifest、缺口/休市归因、跨年/DST/精度全量报告尚待形成。
 - 两交易日持续实测尚未达到，不能把短样本价龄当成 SLA。接收机 NTP 状态已采样：offset +1.699ms、root distance 22.2ms、jitter 10.491ms；
-  [时钟记录](verification/data-integration/receiver-clock-sync.txt)不证明供应商时钟偏差。三品种采集已通过，待扩至10品种负载、
-  401/429、单品种停更与完整通知链路的故障验收。
-- OANDA/Dukascopy 的候选 NY17 日历尚未获得账户产品与历史区间的完整核实，UI 保持“待核实”；
-  真实生产存量来源清点与备份恢复尚未执行。
+  [时钟记录](verification/data-integration/receiver-clock-sync.txt)不证明供应商时钟偏差。
+  十品种短负载、401/429、单品种停更和本地 signal/notification/outbox 已通过（见下节），
+  仍需两交易日持续分段记录与预警计算观测；不将关闭的外部投递称为实际送达。
+- OANDA/Dukascopy 的候选 NY17 日历尚未获得账户产品与历史区间的完整核实，UI 保持“待核实”。
+  生产存量只读清点与已有生产备份在 Ubuntu 隔离恢复已完成，见下节；没有迁移或部署生产。
 - MT4 按用户指令留待后续；本次完成门槛为 P0–P2，目标仍 active，尚不能宣称全体验收通过。
+
+## 继续验收与修正（2026-10-06 02:30 UTC 起）
+
+- 增加在真实 Ubuntu Compose/PostgreSQL 上运行的本地响应故障接缝；不会向供应商发送错误凭据或
+  故意触发限流。401 保持配置故障 20.324 秒，无自动重连，认证 `/retry` 后恢复；429 实际 REST
+  请求间隔 20.062 秒，遵守注入的 Retry-After。故障与真实上游请求分别记录。
+  [401](verification/data-integration/fault-unauthorized.json)、
+  [429](verification/data-integration/fault-rate_limited.json)。最初 429 工具把注入前的恢复重连也纳入
+  “不应重连”断言，记录在 [初次工具结果](verification/data-integration/fault-rate_limited-initial-harness-result.json)；
+  修正断言范围后重新运行，没有删除原始失败。
+- 过滤真实 EURUSD 报价 40 秒，XAUUSD 与心跳继续。EURUSD 为 stale、quote_ready=false，XAUUSD
+  仍 healthy，真实 REST M1 继续确认。恢复首个真实报价前人为设置跨阈值旧判断前态，采集器正确
+  清空并重新建立前态，没有假信号；共享 stream 世代未改变。
+  [单品种故障](verification/data-integration/fault-single_symbol.json)。
+- 日历一手资料核对发现：OANDA SG 外汇通常 17:05–16:59、黄金 18:05–16:59 纽约时间；Dukascopy
+  当前 JForex 表支持 NY17 与黄金一小时暂停。当前 practice 账户 division 和十年 Python feed
+  历史例外仍未证明，不把候选身份改写为已验证。保留合法边界柱，不从公告时刻粗暴裁剪。
+  [研究与适用边界](verification/data-integration/source-calendar-research.md)。已向用户询问账户法律实体/地区，
+  不索取账号或凭据；该信息缺失不阻碍其他验收工作。
+- 回归复现并修复单次 nontradeable 报价被泛化成整分钟闭市的问题；空 REST 不再借此让恢复提前就绪。
+  倒挂 Bid/Ask 同样中断 tick 判断连续性，下一条有效报价先建立新前态。
+- M1 `confirmed_at` 改为 ingestion flush 完成时刻；新增独立写入/预警计算完成与处理耗时审计。
+  该时刻不包含最终数据库 commit 或外部通知投递。小样本 p95/p99 改用 nearest-rank，避免漏报
+  最慢一次确认。新增真实 Chromium SSE 分桶记录接收到浏览器、源到浏览器延迟及全部异常状态。
+- 真实 XAUUSD 报价触发规则，signal、local notification 已生成，继续采集 10 秒只有一个信号；
+  来源到 signal 创建为 561ms，通知保持 pending，外部投递关闭。
+  [本地通知链路](verification/data-integration/live-signal-runtime.json)。该单样本不代表 SLA 或手机送达。
+- unraid 只读清点确认实际存量 EURUSD/XAUUSD 来源均为 OANDA，BTCUSDT 为 Binance，revision r19。
+  不自动映射账户范围或将旧系列改成 Dukascopy。
+  [生产清点](verification/data-integration/production-legacy-inventory.json)。已有生产备份通过 SHA256 后
+  复制到 Ubuntu 独立 PG14 临时库恢复，36 张表/820768 根柱及全部表计数匹配，临时库已清理。
+  [恢复证据](verification/data-integration/production-backup-ubuntu-restore.json)。生产服务及数据库没有修改。
+- 在相同数据集上重新调用真实 Dukascopy 导入产生新小时版本，原版本及 4 个已有 replay 的柱、
+  warmup、day context、manifest 组合 SHA256 保持相同。
+  [版本固定证据](verification/data-integration/replay-real-reimport.json)。已发布样本逐块校验通过：
+  [内容完整性](verification/data-integration/history-sample-integrity.json)。
+- 最终代码全量回归 **596 passed、40 skipped**，最新定向 **20 passed**，PostgreSQL 容器回归
+  **120 passed**；API/OANDA worker 实际加载模块 SHA256 与 worktree 相同。
+  [最终全量](verification/data-integration/backend-tests-timing-final.txt)、
+  [最新定向](verification/data-integration/live-tests-timing-final.txt)、
+  [PostgreSQL](verification/data-integration/postgres-tests-timing.txt)、
+  [容器代码核对](verification/data-integration/container-timing-code.json)。
+- 十品种共享连接负载已重新验收通过。十品种每个 5 个已知应有的完成分钟，共 50 个全部确认，
+  missing/failed/late-over-30s 均为 0；nearest-rank p95/p99 最慢为 EURUSD 13.399 秒。
+  全窗口共享 epoch40，历史导入并行运行；部分低频报价出现 stale，完整状态保留，没有隐藏。
+  [完整容量窗口](verification/data-integration/load-ten-symbols.json)。首次被本轮 API 镜像更新期间的短暂 502 中断，原始结果保留在
+  [中断窗口](verification/data-integration/load-ten-symbols-api-deployment-interrupted.json)。
+  容量结果只采用完整无部署干扰的重新测量窗口；它不替代两个交易日观测。
+- Chromium 短工具验证包含故障、扩品种与本轮 API 部署，
+  [汇总](verification/data-integration/browser-timing-tool-validation.json)完整保留错误与不健康状态。
+  工具首次遇到目录新增品种的空 quote 时产生 NaN 分桶，修复为明确统计未报价快照；旧 NaN
+  在汇总中列为 invalid_samples，不用于延迟百分位。正式持续观察使用修正后的工具。
+
+十年导入在 02:56 UTC 左右达到 EURUSD 60.55%、XAUUSD 58.44%；尚未完成。新的长观察窗口需在
+本轮部署与故障结束后明确保存起点、代码版本与浏览器进程状态，不能回填为过去已发生的持续验收。
 
 ## 基线审计与实现
 
