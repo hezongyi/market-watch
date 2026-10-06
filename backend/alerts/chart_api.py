@@ -701,18 +701,25 @@ def data_sync(body: DataQuery):
                 if body.timeframe in ("W1", "MN")
                 else body.timeframe
             )
+            stamp = db.execute(
+                select(
+                    func.count(Bar.id),
+                    func.max(Bar.received_at),
+                    func.sum(Bar.revision + Bar.volume_revision),
+                    func.min(Bar.start),
+                    func.max(Bar.start),
+                ).where(Bar.instrument_id == inst.id, Bar.timeframe == source)
+            ).one()
+            revision = hashlib.sha256(
+                json.dumps([list(stamp), inst.calendar_profile], sort_keys=True).encode()
+            ).hexdigest()
             if not body.indicators:
                 # Ordinary chart pagination must not materialize all available history.
                 page = chart_rows(db, inst, body.timeframe, before, body.limit + 1, now_ms())
                 visible = page[-body.limit :]
-                revision_at = db.scalar(
-                    select(func.sum(Bar.revision + Bar.volume_revision)).where(
-                        Bar.instrument_id == inst.id, Bar.timeframe == source
-                    )
-                )
                 return {
                     "history_check": history_check(db, inst, source, visible, body),
-                    "history_revision": str(revision_at or 0),
+                    "history_revision": revision,
                     "bars": visible,
                     "indicators": [],
                     "has_more": len(page) > body.limit,
@@ -731,15 +738,6 @@ def data_sync(body: DataQuery):
                     "precision": inst.precision,
                     "as_of": now_ms(),
                 }
-            stamp = db.execute(
-                select(
-                    func.count(Bar.id),
-                    func.max(Bar.received_at),
-                    func.sum(Bar.revision + Bar.volume_revision),
-                    func.min(Bar.start),
-                    func.max(Bar.start),
-                ).where(Bar.instrument_id == inst.id, Bar.timeframe == source)
-            ).one()
             key = (
                 str(db.get_bind().url),
                 inst.id,
@@ -818,11 +816,7 @@ def data_sync(body: DataQuery):
             )
         return {
             "history_check": history_snapshot,
-            "history_revision": hashlib.sha256(
-                json.dumps(
-                    [stamp[0], stamp[2], stamp[3], inst.calendar_profile], sort_keys=True
-                ).encode()
-            ).hexdigest(),
+            "history_revision": revision,
             "bars": visible,
             "indicators": indicators,
             "has_more": bool(visible and any(x["start"] < start for x in all_rows)),

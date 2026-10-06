@@ -71,11 +71,15 @@ python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 
 算法扩展沿用 `chart_indicators.register()`，通用指标工具自动发现。重复算法 ID 拒绝注册；需要稳定 ID/版本、参数、输出和历史要求。测试已通过真实 SDK 协议验证新增动作发现，并验证新增指标发现/计算。
 
-## Ubuntu Docker 验收运行步骤（待执行）
+## Ubuntu Docker 验收运行步骤
 
-工作目录 `/home/quant/repos/market-watch-native-mcp`。独立 project 为 `mw-native-mcp-acceptance`，独立 PostgreSQL 14、网络和 `native-mcp-pg` volume。计划地址为 `https://localhost:18543/`、MCP `https://localhost:18543/mcp`、图表 origin `https://localhost:18544/`。这些地址目前没有已部署实例。
+工作目录 `/home/quant/repos/market-watch-native-mcp`。验收实例已在 Ubuntu 22.04.5 主机 `quant-server` 的 Docker 29.1.3 实际运行。独立 project 为 `mw-native-mcp-acceptance`，PostgreSQL 14，网络 `mw-native-mcp-acceptance_default`，volume `mw-native-mcp-acceptance_native-mcp-pg`。地址为 `https://localhost:18543/`、MCP `https://localhost:18543/mcp`、图表 origin `https://localhost:18544/`，仅绑定 Ubuntu 本机回环地址。
+
+`quant` 已加入 docker 组；当前会话若尚未刷新组身份，可用 `sg docker -c 'docker compose ...'` 执行下列命令，或重新登录。验收已实际使用此方式启动、停止和恢复本 project，未操作其他 project。
 
 凭据、数据库配置和自签 TLS 文件仅在 `/tmp/mw-native-mcp-acceptance`。准备脚本已运行；不重复运行覆盖现有私密配置。图表许可库已由本机已有安装复制到本任务 ignored `advanced-host/charting_library/`，未修改其他工作树原件；不要提交库文件。
+
+TLS 使用独立 `ca.pem` 签发的 `CA:FALSE` 服务端 leaf；不要把 `CA:TRUE` 根证书用作服务端证书，Codex 的 rustls 会拒绝。浏览器需信任该本机验收 CA；SDK 使用 `ca.pem`，Codex 脚本同时设置 `CODEX_CA_CERTIFICATE` 和 `SSL_CERT_FILE` 指向包含公共 CA 与验收 CA 的 `ca-bundle.pem`。验收证书有效期 7 天，agent 凭据为 24 小时；新凭据使用新的 output 文件名，避免覆盖已有文件。
 
 ```bash
 # 新环境才需要执行准备：
@@ -84,7 +88,7 @@ python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 docker compose --env-file /tmp/mw-native-mcp-acceptance/compose.env \
   -f docs/verification/native-mcp/compose.yaml up -d --build
 
-# 仅针对上述隔离数据库生成带 acceptance-fixture 来源标签的确定性数据（包含 H1/H4 已发布快照，可供真实页面读取）：
+# 新数据库才需要 seed，已有 fixture 会拒绝重复：
 docker compose --env-file /tmp/mw-native-mcp-acceptance/compose.env \
   -f docs/verification/native-mcp/compose.yaml exec -T api python - \
   < scripts/seed_native_mcp_acceptance.py
@@ -112,7 +116,7 @@ chmod 600 /tmp/mw-native-mcp-acceptance/agent-read.token
 .venv/bin/python scripts/native_mcp_acceptance.py
 .venv/bin/python scripts/native_mcp_codex_acceptance.py
 
-# 真实网页 -> 原生对象保存 -> PG -> HTTP MCP（未运行）：
+# 真实网页 -> 原生对象保存 -> PG -> HTTP MCP：
 NODE_PATH=/home/quant/repos/market-watch/web/node_modules \
 LD_LIBRARY_PATH=/tmp/mw-indicator-browser-libs/root/usr/lib/x86_64-linux-gnu \
 node web/tests/native-mcp-drawings.browser.cjs
@@ -123,4 +127,6 @@ docker compose --env-file /tmp/mw-native-mcp-acceptance/compose.env \
 # 重启：同一命令将 stop 换成 start。
 ```
 
-实际 SDK 验收须保留 HTTPS 报告；Codex 脚本检查调用成功、无工具错误、EURUSD H1/H4 非空、已保存画线及最终征询问题，并以 0600 保存事件/错误日志；仍须人工核对时间/价位引用与事实/计算/推断区分。Codex 须保留真实 tool-call 事件及含时间/价位、用户意见问题的分析，并核对 audit。自签 TLS 的 Codex 信任组合仍需实测，准备的 `ca-bundle.pem` 同时包含公共 CA 和本机验收证书。若部署权限或实际客户端授权不可用，保持验收未完成状态，不改用 unraid 或模拟客户端来宣称交付完成。
+验收 EURUSD 来源明确为 `acceptance-fixture`。真实网页画线使用独立 `MCPFIXTURE` 已发布合成快照；该品种名称明确标为 SYNTHETIC，无上游品种映射，`binance` 仅用于既有按需路由识别，不代表它的价格来自 Binance。画线报告同时保存 `synthetic_market_data=true` 与 `data_source=acceptance-fixture`。实际 Binance 验收另读 `BTCUSDT provider`，不混用这两份数据。
+
+实际 SDK HTTPS、浏览器数据库保存和 Codex 调用均已通过，证据见 [验收记录](verification/native-mcp/acceptance.md)。Codex 脚本检查成功调用、无工具错误、EURUSD H1/H4 非空、后台指标、已保存画线及最终征询问题，以 0600 保存事件/错误日志；精确指标由 `indicators_calculate` 计算，时间/价位引用与事实/计算/推断区分仍需人工核对。未实施生产发布。

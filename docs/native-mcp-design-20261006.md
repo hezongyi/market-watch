@@ -194,3 +194,9 @@ HTTP/ASGI 集成需要验证：
 ### 后续复核
 
 2026-10-06 第二次继续核实：Docker socket 权限仍拒绝，验收实例仍未部署。新增协议回归复现并修正 Yahoo gap calendar、published indicator budget、provider D/W/M cursor 三处合同错误；Yahoo 休市间隔现在显式标记 calendar unverified，provider 分页 cursor 保留 native chart time。补充真实浏览器保存/PG/MCP 验收脚本和 Codex 成功数据调用检查；这些环境脚本尚未运行，不能据此升级真实验收状态。
+
+### 最终真实验收
+
+2026-10-06 用户授权后，使用已配置的 docker 组和 `sg docker` 恢复 Ubuntu 本机访问；独立 `mw-native-mcp-acceptance` 实例已实际启动。PostgreSQL 14 初始 migration、HTTPS 官方 SDK、真实网页原生对象保存与 HTTP MCP、实际 Codex CLI 0.160.0、实际 Binance provider 和网页同快照、认证及项目启停持久性均已验证。验收来源和证据见 [验收记录](verification/native-mcp/acceptance.md)，启停与连接见 [使用文档](native-mcp-usage.md)。
+
+部署反馈还修复了图表 Docker 白名单漏包和 Codex rustls 拒绝 CA 根证书充当 server leaf 的问题。真实 PG 的删除与修订同时发生时暴露出共享图表 `history_revision` 的求和碰撞；网页与 MCP 现在统一使用行数、修订统计、时间边界和日历配置的指纹。协议回归先失败再通过；最终后端完整回归 **497 passed、38 skipped**。没有生产发布、交易工具或计划 CRUD。

@@ -16,7 +16,7 @@ from mcp.client.streamable_http import streamable_http_client
 async def main(args):
     root = Path(args.private_dir)
     token = (root / "agent.token").read_text().strip()
-    tls = ssl.create_default_context(cafile=str(root / "cert.pem"))
+    tls = ssl.create_default_context(cafile=str(root / "ca.pem"))
     with httpx.Client(base_url=args.url, verify=tls, trust_env=False) as browser:
         response = browser.post("/api/login", json=json.loads((root / "login.json").read_text()))
         response.raise_for_status()

@@ -802,3 +802,22 @@ def test_native_daily_pagination_uses_chart_labels(mcp, monkeypatch):
     assert not result.get("isError"), result
     assert result["structuredContent"]["next_before"] == label
     assert result["structuredContent"]["cursor_coordinate"] == "native_chart_time_ms"
+
+
+def test_bars_revision_changes_when_deletion_offsets_revision_increment(mcp):
+    client, token, database = mcp
+    seed_bars(database)
+    query = {"instrument": "EURUSD", "timeframe": "H1", "limit": 20}
+    original = call(client, token, "market_get_bars", query)["structuredContent"]["page"]
+    with database.begin() as db:
+        rows = list(db.scalars(
+            select(storage.Bar).where(storage.Bar.timeframe == "H1").order_by(storage.Bar.start)
+        ))
+        # The revision sum is unchanged: one row removed, another incremented.
+        db.delete(rows[2])
+        rows[-1].close += Decimal(".0001")
+        rows[-1].revision += 1
+    updated = call(client, token, "market_get_bars", query)["structuredContent"]["page"]
+    assert original["history_revision"] != updated["history_revision"]
+    web = client.post("/api/charts/data", json={**query, "track_history": True}).json()
+    assert updated["history_revision"] == web["history_revision"]

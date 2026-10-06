@@ -1,0 +1,78 @@
+{
+  "recorded_at": "2026-10-06T03:42:42.663839+00:00",
+  "docker": {
+    "name": "quant-server",
+    "os": "Ubuntu 22.04.5 LTS",
+    "version": "29.1.3"
+  },
+  "docker_context": "default, local unix:///var/run/docker.sock",
+  "host": "quant-server",
+  "project": "mw-native-mcp-acceptance",
+  "containers": [
+    {
+      "name": "/mw-native-mcp-acceptance-api-1",
+      "image": "market-watch-api:native-mcp-acceptance",
+      "image_id": "sha256:34948529178be1fc8943bbb28c4340087fbb2e5c216001621556507728589b5f",
+      "status": "running",
+      "project": "mw-native-mcp-acceptance",
+      "service": "api"
+    },
+    {
+      "name": "/mw-native-mcp-acceptance-migrate-1",
+      "image": "market-watch-api:native-mcp-acceptance",
+      "image_id": "sha256:34948529178be1fc8943bbb28c4340087fbb2e5c216001621556507728589b5f",
+      "status": "exited",
+      "project": "mw-native-mcp-acceptance",
+      "service": "migrate"
+    },
+    {
+      "name": "/mw-native-mcp-acceptance-tls-1",
+      "image": "nginx:1.28-alpine",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "project": "mw-native-mcp-acceptance",
+      "service": "tls"
+    },
+    {
+      "name": "/mw-native-mcp-acceptance-web-1",
+      "image": "market-watch-web:native-mcp-acceptance",
+      "image_id": "sha256:49e67fdb633a3cf0edd83bb778971794d3fae2321fec83dba5afde21245142ba",
+      "status": "running",
+      "project": "mw-native-mcp-acceptance",
+      "service": "web"
+    },
+    {
+      "name": "/mw-native-mcp-acceptance-chart-origin-1",
+      "image": "market-watch-chart:native-mcp-acceptance",
+      "image_id": "sha256:3f0b12d63ef73c0e2ae732f1295f1a7c937d5e13b19fd1da40a353643bae5074",
+      "status": "running",
+      "project": "mw-native-mcp-acceptance",
+      "service": "chart-origin"
+    },
+    {
+      "name": "/mw-native-mcp-acceptance-pg-1",
+      "image": "postgres:14-bookworm",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "project": "mw-native-mcp-acceptance",
+      "service": "pg"
+    }
+  ],
+  "volume_labels": {
+    "com.docker.compose.config-hash": "67484ad08cf6bf2f8303e329698c65910314e552299541ad78b4bb44f4626efe",
+    "com.docker.compose.project": "mw-native-mcp-acceptance",
+    "com.docker.compose.version": "2.40.3",
+    "com.docker.compose.volume": "native-mcp-pg"
+  },
+  "network_labels": {
+    "com.docker.compose.config-hash": "70ae01953614722d503161c725d05fbc80b81f7c4fb09784cd978ebd8950e253",
+    "com.docker.compose.network": "default",
+    "com.docker.compose.project": "mw-native-mcp-acceptance",
+    "com.docker.compose.version": "2.40.3"
+  },
+  "app": "https://localhost:18543/",
+  "mcp": "https://localhost:18543/mcp",
+  "chart_origin": "https://localhost:18544/",
+  "bind": "127.0.0.1 only",
+  "project_stop_start_verified": true
+}

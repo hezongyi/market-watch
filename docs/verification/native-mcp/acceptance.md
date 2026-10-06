@@ -1,6 +1,6 @@
 # 原生 MCP 验收记录
 
-日期：2026-10-06。开发基线 `3c18f60`，worktree `/home/quant/repos/market-watch-native-mcp`，branch `feat/native-mcp`。**整体验收未完成，不是已部署交付。**
+日期：2026-10-06。开发基线 `3c18f60`，worktree `/home/quant/repos/market-watch-native-mcp`，branch `feat/native-mcp`。**Ubuntu 本机真实验收已完成**，最终证据与实例信息见文末；前面保留实施时的历史检查与故障记录。没有生产发布。
 
 ## 已核实证据
 
@@ -34,7 +34,7 @@ node web/tests/advanced-layout-refresh.browser.cjs --case=single-provider
 
 这属于自动化浏览器测试夹具，不是验收部署实例。测试曾因夹具缺 history capabilities 初始化失败；补齐当前初始化合同后通过。保存投影使用真实库返回的稳定 ID `horizontal_line/trend_line/rectangle`，不使用猜测的显示名称。许可资源已复制到本任务的 `advanced-host/charting_library` ignored 目录，未修改其他工作树原件，没有提交。
 
-## 未满足的真实环境 gate
+## 初次实施时未满足的真实环境 gate（历史记录）
 
 - 本机 `docker info` 返回 `permission denied ... unix:///var/run/docker.sock`；当前会话禁止提权。已向用户请求配置 quant 本机 Docker 权限，尚未获得完成通知。不能转 unraid 绕过。
 - 尚未 build/start `mw-native-mcp-acceptance`；无可用访问地址。计划使用 `https://localhost:18543` 和独立 chart origin `:18544`，仅为预留配置。
@@ -64,3 +64,33 @@ node web/tests/advanced-layout-refresh.browser.cjs --case=single-provider
 全量回归进程已正常结束（496 passed、38 skipped）。复核实际网页保存事件后，浏览器验收脚本改用真实 Ctrl+S 保存路径，同时等待持久化响应和 dirty 状态清除；JS 语法检查、修改文件 Ruff 和 `git diff --check` 通过。该脚本仍未在部署实例运行。
 
 再次核对 Ubuntu 本机 Docker，socket 为 `660 nobody:nogroup`，当前 `quant` 会话虽列出 `nogroup`，`docker info` 仍返回 permission denied。18543/18544 没有监听，尚未启动本任务 Compose 服务。之前请求的 Docker 权限配置尚未完成；剩余 PostgreSQL、HTTPS、浏览器和实际 Codex gate 均依赖该环境，目标因此阻塞，不能标记完成。
+
+## 最终 Ubuntu 真实验收（2026-10-06）
+
+用户授权后，本机 socket 已为 `root:docker`，`quant` 已加入 docker 组。当前进程尚未刷新组身份，使用 `sg docker -c 'docker ...'` 成功连接本机 daemon。验收环境是 **Ubuntu 22.04.5 / quant-server / Docker 29.1.3**，default context 的本机 Unix socket。独立 project `mw-native-mcp-acceptance`、网络 `mw-native-mcp-acceptance_default`、volume `mw-native-mcp-acceptance_native-mcp-pg`；实际容器、镜像与所属 labels 见 [环境记录](environment.json)。API/PG healthy，migration 容器正常退出 0。
+
+实际地址仅绑定 Ubuntu 回环：应用 `https://localhost:18543/`，MCP `https://localhost:18543/mcp`，图表独立 origin `https://localhost:18544/`。已实际执行整个 project 的 stop/start，恢复后 readyz、凭据、审计、写入操作、通知状态和已保存图表仍可用。启停命令及 CA 信任、凭据有效期见 [使用文档](../../native-mcp-usage.md)。
+
+| 真实 gate | 最终证据 | 结果与边界 |
+| --- | --- | --- |
+| PG migration 与并发幂等 | [PG 报告](postgres-report.json)、[HTTPS 报告](https-report.json) | PostgreSQL 14 到 `s20_agent_capabilities`；4 并发首次创建 + 重试只有一个资源，同键不同意图拒绝；取消与 notification ack 持久化；项目启停后仍保留 |
+| 真实 HTTPS 官方 SDK | [HTTPS 报告](https-report.json) | 初始化、13 个工具发现与 schema、调用、网页/MCP quote/OHLC/EMA/RSI/revision 一致；无效/缺少 token 拒绝 |
+| 真实认证与 scope | [认证报告](auth-report.json) | 过期、撤销返回 401；market-only 凭据只发现行情与 status；直接调用隐藏画线工具返回 FORBIDDEN |
+| 真实浏览器 → PG → HTTP MCP | [浏览器报告](browser-report.json)、[运行日志](browser-runtime.log) | 真实许可库通过公开 API 创建水平线/趋势线/矩形，保存后 ID/锚点/revision 一致；未保存改动不可见，再保存后可见；刷新恢复身份 |
+| 来源、质量与修订 | [质量报告](quality-report.json) | 实际 Binance `BTCUSDT provider` 与网页同快照/同 cache revision；不存在的上游符号明确 DATA_UNAVAILABLE/retryable；独立合成数据删除一根后 gap 可见，同步修订导致 history revision 改变；旧报价显式 stale |
+| 实际 Codex 0.160.0 | [Codex 报告及分析](codex-report.json) | 启停后真实 HTTPS 成功调用 H1、H4、后端 EMA、alerts、saved drawings；非空数据，引用时间/价位/保存版本，区分事实、计算与推断，并在结尾征询意见；相应动作已在 PG audit 核对 |
+| 回归与静态检查 | [全量回归](backend-final.log)、[相关回归](revision-tests.log) | 最终 **497 passed、38 skipped**（206.28 秒）；MCP/图表相关 **40 passed**；修改文件 Ruff、JS parse、diff 检查、Compose config、临时 SQLite 完整 seed、独立 CA/server leaf 验证通过 |
+
+验收数据分开标识：EURUSD 为 `acceptance-fixture`；网页对象验收用 `MCPFIXTURE` 已发布合成快照，名称明确 SYNTHETIC，无上游品种映射，其 `binance` 配置仅供既有路由识别。浏览器报告显式声明 `data_source=acceptance-fixture`、`synthetic_market_data=true`。实际 Binance 上游检查使用不同的 `BTCUSDT provider`，标记 `synthetic=false`。未将合成样本解释为可交易行情或跨周期聚合算法验收。OANDA 凭据与 Yahoo 开关未配置，不声称已对它们进行 live-source 验收；相关 cursor/calendar/provider 合同已有协议回归。
+
+实际部署反馈修正了三处问题：
+
+- Docker 构建白名单漏包含 `drawing-projection.js`，补齐后真实图表镜像构建通过。
+- 原自签 `CA:TRUE` 证书被 Codex rustls 拒绝充当服务端；改为独立 CA 签发的 `CA:FALSE` leaf，官方 SDK 和实际 Codex 均成功连接。未关闭 TLS 校验。
+- 共享查询原 revision 求和在删除与修订抵消时不变；先用协议测试复现，再改为包含行数、修订、时间边界和日历的指纹，网页与 MCP 共享。PG 复验通过。
+
+浏览器脚本的首次复核曾过早取 frame，以及等待图表库延迟 dirty 标记导致超时；最终等待真实 frame URL、持久化保存响应及 native 保存结束，以返回文档和 MCP 投影验证实际内容，显式处理刷新前的 beforeunload。最终运行通过，没有靠清除产品 dirty 状态或伪造保存来通过验收。
+
+Codex 完整 JSONL/stderr trace 保持在 `/tmp/native-mcp-codex-delivery-events.*`，权限 0600；仓库只保留白名单结果摘要、最终分析和 trace SHA-256，没有凭据或完整浏览器状态。Codex 提示现有用户配置 `disable_response_storage` 未识别；未修改该用户配置，实际工具与完整 turn 仍成功。
+
+所有服务为本任务 Ubuntu 隔离验收实例，保留运行供检查；没有操作 unraid，没有生产发布、实盘交易、内部计划 CRUD 或形态扫描引擎。后续交付连接信息和证据现已具备。

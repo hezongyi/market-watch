@@ -7,13 +7,16 @@ const APP = process.env.APP_ORIGIN || 'https://localhost:18543';
 const CHART = process.env.CHART_ORIGIN || 'https://localhost:18544';
 const PRIVATE = process.env.MW_MCP_PRIVATE_DIR || '/tmp/mw-native-mcp-acceptance';
 const OUT = process.env.MW_MCP_DRAWING_OUTPUT || '/tmp/native-mcp-browser-runtime.json';
+const INSTRUMENT = 'MCPFIXTURE';
 (async () => {
   const browser = await chromium.launch({ headless: true,
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? {executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE} : {}) });
   const context = await browser.newContext({ignoreHTTPSErrors: true, viewport: {width: 1600, height: 950}});
   const page = await context.newPage();
+  page.on('dialog', dialog => dialog.type() === 'beforeunload' ? dialog.accept() : dialog.dismiss());
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
+  page.on('requestfailed', request => console.error('Request failed:', request.url(), request.failure()?.errorText));
   const token = fs.readFileSync(path.join(PRIVATE, 'agent-read.token'), 'utf8').trim();
   const login = await context.request.post(APP + '/api/login', {data: JSON.parse(fs.readFileSync(path.join(PRIVATE, 'login.json'), 'utf8'))});
   assert.ok(login.ok(), 'browser login');
@@ -43,13 +46,14 @@ const OUT = process.env.MW_MCP_DRAWING_OUTPUT || '/tmp/native-mcp-browser-runtim
     const responsePromise = page.waitForResponse(response =>
       response.url() === APP + '/api/advanced-charts/native-charts/save' &&
       response.request().method() === 'POST', {timeout: 60000});
-    // Use the actual save shortcut so the bridge also clears dirty/unload state.
+    // Use the actual save shortcut and observe its persisted response. The
+    // vendor's delayed onAutoSaveNeeded event can mark dirty again after saving.
     await page.keyboard.press('Control+s');
     const response = await responsePromise;
     assert.ok(response.ok(), `native save: HTTP ${response.status()}`);
     const row = await response.json();
     assert.equal(row.id, workspace.id, 'native save targets this isolated workspace');
-    await frame.waitForFunction(() => !nativeSaving && !dirty, null, {timeout: 60000});
+    await frame.waitForFunction(() => !nativeSaving, null, {timeout: 60000});
     return api('advanced-charts/native-charts/' + row.id);
   }
   let workspace;
@@ -58,16 +62,28 @@ const OUT = process.env.MW_MCP_DRAWING_OUTPUT || '/tmp/native-mcp-browser-runtim
     assert.equal(initialized.serverInfo.name, 'Market Watch');
     workspace = await api('advanced-charts/workspaces', {name: 'MCP real native drawing ' + Date.now()});
     workspace = await api('advanced-charts/workspaces/' + workspace.id + '/save', {name: workspace.name, revision: workspace.revision,
-      document: {engine: 'tv31', schemaVersion: 1, symbol: 'EURUSD', series_kind: 'managed', interval: '60'}});
+      document: {engine: 'tv31', schemaVersion: 1, symbol: INSTRUMENT, series_kind: 'managed', interval: '60'}});
     await page.goto(APP + '/advanced-charts');
-    await page.locator('iframe[data-workspace-id="' + workspace.id + '"]').waitFor({timeout: 60000});
-    let frame = page.frames().find(f => f.url().startsWith(CHART + '/'));
-    assert.ok(frame, 'isolated native chart origin');
+    async function chartFrame() {
+      const handle = await page.locator('iframe[data-workspace-id="' + workspace.id + '"]').elementHandle({timeout: 60000});
+      const frame = await handle.contentFrame();
+      assert.ok(frame, 'native chart frame exists');
+      await frame.waitForURL(CHART + '/**', {timeout: 60000});
+      return frame;
+    }
+    let frame = await chartFrame();
     async function ready(f) {
-      await f.waitForFunction(() => typeof ready !== 'undefined' && ready && !loading && !nativeSaving && widget.activeChart().dataReady(), null, {timeout: 60000});
+      try {
+        await f.waitForFunction(() => typeof ready !== 'undefined' && ready && !loading && !nativeSaving && widget.activeChart().dataReady(), null, {timeout: 60000});
+      } catch (error) {
+        console.error('Chart readiness:', await f.evaluate(() => ({ready, loading, nativeSaving,
+          symbol: widget?.activeChart().symbol(), dataReady: widget?.activeChart().dataReady()})));
+        console.error('Page status:', await page.locator('[role="status"]').allTextContents(), errors);
+        throw error;
+      }
     }
     await ready(frame);
-    assert.equal(await frame.evaluate(() => widget.chart(0).symbol()), 'EURUSD');
+    assert.equal(await frame.evaluate(() => widget.chart(0).symbol()), INSTRUMENT);
     await frame.evaluate(async () => {
       if (autoSave.enabled) await autoSave.select(false);
       await widget.chart(0).setResolution('60', {doNotActivateChart: true});
@@ -84,7 +100,7 @@ const OUT = process.env.MW_MCP_DRAWING_OUTPUT || '/tmp/native-mcp-browser-runtim
     const first = await drawings(workspace.id);
     assert.equal(first.revision, saved.revision);
     assert.equal(Math.floor(first.saved_at / 1000), saved.timestamp);
-    assert.equal(first.charts[0].instrument, 'EURUSD');
+    assert.equal(first.charts[0].instrument, INSTRUMENT);
     assert.equal(first.charts[0].series_kind, 'managed');
     assert.equal(first.charts[0].timeframe, 'H1');
     const projected = saved.document.state._mwDrawingProjection.charts[0].drawings;
@@ -101,15 +117,14 @@ const OUT = process.env.MW_MCP_DRAWING_OUTPUT || '/tmp/native-mcp-browser-runtim
     assert.ok(second.revision > first.revision, 'successful native save advances revision');
     assert.ok(second.charts[0].drawings.some(s => s.object_id === unsavedId && s.supported));
     await page.reload();
-    await page.locator('iframe[data-workspace-id="' + workspace.id + '"]').waitFor({timeout: 60000});
-    frame = page.frames().find(f => f.url().startsWith(CHART + '/'));
-    assert.ok(frame);
+    frame = await chartFrame();
     await ready(frame);
     const restoredIds = await frame.evaluate(() => widget.chart(0).getAllShapes().map(s => s.id));
     assert.ok([...ids, unsavedId].every(id => restoredIds.includes(id)), 'native objects restored from PostgreSQL save');
     assert.deepEqual(await drawings(workspace.id), second, 'refresh cannot change saved projection');
     assert.deepEqual(errors, []);
     const report = {passed: true, app: APP, chart_origin: CHART, synthetic_market_data: true,
+      data_source: 'acceptance-fixture', configured_adapter: 'binance (routing only; no upstream candles)',
       workspace_id: workspace.id, checks: ['real chart public coordinates', 'PostgreSQL saved revision', 'HTTP MCP projection parity',
       'unsaved edits invisible', 'subsequent save visible', 'page refresh persists drawing identities'], first, second};
     fs.writeFileSync(OUT, JSON.stringify(report, null, 2) + '\n');

@@ -18,6 +18,70 @@ from alerts.storage import (
     now_ms,
     transaction,
 )
+from sqlalchemy import select
+
+
+def seed_chart_fixture(db):
+    # The native managed-chart router requires a supported adapter. This private
+    # symbol has no upstream mapping; only its published synthetic snapshot is read.
+    db.add(
+        Instrument(
+            id="MCPFIXTURE",
+            symbol="MCPFIXTURE",
+            label="SYNTHETIC acceptance-fixture: no live upstream",
+            source="binance",
+            calendar="utc0",
+            basis="last",
+            precision=5,
+            enabled=False,
+            calendar_profile={},
+        )
+    )
+    db.flush()
+    for frame in ("H1", "H4"):
+        for row in db.scalars(
+            select(ChartPublishedBar).where(
+                ChartPublishedBar.instrument_id == "EURUSD",
+                ChartPublishedBar.timeframe == frame,
+            )
+        ):
+            db.add(
+                ChartPublishedBar(
+                    instrument_id="MCPFIXTURE",
+                    timeframe=frame,
+                    start=row.start,
+                    end=row.end,
+                    complete=row.complete,
+                    revision=row.revision,
+                    payload=row.payload,
+                )
+            )
+        row = db.get(ChartPublication, ("EURUSD", frame))
+        db.add(
+            ChartPublication(
+                instrument_id="MCPFIXTURE",
+                timeframe=frame,
+                start=row.start,
+                end=row.end,
+                complete_count=row.complete_count,
+                initialized=True,
+            )
+        )
+    for row in db.scalars(select(Bar).where(Bar.instrument_id == "EURUSD", Bar.timeframe == "M1")):
+        db.add(
+            Bar(
+                instrument_id="MCPFIXTURE",
+                timeframe="M1",
+                start=row.start,
+                end=row.end,
+                open=row.open,
+                high=row.high,
+                low=row.low,
+                close=row.close,
+                complete=True,
+            )
+        )
+
 
 if settings.database_application_name != "mw-native-mcp-acceptance":
     raise SystemExit("Refusing to seed a database outside mw-native-mcp-acceptance")
@@ -141,6 +205,8 @@ with transaction() as db:
             key="acceptance.native-mcp.fixture", value={"seeded_at": now_ms(), "synthetic": True}
         )
     )
+    db.flush()
+    seed_chart_fixture(db)
 print(
     json.dumps({"fixture": "native-mcp-fixture", "source": "acceptance-fixture", "synthetic": True})
 )

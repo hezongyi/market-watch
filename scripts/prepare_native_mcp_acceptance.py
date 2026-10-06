@@ -3,11 +3,10 @@
 import json
 import os
 import secrets
-import subprocess
 from pathlib import Path
 
-import certifi
 from argon2 import PasswordHasher
+from native_mcp_tls import create_tls
 
 root = Path("/tmp/mw-native-mcp-acceptance")
 root.mkdir(mode=0o700, exist_ok=True)
@@ -50,31 +49,7 @@ server {
   location / { proxy_pass http://chart-origin:80; }
 }
 """)
-subprocess.run(
-    [
-        "openssl",
-        "req",
-        "-x509",
-        "-newkey",
-        "rsa:2048",
-        "-nodes",
-        "-keyout",
-        str(root / "key.pem"),
-        "-out",
-        str(root / "cert.pem"),
-        "-days",
-        "7",
-        "-subj",
-        "/CN=localhost",
-        "-addext",
-        "subjectAltName=DNS:localhost,IP:127.0.0.1",
-    ],
-    check=True,
-    capture_output=True,
-)
-(root / "ca-bundle.pem").write_text(
-    Path(certifi.where()).read_text() + (root / "cert.pem").read_text()
-)
+create_tls(root)
 for file in root.iterdir():
     os.chmod(file, 0o600)
 print("Private configuration prepared:", root)

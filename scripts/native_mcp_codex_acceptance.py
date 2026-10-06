@@ -37,7 +37,7 @@ def verify_trace(events):
         if "error" in data:
             raise ValueError("Codex tool reported a business error")
         calls.append({"tool": item.get("tool"), "arguments": item.get("arguments"), "data": data})
-    required = {"market_get_bars", "charts_get_drawings", "alerts_list"}
+    required = {"market_get_bars", "charts_get_drawings", "alerts_list", "indicators_calculate"}
     if not required <= {call["tool"] for call in calls}:
         raise ValueError("Codex did not successfully call all required tools")
     if any(
@@ -56,6 +56,11 @@ def verify_trace(events):
     }
     if not {"H1", "H4"} <= frames:
         raise ValueError("Codex did not read both EURUSD H1/H4 candles")
+    if not any(
+        call["tool"] == "indicators_calculate" and call["data"].get("page", {}).get("indicators")
+        for call in calls
+    ):
+        raise ValueError("Codex has no backend indicator evidence")
     drawing_data = [call["data"] for call in calls if call["tool"] == "charts_get_drawings"]
     if not any(
         data.get("workspace_id") == "native-mcp-fixture"
@@ -86,6 +91,7 @@ def main(args):
     environment = os.environ.copy()
     environment["MW_MCP_TOKEN"] = (root / "agent-read.token").read_text().strip()
     environment["SSL_CERT_FILE"] = str(root / "ca-bundle.pem")
+    environment["CODEX_CA_CERTIFICATE"] = str(root / "ca-bundle.pem")
     command = [
         "codex",
         "exec",
@@ -101,12 +107,14 @@ def main(args):
         "mcp_servers.market_watch.tool_timeout_sec=30",
         "-c",
         "mcp_servers.market_watch.startup_timeout_sec=30",
-        "Use only Market Watch MCP tools for the data. Call market_get_bars for EURUSD managed H1 and H4 separately, "
-        "optional Python indicators, alerts_list, and charts_get_drawings in native-mcp-fixture. "
+        "Use only Market Watch MCP tools for the data. Call market_get_bars for EURUSD managed H1 and H4 separately with limit 30, "
+        "Call indicators_calculate for at least one backend indicator (EMA period 10), alerts_list, "
+        "and charts_get_drawings in native-mcp-fixture. Do not calculate indicators mentally; "
+        "quote exact indicator values only from the backend tool. "
         "This is synthetic acceptance-fixture data, not live market data. Give a concise Chinese analysis distinguishing "
         "data facts, calculations and tentative price-structure interpretations, cite timestamps and price levels, "
         "and ask the user for their opinion at the end. Do not write alerts or execute trades. "
-        "Do not use shell, browsing or other MCP servers.",
+        "Do not use shell, browsing or other MCP servers. Do not read additional stdin.",
     ]
     output = Path(args.output)
     # Client errors are needed to diagnose transport/TLS failures; keep them private.
@@ -117,7 +125,13 @@ def main(args):
     os.chmod(diagnostics, 0o600)
     with os.fdopen(fd, "w") as stream, os.fdopen(err_fd, "w") as errors:
         result = subprocess.run(
-            command, env=environment, stdout=stream, stderr=errors, text=True, timeout=240
+            command,
+            env=environment,
+            stdin=subprocess.DEVNULL,
+            stdout=stream,
+            stderr=errors,
+            text=True,
+            timeout=240,
         )
     if result.returncode:
         raise SystemExit("Codex acceptance failed; inspect private trace and client diagnostics")
