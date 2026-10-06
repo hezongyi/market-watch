@@ -11,8 +11,8 @@ for (const name of readdirSync(new URL('.',import.meta.url)))
 cpSync(new URL('charting_library',import.meta.url), new URL(libraryDirectory,import.meta.url), {recursive:true});
 
 const files = ['series.js', 'indicators.js', 'indicator-picker.js', 'preferences.js', 'chart-style.js', 'chart-autosave.js',
-  'workspaces.js', 'watchlists.js', 'range-sync.js', 'viewports.js',
-  'progressive-history.js', 'history-demand.js', 'native-reserve.js', 'native-navigation.js', 'chart-account.js', 'chart-menu.js', 'drawing-projection.js', 'chart-alerts.js', 'bridge.js'];
+  'workspaces.js', 'watchlists.js', 'sync-coordinator.js', 'range-sync.js', 'viewports.js',
+  'progressive-history.js', 'history-demand.js', 'native-reserve.js', 'native-navigation.js', 'bar-range-mapping.js', 'chart-account.js', 'sync-settings.js', 'chart-menu.js', 'drawing-projection.js', 'chart-alerts.js', 'bridge.js'];
 const source = `globalThis.MW_CHART_LIBRARY_PATH="/${libraryDirectory}/";\nglobalThis.MW_NATIVE_RESERVE_ENABLED=${process.env.NATIVE_RESERVE_ENABLED !== 'false'};\n` +
   files.map(name => readFileSync(new URL(name, import.meta.url), 'utf8')).join('\n;\n');
 const digest = createHash('sha256').update(source).digest('hex').slice(0, 16);

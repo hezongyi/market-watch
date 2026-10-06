@@ -1,88 +1,59 @@
-/* Public chart APIs only. The caller refreshes bindings after layout changes. */
+/* The coordinator owns choices; this guard owns only data-ready identities. */
 function rangeSyncLoadingGuard(widget, onIntervalChange = () => {}) {
-  const toggle = widget.dateRangeSync();
-  const bindings = new Map();
-  const pending = new Map();
-  let desired = toggle.value(),
-    internal = false,
-    disposed = false;
-  function set(value) {
-    // The native setter records an undo action even for an unchanged value.
-    if (toggle.value() === value) return;
-    internal = true;
-    try {
-      toggle.setValue(value);
-    } finally {
-      internal = false;
-    }
-  }
-  function restore() {
-    if (!disposed && !pending.size) set(desired);
-  }
-  function changed(value) {
-    if (internal || disposed) return;
-    desired = value;
-    if (pending.size && value && widget.chartsCount() > 1) set(false);
-  }
-  toggle.subscribe(changed);
+  const coordinator = widget._mwSyncCoordinator;
+  const bindings = new Map(), pending = new Map();
+  let disposed = false;
   function refresh() {
     if (disposed) return;
-    const charts = new Set(
-      Array.from({ length: widget.chartsCount() }, (_, i) => widget.chart(i)),
-    );
+    const charts = new Set(Array.from({length: widget.chartsCount()}, (_,i)=>widget.chart(i)));
     for (const [chart, callback] of bindings) {
       if (charts.has(chart)) continue;
       chart.onSymbolChanged().unsubscribe(null, callback);
       chart.onIntervalChanged().unsubscribe(null, callback);
       bindings.delete(chart);
+      pending.get(chart)?.pause.release();
       pending.delete(chart);
     }
     for (const chart of charts) {
       if (bindings.has(chart)) continue;
       const callback = (interval, parameters) => {
-        if (typeof interval === "string")
-          onIntervalChange(chart, interval, parameters);
-        const token = {};
-        pending.set(chart, token);
-        if (toggle.value() && widget.chartsCount() > 1) set(false);
-        const finish = () => {
+        if (typeof interval === 'string') onIntervalChange(chart,interval,parameters);
+        const pause = coordinator.acquirePause('data-loading',widget.chartsCount()>1 ? ['date','barWidth'] : ['barWidth']);
+        const previous = pending.get(chart);
+        const token = {pause};
+        pending.set(chart,token);
+        previous?.pause.release();
+        token.finish = () => {
           if (disposed || pending.get(chart) !== token) return;
           pending.delete(chart);
-          restore();
+          pause.release();
         };
-        token.finish = finish;
-        chart.dataReady(finish);
+        chart.dataReady(token.finish);
       };
-      bindings.set(chart, callback);
-      chart.onSymbolChanged().subscribe(null, callback);
-      chart.onIntervalChanged().subscribe(null, callback);
+      bindings.set(chart,callback);
+      chart.onSymbolChanged().subscribe(null,callback);
+      chart.onIntervalChanged().subscribe(null,callback);
     }
-    restore();
   }
   refresh();
   return {
     refresh,
-    // Capture load identities before an asynchronous datafeed request. Only an
-    // explicit empty or failed result may finish without native dataReady.
     captureTerminalCompletion(matches) {
-      const loads = [...pending].filter(([chart]) => matches(chart));
-      return () => {
-        for (const [chart, token] of loads) {
-          if (!disposed && pending.get(chart) === token) token.finish();
-        }
-      };
+      const loads = [...pending].filter(([chart])=>matches(chart));
+      return () => loads.forEach(([chart,token])=>{
+        if (!disposed && pending.get(chart)===token) token.finish();
+      });
     },
     busy: () => pending.size > 0,
-    desired: () => desired,
+    desired: () => coordinator.snapshot().date,
     dispose() {
       disposed = true;
-      toggle.unsubscribe(changed);
-      for (const [chart, callback] of bindings) {
-        chart.onSymbolChanged().unsubscribe(null, callback);
-        chart.onIntervalChanged().unsubscribe(null, callback);
+      for (const [chart,callback] of bindings) {
+        chart.onSymbolChanged().unsubscribe(null,callback);
+        chart.onIntervalChanged().unsubscribe(null,callback);
       }
-      bindings.clear();
-      pending.clear();
+      pending.forEach(token=>token.pause.release());
+      bindings.clear(); pending.clear();
     },
   };
 }

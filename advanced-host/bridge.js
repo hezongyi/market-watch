@@ -36,9 +36,13 @@ let seq = 0,
   nativeSaving = false,
   workspaceEpoch = 0,
   nativeReadonly = false;
+let barRangeMapping, syncCoordinator;
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
 let prewarming = false;
 let autoSave, editRevision = 0, manualSavePending = false;
+// The SHA-verified native chartSaved handler reads this after the async save
+// adapter completes, so saving A cannot acknowledge a later edit B.
+globalThis.MWNativeSave = { hasUnsavedChanges: () => dirty };
 function markWorkspaceDirty() {
   if (nativeReadonly || !ready || loading) return;
   dirty = true;
@@ -221,6 +225,13 @@ function barsOf(result, res, ticker) {
     };
   });
 }
+function observeRangeBars(symbol, resolution, bars, accepted, window = '', ticket) {
+  if (!barRangeMapping || decode(symbol).spec) return;
+  const times = new Set(accepted.map(bar => bar.time));
+  barRangeMapping.observeBars({symbol, resolution, window, ticket,
+    bars: bars.filter(bar => times.has(bar.chart_time ?? stamp(bar,resolution,decode(symbol).symbol)))
+      .map(bar => ({...bar,chart_time:bar.chart_time ?? stamp(bar,resolution,decode(symbol).symbol)}))});
+}
 const managedSessions = new Map();
 const maintenanceAsked = new Set();
 const cache = new Map();
@@ -270,7 +281,8 @@ function nativeReserveWarmup(symbol, resolution) {
   }
   return prefix;
 }
-globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen_bars, batch_screens, warmup_bars}) => {
+globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen_bars, batch_screens, warmup_bars, window}) => {
+  const rangeTicket = barRangeMapping?.capture(symbol,resolution,window);
   const page = await query(symbol, resolution, {
     before, limit: screen_bars * batch_screens, countBack: screen_bars * batch_screens,
     client: clientId, native_history: nativeHistoryContext(symbol, resolution),
@@ -282,7 +294,8 @@ globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen
     throw Error('后端尚不支持图表储备协议');
   if (historyOlder(page, providerHistoryState.get(symbol+'|'+resolution)))
     throw Error('已丢弃旧版本的图表储备响应');
-  return {...page, bars: barsOf(page, resolution, symbol)};
+  return {...page, bars: barsOf(page, resolution, symbol),
+    accepted: () => observeRangeBars(symbol,resolution,page.bars,barsOf(page,resolution,symbol),window,rangeTicket)};
 }, nativeReserveWarmup);
 globalThis.MWNativeNavigation?.configure(nativeReserveWarmup);
 
@@ -457,6 +470,7 @@ const feed = {
         description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
+        mw_range_source: meta.source,
         type: ({INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
         session: meta.session || (meta.source === "yahoo" ? "0000-0000:23456" : meta.calendar === "utc0" ? "24x7" : "1700-1700:23456"),
         timezone: meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York"),
@@ -495,6 +509,7 @@ const feed = {
   getBars: async (s, res, p, cb, err) => {
     const loadEpoch=workspaceEpoch;
     const loadId=crypto.randomUUID();
+    const rangeTicket=barRangeMapping?.capture(s.ticker,res,s.mw_window);
     const historyKey=s.ticker+'|'+res;
     const workKey=historyKey+'|'+(s.mw_window || '');
     const isProvider=decode(s.ticker).series_kind==='provider';
@@ -601,7 +616,8 @@ const feed = {
           firstHistory.set(key,Math.min(firstHistory.get(key)??Infinity,rows[0].time));
         }
         send({type:'native-load-applying',id:loadId,epoch:loadEpoch,count:rows.length});
-        cb(rows,{noData:boundary,mw_historyPages:page.history_pages || 0});
+        const accepted = cb(rows,{noData:boundary,mw_historyPages:page.history_pages || 0}) !== false;
+        if (accepted) observeRangeBars(s.ticker,res,page.bars,rows,s.mw_window,rangeTicket);
         if (globalThis.MWNativeReserve)
           requestAnimationFrame(() => MWNativeReserve.delivered(s, res, performance.now() - reserveStarted));
         if(!rows.length) finishTerminal();
@@ -633,12 +649,13 @@ const feed = {
         managedSessions.set(key,session);
       }
       let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
-      let rows=[], boundary=false;
+      let rows=[], rawRows=[], boundary=false;
       while(rows.length < requested) {
         const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length)});
         if(epoch!==workspaceEpoch || !hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) {
           const error=Error('已取消旧图表的历史加载');error.code='HISTORY_CANCELLED';throw error;
         }
+        rawRows.push(...page.bars);
         rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
         boundary=!page.has_more;
         if(boundary) break;
@@ -651,7 +668,8 @@ const feed = {
         firstHistory.set(s.ticker+'|'+res,Math.min(firstHistory.get(s.ticker+'|'+res)??Infinity,rows[0].time));
         lastHistory.set(s.ticker+'|'+res,Math.max(lastHistory.get(s.ticker+'|'+res)||0,rows.at(-1).time));
       }
-      cb(rows,{noData:boundary});
+      const accepted = cb(rows,{noData:boundary}) !== false;
+      if (accepted) observeRangeBars(s.ticker,res,rawRows,rows,'',rangeTicket);
       if(!rows.length) finishTerminal();
     } catch (e) {
       err(isProvider ? e : String(e));
@@ -676,7 +694,8 @@ const feed = {
     const identity=decode(s.ticker);
     if(identity.symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) return;
     const historyKey=s.ticker+'|'+res+(identity.series_kind==='provider' ? '|'+(s.mw_window || '') : '');
-    const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(historyKey)||0,revision:null};
+    const guardedReset = () => {barRangeMapping?.invalidate(s.ticker,res,s.mw_window); reset();};
+    const sub={symbol:s.ticker,res,cb,reset:guardedReset,last:lastHistory.get(historyKey)||0,revision:null};
     subscriptions.set(id,sub);
     // Keep history corrections subscribed, but never append a latest tick
     // across the gap between a historical window and the realtime tail.
@@ -774,6 +793,10 @@ function reviewProviderReset(sub, event) {
         revision:observation.revision,observed_at:observation.observed_at}))
         throw Error('历史更正尚未核实，请刷新历史');
       if(page.history_revalidation.changed) {
+        // A transport gap alone does not invalidate painted history. Once a
+        // delivered interval is proven changed, reject its metadata/tickets
+        // immediately, including when user navigation defers the native reload.
+        barRangeMapping?.invalidate(sub.symbol,sub.res,sub.window);
         sub.needsHistoryReload=true;
         if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub))) {
           sub.needsHistoryReload=false;sub.reviewPending=false;
@@ -871,6 +894,7 @@ async function reloadHistory(symbol, res, relevant = () => true) {
   if (Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(chart=>
       chartUsesSymbol(chart,symbol,res) && relevant(chart) && globalThis.MWNativeNavigation?.interacting(chart))) return false;
   historyReloading = true;
+  edgeGuard?.retry();
   const epoch = workspaceEpoch;
   const invalidated = new Set();
   try {
@@ -878,6 +902,9 @@ async function reloadHistory(symbol, res, relevant = () => true) {
       const chart=widget.chart(i);
       if (!chartUsesSymbol(chart,symbol,res) || !relevant(chart)) continue;
       const window=globalThis.MWNativeNavigation?.chartWindow(chart)?.id || '';
+      // A rebuild creates a new accepted-data generation. Clear the old
+      // interval index before any asynchronous native refresh can complete.
+      barRangeMapping?.invalidate(symbol,res,window);
       if (window) {
         // Native resetCache and resetData both mutate the same source. Rebuild
         // an isolated historical source once, with a fresh validated seed.
@@ -1015,6 +1042,7 @@ async function tick() {
       }
       try {
         if (identity.series_kind === 'managed' && !managedSessions.has(identity.symbol+'|'+first.res)) continue;
+        const rangeTicket = barRangeMapping?.capture(first.symbol,first.res,first.window);
         const result = await query(first.symbol, first.res, {
           limit: 3,
           track_history: true,
@@ -1048,6 +1076,7 @@ async function tick() {
           for (const bar of bars)
             if (bar.time >= sub.last) {
               sub.cb({ ...bar });
+              observeRangeBars(sub.symbol,sub.res,result.bars,[bar],sub.window,rangeTicket);
               sub.last = bar.time;
             }
         }
@@ -1108,7 +1137,8 @@ function snapshot(manual = true) {
       document: {
         engine: "tv31",
         schemaVersion: 1,
-        state: {...state, _mwDrawingProjection: captureDrawingProjection(widget)},
+        state: {...state, _mwBarRangeMapping:barRangeMapping.snapshot(),
+          _mwDrawingProjection: captureDrawingProjection(widget)},
         theme: savedDoc.theme || "Dark",
         templates: savedDoc.templates || {},
       },
@@ -1143,23 +1173,40 @@ function boot(
   }
   let grid;
   const pendingGridStyle = chartState?._mwGridStyle;
+  let pendingBarRange = doc.state?._mwBarRangeMapping || chartState?._mwBarRangeMapping;
   let pendingViewports = storedViewports || chartState?._mwViewports;
-  let pendingSync = doc.state?._mwSync || chartState?._mwSync;
-  const prepareLegacyViewports = (state) => {
-    beforeInitialHistory = state && !pendingSync ? () => {
+  let pendingSync = doc.state?._mwSync || chartSynchronizationState(chartState);
+  const ensureSync = () => {
+    if (!widget._mwSyncCoordinator) {
+      syncCoordinator?.dispose();
+      syncCoordinator = chartSyncCoordinator(widget,{initial:pendingSync,readonly,changed:()=>{
+        markWorkspaceDirty();
+        widget._innerAPI()._saveChartService?.markContentAsChanged();
+      }});
+      globalThis.MWSyncCoordinator = syncCoordinator;
+    }
+    return widget._mwSyncCoordinator;
+  };
+  const prepareLegacyViewports = (state, modernSync = state?._mwSync) => {
+    beforeInitialHistory = state && !modernSync ? () => {
       beforeInitialHistory = undefined;
+      // Cached native layouts may finish loading before a delayed getBars.
+      // Such a callback cannot acquire a pause that chart_loaded already ended.
+      if (!loading) return;
+      ensureSync();
       pendingSync = deferLegacyChartSynchronization(widget);
     } : undefined;
   };
-  prepareLegacyViewports(chartState);
+  prepareLegacyViewports(chartState, doc.state?._mwSync || chartState?._mwSync);
   if (chartState) {
     chartState = { ...chartState };
     delete chartState._mwViewports;
     delete chartState._mwSync;
     delete chartState._mwGridStyle;
+    delete chartState._mwBarRangeMapping;
     delete chartState._mwDrawingProjection;
   }
-  let viewportRestoring = false;
+  let viewportRestoring = false, workspaceLoadPause;
   const restoreViewports = async () => {
     const viewports = pendingViewports;
     pendingViewports = undefined;
@@ -1258,6 +1305,7 @@ function boot(
     const state = await captureChartLayout(widget);
     alertBridge.persist(state);
     state._mwGridStyle = grid.value;
+    state._mwBarRangeMapping = barRangeMapping.snapshot();
     state._mwDrawingProjection = captureDrawingProjection(widget);
     if (epoch !== workspaceEpoch || editRevision !== revision) {
       dirty = true;
@@ -1317,10 +1365,12 @@ function boot(
       const state = JSON.parse(await loadContent(id));
       alertBridge.reset(state);
       grid.restore(state._mwGridStyle);
+      pendingBarRange = state._mwBarRangeMapping;
+      delete state._mwBarRangeMapping;
       delete state._mwGridStyle;
       delete state._mwDrawingProjection;
       pendingViewports = state._mwViewports;
-      pendingSync = state._mwSync;
+      pendingSync = chartSynchronizationState(state);
       prepareLegacyViewports(state);
       delete state._mwViewports;
       delete state._mwSync;
@@ -1353,6 +1403,13 @@ function boot(
   managedSessions.clear();
   maintenanceAsked.clear();
   indicatorPicker?.dispose();
+  barRangeMapping?.dispose();
+  barRangeMapping = chartBarRangeMapping({widget:()=>widget,initial:pendingBarRange,readonly,changed:()=>{
+    markWorkspaceDirty();
+    // Keep the native Save menu enabled for host-only configuration edits.
+    widget?._innerAPI()._saveChartService?.markContentAsChanged();
+  }});
+  globalThis.MWBarRangeMapping = barRangeMapping;
   widget = new TradingView.widget({
     context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
@@ -1440,6 +1497,9 @@ function boot(
     ],
   });
   widget.onChartReady(async () => {
+    ensureSync();
+    syncCoordinator.refreshCharts();
+    barRangeMapping.refreshCharts();
     widget.crosshairSync().subscribe(value => MWNativeNavigation.crosshairEnabled(value));
     grid = chartGridPresentation(widget, preferences,
       async value => {
@@ -1448,8 +1508,7 @@ function boot(
       }, readonly, pendingGridStyle);
     if (!doc.state) {
       widget.crosshairSync().setValue(true);
-      widget.timeSync().setValue(true);
-      widget.dateRangeSync().setValue(true);
+      syncCoordinator.configure({time:true,date:true,barWidth:false},true);
       widget.intervalSync().setValue(false);
       widget.symbolSync().setValue(false);
       if (workspace && !readonly) {
@@ -1522,7 +1581,7 @@ function boot(
             {label: "登出", run: () => send({type: "workspace-action", action: "logout"})},
             ...(!readonly ? [{label: "复制恢复草稿", recovery: true,
               run: () => send({type: "workspace-action", action: "recover"})}] : []),
-          ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave, () => snapshot(), body => request(body, "account-password"),
+          ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave, () => snapshot(), body => request(body, "account-password"), barRangeMapping, syncCoordinator,
         );
 
       })
@@ -1532,6 +1591,7 @@ function boot(
     await restoreViewports();
     await rebuildMobileSingleChart();
     restoreChartSynchronization(widget, pendingSync);
+    beforeInitialHistory = undefined;
     pendingSync = undefined;
     ready = true;
     loading = false;
@@ -1603,6 +1663,7 @@ function boot(
       );
     };
     widget.subscribe("chart_load_requested", () => {
+      barRangeMapping.suspend();
       send({type: "viewport-notice", key: "*", text: ""});
       edgeGuard?.dispose();
       edgeGuard = undefined;
@@ -1610,6 +1671,8 @@ function boot(
       rangeGuard = undefined;
       workspaceEpoch++;
       send({type:'native-load-reset',epoch:workspaceEpoch});
+      syncCoordinator.resetWorkspace(pendingSync);
+      workspaceLoadPause = syncCoordinator.acquirePause("workspace-load",["date","time","barWidth"]);
       for(const [id,sub] of subscriptions) if(sub.providerListener) feed.unsubscribeBars(id);
       providerHistoryState.clear();
       providerHistoryWork.clear();
@@ -1631,9 +1694,15 @@ function boot(
       // final event may rebind guards and release the loading state.
       if (await rebuildMobileSingleChart()) return;
       if (epoch !== workspaceEpoch) return;
+      syncCoordinator.refreshCharts();
       restoreChartSynchronization(widget, pendingSync);
+      beforeInitialHistory = undefined;
       pendingSync = undefined;
+      workspaceLoadPause?.release();
+      workspaceLoadPause = undefined;
       loading = false;
+      barRangeMapping.configure(pendingBarRange || {version:1,enabled:false,style:"background"}, true);
+      barRangeMapping.refreshCharts();
       rangeGuard?.dispose();
       rangeGuard = rangeSyncLoadingGuard(widget);
       bindEdgeSync();
@@ -1644,6 +1713,8 @@ function boot(
     bindEdgeSync();
     bindViewports();
     widget.subscribe("layout_changed", () => {
+      syncCoordinator.refreshCharts();
+      if (!loading) barRangeMapping.refreshCharts();
       send({type: "viewport-notice", key: "*", text: ""});
       rangeGuard?.refresh();
       edgeGuard?.refresh();
@@ -1651,9 +1722,14 @@ function boot(
       alertBridge.refresh();
     });
     widget.drawOnAllChartsEnabled().setValue(true);
-    widget.subscribe("onAutoSaveNeeded", () => {
-      markWorkspaceDirty();
-    });
+    // Native onAutoSaveNeeded is debounced by five seconds. Reading that late
+    // notification as a new edit can dirty a layout already saved after the
+    // actual Undo command. Observe the same stack immediately so editRevision
+    // identifies the real command rather than its delayed notification.
+    const undoStack = widget._innerAPI()._chartWidgetCollection.undoHistory.undoStack();
+    const undoChanged = command => {if(command?.affectsState()) markWorkspaceDirty();};
+    undoStack.onChange().subscribe(null,undoChanged);
+    addEventListener('pagehide',()=>undoStack.onChange().unsubscribe(null,undoChanged),{once:true});
     send({ type: "ready" });
     clearInterval(progressivePoll);
     demandReporter?.dispose();
@@ -1716,7 +1792,8 @@ addEventListener("message", async (e) => {
       }
       if (sub.historical) return;
       const rows=barsOf({bars:event.bars,indicators:event.indicators||[]},sub.res,sub.symbol);
-      for(const bar of rows) if(bar.time>=sub.last) {sub.cb({...bar});sub.last=bar.time;}
+      if (historyOlder({cache_revision:event.revision,as_of:event.as_of},old)) return;
+      for(const bar of rows) if(bar.time>=sub.last) {sub.cb({...bar});observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;}
     } else if(event.type==='error') {
       send({type:'error',error:event.error||'平台行情暂不可用，后台重试中'});
     }
@@ -1732,6 +1809,7 @@ addEventListener("message", async (e) => {
     drain();
   } else if (m.type === "history-capabilities") {
     MWNativeNavigation.setCapabilities(m.capabilities);
+    edgeGuard?.retry();
     globalThis.MW_HISTORY_CAPABILITIES=m.capabilities;
   } else if (m.type === "history-capacity-open") {
     send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident});
@@ -1751,3 +1829,5 @@ addEventListener("message", async (e) => {
   }
 });
 send({ type: "loaded" });
+
+addEventListener("pagehide", () => {barRangeMapping?.dispose();syncCoordinator?.dispose();}, {once:true});

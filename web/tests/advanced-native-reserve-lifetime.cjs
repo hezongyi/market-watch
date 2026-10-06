@@ -28,6 +28,22 @@ function fixture(count=8){
  return{api,a,b,models,requests,deferred,advance,flush,addModel,switch:(next='MWP:B')=>{symbol=next;listeners.forEach(fn=>fn());}};
 }
 (async()=>{
+ {
+  const ctx=vm.createContext({URLSearchParams,location:{search:'?native_reserve=off'},performance:{now:()=>0}});
+  let notifications=0;
+  ctx.MWBarRangeMapping={cachePurged:()=>notifications++};
+  vm.runInContext(fs.readFileSync(path.resolve(__dirname,'../../advanced-host/native-reserve.js'),'utf8'),ctx);
+  for(const ticker of ['MWP:A','MW:MANAGED','MWPY_indicator']) {
+   const t={_symbolInfo:{ticker},_resolution:'5',_cache:{bars:[{time:1}]},
+    _purgeCache(){this._cache={bars:[]};return 'purged';}};
+   ctx.MWNativeReserve.bindThread(t,t._symbolInfo,'5');
+   ctx.MWNativeReserve.bindThread(t,t._symbolInfo,'5');
+   assert.equal(t._purgeCache(),'purged');
+   assert.equal(t._cache.bars.length,0);
+   ctx.MWNativeReserve.unbindThread(t);
+  }
+  assert.equal(notifications,6,'all source purge/unbind notifications work once with reserve off');
+ }
  for(const fault of ['error','miss','alternating']){
   const f=fixture();await f.advance(100);assert.equal(f.requests.length,1);
   for(let attempt=0;attempt<4;attempt++){

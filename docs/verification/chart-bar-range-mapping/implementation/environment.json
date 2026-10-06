@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-04",
+  "worktree": "/home/quant/repos/market-watch-range-mapping",
+  "branch": "feat/chart-bar-range-mapping",
+  "baseline": "20418691598da38577ee23f4616f07de42d58d55",
+  "compose_project": "mw-range-mapping-acceptance-20261004",
+  "docker_host": "unraid",
+  "directory": "/mnt/user/appdata/mw-range-mapping-acceptance-20261004",
+  "ports": [
+    "127.0.0.1:16043",
+    "127.0.0.1:16044"
+  ],
+  "database": "range_mapping",
+  "delivery_enabled": false,
+  "worker": false,
+  "images": {
+    "api": "trading-alerts-api:v1.7.0-e40eaac",
+    "web": "mw-range-mapping-web:20261004",
+    "chart": "mw-range-mapping-chart:20261004",
+    "chart_id": "sha256:0b3c2667f089df79d83aeb8bac38a9c91d409b92d46cc00af246a37683e53faa"
+  },
+  "assets": {
+    "host": "host.482d92dae626ab5a.js",
+    "native_original_sha256": "114428b8dde6eb137fd7ef3bc20ef35882189186c4bd092bb743b64d11682be1",
+    "native_patched_sha256": "e6dde5daa90a44276031243138dd677564f714b12e70c492949f2117929274e2"
+  },
+  "browser": {
+    "engine": "Chromium",
+    "viewport": [
+      1600,
+      1000
+    ],
+    "launch": "headless with actual Playwright mouse input",
+    "executable": "/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome"
+  },
+  "yahoo": {
+    "symbol": "SPY",
+    "exchange": "NYSE Arca",
+    "source": "real provider cache read-only export from prior isolated chart-sync database",
+    "datasets": 7,
+    "bars": 21225,
+    "limitation": "Does not validate current external Yahoo refetch; existing backend rejected invalid OHLC relation."
+  },
+  "historical_environment": true,
+  "cleanup": {
+    "date": "2026-10-04",
+    "containers_volumes_networks_images_and_directories_removed": true,
+    "current_environment": "ubuntu-environment.json"
+  }
+}

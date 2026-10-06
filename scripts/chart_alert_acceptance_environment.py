@@ -7,6 +7,7 @@ PROJECT = os.environ.get("MW_ALERT_ACCEPTANCE_PROJECT", "mw-chart-alerts-accepta
 ENVIRONMENTS = {
     "mw-chart-alerts-acceptance": ("chart_alerts_acceptance", 19443),
     "mw-chart-alerts-integration": ("chart_alerts_integration", 19543),
+    "mw-range-main-20261006": ("range_main", 16843),
 }
 if PROJECT not in ENVIRONMENTS:
     raise ValueError("Only the named isolated alert acceptance projects are allowed")
@@ -18,3 +19,8 @@ COMPOSE = (
     / "docs/verification/chart-alerts"
     / ("compose.yaml" if PROJECT == "mw-chart-alerts-acceptance" else "compose.integration.yaml")
 )
+
+if PROJECT == "mw-range-main-20261006":
+    ROOT = Path("/home/quant/repos/.acceptance/range-main-20261006")
+    APP = "https://192.168.7.232:16843"
+    COMPOSE = ROOT / "compose.yaml"

@@ -3,8 +3,28 @@ const { chromium } = require("@playwright/test");
 const fs = require("node:fs"),
   path = require("node:path"),
   assert = require("node:assert/strict");
-const APP = "https://localhost:18443",
-  CHART = "https://localhost:18444";
+const PRIVATE =
+  process.env.INDICATOR_PRIVATE_DIR || "/tmp/mw-indicator-acceptance";
+const APP = process.env.INDICATOR_APP || "https://localhost:18443",
+  CHART = process.env.INDICATOR_CHART || "https://localhost:18444";
+assert.ok(
+  [
+    [
+      "/tmp/mw-indicator-acceptance",
+      "https://localhost:18443",
+      "https://localhost:18444",
+    ],
+    [
+      "/home/quant/repos/.acceptance/range-main-20261006",
+      "https://192.168.7.232:16843",
+      "https://192.168.7.232:16844",
+    ],
+  ].some(
+    ([directory, app, chart]) =>
+      directory === PRIVATE && app === APP && chart === CHART,
+  ),
+  "Only matching named isolated indicator acceptance targets allowed",
+);
 const OUT =
   process.env.INDICATOR_ACCEPTANCE_OUTPUT ||
   "/tmp/mw-indicator-acceptance/full-stack";
@@ -17,6 +37,10 @@ const report = {
   policyBlocks: [],
   errors: [],
 };
+const displayedNumber = (value) =>
+  typeof value === "string"
+    ? Number(value.replace(/[,\u202f\u00a0]/g, "").replace("−", "-"))
+    : NaN;
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const record = (name) => {
   report.cases.push(name);
@@ -32,11 +56,10 @@ const record = (name) => {
     ignoreHTTPSErrors: true,
     viewport: { width: 1440, height: 950 },
   });
+  let page;
   try {
     const login = await context.request.post(APP + "/api/login", {
-      data: JSON.parse(
-        fs.readFileSync("/tmp/mw-indicator-acceptance/login.json"),
-      ),
+      data: JSON.parse(fs.readFileSync(path.join(PRIVATE, "login.json"))),
     });
     assert.ok(login.ok(), "isolated login " + login.status());
     const csrf = (await login.json()).csrf;
@@ -88,7 +111,23 @@ const record = (name) => {
         interval: "5",
       },
     });
-    const page = await context.newPage();
+    // Reopen this test's workspace rather than another browser's latest save.
+    await context.route(
+      "**/api/advanced-charts/workspaces?limit=1",
+      async (route) => {
+        const response = await context.request.get(
+          APP + "/api/advanced-charts/workspaces",
+        );
+        assert.ok(response.ok(), "workspace listing");
+        const rows = await response.json();
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(rows.filter((row) => row.id === workspace.id)),
+        });
+      },
+    );
+    page = await context.newPage();
     page.on("pageerror", (e) => report.errors.push(e.message));
     page.on("console", (m) => {
       if (m.type() !== "error") return;
@@ -165,10 +204,12 @@ const record = (name) => {
     let host, ui, dialog, query;
     const ready = async () => {
       await page.locator('iframe[title="专业图表工作区"]').waitFor();
-      await page.waitForFunction(() =>
-        [...document.querySelectorAll("iframe")].some((f) =>
-          f.src.startsWith("https://localhost:18444/"),
-        ),
+      await page.waitForFunction(
+        (origin) =>
+          [...document.querySelectorAll("iframe")].some((f) =>
+            f.src.startsWith(origin + "/"),
+          ),
+        CHART,
       );
       for (let attempt = 0; attempt < 100 && !host; attempt++) {
         host = page.frames().find((f) => f.url().startsWith(CHART + "/"));
@@ -179,6 +220,13 @@ const record = (name) => {
         () => ready && !loading && widget.activeChart().dataReady(),
         null,
         { timeout: 60000 },
+      );
+      report.runningHostAsset = await host.evaluate(() =>
+        [...document.scripts]
+          .map((s) => s.src)
+          .find((src) => /\/host\.[a-f0-9]+\.js$/.test(src))
+          ?.split("/")
+          .at(-1),
       );
       ui = host.childFrames()[0];
       assert.ok(ui);
@@ -220,7 +268,9 @@ const record = (name) => {
     const py = dialog.locator('[data-study-name="守望 Python SMA"]');
     await py.locator("summary").click();
     await py.getByText("用途：平滑价格，观察趋势。", { exact: true }).waitFor();
-    await py.getByText("计算：取最近 period 根收盘价的算术平均值。", { exact: true }).waitFor();
+    await py
+      .getByText("计算：取最近 period 根收盘价的算术平均值。", { exact: true })
+      .waitFor();
     await py.getByText(/^输入：/).waitFor();
     await py.getByText(/^版本 1/).waitFor();
     record("Python 指标详情含用途、计算、输入及版本");
@@ -369,8 +419,30 @@ const record = (name) => {
     await host.waitForFunction(() => widget.chart(0).dataReady());
     const chartBox = await ui.locator(".chart-container").first().boundingBox();
     assert.ok(chartBox, "native chart plotting area");
+    const studyPlots = await host.evaluate(() =>
+      widget
+        .chart(0)
+        .getAllStudies()
+        .map((study) => ({
+          ...study,
+          inputs: widget.chart(0).getStudyById(study.id).getInputValues(),
+        })),
+    );
+    const renderedPlots = expected.flatMap(([name, period]) => {
+      const study = studyPlots.find(
+        (s) =>
+          s.name === "守望 Python " + name &&
+          (period === undefined ||
+            s.inputs.some((p) => p.id === "period" && p.value === period)),
+      );
+      assert.ok(study, "rendered study identity " + name);
+      return matchingResponse([name, period])
+        .result.indicators.find((s) => s.name === name)
+        .series.map((plot) => ({ id: study.id, key: plot.key }));
+    });
     let crosshair = [];
-    for (let attempt = 0; attempt < 10; attempt++) {
+    const renderStarted = Date.now();
+    for (let attempt = 0; attempt < 30; attempt++) {
       for (let i = 0; i < 12; i++) {
         await page.mouse.move(
           chartBox.x + chartBox.width * (0.3 + i * 0.035),
@@ -379,13 +451,31 @@ const record = (name) => {
         await page.waitForTimeout(80);
       }
       crosshair = await host.evaluate(() => acceptanceCrosshair);
+      // dataReady() covers the primary series. Added studies can expose their
+      // identities before their asynchronous secondary feeds have rendered.
+      // Require actual finite values on every plot; entity count is insufficient.
+      const unique = new Map(crosshair.map((sample) => [sample.time, sample]));
       if (
-        crosshair.some(
-          (sample) =>
-            sample.entityValues && Object.keys(sample.entityValues).length >= 7,
+        renderedPlots.every(
+          (plot) =>
+            [...unique.values()].filter((sample) =>
+              Number.isFinite(
+                displayedNumber(
+                  sample.entityValues?.[plot.id]?.values.find(
+                    (v) => v.title === plot.key,
+                  )?.value,
+                ),
+              ),
+            ).length >= 5,
         )
-      )
+      ) {
+        report.renderWait = {
+          attempts: attempt + 1,
+          milliseconds: Date.now() - renderStarted,
+          plots: renderedPlots.length,
+        };
         break;
+      }
       await page.waitForTimeout(500);
     }
     for (const spec of expected) {
@@ -421,13 +511,7 @@ const record = (name) => {
           const displayed = sample.entityValues?.[study.id]?.values.find(
             (v) => v.title === plot.key,
           );
-          const actual = displayed
-            ? Number(
-                displayed.value
-                  .replace(/[,\u202f\u00a0]/g, "")
-                  .replace("−", "-"),
-              )
-            : NaN;
+          const actual = displayedNumber(displayed?.value);
           const value = backend.get(sample.time * 1000);
           if (!Number.isFinite(actual) || !Number.isFinite(value)) continue;
           assert.ok(
@@ -624,6 +708,17 @@ const record = (name) => {
         .map((s) => s.id)
         .sort(),
     );
+    await host.waitForFunction(
+      () =>
+        ready &&
+        !loading &&
+        !nativeSaving &&
+        !MWNativeNavigation.busy() &&
+        !rangeGuard.busy() &&
+        !edgeGuard.busy(),
+      null,
+      { timeout: 60000 },
+    );
     const workspaceSaved = page.waitForResponse(
       (r) =>
         r.url().endsWith("/api/advanced-charts/native-charts/save") && r.ok(),
@@ -712,10 +807,7 @@ const record = (name) => {
     assert.deepEqual(restoredTemplateSignature, templateSignature);
     record("服务器模板刷新恢复参数、曲线样式与显隐");
     const legacy = JSON.parse(
-      fs.readFileSync(
-        "/tmp/mw-indicator-acceptance/legacy-fixture.json",
-        "utf8",
-      ),
+      fs.readFileSync(path.join(PRIVATE, "legacy-fixture.json"), "utf8"),
     );
     assert.equal(legacy.symbol, "MWP:BTCUSDT");
     const signature = () =>
@@ -741,6 +833,17 @@ const record = (name) => {
         widget.chart(0).dataReady(),
     );
     assert.deepEqual(await signature(), legacy.signature);
+    await host.waitForFunction(
+      () =>
+        ready &&
+        !loading &&
+        !nativeSaving &&
+        !MWNativeNavigation.busy() &&
+        !rangeGuard.busy() &&
+        !edgeGuard.busy(),
+      null,
+      { timeout: 60000 },
+    );
     const legacySaved = page.waitForResponse(
       (r) =>
         r.url().endsWith("/api/advanced-charts/native-charts/save") && r.ok(),
@@ -840,6 +943,30 @@ const record = (name) => {
   } catch (error) {
     report.status = "failed";
     report.failure = error.message;
+    const currentHost = page
+      ?.frames()
+      .find((frame) => frame.url().startsWith(CHART + "/"));
+    report.failureState = currentHost
+      ? await currentHost
+          .evaluate(() => ({
+            ready,
+            loading,
+            nativeSaving,
+            dirty,
+            manualSavePending,
+            editRevision,
+            pending: pending.size,
+            requests: requests.length,
+            navigation: MWNativeNavigation.diagnostics(),
+            rangeBusy: rangeGuard?.busy(),
+            edgeBusy: edgeGuard?.busy(),
+            studies: widget.chart(0).getAllStudies(),
+          }))
+          .catch((error) => ({ diagnosticError: error.message }))
+      : null;
+    report.pageStatus = page
+      ? await page.locator('[role="status"]').allTextContents()
+      : [];
     throw error;
   } finally {
     fs.writeFileSync(OUT + ".json", JSON.stringify(report, null, 2));

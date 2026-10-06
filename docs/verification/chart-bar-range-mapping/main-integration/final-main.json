@@ -1,0 +1,1455 @@
+{
+  "at": "2026-10-06T11:17:20.693Z",
+  "APP": "https://192.168.7.232:16843",
+  "CHART": "https://192.168.7.232:16844",
+  "cases": [
+    {
+      "name": "menu rename and styles relocated"
+    },
+    {
+      "name": "enable no-op and date disabled"
+    },
+    {
+      "name": "four-chart wheel",
+      "spacing": [
+        6.6,
+        6.6,
+        6.6,
+        6.6
+      ]
+    },
+    {
+      "name": "wheel over non-active chart synchronizes without click",
+      "before": [
+        6.6,
+        6.6,
+        6.6,
+        6.6
+      ],
+      "after": [
+        7.26,
+        7.26,
+        7.26,
+        7.26
+      ]
+    },
+    {
+      "name": "shortcut animation",
+      "spacing": [
+        8.914914373647145,
+        8.914914373647145,
+        8.914914373647145,
+        8.914914373647145
+      ]
+    },
+    {
+      "name": "focus and program setter excluded"
+    },
+    {
+      "name": "actual native animation remains source through focus change",
+      "spacing": [
+        9.786863660633927,
+        9.786863660633927,
+        9.786863660633927,
+        9.786863660633927
+      ]
+    },
+    {
+      "name": "animation with program setter",
+      "spacing": [
+        11.99498588627922,
+        11.99498588627922,
+        11.994985890424676,
+        11.99498588627922
+      ]
+    },
+    {
+      "name": "box zoom",
+      "spacing": [
+        23.217391304347824,
+        23.217391304347824,
+        23.217391304347824,
+        23.217391304347824
+      ]
+    },
+    {
+      "name": "price scale excluded"
+    },
+    {
+      "name": "reverse mutual exclusion"
+    },
+    {
+      "name": "cancel draft"
+    },
+    {
+      "name": "atomic appearance",
+      "config": {
+        "version": 2,
+        "enabled": true,
+        "style": "rectangle",
+        "colorMode": "custom",
+        "color": "#AABBCC",
+        "transparencyMode": "custom",
+        "transparency": 70,
+        "priceLabels": true
+      }
+    },
+    {
+      "name": "formatted prices and source W1 exclusion",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 56,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069964302538602,
+            "to": 1.2194894621826746
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789689600,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1127429443023027,
+            "to": 1.1535963196221215
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 654,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791278400,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.1099895315362474,
+            "to": 1.150013085579691
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.110629693629863,
+            "to": 1.1778278829626714
+          }
+        }
+      ]
+    },
+    {
+      "name": "hover no geometry or history changes"
+    },
+    {
+      "name": "leave clears content keeps rail"
+    },
+    {
+      "name": "menu clears labels"
+    },
+    {
+      "name": "axis mode 0",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 56,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069964302538602,
+            "to": 1.2194894621826746
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789689600,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1127429443023027,
+            "to": 1.1535963196221215
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 654,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791278400,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.1099895315362474,
+            "to": 1.150013085579691
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.110629693629863,
+            "to": 1.1778278829626714
+          }
+        }
+      ]
+    },
+    {
+      "name": "axis mode 1",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 56,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069964302538602,
+            "to": 1.2194894621826746
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789689600,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1127958036733447,
+            "to": 1.1536646835707278
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 654,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791278400,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.1099895315362474,
+            "to": 1.150013085579691
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.110629693629863,
+            "to": 1.1778278829626714
+          }
+        }
+      ]
+    },
+    {
+      "name": "axis mode 2",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 56,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069964302538602,
+            "to": 1.2194894621826746
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 536,
+            "height": 373
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13%低 1.12%",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789689600,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1127429443023027,
+            "to": 1.1535963196221215
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 654,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791278400,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.1099895315362474,
+            "to": 1.150013085579691
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.110629693629863,
+            "to": 1.1778278829626714
+          }
+        }
+      ]
+    },
+    {
+      "name": "axis mode 3",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 56,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069964302538602,
+            "to": 1.2194894621826746
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 540,
+            "height": 373
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13低 1.12",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789603200,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1530076107065537,
+            "to": 1.1118979866168077
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 654,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791278400,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.1099895315362474,
+            "to": 1.150013085579691
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.110629693629863,
+            "to": 1.1778278829626714
+          }
+        }
+      ]
+    },
+    {
+      "name": "theme Light",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 56,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069964302538602,
+            "to": 1.2194894621826746
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 540,
+            "height": 373
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13低 1.12",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789603200,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1530076107065537,
+            "to": 1.1118979866168077
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 654,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791278400,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.1099895315362474,
+            "to": 1.150013085579691
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.110629693629863,
+            "to": 1.1778278829626714
+          }
+        }
+      ]
+    },
+    {
+      "name": "theme Dark",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 56,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069964302538602,
+            "to": 1.2194894621826746
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 540,
+            "height": 373
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13低 1.12",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789603200,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1530076107065537,
+            "to": 1.1118979866168077
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 374
+          },
+          "rail": {
+            "x": 654,
+            "y": 444,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791278400,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.1099895315362474,
+            "to": 1.150013085579691
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 373
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.110629693629863,
+            "to": 1.1778278829626714
+          }
+        }
+      ]
+    },
+    {
+      "name": "transparency 0",
+      "color": "rgba(255,255,255,1)"
+    },
+    {
+      "name": "transparency 100",
+      "color": "rgba(255,255,255,0)"
+    },
+    {
+      "name": "clean nested pause and capture",
+      "pause": {
+        "before": {
+          "undo": {
+            "enableUndo": true,
+            "undoCommandCount": 10,
+            "undoText": "应用图表主题",
+            "enableRedo": false,
+            "redoCommandCount": 0,
+            "originalUndoText": "apply chart theme"
+          },
+          "save": false,
+          "dirty": false,
+          "desired": {
+            "date": true,
+            "barWidth": false,
+            "time": true
+          },
+          "native": {
+            "date": true,
+            "time": true
+          }
+        },
+        "mid": {
+          "undo": {
+            "enableUndo": true,
+            "undoCommandCount": 10,
+            "undoText": "应用图表主题",
+            "enableRedo": false,
+            "redoCommandCount": 0,
+            "originalUndoText": "apply chart theme"
+          },
+          "save": false,
+          "dirty": false,
+          "desired": {
+            "date": true,
+            "barWidth": false,
+            "time": true
+          },
+          "native": {
+            "date": false,
+            "time": false
+          }
+        },
+        "after": {
+          "undo": {
+            "enableUndo": true,
+            "undoCommandCount": 10,
+            "undoText": "应用图表主题",
+            "enableRedo": false,
+            "redoCommandCount": 0,
+            "originalUndoText": "apply chart theme"
+          },
+          "save": false,
+          "dirty": false,
+          "desired": {
+            "date": true,
+            "barWidth": false,
+            "time": true
+          },
+          "native": {
+            "date": true,
+            "time": true
+          }
+        },
+        "captured": {
+          "date": true,
+          "barWidth": false,
+          "time": true
+        }
+      }
+    },
+    {
+      "name": "server saved appearance and logical sync",
+      "config": {
+        "version": 2,
+        "enabled": true,
+        "style": "rectangle",
+        "colorMode": "theme",
+        "color": "#AABBCC",
+        "transparencyMode": "theme",
+        "transparency": 100,
+        "priceLabels": true
+      },
+      "sync": {
+        "date": false,
+        "barWidth": true,
+        "time": false
+      }
+    },
+    {
+      "name": "2 charts",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 813
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 25.539130434782606,
+          "range": {
+            "from": 1791248400,
+            "to": 1791320400
+          },
+          "price": {
+            "from": 1.1196960583481055,
+            "to": 1.126112427064868
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 540,
+            "height": 813
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 596,
+            "height": 36
+          },
+          "text": "高 1.13低 1.12",
+          "spacing": 25.539130434782606,
+          "range": {
+            "from": 1791282300,
+            "to": 1791288300
+          },
+          "price": {
+            "from": 1.1254999510260493,
+            "to": 1.123877561217438
+          }
+        }
+      ]
+    },
+    {
+      "name": "8 charts",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 235,
+            "height": 374
+          },
+          "rail": {
+            "x": 56,
+            "y": 444,
+            "width": 297,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791280800,
+            "to": 1791309600
+          },
+          "price": {
+            "from": 1.123900031405391,
+            "to": 1.1256449607432608
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 241,
+            "height": 373
+          },
+          "rail": {
+            "x": 56,
+            "y": 883,
+            "width": 297,
+            "height": 36
+          },
+          "text": "高 1.13低 1.12（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791287400
+          },
+          "price": {
+            "from": 1.125482563143738,
+            "to": 1.1240792960703272
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 355,
+            "y": 42,
+            "width": 235,
+            "height": 374
+          },
+          "rail": {
+            "x": 355,
+            "y": 444,
+            "width": 297,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791282600,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.1099895315362474,
+            "to": 1.150013085579691
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 355,
+            "y": 482,
+            "width": 235,
+            "height": 373
+          },
+          "rail": {
+            "x": 355,
+            "y": 883,
+            "width": 297,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791287400
+          },
+          "price": {
+            "from": 1.1241074368562618,
+            "to": 1.1255107039296726
+          }
+        },
+        {
+          "i": 4,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 235,
+            "height": 374
+          },
+          "rail": {
+            "x": 654,
+            "y": 444,
+            "width": 297,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791287400
+          },
+          "price": {
+            "from": 1.1241074378434965,
+            "to": 1.1255107026956295
+          }
+        },
+        {
+          "i": 5,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 235,
+            "height": 373
+          },
+          "rail": {
+            "x": 654,
+            "y": 883,
+            "width": 297,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791287400
+          },
+          "price": {
+            "from": 1.1241074368562618,
+            "to": 1.1255107039296726
+          }
+        },
+        {
+          "i": 6,
+          "pane": {
+            "x": 953,
+            "y": 42,
+            "width": 235,
+            "height": 374
+          },
+          "rail": {
+            "x": 953,
+            "y": 444,
+            "width": 297,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791287400
+          },
+          "price": {
+            "from": 1.1241074378434965,
+            "to": 1.1255107026956295
+          }
+        },
+        {
+          "i": 7,
+          "pane": {
+            "x": 953,
+            "y": 482,
+            "width": 235,
+            "height": 373
+          },
+          "rail": {
+            "x": 953,
+            "y": 883,
+            "width": 297,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791287400
+          },
+          "price": {
+            "from": 1.1241074368562618,
+            "to": 1.1255107039296726
+          }
+        }
+      ]
+    },
+    {
+      "name": "narrow eight charts",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 110,
+            "height": 274
+          },
+          "rail": {
+            "x": 56,
+            "y": 344,
+            "width": 172,
+            "height": 36
+          },
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791280800,
+            "to": 1791291600
+          },
+          "price": {
+            "from": 1.1238998640915594,
+            "to": 1.1256451698855507
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 382,
+            "width": 116,
+            "height": 273
+          },
+          "rail": {
+            "x": 56,
+            "y": 683,
+            "width": 172,
+            "height": 36
+          },
+          "text": "高 1.13低 1.12（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791285900
+          },
+          "price": {
+            "from": 1.1254826985551467,
+            "to": 1.1240791268060666
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 230,
+            "y": 42,
+            "width": 110,
+            "height": 274
+          },
+          "rail": {
+            "x": 230,
+            "y": 344,
+            "width": 172,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791284100,
+            "to": 1791285000
+          },
+          "price": {
+            "from": 1.109985693848355,
+            "to": 1.1500178826895564
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 230,
+            "y": 382,
+            "width": 110,
+            "height": 273
+          },
+          "rail": {
+            "x": 230,
+            "y": 683,
+            "width": 172,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791285900
+          },
+          "price": {
+            "from": 1.1241073014448533,
+            "to": 1.1255108731939334
+          }
+        },
+        {
+          "i": 4,
+          "pane": {
+            "x": 404,
+            "y": 42,
+            "width": 110,
+            "height": 274
+          },
+          "rail": {
+            "x": 404,
+            "y": 344,
+            "width": 172,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791285900
+          },
+          "price": {
+            "from": 1.124107303290415,
+            "to": 1.1255108708869814
+          }
+        },
+        {
+          "i": 5,
+          "pane": {
+            "x": 404,
+            "y": 382,
+            "width": 110,
+            "height": 273
+          },
+          "rail": {
+            "x": 404,
+            "y": 683,
+            "width": 172,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791285900
+          },
+          "price": {
+            "from": 1.1241073014448533,
+            "to": 1.1255108731939334
+          }
+        },
+        {
+          "i": 6,
+          "pane": {
+            "x": 578,
+            "y": 42,
+            "width": 110,
+            "height": 274
+          },
+          "rail": {
+            "x": 578,
+            "y": 344,
+            "width": 172,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791285900
+          },
+          "price": {
+            "from": 1.124107303290415,
+            "to": 1.1255108708869814
+          }
+        },
+        {
+          "i": 7,
+          "pane": {
+            "x": 578,
+            "y": 382,
+            "width": 110,
+            "height": 273
+          },
+          "rail": {
+            "x": 578,
+            "y": 683,
+            "width": 172,
+            "height": 36
+          },
+          "text": "高 1.12547低 1.12404（低价在屏外）",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791285000,
+            "to": 1791285900
+          },
+          "price": {
+            "from": 1.1241073014448533,
+            "to": 1.1255108731939334
+          }
+        }
+      ]
+    },
+    {
+      "name": "eight chart 60 second performance",
+      "performance": {
+        "frames": 3481,
+        "p95": 0.9999995231628418,
+        "setterSamples": 3600,
+        "maxCalls": 1,
+        "maxWork": 26.199999809265137,
+        "latencySamples": 3150,
+        "latencyP95": 2.9000000953674316,
+        "afterRafP95": 2.9000000953674316
+      }
+    }
+  ],
+  "errors": [],
+  "runningHostAsset": "host.d0a96d61fcfcc340.js",
+  "lastHover": {
+    "i": 0,
+    "x": 42.139565217391606,
+    "y": 192.70000000000002,
+    "index": 197,
+    "contains": true,
+    "time": 1791284400,
+    "hit": {
+      "tag": "CANVAS",
+      "role": null,
+      "name": null,
+      "text": ""
+    },
+    "lastIndex": 197,
+    "source": {
+      "symbol": "MWP:EURUSD",
+      "resolution": "60",
+      "chartTime": 1791284400000,
+      "start": 1791284400000,
+      "end": 1791288000000,
+      "high": 1.12547,
+      "low": 1.12404
+    }
+  },
+  "performance": {
+    "frames": 3481,
+    "p95": 0.9999995231628418,
+    "setterSamples": 3600,
+    "maxCalls": 1,
+    "maxWork": 26.199999809265137,
+    "latencySamples": 3150,
+    "latencyP95": 2.9000000953674316,
+    "afterRafP95": 2.9000000953674316
+  }
+}

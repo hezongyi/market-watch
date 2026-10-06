@@ -1,0 +1,77 @@
+{
+  "at": "2026-10-06T11:23:12.536Z",
+  "cases": [
+    {
+      "name": "trusted two-finger pinch",
+      "before": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "after": [
+        12.163719177246094,
+        12.163719177246094,
+        12.163719177246094,
+        12.163719177246094
+      ]
+    },
+    {
+      "name": "horizontal trackpad pan excluded",
+      "pan": [
+        6,
+        12.163719177246094,
+        12.163719177246094,
+        12.163719177246094
+      ]
+    },
+    {
+      "name": "vertical trackpad wheel follows",
+      "wheel": [
+        6.6,
+        6.6,
+        6.6,
+        6.6
+      ]
+    },
+    {
+      "name": "mobile view state",
+      "state": {
+        "nativeReadonly": true,
+        "charts": 4
+      }
+    },
+    {
+      "name": "readonly temporary config and save do not write server",
+      "writes": [],
+      "revision": 2
+    },
+    {
+      "name": "actual native dispose cleanup",
+      "cleanup": {
+        "sync": {
+          "epoch": 1,
+          "layoutEpoch": 3,
+          "mode": "barWidth",
+          "time": false,
+          "pauses": 0,
+          "bindings": 0,
+          "queued": 0
+        },
+        "mapping": {
+          "epoch": 25,
+          "bindings": 0,
+          "rails": 0,
+          "stores": []
+        },
+        "rails": 0
+      }
+    }
+  ],
+  "errors": [],
+  "runningHostAsset": "host.d0a96d61fcfcc340.js",
+  "mobile": {
+    "nativeReadonly": true,
+    "charts": 4
+  }
+}

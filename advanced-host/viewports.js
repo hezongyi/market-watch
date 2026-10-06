@@ -23,44 +23,33 @@ function captureChartLayout(widget) {
   return pending;
 }
 async function captureChartLayoutNow(widget) {
-  const date = widget.dateRangeSync(), time = widget.timeSync();
-  const desired = {date: date.value(), time: time.value()};
+  const coordinator = widget._mwSyncCoordinator;
+  const desired = coordinator.snapshot();
   const viewports = captureChartViewports(widget);
-  // Native startup synchronization can enqueue range jumps before peer tick
-  // marks exist. Capture a layout through the public API with sync deferred;
-  // store the user's choices in our own metadata and restore them after data.
-  if (desired.date && widget.chartsCount() > 1) {
-    date.setValue(false);
-    time.setValue(false);
-  }
+  const pause = coordinator.acquirePause('capture-layout', desired.date && widget.chartsCount()>1
+    ? ['date','time','barWidth'] : ['barWidth']);
   try {
     const state = await new Promise((resolve, reject) => {
       try { widget.save(resolve); } catch(error) { reject(error); }
     });
     return {...state, _mwViewports: viewports, _mwSync: desired};
   } finally {
-    if (time.value() !== desired.time) time.setValue(desired.time);
-    if (date.value() !== desired.date) date.setValue(desired.date);
+    pause.release();
   }
 }
 
 function restoreChartSynchronization(widget, desired) {
-  if (typeof desired?.time === 'boolean' && widget.timeSync().value() !== desired.time)
-    widget.timeSync().setValue(desired.time);
-  if (typeof desired?.date === 'boolean' && widget.dateRangeSync().value() !== desired.date)
-    widget.dateRangeSync().setValue(desired.date);
+  if (desired) widget._mwSyncCoordinator.configure(desired, true);
+  widget._mwLegacyPause?.release();
+  delete widget._mwLegacyPause;
 }
 
 function deferLegacyChartSynchronization(widget) {
-  const date = widget.dateRangeSync(), time = widget.timeSync();
-  const desired = {date: date.value(), time: time.value()};
-  // The first getBars call is early enough to avoid native startup range
-  // propagation and late enough for these public watched values to exist.
-  // Older opaque layouts cannot be rewritten into our new snapshot format.
-  if (desired.date && widget.chartsCount() > 1) {
-    date.setValue(false);
-    time.setValue(false);
-  }
+  const coordinator = widget._mwSyncCoordinator;
+  const desired = coordinator.snapshot();
+  widget._mwLegacyPause?.release();
+  if (desired.date && widget.chartsCount()>1)
+    widget._mwLegacyPause = coordinator.acquirePause('legacy-load',['date','time','barWidth']);
   return desired;
 }
 
@@ -72,10 +61,9 @@ function restoreHistoricalSpacing(chart, spacing) {
 }
 async function restoreChartViewports(widget, viewports, isCurrent) {
   if (!Array.isArray(viewports) || !isCurrent()) return;
-  const sync = widget.dateRangeSync(),
-    desired = sync.value(),
-    timeSync = widget.timeSync(),
-    desiredTime = timeSync.value();
+  const coordinator = widget._mwSyncCoordinator,
+    desired = coordinator.snapshot().date;
+  let pause = coordinator.acquirePause('restore-viewport',['barWidth']);
   const matches = (state, chart) => state &&
     state.symbol === chart.symbol() && state.resolution === chart.resolution() &&
     Number.isFinite(state.range?.from) && Number.isFinite(state.range?.to) &&
@@ -108,8 +96,9 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
       }
       return;
     }
-    timeSync.setValue(false);
-    sync.setValue(false);
+    const allPause = coordinator.acquirePause('restore-independent-viewports',['date','time','barWidth']);
+    pause.release();
+    pause = allPause;
     for (
       let index = 0;
       index < Math.min(viewports.length, widget.chartsCount());
@@ -155,57 +144,29 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
       }
     }
   } finally {
-    if (isCurrent()) {
-      if (timeSync.value() !== desiredTime) timeSync.setValue(desiredTime);
-      if (sync.value() !== desired) sync.setValue(desired);
-    }
+    pause.release();
   }
 }
 
 // Correct native range differences at data edges and historical session gaps.
 function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => target, notice = () => {}) {
   const bindings = new Map();
-  const range = widget.dateRangeSync(),
-    time = widget.timeSync();
-  let timer,
-    applying = false,
-    disposed = false,
-    internal = false;
-  let desiredRange = range.value(),
-    desiredTime = time.value(),
-    generation = 0;
-  function set(toggle, value) {
-    if (toggle.value() === value) return;
-    internal = true;
-    try {
-      toggle.setValue(value);
-    } finally {
-      internal = false;
-    }
-  }
-  function rangeChanged(value) {
-    if (internal) return;
-    desiredRange = value;
-    if (!value) for (const peer of bindings.keys()) notice(peer, "");
+  const coordinator = widget._mwSyncCoordinator;
+  const reconciled = new Map();
+  let timer, applying = false, disposed = false, generation = 0, activePause;
+  let alignmentCount = 0, lastTarget, retryPending = false;
+  const unsubscribe = coordinator.subscribe((state,event) => {
+    if(event?.execution)return;
     generation++;
-  }
-  function timeChanged(value) {
-    if (internal) return;
-    desiredTime = value;
-    generation++;
-  }
-  range.subscribe(rangeChanged);
-  time.subscribe(timeChanged);
-  function restore() {
-    set(range, desiredRange);
-    set(time, desiredTime);
-  }
+    reconciled.clear();
+    if (!coordinator.snapshot().date) for (const peer of bindings.keys()) notice(peer, '');
+  });
   async function align(chart) {
     timer = undefined;
     if (
       disposed ||
       applying ||
-      !range.value() ||
+      !coordinator.snapshot().date ||
       widget.activeChart() !== chart
     )
       return;
@@ -214,11 +175,24 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
       return;
     }
     const target = chart.getVisibleRange();
+    lastTarget = target;
     if (!(target?.to > target?.from)) return;
+    const settled = peer => {
+      const range = peer.getVisibleRange(), previous = reconciled.get(peer);
+      // Capacity and session edges can legitimately clamp a public range.
+      // Do not replay an unchanged correction on its late native notification.
+      const boundary = globalThis.MWNativeNavigation?.rangeBoundary(peer);
+      if (Number.isFinite(boundary) && target.from < boundary && range?.from === boundary)
+        return true;
+      return previous?.source === chart &&
+        previous.target.from === target.from && previous.target.to === target.to &&
+        previous.actual.from === range?.from && previous.actual.to === range?.to;
+    };
     const peers = [...bindings.keys()].filter((peer) => {
       const minutes = Number(peer.resolution());
       return (
         peer !== chart &&
+        !settled(peer) &&
         minutes > 0 &&
         Number.isFinite(minutes) &&
         peer.dataReady() &&
@@ -227,15 +201,14 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
       );
     });
     for (const peer of bindings.keys()) {
-      if (!peers.includes(peer)) notice(peer, "");
+      if (!peers.includes(peer) && !settled(peer)) notice(peer, "");
     }
     if (!peers.length) return;
     const current = ++generation;
+    retryPending = false;
+    alignmentCount++;
     applying = true;
-    desiredRange = range.value();
-    desiredTime = time.value();
-    set(range, false);
-    set(time, false);
+    const pause = activePause = coordinator.acquirePause('edge-alignment',['date','time','barWidth']);
     try {
       // Start independent session lookups together; settle errors immediately
       // so cancellation cannot leave an unhandled rejected lookup behind.
@@ -249,19 +222,27 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
           const adjusted = result.value;
           if (disposed || current !== generation || blocked()) return;
           await peer.setVisibleRange({from: adjusted.from, to: adjusted.to}, { rejectByTimeout: 20000 });
-          if (!disposed && current === generation) notice(peer, adjusted.notice || "");
+          if (!disposed && current === generation) {
+            const actual = peer.getVisibleRange();
+            if (actual?.to > actual?.from)
+              reconciled.set(peer, {source: chart, target: {...target}, actual: {...actual}});
+            notice(peer, adjusted.notice || "");
+          }
         } catch (error) {
-          if (!disposed) onError(error);
+          // The native engine owns capacity failure and asynchronously places
+          // this pane at the real boundary; it is not a failed session lookup.
+          if (!disposed && error?.code !== "NATIVE_HISTORY_CAPACITY_EXCEEDED") onError(error);
         }
       }));
     } finally {
-      if (!disposed) restore();
+      pause.release();
+      if (activePause === pause) activePause = undefined;
       applying = false;
       // A wheel/drag can arrive while a peer's public range call is pending.
       // Reconcile the latest active viewport instead of dropping that intent.
       const latest = !disposed && widget.activeChart() === chart && chart.getVisibleRange();
-      if (!disposed && desiredRange && latest &&
-          (latest.from !== target.from || latest.to !== target.to)) {
+      if (!disposed && coordinator.snapshot().date &&
+          (retryPending || latest && (latest.from !== target.from || latest.to !== target.to))) {
         clearTimeout(timer);
         timer = setTimeout(() => align(widget.activeChart()), 150);
       }
@@ -269,6 +250,7 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
   }
   function refresh() {
     generation++;
+    reconciled.clear();
     clearTimeout(timer);
     timer = undefined;
     for (const [chart, binding] of bindings) {
@@ -284,11 +266,16 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
       const changed = () => {
         notice(chart, "");
         generation++;
+        reconciled.clear();
       };
       chart.onSymbolChanged().subscribe(null, changed);
       chart.onIntervalChanged().subscribe(null, changed);
       const callback = () => {
-        if (disposed || applying || !range.value()) return;
+        if (disposed || !coordinator.snapshot().date) return;
+        if (applying) {
+          if (widget.activeChart() === chart) retryPending = true;
+          return;
+        }
         clearTimeout(timer);
         timer = setTimeout(() => align(widget.activeChart()), 150);
       };
@@ -299,15 +286,22 @@ function edgeRangeSync(widget, blocked, onError, prepare = async (_, target) => 
   refresh();
   return {
     refresh,
+    retry() {
+      generation++; reconciled.clear(); retryPending = true;
+      if (!disposed && !applying && coordinator.snapshot().date) {
+        clearTimeout(timer);
+        timer = setTimeout(() => align(widget.activeChart()), 150);
+      }
+    },
     busy: () => applying || timer !== undefined,
+    diagnostics: () => ({ applying, scheduled: timer !== undefined, blocked: blocked(), alignmentCount, lastTarget }),
     dispose() {
       disposed = true;
       generation++;
       clearTimeout(timer);
       timer = undefined;
-      if (applying) restore();
-      range.unsubscribe(rangeChanged);
-      time.unsubscribe(timeChanged);
+      activePause?.release();
+      unsubscribe();
       for (const [chart, binding] of bindings) {
         chart.onVisibleRangeChanged().unsubscribe(null, binding.callback);
         chart.onSymbolChanged().unsubscribe(null, binding.changed);
@@ -363,4 +357,15 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
     clearTimeout(timeout);
     chart.onDataLoaded().unsubscribe(null, loaded);
   }
+}
+// Import old native layouts before loading can replace their watched values
+// with temporary execution state. Modern host metadata remains authoritative.
+function chartSynchronizationState(state) {
+  if (!state) return undefined;
+  if (state._mwSync) return state._mwSync;
+  return {
+    date: state.dateRangeLock === true || state.dateRangeLock === 1,
+    time: state.trackTimeLock === true || state.trackTimeLock === 1,
+    barWidth: false,
+  };
 }

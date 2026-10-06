@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "workspace": {
+    "name": "main 集成：范围映射与柱宽同步验收",
+    "id": "fd9959f5-6c96-49e9-a2b4-a9dc0686ce11",
+    "periods": [
+      "1W",
+      "5",
+      "240",
+      "1D"
+    ],
+    "max_bars": 200000,
+    "errors": []
+  },
+  "runningHostAsset": "host.d0a96d61fcfcc340.js",
+  "periods": [
+    "1W",
+    "5",
+    "240",
+    "1D"
+  ],
+  "sync": {
+    "date": false,
+    "barWidth": true,
+    "time": true
+  },
+  "mapping": {
+    "version": 2,
+    "enabled": true,
+    "style": "rectangle",
+    "colorMode": "theme",
+    "color": "#FFFFFF",
+    "transparencyMode": "theme",
+    "transparency": 88,
+    "priceLabels": true
+  },
+  "limits": {
+    "max_bars": 200000,
+    "workspace_bars": 800000,
+    "min_bars": 20000,
+    "hard_max_bars": 1000000,
+    "default_bars": 200000,
+    "response_bytes": 134217728,
+    "task_seconds": 600,
+    "max_pages": 300,
+    "max_inflight": 8,
+    "mode": "continuous",
+    "protocol": 1,
+    "version": "01cac1254a994dcc"
+  },
+  "theme": "dark",
+  "errors": []
+}

@@ -1,5 +1,5 @@
 /* Host-owned controls using the public header/custom-CSS integration. */
-function chartThemeMenu(chartWidget, report, grid, actions, createWorkspace, autoSave, saveLayout, changePassword) {
+function chartThemeMenu(chartWidget, report, grid, actions, createWorkspace, autoSave, saveLayout, changePassword, barRangeMapping, syncCoordinator) {
   // Obtain the chart document through the public HTML-button API, then release
   // that slot: the native header clones its contents for measuring overflow.
   // An independent button keeps the corner control out of those sizing clones.
@@ -88,6 +88,10 @@ function chartThemeMenu(chartWidget, report, grid, actions, createWorkspace, aut
     observer.observe(doc.body, {childList: true, subtree: true});
     extendLayoutMenu();
     doc.defaultView.addEventListener("pagehide", () => observer.disconnect(), {once: true});
+  }
+  if (barRangeMapping && syncCoordinator) {
+    const syncSettings=chartSyncSettings(chartWidget,doc,barRangeMapping,syncCoordinator,grid.readonly);
+    doc.defaultView.addEventListener('pagehide',()=>syncSettings.dispose(),{once:true});
   }
   const button = doc.createElement("button");
   button.type = "button";

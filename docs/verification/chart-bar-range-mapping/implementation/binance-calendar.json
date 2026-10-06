@@ -1,0 +1,1699 @@
+{
+  "scope": "Actual provider candles, native calendar, actual mouse and recorded paint bounds",
+  "at": "2026-10-04T09:23:18.154Z",
+  "cases": [
+    {
+      "date": "2024-03-01",
+      "source": {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "1M",
+        "chartTime": 1709251200000,
+        "start": 1709251200000,
+        "end": 1711929600000,
+        "high": 73777,
+        "low": 59005
+      },
+      "before": {
+        "mapper": {
+          "epoch": 9,
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw1",
+              "size": 444,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw5",
+              "size": 975,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 103.2,
+            "offset": -29,
+            "price": {
+              "from": 35108.45584725537,
+              "to": 78085.18019093078
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 11.391304347826088,
+            "offset": -130,
+            "price": {
+              "from": 48245.336623003765,
+              "to": 76621.57922124528
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1709164800,
+              "to": 1709510400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -145,
+            "price": {
+              "from": 59982.7306921241,
+              "to": 64745.70163484487
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 28.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 35108.430707578205,
+              "to": 78085.21161552724
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "chartTime": 1709251200000,
+            "start": 1709251200000,
+            "end": 1711929600000,
+            "high": 73777,
+            "low": 59005
+          },
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw1",
+              "size": 444,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw5",
+              "size": 975,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              79.73913043478258,
+              0,
+              353.1304347826087,
+              409
+            ],
+            "at": 9261.099999904633
+          },
+          {
+            "id": "2bff97bf-2fd9-44aa-a719-d95ee4f2d126",
+            "resolution": "60",
+            "rect": [
+              129.6494845360824,
+              0,
+              394.3505154639176,
+              410
+            ],
+            "at": 9263
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 103.2,
+            "offset": -29,
+            "price": {
+              "from": 35108.45584725537,
+              "to": 78085.18019093078
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 11.391304347826088,
+            "offset": -130,
+            "price": {
+              "from": 48245.336623003765,
+              "to": 76621.57922124528
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1709164800,
+              "to": 1709510400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -145,
+            "price": {
+              "from": 59982.7306921241,
+              "to": 64745.70163484487
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 28.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 35108.430707578205,
+              "to": 78085.21161552724
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "chartTime": 1709251200000,
+            "start": 1709251200000,
+            "end": 1711929600000,
+            "high": 73777,
+            "low": 59005
+          },
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw1",
+              "size": 444,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw5",
+              "size": 975,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              79.73913043478258,
+              0,
+              353.1304347826087,
+              409
+            ],
+            "at": 9261.099999904633
+          },
+          {
+            "id": "2bff97bf-2fd9-44aa-a719-d95ee4f2d126",
+            "resolution": "60",
+            "rect": [
+              129.6494845360824,
+              0,
+              394.3505154639176,
+              410
+            ],
+            "at": 9263
+          },
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              79.73913043478258,
+              0,
+              353.1304347826087,
+              409
+            ],
+            "at": 9469.300000190735
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 103.2,
+            "offset": -29,
+            "price": {
+              "from": 35108.45584725537,
+              "to": 78085.18019093078
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 11.391304347826088,
+            "offset": -130,
+            "price": {
+              "from": 48245.336623003765,
+              "to": 76621.57922124528
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1709164800,
+              "to": 1709510400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -145,
+            "price": {
+              "from": 59982.7306921241,
+              "to": 64745.70163484487
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 28.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 35108.430707578205,
+              "to": 78085.21161552724
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2020-02-01",
+      "source": {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "1M",
+        "chartTime": 1580515200000,
+        "start": 1580515200000,
+        "end": 1583020800000,
+        "high": 10500,
+        "low": 8445
+      },
+      "before": {
+        "mapper": {
+          "epoch": 11,
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw7",
+              "size": 234,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw9",
+              "size": 693,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw10",
+              "size": 156,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 129,
+            "offset": -79,
+            "price": {
+              "from": 3124.7727923627685,
+              "to": 11321.696509546538
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1579910400,
+              "to": 1583625600
+            },
+            "spacing": 11.909090909090908,
+            "offset": -48,
+            "price": {
+              "from": 7755.368144027753,
+              "to": 10805.789819965308
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1580425200,
+              "to": 1580774400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -148,
+            "price": {
+              "from": 9071.192386634844,
+              "to": 9679.799516706446
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 30.823529411764707,
+            "offset": -18,
+            "price": {
+              "from": 3124.7679974878884,
+              "to": 11321.702503140139
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 11,
+          "source": {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "chartTime": 1580515200000,
+            "start": 1580515200000,
+            "end": 1583020800000,
+            "high": 10500,
+            "low": 8445
+          },
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw7",
+              "size": 234,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw9",
+              "size": 693,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw10",
+              "size": 156,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              83.36363636363642,
+              0,
+              345.3636363636363,
+              409
+            ],
+            "at": 12406.400000095367
+          },
+          {
+            "id": "2bff97bf-2fd9-44aa-a719-d95ee4f2d126",
+            "resolution": "60",
+            "rect": [
+              135.6494845360824,
+              0,
+              394.3505154639176,
+              410
+            ],
+            "at": 12408.5
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 129,
+            "offset": -79,
+            "price": {
+              "from": 3124.7727923627685,
+              "to": 11321.696509546538
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1579910400,
+              "to": 1583625600
+            },
+            "spacing": 11.909090909090908,
+            "offset": -48,
+            "price": {
+              "from": 7755.368144027753,
+              "to": 10805.789819965308
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1580425200,
+              "to": 1580774400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -148,
+            "price": {
+              "from": 9071.192386634844,
+              "to": 9679.799516706446
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 30.823529411764707,
+            "offset": -18,
+            "price": {
+              "from": 3124.7679974878884,
+              "to": 11321.702503140139
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 11,
+          "source": {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "chartTime": 1580515200000,
+            "start": 1580515200000,
+            "end": 1583020800000,
+            "high": 10500,
+            "low": 8445
+          },
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw7",
+              "size": 234,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw9",
+              "size": 693,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw10",
+              "size": 156,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              83.36363636363642,
+              0,
+              345.3636363636363,
+              409
+            ],
+            "at": 12406.400000095367
+          },
+          {
+            "id": "2bff97bf-2fd9-44aa-a719-d95ee4f2d126",
+            "resolution": "60",
+            "rect": [
+              135.6494845360824,
+              0,
+              394.3505154639176,
+              410
+            ],
+            "at": 12408.5
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 129,
+            "offset": -79,
+            "price": {
+              "from": 3124.7727923627685,
+              "to": 11321.696509546538
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1579910400,
+              "to": 1583625600
+            },
+            "spacing": 11.909090909090908,
+            "offset": -48,
+            "price": {
+              "from": 7755.368144027753,
+              "to": 10805.789819965308
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1580425200,
+              "to": 1580774400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -148,
+            "price": {
+              "from": 9071.192386634844,
+              "to": 9679.799516706446
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 30.823529411764707,
+            "offset": -18,
+            "price": {
+              "from": 3124.7679974878884,
+              "to": 11321.702503140139
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2023-12-01",
+      "source": {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "1M",
+        "chartTime": 1701388800000,
+        "start": 1701388800000,
+        "end": 1704067200000,
+        "high": 44700,
+        "low": 37615.86
+      },
+      "before": {
+        "mapper": {
+          "epoch": 13,
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw14",
+              "size": 465,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw15",
+              "size": 499,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw17",
+              "size": 175,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 129,
+            "offset": -33,
+            "price": {
+              "from": 24343.75875894988,
+              "to": 51713.10655131265
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 11.391304347826088,
+            "offset": -69,
+            "price": {
+              "from": 35675.43736826365,
+              "to": 48538.44328967043
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1701302400,
+              "to": 1701648000
+            },
+            "spacing": 5.402061855670103,
+            "offset": -101,
+            "price": {
+              "from": 37230.90692124105,
+              "to": 40586.36634844869
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 29.11111111111111,
+            "offset": -16,
+            "price": {
+              "from": 24343.742748968238,
+              "to": 51713.1265637897
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 13,
+          "source": {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "chartTime": 1701388800000,
+            "start": 1701388800000,
+            "end": 1704067200000,
+            "high": 44700,
+            "low": 37615.86
+          },
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw14",
+              "size": 465,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw15",
+              "size": 499,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw17",
+              "size": 175,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              79.73913043478258,
+              0,
+              353.1304347826087,
+              409
+            ],
+            "at": 15353.099999904633
+          },
+          {
+            "id": "2bff97bf-2fd9-44aa-a719-d95ee4f2d126",
+            "resolution": "60",
+            "rect": [
+              129.6494845360824,
+              0,
+              394.3505154639176,
+              410
+            ],
+            "at": 15355.099999904633
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 129,
+            "offset": -33,
+            "price": {
+              "from": 24343.75875894988,
+              "to": 51713.10655131265
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 11.391304347826088,
+            "offset": -69,
+            "price": {
+              "from": 35675.43736826365,
+              "to": 48538.44328967043
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1701302400,
+              "to": 1701648000
+            },
+            "spacing": 5.402061855670103,
+            "offset": -101,
+            "price": {
+              "from": 37230.90692124105,
+              "to": 40586.36634844869
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 29.11111111111111,
+            "offset": -16,
+            "price": {
+              "from": 24343.742748968238,
+              "to": 51713.1265637897
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 13,
+          "source": {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "chartTime": 1701388800000,
+            "start": 1701388800000,
+            "end": 1704067200000,
+            "high": 44700,
+            "low": 37615.86
+          },
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw14",
+              "size": 465,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw15",
+              "size": 499,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw17",
+              "size": 175,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              79.73913043478258,
+              0,
+              353.1304347826087,
+              409
+            ],
+            "at": 15353.099999904633
+          },
+          {
+            "id": "2bff97bf-2fd9-44aa-a719-d95ee4f2d126",
+            "resolution": "60",
+            "rect": [
+              129.6494845360824,
+              0,
+              394.3505154639176,
+              410
+            ],
+            "at": 15355.099999904633
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 129,
+            "offset": -33,
+            "price": {
+              "from": 24343.75875894988,
+              "to": 51713.10655131265
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 11.391304347826088,
+            "offset": -69,
+            "price": {
+              "from": 35675.43736826365,
+              "to": 48538.44328967043
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1701302400,
+              "to": 1701648000
+            },
+            "spacing": 5.402061855670103,
+            "offset": -101,
+            "price": {
+              "from": 37230.90692124105,
+              "to": 40586.36634844869
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 29.11111111111111,
+            "offset": -16,
+            "price": {
+              "from": 24343.742748968238,
+              "to": 51713.1265637897
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2024-12-01",
+      "source": {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "1M",
+        "chartTime": 1733011200000,
+        "start": 1733011200000,
+        "end": 1735689600000,
+        "high": 108353,
+        "low": 90500
+      },
+      "before": {
+        "mapper": {
+          "epoch": 15,
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw18",
+              "size": 234,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw19",
+              "size": 687,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw20",
+              "size": 94,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 129,
+            "offset": -21,
+            "price": {
+              "from": 53990.577565632455,
+              "to": 115782.27804295943
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1732406400,
+              "to": 1736294400
+            },
+            "spacing": 11.217391304347826,
+            "offset": -46,
+            "price": {
+              "from": 88753.03499013098,
+              "to": 110536.70626233626
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1732924800,
+              "to": 1733270400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -97,
+            "price": {
+              "from": 93132.76420047732,
+              "to": 98686.75724940334
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 30.352941176470587,
+            "offset": -18,
+            "price": {
+              "from": 53990.541419941386,
+              "to": 115782.32322507325
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 15,
+          "source": {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "chartTime": 1733011200000,
+            "start": 1733011200000,
+            "end": 1735689600000,
+            "high": 108353,
+            "low": 90500
+          },
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw18",
+              "size": 234,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw19",
+              "size": 687,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw20",
+              "size": 94,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              78.52173913043478,
+              0,
+              347.7391304347826,
+              409
+            ],
+            "at": 18665.800000190735
+          },
+          {
+            "id": "2bff97bf-2fd9-44aa-a719-d95ee4f2d126",
+            "resolution": "60",
+            "rect": [
+              129.6494845360824,
+              0,
+              394.3505154639176,
+              410
+            ],
+            "at": 18667.400000095367
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 129,
+            "offset": -21,
+            "price": {
+              "from": 53990.577565632455,
+              "to": 115782.27804295943
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1732406400,
+              "to": 1736294400
+            },
+            "spacing": 11.217391304347826,
+            "offset": -46,
+            "price": {
+              "from": 88753.03499013098,
+              "to": 110536.70626233626
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1732924800,
+              "to": 1733270400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -97,
+            "price": {
+              "from": 93132.76420047732,
+              "to": 98686.75724940334
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 30.352941176470587,
+            "offset": -18,
+            "price": {
+              "from": 53990.541419941386,
+              "to": 115782.32322507325
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 15,
+          "source": {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "chartTime": 1733011200000,
+            "start": 1733011200000,
+            "end": 1735689600000,
+            "high": 108353,
+            "low": 90500
+          },
+          "stores": [
+            {
+              "key": "MWP:BTCUSDT|1M|",
+              "size": 111,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|",
+              "size": 441,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|5|",
+              "size": 353,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|",
+              "size": 263,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|",
+              "size": 355,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1D|mw18",
+              "size": 234,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|60|mw19",
+              "size": 687,
+              "generation": 1
+            },
+            {
+              "key": "MWP:BTCUSDT|1W|mw20",
+              "size": 94,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "aaeffb10-a212-4738-b163-ed49121ebf8f",
+            "resolution": "1D",
+            "rect": [
+              78.52173913043478,
+              0,
+              347.7391304347826,
+              409
+            ],
+            "at": 18665.800000190735
+          },
+          {
+            "id": "2bff97bf-2fd9-44aa-a719-d95ee4f2d126",
+            "resolution": "60",
+            "rect": [
+              129.6494845360824,
+              0,
+              394.3505154639176,
+              410
+            ],
+            "at": 18667.400000095367
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 129,
+            "offset": -21,
+            "price": {
+              "from": 53990.577565632455,
+              "to": 115782.27804295943
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1D",
+            "range": {
+              "from": 1732406400,
+              "to": 1736294400
+            },
+            "spacing": 11.217391304347826,
+            "offset": -46,
+            "price": {
+              "from": 88753.03499013098,
+              "to": 110536.70626233626
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "60",
+            "range": {
+              "from": 1732924800,
+              "to": 1733270400
+            },
+            "spacing": 5.402061855670103,
+            "offset": -97,
+            "price": {
+              "from": 93132.76420047732,
+              "to": 98686.75724940334
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 30.352941176470587,
+            "offset": -18,
+            "price": {
+              "from": 53990.541419941386,
+              "to": 115782.32322507325
+            },
+            "shapes": []
+          }
+        ]
+      }
+    }
+  ],
+  "errors": []
+}

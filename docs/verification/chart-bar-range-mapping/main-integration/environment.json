@@ -1,0 +1,132 @@
+{
+  "at": "2026-10-06T12:00:26.446538+00:00",
+  "host": "Ubuntu local 192.168.7.232",
+  "compose_project": "mw-range-main-20261006",
+  "application": "https://192.168.7.232:16843/advanced-charts",
+  "chart_origin": "https://192.168.7.232:16844",
+  "database": "range_main",
+  "database_port": "127.0.0.1:16832",
+  "services": [
+    {
+      "Service": "aggregation-worker",
+      "Name": "mw-range-main-20261006-aggregation-worker-1",
+      "Image": "mw-range-main-api:candidate1",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "api",
+      "Name": "mw-range-main-20261006-api-1",
+      "Image": "mw-range-main-api:candidate1",
+      "State": "running",
+      "Health": "healthy",
+      "Ports": "8000/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "chart-origin",
+      "Name": "mw-range-main-20261006-chart-origin-1",
+      "Image": "mw-range-main-chart:candidate2",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "managed-history-worker",
+      "Name": "mw-range-main-20261006-managed-history-worker-1",
+      "Image": "mw-range-main-api:candidate1",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "market-worker",
+      "Name": "mw-range-main-20261006-market-worker-1",
+      "Image": "mw-range-main-api:candidate1",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "native-history-worker",
+      "Name": "mw-range-main-20261006-native-history-worker-1",
+      "Image": "mw-range-main-api:candidate1",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "notification-sink",
+      "Name": "mw-range-main-20261006-notification-sink-1",
+      "Image": "mw-range-main-api:candidate1",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp",
+      "Networks": "mw-range-main-20261006_notification-fixture",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "notification-worker",
+      "Name": "mw-range-main-20261006-notification-worker-1",
+      "Image": "mw-range-main-api:candidate1",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp",
+      "Networks": "mw-range-main-20261006_default,mw-range-main-20261006_notification-fixture",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "pg",
+      "Name": "mw-range-main-20261006-pg-1",
+      "Image": "postgres:14-bookworm",
+      "State": "running",
+      "Health": "healthy",
+      "Ports": "127.0.0.1:16832->5432/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "tls",
+      "Name": "mw-range-main-20261006-tls-1",
+      "Image": "nginx:1.28-alpine",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp, 192.168.7.232:16843->443/tcp, 192.168.7.232:16844->444/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    },
+    {
+      "Service": "web",
+      "Name": "mw-range-main-20261006-web-1",
+      "Image": "mw-range-main-web:candidate1",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp",
+      "Networks": "mw-range-main-20261006_default",
+      "Project": "mw-range-main-20261006"
+    }
+  ],
+  "images": {
+    "mw-range-main-api:candidate1": "sha256:dd76f1b3481fd12abc477adfd1eb6087eb6616798eab4977ee1a2b14943c47d0",
+    "mw-range-main-chart:candidate2": "sha256:8a7bd53d19832e7951056e4a56ff05d12074169ee35c9744bcd3a70b026908ca",
+    "postgres:14-bookworm": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "nginx:1.28-alpine": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+    "mw-range-main-web:candidate1": "sha256:e3f08a7a464a1f5adcb9fc1fa8e4aeed5ded16ed6dd33cc8be72490ca32df157"
+  },
+  "original_v180_preserved": true,
+  "unraid_modified": false,
+  "notification_sink_internal": true,
+  "external_notifications_sent": false
+}

@@ -1,0 +1,1421 @@
+{
+  "at": "2026-10-04T19:39:14.766Z",
+  "cases": [
+    {
+      "phase": "month-hover",
+      "state": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1790812800000,
+            "start": 1790802000000,
+            "end": 1793480400000,
+            "high": 1.1336,
+            "low": 1.12144
+          },
+          "bindings": 4,
+          "rails": 0,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              0,
+              72,
+              409
+            ],
+            "at": 5619.400000095367
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              410
+            ],
+            "at": 5624.799999713898
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "background",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1585699200,
+              "to": 1817154000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 0.925988353221957,
+              "to": 1.2692945584725537
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1781568000,
+              "to": 1792098000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1165816113403912,
+              "to": 1.177162985824511
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790951100,
+              "to": 1791150300
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1243859904534605,
+              "to": 1.1289250119331744
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1743379200,
+              "to": 1796594400
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.0649841312279442,
+              "to": 1.2241673359650698
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "phase": "continuous",
+      "before": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1790812800000,
+            "start": 1790802000000,
+            "end": 1793480400000,
+            "high": 1.1336,
+            "low": 1.12144
+          },
+          "bindings": 4,
+          "rails": 0,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              0,
+              72,
+              409
+            ],
+            "at": 5619.400000095367
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              410
+            ],
+            "at": 5624.799999713898
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "background",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1585699200,
+              "to": 1817154000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 0.925988353221957,
+              "to": 1.2692945584725537
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1781568000,
+              "to": 1792098000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1165816113403912,
+              "to": 1.177162985824511
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790951100,
+              "to": 1791150300
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1243859904534605,
+              "to": 1.1289250119331744
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1743379200,
+              "to": 1796594400
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.0649841312279442,
+              "to": 1.2241673359650698
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "after": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1727740800000,
+            "start": 1727730000000,
+            "end": 1730408400000,
+            "high": 1.11434,
+            "low": 1.07605
+          },
+          "bindings": 4,
+          "rails": 0,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              0,
+              72,
+              409
+            ],
+            "at": 5619.400000095367
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              410
+            ],
+            "at": 5624.799999713898
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "background",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1585699200,
+              "to": 1817154000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 0.925988353221957,
+              "to": 1.2692945584725537
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1781568000,
+              "to": 1792098000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1165816113403912,
+              "to": 1.177162985824511
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790951100,
+              "to": 1791150300
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1243859904534605,
+              "to": 1.1289250119331744
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1743379200,
+              "to": 1796594400
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.0649841312279442,
+              "to": 1.2241673359650698
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "historyBefore": 10,
+      "historyAfter": 10
+    },
+    {
+      "phase": "leave",
+      "state": {
+        "mapper": {
+          "epoch": 11,
+          "bindings": 4,
+          "rails": 0,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              0,
+              72,
+              409
+            ],
+            "at": 5619.400000095367
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              410
+            ],
+            "at": 5624.799999713898
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "background",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1585699200,
+              "to": 1817154000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 0.925988353221957,
+              "to": 1.2692945584725537
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1781568000,
+              "to": 1792098000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1165816113403912,
+              "to": 1.177162985824511
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790951100,
+              "to": 1791150300
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1243859904534605,
+              "to": 1.1289250119331744
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1743379200,
+              "to": 1796594400
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.0649841312279442,
+              "to": 1.2241673359650698
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "phase": "rectangle",
+      "state": {
+        "mapper": {
+          "epoch": 24,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "chartTime": 1790812800000,
+            "start": 1790802000000,
+            "end": 1793480400000,
+            "high": 1.1336,
+            "low": 1.12144
+          },
+          "bindings": 4,
+          "rails": 4,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              0,
+              72,
+              409
+            ],
+            "at": 5619.400000095367
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              410
+            ],
+            "at": 5624.799999713898
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              267.49539577039303,
+              72,
+              74.664604229607
+            ],
+            "at": 7554
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              374
+            ],
+            "at": 7558.900000095367
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1585699200,
+              "to": 1817154000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 0.9259804449097095,
+              "to": 1.2693044438628631
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1781568000,
+              "to": 1792098000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1165802086203502,
+              "to": 1.177164739224562
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790951100,
+              "to": 1791150300
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.124385885893745,
+              "to": 1.1289251426328188
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1743379200,
+              "to": 1796594400
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.0649804454503706,
+              "to": 1.2241719431870366
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "phase": "switch-source",
+      "state": {
+        "mapper": {
+          "epoch": 26,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "chartTime": 1790974500000,
+            "start": 1790974500000,
+            "end": 1790974800000,
+            "high": 1.12516,
+            "low": 1.1249
+          },
+          "bindings": 4,
+          "rails": 4,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              0,
+              72,
+              409
+            ],
+            "at": 5619.400000095367
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              410
+            ],
+            "at": 5624.799999713898
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              267.49539577039303,
+              72,
+              74.664604229607
+            ],
+            "at": 7554
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              374
+            ],
+            "at": 7558.900000095367
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1585699200,
+              "to": 1817154000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 0.9259804449097095,
+              "to": 1.2693044438628631
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1781568000,
+              "to": 1792098000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1165802086203502,
+              "to": 1.177164739224562
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790951100,
+              "to": 1791150300
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.124385885893745,
+              "to": 1.1289251426328188
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1743379200,
+              "to": 1796594400
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.0649804454503706,
+              "to": 1.2241719431870366
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "phase": "held-drag",
+      "state": {
+        "mapper": {
+          "epoch": 26,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "chartTime": 1790966400000,
+            "start": 1790966400000,
+            "end": 1790966700000,
+            "high": 1.1251,
+            "low": 1.125
+          },
+          "bindings": 4,
+          "rails": 4,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              0,
+              72,
+              409
+            ],
+            "at": 5619.400000095367
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              410
+            ],
+            "at": 5624.799999713898
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "1D",
+            "rect": [
+              462,
+              267.49539577039303,
+              72,
+              74.664604229607
+            ],
+            "at": 7554
+          },
+          {
+            "id": "a934394d-0dbe-4161-a81b-39afce6fc23f",
+            "resolution": "5",
+            "rect": [
+              0,
+              0,
+              534,
+              374
+            ],
+            "at": 7558.900000095367
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1M",
+            "range": {
+              "from": 1585699200,
+              "to": 1817154000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 0.9259804449097095,
+              "to": 1.2693044438628631
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1D",
+            "range": {
+              "from": 1781568000,
+              "to": 1792098000
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.1165802086203502,
+              "to": 1.177164739224562
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1790959800,
+              "to": 1791159300
+            },
+            "spacing": 6,
+            "offset": 39.66666700000002,
+            "price": {
+              "from": 1.124632543836692,
+              "to": 1.126096820204135
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1743379200,
+              "to": 1796594400
+            },
+            "spacing": 6,
+            "offset": 10,
+            "price": {
+              "from": 1.0649804454503706,
+              "to": 1.2241719431870366
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "phase": "stationary-navigation",
+      "state": {
+        "mapper": {
+          "epoch": 29,
+          "source": {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "chartTime": 1709510400000,
+            "start": 1709503200000,
+            "end": 1710104400000,
+            "high": 1.09806,
+            "low": 1.08367
+          },
+          "bindings": 2,
+          "rails": 0,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|mw3",
+              "size": 3133,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 10618.599999904633
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 10633
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 10659.5
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 10676.199999809265
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              74.5,
+              0,
+              459.5,
+              849
+            ],
+            "at": 11797
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 11819.5
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 11855.5
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 11870.900000095367
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 12004.299999713898
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 12012.400000095367
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "background",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1708300800,
+              "to": 1710720000
+            },
+            "spacing": 106.8,
+            "offset": -132,
+            "price": {
+              "from": 1.0739435021145602,
+              "to": 1.1007431223567996
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1709270700,
+              "to": 1709577000
+            },
+            "spacing": 1.1973094170403586,
+            "offset": -671,
+            "price": {
+              "from": 1.079078791967548,
+              "to": 1.087459010040565
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "phase": "leave-before-navigation",
+      "state": {
+        "mapper": {
+          "epoch": 31,
+          "bindings": 2,
+          "rails": 0,
+          "stores": [
+            {
+              "key": "MWP:EURUSD|1M|",
+              "size": 293,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1D|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|",
+              "size": 358,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|1W|",
+              "size": 269,
+              "generation": 1
+            },
+            {
+              "key": "MWP:EURUSD|5|mw5",
+              "size": 2239,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 10618.599999904633
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 10633
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 10659.5
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 10676.199999809265
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              74.5,
+              0,
+              459.5,
+              849
+            ],
+            "at": 11797
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 11819.5
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 11855.5
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 11870.900000095367
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 12004.299999713898
+          },
+          {
+            "id": "7d4b3224-8386-4a66-bb3f-36e5f553a001",
+            "resolution": "5",
+            "rect": [
+              238.26457399103143,
+              0,
+              295.7354260089686,
+              849
+            ],
+            "at": 12012.400000095367
+          }
+        ],
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "background",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "1W",
+            "range": {
+              "from": 1708300800,
+              "to": 1710720000
+            },
+            "spacing": 106.8,
+            "offset": -132,
+            "price": {
+              "from": 1.0739435021145602,
+              "to": 1.1007431223567996
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "5",
+            "range": {
+              "from": 1678060800,
+              "to": 1678147200
+            },
+            "spacing": 1.8477508650519032,
+            "offset": -605,
+            "price": {
+              "from": 1.0614336194942318,
+              "to": 1.0702529756322103
+            },
+            "shapes": []
+          }
+        ]
+      }
+    }
+  ],
+  "errors": []
+}

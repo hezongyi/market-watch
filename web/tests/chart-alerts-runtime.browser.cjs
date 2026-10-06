@@ -7,6 +7,10 @@ const CHART = process.env.CHART_ORIGIN || "https://127.0.0.1:19444";
 const PRIVATE =
   process.env.MW_ALERT_PRIVATE_DIR || "/tmp/mw-chart-alerts-acceptance";
 const ENVIRONMENTS = {
+  "/home/quant/repos/.acceptance/range-main-20261006": [
+    "https://192.168.7.232:16843",
+    "https://192.168.7.232:16844",
+  ],
   "/tmp/mw-chart-alerts-acceptance": [
     "https://localhost:19443",
     "https://127.0.0.1:19444",
@@ -112,6 +116,27 @@ assert.deepEqual(
       { timeout: 60000 },
     );
 
+    report.runningHostAsset = await frame.evaluate(() =>
+      [...document.scripts]
+        .map((s) => s.src)
+        .find((src) => /\/host\.[a-f0-9]+\.js$/.test(src))
+        ?.split("/")
+        .at(-1),
+    );
+    if (PRIVATE.endsWith("range-main-20261006")) {
+      await frame.evaluate(() => {
+        MWBarRangeMapping.configure({
+          enabled: true,
+          style: "rectangle",
+          priceLabels: true,
+        });
+        MWSyncCoordinator.configure({
+          date: false,
+          time: false,
+          barWidth: true,
+        });
+      });
+    }
     report.cases.push("actual HTTPS login and platform native chart load");
     const nativeUI = frame.childFrames()[0];
     await nativeUI.getByText("创建告警", { exact: true }).click();
@@ -479,6 +504,12 @@ print(sum(ys)/len(ys))
     report.cases.push(
       "four actual native studies create parameter/history snapshots through authenticated parent and reach ready on real provider data",
     );
+    if (PRIVATE.endsWith("range-main-20261006")) {
+      await frame.evaluate(() => snapshot());
+      await frame.waitForFunction(() => !nativeSaving && !dirty, null, {
+        timeout: 60000,
+      });
+    }
     await page.reload();
     await page.locator('iframe[title="专业图表工作区"]').waitFor();
     const restoredFrame = await new Promise(async (resolve, reject) => {
@@ -508,6 +539,23 @@ print(sum(ys)/len(ys))
       null,
       { timeout: 15000 },
     );
+    if (PRIVATE.endsWith("range-main-20261006")) {
+      const combined = await restoredFrame.evaluate(() => ({
+        mapping: MWBarRangeMapping.snapshot(),
+        sync: MWSyncCoordinator.snapshot(),
+        studies: widget
+          .activeChart()
+          .getAllStudies()
+          .map((s) => s.name),
+      }));
+      assert.equal(combined.mapping.enabled, true);
+      assert.equal(combined.sync.barWidth, true);
+      assert.equal(
+        combined.studies.filter((s) => s.startsWith("守望 Python")).length,
+        4,
+      );
+      report.combinedRestoration = combined;
+    }
     const current = await api("/chart-alerts/" + drawingRow.id);
     assert.equal(current.version, 2);
     assert.equal(current.status, "active");

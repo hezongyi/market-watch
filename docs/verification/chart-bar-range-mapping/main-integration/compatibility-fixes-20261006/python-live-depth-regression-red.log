@@ -1,0 +1,31 @@
+node:assert:150
+  throw new AssertionError(obj);
+  ^
+
+AssertionError [ERR_ASSERTION]: actual native alignment must not overrun its history
++ actual - expected
+
++ [
++   'not enough depth: 1791280960000'
++ ]
+- []
+
+    at replay (/home/quant/repos/market-watch-range-main/web/tests/advanced-python-live-depth.cjs:87:10)
+    at Array.map (<anonymous>)
+    at Object.<anonymous> (/home/quant/repos/market-watch-range-main/web/tests/advanced-python-live-depth.cjs:93:58)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Function._load (node:internal/modules/cjs/loader:1309:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [ 'not enough depth: 1791280960000' ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.2

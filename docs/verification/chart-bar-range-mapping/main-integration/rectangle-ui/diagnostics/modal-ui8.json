@@ -1,0 +1,66 @@
+{
+  "at": "2026-10-06T15:31:09.139Z",
+  "APP": "https://192.168.7.232:16843",
+  "CHART": "https://192.168.7.232:16844",
+  "errors": [],
+  "settleFailure": {
+    "ready": false,
+    "loading": true,
+    "historyReloading": false,
+    "dirty": false,
+    "nativeSaving": false,
+    "navigation": {
+      "mode": "continuous",
+      "cursors": [
+        {
+          "res": "1M",
+          "phase": "idle",
+          "mapped": null
+        }
+      ],
+      "windows": [],
+      "models": 1,
+      "threads": 1,
+      "pending": 0,
+      "resident": 293,
+      "limits": {
+        "max_bars": 20000,
+        "workspace_bars": 80000,
+        "min_bars": 20000,
+        "hard_max_bars": 1000000,
+        "default_bars": 200000,
+        "response_bytes": 134217728,
+        "task_seconds": 600,
+        "max_pages": 300,
+        "max_inflight": 8,
+        "mode": "continuous",
+        "protocol": 1,
+        "version": "78335a6f1c6d646b"
+      }
+    },
+    "navigationBusy": false,
+    "synchronization": {
+      "epoch": 0,
+      "layoutEpoch": 2,
+      "mode": "date",
+      "time": true,
+      "pauses": 0,
+      "bindings": 1,
+      "queued": 0
+    },
+    "legacyPause": false,
+    "charts": [
+      {
+        "ready": true,
+        "resolution": "1M",
+        "range": {
+          "from": 1322697600,
+          "to": 1817154000
+        }
+      }
+    ]
+  },
+  "failure": "frame.waitForFunction: Timeout 60000ms exceeded.\n    at settle (/home/quant/repos/market-watch-range-main/web/tests/fixtures/bar-range-acceptance.cjs:67:22)\n    at rangeFixture (/home/quant/repos/market-watch-range-main/web/tests/fixtures/bar-range-acceptance.cjs:98:9)\n    at async /home/quant/repos/market-watch-range-main/web/tests/advanced-sync-settings-modal.browser.cjs:24:15",
+  "completedCases": [],
+  "originalSHA256": "df963b210891913bd797cda030c3fb85accb482a9293024bb2f368a65c9cccb0"
+}

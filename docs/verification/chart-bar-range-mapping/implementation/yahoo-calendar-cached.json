@@ -1,0 +1,1609 @@
+{
+  "scope": "Actual provider candles, native calendar, actual mouse and recorded paint bounds",
+  "at": "2026-10-04T09:23:38.924Z",
+  "cases": [
+    {
+      "date": "2024-03-01",
+      "source": {
+        "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+        "resolution": "1M",
+        "chartTime": 1709251200000,
+        "start": 1709269200000,
+        "end": 1711944000000,
+        "high": 509.5645075137889,
+        "low": 490.42950866147066
+      },
+      "before": {
+        "mapper": {
+          "epoch": 9,
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw1",
+              "size": 419,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw3",
+              "size": 419,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 99.6,
+            "offset": -29,
+            "price": {
+              "from": 445.178646755323,
+              "to": 525.8708503381445
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.06451612903226,
+            "offset": -130,
+            "price": {
+              "from": 486.71932139609635,
+              "to": 512.1098441737528
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.06451612903226,
+            "offset": -130,
+            "price": {
+              "from": 486.71933624852437,
+              "to": 512.1098256082176
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 27.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 445.98266788307,
+              "to": 516.6484348598144
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "chartTime": 1709251200000,
+            "start": 1709269200000,
+            "end": 1711944000000,
+            "high": 509.5645075137889,
+            "low": 490.42950866147066
+          },
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw1",
+              "size": 419,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw3",
+              "size": 419,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              80.32258064516125,
+              0,
+              321.2903225806451,
+              409
+            ],
+            "at": 11641.5
+          },
+          {
+            "id": "a05582a9-0806-461e-acbc-8b69af7e23b7",
+            "resolution": "1D",
+            "rect": [
+              80.32258064516125,
+              0,
+              321.2903225806451,
+              410
+            ],
+            "at": 11643.599999904633
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 99.6,
+            "offset": -29,
+            "price": {
+              "from": 445.178646755323,
+              "to": 525.8708503381445
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.06451612903226,
+            "offset": -130,
+            "price": {
+              "from": 486.71932139609635,
+              "to": 512.1098441737528
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.06451612903226,
+            "offset": -130,
+            "price": {
+              "from": 486.71933624852437,
+              "to": 512.1098256082176
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 27.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 445.98266788307,
+              "to": 516.6484348598144
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 9,
+          "source": {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "chartTime": 1709251200000,
+            "start": 1709269200000,
+            "end": 1711944000000,
+            "high": 509.5645075137889,
+            "low": 490.42950866147066
+          },
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw1",
+              "size": 419,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw3",
+              "size": 419,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              80.32258064516125,
+              0,
+              321.2903225806451,
+              409
+            ],
+            "at": 11641.5
+          },
+          {
+            "id": "a05582a9-0806-461e-acbc-8b69af7e23b7",
+            "resolution": "1D",
+            "rect": [
+              80.32258064516125,
+              0,
+              321.2903225806451,
+              410
+            ],
+            "at": 11643.599999904633
+          },
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              80.32258064516125,
+              0,
+              321.2903225806451,
+              409
+            ],
+            "at": 11876.300000190735
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1704067200,
+              "to": 1714521600
+            },
+            "spacing": 99.6,
+            "offset": -29,
+            "price": {
+              "from": 445.178646755323,
+              "to": 525.8708503381445
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.06451612903226,
+            "offset": -130,
+            "price": {
+              "from": 486.71932139609635,
+              "to": 512.1098441737528
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1708646400,
+              "to": 1712534400
+            },
+            "spacing": 16.06451612903226,
+            "offset": -130,
+            "price": {
+              "from": 486.71933624852437,
+              "to": 512.1098256082176
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1704067200,
+              "to": 1714348800
+            },
+            "spacing": 27.666666666666668,
+            "offset": -126,
+            "price": {
+              "from": 445.98266788307,
+              "to": 516.6484348598144
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2020-02-01",
+      "source": {
+        "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+        "resolution": "1M",
+        "chartTime": 1580515200000,
+        "start": 1580533200000,
+        "end": 1583038800000,
+        "high": 308.31232711449314,
+        "low": 259.63049429346006
+      },
+      "before": {
+        "mapper": {
+          "epoch": 11,
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw5",
+              "size": 159,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw6",
+              "size": 159,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw7",
+              "size": 184,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 124.5,
+            "offset": -79,
+            "price": {
+              "from": 188.98685020741846,
+              "to": 321.60674166120526
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.17241379310345,
+            "offset": -31,
+            "price": {
+              "from": 254.86693303635502,
+              "to": 314.2669634397351
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.17241379310345,
+            "offset": -31,
+            "price": {
+              "from": 254.86696778296835,
+              "to": 314.2669200064684
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 29.294117647058822,
+            "offset": -19,
+            "price": {
+              "from": 188.98676194000137,
+              "to": 321.606844074546
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 11,
+          "source": {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "chartTime": 1580515200000,
+            "start": 1580533200000,
+            "end": 1583038800000,
+            "high": 308.31232711449314,
+            "low": 259.63049429346006
+          },
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw5",
+              "size": 159,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw6",
+              "size": 159,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw7",
+              "size": 184,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              85.86206896551722,
+              0,
+              326.2758620689655,
+              409
+            ],
+            "at": 14959.400000095367
+          },
+          {
+            "id": "a05582a9-0806-461e-acbc-8b69af7e23b7",
+            "resolution": "1D",
+            "rect": [
+              85.86206896551722,
+              0,
+              326.2758620689655,
+              410
+            ],
+            "at": 14961.400000095367
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 124.5,
+            "offset": -79,
+            "price": {
+              "from": 188.98685020741846,
+              "to": 321.60674166120526
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.17241379310345,
+            "offset": -31,
+            "price": {
+              "from": 254.86693303635502,
+              "to": 314.2669634397351
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.17241379310345,
+            "offset": -31,
+            "price": {
+              "from": 254.86696778296835,
+              "to": 314.2669200064684
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 29.294117647058822,
+            "offset": -19,
+            "price": {
+              "from": 188.98676194000137,
+              "to": 321.606844074546
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 11,
+          "source": {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "chartTime": 1580515200000,
+            "start": 1580533200000,
+            "end": 1583038800000,
+            "high": 308.31232711449314,
+            "low": 259.63049429346006
+          },
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw5",
+              "size": 159,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw6",
+              "size": 159,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw7",
+              "size": 184,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              85.86206896551722,
+              0,
+              326.2758620689655,
+              409
+            ],
+            "at": 14959.400000095367
+          },
+          {
+            "id": "a05582a9-0806-461e-acbc-8b69af7e23b7",
+            "resolution": "1D",
+            "rect": [
+              85.86206896551722,
+              0,
+              326.2758620689655,
+              410
+            ],
+            "at": 14961.400000095367
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1575158400,
+              "to": 1583020800
+            },
+            "spacing": 124.5,
+            "offset": -79,
+            "price": {
+              "from": 188.98685020741846,
+              "to": 321.60674166120526
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.17241379310345,
+            "offset": -31,
+            "price": {
+              "from": 254.86693303635502,
+              "to": 314.2669634397351
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1580083200,
+              "to": 1583452800
+            },
+            "spacing": 17.17241379310345,
+            "offset": -31,
+            "price": {
+              "from": 254.86696778296835,
+              "to": 314.2669200064684
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1575849600,
+              "to": 1585526400
+            },
+            "spacing": 29.294117647058822,
+            "offset": -19,
+            "price": {
+              "from": 188.98676194000137,
+              "to": 321.606844074546
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2023-12-01",
+      "source": {
+        "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+        "resolution": "1M",
+        "chartTime": 1701388800000,
+        "start": 1701406800000,
+        "end": 1704085200000,
+        "high": 462.41745335368626,
+        "low": 439.9138885440413
+      },
+      "before": {
+        "mapper": {
+          "epoch": 16,
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw9",
+              "size": 149,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw11",
+              "size": 149,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw12",
+              "size": 174,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 124.5,
+            "offset": -33,
+            "price": {
+              "from": 386.6778767455186,
+              "to": 485.9978738881992
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 434.73460812462827,
+              "to": 465.50170132835535
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 434.73462612213234,
+              "to": 465.50167883147526
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 27.666666666666668,
+            "offset": -16,
+            "price": {
+              "from": 386.2581039536024,
+              "to": 490.8122417311075
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 16,
+          "source": {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "chartTime": 1701388800000,
+            "start": 1701406800000,
+            "end": 1704085200000,
+            "high": 462.41745335368626,
+            "low": 439.9138885440413
+          },
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw9",
+              "size": 149,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw11",
+              "size": 149,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw12",
+              "size": 174,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              82.99999999999996,
+              0,
+              332.00000000000006,
+              409
+            ],
+            "at": 19495.900000095367
+          },
+          {
+            "id": "a05582a9-0806-461e-acbc-8b69af7e23b7",
+            "resolution": "1D",
+            "rect": [
+              82.99999999999996,
+              0,
+              332.00000000000006,
+              410
+            ],
+            "at": 19497.199999809265
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 124.5,
+            "offset": -33,
+            "price": {
+              "from": 386.6778767455186,
+              "to": 485.9978738881992
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 434.73460812462827,
+              "to": 465.50170132835535
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 434.73462612213234,
+              "to": 465.50167883147526
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 27.666666666666668,
+            "offset": -16,
+            "price": {
+              "from": 386.2581039536024,
+              "to": 490.8122417311075
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 16,
+          "source": {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "chartTime": 1701388800000,
+            "start": 1701406800000,
+            "end": 1704085200000,
+            "high": 462.41745335368626,
+            "low": 439.9138885440413
+          },
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw9",
+              "size": 149,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw11",
+              "size": 149,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw12",
+              "size": 174,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              82.99999999999996,
+              0,
+              332.00000000000006,
+              409
+            ],
+            "at": 19495.900000095367
+          },
+          {
+            "id": "a05582a9-0806-461e-acbc-8b69af7e23b7",
+            "resolution": "1D",
+            "rect": [
+              82.99999999999996,
+              0,
+              332.00000000000006,
+              410
+            ],
+            "at": 19497.199999809265
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1696118400,
+              "to": 1704067200
+            },
+            "spacing": 124.5,
+            "offset": -33,
+            "price": {
+              "from": 386.6778767455186,
+              "to": 485.9978738881992
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 434.73460812462827,
+              "to": 465.50170132835535
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1700784000,
+              "to": 1704672000
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 434.73462612213234,
+              "to": 465.50167883147526
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1696204800,
+              "to": 1706486400
+            },
+            "spacing": 27.666666666666668,
+            "offset": -16,
+            "price": {
+              "from": 386.2581039536024,
+              "to": 490.8122417311075
+            },
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "date": "2024-12-01",
+      "source": {
+        "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+        "resolution": "1M",
+        "chartTime": 1733011200000,
+        "start": 1733029200000,
+        "end": 1735707600000,
+        "high": 597.335004016685,
+        "low": 569.7175315955229
+      },
+      "before": {
+        "mapper": {
+          "epoch": 18,
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw13",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw14",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw15",
+              "size": 94,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 124.5,
+            "offset": -21,
+            "price": {
+              "from": 547.9699720885353,
+              "to": 604.698812786929
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 566.7698292547843,
+              "to": 598.5134630702005
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 566.7698478235252,
+              "to": 598.5134398592744
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 29.294117647058822,
+            "offset": -19,
+            "price": {
+              "from": 549.4291966204682,
+              "to": 604.536298334354
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "selected": {
+        "mapper": {
+          "epoch": 18,
+          "source": {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "chartTime": 1733011200000,
+            "start": 1733029200000,
+            "end": 1735707600000,
+            "high": 597.335004016685,
+            "low": 569.7175315955229
+          },
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw13",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw14",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw15",
+              "size": 94,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              66.39999999999999,
+              0,
+              348.6,
+              409
+            ],
+            "at": 23684.400000095367
+          },
+          {
+            "id": "a05582a9-0806-461e-acbc-8b69af7e23b7",
+            "resolution": "1D",
+            "rect": [
+              66.39999999999999,
+              0,
+              348.6,
+              410
+            ],
+            "at": 23686.300000190735
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 124.5,
+            "offset": -21,
+            "price": {
+              "from": 547.9699720885353,
+              "to": 604.698812786929
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 566.7698292547843,
+              "to": 598.5134630702005
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 566.7698478235252,
+              "to": 598.5134398592744
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 29.294117647058822,
+            "offset": -19,
+            "price": {
+              "from": 549.4291966204682,
+              "to": 604.536298334354
+            },
+            "shapes": []
+          }
+        ]
+      },
+      "timezone": {
+        "mapper": {
+          "epoch": 18,
+          "source": {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "chartTime": 1733011200000,
+            "start": 1733029200000,
+            "end": 1735707600000,
+            "high": 597.335004016685,
+            "low": 569.7175315955229
+          },
+          "stores": [
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1M|",
+              "size": 406,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|5|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|",
+              "size": 257,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw13",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1D|mw14",
+              "size": 154,
+              "generation": 1
+            },
+            {
+              "key": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3|1W|mw15",
+              "size": 94,
+              "generation": 1
+            }
+          ]
+        },
+        "paints": [
+          {
+            "id": "2810011f-42f3-4315-8ad6-138d4cada32a",
+            "resolution": "1D",
+            "rect": [
+              66.39999999999999,
+              0,
+              348.6,
+              409
+            ],
+            "at": 23684.400000095367
+          },
+          {
+            "id": "a05582a9-0806-461e-acbc-8b69af7e23b7",
+            "resolution": "1D",
+            "rect": [
+              66.39999999999999,
+              0,
+              348.6,
+              410
+            ],
+            "at": 23686.300000190735
+          }
+        ],
+        "config": {
+          "version": 1,
+          "enabled": true,
+          "style": "background"
+        },
+        "dirty": true,
+        "charts": [
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1M",
+            "range": {
+              "from": 1727740800,
+              "to": 1735689600
+            },
+            "spacing": 124.5,
+            "offset": -21,
+            "price": {
+              "from": 547.9699720885353,
+              "to": 604.698812786929
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 566.7698292547843,
+              "to": 598.5134630702005
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1D",
+            "range": {
+              "from": 1732492800,
+              "to": 1736294400
+            },
+            "spacing": 16.6,
+            "offset": -25,
+            "price": {
+              "from": 566.7698478235252,
+              "to": 598.5134398592744
+            },
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:YAHOO:6493341E6B5636B2080FA9A1961F4FD3",
+            "resolution": "1W",
+            "range": {
+              "from": 1728259200,
+              "to": 1737936000
+            },
+            "spacing": 29.294117647058822,
+            "offset": -19,
+            "price": {
+              "from": 549.4291966204682,
+              "to": 604.536298334354
+            },
+            "shapes": []
+          }
+        ]
+      }
+    }
+  ],
+  "errors": []
+}

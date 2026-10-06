@@ -22,6 +22,7 @@ from sqlalchemy.orm import sessionmaker
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database-host", required=True)
+    parser.add_argument("--database-port", type=int)
     args = parser.parse_args()
     values = dict(
         line.split("=", 1) for line in (ROOT / "api.env").read_text().splitlines() if "=" in line
@@ -29,7 +30,7 @@ def main():
     url = make_url(values["ALERTS_DATABASE_URL"])
     if url.database != DATABASE or url.username != DATABASE:
         raise ValueError("Only the dedicated chart-alert acceptance database is allowed")
-    engine = create_engine(url.set(host=args.database_host))
+    engine = create_engine(url.set(host=args.database_host, port=args.database_port or url.port))
     factory = sessionmaker(engine, expire_on_commit=False)
     report = {
         "scope": "running Ubuntu Compose API/worker/PostgreSQL; synthetic fixture observations",

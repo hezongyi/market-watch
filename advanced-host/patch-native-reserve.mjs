@@ -84,14 +84,68 @@ const continuousV9 = [...continuousV8,
 const replacements = [...continuousV9,
   ['undoToCheckpoint:function(e){for(',
    `undoToCheckpoint:function(e){${navigation}?.admitCheckpoint(i,e);for(`]];
+const continuousHooks = replacements.map(pair => [...pair]);
+replacements.push(['s&&this._drawSources(e,t)}if(null!==this._state)',
+ 's&&(globalThis.parent?.MWBarRangeRenderer?.draw(this,e,t),this._drawSources(e,t))}if(null!==this._state)']);
+replacements.push(['syncSourceTarget(){return{uniqueId:',
+ 'mwRangeSlot(e,internal=!1){if(internal&&/[DWM]$/.test(String(this._resolution))){const z=i(123226),d=this._session.spec.correctTradingDay(z.utc_to_cal(this._session.timezone,e));z.set_hms(d,0,0,0,0,z.get_timezone("Etc/UTC"));e=d.getTime()}const session=this._symbolInfo.mw_range_source==="yahoo"&&/[DWM]$/.test(String(this._resolution))?new Q.SessionInfo(this._symbolInfo.timezone,"0000-0000:1234567"):this._session;const b=(0,ee.newBarBuilder)(this._resolution,session,new Q.SessionInfo("Etc/UTC","24x7"));b.moveTo(e);return{start:b.startOfBar(0),end:b.endOfBar?.(0)??b.startOfBar(1)}}syncSourceTarget(){return{uniqueId:']);
+// The native saver compares its captured state before calling our adapter.
+// Include host configuration in that comparison so a config-only edit saves.
+replacements.push(['return e?n=!0:(t=!0,s=!1),this._chartWidgetCollection.state({withData:!!e,skipLineToolsFromOtherSymbols:!!i,wipeSensitiveData:!!s,skipLineTools:r,skipHiddenSources:n,addOnlyActiveChart:!t})}',
+ 'return e?n=!0:(t=!0,s=!1),Object.assign(this._chartWidgetCollection.state({withData:!!e,skipLineToolsFromOtherSymbols:!!i,wipeSensitiveData:!!s,skipLineTools:r,skipHiddenSources:n,addOnlyActiveChart:!t}),globalThis.parent?.MWBarRangeMapping?{_mwBarRangeMapping:globalThis.parent.MWBarRangeMapping.snapshot()}:{})}']);
+// Preserve the previous complete revision so upgrades can reverse it to the
+// same verified original before installing the expanded adapter.
+const rangeHooks = replacements.map(pair => [...pair]);
+const legacyRangeHooks = [...previous, ...replacements.slice(continuousHooks.length)];
+const nativeSync = 'globalThis.parent?.MWNativeSync';
+const savePair = replacements[replacements.length-1];
+replacements[replacements.length-1] = [savePair[0],savePair[1].replace(':{})}', ':{} ,globalThis.parent?.MWSyncCoordinator?{_mwSync:globalThis.parent.MWSyncCoordinator.snapshot()}:{})}')];
+replacements.push(
+  ['_handleDateRangeLockChange(e){this._loadingContent?',
+   `_handleDateRangeLockChange(e){if(${nativeSync}?.handleChoice(this,"date",e,Cf))return;this._loadingContent||${nativeSync}?.internalWrite()?`],
+  ['_handleTrackTimeLockChange(e){this._loadingContent?',
+   `_handleTrackTimeLockChange(e){if(${nativeSync}?.handleChoice(this,"time",e,Tf))return;this._loadingContent||${nativeSync}?.internalWrite()?`],
+  ['_height(){return this._options.height.value()}',
+   `_height(){return Math.max(1,this._options.height.value()-(${nativeSync}?.railHeight(this)||0))}`],
+  ['zoomOut(){const e=this.timeScale().width();this.canZoomOut()&&(0,Vo.doAnimate)({to:e/5,onStep:e=>{this.startScaleTime(0),this.scaleTimeTo(e),this.endScaleTime()}})}',
+   `zoomOut(){const e=this.timeScale().width();if(this.canZoomOut()){const t=${nativeSync}?.begin(this.model(),"zoom-out");(0,Vo.doAnimate)({to:e/5,onStep:e=>{const f=()=>{this.startScaleTime(0),this.scaleTimeTo(e),this.endScaleTime()};${nativeSync}?${nativeSync}.step(t,f):f()},onComplete:()=>${nativeSync}?.end(t)})}}`],
+  ['zoomIn(){const e=this.timeScale().width();this.canZoomIn()&&(0,Vo.doAnimate)({to:e/5,onStep:e=>{this.startScaleTime(e),this.scaleTimeTo(0),this.endScaleTime()}})}',
+   `zoomIn(){const e=this.timeScale().width();if(this.canZoomIn()){const t=${nativeSync}?.begin(this.model(),"zoom-in");(0,Vo.doAnimate)({to:e/5,onStep:e=>{const f=()=>{this.startScaleTime(e),this.scaleTimeTo(0),this.endScaleTime()};${nativeSync}?${nativeSync}.step(t,f):f()},onComplete:()=>${nativeSync}?.end(t)})}}`],
+  ['this.model().model().zoomTime(r,t,!!o||void 0),this._onZoom.fire(o)',
+   `(${nativeSync}?${nativeSync}.run(this.model().model(),"wheel",()=>this.model().model().zoomTime(r,t,!!o||void 0)):this.model().model().zoomTime(r,t,!!o||void 0)),this._onZoom.fire(o)`],
+  ['this._chartModel().zoomTime(e.x,r,!0),this._prevPinchScale=s',
+   `(${nativeSync}?${nativeSync}.run(this._chartModel(),"pinch",()=>this._chartModel().zoomTime(e.x,r,!0)):this._chartModel().zoomTime(e.x,r,!0)),this._prevPinchScale=s`],
+  ['t.timeScale().isEmpty()||t.startScaleTime(e.localX)',
+   `t.timeScale().isEmpty()||(this._mwScaleToken=${nativeSync}?.begin(t.model(),"time-axis"),t.startScaleTime(e.localX))`],
+  ['_pressedMouseOrTouchMoveEvent(e){this._zoomAvailable()&&this.chart.model().scaleTimeTo(e.localX)}',
+   `_pressedMouseOrTouchMoveEvent(e){if(this._zoomAvailable()){const f=()=>this.chart.model().scaleTimeTo(e.localX);${nativeSync}?${nativeSync}.step(this._mwScaleToken,f):f()}}`],
+  ['_mouseUpOrTouchEndEvent(e){this._zoomAvailable()&&(this._mousedown=!1,this.chart.model().endScaleTime(),this.restoreDefaultCursor())}',
+   `_mouseUpOrTouchEndEvent(e){this._zoomAvailable()&&(this._mousedown=!1,this.chart.model().endScaleTime(),${nativeSync}?.end(this._mwScaleToken),this._mwScaleToken=null,this.restoreDefaultCursor())}`],
+  ['a!==l.index&&o.zoomToViewport(l.index,a,l.price,r,t)',
+   `a!==l.index&&(${nativeSync}?${nativeSync}.run(o.model(),"zoom-tool",()=>o.zoomToViewport(l.index,a,l.price,r,t)):o.zoomToViewport(l.index,a,l.price,r,t))`],
+  ['(0,ae.trackEvent)("GUI","Double click time scale"),this.chart.model().resetTimeScale()',
+   `(0,ae.trackEvent)("GUI","Double click time scale"),(${nativeSync}?${nativeSync}.run(this.chart.model().model(),"time-axis-reset",()=>this.chart.model().resetTimeScale()):this.chart.model().resetTimeScale())`],
+);
+const previousSyncHooks = replacements.map(([before, after]) => [before,
+  after.replace(`if(${nativeSync}?.handleChoice(this,"date",e,Cf))return;`, '')
+    .replace(`if(${nativeSync}?.handleChoice(this,"time",e,Tf))return;`, '')]);
+replacements.push([
+  '_handleChartSaved(e){e&&this._setContentHasChanges(!1)}',
+  '_handleChartSaved(e){e&&this._setContentHasChanges(globalThis.parent?.MWNativeSave?.hasUnsavedChanges()===true)}',
+]);
 const legacy = previous.slice(0,6).map(([before, after])=>[before,after]);
 legacy[0][1] = `class h{constructor(e,t){${runtime}?.bindModel(t);this._bars=[],this._invalidated=!0`;
 legacy[1][1] = `destroy(){${runtime}?.unbindModel(this);this._abortController.abort(),this.clearIntervals()`;
 legacy[2][1] = `this._datafeed=e,this._symbolInfo=t,${runtime}?.bindThread(this,t,i),this._interval=Ne.Interval.parse(i)`;
 legacy[3][1] = `destroy(){${runtime}?.unbindThread(this);0!==this._subscribers.length&&this._logWarning`;
+const legacySyncHooks = [...legacyRangeHooks.slice(0,-1), replacements[rangeHooks.length-1],
+  ...replacements.slice(rangeHooks.length)];
+const legacyPreviousSyncHooks = legacySyncHooks.slice(0,-1).map(([before, after]) => [before,
+  after.replace(`if(${nativeSync}?.handleChoice(this,"date",e,Cf))return;`, "")
+    .replace(`if(${nativeSync}?.handleChoice(this,"time",e,Tf))return;`, "")]);
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [previous, replacements, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
+  const installed = [replacements, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;
@@ -106,7 +160,7 @@ if (digest(source) !== expected) {
 }
 if (disabled) {console.log('Verified original native bundle; hooks disabled');process.exit(0);}
 for (const [before, after] of replacements) {
-  if (source.split(before).length !== 2) throw Error('Native hook anchor mismatch');
+  if (source.split(before).length !== 2) throw Error(`Native hook anchor mismatch (${source.split(before).length-1}): ${before.slice(0,120)}`);
   source = source.replace(before, after);
 }
 writeFileSync(file, source);

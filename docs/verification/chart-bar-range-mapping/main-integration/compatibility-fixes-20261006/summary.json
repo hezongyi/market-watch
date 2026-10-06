@@ -1,0 +1,56 @@
+{
+  "sourceCommit": "0aaec93",
+  "chartImage": "mw-range-main-chart:candidate4",
+  "runningHostAsset": "host.73eb5768a881494f.js",
+  "apiImage": "mw-range-main-api:candidate3",
+  "status": "compatibility-incomplete",
+  "nativeReplay": {
+    "budget": 10001,
+    "lagCases": 6,
+    "historicalBars": 32,
+    "plots": 3,
+    "liveRollovers": 3,
+    "result": "passed"
+  },
+  "candidate4Api2Live": {
+    "samples": 72,
+    "consoleErrors": 0,
+    "depthErrors": 0,
+    "result": "passed",
+    "limit": "public samples during real live updates; no latest-candle numeric oracle in this probe"
+  },
+  "backend": {
+    "api2Full": {
+      "passed": 586,
+      "skipped": 47
+    },
+    "api3Relevant": {
+      "passed": 46
+    },
+    "api3Postgres": {
+      "passed": 20
+    }
+  },
+  "candidate4Api2Native": {
+    "result": "failed",
+    "rawRevision": "resetCount=1, exact callback close=1.16018",
+    "saveReopen": "passed",
+    "prefixRevision": "SMA201 initial source delivered no callback within90s; actual prefix correction not started"
+  },
+  "api3RuntimeSource": {
+    "provider_service.py": "dca8c7d15d58a21fbecac619cdcbece6d9f0d68cb42ac658e5d3128f0e980e71",
+    "provider_cache.py": "8d6660216bcefd7fac4af2624f4f11b766f0c3d18e5080d43964f7b949274c56"
+  },
+  "pending": [
+    "API3 whole native product acceptance with real prefix correction",
+    "final candidate numerical indicators + alerts/MCP combinations",
+    "final candidate range/time and painted stability retest",
+    "user manual acceptance before merge"
+  ],
+  "api3FocusedPrefix": {
+    "count": 64129,
+    "errors": 0,
+    "result": "passed",
+    "limit": "single focused initial request; full native prefix correction still pending"
+  }
+}
