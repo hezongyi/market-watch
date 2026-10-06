@@ -19,7 +19,7 @@ from .calendar_profile import closures_from
 from .chart_data import FRAMES, chart_rows, future_grid
 from .chart_history_plan import bucket_has_trading
 from .chart_indicators import CATALOG, calculate, validate
-from .chart_series import SeriesKind
+from .chart_series import SeriesKind, is_gold
 from .domain import Calendar
 from .managed_dataset import data as published_data
 from .storage import (
@@ -621,8 +621,9 @@ def router(authenticated):
             raise HTTPException(422, str(exc)) from None
 
     async def history_operation(operation, *args):
-        from .provider_history_policy import CapacityExceeded
         import httpx
+
+        from .provider_history_policy import CapacityExceeded
         try:
             return await asyncio.to_thread(operation, *args)
         except CapacityExceeded as exc:
@@ -790,7 +791,7 @@ def router(authenticated):
                             instant(prev["end"]),
                             instant(row["start"]),
                             Calendar(inst.calendar),
-                            gold=inst.id == "XAUUSD",
+                            gold=is_gold(inst.id),
                             closures=closures,
                         )
                 with _CACHE_LOCK:

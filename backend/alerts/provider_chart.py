@@ -21,7 +21,7 @@ from .provider_capabilities import SOURCES, versions
 from .provider_capabilities import frames as source_frames
 from .provider_transport import activity, discard_client, pooled_client, warm_connections
 from .provider_transport import close_clients as close_clients
-from .storage import Instrument, MarketCatalog, instant, ms, now_ms, transaction
+from .storage import Instrument, MarketCatalog, MarketDataset, instant, ms, now_ms, transaction
 from .volume import encoded
 from .volume import metadata as volume_metadata
 
@@ -77,6 +77,10 @@ def metadata(ident, *, deadline=None, cached_only=False):
         from .yahoo_catalog import chart_metadata
         return chart_metadata(ident, deadline=deadline or DEADLINE.get(), cached_only=cached_only)
     with transaction() as db:
+        from sqlalchemy import select
+
+        if db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == ident)):
+            raise HTTPException(422, "显式数据集仅支持自建系列，不转换为平台原生身份")
         entry = db.get(MarketCatalog, ident)
         inst = db.get(Instrument, ident)
         if entry:

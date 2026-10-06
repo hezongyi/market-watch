@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import delete, func, select
 
 from .calendar_profile import closures_from
+from .chart_series import is_gold
 from .config import settings
 from .domain import TIMEFRAMES, Calendar, previous_session, scheduled_open
 from .notify import DEFAULTS
@@ -271,7 +272,7 @@ def instruments():
                         if not scheduled_open(
                             instant(now_ms()),
                             Calendar(inst.calendar),
-                            gold=inst.id == "XAUUSD",
+                            gold=is_gold(inst.id),
                             closures=closures_from(inst.calendar_profile),
                         )
                         else "stale"
@@ -324,7 +325,7 @@ def session_range(instrument: str, at: int | None = None):
         left, right = previous_session(
             instant(at or now_ms()),
             Calendar(inst.calendar),
-            gold=inst.id == "XAUUSD",
+            gold=is_gold(inst.id),
             closures=closures_from(inst.calendar_profile),
         )
         row = db.scalar(

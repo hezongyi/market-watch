@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 from .calendar_profile import closures_from
 from .chart_data import bounds
+from .chart_series import is_gold
 from .domain import Calendar, bucket_bounds, scheduled_open
 from .storage import (
     ChartAggregationJob,
@@ -46,7 +47,7 @@ def history_start(inst, timeframe, end, count):
         left, right = (bounds(probe, timeframe, calendar) if timeframe == "M30"
                        else bucket_bounds(probe, timeframe, calendar))
         if bucket_has_trading(left, min(right, cursor), calendar,
-                              gold=inst.id == "XAUUSD", closures=closures):
+                              gold=is_gold(inst.id), closures=closures):
             remaining -= 1
         cursor = left
         if remaining == 0:
@@ -65,7 +66,7 @@ def history_end(inst, timeframe, start, count):
         left, right = (bounds(cursor, timeframe, calendar) if timeframe == "M30"
                        else bucket_bounds(cursor, timeframe, calendar))
         if bucket_has_trading(max(left, cursor), right, calendar,
-                              gold=inst.id == "XAUUSD", closures=closures):
+                              gold=is_gold(inst.id), closures=closures):
             count -= 1
         cursor = right
         if count == 0:

@@ -6,6 +6,7 @@ from decimal import Decimal
 from sqlalchemy import select
 
 from .calendar_profile import closures_from
+from .chart_series import is_gold
 from .domain import (
     Calendar,
     Signal,
@@ -41,7 +42,7 @@ def previous_day(db, instrument, bar, *, day_cache=None):
     session_start, session_end = previous_session(
         bar.start,
         Calendar(instrument.calendar),
-        gold=instrument.id == "XAUUSD",
+        gold=is_gold(instrument.id),
         closures=closures_from(instrument.calendar_profile),
     )
     if day_cache is not None:
@@ -137,7 +138,7 @@ def create_watch(db, instrument_id, name, rule_dict, *, armed_at=None, use_histo
                 state.previous.end,
                 row.candle().start,
                 Calendar(instrument.calendar),
-                gold=instrument.id == "XAUUSD",
+                gold=is_gold(instrument.id),
                 closures=closures_from(instrument.calendar_profile),
             ):
                 state = State()
@@ -193,7 +194,7 @@ def evaluate_watch(db, watch_id):
             state.previous.end,
             row.candle().start,
             Calendar(instrument.calendar),
-            gold=instrument.id == "XAUUSD",
+            gold=is_gold(instrument.id),
             closures=closures_from(instrument.calendar_profile),
         ):
             watch.paused_reason = "缺少中间 K 线，等待补数后恢复"
@@ -263,7 +264,7 @@ def add_replay_watch(run, name, rule_dict, calendar, *, use_history=True):
             state.previous.end,
             b.start,
             Calendar(calendar),
-            gold=run.instrument_id == "XAUUSD",
+            gold=is_gold(run.instrument_id),
             closures=closures_from(run.calendar_profile),
         ):
             state = State()
@@ -275,7 +276,7 @@ def add_replay_watch(run, name, rule_dict, calendar, *, use_history=True):
                 run.days,
                 b,
                 calendar,
-                gold=run.instrument_id == "XAUUSD",
+                gold=is_gold(run.instrument_id),
                 profile=run.calendar_profile,
             )
             if rule.kind == "previous_day"
@@ -319,7 +320,7 @@ def replay_step(run, calendar, count=1):
                 state.previous.end,
                 b.start,
                 Calendar(calendar),
-                gold=run.instrument_id == "XAUUSD",
+                gold=is_gold(run.instrument_id),
                 closures=closures_from(run.calendar_profile),
             ):
                 w["status"] = "paused"
@@ -329,7 +330,7 @@ def replay_step(run, calendar, count=1):
                 run.days,
                 b,
                 calendar,
-                gold=run.instrument_id == "XAUUSD",
+                gold=is_gold(run.instrument_id),
                 profile=run.calendar_profile,
             )
             if rule.kind == "previous_day" and day is None:

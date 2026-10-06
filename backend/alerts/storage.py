@@ -18,6 +18,7 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
+from sqlalchemy.orm import Session as ORMSession
 
 from .config import settings
 from .domain import Candle, Rule, State
@@ -57,6 +58,40 @@ class Instrument(Base):
     last_received: Mapped[int | None] = mapped_column(BigInteger)
     error: Mapped[str | None]
     enabled: Mapped[bool] = mapped_column(default=True, server_default="true")
+
+
+class MarketDataset(Base):
+    __tablename__ = "market_datasets"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), unique=True)
+    logical_symbol: Mapped[str] = mapped_column(String(10))
+    identity: Mapped[dict] = mapped_column(JSON)
+    volume_kind: Mapped[str] = mapped_column(String(20))
+    volume_unit: Mapped[str | None] = mapped_column(String(40))
+
+
+@event.listens_for(ORMSession, "before_flush")
+def immutable_dataset_identity(db, flush_context, instances):
+    from sqlalchemy import inspect, select
+
+    for row in db.deleted:
+        if isinstance(row, MarketDataset):
+            raise ValueError("Explicit dataset bindings cannot be removed by runtime writers")
+        if isinstance(row, Instrument) and db.scalar(
+                select(MarketDataset.id).where(MarketDataset.instrument_id == row.id)):
+            raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
+    for row in db.dirty:
+        state = inspect(row)
+        if isinstance(row, MarketDataset) and any(
+            attr.history.has_changes() for attr in state.attrs
+        ):
+            raise ValueError("Dataset identity is immutable")
+        if isinstance(row, Instrument) and any(state.attrs[key].history.has_changes()
+                for key in ("id", "source", "symbol", "basis", "calendar", "precision", "calendar_profile")):
+            previous_ids = state.attrs.id.history.deleted or [row.id]
+            if db.scalar(select(MarketDataset.id).where(
+                    MarketDataset.instrument_id.in_(previous_ids))):
+                raise ValueError("Bound dataset metadata is immutable; register a new version")
 
 
 class Bar(Base):

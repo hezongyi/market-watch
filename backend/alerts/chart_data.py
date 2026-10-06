@@ -6,6 +6,7 @@ from functools import lru_cache
 from sqlalchemy import select
 
 from .calendar_profile import closures_from
+from .chart_series import is_gold
 from .domain import NY, Calendar, Candle, scheduled_open, session_bounds
 from .storage import Bar, ChartAggregationJob, candle_dict, instant, ms
 
@@ -116,7 +117,7 @@ def _chart_rows(db, instrument, frame, before, limit, now):
                 probe = cursor
                 while probe < stop:
                     if scheduled_open(
-                        probe, calendar, gold=instrument.id == "XAUUSD", closures=closures
+                        probe, calendar, gold=is_gold(instrument.id), closures=closures
                     ):
                         expected.add(ms(cursor))
                         break
@@ -134,10 +135,10 @@ def _chart_rows(db, instrument, frame, before, limit, now):
                 complete,
             )
         else:
-            expected = expected_days(left, right, calendar, instrument.id == "XAUUSD", closures)
+            expected = expected_days(left, right, calendar, is_gold(instrument.id), closures)
             complete = bool(expected) and expected <= {r.start for r in members}
             complete = complete and all(r.complete for r in members)
-            if instrument.id == "XAUUSD" and not covers_interval(coverage, ms(left), ms(right)):
+            if is_gold(instrument.id) and not covers_interval(coverage, ms(left), ms(right)):
                 # Gold's daily maintenance is date-generated, not an eternal rule.
                 # Every expected D1 needs explicit coverage of its NY17 maintenance start.
                 maintenance = [c for c in closures if c.kind == "maintenance"]
@@ -181,7 +182,7 @@ def future_grid(instrument, frame, after, count=120):
     return _future_grid(
         Calendar(instrument.calendar),
         closures_from(instrument.calendar_profile),
-        instrument.id == "XAUUSD",
+        is_gold(instrument.id),
         frame,
         after,
         count,

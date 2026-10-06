@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
-from .chart_series import SeriesKind, decode, display_symbol
+from .chart_series import SeriesKind, decode, display_symbol, is_gold
 from .coverage import covers_interval
 from .domain import Calendar, bucket_bounds, has_trading_gap, scheduled_open, session_bounds
 from .market import stored_coverage
@@ -195,7 +195,7 @@ def viewport_session(inst, start, end):
         raise HTTPException(422, "视区范围必须在31天以内")
     calendar = Calendar(inst.calendar)
     closures = closures_from(inst.calendar_profile)
-    options = dict(gold=inst.id == "XAUUSD", closures=closures)
+    options = dict(gold=is_gold(inst.id), closures=closures)
     if has_trading_gap(instant(start), instant(end), calendar, **options):
         return {"closed": False}
     # M1 is the finest supported chart granularity. Bound the backwards search.
@@ -282,7 +282,7 @@ def read_cached_history(body: HistoryQuery):
                 right = contiguous[-1]["start"]
                 gaps = missing_intervals(coverage, row["end"], right)
                 if any(has_trading_gap(instant(a), instant(b), calendar,
-                                       gold=inst.id == "XAUUSD", closures=closures)
+                                       gold=is_gold(inst.id), closures=closures)
                        for a, b in gaps):
                     break
             contiguous.append(row)
@@ -597,7 +597,7 @@ def router(authenticated):
                 is_open = scheduled_open(
                     instant(observed_now),
                     Calendar(inst.calendar),
-                    gold=inst.id == "XAUUSD",
+                    gold=is_gold(inst.id),
                     closures=closures_from(inst.calendar_profile),
                 )
                 quality = "fresh" if age <= 180000 else "stale" if is_open else "closed"
@@ -631,7 +631,7 @@ def router(authenticated):
                         instant(previous.end),
                         instant(session_start),
                         Calendar(inst.calendar),
-                        gold=inst.id == "XAUUSD",
+                        gold=is_gold(inst.id),
                         closures=closures_from(inst.calendar_profile),
                     )
                 ):

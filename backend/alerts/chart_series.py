@@ -29,3 +29,7 @@ def encode(symbol: str, kind: SeriesKind = "managed") -> str:
 def display_symbol(symbol: str) -> str:
     """A compact UI code; provider routing always retains the original ticker."""
     return symbol.rsplit(":", 1)[-1].replace("_", "").replace("/", "").upper()
+
+
+def is_gold(symbol: str) -> bool:
+    return display_symbol(symbol) == "XAUUSD"

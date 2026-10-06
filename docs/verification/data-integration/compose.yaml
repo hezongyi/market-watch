@@ -1,0 +1,45 @@
+# Ubuntu local acceptance only; this project owns its database/network/volume.
+name: market-watch-data-integration
+x-backend: &backend
+  build: ../../..
+  image: market-watch-data-integration:p0
+  restart: "no"
+  environment: &environment
+    ALERTS_DATABASE_URL: postgresql+psycopg://integration:${MW_DATA_TEST_PASSWORD:?Set isolated test password}@postgres/integration
+    ALERTS_DELIVERY_ENABLED: "false"
+    ALERTS_YAHOO_ENABLED: "false"
+    ALERTS_INITIAL_HISTORY_DAYS: "0"
+    ALERTS_DATABASE_APPLICATION_NAME: market-watch-data-integration
+  labels:
+    market-watch.purpose: data-integration-acceptance
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: "no"
+    environment:
+      POSTGRES_DB: integration
+      POSTGRES_USER: integration
+      POSTGRES_PASSWORD: ${MW_DATA_TEST_PASSWORD:?Set isolated test password}
+    volumes: ["integration-postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U integration"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    labels:
+      market-watch.purpose: data-integration-acceptance
+  migrate:
+    <<: *backend
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres: {condition: service_healthy}
+  verify:
+    <<: *backend
+    environment:
+      <<: *environment
+      TEST_POSTGRES_URL: postgresql+psycopg://integration:${MW_DATA_TEST_PASSWORD:?Set isolated test password}@postgres/integration
+    command: ["python", "-m", "pytest", "backend/tests/test_market_contracts.py", "backend/tests/test_market_datasets.py", "backend/tests/test_market_datasets_postgres.py", "-q"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+volumes:
+  integration-postgres:
