@@ -197,6 +197,45 @@ def test_history_response_is_repeatable_read_snapshot_during_revision(provider_p
         event.remove(engine, 'after_cursor_execute', pause_after_select)
 
 
+def test_live_indicator_calculation_releases_database_connection(provider_pg, monkeypatch):
+    from alerts import provider_service as service
+    from test_provider_cache import seed
+
+    _, engine = provider_pg
+    monkeypatch.setattr(upstream, "metadata", lambda instrument: META)
+    key = seed(META, "M5", 10000, page(1000, 10000))
+    initial = cache.snapshot(key, 10000, 3)
+    specs = [{"name": "SMA", "params": {"period": 3}}]
+    service.subscribe("live-pool", "sma", META["id"], "M5", 9000,
+                      initial["cache_revision"], initial["as_of"], specs)
+    seed(META, "M5", 12000, page(9000, 12000, close="4"))
+    calculate = service.calculate
+    calls = []
+    fail = [True]
+
+    def calculate_without_connection(*args, **kwargs):
+        assert engine.pool.checkedout() == 0, (
+            "CPU-only indicator calculation must release the SSE snapshot connection"
+        )
+        calls.append(True)
+        if fail[0]:
+            raise ValueError("indicator calculation interrupted")
+        return calculate(*args, **kwargs)
+
+    monkeypatch.setattr(service, "calculate", calculate_without_connection)
+    cursors = {}
+    with pytest.raises(ValueError, match="indicator calculation interrupted"):
+        service.events("live-pool", cursors)
+    assert cursors == {}, "failed calculation must leave the update available to retry"
+    fail[0] = False
+    update = service.events("live-pool", cursors)[0]
+    assert calls == [True, True]
+    assert update["type"] == "bars"
+    assert update["indicators"][0]["series"][0]["values"][-1]["value"] == 4
+    assert cursors["sma"] == (11000, update["revision"])
+    assert service.events("live-pool", cursors) == []
+
+
 def test_snapshot_statement_timeout_preserves_error_type_and_recovers(provider_pg):
     from test_provider_cache import seed
 
