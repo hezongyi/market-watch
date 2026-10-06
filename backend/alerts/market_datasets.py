@@ -51,6 +51,9 @@ def register_dataset(db, identity, *, logical_symbol, label, calendar, precision
                 or (row.volume_kind, row.volume_unit) != (volume_kind, volume_unit)):
             raise ValueError("Existing dataset metadata cannot be reinterpreted")
         assert_binding(inst, row, identity)
+        from .source_registry import link_dataset
+
+        link_dataset(db, row)
         return inst
     if db.get(Instrument, ident):
         raise ValueError("Refusing to rebind an existing instrument")
@@ -64,6 +67,9 @@ def register_dataset(db, identity, *, logical_symbol, label, calendar, precision
                          identity=identity.model_dump(), volume_kind=volume_kind,
                          volume_unit=volume_unit, asset_class=asset_class))
     db.flush()
+    from .source_registry import link_dataset
+
+    link_dataset(db, db.get(MarketDataset, identity.key))
     return inst
 
 

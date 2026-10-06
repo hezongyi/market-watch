@@ -1,0 +1,44 @@
+# Ubuntu-only, independent from the existing data-integration observation.
+name: market-watch-three-layer
+services:
+  postgres:
+    image: postgres:14-bookworm
+    restart: "no"
+    mem_limit: 512m
+    environment:
+      POSTGRES_DB: three_layer
+      POSTGRES_USER: three_layer
+      POSTGRES_PASSWORD: ${MW_THREE_LAYER_TEST_PASSWORD:?Set isolated password}
+    volumes: ["three-layer-postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U three_layer -d three_layer"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    labels:
+      market-watch.purpose: three-layer-acceptance
+  verify:
+    image: market-watch-data-integration:dev
+    restart: "no"
+    mem_limit: 768m
+    cpus: 2
+    working_dir: /app
+    volumes:
+      - ../../..:/app:ro
+    environment:
+      PYTHONPATH: /app/backend
+      PYTHONDONTWRITEBYTECODE: "1"
+      ALERTS_DATABASE_URL: postgresql+psycopg://three_layer:${MW_THREE_LAYER_TEST_PASSWORD}@postgres/three_layer
+      TEST_POSTGRES_URL: postgresql+psycopg://three_layer:${MW_THREE_LAYER_TEST_PASSWORD}@postgres/three_layer
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_INITIAL_HISTORY_DAYS: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-three-layer-verify
+    command: ["python", "-m", "pytest", "backend/tests/test_source_registry_postgres.py", "-q", "-p", "no:cacheprovider"]
+    depends_on:
+      postgres: {condition: service_healthy}
+    labels:
+      market-watch.purpose: three-layer-acceptance
+volumes:
+  three-layer-postgres:
+    labels:
+      market-watch.purpose: three-layer-acceptance

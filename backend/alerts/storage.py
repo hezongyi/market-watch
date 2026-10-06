@@ -71,6 +71,41 @@ class MarketDataset(Base):
     volume_unit: Mapped[str | None] = mapped_column(String(40))
 
 
+class SourceSeries(Base):
+    __tablename__ = "market_source_series"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    identity: Mapped[dict] = mapped_column(JSON)
+
+
+class DatasetSource(Base):
+    __tablename__ = "market_dataset_sources"
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+
+
+class SourceBlob(Base):
+    __tablename__ = "market_source_blobs"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+    checksum: Mapped[str] = mapped_column(String(64))
+    content: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+class SourceFetch(Base):
+    __tablename__ = "market_source_fetches"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    checkpoint: Mapped[int | None] = mapped_column(BigInteger)
+    content_id: Mapped[str | None] = mapped_column(ForeignKey("market_source_blobs.id"))
+    observed_at: Mapped[int | None] = mapped_column(BigInteger)
+    fetched_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    result: Mapped[str | None] = mapped_column(String(20))
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
 class HistoryVersion(Base):
     __tablename__ = "market_history_versions"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
@@ -100,6 +135,9 @@ class HistoryChunk(Base):
     count: Mapped[int]
     checksum: Mapped[str] = mapped_column(String(64))
     content: Mapped[bytes] = mapped_column(LargeBinary)
+    # Old inline chunks remain valid. New chunks reference source-isolated,
+    # immutable content; lookup verifies existence and checksum on every read.
+    content_id: Mapped[str | None] = mapped_column(String(64), index=True)
     result: Mapped[str] = mapped_column(String(20))
     unknown: Mapped[list] = mapped_column(JSON, default=list)
 
@@ -159,16 +197,16 @@ def immutable_dataset_identity(db, flush_context, instances):
     from sqlalchemy import inspect, select
 
     for row in db.deleted:
-        if isinstance(row, (HistoryChunk, HistoryVersion)):
+        if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob)):
             raise ValueError("Historical snapshots cannot be deleted by runtime writers")
-        if isinstance(row, MarketDataset):
-            raise ValueError("Explicit dataset bindings cannot be removed by runtime writers")
+        if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)):
+            raise ValueError("Explicit dataset/source bindings cannot be removed by runtime writers")
         if isinstance(row, Instrument) and db.scalar(
                 select(MarketDataset.id).where(MarketDataset.instrument_id == row.id)):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
-        if isinstance(row, HistoryChunk) and any(attr.history.has_changes() for attr in state.attrs):
+        if isinstance(row, (HistoryChunk, SourceBlob)) and any(attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Historical snapshot chunks are immutable")
         if isinstance(row, HistoryVersion):
             old = state.attrs.status.history.deleted
@@ -176,7 +214,7 @@ def immutable_dataset_identity(db, flush_context, instances):
                     or "published" in old):
                 if any(attr.history.has_changes() for attr in state.attrs):
                     raise ValueError("Published historical versions are immutable")
-        if isinstance(row, MarketDataset) and any(
+        if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)) and any(
             attr.history.has_changes() for attr in state.attrs
         ):
             raise ValueError("Dataset identity is immutable")

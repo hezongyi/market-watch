@@ -5,7 +5,6 @@ allowed: provider, channel, environment, account and BID series remain identical
 No staging bar is trusted as the original snapshot or copied across providers.
 """
 
-import gzip
 import hashlib
 import json
 from decimal import Decimal
@@ -17,6 +16,7 @@ from .domain import calendar_for, scheduled_open
 from .history_versions import create_version, publish
 from .market_contracts import CandleBatch, DatasetIdentity, RequestResult
 from .market_datasets import validate_ingestion
+from .source_history_store import raw_chunk
 from .storage import (
     Audit,
     Bar,
@@ -84,9 +84,7 @@ def derive_page(ident):
                 version.status = "pending"
                 version.next_at = now_ms()
             return True
-        raw = gzip.decompress(source.content)
-        if hashlib.sha256(raw).hexdigest() != source.checksum:
-            raise ValueError("Original chunk checksum mismatch")
+        raw = raw_chunk(db, source)
         dataset = db.get(MarketDataset, version.dataset_id)
         inst = db.scalar(select(Instrument).where(Instrument.id == dataset.instrument_id).with_for_update())
         payload = CandleBatch(identity=DatasetIdentity.model_validate(dataset.identity),
@@ -119,7 +117,8 @@ def derive_page(ident):
                     "observed_minute_starts": conflicts, "observed_at": now_ms(), "derivation": ident}))
         db.add(HistoryChunk(version_id=version.id, start=source.start, end=source.end,
             observed_at=source.observed_at, count=source.count, checksum=source.checksum,
-            content=source.content, result=source.result, unknown=source.unknown))
+            content=source.content, content_id=source.content_id,
+            result=source.result, unknown=source.unknown))
         version.cursor = source.end
         db.flush()
         digest = hashlib.sha256()
@@ -157,9 +156,7 @@ def restore_derivation_coverage_page(ident, after):
             HistoryChunk.start >= after).order_by(HistoryChunk.start).limit(1))
         if not chunk:
             return None
-        raw = gzip.decompress(chunk.content)
-        if hashlib.sha256(raw).hexdigest() != chunk.checksum:
-            raise ValueError("Derived chunk checksum mismatch")
+        raw = raw_chunk(db, chunk)
         dataset = db.get(MarketDataset, version.dataset_id)
         inst = db.scalar(select(Instrument).where(Instrument.id == dataset.instrument_id).with_for_update())
         _observed_coverage(db, inst, json.loads(raw), chunk.observed_at)

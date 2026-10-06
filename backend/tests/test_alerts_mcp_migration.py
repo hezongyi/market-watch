@@ -11,7 +11,7 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "x25_dataset_asset_class"
+HEAD = "z27_source_m1_store"
 
 
 def configuration():

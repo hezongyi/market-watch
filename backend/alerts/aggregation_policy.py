@@ -28,14 +28,31 @@ def resolve_calendar(asset_class, calendar=None):
 
 
 def register_history_dataset(db, *, logical_symbol, provider_symbol, asset_class, precision,
-                             aggregation_calendar=None):
+                             aggregation_calendar=None, source="dukascopy"):
     calendar = resolve_calendar(asset_class, aggregation_calendar)
-    identity = DatasetIdentity(source="dukascopy", channel="python", environment="historical",
-        account_scope="public", provider_symbol=provider_symbol, basis="bid",
+    if source == "dukascopy":
+        channel, environment, scope = "python", "historical", "public"
+        volume_kind, volume_unit = "quantity", "source_quantity"
+    elif source == "oanda":
+        import re
+
+        from .config import settings
+
+        if not settings.oanda_account_id or not settings.oanda_token:
+            raise ValueError("请先配置OANDA Practice连接")
+        if not re.fullmatch(r"[A-Z0-9]+(?:_[A-Z0-9]+)+", provider_symbol):
+            raise ValueError("请选择准确的OANDA品种代码")
+        channel, environment = "v20", "practice"
+        scope = "sha256:" + hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
+        volume_kind, volume_unit = "price_count", "quotes"
+    else:
+        raise ValueError("此来源尚未支持自建历史版本")
+    identity = DatasetIdentity(source=source, channel=channel, environment=environment,
+        account_scope=scope, provider_symbol=provider_symbol, basis="bid",
         calendar_version=f"user-{asset_class}-{calendar}-v1")
     inst = register_dataset(db, identity, logical_symbol=logical_symbol, label=logical_symbol,
-        calendar=calendar, precision=precision, volume_kind="quantity",
-        volume_unit="source_quantity", asset_class=asset_class)
+        calendar=calendar, precision=precision, volume_kind=volume_kind,
+        volume_unit=volume_unit, asset_class=asset_class)
     return db.get(MarketDataset, identity.key), inst
 
 
@@ -47,9 +64,9 @@ def change_aggregation(db, dataset_id, calendar, *, version_id=None):
     if not source:
         raise ValueError("数据集不存在")
     identity = DatasetIdentity.model_validate(source.identity)
-    if (identity.source, identity.channel, identity.environment) != (
-            "dukascopy", "python", "historical"):
-        raise ValueError("此设置仅用于Dukascopy Python历史数据集")
+    from .history_sources import history_identity
+
+    history_identity(identity)
     inst = db.scalar(select(Instrument).where(Instrument.id == source.instrument_id).with_for_update())
     original = db.get(HistoryVersion, version_id) if version_id else None
     if version_id and (not original or original.dataset_id != source.id

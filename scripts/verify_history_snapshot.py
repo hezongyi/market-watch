@@ -1,13 +1,13 @@
 """Bounded-memory audit of published original chunks in the isolated API container."""
 
 import argparse
-import gzip
 import hashlib
 import json
 from collections import Counter
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from alerts.source_history_store import raw_chunk
 from alerts.storage import HistoryChunk, HistoryVersion, Instrument, MarketDataset, transaction
 from sqlalchemy import select
 
@@ -34,9 +34,7 @@ def verify(db, version):
                             .order_by(HistoryChunk.start).execution_options(yield_per=1)):
         if chunk.start != cursor or chunk.end <= cursor:
             raise ValueError("Chunk partition is discontinuous")
-        raw = gzip.decompress(chunk.content)
-        if hashlib.sha256(raw).hexdigest() != chunk.checksum:
-            raise ValueError("Original chunk checksum mismatch")
+        raw = raw_chunk(db, chunk)
         digest.update(chunk.checksum.encode())
         content = json.loads(raw)
         if len(content) != chunk.count:
@@ -49,7 +47,7 @@ def verify(db, version):
             original = db.scalar(select(HistoryChunk).where(HistoryChunk.version_id == parent.id,
                                                            HistoryChunk.start == chunk.start))
             if not original or any(getattr(original, key) != getattr(chunk, key) for key in (
-                    "end", "count", "checksum", "content", "unknown", "result", "observed_at")):
+                    "end", "count", "checksum", "content", "content_id", "unknown", "result", "observed_at")):
                 raise ValueError("Derived prefix differs from immutable parent")
             prefix_digest.update(chunk.checksum.encode())
             prefix_chunks += 1

@@ -1,7 +1,6 @@
 """Fixed-cutoff imports, immutable snapshots and source-specific coverage reports."""
 
 import argparse
-import gzip
 import hashlib
 import json
 import time
@@ -10,11 +9,12 @@ from pathlib import Path
 
 from sqlalchemy import select
 
-from .config import settings
-from .dukascopy_history import DukascopyHistory
+from .history_sources import HistoryConfigurationError, HistorySources, history_identity, page_end
 from .market_contracts import DatasetIdentity
 from .market_datasets import PricePrecisionError, register_dataset
 from .market_resources import cooldown, lane
+from .source_history_store import AcquisitionBusy, raw_chunk, shared_page, store_blob
+from .source_registry import collection_identity
 from .storage import (
     HistoryChunk,
     HistoryVersion,
@@ -37,10 +37,7 @@ def create_version(db, dataset_id, start, end):
     dataset = db.get(MarketDataset, dataset_id)
     if not dataset:
         raise ValueError("Unknown dataset")
-    identity = DatasetIdentity.model_validate(dataset.identity)
-    if (identity.source, identity.channel, identity.environment) != (
-            "dukascopy", "python", "historical"):
-        raise ValueError("Historical backtests require a Dukascopy Python dataset")
+    history_identity(dataset.identity)
     if not 0 <= start < end <= (now_ms() - 5000) // 60000 * 60000 or start % 60000 or end % 60000:
         raise ValueError("Historical version requires fixed past UTC minute boundaries")
     version = HistoryVersion(dataset_id=dataset_id, start=start, end=end, cursor=start)
@@ -78,7 +75,8 @@ def claim(version_id=None):
         version.lease_until = stamp + 60000
         dataset = db.get(MarketDataset, version.dataset_id)
         return (version.id, version.lease_token, version.cursor,
-                min(version.end, month_end(version.cursor)), dataset.identity)
+                page_end(dataset.identity, version.cursor,
+                         min(version.end, month_end(version.cursor))), dataset.identity)
 
 
 def publish(db, version):
@@ -92,9 +90,7 @@ def publish(db, version):
     for chunk in chunks:
         if chunk.start != cursor or chunk.end <= cursor:
             raise ValueError("Historical snapshot chunks are not a contiguous query partition")
-        raw = gzip.decompress(chunk.content)
-        if hashlib.sha256(raw).hexdigest() != chunk.checksum:
-            raise ValueError("Historical chunk content checksum mismatch")
+        raw_chunk(db, chunk)
         cursor = chunk.end
         count += chunk.count
         unknown_minutes += sum((end - start) // 60000 for start, end in chunk.unknown)
@@ -138,12 +134,15 @@ def import_page(adapter, *, version_id=None):
     ident, token, start, end, raw_identity = ownership
     batch = None
     try:
+        with transaction() as db:
+            fresh_after = db.get(HistoryVersion, ident).created_at
         with lane("history"):
-            batch = adapter.page(DatasetIdentity.model_validate(raw_identity), start, end)
+            batch = shared_page(adapter, DatasetIdentity.model_validate(raw_identity), start, end,
+                                fresh_after=fresh_after)
         if not batch.result.successful:
-            if batch.result.status == "rate_limited":
+            if batch.result.status == "rate_limited" and raw_identity["source"] != "oanda":
                 seconds = max(1, (batch.result.retry_at - now_ms()) / 1000) if batch.result.retry_at else None
-                cooldown("dukascopy", retry_seconds=seconds)
+                cooldown(raw_identity["source"], retry_seconds=seconds)
             from .market_contracts import MarketRequestError
 
             raise MarketRequestError(batch.result)
@@ -168,9 +167,10 @@ def import_page(adapter, *, version_id=None):
 
             ingest(db, db.get(Instrument, dataset.instrument_id), batch.ingestion_payload(),
                    defer_aggregation=True)
+            content_id, checksum = store_blob(db, collection_identity(raw_identity).key, content)
             db.add(HistoryChunk(version_id=ident, start=start, end=checkpoint,
                 observed_at=batch.observed_at, count=len(batch.rows),
-                checksum=hashlib.sha256(content).hexdigest(), content=gzip.compress(content, mtime=0),
+                checksum=checksum, content=b"", content_id=content_id,
                 result=batch.result.status, unknown=_unknown(batch.rows, start, checkpoint)))
             version.cursor = checkpoint
             version.lease_token = None
@@ -184,6 +184,13 @@ def import_page(adapter, *, version_id=None):
             else:
                 version.status = "pending"
         return True
+    except AcquisitionBusy:
+        with transaction() as db:
+            version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident).with_for_update())
+            if version.lease_token == token:
+                version.status, version.next_at = "pending", now_ms() + 1000
+                version.lease_token, version.lease_until = None, 0
+        return True
     except Exception as error:
         with transaction() as db:
             version = db.scalar(select(HistoryVersion).where(HistoryVersion.id == ident)
@@ -193,11 +200,13 @@ def import_page(adapter, *, version_id=None):
             version.attempts += 1
             result = batch.result if batch and not batch.result.successful else None
             metadata_failure = isinstance(error, PricePrecisionError)
+            configuration_failure = isinstance(error, HistoryConfigurationError)
             version.error = "price_precision_overflow" if metadata_failure else (
+                "history_source_configuration" if configuration_failure else
                 result.status if result else "invalid_payload")
             version.next_at = (result.retry_at if result and result.retry_at else
                                now_ms() + min(900000, 1000 * 2 ** min(version.attempts, 10)))
-            version.status = "configuration_error" if metadata_failure or (
+            version.status = "configuration_error" if metadata_failure or configuration_failure or (
                 result and result.status == "unauthorized") else "retrying"
             version.lease_token = None
             version.lease_until = 0
@@ -229,16 +238,14 @@ def snapshot_rows(db, ident, *, start=None, end=None):
     query = select(HistoryChunk).where(HistoryChunk.version_id == ident,
         HistoryChunk.start < right, HistoryChunk.end > left).order_by(HistoryChunk.start)
     for chunk in db.scalars(query.execution_options(yield_per=1)):
-        raw = gzip.decompress(chunk.content)
-        if hashlib.sha256(raw).hexdigest() != chunk.checksum:
-            raise ValueError("Historical chunk content checksum mismatch")
+        raw = raw_chunk(db, chunk)
         for row in json.loads(raw):
             if left <= row["timestamp"] < right:
                 yield row
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Source-isolated Dukascopy historical versions")
+    parser = argparse.ArgumentParser(description="Source-isolated managed historical versions")
     parser.add_argument("--create", help="Canonical logical symbol, e.g. EURUSD or BTCUSD")
     parser.add_argument("--provider-symbol", help="Exact Dukascopy symbol, e.g. EUR/USD")
     parser.add_argument("--asset-class", choices=("forex", "metal", "crypto", "index", "other"))
@@ -280,7 +287,7 @@ def main():
         with transaction() as db:
             print(json.dumps(version_report(db, version_id)))
         return
-    adapter = DukascopyHistory(proxy=settings.market_proxy)
+    adapter = HistorySources()
     try:
         while True:
             worked = import_page(adapter, version_id=version_id)

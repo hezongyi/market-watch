@@ -1,5 +1,7 @@
 """Authenticated source identities, import controls and immutable version reports."""
 
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
@@ -24,6 +26,7 @@ class VersionRequest(BaseModel):
 
 class DatasetRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    source: Literal["dukascopy", "oanda"] = "dukascopy"
     logical_symbol: str = Field(pattern=r"^[A-Z0-9]{1,10}$")
     provider_symbol: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9/_.-]+$")
     asset_class: AssetClass
@@ -53,6 +56,22 @@ def router(authenticated):
         with transaction() as db:
             return [dataset_report(row, db.get(Instrument, row.instrument_id))
                     for row in db.scalars(select(MarketDataset).order_by(MarketDataset.logical_symbol))]
+
+    @routes.get("/sources")
+    def sources():
+        from .source_registry import capabilities
+
+        return [capabilities(source) for source in ("dukascopy", "oanda", "binance", "yahoo")]
+
+    @routes.get("/datasets/{dataset_id}/source")
+    def collection(dataset_id: str):
+        from .source_registry import source_report
+
+        with transaction() as db:
+            try:
+                return source_report(db, dataset_id)
+            except ValueError as error:
+                raise HTTPException(404, str(error)) from None
 
     @routes.get("/aggregation-options")
     def options():
