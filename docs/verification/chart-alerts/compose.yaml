@@ -23,6 +23,7 @@ services:
       pg: {condition: service_healthy}
   api:
     image: market-watch-api:chart-alerts-acceptance
+    networks: [default, notification-fixture]
     env_file:
       - path: /tmp/mw-chart-alerts-acceptance/api.env
         format: raw
@@ -79,5 +80,33 @@ services:
       - 'export CHART_ALERT_TEST_DATABASE_URL="$$ALERTS_DATABASE_URL"; PYTHONPATH=backend pytest -q backend/tests/test_chart_alert_postgres.py'
     depends_on:
       pg: {condition: service_healthy}
+  notification-sink:
+    profiles: [notification-test]
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "/fixture/notification_sink.py"]
+    volumes:
+      - ./notification_sink.py:/fixture/notification_sink.py:ro
+    networks: [notification-fixture]
+    environment:
+      SINK_INITIAL_FAILURES: "1"
+  notification-worker:
+    profiles: [notification-test]
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.notify"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    environment:
+      ALERTS_DELIVERY_ENABLED: "true"
+      ALERTS_NTFY_URL: http://notification-sink:8080
+      ALERTS_NTFY_TOPIC: chart-alerts-acceptance-fixture
+      ALERTS_NTFY_TOKEN: ""
+    networks: [default, notification-fixture]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      notification-sink: {condition: service_started}
 volumes:
   chart-alerts-pg:
+networks:
+  notification-fixture:
+    internal: true

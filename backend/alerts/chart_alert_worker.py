@@ -4,7 +4,6 @@ import hashlib
 import json
 import logging
 from decimal import Decimal
-from types import SimpleNamespace
 
 from sqlalchemy import select
 
@@ -13,7 +12,8 @@ from .chart_alert_domain import Observation
 from .chart_alert_service import AlertConfig, consume, current_version
 from .chart_alert_values import operand_values
 from .chart_calculation_history import calculation_rows
-from .chart_data import chart_rows, future_grid
+from .chart_data import chart_rows
+from .chart_geometry_mapping import bar_indices
 from .chart_labels import managed_label
 from .domain import Calendar, scheduled_open
 from .storage import (
@@ -63,7 +63,7 @@ def stored_rows(db, version, config, now):
             or instrument.calendar_profile != version.market_identity["calendar_profile"]):
         raise ValueError("持久行情身份已改变，需显式编辑告警")
     rows = chart_rows(db, instrument, config.timeframe, now + 1, 100_000, now)
-    if config.calculation_origin is not None and config.indicators():
+    if config.published:
         from .managed_dataset import read_rows
         rows = read_rows(db, instrument, config.timeframe, now + 1, 100_000,
                          dataset_start=config.calculation_origin)
@@ -92,11 +92,8 @@ def geometry_indices(rows, line, *, meta=None, config=None):
         return list(range(len(rows)))
     labels = {row.get("chart_time", row["start"]): i for i, row in enumerate(rows)}
     if rows and meta and config and any(p.time > max(labels) for p in line.points):
-        from .provider_chart import label
-        instrument = SimpleNamespace(calendar=meta["calendar"], calendar_profile=meta.get("calendar_profile", {}), id=config.instrument)
-        for i, slot in enumerate(future_grid(instrument, config.timeframe, rows[-1]["end"], 500), len(rows)):
-            time = label(slot["start"], config.timeframe, meta["calendar"]) if config.series_kind == "provider" else managed_label(slot, config.timeframe, config.instrument)
-            labels[time] = i
+        labels = bar_indices(rows, instrument=config.instrument, timeframe=config.timeframe,
+                             series_kind=config.series_kind, meta=meta, future=True)
     first = line.points[0]
     if first.time not in labels:
         raise ValueError("画线端点尚未映射到实际 K 线；等待历史或未来端点验证")
@@ -169,7 +166,10 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
         row = rows[i]
         at = row.get("observed_at", 0)
         if not at or now - at > 120_000 or at > now:
-            health(alert, "stale", "抽样行情超过 120 秒，等待新鲜观察值")
+            if not scheduled_open(instant(now), calendar, gold=config.instrument == "XAUUSD", closures=closures):
+                health(alert, "ready" if alert.state else "warming", "正常闭市，等待下一交易时段的新鲜观察值")
+            else:
+                health(alert, "stale", "抽样行情超过 120 秒，等待新鲜观察值")
             return []
         indices = [i]
     else:
@@ -200,6 +200,11 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
         if alert.status != "active":
             break
     committed = [r for r in rows if r["end"] <= runtime.get("confirmed_end", -1)]
+    if config.mode == "intrabar" and rows:
+        confirmed = [row["end"] for row in rows[:-1] if row["complete"] and row["end"] <= now]
+        if confirmed:
+            runtime["confirmed_end"] = max(confirmed)
+        committed = [r for r in rows if r["end"] <= runtime.get("confirmed_end", -1)]
     runtime["fingerprint"] = fingerprint(committed)
     alert.runtime = runtime
     if alert.health == "ready" and config.mode == "close" and now - rows[-1]["end"] > 120_000:

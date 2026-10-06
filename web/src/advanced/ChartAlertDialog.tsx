@@ -332,6 +332,7 @@ export function ChartAlertDialog({
                     series_kind: series_kind as AlertConfig["series_kind"],
                     association: null,
                     calculation_origin: null,
+                    published: series_kind === "managed",
                   });
                 }}
               >

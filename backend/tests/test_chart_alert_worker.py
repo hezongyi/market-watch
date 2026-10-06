@@ -119,6 +119,43 @@ def test_intrabar_aggregated_frame_uses_latest_source_observation_time(database)
         assert len(evaluate(db, ident, now=1_700_011)) == 1
 
 
+def test_forex_intrabar_closed_weekend_is_distinct_from_open_session_staleness(database):
+    from datetime import datetime, timezone
+
+    friday = int(datetime(2026, 10, 2, 20, 59, tzinfo=timezone.utc).timestamp()*1000)
+    saturday = int(datetime(2026, 10, 3, 13, tzinfo=timezone.utc).timestamp()*1000)
+    monday = int(datetime(2026, 10, 5, 13, tzinfo=timezone.utc).timestamp()*1000)
+    with database.begin() as db:
+        db.add(Bar(instrument_id="EURUSD", timeframe="M1", start=friday, end=friday+60_000,
+                   open=D(9), high=D(9), low=D(9), close=D(9), complete=False, observed_at=friday+1))
+        ident = create(db, "intrabar-closed", config(instrument="EURUSD", source="dukascopy", mode="intrabar"), at=friday).id
+        evaluate(db, ident, now=friday+2)
+        assert evaluate(db, ident, now=saturday) == []
+        assert db.get(ChartAlert, ident).health == "ready"
+        assert "闭市" in db.get(ChartAlert, ident).health_reason
+        assert evaluate(db, ident, now=monday) == []
+        assert db.get(ChartAlert, ident).health == "stale"
+
+
+def test_intrabar_history_revision_blocks_but_provisional_changes_do_not(database):
+    with database.begin() as db:
+        seed(db, [9, 9, 9], incomplete=2)
+        ident = create(db, "intrabar-revision", config(mode="intrabar"), at=120_000).id
+        assert evaluate(db, ident, now=180_001) == []
+        assert db.get(ChartAlert, ident).runtime["confirmed_end"] == 120_000
+    with database.begin() as db:
+        live = db.scalar(select(Bar).where(Bar.start == 120_000))
+        live.close = live.high = D(11)
+        live.observed_at = 180_010
+        assert len(evaluate(db, ident, now=180_011)) == 1
+        historical = db.scalar(select(Bar).where(Bar.start == 0))
+        historical.open = historical.high = historical.low = historical.close = D(8)
+        live.observed_at = 180_020
+        assert evaluate(db, ident, now=180_021) == []
+        assert db.get(ChartAlert, ident).health == "blocked"
+        assert "修订" in db.get(ChartAlert, ident).health_reason
+
+
 def test_provider_demands_survive_absent_browser_and_protect_dataset(database, monkeypatch):
     meta = {"id": "BTCUSDT", "source": "binance", "symbol": "BTCUSDT",
             "basis": "last", "calendar": "utc0", "precision": 2}

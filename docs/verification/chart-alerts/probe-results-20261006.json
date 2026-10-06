@@ -100,5 +100,11 @@
   },
   "external_notifications_sent": false,
   "postgres_validation": "pending Docker permission",
-  "deployed_acceptance": "not started"
+  "deployed_acceptance": "not started",
+  "backend_regression": {
+    "passed": 545,
+    "skipped": 40,
+    "duration_seconds": 134.69,
+    "scope": "Ubuntu local Python venv; PostgreSQL and deployed-instance verification still pending"
+  }
 }

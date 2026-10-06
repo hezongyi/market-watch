@@ -51,6 +51,7 @@ export type AlertConfig = {
   association: Association | null;
   calculation_version: "chart-python-v1";
   calculation_origin?: number | null;
+  published?: boolean;
 };
 export type AlertContext = {
   request_id: string;
@@ -63,6 +64,7 @@ export type AlertContext = {
   line?: LineGeometry;
   indicator?: IndicatorSpec;
   calculation_origin?: number | null;
+  published?: boolean;
 };
 export type AlertRow = {
   id: string;
@@ -217,5 +219,6 @@ export function freshDraft(context: AlertContext): AlertConfig {
     association: context.association,
     calculation_version: "chart-python-v1",
     calculation_origin: context.calculation_origin ?? null,
+    published: context.published ?? false,
   };
 }

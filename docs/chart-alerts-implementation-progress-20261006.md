@@ -106,3 +106,18 @@ LD_LIBRARY_PATH=/tmp/mw-indicator-browser-libs/root/usr/lib/x86_64-linux-gnu PLA
 原始 JSON和截图在 `/tmp/mw-chart-alerts-acceptance`；仓库只记录摘要与探针脚本，不提交许可库、凭据、TLS私钥。原许可包公开 `exportData` 入口引用缺失的 chunk；本探针因此直接观测实际 custom-study `main` 返回值，不修改许可资源，也不把未运行的 export API记为通过。
 
 新增后端计算合同/几何等定向回归已通过；一次较新全量回归为 **537 passed、40 skipped**（176.97秒），随后聚合盘中时间及共享计算补充测试17项通过。最新最终检查结果将在下面更新。所有运行依然没有产品访问地址。剩余完整门槛：真实 PostgreSQL迁移/并发/恢复；独立Compose运行；关闭全部网页后的持续采集；真实故障注入、原生拖动/布局/撤销等完整矩阵及隔离通知端到端，修复审查发现的问题。必须在这些验收通过后才可交付。
+
+## 审查修复与隔离通知准备
+
+双轴审查见 [审查记录](verification/chart-alerts/review-20261006.md)。已修复三个可复现Spec缺陷：所有managed图上告警保存published身份，不读取不可见staging价格；盘中监控记录已确认prefix指纹而排除临时最后根，历史修订停止判定；published图表与告警共享gap segmentation。已增加相应定向回归。盘中正常闭市显示原因，不误报交易时段内陈旧。
+
+Compose增加可选 `notification-test` profile。`notification-sink`位于任务独立internal网络，无宿主端口、不转发到任何服务，默认首次请求返回503供重试验收。`notification-worker`固定指向该sink，覆盖ntfy token为空；常规启动仍关闭外发。仅用于本任务实际部署后的隔离通知验收，**尚未启动**。
+
+```bash
+docker compose --env-file /tmp/mw-chart-alerts-acceptance/compose.env -p mw-chart-alerts-acceptance -f docs/verification/chart-alerts/compose.yaml --profile notification-test up -d notification-sink notification-worker
+docker compose --env-file /tmp/mw-chart-alerts-acceptance/compose.env -p mw-chart-alerts-acceptance -f docs/verification/chart-alerts/compose.yaml exec -T api python -c 'import urllib.request; print(urllib.request.urlopen("http://notification-sink:8080/records").read().decode())'
+```
+
+以上sink记录只证明本地服务接受，不能显示为设备接收。完整结束时用本project的 `--profile notification-test down`停止profile及常规服务；保留数据库volume，不清理其他项目。
+
+最新审查修复后的全量后端回归：**545 passed、40 skipped**，134.69秒；一个既有Starlette/httpx弃用提示。最新前端build、Ruff、diff检查及Compose静态解析通过，native/UI探针摘要已同步。2026-10-06再次实际执行docker info仍返回socket permission denied，未启动实例；此结果不构成最终交付验收。

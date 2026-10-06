@@ -550,6 +550,7 @@ def published_history_check(db, inst, pub, visible, body):
 
 
 def data(body):
+    from .chart_calculation_history import calculation_rows
     from .chart_data import future_grid
     from .chart_indicators import calculate
 
@@ -586,6 +587,8 @@ def data(body):
         basis, calendar, precision = inst.basis, inst.calendar, inst.precision
         future = future_grid(inst, body.timeframe, visible[-1]["end"]) if visible else []
         history_check = published_history_check(db, inst, pub, visible, body)
+        calculation_meta = {"calendar": inst.calendar, "calendar_profile": inst.calendar_profile}
+    rows = calculation_rows(rows, calculation_meta, body.instrument)
     indicators = []
     for spec in body.indicators:
         result = calculate(rows, spec, provisional=True)

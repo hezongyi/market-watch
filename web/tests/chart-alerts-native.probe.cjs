@@ -538,26 +538,49 @@ print(json.dumps(dict(red_y=sum(red)/len(red),blue_y=sum(blue)/len(blue))))
     report.cases.push(
       "four actual native custom studies return alert-identical values including provisional last candle",
     );
-    report.multiChart=await page.evaluate(async()=>{
-      widget.setLayout('2h');
-      for(let i=0;i<100&&(widget.chartsCount()!==2||!widget.chart(1).dataReady());i++)await new Promise(r=>setTimeout(r,30));
-      if(widget.chartsCount()!==2)throw Error('actual native two-chart layout unavailable');
+    report.multiChart = await page.evaluate(async () => {
+      widget.setLayout("2h");
+      for (
+        let i = 0;
+        i < 100 && (widget.chartsCount() !== 2 || !widget.chart(1).dataReady());
+        i++
+      )
+        await new Promise((r) => setTimeout(r, 30));
+      if (widget.chartsCount() !== 2)
+        throw Error("actual native two-chart layout unavailable");
       probeAdapter.refresh();
-      await probeAdapter.create({chart:widget.chart(0),price:100});
-      const first=probeMessages.filter(m=>m.type==='chart-alert-context').at(-1).context;
-      await probeAdapter.create({chart:widget.chart(1),price:110});
-      const second=probeMessages.filter(m=>m.type==='chart-alert-context').at(-1).context;
-      await new Promise(ok=>widget.chart(1).setSymbol('ETHUSDT',ok));
-      await probeAdapter.create({chart:widget.chart(1),price:120});
-      const switched=probeMessages.filter(m=>m.type==='chart-alert-context').at(-1).context;
-      return {first,second,switched};
+      await probeAdapter.create({ chart: widget.chart(0), price: 100 });
+      const first = probeMessages
+        .filter((m) => m.type === "chart-alert-context")
+        .at(-1).context;
+      await probeAdapter.create({ chart: widget.chart(1), price: 110 });
+      const second = probeMessages
+        .filter((m) => m.type === "chart-alert-context")
+        .at(-1).context;
+      await new Promise((ok) => widget.chart(1).setSymbol("ETHUSDT", ok));
+      await probeAdapter.create({ chart: widget.chart(1), price: 120 });
+      const switched = probeMessages
+        .filter((m) => m.type === "chart-alert-context")
+        .at(-1).context;
+      return { first, second, switched };
     });
-    assert.notEqual(report.multiChart.first.association.chart_id,report.multiChart.second.association.chart_id);
-    assert.equal(report.multiChart.second.association.chart_index,1);
-    assert.equal(report.multiChart.switched.instrument,'ETHUSDT');
-    assert.equal(report.multiChart.switched.association.chart_id,report.multiChart.second.association.chart_id);
-    assert.notEqual(report.multiChart.switched.association.generation,report.multiChart.second.association.generation);
-    report.cases.push('actual two-chart layout retains distinct business identities and fences symbol generations');
+    assert.notEqual(
+      report.multiChart.first.association.chart_id,
+      report.multiChart.second.association.chart_id,
+    );
+    assert.equal(report.multiChart.second.association.chart_index, 1);
+    assert.equal(report.multiChart.switched.instrument, "ETHUSDT");
+    assert.equal(
+      report.multiChart.switched.association.chart_id,
+      report.multiChart.second.association.chart_id,
+    );
+    assert.notEqual(
+      report.multiChart.switched.association.generation,
+      report.multiChart.second.association.generation,
+    );
+    report.cases.push(
+      "actual two-chart layout retains distinct business identities and fences symbol generations",
+    );
     report.errors = errors;
     assert.deepEqual(errors, []);
     fs.writeFileSync(output, JSON.stringify(report, null, 2));

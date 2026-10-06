@@ -37,7 +37,7 @@ def test_published_chart_and_alert_share_fixed_origin_and_live_value(database, n
         for row in history:
             db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1", start=row["start"],
                                     end=row["end"], complete=row["complete"], payload=row))
-        rule = config(calculation_origin=0, mode="intrabar", condition={
+        rule = config(calculation_origin=0, published=True, mode="intrabar", condition={
             "relation": "cross_up", "left": spec.model_dump(), "right": {"kind": "constant", "value": 100},
         })
         alert = create(db, "contract-"+name, rule, at=600_000)
@@ -137,3 +137,39 @@ def test_provider_pinned_origin_does_not_shift_when_older_cache_is_added(databas
     output = graph["indicators"][0]["series"][0]["values"]
     assert graph["calculation_origin"] == 600_000
     assert [Decimal(str(v["value"])) for v in output] == operand_values(history[10:], spec)[-5:]
+
+
+def test_published_price_alert_never_compares_invisible_staging_prices(database):
+    history = rows([9, 9, 9])
+    with database.begin() as db:
+        seed(db, [9, 11, 9])
+        db.add(ChartPublication(instrument_id="BTCUSDT", timeframe="M1", start=0,
+                                end=180_000, complete_count=3, initialized=True))
+        for row in history:
+            db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1", start=row["start"],
+                                    end=row["end"], complete=True, payload=row))
+        ident = create(db, "published-price", config(published=True), at=60_000).id
+        assert evaluate(db, ident, now=180_001) == []
+        assert db.get(ChartAlert, ident).count == 0
+
+
+def test_published_chart_and_alert_restart_indicator_after_same_missing_interval(database):
+    spec = indicator("EMA", period=3)
+    history = rows([10+i for i in range(30)])
+    history = [row for i, row in enumerate(history) if i != 10]
+    with database.begin() as db:
+        db.add(ChartPublication(instrument_id="BTCUSDT", timeframe="M1", start=0,
+                                end=1_800_000, complete_count=29, initialized=True))
+        for row in history:
+            db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1", start=row["start"],
+                                    end=row["end"], complete=True, payload=row))
+        rule = config(published=True, calculation_origin=0, condition={"relation":"cross_up", "left":spec.model_dump(), "right":{"kind":"constant","value":100}})
+        alert = create(db, "published-gap", rule, at=1_800_000)
+        db.flush()
+        from alerts.chart_calculation_history import calculation_rows
+        inputs, meta = stored_rows(db, current_version(db, alert), rule, 1_800_000)
+        expected = operand_values(calculation_rows(inputs, meta, rule.instrument), spec)
+    graph = managed_dataset.data(DataQuery(instrument="BTCUSDT", timeframe="M1", published=True,
+                                           dataset_start=0, before=1_800_000, limit=20, indicators=[spec.indicator.model_dump()]))
+    output = graph["indicators"][0]["series"][0]["values"]
+    assert [Decimal(str(v["value"])) if v["value"] is not None else None for v in output] == expected[-20:]

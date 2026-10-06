@@ -57,6 +57,7 @@ class AlertConfig(Contract):
     association: Association | None = None
     calculation_version: Literal["chart-python-v1"] = "chart-python-v1"
     calculation_origin: int | None = Field(default=None, ge=0)
+    published: bool = False
 
     @model_validator(mode="after")
     def frame(self):

@@ -82,6 +82,7 @@ function chartAlertBridge({
       source: meta.source,
       calculation_origin:
         calculationOrigin(chart.symbol(), chart.resolution()) ?? null,
+      published: identity.series_kind === "managed",
       association: {
         workspace_id: String(getWorkspace().id),
         chart_id: chartIdentity(chart),
@@ -337,7 +338,11 @@ function chartAlertBridge({
       old.id === row.id && old.version <= row.version ? row : old,
     );
   }
-  function drawingEvent(nativeId, type, initiatingChart = pointerDown ? pointerChart : getWidget().activeChart()) {
+  function drawingEvent(
+    nativeId,
+    type,
+    initiatingChart = pointerDown ? pointerChart : getWidget().activeChart(),
+  ) {
     if (readonly || suppress || disposed || isLoading()) return;
     for (const row of rows) {
       const a = row.config.association;
@@ -416,7 +421,8 @@ function chartAlertBridge({
       pointerDown = false;
       const changes = [...previewChanges.values()];
       previewChanges.clear();
-      for (const change of changes) drawingEvent(change.nativeId, change.type, change.chart);
+      for (const change of changes)
+        drawingEvent(change.nativeId, change.type, change.chart);
       pointerChart = null;
     });
     getWidget().subscribe("onPlusClick", (p) => {
@@ -568,13 +574,20 @@ function chartAlertBridge({
         Object.entries(saved.params).some(
           ([key, value]) => current.params[key] !== value,
         );
-      const currentOrigin=calculationOrigin(chart.symbol(),chart.resolution());
-      const savedOrigin=row.config.calculation_origin ?? row.runtime?.origin;
+      const currentOrigin = calculationOrigin(
+        chart.symbol(),
+        chart.resolution(),
+      );
+      const savedOrigin = row.config.calculation_origin ?? row.runtime?.origin;
       associationNotice(
         row,
         differs
           ? "图表指标参数与告警快照不同；请在编辑表单中确认并保存新参数"
-          : currentOrigin != null && savedOrigin != null && currentOrigin !== savedOrigin ? "图表与告警固定历史起点不同；请核对计算历史后编辑告警" : "",
+          : currentOrigin != null &&
+              savedOrigin != null &&
+              currentOrigin !== savedOrigin
+            ? "图表与告警固定历史起点不同；请核对计算历史后编辑告警"
+            : "",
       );
     }
   }
