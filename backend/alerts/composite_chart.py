@@ -50,6 +50,11 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
     cutoff = stamp + 1 if before is None else before
     output, partitions = [], 0
     cursor = cutoff
+    from .composite_aggregates import read
+
+    persisted = read(db, revision.id, frame, value, before=cutoff, count=count + 1, now=stamp)
+    if persisted is not None:
+        output, cursor = persisted, seam_bucket
     # Jump across missing intervals by indexed observed timestamps. Fixed input
     # versions filter revisions before selecting, so current heads cannot leak in.
     def latest_minute(bound):
@@ -65,8 +70,17 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
         # read_window owns freshness/owner validation; this only supplies a seek
         # candidate. Invalid forming data never becomes a candle.
         forming = live.forming if live else {}
-        if forming and period(forming["start"], frame, phase)[0] < cutoff:
-            latest = max(latest if latest is not None else seam, forming["start"])
+        if forming and forming["start"] >= seam and period(forming["start"], frame, phase)[0] < cutoff:
+            if persisted is None:
+                latest = max(latest if latest is not None else seam, forming["start"])
+            else:
+                left, right = period(forming["start"], frame, phase)
+                sampled = read_window(db, composite.id, frame, left, right, revision_id=revision.id,
+                    provisional=True, now=stamp, permission_scope=permission_scope)["bars"]
+                if sampled:
+                    output = sorted([bar for bar in output if bar["start"] != left] + sampled,
+                                    key=lambda bar: bar["start"])
+                partitions += 1
     while cursor > seam_bucket and len(output) <= count and partitions < 4:
         if latest is None:
             # W1/MN can contain historical observations in the seam bucket even
@@ -129,4 +143,5 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
         "history_revision": hashlib.sha256(json.dumps(fingerprint, sort_keys=True).encode()).hexdigest(),
         "origin": version.start, "rule_version": revision.rules["aggregation"],
         "preparation_status": prep.status, "pending": pending, "bounded_partitions": partitions,
+        "materialized": persisted is not None,
         "queried_cutoff": prep.cutoff, "current_observed_confirmed_end": prep.confirmed_end}

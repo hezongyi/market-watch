@@ -42,6 +42,8 @@ type Composite = {
     input_revision: number;
     error: string | null;
   };
+  periods: {timeframe:string;status:string;applied_input_revision:number;input_revision:number;
+    updated_at:number|null;error:string|null;next_at:number}[];
   usage: {
     charts: number;
     strategies: number;
@@ -681,6 +683,18 @@ export function CompositeDetail() {
               <p>
                 每日历史发布不会移动基线或接续点。查询完成不代表覆盖完整、指标预热完成或策略可以判断。
               </p>
+              <h3>接续周期产物</h3>
+              <div className="table-scroll dc-period-table" tabIndex={0} role="region" aria-label="接续周期产物滚动区"><table aria-label="接续周期产物">
+                <thead><tr><th>周期</th><th>状态</th><th>已处理 / 当前输入</th><th>最近处理</th></tr></thead>
+                <tbody>{row.periods.map(period=><tr key={period.timeframe}>
+                  <td>{period.timeframe}</td>
+                  <td>{({caught_up:"已处理当前输入",building:"正在派生",pending:"等待派生",retrying:"失败待重试"} as Record<string,string>)[period.status] || period.status}
+                    {period.error && <> · {period.error} · 重试 {time(period.next_at)}</>}</td>
+                  <td>{period.applied_input_revision<0?"尚未处理":period.applied_input_revision} / {period.input_revision}</td>
+                  <td>{period.updated_at?time(period.updated_at):"尚无记录"}</td>
+                </tr>)}</tbody>
+              </table></div>
+              <p>周期产物处理完成不代表覆盖完整或策略依赖已就绪。</p>
               <Link to={`/market-data/datasets/${row.dataset_id}/mapping`}>
                 保存新的实时映射
               </Link>

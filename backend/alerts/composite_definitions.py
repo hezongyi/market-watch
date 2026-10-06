@@ -168,6 +168,8 @@ def first_use(db, dataset_id, mapping_id, *, permission_scope="workspace:default
     if existing:
         fixed = db.get(CompositeRevision, existing.active_revision_id)
         request_artifacts(db, db.get(HistoryVersion, fixed.history_version_id), FRAMES)
+        from .composite_aggregates import request
+        request(db, fixed.id)
         return existing  # Daily publication never moves the original baseline/T.
     version, seam = baseline(db, dataset_id, source.calendar)
     ticker = "MC:" + ident[:25] + ":" + dataset.logical_symbol
@@ -192,4 +194,6 @@ def first_use(db, dataset_id, mapping_id, *, permission_scope="workspace:default
             "historical_input": {"version_id": version.id, "checksum": version.manifest["checksum"],
                 "start": version.start, "end": seam}, "target_identity": identity.model_dump()}))
     db.flush()
+    from .composite_aggregates import request
+    request(db, revision.id)
     return composite

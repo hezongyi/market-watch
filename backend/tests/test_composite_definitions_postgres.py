@@ -11,6 +11,8 @@ from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alerts.composite_definitions import first_use, save_mapping
 from alerts.storage import (
+    CompositeAggregateBar,
+    CompositeAggregateTask,
     CompositeInputEvent,
     CompositeMinute,
     CompositeMinuteInput,
@@ -65,7 +67,7 @@ def test_additive_migration_and_no_unreviewed_mapping_loss(provider_pg, monkeypa
     migration = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration)
     with engine.begin() as conn:
-        for model in (CompositeMinute, CompositeMinuteInput, CompositeInputEvent, CompositeReadAttempt, CompositePreparation,
+        for model in (CompositeAggregateBar, CompositeAggregateTask, CompositeMinute, CompositeMinuteInput, CompositeInputEvent, CompositeReadAttempt, CompositePreparation,
                       CompositeRevision, MarketComposite, RealtimeMapping):
             model.__table__.drop(conn)
         migration.op = Operations(MigrationContext.configure(conn))

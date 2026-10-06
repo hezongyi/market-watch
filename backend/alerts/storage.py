@@ -347,6 +347,30 @@ class CompositeMinuteInput(Base):
     source_revision_id: Mapped[str] = mapped_column(ForeignKey("market_source_minute_revisions.id"))
 
 
+class CompositeAggregateTask(Base):
+    __tablename__ = "market_composite_aggregate_tasks"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(4), primary_key=True)
+    applied_input_revision: Mapped[int] = mapped_column(BigInteger, default=-1)
+    offset: Mapped[int] = mapped_column(default=0)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    attempts: Mapped[int] = mapped_column(default=0)
+    error: Mapped[str | None] = mapped_column(String(40))
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class CompositeAggregateBar(Base):
+    __tablename__ = "market_composite_aggregate_bars"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(4), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    input_revision: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    data: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
 class CompositeReadAttempt(Base):
     __tablename__ = "market_composite_read_attempts"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
@@ -411,7 +435,7 @@ def immutable_dataset_identity(db, flush_context, instances):
 
     for row in db.deleted:
         if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, SourceMinute, CompositeMinute,
-                            CompositeReadAttempt, CompositeMinuteInput)):
+                            CompositeReadAttempt, CompositeMinuteInput, CompositeAggregateBar)):
             raise ValueError("Confirmed minute inputs and audit cannot be deleted by runtime writers")
         if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob, HistoryArtifactBlock, HistoryArtifact,
                             HistoryReclamation, DatasetReclamation, HistoryReadAttempt)):
@@ -425,9 +449,12 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
-        if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, CompositeMinuteInput)) and any(
+        if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, CompositeMinuteInput, CompositeAggregateBar)) and any(
                 attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Confirmed minute revisions and input audit are immutable")
+        if isinstance(row, CompositeAggregateTask) and any(state.attrs[key].history.has_changes()
+                for key in ("revision_id", "timeframe")):
+            raise ValueError("Composite aggregation task identity is immutable")
         if isinstance(row, (SourceMinute, CompositeMinute)) and any(
                 state.attrs[key].history.has_changes() for key in (
                     ("source_id", "start") if isinstance(row, SourceMinute) else ("revision_id", "start"))):

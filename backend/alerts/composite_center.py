@@ -79,6 +79,7 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
     quote_ready = bool(owned and quote.get("bid") and quote.get("ask") and quote.get("tradeable")
         and Decimal(quote["ask"]) >= Decimal(quote["bid"]) and quote_age is not None and 0 <= quote_age <= 15000)
     confirmed_ready = bool(owned and state.ready and not state.error)
+    from .composite_aggregates import report
     status = "account_changed" if not current_account else "attention" if prep.error else (
         "preparing" if prep.status != "queried" else "inactive" if not active else
         "receiving" if confirmed_ready else "recovering")
@@ -87,6 +88,7 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         "precision": inst.precision, "calendar": revision.rules["aggregation_calendar"],
         "historical_source": dataset.identity["source"], "live_source": "oanda",
         "basis": inst.basis, "status": status, "created_at": composite.created_at,
+        "periods": report(db, revision.id, prep.input_revision),
         "mapping": mapping_report(db, mapping), "active_revision_id": revision.id,
         "revision": {"id": revision.id, "history_version_id": history.id, "history_start": history.start,
             "history_end": history.end, "history_checksum": history.manifest["checksum"],

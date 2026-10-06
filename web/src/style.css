@@ -44,6 +44,7 @@
 .dc-facts dt { color: var(--muted); margin-bottom: 8px; }
 .dc-facts dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .data-center .table-scroll { min-width: 0; }
+.data-center .dc-period-table { max-height: none; }
 .data-center td small { display: block; margin-top: 8px; }
 
 :root {

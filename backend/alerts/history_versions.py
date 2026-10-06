@@ -388,15 +388,19 @@ def main():
 
             artifact_tick(version_id)
             if not version_id:
+                from .composite_aggregates import aggregate_tick
                 from .composite_preparation import preparation_tick
                 from .history_maintenance import schedule_tick
 
                 schedule_tick()
                 preparation_tick(adapter)
+                aggregated = aggregate_tick()
+            else:
+                aggregated = False
             worked = import_page(adapter, version_id=version_id)
             if args.once:
                 return
-            time.sleep(1 if worked else 5)
+            time.sleep(1 if worked or aggregated else 5)
     finally:
         adapter.close()
 
