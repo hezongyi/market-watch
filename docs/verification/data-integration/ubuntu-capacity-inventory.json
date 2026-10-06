@@ -1,0 +1,43 @@
+{
+  "captured_at_utc": "2026-10-06T10:39:02.299610+00:00",
+  "scope": "Read-only Ubuntu capacity inventory; no deletion or production action",
+  "filesystem": {
+    "root_size_gib_approx": 142,
+    "used_gib_approx": 135,
+    "available_mib_latest_approx": 303,
+    "inodes_used_percent": 30
+  },
+  "docker_reported": {
+    "containers": 97,
+    "compose_projects": 13,
+    "running_containers_at_inventory": 81,
+    "images_bytes": 66910000000,
+    "images_count_in_system_df": 550,
+    "images_active": 41,
+    "volumes_bytes": 12740000000,
+    "volumes_count": 13,
+    "build_cache_bytes": 10510000000,
+    "build_cache_reclaimable_bytes_reported": 4710000000,
+    "container_writable_bytes": 4731000,
+    "image_reclaimable_warning": "Docker returned negative reclaimable image bytes; do not use this as a cleanup estimate. Image totals/cache can share layers."
+  },
+  "other_storage": {
+    "home_quant_gib_approx": 34,
+    "tmp_gib_approx": 12,
+    "journal_gib_approx": 3.9,
+    "download_compile_cache_candidates_gib_approx": "6–7; review before cleanup"
+  },
+  "acceptance": {
+    "database_bytes": 5010550107,
+    "pg_wal_kib": 81932,
+    "postgres_directory_kib": 5011668,
+    "existing_artifacts_mib_approx": 58,
+    "browser_48h_extrapolated_bytes_upper": 7269763,
+    "rules_48h_extrapolated_bytes_upper": 13650111,
+    "database_growth_bytes_since_0604_approx": 183214080,
+    "additional_48h_estimate_gib": "1–3; rough extrapolation from ~183MB database growth over ~4.5h, not a cap",
+    "recommended_free_gib": 10,
+    "recommended_free_gib_with_parallel_tasks": 20
+  },
+  "cleanup_plan": "Review exact old image IDs, cache records and project ownership. Preserve active/rollback images and all required volumes. No global prune. Download/build caches and retained system journal are separate candidates. Aim for 10–15GB first; actual reclaimed bytes measured via df."
+}
