@@ -11,7 +11,7 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "ag34_composite_aggregates"
+HEAD = "ah35_fixed_indicators"
 
 
 def configuration():

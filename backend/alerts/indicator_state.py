@@ -1,0 +1,167 @@
+"""Bounded, serializable states for the built-in Python indicator contracts.
+
+Start at the fixed series origin (or a verified checkpoint), never at a chart
+page's warmup prefix. Confirmed updates mutate a state; provisional updates
+operate on a copy. A missing dependency resets the valid span as in TA-Lib.
+"""
+
+import copy
+import math
+
+from .chart_indicators import CATALOG, validate
+
+ALGORITHM = "fixed-indicator-state-v2"
+SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH"))
+
+
+class IndicatorState:
+    def __init__(self, spec, checkpoint=None):
+        self.name, self.params = validate(spec)
+        if self.name not in SUPPORTED:
+            raise ValueError("该指标尚未声明完整初始化与检查点算法")
+        self.spec = {"name": self.name, "version": "1", "params": self.params}
+        self.state = {}
+        if checkpoint is not None:
+            if (checkpoint.get("algorithm") != ALGORITHM or checkpoint.get("spec") != self.spec):
+                raise ValueError("指标检查点算法或参数不匹配")
+            self.state = copy.deepcopy(checkpoint["state"])
+
+    def checkpoint(self):
+        return {"algorithm": ALGORITHM, "spec": copy.deepcopy(self.spec),
+                "state": copy.deepcopy(self.state)}
+
+    def step(self, row, *, provisional=False):
+        if provisional:
+            trial = IndicatorState(self.spec, self.checkpoint())
+            return trial.step({**row, "complete": True})
+        empty = dict.fromkeys(item["key"] for item in CATALOG[self.name]["series"])
+        if row.get("gap_before"):
+            self.state = {}
+        if not row["complete"]:
+            self.state = {}
+            return empty
+        high, low, close = (float(row[key]) for key in ("high", "low", "close"))
+        if not all(math.isfinite(value) for value in (high, low, close)):
+            raise ValueError("指标输入价格必须是有限数值")
+        s, p = self.state, self.params
+        if not s:
+            s.update(n=0, origin=row["start"], seam=False)
+        s["seam"] |= bool(row.get("seam_crossing") or row.get("seam_at_start"))
+        s["n"] += 1
+        n = s["n"]
+        if self.name in ("SMA", "LWMA", "BBANDS", "STOCH"):
+            length = (p["k"] + p["smooth"] + p["d"] - 2) if self.name == "STOCH" else p["period"]
+            dependencies = s.setdefault("dependencies", [])
+            dependencies.append([row["start"], bool(row.get("seam_crossing") or row.get("seam_at_start"))])
+            if len(dependencies) > length:
+                dependencies.pop(0)
+            s["origin"] = dependencies[0][0]
+            s["seam"] = any(item[1] for item in dependencies)
+        if self.name in ("SMA", "LWMA", "BBANDS", "EMA"):
+            period = p["period"]
+            window = s.setdefault("window", [])
+            if self.name == "EMA" and n > period:
+                s["ema"] += (close - s["ema"]) * (2 / (period + 1))
+                result = {"value": s["ema"]}
+            else:
+                window.append(close)
+                if self.name in ("SMA", "BBANDS"):
+                    s["sum"] = s.get("sum", 0.0) + close
+                    s["squares"] = s.get("squares", 0.0) + close * close
+                result = empty
+                if len(window) == period:
+                    if self.name == "EMA":
+                        s["ema"] = sum(window) / period
+                        result = {"value": s["ema"]}
+                        window.clear()
+                    elif self.name == "LWMA":
+                        result = {"value": sum((i + 1) * value for i, value in enumerate(window)) /
+                                  (period * (period + 1) / 2)}
+                        window.pop(0)
+                    else:
+                        mean = s["sum"] / period
+                        if self.name == "SMA":
+                            result = {"value": mean}
+                        else:
+                            variance = s["squares"] / period - mean * mean
+                            deviation = math.sqrt(max(0.0, variance)) * p["deviation"]
+                            result = {"upper": mean + deviation, "middle": mean, "lower": mean - deviation}
+                        old = window.pop(0)
+                        s["sum"] -= old
+                        s["squares"] -= old * old
+        elif self.name in ("RSI", "ATR"):
+            result = empty
+            period = p["period"]
+            if n > 1:
+                if self.name == "RSI":
+                    change = close - s["previous"]
+                    measures = {"gain": max(change, 0.0), "loss": max(-change, 0.0)}
+                else:
+                    measures = {"tr": max(high - low, abs(high - s["previous"]), abs(low - s["previous"]))}
+                for key, value in measures.items():
+                    if n <= period + 1:
+                        s[key] = s.get(key, 0.0) + value
+                        if n == period + 1:
+                            s[key] /= period
+                    else:
+                        s[key] = (s[key] * (period - 1) + value) / period
+                if n >= period + 1:
+                    total = s.get("gain", 0) + s.get("loss", 0)
+                    result = {"value": s["tr"] if self.name == "ATR" else
+                              (100 * (s["gain"] / total) if abs(total) >= 1e-8 else 0.0)}
+        elif self.name == "MACD":
+            result = empty
+            if n <= p["slow"]:
+                seed = s.setdefault("seed", [])
+                seed.append(close)
+                if n == p["slow"]:
+                    s["slow"] = sum(seed) / p["slow"]
+                    s["fast"] = sum(seed[-p["fast"]:]) / p["fast"]
+                    del s["seed"]
+            else:
+                for key in ("fast", "slow"):
+                    s[key] += (close - s[key]) * (2 / (p[key] + 1))
+            if n >= p["slow"]:
+                macd = s["fast"] - s["slow"]
+                if n <= p["slow"] + p["signal"] - 1:
+                    signals = s.setdefault("signals", [])
+                    signals.append(macd)
+                    if len(signals) == p["signal"]:
+                        s["signal"] = sum(signals) / p["signal"]
+                        del s["signals"]
+                else:
+                    s["signal"] += (macd - s["signal"]) * (2 / (p["signal"] + 1))
+                if "signal" in s:
+                    result = {"macd": macd, "signal": s["signal"], "histogram": macd - s["signal"]}
+        else:  # STOCH: slow K is withheld until slow D is initialized, as in TA-Lib.
+            result = empty
+            window = s.setdefault("window", [])
+            window.append([high, low])
+            if len(window) > p["k"]:
+                window.pop(0)
+            if len(window) == p["k"]:
+                highest, lowest = max(pair[0] for pair in window), min(pair[1] for pair in window)
+                fast = 0.0 if highest == lowest else (close - lowest) / ((highest - lowest) / 100)
+                ks = s.setdefault("ks", [])
+                ks.append(fast)
+                if len(ks) > p["smooth"]:
+                    ks.pop(0)
+                if len(ks) == p["smooth"]:
+                    k = sum(ks) / p["smooth"]
+                    ds = s.setdefault("ds", [])
+                    ds.append(k)
+                    if len(ds) > p["d"]:
+                        ds.pop(0)
+                    if len(ds) == p["d"]:
+                        result = {"k": k, "d": sum(ds) / p["d"]}
+        s["previous"], s["last_start"], s["last_end"] = close, row["start"], row["end"]
+        return {key: value if value is None or math.isfinite(value) else None for key, value in result.items()}
+
+
+def presentation(spec, rows):
+    name, params = validate(spec)
+    return {"name": name, "version": "1", "params": params, "pane": CATALOG[name]["pane"],
+        "levels": CATALOG[name].get("levels", []), "series": [
+            {**item, "values": [{"time": row["start"], "value": row["values"][item["key"]],
+                **({"provisional": True} if row.get("provisional") else {})} for row in rows]}
+            for item in CATALOG[name]["series"]]}

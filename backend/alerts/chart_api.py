@@ -431,6 +431,8 @@ def router(authenticated):
 
                 with transaction() as db:
                     page = export_page(db, body)
+                if page.get("export_pending"):
+                    raise HTTPException(409, "；".join(page["pending"]))
                 return Response(chart_csv(page, instrument=encode(body.instrument, body.series_kind),
                         timeframe=body.timeframe), media_type="text/csv; charset=utf-8",
                         headers={"Content-Disposition": 'attachment; filename="market-watch.csv"',

@@ -371,6 +371,40 @@ class CompositeAggregateBar(Base):
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
 
 
+class FixedIndicatorRun(Base):
+    __tablename__ = "market_fixed_indicator_runs"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    group_key: Mapped[str] = mapped_column(String(64), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    revision_id: Mapped[str | None] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    timeframe: Mapped[str] = mapped_column(String(4))
+    spec: Mapped[dict] = mapped_column(JSON)
+    algorithm: Mapped[str] = mapped_column(String(40))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    target_end: Mapped[int] = mapped_column(BigInteger)
+    parent_id: Mapped[str | None] = mapped_column(ForeignKey("market_fixed_indicator_runs.id"))
+    prefix_end: Mapped[int] = mapped_column(BigInteger, default=0)
+    cursor: Mapped[int] = mapped_column(BigInteger, default=0)
+    state: Mapped[dict] = mapped_column(JSON, default=dict)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(40))
+    attempts: Mapped[int] = mapped_column(default=0)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class FixedIndicatorBlock(Base):
+    __tablename__ = "market_fixed_indicator_blocks"
+    run_id: Mapped[str] = mapped_column(ForeignKey("market_fixed_indicator_runs.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    end: Mapped[int] = mapped_column(BigInteger)
+    checkpoint: Mapped[dict] = mapped_column(JSON)
+    checksum: Mapped[str] = mapped_column(String(64))
+    content: Mapped[bytes] = mapped_column(LargeBinary)
+
+
 class CompositeReadAttempt(Base):
     __tablename__ = "market_composite_read_attempts"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
@@ -435,7 +469,8 @@ def immutable_dataset_identity(db, flush_context, instances):
 
     for row in db.deleted:
         if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, SourceMinute, CompositeMinute,
-                            CompositeReadAttempt, CompositeMinuteInput, CompositeAggregateBar)):
+                            CompositeReadAttempt, CompositeMinuteInput, CompositeAggregateBar,
+                            FixedIndicatorRun, FixedIndicatorBlock)):
             raise ValueError("Confirmed minute inputs and audit cannot be deleted by runtime writers")
         if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob, HistoryArtifactBlock, HistoryArtifact,
                             HistoryReclamation, DatasetReclamation, HistoryReadAttempt)):
@@ -449,9 +484,13 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
-        if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, CompositeMinuteInput, CompositeAggregateBar)) and any(
+        if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, CompositeMinuteInput, CompositeAggregateBar, FixedIndicatorBlock)) and any(
                 attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Confirmed minute revisions and input audit are immutable")
+        if isinstance(row, FixedIndicatorRun) and any(state.attrs[key].history.has_changes() for key in (
+                "id", "group_key", "history_version_id", "revision_id", "timeframe", "spec", "algorithm",
+                "input_revision", "target_end", "parent_id", "prefix_end")):
+            raise ValueError("Fixed indicator input and inherited prefix are immutable")
         if isinstance(row, CompositeAggregateTask) and any(state.attrs[key].history.has_changes()
                 for key in ("revision_id", "timeframe")):
             raise ValueError("Composite aggregation task identity is immutable")

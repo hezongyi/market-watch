@@ -47,6 +47,8 @@ export type IndicatorResult = {
   }[];
 };
 export type ChartData = {
+  pending?: string[];
+  series_kind?: string;
   history_revision: string;
   bars: Bar[];
   future: { start: number; end: number }[];

@@ -223,6 +223,7 @@ function barsOf(result, res, ticker) {
   });
 }
 const managedSessions = new Map();
+const fixedIndicatorPending = new Map();
 const maintenanceAsked = new Set();
 const cache = new Map();
 function datasetGeometry(ticker, res) {
@@ -625,6 +626,8 @@ const feed = {
         let rows=[], boundary=false, fixed={};
         for (let partition=0; rows.length<requested && partition<32; partition++) {
           const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed});
+          if (identity.spec) fixedIndicatorPending.set(historyKey,
+            page.indicator_progress?.some(item=>item.status!=='complete') || false);
           if(page.bars?.length)
             fixedHistoryStarts.set(historyKey,Math.min(fixedHistoryStarts.get(historyKey)??Infinity,page.bars[0].start));
           rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
@@ -632,7 +635,11 @@ const feed = {
           boundary=!page.has_more;
           if (page.pending?.length) {
             send({type:'status',text:page.pending.join('；')});
-            boundary=false; break;
+            // Indicator initialization is asynchronous; retain pagination and
+            // let subscription review redraw as immutable output progresses.
+            if (!identity.spec || !page.indicator_progress?.length) {
+              boundary=false; break;
+            }
           }
           if (boundary) break;
           const next=page.next_before;
@@ -716,7 +723,8 @@ const feed = {
     const identity=decode(s.ticker);
     if(identity.symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) return;
     const historyKey=s.ticker+'|'+res+(identity.series_kind==='provider' ? '|'+(s.mw_window || '') : '');
-    const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(historyKey)||0,revision:null};
+    const sub={symbol:s.ticker,res,cb,reset,last:lastHistory.get(historyKey)||0,revision:null,
+      initialIndicatorPending:fixedIndicatorPending.get(historyKey) || false};
     subscriptions.set(id,sub);
     // Keep history corrections subscribed, but never append a latest tick
     // across the gap between a historical window and the realtime tail.
@@ -1066,8 +1074,22 @@ async function tick() {
         });
         const bars = barsOf(result, first.res, first.symbol);
         const check = result.history_check;
+        const progressBoundary = first.historyBefore || check?.before;
+        const indicatorProgress = JSON.stringify((result.indicator_progress || []).map(item =>
+          [Math.min(item.cursor,progressBoundary ?? item.cursor),
+            item.cursor < (progressBoundary ?? item.cursor) ? 'pending' : 'ready']));
         let needsReload = group.some(sub=>sub.needsHistoryReload);
         for (const sub of group) {
+          if (identity.spec && sub.initialIndicatorPending && result.indicator_progress?.every(item=>item.status==='complete')) {
+            sub.initialIndicatorPending = false;
+            sub.needsHistoryReload = true;
+            needsReload = true;
+          }
+          if (identity.spec && sub.indicatorProgress && sub.indicatorProgress !== indicatorProgress) {
+            sub.needsHistoryReload = true;
+            needsReload = true;
+          }
+          sub.indicatorProgress = indicatorProgress;
           const changed =
             check &&
             sub.historyBefore === check.before &&
@@ -1095,6 +1117,7 @@ async function tick() {
         if (needsReload && await reloadHistory(symbol, first.res))
           for (const sub of group) sub.needsHistoryReload = false;
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: "" });
+        if (result.pending?.length) send({type:'status',text:result.pending.join('；')});
       } catch (e) {
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: String(e) });
       }
@@ -1658,6 +1681,7 @@ function boot(
       lastHistory.clear();
       firstHistory.clear();
       fixedHistoryStarts.clear();
+      fixedIndicatorPending.clear();
       indicatorHistoryNeeds.clear();
       alertCalculationOrigins.clear();
       managedSessions.clear();

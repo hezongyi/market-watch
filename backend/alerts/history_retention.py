@@ -23,6 +23,8 @@ from .storage import (
     CompositeRevision,
     DatasetMaintenance,
     DatasetReclamation,
+    FixedIndicatorBlock,
+    FixedIndicatorRun,
     HistoryArtifact,
     HistoryArtifactBlock,
     HistoryChunk,
@@ -72,6 +74,10 @@ def reference_values(row):
         return {"dataset_id": row.dataset_id}
     if isinstance(row, CompositeRevision):
         return {"history_version_id": row.history_version_id}
+    if isinstance(row, FixedIndicatorRun):
+        from sqlalchemy import inspect
+
+        return {"history_version_id": row.history_version_id} if not inspect(row).persistent else None
     if isinstance(row, Watch):
         return {"instrument_id": row.instrument_id, "rule": row.rule}
     if isinstance(row, ChartAlertVersion):
@@ -200,7 +206,8 @@ def references(db, dataset_id):
         add("demand", dataset.instrument_id, "图表持续维护计划")
     # New FK-backed modules (e.g. composites) cannot be accidentally omitted.
     owned = {DatasetMaintenance.__table__.name, DatasetReclamation.__table__.name,
-             HistoryVersion.__table__.name, HistoryRun.__table__.name, "market_history_read_attempts"}
+             HistoryVersion.__table__.name, HistoryRun.__table__.name, FixedIndicatorRun.__table__.name,
+             "market_history_read_attempts"}
     for table in MarketDataset.metadata.sorted_tables:
         if table.name in owned:
             continue
@@ -238,10 +245,13 @@ def reclaim(db, dataset_id, request_id):
     versions = list(db.scalars(select(HistoryVersion.id).where(HistoryVersion.dataset_id == dataset_id,
         ~select(HistoryReclamation.version_id).where(HistoryReclamation.version_id == HistoryVersion.id).exists())))
     artifacts = select(HistoryArtifact.id).where(HistoryArtifact.version_id.in_(versions))
+    indicator_runs = select(FixedIndicatorRun.id).where(FixedIndicatorRun.history_version_id.in_(versions))
     candidates = list(db.scalars(select(HistoryChunk.content_id).where(
         HistoryChunk.version_id.in_(versions), HistoryChunk.content_id.is_not(None)).distinct()))
     summary = {"dataset_id": dataset_id, "request_id": request_id, "versions": len(versions), "deleted": {}}
     for model, predicate in (
+        (FixedIndicatorBlock, FixedIndicatorBlock.run_id.in_(indicator_runs)),
+        (FixedIndicatorRun, FixedIndicatorRun.history_version_id.in_(versions)),
         (HistoryArtifactBlock, HistoryArtifactBlock.artifact_id.in_(artifacts)),
         (HistoryArtifact, HistoryArtifact.version_id.in_(versions)),
         (HistoryChunk, HistoryChunk.version_id.in_(versions)),

@@ -141,20 +141,25 @@ def aggregate_tick(revision_id=None, timeframe=None):
     return True
 
 
-def read(db, revision_id, frame, input_revision, *, before, count, now):
+def read(db, revision_id, frame, input_revision, *, before, count, now, after=None, newest_first=True):
     """None means still preparing; [] means a fully processed empty tail."""
     task = db.get(CompositeAggregateTask, (revision_id, frame))
     if not task or task.applied_input_revision < input_revision:
         return None
-    latest = select(CompositeAggregateBar.start, func.max(CompositeAggregateBar.input_revision).label("latest")).where(
+    latest_query = select(CompositeAggregateBar.start, func.max(CompositeAggregateBar.input_revision).label("latest")).where(
         CompositeAggregateBar.revision_id == revision_id, CompositeAggregateBar.timeframe == frame,
         CompositeAggregateBar.input_revision <= input_revision, CompositeAggregateBar.start < before
-    ).group_by(CompositeAggregateBar.start).subquery()
+    )
+    if after is not None:
+        latest_query = latest_query.where(CompositeAggregateBar.start >= after)
+    latest = latest_query.group_by(CompositeAggregateBar.start).subquery()
     query = select(CompositeAggregateBar).join(latest, and_(
         CompositeAggregateBar.start == latest.c.start, CompositeAggregateBar.input_revision == latest.c.latest)).where(
             CompositeAggregateBar.revision_id == revision_id, CompositeAggregateBar.timeframe == frame)
     output = []
-    for row in reversed(list(db.scalars(query.order_by(CompositeAggregateBar.start.desc()).limit(count)))):
+    ordering = CompositeAggregateBar.start.desc() if newest_first else CompositeAggregateBar.start
+    selected = list(db.scalars(query.order_by(ordering).limit(count)))
+    for row in reversed(selected) if newest_first else selected:
         bar = copy.deepcopy(row.data)
         bar["input_revision"] = input_revision
         bar["time_closed"] = bar["end"] <= now

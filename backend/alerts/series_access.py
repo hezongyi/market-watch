@@ -91,8 +91,7 @@ def chart_data(db, body):
     from .history_artifacts import chart_page as history_page
     from .market_data import renew_demand
 
-    if body.indicators:
-        raise ValueError("固定历史与组合指标正在接入完整预热链路，不能按当前页面截断计算")
+    stamp = now_ms()
     meta = metadata(db, body.instrument, body.series_kind)
     if body.series_kind == "history":
         parent = db.get(HistoryVersion, body.instrument)
@@ -111,7 +110,7 @@ def chart_data(db, body):
             raise ValueError("组合尚未建立；请从图表实际使用入口打开")
         page = composite_page(db, composite.id, body.timeframe, before=body.before, count=body.limit,
             revision_id=body.composite_revision_id, input_revision=body.input_revision,
-            provisional=body.provisional and body.input_revision is None)
+            provisional=body.provisional and body.input_revision is None, now=stamp)
         inst = db.get(Instrument, composite.instrument_id)
         if body.client:
             renew_demand(db, body.client, inst)
@@ -123,11 +122,24 @@ def chart_data(db, body):
             if body.timeframe == "MN":
                 date = date.replace(day=1)
             bar["chart_time"] = int(datetime.combine(date, datetime.min.time(), timezone.utc).timestamp() * 1000)
+    indicators, indicator_progress = [], []
+    if body.indicators:
+        from .fixed_indicators import chart_results
+
+        indicators, indicator_progress = chart_results(db, page, body.indicators,
+            provisional=body.provisional and body.input_revision is None, stamp=stamp)
+        if any(item["status"] != "complete" for item in indicator_progress):
+            page["pending"].append("指标正在从固定输入起点初始化或修复；已计算区间可读，未完成区间不截断预热")
+    page["indicator_progress"] = indicator_progress
+    if indicator_progress:
+        page["history_revision"] = hashlib.sha256(json.dumps([page["history_revision"],
+            [[item["run_id"], item["cursor"]] for item in indicator_progress]], sort_keys=True).encode()).hexdigest()
     check = history_check(db, page, body, meta)
     return {**page, "history_check": check, "basis": meta["basis"], "calendar": meta["calendar"], "precision": meta["precision"],
         "volume_kind": meta["volume_kind"], "volume_unit": meta["volume_unit"],
-        "indicators": [], "future": future_grid(inst, body.timeframe, page["bars"][-1]["end"]) if page["bars"] else [],
-        "bounded_history": True, "as_of": now_ms(), "series_kind": body.series_kind, "symbol": meta["symbol"]}
+        "indicators": indicators, "indicator_progress": indicator_progress,
+        "future": future_grid(inst, body.timeframe, page["bars"][-1]["end"]) if page["bars"] else [],
+        "bounded_history": True, "as_of": stamp, "series_kind": body.series_kind, "symbol": meta["symbol"]}
 
 
 def history_check(db, page, body, meta):
@@ -143,7 +155,9 @@ def history_check(db, page, body, meta):
 
     next_before = page["bars"][-1]["start"]
     before = body.revision_before or next_before
-    after = body.revision_after
+    # Recursive dependencies include the fixed prefix preceding visible prices.
+    # Corrections there must reset studies even if loaded OHLC is unchanged.
+    after = page["origin"] if body.indicators else body.revision_after
 
     def fingerprint(boundary):
         if body.series_kind == "history":
@@ -159,6 +173,11 @@ def history_check(db, page, body, meta):
                 CompositeMinuteInput.start >= max(0, floor), CompositeMinuteInput.start < cutoff))
             facts = [page["revision_id"], page["history_version_id"], page["rule_version"],
                      body.timeframe, changed or 0]
+        if body.indicators:
+            from .indicator_state import ALGORITHM
+
+            facts += [ALGORITHM, body.indicators,
+                      [min(item["cursor"], boundary) for item in page.get("indicator_progress", [])]]
         return hashlib.sha256(json.dumps(facts, sort_keys=True).encode()).hexdigest()
 
     revision = fingerprint(before)
@@ -172,22 +191,30 @@ def export_page(db, body):
 
     from .chart_api import DataQuery
 
-    before, bars = body.end, []
+    before, bars, indicators = body.end, [], {}
     revision, inputs = body.composite_revision_id, body.input_revision
     for _ in range(32):
         page = chart_data(db, DataQuery(instrument=body.instrument, series_kind=body.series_kind,
             timeframe=body.timeframe, before=before, limit=2000, indicators=body.indicators,
             provisional=False, composite_revision_id=revision, input_revision=inputs))
         if page.get("pending"):
-            raise HTTPException(409, "导出所需的固定历史周期产物尚未发布，请等待相应周期完成")
+            # Return the pending command result so the enclosing transaction
+            # commits indicator requests; raising here would roll them back.
+            return {**page, "export_pending": True}
         if body.series_kind == "composite":
             revision, inputs = page["revision_id"], page["input_revision"]
         bars = [bar for bar in page["bars"] if body.start <= bar["start"] < body.end] + bars
+        for indicator in page["indicators"]:
+            old = indicators.setdefault(indicator["id"], {**indicator, "series": [
+                {**series, "values": []} for series in indicator["series"]]})
+            for series, accumulated in zip(indicator["series"], old["series"]):
+                accumulated["values"] = [value for value in series["values"]
+                    if body.start <= value["time"] < body.end] + accumulated["values"]
         if len(bars) > 2000:
             raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
         cursor = page["next_before"]
         if cursor is None or cursor <= body.start:
-            return {**page, "bars": bars}
+            return {**page, "bars": bars, "indicators": list(indicators.values())}
         if cursor >= before:
             raise ValueError("行情导出分页没有推进")
         before = cursor

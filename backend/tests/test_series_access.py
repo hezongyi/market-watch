@@ -96,11 +96,20 @@ def test_fixed_history_stays_on_version_after_daily_head_and_retains_workspace_r
 
 
 def test_fixed_chart_never_silently_computes_indicator_on_page_prefix(database, monkeypatch):
+    from alerts.fixed_indicators import indicator_tick
+
     parent = fixture(database, monkeypatch)
-    with pytest.raises(HTTPException) as error:
-        data_sync(DataQuery(instrument=parent, series_kind="history", timeframe="M1", limit=2,
-            indicators=[{"name": "SMA", "version": "1", "params": {"period": 2}}]))
-    assert error.value.status_code == 422
+    query = DataQuery(instrument=parent, series_kind="history", timeframe="M1", limit=2,
+        indicators=[{"name": "SMA", "version": "1", "params": {"period": 2}}])
+    page = data_sync(query)
+    assert page["pending"] and page["indicators"][0]["series"][0]["values"] == []
+    run_id = page["indicator_progress"][0]["run_id"]
+    while indicator_tick(run_id):
+        pass
+    page = data_sync(query)
+    assert not page["pending"] and page["indicator_progress"][0]["status"] == "complete"
+    assert [value["time"] for value in page["indicators"][0]["series"][0]["values"]] == [
+        bar["start"] for bar in page["bars"]]
 
 
 def test_fixed_export_uses_original_version_and_composite_snapshot_without_demand(database, monkeypatch):
