@@ -19,6 +19,7 @@ MT4 实时留到后续；OANDA 故障只降级，不切源。目标仍 active。
 | 断线、401/429、单品种、浏览器恢复 | 已验证 | fault-pause-30s/120s、fault-restart、fault-unauthorized、fault-rate_limited、fault-single_symbol、browser-acceptance |
 | 真实规则到本地 signal/notification/outbox | 单样本已验证 | [561ms 本地信号](live-signal-runtime.json)，保持一个信号；外部 delivery disabled |
 | 持续完成柱规则计算 | 已建立，实际逐分钟推进；长期未完成 | [规则起点](sustained-m1-watches-start.json)、[当前规则](sustained-m1-watches-checkpoint.json)；04:08 起真实存在，不能回填之前无规则的时段 |
+| 持续逐规则状态观察 | 工具真实验证通过，独立48小时窗口已开始 | [24次采样含续期](rule-observer-validation.json)，两watch各推进2次；[新规则窗口](rules-observation-window.json)04:42:50UTC开始，每15秒只读采样，状态/暂停/缺失/跳变/失败均保留；首值不计执行，尚未满时长 |
 | 两活跃交易日、欧美段、跨日和黄金暂停/恢复 | 尚未达到时长 | [04:04:14 UTC 新窗口](sustained-observation-window.json)，计划至 2026-10-08；[原中断窗口](sustained-observation-window-interrupted.json)保留错误 |
 | 全窗口 p50/p95/p99 与缺失/失败/迟到分母 | 等待持续窗口 | backend receive、Chromium receive→browser、M1→confirmation/evaluation 分别记录；短负载不代替长期结果 |
 | 有界逐时段分母及观察分组 | 实际只读 PostgreSQL 快照通过 | [分段快照](sustained-live-report-checkpoint.json)、[9 个统计回归](sustained-report-tests.txt)；未观测/unknown/闭市/补数分别列出，伦敦纽约分组及黄金 NY17–18 均非官方会话证明 |
@@ -33,3 +34,4 @@ M1确认 p95 为 XAU 7.638s、EUR 11.237s，p99 为 XAU 10.485s、EUR 11.624s。
 规则连续活跃还需结合起点、当前last_event及长期观察判断，不能只凭阶段审计认定。
 浏览器62块，errors0、无心跳块0，原始不健康状态仍保留。此记录仅为短窗口进展。
 浏览器计划于10月8日04:04:14UTC结束；规则48小时窗口须独立延续并检查至04:09UTC之后。
+额外逐规则采样窗口计划至10月8日04:42:50UTC，不能向前回填；此窗口不改变原浏览器起止。

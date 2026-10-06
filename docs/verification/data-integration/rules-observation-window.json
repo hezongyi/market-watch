@@ -1,0 +1,34 @@
+{
+  "event": "started",
+  "at": 1791261770960,
+  "phase": "sustained",
+  "started_at": 1791261770867,
+  "planned_end": 1791434570867,
+  "planned_minutes": 2880,
+  "poll_interval_seconds": 15,
+  "authentication_renewal_minutes": 720,
+  "owned": {
+    "67575ffc-5d15-4e73-aa6b-f9b075700626": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+    "cab0a0df-6f35-4cad-a6a3-b989656cee7e": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD"
+  },
+  "host": "Ubuntu host observing local isolated Docker API",
+  "url": "http://127.0.0.1:16589",
+  "source_clock_offset_verified": false,
+  "started_at_utc": "2026-10-06T04:42:50.867000+00:00",
+  "planned_end_utc": "2026-10-08T04:42:50.867000+00:00",
+  "service": "market-watch-data-integration-rules.service",
+  "service_at_record": {
+    "MainPID": "2669988",
+    "ActiveState": "active",
+    "SubState": "running"
+  },
+  "branch": "feat/market-data-integration",
+  "implementation_base_commit": "cae7bf8cedea35e2673f256729b1b7e75895da82",
+  "observer_sha256": "f01cde69742c72960b6aab5f22adb89aa417d3544dead24c13aa951290c61317",
+  "summarizer_sha256": "398bd4863d83ebfea14b380f053f9a4fbaa227b8755263bd30d2c20476a73e63",
+  "raw": "artifacts/data-integration/rules-sustained.jsonl (ignored)",
+  "browser_window_preserved": "sustained-observation-window.json",
+  "scope": "additional independent 48-hour sampled rule observation; not backfilled to watch creation",
+  "two_trading_days_verified": false,
+  "mt4_deferred": true
+}

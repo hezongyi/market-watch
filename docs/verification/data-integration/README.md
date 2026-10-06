@@ -134,6 +134,36 @@ sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -
 浏览器计划结束为10月8日04:04:14UTC；持续规则的48小时计算窗口至少到04:09UTC后独立检查，
 不能将创建前的几分钟回填成实际规则执行。
 
+## 持续逐规则只读观察
+
+`scripts/observe_sustained_rules.py` 每15秒读取本实例的规则与live状态，只保留起点文件中的
+两个验收watch ID及已核实品种身份。记录last_event、暂停原因、tradeable、行情质量、连接世代、
+缺失规则/来源及HTTP失败；不创建/修改规则，也不重启采集。原始文件为忽略且0600权限的
+`artifacts/data-integration/rules-sustained.jsonl`，不含价格、账户目录或cookie/token。
+工具每12小时重新认证，每小时取得接收机NTP的offset/root distance/jitter测量；
+各轮采样还记录UTC与monotonic时间差，保留时钟跳变和长请求间隔。
+
+```bash
+cp docs/verification/data-integration/rule-observation.service ~/.config/systemd/user/market-watch-data-integration-rules.service
+systemctl --user daemon-reload
+systemctl --user start market-watch-data-integration-rules.service
+systemctl --user show market-watch-data-integration-rules.service -p MainPID -p ActiveState -p SubState
+.venv/bin/python scripts/summarize_sustained_rules.py artifacts/data-integration/rules-sustained.jsonl
+# 只停止本任务的规则观察；若停止整个验收实例，也先停止此service。
+systemctl --user stop market-watch-data-integration-rules.service
+```
+
+首次采样的last_event是基线，不计为本工具观察到的执行；跨分钟跳变只证明末尾状态已推进，
+不能推断跳过分钟逐次执行。`rule_close_to_poll_upper_bound`包含请求和15秒轮询，属于
+逐规则收盘到被观察的**上界**，不与后端阶段耗时混成同一分布。暂停/失败/缺失和未推进区间
+全部保留，规则列表与live列表为先后请求，不能冒充同一数据库快照。
+
+两分钟真实工具验证含一次认证续期、实际规则推进和NTP采样，见
+[规则观察工具验证](rule-observer-validation.json)。正式窗口起点/计划结束及PID见
+[规则窗口](rules-observation-window.json)，[当前摘要](rules-sustained-checkpoint.json)保留短窗口进展。
+该窗口是额外48小时逐规则观察，不能向前回填到04:08规则创建时刻，也不重置原浏览器窗口。
+此service无自动重启或开机启用，每次start/finish都追加记录；不把多个片段拼成无中断窗口。
+
 ## 当前结果与限制
 
 后端与 PostgreSQL 测试记录、截图、容器快照与故障 JSON 位于本目录。

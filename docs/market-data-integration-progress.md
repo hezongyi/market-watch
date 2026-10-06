@@ -322,3 +322,20 @@ unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证�
   补数、重复审计、规则起点、未来确认、负时差和DST分组；Ruff、diff检查通过。
 - 两交易日仍未完成。浏览器计划到10月8日04:04:14UTC，规则完整48小时需到04:09UTC后独立检查。
   来源账户日历适用性及供应商时钟偏差仍未证明，目标保持active。
+
+### 2026-10-06 04:44 UTC：逐规则长期观察
+
+- 现有pricing_confirmed审计未保存逐规则推进状态；补充宿主只读观察工具，每15秒读取两个
+  已拥有的验收watch，保留last_event、status/paused_reason、tradeable/quality、世代变化、
+  无观测或HTTP失败，以及轮询与UTC/monotonic时间差。只请求登录和GET，不修改业务状态。
+- [真实两分钟工具验证](verification/data-integration/rule-observer-validation.json)：24次采样、
+  一次续期、两规则各推进2次、失败0；每小时NTP采样机制首样本offset −2.214ms，
+  root distance 22.155ms、jitter8.845ms。未独立证明供应商clock offset。
+- 新工具7个定向回归通过，覆盖身份保密/缺失、基线不算执行、跳变不补造执行、暂停/失败、
+  状态回退/清空、分段重启及clock jump；Ruff、diff和文档本地链接检查通过。
+- 专用 `market-watch-data-integration-rules.service` PID2669988 active/running，无自动重启/enable。
+  [独立规则观察窗口](verification/data-integration/rules-observation-window.json)：
+  **2026-10-06 04:42:50.867UTC → 2026-10-08 04:42:50.867UTC**；
+  该窗口不回填到规则创建时间，不替换04:04浏览器窗口，后者PID2266365继续运行。
+- `rule_close_to_poll_upper_bound`包含15秒轮询，不能当成后端执行耗时，也不证明跳变中间的每次计算。
+  合并评估时仍保留后端分母、阶段审计及实际每规则状态。两交易日与来源会话适用性未完成。
