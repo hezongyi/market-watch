@@ -190,3 +190,22 @@ def test_provider_demands_survive_absent_browser_and_protect_dataset(database, m
     with database() as db:
         assert db.get(ProviderDataset, key) is not None
         assert db.scalar(select(func.count()).select_from(ProviderBar)) == 3
+
+
+def test_price_outside_reversed_ray_reports_geometry_range_not_indicator_warmup(database):
+    with database.begin() as db:
+        seed(db, [9, 9, 9], incomplete=2)
+        ident = create(db, 'reverse-ray-range', config(mode='intrabar', condition={
+            'relation': 'cross_up', 'right': {'kind': 'line', 'line': {
+                'kind': 'ray', 'points': [
+                    {'time': 60_000, 'index': 0, 'price': '10'},
+                    {'time': 0, 'index': -1, 'price': '10'},
+                ],
+            }},
+        }), at=120_000).id
+        assert evaluate(db, ident, now=180_001) == []
+        row = db.get(ChartAlert, ident)
+        assert row.health == 'warming'
+        assert '画线有效范围' in row.health_reason
+        assert '指标' not in row.health_reason
+        assert row.count == 0 and row.state == {}

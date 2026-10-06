@@ -1,6 +1,6 @@
 # 图表告警接续开发记录
 
-2026-10-06。目标保持完整：按 [正式方案](advanced-charts-alert-system-plan-20261006.md) 开发并真实验收后交付。当前是前后端接入及真实许可库探针检查点，**尚未达到完整实例交付门槛**。
+2026-10-06。目标保持完整：按 [正式方案](advanced-charts-alert-system-plan-20261006.md) 开发并真实验收后交付。最新已实际运行独立Ubuntu实例并完成主要验收。下面早期章节保留当时状态；**当前环境、结果与启动停止以 [真实实例验收记录](verification/chart-alerts/runtime-acceptance-20261006.md) 为准**。原Docker权限阻碍已通过系统既有docker组及 `sg docker -c` 解决。
 
 ## 工作区与基线
 
@@ -115,7 +115,7 @@ Compose增加可选 `notification-test` profile。`notification-sink`位于任�
 
 ```bash
 docker compose --env-file /tmp/mw-chart-alerts-acceptance/compose.env -p mw-chart-alerts-acceptance -f docs/verification/chart-alerts/compose.yaml --profile notification-test up -d notification-sink notification-worker
-docker compose --env-file /tmp/mw-chart-alerts-acceptance/compose.env -p mw-chart-alerts-acceptance -f docs/verification/chart-alerts/compose.yaml exec -T api python -c 'import urllib.request; print(urllib.request.urlopen("http://notification-sink:8080/records").read().decode())'
+# 不直接输出完整 /records，通知确认bearer token仅保留私有目录。
 ```
 
 以上sink记录只证明本地服务接受，不能显示为设备接收。完整结束时用本project的 `--profile notification-test down`停止profile及常规服务；保留数据库volume，不清理其他项目。

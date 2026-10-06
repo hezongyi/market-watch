@@ -2,7 +2,7 @@
 name: mw-chart-alerts-acceptance
 services:
   pg:
-    image: postgres:17-alpine
+    image: public.ecr.aws/docker/library/postgres:17-alpine
     environment:
       POSTGRES_DB: chart_alerts_acceptance
       POSTGRES_USER: chart_alerts_acceptance
@@ -49,11 +49,27 @@ services:
         format: raw
     depends_on:
       migrate: {condition: service_completed_successfully}
+  managed-history-worker:
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.chart_history_worker"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      api: {condition: service_healthy}
+  aggregation-worker:
+    image: market-watch-api:chart-alerts-acceptance
+    command: ["python", "-m", "alerts.chart_aggregation_worker"]
+    env_file:
+      - path: /tmp/mw-chart-alerts-acceptance/api.env
+        format: raw
+    depends_on:
+      api: {condition: service_healthy}
   web:
     build:
       context: ../../../web
       args:
-        VITE_ADVANCED_CHART_ORIGIN: https://localhost:19444
+        VITE_ADVANCED_CHART_ORIGIN: https://127.0.0.1:19444
     image: market-watch-web:chart-alerts-acceptance
     depends_on: [api]
   chart-origin:
@@ -77,7 +93,7 @@ services:
         format: raw
     entrypoint: ["/bin/sh", "-c"]
     command:
-      - 'export CHART_ALERT_TEST_DATABASE_URL="$$ALERTS_DATABASE_URL"; PYTHONPATH=backend pytest -q backend/tests/test_chart_alert_postgres.py'
+      - 'export CHART_ALERT_TEST_DATABASE_URL="$$ALERTS_DATABASE_URL"; PYTHONPATH=backend pytest -q -p no:cacheprovider backend/tests/test_chart_alert_postgres.py'
     depends_on:
       pg: {condition: service_healthy}
   notification-sink:

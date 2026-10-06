@@ -11,8 +11,27 @@ from argon2 import PasswordHasher
 root = Path("/tmp/mw-chart-alerts-acceptance")
 root.mkdir(mode=0o700, exist_ok=True)
 os.chmod(root, 0o700)
+(root / "tls.conf").write_text("""resolver 127.0.0.11 valid=5s ipv6=off;
+upstream acceptance_web { zone acceptance_web 64k; server web:80 resolve; }
+upstream acceptance_chart { zone acceptance_chart 64k; server chart-origin:80 resolve; }
+server {
+  listen 443 ssl;
+  ssl_certificate /certs/cert.pem;
+  ssl_certificate_key /certs/key.pem;
+  location / { proxy_pass http://acceptance_web; proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto https; proxy_buffering off; proxy_read_timeout 3600s; }
+}
+server {
+  listen 444 ssl;
+  ssl_certificate /certs/cert.pem;
+  ssl_certificate_key /certs/key.pem;
+  location / { proxy_pass http://acceptance_chart; }
+}
+""")
+os.chmod(root / "tls.conf", 0o600)
 if (root / "api.env").exists():
-    raise SystemExit("Configuration exists; reuse it without resetting credentials.")
+    print("Refreshed TLS proxy configuration; existing credentials and certificate preserved.")
+    raise SystemExit(0)
 password, db_password = secrets.token_urlsafe(24), secrets.token_urlsafe(24)
 (root / "login.json").write_text(json.dumps({"password": password}))
 (root / "compose.env").write_text("MW_CHART_ALERTS_DB_PASSWORD=" + db_password + "\n")
@@ -27,20 +46,6 @@ config = {
     "ALERTS_PROVIDER_REQUEST_SECONDS": "30",
 }
 (root / "api.env").write_text("".join(f"{key}={value}\n" for key, value in config.items()))
-(root / "tls.conf").write_text("""server {
-  listen 443 ssl;
-  ssl_certificate /certs/cert.pem;
-  ssl_certificate_key /certs/key.pem;
-  location / { proxy_pass http://web:80; proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-Proto https; proxy_buffering off; proxy_read_timeout 3600s; }
-}
-server {
-  listen 444 ssl;
-  ssl_certificate /certs/cert.pem;
-  ssl_certificate_key /certs/key.pem;
-  location / { proxy_pass http://chart-origin:80; }
-}
-""")
 subprocess.run(
     [
         "openssl",

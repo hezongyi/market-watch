@@ -186,7 +186,9 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
             health(alert, "stale", "缺少完整收盘或中间 K 线，等待补齐")
             break
         if left[i] is None or config.condition.right and right[i] is None:
-            health(alert, "warming", "指标预热尚未完成")
+            reason = ("当前观察值不在画线有效范围内，等待范围内的新样本"
+                      if line and right[i] is None else "指标预热尚未完成")
+            health(alert, "warming", reason)
             continue
         sample = Observation(f"bar:{row['start']}" if config.mode == "close" else f"sample:{sequence}",
                              sequence, sequence, left[i], right[i], Decimal(str(row["close"])),
