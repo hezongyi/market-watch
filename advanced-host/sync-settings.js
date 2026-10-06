@@ -6,121 +6,235 @@ function chartSyncSettings(
   coordinator,
   readonly = false,
 ) {
-  let dialog, dialogEpoch, opener;
+  let dialog, dialogEpoch, opener, nativeClose, pending, dropdown;
   const cleanups = [];
+  function moveFocus(event) {
+    event.preventDefault();
+    const controls = [...dialog.querySelectorAll('button:not(:disabled),input:not(:disabled),[role="combobox"]')]
+      .filter(el => !el.hidden && el.getClientRects().length && el.getAttribute("aria-disabled") !== "true");
+    const index = controls.indexOf(doc.activeElement);
+    controls[(index + (event.shiftKey ? -1 : 1) + controls.length) % controls.length]?.focus();
+  }
   const modalKeyboard = (event) => {
     if (!dialog) return;
+    // The native window owns chart shortcuts. Keep modal keys in the modal.
     event.stopImmediatePropagation();
-    if (event.key === "Escape") {
+    if (dropdown) {
+      const items = [...dropdown.querySelectorAll('[role="option"]')];
+      const index = items.indexOf(doc.activeElement);
+      if (event.key === "Escape") { event.preventDefault(); closeOptions(true); }
+      else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+        event.preventDefault();
+        const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+          : (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+        items[next].focus();
+      } else if (["Enter", " "].includes(event.key)) {
+        event.preventDefault(); doc.activeElement.click();
+      } else if (event.key === "Tab") { closeOptions(true); moveFocus(event); }
+      return;
+    }
+    if (event.key === "Tab") moveFocus(event);
+    else if (event.key === "Escape") { event.preventDefault(); close(); }
+    else if (event.key === "Enter") {
       event.preventDefault();
-      close();
-    } else if (event.key === "Enter") {
-      event.preventDefault();
-      // Native chart shortcuts must not consume modal Enter, but focused
-      // buttons retain their own action (especially Cancel and Defaults).
-      const button = event.target.closest?.("button");
-      (button && dialog.contains(button)
-        ? button
+      const action = event.target.closest?.('button, [role="combobox"]');
+      (action && dialog.contains(action) ? action
         : dialog.querySelector('[data-action="confirm"]')).click();
+    } else if (["ArrowDown", "ArrowUp", " "].includes(event.key) && event.target.matches?.('[role="combobox"]')) {
+      event.preventDefault(); event.target.click();
     }
   };
-  // The library consumes Escape/Enter in its document keyboard manager.
-  // Intercept on the native window while our modal owns keyboard focus.
   doc.defaultView.addEventListener("keydown", modalKeyboard, true);
-  function close() {
-    dialog?.remove();
-    dialog = undefined;
+  function closeOptions(focus = false) {
+    if (!dropdown) return;
+    const button = dropdown._opener;
+    dropdown.remove(); dropdown = undefined;
+    button.setAttribute("aria-expanded", "false");
+    if (focus && button.isConnected) button.focus();
+  }
+  function release() {
+    closeOptions(); pending?.disconnect(); pending = undefined;
+    dialog = undefined; nativeClose = undefined;
     if (opener?.isConnected) opener.focus();
     opener = undefined;
   }
+  function close() {
+    if (nativeClose?.isConnected) nativeClose.click();
+    release();
+  }
   function open(button) {
-    close();
-    mapping.hide();
-    opener = button;
+    close(); mapping.hide(); opener = button;
+    // NoticeDialog does not load the native checkbox chunk on its own.
+    if (!doc.querySelector('[data-name="mw-native-checkbox-skin"]')) {
+      const skin = doc.createElement("link");
+      skin.rel = "stylesheet"; skin.dataset.name = "mw-native-checkbox-skin";
+      skin.href = new URL((globalThis.MW_CHART_LIBRARY_PATH || "/charting_library/") + "bundles/69437.2948ab6dbdff9ed7521d.css", location.href).href;
+      doc.head.appendChild(skin);
+    }
     dialogEpoch = coordinator.epoch();
     let draft = mapping.snapshot();
-    dialog = doc.createElement("dialog");
-    dialog.className = "mw-sync-settings";
-    dialog.dataset.name = "mw-sync-settings-dialog";
-    dialog.setAttribute("aria-labelledby", "mw-sync-settings-title");
-    dialog.innerHTML =
-      '<form method="dialog"><header><h2 id="mw-sync-settings-title">同步设置</h2><button type="button" data-action="close" aria-label="关闭同步设置">×</button></header>' +
-      "<fieldset><legend>范围映射</legend>" +
-      '<label>显示方式<select name="style"><option value="background">淡色背景</option><option value="rectangle">高低价矩形</option></select></label>' +
-      '<label>填充颜色<select name="colorMode"><option value="theme">跟随主题</option><option value="custom">自定义</option></select><input type="color" name="color" aria-label="自定义填充颜色"></label>' +
-      '<label>透明度<select name="transparencyMode"><option value="theme">主题默认</option><option value="custom">自定义</option></select></label>' +
-      '<div class="mw-transparency"><input type="range" name="transparencyRange" min="0" max="100" step="1" aria-label="透明度滑块"><label><input type="number" name="transparency" min="0" max="100" step="1" aria-label="透明度百分比">%</label></div>' +
-      '<label class="mw-label-checkbox"><input type="checkbox" name="priceLabels">显示高低价</label>' +
-      '<div class="mw-range-preview" aria-label="范围映射颜色预览"><span>颜色预览</span></div></fieldset>' +
-      "<p>柱宽同步：用户在图表上通过滚轮、按钮或快捷键缩放时，其他图跟随。与日期范围同步互斥。</p>" +
-      (readonly ? "<p>当前为只读视图，调整不会保存到工作区。</p>" : "") +
-      '<footer><button type="button" data-action="defaults">恢复默认</button><span></span><button type="button" data-action="cancel">取消</button><button type="button" data-action="confirm">确定</button></footer></form>';
-    const form = dialog.querySelector("form"),
-      field = (name) => form.elements.namedItem(name);
-    function reflect() {
-      for (const k of [
-        "style",
-        "colorMode",
-        "color",
-        "transparencyMode",
-        "transparency",
-      ])
-        field(k).value = draft[k];
-      field("transparencyRange").value = draft.transparency;
-      field("priceLabels").checked = draft.priceLabels;
-      field("priceLabels").disabled = draft.style !== "rectangle";
-      field("color").disabled = draft.colorMode !== "custom";
-      for (const k of ["transparencyRange", "transparency"])
-        field(k).disabled = draft.transparencyMode !== "custom";
-      const dark = widget.getTheme().toLowerCase() === "dark";
-      dialog.querySelector(".mw-range-preview").style.background =
-        mapping.fillColor(draft);
-      dialog.dataset.theme = dark ? "dark" : "light";
-    }
-    form.addEventListener("input", (event) => {
-      const el = event.target,
-        k = el.name;
-      if (k === "transparencyRange" || k === "transparency") {
-        if (el.value === "" || !Number.isFinite(Number(el.value))) return;
-        draft.transparency = Math.max(0, Math.min(100, Number(el.value)));
-        draft.transparencyMode = "custom";
-      } else if (k === "priceLabels") draft.priceLabels = el.checked;
-      else if (k in draft) draft[k] = el.value;
-      reflect();
-    });
-    const confirm = (event) => {
-      event.preventDefault();
-      if (dialogEpoch !== coordinator.epoch()) {
-        close();
-        return;
+    // Use the actual installed chart modal, including theme, drag, backdrop,
+    // focus management, close control and buttons. Only its form is host-owned.
+    widget.showNoticeDialog({ title: "同步设置", body: " ", callback: release });
+    pending = new MutationObserver(mount);
+    pending.observe(doc.body, { childList: true, subtree: true });
+    mount();
+    function mount() {
+      const shell = [...doc.querySelectorAll('[data-name="warning-dialog"]')]
+        .find(node => node.querySelector('[class*="title-"]')?.textContent === "同步设置");
+      if (!shell || dialog) return;
+      pending.disconnect(); pending = undefined;
+      dialog = shell;
+      shell.dataset.name = "mw-sync-settings-dialog";
+      shell.classList.add("mw-sync-settings");
+      shell.setAttribute("role", "dialog"); shell.setAttribute("aria-modal", "true");
+      const title = shell.querySelector('[class*="title-"]');
+      title.id = "mw-sync-settings-title"; shell.setAttribute("aria-labelledby", title.id);
+      nativeClose = shell.querySelector('[data-name="close"]');
+      nativeClose.dataset.action = "close"; nativeClose.setAttribute("aria-label", "关闭同步设置");
+      const content = shell.querySelector('[class*="content-"]'),
+        footer = shell.querySelector('[class*="footer-"]'),
+        template = footer.querySelector("button");
+      const form = doc.createElement("form"); form.className = "mw-sync-settings-form";
+      form.innerHTML =
+        '<section aria-labelledby="mw-range-appearance"><h3 id="mw-range-appearance">范围映射</h3>' +
+        '<label class="mw-setting-row"><span>显示方式</span><select name="style"><option value="background">淡色背景</option><option value="rectangle">高低价矩形</option></select></label>' +
+        '<label class="mw-setting-row"><span>填充颜色</span><div class="mw-setting-controls"><select name="colorMode"><option value="theme">主题默认</option><option value="custom">自定义</option></select><input type="color" name="color" aria-label="自定义填充颜色"></div></label>' +
+        '<label class="mw-setting-row"><span>透明度</span><select name="transparencyMode"><option value="theme">主题默认</option><option value="custom">自定义</option></select></label>' +
+        '<div class="mw-setting-row mw-transparency"><span></span><div class="mw-setting-controls"><input type="range" name="transparencyRange" min="0" max="100" step="1" aria-label="透明度滑块"><label><input type="number" name="transparency" min="0" max="100" step="1" aria-label="透明度百分比">%</label></div></div>' +
+        '<label class="mw-label-checkbox checkbox-vyj6oJxw baseline-vyj6oJxw"><span class="wrapper-GZajBGIm"><span class="view-GZajBGIm primary-GZajBGIm"><div class="box-vgla_e5o"><span aria-hidden="true" class="checkedMark-vgla_e5o"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path stroke="currentColor" stroke-width="2" d="M1 4L4 7L10 1"/></svg></span></div></span><input class="primary-GZajBGIm input-GZajBGIm" type="checkbox" name="priceLabels"><span class="focusOutline-GZajBGIm"></span></span><span class="label-vyj6oJxw primary-vyj6oJxw">在矩形外侧显示高低价</span></label>' +
+        '<div class="mw-range-preview" aria-label="范围映射颜色预览"><span>颜色预览</span></div></section>' +
+        '<section class="mw-sync-help"><h3>柱宽同步</h3><p>缩放任一图表，其他图表跟随柱宽变化。</p><p>同步开关位于布局菜单；柱宽与日期范围同步互斥。</p></section>' +
+        (readonly ? '<p class="mw-readonly-note">当前为只读视图，调整不会保存到工作区。</p>' : '');
+      form.querySelector('.checkedMark-vgla_e5o svg').style.display = "block";
+      content.replaceChildren(form);
+      const field = name => form.elements.namedItem(name);
+      const combos = new Map();
+      for (const select of form.querySelectorAll("select")) {
+        const wrapper = doc.createElement("span");
+        wrapper.className = "mw-native-select";
+        const control = doc.createElement("span");
+        control.className = "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX dropdown-RxdEkbF0 normal-RxdEkbF0";
+        control.setAttribute("role", "combobox"); control.tabIndex = 0;
+        control.setAttribute("aria-label", select.closest("label").querySelector("span").textContent);
+        control.setAttribute("aria-haspopup", "listbox"); control.setAttribute("aria-expanded", "false");
+        control.innerHTML = '<span class="mw-native-select-text"></span><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" d="m4 7 5 5 5-5"/></svg>';
+        select.before(wrapper); wrapper.append(select, control);
+        select.tabIndex = -1; select.setAttribute("aria-hidden", "true");
+        combos.set(select, control);
+        control.addEventListener("click", event => {
+          event.preventDefault(); event.stopPropagation();
+          if (select.disabled) return;
+          if (dropdown?._opener === control) { closeOptions(true); return; }
+          closeOptions();
+          dropdown = doc.createElement("div");
+          dropdown.className = "menuWrap-Kq3ruQo8 mw-sync-options";
+          dropdown.dataset.name = "mw-sync-options"; dropdown.setAttribute("role", "listbox");
+          dropdown.setAttribute("aria-label", control.getAttribute("aria-label")); dropdown._opener = control;
+          for (const option of select.options) {
+            const item = doc.createElement("div");
+            item.className = "item-jFqVJoPk" + (select.value === option.value ? " isActive-jFqVJoPk" : "");
+            item.setAttribute("role", "option"); item.setAttribute("aria-selected", String(select.value === option.value)); item.tabIndex = -1;
+            item.innerHTML = '<span class="labelRow-jFqVJoPk"><span class="label-jFqVJoPk"></span></span>';
+            item.firstElementChild.firstElementChild.textContent = option.text;
+            item.addEventListener("click", event => {
+              event.preventDefault(); event.stopPropagation();
+              select.value = option.value;
+              select.dispatchEvent(new doc.defaultView.Event("input", { bubbles: true }));
+              closeOptions(true);
+            });
+            dropdown.appendChild(item);
+          }
+          // Keep options inside the native modal's click/focus boundary.
+          // A body portal is treated as an outside click by NoticeDialog.
+          dialog.appendChild(dropdown);
+          const bounds = control.getBoundingClientRect(), shellBounds = dialog.getBoundingClientRect();
+          dropdown.style.left = bounds.left-shellBounds.left + "px"; dropdown.style.minWidth = bounds.width + "px";
+          dropdown.style.top = Math.min(bounds.bottom + 4, doc.defaultView.innerHeight - dropdown.offsetHeight - 8)-shellBounds.top + "px";
+          control.setAttribute("aria-expanded", "true");
+          dropdown.querySelector('[aria-selected="true"]').focus();
+        });
       }
-      if (!form.reportValidity()) return;
-      mapping.configure(draft);
-      close();
-    };
-    form.addEventListener("submit", confirm);
-    dialog
-      .querySelector('[data-action="confirm"]')
-      .addEventListener("click", confirm);
-    for (const action of ["close", "cancel"])
-      dialog
-        .querySelector(`[data-action="${action}"]`)
-        .addEventListener("click", close);
-    dialog
-      .querySelector('[data-action="defaults"]')
-      .addEventListener("click", () => {
-        draft = { ...mapping.defaults(), enabled: draft.enabled };
+      const number = field("transparency"), numberWrap = doc.createElement("span");
+      numberWrap.className = "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh mw-native-number";
+      number.className = "input-RUSovanF size-small-RUSovanF";
+      number.before(numberWrap); numberWrap.appendChild(number);
+      function reflect() {
+        for (const k of ["style", "colorMode", "color", "transparencyMode", "transparency"]) field(k).value = draft[k];
+        field("transparencyRange").value = draft.transparency;
+        field("priceLabels").checked = draft.priceLabels;
+        field("priceLabels").disabled = draft.style !== "rectangle";
+        field("priceLabels").setAttribute("aria-checked", String(draft.priceLabels));
+        const checkbox = shell.querySelector(".mw-label-checkbox");
+        checkbox.style.opacity = draft.style === "rectangle" ? "1" : ".45";
+        const box = checkbox.querySelector(".box-vgla_e5o");
+        box.classList.toggle("checked-vgla_e5o", draft.priceLabels);
+        box.classList.toggle("unchecked-vgla_e5o", !draft.priceLabels);
+        box.firstElementChild.hidden = !draft.priceLabels;
+        field("color").disabled = draft.colorMode !== "custom";
+        for (const k of ["transparencyRange", "transparency"]) field(k).disabled = draft.transparencyMode !== "custom";
+        for (const [select, control] of combos) {
+          control.firstElementChild.textContent = select.selectedOptions[0].text;
+          control.setAttribute("aria-disabled", String(select.disabled));
+        }
+        const dark = widget.getTheme().toLowerCase() === "dark";
+        const effective = { ...draft };
+        if (draft.colorMode === "theme") effective.color = dark ? "#5A91FF" : "#2962FF";
+        if (draft.transparencyMode === "theme") effective.transparency = dark ? 82 : 88;
+        field("color").value = effective.color;
+        field("transparency").value = field("transparencyRange").value = effective.transparency;
+        shell.querySelector(".mw-range-preview").style.background = mapping.fillColor(draft);
+      }
+      form.addEventListener("input", event => {
+        const el = event.target, k = el.name;
+        if (k === "transparencyRange" || k === "transparency") {
+          if (el.value === "" || !Number.isFinite(Number(el.value))) return;
+          draft.transparency = Math.max(0, Math.min(100, Number(el.value))); draft.transparencyMode = "custom";
+        } else if (k === "priceLabels") draft.priceLabels = el.checked;
+        else if (k in draft) draft[k] = el.value;
         reflect();
       });
-    dialog.addEventListener("cancel", (event) => {
-      event.preventDefault();
-      close();
-    });
-    doc.body.appendChild(dialog);
-    reflect();
-    dialog.showModal();
-    field("style").focus();
+      const confirm = event => {
+        event.preventDefault(); event.stopPropagation();
+        if (dialogEpoch !== coordinator.epoch()) { close(); return; }
+        if (!form.reportValidity()) return;
+        mapping.configure(draft); close();
+      };
+      form.addEventListener("submit", confirm);
+      const action = (text, name, handler, primary = false) => {
+        const node = template.cloneNode(true); node.type = "button";
+        for (const attr of ["name", "data-qa-id", "data-overflow-tooltip-text"]) node.removeAttribute(attr);
+        node.dataset.action = name;
+        node.querySelector('[class*="content-"]').textContent = text;
+        node.classList.toggle("primary-D4RPB3ZC", primary); node.classList.toggle("secondary-D4RPB3ZC", !primary);
+        node.addEventListener("click", handler); return node;
+      };
+      footer.replaceChildren(
+        action("恢复默认", "defaults", () => { draft = { ...mapping.defaults(), enabled: draft.enabled }; reflect(); }),
+        action("取消", "cancel", close), action("确定", "confirm", confirm, true));
+      form.appendChild(footer);
+      shell._mwReflect = reflect;
+      reflect();
+      doc.defaultView.requestAnimationFrame(() => {
+        if (!shell.isConnected) return;
+        const outer = shell.parentElement;
+        outer.style.transform = `translate(${Math.max(8, (doc.defaultView.innerWidth - outer.offsetWidth) / 2)}px, ${Math.max(8, (doc.defaultView.innerHeight - outer.offsetHeight) / 2)}px)`;
+        combos.get(field("style")).focus();
+      });
+    }
   }
+  const outsideOptions = event => {
+    if (dropdown && !dropdown.contains(event.target) && !dropdown._opener.contains(event.target)) closeOptions();
+  };
+  doc.addEventListener("pointerdown", outsideOptions, true);
+  const dismissOptions = () => closeOptions();
+  doc.addEventListener("scroll", dismissOptions, true);
+  doc.defaultView.addEventListener("resize", dismissOptions);
+  cleanups.push(() => {
+    doc.removeEventListener("pointerdown", outsideOptions, true);
+    doc.removeEventListener("scroll", dismissOptions, true);
+    doc.defaultView.removeEventListener("resize", dismissOptions);
+  });
   function extend() {
     const crosshair = doc.querySelector('input[value="syncCrosshairLabel"]'),
       row = crosshair?.closest('[data-role="menuitem"]');
@@ -137,7 +251,24 @@ function chartSyncSettings(
       entry.tabIndex = 0;
       entry.setAttribute("aria-label", label);
       entry.querySelector('[role="rowheader"]').textContent = label;
-      entry.querySelector('[role="cell"]')?.remove();
+      const info = entry.querySelector('[role="cell"]');
+      const purpose = name === "mw-bar-range-mapping"
+        ? "将鼠标所在K线的真实时间范围映射到同品种的小周期图表；高低价显示在矩形外侧对应极值K线的位置。需开启十字线同步。"
+        : "缩放任一图表时，其他图表跟随柱宽变化；支持滚轮、缩放按钮和快捷键。与日期范围同步互斥。";
+      info.title = purpose;
+      info.setAttribute("data-tooltip", purpose);
+      info.setAttribute("aria-label", purpose);
+      info.dataset.name = name + "-help";
+      info.setAttribute("data-tooltip-show-on-focus", "true");
+      info.tabIndex = 0;
+      info.setAttribute("role", "button");
+      // The native hover delegate also handles focus, but mixed pointer and
+      // keyboard entry can retain its hover listener after focus leaves.
+      info.addEventListener("blur", () => info.dispatchEvent(new doc.defaultView.MouseEvent("mouseleave")));
+      info.addEventListener("keydown", event => {
+        if (["Enter", " "].includes(event.key)) { event.preventDefault(); event.stopPropagation(); }
+      });
+      info.addEventListener("click", event => { event.preventDefault(); event.stopPropagation(); });
       const input = entry.querySelector("input");
       input.removeAttribute("value");
       input.removeAttribute("id");
@@ -176,8 +307,10 @@ function chartSyncSettings(
       const button = doc.createElement("button");
       button.type = "button";
       button.dataset.name = "mw-sync-settings";
-      button.className = "mw-sync-settings-entry";
-      button.textContent = "同步设置…";
+      button.className = row.className + " mw-sync-settings-entry";
+      button.classList.remove("switcher-aGeQPIIx");
+      button.style.color = doc.defaultView.getComputedStyle(row.querySelector('[role="rowheader"]')).color;
+      button.textContent = "同步设置";
       button.setAttribute("aria-haspopup", "dialog");
       button.addEventListener("click", (event) => {
         event.preventDefault();
@@ -193,9 +326,13 @@ function chartSyncSettings(
     if (el?.getAttribute(k) !== String(v)) el?.setAttribute(k, String(v));
   };
   function reflectMenu() {
+    if (dialog && !dialog.isConnected) release();
     if (dialog && dialogEpoch !== coordinator.epoch()) close();
     const state = coordinator.snapshot(),
       config = mapping.snapshot();
+    const settingsButton = doc.querySelector('[data-name="mw-sync-settings"]');
+    const nativeLabel = doc.querySelector('input[value="syncCrosshairLabel"]')?.closest('[data-role="menuitem"]')?.querySelector('[role="rowheader"]');
+    if (settingsButton && nativeLabel) settingsButton.style.color = doc.defaultView.getComputedStyle(nativeLabel).color;
     for (const [name, enabled, disabled, title] of [
       [
         "mw-bar-range-mapping",
@@ -273,6 +410,8 @@ function chartSyncSettings(
     mapping.subscribe(reflectMenu),
     coordinator.subscribe(() => {reflectMenu();doc.defaultView.requestAnimationFrame(reflectMenu);}),
   );
+  const themeChanged = () => { reflectMenu(); dialog?._mwReflect?.(); };
+  widget.subscribe("chart_theme_changed", themeChanged);
   const crosshairChanged = () => reflectMenu();
   widget.crosshairSync().subscribe(crosshairChanged);
   widget.subscribe("chart_load_requested", close);
@@ -285,6 +424,7 @@ function chartSyncSettings(
       cleanups.forEach((fn) => fn());
       widget.crosshairSync().unsubscribe(crosshairChanged);
       widget.unsubscribe("chart_load_requested", close);
+      widget.unsubscribe("chart_theme_changed", themeChanged);
       doc.removeEventListener("click", selectNativeSync, true);
       doc.removeEventListener("keydown", selectNativeSync, true);
     },

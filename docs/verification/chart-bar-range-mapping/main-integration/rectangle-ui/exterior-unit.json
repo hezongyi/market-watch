@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "count": 17,
+  "sourceSHA256": "77d9bd46641fc2b5f91b080d43e6d4831ca967282639bf9d18f41080cefce409",
+  "cases": [
+    {
+      "name": "earliest exact matching visible extrema"
+    },
+    {
+      "name": "hide and redraw cannot resurrect labels"
+    },
+    {
+      "name": "unmatched extrema hide"
+    },
+    {
+      "name": "metadata without native candles cannot anchor"
+    },
+    {
+      "name": "mismatched native candles cannot anchor"
+    },
+    {
+      "name": "offscreen earliest bar excluded"
+    },
+    {
+      "name": "inverted scale exterior sides"
+    },
+    {
+      "name": "vertical viewport disjoint hides all"
+    },
+    {
+      "name": "actual legend bounds hide tags"
+    },
+    {
+      "name": "dense adjacent candle occupying only leader hides tag"
+    },
+    {
+      "name": "legend occupying only leader hides tag"
+    },
+    {
+      "name": "zero-width half-open time intersection excluded"
+    },
+    {
+      "name": "canvas restoration on thrown rendering"
+    },
+    {
+      "name": "configure and dispose clean label state"
+    },
+    {
+      "name": "one-tick earlier high cannot replace exact high"
+    },
+    {
+      "name": "nearby tick without exact high hides"
+    },
+    {
+      "name": "one-tick earlier low cannot replace exact low"
+    }
+  ]
+}

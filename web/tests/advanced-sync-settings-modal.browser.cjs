@@ -72,6 +72,29 @@ const report = {
       });
     }
     let dialog = await open();
+    const focus = () => dialog.evaluate(el => el.contains(el.ownerDocument.activeElement));
+    for (const key of ['Tab','Shift+Tab']) {
+      for(let i=0;i<20;i++){await page.keyboard.press(key);assert.ok(await focus(),'focus remains in native modal');}
+    }
+    const combo = dialog.getByRole('combobox',{name:'显示方式'});
+    await combo.focus();await page.keyboard.press('Enter');
+    await native.getByRole('listbox',{name:'显示方式'}).waitFor({state:'visible'});
+    await page.keyboard.press('Tab');
+    await native.getByRole('listbox',{name:'显示方式'}).waitFor({state:'hidden'});
+    assert.ok(await focus());
+    // Exercise actual option clicks: the hidden select alone cannot detect
+    // native NoticeDialog outside-click dismissal of a body portal.
+    for(const name of ['淡色背景','高低价矩形']) {
+      await combo.click();await native.getByRole('option',{name,exact:true}).click();
+      assert.ok(await dialog.isVisible(),'choosing a style keeps the native modal open');
+      assert.equal(await dialog.locator('[name="style"]').inputValue(),name==='高低价矩形'?'rectangle':'background');
+    }
+    const box = await dialog.locator('.box-vgla_e5o').boundingBox();
+    assert.ok(box.width===18&&box.height===18,'native checkbox has its full square skin');
+    const mark=await dialog.locator('.checkedMark-vgla_e5o svg').boundingBox();
+    assert.ok(mark.x>=box.x&&mark.x+mark.width<=box.x+box.width&&mark.y>=box.y&&mark.y+mark.height<=box.y+box.height,'entire native check mark is inside its box');
+    await page.screenshot({path:OUT.replace('.json','-native.png')});
+    report.cases.push({name:'native checkbox and modal/dropdown keyboard focus',box});
     await tabTo("defaults");
     await page.keyboard.press("Enter");
     assert.equal(await dialog.isVisible(), true);

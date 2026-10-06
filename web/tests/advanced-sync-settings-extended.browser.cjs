@@ -55,9 +55,17 @@ const report = { at: new Date().toISOString(), cases: [], errors: [] };
       return v;
     };
     const labels = () =>
-      native
-        .locator('[data-name="mw-range-price-rail"]')
-        .evaluateAll((es) => es.map((e) => e.textContent));
+      host.evaluate(() => Array.from({length:widget.chartsCount()}, (_,i) =>
+        MWBarRangeMapping.labels(widget.chart(i)).filter(tag=>tag.visible).map(tag => tag.text).join("")));
+    const verifyTargetLabels = async () => {
+      const tags=await host.evaluate(()=>MWBarRangeMapping.labels(widget.chart(1)));
+      assert.equal(tags.length,2,'both exterior prices have diagnostics');
+      for(const tag of tags) {
+        if(!tag.visible)assert.ok(['occupied','unmatched-extreme','outside-pane'].includes(tag.reason));
+        else assert.ok(tag.box.y+tag.box.height<=tag.boundary-7||tag.box.y>=tag.boundary+7);
+      }
+      return tags;
+    };
     await host.evaluate(() =>
       MWSyncCoordinator.configure({ date: false, barWidth: true, time: false }),
     );
@@ -202,14 +210,13 @@ const report = { at: new Date().toISOString(), cases: [], errors: [] };
         range: widget.chart(i).getVisibleRange(),
       })),
     }));
-    assert.match((await labels())[1], /高 /);
+    await verifyTargetLabels();
     await host.evaluate(() =>
       widget.chart(1).getSeries().changePriceScale("new-left"),
     );
     await page.waitForTimeout(200);
     await f.hoverLast(0);
-    assert.match((await labels())[1], /高 /);
-    record("left axis information rail");
+    record("exterior labels with native left axis",{tags:await verifyTargetLabels()});
     // The installed vendor rejects no-scale on the only main price source.
     // Left-axis coverage proves right-axis absence without an invalid state.
     await host.evaluate(() =>
@@ -220,21 +227,16 @@ const report = { at: new Date().toISOString(), cases: [], errors: [] };
     );
     await page.waitForTimeout(300);
     await f.hoverLast(0);
-    assert.match((await labels())[1], /高 /);
-    record("subpane rail", { study });
+    record("exterior labels with subpane", { study,tags:await verifyTargetLabels() });
     await host.evaluate(() => widget.chart(1)._chartWidget.toggleFullscreen());
     await page.waitForTimeout(300);
     const rect = await host.evaluate(() => {
       const cw = widget.chart(1)._chartWidget,
-        p = cw.paneWidgets().find((p) => p.containsMainSeries()),
-        r = p.canvasElement().getBoundingClientRect(),
-        rail = cw._parent
-          .querySelector('[data-name="mw-range-price-rail"]')
-          .getBoundingClientRect();
-      return { paneBottom: r.bottom, railTop: rail.top };
+        pane = cw.paneWidgets().find(p => p.containsMainSeries()).canvasElement().getBoundingClientRect();
+      return {pane:{left:pane.left,right:pane.right}, axes:MWBarRangeMapping.labels(widget.chart(1)).filter(tag=>tag.visible)};
     });
-    assert.ok(rect.paneBottom <= rect.railTop);
-    record("maximized chart rail", { rect });
+    for(const tag of rect.axes) assert.ok(tag.box.y+tag.box.height<=tag.boundary-7 || tag.box.y>=tag.boundary+7);
+    record("maximized chart exterior labels", { rect });
     await host.evaluate(() => widget.chart(1)._chartWidget.toggleFullscreen());
     await page.waitForTimeout(300);
     // Horizontal disjointness must never show fallback even when prices are valid.
@@ -262,7 +264,8 @@ const report = { at: new Date().toISOString(), cases: [], errors: [] };
     }));
     assert.equal(resources.sync.bindings, 4);
     assert.equal(resources.sync.pauses, 0);
-    assert.equal(resources.rails, 4);
+    assert.equal(resources.rails, 0);
+    assert.ok(await host.evaluate(() => MWBarRangeMapping.diagnostics().labelPanes) <= 4);
     record("20 layout cycles stable resources", { resources });
     // One automatic interval must persist an appearance-only edit.
     await host.evaluate(() => {

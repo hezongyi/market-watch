@@ -147,6 +147,7 @@ const report = { at: new Date().toISOString(), cases: [], errors: [] };
     assert.equal(cleanup.sync.pauses, 0);
     assert.equal(cleanup.mapping.bindings, 0);
     assert.equal(cleanup.mapping.rails, 0);
+    assert.equal(cleanup.mapping.labelPanes, 0);
     assert.equal(cleanup.rails, 0);
     record("actual native dispose cleanup", { cleanup });
     assert.deepEqual(report.errors, []);

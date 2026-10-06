@@ -69,9 +69,7 @@ const report = {
             internal = ts.points().valueAt(index);
           const pane = cw.paneWidgets().find((p) => p.containsMainSeries()),
             canvas = pane.canvasElement();
-          const rail = cw._parent.querySelector(
-            '[data-name="mw-range-price-rail"]',
-          );
+          const labels = MWBarRangeMapping.labels(c);
           const label = { ...cross._timeAxisView._rendererData };
           return {
             i,
@@ -92,7 +90,8 @@ const report = {
               : null,
             label: label.text,
             visible: !!cross.visible,
-            rail: rail?.textContent || "",
+            rail: labels.filter(tag=>tag.visible).map(tag => tag.text).join(""),
+            exteriorLabels: labels,
             range: c.getVisibleRange(),
             spacing: c.getTimeScale().barSpacing(),
             offset: c.getTimeScale().rightOffset(),
@@ -109,7 +108,7 @@ const report = {
         return { source, rows, resets: __stability.resets.length };
       };
       globalThis.__samplePaint = () => {
-        const rows = __cursorState().rows;
+        const state = __cursorState(), rows = state.rows;
         for (const row of rows) {
           const pane = widget
             .chart(row.i)
@@ -134,7 +133,7 @@ const report = {
           row.candlePixels = candlePixels;
         }
         if (__stability.samples.length < 1000)
-          __stability.samples.push({ at: performance.now(), rows });
+          __stability.samples.push({ at: performance.now(), source:state.source, mapper:MWBarRangeMapping.diagnostics(), rows });
         __stability.raf = requestAnimationFrame(__samplePaint);
       };
     });

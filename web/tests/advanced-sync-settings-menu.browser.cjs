@@ -30,9 +30,41 @@ const report = {
     const { native, page, host } = f;
     for (const theme of ["Dark", "Light"]) {
       await host.evaluate((theme) => widget.changeTheme(theme), theme);
+      await host.evaluate(()=>MWSyncCoordinator.configure({date:false,barWidth:false}));
       await native
         .getByRole("button", { name: "布局设置", exact: true })
         .click();
+      const alignment = await native.locator('[data-name="mw-sync-settings"]').evaluate(el => {
+        const label = document.querySelector('input[value="syncCrosshairLabel"]').closest('[data-role="menuitem"]').querySelector('[role="rowheader"]');
+        const rect = el.getBoundingClientRect();
+        return {text:el.textContent,textAlign:getComputedStyle(el).textAlign,justify:getComputedStyle(el).justifyContent,textX:rect.x+parseFloat(getComputedStyle(el).paddingLeft),nativeX:label.getBoundingClientRect().x,
+          color:getComputedStyle(el).color,nativeColor:getComputedStyle(label).color};
+      });
+      assert.equal(alignment.text,'同步设置');assert.equal(alignment.textAlign,'left');assert.equal(alignment.justify,'flex-start');
+      assert.ok(Math.abs(alignment.textX-alignment.nativeX)<1,'settings text aligns with native menu text');
+      assert.equal(alignment.color,alignment.nativeColor);
+      for (const name of ['mw-bar-range-mapping','mw-bar-width-sync']) {
+        const help = native.locator(`[data-name="${name}-help"]`);
+        const state = () => host.evaluate(() => [MWBarRangeMapping.snapshot().enabled,MWSyncCoordinator.snapshot().barWidth]);
+        const before = await state(), purpose = await help.getAttribute('aria-label');
+        await help.hover();
+        await native.locator('[class*="common-tooltip__body"]').filter({hasText:purpose}).waitFor({state:'visible'});
+        await native.waitForFunction(()=>{const t=document.querySelector('#common-tooltip-wrapper');return t&&getComputedStyle(t).opacity==='1'});
+        await help.click();await help.press('Enter');await help.press('Space');
+        assert.deepEqual(await state(),before,'help must not toggle synchronization');
+        await page.mouse.move(10,10);
+        await native.locator(`[data-name="${name}"]`).focus();
+        await page.keyboard.press('Tab');
+        assert.equal(await help.evaluate(el=>el.ownerDocument.activeElement===el),true);
+        await native.locator('[class*="common-tooltip__body"]').filter({hasText:purpose}).waitFor({state:'visible'});
+        await native.waitForFunction(()=>{const t=document.querySelector('#common-tooltip-wrapper');return t&&getComputedStyle(t).opacity==='1'});
+        await page.keyboard.press('Tab');
+        assert.equal(await help.evaluate(el=>el.ownerDocument.activeElement===el),false);
+        // Native tooltips hide with opacity; Playwright's "visible" ignores it.
+        await native.waitForFunction(()=>{const t=document.querySelector('#common-tooltip-wrapper');return !t||getComputedStyle(t).opacity==='0'});
+        assert.deepEqual(await state(),before);
+      }
+      report.cases.push({name:theme+' native alignment color and isolated hover/keyboard help',alignment});
       for (const enabled of [false, true]) {
         await host.evaluate((enabled) => {
           widget.crosshairSync().setValue(true);

@@ -91,9 +91,7 @@ let phase;
           const c = widget.chart(i),
             cw = c._chartWidget,
             p = cw.paneWidgets().find((p) => p.containsMainSeries()),
-            rail = cw._parent.querySelector(
-              '[data-name="mw-range-price-rail"]',
-            );
+            tags = MWBarRangeMapping.labels(c);
           const rect = (e) =>
             e &&
             (() => {
@@ -103,8 +101,8 @@ let phase;
           return {
             i,
             pane: rect(p.canvasElement()),
-            rail: rect(rail),
-            text: rail?.textContent,
+            labels: tags,
+            text: tags.filter(tag => tag.visible).map(tag => tag.text).join(""),
             spacing: c.getTimeScale().barSpacing(),
             range: c.getVisibleRange(),
             price: c
@@ -115,13 +113,19 @@ let phase;
           };
         }),
       );
-    const noOverlap = (rows) => {
-      for (const r of rows)
-        if (r.rail)
-          assert.ok(
-            r.pane.y + r.pane.height <= r.rail.y + 0.01,
-            "rail overlaps candles",
-          );
+    const noOverlap = rows => {
+      for (const row of rows) for (const tag of row.labels.filter(tag=>tag.visible)) {
+        assert.ok(tag.box.y+tag.box.height<=tag.boundary-7 || tag.box.y>=tag.boundary+7,"label must stay outside rectangle");
+        assert.ok(tag.box.x>=0 && tag.box.x+tag.box.width<=row.pane.width && tag.box.y>=0 && tag.box.y+tag.box.height<=row.pane.height);
+        assert.ok(Number.isFinite(tag.barTime),"label must match an accepted real bar");
+      }
+    };
+    const verifyLabels = rows => {
+      noOverlap(rows);
+      for(const row of rows) for(const tag of row.labels) {
+        assert.match(tag.text,tag.kind==='high'?/^高 /:/^低 /);
+        if(!tag.visible) assert.ok(['unmatched-extreme','outside-pane','occupied'].includes(tag.reason));
+      }
     };
     await menu();
     assert.equal(
@@ -251,9 +255,8 @@ let phase;
     noOverlap(rows);
     assert.equal(rows[0].text, "");
     assert.equal(rows[3].text, "");
-    assert.match(rows[1].text, /高 .*低 /);
-    assert.match(rows[2].text, /高 .*低 /);
-    record("formatted prices and source W1 exclusion", { rows });
+    verifyLabels(rows);
+    record("formatted exterior prices and source W1 exclusion", { rows });
     const geometryBefore = await geometry(),
       requests = f.history;
     await f.hoverLast(2);
@@ -264,7 +267,7 @@ let phase;
     await page.mouse.move(10, 10);
     await page.waitForTimeout(100);
     assert.ok((await geometry()).every((r) => r.text === ""));
-    record("leave clears content keeps rail");
+    record("leave clears exterior tags");
     await f.hoverLast(0);
     await menu();
     await page.waitForTimeout(100);
@@ -284,7 +287,7 @@ let phase;
       await f.hoverLast(0);
       rows = await geometry();
       noOverlap(rows);
-      assert.match(rows[1].text, /高 .*低 /);
+      verifyLabels(rows);
       record("axis mode " + mode, { rows });
     }
     for (const theme of ["Light", "Dark"]) {
@@ -309,7 +312,7 @@ let phase;
         alpha,
       );
       await f.hoverLast(0);
-      assert.match((await geometry())[1].text, /高 .*低 /);
+      verifyLabels(await geometry());
       record("transparency " + alpha, {
         color: await host.evaluate(() => MWBarRangeMapping.fillColor()),
       });
@@ -404,9 +407,18 @@ let phase;
     noOverlap(rows);
     record("narrow eight charts", { rows });
     await page.setViewportSize({ width: 1600, height: 1000 });
+    await host.evaluate(async () => {
+      MWBarRangeMapping.configure({style:'rectangle',priceLabels:true});
+      for(let i=0;i<widget.chartsCount();i++) {
+        await widget.chart(i).setSymbol('MWP:BTCUSDT',{doNotActivateChart:true});
+        await widget.chart(i).setResolution(i?'5':'60',{doNotActivateChart:true});
+      }
+    });
+    await f.settle();await f.hoverLast(0);
+    assert.equal(await host.evaluate(()=>MWBarRangeMapping.diagnostics().labelPanes),7,'performance precondition exercises all seven label projections');
     await page.mouse.move(10, 10);
     await host.evaluate(() => {
-      globalThis.__metrics = { frames: [], frame: { work: 0, setters: {} },latencies:[],lastStep:undefined,lastFrame:performance.now() };
+      globalThis.__metrics = { frames: [], frame: { work: 0, setters: {} },latencies:[],labelDraws:0,maxLabelPanes:0,lastStep:undefined,lastFrame:performance.now() };
       const step=MWNativeSync.step;
       MWNativeSync.step=function(token,fn){const before=token?.chart.getTimeScale().barSpacing();const out=step(token,fn);if(token&&!token.cancelled&&token.chart.getTimeScale().barSpacing()!==before)__metrics.lastStep=performance.now();return out};
       const next = timestamp => {
@@ -437,10 +449,12 @@ let phase;
           return draw.apply(this, args);
         } finally {
           __metrics.frame.work += performance.now() - start;
+          const count=MWBarRangeMapping.diagnostics().labelPanes;
+          if(count){__metrics.labelDraws++;__metrics.maxLabelPanes=Math.max(count,__metrics.maxLabelPanes);}
         }
       };
     });
-    await activate(0);
+    await f.hoverLast(0);
     const finish = Date.now() + 60000;
     let turns = 0;
     while (Date.now() < finish) {
@@ -453,6 +467,7 @@ let phase;
         work = rows.map((r) => r.work).sort((a, b) => a - b);
       return {
         frames: rows.length,
+        labelDraws:__metrics.labelDraws,maxLabelPanes:__metrics.maxLabelPanes,
         p95: work[Math.floor(work.length * 0.95)],
         setterSamples: rows.flatMap((r) => Object.values(r.setters)).length,
         maxCalls: Math.max(...rows.flatMap((r) => Object.values(r.setters))),
@@ -463,6 +478,8 @@ let phase;
       };
     });
     assert.ok(report.performance.p95 <= 8);
+    assert.equal(report.performance.maxLabelPanes,7);
+    assert.ok(report.performance.labelDraws>100,'performance run must exercise labels');
     assert.ok(
       report.performance.setterSamples > 100,
       "performance run did not exercise setters",

@@ -36,7 +36,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(mapper.snapshot())), {
   version: 2,
   enabled: false,
   style: "background",
-  colorMode:"theme",color:"#FFFFFF",transparencyMode:"theme",transparency:88,priceLabels:true,
+  colorMode:"theme",color:"#5A91FF",transparencyMode:"theme",transparency:82,priceLabels:true,
 });
 mapper.configure({ enabled: true, style: "rectangle" });
 assert.equal(edits, 1);
@@ -279,6 +279,7 @@ console.log(
     save: () => {},
     scale: () => {},
     fillRect: (...r) => paints.push(r),
+    strokeRect: () => {},
     restore: () => {},
   };
   const info = {

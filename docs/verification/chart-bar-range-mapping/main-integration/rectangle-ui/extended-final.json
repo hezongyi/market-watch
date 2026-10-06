@@ -1,0 +1,407 @@
+{
+  "at": "2026-10-06T15:39:24.228Z",
+  "cases": [
+    {
+      "name": "time axis drag input",
+      "before": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "after": [
+        11.962732919254659,
+        11.962732919254659,
+        11.962732919254659,
+        11.962732919254659
+      ]
+    },
+    {
+      "name": "native zoom in button",
+      "before": [
+        11.962732919254659,
+        11.962732919254659,
+        11.962732919254659,
+        11.962732919254659
+      ],
+      "after": [
+        14.715212618751686,
+        14.715212618751686,
+        14.715212618751686,
+        14.715212618751686
+      ]
+    },
+    {
+      "name": "native zoom out button",
+      "before": [
+        14.715212618751686,
+        14.715212618751686,
+        14.715212618751686,
+        14.715212618751686
+      ],
+      "after": [
+        12.01024804005348,
+        12.01024804005348,
+        12.01024804005348,
+        12.01024804005348
+      ]
+    },
+    {
+      "name": "different symbol period bar width",
+      "values": [
+        13.211272844058827,
+        13.211272844058827,
+        13.211272844058827,
+        13.211272844058827
+      ]
+    },
+    {
+      "name": "different symbol range label excluded"
+    },
+    {
+      "name": "boundary -200",
+      "prior": {
+        "offset": -89,
+        "spacing": 13.211272844058827,
+        "range": {
+          "from": 1780358400,
+          "to": 1780444800
+        }
+      },
+      "result": {
+        "offset": -89,
+        "spacing": 14.53240012846471,
+        "range": {
+          "from": 1780358400,
+          "to": 1780444800
+        }
+      }
+    },
+    {
+      "name": "boundary 1000",
+      "prior": {
+        "offset": 34.74547874263733,
+        "spacing": 14.53240012846471,
+        "range": {
+          "from": 1791158400,
+          "to": 1795471200
+        }
+      },
+      "result": {
+        "offset": 31.404980675124847,
+        "spacing": 15.985640141311181,
+        "range": {
+          "from": 1791158400,
+          "to": 1795039200
+        }
+      }
+    },
+    {
+      "name": "Esc cancels"
+    },
+    {
+      "name": "defaults preserve enabled and sync",
+      "defaults": {
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "background",
+          "colorMode": "theme",
+          "color": "#5A91FF",
+          "transparencyMode": "theme",
+          "transparency": 82,
+          "priceLabels": true
+        },
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        }
+      }
+    },
+    {
+      "name": "exterior labels with native left axis",
+      "tags": [
+        {
+          "kind": "high",
+          "text": "高 1.13360",
+          "price": 1.1336,
+          "boundary": 268.5358489195573,
+          "visible": false,
+          "reason": "occupied",
+          "barTime": 1790812800000,
+          "barX": 453,
+          "box": {
+            "x": 418,
+            "y": 240.53584891955728,
+            "width": 70,
+            "height": 20
+          },
+          "leader": {
+            "x": 452.5,
+            "y": 260.5358489195573,
+            "width": 1,
+            "height": 5
+          }
+        },
+        {
+          "kind": "low",
+          "text": "低 1.11602",
+          "price": 1.11602,
+          "boundary": 375.28,
+          "visible": true,
+          "reason": "",
+          "barTime": 1791158400000,
+          "barX": 465,
+          "box": {
+            "x": 430,
+            "y": 383.28,
+            "width": 70,
+            "height": 20
+          },
+          "leader": {
+            "x": 464.5,
+            "y": 378.28,
+            "width": 1,
+            "height": 5
+          }
+        }
+      ]
+    },
+    {
+      "name": "exterior labels with subpane",
+      "study": "cGv00u",
+      "tags": [
+        {
+          "kind": "high",
+          "text": "高 1.13360",
+          "price": 1.1336,
+          "boundary": 178.35815507535887,
+          "visible": false,
+          "reason": "occupied",
+          "barTime": 1790812800000,
+          "barX": 453,
+          "box": {
+            "x": 418,
+            "y": 150.35815507535887,
+            "width": 70,
+            "height": 20
+          },
+          "leader": {
+            "x": 452.5,
+            "y": 170.35815507535887,
+            "width": 1,
+            "height": 5
+          }
+        },
+        {
+          "kind": "low",
+          "text": "低 1.11602",
+          "price": 1.11602,
+          "boundary": 249.24,
+          "visible": false,
+          "reason": "outside-pane",
+          "barTime": 1791158400000,
+          "barX": 465,
+          "box": {
+            "x": 430,
+            "y": 257.24,
+            "width": 70,
+            "height": 20
+          },
+          "leader": {
+            "x": 464.5,
+            "y": 252.24,
+            "width": 1,
+            "height": 5
+          }
+        }
+      ]
+    },
+    {
+      "name": "maximized chart exterior labels",
+      "rect": {
+        "pane": {
+          "left": 56,
+          "right": 1188
+        },
+        "axes": []
+      }
+    },
+    {
+      "name": "horizontal offscreen clears fallback"
+    },
+    {
+      "name": "20 layout cycles stable resources",
+      "resources": {
+        "sync": {
+          "epoch": 0,
+          "layoutEpoch": 25,
+          "mode": "barWidth",
+          "time": false,
+          "pauses": 0,
+          "bindings": 4,
+          "queued": 0
+        },
+        "rails": 0
+      }
+    },
+    {
+      "name": "automatic appearance-only save"
+    },
+    {
+      "name": "pending save A cannot clean host or native config B"
+    },
+    {
+      "name": "real Save menu persists B and late debounce stays clean"
+    },
+    {
+      "name": "reload restores choices without uniform spacing",
+      "saved": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "restored": {
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        },
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#5A91FF",
+          "transparencyMode": "custom",
+          "transparency": 40,
+          "priceLabels": true
+        }
+      }
+    },
+    {
+      "name": "failed save retains dirty and blocks original-ID overwrite"
+    },
+    {
+      "name": "recovery copy preserves config and sync without overwriting original",
+      "recovered": {
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#5A91FF",
+          "transparencyMode": "custom",
+          "transparency": 22,
+          "priceLabels": true
+        },
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        },
+        "id": "5e17f0a2-1c24-41e3-91ec-f2073e9ecd41"
+      }
+    }
+  ],
+  "errors": [],
+  "runningHostAsset": "host.6a46e53eefd5abae.js",
+  "controls": [
+    {
+      "name": "zoom",
+      "title": null,
+      "visible": true
+    }
+  ],
+  "lastHover": {
+    "i": 0,
+    "x": 366.1507785162326,
+    "y": 267.5,
+    "index": 292,
+    "contains": true,
+    "time": 1790812800,
+    "hit": {
+      "tag": "CANVAS",
+      "role": null,
+      "name": null,
+      "text": ""
+    },
+    "lastIndex": 292,
+    "source": {
+      "symbol": "MWP:EURUSD",
+      "resolution": "1M",
+      "chartTime": 1790812800000,
+      "start": 1790802000000,
+      "end": 1793480400000,
+      "high": 1.1336,
+      "low": 1.11602
+    }
+  },
+  "labelDebug": {
+    "mapper": {
+      "epoch": 57,
+      "source": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1M",
+        "chartTime": 1790812800000,
+        "start": 1790802000000,
+        "end": 1793480400000,
+        "high": 1.1336,
+        "low": 1.11602
+      },
+      "bindings": 4,
+      "rails": 0,
+      "labelPanes": 2,
+      "stores": [
+        {
+          "key": "MWP:EURUSD|1M|",
+          "size": 293,
+          "generation": 1
+        },
+        {
+          "key": "MWP:EURUSD|5|",
+          "size": 359,
+          "generation": 1
+        },
+        {
+          "key": "MWP:EURUSD|1W|",
+          "size": 369,
+          "generation": 1
+        },
+        {
+          "key": "MWP:EURUSD|1D|",
+          "size": 131,
+          "generation": 1
+        }
+      ]
+    },
+    "config": {
+      "version": 2,
+      "enabled": true,
+      "style": "rectangle",
+      "colorMode": "theme",
+      "color": "#5A91FF",
+      "transparencyMode": "theme",
+      "transparency": 82,
+      "priceLabels": true
+    },
+    "charts": [
+      {
+        "r": "1M",
+        "range": {
+          "from": 1730419200,
+          "to": 1817154000
+        }
+      },
+      {
+        "r": "1D",
+        "range": {
+          "from": 1781740800,
+          "to": 1792443600
+        }
+      }
+    ]
+  }
+}

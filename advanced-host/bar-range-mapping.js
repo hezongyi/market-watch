@@ -13,9 +13,9 @@ function chartBarRangeMapping({
     enabled: false,
     style: "background",
     colorMode: "theme",
-    color: "#FFFFFF",
+    color: "#5A91FF",
     transparencyMode: "theme",
-    transparency: 88,
+    transparency: 82,
     priceLabels: true,
   };
   const validate = (value) => {
@@ -47,7 +47,7 @@ function chartBarRangeMapping({
     epoch = 0,
     needsPrune = true;
   let doc, pointer, source, syncBinding;
-  const rails = new Map();
+
   const stores = new Map(),
     tickets = new Map(),
     bindings = new Map(),
@@ -91,7 +91,7 @@ function chartBarRangeMapping({
     source = undefined;
     pointer = undefined;
     epoch++;
-    for (const rail of rails.values()) rail.replaceChildren();
+    labelPaints.clear();
     cancelFrame(raf);
     raf = 0;
     repaint();
@@ -261,93 +261,89 @@ function chartBarRangeMapping({
   function notify() {
     for (const listener of listeners) listener({ ...config });
   }
-  function reserved(chart) {
-    return (
-      !disposed &&
-      config.enabled &&
-      config.style === "rectangle" &&
-      config.priceLabels &&
-      widget()?.crosshairSync().value() &&
-      timeSeries(chart)
-    );
-  }
-  function refreshRails() {
-    for (const [cw, rail] of rails) {
-      if (
-        ![...bindings.keys()].some((c) => c._chartWidget === cw && reserved(c))
-      ) {
-        rail.remove();
-        rails.delete(cw);
-        try {
-          cw.model().model().fullUpdate();
-        } catch {}
+  // Rectangle labels are painted by the existing pane overlay. Price-axis
+  // objects, width, autoscale and chart layout remain untouched.
+  const labelPaints = new Map();
+  function clearLabel(pane) { labelPaints.delete(pane); }
+  function priceLabels(chart, pane, context, projection) {
+    if (!config.priceLabels) return;
+    const { left, right, a, b, extrema, candles } = projection;
+    const width = pane.width?.() ?? model(chart).timeScale().width();
+    const height = pane.height(), dark = widget().getTheme().toLowerCase() === "dark";
+    const fontSize = model(chart).properties?.().childs().scalesProperties.childs().fontSize.value() || 12;
+    context.font = `${fontSize}px Arial,sans-serif`;
+    context.textBaseline = "middle";
+    const gap = 8, pad = 5, tagHeight = fontSize + 8;
+    const canvasRect = pane.canvasElement().getBoundingClientRect();
+    const legend = pane._legendWidget?.getElement?.();
+    // Reserve the actual legend's bounds, including multi-line study legends.
+    const obstacles = [...(pane.getElement?.().querySelectorAll('[data-name="legend"]') || [])]
+      .map(el => el.getBoundingClientRect())
+      .filter(rect => rect.width && rect.height)
+      .map(rect => ({left:rect.left-canvasRect.left,right:rect.right-canvasRect.left,
+        top:rect.top-canvasRect.top,bottom:rect.bottom-canvasRect.top}));
+    if (legend?.getBoundingClientRect) {
+      const rect = legend.getBoundingClientRect();
+      obstacles.push({left:rect.left-canvasRect.left,right:rect.right-canvasRect.left,
+        top:rect.top-canvasRect.top,bottom:rect.bottom-canvasRect.top});
+    }
+    const overlaps = (x,y,w,h,rect) => x < rect.right + 2 && x+w > rect.left-2
+      && y < rect.bottom+2 && y+h > rect.top-2;
+    const labels = [];
+    for (const [kind, name, price, boundary, extreme] of [
+      ["high","高",source.high,a,extrema.high],
+      ["low","低",source.low,b,extrema.low],
+    ]) {
+      const text = name + " " + chart.priceFormatter().format(price);
+      const item = { kind, text, price, boundary, visible:false, reason:"unmatched-extreme" };
+      labels.push(item);
+      if (!extreme) continue;
+      item.barTime = extreme.time; item.barX = extreme.x;
+      const w = Math.ceil(context.measureText(text).width) + pad*2;
+      const topEdge = boundary <= (kind === "high" ? b : a);
+      const y = topEdge ? boundary-gap-tagHeight : boundary+gap;
+      const x = Math.max(2, Math.min(width-w-2, extreme.x-w/2));
+      item.box = { x, y, width:w, height:tagHeight };
+      const leaderStart = topEdge ? y+tagHeight : boundary+3;
+      const leaderEnd = topEdge ? boundary-3 : y;
+      item.leader = { x:extreme.x-0.5, y:leaderStart, width:1, height:leaderEnd-leaderStart };
+      if (y < 2 || y+tagHeight > height-2 || w+4 > width || boundary < 0 || boundary > height) {
+        item.reason = "outside-pane"; continue;
       }
+      // Never move a label onto a different bar to find space. Check every
+      // loaded visible wick under its box, including bars outside the mapping.
+      const occupied = rect => overlaps(x,y,w,tagHeight,rect)
+        || overlaps(item.leader.x,item.leader.y,item.leader.width,item.leader.height,rect);
+      if (candles.some(occupied)
+        || obstacles.some(occupied)
+        || labels.some(other=>other!==item && other.visible && overlaps(x,y,w,tagHeight,
+          {left:other.box.x,right:other.box.x+other.box.width,top:other.box.y,bottom:other.box.y+other.box.height}))) {
+        item.reason = "occupied"; continue;
+      }
+      item.visible = true; item.reason = "";
+      context.fillStyle = dark ? "#1F1F1F" : "#FFFFFF";
+      context.fillRect(x,y,w,tagHeight);
+      context.strokeStyle = dark ? "#5A91FF" : "#2962FF";
+      context.lineWidth = 1; context.strokeRect(x+0.5,y+0.5,w-1,tagHeight-1);
+      context.fillStyle = dark ? "#DBDBDB" : "#131722";
+      context.fillText(text,x+pad,y+tagHeight/2);
+      // Both the label and its short leader have passed the collision checks.
+      context.beginPath(); context.moveTo(extreme.x,topEdge?y+tagHeight:y);
+      context.lineTo(extreme.x,topEdge?boundary-3:boundary+3); context.stroke();
     }
-    for (const chart of bindings.keys()) {
-      const cw = chart._chartWidget;
-      if (!reserved(chart) || rails.has(cw)) continue;
-      const rail = cw.ownerDocument().createElement("div");
-      rail.dataset.name = "mw-range-price-rail";
-      rail.className = "mw-range-price-rail";
-      rail.style.cssText =
-        "position:absolute;bottom:0;left:0;right:0;height:36px;box-sizing:border-box;pointer-events:none;display:flex;flex-direction:column;justify-content:center;padding:2px 8px;font:12px/16px Arial,sans-serif;overflow:hidden";
-      cw._parent.appendChild(rail);
-      rails.set(cw, rail);
-      cw.model().model().fullUpdate();
-    }
-  }
-  function clearLabel(pane) {
-    const rail = [...rails].find(([cw]) =>
-      cw.paneWidgets().includes(pane),
-    )?.[1];
-    if (rail?.childNodes.length) rail.replaceChildren();
-  }
-  function priceLabel(chart, pane, scale, value) {
-    const rail = rails.get(chart._chartWidget);
-    if (!rail || !source || !config.priceLabels) return;
-    const high = scale.priceToCoordinate(source.high, value),
-      low = scale.priceToCoordinate(source.low, value);
-    const text = (price, y, name) => ({
-      price: name + " " + chart.priceFormatter().format(price),
-      hint: y < 0 || y > pane.height() ? "（" + name + "价在屏外）" : "",
-    });
-    const lines = [text(source.high, high, "高"), text(source.low, low, "低")];
-    if (
-      rail.textContent !== lines.map((line) => line.price + line.hint).join("")
-    ) {
-      rail.replaceChildren(
-        ...lines.map(({ price, hint }) => {
-          const e = rail.ownerDocument.createElement("div");
-          e.style.cssText = "display:flex;white-space:nowrap;overflow:hidden";
-          const value = rail.ownerDocument.createElement("span");
-          value.dataset.name = "mw-range-price-value";
-          value.textContent = price;
-          value.style.flexShrink = "0";
-          const note = rail.ownerDocument.createElement("span");
-          note.textContent = hint;
-          note.style.cssText =
-            "min-width:0;overflow:hidden;text-overflow:ellipsis";
-          e.append(value, note);
-          e.title = price + hint;
-          return e;
-        }),
-      );
-    }
-    const dark = widget().getTheme().toLowerCase() === "dark";
-    rail.style.background = dark ? "#131722" : "#FFFFFF";
-    rail.style.color = dark ? "#D1D4DC" : "#131722";
+    labelPaints.set(pane, labels);
   }
   function fillColor(value = config) {
     const dark = widget().getTheme().toLowerCase() === "dark";
     const hex =
-      value.colorMode === "custom" ? value.color : dark ? "#FFFFFF" : "#6B7280";
+      value.colorMode === "custom" ? value.color : dark ? "#5A91FF" : "#2962FF";
     const alpha =
       1 -
       (value.transparencyMode === "custom"
         ? value.transparency
         : dark
-          ? 88
-          : 85) /
+          ? 82
+          : 88) /
         100;
     return `rgba(${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)},${alpha})`;
   }
@@ -366,6 +362,8 @@ function chartBarRangeMapping({
     for (const [chart, cleanup] of bindings)
       if (!charts.has(chart)) {
         cleanup();
+        const pane = mainPane(chart);
+        if (pane) labelPaints.delete(pane);
         bindings.delete(chart);
         if (pointer?.chart === chart) hide();
       }
@@ -385,7 +383,7 @@ function chartBarRangeMapping({
         if (chart.onChartTypeChanged)
           subscribe(chart.onChartTypeChanged(), () => {
             hide();
-            refreshRails();
+            labelPaints.clear();
             schedule(true);
           });
         subscribe(chart.onVisibleRangeChanged(), schedule);
@@ -406,7 +404,7 @@ function chartBarRangeMapping({
           doc.defaultView.addEventListener("blur", hide);
         }
       }
-    refreshRails();
+    labelPaints.clear();
     schedule(true);
   }
   function leave(event) {
@@ -420,7 +418,7 @@ function chartBarRangeMapping({
   }
   const syncChanged = () => {
     hide();
-    refreshRails();
+    labelPaints.clear();
     notify();
   };
   function observeBars({
@@ -471,21 +469,11 @@ function chartBarRangeMapping({
     }
     schedule(true);
   }
-  function draw(pane, context, info) {
-    if (!pane.containsMainSeries()) return;
-    let labelShown = false;
-    try {
-      if (!active() || !source || !pane.containsMainSeries()) return;
-      const m = pane.state().model();
-      const chart = [...bindings.keys()].find((chart) => model(chart) === m);
-      if (
-        !chart ||
-        chart === source.chart ||
-        !timeSeries(chart) ||
-        !MWSeries.same(chart.symbol(), source.symbol) ||
-        !chartBarRangeMapping.eligible(source.resolution, chart.resolution())
-      )
-        return;
+  function project(chart, pane) {
+    if (!pane || !active() || !source || chart === source.chart || !timeSeries(chart)
+      || !MWSeries.same(chart.symbol(), source.symbol)
+      || !chartBarRangeMapping.eligible(source.resolution, chart.resolution())) return;
+    const m = model(chart);
       const sourceStore = stores.get(source.key);
       if (!sourceStore || sourceStore.generation !== source.generation) return;
       const ts = m.timeScale(),
@@ -500,8 +488,11 @@ function chartBarRangeMapping({
         points.roughTime(index, sync.projectTime.bind(sync));
       const first = Math.floor(ts.coordinateToFloatIndex(0)) - 1,
         last = Math.ceil(ts.coordinateToFloatIndex(ts.width())) + 1;
-      let left = Infinity,
-        right = -Infinity;
+      let left = Infinity, right = -Infinity;
+      const extrema = {}, candles = [], series = m.mainSeries(), scale = series.priceScale(), value = series.firstValue();
+      // Provider extrema are selected from unchanged OHLC values. A tolerance
+      // could collapse distinct valid ticks (e.g. eight-decimal Yahoo prices).
+      const match = (a,b) => a === b;
       for (let i = Math.min(first, last); i <= Math.max(first, last); i++) {
         const t = timeAt(i);
         if (!Number.isFinite(t)) continue;
@@ -509,7 +500,23 @@ function chartBarRangeMapping({
           i <= range.lastIndex
             ? chart._convertIndexToPublicTime(i)
             : converter.convertInternalTimeToPublicTime(t);
-        const row = store?.rows.get(publicTime * 1000);
+        const time = publicTime * 1000, row = store?.rows.get(time);
+        const center = ts.indexToCoordinate(i);
+        // Actual native OHLC is needed outside the mapped interval too, so
+        // labels cannot obscure a neighbouring candle in the same viewport.
+        const nativeBar = config.style === "rectangle" && config.priceLabels ? series.bars().valueAt?.(i) : undefined;
+        const high = nativeBar?.[2] ?? row?.high, low = nativeBar?.[3] ?? row?.low;
+        if (config.style === "rectangle" && config.priceLabels && value != null && !scale.isEmpty() && Number.isFinite(high) && Number.isFinite(low)) {
+          const yHigh = scale.priceToCoordinate(high,value), yLow = scale.priceToCoordinate(low,value);
+          if (Number.isFinite(yHigh) && Number.isFinite(yLow)) candles.push({
+            left:center-Math.max(1,ts.barSpacing()*0.4),right:center+Math.max(1,ts.barSpacing()*0.4),
+            top:Math.min(yHigh,yLow),bottom:Math.max(yHigh,yLow),time,high,low,
+          });
+        }
+        if (row && nativeBar && row.start >= source.start && row.end <= source.end && center >= 0 && center <= ts.width()) {
+          for (const kind of ["high","low"]) if (match(row[kind],source[kind]) && match(kind === "high" ? high : low,source[kind]) && (!extrema[kind] || time < extrema[kind].time))
+            extrema[kind] = {time,x:center};
+        }
         let start = row?.start,
           end = row?.end;
         if (!row) {
@@ -537,39 +544,48 @@ function chartBarRangeMapping({
       left = Math.max(0, left);
       right = Math.min(ts.width(), right);
       if (!(right > left)) return;
-      let top = 0,
-        bottom = pane.height();
-      if (config.style === "rectangle") {
-        const series = m.mainSeries(),
-          scale = series.priceScale(),
-          value = series.firstValue();
-        if (value == null || scale.isEmpty()) return;
-        const a = scale.priceToCoordinate(source.high, value),
-          b = scale.priceToCoordinate(source.low, value);
-        priceLabel(chart, pane, scale, value);
-        labelShown = true;
-        top = Math.max(0, Math.min(a, b));
-        bottom = Math.min(bottom, Math.max(a, b));
-        if (!(bottom > top)) return;
-      }
+      if (config.style !== "rectangle") return { left, right };
+      if (value == null || scale.isEmpty()) return;
+      return { left, right, extrema, candles, a: scale.priceToCoordinate(source.high, value),
+        b: scale.priceToCoordinate(source.low, value) };
+  }
+  function draw(pane, context, info) {
+    if (!pane.containsMainSeries()) return;
+    const chart = [...bindings.keys()].find(chart => model(chart) === pane.state().model());
+    clearLabel(pane);
+    if (!chart) return;
+    const projection = project(chart, pane);
+    if (!projection) return;
+    const { left, right, a, b } = projection;
+    let top = 0, bottom = pane.height();
+    if (config.style === "rectangle") {
+      top = Math.max(0, Math.min(a, b)); bottom = Math.min(bottom, Math.max(a, b));
+      if (!(bottom > top)) return;
+    }
       context.save();
+      try {
       context.scale(
         info.bitmapSize.width / info.mediaSize.width,
         info.bitmapSize.height / info.mediaSize.height,
       );
       context.fillStyle = fillColor();
       context.fillRect(left, top, right - left, bottom - top);
-      context.restore();
-    } finally {
-      if (!labelShown) clearLabel(pane);
-    }
+      if (config.style === "rectangle") {
+        context.strokeStyle = fillColor({ ...config, transparencyMode:"custom", transparency:35 });
+        context.lineWidth = 1;
+        context.strokeRect(left+0.5,top+0.5,Math.max(0,right-left-1),Math.max(0,bottom-top-1));
+        priceLabels(chart,pane,context,projection);
+      }
+      } finally { context.restore(); }
   }
   return {
     observeBars,
     cachePurged: () => schedule(true),
     refreshCharts,
     hide,
-    railHeight: (cw) => (rails.has(cw) ? 36 : 0),
+    // Retain the installed height hook contract without reserving a bottom rail.
+    railHeight: () => 0,
+    labels: (chart) => (labelPaints.get(mainPane(chart)) || []).map(label => ({ ...label, box: label.box && { ...label.box } })),
     defaults: () => ({ ...defaults }),
     fillColor,
 
@@ -584,7 +600,7 @@ function chartBarRangeMapping({
       if (JSON.stringify(next) === JSON.stringify(config)) return;
       hide();
       config = next;
-      refreshRails();
+      labelPaints.clear();
       notify();
       if (!restore && !readonly) changed();
     },
@@ -618,7 +634,8 @@ function chartBarRangeMapping({
         low: source.low,
       },
       bindings: bindings.size,
-      rails: rails.size,
+      rails: 0,
+      labelPanes: labelPaints.size,
       stores: [...stores].map(([key, s]) => ({
         key,
         size: s.rows.size,
@@ -634,8 +651,7 @@ function chartBarRangeMapping({
       bindings.clear();
       stores.clear();
       tickets.clear();
-      for (const rail of rails.values()) rail.remove();
-      rails.clear();
+      labelPaints.clear();
       listeners.clear();
       doc?.removeEventListener("pointermove", move, true);
       doc?.removeEventListener("pointerout", leave, true);
