@@ -10,7 +10,16 @@ import test_composite_definitions as contracts
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alerts.composite_definitions import first_use, save_mapping
-from alerts.storage import CompositePreparation, CompositeRevision, MarketComposite, RealtimeMapping
+from alerts.storage import (
+    CompositeInputEvent,
+    CompositeMinute,
+    CompositeMinuteInput,
+    CompositePreparation,
+    CompositeReadAttempt,
+    CompositeRevision,
+    MarketComposite,
+    RealtimeMapping,
+)
 from sqlalchemy import func, inspect, select
 from test_market_contracts import identity
 from test_provider_postgres import provider_pg as _provider_pg
@@ -56,7 +65,8 @@ def test_additive_migration_and_no_unreviewed_mapping_loss(provider_pg, monkeypa
     migration = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration)
     with engine.begin() as conn:
-        for model in (CompositePreparation, CompositeRevision, MarketComposite, RealtimeMapping):
+        for model in (CompositeMinute, CompositeMinuteInput, CompositeInputEvent, CompositeReadAttempt, CompositePreparation,
+                      CompositeRevision, MarketComposite, RealtimeMapping):
             model.__table__.drop(conn)
         migration.op = Operations(MigrationContext.configure(conn))
         migration.upgrade()

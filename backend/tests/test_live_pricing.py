@@ -137,6 +137,27 @@ def test_recovery_and_confirmation_restore_source_state_without_historical_notif
     assert report["recovery_confirmed"] == 1 and report["late_over_30s"] == 0
 
 
+def test_actual_confirmation_transaction_records_canonical_minutes_and_fences_old_epoch(running):
+    factory, ownership, epoch, identities = running
+    from alerts.confirmed_minutes import rows
+    from alerts.source_registry import collection_identity
+    from alerts.storage import SourceMinuteRevision
+    from sqlalchemy import func
+
+    identity = identities["EUR_USD"]
+    live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
+    with factory.begin() as db:
+        stored = list(rows(db, collection_identity(identity).key, 0, 120000))
+        assert len(stored) == 2 and stored[0]["volume_kind"] == "price_count"
+        assert stored[0]["volume"] == "3"
+    successor = live.begin_connection(ownership, identities, now=126000)
+    with pytest.raises(TimeoutError):
+        live.commit_confirmation(ownership, epoch, candles(identity), now=126000)
+    assert successor == epoch + 1
+    with factory.begin() as db:
+        assert db.scalar(select(func.count()).select_from(SourceMinuteRevision)) == 2
+
+
 def test_empty_success_cannot_restore_open_market_and_failed_attempts_remain_in_denominator(running):
     _, ownership, epoch, identities = running
     identity = identities["EUR_USD"]

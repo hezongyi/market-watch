@@ -388,9 +388,11 @@ def main():
 
             artifact_tick(version_id)
             if not version_id:
+                from .composite_preparation import preparation_tick
                 from .history_maintenance import schedule_tick
 
                 schedule_tick()
+                preparation_tick(adapter)
             worked = import_page(adapter, version_id=version_id)
             if args.once:
                 return

@@ -106,6 +106,24 @@ class SourceFetch(Base):
     lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
 
 
+class SourceMinuteRevision(Base):
+    __tablename__ = "market_source_minute_revisions"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger, index=True)
+    data: Mapped[dict] = mapped_column(JSON)
+    observed_at: Mapped[int] = mapped_column(BigInteger)
+    received_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class SourceMinute(Base):
+    __tablename__ = "market_source_minutes"
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_source_minute_revisions.id"))
+    last_observed_at: Mapped[int] = mapped_column(BigInteger)
+
+
 class HistoryVersion(Base):
     __tablename__ = "market_history_versions"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
@@ -303,6 +321,48 @@ class CompositePreparation(Base):
     state: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
+class CompositeInputEvent(Base):
+    __tablename__ = "market_composite_input_events"
+    __table_args__ = (UniqueConstraint("revision_id", "input_revision"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    input_manifest: Mapped[dict] = mapped_column(JSON)
+
+
+class CompositeMinute(Base):
+    __tablename__ = "market_composite_minutes"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    source_revision_id: Mapped[str] = mapped_column(ForeignKey("market_source_minute_revisions.id"))
+
+
+class CompositeMinuteInput(Base):
+    __tablename__ = "market_composite_minute_inputs"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    input_revision: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    event_id: Mapped[str] = mapped_column(ForeignKey("market_composite_input_events.id"), index=True)
+    source_revision_id: Mapped[str] = mapped_column(ForeignKey("market_source_minute_revisions.id"))
+
+
+class CompositeReadAttempt(Base):
+    __tablename__ = "market_composite_read_attempts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    started_at: Mapped[int] = mapped_column(BigInteger)
+    finished_at: Mapped[int | None] = mapped_column(BigInteger)
+    result: Mapped[str] = mapped_column(String(40), default="started")
+    read_kind: Mapped[str] = mapped_column(String(24), default="pending")
+    checkpoint: Mapped[int | None] = mapped_column(BigInteger)
+    observed_at: Mapped[int | None] = mapped_column(BigInteger)
+    observations: Mapped[int | None]
+    accepted: Mapped[bool] = mapped_column(default=False)
+
+
 class LiveState(Base):
     __tablename__ = "market_live_states"
     dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
@@ -350,6 +410,9 @@ def immutable_dataset_identity(db, flush_context, instances):
     guard_reference_writes(db)
 
     for row in db.deleted:
+        if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, SourceMinute, CompositeMinute,
+                            CompositeReadAttempt, CompositeMinuteInput)):
+            raise ValueError("Confirmed minute inputs and audit cannot be deleted by runtime writers")
         if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob, HistoryArtifactBlock, HistoryArtifact,
                             HistoryReclamation, DatasetReclamation, HistoryReadAttempt)):
             raise ValueError("Historical snapshots cannot be deleted by runtime writers")
@@ -362,6 +425,13 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
+        if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, CompositeMinuteInput)) and any(
+                attr.history.has_changes() for attr in state.attrs):
+            raise ValueError("Confirmed minute revisions and input audit are immutable")
+        if isinstance(row, (SourceMinute, CompositeMinute)) and any(
+                state.attrs[key].history.has_changes() for key in (
+                    ("source_id", "start") if isinstance(row, SourceMinute) else ("revision_id", "start"))):
+            raise ValueError("Confirmed minute head identity is immutable")
         if isinstance(row, RealtimeMapping) and any(attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Realtime mappings are immutable; save a new mapping version")
         if isinstance(row, MarketComposite) and any(state.attrs[key].history.has_changes() for key in (
@@ -371,15 +441,19 @@ def immutable_dataset_identity(db, flush_context, instances):
                 "id", "composite_id", "history_version_id", "mapping_id", "parent_revision_id", "seam", "rules",
                 "request_id", "created_at")):
             raise ValueError("Composite baseline, seam and rules are immutable")
-        if isinstance(row, HistoryReadAttempt):
+        if isinstance(row, CompositePreparation) and any(state.attrs[key].history.has_changes()
+                for key in ("revision_id", "cutoff")):
+            raise ValueError("Composite preparation revision and cutoff are immutable")
+        if isinstance(row, (HistoryReadAttempt, CompositeReadAttempt)):
             previous = state.attrs.finished_at.history
             completed = (bool(previous.deleted and previous.deleted[0] is not None) or
                          not previous.has_changes() and row.finished_at is not None)
             if completed and any(
                         attr.history.has_changes() for attr in state.attrs):
                 raise ValueError("Completed historical request evidence is immutable")
+            parent_key = "version_id" if isinstance(row, HistoryReadAttempt) else "revision_id"
             if any(state.attrs[key].history.has_changes() for key in (
-                    "id", "version_id", "start", "end", "started_at")):
+                    "id", parent_key, "start", "end", "started_at")):
                 raise ValueError("Historical request identity is immutable")
         if isinstance(row, (HistoryChunk, SourceBlob, HistoryArtifactBlock, HistoryReclamation, DatasetReclamation)) and any(attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Historical snapshot chunks are immutable")

@@ -383,9 +383,12 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
             return
         dataset = db.get(MarketDataset, batch.identity.key)
         inst = db.get(Instrument, dataset.instrument_id)
+        from .composite_inputs import apply_minutes
+        from .confirmed_minutes import record
         from .market import ingest
         from .storage import Bar
 
+        apply_minutes(db, record(db, batch))
         previous_rows = {row.start: row for row in db.scalars(select(Bar).where(
             Bar.instrument_id == inst.id, Bar.timeframe == "M1",
             Bar.start >= batch.window_start, Bar.start < batch.window_end))}
