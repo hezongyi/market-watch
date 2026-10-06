@@ -46,7 +46,8 @@ def signal_message(signal):
         return f"价格 {signal.price} / 阈值 {signal.threshold}\n发生时间 {instant(signal.occurred_at).isoformat()}\n信号 {signal.id}\n请使用“确认”停止后续提醒。"
     config, identity = evidence["config"], evidence["market_identity"]
     delay = max(0, evidence["detected_at"] - signal.occurred_at) / 1000
-    values = {"symbol": signal.instrument_id, "source": identity["source"],
+    values = {"symbol": identity.get("symbol", signal.instrument_id) if identity.get("series_kind") == "composite" else signal.instrument_id,
+              "source": identity["source"],
               "timeframe": config["timeframe"], "condition": condition_label(config["condition"]),
               "value": evidence["left"], "threshold": str(signal.threshold),
               "price": str(signal.price), "event_time": instant(signal.occurred_at).isoformat(),

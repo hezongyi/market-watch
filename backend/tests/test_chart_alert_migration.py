@@ -125,7 +125,12 @@ def full_legacy_upgrade(engine, monkeypatch):
     with pytest.raises(RuntimeError, match="backup"):
         command.downgrade(alembic, "r19_native_history_loads")
     with engine.connect() as connection:
-        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == "u22_chart_alert_actions"
+        # PostgreSQL rolls back the complete downgrade transaction, including
+        # the empty market-data branch. SQLite retains those earlier DDL steps.
+        from alembic.script import ScriptDirectory
+
+        expected = ScriptDirectory.from_config(alembic).get_current_head() if engine.dialect.name == "postgresql" else "u22_chart_alert_actions"
+        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == expected
         assert connection.execute(text("SELECT count(*) FROM signals")).scalar() == 4
     # Empty market-data branch can downgrade before the populated alert branch
     # refuses rollback. Rejoin head before testing a full-schema backup.

@@ -224,6 +224,7 @@ function barsOf(result, res, ticker) {
 }
 const managedSessions = new Map();
 const fixedIndicatorPending = new Map();
+const alertCompositeRevisions = new Map();
 const maintenanceAsked = new Set();
 const cache = new Map();
 function datasetGeometry(ticker, res) {
@@ -320,6 +321,8 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   const promise = request(q, "data", () => epoch === workspaceEpoch && current() && Date.now() < expires &&
     (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})))
     .then(page=>{
+      if(epoch===workspaceEpoch && series_kind==='composite' && page.revision_id)
+        alertCompositeRevisions.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.revision_id);
       if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
         alertCalculationOrigins.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.calculation_origin ?? page.origin);
       return page;
@@ -1273,9 +1276,10 @@ function boot(
   alertBridge?.destroy();
   alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
     getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
-    metadata:ticker=>alertSourceMetadata.get(ticker),frames,
+    metadata:ticker=>alertSourceMetadata.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)),frames,
     calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(ticker+'|'+res) ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
+    compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
     rpc:query=>request(query,"chart-alert-rpc"),send,
     fail:error=>send({type:"error",error:String(error)})});
   alertBridge.reset(chartState || {});
@@ -1682,6 +1686,7 @@ function boot(
       firstHistory.clear();
       fixedHistoryStarts.clear();
       fixedIndicatorPending.clear();
+      alertCompositeRevisions.clear();
       indicatorHistoryNeeds.clear();
       alertCalculationOrigins.clear();
       managedSessions.clear();

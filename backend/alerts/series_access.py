@@ -115,13 +115,8 @@ def chart_data(db, body):
         if body.client:
             renew_demand(db, body.client, inst)
     for bar in page["bars"]:
-        at = bar["end"] - 1 if body.timeframe == "D1" else bar["start"] + (
-            86400000 if meta["calendar"] == "ny17" else 0)
         if body.timeframe in ("D1", "W1", "MN"):
-            date = datetime.fromtimestamp(at / 1000, ZoneInfo("America/New_York") if meta["calendar"] == "ny17" else timezone.utc).date()
-            if body.timeframe == "MN":
-                date = date.replace(day=1)
-            bar["chart_time"] = int(datetime.combine(date, datetime.min.time(), timezone.utc).timestamp() * 1000)
+            bar["chart_time"] = fixed_label(bar, body.timeframe, meta["calendar"])
     indicators, indicator_progress = [], []
     if body.indicators:
         from .fixed_indicators import chart_results
@@ -140,6 +135,16 @@ def chart_data(db, body):
         "indicators": indicators, "indicator_progress": indicator_progress,
         "future": future_grid(inst, body.timeframe, page["bars"][-1]["end"]) if page["bars"] else [],
         "bounded_history": True, "as_of": stamp, "series_kind": body.series_kind, "symbol": meta["symbol"]}
+
+
+def fixed_label(bar, frame, phase):
+    if frame not in ("D1", "W1", "MN"):
+        return bar["start"]
+    at = bar["end"] - 1 if frame == "D1" else bar["start"] + (86400000 if phase == "ny17" else 0)
+    date = datetime.fromtimestamp(at / 1000, ZoneInfo("America/New_York") if phase == "ny17" else timezone.utc).date()
+    if frame == "MN":
+        date = date.replace(day=1)
+    return int(datetime.combine(date, datetime.min.time(), timezone.utc).timestamp() * 1000)
 
 
 def history_check(db, page, body, meta):

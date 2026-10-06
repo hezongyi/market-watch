@@ -8,6 +8,7 @@ function chartAlertBridge({
   metadata,
   frames,
   calculationOrigin = () => null,
+  compositeRevision = () => null,
   rpc,
   send,
   fail,
@@ -83,6 +84,7 @@ function chartAlertBridge({
       calculation_origin:
         calculationOrigin(chart.symbol(), chart.resolution()) ?? null,
       published: identity.series_kind === "managed",
+      ...(identity.series_kind === 'composite' ? {composite_revision_id:compositeRevision(chart.symbol(),chart.resolution())} : {}),
       association: {
         workspace_id: String(getWorkspace().id),
         chart_id: chartIdentity(chart),
@@ -146,6 +148,7 @@ function chartAlertBridge({
       series_kind: context.series_kind,
       timeframe: context.timeframe,
       published: context.series_kind === "managed",
+      ...(context.series_kind === 'composite' ? {composite_revision_id:context.composite_revision_id} : {}),
       kind,
       scale: mode === 1 ? "log" : "linear",
       extend_left: (reversed ? props.extendRight : props.extendLeft) === true,

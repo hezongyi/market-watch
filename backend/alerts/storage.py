@@ -672,6 +672,38 @@ class SignalRow(Base):
     evidence: Mapped[dict] = mapped_column(JSON)
 
 
+class CompositeJudgment(Base):
+    """Immutable evidence for successful comparisons, including no-event baselines."""
+    __tablename__ = "market_composite_judgments"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    alert_version_id: Mapped[str] = mapped_column(ForeignKey("chart_alert_versions.id"), index=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    event_time: Mapped[int] = mapped_column(BigInteger)
+    outcome: Mapped[str] = mapped_column(String(32))
+    signal_id: Mapped[str | None] = mapped_column(ForeignKey("signals.id"))
+    evidence: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+@event.listens_for(CompositeJudgment, "before_update")
+@event.listens_for(CompositeJudgment, "before_delete")
+def immutable_composite_judgment(mapper, connection, target):
+    raise ValueError("组合判断证据不可变；后续修订不能覆盖当时输入")
+
+
+@event.listens_for(SignalRow, "before_update")
+@event.listens_for(SignalRow, "before_delete")
+def immutable_composite_signal(mapper, connection, target):
+    from sqlalchemy import inspect
+
+    history = inspect(target).attrs.evidence.history
+    documents = [target.evidence, *history.deleted]
+    if any(document.get("market_identity", {}).get("series_kind") == "composite" for document in documents):
+        raise ValueError("组合事件及判断输入不可变；通知状态单独维护")
+
+
 class Notification(Base):
     __tablename__ = "notifications"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)

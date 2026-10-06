@@ -21,6 +21,7 @@ from .chart_alert_service import (
 from .storage import (
     ChartAlert,
     ChartAlertVersion,
+    CompositeJudgment,
     Instrument,
     Notification,
     Outbox,
@@ -30,8 +31,8 @@ from .storage import (
 
 
 class CapabilityQuery(Contract):
-    instrument: str = Field(min_length=1, max_length=40)
-    series_kind: Literal["managed", "provider"]
+    instrument: str = Field(min_length=1, max_length=64)
+    series_kind: Literal["managed", "provider", "composite"]
     timeframe: str
 
 
@@ -41,6 +42,16 @@ def capabilities(body):
     if body.timeframe not in FRAMES:
         raise ValueError("未知判定周期")
     with transaction() as db:
+        if body.series_kind == "composite":
+            from .series_access import metadata as fixed_metadata
+
+            meta = fixed_metadata(db, body.instrument, "composite")
+            return {"instrument": body.instrument, "timeframe": body.timeframe,
+                "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"],
+                    "calendar": meta["calendar"], "available": body.timeframe in meta["frames"], "reason": None,
+                    "observation_basis": "固定历史与确认M1接续；临时触价为显式抽样模式，断线后不追认未观测事件"}],
+                "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD"],
+                "line_mapping": "固定组合修订；斜线需要准确周期柱序号", "seam_policies": ["reject", "accept_raw"]}
         instrument = db.get(Instrument, body.instrument)
         managed = ({"source": instrument.source, "series_kind": "managed", "basis": instrument.basis,
                     "calendar": instrument.calendar, "enabled": instrument.enabled}
@@ -83,7 +94,7 @@ class Action(Contract):
 
 
 def dataset_for(config):
-    if config.series_kind == "managed":
+    if config.series_kind in ("managed", "composite"):
         return None
     from .provider_cache import ensure
     from .provider_chart import metadata
@@ -138,7 +149,7 @@ def router(authenticated):
     def listing(instrument: str | None = None, status: str | None = None, search: str = ""):
         if status and status not in ("active", "paused", "completed", "expired", "archived"):
             raise HTTPException(422, "未知告警状态")
-        if len(search) > 100 or instrument and len(instrument) > 40:
+        if len(search) > 100 or instrument and len(instrument) > 64:
             raise HTTPException(422, "筛选值过长")
         with transaction() as db:
             query = select(ChartAlert).join(ChartAlertVersion, (ChartAlert.id == ChartAlertVersion.alert_id)
@@ -182,6 +193,22 @@ def router(authenticated):
             if not alert:
                 raise HTTPException(404, "告警不存在")
             return alert_dict(db, alert)
+
+    @api.get("/{alert_id}/judgments")
+    def judgments(alert_id: str, before: int | None = None, limit: int = 100):
+        if len(alert_id) > 36 or not 1 <= limit <= 500 or before is not None and before < 0:
+            raise HTTPException(422, "无效判断记录分页")
+        with transaction() as db:
+            if not db.get(ChartAlert, alert_id):
+                raise HTTPException(404, "告警不存在")
+            query = select(CompositeJudgment).join(ChartAlertVersion,
+                ChartAlertVersion.id == CompositeJudgment.alert_version_id).where(ChartAlertVersion.alert_id == alert_id)
+            if before is not None:
+                query = query.where(CompositeJudgment.created_at < before)
+            return [{"id": row.id, "revision_id": row.revision_id, "history_version_id": row.history_version_id,
+                "input_revision": row.input_revision, "event_time": row.event_time, "outcome": row.outcome,
+                "signal_id": row.signal_id, "created_at": row.created_at, "evidence": row.evidence}
+                for row in db.scalars(query.order_by(CompositeJudgment.created_at.desc(), CompositeJudgment.id).limit(limit))]
 
     @api.post("", status_code=201)
     def new(body: Create):

@@ -43,8 +43,8 @@ class Association(Contract):
 
 class AlertConfig(Contract):
     name: str = Field(min_length=1, max_length=100)
-    instrument: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z0-9:_-]+$")
-    series_kind: Literal["managed", "provider"] = "managed"
+    instrument: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9:_-]+$")
+    series_kind: Literal["managed", "provider", "composite"] = "managed"
     source: str = Field(min_length=1, max_length=32)
     timeframe: str
     mode: Literal["close", "intrabar"] = "close"
@@ -59,6 +59,8 @@ class AlertConfig(Contract):
     calculation_version: Literal["chart-python-v1"] = "chart-python-v1"
     calculation_origin: int | None = Field(default=None, ge=0)
     published: bool = False
+    composite_revision_id: str | None = Field(default=None, max_length=36)
+    seam_policy: Literal["reject", "accept_raw"] = "reject"
 
     @model_validator(mode="after")
     def frame(self):
@@ -66,6 +68,16 @@ class AlertConfig(Contract):
             raise ValueError("未知判定周期")
         if not self.name.strip():
             raise ValueError("告警名称不能为空")
+        if self.series_kind != "composite" and (self.composite_revision_id or self.seam_policy != "reject"):
+            raise ValueError("组合修订与接缝政策只适用于组合行情")
+        if self.series_kind != "composite" and len(self.instrument) > 40:
+            raise ValueError("旧系列身份最长40字符")
+        if self.series_kind == "composite":
+            from .chart_series import decode
+
+            decode("MWC:" + self.instrument)
+            if self.source != "composite" or self.published:
+                raise ValueError("组合告警必须使用明确组合来源，不使用旧发布系列")
         validate_template(self.message)
         return self
 
@@ -88,6 +100,12 @@ def config_hash(config):
 
 def market_identity(db, config: AlertConfig, dataset_id=None):
     """Require the stored source identity; never silently fall back to another series."""
+    if config.series_kind == "composite":
+        from .composite_alerts import bind
+
+        if dataset_id:
+            raise ValueError("组合告警不能绑定平台缓存数据集")
+        return bind(db, config)
     if config.series_kind == "managed":
         instrument = db.get(Instrument, config.instrument)
         if not instrument or not instrument.enabled or instrument.source != config.source:
@@ -253,7 +271,14 @@ def consume(db, alert_id, observation: Observation, *, detected_at=None, baselin
                                     observation.identity, trigger.direction]).encode()).hexdigest()
     # Revisions of the same historical observation never cause another delivery.
     if db.scalar(select(SignalRow.id).where(SignalRow.event_key == key)):
-        raise Conflict("历史事件已存在，运行状态需要重建")
+        if config.series_kind != "composite":
+            raise Conflict("历史事件已存在，运行状态需要重建")
+        # Repaired inputs or a restarted evaluator cannot increment the count
+        # again for an already committed logical event.
+        alert.count = state.count
+        alert.state = asdict(EvaluationState(observation.sequence, str(observation.left),
+            str(observation.right) if observation.right is not None else None, state.count))
+        return None
     late = detected_at - observation.occurred_at > 120_000
     record = SignalRow(chart_alert_id=alert.id, event_key=key, instrument_id=config.instrument,
                        occurred_at=observation.occurred_at, created_at=detected_at,

@@ -63,7 +63,12 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         MarketDemand.instrument_id == composite.instrument_id, MarketDemand.expires > stamp))
     watch_count = db.scalar(select(func.count()).select_from(Watch).where(
         Watch.instrument_id == composite.instrument_id, Watch.status == "active"))
-    alert_count = sum(row.config.get("instrument") == composite.instrument_id for row in db.scalars(
+    active_alerts = [row for row in db.execute(
+        select(ChartAlertVersion, ChartAlert).join(ChartAlert, (ChartAlertVersion.alert_id == ChartAlert.id) & (
+            ChartAlertVersion.version == ChartAlert.version)).where(ChartAlert.status == "active",
+                or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp)))
+        if row[0].market_identity.get("composite_id") == composite.id]
+    alert_count = sum(row.config.get("instrument") in (composite.instrument_id, composite.id) for row in db.scalars(
         select(ChartAlertVersion).join(ChartAlert, (ChartAlertVersion.alert_id == ChartAlert.id) & (
             ChartAlertVersion.version == ChartAlert.version)).where(ChartAlert.status == "active",
                 or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp))))
@@ -101,7 +106,12 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         "health": {"connection": connection, "quote_ready": quote_ready,
             "confirmed_tail_ready": confirmed_ready, "quote_age_ms": quote_age,
             "source_confirmed_end": state.confirmed_end if state else 0,
-            "strategy_readiness": "no_strategies" if watch_count + alert_count == 0 else "pending_dependency_validation",
+            "strategy_readiness": "no_strategies" if watch_count + alert_count == 0 else
+                "ready" if active_alerts and all(row.health == "ready" for _, row in active_alerts) and not watch_count else "pending_dependency_validation",
+            "rules": [{"id": row.id, "name": row.name, "health": row.health, "reason": row.health_reason,
+                "revision_id": version.market_identity["composite_revision_id"],
+                "seam_policy": version.market_identity["seam_policy"], "readiness": row.runtime.get("readiness", {})}
+                for version, row in active_alerts],
             "coverage": "per-bar; query completion and newest M1 are not complete indicator dependencies"}}
 
 

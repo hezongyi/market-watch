@@ -56,6 +56,7 @@ type Composite = {
     confirmed_tail_ready: boolean;
     quote_age_ms: number | null;
     strategy_readiness: string;
+    rules?: {id:string;name:string;health:string;reason:string|null;revision_id:string;seam_policy:string}[];
   };
 };
 type Candidate = {
@@ -256,6 +257,7 @@ export function CompositeList() {
                           <small>
                             {row.health.strategy_readiness === "no_strategies"
                               ? "暂无策略"
+                              : row.health.strategy_readiness === "ready" ? "规则依赖就绪"
                               : "策略依赖待检查"}
                           </small>
                         </td>
@@ -939,9 +941,16 @@ export function CompositeDetail() {
               <p>
                 {row.health.strategy_readiness === "no_strategies"
                   ? "暂无策略，不代表策略已就绪。"
+                  : row.health.strategy_readiness === "ready" ? "当前规则依赖已验证。"
                   : "策略需要单独检查实际依赖与接缝政策。"}{" "}
                 持久策略与预警会在浏览器关闭后维持共享采集。
               </p>
+              {row.health.rules?.length ? <div className="dc-scroll dc-period-table" tabIndex={0} aria-label="组合规则依赖状态">
+                <table><thead><tr><th>规则</th><th>状态 / 原因</th><th>固定修订</th><th>接缝政策</th></tr></thead>
+                  <tbody>{row.health.rules.map(rule=><tr key={rule.id}><td>{rule.name}</td>
+                    <td>{rule.health === "ready" ? "数据就绪" : rule.reason || "等待依赖"}</td>
+                    <td>{rule.revision_id}</td><td>{rule.seam_policy === "accept_raw" ? "接受原价影响" : "等待同源依赖"}</td></tr>)}</tbody>
+                </table></div> : null}
             </>
           )}
         </>

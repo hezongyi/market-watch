@@ -10,7 +10,7 @@ import math
 
 from .chart_indicators import CATALOG, validate
 
-ALGORITHM = "fixed-indicator-state-v2"
+ALGORITHM = "fixed-indicator-state-v3"
 SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH"))
 
 
@@ -44,15 +44,17 @@ class IndicatorState:
         if not all(math.isfinite(value) for value in (high, low, close)):
             raise ValueError("指标输入价格必须是有限数值")
         s, p = self.state, self.params
+        continued = bool(s)
         if not s:
             s.update(n=0, origin=row["start"], seam=False)
-        s["seam"] |= bool(row.get("seam_crossing") or row.get("seam_at_start"))
+        touches_seam = bool(row.get("seam_crossing") or row.get("seam_at_start") and continued)
+        s["seam"] |= touches_seam
         s["n"] += 1
         n = s["n"]
         if self.name in ("SMA", "LWMA", "BBANDS", "STOCH"):
             length = (p["k"] + p["smooth"] + p["d"] - 2) if self.name == "STOCH" else p["period"]
             dependencies = s.setdefault("dependencies", [])
-            dependencies.append([row["start"], bool(row.get("seam_crossing") or row.get("seam_at_start"))])
+            dependencies.append([row["start"], touches_seam])
             if len(dependencies) > length:
                 dependencies.pop(0)
             s["origin"] = dependencies[0][0]

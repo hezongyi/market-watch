@@ -46,5 +46,12 @@ for(const file of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../
  assert.equal(ctx.quoteRows[0].v.short_name,'EURUSD');
  assert.equal(ctx.quoteRows[0].v.lp,undefined,'Naming a composite must not fabricate a quote');
  assert.equal(ctx.quoteRows[0].n,ctx.compositeTicker.toUpperCase());
+ // Exercise the metadata callback actually supplied to the native alert bridge.
+ const source=fs.readFileSync('../advanced-host/bridge.js','utf8');
+ const metadata=source.match(/metadata:(ticker=>[^\n]+),frames,/)[1];
+ const nativeMetadata=vm.runInContext(metadata,ctx);
+ vm.runInContext("alertSourceMetadata.set(compositeTicker,{source:'composite'})",ctx);
+ assert.equal(nativeMetadata(ctx.compositeTicker.toUpperCase())?.source,'composite',
+   'The native widget uppercases fixed tickers before creating alerts');
  console.log('Fixed native feed: uppercase identity, pure history, composite demand, no legacy maintenance passed');
 })().catch(e=>{console.error(e);process.exitCode=1});
