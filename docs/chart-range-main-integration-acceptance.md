@@ -44,13 +44,13 @@ MCP HTTPS SDK 15个检查/13工具通过；组合事件一致、readonly写拒�
 
 ## 2026-10-06 兼容修复检查点（尚未收口）
 
-源码修复提交 `0aaec93`：Python 主时间缓冲由 precise adopt 初始两格改为原生默认有界10,001格，不增加 mandatory countBack；每条曲线晚于主图当前柱时留空，避免旧值短暂写入新柱。实际许可库 Context 回放验证6种延迟、32根历史逐值重算和3条曲线连续3次换柱，保持precise、零值、负值、缺口及追赶恢复。新增维护约束见 [指标维护文档](python-chart-indicator-maintenance.md)。
+源码修复提交 `0aaec93`：Python 主时间缓冲由 precise adopt 初始两格改为原生默认有界10,001格，不增加 mandatory countBack；某条曲线仍停留在主图当前柱之前时留空，避免旧值短暂写入新柱。实际许可库 Context 回放验证6种延迟、32根历史逐值重算和3条曲线连续3次换柱，保持precise、零值、负值、缺口及追赶恢复。新增维护约束见 [指标维护文档](python-chart-indicator-maintenance.md)。
 
 运行图表已更新为候选4 `host.73eb5768a881494f.js`，22模块字节一致。候选4/API候选2真实M1探针72次采样、0console异常、0depth异常。该探针不提供“最新未闭合柱数值与后端逐点一致”的oracle，不据此声称所有实时数值验收已完成。
 
 后端实时指标计算移出数据库事务，同次更新按数据集/末柱复用前缀，只读必要列；不截短算法输入，全部计算成功才发布cursor，失败可重试。API候选2全量586通过/47跳过；最新API候选3相关46通过，真实PG20通过，包括计算时无连接占用、失败不推进cursor、相同源前缀只读一次与不同参数结果保留。Ubuntu实例已部署API候选3，两处实际导入源码SHA与工作树相同。
 
-候选4/API候选2连续历史整链仍失败：真实PG修订resetCount=1、回调close精确1.16018、历史范围恢复及保存重开通过；新SMA201首次64,122根请求90秒无回调，前缀修订尚未开始，同期连接池超时仍有记录。API候选3的长前缀定向探针和整链复验待完成，不能以专项测试替代。新证据单独保存在 [兼容修复汇总](verification/chart-bar-range-mapping/main-integration/compatibility-fixes-20261006/summary.json)，前面候选2检查点保持原始结果。
+候选4/API候选2连续历史整链仍失败：真实PG修订resetCount=1、回调close精确1.16018、历史范围恢复及保存重开通过；新SMA201首次64,122根请求90秒无回调，前缀修订尚未开始，同期连接池超时仍有记录。API候选3长前缀定向探针已返回64,129根，0页面/接口/实时流异常；它只证明一次初始请求，整链及真正前缀修订复验仍待完成，不能以专项测试替代。新证据单独保存在 [兼容修复汇总](verification/chart-bar-range-mapping/main-integration/compatibility-fixes-20261006/summary.json)，前面候选2检查点保持原始结果。
 
 最终候选还需数字对照、告警/MCP组合及范围/十字线逐帧复验，随后提交用户人工验收。PR继续WIP，未合并、未生产部署。
 
