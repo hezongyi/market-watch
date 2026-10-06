@@ -69,6 +69,20 @@ services:
         format: raw
     depends_on:
       api: {condition: service_healthy}
+  pricing-worker:
+    <<: *backend
+    profiles: ["realtime"]
+    command: ["python", "-m", "alerts.oanda_worker"]
+    env_file:
+      - path: ../../../artifacts/data-integration/three-layer-runtime.env
+        format: raw
+    environment:
+      <<: *environment
+      ALERTS_OANDA_STREAM_ENABLED: "true"
+      ALERTS_OANDA_RESIDENT_SYMBOLS: ""
+      ALERTS_OANDA_IDLE_GRACE_SECONDS: "10"
+    depends_on:
+      api: {condition: service_healthy}
   web:
     image: market-watch-data-integration-web:dev
     restart: "no"

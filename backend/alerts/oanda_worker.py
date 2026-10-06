@@ -26,12 +26,20 @@ from .storage import now_ms
 log = logging.getLogger(__name__)
 
 
+def subscription_change(identities, desired, idle_since, now):
+    if desired:
+        return None, set(desired) != set(identities)
+    idle_since = now if idle_since is None else idle_since
+    return idle_since, now - idle_since >= settings.oanda_idle_grace_seconds
+
+
 def collect(adapter, ownership, identities, stopped):
     requirements = recovery_requirements(identities)
     epoch = begin_connection(ownership, identities)
     connection_stop = threading.Event()
     lost = threading.Event()
     maintenance_error = []
+    intentional_stop = threading.Event()
 
     def guard():
         while not stopped.is_set() and not connection_stop.is_set():
@@ -47,16 +55,22 @@ def collect(adapter, ownership, identities, stopped):
 
     def maintenance():
         refreshed = 0
+        idle_since = None
         while not stopped.is_set() and not connection_stop.is_set():
             try:
                 if not renew(ownership):
                     lost.set()
                     return
                 if time.monotonic() - refreshed >= 10:
-                    if set(desired_datasets(adapter.account_id)) != set(identities):
+                    desired = desired_datasets(adapter.account_id)
+                    current = time.monotonic()
+                    idle_since, changed = subscription_change(identities, desired, idle_since, current)
+                    if changed:
+                        intentional_stop.set()
                         connection_stop.set()
                         return
                     if any(minutes > requirements[key] for key, minutes in recovery_requirements(identities).items()):
+                        intentional_stop.set()
                         connection_stop.set()
                         return
                     refreshed = time.monotonic()
@@ -104,7 +118,8 @@ def collect(adapter, ownership, identities, stopped):
         guardian.join(timeout=6)
         if not lost.is_set():
             try:
-                disconnected(ownership, epoch, identities, maintenance_error[-1] if maintenance_error else result)
+                disconnected(ownership, epoch, identities, maintenance_error[-1] if maintenance_error else result,
+                             intentional=intentional_stop.is_set())
             except TimeoutError:
                 pass
 
@@ -114,13 +129,14 @@ def run(adapter, stopped):
     with lane("realtime"):
         ensure_catalog(adapter.catalog(), adapter.account_id)
     while not stopped.is_set():
+        identities = desired_datasets(adapter.account_id)
+        if not identities:
+            stopped.wait(1)
+            continue
         ownership = claim(adapter.account_id)
         if ownership is None:
             stopped.wait(1)
             continue
-        identities = desired_datasets(adapter.account_id)
-        if not identities:
-            raise ValueError("No resident or demanded practice instruments")
         collect(adapter, ownership, identities, stopped)
 
 

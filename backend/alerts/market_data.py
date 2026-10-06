@@ -234,10 +234,11 @@ def renew_demand(db, client, inst):
     # Searching/selecting/refusing an unmaintained managed series does not
     # authorize even a temporary M1 maintenance lease.
     plan = db.get(ChartHistoryPlan, inst.id)
-    from .storage import MarketDataset
+    from .storage import MarketComposite, MarketDataset
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == inst.id))
+    composite = db.scalar(select(MarketComposite).where(MarketComposite.instrument_id == inst.id))
     live_source = dataset and dataset.identity["source"] == "oanda"
-    if not live_source and not inst.enabled and not (plan and plan.realtime_enabled):
+    if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
         return
     import hashlib
 

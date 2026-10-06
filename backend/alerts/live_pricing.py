@@ -40,12 +40,10 @@ def ensure_catalog(items, account):
     scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
     by_symbol = {row["name"]: row for row in items}
     resident = tuple(symbol.strip() for symbol in settings.oanda_resident_symbols.split(",") if symbol.strip())
-    if not resident or any(symbol not in by_symbol for symbol in resident):
+    if any(symbol not in by_symbol for symbol in resident):
         raise ValueError("Resident instruments are unavailable in this practice account")
     with transaction() as db:
         for symbol, meta in by_symbol.items():
-            if meta.get("type") != "CURRENCY" and symbol != "XAU_USD":
-                continue
             logical = symbol.replace("_", "")
             if len(logical) > 10:
                 continue
@@ -67,10 +65,10 @@ def desired_datasets(account):
     scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
     residents = {symbol.strip() for symbol in settings.oanda_resident_symbols.split(",") if symbol.strip()}
     with transaction() as db:
-        from .storage import MarketDemand
+        from .market_usage import composite_targets, wanted_instruments
 
-        wanted = set(db.scalars(select(Watch.instrument_id).where(Watch.status == "active")))
-        wanted.update(db.scalars(select(MarketDemand.instrument_id).where(MarketDemand.expires > now_ms())))
+        wanted = wanted_instruments(db)
+        targets = composite_targets(db, wanted)
         result = {}
         for row in db.scalars(select(MarketDataset)):
             identity = DatasetIdentity.model_validate(row.identity)
@@ -79,7 +77,7 @@ def desired_datasets(account):
                 continue
             if identity.calendar_version != settings.oanda_calendar_version:
                 continue
-            if identity.provider_symbol in residents or row.instrument_id in wanted:
+            if identity.provider_symbol in residents or row.instrument_id in wanted or row.id in targets:
                 result[identity.provider_symbol] = identity
         return result
 
@@ -270,28 +268,33 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
             evaluate_quote(db, inst, event.source_time, Decimal(event.bid), Decimal(event.ask))
 
 
-def disconnected(ownership, epoch, identities, result, *, now=None):
+def disconnected(ownership, epoch, identities, result, *, now=None, intentional=False):
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
-        owner.failures = min(owner.failures + 1, 10)
+        owner.failures = 0 if intentional else min(owner.failures + 1, 10)
         delay = min(60000, 1000 * 2 ** (owner.failures - 1))
-        owner.next_at = max(stamp + int(delay * random.uniform(0.8, 1.2)), result.retry_at or 0)
-        owner.error = result.status
+        owner.next_at = 0 if intentional else max(stamp + int(delay * random.uniform(0.8, 1.2)), result.retry_at or 0)
+        owner.error = None if intentional else result.status
         owner.expires = 0
         owner.token = None
         for identity in identities.values():
             state = db.get(LiveState, identity.key)
             if state and state.epoch == epoch:
-                state.connection = "disconnected"
+                state.connection = "inactive" if intentional else "disconnected"
                 state.ready = False
-                state.error = result.status
+                state.error = None if intentional else result.status
                 state.forming = {**state.forming, "observation_complete": False} if state.forming else {}
                 state.revision += 1
                 dataset = db.get(MarketDataset, identity.key)
                 inst = db.get(Instrument, dataset.instrument_id)
-                inst.quality = "error"
-                inst.error = result.status
+                inst.quality = "waiting" if intentional else "error"
+                inst.error = None if intentional else result.status
+                if intentional:
+                    inst.enabled = False
+                    db.add(Audit(kind="pricing_idle", details={"dataset": identity.key,
+                        "epoch": epoch, "effective_at": stamp}))
+                    continue
                 for watch in db.scalars(select(Watch).where(Watch.instrument_id == inst.id,
                                                             Watch.status == "active")):
                     watch.paused_reason = "主行情不可用；备用尚未接入，暂停依赖缺失数据的判断"
@@ -388,7 +391,11 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
         from .market import ingest
         from .storage import Bar
 
-        apply_minutes(db, record(db, batch))
+        # Legacy empty confirmations carry no checkpoint and no M1 to pin.
+        # Preserve their independently reviewed closure path without inventing
+        # canonical minutes or a query checkpoint. Data confirmations stay strict.
+        if batch.rows:
+            apply_minutes(db, record(db, batch))
         previous_rows = {row.start: row for row in db.scalars(select(Bar).where(
             Bar.instrument_id == inst.id, Bar.timeframe == "M1",
             Bar.start >= batch.window_start, Bar.start < batch.window_end))}

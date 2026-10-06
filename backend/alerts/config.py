@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     oanda_calendar_profiles: dict[str, dict] = Field(default_factory=dict)
     oanda_recovery_minutes: int = Field(default=1500, ge=120, le=20000)
     oanda_stream_lease_seconds: int = Field(default=30, ge=20, le=90)
+    oanda_idle_grace_seconds: int = Field(default=60, ge=0, le=900)
     session_hours: int = 24
     market_poll_seconds: int = 15
     import_poll_seconds: int = 30
