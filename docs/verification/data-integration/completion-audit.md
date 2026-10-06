@@ -21,7 +21,15 @@ MT4 实时留到后续；OANDA 故障只降级，不切源。目标仍 active。
 | 持续完成柱规则计算 | 已建立，实际逐分钟推进；长期未完成 | [规则起点](sustained-m1-watches-start.json)、[当前规则](sustained-m1-watches-checkpoint.json)；04:08 起真实存在，不能回填之前无规则的时段 |
 | 两活跃交易日、欧美段、跨日和黄金暂停/恢复 | 尚未达到时长 | [04:04:14 UTC 新窗口](sustained-observation-window.json)，计划至 2026-10-08；[原中断窗口](sustained-observation-window-interrupted.json)保留错误 |
 | 全窗口 p50/p95/p99 与缺失/失败/迟到分母 | 等待持续窗口 | backend receive、Chromium receive→browser、M1→confirmation/evaluation 分别记录；短负载不代替长期结果 |
+| 有界逐时段分母及观察分组 | 实际只读 PostgreSQL 快照通过 | [分段快照](sustained-live-report-checkpoint.json)、[9 个统计回归](sustained-report-tests.txt)；未观测/unknown/闭市/补数分别列出，伦敦纽约分组及黄金 NY17–18 均非官方会话证明 |
 | 时钟误差说明 | 接收机 NTP 已采样；供应商时钟偏差未独立证明 | [窗口时钟](receiver-clock-sync-window.txt)，同主机 browser/backend；不将源时间差宣称为纯传输延迟 |
 
 所有“已验证”只指链接对应的实际样本/范围，不扩大为全部 P0–P2 验收通过。
 来源会话未知保持 unknown，不能为了满足覆盖门槛裁剪边界柱、补价格、静默减分母或换成 MT4。
+
+04:35 UTC 的实际分段快照：两品种各30个已确认完整分钟，missing/fail/over30s均为0，
+M1确认 p95 为 XAU 7.638s、EUR 11.237s，p99 为 XAU 10.485s、EUR 11.624s。
+04:09首根合格规则柱之后分别有27个入库与规则阶段审计；这些审计不含逐规则执行记录，
+规则连续活跃还需结合起点、当前last_event及长期观察判断，不能只凭阶段审计认定。
+浏览器62块，errors0、无心跳块0，原始不健康状态仍保留。此记录仅为短窗口进展。
+浏览器计划于10月8日04:04:14UTC结束；规则48小时窗口须独立延续并检查至04:09UTC之后。

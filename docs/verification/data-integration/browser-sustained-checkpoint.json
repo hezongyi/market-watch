@@ -18,64 +18,64 @@
   "prior_records_retained_in_original": 118,
   "contains_deployment": false,
   "first_block": 1791259485335,
-  "last_block": 1791260866328,
-  "blocks": 47,
-  "snapshots": 1104,
-  "heartbeats": 1363,
+  "last_block": 1791261317127,
+  "blocks": 62,
+  "snapshots": 1479,
+  "heartbeats": 1805,
   "errors": 0,
   "zero_heartbeat_blocks": 0,
-  "max_block_interval_ms": 30115,
+  "max_block_interval_ms": 30266,
   "opened": 1,
   "symbols": {
     "EURUSD": {
-      "unique_quotes": 337,
+      "unique_quotes": 460,
       "negative_delays": 0,
       "missing_quote_snapshots": 0,
       "epoch_changes": 0,
       "quality_counts": {
-        "healthy": 1009,
-        "stale": 95
+        "healthy": 1347,
+        "stale": 132
       },
       "receive_to_browser_ms": {
-        "samples": 337,
+        "samples": 460,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 460,
-        "p95_ms": 1040,
-        "p99_ms": 1210
+        "p50_ms": 440,
+        "p95_ms": 1010,
+        "p99_ms": 1180
       },
       "source_to_browser_ms": {
-        "samples": 337,
+        "samples": 460,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 850,
-        "p95_ms": 1600,
-        "p99_ms": 1870
+        "p50_ms": 830,
+        "p95_ms": 1560,
+        "p99_ms": 1920
       }
     },
     "XAUUSD": {
-      "unique_quotes": 974,
+      "unique_quotes": 1301,
       "negative_delays": 0,
       "missing_quote_snapshots": 0,
       "epoch_changes": 0,
       "quality_counts": {
-        "healthy": 1104
+        "healthy": 1479
       },
       "receive_to_browser_ms": {
-        "samples": 974,
+        "samples": 1301,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 380,
-        "p95_ms": 980,
-        "p99_ms": 1090
+        "p50_ms": 350,
+        "p95_ms": 960,
+        "p99_ms": 1080
       },
       "source_to_browser_ms": {
-        "samples": 974,
+        "samples": 1301,
         "invalid_samples": 0,
         "histogram_resolution_ms": 10,
-        "p50_ms": 700,
-        "p95_ms": 1340,
-        "p99_ms": 1700
+        "p50_ms": 680,
+        "p95_ms": 1330,
+        "p99_ms": 1620
       }
     }
   },

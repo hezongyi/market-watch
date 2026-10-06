@@ -301,7 +301,24 @@ docker compose -p market-watch-data-integration -f docs/verification/data-integr
 
 ## 接续验收
 
-保持本任务隔离实例运行，持续采集并完成两个十年任务。最终按正式方案汇总观察覆盖、
-unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证据；生产存量清点需独立只读核对。
+保持本任务隔离实例运行，保留已完成校验的两个十年固定版本。最终按正式方案汇总观察覆盖、
+unknown、失败、迟到、正常与故障阶段、时钟校准和源日历证据；生产存量清点及Ubuntu备份恢复已通过。
 当前目标仍 active，MT4 不在本轮范围。服务启动/停止与凭据位置见
 [实例说明](verification/data-integration/README.md)。
+
+### 2026-10-06 04:36 UTC：有界持续验收报告
+
+- 保持 `feat/market-data-integration` 隔离 worktree，浏览器service PID2266365仍active/running，
+  未重新部署或重启长期窗口。
+- 新增 `scripts/sustained_live_report.py`：PostgreSQL只读repeatable-read快照，最多72小时，
+  按UTC小时及伦敦/纽约观察时段列出完整分钟、未知/无观测、缺失、失败、迟到和补数。
+  黄金NY17–18仅为candidate分组；原始价格、日历身份与历史版本均未修改。
+- 规则阶段从04:09首根合格柱收盘起统计，不能回填此前入库时段；还按owned规则armed_at约束。
+  无owned规则时不统计计算样本。阶段审计只证明入库/计算阶段flush，不证明逐规则连续执行。
+- [实际快照](verification/data-integration/sustained-live-report-checkpoint.json)：两品种各30根M1，
+  缺失/失败/超过30秒迟到均0，合格阶段审计各27；小时分组与总体分母逐项一致。
+  浏览器62块、errors0、无心跳块0，所有stale状态保留。
+- [9个统计回归](verification/data-integration/sustained-report-tests.txt)覆盖未知分母、失败/迟到、
+  补数、重复审计、规则起点、未来确认、负时差和DST分组；Ruff、diff检查通过。
+- 两交易日仍未完成。浏览器计划到10月8日04:04:14UTC，规则完整48小时需到04:09UTC后独立检查。
+  来源账户日历适用性及供应商时钟偏差仍未证明，目标保持active。

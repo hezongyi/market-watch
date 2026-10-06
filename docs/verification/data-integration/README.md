@@ -98,7 +98,7 @@ systemctl --user stop market-watch-data-integration-browser.service
 
 原 03:06 UTC 窗口因 API 部署触发观察工具 EventSource CLOSED 而中断，保留
 [原窗口](sustained-observation-window-interrupted.json)及原 JSONL。工具补齐 15s 心跳超时重连，
-真实 Chromium 本地 502→恢复验证见 [重连证据](observer-reconnect.json)。新完整窗口于
+真实 Chromium 本地 502→恢复验证见 [重连证据](observer-reconnect.json)。
 03:50 窗口为工具续期修正而停止，[该窗口](sustained-observation-window-pre-renewal.json)保留。
 最终完整窗口于 **2026-10-06 04:04:14.900 UTC** 启动，计划至 **2026-10-08 04:04:14.900 UTC**。
 窗口起点/代码版本/状态见 [窗口记录](sustained-observation-window.json)；每次中断或重启都在 JSONL 追加
@@ -113,6 +113,26 @@ systemctl --user stop market-watch-data-integration-browser.service
 持续 M1 验收规则于 04:08 UTC 建立；其 armed_at 与首次 last_event 独立记录，
 预警计算验收从规则真实存在并完成首次判断后统计，不能回填到浏览器窗口起点。
 规则使用远离市场的价位保持 M1 计算活跃，不人为制造信号；先前真实触发样本另有证据。
+
+按 UTC 小时与欧美观察时段输出有界持续验收报告，无需构建镜像或重启服务：
+
+```bash
+sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml exec -T api python - --since 1791259500000 --evaluation-since 1791259740000' < scripts/sustained_live_report.py
+```
+
+该工具使用 PostgreSQL 只读 repeatable-read 快照，最多查询72小时，保留每个完整分钟的分母，
+分别报告未知、有记录但未确认、没有观测记录、失败、迟到和补数。源到接收时差的直方图精度为10ms；
+成功确认的 p50/p95/p99 使用 nearest rank，与缺失/失败分母同时输出。`--evaluation-since`
+表示首根合格柱的**收盘时刻**，还会按验收规则真实 armed_at 限制；没有本工具规则时不输出计算样本。
+现有审计仅证明入库与规则计算阶段完成，不包含逐规则执行记录，也不能独立证明规则一直活跃。
+当前规则状态/last_event、[规则起点](sustained-m1-watches-start.json)和观察记录需共同评估。
+
+伦敦、纽约工作日08–17点只是观察分组；黄金纽约17–18点标 candidate，不构成已认证会话或闭市。
+`--until` 可限制时段，但分钟级期望、尝试及报价累计仍是采样时数据库中的最终状态，
+不能把该参数当完整的历史事件重建。首次实际报告见
+[有界持续快照](sustained-live-report-checkpoint.json)，短窗口仍不代表两交易日验收。
+浏览器计划结束为10月8日04:04:14UTC；持续规则的48小时计算窗口至少到04:09UTC后独立检查，
+不能将创建前的几分钟回填成实际规则执行。
 
 ## 当前结果与限制
 
