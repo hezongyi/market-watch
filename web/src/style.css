@@ -888,12 +888,38 @@ input::placeholder {
 }
 .replay-setup label {
   margin: 0;
-  flex: 1;
-  min-width: 100px;
+  flex: 1 1 240px;
+  min-width: min(240px, 100%);
 }
 .replay-setup input {
-  font-size: 12px;
+  font-size: 14px;
 }
+.qualified-series-picker {
+  flex-basis: 100%;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.qualified-series-picker > label {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+.qualified-series-picker select,
+.qualified-series-picker input {
+  width: 100%;
+  min-width: 0;
+  font-size: 14px;
+}
+.qualified-series-picker > p,
+.qualified-series-picker > div,
+.qualified-series-picker > details {
+  flex-basis: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.qualified-series-picker summary { cursor: pointer; }
+.qualified-series-picker li { margin: 8px 0; }
 .replay-controls {
   padding: 16px 24px;
   display: flex;

@@ -39,6 +39,7 @@ import {
 import "./style.css";
 import AdvancedWorkspacePage from "./advanced/AdvancedWorkspace";
 import MarketDataPage from "./market-data/Center";
+import SeriesPicker, { type QualifiedSeries } from "./market-data/SeriesPicker";
 
 const names: Record<string, string> = {
   pullback: "回落 / 反弹结束",
@@ -906,6 +907,8 @@ function Signals({
 
 function ReplayPage({ instruments }: { instruments: Instrument[] }) {
   const location=useLocation();
+  const [inputMode,setInputMode]=useState<'history'|'legacy'>('history');
+  const [selectedHistory,setSelectedHistory]=useState<QualifiedSeries|null>(null);
   const [historyVersions,setHistoryVersions]=useState<any[]>([]);
   const [historyDatasets,setHistoryDatasets]=useState<any[]>([]);
   const [datasetVersion,setDatasetVersion]=useState(new URLSearchParams(location.search).get('dataset_version') ?? '');
@@ -925,11 +928,29 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
     load();const timer=setInterval(load,10000);
     return()=>{active=false;clearInterval(timer)};
   },[datasetVersion,periodRefresh]);
-  useEffect(()=>{let active=true;Promise.all([api('/market-data/versions'),api('/market-data/datasets')]).then(([v,d])=>{
-    if(!active)return;setHistoryVersions(v.filter((row:any)=>row.status==='published'&&row.payload_available!==false));setHistoryDatasets(d);
+  useEffect(()=>{let active=true;
     const wanted=new URLSearchParams(location.search).get('dataset_version');
-    if(wanted){const version=v.find((row:any)=>row.id===wanted);const source=d.find((row:any)=>row.id===version?.dataset_id);if(source){setInstrument(source.instrument_id);setDatasetVersion(wanted);setStart(inputTime(version.start));setEnd(inputTime(version.end));setFrame('M1')}}
+    Promise.all([wanted?api('/market-data/versions/'+encodeURIComponent(wanted)):Promise.resolve(null),api('/market-data/datasets')]).then(([version,d])=>{
+    if(!active)return;setHistoryDatasets(d);
+    if(wanted){const source=d.find((row:any)=>row.id===version?.dataset_id);if(source&&version.status==='published'&&version.payload_available!==false){
+      setInputMode('history');setInstrument(source.instrument_id);setDatasetVersion(wanted);setStart(inputTime(version.start));setEnd(inputTime(version.end));setFrame('M1');
+      setSelectedHistory({id:version.id,ticker:'MWH:'+version.id,symbol:source.logical_symbol,series_kind:'history',dataset_id:source.id,historical_source:source.identity.source,basis:source.identity.basis,calendar:source.aggregation_calendar,description:'固定发布版本'});
+    }else{setDatasetVersion('');setError('指定历史版本尚未发布或已回收，请查看数据中心')}}
   }).catch(e=>{if(active)setError(String(e))});return()=>{active=false}},[location.search]);
+  useEffect(()=>{
+    setHistoryVersions([]);
+    if(!selectedHistory)return;
+    const controller=new AbortController();
+    Promise.all([
+      api<any[]>('/market-data/versions?dataset_id='+selectedHistory.dataset_id,undefined,controller.signal),
+      api('/market-data/versions/'+selectedHistory.id,undefined,controller.signal),
+    ]).then(([rows,selected])=>{if(!controller.signal.aborted){
+      const versions=rows.some(row=>row.id===selected.id)?rows:[selected,...rows];
+      setHistoryVersions(versions.filter(row=>row.dataset_id===selectedHistory.dataset_id&&row.status==='published'&&row.payload_available!==false));
+    }})
+      .catch(e=>{if(!controller.signal.aborted)setError(String(e))});
+    return()=>controller.abort();
+  },[selectedHistory?.dataset_id]);
   const generation=useRef(0);
   const [savedRuns,setSavedRuns]=useState<any[]>([]);
   useEffect(()=>{api('/replays').then(setSavedRuns).catch(()=>{})},[]);
@@ -949,14 +970,18 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
     [open, setOpen] = useState(false),
     [seek, setSeek] = useState("");
   const locked = useRef(false);
-  const fixedDataset=historyDatasets.find(d=>d.instrument_id===instrument);
+  const fixedDataset=inputMode==='history'?historyDatasets.find(d=>d.id===selectedHistory?.dataset_id):undefined;
+  function selectHistory(row:QualifiedSeries|null){
+    setSelectedHistory(row);setDatasetVersion('');setStart('');setEnd('');setError('');
+    setInstrument(historyDatasets.find(d=>d.id===row?.dataset_id)?.instrument_id ?? '');
+  }
   function replayLabel(id:string){
     const source=historyDatasets.find(d=>d.instrument_id===id);
     return source?`${source.logical_symbol} · ${source.identity.source==='oanda'?'OANDA':source.identity.source==='dukascopy'?'Dukascopy':source.identity.source} · ${source.aggregation_calendar==='ny17'?'NY17':'UTC 00:00'}`:id;
   }
   const requiredPeriods=Array.from(new Set([frame,'D1']));
   const missingPeriods=requiredPeriods.filter(f=>!historyPeriods.some(p=>p.version_id===datasetVersion&&p.timeframe===f&&p.status==='published'));
-  const fixedReady=!!datasetVersion&&!periodsLoading&&!periodsError&&!missingPeriods.length;
+  const fixedReady=!!datasetVersion&&historyVersions.some(v=>v.id===datasetVersion&&v.dataset_id===selectedHistory?.dataset_id)&&!periodsLoading&&!periodsError&&!missingPeriods.length;
   async function prepareReplayPeriods(){
     if(!datasetVersion||preparingPeriods)return;
     setPreparingPeriods(true);setPeriodsError('');
@@ -968,13 +993,14 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
   }
   async function create(e: React.FormEvent) {
     e.preventDefault();
+    if(inputMode==='history'&&(!fixedDataset||!fixedReady)){setError('请选择已发布的自建行情、固定版本和可用周期');return}
     const g=++generation.current;
     setBusy(true);
     setError("");
     setPlaying(false);
     try {
       const result=await api("/replays", {
-          instrument_id: instrument,
+          instrument_id: inputMode==='history'?fixedDataset.instrument_id:instrument,
           dataset_version: datasetVersion || undefined,
           timeframe: frame,
           start: new Date(start).getTime(),
@@ -1038,7 +1064,11 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
       {savedRuns.length>0&&<section className="panel"><div className="panel-heading"><h2>继续已有演练</h2></div><div className="replay-controls"><label>已保存的演练<select defaultValue="" onChange={e=>{if(e.target.value)resumeReplay(e.target.value)}}><option value="">选择演练</option>{savedRuns.map(r=><option key={r.id} value={r.id}>{replayLabel(r.instrument_id)} · {r.timeframe} · {date(r.cursor)} · {r.id.slice(0,6)}</option>)}</select></label></div></section>}
       <section className="panel replay-setup">
         <form onSubmit={create}>
-          <label>
+          <label>行情范围<select value={inputMode} onChange={e=>{
+            const mode=e.target.value as 'history'|'legacy';setInputMode(mode);setDatasetVersion('');setStart('');setEnd('');setError('');
+            setInstrument(mode==='legacy'?'XAUUSD':historyDatasets.find(d=>d.id===selectedHistory?.dataset_id)?.instrument_id ?? '');
+          }}><option value="history">自建行情 · 固定发布版本</option><option value="legacy">旧版历史 · 兼容入口</option></select></label>
+          {inputMode==='history'?<SeriesPicker kind="history" selected={selectedHistory} onSelect={selectHistory}/>:<label>
             品种
             <select
               value={instrument}
@@ -1047,14 +1077,13 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
               {instruments.map((i) => (
                 <option key={i.id}>{i.id}</option>
               ))}
-              {historyDatasets.filter(d=>historyVersions.some(v=>v.dataset_id===d.id)&&!instruments.some(i=>i.id===d.instrument_id)).map(d=><option key={d.instrument_id} value={d.instrument_id}>{d.logical_symbol} · {d.identity.source==='oanda'?'OANDA':d.identity.source==='dukascopy'?'Dukascopy':d.identity.source} · {d.aggregation_calendar==='ny17'?'NY17':'UTC 00:00'} 历史</option>)}
             </select>
-          </label>
-          {historyDatasets.some(d=>d.instrument_id===instrument)&&<label>不可变历史版本<select required value={datasetVersion} onChange={e=>{setDatasetVersion(e.target.value);const version=historyVersions.find(v=>v.id===e.target.value);if(version){setStart(inputTime(version.start));setEnd(inputTime(version.end))}}}><option value="">选择已发布版本</option>{historyVersions.filter(v=>historyDatasets.find(d=>d.id===v.dataset_id)?.instrument_id===instrument).map(v=><option key={v.id} value={v.id}>{date(v.start)} — {date(v.end)} · {v.id.slice(0,8)}</option>)}</select></label>}
+          </label>}
+          {fixedDataset&&<label>不可变历史版本<select required value={datasetVersion} onChange={e=>{setDatasetVersion(e.target.value);const version=historyVersions.find(v=>v.id===e.target.value);if(version){setStart(inputTime(version.start));setEnd(inputTime(version.end))}}}><option value="">选择已发布版本</option>{historyVersions.filter(v=>v.dataset_id===fixedDataset.id).map(v=><option key={v.id} value={v.id}>{date(v.start)} — {date(v.end)} · {v.id.slice(0,8)}</option>)}</select></label>}
           <label>
             周期
             <select value={frame} onChange={(e) => setFrame(e.target.value)}>
-              {(fixedDataset?['M1','M5','M15','M30','H1','H4','D1','W1','MN']:frames).map((f) => (
+              {(inputMode==='history'?['M1','M5','M15','M30','H1','H4','D1','W1','MN']:frames).map((f) => (
                 <option key={f}>{f}</option>
               ))}
             </select>
@@ -1077,13 +1106,16 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
               onChange={(e) => setEnd(e.target.value)}
             />
           </label>
-          <button className="primary" disabled={busy||!!fixedDataset&&!fixedReady}>
+          <button className="primary" disabled={busy||inputMode==='history'&&(!fixedDataset||!fixedReady)}>
             {busy ? "正在准备…" : "创建演练"}
           </button>
-          <button type="button" className="secondary" disabled={busy||!start||!end||!!fixedDataset||!!datasetVersion} onClick={importHistory}>补齐所选历史</button>
+          {inputMode==='legacy'&&<button type="button" className="secondary" disabled={busy||!start||!end} onClick={importHistory}>补齐所选历史</button>}
         </form>
+        {inputMode==='history'&&!selectedHistory&&<p>回测使用自建历史。选择来源和日界后，再明确选择发布版本及区间；<a href="/market-data">去数据中心维护历史</a>。</p>}
+        {inputMode==='legacy'&&<p>保留旧版历史及演练绑定；该入口不替代自建行情的固定版本回测。</p>}
         {fixedDataset&&<div aria-live="polite">
           <p>固定历史 · {fixedDataset.identity.source==='oanda'?'OANDA':fixedDataset.identity.source==='dukascopy'?'Dukascopy':fixedDataset.identity.source} · {fixedDataset.aggregation_calendar==='ny17'?'NY17':'UTC 00:00'}。演练保留所选版本和周期；未观察区间仍可能存在缺口。</p>
+          {datasetVersion&&historyVersions.filter(v=>v.id===datasetVersion).map(v=><p key={v.id}>所选固定版本：{date(v.start)} — {date(v.end)} · {v.id.slice(0,8)}</p>)}
           {datasetVersion&&(periodsLoading?<p>正在核对回测周期…</p>:periodsError?<p role="alert">{periodsError}</p>:missingPeriods.length?<p>等待准备：{missingPeriods.join('、')}。D1 用于前日数据。</p>:<p>回测周期与前日数据已发布。</p>)}
           {datasetVersion&&missingPeriods.length>0&&!periodsLoading&&<button type="button" className="secondary" disabled={preparingPeriods} onClick={prepareReplayPeriods}>{preparingPeriods?'正在提交…':'准备回测周期'}</button>}
           <a href={`/market-data/datasets/${fixedDataset.id}`}>查看历史覆盖与维护</a>
