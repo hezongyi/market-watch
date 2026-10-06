@@ -23,6 +23,7 @@ from .storage import (
     LiveMinute,
     LiveState,
     MarketDataset,
+    Preference,
     PricingOwner,
     Watch,
     now_ms,
@@ -479,10 +480,18 @@ def snapshots(*, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
         result = []
+        source_cooldowns = {}
         for state in db.scalars(select(LiveState)):
             if state.epoch == 0 or state.connection == "inactive":
                 continue
             dataset = db.get(MarketDataset, state.dataset_id)
+            source = dataset.identity["source"]
+            if source not in source_cooldowns:
+                budget = db.get(Preference, "upstream_slots:" + source)
+                deadline = budget.value.get("cooldown_until", 0) if budget else 0
+                # Budget Retry-After durations may have fractional milliseconds.
+                # Report only active shared REST cooldowns, rounded outward.
+                source_cooldowns[source] = math.ceil(deadline) if deadline > stamp else None
             inst = db.get(Instrument, dataset.instrument_id)
             session = session_from(inst.calendar_profile)
             quote = state.quote
@@ -500,6 +509,7 @@ def snapshots(*, now=None):
                 "revision": state.revision, "quote": quote, "forming": state.forming,
                 "quality": quality, "connection": state.connection, "connection_epoch": state.epoch,
                 "heartbeat_at": state.heartbeat_at, "last_confirmed_m1": state.confirmed_end,
+                "cooldown_until": source_cooldowns[source],
                 "recovery_ready": state.ready, "error": state.error,
                 "calendar_verified": bool(session and int(session.reviewed_start.timestamp() * 1000) <= stamp
                     < int(session.reviewed_end.timestamp() * 1000)),

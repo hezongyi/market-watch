@@ -1,6 +1,9 @@
+import json
+
+import pytest
 from alerts import api as api_module
 from alerts import live_pricing as live
-from alerts.storage import MarketDataset, MarketDemand
+from alerts.storage import MarketDataset, MarketDemand, Preference
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 from test_live_pricing import running as _running
@@ -57,3 +60,59 @@ def test_registered_source_identity_is_available_and_saved_in_chart_workspace(ru
             assert metrics.status_code == 200
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_live_snapshot_reports_shared_rest_cooldown_without_changing_quote_readiness(running):
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    from test_live_pricing import candles, quote
+
+    live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
+    live.publish_event(ownership, epoch, quote(identity, epoch), identities, now=125000)
+    with factory.begin() as db:
+        db.add(Preference(key="upstream_slots:oanda", value={"cooldown_until": 155000.5}))
+        db.add(Preference(key="upstream_slots:dukascopy", value={"cooldown_until": 999999}))
+    rows = live.snapshots(now=125000)
+    assert {row["cooldown_until"] for row in rows} == {155001}
+    eur = next(row for row in rows if row["dataset_id"] == identity.key)
+    assert eur["quote_ready"] and eur["candle_ready"]
+    assert eur["quality"] == "healthy"
+    assert all(row["cooldown_until"] is None for row in live.snapshots(now=155001))
+
+
+def test_snapshot_signature_detects_cooldown_change_without_new_quote_or_epoch():
+    from alerts.live_api import snapshot_signature
+
+    row = {"dataset_id": "dataset", "revision": 2, "quality": "healthy", "cooldown_until": None}
+    assert snapshot_signature([row]) != snapshot_signature([row | {"cooldown_until": 200000}])
+    assert snapshot_signature([row]) == snapshot_signature([dict(row)])
+
+
+@pytest.mark.asyncio
+async def test_sse_publishes_cooldown_start_and_expiry_with_unchanged_revision(monkeypatch):
+    from alerts import live_api
+
+    deadlines = iter((None, 200000, None))
+    monkeypatch.setattr(live_api, "snapshots", lambda: [{"dataset_id": "dataset", "revision": 2,
+        "quality": "healthy", "cooldown_until": next(deadlines)}])
+
+    async def no_delay(_):
+        return None
+
+    monkeypatch.setattr(live_api.asyncio, "sleep", no_delay)
+
+    class Request:
+        remaining = 3
+
+        async def is_disconnected(self):
+            self.remaining -= 1
+            return self.remaining < 0
+
+    route = next(route for route in live_api.router(lambda: "test").routes
+                 if route.path.endswith("/events"))
+    response = await route.endpoint(Request())
+    snapshots = []
+    async for event in response.body_iterator:
+        if event.startswith("event: snapshot"):
+            snapshots.append(json.loads(event.split("data: ")[1])[0])
+    assert [row["cooldown_until"] for row in snapshots] == [None, 200000, None]

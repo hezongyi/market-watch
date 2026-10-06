@@ -18,6 +18,12 @@ class Demand(BaseModel):
     dataset_id: str = Field(min_length=64, max_length=64, pattern=r"^[a-f0-9]+$")
 
 
+def snapshot_signature(snapshot):
+    # Shared cooldowns can change without a quote or LiveState revision.
+    return tuple((row["dataset_id"], row["revision"], row["quality"], row["cooldown_until"])
+                 for row in snapshot)
+
+
 def router(authenticated):
     routes = APIRouter(prefix="/api/market-data/live", dependencies=[Depends(authenticated)])
 
@@ -65,7 +71,7 @@ def router(authenticated):
             cursor = None
             while not await request.is_disconnected():
                 snapshot = await asyncio.to_thread(snapshots)
-                signature = tuple((row["dataset_id"], row["revision"], row["quality"]) for row in snapshot)
+                signature = snapshot_signature(snapshot)
                 if cursor != signature:
                     # Every browser reconnect starts with a full current snapshot.
                     yield "event: snapshot\ndata: " + json.dumps(snapshot) + "\n\n"
