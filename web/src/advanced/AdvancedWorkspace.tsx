@@ -263,7 +263,7 @@ export default function AdvancedWorkspace() {
               // workspace; it cannot replace an arbitrary alert configuration.
               const row = await api(`/chart-alerts/${q.alert_id}`), a = row.config.association;
               if (!a || requestWorkspace !== current.current?.id || q.workspace_id !== requestWorkspace || a.workspace_id !== requestWorkspace || a.object_id !== q.object_id || a.chart_id !== q.chart_id) throw Error("告警图表关联已改变");
-              if (q.op === "lifecycle" && q.action === "drawing_deleted") result = await api(`/chart-alerts/${q.alert_id}/lifecycle`, {version: q.version, action: "drawing_deleted"});
+              if (q.op === "lifecycle" && q.action === "drawing_deleted") result = await api(`/chart-alerts/${q.alert_id}/lifecycle`, {version: q.version, control_revision: q.control_revision, request_id: q.request_id, action: "drawing_deleted"});
               else if (q.op === "edit" && q.line && a.object_kind === "drawing") result = await api(`/chart-alerts/${q.alert_id}/edit`, {version: q.version, config: {...row.config, condition: {...row.config.condition, right: {kind: "line", line: q.line}}, association: {...a, generation: q.generation}}});
               else throw Error("不允许的画线告警操作");
             }

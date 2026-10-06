@@ -78,3 +78,20 @@ def test_rule_versions_cannot_be_mutated_or_deleted(database):
     with pytest.raises(ValueError, match="不可变"):
         with database.begin() as db:
             db.delete(db.scalar(select(ChartAlertVersion).where(ChartAlertVersion.alert_id == ident)))
+
+
+def test_lifecycle_http_requires_revision_and_replays_same_request_once(database, monkeypatch):
+    with TestClient(api_module.app) as client:
+        login(client, monkeypatch)
+        row = client.post("/api/chart-alerts", json={
+            "request_id": "http-lifecycle", "config": config().model_dump(mode="json"),
+        }).json()
+        path = f"/api/chart-alerts/{row['id']}/lifecycle"
+        assert client.post(path, json={"version": 1, "action": "restart"}).status_code == 422
+        intent = {"version": 1, "control_revision": row["control_revision"],
+                  "request_id": "restart-once", "action": "restart"}
+        first = client.post(path, json=intent)
+        assert first.status_code == 200 and first.json()["run"] == 2
+        assert client.post(path, json=intent).json()["run"] == 2
+        assert client.post(path, json={**intent, "request_id": "stale-restart"}).status_code == 409
+        assert client.post(path, json={**intent, "action": "pause"}).status_code == 409

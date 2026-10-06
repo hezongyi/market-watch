@@ -133,6 +133,7 @@ class ChartAlert(Base):
     health: Mapped[str] = mapped_column(String(16), default="warming")
     health_reason: Mapped[str | None] = mapped_column(String(250))
     version: Mapped[int] = mapped_column(default=1)
+    control_revision: Mapped[int] = mapped_column(default=1, server_default="1")
     run: Mapped[int] = mapped_column(default=1)
     count: Mapped[int] = mapped_column(default=0)
     max_triggers: Mapped[int] = mapped_column(default=1)
@@ -142,6 +143,15 @@ class ChartAlert(Base):
     runtime: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class ChartAlertAction(Base):
+    """Committed lifecycle request identities; retries never repeat transitions."""
+    __tablename__ = "chart_alert_actions"
+    alert_id: Mapped[str] = mapped_column(ForeignKey("chart_alerts.id"), primary_key=True)
+    request_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    request_hash: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
 
 
 class ChartAlertVersion(Base):

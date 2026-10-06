@@ -352,6 +352,9 @@ print(sum(ys)/len(ys))
     );
     await api("/chart-alerts/" + dragRow.id + "/lifecycle", {
       version: 2,
+      control_revision: (await api("/chart-alerts/" + dragRow.id))
+        .control_revision,
+      request_id: crypto.randomUUID(),
       action: "pause",
     });
     await frame.evaluate((id) => widget.activeChart().removeEntity(id), dragId);

@@ -20,6 +20,7 @@ from .provider_capabilities import frames, versions
 from .storage import (
     Audit,
     ChartAlert,
+    ChartAlertAction,
     ChartAlertVersion,
     Instrument,
     Notification,
@@ -163,6 +164,7 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
         raise ValueError("到期时间必须晚于生效时间")
     identity = market_identity(db, config, dataset_id)
     alert.version += 1
+    alert.control_revision += 1
     alert.name, alert.max_triggers, alert.expires_at = config.name, config.max_triggers, config.expires_at
     alert.state, alert.runtime, alert.effective_at, alert.updated_at = {}, {}, at, at
     alert.health, alert.health_reason = "warming", "条件已更新，等待建立新基准"
@@ -176,13 +178,20 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
     return alert
 
 
-def lifecycle(db, alert_id, expected_version, action, *, at=None):
-    alert = locked(db, alert_id, expected_version)
+def lifecycle(db, alert_id, expected_version, action, *, expected_revision, request_id, at=None):
+    alert = locked(db, alert_id)
+    digest = hashlib.sha256(json.dumps([expected_version, expected_revision, action]).encode()).hexdigest()
+    previous = db.get(ChartAlertAction, (alert_id, request_id))
+    if previous:
+        if previous.request_hash != digest:
+            raise Conflict("此请求身份已用于其他告警操作")
+        return alert
+    if alert.version != expected_version or alert.control_revision != expected_revision:
+        raise Conflict("告警运行状态已改变，请读取当前状态后重试")
     at = now_ms() if at is None else at
     if alert.status == "archived":
-        if action == "archive":
-            return alert
-        raise ValueError("已删除的告警不能恢复")
+        if action != "archive":
+            raise ValueError("已删除的告警不能恢复")
     if action in ("pause", "drawing_deleted"):
         if alert.status == "active":
             alert.status = "paused"
@@ -198,7 +207,7 @@ def lifecycle(db, alert_id, expected_version, action, *, at=None):
         elif action == "rebaseline" and alert.health != "blocked":
             raise ValueError("仅等待核对的告警可重建基准")
         elif alert.status == "active" and action != "rebaseline":
-            return alert
+            raise ValueError("告警已在监控，无需恢复")
         alert.status, alert.state, alert.runtime, alert.effective_at = "active", {}, {}, at
         alert.health, alert.health_reason = "warming", "等待重新建立基准"
     elif action == "archive":
@@ -206,6 +215,8 @@ def lifecycle(db, alert_id, expected_version, action, *, at=None):
     else:
         raise ValueError("未知生命周期操作")
     alert.updated_at = at
+    alert.control_revision += 1
+    db.add(ChartAlertAction(alert_id=alert_id, request_id=request_id, request_hash=digest, created_at=at))
     db.add(Audit(kind="chart_alert_" + action, details={"alert_id": alert.id, "run": alert.run}))
     return alert
 
@@ -219,6 +230,7 @@ def consume(db, alert_id, observation: Observation, *, detected_at=None, baselin
         return None
     if alert.expires_at is not None and detected_at >= alert.expires_at:
         alert.status = "expired"
+        alert.control_revision += 1
         return None
     version = current_version(db, alert)
     config = AlertConfig.model_validate(version.config)
@@ -269,6 +281,7 @@ def consume(db, alert_id, observation: Observation, *, detected_at=None, baselin
                       status="suppressed" if late and config.late_delivery == "log_only" else "pending"))
     if alert.count >= alert.max_triggers:
         alert.status = "completed"
+        alert.control_revision += 1
     db.add(Audit(kind="chart_alert_signal", details={"alert_id": alert.id, "signal_id": record.id,
                                                     "ordinal": trigger.ordinal, "run": alert.run}))
     db.flush()

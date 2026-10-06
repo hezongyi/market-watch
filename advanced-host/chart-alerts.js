@@ -359,7 +359,11 @@ function chartAlertBridge({
   }
   function replace(row) {
     rows = rows.map((old) =>
-      old.id === row.id && old.version <= row.version ? row : old,
+      old.id === row.id &&
+      old.version <= row.version &&
+      !(old.control_revision > row.control_revision)
+        ? row
+        : old,
     );
   }
   function drawingEvent(
@@ -396,6 +400,8 @@ function chartAlertBridge({
               op: "lifecycle",
               alert_id: row.id,
               version: row.version,
+              control_revision: row.control_revision,
+              request_id: crypto.randomUUID(),
               action: "drawing_deleted",
               object_id: a.object_id,
               chart_id: a.chart_id,
@@ -692,7 +698,11 @@ function chartAlertBridge({
       )
       .map((row) => {
         const previous = rows.find((old) => old.id === row.id);
-        return previous?.version > row.version ? previous : row;
+        return previous &&
+          (previous.version > row.version ||
+            previous.control_revision > row.control_revision)
+          ? previous
+          : row;
       });
     for (const row of rows)
       if (!reconciliations.has(row.id)) {

@@ -16,6 +16,7 @@ from alerts.storage import (
     AgentCredential,
     AgentOperation,
     ChartAlert,
+    ChartAlertAction,
     ChartAlertVersion,
     Notification,
     Outbox,
@@ -82,7 +83,7 @@ def main():
     created = False
     tables = (ChartAlert, ChartAlertVersion, SignalRow, Notification, Outbox)
     if PROJECT == "mw-chart-alerts-integration":
-        tables += (AgentCredential, AgentOperation)
+        tables += (AgentCredential, AgentOperation, ChartAlertAction)
 
     def contents(db):
         with db.connect() as connection:
@@ -137,7 +138,7 @@ def main():
             assert connection.scalar(text("SELECT version_num FROM alembic_version")) == (
                 "s20_chart_alerts"
                 if PROJECT == "mw-chart-alerts-acceptance"
-                else "t21_merge_alerts_mcp"
+                else "u22_chart_alert_actions"
             )
         result = {
             "verified": True,
@@ -148,7 +149,7 @@ def main():
             "full_alert_payloads_equal": True,
             "migration_head": "s20_chart_alerts"
             if PROJECT == "mw-chart-alerts-acceptance"
-            else "t21_merge_alerts_mcp",
+            else "u22_chart_alert_actions",
             "temporary_restore_database_removed": True,
         }
     finally:

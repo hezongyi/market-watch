@@ -224,7 +224,8 @@ def main():
             saved = state(revised["id"])
             rebuilt = post(
                 "/chart-alerts/" + saved["id"] + "/lifecycle",
-                {"version": saved["version"], "action": "rebaseline"},
+                {"version": saved["version"], "control_revision": saved["control_revision"],
+                 "request_id": uuid.uuid4().hex, "action": "rebaseline"},
             )
             assert rebuilt["count"] == saved["count"] and rebuilt["run"] == saved["run"]
             wait(

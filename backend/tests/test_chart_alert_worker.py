@@ -209,3 +209,81 @@ def test_price_outside_reversed_ray_reports_geometry_range_not_indicator_warmup(
         assert '画线有效范围' in row.health_reason
         assert '指标' not in row.health_reason
         assert row.count == 0 and row.state == {}
+
+
+def test_pre_activation_gap_does_not_block_latest_price_baseline(database):
+    with database.begin() as db:
+        seed(db, [9, 9, 9, 11], absent=1)
+        ident = create(db, "old-gap", config(), at=180_000).id
+        assert len(evaluate(db, ident, now=240_001)) == 1
+        assert db.get(ChartAlert, ident).count == 1
+
+
+def test_pre_activation_gap_restarts_indicator_warmup_without_blocking_baseline(database):
+    with database.begin() as db:
+        seed(db, [9] * 20 + [15], absent=2)
+        ident = create(db, "old-indicator-gap", config(condition={
+            "relation": "cross_up", "left": {"kind": "indicator", "indicator": {
+                "name": "SMA", "params": {"period": 3},
+            }}, "right": {"kind": "constant", "value": 10},
+        }), at=1_200_000).id
+        assert len(evaluate(db, ident, now=1_260_001)) == 1
+        assert db.get(ChartAlert, ident).health == "ready"
+
+
+def test_managed_calendar_change_blocks_old_identity(database):
+    from alerts.storage import Instrument
+    with database.begin() as db:
+        seed(db, [9, 9, 11])
+        ident = create(db, "calendar-fence", config(), at=120_000).id
+        db.get(Instrument, "BTCUSDT").calendar = "ny17"
+        db.flush()
+        assert evaluate(db, ident, now=180_001) == []
+        row = db.get(ChartAlert, ident)
+        assert row.health == "blocked" and row.count == 0
+
+
+def test_published_intrabar_observation_waits_for_matching_publication(database):
+    from alerts.storage import ChartPublication, ChartPublishedBar
+    from test_chart_alert_values import rows
+    with database.begin() as db:
+        seed(db, [9, 9], incomplete=1)
+        db.add(ChartPublication(instrument_id="BTCUSDT", timeframe="M1", start=0,
+                               end=120_000, complete_count=1, initialized=True))
+        for payload in rows([9, 9], incomplete=1):
+            payload["observed_at"] = payload["end"]
+            db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1",
+                                    start=payload["start"], end=payload["end"],
+                                    complete=payload["complete"], payload=payload))
+        db.flush()
+        ident = create(db, "published-lag", config(mode="intrabar", published=True), at=120_000).id
+        evaluate(db, ident, now=120_001)
+    with database.begin() as db:
+        stage = db.scalar(select(Bar).where(Bar.start == 60_000))
+        stage.close = stage.high = D(11)
+        stage.observed_at = 120_010
+    with database.begin() as db:
+        assert evaluate(db, ident, now=120_011) == []
+        assert db.get(ChartAlert, ident).state["sequence"] == 120_000
+        published = db.get(ChartPublishedBar, ("BTCUSDT", "M1", 60_000))
+        published.payload = {**published.payload, "close": "11", "high": "11", "observed_at": 120_010}
+    with database.begin() as db:
+        assert len(evaluate(db, ident, now=120_012)) == 1
+        assert db.get(ChartAlert, ident).count == 1
+        assert evaluate(db, ident, now=120_013) == []
+
+
+def test_provider_acquisition_does_not_write_lifecycle_from_expired_snapshot(database, monkeypatch):
+    meta = {"id": "BTCUSDT", "source": "binance", "symbol": "BTCUSDT",
+            "basis": "last", "calendar": "utc0", "precision": 2}
+    key = provider_cache.ensure(meta, "M1")
+    with database.begin() as db:
+        ident = create(db, "collector-expiry", config(series_kind="provider", expires_at=1000),
+                       dataset_id=key, at=0).id
+    monkeypatch.setattr(provider_service, "now_ms", lambda: 2000)
+    provider_service.realtime_step("binance")
+    with database.begin() as db:
+        row = db.get(ChartAlert, ident)
+        assert row.status == "active" and row.control_revision == 1
+        evaluate(db, ident, now=2000)
+        assert row.status == "expired" and row.control_revision == 2

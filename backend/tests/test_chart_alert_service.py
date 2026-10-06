@@ -2,7 +2,8 @@ from decimal import Decimal as D
 
 import pytest
 from alerts.chart_alert_domain import Observation
-from alerts.chart_alert_service import AlertConfig, Conflict, consume, create, edit, lifecycle
+from alerts.chart_alert_service import AlertConfig, Conflict, consume, create, edit
+from alerts.chart_alert_service import lifecycle as apply_lifecycle
 from alerts.service import acknowledge
 from alerts.storage import ChartAlert, ChartAlertVersion, Notification, Outbox, SignalRow
 from sqlalchemy import func, select
@@ -137,3 +138,30 @@ def test_expiration_and_incorrect_source_never_silently_monitor_another_series(d
         consume(db, ident, sample(0, 9), detected_at=0)
         assert consume(db, ident, sample(1, 11), detected_at=1000) is None
         assert db.get(ChartAlert, ident).status == "expired"
+
+
+def lifecycle(db, alert_id, version, action, *, at=None):
+    import uuid
+    return apply_lifecycle(db, alert_id, version, action,
+                           expected_revision=db.get(ChartAlert, alert_id).control_revision,
+                           request_id=uuid.uuid4().hex, at=at)
+
+
+def test_lifecycle_fences_delayed_actions_and_replays_restart_once(database):
+    with database.begin() as db:
+        row = create(db, "lifecycle-race", config(), at=0)
+        apply_lifecycle(db, row.id, 1, "pause", expected_revision=1, request_id="pause", at=100)
+        apply_lifecycle(db, row.id, 1, "resume", expected_revision=2, request_id="resume", at=200)
+        with pytest.raises(Conflict):
+            apply_lifecycle(db, row.id, 1, "pause", expected_revision=1, request_id="delayed", at=300)
+        # Retrying the original pause is a no-op, and cannot undo the resume.
+        apply_lifecycle(db, row.id, 1, "pause", expected_revision=1, request_id="pause", at=300)
+        assert row.status == "active" and row.control_revision == 3
+        apply_lifecycle(db, row.id, 1, "restart", expected_revision=3, request_id="restart", at=400)
+        consume(db, row.id, sample(1, 9), detected_at=400)
+        consume(db, row.id, sample(2, 11), detected_at=600_001)
+        assert row.count == 1
+        apply_lifecycle(db, row.id, 1, "restart", expected_revision=3, request_id="restart", at=500)
+        assert row.run == 2 and row.count == 1 and row.control_revision == 4
+        with pytest.raises(Conflict):
+            apply_lifecycle(db, row.id, 1, "pause", expected_revision=4, request_id="restart")

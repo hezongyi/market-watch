@@ -70,6 +70,7 @@ export type AlertRow = {
   id: string;
   name: string;
   version: number;
+  control_revision: number;
   run: number;
   status: string;
   health: string;

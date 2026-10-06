@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, date } from "../api";
+import { ApiError, api, date } from "../api";
 import { ChartAlertDialog } from "./ChartAlertDialog";
 import {
   deliveryNames,
@@ -64,6 +64,17 @@ export function ChartAlertsPanel({
     });
   const mounted = useRef(true),
     refreshing = useRef(false);
+  const pendingActions = useRef(
+    new Map<
+      string,
+      {
+        version: number;
+        control_revision: number;
+        request_id: string;
+        action: string;
+      }
+    >(),
+  );
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -113,18 +124,30 @@ export function ChartAlertsPanel({
     }
   }, [draft, draftKey]);
   async function action(row: AlertRow, action: string) {
+    const key = `${row.id}:${action}`;
     setBusy(row.id);
     setError("");
     try {
-      const saved = await api<AlertRow>(`/chart-alerts/${row.id}/lifecycle`, {
+      const intent = pendingActions.current.get(key) || {
         version: row.version,
+        control_revision: row.control_revision,
+        request_id: crypto.randomUUID(),
         action,
+      };
+      pendingActions.current.set(key, intent);
+      const saved = await api<AlertRow>(`/chart-alerts/${row.id}/lifecycle`, {
+        ...intent,
       });
+      pendingActions.current.delete(key);
       if (mounted.current) {
         setFeedback(`${saved.name}：${statuses[saved.status]}`);
         await refresh();
       }
     } catch (e) {
+      if (e instanceof ApiError && e.status < 500) {
+        pendingActions.current.delete(key);
+        await refresh();
+      }
       if (mounted.current) setError(String(e));
     } finally {
       if (mounted.current) setBusy(null);

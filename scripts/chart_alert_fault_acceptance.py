@@ -10,6 +10,7 @@ import shlex
 import subprocess
 import time
 import uuid
+from contextlib import contextmanager
 from decimal import Decimal
 
 import httpx
@@ -46,6 +47,16 @@ def compose(*args):
     )
 
 
+@contextmanager
+def paused_api():
+    # Stop may have reached Docker even if the caller times out receiving it.
+    try:
+        compose("stop", "api")
+        yield
+    finally:
+        compose("start", "api")
+
+
 def wait(check, description, seconds=60):
     end = time.monotonic() + seconds
     while time.monotonic() < end:
@@ -77,7 +88,6 @@ def main():
         "scope": "deployed autonomous worker; synthetic data, gaps, stale timestamps and generated rule epoch",
         "cases": [],
     }
-    stopped = False
 
     def bar(db, start, price, complete=True, observed=None):
         db.add(
@@ -160,15 +170,12 @@ def main():
             wait(lambda: state()["health"] == "stale", "old complete source must be stale")
             with factory() as db:
                 assert db.get(ChartAlert, ident).state["sequence"] == epoch
-            compose("stop", "api")
-            stopped = True
-            with factory.begin() as db:
-                # Explicit fault fixture: generated rule simulates a run active at epoch.
-                db.get(ChartAlert, ident).effective_at = epoch
-                bar(db, epoch + 60_000, 9)
-                bar(db, epoch + 120_000, 11)
-            compose("start", "api")
-            stopped = False
+            with paused_api():
+                with factory.begin() as db:
+                    # Explicit fault fixture: generated rule simulates a run active at epoch.
+                    db.get(ChartAlert, ident).effective_at = epoch
+                    bar(db, epoch + 60_000, 9)
+                    bar(db, epoch + 120_000, 11)
             wait(login, "HTTPS login after restart")
             wait(
                 lambda: state()["health"] == "stale", "missing first pending bar blocks advancement"
@@ -185,13 +192,10 @@ def main():
             report["cases"].append(
                 "gap fences persisted checkpoint; actual backfill yields exactly two ordered late events"
             )
-            compose("stop", "api")
-            stopped = True
-            with factory.begin() as db:
-                bar(db, epoch + 180_000, 9)
-                bar(db, epoch + 240_000, 11)
-            compose("start", "api")
-            stopped = False
+            with paused_api():
+                with factory.begin() as db:
+                    bar(db, epoch + 180_000, 9)
+                    bar(db, epoch + 240_000, 11)
             wait(login, "HTTPS login after queued data restart")
             wait(
                 lambda: state()["count"] == 3 and state()["status"] == "completed",
@@ -230,8 +234,6 @@ def main():
             (ROOT / "fault-acceptance.json").write_text(json.dumps(report, indent=2) + "\n")
             print(json.dumps(report))
     finally:
-        if stopped:
-            compose("start", "api")
         engine.dispose()
 
 

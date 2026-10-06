@@ -77,6 +77,8 @@ class Edit(Contract):
 
 class Action(Contract):
     version: int = Field(ge=1)
+    control_revision: int = Field(ge=1)
+    request_id: str = Field(min_length=1, max_length=100)
     action: Literal["pause", "resume", "restart", "rebaseline", "archive", "drawing_deleted"]
 
 
@@ -94,7 +96,8 @@ def dataset_for(config):
 def alert_dict(db, alert):
     version = current_version(db, alert)
     return {"id": alert.id, "name": alert.name, "version": alert.version,
-            "run": alert.run, "status": alert.status, "health": alert.health,
+            "run": alert.run, "control_revision": alert.control_revision,
+            "status": alert.status, "health": alert.health,
             "health_reason": alert.health_reason, "count": alert.count,
             "max_triggers": alert.max_triggers, "effective_at": alert.effective_at,
             "expires_at": alert.expires_at, "created_at": alert.created_at,
@@ -211,7 +214,9 @@ def router(authenticated):
     def action(alert_id: str, body: Action):
         try:
             with transaction() as db:
-                return alert_dict(db, lifecycle(db, alert_id, body.version, body.action))
+                return alert_dict(db, lifecycle(db, alert_id, body.version, body.action,
+                                               expected_revision=body.control_revision,
+                                               request_id=body.request_id))
         except (ValueError, LookupError) as exc:
             raise error(exc) from exc
 

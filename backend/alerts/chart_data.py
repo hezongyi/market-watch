@@ -55,8 +55,8 @@ def expected_days(left, right, calendar, gold, closures):
     return frozenset(expected)
 
 
-def chart_rows(db, instrument, frame, before, limit, now):
-    rows = _chart_rows(db, instrument, frame, before, limit, now)
+def chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
+    rows = _chart_rows(db, instrument, frame, before, limit, now, observed=observed)
     if not rows or frame == "M1":
         return rows
     source = "M15" if frame == "M30" else "D1" if frame in ("W1", "MN") else frame
@@ -73,7 +73,7 @@ def chart_rows(db, instrument, frame, before, limit, now):
     return rows
 
 
-def _chart_rows(db, instrument, frame, before, limit, now):
+def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
     if frame not in FRAMES:
         raise ValueError("未知图表周期")
     if frame not in ("M30", "W1", "MN"):
@@ -83,7 +83,7 @@ def _chart_rows(db, instrument, frame, before, limit, now):
             .order_by(Bar.start.desc())
             .limit(limit)
         ).all()[::-1]
-        return [candle_dict(r.candle()) for r in rows]
+        return [{**candle_dict(r.candle()), **({"observed_at": r.observed_at or r.received_at} if observed else {})} for r in rows]
     calendar = Calendar(instrument.calendar)
     source = "M15" if frame == "M30" else "D1"
     # Paginate whole target buckets, so a request never cuts a source bucket in half.
@@ -172,7 +172,7 @@ def _chart_rows(db, instrument, frame, before, limit, now):
             volume_complete=complete and ms(right) <= now and all(r.volume_complete for r in members),
             volume_supplied=True,
         )
-        result.append(candle_dict(c))
+        result.append({**candle_dict(c), **({"observed_at": max(r.observed_at or r.received_at for r in members)} if observed else {})})
     return result
 
 

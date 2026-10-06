@@ -17,7 +17,6 @@ from .chart_geometry_mapping import bar_indices
 from .chart_labels import managed_label
 from .domain import Calendar, scheduled_open
 from .storage import (
-    Bar,
     ChartAlert,
     Instrument,
     ProviderBar,
@@ -57,33 +56,20 @@ def stored_rows(db, version, config, now):
                 for record in records]
         return rows, dataset.metadata_json
     instrument = db.get(Instrument, config.instrument)
-    if (instrument.source != version.market_identity["source"]
+    if (not instrument or not instrument.enabled
+            or instrument.source != version.market_identity["source"]
             or instrument.symbol != version.market_identity["symbol"]
             or instrument.basis != version.market_identity["basis"]
+            or instrument.calendar != version.market_identity["calendar"]
             or instrument.calendar_profile != version.market_identity["calendar_profile"]):
         raise ValueError("持久行情身份已改变，需显式编辑告警")
-    rows = chart_rows(db, instrument, config.timeframe, now + 1, 100_000, now)
+    rows = chart_rows(db, instrument, config.timeframe, now + 1, 100_000, now, observed=True)
     if config.published:
         from .managed_dataset import read_rows
         rows = read_rows(db, instrument, config.timeframe, now + 1, 100_000,
                          dataset_start=config.calculation_origin)
-    source = "M15" if config.timeframe == "M30" else "D1" if config.timeframe in ("W1", "MN") else config.timeframe
-    source_bars = list(db.scalars(select(Bar).where(
-        Bar.instrument_id == config.instrument, Bar.timeframe == source,
-    ).order_by(Bar.start)))
-    stamps = {r.start: r.observed_at or r.received_at for r in source_bars}
-    if source != config.timeframe:
-        cursor = 0
-        for row in rows:
-            observed = 0
-            while cursor < len(source_bars) and source_bars[cursor].start < row["end"]:
-                member = source_bars[cursor]
-                if member.start >= row["start"]:
-                    observed = max(observed, member.observed_at or member.received_at)
-                cursor += 1
-            stamps[row["start"]] = observed
     rows = [{**row, "chart_time": managed_label(row, config.timeframe, config.instrument),
-             "observed_at": stamps.get(row["start"], 0)} for row in rows]
+             "observed_at": row.get("observed_at", 0)} for row in rows]
     return rows, version.market_identity
 
 
@@ -112,6 +98,7 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
         return []
     if alert.expires_at is not None and now >= alert.expires_at:
         alert.status = "expired"
+        alert.control_revision += 1
         return []
     version = current_version(db, alert)
     config = AlertConfig.model_validate(version.config)
@@ -183,8 +170,14 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
         if sequence <= checkpoint:
             continue
         if config.mode == "close" and (not row["complete"] or row.get("gap_before")):
-            health(alert, "stale", "缺少完整收盘或中间 K 线，等待补齐")
-            break
+            if row["end"] > alert.effective_at:
+                health(alert, "stale", "缺少完整收盘或中间 K 线，等待补齐")
+                break
+            # Before activation only the last valid segment supplies a baseline.
+            # Old gaps never fence observations in this new run.
+            alert.state = {}
+            if not row["complete"]:
+                continue
         if left[i] is None or config.condition.right and right[i] is None:
             reason = ("当前观察值不在画线有效范围内，等待范围内的新样本"
                       if line and right[i] is None else "指标预热尚未完成")

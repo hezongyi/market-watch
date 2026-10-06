@@ -5,7 +5,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
-from alerts.chart_alert_service import consume, create
+from alerts.chart_alert_service import consume, create, lifecycle
 from alerts.storage import ChartAlert, Notification, Outbox, SignalRow, bootstrap
 from sqlalchemy import create_engine, func, select, text
 from sqlalchemy.engine import make_url
@@ -61,6 +61,26 @@ def test_postgres_workers_commit_one_logical_event_with_one_outbox(postgres_aler
         assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
         assert db.scalar(select(func.count()).select_from(Notification)) == 1
         assert db.scalar(select(func.count()).select_from(Outbox)) == 1
+
+
+def test_postgres_concurrent_lifecycle_retry_opens_one_run(postgres_alerts, monkeypatch):
+    from alerts.storage import ChartAlertAction, settings
+    monkeypatch.setattr(settings, "fx_source", "dukascopy")
+    bootstrap(postgres_alerts)
+    factory = sessionmaker(postgres_alerts, expire_on_commit=False)
+    with factory.begin() as db:
+        ident = create(db, "pg-lifecycle", config(), at=0).id
+
+    def attempt(_):
+        with factory.begin() as db:
+            return lifecycle(db, ident, 1, "restart", expected_revision=1,
+                             request_id="concurrent-restart", at=100).run
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        assert list(executor.map(attempt, range(8))) == [2] * 8
+    with factory() as db:
+        assert db.get(ChartAlert, ident).control_revision == 2
+        assert db.scalar(select(func.count()).select_from(ChartAlertAction)) == 1
 
 
 def test_postgres_populated_legacy_upgrade_preserves_foreign_keys(postgres_alerts):

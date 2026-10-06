@@ -4,7 +4,8 @@ from decimal import Decimal
 
 import pytest
 from alerts import managed_dataset, provider_cache, provider_chart
-from alerts.chart_alert_service import create, current_version, lifecycle
+from alerts.chart_alert_service import create, current_version
+from alerts.chart_alert_service import lifecycle as apply_lifecycle
 from alerts.chart_alert_values import operand_values
 from alerts.chart_alert_worker import evaluate, stored_rows
 from alerts.chart_api import DataQuery
@@ -173,3 +174,10 @@ def test_published_chart_and_alert_restart_indicator_after_same_missing_interval
                                            dataset_start=0, before=1_800_000, limit=20, indicators=[spec.indicator.model_dump()]))
     output = graph["indicators"][0]["series"][0]["values"]
     assert [Decimal(str(v["value"])) if v["value"] is not None else None for v in output] == expected[-20:]
+
+
+def lifecycle(db, alert_id, version, action, *, at=None):
+    import uuid
+    return apply_lifecycle(db, alert_id, version, action,
+                           expected_revision=db.get(ChartAlert, alert_id).control_revision,
+                           request_id=uuid.uuid4().hex, at=at)

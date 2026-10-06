@@ -416,7 +416,8 @@ def realtime_step(source=None):
                 alert.health, alert.health_reason = "blocked", "平台账户或数据集身份已改变，需显式编辑告警"
                 continue
             if alert.expires_at is not None and alert.expires_at <= now:
-                alert.status = "expired"
+                # The locked alert evaluator owns lifecycle transitions. This
+                # acquisition snapshot may race an edit extending expiry.
                 continue
             if dataset.latest_at + poll_seconds(dataset.source) * 1000 > now:
                 continue
