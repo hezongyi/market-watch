@@ -1,0 +1,316 @@
+{
+  "at": "2026-10-06T11:20:01.795Z",
+  "cases": [
+    {
+      "name": "time axis drag input",
+      "before": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "after": [
+        11.962732919254659,
+        11.962732919254659,
+        11.962732919254659,
+        11.962732919254659
+      ]
+    },
+    {
+      "name": "native zoom in button",
+      "before": [
+        11.962732919254659,
+        11.962732919254659,
+        11.962732919254659,
+        11.962732919254659
+      ],
+      "after": [
+        14.670289253844555,
+        14.670289253844555,
+        14.670289253844555,
+        14.670289253844555
+      ]
+    },
+    {
+      "name": "native zoom out button",
+      "before": [
+        14.670289253844555,
+        14.670289253844555,
+        14.670289253844555,
+        14.670289253844555
+      ],
+      "after": [
+        11.966580793319201,
+        11.966580793319201,
+        11.966580793319201,
+        11.966580793319201
+      ]
+    },
+    {
+      "name": "different symbol period bar width",
+      "values": [
+        13.163238872651121,
+        13.163238872651121,
+        13.163238872651121,
+        13.163238872651121
+      ]
+    },
+    {
+      "name": "different symbol range label excluded"
+    },
+    {
+      "name": "boundary -200",
+      "prior": {
+        "offset": -89,
+        "spacing": 13.163238872651121,
+        "range": {
+          "from": 1780358400,
+          "to": 1780444800
+        }
+      },
+      "result": {
+        "offset": -89,
+        "spacing": 14.479562759916233,
+        "range": {
+          "from": 1780358400,
+          "to": 1780444800
+        }
+      }
+    },
+    {
+      "name": "boundary 1000",
+      "prior": {
+        "offset": 34.87956665917233,
+        "spacing": 14.479562759916233,
+        "range": {
+          "from": 1791158400,
+          "to": 1795471200
+        }
+      },
+      "result": {
+        "offset": 31.526878781065754,
+        "spacing": 15.927519035907856,
+        "range": {
+          "from": 1791158400,
+          "to": 1795039200
+        }
+      }
+    },
+    {
+      "name": "Esc cancels"
+    },
+    {
+      "name": "defaults preserve enabled and sync",
+      "defaults": {
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "background",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        }
+      }
+    },
+    {
+      "name": "left axis information rail"
+    },
+    {
+      "name": "subpane rail",
+      "study": "NdhhaP"
+    },
+    {
+      "name": "maximized chart rail",
+      "rect": {
+        "paneBottom": 583,
+        "railTop": 883
+      }
+    },
+    {
+      "name": "horizontal offscreen clears fallback"
+    },
+    {
+      "name": "20 layout cycles stable resources",
+      "resources": {
+        "sync": {
+          "epoch": 0,
+          "layoutEpoch": 25,
+          "mode": "barWidth",
+          "time": false,
+          "pauses": 0,
+          "bindings": 4,
+          "queued": 0
+        },
+        "rails": 4
+      }
+    },
+    {
+      "name": "automatic appearance-only save"
+    },
+    {
+      "name": "pending save A cannot clean host or native config B"
+    },
+    {
+      "name": "real Save menu persists B and late debounce stays clean"
+    },
+    {
+      "name": "reload restores choices without uniform spacing",
+      "saved": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "restored": {
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        },
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "custom",
+          "transparency": 40,
+          "priceLabels": true
+        }
+      }
+    },
+    {
+      "name": "failed save retains dirty and blocks original-ID overwrite"
+    },
+    {
+      "name": "recovery copy preserves config and sync without overwriting original",
+      "recovered": {
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "custom",
+          "transparency": 22,
+          "priceLabels": true
+        },
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        },
+        "id": "1974ac62-7e31-4a3e-814c-d1938ecf6c15"
+      }
+    }
+  ],
+  "errors": [],
+  "runningHostAsset": "host.d0a96d61fcfcc340.js",
+  "controls": [
+    {
+      "name": "zoom",
+      "title": null,
+      "visible": true
+    }
+  ],
+  "lastHover": {
+    "i": 0,
+    "x": 366.7610501229675,
+    "y": 247.70000000000002,
+    "index": 292,
+    "contains": true,
+    "time": 1790812800,
+    "hit": {
+      "tag": "CANVAS",
+      "role": null,
+      "name": null,
+      "text": ""
+    },
+    "lastIndex": 292,
+    "source": {
+      "symbol": "MWP:EURUSD",
+      "resolution": "1M",
+      "chartTime": 1790812800000,
+      "start": 1790802000000,
+      "end": 1793480400000,
+      "high": 1.1336,
+      "low": 1.11602
+    }
+  },
+  "labelDebug": {
+    "mapper": {
+      "epoch": 56,
+      "source": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "1M",
+        "chartTime": 1790812800000,
+        "start": 1790802000000,
+        "end": 1793480400000,
+        "high": 1.1336,
+        "low": 1.11602
+      },
+      "bindings": 4,
+      "rails": 4,
+      "stores": [
+        {
+          "key": "MWP:EURUSD|1M|",
+          "size": 293,
+          "generation": 1
+        },
+        {
+          "key": "MWP:EURUSD|5|",
+          "size": 358,
+          "generation": 1
+        },
+        {
+          "key": "MWP:EURUSD|1W|",
+          "size": 358,
+          "generation": 1
+        },
+        {
+          "key": "MWP:BTCUSDT|5|",
+          "size": 136,
+          "generation": 1
+        },
+        {
+          "key": "MWP:EURUSD|1D|",
+          "size": 91,
+          "generation": 1
+        }
+      ]
+    },
+    "config": {
+      "version": 2,
+      "enabled": true,
+      "style": "rectangle",
+      "colorMode": "theme",
+      "color": "#FFFFFF",
+      "transparencyMode": "theme",
+      "transparency": 88,
+      "priceLabels": true
+    },
+    "charts": [
+      {
+        "r": "1M",
+        "range": {
+          "from": 1730419200,
+          "to": 1817154000
+        }
+      },
+      {
+        "r": "1D",
+        "range": {
+          "from": 1781740800,
+          "to": 1792443600
+        }
+      }
+    ]
+  }
+}

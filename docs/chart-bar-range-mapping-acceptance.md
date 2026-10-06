@@ -1,6 +1,6 @@
 # K线范围映射：实现与隔离验收
 
-> 本页为 v1.8.0 迁移前的历史实现/验收记录；焦点来源等旧合同已由用户修订。当前分支的代码、Ubuntu 实例与复验结论见 [v1.8.0 迁移验收](chart-range-v1.8.0-acceptance.md)。
+> 本页为 v1.8.0 迁移前的历史实现/验收记录；焦点来源等旧合同已由用户修订。当前分支的代码、Ubuntu 实例与复验结论见 [main 集成验收](chart-range-main-integration-acceptance.md)；[v1.8.0 迁移验收](chart-range-v1.8.0-acceptance.md)保留为历史。
 
 2026-10-04。功能分支 `feat/chart-bar-range-mapping`，独立 worktree `/home/quant/repos/market-watch-range-mapping`。实现基于已提交的同步修复 `20418691598da38577ee23f4616f07de42d58d55`；原仓库 MT4 工作未修改。本次交付为本地可审查实现，未合并或部署生产。
 

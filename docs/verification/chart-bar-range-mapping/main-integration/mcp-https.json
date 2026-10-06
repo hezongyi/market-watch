@@ -1,0 +1,70 @@
+{
+  "url": "https://192.168.7.232:16843/mcp",
+  "transport": "Streamable HTTP over HTTPS",
+  "source": "acceptance-fixture",
+  "synthetic_market_data": true,
+  "checks": [
+    "initialize",
+    "tools/list",
+    "schema discovery",
+    "authentication rejection",
+    "web/MCP quote parity",
+    "web/MCP OHLC parity",
+    "web/MCP indicator parity",
+    "revision parity",
+    "saved projection",
+    "unknown drawing rejection",
+    "concurrent first create",
+    "notification ack retry",
+    "idempotent create retry",
+    "same-key intent conflict",
+    "cancel"
+  ],
+  "versions": {
+    "mcp": "2.3.0",
+    "fastapi": "0.141.1",
+    "starlette": "1.7.0",
+    "pydantic": "2.13.5"
+  },
+  "protocol_version": "2025-11-25",
+  "tools": [
+    "market_list_instruments",
+    "market_get_quote",
+    "market_get_bars",
+    "indicators_list",
+    "indicators_calculate",
+    "alerts_list",
+    "alerts_get_signals",
+    "system_get_status",
+    "charts_list_workspaces",
+    "charts_get_drawings",
+    "alerts_create",
+    "alerts_cancel",
+    "notifications_ack"
+  ],
+  "sample": {
+    "quote": {
+      "instrument": "EURUSD",
+      "source": "acceptance-fixture",
+      "series_kind": "managed",
+      "basis": "bid",
+      "price": "1.1001000000",
+      "price_type": "M1 close",
+      "observed_at": 1791280800000,
+      "queried_at": 1791284121687,
+      "quality": "stale",
+      "age_seconds": 3321,
+      "calendar": "ny17",
+      "precision": 5,
+      "market_open": true,
+      "is_stale": true
+    },
+    "range": [
+      1791172800000,
+      1791280800000
+    ],
+    "history_revision": "a5d84eadadbeb4dde9900840f0bb09b10db3dc094e8a5d82db5367a9c3398604"
+  },
+  "alert_count_before": 1,
+  "alert_count_after": 2
+}

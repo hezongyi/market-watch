@@ -1,6 +1,6 @@
 # 同步设置、柱宽同步与范围映射：实现验收
 
-> 本页为 v1.8.0 迁移前的历史实现/验收记录；焦点来源等旧合同已由用户修订。当前分支的代码、Ubuntu 实例与复验结论见 [v1.8.0 迁移验收](chart-range-v1.8.0-acceptance.md)。
+> 本页为 v1.8.0 迁移前的历史实现/验收记录；焦点来源等旧合同已由用户修订。当前分支的代码、Ubuntu 实例与复验结论见 [main 集成验收](chart-range-main-integration-acceptance.md)；[v1.8.0 迁移验收](chart-range-v1.8.0-acceptance.md)保留为历史。
 
 2026-10-05（Asia/Singapore）。独立 worktree `/home/quant/repos/market-watch-range-mapping`，分支 `feat/chart-bar-range-mapping`，实现基线 `279b1ef`。按 [审核修订方案](chart-sync-settings-plan.md) 实施，阶段 A 决策见 [技术记录](chart-sync-settings-stage-a.md)。本次完成本地实现与 Ubuntu 验收，生产发布仍待用户另行授权。
 

@@ -1,6 +1,6 @@
 # 范围映射与柱宽同步：v1.8.0 迁移验收
 
-2026-10-06（Asia/Singapore）。独立分支 `feat/range-sync-settings-v1.8.0`，worktree `/home/quant/repos/market-watch-range-v180`，基线 `v1.8.0` / `b700911cff0b6f8448ac54e4355524891238efa8`。本页记录当前迁移，其他范围映射/同步设置验收页保留为旧版历史。
+2026-10-06（Asia/Singapore）。独立分支 `feat/range-sync-settings-v1.8.0`，worktree `/home/quant/repos/market-watch-range-v180`，基线 `v1.8.0` / `b700911cff0b6f8448ac54e4355524891238efa8`。本页保留 v1.8.0 迁移历史。最新 main 集成的当前验收入口见 [main 集成验收](chart-range-main-integration-acceptance.md)。
 
 ## 当前行为
 

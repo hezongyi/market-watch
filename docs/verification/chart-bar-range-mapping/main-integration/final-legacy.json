@@ -1,0 +1,155 @@
+{
+  "at": "2026-10-06T11:32:48.590Z",
+  "APP": "https://192.168.7.232:16843",
+  "CHART": "https://192.168.7.232:16844",
+  "cases": [
+    {
+      "name": "same-widget legacy preference migration",
+      "date": true,
+      "time": true,
+      "state": {
+        "logic": {
+          "date": true,
+          "barWidth": false,
+          "time": true
+        },
+        "date": true,
+        "time": true,
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "syncDiagnostics": {
+          "epoch": 1,
+          "layoutEpoch": 5,
+          "mode": "date",
+          "time": true,
+          "pauses": 0,
+          "bindings": 4,
+          "queued": 0
+        },
+        "legacyPause": false
+      }
+    },
+    {
+      "name": "fresh boot legacy preferences",
+      "date": true,
+      "time": true
+    },
+    {
+      "name": "same-widget legacy preference migration",
+      "date": false,
+      "time": true,
+      "state": {
+        "logic": {
+          "date": false,
+          "barWidth": false,
+          "time": true
+        },
+        "date": false,
+        "time": true,
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "syncDiagnostics": {
+          "epoch": 1,
+          "layoutEpoch": 4,
+          "mode": "none",
+          "time": true,
+          "pauses": 0,
+          "bindings": 4,
+          "queued": 0
+        },
+        "legacyPause": false
+      }
+    },
+    {
+      "name": "fresh boot legacy preferences",
+      "date": false,
+      "time": true
+    },
+    {
+      "name": "same-widget legacy preference migration",
+      "date": true,
+      "time": false,
+      "state": {
+        "logic": {
+          "date": true,
+          "barWidth": false,
+          "time": false
+        },
+        "date": true,
+        "time": false,
+        "config": {
+          "version": 2,
+          "enabled": true,
+          "style": "rectangle",
+          "colorMode": "theme",
+          "color": "#FFFFFF",
+          "transparencyMode": "theme",
+          "transparency": 88,
+          "priceLabels": true
+        },
+        "syncDiagnostics": {
+          "epoch": 1,
+          "layoutEpoch": 4,
+          "mode": "date",
+          "time": false,
+          "pauses": 0,
+          "bindings": 4,
+          "queued": 0
+        },
+        "legacyPause": false
+      }
+    },
+    {
+      "name": "fresh boot legacy preferences",
+      "date": true,
+      "time": false
+    }
+  ],
+  "errors": [],
+  "runningHostAsset": "host.d0a96d61fcfcc340.js",
+  "lastState": {
+    "logic": {
+      "date": true,
+      "barWidth": false,
+      "time": false
+    },
+    "date": true,
+    "time": false,
+    "config": {
+      "version": 2,
+      "enabled": true,
+      "style": "rectangle",
+      "colorMode": "theme",
+      "color": "#FFFFFF",
+      "transparencyMode": "theme",
+      "transparency": 88,
+      "priceLabels": true
+    },
+    "syncDiagnostics": {
+      "epoch": 1,
+      "layoutEpoch": 4,
+      "mode": "date",
+      "time": false,
+      "pauses": 0,
+      "bindings": 4,
+      "queued": 0
+    },
+    "legacyPause": false
+  }
+}
