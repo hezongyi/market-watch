@@ -826,15 +826,18 @@
     "script": "releases/v1.14.1-6fd9273/rollback-v1.12.0.sh",
     "additive_schema_retained": true,
     "prepare_rollback_required": true,
-    "images_preserved": true
+    "images_preserved": true,
+    "explicit_dataset_guard": true,
+    "current_direct_application_rollback_allowed": false,
+    "stream_only_rollback": "releases/v1.14.1-6fd9273/disable-oanda-stream.sh"
   },
   "feature_flags": {
     "mcp_enabled": false,
     "yahoo_enabled": false,
     "delivery_enabled": true,
-    "oanda_stream_enabled": false,
-    "pricing_worker": "not started; explicit oanda-stream profile",
-    "explicit_datasets": 0
+    "oanda_stream_enabled": true,
+    "pricing_worker": "running; default service",
+    "explicit_datasets": 127
   },
   "startup_log_summary": {
     "Traceback": 0,
@@ -845,10 +848,9 @@
     "ERROR": 0
   },
   "limitations": [
-    "Production administrator browser login was not performed because the current password was unavailable; no password change or session bypass was performed.",
     "Ubuntu native four-chart layout, indicators and sync settings were checked; supplier credentials were omitted, missing-history demand was cancelled, and full chart data readiness/live events were not asserted.",
-    "Source/gap blocked publication requests retain their actual state; historical import_heartbeat remains stale. New history/composite workers are idle with zero explicit datasets; live OANDA pricing profile remains off.",
-    "Short deployment observation does not establish long-term performance or provider/notification delivery SLA; scheduled backup and whole-host reboot were not retested."
+    "Short deployment observation does not establish long-term performance or provider/notification delivery SLA; scheduled backup and whole-host reboot were not retested.",
+    "Historical initial deployment observations are retained; latest flags and production browser checks are in post_deployment_oanda_stream_activation. New catalog datasets are registered; source/gap waits and stale historical import heartbeat remain distinct from stream health."
   ],
   "other_production_services": {
     "count": 23,
@@ -912,5 +914,245 @@
     "temporary_config_extracts_removed": true,
     "temporary_verification_password_file_removed": true
   },
-  "final_production_check": "10 running services, API healthy, restart_count=0 after retirement"
+  "final_production_check": "10 running services, API healthy, restart_count=0 after retirement",
+  "post_deployment_oanda_stream_activation": {
+    "enabled": true,
+    "resident_symbols": [
+      "EUR_USD",
+      "XAU_USD"
+    ],
+    "service": "market-watch-pricing-worker-1",
+    "persistent_default_start": true,
+    "api_flag_enabled": true,
+    "stream_recovery": {
+      "owners": [
+        {
+          "epoch": 6,
+          "failures": 0,
+          "error": null,
+          "lease_remaining_ms": 29936
+        }
+      ],
+      "rows": [
+        {
+          "logical_symbol": "XAUUSD",
+          "quality": "healthy",
+          "connection": "connected",
+          "connection_epoch": 6,
+          "recovery_ready": true,
+          "quote_ready": true,
+          "candle_ready": true,
+          "quote_age_ms": 4642,
+          "last_confirmed_m1": 1791414840000,
+          "received_at": 1791414881682,
+          "heartbeat_at": 1791414881743,
+          "error": null
+        },
+        {
+          "logical_symbol": "EURUSD",
+          "quality": "healthy",
+          "connection": "connected",
+          "connection_epoch": 6,
+          "recovery_ready": true,
+          "quote_ready": true,
+          "candle_ready": true,
+          "quote_age_ms": 271,
+          "last_confirmed_m1": 1791414840000,
+          "received_at": 1791414885979,
+          "heartbeat_at": 1791414881743,
+          "error": null
+        }
+      ]
+    },
+    "catalog_registered_datasets": 127,
+    "production_browser": {
+      "environment": "Unraid production HTTPS",
+      "app": "https://trade.kookvv.com:8443",
+      "chartOrigin": "https://charts.kookvv.com:8443",
+      "checks": [
+        "existing password login and Secure/HttpOnly session",
+        "v1.14.1 data center platform tab",
+        "Production live snapshot and SSE heartbeat",
+        "existing saved native chart loaded",
+        "v1.9 indicator picker search opens and closes",
+        "v1.11 chart alert form and panel read-only inspection",
+        "v1.12 range mapping and sync settings open and close without saving",
+        "390px home layout"
+      ],
+      "liveSnapshots": {
+        "status": 200,
+        "rows": [
+          {
+            "symbol": "XAUUSD",
+            "quality": "healthy",
+            "connection": "connected",
+            "recovery_ready": true,
+            "quote_ready": true,
+            "candle_ready": true,
+            "quote_age_ms": 416,
+            "error": null
+          },
+          {
+            "symbol": "EURUSD",
+            "quality": "healthy",
+            "connection": "connected",
+            "recovery_ready": true,
+            "quote_ready": true,
+            "candle_ready": true,
+            "quote_age_ms": 1111,
+            "error": null
+          }
+        ]
+      },
+      "liveSSE": {
+        "status": 200,
+        "snapshot": true,
+        "heartbeat": true
+      },
+      "chart": {
+        "charts": 4,
+        "symbol": "MWP:EURUSD",
+        "resolution": "60",
+        "dataReady": true
+      },
+      "readOnlyPreferenceMigrationSuppressed": true,
+      "indicatorMatches": 2,
+      "syncSettings": "同步设置\n范围映射\n显示方式\n淡色背景\n高低价矩形\n高低价矩形\n填充颜色\n主题默认\n自定义\n自定义\n透明度\n主题默认\n自定义\n主题默认\n%\n在矩形外侧显示高低价\n颜色预览\n柱宽同步\n\n缩放任一图表，其他图表跟随柱宽变化。\n\n同步开关位于布局菜单；柱宽与日期范围同步互斥。\n\n恢复默认\n取消\n确定\nclose",
+      "mobileOverflow": false,
+      "logout": 200,
+      "errors": [],
+      "httpFailures": [],
+      "credentialLeaks": [],
+      "blockedWrites": [],
+      "checkedAt": "2026-10-07T23:13:46.930Z"
+    },
+    "production_env_file_unchanged": true,
+    "user_table_fingerprints_unchanged": true,
+    "configuration_backup": {
+      "archive": "/mnt/user/backup/market-watch/config-20261007T231622Z-B691VO.tar.gz",
+      "sha256": "ccefaced5aedbde3ae3129d380d41c8219b0396fce69ed0fc92e706af9e294bf",
+      "actual_extract": true,
+      "env_unchanged": true,
+      "env_mode": "0600",
+      "stream_default_start": true,
+      "rollback_stops_pricing": true,
+      "old_application_guard_included": true,
+      "disable_stream_script_included": true
+    },
+    "observed_reconnects": 10,
+    "limitations": [
+      "Upstream stream disconnects and automatic recovery occurred during observation; quote quality can be stale between source price updates even while heartbeats and confirmed M1 remain current.",
+      "The prior v1.12.0 binary was tested before explicit OANDA datasets were registered. Its rollback now refuses explicit datasets before stopping services; reverting only stream config retains v1.14.1 and all data."
+    ],
+    "disable_stream_script": "releases/v1.14.1-6fd9273/disable-oanda-stream.sh",
+    "checked_at": "2026-10-07T23:16:51.744061+00:00",
+    "latest_observation": {
+      "owners": [
+        {
+          "epoch": 11,
+          "failures": 0,
+          "error": null,
+          "lease_remaining_ms": 29798
+        }
+      ],
+      "rows": [
+        {
+          "logical_symbol": "XAUUSD",
+          "quality": "healthy",
+          "connection": "connected",
+          "connection_epoch": 11,
+          "recovery_ready": true,
+          "quote_ready": true,
+          "candle_ready": true,
+          "quote_age_ms": 792,
+          "last_confirmed_m1": 1791414960000,
+          "received_at": 1791415010937,
+          "heartbeat_at": 1791415008956,
+          "error": null
+        },
+        {
+          "logical_symbol": "EURUSD",
+          "quality": "recovering",
+          "connection": "recovering",
+          "connection_epoch": 11,
+          "recovery_ready": false,
+          "quote_ready": false,
+          "candle_ready": false,
+          "quote_age_ms": 19338,
+          "last_confirmed_m1": 1791414840000,
+          "received_at": 1791414992814,
+          "heartbeat_at": 1791415008956,
+          "error": null
+        }
+      ],
+      "checked_at": "2026-10-07T23:16:51.744061+00:00",
+      "containers": [
+        {
+          "service": "pricing-worker",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "api",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "web",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "history-worker",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "composite-aggregate-worker",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "notify-worker",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "realtime-worker",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "chart-aggregation-worker",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "chart-history-worker",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "native-history-worker",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "service": "chart-origin",
+          "running": true,
+          "restart_count": 0
+        }
+      ]
+    },
+    "confirmation_progression": {
+      "XAUUSD": {
+        "initial": 1791414600000,
+        "final": 1791414960000
+      },
+      "EURUSD": {
+        "initial": 1791414600000,
+        "final": 1791414840000
+      }
+    }
+  }
 }

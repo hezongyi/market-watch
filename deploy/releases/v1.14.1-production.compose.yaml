@@ -16,6 +16,7 @@ services:
     <<: *app
     environment:
       ALERTS_COOKIE_SECURE: "true"
+      ALERTS_OANDA_STREAM_ENABLED: "true"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-api
@@ -89,12 +90,11 @@ services:
       api: {condition: service_healthy}
   pricing-worker:
     <<: *app
-    profiles: [oanda-stream]
     command: ["python", "-m", "alerts.oanda_worker"]
     environment:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_OANDA_STREAM_ENABLED: "true"
-      ALERTS_OANDA_RESIDENT_SYMBOLS: ""
+      ALERTS_OANDA_RESIDENT_SYMBOLS: "EUR_USD,XAU_USD"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-pricing
