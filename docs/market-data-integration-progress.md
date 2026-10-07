@@ -1,10 +1,14 @@
 # 行情接入接续开发记录
 
+最新交付（2026-10-07）：完整三层A–E实现与Ubuntu真实环境实现验收通过，已验收实现提交`b0f2c78`。
+[最终逐项核对及启停](verification/three-layer/completion-audit.md)。长期质量观察按用户决定暂缓，
+未推送/PR/生产发布，MT4后续。下面P0–P2和旧观察结论是当时历史，不覆盖此最新三层结论。
+
 日期：2026-10-06。工作区 `/home/quant/repos/market-watch-data-integration`，分支
 `feat/market-data-integration`；`git fetch origin` 后基于 `origin/main` 的 `3c18f60` 创建。
 主工作区与其他任务的未提交文件保持原样。正式方案由原文档 worktree 复制保留，原件仍在。
 
-## 已恢复决策与当前边界
+## 旧接入阶段决策与边界（历史记录）
 
 主历史采用 dukascopy-python；实时为 OANDA practice；首批 EURUSD/XAUUSD；外汇/黄金回测
 只读单一 Dukascopy 数据集。MT4 在其活跃终端验收后才可参与互备。保留 Binance、yfinance 的既有能力。
@@ -14,7 +18,7 @@
 当前目标为 P0–P2 全部实现与验收，P3 不列入本次完成门槛。下面初始 P0 记录保留作历史，
 本节更新为最新状态。
 
-## 当前交付状态（2026-10-06更新）
+## 旧P0–P2交付状态（2026-10-06记录）
 
 用户要求实现与质量分别验收。**[实现验收通过](verification/data-integration/implementation-acceptance.md)**，
 P0–P2功能有独立证据，可以先交付；**[质量验收未通过](verification/data-integration/quality-acceptance.md)**，
