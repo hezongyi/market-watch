@@ -51,7 +51,7 @@ mw-docker retire --task mw-issue42 --project mw-issue42
 mw-docker retire --task mw-issue42 --project mw-issue42 --apply
 ```
 
-只支持由本工具登记、镜像归属匹配的acceptance项目，以及单个本项目拥有的PG数据volume。归档私有inspect、配置和bind材料，停止应用写入，导出所有非template库及全局角色；在该Ubuntu PG上新建临时库实际恢复，核对所有public表行数和来源稳定性。成功后重新核对容器、卷、网络和其他引用，删除明确资源，再登记task完成和删除无引用任务镜像。
+只支持由本工具登记、镜像归属匹配的acceptance项目，以及单个本项目拥有的PG14数据volume。数据库按受支持的官方 `postgres:14-bookworm` / `postgres:14` 镜像及数据挂载识别，Compose service 可叫 `pg`，不依赖必须命名 `postgres`。TLS service 使用共享的 `nginx:1.28-alpine` 时，必须核对固定官方 manifest digest 和容器实际镜像 ID；仅移除本项目容器，共享基础镜像保留。应用镜像仍要求 managed、task、project、acceptance 用途全部匹配；镜像检查读取容器实际 ID，不信任可变 tag。归档私有inspect、配置和bind材料，停止应用写入，导出所有非template库及全局角色；在该Ubuntu PG上新建临时库实际恢复，核对所有public表行数和来源稳定性。成功后重新核对容器、卷、网络和其他引用，删除明确资源，再登记task完成和删除无引用任务镜像。
 
 共享卷、外部卷、非PG卷、bind数据库和外部数据库需要单独审查，不自动删除。验证失败保留卷；删除容器前失败会尝试重启原先运行的容器。归档位于`~/.local/share/market-watch-docker/archives/`，权限0700；包含角色凭据及env，严禁提交仓库。
 

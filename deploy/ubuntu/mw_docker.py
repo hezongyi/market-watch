@@ -429,6 +429,29 @@ def project_inventory(docker, project):
     return cs, vs, ns
 
 
+def retirement_postgres(container):
+    return bool(re.fullmatch(
+        r"(?:docker.io/library/)?postgres:14(?:-bookworm)?(?:@sha256:[a-f0-9]{64})?",
+        container["Config"]["Image"],
+    ))
+
+
+def validate_retirement_image(task, project, container, image):
+    # PostgreSQL and the pinned TLS gateway are shared infrastructure images;
+    # retire only their project containers, never these unowned base images.
+    if retirement_postgres(container):
+        return
+    service = (container["Config"].get("Labels") or {}).get("com.docker.compose.service")
+    if service == "tls" and container["Config"]["Image"] == "nginx:1.28-alpine":
+        trusted = "nginx@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592"
+        if image["Id"] == container["Image"] and trusted in image.get("RepoDigests", []):
+            return
+    labels = image["Config"].get("Labels") or {}
+    expected = {"managed": "true", "task": task, "project": project, "purpose": "acceptance"}
+    if any(labels.get(PREFIX + key) != value for key, value in expected.items()):
+        raise ValueError("Container image does not belong to the registered acceptance task")
+
+
 def validate_retirement(project, cs, vs, all_cs):
     if not cs:
         raise ValueError("Exact project has no containers")
@@ -438,7 +461,7 @@ def validate_retirement(project, cs, vs, all_cs):
         if (c["Config"].get("Labels") or {}).get("com.docker.compose.project") != project:
             raise ValueError("Container project mismatch")
         service = (c["Config"].get("Labels") or {}).get("com.docker.compose.service")
-        if service == "postgres" and not any(
+        if (service == "postgres" or retirement_postgres(c)) and not any(
             m["Type"] == "volume" and m["Destination"] == "/var/lib/postgresql/data"
             for m in c["Mounts"]
         ):
@@ -469,8 +492,7 @@ def validate_retirement(project, cs, vs, all_cs):
         ]
         if (
             len(users) != 1
-            or (users[0]["Config"].get("Labels") or {}).get("com.docker.compose.service")
-            != "postgres"
+            or not retirement_postgres(users[0])
         ):
             raise ValueError("Only a single owned PG14 data volume is supported automatically")
 
@@ -549,14 +571,9 @@ def retire(docker, args):
     cs, vs, ns = project_inventory(docker, project)
     validate_retirement(project, cs, vs, docker.containers())
     for c in cs:
-        service = (c["Config"].get("Labels") or {}).get("com.docker.compose.service")
-        if service != "postgres":
-            label = (
-                docker.json("image", "inspect", c["Config"]["Image"])[0]["Config"].get("Labels")
-                or {}
-            )
-            if label.get(PREFIX + "task") != task or label.get(PREFIX + "project") != project:
-                raise ValueError("Container image does not belong to the registered task")
+        validate_retirement_image(
+            task, project, c, docker.json("image", "inspect", c["Image"])[0]
+        )
     print(
         json.dumps(
             {

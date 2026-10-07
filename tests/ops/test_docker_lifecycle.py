@@ -121,6 +121,15 @@ class RetirementSafetyTests(unittest.TestCase):
     def test_owned_pg_volume_allowed(self):
         m.validate_retirement("mw-test", [self.c], [self.v], [self.c])
 
+    def test_pg_service_alias_with_owned_volume_allowed(self):
+        self.c["Config"]["Labels"]["com.docker.compose.service"] = "pg"
+        m.validate_retirement("mw-test", [self.c], [self.v], [self.c])
+
+    def test_postgres_service_cannot_hide_unknown_database_image(self):
+        self.c["Config"]["Image"] = "unknown:latest"
+        with self.assertRaises(ValueError):
+            m.validate_retirement("mw-test", [self.c], [self.v], [self.c])
+
     def test_shared_volume_refused(self):
         other = copy.deepcopy(self.c)
         other["Id"] = "other"
@@ -142,6 +151,50 @@ class RetirementSafetyTests(unittest.TestCase):
         ]
         with self.assertRaises(ValueError):
             m.validate_retirement("mw-test", [self.c], [], [self.c])
+
+
+class RetirementImageTests(unittest.TestCase):
+    def setUp(self):
+        self.container = {
+            "Image": "sha256:gateway",
+            "Config": {"Image": "nginx:1.28-alpine", "Labels": {
+                "com.docker.compose.project": "mw-test",
+                "com.docker.compose.service": "tls",
+            }},
+        }
+        self.image = {
+            "Id": "sha256:gateway", "Config": {"Labels": {}},
+            "RepoDigests": ["nginx@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592"],
+        }
+
+    def test_verified_shared_tls_image_allowed(self):
+        m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_unverified_gateway_digest_refused(self):
+        self.image["RepoDigests"] = []
+        with self.assertRaises(ValueError):
+            m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_changed_gateway_image_refused(self):
+        self.image["Id"] = "sha256:changed"
+        with self.assertRaises(ValueError):
+            m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_unowned_application_cannot_use_gateway_exception(self):
+        self.container["Config"]["Labels"]["com.docker.compose.service"] = "web"
+        with self.assertRaises(ValueError):
+            m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_foreign_task_and_release_images_refused(self):
+        self.container["Config"]["Image"] = "market-watch-api:test"
+        for task, purpose in [("another-task", "acceptance"), ("mw-test", "release")]:
+            self.image["Config"]["Labels"] = {
+                m.PREFIX + key: value for key, value in {
+                    "managed": "true", "project": "mw-test", "task": task, "purpose": purpose,
+                }.items()
+            }
+            with self.assertRaises(ValueError):
+                m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
 
 
 class TagOwnershipTests(unittest.TestCase):
