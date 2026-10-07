@@ -17,6 +17,7 @@ SCRIPTS = (
     'optimized_supplemental_probe.py',
     'optimized_high_period_probe.py',
     'optimized_observation_alert_probe.py',
+    'optimized_normal_input_probe.py',
     'optimized_network_alert_probe.py',
 )
 

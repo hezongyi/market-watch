@@ -42,6 +42,7 @@ def aggregation_priority(job, demands):
 
 def aggregate_once():
     from .market import aggregate_touched
+    from .publication_budget import current
     from .storage import instant, now_ms, transaction
 
     with transaction() as db:
@@ -72,7 +73,21 @@ def aggregate_once():
             ChartAggregationJob.id == job.id).with_for_update().execution_options(populate_existing=True))
         if job is None or job.next_at > now:
             return True
-        touched = {instant(at) for at in range(job.start, job.end, 60000)}
+        from .domain import bucket_bounds, calendar_for
+        from .storage import ms
+        budget = current()
+        # Complete buckets only: the largest indivisible D1 uses <=1500 source
+        # minutes across DST. No partial bucket is persisted as complete.
+        frame_end = ms(bucket_bounds(instant(job.start), job.timeframe, calendar_for(inst))[1])
+        slice_end = min(job.end, max(frame_end, job.start + 120 * 60000))
+        slice_end = min(job.end, ms(bucket_bounds(instant(slice_end - 1),
+            job.timeframe, calendar_for(inst))[1]))
+        source_left = ms(bucket_bounds(instant(job.start), job.timeframe, calendar_for(inst))[0])
+        source_right = ms(bucket_bounds(instant(slice_end - 1), job.timeframe, calendar_for(inst))[1])
+        needed = (source_right - source_left) // 60000
+        if budget and budget.available < needed:
+            return False
+        touched = {instant(at) for at in range(job.start, slice_end, 60000)}
         try:
             # A failed calculation/write must not publish any partial aggregate.
             # Keep the outer transaction usable to persist retry state.
@@ -80,6 +95,16 @@ def aggregate_once():
                 aggregate_touched(db, inst, touched, received_at=now, timeframes=(job.timeframe,), kind=job.kind)
                 from .publication_schedule import AGGREGATED, request, source_frames
                 request(db, inst.id, frames=source_frames(job.timeframe), reason=AGGREGATED, stamp=now)
+                if slice_end < job.end:
+                    remaining = db.scalar(select(ChartAggregationJob).where(
+                        ChartAggregationJob.instrument_id == inst.id,
+                        ChartAggregationJob.timeframe == job.timeframe,
+                        ChartAggregationJob.start == slice_end, ChartAggregationJob.end == job.end))
+                    if remaining is None:
+                        db.add(ChartAggregationJob(instrument_id=inst.id, timeframe=job.timeframe,
+                            start=slice_end, end=job.end, created_at=now, kind=job.kind))
+                    elif job.kind == 'price' or job.kind == 'volume' and remaining.kind == 'observed':
+                        remaining.kind = job.kind
                 db.delete(job)
                 db.flush()
         except Exception as error:

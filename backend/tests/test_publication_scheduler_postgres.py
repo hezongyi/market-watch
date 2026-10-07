@@ -16,6 +16,18 @@ from test_publication_scheduler import MINUTE, START
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated Ubuntu PostgreSQL')
 
 
+def test_pg_service_order_survives_different_history_and_clock_rollback(publication_pg, monkeypatch):
+    from test_publication_scheduler import (
+        test_service_order_survives_different_history_and_clock_rollback,
+    )
+    test_service_order_survives_different_history_and_clock_rollback(publication_pg[0], monkeypatch)
+
+
+def test_pg_failed_target_does_not_idle_other_ready_targets(publication_pg, monkeypatch):
+    from test_publication_scheduler import test_failed_target_does_not_idle_other_ready_targets
+    test_failed_target_does_not_idle_other_ready_targets(publication_pg[0], monkeypatch)
+
+
 @pytest.fixture
 def publication_pg(monkeypatch):
     url = os.environ['TEST_POSTGRES_URL']

@@ -15,7 +15,9 @@ def audit(scenario, repetition):
     assert result['duration'] >= 300 and len(raw) == result['cycles'] and raw
     assert raw[-1]['queries'] == result['queries']
     assert all(a['at'] < b['at'] for a, b in zip(raw, raw[1:]))
-    assert abs(max(row['target_wait'] for row in raw) - result['longest_target_wait']) < 1e-8
+    longest = max([row.get('longest_ready_age', row['target_wait']) for row in raw] +
+                  [row['seconds'] for row in result.get('final_unserved_ready', [])])
+    assert abs(longest - result['longest_target_wait']) < 1e-8
     assert abs(100 * result['process_cpu_seconds'] / result['duration'] - result['process_cpu_percent']) < 1e-8
     assert pg['statements']
     assert all(row['target'] is None or row['publish_claim'] for row in raw)

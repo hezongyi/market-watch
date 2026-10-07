@@ -83,6 +83,8 @@ def chart_rows(db, instrument, frame, before, limit, now, *, observed=False, aft
 
 
 def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False, after=None):
+    from .publication_budget import current
+    budget = current()
     if frame not in FRAMES:
         raise ValueError("未知图表周期")
     if frame not in ("M30", "W1", "MN"):
@@ -94,6 +96,8 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False, af
             .order_by(Bar.start.desc())
             .limit(limit)
         ).all()[::-1]
+        if budget:
+            budget.consume(len(rows))
         return [{**candle_dict(r.candle()), **({"observed_at": r.observed_at or r.received_at} if observed else {})} for r in rows]
     calendar = calendar_for(instrument)
     source = "M15" if frame == "M30" else "D1"
@@ -113,6 +117,8 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False, af
         .order_by(Bar.start.desc())
         .limit(source_limit)
     ).all()[::-1]
+    if budget:
+        budget.consume(len(rows))
     groups = {}
     for row in rows:
         left, right = bounds(instant(row.start), frame, calendar)

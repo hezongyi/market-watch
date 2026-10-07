@@ -11,6 +11,7 @@ from sqlalchemy import (
     Index,
     LargeBinary,
     Numeric,
+    Sequence,
     String,
     UniqueConstraint,
     create_engine,
@@ -1198,10 +1199,13 @@ class ChartPublicationJob(Base):
     end: Mapped[int] = mapped_column(BigInteger)
 
 
+PUBLICATION_SERVICE_SEQUENCE = Sequence('chart_publication_service_seq', metadata=Base.metadata)
+
+
 class ChartPublicationState(Base):
     """Durable requests for one registered instrument/period, never display symbols."""
     __tablename__ = "chart_publication_state"
-    __table_args__ = (Index("ix_publication_state_ready", "next_at", "served_at"),)
+    __table_args__ = (Index("ix_publication_state_ready", "next_at", "last_service_seq"),)
     instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
     timeframe: Mapped[str] = mapped_column(String(8), primary_key=True)
     requested: Mapped[int] = mapped_column(BigInteger, default=1, server_default="1")
@@ -1209,6 +1213,7 @@ class ChartPublicationState(Base):
     reasons: Mapped[int] = mapped_column(default=1, server_default="1")
     requested_at: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     served_at: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    last_service_seq: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     next_at: Mapped[int | None] = mapped_column(BigInteger, default=0)
     attempts: Mapped[int] = mapped_column(default=0, server_default="0")
     blocked_reason: Mapped[str | None] = mapped_column(String(40))

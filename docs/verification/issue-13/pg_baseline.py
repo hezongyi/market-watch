@@ -135,6 +135,9 @@ def snapshot():
 
 
 def cycle():
+    from alerts import chart_aggregation_worker
+    if hasattr(chart_aggregation_worker, 'cycle'):
+        return chart_aggregation_worker.cycle()
     return aggregate_once(), m.publish_once()
 
 
@@ -308,13 +311,21 @@ def measure(scenario, seconds, repetition):
             t = time.monotonic()
             a,p = cycle()
             elapsed = time.monotonic()-t
-            target = m._PUBLISH_CURSOR if p else None
-            age = time.monotonic()-ready_since.get(target, time.monotonic()) if target else 0
+            target = getattr(p, 'selected_target', None) or (m._PUBLISH_CURSOR if p else None)
+            completed_at = time.monotonic()
+            ages = {key: completed_at - value for key, value in ready_since.items()}
+            age = completed_at-ready_since.get(target, completed_at) if target else 0
             age = max(0, age)
+            wait_to_start = max(0, t-ready_since.get(target, t)) if target else 0
             if target:
                 ready_since[target] = time.monotonic()
-            turn = dict(at=time.monotonic()-begun, seconds=elapsed, aggregate=a, publish_claim=bool(p),
-                        target=target, target_wait=age, ready_targets=len(ready), queries=dict(queries))
+            turn = dict(at=completed_at-begun, seconds=elapsed, aggregate=a,
+                        publish_claim=bool(p) or getattr(p, 'attempted', False),
+                        target=target, target_wait=age,
+                        target_wait_to_start=wait_to_start,
+                        ready_targets=len(ready), queries=dict(queries),
+                        ready_ages=[dict(target=key, seconds=value) for key,value in sorted(ages.items())],
+                        longest_ready_age=max(ages.values(), default=0))
             turns.append(turn)
             output.write(json.dumps(turn)+"\n")
             output.flush()
@@ -324,6 +335,14 @@ def measure(scenario, seconds, repetition):
                     completed.append(dict(**item, latency_seconds=time.monotonic()-begun-item["committed_seconds"]))
                     pending.remove(item)
             time.sleep(wait_seconds(a, p))
+    final_at = time.monotonic()
+    with s.transaction() as db:
+        final_ready = set(db.execute(select(s.ChartPublicationState.instrument_id,
+            s.ChartPublicationState.timeframe).where(
+            s.ChartPublicationState.requested > s.ChartPublicationState.processed,
+            s.ChartPublicationState.next_at <= clock)).all())
+    unresolved = [dict(target=key, seconds=final_at-ready_since.get(key, final_at),
+                       right_censored=True) for key in sorted(final_ready)]
     duration, cpu = time.monotonic()-begun, time.process_time()-cpu_begun
     event.remove(s.engine,"before_cursor_execute",before)
     event.remove(s.engine,"after_cursor_execute",after)
@@ -344,7 +363,9 @@ def measure(scenario, seconds, repetition):
         queries=dict(queries),worker_sql_seconds=sql_seconds,cycles=len(turns),
         cycle_p50=percentile(ordered,.5),cycle_p95=percentile(ordered,.95),cycle_p99=percentile(ordered,.99),
         events=completed,unpublished_events=pending,latency_p50=percentile(latencies,.5),latency_p95=percentile(latencies,.95),latency_p99=percentile(latencies,.99),
-        longest_target_wait=max((t["target_wait"] for t in turns), default=0),
+        longest_target_wait=max([t['longest_ready_age'] for t in turns] +
+                                [row['seconds'] for row in unresolved] + [0]),
+        final_unserved_ready=unresolved,
         before=before_state, after=after_state, visible_unchanged=before_state==after_state,
         backfill_bars_per_second=(after_state["published_bars"]-before_state["published_bars"])/duration,
         limitation="No API/alert/browser process; synthetic sources, warm cache; host contention sampled separately")

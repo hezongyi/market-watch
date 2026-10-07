@@ -3,6 +3,7 @@
 import hashlib
 import json
 import logging
+import time
 from decimal import Decimal
 
 from sqlalchemy import select
@@ -216,13 +217,24 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
     return results
 
 
-def step(*, now=None):
+def step(*, now=None, on_evaluated=None):
     with transaction() as db:
         ids = list(db.scalars(select(ChartAlert.id).where(ChartAlert.status == "active")))
     for ident in ids:
+        started = time.monotonic()
         try:
             with transaction() as db:
-                evaluate(db, ident, now=now, values_cache=_VALUE_CACHE)
+                business_now = now_ms() if now is None else now
+                evaluate(db, ident, now=business_now, values_cache=_VALUE_CACHE)
+                if on_evaluated:
+                    row = db.get(ChartAlert, ident)
+                    observation = dict(alert_id=ident, read_started=started,
+                        evaluation_finished=time.monotonic(),
+                        business_now=business_now, sequence=row.state.get('sequence') if row else None,
+                        count=row.count if row else None, health=row.health if row else None,
+                        status=row.status if row else None, commit_started=time.monotonic())
+            if on_evaluated:
+                on_evaluated(dict(**observation, committed=time.monotonic()))
         except Exception as exc:
             log.exception("Chart alert evaluation failed for %s", ident)
             with transaction() as db:

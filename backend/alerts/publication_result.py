@@ -10,6 +10,8 @@ class PublicationResult:
     runnable_remaining: bool = False
     next_due_at: int | None = None
     blocked_reason: str | None = None
+    selected_target: tuple[str, str] | None = None
+    attempted: bool = False
 
     def __bool__(self):
         # Existing callers may use truthiness, but inspecting a target is never

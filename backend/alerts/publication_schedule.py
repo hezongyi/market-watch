@@ -14,6 +14,7 @@ from .chart_data import FRAMES
 from .publication_result import PublicationResult
 from .source_history_store import _insert
 from .storage import (
+    PUBLICATION_SERVICE_SEQUENCE,
     ChartAggregationJob,
     ChartHistoryPlan,
     ChartPublication,
@@ -29,6 +30,22 @@ COVERAGE = 4
 AGGREGATED = 8
 RULES = 16
 _DISCOVER_AT = WeakKeyDictionary()
+
+
+def _service(db, state, stamp):
+    # PostgreSQL sequences never hold a global row lock across publication and
+    # may leave harmless gaps on rollback. SQLite serializes writers itself.
+    state.last_service_seq = (db.scalar(PUBLICATION_SERVICE_SEQUENCE.next_value())
+        if db.get_bind().dialect.name == 'postgresql' else
+        (db.scalar(select(func.max(ChartPublicationState.last_service_seq))) or 0) + 1)
+    state.served_at = stamp
+
+
+def _queue(db, stamp, **facts):
+    earliest = db.scalar(select(func.min(ChartPublicationState.next_at)).where(
+        ChartPublicationState.requested > ChartPublicationState.processed))
+    return PublicationResult(**facts, runnable_remaining=earliest is not None and earliest <= stamp,
+                             next_due_at=earliest)
 
 
 def request(db, instrument_id, *, frames=FRAMES, reason=BARS, stamp=None, approved=False):
@@ -50,7 +67,11 @@ def request(db, instrument_id, *, frames=FRAMES, reason=BARS, stamp=None, approv
         'requested': model.requested + 1,
         'reasons': model.reasons.op('|')(reason),
         'requested_at': case((model.requested == model.processed, ready_at), else_=model.requested_at),
-        'next_at': ready_at, 'attempts': 0, 'blocked_reason': None,
+        # Fresh input must not repeatedly cancel a deterministic failure's
+        # retry delay. New generation remains pending and is served when due.
+        'next_at': case((model.attempts > 0, model.next_at), else_=ready_at),
+        'attempts': model.attempts,
+        'blocked_reason': case((model.attempts > 0, model.blocked_reason), else_=None),
     }))
 
 
@@ -111,11 +132,14 @@ def tick(publisher, corrections):
             Instrument, Instrument.id == ChartPublicationState.instrument_id).where(
             ChartPublicationState.requested > ChartPublicationState.processed,
             ChartPublicationState.next_at <= stamp).order_by(
-                ChartPublicationState.served_at, ChartPublicationState.requested_at,
+                ChartPublicationState.last_service_seq, ChartPublicationState.requested_at,
                 ChartPublicationState.instrument_id, ChartPublicationState.timeframe).limit(1)
             .with_for_update(of=Instrument, skip_locked=True)).first()
         if selected is None:
-            return PublicationResult()
+            earliest = db.scalar(select(func.min(ChartPublicationState.next_at)).where(
+                ChartPublicationState.requested > ChartPublicationState.processed))
+            return PublicationResult(next_due_at=max(stamp + 100, earliest) if earliest is not None else None,
+                                     blocked_reason='locked' if earliest is not None and earliest <= stamp else None)
         state, inst = selected
         ident, frame = state.instrument_id, state.timeframe
         managed_dataset._PUBLISH_CURSOR = (ident, frame)
@@ -128,7 +152,10 @@ def tick(publisher, corrections):
         try:
             with db.begin_nested():
                 from .coverage_projection import backfill_page
-                coverage_work = backfill_page(db, inst)
+                coverage_work = backfill_page(db, inst, limit=64)
+                from .publication_budget import current
+                if current() and coverage_work['examined']:
+                    current().consume(coverage_work['examined'])
                 plan = db.get(ChartHistoryPlan, ident)
                 pub = db.get(ChartPublication, (ident, frame))
                 result = publisher(db, inst, plan, frame, stamp) if plan else (
@@ -138,12 +165,13 @@ def tick(publisher, corrections):
         except Exception as error:
             state.attempts += 1
             state.next_at = stamp + min(300_000, 1000 * 2 ** min(state.attempts, 8))
-            state.served_at = max(stamp, state.served_at + 1)
+            _service(db, state, stamp)
             state.blocked_reason = type(error).__name__[:40]
-            return PublicationResult(next_due_at=state.next_at, blocked_reason=state.blocked_reason)
+            return _queue(db, stamp, selected_target=(ident, frame), attempted=True,
+                          blocked_reason=state.blocked_reason)
         # The equality condition also protects callers that enqueue another
         # generation inside the same publication transaction.
-        state.served_at = max(stamp, state.served_at + 1)
+        _service(db, state, stamp)
         state.attempts = 0
         if result.runnable_remaining or (not coverage_work['complete'] and
                                         not coverage_work.get('maintenance_required')):
@@ -157,9 +185,5 @@ def tick(publisher, corrections):
                 ChartPublicationState.instrument_id == ident, ChartPublicationState.timeframe == frame,
                 ChartPublicationState.requested == generation).values(
                     processed=generation, reasons=0, next_at=None, blocked_reason=result.blocked_reason))
-        remaining = db.scalar(select(ChartPublicationState.instrument_id).where(
-            ChartPublicationState.requested > ChartPublicationState.processed,
-            ChartPublicationState.next_at <= stamp).limit(1)) is not None
-        return PublicationResult(snapshot_changed=result.snapshot_changed, task_progressed=True,
-                                 runnable_remaining=remaining, blocked_reason=result.blocked_reason,
-                                 next_due_at=result.next_due_at)
+        return _queue(db, stamp, snapshot_changed=result.snapshot_changed, task_progressed=True,
+                      selected_target=(ident, frame), attempted=True, blocked_reason=result.blocked_reason)

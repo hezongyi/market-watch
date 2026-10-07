@@ -63,9 +63,10 @@ def main():
     for item in observation['events']:
         ident, marker = item['instrument'],item['source_observed_at']
         visible = next(r for r in timeline if r['identities'][ident]['published_observed_at'] == marker)
-        judged = next(r for r in timeline if r['identities'][ident]['sequence'] == marker)
+        judged = next(r for r in observation['alert_commits'] if
+            r['alert_id'] == item['alert_id'] and r['sequence'] == marker)
         assert item['visible_seconds'] == visible['observed_seconds']
-        assert item['judged_seconds'] == judged['observed_seconds']
+        assert item['judged_seconds'] == judged['committed']
     for ident, final in observation['final'].items():
         assert final['count'] == final['signal_count'] == 0
         assert final['source_observed_at'] == final['published_payload']['observed_at'] == final['sequence']
@@ -77,6 +78,15 @@ def main():
         assert final['health'] == 'ready'
     assert observation['queries'].get('alert_staging_reads',0) == 0
     outputs.append(dict(scope='same_price',exact_visible=50,exact_judged=50))
+    normal=read('normal-input-alert/result.json')
+    assert normal['outcome']=='passed' and not normal['errors']
+    assert normal['inputs']==normal['visible']==normal['judged']==310
+    assert {'same_price','new_minute','price_revision','volume_revision'} <= {r['kind'] for r in normal['events']}
+    for item in normal['events']:
+        row=next(r for r in normal['alert_commits'] if r['alert_id']==item['alert_id']
+            and r['sequence']==item['source_observed_at'])
+        assert item['judged_seconds']==row['committed'] and item['latency_interval'] is not None
+    outputs.append(dict(scope='normal_input',exact_visible=310,exact_judged=310))
     network = read('network-alert/result.json')
     assert not network['errors'] and network['inputs'] == network['visible'] == network['judged'] == 10
     assert network['api']['count'] == len(network['api_samples']) == 120

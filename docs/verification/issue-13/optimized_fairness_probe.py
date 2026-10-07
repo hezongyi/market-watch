@@ -29,7 +29,11 @@ def main():
             db.scalar(select(s.Instrument).where(s.Instrument.id == ident).with_for_update())
             request(db, ident, reason=RULES)
     expected = {(ident, frame) for ident in b.IDENTITIES for frame in m.FRAMES}
+    ready_at = time.monotonic()
     service, turns, next_input = {}, [], 0
+    last_service = {key:ready_at for key in expected}
+    rounds = {key:0 for key in expected}
+    maximum = 0
     while time.monotonic() - begun < 30:
         elapsed = time.monotonic() - begun
         if elapsed >= next_input:
@@ -41,14 +45,23 @@ def main():
             next_input += .5
         at = time.monotonic()
         aggregate, publication = b.cycle()
+        done = time.monotonic()
+        ages = {key:done-value for key,value in last_service.items()}
+        maximum = max(maximum, max(ages.values()))
         if publication.task_progressed:
-            service.setdefault(tuple(m._PUBLISH_CURSOR), time.monotonic() - begun)
+            target = tuple(m._PUBLISH_CURSOR)
+            service.setdefault(target, done - ready_at)
+            last_service[target] = done
+            rounds[target] += 1
+            # Keep all 90 targets logically ready across repeated full rounds;
+            # this is a scheduling probe, not a backfill throughput benchmark.
+            with s.transaction() as db:
+                request(db, target[0], frames=(target[1],), reason=RULES)
         turns.append(dict(at=at-begun, seconds=time.monotonic()-at,
             aggregate=aggregate, publication=bool(publication),
             task_progressed=publication.task_progressed,
-            target=m._PUBLISH_CURSOR if publication.task_progressed else None))
-        if expected <= service.keys() and elapsed >= 10:
-            break
+            target=m._PUBLISH_CURSOR if publication.task_progressed else None,
+            longest_ready_age=max(ages.values())))
         time.sleep(b.wait_seconds(aggregate, publication))
     missing = sorted(expected - service.keys())
     result = dict(environment='Ubuntu isolated PostgreSQL; 0.75 CPU worker / 0.75 CPU PG',
@@ -56,10 +69,13 @@ def main():
         focused_identity='BTCUSDT', service=[dict(instrument=i, frame=f, seconds=v)
             for (i,f),v in sorted(service.items())], missing=missing,
         longest_first_service_seconds=max(service.values(), default=0), turns=turns,
+        longest_target_wait=maximum, rounds=[dict(target=key,count=value) for key,value in sorted(rounds.items())],
+        ready_committed_seconds=ready_at-begun,
         scope='Runnable 10x9 target selection under continuous same-price focus input; not provider latency')
     (ROOT/'result.json').write_text(json.dumps(result, indent=2)+'\n')
     assert not missing, 'Runnable identity/period starved'
     assert result['longest_first_service_seconds'] <= 10, 'Runnable fairness gate exceeded'
+    assert maximum <= 10 and min(rounds.values()) >= 2, 'Sustained rotation gate exceeded'
     print('All 90 runnable targets served within 10s under continuous focused input')
 
 

@@ -22,7 +22,9 @@ import pg_baseline as b
 from supplemental_probe import quantiles
 from alerts.api import app
 from alerts.chart_alert_service import AlertConfig, create
-from alerts.chart_alert_worker import evaluate, step
+from alerts.chart_alert_worker import evaluate
+from alerts.alert_monitor import run as run_monitor
+from measurement_windows import latency_window
 
 s, m = b.s, b.m
 ROOT = Path('/results/network-alert')
@@ -71,13 +73,14 @@ def main():
     fixture_now = lambda: b.NOW+b.MINUTE+int(1000*(time.monotonic()-begun))
     m.now_ms = fixture_now
     s.now_ms = fixture_now
-    from alerts import bar_batch, chart_aggregation, market, publication_jobs
-    for module in (bar_batch,chart_aggregation,market,publication_jobs):
+    from alerts import bar_batch, chart_aggregation, chart_alert_worker, composite_watches, market, publication_jobs
+    for module in (bar_batch,chart_aggregation,chart_alert_worker,composite_watches,market,publication_jobs):
         module.now_ms=fixture_now
     m._PUBLISH_CURSOR = None
     stop = threading.Event()
     errors, worker_turns, alert_turns, visible, judged = [], [], [], {}, {}
     api_samples, events = [], []
+    absent, alert_commits = {}, []
     query_counts=Counter()
     def count(conn,cursor,statement,*args):
         scope={'issue13-publisher':'publisher','issue13-alert':'alert',
@@ -107,18 +110,24 @@ def main():
 
     def monitor():
         try:
-            while not stop.is_set():
-                t=time.monotonic()
-                step(now=fixture_now())
-                committed=time.monotonic()-begun
-                alert_turns.append(dict(at=t-begun,seconds=time.monotonic()-t))
-                with s.transaction() as db:
-                    for ident,alert_id in alerts.items():
-                        record=db.get(s.ChartAlert,alert_id)
-                        if record.count and ident not in judged:
-                            judged[ident]=dict(at=committed,health=record.health,
-                                count=record.count,state_sequence=record.state.get('sequence'))
-                stop.wait(1)
+            reverse={value:key for key,value in alerts.items()}
+            def committed(row):
+                row={**row, **{key:row[key]-begun for key in
+                    ('read_started','commit_started','committed')}}
+                alert_commits.append(row)
+                ident=reverse.get(row['alert_id'])
+                if ident and row['count'] and ident not in judged:
+                    judged[ident]=dict(at=row['committed'],commit_started=row['commit_started'],
+                        health=row['health'],count=row['count'],state_sequence=row['sequence'])
+            def turn(row):
+                if row['error']:
+                    errors.append(dict(scope='monitor',error=row['error']))
+                alert_turns.append(dict(at=row['started']-begun,
+                    seconds=row['finished']-row['started'],
+                    chart_seconds=row['chart_finished']-row['started'],
+                    watch_seconds=row['finished']-row['chart_finished'],
+                    overrun=row['overrun'],error=row['error']))
+            run_monitor(stop,on_alert=committed,on_turn=turn)
         except Exception as exc:
             errors.append(dict(scope='alert',error=type(exc).__name__))
             stop.set()
@@ -131,9 +140,14 @@ def main():
                     rows=list(db.scalars(select(s.ChartPublishedBar).where(
                         s.ChartPublishedBar.timeframe=='M1',s.ChartPublishedBar.start==b.NOW-5000)))
                 at=time.monotonic()-begun
+                found={row.instrument_id for row in rows}
+                for ident in b.IDENTITIES:
+                    if ident not in found:
+                        absent[ident]=t
                 for row in rows:
                     if row.instrument_id not in visible:
-                        visible[row.instrument_id]=dict(at=at,query_start=t,payload=row.payload)
+                        visible[row.instrument_id]=dict(at=at,query_start=t,
+                            last_absent_start=absent.get(row.instrument_id,0),payload=row.payload)
                 stop.wait(.05)
         except Exception as exc:
             errors.append(dict(scope='visibility',error=type(exc).__name__))
@@ -214,6 +228,8 @@ def main():
     for item in events:
         ident=item['instrument']
         v,j=visible.get(ident),judged.get(ident)
+        window=latency_window((v['last_absent_start'],v['at']) if v else None,
+            (j['commit_started'],j['at']) if j else None)
         if v:
             assert Decimal(v['payload']['close'])==Decimal(item['expected_close'])
             assert v['payload']['end']==item['expected_end']
@@ -222,15 +238,18 @@ def main():
             # A sampling estimate, not a rigorous bound: scheduling and the
             # previous query's duration can add uncertainty beyond 50ms.
             visible_to_judged=j['at']-v['at'] if v and j else None,
-            visible_to_judged_upper=j['at']-v['query_start']+.05 if v and j else None,
+            visible_to_judged_upper=window['upper_seconds'] if window else None,
+            latency_interval=window,
             final=final[ident]))
     report=dict(duration=duration,process_cpu_percent=100*cpu/duration,
         execution_key=execution_key,
         queries=dict(query_counts),cgroup_before=cgroup_before,cgroup_after=cgroup_after,
         api=dict(count=len(api_samples),**quantiles([r['seconds'] for r in api_samples])),
         alert_latency_completed_only=quantiles([r['visible_to_judged'] for r in outcomes if r['visible_to_judged'] is not None]),
+        alert_latency_certified_upper=quantiles([r['visible_to_judged_upper'] for r in outcomes
+            if r['visible_to_judged_upper'] is not None]),
         inputs=len(events),visible=len(visible),judged=len(judged),events=outcomes,
-        api_samples=api_samples,worker_turns=worker_turns,alert_turns=alert_turns,errors=errors,
+        api_samples=api_samples,worker_turns=worker_turns,alert_turns=alert_turns,alert_commits=alert_commits,errors=errors,
         scope='Actual TCP Uvicorn routing/authentication + real publisher and one-second alert step, isolated synthetic PG',
         limitations=['Lifespan disabled: no provider prewarm/acquisition/native MCP transport',
             'TCP client runs inside the same container; host mapping checked separately',

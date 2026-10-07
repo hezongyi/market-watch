@@ -168,9 +168,12 @@ def measure(scenario, seconds):
                 elapsed = time.monotonic() - t
                 scope = 'verification'
                 at = time.monotonic() - begun
-                cursor = m._PUBLISH_CURSOR if publish.task_progressed else None
+                cursor = getattr(publish,'selected_target',None) or (
+                    m._PUBLISH_CURSOR if publish.task_progressed else None)
                 turn = dict(at=at, seconds=elapsed, target=cursor,
                     target_wait=max((time.monotonic()-stamp for stamp in ready_since.values()), default=0),
+                    ready_ages=[dict(target=key,seconds=time.monotonic()-stamp)
+                        for key,stamp in sorted(ready_since.items())],
                     aggregate=aggregate, publish_claim=bool(publish), queries=dict(queries))
                 if cursor:
                     fairness[cursor] = time.monotonic()
@@ -193,6 +196,14 @@ def measure(scenario, seconds):
     cgroup_after = {name:(Path('/sys/fs/cgroup')/name).read_text()
         for name in cgroup_before}
     assert not sampler.is_alive(), 'lock sampler did not stop'
+    with s.transaction() as db:
+        final_ready=set(db.execute(select(s.ChartPublicationState.instrument_id,
+            s.ChartPublicationState.timeframe).where(
+            s.ChartPublicationState.requested>s.ChartPublicationState.processed,
+            s.ChartPublicationState.next_at<=b.clock)).all())
+    ended=time.monotonic()
+    unresolved=[dict(target=key,seconds=ended-ready_since.get(key,ended),right_censored=True)
+        for key in sorted(final_ready)]
     after = fingerprint()
     after_state = b.snapshot()
     with s.engine.begin() as conn:
@@ -216,7 +227,8 @@ def measure(scenario, seconds):
         inputs_by_identity={ident: dict(Counter(e['kind'] for e in events+pending if e['instrument']==ident)) for ident in b.IDENTITIES},
         latency_completed_only=quantiles([e['latency_seconds'] for e in events]),
         unpublished_before_final30s=sum(e['committed_seconds']<=duration-30 for e in pending),
-        longest_target_wait=max(t['target_wait'] for t in turns),
+        longest_target_wait=max([t['target_wait'] for t in turns]+[r['seconds'] for r in unresolved]+[0]),
+        final_unserved_ready=unresolved,
         by_target={str(key):dict(turns=sum(t['target'] is not None and tuple(t['target'])==key for t in turns),
             last_seen_seconds=max(t['at'] for t in turns if t['target'] is not None and tuple(t['target'])==key)) for key in fairness},
         lock_sample_count=len(locks),lock_wait_samples=sum(any(r['wait_event_type']=='Lock' for r in sample['connections']) for sample in locks),

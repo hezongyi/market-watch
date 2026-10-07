@@ -44,6 +44,9 @@ def main():
         for i,row in enumerate(rows,1):
             gate(f'{scenario}_{i}_runnable_wait_seconds',row['longest_target_wait'],10,
                 row['longest_target_wait'] <= 10,'Durable runnable target wait, quiet targets excluded')
+            if 'final_unserved_ready' in row:
+                gate(f'{scenario}_{i}_unresolved_runnable_targets',len(row['final_unserved_ready']),0,
+                    not row['final_unserved_ready'],'Right-censored ready intervals require drain or supplementary evidence')
     for i,(row,baseline) in enumerate(zip(samples['backfill'],old['backfill']),1):
         throughput = row['backfill_bars_per_second']
         gate(f'backfill_{i}_absolute_bars_per_second',throughput,660.52,throughput >= 660.52,'New effective published bars only')
@@ -75,6 +78,10 @@ def main():
         gate('fairness_90_targets_first_service_seconds',fairness['longest_first_service_seconds'],10,
             not fairness['missing'] and fairness['longest_first_service_seconds'] <= 10,
             'Ten explicit synthetic identities, nine periods, continuous focused input')
+        if 'rounds' in fairness:
+            gate('fairness_90_targets_sustained_wait_seconds',fairness['longest_target_wait'],10,
+                fairness['longest_target_wait'] <= 10 and min(row['count'] for row in fairness['rounds']) >= 2,
+                'All 90 targets remain runnable; repeated service and unserved ages included')
     mixed = consumer('supplemental/mixed.json')
     if mixed:
         for percentile,limit in [('p95',15),('p99',30)]:
@@ -95,7 +102,8 @@ def main():
             observation['inputs'] == observation['visible'] == observation['judged'] == 50,
             '50 exact markers over 330s, missed markers remain in denominator')
         for percentile,limit in [('p95',1),('p99',2)]:
-            value = observation['visible_to_judged_completed'][percentile]
+            value = observation.get('visible_to_judged_certified_upper',
+                observation['visible_to_judged_completed'])[percentile]
             gate('same_price_visible_to_judged_'+percentile+'_seconds',value,limit,
                 value is not None and value <= limit,'Sequential PG sampling includes scheduling uncertainty')
         for percentile,limit in [('p95',15),('p99',30)]:
@@ -103,13 +111,23 @@ def main():
             gate('same_price_commit_to_visible_'+percentile+'_seconds',value,limit,
                 value is not None and value <= limit,'Same-price M1 input to observed published marker')
     network = consumer('network-alert/result.json')
+    normal = consumer('normal-input-alert/result.json')
+    if normal:
+        gate('normal_input_exact_markers',[normal['inputs'],normal['visible'],normal['judged']],310,
+            normal['inputs']==normal['visible']==normal['judged']==310 and not normal['errors'],
+            '330s continuous input across ten identities; new minutes and price/volume revisions')
+        for percentile,limit in [('p95',1),('p99',2)]:
+            value=normal['visible_to_judged_certified_upper'][percentile]
+            gate('normal_input_visible_to_judged_'+percentile+'_seconds',value,limit,
+                 value is not None and value <= limit,'Conservative visibility and per-alert commit intervals')
     if network:
         for percentile,limit in [('p95',.5),('p99',1)]:
             value = network['api'][percentile]
             gate('tcp_api_'+percentile+'_seconds',value,limit,value is not None and value <= limit,
                  '120 authenticated <=500bar calls alongside publication and alerts; lifespan off')
         for percentile,limit in [('p95',1),('p99',2)]:
-            value = network['alert_latency_completed_only'][percentile]
+            value = network.get('alert_latency_certified_upper',
+                network['alert_latency_completed_only'])[percentile]
             gate('trigger_visible_to_judged_'+percentile+'_seconds',value,limit,
                 value is not None and value <= limit,'Ten new-minute crossings, exact one signal per input')
         gate('tcp_exact_input_judgment_denominator',[network['visible'],network['judged']],10,

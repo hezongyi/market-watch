@@ -16,6 +16,7 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from .chart_data import FRAMES, bounds, chart_rows
 from .coverage import covers_interval
 from .domain import NY, Calendar, bucket_bounds, calendar_for
+from .publication_budget import current, work_budget
 from .publication_result import PublicationResult
 from .storage import (
     Bar,
@@ -130,7 +131,16 @@ def _source(frame):
 def _page_limit(frame):
     # Bound source work too: a target month can require 31 daily members.
     multiplier = 2 if frame == 'M30' else 32 if frame == 'MN' else 7 if frame == 'W1' else 1
-    return max(1, BATCH // multiplier)
+    budget = current()
+    size = min(BATCH, 384, max(0, budget.available - 32)) if budget else BATCH
+    return max(0 if budget else 1, size // multiplier)
+
+
+def _page(db, inst, frame, before, limit, now, *, after):
+    if not limit:
+        return []
+    rows = chart_rows(db, inst, frame, before, limit, now, observed=True, after=after)
+    return rows
 
 
 def _bounds(at, frame, inst):
@@ -165,6 +175,8 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
         ).exists(),
     ).order_by(ChartPublicationJob.start.desc())
     page_limit = _page_limit(frame)
+    if not page_limit:
+        return PublicationResult(runnable_remaining=True)
     jobs = list(db.scalars(ready_jobs.limit(page_limit)))
     if not jobs:
         return PublicationResult()
@@ -185,7 +197,9 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
         limit = min(budget, count * 2)
         if not limit:
             break
-        rows.extend(chart_rows(db, inst, frame, b, limit, now, observed=True, after=a))
+        if not _page_limit(frame):
+            break
+        rows.extend(_page(db, inst, frame, b, min(limit, _page_limit(frame)), now, after=a))
         budget -= limit
     existing = {row.start: row for row in db.scalars(select(ChartPublishedBar).where(
         ChartPublishedBar.instrument_id == inst.id,
@@ -277,6 +291,8 @@ def publish_frame(db, inst, plan, frame, now):
         )
     )
     corrections = publish_corrections(db, inst, pub, frame, left, right, pending, now)
+    if not _page_limit(frame):
+        return finish(runnable=True)
     if pending:
         # A pending slice is a barrier: publish only the completed suffix on
         # its right, retaining previous snapshots on its left unchanged.
@@ -293,14 +309,20 @@ def publish_frame(db, inst, plan, frame, now):
         starts = list(db.scalars(select(Bar.start).where(
             Bar.instrument_id == inst.id, Bar.timeframe == source,
             Bar.start >= tail_start, Bar.start < right).order_by(Bar.start).limit(source_budget + 1)))
+        if current():
+            current().consume(len(starts), progressed=False)
         if len(starts) > source_budget:
             boundary = ms(_bounds(starts[-1], frame, inst)[0])
             if boundary > tail_start:
                 right = min(right, boundary)
                 tail_remaining = True
-    tail = chart_rows(db, inst, frame, right, _page_limit(frame), now, observed=True, after=tail_start)
-    older = chart_rows(db, inst, frame, pub.start, _page_limit(frame), now, observed=True,
-                       after=safe_left) if pub and pub.start > safe_left else []
+    page_limit = _page_limit(frame)
+    if not page_limit:
+        return finish(runnable=True)
+    tail = _page(db, inst, frame, right, page_limit, now, after=tail_start)
+    older_deferred = bool(pub and pub.start > safe_left and not _page_limit(frame))
+    older = _page(db, inst, frame, pub.start, _page_limit(frame), now,
+                  after=safe_left) if pub and pub.start > safe_left and not older_deferred else []
     candidates = {row["start"]: row for row in older + tail}
     rows = []
     for row in sorted(candidates.values(), key=lambda r: r["start"]):
@@ -336,7 +358,7 @@ def publish_frame(db, inst, plan, frame, now):
                 if not pub.initialized:
                     pub.initialized = True
                     pub.revision += 1
-        return finish(blocked="aggregation" if pending else "source",
+        return finish(runnable=older_deferred, blocked="aggregation" if pending else "source",
                       next_due=min((job.next_at for job in pending), default=None))
     # Do not publish disconnected older slices while a newer source segment is
     # still being generated. The current suffix may open independently by frame.
@@ -437,7 +459,7 @@ def publish_frame(db, inst, plan, frame, now):
     # an edge that actually advanced proves another available history page;
     # unchanged unavailable prefixes must wait for their durable source input.
     older_progress = more and (not had_publication or pub.start < old_start)
-    return finish(runnable=older_progress or tail_remaining,
+    return finish(runnable=older_progress or tail_remaining or older_deferred,
                   blocked="aggregation" if pending else "source" if more and not older_progress else None,
                   next_due=min((job.next_at for job in pending), default=None))
 
@@ -445,7 +467,8 @@ def publish_frame(db, inst, plan, frame, now):
 def publish_once():
     """One bounded ready target, with durable progress and per-target retry."""
     from .publication_schedule import tick
-    return tick(publish_frame, publish_corrections)
+    with work_budget():
+        return tick(publish_frame, publish_corrections)
 
 
 def adopt_legacy_once(*, limit=None):

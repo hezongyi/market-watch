@@ -287,3 +287,80 @@ def test_fixed_clock_continuously_runnable_target_does_not_starve_other_ready_ta
         managed.publish_once()
     assert len(set(served[:18])) == 18
     assert len(set(served[18:36])) == 18, 'Fixed observation clock must preserve fair worker turns'
+
+
+def test_service_order_survives_different_history_and_clock_rollback(database, monkeypatch):
+    from alerts.publication_result import PublicationResult
+    from alerts.storage import ChartPublicationState
+    from sqlalchemy import update
+    clock = [START + 30 * MINUTE + 5000]
+    monkeypatch.setattr(managed, 'now_ms', lambda: clock[0])
+    monkeypatch.setattr(storage, 'now_ms', lambda: clock[0])
+    with database.begin() as db:
+        for ident in ('BTCUSDT', 'EURUSD'):
+            join(db, db.get(Instrument, ident), START, clock[0])
+        db.execute(update(ChartPublicationState).values(next_at=clock[0] - 10000))
+        db.execute(update(ChartPublicationState).where(
+            ChartPublicationState.instrument_id == 'EURUSD').values(
+                last_service_seq=1000, served_at=clock[0] + 10000))
+        if db.get_bind().dialect.name == 'postgresql':
+            from sqlalchemy import text
+            db.execute(text("SELECT setval('chart_publication_service_seq',1000)"))
+    served = []
+
+    def publish(db, inst, plan, frame, stamp):
+        served.append((inst.id, frame))
+        return PublicationResult(runnable_remaining=True)
+
+    monkeypatch.setattr(managed, 'publish_frame', publish)
+    for _ in range(36):
+        clock[0] -= 1  # Make requests due again independently of the sort clock.
+        with database.begin() as db:
+            db.execute(update(ChartPublicationState).values(next_at=clock[0]))
+        managed.publish_once()
+    assert len(set(served[:18])) == len(set(served[18:])) == 18
+
+
+def test_failed_target_does_not_idle_other_ready_targets(database, monkeypatch):
+    from alerts.chart_aggregation_worker import wait_seconds
+    from alerts.publication_result import PublicationResult
+    from alerts.storage import ChartPublicationState
+    from sqlalchemy import select
+    clock = START + 30 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: clock)
+    monkeypatch.setattr(storage, 'now_ms', lambda: clock)
+    with database.begin() as db:
+        for ident in ('BTCUSDT', 'EURUSD'):
+            join(db, db.get(Instrument, ident), START, clock)
+
+    def publish(db, inst, plan, frame, stamp):
+        if inst.id == 'BTCUSDT':
+            raise ValueError('Broken source')
+        return PublicationResult()
+
+    monkeypatch.setattr(managed, 'publish_frame', publish)
+    failed = managed.publish_once()
+    assert failed.attempted and failed.blocked_reason == 'ValueError'
+    assert failed.runnable_remaining and wait_seconds(False, failed) == .02
+    healthy = []
+    for _ in range(17):
+        result = managed.publish_once()
+        if result.task_progressed:
+            healthy.append(result.selected_target)
+    assert len(healthy) == 9
+    with database.begin() as db:
+        failures = list(db.scalars(select(ChartPublicationState).where(
+            ChartPublicationState.instrument_id == 'BTCUSDT')))
+        assert all(row.attempts == 1 and row.next_at == clock + 2000 for row in failures)
+    # Coverage adoption may require a second harmless page for a healthy
+    # identity. Retry ownership remains local even during that maintenance.
+    for _ in range(18):
+        if not managed.publish_once():
+            break
+    else:
+        raise AssertionError('Healthy queue failed to drain')
+    from alerts.publication_schedule import request
+    with database.begin() as db:
+        request(db, 'BTCUSDT', frames=('M1',))
+        failed_state = db.get(ChartPublicationState, ('BTCUSDT', 'M1'))
+        assert failed_state.next_at == clock + 2000 and failed_state.attempts == 1

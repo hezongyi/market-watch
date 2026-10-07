@@ -52,7 +52,7 @@ def test_actual_predecessor_upgrade_pending_downgrade_guard_and_schema_roundtrip
         # downgrade when the pending-state guard refuses this unsafe rollback.
         with engine.begin() as conn:
             assert 'market_coverage_projection' in inspect(conn).get_table_names()
-            assert conn.scalar(text('SELECT version_num FROM alembic_version')) == 'ao42_coverage_projection'
+            assert conn.scalar(text('SELECT version_num FROM alembic_version')) == 'ap43_publication_service_order'
             conn.execute(text('UPDATE chart_publication_state SET processed=requested'))
         command.downgrade(config, 'am40_chart_revision_demand')
         with engine.connect() as conn:

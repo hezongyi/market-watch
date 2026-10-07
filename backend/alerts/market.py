@@ -286,8 +286,8 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
     received_at = received_at or now_ms()
     closures = closures_from(instrument.calendar_profile)
     calendar = calendar_for(instrument)
-    earliest = ms(bucket_bounds(min(touched), "D1", calendar)[0])
-    latest_boundary = ms(bucket_bounds(max(touched), "D1", calendar)[1])
+    earliest = min(ms(bucket_bounds(min(touched), frame, calendar)[0]) for frame in timeframes)
+    latest_boundary = max(ms(bucket_bounds(max(touched), frame, calendar)[1]) for frame in timeframes)
     coverage = stored_coverage(db, instrument, earliest, latest_boundary)
     # Read each touched day once rather than issuing one query per aggregate bar.
     minute_rows = db.scalars(
@@ -300,6 +300,9 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
         )
         .order_by(Bar.start)
     ).all()
+    from .publication_budget import current
+    if current():
+        current().consume(len(minute_rows))
     calendar = calendar_for(instrument)
     for timeframe in timeframes:
         bounds = {bucket_bounds(t, timeframe, calendar) for t in touched}
