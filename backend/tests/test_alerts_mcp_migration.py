@@ -11,7 +11,7 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "al39_history_task_activity"
+HEAD = "am40_chart_revision_demand"
 
 
 def configuration():

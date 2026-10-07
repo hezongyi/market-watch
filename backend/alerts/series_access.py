@@ -130,7 +130,8 @@ def chart_data(db, body):
         target_inst = db.get(Instrument, db.get(MarketDataset, db.get(RealtimeMapping, selected.mapping_id).target_dataset_id).instrument_id)
         inst = SimpleNamespace(id=composite.instrument_id, calendar=meta["calendar"], calendar_profile=target_inst.calendar_profile)
         if body.client:
-            renew_demand(db, body.client, db.get(Instrument, composite.instrument_id))
+            renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
+                         composite_revision_id=selected.id)
     for bar in page["bars"]:
         if body.timeframe in ("D1", "W1", "MN"):
             bar["chart_time"] = fixed_label(bar, body.timeframe, meta["calendar"])

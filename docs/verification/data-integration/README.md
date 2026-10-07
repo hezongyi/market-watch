@@ -22,7 +22,11 @@
 # 仅首次准备。只选择 OANDA/行情代理凭据，生成新的数据库和页面密码；不复制生产 DB 配置。
 PYTHONPATH=backend .venv/bin/python scripts/prepare_data_integration.py --source-env /home/quant/repos/market-watch/.env
 
-sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml up -d --build api oanda-worker history-worker aggregation-worker web'
+# 构建须使用 Ubuntu 专用 builder，并登记该验收任务的镜像归属。
+mw-docker compose-build --repo . --task mw-data-integration --project market-watch-data-integration \
+  --purpose acceptance --env-file artifacts/data-integration/compose.env \
+  --file docs/verification/data-integration/compose.yaml
+sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml up -d --no-build api oanda-worker history-worker aggregation-worker web'
 
 # 实际 PostgreSQL 定向验收；测试使用独立临时 schema。
 sg docker -c 'docker compose --env-file artifacts/data-integration/compose.env -p market-watch-data-integration -f docs/verification/data-integration/compose.yaml run --rm verify'

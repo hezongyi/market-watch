@@ -37,6 +37,11 @@ def test_composite_rule_contract(provider_pg, monkeypatch, contract):
     contract(provider_pg[0], monkeypatch)
 
 
+@pytest.mark.parametrize("gap", [15000, 15001, 30000])
+def test_intrabar_quote_gap(provider_pg, monkeypatch, gap):
+    contracts.test_intrabar_quote_gap_without_worker_stale_check_rebuilds_baseline(provider_pg[0], monkeypatch, gap)
+
+
 def test_competing_evaluators_and_rollback_preserve_single_event(provider_pg, monkeypatch):
     factory, _ = provider_pg
     ident, _, revision, seam, stamp = contracts.armed(factory, monkeypatch, notify_ntfy=True)

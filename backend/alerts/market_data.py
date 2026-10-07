@@ -230,22 +230,29 @@ class QuoteQuery(BaseModel):
     client: str | None = Field(default=None, min_length=1, max_length=40)
 
 
-def renew_demand(db, client, inst):
+def renew_demand(db, client, inst, *, composite_revision_id=None):
     # Searching/selecting/refusing an unmaintained managed series does not
     # authorize even a temporary M1 maintenance lease.
     plan = db.get(ChartHistoryPlan, inst.id)
-    from .storage import MarketComposite, MarketDataset
+    from .storage import CompositeRevision, MarketComposite, MarketDataset
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == inst.id))
     composite = db.scalar(select(MarketComposite).where(MarketComposite.instrument_id == inst.id))
+    if composite_revision_id is not None:
+        revision = db.get(CompositeRevision, composite_revision_id)
+        if not composite or not revision or revision.composite_id != composite.id:
+            raise ValueError("需求修订不属于所选组合行情")
     live_source = dataset and dataset.identity["source"] == "oanda"
     if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
         return
     import hashlib
 
-    ident = hashlib.sha256((client + "|" + inst.id).encode()).hexdigest()[:40]
+    lease_key = client + "|" + inst.id
+    if composite_revision_id is not None:
+        lease_key += "|" + composite_revision_id
+    ident = hashlib.sha256(lease_key.encode()).hexdigest()[:40]
     demand = db.get(MarketDemand, ident)
     if not demand:
-        demand = MarketDemand(id=ident, instrument_id=inst.id)
+        demand = MarketDemand(id=ident, instrument_id=inst.id, composite_revision_id=composite_revision_id)
         db.add(demand)
     demand.expires = now_ms() + 120000
     demand.updated_at = now_ms()

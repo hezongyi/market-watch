@@ -11,6 +11,7 @@ from alerts.fixed_indicators import indicator_tick
 from alerts.history_artifacts import artifact_tick
 from alerts.history_versions import create_version, import_page
 from alerts.live_pricing import account_key, desired_datasets
+from alerts.market_contracts import DatasetIdentity, QuoteEvent
 from alerts.storage import (
     ChartAlert,
     CompositeJudgment,
@@ -19,6 +20,7 @@ from alerts.storage import (
     FixedIndicatorRun,
     LiveState,
     MarketComposite,
+    MarketDataset,
     MarketDemand,
     Notification,
     Outbox,
@@ -301,6 +303,59 @@ def test_explicit_sampled_quote_mode_never_mutates_confirmed_state_and_requires_
         db.get(PricingOwner, account_key(settings.oanda_account_id)).expires = 0
         assert evaluate(db, ident, now=stamp + 2000) == []
         assert db.get(ChartAlert, ident).health == "stale"
+
+
+@pytest.mark.parametrize("gap", [15000, 15001, 30000])
+def test_intrabar_quote_gap_without_worker_stale_check_rebuilds_baseline(database, monkeypatch, gap):
+    from alerts.live_pricing import publish_event
+
+    ident, _, revision, _, stamp = armed(database, monkeypatch, mode="intrabar", notify_ntfy=True)
+    with database.begin() as db:
+        target = db.get(RealtimeMapping, db.get(CompositeRevision, revision).mapping_id).target_dataset_id
+        source = DatasetIdentity.model_validate(db.get(MarketDataset, target).identity)
+        db.get(LiveState, target).quote = {}
+    ownership = (account_key(settings.oanda_account_id), "test-owner")
+
+    def quote(offset, price, sequence):
+        event = QuoteEvent(identity=source, source_time=stamp + offset, received_at=stamp + offset,
+            bid=price, ask=str(float(price) + .001), tradeable=True, connection_epoch=1, sequence=sequence)
+        publish_event(ownership, 1, event, {"EUR_USD": source}, now=stamp + offset)
+
+    quote(0, "1.11", 1)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp) == []
+        assert db.get(ChartAlert, ident).health == "ready"
+    # Shared connection stays alive while this symbol has no samples and the
+    # alert worker does not evaluate the intervening stale period.
+    publish_event(ownership, 1, {"type": "heartbeat", "connection_epoch": 1,
+        "received_at": stamp + gap - 1000}, {"EUR_USD": source}, now=stamp + gap - 1000)
+    quote(gap, "1.119", 2)
+    with database.begin() as db:
+        source_state = db.get(LiveState, target)
+        assert source_state.epoch == 1 and source_state.ready and source_state.connection == "connected"
+        events = evaluate(db, ident, now=stamp + gap)
+        if gap <= 15000:
+            assert len(events) == 1
+            return
+        assert events == []
+        row = db.get(ChartAlert, ident)
+        assert row.count == 0 and row.state["sequence"] == stamp + gap
+        judgment = db.scalar(select(CompositeJudgment).where(CompositeJudgment.event_time == stamp + gap))
+        assert judgment.outcome == "recovery_baseline" and judgment.evidence["recovery"]
+        assert judgment.evidence["observation_gap_ms"] == gap
+        for model in (SignalRow, Notification, Outbox):
+            assert db.scalar(select(func.count()).select_from(model)) == 0
+        assert evaluate(db, ident, now=stamp + gap) == []
+    quote(gap + 1000, "1.11", 3)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + gap + 1000) == []
+    quote(gap + 2000, "1.119", 4)
+    with database.begin() as db:
+        assert len(evaluate(db, ident, now=stamp + gap + 2000)) == 1
+        assert evaluate(db, ident, now=stamp + gap + 2000) == []
+        assert db.get(ChartAlert, ident).count == 1
+        for model in (SignalRow, Notification, Outbox):
+            assert db.scalar(select(func.count()).select_from(model)) == 1
 
 
 def test_missed_and_expired_events_establish_baseline_without_notifications(database, monkeypatch):

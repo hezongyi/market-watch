@@ -279,8 +279,11 @@ def evaluate(db, alert, version, config, now):
         CompositeMinuteInput.input_revision > previous_input, CompositeMinuteInput.input_revision <= value,
         CompositeMinuteInput.start < old_end)) if value > previous_input else None
     correction = earliest is not None
+    prior_sequence = alert.state.get("sequence")
+    observation_gap = sequence - prior_sequence if config.mode == "intrabar" and prior_sequence is not None else None
     recovering = bool(runtime.get("recovering") or runtime.pop("closed", False) or
-                      runtime.get("epoch", live.epoch) != live.epoch or correction)
+                      runtime.get("epoch", live.epoch) != live.epoch or correction or
+                      observation_gap is not None and observation_gap > 15000)
     crossed_seam = bool((bar.get("seam_crossing") or bar.get("seam_at_start")) and
                         runtime.get("last_start") != bar["start"] or
                         runtime.get("last_start", bar["start"]) < revision.seam <= bar["start"])
@@ -307,6 +310,7 @@ def evaluate(db, alert, version, config, now):
         "rules": revision.rules, "seam": revision.seam}, "dependencies": dependencies,
         "seam_policy": config.seam_policy, "previous_state": before_state, "recovery": recovering,
         "correction_from": earliest, "baseline_reason": outcome if baseline else None,
+        "observation_gap_ms": observation_gap,
         "source_epoch": live.epoch, "quote": dict(quote) if config.mode == "intrabar" else None,
         "observation_basis": "complete_close" if config.mode == "close" else "sampled_bid_quote"}
     sample = Observation(f"bar:{bar['start']}" if config.mode == "close" else f"sample:{sequence}",

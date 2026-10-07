@@ -1091,6 +1091,8 @@ class MarketDemand(Base):
     __tablename__ = "market_data_demand"
     id: Mapped[str] = mapped_column(String(40), primary_key=True)
     instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), index=True)
+    composite_revision_id: Mapped[str | None] = mapped_column(
+        ForeignKey("market_composite_revisions.id", name="fk_market_demand_composite_revision"), index=True)
     expires: Mapped[int] = mapped_column(BigInteger, index=True)
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
 

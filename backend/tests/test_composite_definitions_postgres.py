@@ -10,18 +10,8 @@ import test_composite_definitions as contracts
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alerts.composite_definitions import first_use, save_mapping
-from alerts.storage import (
-    CompositeAggregateBar,
-    CompositeAggregateTask,
-    CompositeInputEvent,
-    CompositeMinute,
-    CompositeMinuteInput,
-    CompositePreparation,
-    CompositeReadAttempt,
-    CompositeRevision,
-    MarketComposite,
-    RealtimeMapping,
-)
+from alerts.storage import CompositePreparation, CompositeRevision, MarketComposite
+from postgres_migration_helpers import complete, predecessor
 from sqlalchemy import func, inspect, select
 from test_market_contracts import identity
 from test_provider_postgres import provider_pg as _provider_pg
@@ -66,13 +56,12 @@ def test_additive_migration_and_no_unreviewed_mapping_loss(provider_pg, monkeypa
     spec = importlib.util.spec_from_file_location("composite_migration", path)
     migration = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration)
+    config = predecessor(engine, monkeypatch, migration.down_revision)
     with engine.begin() as conn:
-        for model in (CompositeAggregateBar, CompositeAggregateTask, CompositeMinute, CompositeMinuteInput, CompositeInputEvent, CompositeReadAttempt, CompositePreparation,
-                      CompositeRevision, MarketComposite, RealtimeMapping):
-            model.__table__.drop(conn)
         migration.op = Operations(MigrationContext.configure(conn))
         migration.upgrade()
         assert "market_composite_preparations" in inspect(conn).get_table_names()
+    complete(config, migration.revision)
     catalog = contracts.prepare(factory, monkeypatch)
     with factory.begin() as db:
         save_mapping(db, identity().key, catalog, contracts.PROOF)

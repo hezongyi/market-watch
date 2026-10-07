@@ -31,21 +31,29 @@ def composite_targets(db, wanted):
     # Running rules may remain on an older revision/mapping after explicit
     # activation for charts; keep that exact target subscribed independently.
     stamp = now_ms()
-    targets, fixed_consumers = set(), set()
-    for binding, watch in db.execute(select(CompositeWatchBinding, Watch).join(
-            Watch, Watch.id == CompositeWatchBinding.watch_id).where(Watch.status == "active")):
-        targets.add(binding.market_identity["target_dataset_id"])
-        fixed_consumers.add(watch.instrument_id)
+    targets, head_consumers = set(), set()
+    for watch, binding in db.execute(select(Watch, CompositeWatchBinding).outerjoin(
+            CompositeWatchBinding, Watch.id == CompositeWatchBinding.watch_id).where(Watch.status == "active")):
+        if binding:
+            targets.add(binding.market_identity["target_dataset_id"])
+        else:
+            head_consumers.add(watch.instrument_id)
     for version in db.scalars(select(ChartAlertVersion).join(ChartAlert, (
         ChartAlertVersion.alert_id == ChartAlert.id) & (ChartAlertVersion.version == ChartAlert.version)
     ).where(ChartAlert.status == "active", or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp))):
         if version.config.get("series_kind") == "composite":
             targets.add(version.market_identity["target_dataset_id"])
-            fixed_consumers.add(version.market_identity["instrument_id"])
-    # A fixed rule alone must not subscribe a newly activated chart target.
-    # Only actual chart demand (or pre-binding legacy consumers) follows head.
-    chart_consumers = set(db.scalars(select(MarketDemand.instrument_id).where(MarketDemand.expires > stamp)))
-    active_consumers = (wanted - fixed_consumers) | (wanted & chart_consumers)
+        else:
+            head_consumers.add(version.market_identity.get("instrument_id", version.config.get("instrument")))
+    # Each chart lease owns the revision actually read. Only legacy unbound
+    # leases/rules follow head, including when a fixed consumer shares its ticker.
+    targets.update(db.scalars(select(RealtimeMapping.target_dataset_id).join(
+        CompositeRevision, CompositeRevision.mapping_id == RealtimeMapping.id).join(
+        MarketDemand, MarketDemand.composite_revision_id == CompositeRevision.id
+    ).where(MarketDemand.expires > stamp)))
+    head_consumers.update(db.scalars(select(MarketDemand.instrument_id).where(
+        MarketDemand.expires > stamp, MarketDemand.composite_revision_id.is_(None))))
+    active_consumers = wanted & head_consumers
     if active_consumers:
         targets.update(db.scalars(select(RealtimeMapping.target_dataset_id).join(
             CompositeRevision, CompositeRevision.mapping_id == RealtimeMapping.id).join(
