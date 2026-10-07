@@ -143,9 +143,26 @@ const legacySyncHooks = [...legacyRangeHooks.slice(0,-1), replacements[rangeHook
 const legacyPreviousSyncHooks = legacySyncHooks.slice(0,-1).map(([before, after]) => [before,
   after.replace(`if(${nativeSync}?.handleChoice(this,"date",e,Cf))return;`, "")
     .replace(`if(${nativeSync}?.handleChoice(this,"time",e,Tf))return;`, "")]);
+const productionV112Hooks = replacements.map(pair => [...pair]);
+// Replace only the native empty-pane action. Object/axis double clicks continue
+// through their original handlers; do not add a second DOM dblclick listener.
+replacements.push([
+  'this._chartUndoModel().selection().isEmpty()){const t=this.state();new Er.EnvironmentState(e).mod()',
+  'this._chartUndoModel().selection().isEmpty()&&!(null===t&&this._mwBlankDoubleClickCursor&&(0,Rt.toolIsCursor)(Rt.tool.value())&&!this._isSelectPointModeEnabled()&&null===this._firstZoomPoint&&!this._chartUndoModel().crosshairSource().startMeasurePoint()&&globalThis.parent?.MWChartMaximize?.handle(this,e))){const t=this.state();new Er.EnvironmentState(e).mod()',
+]);
+// Some tools reset to cursor while mouseUp completes the drawing/zoom, before
+// the engine dispatches the double click. Retain the tool at mouseDown.
+replacements.push([
+  'mouseDownEvent(e){this._onMouseEvent(),this.hasState()&&this._mouseDownOrTouchStartEvent(e,this._dataSourceAtPoint(e.localX,e.localY))}',
+  'mouseDownEvent(e){const mwCursor=(0,Rt.toolIsCursor)(Rt.tool.value())&&null===this._dataSourceAtPoint(e.localX,e.localY);this._mwBlankDoubleClickCursor=0===this._mouseEventHandler._clickCount?mwCursor:this._mwBlankDoubleClickCursor&&mwCursor;this._onMouseEvent(),this.hasState()&&this._mouseDownOrTouchStartEvent(e,this._dataSourceAtPoint(e.localX,e.localY))}',
+]);
+replacements.push([
+  '_syncChartsDateRangesWithActiveChartRange(e){const t=this.activeChartWidget.value(),',
+  '_syncChartsDateRangesWithActiveChartRange(e){if(globalThis.parent?.MWChartMaximize?.resizing())return;const t=this.activeChartWidget.value(),',
+]);
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [replacements, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
+  const installed = [replacements, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;

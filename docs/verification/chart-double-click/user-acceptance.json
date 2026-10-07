@@ -1,0 +1,95 @@
+{
+  "userResult": "验收正常",
+  "acceptedAt": "2026-10-07T02:50:22.799268+00:00",
+  "baseline": "9670dae",
+  "baselineVersion": "1.12.1",
+  "implementationCommit": "b6d6459",
+  "project": "mw-chart-maximize-20261007",
+  "lifecycle": "accepted and retired after actual backup restore verification",
+  "privateArchive": "/home/quant/.local/share/market-watch-docker/archives/mw-chart-maximize-20261007-20261007T024843-598b6df0",
+  "actualRestoreVerified": true,
+  "retirement": {
+    "project": "mw-chart-maximize-20261007",
+    "task": "mw-chart-maximize-20261007",
+    "at": "2026-10-07T02:49:24.493277+00:00",
+    "containers": 12,
+    "volumes": [
+      "mw-chart-maximize-20261007_maximize-pg"
+    ],
+    "networks": [
+      "b2425449de02"
+    ],
+    "verified_backups": [
+      {
+        "volume_names": [
+          "mw-chart-maximize-20261007_maximize-pg"
+        ],
+        "database": "chart_maximize",
+        "file": "8c33a46c476aa78f.dump",
+        "sha256": "9c9b77b52c4a7702ae26b2bc8d52d44f771efcce4cb52cfaa4a565bd47d34e7a",
+        "tables": {
+          "ack_grants": 0,
+          "advanced_chart_preferences": 13,
+          "advanced_chart_workspaces": 2,
+          "agent_credentials": 0,
+          "agent_operations": 0,
+          "alembic_version": 1,
+          "audit_events": 869,
+          "candles": 1743,
+          "chart_aggregation_jobs": 0,
+          "chart_alert_actions": 0,
+          "chart_alert_versions": 0,
+          "chart_alerts": 0,
+          "chart_history_plans": 3,
+          "chart_indicator_templates": 0,
+          "chart_publication_jobs": 0,
+          "chart_publications": 28,
+          "chart_published_bars": 1743,
+          "chart_viewport_demands": 0,
+          "chart_workspaces": 0,
+          "delivery_attempts": 0,
+          "device_receipts": 0,
+          "devices": 0,
+          "import_jobs": 0,
+          "instruments": 5,
+          "market_data_coverage": 174,
+          "market_data_demand": 0,
+          "market_instrument_catalog": 127,
+          "native_history_loads": 18,
+          "notifications": 0,
+          "outbox": 0,
+          "preferences": 6,
+          "provider_bars": 147608,
+          "provider_datasets": 27,
+          "provider_interests": 11,
+          "quotes": 0,
+          "replays": 0,
+          "sessions": 22,
+          "signals": 0,
+          "volume_backfill_jobs": 0,
+          "volume_backfill_segments": 0,
+          "watches": 0,
+          "weekly_history_requests": 0
+        },
+        "actual_restore_verified": true
+      },
+      {
+        "volume_names": [
+          "mw-chart-maximize-20261007_maximize-pg"
+        ],
+        "database": "postgres",
+        "file": "d02d3a1da49f2736.dump",
+        "sha256": "c062661534cb3e2610b0c0e9683fb4e7164f96a5acdd302ab88afa853cc6627c",
+        "tables": {},
+        "actual_restore_verified": true
+      }
+    ]
+  },
+  "retirementToolFixCommit": "7c756d7",
+  "retirementToolSafetyTests": 32,
+  "remainingProjectContainers": 0,
+  "remainingProjectVolumes": 0,
+  "remainingProjectNetworks": 0,
+  "productionReleased": false,
+  "productionObservedVersion": "v1.12.0-0591e56"
+}
