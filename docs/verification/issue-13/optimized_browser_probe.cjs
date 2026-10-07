@@ -2,8 +2,8 @@
 const { chromium } = require('@playwright/test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const APP = 'https://192.168.7.232:19635';
-const CHART = 'https://192.168.7.232:19636';
+const APP = 'https://192.168.7.232:19645';
+const CHART = 'https://192.168.7.232:19646';
 const OUT = '/results/browser/result.json';
 assert.ok(!fs.existsSync(OUT), 'Existing browser evidence retained');
 const report = { synthetic_market_data: true, upstream_isolated: true,

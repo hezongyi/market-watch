@@ -282,7 +282,7 @@ def main():
         visible_to_judged_completed=quantiles([item['visible_to_judged'] for item in outcomes if item['visible_to_judged'] is not None]),
         visible_to_judged_certified_upper=quantiles([item['latency_interval']['upper_seconds']
             for item in outcomes if item['latency_interval'] is not None]),
-        scope='Real aggregate_once/publish_once + one-second alert step + PG sampling; same completed M1 candle, no new minutes',
+        scope='Real aggregate_once/publish_once + shared production monitor cadence + PG sampling; same completed M1 candle, no new minutes',
         limitations=['One 330-second synthetic run; no successful provider I/O, network, API lifespan, browser or notifications',
             'Same completed candle observes newer sample markers; not actual quote arrival or complete-close SLA',
             'Sampler uses read-committed sequential SELECTs; timestamps include pool/scheduling uncertainty and commit-return overlap',

@@ -1,7 +1,7 @@
 """Own-PG TCP API and concurrent published-alert baseline, no upstream I/O.
 
 Uvicorn runs the actual app with lifespan disabled. A dedicated thread invokes
-the real alert step then waits one second, as provider_service does. This isolates
+the shared production chart-plus-watch monitor cadence. This isolates
 synthetic published consumption; it does not certify the full provider lifespan,
 browser, native chart assets, upstream SLA or notification delivery.
 """
@@ -254,7 +254,7 @@ def main():
             if r['visible_to_judged_upper'] is not None]),
         inputs=len(events),visible=len(visible),judged=len(judged),events=outcomes,
         api_samples=api_samples,worker_turns=worker_turns,alert_turns=alert_turns,alert_commits=alert_commits,errors=errors,
-        scope='Actual TCP Uvicorn routing/authentication + real publisher and one-second alert step, isolated synthetic PG',
+        scope='Actual TCP Uvicorn routing/authentication + real publisher and shared production alert monitor, isolated synthetic PG',
         limitations=['Lifespan disabled: no provider prewarm/acquisition/native MCP transport',
             'TCP client runs inside the same container; host mapping checked separately',
             'No full webpage, browser, upstream data, external notifications or production SLA',

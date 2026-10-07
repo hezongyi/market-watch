@@ -10,7 +10,7 @@ import time
 log = logging.getLogger(__name__)
 
 
-def run(stop, *, period=1.0, monotonic=time.monotonic, on_alert=None, on_turn=None):
+def run(stop, *, period=0.75, monotonic=time.monotonic, on_alert=None, on_turn=None):
     from .chart_alert_worker import step
     from .composite_watches import step as watch_step
 

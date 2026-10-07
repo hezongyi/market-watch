@@ -46,7 +46,7 @@ services:
   web:
     image: ${ISSUE13_WEB_IMAGE:?owned immutable built frontend image}
     pull_policy: never
-    ports: ["192.168.7.232:19635:443"]
+    ports: ["192.168.7.232:19645:443"]
     volumes:
       - /tmp/mw-issue13-optimized-browser-private/web-tls.conf:/etc/nginx/conf.d/default.conf:ro
       - /tmp/mw-issue13-optimized-browser-private/cert.pem:/certs/cert.pem:ro
@@ -58,7 +58,7 @@ services:
   chart-origin:
     image: ${ISSUE13_CHART_IMAGE:?owned immutable built native chart image}
     pull_policy: never
-    ports: ["192.168.7.232:19636:443"]
+    ports: ["192.168.7.232:19646:443"]
     volumes:
       - /tmp/mw-issue13-optimized-browser-private/chart-tls.conf:/etc/nginx/conf.d/default.conf:ro
       - /tmp/mw-issue13-optimized-browser-private/cert.pem:/certs/cert.pem:ro

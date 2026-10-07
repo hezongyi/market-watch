@@ -4,7 +4,7 @@ import pytest
 from alerts import alert_monitor, chart_alert_worker, composite_watches
 
 
-@pytest.mark.parametrize('cost,expected', [(.3, [0, 1, 2]), (1.3, [0, 2, 4])])
+@pytest.mark.parametrize('cost,expected', [(.3, [0, .75, 1.5]), (1.3, [0, 1.5, 3])])
 def test_shared_monitor_deadlines_include_watch_and_coalesce_overruns(monkeypatch, cost, expected):
     stop = Event()
     clock, starts, watches, reports = [0.0], [], [], []
@@ -29,7 +29,7 @@ def test_shared_monitor_deadlines_include_watch_and_coalesce_overruns(monkeypatc
     alert_monitor.run(stop, monotonic=lambda: clock[0], on_turn=reports.append)
     assert starts == expected
     assert len(watches) == 3
-    assert all(row['overrun'] == (cost > 1) for row in reports)
+    assert all(row['overrun'] == (cost > .75) for row in reports)
 
 
 def test_monitor_errors_back_off_without_running_watch(monkeypatch):
@@ -42,7 +42,7 @@ def test_monitor_errors_back_off_without_running_watch(monkeypatch):
         pytest.fail('Failed chart round must not start watch')
 
     def wait(seconds):
-        assert seconds >= 1
+        assert seconds >= .75
         stop.set()
 
     monkeypatch.setattr(chart_alert_worker, 'step', failed)
