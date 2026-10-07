@@ -1374,8 +1374,8 @@
       "bytes": 180
     },
     "audit_optimized_baseline.py": {
-      "sha256": "eda09d469eb8bd57baa0607a08fc77dc310cc6b4f2f6a91fb6a8c1cce598764d",
-      "bytes": 4049
+      "sha256": "f807ad4ce5dc3a87a789d9389a1ab2b3ddd71c31634c3ae06a29238e18a079c2",
+      "bytes": 4063
     },
     "results/v114-baseline/idle-3-sql.json": {
       "sha256": "88f96c59c3183347ff09fa76fe5f23bf0e5068a7af89f3689da616ac9d0234e8",
@@ -2544,6 +2544,94 @@
     "results/optimized-r5/environment-performance.json": {
       "sha256": "755702222d435817a44c68d3f183eb3a78d98846e72cb533754d4ce74f907017",
       "bytes": 3333
+    },
+    "results/optimized-r5/performance-checkpoint-7.json": {
+      "sha256": "f3131ce80fcc6eb46d619cf757c9becd9a7eba40d91e6603d5567c902ecd82b2",
+      "bytes": 2795
+    },
+    "results/optimized-r5-baseline/idle-1.json": {
+      "sha256": "b1c2886ffd4559769c25730d5c5e20adeb6c2a8c1f0e056d797d06de6ea2115f",
+      "bytes": 39104
+    },
+    "results/optimized-r5-baseline/idle-1.jsonl": {
+      "sha256": "afe1be05592fdb815b07e7eb586049975391ba2a9efe11c1eb1ce5b4036c115b",
+      "bytes": 41148
+    },
+    "results/optimized-r5-baseline/idle-1-sql.json": {
+      "sha256": "32a33b80a809369f69b8a24e132b5d1f24feb81926b34048bb75c8815ea8642a",
+      "bytes": 12228
+    },
+    "results/optimized-r5-baseline/live-1.json": {
+      "sha256": "f7f42da6b39f962ddba21cbe5217632a7227af5162fdf4c3ba33877d5ce95d24",
+      "bytes": 45827
+    },
+    "results/optimized-r5-baseline/live-1.jsonl": {
+      "sha256": "7d1eadbd902df1a477e86f24acf0a30fd9379962073b90373df2330e33d44b54",
+      "bytes": 509727
+    },
+    "results/optimized-r5-baseline/live-1-sql.json": {
+      "sha256": "7ff09e64b729e4abd66ae9cf79d8dcea4fd47ecce470bb88948d4d16c06717f8",
+      "bytes": 56856
+    },
+    "results/optimized-r5-baseline/backfill-1.json": {
+      "sha256": "5a5699bd6ede7d87d9c172f3e1774b53e500ebf6a4b7958607cf4a3b736642dc",
+      "bytes": 39402
+    },
+    "results/optimized-r5-baseline/backfill-1.jsonl": {
+      "sha256": "894bba33e3a2f556d67d12544bf2b7d71dfc86a24f9d3977afbf35f8f5cf8761",
+      "bytes": 3729302
+    },
+    "results/optimized-r5-baseline/backfill-1-sql.json": {
+      "sha256": "181d4948aa0b4707e57983724b0069c0228b4faecc2bdfe42812359c8b6ee7e1",
+      "bytes": 82070
+    },
+    "results/optimized-r5-baseline/revision-1.json": {
+      "sha256": "25dafb55f3a58509fcc47ee85f604037c6ed9c454242d832419e8401f2dcee0d",
+      "bytes": 47400
+    },
+    "results/optimized-r5-baseline/revision-1.jsonl": {
+      "sha256": "0332fc6d738ff77131ff6de86c802004d445ac36826141a863352c1b65b71e7d",
+      "bytes": 188046
+    },
+    "results/optimized-r5-baseline/revision-1-sql.json": {
+      "sha256": "9923c7bb97acd943a3eb96552d8b2912eb9b27b3882d4a6af7167beb836229cb",
+      "bytes": 43242
+    },
+    "results/optimized-r5-baseline/idle-2.json": {
+      "sha256": "9f31567eee84d0724f36d4a7b56f045bf15e5e085efe55551091e001814e5e5c",
+      "bytes": 39098
+    },
+    "results/optimized-r5-baseline/idle-2.jsonl": {
+      "sha256": "0291df50768bc0609dc922c571f3f0fbd5b425f8f0fd5f71da14092764ca3181",
+      "bytes": 41161
+    },
+    "results/optimized-r5-baseline/idle-2-sql.json": {
+      "sha256": "7dd7195d23aaa8b25859881e7600de824f226196cecc8161a7a3accca43088d3",
+      "bytes": 12229
+    },
+    "results/optimized-r5-baseline/live-2.json": {
+      "sha256": "fdf5513dd764378256e581db4190687c3ab2be73fe58ae0d0d448bea40f43890",
+      "bytes": 45828
+    },
+    "results/optimized-r5-baseline/live-2.jsonl": {
+      "sha256": "1b0f642f5f5116ce04a16fdf968b3ce648fcb47917a7a0d1ceb9903220cda825",
+      "bytes": 504472
+    },
+    "results/optimized-r5-baseline/live-2-sql.json": {
+      "sha256": "6253c3e1017b7c27c84c940c8371bb86bf51efd82b9500d0c6d1390649fdad78",
+      "bytes": 56744
+    },
+    "results/optimized-r5-baseline/backfill-2.json": {
+      "sha256": "091b801e74d5b852242e6b0383a42b27caf00981883e5ecb4c092d0b4ac3e62e",
+      "bytes": 39399
+    },
+    "results/optimized-r5-baseline/backfill-2.jsonl": {
+      "sha256": "ecc77c475d47be38bbc93dcfd01163f6d8576a2e73f75546da1db213de6a21c5",
+      "bytes": 3726947
+    },
+    "results/optimized-r5-baseline/backfill-2-sql.json": {
+      "sha256": "df1a8b32d104b2b045729a0460a1bed168c58fbe18df5b68caa392028b238449",
+      "bytes": 82052
     }
   },
   "updated_for_commit": "623ea85",

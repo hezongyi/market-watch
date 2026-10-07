@@ -4,7 +4,7 @@
   "source_commit": "ccb2a12b47ea1c9fd06517c2ccf3dec670532ee4",
   "runs": [
     {
-      "run": "p99",
+      "run": "idle-1",
       "scenario": "idle",
       "cpu_percent": 1.144596650459029,
       "sql_per_second": 1.5438153296361197,
@@ -15,7 +15,7 @@
       "backfill_bars_per_second": 0.0
     },
     {
-      "run": "p99",
+      "run": "live-1",
       "scenario": "live",
       "cpu_percent": 5.312893397683331,
       "sql_per_second": 50.7768169401422,
@@ -26,7 +26,7 @@
       "backfill_bars_per_second": 0.16262919341571133
     },
     {
-      "run": "p99",
+      "run": "backfill-1",
       "scenario": "backfill",
       "cpu_percent": 35.28166420714983,
       "sql_per_second": 192.09637533077324,
@@ -37,7 +37,7 @@
       "backfill_bars_per_second": 2725.716934145051
     },
     {
-      "run": "p99",
+      "run": "revision-1",
       "scenario": "revision",
       "cpu_percent": 4.290245449295687,
       "sql_per_second": 33.29504850965343,
@@ -48,7 +48,7 @@
       "backfill_bars_per_second": 0.0
     },
     {
-      "run": "p99",
+      "run": "idle-2",
       "scenario": "idle",
       "cpu_percent": 1.1523353790359647,
       "sql_per_second": 1.5437504893972893,
@@ -59,7 +59,7 @@
       "backfill_bars_per_second": 0.0
     },
     {
-      "run": "p99",
+      "run": "live-2",
       "scenario": "live",
       "cpu_percent": 5.614401588808621,
       "sql_per_second": 50.64683531827391,
@@ -70,7 +70,7 @@
       "backfill_bars_per_second": 0.16288362631894338
     },
     {
-      "run": "p99",
+      "run": "backfill-2",
       "scenario": "backfill",
       "cpu_percent": 35.37978372746832,
       "sql_per_second": 192.08962953372955,
@@ -82,5 +82,6 @@
     }
   ],
   "complete_acceptance": false,
-  "note": "Terminal scenario consistency only; growing host/state/raw files excluded"
+  "note": "Terminal scenario consistency only; growing host/state/raw files excluded",
+  "audit_checkpoint_correction": "Fixed host-side quantile loop shadowing report run label during initial archive; raw measurements unchanged. Initial hash update failed before manifest write; all 22 terminal files now explicitly hashed."
 }
