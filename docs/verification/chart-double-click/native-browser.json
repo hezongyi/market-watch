@@ -1,0 +1,709 @@
+{
+  "environment": "Ubuntu Playwright routed native-library fixture",
+  "cpuRate": 1,
+  "cases": [
+    {
+      "name": "inactive main chart blank double click maximizes whole chart with subpane",
+      "before": {
+        "layout": "4",
+        "active": 0,
+        "sync": {
+          "date": false,
+          "barWidth": false,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST-B",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [
+              {
+                "id": "LQ6JIp",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              }
+            ],
+            "panes": [
+              false,
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "5",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1790616000,
+              "to": 1790642700
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          }
+        ]
+      },
+      "after": {
+        "layout": "4",
+        "active": 2,
+        "sync": {
+          "date": false,
+          "barWidth": false,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST-B",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1775088000,
+              "to": 1791417600
+            },
+            "max": true,
+            "studies": [
+              {
+                "id": "LQ6JIp",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              }
+            ],
+            "panes": [
+              false,
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "5",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1790616000,
+              "to": 1790642700
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "double click restores original four-chart state and studies/drawing"
+    },
+    {
+      "name": "keyboard maximize can be restored by double click with identical grid geometry"
+    },
+    {
+      "name": "trend_line tool does not trigger whole-chart maximize"
+    },
+    {
+      "name": "measure tool does not trigger whole-chart maximize"
+    },
+    {
+      "name": "zoom tool does not trigger whole-chart maximize"
+    },
+    {
+      "name": "candle double click retains native properties dialog"
+    },
+    {
+      "name": "drawing double click retains native properties dialog"
+    },
+    {
+      "name": "price axis double click does not maximize chart"
+    },
+    {
+      "name": "time axis double click does not maximize chart"
+    },
+    {
+      "name": "RSI blank double click retains native pane maximize/restore"
+    },
+    {
+      "name": "rapid maximize/restore follows current native state"
+    },
+    {
+      "name": "barWidth synchronization ignores maximize resize",
+      "prior": {
+        "layout": "4",
+        "active": 3,
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST-B",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [
+              {
+                "id": "LQ6JIp",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false,
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          }
+        ]
+      },
+      "restored": {
+        "layout": "4",
+        "active": 1,
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST-B",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [
+              {
+                "id": "LQ6JIp",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false,
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6,
+            "offset": 10,
+            "range": {
+              "from": 1783728000,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "barWidth real wheel synchronization remains active after restore"
+    },
+    {
+      "name": "date synchronization ignores maximize resize",
+      "prior": {
+        "layout": "4",
+        "active": 1,
+        "sync": {
+          "date": true,
+          "barWidth": false,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6.6,
+            "offset": 10,
+            "range": {
+              "from": 1784419200,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST-B",
+            "resolution": "1D",
+            "spacing": 6.6,
+            "offset": 10,
+            "range": {
+              "from": 1784419200,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6.6,
+            "offset": 10,
+            "range": {
+              "from": 1784419200,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [
+              {
+                "id": "LQ6JIp",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false,
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6.6,
+            "offset": 10,
+            "range": {
+              "from": 1784419200,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          }
+        ]
+      },
+      "restored": {
+        "layout": "4",
+        "active": 1,
+        "sync": {
+          "date": true,
+          "barWidth": false,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6.6,
+            "offset": 10,
+            "range": {
+              "from": 1784419200,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST-B",
+            "resolution": "1D",
+            "spacing": 6.6,
+            "offset": 10,
+            "range": {
+              "from": 1784419200,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [],
+            "panes": [
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6.6,
+            "offset": 10,
+            "range": {
+              "from": 1784419200,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [
+              {
+                "id": "LQ6JIp",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false,
+              false
+            ]
+          },
+          {
+            "symbol": "TEST",
+            "resolution": "1D",
+            "spacing": 6.6,
+            "offset": 10,
+            "range": {
+              "from": 1784419200,
+              "to": 1791417600
+            },
+            "max": false,
+            "studies": [],
+            "shapes": [
+              {
+                "id": "vJoA6I",
+                "name": "horizontal_line"
+              },
+              {
+                "id": "kxAJ6G",
+                "name": "trend_line"
+              }
+            ],
+            "panes": [
+              false
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "date real wheel synchronization remains active after restore"
+    },
+    {
+      "name": "two-chart maximize restores genuinely dragged divider proportions"
+    },
+    {
+      "name": "eight-chart first/last/middle chart round trips"
+    },
+    {
+      "name": "single-chart layout does not switch whole-chart maximize"
+    },
+    {
+      "name": "read-only host does not use the desktop gesture"
+    },
+    {
+      "name": "touch double tap retains native behavior without whole-chart maximize"
+    },
+    {
+      "name": "workspace teardown cancels pending resize observations"
+    }
+  ],
+  "errors": [],
+  "lastState": null,
+  "maximizeCalls": [
+    {
+      "target": "CANVAS",
+      "touch": false,
+      "main": true,
+      "paneMax": false,
+      "count": 4,
+      "full": true,
+      "handled": true
+    }
+  ]
+}

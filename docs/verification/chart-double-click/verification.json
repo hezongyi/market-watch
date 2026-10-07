@@ -1,0 +1,37 @@
+{
+  "baseline": "cf84f03",
+  "productionSource": "0591e56",
+  "at": "2026-10-07T00:43:05.233500+00:00",
+  "asset": "host.b094dc92d30c3ed8.js",
+  "assetSha256": "b094dc92d30c3ed83e9110a3ea2e0d4754140dbd9d474223a1afa24b7175a209",
+  "nativeCases": 22,
+  "dockerDeployed": false,
+  "productBrowserRun": false,
+  "sourceSha256": {
+    "advanced-host/chart-maximize.js": "3ea3ea3a599b99875e632c4209d98c3cdb9c5942019e74d24a289db682e14685",
+    "advanced-host/patch-native-reserve.mjs": "8862cff14cb30b848ba8a4010e617ec8a8e3fce2554bf3e5aef00b4e522b577f",
+    "advanced-host/bridge.js": "a5c8afcb21c327f83729777c30f4c9ae708339a5a8c5789c29840fd60641ef8d",
+    "advanced-host/build-assets.mjs": "6a23d7a44c026d31de411a6f2ce24509a2818e7a3d91b42e5cfbedd0b6f337b3",
+    "advanced-host/Dockerfile": "a59bd2de2a442be655ce0053f813911a1a5bb1b199536df3e4170edb1b796d7e",
+    "advanced-host/.dockerignore": "769a97630d1ef0a51580b53ccbfc4d373bb8dc5455299a36313b2826fc40736f",
+    "advanced-host/index.html": "595ce4c440c2963d23824bcba4f4a0372c5eea2c4d80fc11f69ffe58df09d0e9",
+    "web/tests/advanced-chart-maximize.browser.cjs": "8dd35677285f27436e00eb622e9b0d59c78758a3e14567731d951d7405736267"
+  },
+  "cpu4Cases": 22,
+  "patchChecks": [
+    "verified-original",
+    "v1.12-upgrade",
+    "idempotence",
+    "exact-rollback",
+    "clean-install",
+    "tamper-refusal"
+  ],
+  "regressions": {
+    "syncCoordinator": "passed",
+    "nativeSyncChoices": "passed",
+    "webBuild": "passed",
+    "hostAssetBuildAndSyntax": "passed",
+    "pythonRuff": "passed",
+    "composeConfig": "passed"
+  }
+}

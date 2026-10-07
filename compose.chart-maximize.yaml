@@ -1,0 +1,64 @@
+# Ubuntu Docker only; this project never reads production data or configuration.
+name: mw-chart-maximize-20261007
+services:
+  pg:
+    image: postgres:14-bookworm
+    environment:
+      POSTGRES_DB: chart_maximize
+      POSTGRES_USER: chart_maximize
+      POSTGRES_PASSWORD: ${MAXIMIZE_DB_PASSWORD:?Run scripts/prepare_chart_maximize_acceptance.py}
+    volumes: [maximize-pg:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U chart_maximize]
+      interval: 2s
+      retries: 30
+  migrate:
+    build: .
+    image: market-watch-api:chart-maximize-20261007
+    command: [alembic, upgrade, head]
+    env_file:
+      - path: /tmp/mw-chart-maximize-20261007/api.env
+        format: raw
+    depends_on:
+      pg: {condition: service_healthy}
+  seed:
+    image: market-watch-api:chart-maximize-20261007
+    command: [python, /fixtures/seed.py]
+    env_file:
+      - path: /tmp/mw-chart-maximize-20261007/api.env
+        format: raw
+    volumes: [./scripts/seed_chart_maximize_acceptance.py:/fixtures/seed.py:ro]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  api:
+    image: market-watch-api:chart-maximize-20261007
+    env_file:
+      - path: /tmp/mw-chart-maximize-20261007/api.env
+        format: raw
+    depends_on:
+      seed: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz')"]
+      interval: 3s
+      retries: 30
+  web:
+    build:
+      context: ./web
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: https://127.0.0.1:17444
+    image: market-watch-web:chart-maximize-20261007
+    depends_on:
+      api: {condition: service_healthy}
+  chart-origin:
+    build: ./advanced-host
+    image: market-watch-chart-origin:chart-maximize-20261007
+  tls:
+    image: nginx:1.28-alpine
+    ports: [127.0.0.1:17443:443, 127.0.0.1:17444:444]
+    volumes:
+      - /tmp/mw-chart-maximize-20261007/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - /tmp/mw-chart-maximize-20261007/cert.pem:/certs/cert.pem:ro
+      - /tmp/mw-chart-maximize-20261007/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+volumes:
+  maximize-pg:

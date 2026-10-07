@@ -1410,6 +1410,8 @@ function boot(
     widget?._innerAPI()._saveChartService?.markContentAsChanged();
   }});
   globalThis.MWBarRangeMapping = barRangeMapping;
+  globalThis.MWChartMaximize?.dispose();
+  globalThis.MWChartMaximize = undefined;
   widget = new TradingView.widget({
     context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
@@ -1497,6 +1499,7 @@ function boot(
     ],
   });
   widget.onChartReady(async () => {
+    globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
     syncCoordinator.refreshCharts();
     barRangeMapping.refreshCharts();
@@ -1830,4 +1833,4 @@ addEventListener("message", async (e) => {
 });
 send({ type: "loaded" });
 
-addEventListener("pagehide", () => {barRangeMapping?.dispose();syncCoordinator?.dispose();}, {once:true});
+addEventListener("pagehide", () => {globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();}, {once:true});
