@@ -48,7 +48,47 @@ def test_publication_rotation_does_not_sleep_as_an_idle_worker(monkeypatch, publ
     def sleep(seconds):
         delays.append(seconds)
         raise SystemExit
-    monkeypatch.setattr(publisher.time, "sleep", sleep)
+    from alerts.publication_wakeup import PublicationWakeup
+    monkeypatch.setattr(PublicationWakeup, "prepare", lambda self: None)
+    monkeypatch.setattr(PublicationWakeup, "wait", lambda self, seconds: sleep(seconds))
     with pytest.raises(SystemExit):
         publisher.main()
     assert delays == [expected_sleep], "live publication work is not an empty aggregation queue"
+
+
+@pytest.mark.parametrize('worked,result,delay', [
+    (False, dict(runnable_remaining=True), .005),
+    (False, dict(runnable_remaining=True, blocked_reason='ValueError', attempted=True), .005),
+    (False, dict(task_progressed=True), .02),
+    (True, {}, .02),
+    (False, dict(blocked_reason='ValueError', next_due_at=3000), 2),
+    (False, dict(blocked_reason='locked', next_due_at=1100), .1),
+    (False, dict(next_due_at=1500), .5),
+    (False, {}, 2),
+])
+def test_short_wait_requires_confirmed_ready_publication(worked, result, delay, monkeypatch):
+    from alerts import chart_aggregation_worker as publisher
+    from alerts import storage
+    from alerts.publication_result import PublicationResult
+    monkeypatch.setattr(storage, 'now_ms', lambda: 1000)
+    assert publisher.wait_seconds(worked, PublicationResult(**result)) == delay
+
+
+def test_cycle_optional_observer_reports_separate_call_boundaries(monkeypatch):
+    from alerts import chart_aggregation_worker as publisher
+    from alerts import publication_budget
+    from alerts.publication_result import PublicationResult
+    ticks = iter((1., 2., 3., 4., 5.))
+    monkeypatch.setattr(publisher.time, 'monotonic', lambda: next(ticks))
+    result = PublicationResult(task_progressed=True, runnable_remaining=True,
+                               selected_target=('EURUSD', 'M1'), attempted=True)
+    monkeypatch.setattr(publisher, 'publish_once', lambda: result)
+    monkeypatch.setattr(publisher, 'aggregate_once', lambda: True)
+    observations = []
+    def observe(row):
+        assert publication_budget.current() is None
+        observations.append(row)
+    assert publisher.cycle(observer=observe) == (True, result)
+    assert observations == [dict(publication_started=2., publication_finished=3.,
+        publication_result=result, aggregation_started=4., aggregation_finished=5.,
+        aggregation_result=True)]

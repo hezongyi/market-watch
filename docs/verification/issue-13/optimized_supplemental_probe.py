@@ -145,8 +145,10 @@ def measure(scenario, seconds):
     ready_since = {}
     sequence = 0
     try:
-        with (ROOT / (scenario + '.jsonl')).open('x') as output:
+        from alerts.publication_wakeup import PublicationWakeup
+        with PublicationWakeup(s.engine) as wakeup, (ROOT / (scenario + '.jsonl')).open('x') as output:
             while time.monotonic() - begun < seconds:
+                wakeup.prepare()
                 b.clock = b.NOW + int(1000 * (time.monotonic() - begun))
                 if scenario == 'mixed' and sequence < 20 and time.monotonic() - begun >= 60 + sequence * 5:
                     scope = 'input'
@@ -186,7 +188,7 @@ def measure(scenario, seconds):
                         events.append(dict(**item, visible_seconds=time.monotonic() - begun,
                             latency_seconds=time.monotonic() - begun - item['committed_seconds']))
                         pending.remove(item)
-                time.sleep(b.wait_seconds(aggregate, publish))
+                wakeup.wait(b.wait_seconds(aggregate,publish),stop)
     finally:
         duration = time.monotonic() - begun
         cpu = time.process_time() - cpu_begun

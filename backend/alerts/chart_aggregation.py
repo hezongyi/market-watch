@@ -23,6 +23,9 @@ def enqueue_aggregation(db, instrument, start, end, now, *, kind="price"):
             elif kind == 'volume' and exists.kind == 'observed':
                 exists.kind = 'volume'
     db.flush()
+    if end > start:
+        from .publication_wakeup import notify
+        notify(db)
 
 
 def aggregation_priority(job, demands):

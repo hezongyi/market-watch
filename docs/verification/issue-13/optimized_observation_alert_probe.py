@@ -18,6 +18,7 @@ from alerts.chart_alert_service import AlertConfig, create
 from alerts.chart_alert_worker import evaluate
 from alerts.alert_monitor import run as run_monitor
 from measurement_windows import latency_window
+from observation_sampling import read_sample
 from supplemental_probe import quantiles
 
 s, m = b.s, b.m
@@ -96,12 +97,30 @@ def main():
             stop.set()
 
     def publisher():
-        while not stop.is_set():
-            at=time.monotonic()
-            aggregate,publish=b.cycle()
-            turns.append(dict(at=at-begun,seconds=time.monotonic()-at,
-                target=m._PUBLISH_CURSOR,aggregate=aggregate,publish=bool(publish)))
-            stop.wait(b.wait_seconds(aggregate, publish))
+        from alerts.publication_wakeup import PublicationWakeup
+        with PublicationWakeup(s.engine) as wakeup:
+            while not stop.is_set():
+                prepare_at=time.monotonic()
+                wakeup.prepare()
+                prepare_seconds=time.monotonic()-prepare_at
+                at=time.monotonic()
+                stages=[]
+                aggregate,publish=b.cycle(observer=stages.append)
+                record=dict(at=at-begun,seconds=time.monotonic()-at,
+                    listener_prepare_seconds=prepare_seconds,
+                    target=publish.selected_target,aggregate=aggregate,publish=bool(publish),
+                    attempted=publish.attempted,task_progressed=publish.task_progressed,
+                    snapshot_changed=publish.snapshot_changed,runnable_remaining=publish.runnable_remaining,
+                    next_due_at=publish.next_due_at,blocked_reason=publish.blocked_reason,
+                    publication_call_seconds=stages[0]['publication_finished']-stages[0]['publication_started'],
+                    aggregation_call_seconds=stages[0]['aggregation_finished']-stages[0]['aggregation_started'])
+                delay=b.wait_seconds(aggregate,publish)
+                wait_at=time.monotonic()
+                record['requested_wait_seconds']=delay
+                record['wake_reason']=wakeup.wait(delay,stop)
+                record['actual_wait_seconds']=time.monotonic()-wait_at
+                record['listener_error']=wakeup.error
+                turns.append(record)
 
     def monitor():
         def committed(row):
@@ -120,22 +139,15 @@ def main():
         with (ROOT/'timeline.jsonl').open('x') as output:
             while not stop.is_set():
                 at=time.monotonic()-begun
+                sql_before=queries['sampler_sql']
                 with s.transaction() as db:
-                    query=select(s.ChartPublishedBar).where(s.ChartPublishedBar.timeframe=='M1')
-                    query=(query.distinct(s.ChartPublishedBar.instrument_id).order_by(
-                        s.ChartPublishedBar.instrument_id,s.ChartPublishedBar.start.desc()) if NORMAL else
-                        query.where(s.ChartPublishedBar.start==start))
-                    payloads={row.instrument_id:row.payload for row in db.scalars(query)}
-                    records={ident:db.get(s.ChartAlert,alert_id) for ident,alert_id in alerts.items()}
-                    data={ident:dict(published_observed_at=payloads[ident]['observed_at'],
-                        payload=payloads[ident],
-                        sequence=record.state.get('sequence'),health=record.health,count=record.count,
-                        status=record.status) for ident,record in records.items()}
+                    data=read_sample(db, alerts, start=None if NORMAL else start)
                     if not NORMAL:
-                        assert all(stable_payload(payloads[ident])==stable_payload(before[ident]['payload'])
+                        assert all(stable_payload(data[ident]['payload'])==stable_payload(before[ident]['payload'])
                             for ident in alerts), 'Same-price publication changed stable payload'
                 row=dict(query_start_seconds=at,observed_seconds=time.monotonic()-begun,
-                    consumer_clock=clock(),identities=data)
+                    consumer_clock=clock(),identities=data,
+                    sampler_sql=queries['sampler_sql']-sql_before)
                 samples.append(row)
                 output.write(json.dumps(row)+'\n')
                 output.flush()
@@ -278,7 +290,7 @@ def main():
             'Idle-gap stale/recovery is intrabar freshness, not high-period trigger or migration/crash acceptance'],
         source_sha256={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in
             [Path(__file__),Path('backend/alerts/managed_dataset.py'),Path('backend/alerts/chart_alert_worker.py'),
-                Path('backend/alerts/bar_batch.py')]})
+                Path('backend/alerts/bar_batch.py'),Path(__file__).with_name('observation_sampling.py')]})
     (ROOT/'result.json').write_text(json.dumps(report,indent=2)+'\n')
     expected_inputs=len(TIMES)*len(alerts)
     assert not errors and len(inputs)==expected_inputs

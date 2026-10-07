@@ -70,6 +70,8 @@ def main():
     assert observation['outcome'] == 'passed' and not observation['errors']
     assert observation['inputs'] == observation['visible'] == observation['judged'] == 50
     assert len(timeline) == observation['sample_count']
+    if 'sampler_sql' in timeline[0]:
+        assert all(row['sampler_sql']==2 for row in timeline)
     from measurement_windows import latency_window
     from supplemental_probe import quantiles
     def check_intervals(report, samples):
@@ -114,6 +116,8 @@ def main():
     assert {'same_price','new_minute','price_revision','volume_revision'} <= {r['kind'] for r in normal['events']}
     normal_timeline=[json.loads(line) for line in (ROOT/'normal-input-alert/timeline.jsonl').read_text().splitlines()]
     assert len(normal_timeline)==normal['sample_count']
+    if 'sampler_sql' in normal_timeline[0]:
+        assert all(row['sampler_sql']==2 for row in normal_timeline)
     check_intervals(normal,normal_timeline)
     for item in normal['events']:
         row=next(r for r in normal['alert_commits'] if r['alert_id']==item['alert_id']

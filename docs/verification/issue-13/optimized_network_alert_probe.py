@@ -98,12 +98,16 @@ def main():
 
     def aggregate():
         try:
-            while not stop.is_set():
-                t=time.monotonic()
-                a,p=b.cycle()
-                worker_turns.append(dict(at=t-begun,seconds=time.monotonic()-t,
-                    target=m._PUBLISH_CURSOR,aggregate=a,publish=bool(p)))
-                stop.wait(b.wait_seconds(a, p))
+            from alerts.publication_wakeup import PublicationWakeup
+            with PublicationWakeup(s.engine) as wakeup:
+                while not stop.is_set():
+                    wakeup.prepare()
+                    t=time.monotonic()
+                    a,p=b.cycle()
+                    worker_turns.append(dict(at=t-begun,seconds=time.monotonic()-t,
+                        target=p.selected_target,aggregate=a,publish=bool(p),
+                        attempted=p.attempted,runnable_remaining=p.runnable_remaining))
+                    wakeup.wait(b.wait_seconds(a,p),stop)
         except Exception as exc:
             errors.append(dict(scope='publisher',error=type(exc).__name__))
             stop.set()

@@ -341,7 +341,7 @@ def test_failed_target_does_not_idle_other_ready_targets(database, monkeypatch):
     monkeypatch.setattr(managed, 'publish_frame', publish)
     failed = managed.publish_once()
     assert failed.attempted and failed.blocked_reason == 'ValueError'
-    assert failed.runnable_remaining and wait_seconds(False, failed) == .02
+    assert failed.runnable_remaining and wait_seconds(False, failed) == .005
     healthy = []
     for _ in range(17):
         result = managed.publish_once()

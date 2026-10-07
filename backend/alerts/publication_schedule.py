@@ -73,6 +73,8 @@ def request(db, instrument_id, *, frames=FRAMES, reason=BARS, stamp=None, approv
         'attempts': model.attempts,
         'blocked_reason': case((model.attempts > 0, model.blocked_reason), else_=None),
     }))
+    from .publication_wakeup import notify
+    notify(db)
 
 
 def source_frames(source):

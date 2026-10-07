@@ -27,6 +27,7 @@ from alerts import managed_dataset as m, storage as s
 from alerts.bar_batch import write_bars
 from alerts.chart_aggregation import aggregate_once
 from alerts.chart_aggregation_worker import wait_seconds
+from alerts.publication_wakeup import PublicationWakeup
 from alerts.market import ingest, stored_coverage
 
 MINUTE = 60000
@@ -134,10 +135,10 @@ def snapshot():
             publication_jobs=db.scalar(select(func.count()).select_from(s.ChartPublicationJob)))
 
 
-def cycle():
+def cycle(*, observer=None):
     from alerts import chart_aggregation_worker
     if hasattr(chart_aggregation_worker, 'cycle'):
-        return chart_aggregation_worker.cycle()
+        return chart_aggregation_worker.cycle(observer=observer) if observer else chart_aggregation_worker.cycle()
     return aggregate_once(), m.publish_once()
 
 
@@ -288,8 +289,9 @@ def measure(scenario, seconds, repetition, *, drain_seconds=0):
     ready_since = {}
     sequence, next_input = 0, begun
     raw = ROOT / f"{scenario}-{repetition}.jsonl"
-    with raw.open("w") as output:
+    with PublicationWakeup(s.engine) as wakeup, raw.open("w") as output:
         while time.monotonic()-begun < seconds+drain_seconds:
+            wakeup.prepare()
             elapsed_window=time.monotonic()-begun
             if elapsed_window >= seconds:
                 with s.transaction() as db:
@@ -342,7 +344,7 @@ def measure(scenario, seconds, repetition, *, drain_seconds=0):
                 if matched(item):
                     completed.append(dict(**item, latency_seconds=time.monotonic()-begun-item["committed_seconds"]))
                     pending.remove(item)
-            time.sleep(wait_seconds(a, p))
+            wakeup.wait(wait_seconds(a,p))
     final_at = time.monotonic()
     with s.transaction() as db:
         final_ready = set(db.execute(select(s.ChartPublicationState.instrument_id,
