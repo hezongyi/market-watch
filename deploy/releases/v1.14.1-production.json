@@ -1,0 +1,916 @@
+{
+  "version": "1.14.1",
+  "release_tag": "v1.14.1",
+  "source_commit": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+  "merged_pr": "https://github.com/hezongyi/market-watch/pull/21",
+  "previous_production_version": "1.12.0",
+  "host": "unraid",
+  "project": "market-watch",
+  "production_directory": "/mnt/user/appdata/market-watch",
+  "active_release": "releases/v1.14.1-6fd9273",
+  "website": "https://trade.kookvv.com:8443",
+  "chart_origin": "https://charts.kookvv.com:8443",
+  "ports": {
+    "web": "192.168.7.33:18080",
+    "chart": "192.168.7.33:18083"
+  },
+  "build_host": "Ubuntu quant-server; market-watch-ubuntu BuildKit through mw-docker",
+  "images": [
+    {
+      "reference": "market-watch-api:v1.14.1-6fd9273",
+      "ubuntu_id": "sha256:320573e397090c260204c88fec206781efe4ee3561c2efe7c24374b8f70d4ebf",
+      "production_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "layers": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:89047aefac50e42ccc51776fd372fc88484a3a1a3626a9ce82df18351ad02e4b",
+        "sha256:2b8e3131615a35ea92ec259a9a41e6b877f265c6ce7c663e46681dc20384dcb1",
+        "sha256:7e4282a6b3af99f6844cd5c762b1e98521a7ce7bb54bc43f838005e9b3eed762",
+        "sha256:dcad2cff6830a60be978aacd67f7f18ac00bfcc862f5545e091dfa1c5f0eaff5",
+        "sha256:1b8ee2d64c1688a1c149ce2af4427c1e9d370eae987241625ec6a8f91da86838",
+        "sha256:c3b677ab3d5f67e71b9ec7493325d3d198fa17fd5f1dbfbf16696ac8267c47f1",
+        "sha256:45fbaa6f294d938a0b5583fbbf3d638977d9f14d56d0a396b9c4fd2c55a78247",
+        "sha256:cc575fe151a91de1ff6ba8acbf70e3d8555fbdba2a94aa22555ff60a54ea75cb",
+        "sha256:e13f5ac6ee21e85f0bf39bbbe37779ab7caac95d4ccdcf99012e8bc8747780ea",
+        "sha256:fc71182f49cdf2f073b254c383484168e4aadc805014c30ce4571d9cd062d1b3",
+        "sha256:d696cddb6139b086583b6d54294740ae6ee080ed99310a0f4623c7ab542942c1"
+      ],
+      "config_match": true,
+      "config_comparison": "Empty defaults normalized between containerd and Docker Engine",
+      "build_task": "mw-release-v1141-20261008",
+      "build_project": "mw-release-v1141-20261008",
+      "purpose": "release",
+      "source_commit": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5"
+    },
+    {
+      "reference": "market-watch-web:v1.14.1-6fd9273",
+      "ubuntu_id": "sha256:b696295299ac195a9826564145e31ea9aa8126784a09575d29f8272a3b6ad24d",
+      "production_id": "sha256:a9a481d00f86c69dcfd2ab4bb68333168d1033b56cb3915ec381c0c85717fd80",
+      "layers": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:89190ebd29dff3e1d81d3ad2b20fc65ec424977404a983ce3b755bee0586c0ea",
+        "sha256:e67f7ffe472f85fe9f39ba1c3d4a8487f984a7fd68db2b77c2dff7595253972d"
+      ],
+      "config_match": true,
+      "config_comparison": "Empty defaults normalized between containerd and Docker Engine",
+      "build_task": "mw-release-v1141-20261008",
+      "build_project": "mw-release-v1141-20261008",
+      "purpose": "release",
+      "source_commit": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5"
+    },
+    {
+      "reference": "market-watch-chart-origin:v1.14.1-6fd9273",
+      "ubuntu_id": "sha256:7bd18187f103a6898db847adb0b65a091f05a460088622e88cc297ae7fb7a28d",
+      "production_id": "sha256:949fde14005efd34931beef041c44d67b05c9b697ef2d19c0e578549105ba2b6",
+      "layers": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:a43e86dea34c141a3cadfdee1e52a916d80cc2feed1205f6e3366a655d9fc63c",
+        "sha256:e88de7aad0c7372878009fc4ecf01f87516eaa14dd84c2b34e227870c5c4cb26",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ],
+      "config_match": true,
+      "config_comparison": "Empty defaults normalized between containerd and Docker Engine",
+      "build_task": "mw-release-v1141-20261008",
+      "build_project": "mw-release-v1141-20261008",
+      "purpose": "release",
+      "source_commit": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5"
+    },
+    {
+      "reference": "market-watch-backup:v1.14.1-6fd9273",
+      "ubuntu_id": "sha256:9c699ae51b5a68ff413d7b9f02013784c4aa40e459ea44331ead78220dcd6ccf",
+      "production_id": "sha256:44cf3295a201604287d1e1ff2783bacf0a05dfcef92cc9db91b212840d832755",
+      "layers": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:89047aefac50e42ccc51776fd372fc88484a3a1a3626a9ce82df18351ad02e4b",
+        "sha256:2b8e3131615a35ea92ec259a9a41e6b877f265c6ce7c663e46681dc20384dcb1",
+        "sha256:7e4282a6b3af99f6844cd5c762b1e98521a7ce7bb54bc43f838005e9b3eed762",
+        "sha256:dcad2cff6830a60be978aacd67f7f18ac00bfcc862f5545e091dfa1c5f0eaff5",
+        "sha256:1b8ee2d64c1688a1c149ce2af4427c1e9d370eae987241625ec6a8f91da86838",
+        "sha256:c3b677ab3d5f67e71b9ec7493325d3d198fa17fd5f1dbfbf16696ac8267c47f1",
+        "sha256:45fbaa6f294d938a0b5583fbbf3d638977d9f14d56d0a396b9c4fd2c55a78247",
+        "sha256:cc575fe151a91de1ff6ba8acbf70e3d8555fbdba2a94aa22555ff60a54ea75cb",
+        "sha256:e13f5ac6ee21e85f0bf39bbbe37779ab7caac95d4ccdcf99012e8bc8747780ea",
+        "sha256:fc71182f49cdf2f073b254c383484168e4aadc805014c30ce4571d9cd062d1b3",
+        "sha256:d696cddb6139b086583b6d54294740ae6ee080ed99310a0f4623c7ab542942c1",
+        "sha256:12b8503d80f6d694f56e835007ceb713f0814d22ff2eebbc99552099cf1e2377",
+        "sha256:8cbd49edd93c6e20d74d26541373bd6921e10704644031c8319dafdda7032560",
+        "sha256:93ff5bef923e65aaa5b5dfa98dadf25ff238a4bda5e20baf008909aa898b839e"
+      ],
+      "config_match": true,
+      "config_comparison": "Empty defaults normalized between containerd and Docker Engine",
+      "build_task": "mw-release-v1141-20261008",
+      "build_project": "mw-release-v1141-20261008",
+      "purpose": "release",
+      "source_commit": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5"
+    }
+  ],
+  "maintenance": {
+    "started_utc": "2026-10-07T22:37:37.750495+00:00",
+    "ended_utc": "2026-10-07T22:41:24.973131+00:00",
+    "duration_seconds": 227.222636
+  },
+  "formal_image_preflight": {
+    "environment": "Ubuntu local Docker",
+    "project": "mw-v1141-restore-20261008",
+    "ports": {
+      "postgres": "127.0.0.1:19724",
+      "api": "127.0.0.1:19725",
+      "web": "127.0.0.1:19726",
+      "chart": "127.0.0.1:19727"
+    },
+    "migration": {
+      "schema": "aq44_aggregation_service_order",
+      "prior_tables": 41,
+      "prior_counts_preserved": true,
+      "coverage_verified": true
+    },
+    "browser": {
+      "environment": "Ubuntu isolated Docker; formal images; HTTPS browser origins routed to local ports",
+      "checks": [
+        "Login; Secure and HttpOnly session",
+        "Data center managed tab",
+        "Data center platform tab",
+        "Data center composite tab",
+        "Data center tasks tab",
+        "Saved four-chart layout and native renderer initialized; data readiness not asserted without supplier credentials",
+        "Native indicator picker",
+        "Sync/range mapping settings",
+        "390px mobile home"
+      ],
+      "errors": [],
+      "httpFailures": [],
+      "blockedWrites": [],
+      "credentialLeaks": [],
+      "liveEventsTested": false,
+      "missingHistoryCancelled": true,
+      "chart": {
+        "charts": 4,
+        "symbol": "MWP:EURUSD",
+        "resolution": "60",
+        "dataReady": false
+      },
+      "logout": 200,
+      "checkedAt": "2026-10-07T22:36:45.761Z"
+    },
+    "rollback": {
+      "previous_version": "1.12.0",
+      "schema": "aq44_aggregation_service_order",
+      "actual_old_binary_reads": true,
+      "old_api_ready": true,
+      "rollback_preparation": true,
+      "new_coverage_resumed": true,
+      "scope": "Old API, aggregation and publication ran on isolated production restore; no upstream ingestion or notifications",
+      "actual_old_publisher_executed": true
+    },
+    "new_worker_entrypoints_executed": true,
+    "command_recipe": {
+      "private_compose": "/home/quant/repos/.production/market-watch-v1.14.1-20261008/compose.verify.yaml",
+      "private_environment": "/home/quant/repos/.production/market-watch-v1.14.1-20261008/verify.env",
+      "startup": "Historical sequence: start postgres; restore private preflight dump; run migrate; then up --no-build --wait api web chart-origin",
+      "stop": "docker compose --env-file PRIVATE_ENV -p mw-v1141-restore-20261008 -f PRIVATE_COMPOSE stop",
+      "instance_status": "retired; all project containers, network and volume removed after actual restore/content checks",
+      "reuse": "Completed acceptance task must not be restarted; use a new task/project, isolated ports/network/volume for another verification"
+    }
+  },
+  "migration": {
+    "schema": "aq44_aggregation_service_order",
+    "migration_exit": 0,
+    "old_table_counts_preserved_except_completed_backup_audit": true,
+    "user_fingerprints_match": true,
+    "all_existing_preferences_match": true,
+    "coverage": [
+      {
+        "instrument": "BTCUSD",
+        "pages": 2,
+        "complete": true,
+        "examined": 0,
+        "phase": "complete",
+        "version": 0
+      },
+      {
+        "instrument": "BTCUSDT",
+        "pages": 7,
+        "complete": true,
+        "examined": 2574,
+        "phase": "complete",
+        "version": 5
+      },
+      {
+        "instrument": "EURUSD",
+        "pages": 108,
+        "complete": true,
+        "examined": 53097,
+        "phase": "complete",
+        "version": 53
+      },
+      {
+        "instrument": "XAUUSD",
+        "pages": 108,
+        "complete": true,
+        "examined": 53328,
+        "phase": "complete",
+        "version": 52
+      }
+    ]
+  },
+  "verification": {
+    "version": "1.14.1",
+    "schema": "aq44_aggregation_service_order",
+    "containers": [
+      {
+        "name": "market-watch-web-1",
+        "service": "web",
+        "image": "market-watch-web:v1.14.1-6fd9273",
+        "image_id": "sha256:a9a481d00f86c69dcfd2ab4bb68333168d1033b56cb3915ec381c0c85717fd80",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-history-worker-1",
+        "service": "history-worker",
+        "image": "market-watch-api:v1.14.1-6fd9273",
+        "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-composite-aggregate-worker-1",
+        "service": "composite-aggregate-worker",
+        "image": "market-watch-api:v1.14.1-6fd9273",
+        "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-notify-worker-1",
+        "service": "notify-worker",
+        "image": "market-watch-api:v1.14.1-6fd9273",
+        "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-realtime-worker-1",
+        "service": "realtime-worker",
+        "image": "market-watch-api:v1.14.1-6fd9273",
+        "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-chart-aggregation-worker-1",
+        "service": "chart-aggregation-worker",
+        "image": "market-watch-api:v1.14.1-6fd9273",
+        "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-chart-history-worker-1",
+        "service": "chart-history-worker",
+        "image": "market-watch-api:v1.14.1-6fd9273",
+        "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-native-history-worker-1",
+        "service": "native-history-worker",
+        "image": "market-watch-api:v1.14.1-6fd9273",
+        "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-chart-origin-1",
+        "service": "chart-origin",
+        "image": "market-watch-chart-origin:v1.14.1-6fd9273",
+        "image_id": "sha256:949fde14005efd34931beef041c44d67b05c9b697ef2d19c0e578549105ba2b6",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "market-watch-api-1",
+        "service": "api",
+        "image": "market-watch-api:v1.14.1-6fd9273",
+        "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      }
+    ],
+    "https": {
+      "https://trade.kookvv.com:8443/": {
+        "status": 200,
+        "sha256": "b8f696004d9c6c7299c92df93e4a248b7cbe91156ea1d1c0e8f9b8db0b592f9e"
+      },
+      "https://trade.kookvv.com:8443/assets/index-BSeZoFbt.js": {
+        "status": 200,
+        "sha256": "df1eed9925723c621902fa10972eb5cf33d68c9e7cde7efb5dba32550ee45740"
+      },
+      "https://trade.kookvv.com:8443/assets/index-Cz3ZmdE6.css": {
+        "status": 200,
+        "sha256": "ebe8eaeba44c4ef2a05a92222014598316477260629477441de21dd851440ed2"
+      },
+      "https://charts.kookvv.com:8443/": {
+        "status": 200,
+        "sha256": "7f6a0895129008c5b83ce310a3949941028f68130e6ad16101d1f041e78055dd"
+      },
+      "https://charts.kookvv.com:8443/charting_library_92d6b2426b6c88c2/charting_library.js": {
+        "status": 200,
+        "sha256": "2b49390b118321b574f11119d3d9b9e1b8dad7af22aa8d674425ad75f0c7ab41"
+      },
+      "https://charts.kookvv.com:8443/series-picker.css": {
+        "status": 200,
+        "sha256": "73774b1112710403f1f2fa35f5445c1897aad58e0052f217f684b2325e0a508d"
+      },
+      "https://charts.kookvv.com:8443/host.3434b926d37e2bb0.js": {
+        "status": 200,
+        "sha256": "3434b926d37e2bb03470ac447f09fe3ac2d64419256d3a7104464e3702ad383e"
+      },
+      "https://trade.kookvv.com:8443/readyz": {
+        "status": 200,
+        "sha256": "be4e5ec0e4e99e73ba0972a709267f4bafa465b8d1892ae36700bf873ab92109"
+      },
+      "https://trade.kookvv.com:8443/healthz": {
+        "status": 200,
+        "sha256": "08893f22d5bec91a7f874ee96068fc4c07d78d64993268293b342683efb75464"
+      },
+      "https://trade.kookvv.com:8443/api/session": {
+        "status": 401,
+        "sha256": "c57499d758df03c09fd12f98e501d673bf885988423ec85fb7dc76ab8f4e0d74"
+      }
+    },
+    "heartbeats": {
+      "import_heartbeat": {
+        "at": 1790967614023,
+        "age_ms": 445551501
+      },
+      "market_heartbeat": {
+        "at": 1791413160160,
+        "age_ms": 5364
+      },
+      "notify_heartbeat": {
+        "at": 1791413126559,
+        "age_ms": 38965
+      }
+    },
+    "m1_endpoints": {
+      "BTCUSDT": 1791413100000,
+      "EURUSD": 1791413100000,
+      "XAUUSD": 1791413100000
+    },
+    "user_tables_preserved": {
+      "advanced_chart_preferences": true,
+      "advanced_chart_workspaces": true,
+      "chart_indicator_templates": true,
+      "chart_workspaces": true,
+      "devices": true,
+      "watches": true,
+      "chart_alerts": true,
+      "chart_alert_versions": true,
+      "agent_credentials": true
+    },
+    "changed_runtime_preferences": [
+      "upstream_slots:binance",
+      "upstream_slots:oanda"
+    ],
+    "feature_flags": {
+      "mcp_enabled": false,
+      "delivery_enabled": true,
+      "yahoo_enabled": false,
+      "oanda_stream_enabled": false
+    },
+    "production_env_unchanged": true,
+    "runtime": {
+      "publication": [
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "D1",
+          "requested": 60,
+          "processed": 60,
+          "served_at": 1791413158763,
+          "blocked_reason": "gap",
+          "attempts": 0
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "H1",
+          "requested": 88,
+          "processed": 88,
+          "served_at": 1791413158429,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "H4",
+          "requested": 60,
+          "processed": 60,
+          "served_at": 1791413158790,
+          "blocked_reason": "gap",
+          "attempts": 0
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "M1",
+          "requested": 42,
+          "processed": 42,
+          "served_at": 1791413158248,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "M15",
+          "requested": 166,
+          "processed": 166,
+          "served_at": 1791413158369,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "M30",
+          "requested": 166,
+          "processed": 166,
+          "served_at": 1791413158626,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "M5",
+          "requested": 390,
+          "processed": 390,
+          "served_at": 1791413158810,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "MN",
+          "requested": 60,
+          "processed": 60,
+          "served_at": 1791413158841,
+          "blocked_reason": "source",
+          "attempts": 0
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "timeframe": "W1",
+          "requested": 60,
+          "processed": 60,
+          "served_at": 1791413158718,
+          "blocked_reason": "gap",
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "D1",
+          "requested": 111,
+          "processed": 111,
+          "served_at": 1791413162010,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "H1",
+          "requested": 125,
+          "processed": 125,
+          "served_at": 1791413162121,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "H4",
+          "requested": 111,
+          "processed": 111,
+          "served_at": 1791413162147,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "M1",
+          "requested": 40,
+          "processed": 40,
+          "served_at": 1791413159692,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "M15",
+          "requested": 203,
+          "processed": 203,
+          "served_at": 1791413162092,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "M30",
+          "requested": 203,
+          "processed": 203,
+          "served_at": 1791413162035,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "M5",
+          "requested": 427,
+          "processed": 427,
+          "served_at": 1791413162066,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "MN",
+          "requested": 111,
+          "processed": 111,
+          "served_at": 1791413161951,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "EURUSD",
+          "timeframe": "W1",
+          "requested": 111,
+          "processed": 111,
+          "served_at": 1791413161979,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "D1",
+          "requested": 92,
+          "processed": 92,
+          "served_at": 1791413161744,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "H1",
+          "requested": 92,
+          "processed": 92,
+          "served_at": 1791413161791,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "H4",
+          "requested": 92,
+          "processed": 92,
+          "served_at": 1791413161822,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "M1",
+          "requested": 40,
+          "processed": 40,
+          "served_at": 1791413160201,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "M15",
+          "requested": 128,
+          "processed": 128,
+          "served_at": 1791413161885,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "M30",
+          "requested": 128,
+          "processed": 128,
+          "served_at": 1791413161850,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "M5",
+          "requested": 240,
+          "processed": 240,
+          "served_at": 1791413161918,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "MN",
+          "requested": 92,
+          "processed": 92,
+          "served_at": 1791413161579,
+          "blocked_reason": null,
+          "attempts": 0
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "timeframe": "W1",
+          "requested": 92,
+          "processed": 92,
+          "served_at": 1791413161682,
+          "blocked_reason": null,
+          "attempts": 0
+        }
+      ],
+      "coverage": [
+        {
+          "instrument_id": "BTCUSD",
+          "source": "dukascopy",
+          "basis": "bid",
+          "phase": "complete",
+          "complete": true
+        },
+        {
+          "instrument_id": "BTCUSDT",
+          "source": "binance",
+          "basis": "last",
+          "phase": "complete",
+          "complete": true
+        },
+        {
+          "instrument_id": "EURUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "phase": "complete",
+          "complete": true
+        },
+        {
+          "instrument_id": "XAUUSD",
+          "source": "oanda",
+          "basis": "bid",
+          "phase": "complete",
+          "complete": true
+        }
+      ],
+      "jobs": [],
+      "audit_after_start": [
+        {
+          "kind": "backup_completed",
+          "count": 1
+        },
+        {
+          "kind": "candle_revision",
+          "count": 109
+        },
+        {
+          "kind": "market_heartbeat",
+          "count": 19
+        },
+        {
+          "kind": "market_ingested",
+          "count": 57
+        },
+        {
+          "kind": "notify_heartbeat",
+          "count": 5
+        },
+        {
+          "kind": "provider_query_coverage",
+          "count": 38
+        },
+        {
+          "kind": "volume_revision",
+          "count": 93
+        }
+      ],
+      "explicit_datasets": 0
+    },
+    "checked_at": "2026-10-07T22:46:07.200058+00:00"
+  },
+  "market_progression": {
+    "BTCUSDT": {
+      "first": 1791412920000,
+      "final": 1791413100000,
+      "advanced": true
+    },
+    "EURUSD": {
+      "first": 1791412860000,
+      "final": 1791413100000,
+      "advanced": true
+    },
+    "XAUUSD": {
+      "first": 1791412860000,
+      "final": 1791413100000,
+      "advanced": true
+    }
+  },
+  "backups": {
+    "preflight": {
+      "backup": {
+        "dump": "/mnt/user/backup/market-watch/alerts-20261007T221934474186Z.dump",
+        "configuration": "/mnt/user/backup/market-watch/config-20261007T221948Z-7x8WBt.tar.gz",
+        "sha256": "9a1da48e2c7dd064cabeeb0ff8c18a40aa028f1f87fe592c8fe5bc19b0694569",
+        "tables": 41,
+        "bytes": 64932703
+      },
+      "restore": {
+        "sha256": "9a1da48e2c7dd064cabeeb0ff8c18a40aa028f1f87fe592c8fe5bc19b0694569",
+        "bytes": 64932703,
+        "actual_restore": true,
+        "tables": 41,
+        "counts_match": true,
+        "schema": "u22_chart_alert_actions",
+        "environment": "Ubuntu local Docker PostgreSQL14",
+        "project": "mw-v1141-restore-20261008"
+      }
+    },
+    "frozen_before_cutover": {
+      "backup": {
+        "dump": "/mnt/user/backup/market-watch/alerts-20261007T223813878909Z.dump",
+        "configuration": "/mnt/user/backup/market-watch/config-20261007T223825Z-MnxTyN.tar.gz",
+        "sha256": "0826f4ce9bb58dba4a807d1077810fd8cba659be0306eb49290291138c04d17f",
+        "tables": 41,
+        "bytes": 64949478
+      },
+      "restore": {
+        "sha256": "0826f4ce9bb58dba4a807d1077810fd8cba659be0306eb49290291138c04d17f",
+        "bytes": 64949478,
+        "actual_restore": true,
+        "tables": 41,
+        "counts_match": true,
+        "schema": "u22_chart_alert_actions",
+        "environment": "Ubuntu local Docker PostgreSQL14",
+        "project": "mw-v1141-restore-20261008"
+      }
+    },
+    "after_deployment": {
+      "backup": {
+        "dump": "/mnt/user/backup/market-watch/alerts-20261007T224229834300Z.dump",
+        "configuration": "/mnt/user/backup/market-watch/config-20261007T224242Z-catCs2.tar.gz",
+        "sha256": "31f5394419dfed38a7ee54668399d6b761e3b436a5063a59652fef24d843cc09",
+        "tables": 82,
+        "bytes": 65100817
+      },
+      "restore": {
+        "sha256": "31f5394419dfed38a7ee54668399d6b761e3b436a5063a59652fef24d843cc09",
+        "bytes": 65100817,
+        "actual_restore": true,
+        "tables": 82,
+        "counts_match": true,
+        "schema": "aq44_aggregation_service_order",
+        "environment": "Ubuntu local Docker PostgreSQL14",
+        "project": "mw-v1141-restore-20261008"
+      }
+    }
+  },
+  "configuration_backups": {
+    "before": {
+      "sha256": "91097877cd7f39acc2e669823c51f62fc7002598a9d2684af555b4961b29346b",
+      "actual_extract": true,
+      "production_env_match": true,
+      "private_env_mode": "0600"
+    },
+    "after_database_backup": {
+      "sha256": "f734bc0d31d2332e7df1979afc1a634c7fba180dd3bedc1f5a499bffeddad781",
+      "actual_extract": true,
+      "production_env_match": true,
+      "private_env_mode": "0600"
+    },
+    "final_with_rollback": {
+      "sha256": "72ee3ec5a7fe1289a14b04a3a77729a48da1835a3312346ca921302c5c815185",
+      "actual_extract": true,
+      "production_env_match": true,
+      "private_env_mode": "0600",
+      "archive": "/mnt/user/backup/market-watch/config-20261007T224746Z-lZh5os.tar.gz",
+      "rollback_included": true
+    }
+  },
+  "rollback": {
+    "version": "1.12.0",
+    "source": "releases/v1.12.0-0591e56",
+    "compose": "releases/v1.14.1-6fd9273/rollback-v1.12.0-compose.yaml",
+    "script": "releases/v1.14.1-6fd9273/rollback-v1.12.0.sh",
+    "additive_schema_retained": true,
+    "prepare_rollback_required": true,
+    "images_preserved": true
+  },
+  "feature_flags": {
+    "mcp_enabled": false,
+    "yahoo_enabled": false,
+    "delivery_enabled": true,
+    "oanda_stream_enabled": false,
+    "pricing_worker": "not started; explicit oanda-stream profile",
+    "explicit_datasets": 0
+  },
+  "startup_log_summary": {
+    "Traceback": 0,
+    "Error": 0,
+    "failed": 0,
+    "exception": 0,
+    "WARNING": 0,
+    "ERROR": 0
+  },
+  "limitations": [
+    "Production administrator browser login was not performed because the current password was unavailable; no password change or session bypass was performed.",
+    "Ubuntu native four-chart layout, indicators and sync settings were checked; supplier credentials were omitted, missing-history demand was cancelled, and full chart data readiness/live events were not asserted.",
+    "Source/gap blocked publication requests retain their actual state; historical import_heartbeat remains stale. New history/composite workers are idle with zero explicit datasets; live OANDA pricing profile remains off.",
+    "Short deployment observation does not establish long-term performance or provider/notification delivery SLA; scheduled backup and whole-host reboot were not retested."
+  ],
+  "other_production_services": {
+    "count": 23,
+    "same_container_ids": true,
+    "same_running_state": true,
+    "shared_postgresql_not_restarted": true
+  },
+  "source_verification": {
+    "reviewed_input_count": 711,
+    "all_sha256_match": true,
+    "licensed_input_files_verified": 2928,
+    "tag_unmodified": true,
+    "production_source_files_match": 711
+  },
+  "observation_log_summary": {
+    "Traceback": 0,
+    "Error": 0,
+    "failed": 0,
+    "exception": 0,
+    "WARNING": 0,
+    "ERROR": 0
+  },
+  "release_build_task_finished": true,
+  "cleanup": {
+    "ubuntu_project_retired": true,
+    "ubuntu_remaining_containers": 0,
+    "ubuntu_remaining_volumes": 0,
+    "ubuntu_remaining_networks": 0,
+    "retirement_archive_id": "mw-v1141-restore-20261008-20261007T224746-13797b69",
+    "retirement_databases": [
+      {
+        "database": "frozen1141",
+        "tables": 42,
+        "actual_restore_verified": true,
+        "table_content_fingerprints_verified": true
+      },
+      {
+        "database": "post1141",
+        "tables": 83,
+        "actual_restore_verified": true,
+        "table_content_fingerprints_verified": true
+      },
+      {
+        "database": "postgres",
+        "tables": 0,
+        "actual_restore_verified": true,
+        "table_content_fingerprints_verified": true
+      },
+      {
+        "database": "verify1141",
+        "tables": 83,
+        "actual_restore_verified": true,
+        "table_content_fingerprints_verified": true
+      }
+    ],
+    "release_images_preserved": true,
+    "rollback_images_preserved": true,
+    "production_temporary_containers_remaining": 0,
+    "production_steady_services": 10,
+    "release_build_task_finished": true,
+    "temporary_config_extracts_removed": true,
+    "temporary_verification_password_file_removed": true
+  },
+  "final_production_check": "10 running services, API healthy, restart_count=0 after retirement"
+}
