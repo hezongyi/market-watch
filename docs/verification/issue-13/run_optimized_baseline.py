@@ -45,6 +45,8 @@ def main():
     if subprocess.check_output(['git', '-C', str(SOURCE), 'status', '--porcelain'], text=True).strip():
         raise SystemExit('Frozen source worktree is dirty')
     OUTPUT.mkdir()
+    os.environ['ISSUE13_SOURCE'] = str(SOURCE)
+    os.environ['ISSUE13_RESULTS'] = str(OUTPUT)
     commit = subprocess.check_output(['git', '-C', str(SOURCE), 'rev-parse', 'HEAD'], text=True).strip()
     (OUTPUT / 'source.json').write_text(json.dumps(dict(
         started_at=datetime.now(timezone.utc).isoformat(), commit=commit,

@@ -1274,8 +1274,8 @@
       "bytes": 47496
     },
     "run_optimized_baseline.py": {
-      "bytes": 4215,
-      "sha256": "bd41df2e0b7cd7693f5dc0813cfef538ce58bf909e3f754aff240a6034eea14c"
+      "bytes": 4310,
+      "sha256": "1aadf6e4a9c558cdba6248ba8f595280f46d23caaaf23f3202800a52183a65a2"
     },
     "results/v114-baseline/backfill-1-sql.json": {
       "sha256": "a2f0443aeb7fb5ecdd20e1082c6db1fa53d1d38752e233fe9b2dde453bb46152",
@@ -1456,6 +1456,34 @@
     "verify_application_rollback.py": {
       "bytes": 5255,
       "sha256": "09c91c4ba4ddffaf584a24aeb3e2477dcc5b652f6ae18ea31eeb6eb89ef2e725"
+    },
+    "run_optimized_browser.py": {
+      "bytes": 4975,
+      "sha256": "0d59fcd128a7a2ca939470027155417f85fddf9c6492cce47af6980ca1d22f8b"
+    },
+    "run_optimized_consumers.py": {
+      "bytes": 3210,
+      "sha256": "5f69ff4d38f0f433714878c8aa9a5c31e5c19f8bb96db5ee29de8c51a19f5c7f"
+    },
+    "optimized_browser_probe.cjs": {
+      "bytes": 8195,
+      "sha256": "2355e5f11ed7b3c828b4f924bceaa03187b625c7d8c334cf7d924283cd689bc4"
+    },
+    "optimized_fairness_probe.py": {
+      "bytes": 3250,
+      "sha256": "4dcb936cc339f99e3e2fe2e76a65252849acc1005ae7ce291d30c243068a2404"
+    },
+    "optimized_consumer_probe.py": {
+      "bytes": 6530,
+      "sha256": "7e9bc1ed0349453535373544102361d928fb39bde9f2a8e852519c6cf4513574"
+    },
+    "capture_optimized_browser_environment.py": {
+      "bytes": 1942,
+      "sha256": "63b2db3bdd0f8c126f163919f1c9ff2742ca54f9a9ebca80dec88674087cd8ab"
+    },
+    "optimized_browser.compose.yaml": {
+      "bytes": 3354,
+      "sha256": "6d5592d75102563c4c210bda91aa1fbf967d67aafdfd87dd7fe594234b32f81a"
     }
   }
 }
