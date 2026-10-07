@@ -1,0 +1,48 @@
+{
+  "host": "Ubuntu isolated Docker",
+  "observed_at": 1791259733126,
+  "command": "ensure",
+  "external_delivery": "disabled by acceptance Compose",
+  "watches": [
+    {
+      "id": "67575ffc-5d15-4e73-aa6b-f9b075700626",
+      "instrument_id": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "name": "Ubuntu sustained M1 acceptance XAUUSD",
+      "status": "active",
+      "armed_at": 1791259733075,
+      "paused_reason": null,
+      "state": {
+        "previous": null,
+        "last_event": null,
+        "indicator_closes": [],
+        "indicator_reading": null,
+        "down_count": 0,
+        "up_count": 0,
+        "buy_ready": false,
+        "sell_ready": false
+      }
+    },
+    {
+      "id": "cab0a0df-6f35-4cad-a6a3-b989656cee7e",
+      "instrument_id": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "name": "Ubuntu sustained M1 acceptance EURUSD",
+      "status": "active",
+      "armed_at": 1791259733032,
+      "paused_reason": null,
+      "state": {
+        "previous": null,
+        "last_event": null,
+        "indicator_closes": [],
+        "indicator_reading": null,
+        "down_count": 0,
+        "up_count": 0,
+        "buy_ready": false,
+        "sell_ready": false
+      }
+    }
+  ],
+  "signal_counts": {
+    "67575ffc-5d15-4e73-aa6b-f9b075700626": 0,
+    "cab0a0df-6f35-4cad-a6a3-b989656cee7e": 0
+  }
+}

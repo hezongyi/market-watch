@@ -1,0 +1,467 @@
+{
+  "environment": "Ubuntu Docker project mw-chart-maximize-20261007",
+  "app": "https://192.168.7.232:17443",
+  "chart": "https://192.168.7.232:17444",
+  "symbol": "MWP:XAUUSD",
+  "cases": [
+    {
+      "name": "none full application double-click round trip"
+    },
+    {
+      "name": "barWidth full application double-click round trip"
+    },
+    {
+      "name": "date full application double-click round trip"
+    },
+    {
+      "name": "real API and PostgreSQL workspace save, reload, and double-click round trip"
+    }
+  ],
+  "errors": [],
+  "chartCredentialLeaks": [],
+  "marketFailures": [],
+  "cookieScope": "/api",
+  "legacyRootCookieCleared": true,
+  "liveQuotes": [
+    {
+      "symbol": "MWP:XAUUSD",
+      "price": 4146,
+      "exchange": "OANDA"
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "price": 1.12351,
+      "exchange": "OANDA"
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "price": 83943.97,
+      "exchange": "BINANCE"
+    }
+  ],
+  "roundTrips": [
+    {
+      "mode": "none",
+      "before": {
+        "layout": "4",
+        "sync": {
+          "date": false,
+          "barWidth": false,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 5.954545454545454,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1790874000,
+              "to": 1791363600
+            },
+            "spacing": 23.217391304347824,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "15",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 0.940754039497307,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 5.954545454545454,
+            "max": false,
+            "studies": [
+              {
+                "id": "bbacVz",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": []
+          }
+        ]
+      },
+      "restored": {
+        "layout": "4",
+        "sync": {
+          "date": false,
+          "barWidth": false,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 5.954545454545454,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1790874000,
+              "to": 1791363600
+            },
+            "spacing": 23.217391304347824,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "15",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 0.940754039497307,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 5.954545454545454,
+            "max": false,
+            "studies": [
+              {
+                "id": "bbacVz",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "mode": "barWidth",
+      "before": {
+        "layout": "4",
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 5.954545454545454,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1790874000,
+              "to": 1791363600
+            },
+            "spacing": 23.217391304347824,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "15",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 0.940754039497307,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 5.954545454545454,
+            "max": false,
+            "studies": [
+              {
+                "id": "bbacVz",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": []
+          }
+        ]
+      },
+      "restored": {
+        "layout": "4",
+        "sync": {
+          "date": false,
+          "barWidth": true,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 5.954545454545454,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1790874000,
+              "to": 1791363600
+            },
+            "spacing": 23.217391304347824,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "15",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 0.940754039497307,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790874000,
+              "to": 1791374400
+            },
+            "spacing": 5.954545454545454,
+            "max": false,
+            "studies": [
+              {
+                "id": "bbacVz",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": []
+          }
+        ]
+      }
+    },
+    {
+      "mode": "date",
+      "before": {
+        "layout": "4",
+        "sync": {
+          "date": true,
+          "barWidth": false,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790892000,
+              "to": 1791374400
+            },
+            "spacing": 6.238095238095238,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1790902800,
+              "to": 1791363600
+            },
+            "spacing": 25.428571428571427,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "15",
+            "range": {
+              "from": 1790892000,
+              "to": 1791374400
+            },
+            "spacing": 0.9757914338919925,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790892000,
+              "to": 1791374400
+            },
+            "spacing": 6.252272727272727,
+            "max": false,
+            "studies": [
+              {
+                "id": "bbacVz",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": []
+          }
+        ]
+      },
+      "restored": {
+        "layout": "4",
+        "sync": {
+          "date": true,
+          "barWidth": false,
+          "time": false
+        },
+        "charts": [
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790892000,
+              "to": 1791374400
+            },
+            "spacing": 6.238095238095238,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:EURUSD",
+            "resolution": "240",
+            "range": {
+              "from": 1790902800,
+              "to": 1791363600
+            },
+            "spacing": 25.428571428571427,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:BTCUSDT",
+            "resolution": "15",
+            "range": {
+              "from": 1790892000,
+              "to": 1791374400
+            },
+            "spacing": 0.9757914338919925,
+            "max": false,
+            "studies": [],
+            "shapes": []
+          },
+          {
+            "symbol": "MWP:XAUUSD",
+            "resolution": "60",
+            "range": {
+              "from": 1790892000,
+              "to": 1791374400
+            },
+            "spacing": 6.252272727272727,
+            "max": false,
+            "studies": [
+              {
+                "id": "bbacVz",
+                "name": "Relative Strength Index"
+              }
+            ],
+            "shapes": []
+          }
+        ]
+      }
+    }
+  ],
+  "charts": [
+    {
+      "symbol": "MWP:XAUUSD",
+      "resolution": "60",
+      "range": {
+        "from": 1790892000,
+        "to": 1791374400
+      }
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "resolution": "240",
+      "range": {
+        "from": 1790902800,
+        "to": 1791363600
+      }
+    },
+    {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "15",
+      "range": {
+        "from": 1790892000,
+        "to": 1791374400
+      }
+    },
+    {
+      "symbol": "MWP:XAUUSD",
+      "resolution": "60",
+      "range": {
+        "from": 1790892000,
+        "to": 1791374400
+      }
+    }
+  ],
+  "hostAsset": "host.b094dc92d30c3ed8.js",
+  "logoutVerified": true
+}

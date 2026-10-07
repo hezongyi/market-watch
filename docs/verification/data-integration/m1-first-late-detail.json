@@ -1,0 +1,45 @@
+{
+  "captured_at": 1791264521009,
+  "host": "Ubuntu local isolated Docker",
+  "since": 1791259500000,
+  "late_over_30s": [
+    {
+      "symbol": "EURUSD",
+      "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "start": 1791264120000,
+      "end": 1791264180000,
+      "end_utc": "2026-10-06T05:23:00+00:00",
+      "expected": true,
+      "expectation": "fresh_source_tradeable",
+      "first_attempt": 1791264209092,
+      "last_attempt": 1791264307779,
+      "attempts": 3,
+      "failures": 0,
+      "quote_count": 14,
+      "confirmed_at": 1791264212005,
+      "confirmation_delay_ms": 32005,
+      "audits": [
+        {
+          "epoch": 49,
+          "window_start": 1791264000000,
+          "window_end": 1791264180000,
+          "confirmed": 3,
+          "observed_at": 1791264209092,
+          "transport_received_at": 1791264209009,
+          "write_completed_at": 1791264212005,
+          "last_confirmed_end": 1791264180000,
+          "evaluation_completed_at": 1791264212472,
+          "m1_to_evaluation_ms": 32472,
+          "processing_ms": 3380,
+          "timing_scope": "ingestion and watch computation flushed; excludes transaction commit and delivery",
+          "source_close_to_rest_receive_ms": 29009,
+          "rest_receive_to_write_flush_ms": 2996,
+          "write_to_evaluation_flush_ms": 467
+        }
+      ]
+    }
+  ],
+  "two_trading_days_verified": false,
+  "interpretation": "First observed EURUSD complete M1 over 30s remains in the known expected denominator. REST response received 29.009s after close; write flush 2.996s later, watch phase flush 0.467s later. Request-start timestamps are not recorded, so source availability, network delay, scheduling and host pressure cannot be isolated. Concurrent host-pressure evidence is not causal proof.",
+  "related_host_pressure": "observer-silent-block.json"
+}

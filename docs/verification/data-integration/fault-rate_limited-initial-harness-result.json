@@ -1,0 +1,204 @@
+{
+  "fault": "rate_limited",
+  "injection": "local response/filter seam; upstream otherwise real",
+  "host": "Ubuntu local Docker",
+  "project": "market-watch-data-integration",
+  "started_at": 1791254421905,
+  "first_rest_after_injection_ms": 20155,
+  "passed": false,
+  "error_type": "RuntimeError",
+  "error": "REST rate limit unnecessarily restarted the stream",
+  "events": [
+    {
+      "event": "stream_started",
+      "at": 1791254429539,
+      "epoch": 28
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254429621,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254430275,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254431744,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254432916,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254434372,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254434848,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254436382,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254436884,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254438352,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254438792,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254440369,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254440874,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254442611,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254443010,
+      "injected_already": false
+    },
+    {
+      "event": "stream_started",
+      "at": 1791254447628,
+      "epoch": 29
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254447671,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254448251,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254449700,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254450200,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254451699,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254452228,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254454087,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254454563,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254456061,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254456517,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254457953,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254458401,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254459794,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254460192,
+      "injected_already": false
+    },
+    {
+      "event": "armed",
+      "at": 1791254465646
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254465646,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254466643,
+      "injected_already": false
+    },
+    {
+      "event": "injected",
+      "at": 1791254525172,
+      "status": 429,
+      "retry_after_seconds": 20
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254545327,
+      "injected_already": true
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254550168,
+      "injected_already": true
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254585872,
+      "injected_already": true
+    },
+    {
+      "event": "rest_call",
+      "at": 1791254587966,
+      "injected_already": true
+    }
+  ],
+  "finished_at": 1791254594790
+}

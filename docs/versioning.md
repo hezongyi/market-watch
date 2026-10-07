@@ -1,5 +1,19 @@
 # Git与版本维护
 
+## v1.14.0 三层行情与数据中心源码发布
+
+PR #20 新增平台、自建及组合三层行情、数据中心维护与固定输入修订，按兼容新增功能使用次版本 1.14.0。用户授权合并并推 tag 后，同步 Python/web/锁文件根包、CHANGELOG 与源码清单，以 PR #20 最终 main 合并提交创建和推送附注标签 `v1.14.0`；保留旧标签。运行实现、迁移与测试保持复审通过的 `b261423` 输入，发布整理仅修改版本及交付资料。
+
+新增 dukascopy-python 依赖及迁移至 `am40_chart_revision_demand`。完整后端 1324 passed / 2 skipped，跳过项分别补验日历 4 项和 PG 备份恢复 1 项通过；独立 Standards/Spec 无阻塞，Ubuntu 独立资源已备份、实际恢复核对并退役。来源、哈希与迁移/回退边界见 [交付记录](market-data-v1.14.0-source-delivery.md)和 `deploy/releases/v1.14.0-source.json`。本次发布源码，长期观察按用户决定暂缓，生产部署另行执行。
+
+## v1.13.0 双击最大化与验收退役身份校验
+
+PR #17（`699e6ec`）新增兼容的图表双击操作，采用次版本1.13.0；PR #18（`c18b219`）补齐 PG/TLS 共享镜像身份校验。同步 Python/web 及锁文件根包、CHANGELOG 和源码清单后，以发布整理 PR 的最终 main 合并提交创建并推送附注标签 `v1.13.0`，保留旧标签。来源与验证边界见 [交付记录](chart-maximize-v1.13.0-source-delivery.md)及 `deploy/releases/v1.13.0-source.json`。本次发布源码，生产部署另行执行。
+
+## v1.12.1 Ubuntu Docker 运维维护发布
+
+PR #15 在 `ec9403a` 合入main，落地专用BuildKit、任务归属构建、备份及实际恢复验证后的验收退役、定时镜像清理与空间告警。按维护版本1.12.1同步Python/web及锁文件根包、CHANGELOG和源码清单，发布整理不改变受测工具逻辑。用户授权创建并推送附注标签v1.12.1，指向发布元数据PR最终main合并提交，保留旧标签。工具25项测试及Ubuntu实际构建、恢复和清理通过；schema/业务逻辑/依赖不变。见 deploy/releases/v1.12.1-source.json 和 docs/ubuntu-docker-v1.12.1-source-delivery.md。本次发布源码，不切换Unraid生产。
+
 ## v1.12.0 范围映射与柱宽同步源码发布
 
 PR #12 在 `77834e5` 合入main，新增范围映射、原生同步设置及柱宽同步，采用兼容功能次版本1.12.0。Python/web/锁文件根版本和CHANGELOG同步，发布整理分支只调整版本及记录，不改变受测功能源码。用户授权合并及推tag；以发布整理PR的最终main合并提交创建、推送附注标签v1.12.0，保留旧标签。当前Ubuntu候选54项/4组浏览器和21项模块通过，两轴审核无开放P1/P2；候选镜像保持实际来源。见 deploy/releases/v1.12.0-source.json 和 docs/chart-range-v1.12.0-source-delivery.md；本次只发布源码，生产另行授权。

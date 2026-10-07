@@ -1,0 +1,77 @@
+{
+  "host": "Ubuntu local isolated Docker",
+  "versions": [
+    {
+      "version": "1671ad4f-5c22-46f2-b739-6173d5867ce5",
+      "logical_symbol": "EURUSD",
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "EUR/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      },
+      "start": 1791162000000,
+      "end": 1791165600000,
+      "chunks": 1,
+      "checksum": "9d5e4d8ff0a4d059d26bdba738231b899eac58c6126964c12bd431abdcb57459",
+      "all_checks_passed": true,
+      "observed_minutes": 60,
+      "unknown_minutes": 0,
+      "unknown_intervals": 0,
+      "years": {
+        "2026": {
+          "observed": 60,
+          "unknown": 0
+        }
+      },
+      "largest_unknown_intervals": [],
+      "precision": 5,
+      "volume_kind": "quantity",
+      "volume_unit": "source_quantity",
+      "volume_present": 60,
+      "volume_nonzero": 60,
+      "month_utc_boundary_samples": [],
+      "calendar_status": "candidate; no unknown interval is relabeled as proven closure",
+      "coverage_meaning": "complete fixed query partition; observed prices and unknown gaps remain separate"
+    },
+    {
+      "version": "844fb514-ed13-4258-8f1c-cab43f55c06b",
+      "logical_symbol": "XAUUSD",
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "XAU/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      },
+      "start": 1791162000000,
+      "end": 1791165600000,
+      "chunks": 1,
+      "checksum": "5b03632f646c8e15e34b68651e4771639b9abc0124cc9efecb1dac005c61d818",
+      "all_checks_passed": true,
+      "observed_minutes": 60,
+      "unknown_minutes": 0,
+      "unknown_intervals": 0,
+      "years": {
+        "2026": {
+          "observed": 60,
+          "unknown": 0
+        }
+      },
+      "largest_unknown_intervals": [],
+      "precision": 3,
+      "volume_kind": "quantity",
+      "volume_unit": "source_quantity",
+      "volume_present": 60,
+      "volume_nonzero": 60,
+      "month_utc_boundary_samples": [],
+      "calendar_status": "candidate; no unknown interval is relabeled as proven closure",
+      "coverage_meaning": "complete fixed query partition; observed prices and unknown gaps remain separate"
+    }
+  ]
+}

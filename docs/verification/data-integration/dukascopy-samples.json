@@ -1,0 +1,256 @@
+{
+  "environment": "Ubuntu standalone read-only SDK sample; no service instance",
+  "sdk": "dukascopy-python==4.0.1",
+  "cases": [
+    {
+      "symbol": "EURUSD",
+      "case": "near_month",
+      "start": 1788264000000,
+      "end": 1788264900000,
+      "observed_at": 1791249771333,
+      "result": {
+        "status": "data",
+        "retry_at": null
+      },
+      "rows": 15,
+      "expected_clock_minutes": 15,
+      "elapsed_seconds": 0.997,
+      "checksum": "e9be8222b990a7f9490454862756d8d6abb32a331f8c021954231fbba74e0ff3",
+      "first": {
+        "timestamp": 1788264000000,
+        "open": "1.159260",
+        "high": "1.159310",
+        "low": "1.159180",
+        "close": "1.159200",
+        "volume": "119.340000",
+        "complete": true
+      },
+      "last": {
+        "timestamp": 1788264840000,
+        "open": "1.158960",
+        "high": "1.159090",
+        "low": "1.158960",
+        "close": "1.159090",
+        "volume": "106.200000",
+        "complete": true
+      },
+      "precision_observed_raw_decimals": 6,
+      "significant_decimals_first_last": 5
+    },
+    {
+      "symbol": "EURUSD",
+      "case": "earliest_year",
+      "start": 1475755200000,
+      "end": 1475756100000,
+      "observed_at": 1791249772631,
+      "result": {
+        "status": "data",
+        "retry_at": null
+      },
+      "rows": 15,
+      "expected_clock_minutes": 15,
+      "elapsed_seconds": 0.297,
+      "checksum": "8764f655cb767d52bab85893e3e81fc166de864029df977b2ed24626699defe1",
+      "first": {
+        "timestamp": 1475755200000,
+        "open": "1.118380",
+        "high": "1.118480",
+        "low": "1.118360",
+        "close": "1.118390",
+        "volume": "773.290000",
+        "complete": true
+      },
+      "last": {
+        "timestamp": 1475756040000,
+        "open": "1.118020",
+        "high": "1.118470",
+        "low": "1.117830",
+        "close": "1.118450",
+        "volume": "1337.590000",
+        "complete": true
+      },
+      "precision_observed_raw_decimals": 6,
+      "significant_decimals_first_last": 5
+    },
+    {
+      "symbol": "EURUSD",
+      "case": "year_boundary",
+      "start": 1767225300000,
+      "end": 1767226200000,
+      "observed_at": 1791249774127,
+      "result": {
+        "status": "empty_success",
+        "retry_at": null
+      },
+      "rows": 0,
+      "expected_clock_minutes": 15,
+      "elapsed_seconds": 0.495,
+      "checksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "first": null,
+      "last": null,
+      "precision_observed_raw_decimals": null,
+      "significant_decimals_first_last": null
+    },
+    {
+      "symbol": "EURUSD",
+      "case": "dst_week",
+      "start": 1773057600000,
+      "end": 1773058500000,
+      "observed_at": 1791249775430,
+      "result": {
+        "status": "data",
+        "retry_at": null
+      },
+      "rows": 15,
+      "expected_clock_minutes": 15,
+      "elapsed_seconds": 0.303,
+      "checksum": "8097efc58e90202b7c6a32a55d339f6cac23bc942eb4209a56809ed1db198ead",
+      "first": {
+        "timestamp": 1773057600000,
+        "open": "1.156120",
+        "high": "1.156230",
+        "low": "1.156010",
+        "close": "1.156180",
+        "volume": "206.100000",
+        "complete": true
+      },
+      "last": {
+        "timestamp": 1773058440000,
+        "open": "1.155960",
+        "high": "1.156300",
+        "low": "1.155940",
+        "close": "1.156250",
+        "volume": "139.930000",
+        "complete": true
+      },
+      "precision_observed_raw_decimals": 6,
+      "significant_decimals_first_last": 5
+    },
+    {
+      "symbol": "XAUUSD",
+      "case": "near_month",
+      "start": 1788264000000,
+      "end": 1788264900000,
+      "observed_at": 1791249776745,
+      "result": {
+        "status": "data",
+        "retry_at": null
+      },
+      "rows": 15,
+      "expected_clock_minutes": 15,
+      "elapsed_seconds": 0.314,
+      "checksum": "c74c46a87088708e67c2d7cb201f4c207e741a2767e3aa3030bafe823534c294",
+      "first": {
+        "timestamp": 1788264000000,
+        "open": "4374.235000",
+        "high": "4374.515000",
+        "low": "4370.915000",
+        "close": "4371.115000",
+        "volume": "0.042930",
+        "complete": true
+      },
+      "last": {
+        "timestamp": 1788264840000,
+        "open": "4371.065000",
+        "high": "4372.425000",
+        "low": "4369.505000",
+        "close": "4370.755000",
+        "volume": "0.035520",
+        "complete": true
+      },
+      "precision_observed_raw_decimals": 6,
+      "significant_decimals_first_last": 3
+    },
+    {
+      "symbol": "XAUUSD",
+      "case": "earliest_year",
+      "start": 1475755200000,
+      "end": 1475756100000,
+      "observed_at": 1791249778096,
+      "result": {
+        "status": "data",
+        "retry_at": null
+      },
+      "rows": 15,
+      "expected_clock_minutes": 15,
+      "elapsed_seconds": 0.35,
+      "checksum": "3985192c798e998654a946bfe2bb0db1455345cef92ea60d376ec5b1e3ad692a",
+      "first": {
+        "timestamp": 1475755200000,
+        "open": "1264.118000",
+        "high": "1264.604000",
+        "low": "1263.952000",
+        "close": "1264.288000",
+        "volume": "0.061490",
+        "complete": true
+      },
+      "last": {
+        "timestamp": 1475756040000,
+        "open": "1264.351000",
+        "high": "1264.638000",
+        "low": "1264.282000",
+        "close": "1264.509000",
+        "volume": "0.056430",
+        "complete": true
+      },
+      "precision_observed_raw_decimals": 6,
+      "significant_decimals_first_last": 3
+    },
+    {
+      "symbol": "XAUUSD",
+      "case": "year_boundary",
+      "start": 1767225300000,
+      "end": 1767226200000,
+      "observed_at": 1791249779397,
+      "result": {
+        "status": "empty_success",
+        "retry_at": null
+      },
+      "rows": 0,
+      "expected_clock_minutes": 15,
+      "elapsed_seconds": 0.3,
+      "checksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "first": null,
+      "last": null,
+      "precision_observed_raw_decimals": null,
+      "significant_decimals_first_last": null
+    },
+    {
+      "symbol": "XAUUSD",
+      "case": "dst_week",
+      "start": 1773057600000,
+      "end": 1773058500000,
+      "observed_at": 1791249780701,
+      "result": {
+        "status": "data",
+        "retry_at": null
+      },
+      "rows": 15,
+      "expected_clock_minutes": 15,
+      "elapsed_seconds": 0.304,
+      "checksum": "5c4e308e0fcb2a3f0f195ad2ff8b9a2ed04f48419b4685b2457c6c8812496aff",
+      "first": {
+        "timestamp": 1773057600000,
+        "open": "5087.935000",
+        "high": "5091.795000",
+        "low": "5087.229000",
+        "close": "5091.795000",
+        "volume": "0.041460",
+        "complete": true
+      },
+      "last": {
+        "timestamp": 1773058440000,
+        "open": "5097.335000",
+        "high": "5097.865000",
+        "low": "5095.395000",
+        "close": "5096.165000",
+        "volume": "0.031380",
+        "complete": true
+      },
+      "precision_observed_raw_decimals": 6,
+      "significant_decimals_first_last": 3
+    }
+  ],
+  "full_ten_year_coverage": "not_tested",
+  "calendar": "not_verified"
+}

@@ -26,6 +26,15 @@ pytestmark = pytest.mark.skipif(
 
 @pytest.fixture
 def provider_pg(monkeypatch):
+    # HTTP contracts must not bootstrap the shared acceptance database or start
+    # supplier threads merely because their TestClient enters the API lifespan.
+    from alerts import api, provider_chart, provider_service, provider_transport
+
+    monkeypatch.setattr(api, "bootstrap", lambda: None)
+    monkeypatch.setattr(provider_chart, "warm_clients", lambda: None)
+    monkeypatch.setattr(provider_transport, "start", lambda _: None)
+    monkeypatch.setattr(provider_service, "start", lambda: None)
+    monkeypatch.setattr(provider_service, "stop", lambda: None)
     url = os.environ["TEST_POSTGRES_URL"]
     admin = create_engine(url, pool_size=1, max_overflow=0)
     schema = "provider_" + uuid.uuid4().hex

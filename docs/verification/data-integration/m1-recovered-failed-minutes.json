@@ -1,0 +1,57 @@
+{
+  "captured_at": 1791266698288,
+  "host": "Ubuntu local isolated Docker",
+  "since": 1791259500000,
+  "minutes_with_failed_attempts": [
+    {
+      "symbol": "XAUUSD",
+      "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "start": 1791264480000,
+      "expected": true,
+      "expectation": "fresh_source_tradeable",
+      "attempts": 4,
+      "failures": 1,
+      "last_result": "data",
+      "first_attempt": 1791264546797,
+      "last_attempt": 1791264667062,
+      "quote_count": 109,
+      "confirmed_at": 1791264547322,
+      "end_utc": "2026-10-06T05:29:00+00:00",
+      "confirmation_delay_ms": 7322
+    },
+    {
+      "symbol": "XAUUSD",
+      "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "start": 1791264540000,
+      "expected": true,
+      "expectation": "fresh_source_tradeable",
+      "attempts": 4,
+      "failures": 1,
+      "last_result": "data",
+      "first_attempt": 1791264610924,
+      "last_attempt": 1791264726710,
+      "quote_count": 94,
+      "confirmed_at": 1791264614593,
+      "end_utc": "2026-10-06T05:30:00+00:00",
+      "confirmation_delay_ms": 14593
+    },
+    {
+      "symbol": "XAUUSD",
+      "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "start": 1791264420000,
+      "expected": true,
+      "expectation": "fresh_source_tradeable",
+      "attempts": 4,
+      "failures": 1,
+      "last_result": "data",
+      "first_attempt": 1791264486993,
+      "last_attempt": 1791264614400,
+      "quote_count": 147,
+      "confirmed_at": 1791264487303,
+      "end_utc": "2026-10-06T05:28:00+00:00",
+      "confirmation_delay_ms": 7303
+    }
+  ],
+  "interpretation": "Failures are per-minute counters: one overlapping three-minute request can increment three counters. Later successful confirmation overwrites last_result. These rows do not independently prove distinct failed requests or their error type. All failures remain in the denominator.",
+  "two_trading_days_verified": false
+}

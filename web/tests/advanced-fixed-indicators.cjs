@@ -1,0 +1,35 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const {spawnSync}=require('node:child_process');
+const repo=path.resolve(__dirname,'../..');
+const generated=spawnSync(path.join(repo,'.venv/bin/python'),
+  [path.join(__dirname,'fixtures/fixed-indicator-feed.py')],{cwd:repo,encoding:'utf8',
+    env:{...process.env,PYTHONPATH:path.join(repo,'backend')+':'+path.join(repo,'backend/tests'),
+      ALERTS_DATABASE_URL:'sqlite://',ALERTS_DELIVERY_ENABLED:'false'}});
+assert.equal(generated.status,0,generated.stderr);
+const responses=JSON.parse(generated.stdout),events=[];
+const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
+  location:{search:'?parent=http://localhost'},parent:{postMessage(){}},
+  crypto:{randomUUID:()=> 'test'},addEventListener(){},setTimeout,clearTimeout,
+  atob:s=>Buffer.from(s,'base64').toString('utf8'),btoa:s=>Buffer.from(s).toString('base64'),responses,events});
+for(const name of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync(path.join(repo,'advanced-host',name),'utf8'),ctx);
+(async()=>{
+  await vm.runInContext(`(async()=>{
+    ready=true;
+    globalThis.ticker='MWPY_'+btoa(JSON.stringify({symbol:responses.ticker,spec:responses.spec,key:'value'}));
+    const chart={symbol:()=>responses.ticker,resolution:()=> '1',getAllStudies:()=>[],
+      getTimeScale:()=>({rightOffset:()=>0}),resetData:()=>events.push('reload')};
+    widget={chartsCount:()=>1,chart:()=>chart,resetCache:()=>events.push('widget-reset')};
+    chartUsesSymbol=()=>true;
+    refreshChartHistory=async(widget,chart,invalidate,current)=>{if(!current())return false;invalidate();chart.resetData();return true;};
+    request=async()=>responses.pending;
+    await feed.getBars({ticker},'1',{to:4201,countBack:12,firstDataRequest:true},
+      (rows)=>{globalThis.initial=rows},error=>{throw Error(error)});
+    feed.subscribeBars({ticker},'1',()=>events.push('latest'),'study',()=>events.push('cache-reset'));
+    request=async()=>responses.ready;
+    await tick();
+  })()`,ctx);
+  assert.ok(events.includes('cache-reset') && events.includes('reload'),
+    'Initialization completing before the first poll must refill native historical study values');
+  assert.ok(ctx.initial.every(row=>row.volume===0),'Pending values must stay missing, not fabricated');
+  console.log('Full-origin fixed indicator completion reaches native historical redraw');
+})().catch(error=>{console.error(error);process.exitCode=1});

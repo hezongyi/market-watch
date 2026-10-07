@@ -9,9 +9,15 @@ from sqlalchemy import func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
-from .chart_series import SeriesKind, decode, display_symbol
+from .chart_series import SeriesKind, decode, display_symbol, is_gold
 from .coverage import covers_interval
-from .domain import Calendar, bucket_bounds, has_trading_gap, scheduled_open, session_bounds
+from .domain import (
+    bucket_bounds,
+    calendar_for,
+    has_trading_gap,
+    scheduled_open,
+    session_bounds,
+)
 from .market import stored_coverage
 from .market_names import chinese_name
 from .providers import fetch_oanda_catalog
@@ -47,7 +53,8 @@ DAY = 86400000
 def refresh_catalog():
     items = fetch_oanda_catalog()
     with transaction() as db:
-        for old in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda")):
+        for old in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
+                ~MarketCatalog.id.startswith("HC:"))):
             old.available = False
         for item in items:
             symbol = item["name"]
@@ -68,6 +75,8 @@ def refresh_catalog():
 def resolve(db, ident):
     inst = db.get(Instrument, ident)
     entry = db.get(MarketCatalog, ident)
+    if entry and entry.id.startswith("HC:"):
+        raise HTTPException(422, "自建来源目录仅用于登记历史，不作为平台或实时身份")
     if entry and entry.source == "yahoo":
         raise HTTPException(422, "Yahoo 品种仅支持平台系列，不创建历史维护任务")
     if entry and not entry.available:
@@ -110,6 +119,9 @@ def missing_intervals(coverage, left, right):
 
 
 def queue_history(db, inst, left, right, *, priority=100):
+    from .storage import MarketDataset
+    if db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == inst.id)):
+        raise HTTPException(422, "显式数据集由同源采集管理；历史演练请选择不可变 Dukascopy 版本")
     # Serialize planning per instrument; compatible with worker row locks.
     db.scalar(select(Instrument).where(Instrument.id == inst.id).with_for_update())
     coverage = stored_coverage(db, inst, left, right)
@@ -193,9 +205,9 @@ def viewport_session(inst, start, end):
     """Distinguish a scheduled closure from missing price history, using canonical calendar."""
     if not 0 < end - start <= 31 * DAY:
         raise HTTPException(422, "视区范围必须在31天以内")
-    calendar = Calendar(inst.calendar)
+    calendar = calendar_for(inst)
     closures = closures_from(inst.calendar_profile)
-    options = dict(gold=inst.id == "XAUUSD", closures=closures)
+    options = dict(gold=is_gold(inst.id), closures=closures)
     if has_trading_gap(instant(start), instant(end), calendar, **options):
         return {"closed": False}
     # M1 is the finest supported chart granularity. Bound the backwards search.
@@ -218,18 +230,29 @@ class QuoteQuery(BaseModel):
     client: str | None = Field(default=None, min_length=1, max_length=40)
 
 
-def renew_demand(db, client, inst):
+def renew_demand(db, client, inst, *, composite_revision_id=None):
     # Searching/selecting/refusing an unmaintained managed series does not
     # authorize even a temporary M1 maintenance lease.
     plan = db.get(ChartHistoryPlan, inst.id)
-    if not inst.enabled and not (plan and plan.realtime_enabled):
+    from .storage import CompositeRevision, MarketComposite, MarketDataset
+    dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == inst.id))
+    composite = db.scalar(select(MarketComposite).where(MarketComposite.instrument_id == inst.id))
+    if composite_revision_id is not None:
+        revision = db.get(CompositeRevision, composite_revision_id)
+        if not composite or not revision or revision.composite_id != composite.id:
+            raise ValueError("需求修订不属于所选组合行情")
+    live_source = dataset and dataset.identity["source"] == "oanda"
+    if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
         return
     import hashlib
 
-    ident = hashlib.sha256((client + "|" + inst.id).encode()).hexdigest()[:40]
+    lease_key = client + "|" + inst.id
+    if composite_revision_id is not None:
+        lease_key += "|" + composite_revision_id
+    ident = hashlib.sha256(lease_key.encode()).hexdigest()[:40]
     demand = db.get(MarketDemand, ident)
     if not demand:
-        demand = MarketDemand(id=ident, instrument_id=inst.id)
+        demand = MarketDemand(id=ident, instrument_id=inst.id, composite_revision_id=composite_revision_id)
         db.add(demand)
     demand.expires = now_ms() + 120000
     demand.updated_at = now_ms()
@@ -275,14 +298,14 @@ def read_cached_history(body: HistoryQuery):
         # Return a contiguous observed suffix. Do not join cached islands across
         # a trading interval whose provider coverage has not been established.
         contiguous = []
-        calendar = Calendar(inst.calendar)
+        calendar = calendar_for(inst)
         closures = closures_from(inst.calendar_profile)
         for row in reversed(usable):
             if contiguous:
                 right = contiguous[-1]["start"]
                 gaps = missing_intervals(coverage, row["end"], right)
                 if any(has_trading_gap(instant(a), instant(b), calendar,
-                                       gold=inst.id == "XAUUSD", closures=closures)
+                                       gold=is_gold(inst.id), closures=closures)
                        for a, b in gaps):
                     break
             contiguous.append(row)
@@ -308,7 +331,7 @@ def plan_history(body: HistoryQuery):
     left = max(0, right - span)
     with transaction() as db:
         inst = resolve(db, body.instrument)
-        calendar = Calendar(inst.calendar)
+        calendar = calendar_for(inst)
         if body.timeframe == "MN":
             # Monthly charts are an explicit cache-only view. Opening one
             # must not plan dedicated M1 downloads, even for a large countBack.
@@ -485,6 +508,17 @@ class VolumeControlQuery(BaseModel):
 def router(authenticated):
     r = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
 
+    @r.get("/series/search")
+    def series_search(query: str = "", kind: str = "all", limit: int = 100,
+                      source: str | None = None, calendar: str | None = None):
+        return search_series(query, kind=kind, limit=limit, source=source or None, calendar=calendar or None)
+
+    @r.get("/series/page")
+    def series_page(query: str = "", kind: str = "history", page_size: int = 25,
+                    offset: int = 0, source: str | None = None, calendar: str | None = None):
+        return search_series_page(query, kind=kind, page_size=page_size, offset=offset,
+                                  source=source or None, calendar=calendar or None)
+
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
         result = []
@@ -498,6 +532,38 @@ def router(authenticated):
                 raise HTTPException(422, str(error)) from error
             if kind == "managed":
                 managed.append(ident)
+                continue
+            if kind in ("history", "composite"):
+                from .series_access import metadata
+                with transaction() as db:
+                    try:
+                        meta = metadata(db, ident, kind)
+                        values = {"short_name": meta["symbol"], "description": meta["name"] + (
+                            " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
+                        facts = None
+                        if kind == "composite":
+                            from .composite_quotes import snapshot
+                            from .series_access import composite_definition
+
+                            _, _, composite = composite_definition(db, ident)
+                            if composite:
+                                facts = snapshot(db, composite)
+                                if facts["price"] is not None:
+                                    values["lp"] = float(facts["price"])
+                                    if facts["price_type"] == "sampled_bid":
+                                        values["bid"] = values["lp"]
+                                values.update(quote_time=facts["observed_at"], price_type=facts["price_type"],
+                                    quote_ready=facts["quote_ready"], confirmed_tail_ready=facts["confirmed_tail_ready"],
+                                    quality=facts["quality"])
+                                values["description"] += " · " + ("抽样Bid" if facts["price_type"] == "sampled_bid" else
+                                    "保存的确认M1收盘" if facts["price"] is not None else "等待报价")
+                                if facts["observed_at"] is not None:
+                                    values["description"] += " · " + instant(facts["observed_at"]).strftime("%Y-%m-%d %H:%M UTC")
+                        # Watchlist metadata is pure, never a first-use command.
+                        result.append({"s": "ok", "n": ticker, "v": values,
+                                       **({"snapshot": facts} if facts else {})})
+                    except ValueError:
+                        result.append({"s": "error", "n": ticker, "v": {"description": "行情不可用，请查看数据中心"}})
                 continue
             from .provider_chart import metadata, quote_page, quote_previous_close
 
@@ -530,12 +596,14 @@ def router(authenticated):
                     continue
                 page = quote_page(meta)
                 latest = page["bars"][-1] if page["bars"] else None
-                values = {"short_name": display_symbol(meta["symbol"]), "description": display_symbol(meta["symbol"]) + " · 平台行情",
+                values = {"short_name": display_symbol(meta["symbol"]), "description": display_symbol(meta["symbol"]) + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
                           "exchange": meta["source"].upper()}
                 if latest:
                     values["lp"] = float(latest["close"])
                     if meta["basis"] == "bid":
                         values["bid"] = values["lp"]
+                    elif meta["basis"] == "ask":
+                        values["ask"] = values["lp"]
                     # Missing prior-session data must not hide a valid last price.
                     try:
                         previous = quote_previous_close(meta, latest)
@@ -596,8 +664,8 @@ def router(authenticated):
                 age = max(0, observed_now - bar.end)
                 is_open = scheduled_open(
                     instant(observed_now),
-                    Calendar(inst.calendar),
-                    gold=inst.id == "XAUUSD",
+                    calendar_for(inst),
+                    gold=is_gold(inst.id),
                     closures=closures_from(inst.calendar_profile),
                 )
                 quality = "fresh" if age <= 180000 else "stale" if is_open else "closed"
@@ -609,7 +677,7 @@ def router(authenticated):
                 values["description"] += (
                     " · " + label + " · " + instant(bar.end).strftime("%Y-%m-%d %H:%M UTC")
                 )
-                session_start = ms(session_bounds(instant(bar.start), Calendar(inst.calendar))[0])
+                session_start = ms(session_bounds(instant(bar.start), calendar_for(inst))[0])
                 previous = db.scalar(
                     select(Bar)
                     .where(
@@ -630,8 +698,8 @@ def router(authenticated):
                     and not has_trading_gap(
                         instant(previous.end),
                         instant(session_start),
-                        Calendar(inst.calendar),
-                        gold=inst.id == "XAUUSD",
+                        calendar_for(inst),
+                        gold=is_gold(inst.id),
                         closures=closures_from(inst.calendar_profile),
                     )
                 ):
@@ -669,6 +737,13 @@ def router(authenticated):
             from .provider_chart import metadata
 
             return metadata(body.instrument)
+        if body.series_kind in ("history", "composite"):
+            from .series_access import metadata
+            with transaction() as db:
+                try:
+                    return metadata(db, body.instrument, body.series_kind)
+                except ValueError as error:
+                    raise HTTPException(422, str(error)) from None
         with transaction() as db:
             inst = resolve(db, body.instrument)
             return {
@@ -690,6 +765,15 @@ def router(authenticated):
     @r.post("/activity")
     def activity(body: Activity):
         with transaction() as db:
+            ident, kind = decode(body.instrument)
+            if kind == "history":
+                return {"ok": True}
+            if kind == "composite":
+                from .series_access import composite_definition
+                _, _, composite = composite_definition(db, ident)
+                if composite:
+                    renew_demand(db, body.client, db.get(Instrument, composite.instrument_id))
+                return {"ok": True}
             inst = resolve(db, body.instrument)
             renew_demand(db, body.client, inst)
         return {"ok": True}
@@ -867,18 +951,104 @@ def router(authenticated):
     return r
 
 
-def instrument_catalog(query: str = ""):
+def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None):
+    if kind == "provider":
+        if not 1 <= page_size <= 250 or not 0 <= offset <= 1000000 or calendar:
+            raise HTTPException(422, "无效平台搜索分页或筛选")
+        rows = _provider_series(query, source=source)
+        items = rows[offset:offset + page_size]
+        has_more = offset + len(items) < len(rows)
+        return {"items": items, "total": len(rows), "offset": offset, "page_size": page_size,
+            "has_more": has_more, "next_offset": offset + len(items) if has_more else None}
+    from .series_access import search_page
+    try:
+        with transaction() as db:
+            return search_page(db, query, kind=kind, page_size=page_size, offset=offset, source=source, calendar=calendar)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from None
+
+
+def _provider_series(query, *, source=None):
+    from .chart_series import encode
+    from .history_catalog import account_scope
+
+    if source not in (None, "dukascopy", "oanda", "binance", "yahoo"):
+        raise HTTPException(422, "未知平台来源")
+    result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+        "description": "平台 · " + row["source"] + " · 原生周期"}
+        for row in instrument_catalog(query, limit=None) if not row["id"].startswith("MD:")]
+    with transaction() as db:
+        for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
+                MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True))):
+            if row.metadata_json.get("history_account_scope") != account_scope():
+                continue
+            if query.strip().upper() not in (row.symbol + row.symbol.replace("_", "") + row.label).upper():
+                continue
+            ident = "OANDA:" + row.symbol
+            if any(item["id"] == ident for item in result):
+                continue
+            result.append({"id": ident, "symbol": row.symbol, "label": row.label,
+                "series_kind": "provider", "ticker": encode(ident, "provider"),
+                "source": "oanda", "asset_type": row.asset_type, "available": True,
+                "supported": row.calendar in ("ny17", "utc0"), "precision": row.precision,
+                "description": "平台 · OANDA Practice · Bid · 原生周期"})
+    return _rank_catalog([row for row in result if not source or row["source"] == source], query)
+
+
+def search_series(query="", *, kind="all", limit=100, source=None, calendar=None):
+    if kind not in ("all", "provider", "history", "composite") or not 1 <= limit <= 250:
+        raise HTTPException(422, "无效行情搜索范围")
+    if kind != "all":
+        return search_series_page(query, kind=kind, page_size=limit, source=source, calendar=calendar)["items"]
+    if source or calendar:
+        raise HTTPException(422, "筛选请明确平台、自建或组合范围")
+    from itertools import zip_longest
+
+    from .series_access import search_page
+    providers = _provider_series(query)
+    with transaction() as db:
+        histories = search_page(db, query, kind="history", page_size=limit)["items"]
+        composites = search_page(db, query, kind="composite", page_size=limit)["items"]
+    result = [row for group in zip_longest(providers, histories, composites) for row in group if row]
+    return result[:limit]
+
+
+def _rank_catalog(rows, query):
+    """Prefer code matches; interleave equal-ranked sources to avoid starvation."""
+    from collections import defaultdict
+
+    term = query.strip().casefold()
+    groups = defaultdict(lambda: defaultdict(list))
+    for row in rows:
+        codes = [row.get("symbol", "").casefold(), row.get("logical_symbol", "").casefold(),
+                 row.get("symbol", "").replace("_", "").replace("/", "").casefold()]
+        rank = 0 if term and term in codes else 1 if term and any(c.startswith(term) for c in codes) else 2
+        groups[rank][row["source"]].append(row)
+    result = []
+    for rank in sorted(groups):
+        sources = groups[rank]
+        for index in range(max(map(len, sources.values()))):
+            for rows in sources.values():
+                if index < len(rows):
+                    result.append(rows[index])
+    return result
+
+
+def instrument_catalog(query: str = "", *, limit=250):
     from .config import settings
+    from .provider_dukascopy import catalog as dukascopy_catalog
     from .yahoo_catalog import search, seed
     seed()
+    dukascopy = dukascopy_catalog(query)
     search_status = "local"
     if query.strip() and settings.yahoo_enabled:
         # Exact codes/names and known Chinese aliases remain local. A
         # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
         term = query.strip().upper()
         with transaction() as db:
-            local = list(db.scalars(select(MarketCatalog))) + list(db.scalars(select(Instrument)))
-            known = any(
+            local = list(db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))) + list(db.scalars(select(Instrument)))
+            known = any(term in {row["symbol"].upper(), row["logical_symbol"]}
+                        for row in dukascopy) or any(
                 term in {x.symbol.upper(), x.label.upper(),
                          (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
                 or not term.isascii() and term in
@@ -904,7 +1074,7 @@ def instrument_catalog(query: str = ""):
                 "currency": (x.metadata_json or {}).get("currency"),
                 "search_status": search_status,
             }
-            for x in db.scalars(select(MarketCatalog))
+            for x in db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))
         }
         for inst in db.scalars(
             select(Instrument).where(Instrument.source.in_(["oanda", "binance"]))
@@ -939,8 +1109,11 @@ def instrument_catalog(query: str = ""):
             entry['managed_status'] = ('未维护' if plan is None else
                 '失败，已发布历史保留' if entry['id'] in failures else
                 '部分已发布，范围见历史任务' if entry['id'] in published else '处理中')
-        return [
+        result = [
             x
             for x in entries.values()
             if x["available"] and query.upper() in (x["id"] + x["label"] + x["symbol"] + x.get("english_name", "")).upper()
-        ][:250]
+        ]
+    for row in dukascopy:
+        row["search_status"] = search_status
+    return _rank_catalog(result + dukascopy, query)[:limit]

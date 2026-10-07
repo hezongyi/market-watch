@@ -1,0 +1,10 @@
+[Unit]
+Description=Market data integration Ubuntu read-only rule observation (48 hours)
+
+[Service]
+Type=simple
+WorkingDirectory=/home/quant/repos/market-watch-data-integration
+ExecStart=/home/quant/repos/market-watch-data-integration/.venv/bin/python scripts/observe_sustained_rules.py
+Restart=no
+TimeoutStopSec=30
+MemoryMax=128M

@@ -11,7 +11,7 @@ from functools import lru_cache
 from typing import Literal
 from zoneinfo import ZoneInfo
 
-from .calendar_profile import Closure
+from .calendar_profile import Closure, SourceSession, session_from
 from .indicators import get_indicator
 
 NY = ZoneInfo("America/New_York")
@@ -27,6 +27,27 @@ def aware(value: datetime) -> datetime:
 class Calendar(StrEnum):
     NY17 = "ny17"
     UTC0 = "utc0"
+
+
+@dataclass(frozen=True)
+class SourceCalendar:
+    phase: Calendar
+    session: SourceSession | None = None
+
+
+def calendar_phase(calendar):
+    return calendar.phase if isinstance(calendar, SourceCalendar) else calendar
+
+
+def calendar_from(phase, profile=None, *, explicit=False):
+    phase = Calendar(phase)
+    session = session_from(profile)
+    return SourceCalendar(phase, session) if explicit or session is not None else phase
+
+
+def calendar_for(instrument):
+    return calendar_from(instrument.calendar, instrument.calendar_profile,
+                         explicit=instrument.id.startswith("MD:"))
 
 
 @dataclass(frozen=True)
@@ -62,6 +83,7 @@ class Candle:
 
 def session_bounds(moment: datetime, calendar: Calendar) -> tuple[datetime, datetime]:
     moment = aware(moment)
+    calendar = calendar_phase(calendar)
     zone = NY if calendar == Calendar.NY17 else UTC
     local = moment.astimezone(zone)
     start = local.replace(
@@ -89,6 +111,17 @@ def scheduled_open(
     moment = aware(moment)
     if any(c.start <= moment < c.end for c in closures):
         return False
+    if isinstance(calendar, SourceCalendar):
+        session = calendar.session
+        # Candidate phase is not proof that any missing minute was closed.
+        # Reviewed rules certify only fully closed interiors; boundaries and
+        # dates outside the finite review interval remain potentially open.
+        if session and session.reviewed_start <= moment and moment + timedelta(minutes=1) <= session.reviewed_end:
+            local = moment.astimezone(ZoneInfo(session.timezone))
+            minute = local.weekday() * 1440 + local.hour * 60 + local.minute
+            if any(c.start <= minute and minute + 1 <= c.end for c in session.weekly_closures):
+                return False
+        return True
     if calendar == Calendar.UTC0:
         return True
     local = aware(moment).astimezone(NY)

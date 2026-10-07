@@ -1,0 +1,35 @@
+{
+  "fault": "worker_pause",
+  "duration_seconds": 30,
+  "started_at": 1791251866411,
+  "before": [
+    {
+      "symbol": "EURUSD",
+      "epoch": 2,
+      "confirmed_end": 1791251820000
+    },
+    {
+      "symbol": "XAUUSD",
+      "epoch": 2,
+      "confirmed_end": 1791251820000
+    }
+  ],
+  "degraded_symbols": [
+    "EURUSD",
+    "XAUUSD"
+  ],
+  "recovery_seconds": 13.222,
+  "after": [
+    {
+      "symbol": "EURUSD",
+      "epoch": 3,
+      "confirmed_end": 1791251880000
+    },
+    {
+      "symbol": "XAUUSD",
+      "epoch": 3,
+      "confirmed_end": 1791251880000
+    }
+  ],
+  "within_60s": true
+}

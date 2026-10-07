@@ -2,6 +2,7 @@
 
 import csv
 import io
+import json
 from datetime import UTC, datetime
 
 
@@ -24,6 +25,7 @@ def chart_csv(page, *, instrument, timeframe):
     indicator warmup values remain blank, and unavailable volume is not invented.
     """
     columns = []
+    fixed = page.get("series_kind") in ("history", "composite")
     for index, indicator in enumerate(page.get("indicators", []), 1):
         for series in indicator["series"]:
             label = f"python:{index}:{indicator.get('id', indicator['name'])}:{series['key']}"
@@ -51,6 +53,8 @@ def chart_csv(page, *, instrument, timeframe):
             "volume_unit",
             "volume_complete",
             *(["source", "raw_symbol", "adjustment"] if page.get("source") == "yahoo" else []),
+            *(["series_kind", "history_version_id", "composite_revision_id", "input_revision",
+               "time_closed", "source_confirmed", "coverage_complete", "segments"] if fixed else []),
             *[name for name, _ in columns],
         ]
     )
@@ -83,6 +87,12 @@ def chart_csv(page, *, instrument, timeframe):
                     page.get("volume_unit"),
                     str(bar.get("volume_complete", False)).lower(),
                     *([page["source"], page["symbol"], page["adjustment"]] if page.get("source") == "yahoo" else []),
+                    *([page["series_kind"], page.get("history_version_id", page.get("version_id")),
+                       page.get("revision_id"), page.get("input_revision"),
+                       str(bar.get("time_closed", False)).lower(),
+                       str(bar.get("source_confirmed", False)).lower(),
+                       str(bar.get("coverage_complete", False)).lower(),
+                       json.dumps(bar.get("segments", []), sort_keys=True, ensure_ascii=False)] if fixed else []),
                     *[values.get(bar["start"]) for _, values in columns],
                 ]
             ]

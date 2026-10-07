@@ -376,7 +376,7 @@ export default function ChartPane(props: Props) {
       );
       setStatus(
         rows.length
-          ? `${data.basis.toUpperCase()} · 截至 ${zoned(rows.at(-1)!.end / 1000, zone)} · ${zone}${rows.at(-1)!.complete ? "" : " · 灰色：未完成/缺失"}${data.bounded_history ? " · 历史达到10万根上限" : ""}`
+          ? `${data.basis.toUpperCase()} · 截至 ${zoned(rows.at(-1)!.end / 1000, zone)} · ${zone}${rows.at(-1)!.complete ? "" : " · 灰色：未完成/缺失"}${data.bounded_history && !["history", "composite"].includes(data.series_kind || "") ? " · 历史达到10万根上限" : ""}${data.pending?.length ? " · " + data.pending.join("；") : ""}`
           : "当前没有历史数据，请在历史数据页导入",
       );
     }

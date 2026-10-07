@@ -15,9 +15,11 @@ from sqlalchemy import BigInteger, func, or_, select, update
 
 from .bar_batch import write_bars
 from .calendar_profile import closures_from
+from .chart_series import is_gold
 from .config import settings
 from .coverage import covers_interval
-from .domain import Calendar, Candle, aggregate, bucket_bounds, scheduled_open
+from .domain import Candle, aggregate, bucket_bounds, calendar_for, scheduled_open
+from .market_datasets import validate_ingestion
 from .providers import fetch_binance, fetch_oanda
 from .service import evaluate_quote, evaluate_watch
 from .storage import (
@@ -114,16 +116,31 @@ class Ingestion:
 
 def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False, report_changes=False):
     # Serialize bounded writes for one instrument across live and history workers.
+    from .storage import MarketDataset
+
+    if instrument.id.startswith("MD:"):
+        db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == instrument.id).with_for_update())
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
+    batch = validate_ingestion(db, instrument, payload)
+    if batch and payload.get("coverage"):
+        raise ValueError("Explicit M1 batches certify observed minutes only")
     if payload.get("source") and payload["source"] != instrument.source:
         raise ValueError("行情来源不匹配，拒绝混合数据")
     if payload.get("basis") and payload["basis"] != instrument.basis:
         raise ValueError("报价口径不匹配，拒绝混合数据")
-    received_at = received_at or now_ms()
+    received_at = received_at or (batch.observed_at if batch else now_ms())
+    if batch:
+        db.add(Audit(kind="dataset_batch_ingested", details={
+            "dataset": batch.identity.key, "instrument": instrument.id,
+            "window_start": batch.window_start, "window_end": batch.window_end,
+            "observed_at": batch.observed_at, "request_result": batch.result.status,
+            "volume_kind": batch.volume_kind, "volume_unit": batch.volume_unit,
+            "returned": len(batch.rows),
+        }))
     range_starts = [int(r["timestamp"]) for r in payload["rows"]] + [s["start"] for s in payload.get("coverage", [])]
     previous_coverage = stored_coverage(db, instrument, min(range_starts), received_at) if instrument.source == "oanda" and range_starts else []
     closures = closures_from(instrument.calendar_profile)
-    if any(
+    if not batch and any(
         c.start <= instant(int(r["timestamp"])) < c.end for r in payload["rows"] for c in closures
     ):
         raise ValueError("行情观测与已配置休市区间冲突，请核对交易日历")
@@ -146,13 +163,14 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
     # Commit coverage in the same transaction as bars; source empty observations are
     # not a claim of holiday or of the provider's oldest historical boundary.
     spans = payload.get('coverage', [])
-    if instrument.source != 'oanda':
+    if batch or instrument.source != 'oanda':
         # A successful exchange query with missing minutes cannot certify a
         # continuous range. Persist observed minute spans, merged below.
         from .managed_dataset import _merged
         spans = [{'start': a, 'end': b} for a,b in _merged([
             {'start': int(r['timestamp']), 'end': int(r['timestamp']) + 60000}
-            for r in payload['rows']])]
+            for r in payload['rows'] if not batch or
+            (r['complete'] and int(r['timestamp']) + 60000 <= received_at - 5000)])]
     for span in spans:
         end = min(span["end"], (received_at - 5000) // 60000 * 60000)
         if end <= span["start"]:
@@ -200,6 +218,14 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
         minute_candles.append(c)
         changed.append(start)
     changes = write_bars(db, instrument.id, "M1", minute_candles, observed_at=received_at)
+    if batch:
+        conflicts = [ms(c.start) for c in minute_candles if not scheduled_open(
+            c.start, calendar_for(instrument), gold=is_gold(instrument.id), closures=closures)]
+        if conflicts:
+            db.add(Audit(kind="source_session_observation_conflict", details={
+                "dataset": batch.identity.key, "calendar_revision": batch.identity.calendar_version,
+                "observed_minute_starts": conflicts, "observed_at": received_at,
+                "action": "preserve source M1; conflicting closure cannot certify aggregate completeness"}))
     touched = set(changed) if changes.price else set()
     volume_touched = {instant(at) for at in changes.volume}
     if instrument.source == "oanda":
@@ -250,7 +276,7 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
     received_at = received_at or now_ms()
     closures = closures_from(instrument.calendar_profile)
-    calendar = Calendar(instrument.calendar)
+    calendar = calendar_for(instrument)
     earliest = ms(bucket_bounds(min(touched), "D1", calendar)[0])
     latest_boundary = ms(bucket_bounds(max(touched), "D1", calendar)[1])
     coverage = stored_coverage(db, instrument, earliest, latest_boundary)
@@ -265,7 +291,7 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
         )
         .order_by(Bar.start)
     ).all()
-    calendar = Calendar(instrument.calendar)
+    calendar = calendar_for(instrument)
     for timeframe in timeframes:
         bounds = {bucket_bounds(t, timeframe, calendar) for t in touched}
         grouped = {}
@@ -276,6 +302,8 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
         outputs = []
         for left, right in sorted(bounds):
             rows = grouped.get((left, right), [])
+            conflicted = instrument.id.startswith("MD:") and any(not scheduled_open(
+                instant(row.start), calendar, gold=is_gold(instrument.id), closures=closures) for row in rows)
             if coverage and covers_interval(coverage, ms(left), ms(right)):
                 # Fully queried sparse observations need no calendar enumeration.
                 expected = {instant(r.start) for r in rows}
@@ -283,10 +311,10 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
                 expected = set()
                 t = left
                 while t < right:
-                    if scheduled_open(
+                    if conflicted or scheduled_open(
                         t,
                         calendar,
-                        gold=instrument.id == "XAUUSD",
+                        gold=is_gold(instrument.id),
                         closures=closures,
                     ):
                         expected.add(t)
@@ -327,7 +355,7 @@ def enqueue_repair(db, instrument, left, right, *, recent_end=None):
         return
     recent_end = recent_end if recent_end is not None else (now_ms() - 5000) // 60000 * 60000
     recent_start = recent_end - 24 * 60 * 60000
-    calendar = Calendar(instrument.calendar)
+    calendar = calendar_for(instrument)
     closures = closures_from(instrument.calendar_profile)
     for start, end, priority in ((left, min(right, recent_start), 50),
                                   (max(left, recent_start), right, 0)):
@@ -335,7 +363,7 @@ def enqueue_repair(db, instrument, left, right, *, recent_end=None):
             continue
         from .chart_history_plan import bucket_has_trading
         if not bucket_has_trading(instant(start), instant(end), calendar,
-                                  instrument.id == 'XAUUSD', closures):
+                                  is_gold(instrument.id), closures):
             continue
         # A history reservation must never block a separate recent repair or
         # be promoted wholesale into the realtime executor.
@@ -466,6 +494,9 @@ def queue_initial_history(db, *, end=None):
 def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=None):
     fetch = fetcher or fetch_source
     with transaction() as db:
+        from .storage import MarketDataset
+
+        explicit = set(db.scalars(select(MarketDataset.instrument_id)))
         viewers = set()
         if include_viewers:
             from .storage import ChartHistoryPlan, ChartViewportDemand, MarketDemand
@@ -478,7 +509,7 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
         instruments = [
             (i.id, i.symbol, i.source)
             for i in db.scalars(select(Instrument).order_by(Instrument.enabled.desc(), Instrument.id))
-            if (i.id == symbol if symbol else i.enabled or i.id in viewers)
+            if i.id not in explicit and (i.id == symbol if symbol else i.enabled or i.id in viewers)
         ]
     for instrument_id, provider_symbol, source in instruments:
         with transaction() as db:
@@ -678,8 +709,8 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                 while ms(t) < right:
                     if scheduled_open(
                         t,
-                        Calendar(inst.calendar),
-                        gold=inst.id == "XAUUSD",
+                        calendar_for(inst),
+                        gold=is_gold(inst.id),
                         closures=closures_from(inst.calendar_profile),
                     ):
                         raise ValueError("交易时段返回空数据，保留补数游标等待重试")
@@ -703,8 +734,8 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                 while cursor + 60000 <= right:
                     if cursor not in present and scheduled_open(
                         instant(cursor),
-                        Calendar(inst.calendar),
-                        gold=inst.id == "XAUUSD",
+                        calendar_for(inst),
+                        gold=is_gold(inst.id),
                         closures=closures_from(inst.calendar_profile),
                     ):
                         raise ValueError("历史区间仍缺少完整 M1，保留补数游标等待重试")

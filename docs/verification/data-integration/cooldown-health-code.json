@@ -1,0 +1,19 @@
+{
+  "worktree_module_sha256": "c73dcb17c3f73a580ecca426e90e262c4bbbeb58b99a27388511f1633c855419",
+  "containers": [
+    {
+      "service": "api",
+      "module_sha256": "c73dcb17c3f73a580ecca426e90e262c4bbbeb58b99a27388511f1633c855419",
+      "functions_different_from_worktree": []
+    },
+    {
+      "service": "oanda-worker",
+      "module_sha256": "1e24688c335af5a29d77a0d46885edf5e2cbb6b382648ad60f8a3d2d3be4bfa2",
+      "functions_different_from_worktree": [
+        "snapshots"
+      ]
+    }
+  ],
+  "source_ingestion_and_confirmation_functions_unchanged": true,
+  "scope": "API now publishes cooldown; retained worker has identical ingestion, ownership and confirmation functions"
+}

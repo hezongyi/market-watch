@@ -10,7 +10,8 @@ import httpx
 from .config import settings
 
 ORIGINS = {'oanda': 'https://api-fxpractice.oanda.com',
-           'binance': 'https://data-api.binance.vision'}
+           'binance': 'https://data-api.binance.vision',
+           'dukascopy': 'https://freeserv.dukascopy.com'}
 _LOCK = threading.Lock()
 _CLIENTS = {}
 _KEYS = weakref.WeakKeyDictionary()
@@ -24,7 +25,8 @@ def pooled_client(source):
     if source == 'yahoo':
         raise ValueError('Yahoo SDK 会话只能在 Adapter 操作生命周期内取得')
     from .market_resources import LANE
-    proxy = settings.oanda_proxy if source == 'oanda' else settings.effective_binance_proxy
+    proxy = (settings.oanda_proxy if source == 'oanda' else settings.market_proxy
+             if source == 'dukascopy' else settings.effective_binance_proxy)
     key = (source, proxy, LANE.get() or 'chart')
     return client_for_key(key)
 

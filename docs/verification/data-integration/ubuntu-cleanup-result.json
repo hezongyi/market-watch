@@ -1,0 +1,249 @@
+{
+  "captured_at_utc": "2026-10-06T10:54:31.492057+00:00",
+  "authorization": "User explicitly authorized cleanup of completed acceptance projects and reviewed caches",
+  "host": "Ubuntu local; no unraid action",
+  "free_bytes_before_cache_cleanup": 521506816,
+  "free_bytes_at_capture": 17475768320,
+  "net_free_bytes_increase": 16954261504,
+  "measurement_note": "Filesystem net change includes concurrent tasks; not an exact sum of independently freed Docker layers",
+  "removed_rebuildable_caches": [
+    "/home/quant/.cache/go-build",
+    "/home/quant/.cache/pip",
+    "/home/quant/.npm/_cacache",
+    "/home/quant/miniforge3/pkgs/cache",
+    "/home/quant/.cache/uv"
+  ],
+  "conda_archive_files_removed": 406,
+  "projects": [
+    {
+      "project": "mw-viewport-acceptance",
+      "completion_evidence": "/home/quant/repos/market-watch-viewport-buffer/docs/verification/viewport-history/README.md",
+      "containers": [
+        "mw-viewport-acceptance-web-1",
+        "mw-viewport-acceptance-chart-origin-1",
+        "mw-viewport-acceptance-api-1",
+        "mw-viewport-acceptance-migrate-1",
+        "mw-viewport-acceptance-tls-1",
+        "mw-viewport-acceptance-pg-1"
+      ],
+      "volumes": [
+        "mw-viewport-acceptance_viewport-pg"
+      ],
+      "backups": [
+        {
+          "path": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/completed-project-cleanup-backups/mw-viewport-acceptance.dump",
+          "bytes": 6184718,
+          "sha256": "29e40a22fe46cfae7716658c44f34fb4fcfdf46e8037fa75a843816b90a21184",
+          "validation": "pg_dump success and pg_restore archive list parsing; no new restore instance"
+        }
+      ],
+      "networks_removed": [
+        "mw-viewport-acceptance_default"
+      ],
+      "removed": true
+    },
+    {
+      "project": "mw-chart-sync-ubuntu-20261004",
+      "completion_evidence": "/home/quant/repos/market-watch-chart-sync/docs/chart-sync-ubuntu-manual-acceptance.md",
+      "containers": [
+        "mw-chart-sync-ubuntu-20261004-chart-origin-1",
+        "mw-chart-sync-ubuntu-20261004-api-1",
+        "mw-chart-sync-ubuntu-20261004-migrate-1",
+        "mw-chart-sync-ubuntu-20261004-tls-1",
+        "mw-chart-sync-ubuntu-20261004-web-1",
+        "mw-chart-sync-ubuntu-20261004-pg-1"
+      ],
+      "volumes": [
+        "mw-chart-sync-ubuntu-20261004_sync-pg"
+      ],
+      "backups": [
+        {
+          "path": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/completed-project-cleanup-backups/mw-chart-sync-ubuntu-20261004.dump",
+          "bytes": 27606829,
+          "sha256": "e0eee6379bc4325b2f21c8738bff0e46e432c0316e4448e88760f3b553524047",
+          "validation": "pg_dump success and pg_restore archive list parsing; no new restore instance"
+        }
+      ],
+      "networks_removed": [
+        "mw-chart-sync-ubuntu-20261004_default"
+      ],
+      "removed": true
+    },
+    {
+      "project": "mw-native-history-ubuntu-20261004",
+      "completion_evidence": "/home/quant/repos/market-watch-release-v1.8.0/docs/native-history-completion-audit.md",
+      "containers": [
+        "mw-native-history-ubuntu-20261004-web-1",
+        "mw-native-history-ubuntu-20261004-chart-origin-1",
+        "mw-native-history-ubuntu-20261004-api-1",
+        "mw-native-history-ubuntu-20261004-history-worker-1",
+        "mw-native-history-ubuntu-20261004-migrate-1",
+        "mw-native-history-ubuntu-20261004-tls-1",
+        "mw-native-history-ubuntu-20261004-pg-1"
+      ],
+      "volumes": [
+        "mw-native-history-ubuntu-20261004_sync-pg"
+      ],
+      "backups": [
+        {
+          "path": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/completed-project-cleanup-backups/mw-native-history-ubuntu-20261004.dump",
+          "bytes": 1256128,
+          "sha256": "3f4503e4a0112ebc9f5c506cd08f554e144102475aa8754193ec06be36642cb6",
+          "validation": "pg_dump success and pg_restore archive list parsing; no new restore instance"
+        }
+      ],
+      "networks_removed": [
+        "mw-native-history-ubuntu-20261004_default"
+      ],
+      "removed": true
+    },
+    {
+      "project": "mw-native-history-cold-product-20261005",
+      "completion_evidence": "/home/quant/repos/market-watch-release-v1.8.0/docs/native-history-completion-audit.md",
+      "containers": [
+        "mw-native-history-cold-product-20261005-web-1",
+        "mw-native-history-cold-product-20261005-tls-1",
+        "mw-native-history-cold-product-20261005-api-1",
+        "mw-native-history-cold-product-20261005-history-worker-1",
+        "mw-native-history-cold-product-20261005-migrate-1",
+        "mw-native-history-cold-product-20261005-pg-1",
+        "mw-native-history-cold-product-20261005-chart-origin-1"
+      ],
+      "volumes": [
+        "mw-native-history-cold-product-20261005_sync-pg"
+      ],
+      "backups": [
+        {
+          "path": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/completed-project-cleanup-backups/mw-native-history-cold-product-20261005.dump",
+          "bytes": 4508046,
+          "sha256": "8a40d060c1cc27619dd83b810ab125ae4cf85731c60f0c335bacad350daf75f8",
+          "validation": "pg_dump success and pg_restore archive list parsing; no new restore instance"
+        }
+      ],
+      "networks_removed": [
+        "mw-native-history-cold-product-20261005_default"
+      ],
+      "removed": true
+    },
+    {
+      "project": "mw-release-v180-20261006",
+      "completion_evidence": "/home/quant/repos/market-watch-release-v1.8.0/docs/chart-v1.8.0-delivery.md",
+      "containers": [
+        "mw-release-v180-20261006-tls-1",
+        "mw-release-v180-20261006-native-history-worker-1",
+        "mw-release-v180-20261006-web-1",
+        "mw-release-v180-20261006-api-1",
+        "mw-release-v180-20261006-migrate-1",
+        "mw-release-v180-20261006-chart-origin-1",
+        "mw-release-v180-20261006-pg-1"
+      ],
+      "volumes": [
+        "mw-release-v180-20261006_release-pg"
+      ],
+      "backups": [
+        {
+          "path": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/completed-project-cleanup-backups/mw-release-v180-20261006.dump",
+          "bytes": 12881816,
+          "sha256": "7baba9727f635482fde5323db743abb421ddf0cefda9690b7236da4606898435",
+          "validation": "pg_dump success and pg_restore archive list parsing; no new restore instance"
+        }
+      ],
+      "networks_removed": [
+        "mw-release-v180-20261006_default"
+      ],
+      "removed": true
+    },
+    {
+      "project": "mw-indicator-acceptance",
+      "completion_evidence": "/home/quant/repos/market-watch-indicator-dev/docs/chart-v1.9.0-source-delivery.md",
+      "containers": [
+        "mw-indicator-acceptance-web-1",
+        "mw-indicator-acceptance-history-worker-1",
+        "mw-indicator-acceptance-api-1",
+        "mw-indicator-acceptance-migrate-1",
+        "mw-indicator-acceptance-chart-origin-1",
+        "mw-indicator-acceptance-tls-1",
+        "mw-indicator-acceptance-pg-1"
+      ],
+      "volumes": [
+        "mw-indicator-acceptance_indicator-pg"
+      ],
+      "backups": [
+        {
+          "path": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/completed-project-cleanup-backups/mw-indicator-acceptance.dump",
+          "bytes": 1584418,
+          "sha256": "836638d1b58d9588015795b541401d84f4563251deb3c90db3ac2c8da8ac6a8d",
+          "validation": "pg_dump success and pg_restore archive list parsing; no new restore instance"
+        }
+      ],
+      "networks_removed": [
+        "mw-indicator-acceptance_default"
+      ],
+      "removed": true
+    },
+    {
+      "project": "mw-range-mapping-ubuntu-20261004",
+      "completion_evidence": "/home/quant/repos/market-watch-range-v180/docs/chart-bar-range-mapping-acceptance.md",
+      "containers": [
+        "mw-range-mapping-ubuntu-20261004-api-1",
+        "mw-range-mapping-ubuntu-20261004-migrate-1",
+        "mw-range-mapping-ubuntu-20261004-web-1",
+        "mw-range-mapping-ubuntu-20261004-tls-1",
+        "mw-range-mapping-ubuntu-20261004-chart-origin-1",
+        "mw-range-mapping-ubuntu-20261004-pg-1"
+      ],
+      "volumes": [
+        "mw-range-mapping-ubuntu-20261004_range-pg"
+      ],
+      "backups": [
+        {
+          "path": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/completed-project-cleanup-backups/mw-range-mapping-ubuntu-20261004.dump",
+          "bytes": 19683915,
+          "sha256": "7920463e0155408ac7b75e5a461d42e1b8cf36db13778fd8d328ff0434641321",
+          "validation": "pg_dump success and pg_restore archive list parsing; no new restore instance"
+        }
+      ],
+      "networks_removed": [
+        "mw-range-mapping-ubuntu-20261004_default"
+      ],
+      "removed": true
+    },
+    {
+      "project": "mw-sync-settings-ubuntu-20261004",
+      "completion_evidence": "/home/quant/repos/market-watch-range-v180/docs/chart-sync-settings-acceptance.md",
+      "containers": [
+        "mw-sync-settings-ubuntu-20261004-chart-origin-1",
+        "mw-sync-settings-ubuntu-20261004-tls-1",
+        "mw-sync-settings-ubuntu-20261004-web-1",
+        "mw-sync-settings-ubuntu-20261004-api-1",
+        "mw-sync-settings-ubuntu-20261004-migrate-1",
+        "mw-sync-settings-ubuntu-20261004-pg-1"
+      ],
+      "volumes": [
+        "mw-sync-settings-ubuntu-20261004_range-pg"
+      ],
+      "backups": [
+        {
+          "path": "/home/quant/repos/market-watch-data-integration/artifacts/data-integration/completed-project-cleanup-backups/mw-sync-settings-ubuntu-20261004.dump",
+          "bytes": 24652618,
+          "sha256": "c0542655fb618ea27509ad90d94c5308706683f52471aa79c5f526795304388f",
+          "validation": "pg_dump success and pg_restore archive list parsing; no new restore instance"
+        }
+      ],
+      "networks_removed": [
+        "mw-sync-settings-ubuntu-20261004_default"
+      ],
+      "removed": true
+    }
+  ],
+  "backup_note": "Ignored artifacts/data-integration/completed-project-cleanup-backups; chmod0600. pg_dump succeeded and pg_restore --list parsed; no fresh restore-instance verification. Source and acceptance documents retained.",
+  "images_and_build_cache_removed_by_this_task": false,
+  "journal_cleanup": "Permission denied; 0 bytes removed",
+  "global_prune_used": false,
+  "active_project": "market-watch-data-integration",
+  "observers": {
+    "browser_pid": 2233613,
+    "rules_pid": 2233614,
+    "state": "active/running; current raw files continue appending"
+  }
+}

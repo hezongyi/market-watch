@@ -18,6 +18,7 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
+from sqlalchemy.orm import Session as ORMSession
 
 from .config import settings
 from .domain import Candle, Rule, State
@@ -57,6 +58,521 @@ class Instrument(Base):
     last_received: Mapped[int | None] = mapped_column(BigInteger)
     error: Mapped[str | None]
     enabled: Mapped[bool] = mapped_column(default=True, server_default="true")
+
+
+class MarketDataset(Base):
+    __tablename__ = "market_datasets"
+    asset_class: Mapped[str] = mapped_column(String(16), default="unspecified", server_default="unspecified")
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), unique=True)
+    logical_symbol: Mapped[str] = mapped_column(String(10))
+    identity: Mapped[dict] = mapped_column(JSON)
+    volume_kind: Mapped[str] = mapped_column(String(20))
+    volume_unit: Mapped[str | None] = mapped_column(String(40))
+
+
+class SourceSeries(Base):
+    __tablename__ = "market_source_series"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    identity: Mapped[dict] = mapped_column(JSON)
+
+
+class DatasetSource(Base):
+    __tablename__ = "market_dataset_sources"
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+
+
+class SourceBlob(Base):
+    __tablename__ = "market_source_blobs"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+    checksum: Mapped[str] = mapped_column(String(64))
+    content: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+class SourceFetch(Base):
+    __tablename__ = "market_source_fetches"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    checkpoint: Mapped[int | None] = mapped_column(BigInteger)
+    content_id: Mapped[str | None] = mapped_column(ForeignKey("market_source_blobs.id"))
+    observed_at: Mapped[int | None] = mapped_column(BigInteger)
+    fetched_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    result: Mapped[str | None] = mapped_column(String(20))
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
+class SourceMinuteRevision(Base):
+    __tablename__ = "market_source_minute_revisions"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger, index=True)
+    data: Mapped[dict] = mapped_column(JSON)
+    observed_at: Mapped[int] = mapped_column(BigInteger)
+    received_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class SourceMinute(Base):
+    __tablename__ = "market_source_minutes"
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_source_minute_revisions.id"))
+    last_observed_at: Mapped[int] = mapped_column(BigInteger)
+
+
+class HistoryVersion(Base):
+    __tablename__ = "market_history_versions"
+    # Older rows have no recorded mutation time; never backfill a guessed value.
+    updated_at: Mapped[int | None] = mapped_column(BigInteger, onupdate=now_ms)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    published_at: Mapped[int | None] = mapped_column(BigInteger)
+    manifest: Mapped[dict] = mapped_column(JSON, default=dict)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    attempts: Mapped[int] = mapped_column(default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(40))
+
+
+class HistoryChunk(Base):
+    __tablename__ = "market_history_chunks"
+    __table_args__ = (UniqueConstraint("version_id", "start"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    observed_at: Mapped[int] = mapped_column(BigInteger)
+    count: Mapped[int]
+    checksum: Mapped[str] = mapped_column(String(64))
+    content: Mapped[bytes] = mapped_column(LargeBinary)
+    # Old inline chunks remain valid. New chunks reference source-isolated,
+    # immutable content; lookup verifies existence and checksum on every read.
+    content_id: Mapped[str | None] = mapped_column(String(64), index=True)
+    result: Mapped[str] = mapped_column(String(20))
+    unknown: Mapped[list] = mapped_column(JSON, default=list)
+
+
+class HistoryReadAttempt(Base):
+    """Durable bounded M1 read facts, including failures before later success."""
+    __tablename__ = "market_history_read_attempts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    started_at: Mapped[int] = mapped_column(BigInteger)
+    finished_at: Mapped[int | None] = mapped_column(BigInteger)
+    read_kind: Mapped[str] = mapped_column(String(24), default="pending")
+    result: Mapped[str] = mapped_column(String(40), default="started")
+    checkpoint: Mapped[int | None] = mapped_column(BigInteger)
+    observed_at: Mapped[int | None] = mapped_column(BigInteger)
+    observations: Mapped[int | None] = mapped_column()
+    accepted: Mapped[bool] = mapped_column(default=False)
+
+
+class DatasetMaintenance(Base):
+    __tablename__ = "market_dataset_maintenance"
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
+    target_start: Mapped[int] = mapped_column(BigInteger)
+    timeframes: Mapped[list] = mapped_column(JSON)
+    timezone: Mapped[str] = mapped_column(String(64), default="UTC")
+    daily_minute: Mapped[int] = mapped_column(default=15)
+    overlap_minutes: Mapped[int] = mapped_column(default=2880)
+    frequency: Mapped[str] = mapped_column(String(16), default="daily")
+    paused: Mapped[bool] = mapped_column(default=False)
+    archived: Mapped[bool] = mapped_column(default=False)
+    next_at: Mapped[int] = mapped_column(BigInteger)
+    latest_version_id: Mapped[str | None] = mapped_column(ForeignKey("market_history_versions.id"))
+    active_version_id: Mapped[str | None] = mapped_column(ForeignKey("market_history_versions.id"))
+    last_attempt: Mapped[int | None] = mapped_column(BigInteger)
+    last_success: Mapped[int | None] = mapped_column(BigInteger)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class HistoryRun(Base):
+    __tablename__ = "market_history_runs"
+    # Older rows have no recorded mutation time; never backfill a guessed value.
+    updated_at: Mapped[int | None] = mapped_column(BigInteger, onupdate=now_ms)
+    __table_args__ = (UniqueConstraint("dataset_id", "request_id"),)
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), primary_key=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    request_id: Mapped[str] = mapped_column(String(100))
+    request_hash: Mapped[str] = mapped_column(String(64))
+    kind: Mapped[str] = mapped_column(String(16))
+    parent_version_id: Mapped[str | None] = mapped_column(ForeignKey("market_history_versions.id"))
+    refresh_start: Mapped[int] = mapped_column(BigInteger)
+    refresh_end: Mapped[int] = mapped_column(BigInteger)
+    desired_state: Mapped[str] = mapped_column(String(16), default="running")
+    completed_at: Mapped[int | None] = mapped_column(BigInteger)
+
+
+class HistoryArtifact(Base):
+    __tablename__ = "market_history_artifacts"
+    # Older rows have no recorded mutation time; never backfill a guessed value.
+    updated_at: Mapped[int | None] = mapped_column(BigInteger, onupdate=now_ms)
+    __table_args__ = (UniqueConstraint("version_id", "timeframe"),)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    timeframe: Mapped[str] = mapped_column(String(4))
+    rule_version: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    accumulator: Mapped[dict] = mapped_column(JSON, default=dict)
+    count: Mapped[int] = mapped_column(default=0)
+    complete_count: Mapped[int] = mapped_column(default=0)
+    manifest: Mapped[dict] = mapped_column(JSON, default=dict)
+    published_at: Mapped[int | None] = mapped_column(BigInteger)
+
+
+class HistoryArtifactBlock(Base):
+    __tablename__ = "market_history_artifact_blocks"
+    __table_args__ = (UniqueConstraint("artifact_id", "start"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    artifact_id: Mapped[str] = mapped_column(ForeignKey("market_history_artifacts.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    count: Mapped[int]
+    checksum: Mapped[str] = mapped_column(String(64))
+    content: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+class HistoryReclamation(Base):
+    """Retained identity/manifest tombstone after unreferenced payload deletion."""
+    __tablename__ = "market_history_reclamations"
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), primary_key=True)
+    request_id: Mapped[str] = mapped_column(String(100))
+    reclaimed_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class DatasetReclamation(Base):
+    __tablename__ = "market_dataset_reclamations"
+    __table_args__ = (UniqueConstraint("dataset_id", "request_id"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    request_id: Mapped[str] = mapped_column(String(100))
+    reclaimed_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    summary: Mapped[dict] = mapped_column(JSON)
+
+
+class PricingOwner(Base):
+    __tablename__ = "market_pricing_owners"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    token: Mapped[str | None] = mapped_column(String(36))
+    expires: Mapped[int] = mapped_column(BigInteger, default=0)
+    epoch: Mapped[int] = mapped_column(default=0)
+    connected_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    failures: Mapped[int] = mapped_column(default=0)
+    error: Mapped[str | None] = mapped_column(String(32))
+
+
+class RealtimeMapping(Base):
+    __tablename__ = "market_realtime_mappings"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    target_dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"))
+    permission_scope: Mapped[str] = mapped_column(String(80))
+    match: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class MarketComposite(Base):
+    __tablename__ = "market_composites"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), unique=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    mapping_id: Mapped[str] = mapped_column(ForeignKey("market_realtime_mappings.id"))
+    permission_scope: Mapped[str] = mapped_column(String(80))
+    rules: Mapped[dict] = mapped_column(JSON)
+    active_revision_id: Mapped[str | None] = mapped_column(String(36))
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class CompositeRevision(Base):
+    __tablename__ = "market_composite_revisions"
+    __table_args__ = (UniqueConstraint("composite_id", "request_id"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    composite_id: Mapped[str] = mapped_column(ForeignKey("market_composites.id"), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"))
+    mapping_id: Mapped[str] = mapped_column(ForeignKey("market_realtime_mappings.id"))
+    parent_revision_id: Mapped[str | None] = mapped_column(String(36))
+    seam: Mapped[int] = mapped_column(BigInteger)
+    rules: Mapped[dict] = mapped_column(JSON)
+    request_id: Mapped[str] = mapped_column(String(100))
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    activated_at: Mapped[int | None] = mapped_column(BigInteger)
+
+
+class CompositePreparation(Base):
+    __tablename__ = "market_composite_preparations"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    status: Mapped[str] = mapped_column(String(24), default="pending")
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    cutoff: Mapped[int] = mapped_column(BigInteger)
+    confirmed_end: Mapped[int] = mapped_column(BigInteger, default=0)
+    input_revision: Mapped[int] = mapped_column(BigInteger, default=0)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(40))
+    state: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class CompositeRevisionChange(Base):
+    __tablename__ = "market_composite_revision_changes"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    request_hash: Mapped[str] = mapped_column(String(64))
+    reason: Mapped[str] = mapped_column(String(1000))
+    manifest: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class CompositeActivation(Base):
+    __tablename__ = "market_composite_activations"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    previous_revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"))
+    request_id: Mapped[str] = mapped_column(String(100))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    event_boundary: Mapped[int] = mapped_column(BigInteger)
+    at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    evidence: Mapped[dict] = mapped_column(JSON)
+
+
+@event.listens_for(CompositeRevisionChange, "before_update")
+@event.listens_for(CompositeRevisionChange, "before_delete")
+@event.listens_for(CompositeActivation, "before_update")
+@event.listens_for(CompositeActivation, "before_delete")
+def immutable_composite_change(mapper, connection, target):
+    raise ValueError("Composite revision requests and activation evidence are immutable")
+
+
+class CompositeInputEvent(Base):
+    __tablename__ = "market_composite_input_events"
+    __table_args__ = (UniqueConstraint("revision_id", "input_revision"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    input_manifest: Mapped[dict] = mapped_column(JSON)
+
+
+class CompositeMinute(Base):
+    __tablename__ = "market_composite_minutes"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    source_revision_id: Mapped[str] = mapped_column(ForeignKey("market_source_minute_revisions.id"))
+
+
+class CompositeMinuteInput(Base):
+    __tablename__ = "market_composite_minute_inputs"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    input_revision: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    event_id: Mapped[str] = mapped_column(ForeignKey("market_composite_input_events.id"), index=True)
+    source_revision_id: Mapped[str] = mapped_column(ForeignKey("market_source_minute_revisions.id"))
+
+
+class CompositeAggregateTask(Base):
+    __tablename__ = "market_composite_aggregate_tasks"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(4), primary_key=True)
+    applied_input_revision: Mapped[int] = mapped_column(BigInteger, default=-1)
+    offset: Mapped[int] = mapped_column(default=0)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    attempts: Mapped[int] = mapped_column(default=0)
+    error: Mapped[str | None] = mapped_column(String(40))
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class CompositeAggregateBar(Base):
+    __tablename__ = "market_composite_aggregate_bars"
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(4), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    input_revision: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    data: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class FixedIndicatorRun(Base):
+    __tablename__ = "market_fixed_indicator_runs"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    group_key: Mapped[str] = mapped_column(String(64), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    revision_id: Mapped[str | None] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    timeframe: Mapped[str] = mapped_column(String(4))
+    spec: Mapped[dict] = mapped_column(JSON)
+    algorithm: Mapped[str] = mapped_column(String(40))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    target_end: Mapped[int] = mapped_column(BigInteger)
+    parent_id: Mapped[str | None] = mapped_column(ForeignKey("market_fixed_indicator_runs.id"))
+    prefix_end: Mapped[int] = mapped_column(BigInteger, default=0)
+    cursor: Mapped[int] = mapped_column(BigInteger, default=0)
+    state: Mapped[dict] = mapped_column(JSON, default=dict)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(40))
+    attempts: Mapped[int] = mapped_column(default=0)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class FixedIndicatorBlock(Base):
+    __tablename__ = "market_fixed_indicator_blocks"
+    run_id: Mapped[str] = mapped_column(ForeignKey("market_fixed_indicator_runs.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    end: Mapped[int] = mapped_column(BigInteger)
+    checkpoint: Mapped[dict] = mapped_column(JSON)
+    checksum: Mapped[str] = mapped_column(String(64))
+    content: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+class CompositeReadAttempt(Base):
+    __tablename__ = "market_composite_read_attempts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    started_at: Mapped[int] = mapped_column(BigInteger)
+    finished_at: Mapped[int | None] = mapped_column(BigInteger)
+    result: Mapped[str] = mapped_column(String(40), default="started")
+    read_kind: Mapped[str] = mapped_column(String(24), default="pending")
+    checkpoint: Mapped[int | None] = mapped_column(BigInteger)
+    observed_at: Mapped[int | None] = mapped_column(BigInteger)
+    observations: Mapped[int | None]
+    accepted: Mapped[bool] = mapped_column(default=False)
+
+
+class LiveState(Base):
+    __tablename__ = "market_live_states"
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
+    epoch: Mapped[int] = mapped_column(default=0)
+    revision: Mapped[int] = mapped_column(BigInteger, default=0)
+    connection: Mapped[str] = mapped_column(String(20), default="disconnected")
+    heartbeat_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    quote: Mapped[dict] = mapped_column(JSON, default=dict)
+    forming: Mapped[dict] = mapped_column(JSON, default=dict)
+    confirmed_end: Mapped[int] = mapped_column(BigInteger, default=0)
+    recovery_cursor: Mapped[int] = mapped_column(BigInteger, default=0)
+    recovery_started: Mapped[int] = mapped_column(BigInteger, default=0)
+    ready: Mapped[bool] = mapped_column(default=False)
+    next_confirm_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    attempts: Mapped[int] = mapped_column(default=0)
+    error: Mapped[str | None] = mapped_column(String(32))
+    received_at: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
+class LiveMinute(Base):
+    __tablename__ = "market_live_minutes"
+    __table_args__ = (UniqueConstraint("dataset_id", "start"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
+    start: Mapped[int] = mapped_column(BigInteger, index=True)
+    expected: Mapped[bool | None]
+    expectation: Mapped[str] = mapped_column(String(64))
+    attempts: Mapped[int] = mapped_column(default=0)
+    failures: Mapped[int] = mapped_column(default=0)
+    last_result: Mapped[str] = mapped_column(String(32), default="pending")
+    confirmed_at: Mapped[int | None] = mapped_column(BigInteger)
+    first_attempt: Mapped[int] = mapped_column(BigInteger)
+    last_attempt: Mapped[int] = mapped_column(BigInteger)
+    quote_count: Mapped[int] = mapped_column(default=0)
+    age_histogram: Mapped[dict] = mapped_column(JSON, default=dict)
+    max_interarrival: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
+@event.listens_for(ORMSession, "before_flush")
+def immutable_dataset_identity(db, flush_context, instances):
+    from sqlalchemy import inspect, select
+
+    from .history_retention import guard_reference_writes
+
+    guard_reference_writes(db)
+
+    for row in db.deleted:
+        if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, SourceMinute, CompositeMinute,
+                            CompositeReadAttempt, CompositeMinuteInput, CompositeAggregateBar,
+                            FixedIndicatorRun, FixedIndicatorBlock)):
+            raise ValueError("Confirmed minute inputs and audit cannot be deleted by runtime writers")
+        if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob, HistoryArtifactBlock, HistoryArtifact,
+                            HistoryReclamation, DatasetReclamation, HistoryReadAttempt)):
+            raise ValueError("Historical snapshots cannot be deleted by runtime writers")
+        if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)):
+            raise ValueError("Explicit dataset/source bindings cannot be removed by runtime writers")
+        if isinstance(row, (RealtimeMapping, MarketComposite, CompositeRevision)):
+            raise ValueError("Composite identities and revisions cannot be removed by runtime writers")
+        if isinstance(row, Instrument) and db.scalar(
+                select(MarketDataset.id).where(MarketDataset.instrument_id == row.id)):
+            raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
+    for row in db.dirty:
+        state = inspect(row)
+        if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, CompositeMinuteInput, CompositeAggregateBar, FixedIndicatorBlock)) and any(
+                attr.history.has_changes() for attr in state.attrs):
+            raise ValueError("Confirmed minute revisions and input audit are immutable")
+        if isinstance(row, FixedIndicatorRun) and any(state.attrs[key].history.has_changes() for key in (
+                "id", "group_key", "history_version_id", "revision_id", "timeframe", "spec", "algorithm",
+                "input_revision", "target_end", "parent_id", "prefix_end")):
+            raise ValueError("Fixed indicator input and inherited prefix are immutable")
+        if isinstance(row, CompositeAggregateTask) and any(state.attrs[key].history.has_changes()
+                for key in ("revision_id", "timeframe")):
+            raise ValueError("Composite aggregation task identity is immutable")
+        if isinstance(row, (SourceMinute, CompositeMinute)) and any(
+                state.attrs[key].history.has_changes() for key in (
+                    ("source_id", "start") if isinstance(row, SourceMinute) else ("revision_id", "start"))):
+            raise ValueError("Confirmed minute head identity is immutable")
+        if isinstance(row, RealtimeMapping) and any(attr.history.has_changes() for attr in state.attrs):
+            raise ValueError("Realtime mappings are immutable; save a new mapping version")
+        if isinstance(row, MarketComposite) and any(state.attrs[key].history.has_changes() for key in (
+                "id", "instrument_id", "dataset_id", "mapping_id", "permission_scope", "rules", "created_at")):
+            raise ValueError("Composite definitions are immutable")
+        if isinstance(row, CompositeRevision) and any(state.attrs[key].history.has_changes() for key in (
+                "id", "composite_id", "history_version_id", "mapping_id", "parent_revision_id", "seam", "rules",
+                "request_id", "created_at")):
+            raise ValueError("Composite baseline, seam and rules are immutable")
+        if isinstance(row, CompositePreparation) and any(state.attrs[key].history.has_changes()
+                for key in ("revision_id", "cutoff")):
+            raise ValueError("Composite preparation revision and cutoff are immutable")
+        if isinstance(row, (HistoryReadAttempt, CompositeReadAttempt)):
+            previous = state.attrs.finished_at.history
+            completed = (bool(previous.deleted and previous.deleted[0] is not None) or
+                         not previous.has_changes() and row.finished_at is not None)
+            if completed and any(
+                        attr.history.has_changes() for attr in state.attrs):
+                raise ValueError("Completed historical request evidence is immutable")
+            parent_key = "version_id" if isinstance(row, HistoryReadAttempt) else "revision_id"
+            if any(state.attrs[key].history.has_changes() for key in (
+                    "id", parent_key, "start", "end", "started_at")):
+                raise ValueError("Historical request identity is immutable")
+        if isinstance(row, (HistoryChunk, SourceBlob, HistoryArtifactBlock, HistoryReclamation, DatasetReclamation)) and any(attr.history.has_changes() for attr in state.attrs):
+            raise ValueError("Historical snapshot chunks are immutable")
+        if isinstance(row, (HistoryVersion, HistoryArtifact)):
+            old = state.attrs.status.history.deleted
+            if (row.status == "published" and not state.attrs.status.history.has_changes()
+                    or "published" in old):
+                if any(attr.history.has_changes() for attr in state.attrs):
+                    raise ValueError("Published historical versions are immutable")
+        if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)) and any(
+            attr.history.has_changes() for attr in state.attrs
+        ):
+            raise ValueError("Dataset identity is immutable")
+        if isinstance(row, Instrument) and any(state.attrs[key].history.has_changes()
+                for key in ("id", "source", "symbol", "basis", "calendar", "precision", "calendar_profile")):
+            previous_ids = state.attrs.id.history.deleted or [row.id]
+            if db.scalar(select(MarketDataset.id).where(
+                    MarketDataset.instrument_id.in_(previous_ids))):
+                raise ValueError("Bound dataset metadata is immutable; register a new version")
 
 
 class Bar(Base):
@@ -120,6 +636,56 @@ class Watch(Base):
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
     paused_reason: Mapped[str | None]
     warmup_start: Mapped[int | None] = mapped_column(BigInteger)
+
+
+class CompositeWatchBinding(Base):
+    """Fixed strategy input, separate from the legacy domain rule and state."""
+    __tablename__ = "market_composite_watch_bindings"
+    watch_id: Mapped[str] = mapped_column(ForeignKey("watches.id"), primary_key=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    market_identity: Mapped[dict] = mapped_column(JSON)
+    use_history: Mapped[bool] = mapped_column(Boolean)
+    health: Mapped[str] = mapped_column(String(16), default="warming")
+    health_reason: Mapped[str | None] = mapped_column(String(250))
+    runtime: Mapped[dict] = mapped_column(JSON, default=dict)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms, index=True)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+@event.listens_for(CompositeWatchBinding, "before_update")
+def immutable_composite_watch_binding(mapper, connection, target):
+    from sqlalchemy import inspect
+
+    state = inspect(target)
+    if any(state.attrs[key].history.has_changes() for key in (
+            "watch_id", "revision_id", "history_version_id", "market_identity", "use_history", "created_at")):
+        raise ValueError("组合策略输入不可变；请保留旧策略并新建规则")
+
+
+@event.listens_for(CompositeWatchBinding, "before_delete")
+def preserve_composite_watch_binding(mapper, connection, target):
+    raise ValueError("组合策略输入和引用须保留用于审计")
+
+
+class CompositeWatchJudgment(Base):
+    __tablename__ = "market_composite_watch_judgments"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    watch_id: Mapped[str] = mapped_column(ForeignKey("watches.id"), index=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    event_time: Mapped[int] = mapped_column(BigInteger)
+    outcome: Mapped[str] = mapped_column(String(32))
+    signal_id: Mapped[str | None] = mapped_column(ForeignKey("signals.id"))
+    evidence: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+@event.listens_for(CompositeWatchJudgment, "before_update")
+@event.listens_for(CompositeWatchJudgment, "before_delete")
+def preserve_composite_watch_judgment(mapper, connection, target):
+    raise ValueError("组合策略判断证据不可变")
 
 
 class ChartAlert(Base):
@@ -188,6 +754,38 @@ class SignalRow(Base):
     threshold: Mapped[Decimal] = mapped_column(Numeric(24, 10))
     reason: Mapped[str]
     evidence: Mapped[dict] = mapped_column(JSON)
+
+
+class CompositeJudgment(Base):
+    """Immutable evidence for successful comparisons, including no-event baselines."""
+    __tablename__ = "market_composite_judgments"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    alert_version_id: Mapped[str] = mapped_column(ForeignKey("chart_alert_versions.id"), index=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("market_composite_revisions.id"), index=True)
+    history_version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    event_time: Mapped[int] = mapped_column(BigInteger)
+    outcome: Mapped[str] = mapped_column(String(32))
+    signal_id: Mapped[str | None] = mapped_column(ForeignKey("signals.id"))
+    evidence: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+@event.listens_for(CompositeJudgment, "before_update")
+@event.listens_for(CompositeJudgment, "before_delete")
+def immutable_composite_judgment(mapper, connection, target):
+    raise ValueError("组合判断证据不可变；后续修订不能覆盖当时输入")
+
+
+@event.listens_for(SignalRow, "before_update")
+@event.listens_for(SignalRow, "before_delete")
+def immutable_composite_signal(mapper, connection, target):
+    from sqlalchemy import inspect
+
+    history = inspect(target).attrs.evidence.history
+    documents = [target.evidence, *history.deleted]
+    if any(document.get("market_identity", {}).get("series_kind") == "composite" for document in documents):
+        raise ValueError("组合事件及判断输入不可变；通知状态单独维护")
 
 
 class Notification(Base):
@@ -291,6 +889,8 @@ class Replay(Base):
     __tablename__ = "replays"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     instrument_id: Mapped[str]
+    dataset_version: Mapped[str | None] = mapped_column(String(36))
+    input_manifest: Mapped[dict] = mapped_column(JSON, default=dict, server_default="{}")
     calendar_profile: Mapped[dict] = mapped_column(JSON, default=dict, server_default="{}")
     timeframe: Mapped[str]
     start: Mapped[int] = mapped_column(BigInteger)
@@ -491,6 +1091,8 @@ class MarketDemand(Base):
     __tablename__ = "market_data_demand"
     id: Mapped[str] = mapped_column(String(40), primary_key=True)
     instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), index=True)
+    composite_revision_id: Mapped[str | None] = mapped_column(
+        ForeignKey("market_composite_revisions.id", name="fk_market_demand_composite_revision"), index=True)
     expires: Mapped[int] = mapped_column(BigInteger, index=True)
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
 

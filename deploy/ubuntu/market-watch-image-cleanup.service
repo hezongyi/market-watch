@@ -1,0 +1,6 @@
+[Unit]
+Description=Delete expired completed Market Watch task images without container references
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/mw-docker cleanup --automatic --apply
+TimeoutStartSec=10min

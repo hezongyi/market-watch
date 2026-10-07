@@ -199,7 +199,17 @@ export default function AdvancedWorkspace() {
   }, [mobile]);
   useEffect(() => {
     let cancelled = false;
-    refresh(1)
+    const platform = new URLSearchParams(location.search).get("platform");
+    const opening = platform
+      ? api<Workspace>("/advanced-charts/workspaces", {
+          name: "平台行情",
+          symbol: platform,
+        }).then((row) => {
+          history.replaceState(null, "", location.pathname);
+          return [row];
+        })
+      : refresh(1);
+    opening
       .then((list) => {
         if (!cancelled) {
           if (list[0]) select(list[0]);
@@ -537,6 +547,7 @@ export default function AdvancedWorkspace() {
           setExportSelection(value);
       } else if (m.type === "workspace-action") {
         if (m.action === "home") location.assign("/");
+        else if (m.action === "market-data") location.assign("/market-data");
         else if (m.action === "logout") {
           try {
             if (!mobile && unsaved.current) await flush();
@@ -790,7 +801,8 @@ export default function AdvancedWorkspace() {
       } else if (m.type === "market") {
         const q = m.query;
         const endpoints: Record<string, string> = {
-          search: "/market-data/catalog",
+          search: "/market-data/series/search",
+          searchPage: "/market-data/series/page",
           resolve: "/market-data/resolve",
           viewport: "/market-data/viewport-session",
           history: "/market-data/history",
@@ -859,12 +871,19 @@ export default function AdvancedWorkspace() {
           } else
             result = await api(
               endpoints[q.op] +
-                (q.op === "search"
-                  ? "?query=" + encodeURIComponent(String(q.args?.query || ""))
+                (q.op === "searchPage"
+                  ? "?" + new URLSearchParams({query:String(q.args?.query || ""),
+                    kind:["provider","history","composite"].includes(q.args?.kind) ? q.args.kind : "provider",
+                    source:String(q.args?.source || ""),calendar:String(q.args?.calendar || ""),
+                    page_size:"25",offset:String(Number.isSafeInteger(q.args?.offset) ? q.args.offset : 0)})
+                  : q.op === "search"
+                  ? "?query=" + encodeURIComponent(String(q.args?.query || "")) +
+                    "&kind=" + encodeURIComponent(["provider", "history", "composite", "all"].includes(q.args?.kind) ? q.args.kind : "all") +
+                    (q.args?.source ? "&source=" + encodeURIComponent(String(q.args.source)) : "")
                   : q.op === "retry"
                     ? "/" + encodeURIComponent(q.args.id)
                     : ""),
-              q.op === "search" ? undefined : q.args,
+              ["search","searchPage"].includes(q.op) ? undefined : q.args,
               controller.signal,
             );
           reply({
@@ -898,7 +917,7 @@ export default function AdvancedWorkspace() {
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
           (q.series_kind !== undefined &&
-            !["provider", "managed"].includes(q.series_kind)) ||
+            !["provider", "managed", "history", "composite"].includes(q.series_kind)) ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
@@ -1001,6 +1020,8 @@ export default function AdvancedWorkspace() {
                 instrument: q.instrument,
                 series_kind: q.series_kind || "managed",
                 published: q.series_kind !== "provider",
+                ...(q.series_kind === "composite" ? {client:q.client,
+                  composite_revision_id:q.composite_revision_id,input_revision:q.input_revision} : {}),
                 ...(typeof q.dataset_start === "number"
                   ? { dataset_start: q.dataset_start }
                   : {}),

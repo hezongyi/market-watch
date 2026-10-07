@@ -70,6 +70,7 @@ const lastHistory = new Map();
 const providerHistoryState = new Map();
 const providerHistoryWork = new Map();
 const firstHistory = new Map();
+const fixedHistoryStarts = new Map();
 const coldHistory = new Set();
 const refreshingHistoryRanges = new Map();
 const pendingHistory = new Map();
@@ -233,6 +234,8 @@ function observeRangeBars(symbol, resolution, bars, accepted, window = '', ticke
       .map(bar => ({...bar,chart_time:bar.chart_time ?? stamp(bar,resolution,decode(symbol).symbol)}))});
 }
 const managedSessions = new Map();
+const fixedIndicatorPending = new Map();
+const alertCompositeRevisions = new Map();
 const maintenanceAsked = new Set();
 const cache = new Map();
 function datasetGeometry(ticker, res) {
@@ -312,6 +315,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   const q = {
     instrument: symbol,
     series_kind,
+    ...(series_kind === 'composite' ? {client:clientId} : {}),
     timeframe: frames[res],
     ...(spec && series_kind === 'provider' && alertCalculationOrigins.has(MWSeries.encode(symbol,series_kind)+'|'+res)
       ? {calculation_origin:alertCalculationOrigins.get(MWSeries.encode(symbol,series_kind)+'|'+res)} : {}),
@@ -330,6 +334,8 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   const promise = request(q, "data", () => epoch === workspaceEpoch && current() && Date.now() < expires &&
     (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})))
     .then(page=>{
+      if(epoch===workspaceEpoch && series_kind==='composite' && page.revision_id)
+        alertCompositeRevisions.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.revision_id);
       if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
         alertCalculationOrigins.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.calculation_origin ?? page.origin);
       return page;
@@ -368,11 +374,15 @@ function historyQuery(args) {
   promise.then(remove, remove);
   return promise;
 }
-function yahooPresentationRows(symbols) {
+function seriesPresentationRows(symbols) {
   return symbols.flatMap(ticker => {
-    const meta = symbolPresentations.get(decode(ticker).symbol);
+    const identity = decode(ticker);
+    const meta = symbolPresentations.get(identity.symbol);
     return meta ? [{s:"ok",n:ticker,v:{short_name:meta.symbol,
-      description:meta.name + " · Yahoo 市场报价",exchange:meta.exchange}}] : [];
+      description:meta.name + (meta.source === 'yahoo' ? " · Yahoo 市场报价" :
+        identity.series_kind === 'provider' ? " · 平台原生行情" :
+        identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情"),
+      exchange:meta.exchange || meta.source?.toUpperCase()}}] : [];
   });
 }
 const feed = {
@@ -397,13 +407,16 @@ const feed = {
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
     const all=[...new Set([...symbols, ...fastSymbols])];
     quoteSubscriptions.set(id, {symbols:all,cb});
-    const yahoo=all.filter(ticker=>decode(ticker).symbol.startsWith("YAHOO:"));
-    if(yahoo.length) {
+    const presented=all.filter(ticker=>{
+      const identity=decode(ticker);
+      return identity.symbol.startsWith("YAHOO:") || ['history','composite'].includes(identity.series_kind);
+    });
+    if(presented.length) {
       // Give native details its resolved human name while the real market
       // snapshot loads. No price, change or quote time is invented here.
-      const named=yahooPresentationRows(yahoo);
+      const named=seriesPresentationRows(presented);
       if(named.length) setTimeout(()=>{if(quoteSubscriptions.has(id)) cb(named)},0);
-      feed.getQuotes(yahoo,rows=>{if(quoteSubscriptions.has(id)) cb(rows)},
+      feed.getQuotes(presented,rows=>{if(quoteSubscriptions.has(id)) cb(rows)},
         error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}));
     }
   },
@@ -421,16 +434,18 @@ const feed = {
     ),
   searchSymbols: async (input, exchange, type, cb) => {
     try {
+      const currentKind = typeof widget !== 'undefined' && ready ? decode(widget.activeChart().symbol()).series_kind : 'provider';
       const rows = await request(
-        { op: "search", args: { query: input } },
+        { op: "search", args: { query: input, kind: currentKind === 'managed' ? 'provider' : currentKind,
+          source: ['DUKASCOPY','OANDA','BINANCE','YAHOO'].includes(exchange?.toUpperCase()) ? exchange.toLowerCase() : undefined } },
         "market",
       );
       cb(
         rows.map(s => ({
           symbol: s.symbol,
-          ticker: MWSeries.encode(s.id, "provider"),
-          description: s.label + " · 平台行情" +
-            (s.supported ? "" : " · 日历待接入"),
+          ticker: s.ticker || MWSeries.encode(s.id, "provider"),
+          description: s.label + " · " + (s.description || "平台行情") +
+            (s.series_kind && s.series_kind !== 'provider' || s.supported ? "" : " · 日历待接入"),
           exchange: s.exchange || s.source.toUpperCase(),
           type: ({CRYPTO:"crypto", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[s.asset_type] || "forex",
         })),
@@ -458,20 +473,20 @@ const feed = {
       );
       alertSourceMetadata.set(MWSeries.encode(symbol,series_kind),meta);
       while(alertSourceMetadata.size>250) alertSourceMetadata.delete(alertSourceMetadata.keys().next().value);
-      if(meta.source === "yahoo") {
+      if(meta.native_series_id || ['yahoo','dukascopy'].includes(meta.source) || ['history','composite'].includes(series_kind)) {
         symbolPresentations.set(symbol,meta);
         while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       }
       cb({
-        name: meta.source === "yahoo" ? meta.symbol : MWSeries.display(symbol),
+        name: meta.symbol || MWSeries.display(symbol),
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
-        mw_historyPageBars: meta.source === "binance" ? 1000 : 4000,
-        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : " · 量不可用"),
+        mw_historyPageBars: meta.native_page_capacity || (meta.source === "binance" ? 1000 : 4000),
+        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
         mw_range_source: meta.source,
-        type: ({INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
+        type: ({CRYPTO:"crypto", METAL:"commodity", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures", OTHER:"commodity"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
         session: meta.session || (meta.source === "yahoo" ? "0000-0000:23456" : meta.calendar === "utc0" ? "24x7" : "1700-1700:23456"),
         timezone: meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York"),
         minmov: 1,
@@ -503,7 +518,9 @@ const feed = {
       },0);
     } catch (e) {
       err(String(e));
-      send({ type: "error", error: String(e) });
+      // The library also resolves watchlist entries. Its error callback marks
+      // an unavailable entry (or chart symbol) at the requesting surface;
+      // escalating it to a workspace modal blocks unrelated valid charts.
     }
   },
   getBars: async (s, res, p, cb, err) => {
@@ -624,6 +641,44 @@ const feed = {
         return;
       }
       const identity = decode(s.ticker), symbol=identity.symbol;
+      if (['history','composite'].includes(identity.series_kind)) {
+        const requested = Math.max(1, Math.ceil(p.countBack));
+        if (!Number.isSafeInteger(requested) || requested > 20000) throw Error('固定行情单次最多请求20000根');
+        let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
+        let rows=[], rawRows=[], boundary=false, fixed={};
+        for (let partition=0; rows.length<requested && partition<32; partition++) {
+          const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed});
+          if (identity.spec) fixedIndicatorPending.set(historyKey,
+            page.indicator_progress?.some(item=>item.status!=='complete') || false);
+          if(page.bars?.length)
+            fixedHistoryStarts.set(historyKey,Math.min(fixedHistoryStarts.get(historyKey)??Infinity,page.bars[0].start));
+          rawRows.push(...page.bars);
+          rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
+          if (page.revision_id) fixed={composite_revision_id:page.revision_id,input_revision:page.input_revision};
+          boundary=!page.has_more;
+          if (page.pending?.length) {
+            send({type:'status',text:page.pending.join('；')});
+            // Indicator initialization is asynchronous; retain pagination and
+            // let subscription review redraw as immutable output progresses.
+            if (!identity.spec || !page.indicator_progress?.length) {
+              boundary=false; break;
+            }
+          }
+          if (boundary) break;
+          const next=page.next_before;
+          if (!(next<before)) throw Error('固定行情分页未推进');
+          before=next;
+        }
+        rows=[...new Map(rows.map(bar=>[bar.time,bar])).values()].sort((a,b)=>a.time-b.time);
+        if(rows.length) {
+          firstHistory.set(historyKey,Math.min(firstHistory.get(historyKey)??Infinity,rows[0].time));
+          lastHistory.set(historyKey,Math.max(lastHistory.get(historyKey)||0,rows.at(-1).time));
+        }
+        const accepted = cb(rows,{noData:boundary}) !== false;
+        if (accepted) observeRangeBars(s.ticker,res,rawRows,rows,s.mw_window,rangeTicket);
+        if(!rows.length) finishTerminal();
+        return;
+      }
       const requested = Math.max(1, Math.ceil(p.countBack));
       if (!Number.isSafeInteger(requested)) throw Error('无效历史根数');
       const key=symbol+'|'+res, epoch=workspaceEpoch;
@@ -695,7 +750,8 @@ const feed = {
     if(identity.symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) return;
     const historyKey=s.ticker+'|'+res+(identity.series_kind==='provider' ? '|'+(s.mw_window || '') : '');
     const guardedReset = () => {barRangeMapping?.invalidate(s.ticker,res,s.mw_window); reset();};
-    const sub={symbol:s.ticker,res,cb,reset:guardedReset,last:lastHistory.get(historyKey)||0,revision:null};
+    const sub={symbol:s.ticker,res,cb,reset:guardedReset,last:lastHistory.get(historyKey)||0,revision:null,
+      initialIndicatorPending:fixedIndicatorPending.get(historyKey) || false};
     subscriptions.set(id,sub);
     // Keep history corrections subscribed, but never append a latest tick
     // across the gap between a historical window and the realtime tail.
@@ -1046,15 +1102,30 @@ async function tick() {
         const result = await query(first.symbol, first.res, {
           limit: 3,
           track_history: true,
-          revision_after: firstHistory.get(first.symbol + "|" + first.res),
+          revision_after: (['history','composite'].includes(identity.series_kind) ? fixedHistoryStarts : firstHistory)
+            .get(first.symbol + "|" + first.res),
           ...(first.historyBefore
             ? { revision_before: first.historyBefore }
             : {}),
         });
         const bars = barsOf(result, first.res, first.symbol);
         const check = result.history_check;
+        const progressBoundary = first.historyBefore || check?.before;
+        const indicatorProgress = JSON.stringify((result.indicator_progress || []).map(item =>
+          [Math.min(item.cursor,progressBoundary ?? item.cursor),
+            item.cursor < (progressBoundary ?? item.cursor) ? 'pending' : 'ready']));
         let needsReload = group.some(sub=>sub.needsHistoryReload);
         for (const sub of group) {
+          if (identity.spec && sub.initialIndicatorPending && result.indicator_progress?.every(item=>item.status==='complete')) {
+            sub.initialIndicatorPending = false;
+            sub.needsHistoryReload = true;
+            needsReload = true;
+          }
+          if (identity.spec && sub.indicatorProgress && sub.indicatorProgress !== indicatorProgress) {
+            sub.needsHistoryReload = true;
+            needsReload = true;
+          }
+          sub.indicatorProgress = indicatorProgress;
           const changed =
             check &&
             sub.historyBefore === check.before &&
@@ -1083,6 +1154,7 @@ async function tick() {
         if (needsReload && await reloadHistory(symbol, first.res))
           for (const sub of group) sub.needsHistoryReload = false;
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: "" });
+        if (result.pending?.length) send({type:'status',text:result.pending.join('；')});
       } catch (e) {
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: String(e) });
       }
@@ -1256,9 +1328,10 @@ function boot(
   alertBridge?.destroy();
   alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
     getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
-    metadata:ticker=>alertSourceMetadata.get(ticker),frames,
+    metadata:ticker=>alertSourceMetadata.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)),frames,
     calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(ticker+'|'+res) ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
+    compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
     rpc:query=>request(query,"chart-alert-rpc"),send,
     fail:error=>send({type:"error",error:String(error)})});
   alertBridge.reset(chartState || {});
@@ -1410,6 +1483,8 @@ function boot(
     widget?._innerAPI()._saveChartService?.markContentAsChanged();
   }});
   globalThis.MWBarRangeMapping = barRangeMapping;
+  globalThis.MWChartMaximize?.dispose();
+  globalThis.MWChartMaximize = undefined;
   widget = new TradingView.widget({
     context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
@@ -1473,6 +1548,7 @@ function boot(
       "header_layouttoggle",
       "disable_resolution_rebuild",
       "prefer_quote_short_name",
+      "use_symbol_name_for_header_toolbar",
       "study_templates",
       "items_favoriting",
       "chart_template_storage",
@@ -1497,6 +1573,7 @@ function boot(
     ],
   });
   widget.onChartReady(async () => {
+    globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
     syncCoordinator.refreshCharts();
     barRangeMapping.refreshCharts();
@@ -1536,6 +1613,8 @@ function boot(
           send({type: "error", error: String(e)}));
         alertBridge.attach();
         if (!readonly) {
+          globalThis.MWSeriesPicker?.attach(widget, query => request({op:'searchPage',args:query},'market'),
+            error=>error ? send({type:'error',error:String(error)}) : send({type:'workspace-action',action:'market-data'}));
           const button = widget.createButton(); button.textContent = "创建告警";
           button.setAttribute("title","在当前图表创建告警"); button.addEventListener("click",()=>alertBridge.create());
         }
@@ -1634,7 +1713,7 @@ function boot(
         (error) =>
           send({ type: "error", error: "时间范围同步失败：" + String(error) }),
         async (chart, target) => {
-          if (decode(chart.symbol()).series_kind === "provider") return target;
+          if (decode(chart.symbol()).series_kind !== "managed") return target;
           const symbol = decode(chart.symbol()).symbol;
           if (target.to - target.from > 31 * 86400) return target;
           // An actual observed candle inside the target proves this is not
@@ -1678,6 +1757,9 @@ function boot(
       providerHistoryWork.clear();
       lastHistory.clear();
       firstHistory.clear();
+      fixedHistoryStarts.clear();
+      fixedIndicatorPending.clear();
+      alertCompositeRevisions.clear();
       indicatorHistoryNeeds.clear();
       alertCalculationOrigins.clear();
       managedSessions.clear();
@@ -1830,4 +1912,4 @@ addEventListener("message", async (e) => {
 });
 send({ type: "loaded" });
 
-addEventListener("pagehide", () => {barRangeMapping?.dispose();syncCoordinator?.dispose();}, {once:true});
+addEventListener("pagehide", () => {globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();}, {once:true});

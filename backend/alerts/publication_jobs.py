@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from .chart_data import bounds
-from .domain import Calendar, bucket_bounds
+from .domain import bucket_bounds, calendar_for
 from .storage import ChartPublication, ChartPublicationJob, Instrument, instant, ms
 
 
@@ -20,7 +20,7 @@ def enqueue_publication(db, instrument_id, source, starts):
     if not publications:
         return
     inst = db.get(Instrument, instrument_id)
-    calendar = Calendar(inst.calendar)
+    calendar = calendar_for(inst)
     values = {}
     for pub in publications:
         for start in starts:

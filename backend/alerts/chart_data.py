@@ -6,21 +6,30 @@ from functools import lru_cache
 from sqlalchemy import select
 
 from .calendar_profile import closures_from
-from .domain import NY, Calendar, Candle, scheduled_open, session_bounds
+from .chart_series import is_gold
+from .domain import (
+    NY,
+    Calendar,
+    Candle,
+    calendar_for,
+    calendar_phase,
+    scheduled_open,
+    session_bounds,
+)
 from .storage import Bar, ChartAggregationJob, candle_dict, instant, ms
 
 FRAMES = ("M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN")
 
 
 def bounds(moment, frame, calendar):
-    zone = NY if calendar == Calendar.NY17 else UTC
+    zone = NY if calendar_phase(calendar) == Calendar.NY17 else UTC
     local = moment.astimezone(zone)
     if frame == "M30":
         start, end = session_bounds(moment, calendar)
         left = start + timedelta(minutes=30 * int((moment - start).total_seconds() // 1800))
         return left, min(left + timedelta(minutes=30), end)
     # NY17 daily bars are attributed to their END date; UTC0 to their START date.
-    day = (local + timedelta(hours=7)).date() if calendar == Calendar.NY17 else local.date()
+    day = (local + timedelta(hours=7)).date() if calendar_phase(calendar) == Calendar.NY17 else local.date()
     if frame == "W1":
         first = day - timedelta(days=day.weekday())
         last = first + timedelta(days=7)
@@ -32,7 +41,7 @@ def bounds(moment, frame, calendar):
 
     def boundary(d):
         value = datetime(d.year, d.month, d.day, tzinfo=zone)
-        if calendar == Calendar.NY17:
+        if calendar_phase(calendar) == Calendar.NY17:
             value = value - timedelta(days=1) + timedelta(hours=17)
         return value.astimezone(UTC)
 
@@ -84,7 +93,7 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
             .limit(limit)
         ).all()[::-1]
         return [{**candle_dict(r.candle()), **({"observed_at": r.observed_at or r.received_at} if observed else {})} for r in rows]
-    calendar = Calendar(instrument.calendar)
+    calendar = calendar_for(instrument)
     source = "M15" if frame == "M30" else "D1"
     # Paginate whole target buckets, so a request never cuts a source bucket in half.
     cutoff_end = bounds(instant(before - 1), frame, calendar)[1]
@@ -116,7 +125,7 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
                 probe = cursor
                 while probe < stop:
                     if scheduled_open(
-                        probe, calendar, gold=instrument.id == "XAUUSD", closures=closures
+                        probe, calendar, gold=is_gold(instrument.id), closures=closures
                     ):
                         expected.add(ms(cursor))
                         break
@@ -134,10 +143,11 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
                 complete,
             )
         else:
-            expected = expected_days(left, right, calendar, instrument.id == "XAUUSD", closures)
+            expected = expected_days(left, right, calendar, is_gold(instrument.id), closures)
             complete = bool(expected) and expected <= {r.start for r in members}
             complete = complete and all(r.complete for r in members)
-            if instrument.id == "XAUUSD" and not covers_interval(coverage, ms(left), ms(right)):
+            if (is_gold(instrument.id) and not instrument.id.startswith("MD:")
+                    and not covers_interval(coverage, ms(left), ms(right))):
                 # Gold's daily maintenance is date-generated, not an eternal rule.
                 # Every expected D1 needs explicit coverage of its NY17 maintenance start.
                 maintenance = [c for c in closures if c.kind == "maintenance"]
@@ -179,9 +189,9 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
 def future_grid(instrument, frame, after, count=120):
     """Known calendar coordinates, not synthetic prices or future trading guarantees."""
     return _future_grid(
-        Calendar(instrument.calendar),
+        calendar_for(instrument),
         closures_from(instrument.calendar_profile),
-        instrument.id == "XAUUSD",
+        is_gold(instrument.id),
         frame,
         after,
         count,

@@ -32,7 +32,7 @@ python -m alerts.mcp.credentials list
 python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 ```
 
-`issue` 以独占创建、0600 权限写一次 token 文件，不输出明文。重复路径拒绝覆盖。只读凭据不能调用告警写入；写入须单独给予 `alerts:write`。数据库迁移为 `s20_agent_capabilities`，增加 `agent_credentials`、`agent_operations`。幂等记录保留首个成功操作的结果，同 agent、同工具、同 key 的不同规范化意图返回 `IDEMPOTENCY_CONFLICT`；同 key 跨凭据仍属于同一 agent 的操作。客户端超时后应使用原 key 重试。
+`issue` 以独占创建、0600 权限写一次 token 文件，不输出明文。重复路径拒绝覆盖。只读凭据不能调用告警写入；告警写入须单独给予 `alerts:write`。自建历史维护写入须同时给予 `market:read` 和 `market:write`，现有告警写凭据不自动获得历史维护权限。数据库迁移为 `s20_agent_capabilities`，增加 `agent_credentials`、`agent_operations`。幂等记录保留首个成功操作的结果，同 agent、同工具、同 key 的不同规范化意图返回 `IDEMPOTENCY_CONFLICT`；同 key 跨凭据仍属于同一 agent 的操作。客户端超时后应使用原 key 重试。
 
 ## 能力和数据合同
 
@@ -44,16 +44,29 @@ python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 | `alerts:read` | `alerts_list`、`alerts_get_signals` |
 | `charts:read` | `charts_list_workspaces`、`charts_get_drawings` |
 | `alerts:write` | `alerts_create`、`alerts_cancel`、`notifications_ack` |
+| `market:read` + `market:write` | `history_create_dataset`、`history_configure_maintenance`、`history_control_maintenance`、`history_submit_task`、`history_control_task`、`history_change_aggregation`、`history_request_artifacts`、`history_reclaim_dataset` |
 
 - 行情输入使用基础品种 ID，`series_kind` 明确选择 `managed` 或 `provider`。先发现品种；不能把来源 ID 当成券商可交易映射。管理系列的品种发现沿用网页启用品种目录，平台系列沿用网页市场目录。
 - 价格、OHLC 是十进制字符串，时间为毫秒。报价保留网页的 bid/last trade/M1 close 标签；OANDA/Binance 平台报价首期取有限 M1 数据并明确标为 `M1 close`。Yahoo 使用网页共用的市场报价快照，并返回延迟字段。来源不可用返回错误。
 - `market_open`（已知时）与 `is_stale` 分开表达休市和陈旧。报价年龄不等于交易可用性。平台报价未获得休市状态时不推断市场正在交易。
 - K 线默认 300，最多 2000；批量指标 1–12。`before` 是排他的毫秒游标；`next_before` 可继续分页。`cursor_coordinate` 明确管理系列的 UTC start 与平台系列的 native chart time，日/周/月不可混用。所有 bars 与 indicators 来自 `chart_api.query_chart/data_sync`；网页仍使用同一入口。指标保留完整历史前缀、预热、缺口重置和 null 语义。
 - 返回页面保留原有 coverage、cache revision、history revalidation、原始历史起点等字段。管理系列使用 `history_revision`，平台系列使用 `cache_revision`；未知起点不伪造。`gaps`、`incomplete_count` 和 `coverage_scope=returned_page` 仅描述当前页面；Yahoo 的 exchange calendar 不由 NY17/UTC0 判断，返回 `gap_assessment=unknown_calendar`、原始 `interval_breaks` 和 `quality=calendar_unverified`，不把休市间隔冒称缺失数据。这些字段不承诺完整历史覆盖。原生图表时间坐标和 K 线 UTC 起止时间可能因 D/W/M 标签不同。
-- 管理系列指标历史超过 200000 根时拒绝计算（已发布查询统计 `chart_published_bars`，普通管理查询统计实际源周期 candles），避免截短历史后产生不同数值。Provider 保持项目既有缓存填充、超时和取消策略；不创建持久历史维护订阅。长期历史任务继续使用网页现有维护流程，未自动暴露给 agent。
+- 旧管理系列指标历史超过 200000 根时拒绝计算（已发布查询统计 `chart_published_bars`，普通管理查询统计实际源周期 candles），避免截短历史后产生不同数值。Provider 保持项目既有缓存填充、超时和取消策略；不创建持久历史维护订阅。三层固定历史/组合采用后台完整初始化和检查点；自建维护通过单独授权的八个写工具管理。
 - 默认单请求体 64 KiB、每凭据每分钟 60 次协议请求（包括发现/初始化）、最多 4 个业务调用并行、最多 8 个待处理调用、20 秒调用等待预算。数据库配额跨进程；计算并行额度按 API 进程。同步工作未退出时占用业务 slot，客户端断连设置取消标记。当前部署使用一个 API 进程。
 - 告警及通知使用网页现有一次性模型与规则；不把并行开发的新告警模型当成已集成。signals 只包含网页共用视图的最新 500 条。审计保存 agent、请求 ID、能力名、资源和结果，不保存原始凭据或完整请求正文。
 - 无计划 CRUD、计划表、形态扫描引擎或交易工具。Agent 根据 OHLC、可选指标和画线在对话中分析，区分事实、计算、推断，并征询用户意见。
+
+## 自建历史维护写入
+
+八个维护写工具与网页共用事务命令。创建使用 `dataset`（来源、逻辑品种、准确来源代码、资产类别、精度、日界）和 `maintenance`（历史起点、周期、频率、时区、日更分钟、重叠复查分钟）；当前原始口径为 Bid。外汇/金属默认 NY17，加密默认 UTC0，指数及其他类别需明确日界。历史起点与任务区间为已结束的 UTC 分钟边界。
+
+每次写入必须提供 `idempotency_key`。创建或提交返回固定任务版本，下载在 worker 中进行；管理调用不进行供应商 I/O，也不产生实时需求。暂停计划不暂停已有任务，暂停/取消任务使用 `history_control_task`。归档保留已发布价格；重新配置日更不会替换固定回测或运行组合基线。任务失败不撤掉旧发布。
+
+`history_change_aggregation` 接收 `dataset_id` 和 `aggregation`（`aggregation_calendar`、可选已发布 `version_id`），建立单独日界数据集并复用原始 M1；原版本和价格不改写。M1 版本发布与各周期发布分别检查，`history_request_artifacts` 只接受未回收的已发布父版本。
+
+`history_reclaim_dataset` 是物理回收操作，要求计划已暂停且已归档，并在锁内重查回测、工作区、策略、映射、组合、派生及活动任务引用。存在引用返回错误；可回收时保留身份、清单与回收证据，仍被其他日界或采集缓存引用的分块保留。只读查询的引用报告不是删除授权，也不能替代该事务检查。
+
+实际 Ubuntu 验收见[维护 MCP 报告](verification/three-layer/history-writes-stage.md)。旧原生 MCP 实例说明仍属于其原交付环境，不代表本次三层环境。
 
 ## 已保存画线
 

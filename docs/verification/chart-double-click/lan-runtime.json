@@ -1,0 +1,64 @@
+{
+  "at": "2026-10-07T02:15:41.822560+00:00",
+  "project": "mw-chart-maximize-20261007",
+  "app": "https://192.168.7.232:17443/advanced-charts",
+  "chart": "https://192.168.7.232:17444",
+  "chartDNS": null,
+  "ports": {
+    "443/tcp": [
+      {
+        "HostIp": "127.0.0.1",
+        "HostPort": "17443"
+      },
+      {
+        "HostIp": "192.168.7.232",
+        "HostPort": "17443"
+      }
+    ],
+    "444/tcp": [
+      {
+        "HostIp": "127.0.0.1",
+        "HostPort": "17444"
+      },
+      {
+        "HostIp": "192.168.7.232",
+        "HostPort": "17444"
+      }
+    ],
+    "80/tcp": null
+  },
+  "webImage": {
+    "ref": "market-watch-web:chart-maximize-lan-ip-20261007",
+    "id": "sha256:0b03a9b813198a47a256521a8b2bf60d452dcd23c9b7af78d584f1ebf0232b8c",
+    "labels": {
+      "com.docker.compose.project": "mw-chart-maximize-20261007",
+      "com.docker.compose.service": "web",
+      "com.docker.compose.version": "2.40.3",
+      "io.market-watch.built-at": "2026-10-07T02:13:32.960536+00:00",
+      "io.market-watch.commit": "ba6a041eb7428001adb296d2b511cdd416c6e730",
+      "io.market-watch.dirty": "true",
+      "io.market-watch.expires-at": "2026-10-14T02:13:32.960536+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-chart-maximize-20261007",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-chart-maximize-20261007",
+      "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+    }
+  },
+  "httpsCertificateSANVerified": true,
+  "httpApp": 200,
+  "httpChart": 200,
+  "acceptancePasswordChanged": false,
+  "productionChanged": false,
+  "runningForUserAcceptance": true,
+  "chartResolution": {
+    "method": "direct IP",
+    "externalDNS": false
+  },
+  "tlsConfig": "deploy/chart-maximize-lan-tls.conf",
+  "cookieScope": "/api",
+  "legacyRootCookieCleared": true,
+  "chartAPIRoutesHTTP": 404,
+  "chartCredentialLeaks": [],
+  "logoutSessionHTTP": 401
+}

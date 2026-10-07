@@ -1,0 +1,40 @@
+# Complete chart acceptance on the same isolated Ubuntu project and database.
+# Read-only provider credentials belong in the restricted api.env, never here.
+x-worker: &worker
+  image: market-watch-api:chart-maximize-v1121-20261007
+  env_file:
+    - path: /tmp/mw-chart-maximize-20261007/api.env
+      format: raw
+  environment:
+    ALERTS_DELIVERY_ENABLED: "false"
+  mem_limit: 512m
+  cpus: 1
+  depends_on:
+    live-seed: {condition: service_completed_successfully}
+    api: {condition: service_healthy}
+services:
+  live-seed:
+    image: market-watch-api:chart-maximize-v1121-20261007
+    command: [python, /fixtures/live.py]
+    env_file:
+      - path: /tmp/mw-chart-maximize-20261007/api.env
+        format: raw
+    volumes:
+      - ./scripts/configure_chart_maximize_live.py:/fixtures/live.py:ro
+    depends_on:
+      seed: {condition: service_completed_successfully}
+  api:
+    depends_on:
+      live-seed: {condition: service_completed_successfully}
+  realtime-worker:
+    <<: *worker
+    command: [python, -m, alerts.realtime_worker]
+  chart-history-worker:
+    <<: *worker
+    command: [python, -m, alerts.chart_history_worker]
+  chart-aggregation-worker:
+    <<: *worker
+    command: [python, -m, alerts.chart_aggregation_worker]
+  native-history-worker:
+    <<: *worker
+    command: [python, -m, alerts.native_history_loads]

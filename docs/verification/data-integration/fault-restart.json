@@ -1,0 +1,31 @@
+{
+  "fault": "worker_restart",
+  "duration_seconds": 0,
+  "started_at": 1791252111856,
+  "before": [
+    {
+      "symbol": "EURUSD",
+      "epoch": 4,
+      "confirmed_end": 1791252060000
+    },
+    {
+      "symbol": "XAUUSD",
+      "epoch": 4,
+      "confirmed_end": 1791252060000
+    }
+  ],
+  "recovery_seconds": 36.633,
+  "after": [
+    {
+      "symbol": "EURUSD",
+      "epoch": 6,
+      "confirmed_end": 1791252120000
+    },
+    {
+      "symbol": "XAUUSD",
+      "epoch": 6,
+      "confirmed_end": 1791252120000
+    }
+  ],
+  "within_60s": true
+}

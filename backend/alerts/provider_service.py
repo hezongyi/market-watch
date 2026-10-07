@@ -657,9 +657,11 @@ def start():
 
     def alerts():
         from .chart_alert_worker import step
+        from .composite_watches import step as watch_step
         while not _STOP.is_set():
             try:
                 step()
+                watch_step()
             except Exception:
                 log.exception("Chart alert monitor iteration failed")
             _STOP.wait(1)

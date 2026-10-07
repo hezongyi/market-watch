@@ -86,7 +86,7 @@ def identity(meta, frame):
     environment = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
         if meta["source"] == "oanda"
-        else "yahoo-anonymous" if meta["source"] == "yahoo" else "binance-public"
+        else "yahoo-anonymous" if meta["source"] == "yahoo" else meta["source"] + "-public"
     )
     return hashlib.sha256(
         json.dumps(
@@ -119,6 +119,10 @@ def ensure(meta, frame):
     if frame not in frames(meta["source"]):
         raise ValueError("此源不支持该原生周期")
     key = identity(meta, frame)
+    stored_meta = meta
+    if meta["source"] == "oanda":
+        from .native_series import parameters, source_identity
+        stored_meta = {**meta, "native_period_identity": source_identity(meta, parameters(meta), timeframe=frame).model_dump()}
     with budget_transaction() as db:
         insert = pg_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
         db.execute(
@@ -128,7 +132,7 @@ def ensure(meta, frame):
                 source=meta["source"],
                 symbol=meta["symbol"],
                 timeframe=frame,
-                metadata_json=meta,
+                metadata_json=stored_meta,
                 coverage=[],
                 earliest=False,
                 revision=0,
@@ -216,8 +220,9 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
         yield db, {
             **volume_metadata(metadata.source, metadata.symbol),
             **({k: metadata.metadata_json.get(k) for k in
-                ("source", "symbol", "adjustment", "price_description", "volume_kind", "volume_unit")}
-               if metadata.source == "yahoo" else {}),
+                ("source", "symbol", "adjustment", "price_description", "volume_kind", "volume_unit",
+                 "completion_basis", "session_verified")}
+               if metadata.source in ("yahoo", "dukascopy") else {}),
             "window_limit": window_limit, "history_window": window or None,
             "availability": "window_limit" if window_limit else "available",
             "bars": rows if planning else rows[-count:],
@@ -711,6 +716,9 @@ def data(body):
         if body.timeframe not in upstream.FRAMES:
             raise ValueError("无效平台周期")
         page = _observed_read(meta, body.timeframe, 0, lambda: _reserve_read(meta, body, before))
+        if meta["source"] == "oanda":
+            from .native_series import parameters
+            page["native_parameters"] = parameters(meta)
         return {k: v for k, v in page.items() if k not in ('interval', 'preceding', 'satisfied')}
     count = body.count_back or body.limit
     latest = body.before is None or body.first_data_request and body.before >= now - 120000
@@ -735,6 +743,9 @@ def data(body):
     callback = activate_ready if body.client else None
     page = (native_read(meta, body, before, count, extra, latest, on_ready=callback) if native else
             read(meta, body.timeframe, before, count + extra, latest=latest, on_ready=callback))
+    if meta["source"] == "oanda":
+        from .native_series import parameters
+        page["native_parameters"] = parameters(meta)
     page["timings_ms"] = {**page.get("timings_ms", {}), "metadata":round(metadata_ms,2)}
     output_count = page.get("mandatory_count", count)
     visible = page["bars"] if native and not body.indicators else page["bars"][-output_count:]
@@ -770,7 +781,7 @@ def data(body):
         for k, v in {
             **page,
             "bars": visible,
-            "history_dependency_first": upstream.label(prefix[0]["start"], body.timeframe, meta["calendar"]) if prefix else before,
+            "history_dependency_first": prefix[0].get("chart_time", prefix[0]["start"]) if prefix else before,
             "calculation_origin": body.calculation_origin if body.calculation_origin is not None else prefix[0]["start"] if prefix else None,
             "indicators": indicators,
             "has_more": len(page["bars"]) > len(visible) or page["has_more"],
