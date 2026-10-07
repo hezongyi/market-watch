@@ -384,8 +384,12 @@ def finish(docker, task):
     print(json.dumps({"task": task, "completed_at": record["completed_at"]}))
 
 
-def cleanup(docker, task=None, apply=False, automatic=False):
-    plan = candidates(docker.images(), docker.containers(), task_records(), task, automatic)
+def cleanup(docker, task=None, apply=False, automatic=False, retained_images=()):
+    records = task_records()
+    protected = set(retained_images) | {image for record in records.values()
+                                       for image in record.get('retained_images', [])}
+    plan = [row for row in candidates(docker.images(), docker.containers(), records, task, automatic)
+            if row['id'] not in protected]
     print(json.dumps({"apply": apply, "automatic": automatic, "images": plan}, indent=2))
     outcomes = []
     if apply:
@@ -430,6 +434,12 @@ def project_inventory(docker, project):
 
 
 def retirement_postgres(container):
+    reference = container["Config"]["Image"]
+    service = (container["Config"].get("Labels") or {}).get("com.docker.compose.service")
+    # A fixed local ID is only a candidate here. The actual inspected image
+    # still has to prove the reviewed official RepoDigest before any mutation.
+    if re.fullmatch(r"sha256:[a-f0-9]{64}", reference):
+        return reference == container["Image"] and service in ("postgres", "pg")
     return bool(
         re.fullmatch(
             r"(?:docker.io/library/)?postgres:14(?:-bookworm)?(?:@sha256:[a-f0-9]{64})?",
@@ -438,7 +448,7 @@ def retirement_postgres(container):
     )
 
 
-def validate_retirement_image(task, project, container, image):
+def validate_retirement_image(task, project, container, image, retained_images=()):
     if image["Id"] != container["Image"]:
         raise ValueError("Inspected image ID does not match the container's actual image")
     labels = image["Config"].get("Labels") or {}
@@ -457,6 +467,18 @@ def validate_retirement_image(task, project, container, image):
             raise ValueError("Shared TLS image must not have task/release ownership labels")
         if trusted in image.get("RepoDigests", []):
             return
+    if image["Id"] in retained_images:
+        if container["Config"]["Image"] != image["Id"]:
+            raise ValueError("Retained dependency must use its exact full image ID")
+        ownership = {k: v for k, v in labels.items() if k.startswith(PREFIX)}
+        if ownership:
+            if labels.get(PREFIX + "purpose") not in ("development", "acceptance") or not all(
+                labels.get(PREFIX + key) for key in ("task", "project", "managed")
+            ) or labels.get(PREFIX + "managed") != "true":
+                raise ValueError("Retained dependency has incomplete, release or rollback ownership")
+            if "production" in labels[PREFIX + "project"]:
+                raise ValueError("Production dependencies cannot use retirement exceptions")
+        return  # Explicit container-only retirement; this image stays protected.
     expected = {"managed": "true", "task": task, "project": project, "purpose": "acceptance"}
     if any(labels.get(PREFIX + key) != value for key, value in expected.items()):
         raise ValueError("Container image does not belong to the registered acceptance task")
@@ -527,14 +549,29 @@ def table_counts(docker, container, user, database):
         container,
         user,
         database,
-        "SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename",
+        "SELECT json_build_array(schemaname, tablename)::text FROM pg_tables "
+        "WHERE schemaname NOT IN ('pg_catalog', 'information_schema') "
+        "AND schemaname NOT LIKE 'pg_toast%' ORDER BY schemaname, tablename",
     )
     result = {}
-    for t in tables.splitlines():
-        quoted = '"' + t.replace('"', '""') + '"'
-        result[t] = int(
-            pg(docker, container, user, database, "SELECT count(*) FROM public." + quoted)
+    for line in tables.splitlines():
+        schema, table = json.loads(line)
+        qualified = '.'.join('"' + part.replace('"', '""') + '"' for part in (schema, table))
+        result[qualified] = int(
+            pg(docker, container, user, database, "SELECT count(*) FROM " + qualified)
         )
+    return result
+
+
+def table_fingerprints(docker, container, user, database, tables):
+    """Compare restored row content, including custom schemas and duplicates."""
+    result = {}
+    for qualified in tables:
+        content = docker.run('exec', container, 'psql', '-U', user, '-d', database,
+            '-q', '-v', 'ON_ERROR_STOP=1', '-c',
+            'COPY (SELECT row_to_json(t)::text AS row FROM ' + qualified +
+            ' AS t ORDER BY row_to_json(t)::text COLLATE "C") TO STDOUT').stdout
+        result[qualified] = hashlib.sha256(content).hexdigest()
     return result
 
 
@@ -570,15 +607,20 @@ def private_configs(dest, cs):
 def retire(docker, args):
     project = valid_name(args.project)
     task = valid_name(args.task)
+    retained_images = set(args.retain_image)
+    if any(not re.fullmatch(r"sha256:[a-f0-9]{64}", value) for value in retained_images):
+        raise ValueError("Retained dependencies require full sha256 image IDs")
     record = read(task_path(task))
     if not record or record["project"] != project or record["purpose"] != "acceptance":
         raise ValueError("Only registered acceptance tasks with matching project can retire")
     if not project.startswith(("mw-", "market-watch-")) or "production" in project:
         raise ValueError("Expected an isolated Market Watch acceptance project")
     cs, vs, ns = project_inventory(docker, project)
+    if retained_images - {c['Image'] for c in cs}:
+        raise ValueError("Retained dependency is not used by this exact project")
     validate_retirement(project, cs, vs, docker.containers())
     for c in cs:
-        validate_retirement_image(task, project, c, docker.json("image", "inspect", c["Image"])[0])
+        validate_retirement_image(task, project, c, docker.json("image", "inspect", c["Image"])[0], retained_images)
     print(
         json.dumps(
             {
@@ -588,6 +630,7 @@ def retire(docker, args):
                 "containers": [c["Name"].lstrip("/") for c in cs],
                 "volumes": [v["Name"] for v in vs],
                 "networks": ns,
+                "retained_images": sorted(retained_images),
             },
             indent=2,
         )
@@ -650,6 +693,7 @@ def retire(docker, args):
             for db in databases.splitlines():
                 name = hashlib.sha256((c["Id"] + db).encode()).hexdigest()[:16] + ".dump"
                 original = table_counts(docker, c["Id"], user, db)
+                original_fingerprints = table_fingerprints(docker, c["Id"], user, db, original)
                 dump = docker.run(
                     "exec",
                     c["Id"],
@@ -688,8 +732,12 @@ def retire(docker, args):
                     )
                     if table_counts(docker, c["Id"], user, verify) != original:
                         raise ValueError("Actual restore row counts differ")
+                    if table_fingerprints(docker, c["Id"], user, verify, original) != original_fingerprints:
+                        raise ValueError("Actual restore row content differs")
                     if table_counts(docker, c["Id"], user, db) != original:
                         raise ValueError("Source database changed during archive")
+                    if table_fingerprints(docker, c["Id"], user, db, original) != original_fingerprints:
+                        raise ValueError("Source row content changed during archive")
                 finally:
                     pg(docker, c["Id"], user, "postgres", 'DROP DATABASE "' + verify + '"')
                 backups.append(
@@ -699,6 +747,7 @@ def retire(docker, args):
                         "file": name,
                         "sha256": hashlib.sha256(dump).hexdigest(),
                         "tables": original,
+                        "table_fingerprints": original_fingerprints,
                         "actual_restore_verified": True,
                     }
                 )
@@ -714,6 +763,9 @@ def retire(docker, args):
         ):
             raise ValueError("Project changed while archiving")
         validate_retirement(project, fresh_cs, fresh_vs, docker.containers())
+        for c in fresh_cs:
+            validate_retirement_image(task, project, c,
+                docker.json("image", "inspect", c["Image"])[0], retained_images)
         for v in vs:
             if not any(v["Name"] in b["volume_names"] for b in backups):
                 raise ValueError("Volume has no verified restore")
@@ -744,10 +796,14 @@ def retire(docker, args):
                 "volumes": [v["Name"] for v in vs],
                 "networks": ns,
                 "verified_backups": backups,
+                "retained_images": sorted(retained_images),
             },
         )
         finish(docker, task)
-        cleanup(docker, task=task, apply=True)
+        completed = read(task_path(task))
+        completed['retained_images'] = sorted(retained_images)
+        save(task_path(task), completed)
+        cleanup(docker, task=task, apply=True, retained_images=retained_images)
         print(json.dumps({"archive": str(dest), "restore_verified": True}))
     except Exception:
         if not removed:
@@ -898,6 +954,8 @@ def parser():
     s.add_argument("--task", required=True)
     s.add_argument("--apply", action="store_true")
     s.add_argument("--archive-root", default=str(STATE / "archives"))
+    s.add_argument("--retain-image", action="append", default=[],
+                   help="Explicit full-ID dependency: remove only own containers, preserve image")
     s = sub.add_parser("monitor")
     s.add_argument("--detail", action="store_true")
     s.add_argument("--threshold-gib", type=int, default=20)

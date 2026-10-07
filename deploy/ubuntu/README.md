@@ -51,7 +51,7 @@ mw-docker retire --task mw-issue42 --project mw-issue42
 mw-docker retire --task mw-issue42 --project mw-issue42 --apply
 ```
 
-只支持由本工具登记、镜像归属匹配的acceptance项目，以及单个本项目拥有的PG14数据volume。数据库支持 `postgres:14-bookworm` / `postgres:14` 引用及其 `docker.io/library/` 别名，但必须核对容器实际镜像 ID，以及已审查的官方 RepoDigest `postgres@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`；仅有 tag 或来自其他仓库的同名 digest 不足以通过。Compose service 可叫 `pg`，不依赖必须命名 `postgres`。TLS service 使用共享的 `nginx:1.28-alpine` 时，也必须核对固定官方 manifest digest 和容器实际镜像 ID。PG/TLS 共享基础镜像不得带 `io.market-watch.*` 任务或发布归属标签；仅移除本项目容器，共享基础镜像保留。基础镜像更新后，未知 digest 会拒绝退役，需审查并更新允许的 digest 后重试。应用镜像仍要求 managed、task、project、acceptance 用途全部匹配；所有镜像检查读取容器实际 ID，不信任可变 tag。归档私有inspect、配置和bind材料，停止应用写入，导出所有非template库及全局角色；在该Ubuntu PG上新建临时库实际恢复，核对所有public表行数和来源稳定性。成功后重新核对容器、卷、网络和其他引用，删除明确资源，再登记task完成和删除无引用任务镜像。
+只支持由本工具登记、镜像归属匹配的acceptance项目，以及单个本项目拥有的PG14数据volume。数据库支持 `postgres:14-bookworm` / `postgres:14` 引用及其 `docker.io/library/` 别名，但必须核对容器实际镜像 ID，以及已审查的官方 RepoDigest `postgres@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`；仅有 tag 或来自其他仓库的同名 digest 不足以通过。Compose service 可叫 `pg`，不依赖必须命名 `postgres`。TLS service 使用共享的 `nginx:1.28-alpine` 时，也必须核对固定官方 manifest digest 和容器实际镜像 ID。PG/TLS 共享基础镜像不得带 `io.market-watch.*` 任务或发布归属标签；仅移除本项目容器，共享基础镜像保留。基础镜像更新后，未知 digest 会拒绝退役，需审查并更新允许的 digest 后重试。应用镜像仍要求 managed、task、project、acceptance 用途全部匹配；所有镜像检查读取容器实际 ID，不信任可变 tag。归档私有inspect、配置和bind材料，停止应用写入，导出所有非template库及全局角色；在该Ubuntu PG上新建临时库实际恢复，核对所有public表行数和来源稳定性。恢复检查覆盖所有非系统schema的表行数及排序后JSON内容SHA256，来源库也再次核对，避免同数异内容或独立故障schema漏验。成功后重新核对容器、卷、网络和其他引用，删除明确资源，再登记task完成和删除无引用任务镜像。
 
 共享卷、外部卷、非PG卷、bind数据库和外部数据库需要单独审查，不自动删除。验证失败保留卷；删除容器前失败会尝试重启原先运行的容器。归档位于`~/.local/share/market-watch-docker/archives/`，权限0700；包含角色凭据及env，严禁提交仓库。
 
@@ -113,3 +113,5 @@ systemctl --user disable --now market-watch-disk-check.timer \
 ```
 
 保留镜像以及数据观察、性能基线等并行任务；大规模构建/清理会影响CPU/I/O，性能测量必须记录这个环境变化。
+
+固定镜像ID验收：PG服务支持完整`sha256:…`引用，仍必须通过实际镜像ID、官方PG14 RepoDigest及无任务/发布标签检查。跨任务依赖可显式重复提供`--retain-image sha256:完整ID`，仅删除当前project所属容器，保留所列镜像并在完成台账中永久记录自动回收保护；实际引用必须是完整ID，release/rollback/production或不完整归属标签拒绝使用此例外。未列出的应用镜像仍要求本task/project验收归属。先预览再apply，apply前必须仅启动本project PG以便实际恢复验证。
