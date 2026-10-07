@@ -7,7 +7,7 @@ from pathlib import Path
 from sqlalchemy import select
 
 from .calendar_profile import closures_from, normalized_profile
-from .domain import Calendar, bucket_bounds
+from .domain import bucket_bounds, calendar_for
 from .storage import (
     Audit,
     Bar,
@@ -29,6 +29,12 @@ def apply_profile(db, instrument_id, data, *, apply=False):
     )
     if not instrument:
         raise ValueError("Unknown instrument")
+    from .storage import MarketDataset
+
+    if db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == instrument_id)):
+        raise ValueError("Explicit datasets require a new calendar identity; existing profiles cannot be changed")
+    if profile.get("source_session"):
+        raise ValueError("Source/account session rules require an explicit dataset registration")
     old = instrument.calendar_profile or {}
     if profile == old:
         return {"changed": False, "revision": profile["revision"]}
@@ -66,9 +72,9 @@ def apply_profile(db, instrument_id, data, *, apply=False):
                 )
             ).all()
         )
-        start = ms(bucket_bounds(instant(left), "D1", Calendar(instrument.calendar))[0])
+        start = ms(bucket_bounds(instant(left), "D1", calendar_for(instrument))[0])
         end = min(
-            ms(bucket_bounds(instant(right - 1), "D1", Calendar(instrument.calendar))[1]),
+            ms(bucket_bounds(instant(right - 1), "D1", calendar_for(instrument))[1]),
             (now_ms() - 5000) // 60000 * 60000,
         )
         if start < end:

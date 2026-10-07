@@ -1,0 +1,1893 @@
+{
+  "observed_at": 1791253366539,
+  "host": "Ubuntu local isolated Docker",
+  "project": "market-watch-data-integration",
+  "live": [
+    {
+      "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "instrument_id": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "logical_symbol": "XAUUSD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "XAU_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      },
+      "revision": 2976,
+      "quote": {
+        "identity": {
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+          "provider_symbol": "XAU_USD",
+          "basis": "bid",
+          "calendar_version": "ny17-candidate-v1"
+        },
+        "bid": "4128.385",
+        "ask": "4128.615",
+        "source_time": 1791253366031,
+        "received_at": 1791253366177,
+        "tradeable": true,
+        "connection_epoch": 20,
+        "sequence": 72
+      },
+      "forming": {
+        "start": 1791253320000,
+        "end": 1791253380000,
+        "open": "4128.425",
+        "high": "4128.645",
+        "low": "4126.935",
+        "close": "4128.385",
+        "complete": false,
+        "volume": null,
+        "volume_kind": "unavailable",
+        "observation_complete": false,
+        "connection_epoch": 20,
+        "source": "oanda"
+      },
+      "quality": "healthy",
+      "connection": "connected",
+      "connection_epoch": 20,
+      "heartbeat_at": 1791253361357,
+      "last_confirmed_m1": 1791253320000,
+      "recovery_ready": true,
+      "error": null,
+      "calendar_verified": false,
+      "fallback_ready": false,
+      "selection_epoch": 20,
+      "received_at": 1791253366177,
+      "quote_age_ms": 161,
+      "quote_ready": true,
+      "candle_ready": true,
+      "precision": 3,
+      "alert_readiness": []
+    },
+    {
+      "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "instrument_id": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "logical_symbol": "EURUSD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      },
+      "revision": 1183,
+      "quote": {
+        "identity": {
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "calendar_version": "ny17-candidate-v1"
+        },
+        "bid": "1.12154",
+        "ask": "1.12164",
+        "source_time": 1791253365264,
+        "received_at": 1791253365561,
+        "tradeable": true,
+        "connection_epoch": 20,
+        "sequence": 70
+      },
+      "forming": {
+        "start": 1791253320000,
+        "end": 1791253380000,
+        "open": "1.12151",
+        "high": "1.12154",
+        "low": "1.12151",
+        "close": "1.12154",
+        "complete": false,
+        "volume": null,
+        "volume_kind": "unavailable",
+        "observation_complete": false,
+        "connection_epoch": 20,
+        "source": "oanda"
+      },
+      "quality": "healthy",
+      "connection": "connected",
+      "connection_epoch": 20,
+      "heartbeat_at": 1791253361357,
+      "last_confirmed_m1": 1791253320000,
+      "recovery_ready": true,
+      "error": null,
+      "calendar_verified": false,
+      "fallback_ready": false,
+      "selection_epoch": 20,
+      "received_at": 1791253365561,
+      "quote_age_ms": 928,
+      "quote_ready": true,
+      "candle_ready": true,
+      "precision": 5,
+      "alert_readiness": []
+    }
+  ],
+  "measurement_since": 0,
+  "measurements": [
+    {
+      "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "expected": 31,
+      "unknown": 64,
+      "not_tradeable": 0,
+      "confirmed": 31,
+      "missing": 0,
+      "late_over_30s": 5,
+      "failed_attempts": 0,
+      "recovery_confirmed": 1435,
+      "p95_ms": 52866,
+      "p99_ms": 79494,
+      "quotes": {
+        "samples": 2526,
+        "p50_age_ms": 250,
+        "p95_age_ms": 440,
+        "p99_age_ms": 660,
+        "max_interarrival_ms": 7815,
+        "histogram_resolution_ms": 10,
+        "clock_offset_verified": false
+      },
+      "meaning": "Live missing/late/failure denominators; historical recovery and unknown sessions are separate"
+    },
+    {
+      "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "expected": 31,
+      "unknown": 9,
+      "not_tradeable": 0,
+      "confirmed": 31,
+      "missing": 0,
+      "late_over_30s": 6,
+      "failed_attempts": 0,
+      "recovery_confirmed": 1490,
+      "p95_ms": 53532,
+      "p99_ms": 80044,
+      "quotes": {
+        "samples": 733,
+        "p50_age_ms": 290,
+        "p95_age_ms": 550,
+        "p99_age_ms": 1370,
+        "max_interarrival_ms": 24082,
+        "histogram_resolution_ms": 10,
+        "clock_offset_verified": false
+      },
+      "meaning": "Live missing/late/failure denominators; historical recovery and unknown sessions are separate"
+    }
+  ],
+  "history_versions": [
+    {
+      "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+      "dataset_id": "a7da737a76d6e21dd242e74f8468a0d74d0cdb5acd9e3708e01f6053765b0ebd",
+      "start": 1475712000000,
+      "end": 1791244800000,
+      "cursor": 1555936800000,
+      "status": "pending",
+      "error": null,
+      "attempts": 0,
+      "next_at": 1791253363645,
+      "manifest": {}
+    },
+    {
+      "id": "1671ad4f-5c22-46f2-b739-6173d5867ce5",
+      "dataset_id": "a53157b5df6ad178d83a163e9d3469236a4253e303eb0cd58bd98809ce752e30",
+      "start": 1791162000000,
+      "end": 1791165600000,
+      "cursor": 1791165600000,
+      "status": "published",
+      "error": null,
+      "attempts": 0,
+      "next_at": 0,
+      "manifest": {
+        "dataset_version": "1671ad4f-5c22-46f2-b739-6173d5867ce5",
+        "identity": {
+          "source": "dukascopy",
+          "channel": "python",
+          "environment": "historical",
+          "account_scope": "public",
+          "provider_symbol": "EUR/USD",
+          "basis": "bid",
+          "calendar_version": "ny17-candidate-v1"
+        },
+        "start": 1791162000000,
+        "end": 1791165600000,
+        "volume_kind": "quantity",
+        "volume_unit": "source_quantity",
+        "rows": 60,
+        "unknown_minutes": 0,
+        "coverage": "observed_only; unobserved intervals remain unknown",
+        "checksum": "9d5e4d8ff0a4d059d26bdba738231b899eac58c6126964c12bd431abdcb57459",
+        "chunks": [
+          {
+            "id": "5213af55-5cf0-450a-9d8b-031bff316135",
+            "start": 1791162000000,
+            "end": 1791165600000,
+            "count": 60,
+            "checksum": "5aeca6b23572c056ab6a396e49ae1bddb24c4acf4af34b3c4051923970d18478"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+      "dataset_id": "a53157b5df6ad178d83a163e9d3469236a4253e303eb0cd58bd98809ce752e30",
+      "start": 1475712000000,
+      "end": 1791244800000,
+      "cursor": 1567296000000,
+      "status": "pending",
+      "error": null,
+      "attempts": 0,
+      "next_at": 1791253365475,
+      "manifest": {}
+    },
+    {
+      "id": "844fb514-ed13-4258-8f1c-cab43f55c06b",
+      "dataset_id": "a7da737a76d6e21dd242e74f8468a0d74d0cdb5acd9e3708e01f6053765b0ebd",
+      "start": 1791162000000,
+      "end": 1791165600000,
+      "cursor": 1791165600000,
+      "status": "published",
+      "error": null,
+      "attempts": 0,
+      "next_at": 0,
+      "manifest": {
+        "dataset_version": "844fb514-ed13-4258-8f1c-cab43f55c06b",
+        "identity": {
+          "source": "dukascopy",
+          "channel": "python",
+          "environment": "historical",
+          "account_scope": "public",
+          "provider_symbol": "XAU/USD",
+          "basis": "bid",
+          "calendar_version": "ny17-candidate-v1"
+        },
+        "start": 1791162000000,
+        "end": 1791165600000,
+        "volume_kind": "quantity",
+        "volume_unit": "source_quantity",
+        "rows": 60,
+        "unknown_minutes": 0,
+        "coverage": "observed_only; unobserved intervals remain unknown",
+        "checksum": "5b03632f646c8e15e34b68651e4771639b9abc0124cc9efecb1dac005c61d818",
+        "chunks": [
+          {
+            "id": "75edd2ee-6b8f-43c0-83c2-c58f9ca41b70",
+            "start": 1791162000000,
+            "end": 1791165600000,
+            "count": 60,
+            "checksum": "b1b9f03e48c26e1da13cc858c50dec3e495c9d955676c94b3115dec2727f5566"
+          }
+        ]
+      }
+    }
+  ],
+  "datasets": [
+    {
+      "id": "7f4ebc7e8d77829bbc1e0d648f71c38e42556c16b5b8e7b82232673e80210e97",
+      "instrument": "MD:7f4ebc7e8d77829bbc1e0d648:TRYJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "TRY_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "b386d81e49dc6996a9e42eb13edb8f824e35c42796e32fdc88cd1f18b3d1dadc",
+      "instrument": "MD:b386d81e49dc6996a9e42eb13:CHFJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "CHF_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "ac74dc55af20fcc89e4013bdb3afb1d00d40dd371987d751f4c52eb6e24d3468",
+      "instrument": "MD:ac74dc55af20fcc89e4013bdb:NZDSGD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "NZD_SGD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "b2f914dbfc0c056ef69f8dd67f87bb6c7cf6f043a5bb8ce559ee28055b4fa450",
+      "instrument": "MD:b2f914dbfc0c056ef69f8dd67:GBPNZD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_NZD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "f1db384bc994a77797701276163fb78ccafdc4b18f0929542a4f2f3d45635114",
+      "instrument": "MD:f1db384bc994a777977012761:USDMXN",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_MXN",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "48f368cd34ffe7fe6632bd871ee1bf3d4c785a1d411503a3f004cc3a16ffe9fa",
+      "instrument": "MD:48f368cd34ffe7fe6632bd871:GBPUSD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "9e2e25a005d3b5b00c389cb2217971d06cddd482d8ebc047f60e405ad11613f5",
+      "instrument": "MD:9e2e25a005d3b5b00c389cb22:AUDCAD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "AUD_CAD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "fae419493e9e459301a68ac28fcf6b70e1d7865060a0e3f1a332faed19fb707c",
+      "instrument": "MD:fae419493e9e459301a68ac28:EURPLN",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_PLN",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "e540796076c9ceb62b984eed049637fd2c32bf9a39cf70474f2ec6cc40c3055d",
+      "instrument": "MD:e540796076c9ceb62b984eed0:GBPPLN",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_PLN",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "58926637cf6c0f741325a53e740776704761e2205eec83601656493c312124c3",
+      "instrument": "MD:58926637cf6c0f741325a53e7:ZARJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "ZAR_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "5b9998f9442808e9e3ef51dbb318b2ebf9911bfae934245a98070a9b1fbc61f1",
+      "instrument": "MD:5b9998f9442808e9e3ef51dbb:AUDUSD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "AUD_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "0cae317f66900b69c45354f61ea1ce3eb9996ee72b1c84793baf9aa9873b8ab4",
+      "instrument": "MD:0cae317f66900b69c45354f61:NZDJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "NZD_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "1e8f309c989031c0bf306ade95a514a6686a9b6ca1f183710a0306c161e5c9c8",
+      "instrument": "MD:1e8f309c989031c0bf306ade9:GBPCAD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_CAD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "ed79f3841b995882b543dfe871927ab47cdbf457e1159a8749f7e75841891958",
+      "instrument": "MD:ed79f3841b995882b543dfe87:GBPZAR",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_ZAR",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "e7f1a264a58dc3f5d9c85f404d9806dc7446a86a8f184ff058b305ef945418dd",
+      "instrument": "MD:e7f1a264a58dc3f5d9c85f404:SGDJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "SGD_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "2d35563c8a5dcc26a1f55a8a426e4b0748840e8d7f08e80ba5f59310442e60c9",
+      "instrument": "MD:2d35563c8a5dcc26a1f55a8a4:USDJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "784a8cbba21effb1edaf52016cc4a2d0d0143f194345289abd7f2a818b7ba176",
+      "instrument": "MD:784a8cbba21effb1edaf52016:EURTRY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_TRY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "bc33b5fb673dd868fbdedfe3a86c7e80174bdad91da96a20e804fadcfe52e716",
+      "instrument": "MD:bc33b5fb673dd868fbdedfe3a:USDNOK",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_NOK",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "e68295232055716f486750f25f617a61478f014bbd9242c7764f7ed0b278e2c4",
+      "instrument": "MD:e68295232055716f486750f25:EURJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "e842d06b265072505e9e4b0e0f784f1ca5913128742bb73071c4409d810bb157",
+      "instrument": "MD:e842d06b265072505e9e4b0e0:AUDSGD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "AUD_SGD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "0cbc39aa261f14eef58b53a0f755d9a9236c1a82a490c73d691b28951bd2acb1",
+      "instrument": "MD:0cbc39aa261f14eef58b53a0f:EURNZD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_NZD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "f1f3b8df81895b57653bcd575ee3af1befef88afd1cd1822d67fee86cac11304",
+      "instrument": "MD:f1f3b8df81895b57653bcd575:GBPHKD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_HKD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "88c1c73d56d620aa2ef14a901dcba39d8199f890187dadb88238d73b14f27ecd",
+      "instrument": "MD:88c1c73d56d620aa2ef14a901:EURHKD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_HKD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "b6487f56b97265a8baacc63221e59828c99838e28b08d24237974b47f05764df",
+      "instrument": "MD:b6487f56b97265a8baacc6322:USDTHB",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_THB",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "34ccf11c98f3834a4f972fa7052947e62ddfbf1e0f9dcba9bc25a8b145993b7b",
+      "instrument": "MD:34ccf11c98f3834a4f972fa70:GBPCHF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_CHF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "df5bef90d00654294e5bcaa8b19bd59194294287ecc7cc0137bb3352ffeb69a1",
+      "instrument": "MD:df5bef90d00654294e5bcaa8b:AUDCHF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "AUD_CHF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "06ad2e89918aa5bb8b2caff177040ec558e677e5105fd8402eb893b0fb920489",
+      "instrument": "MD:06ad2e89918aa5bb8b2caff17:NZDCHF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "NZD_CHF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "875c7942d1e6f6a54c63aa6ffd41ef5fd8ab37aa95a6251b1c7021dac22d5330",
+      "instrument": "MD:875c7942d1e6f6a54c63aa6ff:AUDHKD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "AUD_HKD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "5b4e85672a128b6d5ab12478f9e9f176bdea5f33940939e9341bebab0a346507",
+      "instrument": "MD:5b4e85672a128b6d5ab12478f:USDCHF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_CHF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "4bd89ca450a1108828a7e152f6baf9732a5ea8884c61b31fcdf7af307b1b1dec",
+      "instrument": "MD:4bd89ca450a1108828a7e152f:CADHKD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "CAD_HKD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "a012b760a339dc53bf9ff67c64c8b53d3ee4ac4638477893b44e97c1da087d71",
+      "instrument": "MD:a012b760a339dc53bf9ff67c6:USDHKD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_HKD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "9bf5aecdfc9ff0a88ceef8e77be8f70fb68a15cd5d1efc41e811cd2ee4317a61",
+      "instrument": "MD:9bf5aecdfc9ff0a88ceef8e77:CHFHKD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "CHF_HKD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "f4a073f810ad9fe46de9269ba4de16032f5b061c9a90543773514d61f3dc675c",
+      "instrument": "MD:f4a073f810ad9fe46de9269ba:NZDUSD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "NZD_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "596cd0613939cd09e31df7bb79f44c36380127271de659d39bb8a4555f9379b8",
+      "instrument": "MD:596cd0613939cd09e31df7bb7:EURSGD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_SGD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "593b90aaad0dac85096f7013705af255e5c175ed910a17167ae0ccdaf13c354b",
+      "instrument": "MD:593b90aaad0dac85096f70137:GBPAUD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_AUD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "cc65a44441aa4e19e87fcf0de56755ede19fc71cee0df03643e23bef619ed138",
+      "instrument": "MD:cc65a44441aa4e19e87fcf0de:USDPLN",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_PLN",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "85c8821aa7a6ec942a51b4d8b09c81d97e71911e71b6236469a1ab1e4c592546",
+      "instrument": "MD:85c8821aa7a6ec942a51b4d8b:USDCNH",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_CNH",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "a94cce3114a25e511d7eba20f47fa1c0a818ab52a8d86254d8b42f95ac312424",
+      "instrument": "MD:a94cce3114a25e511d7eba20f:AUDJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "AUD_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "03ce0d156c451c19262b242cf2b42f3bae4c6107c54af116b21684344529db66",
+      "instrument": "MD:03ce0d156c451c19262b242cf:USDHUF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_HUF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "427da3285811a127de2b8a1e5fdbbfe04a4b86406e12f9919f82f01eabf7664e",
+      "instrument": "MD:427da3285811a127de2b8a1e5:USDCZK",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_CZK",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "a0c2a769811f385e008b75f8e2605d010030ff606279f14c5544dc215fe56662",
+      "instrument": "MD:a0c2a769811f385e008b75f8e:EURGBP",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_GBP",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "56f47462c813f9531755e0276870f326632383dd9e62c051971763ca7ec23a84",
+      "instrument": "MD:56f47462c813f9531755e0276:NZDHKD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "NZD_HKD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "2e5cdaacf62b1b89bb7dcc6a223a0c3a4baa99331ecb0cee803f5499b2e412f8",
+      "instrument": "MD:2e5cdaacf62b1b89bb7dcc6a2:GBPSGD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_SGD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "d32bb4d400841eb16ad9d3526d4aae7186436c1205f97954fb6225b8af0e435d",
+      "instrument": "MD:d32bb4d400841eb16ad9d3526:USDSEK",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_SEK",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "10da9c4b69a22f9d4b6c2e91e0ab24c7fec8a671635baf0f050c30a1525eaac3",
+      "instrument": "MD:10da9c4b69a22f9d4b6c2e91e:EURCAD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_CAD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "XAU_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "b5f5b49026484cf461a2e9355bef82d8b6d364396856ffbe4711f6bd721b088b",
+      "instrument": "MD:b5f5b49026484cf461a2e9355:EURAUD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_AUD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "d86eada43edb5df78ac84069c3f87687a0a2afe1828dcea76da8b19b78945d3f",
+      "instrument": "MD:d86eada43edb5df78ac84069c:USDCAD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_CAD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "caedd9b8ceb284d1adba54880ce51748b1d97d0fb049d504c80d33d91a235c4c",
+      "instrument": "MD:caedd9b8ceb284d1adba54880:EURNOK",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_NOK",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "1b429d51958d710bd28abb5bd312e0badfbc48c99e8aeccc47cfb06e7cd81031",
+      "instrument": "MD:1b429d51958d710bd28abb5bd:EURZAR",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_ZAR",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "8d97ae9dc3fb2f237961828632d37136357406dba54702836add8b597d304134",
+      "instrument": "MD:8d97ae9dc3fb2f23796182863:AUDNZD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "AUD_NZD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "a94ff981c1e508933bc858b20fa805fb6ca0aba4fd4edd3536b273e769a69ea1",
+      "instrument": "MD:a94ff981c1e508933bc858b20:EURCHF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_CHF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "d7f7cb6b4bfa74a74ab7fea24904c38b8e5c1fcfbc213505057f9c86d5084b50",
+      "instrument": "MD:d7f7cb6b4bfa74a74ab7fea24:CADCHF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "CAD_CHF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "54ec4f0f3a08b3e400a4e9f60949cb3c7de8cd24b6af6c9a8004997c3c648af8",
+      "instrument": "MD:54ec4f0f3a08b3e400a4e9f60:CHFZAR",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "CHF_ZAR",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "8efa2f27a4081f95418fb4580bca5c4ce0e606f118ea6a4235bf3e317b53c1c6",
+      "instrument": "MD:8efa2f27a4081f95418fb4580:USDDKK",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_DKK",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "eea2112cca8c67b8152690a82faabffa5e60dddfba081d3aa33b04bb820cfc18",
+      "instrument": "MD:eea2112cca8c67b8152690a82:CADJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "CAD_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "4096b0f475a3920d2771583922cd04c7237de52d653b2da67c6b64abd464f9d7",
+      "instrument": "MD:4096b0f475a3920d277158392:USDZAR",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_ZAR",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "d5072e36b16d54cc737a3094630233add233bc6b9ae72c6e063f549ae72bcbb7",
+      "instrument": "MD:d5072e36b16d54cc737a30946:HKDJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "HKD_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "0e9cec9b6c8cd6359bb5c7040f5c7a8eb444404e5162abfd6dc856a28edc1fb0",
+      "instrument": "MD:0e9cec9b6c8cd6359bb5c7040:CADSGD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "CAD_SGD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "a3af4444af37cecfd89b22f1b7810aa8eead7293007b0bb901cea11dd62efa87",
+      "instrument": "MD:a3af4444af37cecfd89b22f1b:EURHUF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_HUF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "518710753828a7e280a951a06072bb59a2d74e95563ed74eb191e82e0d5d87eb",
+      "instrument": "MD:518710753828a7e280a951a06:EURSEK",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_SEK",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "d9122b1e5bc3b03860055fbc38ba949f3aa4f82d4cf14b1d43939f83fab2555a",
+      "instrument": "MD:d9122b1e5bc3b03860055fbc3:USDSGD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_SGD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "d2766224172275199aea3b4e6db3ea2faa519488cd42d3941d62d7c212af0b67",
+      "instrument": "MD:d2766224172275199aea3b4e6:EURDKK",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_DKK",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "ccf63dfb46f852aeba74a4c44a12053f70bd26b2a3249e5d34147b36fa86383a",
+      "instrument": "MD:ccf63dfb46f852aeba74a4c44:SGDCHF",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "SGD_CHF",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "d8e5c50815f64304919faa1f4d8f6dda31d2975659c822135ac3bda14ef71aaa",
+      "instrument": "MD:d8e5c50815f64304919faa1f4:EURCZK",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_CZK",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "cdd335a9afa03c9745c68e83805353b7b276be4cd27d889e46c8bfe9ddf236d7",
+      "instrument": "MD:cdd335a9afa03c9745c68e838:NZDCAD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "NZD_CAD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "EUR_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "e39acf361d092043ea695df65bf1fbedb5cf341e346c059586c03405e6131729",
+      "instrument": "MD:e39acf361d092043ea695df65:GBPJPY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "GBP_JPY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "1e138bc643c11ba89b136e9d2f0a52ce018f93ca8a7b7c94b2941845cdb507f1",
+      "instrument": "MD:1e138bc643c11ba89b136e9d2:USDTRY",
+      "identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+        "provider_symbol": "USD_TRY",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "a53157b5df6ad178d83a163e9d3469236a4253e303eb0cd58bd98809ce752e30",
+      "instrument": "MD:a53157b5df6ad178d83a163e9:EURUSD",
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "EUR/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    },
+    {
+      "id": "a7da737a76d6e21dd242e74f8468a0d74d0cdb5acd9e3708e01f6053765b0ebd",
+      "instrument": "MD:a7da737a76d6e21dd242e74f8:XAUUSD",
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "XAU/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      }
+    }
+  ],
+  "legacy_inventory": [
+    {
+      "instrument": "BTCUSD",
+      "source": "dukascopy",
+      "provider_symbol": "btcusd",
+      "basis": "bid",
+      "calendar": "utc0",
+      "bars": 0,
+      "mapping": "legacy_unverified"
+    },
+    {
+      "instrument": "BTCUSDT",
+      "source": "binance",
+      "provider_symbol": "BTCUSDT",
+      "basis": "last",
+      "calendar": "utc0",
+      "bars": 0,
+      "mapping": "legacy_unverified"
+    },
+    {
+      "instrument": "EURUSD",
+      "source": "dukascopy",
+      "provider_symbol": "eurusd",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "legacy_unverified"
+    },
+    {
+      "instrument": "MD:03ce0d156c451c19262b242cf:USDHUF",
+      "source": "oanda",
+      "provider_symbol": "USD_HUF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:06ad2e89918aa5bb8b2caff17:NZDCHF",
+      "source": "oanda",
+      "provider_symbol": "NZD_CHF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "source": "oanda",
+      "provider_symbol": "XAU_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1896,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:0cae317f66900b69c45354f61:NZDJPY",
+      "source": "oanda",
+      "provider_symbol": "NZD_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:0cbc39aa261f14eef58b53a0f:EURNZD",
+      "source": "oanda",
+      "provider_symbol": "EUR_NZD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:0e9cec9b6c8cd6359bb5c7040:CADSGD",
+      "source": "oanda",
+      "provider_symbol": "CAD_SGD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:10da9c4b69a22f9d4b6c2e91e:EURCAD",
+      "source": "oanda",
+      "provider_symbol": "EUR_CAD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:1b429d51958d710bd28abb5bd:EURZAR",
+      "source": "oanda",
+      "provider_symbol": "EUR_ZAR",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:1e138bc643c11ba89b136e9d2:USDTRY",
+      "source": "oanda",
+      "provider_symbol": "USD_TRY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:1e8f309c989031c0bf306ade9:GBPCAD",
+      "source": "oanda",
+      "provider_symbol": "GBP_CAD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:2d35563c8a5dcc26a1f55a8a4:USDJPY",
+      "source": "oanda",
+      "provider_symbol": "USD_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:2e5cdaacf62b1b89bb7dcc6a2:GBPSGD",
+      "source": "oanda",
+      "provider_symbol": "GBP_SGD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:34ccf11c98f3834a4f972fa70:GBPCHF",
+      "source": "oanda",
+      "provider_symbol": "GBP_CHF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:4096b0f475a3920d277158392:USDZAR",
+      "source": "oanda",
+      "provider_symbol": "USD_ZAR",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:427da3285811a127de2b8a1e5:USDCZK",
+      "source": "oanda",
+      "provider_symbol": "USD_CZK",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:48f368cd34ffe7fe6632bd871:GBPUSD",
+      "source": "oanda",
+      "provider_symbol": "GBP_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1945,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:4bd89ca450a1108828a7e152f:CADHKD",
+      "source": "oanda",
+      "provider_symbol": "CAD_HKD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:518710753828a7e280a951a06:EURSEK",
+      "source": "oanda",
+      "provider_symbol": "EUR_SEK",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:54ec4f0f3a08b3e400a4e9f60:CHFZAR",
+      "source": "oanda",
+      "provider_symbol": "CHF_ZAR",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:56f47462c813f9531755e0276:NZDHKD",
+      "source": "oanda",
+      "provider_symbol": "NZD_HKD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:58926637cf6c0f741325a53e7:ZARJPY",
+      "source": "oanda",
+      "provider_symbol": "ZAR_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:593b90aaad0dac85096f70137:GBPAUD",
+      "source": "oanda",
+      "provider_symbol": "GBP_AUD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:596cd0613939cd09e31df7bb7:EURSGD",
+      "source": "oanda",
+      "provider_symbol": "EUR_SGD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:5b4e85672a128b6d5ab12478f:USDCHF",
+      "source": "oanda",
+      "provider_symbol": "USD_CHF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:5b9998f9442808e9e3ef51dbb:AUDUSD",
+      "source": "oanda",
+      "provider_symbol": "AUD_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:784a8cbba21effb1edaf52016:EURTRY",
+      "source": "oanda",
+      "provider_symbol": "EUR_TRY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:7f4ebc7e8d77829bbc1e0d648:TRYJPY",
+      "source": "oanda",
+      "provider_symbol": "TRY_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "source": "oanda",
+      "provider_symbol": "EUR_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1968,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:85c8821aa7a6ec942a51b4d8b:USDCNH",
+      "source": "oanda",
+      "provider_symbol": "USD_CNH",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:875c7942d1e6f6a54c63aa6ff:AUDHKD",
+      "source": "oanda",
+      "provider_symbol": "AUD_HKD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:88c1c73d56d620aa2ef14a901:EURHKD",
+      "source": "oanda",
+      "provider_symbol": "EUR_HKD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:8d97ae9dc3fb2f23796182863:AUDNZD",
+      "source": "oanda",
+      "provider_symbol": "AUD_NZD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:8efa2f27a4081f95418fb4580:USDDKK",
+      "source": "oanda",
+      "provider_symbol": "USD_DKK",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:9bf5aecdfc9ff0a88ceef8e77:CHFHKD",
+      "source": "oanda",
+      "provider_symbol": "CHF_HKD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:9e2e25a005d3b5b00c389cb22:AUDCAD",
+      "source": "oanda",
+      "provider_symbol": "AUD_CAD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a012b760a339dc53bf9ff67c6:USDHKD",
+      "source": "oanda",
+      "provider_symbol": "USD_HKD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a0c2a769811f385e008b75f8e:EURGBP",
+      "source": "oanda",
+      "provider_symbol": "EUR_GBP",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a3af4444af37cecfd89b22f1b:EURHUF",
+      "source": "oanda",
+      "provider_symbol": "EUR_HUF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a53157b5df6ad178d83a163e9:EURUSD",
+      "source": "dukascopy",
+      "provider_symbol": "EUR/USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 1311305,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a7da737a76d6e21dd242e74f8:XAUUSD",
+      "source": "dukascopy",
+      "provider_symbol": "XAU/USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 898180,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a94cce3114a25e511d7eba20f:AUDJPY",
+      "source": "oanda",
+      "provider_symbol": "AUD_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:a94ff981c1e508933bc858b20:EURCHF",
+      "source": "oanda",
+      "provider_symbol": "EUR_CHF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:ac74dc55af20fcc89e4013bdb:NZDSGD",
+      "source": "oanda",
+      "provider_symbol": "NZD_SGD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:b2f914dbfc0c056ef69f8dd67:GBPNZD",
+      "source": "oanda",
+      "provider_symbol": "GBP_NZD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:b386d81e49dc6996a9e42eb13:CHFJPY",
+      "source": "oanda",
+      "provider_symbol": "CHF_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:b5f5b49026484cf461a2e9355:EURAUD",
+      "source": "oanda",
+      "provider_symbol": "EUR_AUD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:b6487f56b97265a8baacc6322:USDTHB",
+      "source": "oanda",
+      "provider_symbol": "USD_THB",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:bc33b5fb673dd868fbdedfe3a:USDNOK",
+      "source": "oanda",
+      "provider_symbol": "USD_NOK",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:caedd9b8ceb284d1adba54880:EURNOK",
+      "source": "oanda",
+      "provider_symbol": "EUR_NOK",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:cc65a44441aa4e19e87fcf0de:USDPLN",
+      "source": "oanda",
+      "provider_symbol": "USD_PLN",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:ccf63dfb46f852aeba74a4c44:SGDCHF",
+      "source": "oanda",
+      "provider_symbol": "SGD_CHF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:cdd335a9afa03c9745c68e838:NZDCAD",
+      "source": "oanda",
+      "provider_symbol": "NZD_CAD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:d2766224172275199aea3b4e6:EURDKK",
+      "source": "oanda",
+      "provider_symbol": "EUR_DKK",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:d32bb4d400841eb16ad9d3526:USDSEK",
+      "source": "oanda",
+      "provider_symbol": "USD_SEK",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:d5072e36b16d54cc737a30946:HKDJPY",
+      "source": "oanda",
+      "provider_symbol": "HKD_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:d7f7cb6b4bfa74a74ab7fea24:CADCHF",
+      "source": "oanda",
+      "provider_symbol": "CAD_CHF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:d86eada43edb5df78ac84069c:USDCAD",
+      "source": "oanda",
+      "provider_symbol": "USD_CAD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:d8e5c50815f64304919faa1f4:EURCZK",
+      "source": "oanda",
+      "provider_symbol": "EUR_CZK",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:d9122b1e5bc3b03860055fbc3:USDSGD",
+      "source": "oanda",
+      "provider_symbol": "USD_SGD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:df5bef90d00654294e5bcaa8b:AUDCHF",
+      "source": "oanda",
+      "provider_symbol": "AUD_CHF",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:e39acf361d092043ea695df65:GBPJPY",
+      "source": "oanda",
+      "provider_symbol": "GBP_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:e540796076c9ceb62b984eed0:GBPPLN",
+      "source": "oanda",
+      "provider_symbol": "GBP_PLN",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:e68295232055716f486750f25:EURJPY",
+      "source": "oanda",
+      "provider_symbol": "EUR_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:e7f1a264a58dc3f5d9c85f404:SGDJPY",
+      "source": "oanda",
+      "provider_symbol": "SGD_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:e842d06b265072505e9e4b0e0:AUDSGD",
+      "source": "oanda",
+      "provider_symbol": "AUD_SGD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:ed79f3841b995882b543dfe87:GBPZAR",
+      "source": "oanda",
+      "provider_symbol": "GBP_ZAR",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:eea2112cca8c67b8152690a82:CADJPY",
+      "source": "oanda",
+      "provider_symbol": "CAD_JPY",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:f1db384bc994a777977012761:USDMXN",
+      "source": "oanda",
+      "provider_symbol": "USD_MXN",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:f1f3b8df81895b57653bcd575:GBPHKD",
+      "source": "oanda",
+      "provider_symbol": "GBP_HKD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:f4a073f810ad9fe46de9269ba:NZDUSD",
+      "source": "oanda",
+      "provider_symbol": "NZD_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "MD:fae419493e9e459301a68ac28:EURPLN",
+      "source": "oanda",
+      "provider_symbol": "EUR_PLN",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "explicit"
+    },
+    {
+      "instrument": "XAUUSD",
+      "source": "dukascopy",
+      "provider_symbol": "xauusd",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 0,
+      "mapping": "legacy_unverified"
+    }
+  ],
+  "two_trading_days_verified": false,
+  "clock_offset_verified": false,
+  "mt4_deferred": true
+}

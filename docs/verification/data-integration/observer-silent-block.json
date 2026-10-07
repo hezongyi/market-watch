@@ -1,0 +1,119 @@
+{
+  "captured_at": 1791264288440,
+  "host": "Ubuntu local acceptance host",
+  "window_since": 1791259454900,
+  "services": {
+    "market-watch-data-integration-browser.service": {
+      "MainPID": "2266365",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "market-watch-data-integration-rules.service": {
+      "MainPID": "2669988",
+      "ActiveState": "active",
+      "SubState": "running"
+    }
+  },
+  "zero_heartbeat_blocks": 1,
+  "anomalies": [
+    {
+      "at": 1791264085103,
+      "utc": "2026-10-06T05:21:25.103000+00:00",
+      "context": [
+        {
+          "at": 1791263977694,
+          "snapshots": 19,
+          "heartbeats": 26,
+          "errors": 0,
+          "opened": 0,
+          "preceding_interval_ms": 30105
+        },
+        {
+          "at": 1791264036196,
+          "snapshots": 20,
+          "heartbeats": 23,
+          "errors": 0,
+          "opened": 0,
+          "preceding_interval_ms": 58502
+        },
+        {
+          "at": 1791264085103,
+          "snapshots": 0,
+          "heartbeats": 0,
+          "errors": 0,
+          "opened": 0,
+          "preceding_interval_ms": 48907
+        },
+        {
+          "at": 1791264132310,
+          "snapshots": 29,
+          "heartbeats": 30,
+          "errors": 0,
+          "opened": 1,
+          "preceding_interval_ms": 47207
+        },
+        {
+          "at": 1791264164486,
+          "snapshots": 27,
+          "heartbeats": 30,
+          "errors": 0,
+          "opened": 0,
+          "preceding_interval_ms": 32176
+        },
+        {
+          "at": 1791264214254,
+          "snapshots": 16,
+          "heartbeats": 17,
+          "errors": 0,
+          "opened": 0,
+          "preceding_interval_ms": 49768
+        }
+      ]
+    }
+  ],
+  "latest_browser_block": {
+    "at": 1791264275825,
+    "snapshots": 20,
+    "heartbeats": 22,
+    "errors": 0,
+    "opened": 0
+  },
+  "latest_rule_sample": {
+    "at": 1791264276799,
+    "watches": [
+      {
+        "watch_id": "67575ffc-5d15-4e73-aa6b-f9b075700626",
+        "instrument_id": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+        "status": "active",
+        "last_event": 1791264240000,
+        "paused_reason": null,
+        "quality": "healthy",
+        "connection_epoch": 49
+      },
+      {
+        "watch_id": "cab0a0df-6f35-4cad-a6a3-b989656cee7e",
+        "instrument_id": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+        "status": "active",
+        "last_event": 1791264240000,
+        "paused_reason": null,
+        "quality": "healthy",
+        "connection_epoch": 49
+      }
+    ]
+  },
+  "host_observation": {
+    "load_averages": [
+      56.51611328125,
+      58.705078125,
+      38.37841796875
+    ],
+    "logical_cpu_count": 4,
+    "pressure": {
+      "cpu": "some avg10=87.36 avg60=86.89 avg300=85.91 total=171096443354\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+      "io": "some avg10=35.20 avg60=43.47 avg300=44.15 total=77463962914\nfull avg10=0.69 avg60=0.89 avg300=0.91 total=61803749876",
+      "memory": "some avg10=30.82 avg60=70.41 avg300=72.48 total=9960528997\nfull avg10=13.10 avg60=35.59 avg300=36.73 total=6743541172"
+    }
+  },
+  "interpretation": "Observer heartbeat absence and subsequent SSE re-open are recorded. Host load/pressure is concurrent evidence, not a proven cause. Rule computation and same process handles remained live; no restart or error removal.",
+  "two_trading_days_verified": false
+}

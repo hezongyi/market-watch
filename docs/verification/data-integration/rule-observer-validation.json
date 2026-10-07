@@ -1,0 +1,142 @@
+{
+  "measurement_since": 0,
+  "starts": [
+    {
+      "event": "started",
+      "at": 1791261682693,
+      "phase": "tool-validation",
+      "started_at": 1791261682559,
+      "planned_end": 1791261802559,
+      "planned_minutes": 2.0,
+      "poll_interval_seconds": 5.0,
+      "authentication_renewal_minutes": 1.0,
+      "owned": {
+        "67575ffc-5d15-4e73-aa6b-f9b075700626": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+        "cab0a0df-6f35-4cad-a6a3-b989656cee7e": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD"
+      },
+      "host": "Ubuntu host observing local isolated Docker API",
+      "url": "http://127.0.0.1:16589",
+      "source_clock_offset_verified": false
+    }
+  ],
+  "finishes": [
+    {
+      "event": "finished",
+      "at": 1791261802559,
+      "phase": "tool-validation",
+      "interrupted": false,
+      "planned_end": 1791261802559
+    }
+  ],
+  "samples": 24,
+  "first_sample": 1791261683432,
+  "last_sample": 1791261797789,
+  "failed_polls": [],
+  "authentications": [
+    {
+      "event": "authenticated",
+      "at": 1791261683401,
+      "phase": "tool-validation"
+    },
+    {
+      "event": "authenticated",
+      "at": 1791261747877,
+      "phase": "tool-validation"
+    }
+  ],
+  "receiver_clocks": [
+    {
+      "event": "receiver_clock",
+      "at": 1791261683480,
+      "phase": "tool-validation",
+      "available": true,
+      "fields": {
+        "Leap": "normal",
+        "Root distance": "22.155ms (max: 5s)",
+        "Offset": "-2.214ms",
+        "Delay": "255.011ms",
+        "Jitter": "8.845ms",
+        "Packet count": "255"
+      },
+      "meaning": "receiver NTP sample only; supplier offset remains unverified"
+    }
+  ],
+  "max_poll_interval_ms": 5001,
+  "max_request_duration_ms": 739,
+  "max_wall_minus_monotonic_ms": 1,
+  "watches": {
+    "67575ffc-5d15-4e73-aa6b-f9b075700626": {
+      "instrument_id": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "samples": 24,
+      "missing_watch_samples": 0,
+      "missing_source_samples": 0,
+      "missing_last_event_samples": 0,
+      "state_reset_samples": 0,
+      "status_counts": {
+        "active": 24
+      },
+      "quality_counts": {
+        "healthy": 24
+      },
+      "paused_reason_counts": {
+        "None": 24
+      },
+      "tradeable_counts": {
+        "True": 24
+      },
+      "observed_advancements": 2,
+      "observed_forward_jumps_over_one_minute": 0,
+      "observed_regressions": 0,
+      "epoch_changes": 0,
+      "unchanged_samples": 21,
+      "longest_observed_unchanged_ms": 54943,
+      "first_last_event": 1791261660000,
+      "last_last_event": 1791261780000,
+      "rule_close_to_poll_upper_bound": {
+        "samples": 2,
+        "negative_samples": 0,
+        "p50_ms": 7735,
+        "p95_ms": 7779,
+        "p99_ms": 7779
+      }
+    },
+    "cab0a0df-6f35-4cad-a6a3-b989656cee7e": {
+      "instrument_id": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "samples": 24,
+      "missing_watch_samples": 0,
+      "missing_source_samples": 0,
+      "missing_last_event_samples": 0,
+      "state_reset_samples": 0,
+      "status_counts": {
+        "active": 24
+      },
+      "quality_counts": {
+        "healthy": 24
+      },
+      "paused_reason_counts": {
+        "None": 24
+      },
+      "tradeable_counts": {
+        "True": 24
+      },
+      "observed_advancements": 2,
+      "observed_forward_jumps_over_one_minute": 0,
+      "observed_regressions": 0,
+      "epoch_changes": 0,
+      "unchanged_samples": 21,
+      "longest_observed_unchanged_ms": 54943,
+      "first_last_event": 1791261660000,
+      "last_last_event": 1791261780000,
+      "rule_close_to_poll_upper_bound": {
+        "samples": 2,
+        "negative_samples": 0,
+        "p50_ms": 7735,
+        "p95_ms": 7779,
+        "p99_ms": 7779
+      }
+    }
+  },
+  "meaning": "read-only sampled rule last_event; first value is baseline; no inferred executions across jumps or restarts; per-watch delay is upper bound including polling",
+  "source_clock_offset_verified": false,
+  "two_trading_days_verified": false
+}

@@ -348,7 +348,7 @@ export function ChartAlertDialog({
                     disabled={!s.available}
                   >
                     {s.source} ·{" "}
-                    {s.series_kind === "managed" ? "自建系列" : "平台原生"} ·{" "}
+                    {s.series_kind === "managed" ? "自建系列" : s.series_kind === "composite" ? "组合行情" : "平台原生"} ·{" "}
                     {s.basis}
                     {s.reason ? ` · ${s.reason}` : ""}
                   </option>
@@ -356,6 +356,22 @@ export function ChartAlertDialog({
               </select>
             </label>
             {source?.reason && <p role="status">{source.reason}</p>}
+            {draft.series_kind === "composite" && (
+              <fieldset disabled={busy}>
+                <legend>组合输入与接缝</legend>
+                <p>保存时固定组合修订；历史日更不会更换正在监控的基线。修订或恢复后先建立新基准，不补发过期事件。</p>
+                {draft.composite_revision_id && <p>修订：{draft.composite_revision_id}</p>}
+                <label>
+                  指标依赖含原价接缝时
+                  <select value={draft.seam_policy || "reject"}
+                    onChange={event=>change({seam_policy:event.target.value as "reject" | "accept_raw"})}>
+                    <option value="reject">等待完整同源依赖，不接受接缝影响</option>
+                    <option value="accept_raw">接受历史与实时来源原价差对指标的影响</option>
+                  </select>
+                </label>
+                <p>跨接缝事件比较始终先建立基准。选择接受后也不会消除价差或重算成另一来源。</p>
+              </fieldset>
+            )}
             <fieldset disabled={busy}>
               <legend>条件</legend>
               <label>

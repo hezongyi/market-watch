@@ -1,0 +1,123 @@
+{
+  "fault": "single_symbol",
+  "injection": "local response/filter seam; upstream otherwise real",
+  "host": "Ubuntu local Docker",
+  "project": "market-watch-data-integration",
+  "started_at": 1791254975578,
+  "stale_evidence": {
+    "eur_quality": "stale",
+    "eur_quote_ready": false,
+    "eur_candle_ready": true,
+    "xau_quality": "healthy",
+    "epoch": 38
+  },
+  "passed": true,
+  "events": [
+    {
+      "event": "stream_started",
+      "at": 1791255009382,
+      "epoch": 38
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255009420,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255010319,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255011929,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255012490,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255013998,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255014455,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255016155,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255016666,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255018125,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255018678,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255020380,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255021144,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255022757,
+      "injected_already": false
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255023362,
+      "injected_already": false
+    },
+    {
+      "event": "armed",
+      "at": 1791255024468
+    },
+    {
+      "event": "injected",
+      "at": 1791255034610,
+      "symbol": "EURUSD",
+      "duration_seconds": 40
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255065931,
+      "injected_already": true
+    },
+    {
+      "event": "rest_call",
+      "at": 1791255067354,
+      "injected_already": true
+    },
+    {
+      "event": "filter_removed",
+      "at": 1791255074789,
+      "dropped_quotes": 9
+    },
+    {
+      "event": "gap_crossing_suppressed",
+      "at": 1791255077070,
+      "watch_state_reseeded": true
+    }
+  ],
+  "finished_at": 1791255083220
+}

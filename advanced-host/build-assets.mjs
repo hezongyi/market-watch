@@ -10,7 +10,7 @@ for (const name of readdirSync(new URL('.',import.meta.url)))
     rmSync(new URL(name,import.meta.url), {recursive:true});
 cpSync(new URL('charting_library',import.meta.url), new URL(libraryDirectory,import.meta.url), {recursive:true});
 
-const files = ['series.js', 'indicators.js', 'indicator-picker.js', 'preferences.js', 'chart-style.js', 'chart-autosave.js',
+const files = ['series.js', 'series-picker.js', 'indicators.js', 'indicator-picker.js', 'preferences.js', 'chart-style.js', 'chart-autosave.js',
   'workspaces.js', 'watchlists.js', 'sync-coordinator.js', 'range-sync.js', 'viewports.js',
   'progressive-history.js', 'history-demand.js', 'native-reserve.js', 'native-navigation.js', 'bar-range-mapping.js', 'chart-account.js', 'sync-settings.js', 'chart-menu.js', 'drawing-projection.js', 'chart-alerts.js', 'chart-maximize.js', 'bridge.js'];
 const source = `globalThis.MW_CHART_LIBRARY_PATH="/${libraryDirectory}/";\nglobalThis.MW_NATIVE_RESERVE_ENABLED=${process.env.NATIVE_RESERVE_ENABLED !== 'false'};\n` +

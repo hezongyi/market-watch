@@ -2,6 +2,17 @@ from alerts.market_resources import acquire, release
 from alerts.storage import ImportJob
 
 
+def test_all_sources_enforce_shared_cooldown_before_new_requests(database, monkeypatch):
+    from alerts import market_resources
+
+    monkeypatch.setattr(market_resources, "now_ms", lambda: 100000)
+    for source in ("oanda", "binance", "dukascopy", "yahoo"):
+        market_resources.cooldown(source, retry_seconds=30)
+        assert acquire(source, "realtime", 129999) is None
+        assert acquire(source, "history", 129999) is None
+        assert acquire(source, "realtime", 130001)
+
+
 def test_history_cannot_consume_reserved_realtime_slots_or_rate(database):
     now = 100000
     history = acquire("oanda", "history", now)

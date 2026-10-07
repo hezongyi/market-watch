@@ -1,0 +1,133 @@
+// Real Ubuntu fixed replay, supplier data, desktop and input parity acceptance.
+const { chromium, expect } = require('@playwright/test');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.resolve(__dirname, '../..');
+const base = 'http://127.0.0.1:16629';
+const artifact = path.join(root, 'artifacts/data-integration');
+const input = JSON.parse(fs.readFileSync(path.join(artifact, 'history-writes-mcp-real.json')));
+const login = JSON.parse(fs.readFileSync(path.join(artifact, 'three-layer-login.json')));
+(async () => {
+  const browser = await chromium.launch({headless: true});
+  const page = await browser.newPage({viewport: {width: 1440, height: 1000}});
+  const errors = [], checks = [], requests = [];
+  page.on('pageerror', e => errors.push(e.message));
+  page.on('request', r => {if(r.method()==='POST')requests.push(new URL(r.url()).pathname)});
+  try {
+    await expect.poll(async () => (await page.request.get(base + '/readyz')).status(), {timeout: 60000}).toBe(200);
+    await page.goto(base + '/replay?dataset_version=' + input.version_id);
+    await page.getByLabel('管理员密码').fill(login.password);
+    await page.getByRole('button', {name: '登录工作台'}).click();
+    await expect(page.getByRole('combobox', {name: '不可变历史版本'})).toHaveValue(input.version_id);
+    const get = async p => {const r=await page.request.get(base+'/api/'+p);expect(r.ok()).toBe(true);return r.json()};
+    const dataset = await get('market-data/center/datasets/' + input.dataset_id);
+    await expect(page.getByRole('combobox', {name: '品种',exact:true})).toHaveValue(input.version_id);
+    await page.goto(base+'/replay');
+    await expect(page.getByRole('combobox',{name:'行情范围',exact:true})).toHaveValue('history');
+    await expect(page.getByRole('button',{name:'创建演练',exact:true})).toBeDisabled();
+    const search = page.getByRole('searchbox',{name:'查找自建行情',exact:true});
+    await search.fill(dataset.logical_symbol);
+    const searchHits = await get('market-data/series/search?kind=history&query='+dataset.logical_symbol);
+    const chosen=searchHits.find(r=>r.dataset_id===input.dataset_id);expect(chosen).toBeTruthy();
+    const picker=page.getByRole('combobox',{name:'品种',exact:true});
+    await expect(picker.locator(`option[value="${chosen.id}"]`)).toBeAttached();
+    expect(await picker.locator(`option[value="${chosen.id}"]`).textContent()).toContain('OANDA');
+    expect(await picker.locator(`option[value="${chosen.id}"]`).textContent()).toContain('NY17');
+    await picker.selectOption(chosen.id);
+    await expect(page.getByRole('combobox',{name:'不可变历史版本'})).toHaveValue('');
+    await expect(page.getByRole('button',{name:'创建演练',exact:true})).toBeDisabled();
+    await page.getByRole('combobox',{name:'不可变历史版本'}).selectOption(input.version_id);
+    await page.getByRole('combobox',{name:'周期',exact:true}).selectOption('M1');
+    await search.fill('NO_SUCH_SOURCE_SYMBOL');
+    await expect(page.getByText('没有符合条件的可用行情。',{exact:true})).toBeVisible();
+    await expect(picker).toHaveValue(chosen.id);
+    await expect(page.getByRole('combobox',{name:'不可变历史版本'})).toHaveValue(input.version_id);
+    checks.push('default unified self-built search, explicit fixed version, source/calendar identity and selected input survives empty search');
+    await page.getByRole('combobox',{name:'行情范围',exact:true}).selectOption('legacy');
+    await expect(page.getByRole('button',{name:'补齐所选历史',exact:true})).toBeVisible();
+    await expect(page.getByRole('combobox',{name:'不可变历史版本'})).toHaveCount(0);
+    await page.goto(base+'/replay?dataset_version='+input.version_id);
+    await expect(page.getByRole('combobox',{name:'不可变历史版本'})).toHaveValue(input.version_id);
+    checks.push('explicit legacy compatibility and data-center deep link retain their input semantics');
+    await expect(page.getByText(/固定历史 · OANDA · NY17/)).toBeVisible();
+    expect(await page.getByRole('combobox', {name:'周期',exact:true}).locator('option').allTextContents()).toEqual(['M1','M5','M15','M30','H1','H4','D1','W1','MN']);
+    checks.push('OANDA source/calendar discoverable with nine fixed periods');
+    expect(requests.some(p=>/demand|subscription/.test(p))).toBe(false);
+    const existing=await get(`market-data/versions/${input.version_id}/artifacts`);
+    if(!existing.some(p=>p.timeframe==='D1'&&p.status==='published')){
+      await expect(page.getByRole('button',{name:'创建演练',exact:true})).toBeDisabled();
+      await expect(page.getByText(/等待准备：D1/)).toBeVisible();
+      const submitted=page.waitForResponse(r=>r.url().endsWith(`/versions/${input.version_id}/artifacts`)&&r.request().method()==='POST');
+      await page.getByRole('button',{name:'准备回测周期',exact:true}).click();
+      expect((await submitted).status()).toBe(202);
+      checks.push('M1 ready alone cannot start replay before explicit D1 publication');
+    }
+    await expect(page.getByRole('button',{name:'创建演练',exact:true})).toBeEnabled({timeout:120000});
+    const created=page.waitForResponse(r=>r.url().endsWith('/api/replays')&&r.request().method()==='POST');
+    await page.getByRole('button',{name:'创建演练',exact:true}).click();
+    const response=await created;expect(response.status()).toBe(201);
+    const run=await response.json();
+    expect(run.dataset_version).toBe(input.version_id);
+    expect(run.input_manifest.replay_input_method).toBe('published_period_artifacts_v1');
+    expect(Object.keys(run.input_manifest.period_artifacts).sort()).toEqual(['D1','M1']);
+    const raw=await get(`market-data/versions/${input.version_id}/chart?count=2000`);
+    const stepped=page.waitForResponse(r=>r.url().endsWith(`/replays/${run.id}/step`));
+    await page.getByRole('button',{name:'下一根',exact:true}).click();
+    const current=await (await stepped).json();
+    expect(current.bars).toEqual(raw.bars.filter(b=>b.end<=current.cursor).map(b=>({...b,revision:1})));
+    const exported=await get(`replays/${run.id}/export`);
+    expect(exported.input_manifest).toEqual(run.input_manifest);
+    const original=await get('market-data/versions/'+input.version_id);
+    expect(run.input_manifest.checksum).toBe(original.manifest.checksum);
+    checks.push('actual chart/replay prices and quality fields identical, pinned manifest and no future disclosure');
+    await page.reload();
+    await expect(page.getByLabel('已保存的演练',{exact:false})).toBeVisible();
+    await page.getByLabel('已保存的演练',{exact:false}).selectOption(run.id);
+    await expect(page.getByRole('link',{name:'导出演练记录'})).toBeVisible();
+    const restored=await get('replays/'+run.id);expect(restored.input_manifest).toEqual(run.input_manifest);
+    checks.push('saved fixed replay resumes after reload');
+    for(const width of [1024,1440,1920]){
+      await page.setViewportSize({width,height:1000});
+      expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+      await page.screenshot({path:path.join(artifact,`fixed-replay-${width}.png`),fullPage:true});
+    }
+    await page.setViewportSize({width:1024,height:1000});
+    await page.evaluate(()=>document.querySelector('.replay-setup').style.zoom='2');
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await page.getByRole('combobox',{name:'不可变历史版本'}).focus();
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(()=>document.activeElement.tagName)).toBe('SELECT');
+    expect(requests.some(p=>/demand|subscription/.test(p))).toBe(false);
+    expect(errors).toEqual([]);
+    checks.push('desktop three widths, keyboard and 200 percent content zoom, no live demand');
+    const available=(await get('market-data/center/datasets?status=available&page_size=100')).items;
+    const higher=[];
+    for(const source of ['dukascopy','oanda']){
+      const target=available.find(d=>d.identity.source===source&&d.logical_symbol==='EURUSD'&&d.aggregation_calendar==='ny17'&&d.usable_timeframes.includes('H4'));
+      expect(target).toBeTruthy();
+      await page.goto(base+'/replay?dataset_version='+target.latest_version_id);
+      await expect(page.getByRole('combobox',{name:'不可变历史版本'})).toHaveValue(target.latest_version_id);
+      await page.getByRole('combobox',{name:'周期',exact:true}).selectOption('H4');
+      await expect(page.getByRole('button',{name:'创建演练',exact:true})).toBeEnabled({timeout:30000});
+      const pending=page.waitForResponse(r=>r.url().endsWith('/api/replays')&&r.request().method()==='POST');
+      await page.getByRole('button',{name:'创建演练',exact:true}).click();
+      const response=await pending;expect(response.status()).toBe(201);
+      const fixed=await response.json();
+      const all=await get(`replays/${fixed.id}/export`);
+      expect(all.bars).toEqual([]); // Future H4 is hidden at initial cursor.
+      const advance=await page.request.post(base+`/api/replays/${fixed.id}/step`,{
+        headers:{'X-CSRF-Token':(await get('session')).csrf},data:{count:1000}});
+      expect(advance.ok()).toBe(true);
+      const final=await advance.json();
+      const chart=await get(`market-data/versions/${target.latest_version_id}/chart?timeframe=H4&count=2000`);
+      expect(final.bars).toEqual(chart.bars.filter(b=>b.end<=fixed.end).map(b=>({...b,revision:1})));
+      expect(final.input_manifest.period_artifacts.H4.parent_checksum).toBe(final.input_manifest.checksum);
+      higher.push({source,version:target.latest_version_id,replay:fixed.id,closed_h4:final.bars.length});
+    }
+    checks.push('actual Dukascopy and OANDA H4 use same fixed published prices/quality as charts');
+    expect(errors).toEqual([]);
+    fs.writeFileSync(path.join(artifact,'fixed-replay-browser-real.json'),JSON.stringify({environment:'Ubuntu isolated market-watch-three-layer',base,version_id:input.version_id,replay_id:run.id,checks,passed:true},null,2)+'\n');
+    fs.writeFileSync(path.join(artifact,'fixed-replay-higher-real.json'),JSON.stringify({higher,passed:true},null,2)+'\n');
+    console.log(JSON.stringify({checks,passed:true}));
+  } finally {await browser.close()}
+})().catch(e=>{console.error(e);process.exit(1)});

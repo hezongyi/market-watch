@@ -1,0 +1,58 @@
+{
+  "host": "Ubuntu local isolated Docker",
+  "project": "market-watch-data-integration",
+  "commit": "42ec05176b80b46e370d6a630fee78f1c20b3937",
+  "started_at": 1791262860351,
+  "api_recovered_at": 1791262889349,
+  "before_containers": {
+    "aggregation-worker": "bc909bee1879",
+    "api": "9718cde30004",
+    "history-worker": "a46a03670bab",
+    "oanda-worker": "645b5113f1fc",
+    "postgres": "af4060babedb",
+    "web": "6f4e8e814bd2"
+  },
+  "after_containers": {
+    "aggregation-worker": "bc909bee1879",
+    "api": "030ca18b1100",
+    "history-worker": "a46a03670bab",
+    "oanda-worker": "645b5113f1fc",
+    "postgres": "af4060babedb",
+    "web": "6f4e8e814bd2"
+  },
+  "observer_pids": {
+    "market-watch-data-integration-browser.service": 2266365,
+    "market-watch-data-integration-rules.service": 2669988
+  },
+  "epochs_before": {
+    "EURUSD": 49,
+    "XAUUSD": 49
+  },
+  "live": [
+    {
+      "logical_symbol": "EURUSD",
+      "quality": "healthy",
+      "connection_epoch": 49,
+      "cooldown_until": null,
+      "quote_ready": true,
+      "candle_ready": true,
+      "last_confirmed_m1": 1791262860000
+    },
+    {
+      "logical_symbol": "XAUUSD",
+      "quality": "healthy",
+      "connection_epoch": 49,
+      "cooldown_until": null,
+      "quote_ready": true,
+      "candle_ready": true,
+      "last_confirmed_m1": 1791262860000
+    }
+  ],
+  "worker_ids_unchanged": true,
+  "upstream_epochs_unchanged": true,
+  "observer_pids_unchanged": true,
+  "segment_recorded": true,
+  "two_trading_days_verified": false,
+  "deployment_envelope_ms": 28998,
+  "duration_meaning": "deployment preparation to authenticated API verification; not pure HTTP outage duration"
+}

@@ -1,0 +1,27 @@
+{
+  "initial": [
+    {
+      "symbol": "XAUUSD",
+      "quality": "healthy",
+      "epoch": 15
+    },
+    {
+      "symbol": "EURUSD",
+      "quality": "healthy",
+      "epoch": 15
+    }
+  ],
+  "concurrent_browsers": 3,
+  "browser_connections_changed_upstream_epoch": false,
+  "browser_disconnect_recovered": true,
+  "three_instruments_shared_stream": true,
+  "same_source_watch_advanced_on_real_m1": true,
+  "replay": {
+    "version": "844fb514-ed13-4258-8f1c-cab43f55c06b",
+    "source": "dukascopy",
+    "observed_minutes": 60,
+    "visible_after_step": 1
+  },
+  "qualified_identity_in_existing_chart_workspace": true,
+  "errors": []
+}

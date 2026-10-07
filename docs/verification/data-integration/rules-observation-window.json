@@ -1,0 +1,39 @@
+{
+  "host": "Ubuntu local isolated Docker; host Chromium/rule observers",
+  "project": "market-watch-data-integration",
+  "phase": "sustained",
+  "event": "new_independent_window_after_disk_cleanup",
+  "started_at": 1791283668874,
+  "planned_end": 1791456468874,
+  "started_at_utc": "2026-10-06T10:47:48.874000+00:00",
+  "planned_end_utc": "2026-10-08T10:47:48.874000+00:00",
+  "observer_pid": 2233614,
+  "planned_minutes": 2880,
+  "raw": "artifacts/data-integration/rules-sustained.jsonl",
+  "code_commit": "64282253f6db892b1e4cfb03331030004f6af292",
+  "prior_disk_interrupted_window": "rules-observation-window-disk-interrupted.json",
+  "old_raw_preserved": "observation-restart-archives.json",
+  "previous_duration_not_counted": true,
+  "two_trading_days_verified": false,
+  "source_clock_offset_verified": false,
+  "calendar_verified": false,
+  "mt4_deferred": true,
+  "start_record": {
+    "event": "started",
+    "at": 1791283669037,
+    "phase": "sustained",
+    "started_at": 1791283668874,
+    "planned_end": 1791456468874,
+    "planned_minutes": 2880,
+    "poll_interval_seconds": 15,
+    "authentication_renewal_minutes": 720,
+    "owned": {
+      "67575ffc-5d15-4e73-aa6b-f9b075700626": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "cab0a0df-6f35-4cad-a6a3-b989656cee7e": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD"
+    },
+    "host": "Ubuntu host observing local isolated Docker API",
+    "url": "http://127.0.0.1:16589",
+    "source_clock_offset_verified": false
+  },
+  "evaluation_since": 1791283680000
+}

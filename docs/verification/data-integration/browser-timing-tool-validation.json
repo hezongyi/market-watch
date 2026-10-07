@@ -1,0 +1,339 @@
+{
+  "starts": [
+    {
+      "event": "started",
+      "at": 1791254425167,
+      "phase": "tool-validation",
+      "planned_minutes": 1,
+      "host": "Ubuntu local Chromium",
+      "url": "http://127.0.0.1:16589/market-data",
+      "receiver_browser_same_host_clock": true,
+      "clock_scope": "same host; source clock offset remains unverified"
+    },
+    {
+      "event": "started",
+      "at": 1791255112376,
+      "phase": "tool-validation",
+      "planned_minutes": 7,
+      "host": "Ubuntu local Chromium",
+      "url": "http://127.0.0.1:16589/market-data",
+      "receiver_browser_same_host_clock": true,
+      "clock_scope": "same host; source clock offset remains unverified"
+    },
+    {
+      "event": "started",
+      "at": 1791255760476,
+      "phase": "tool-validation",
+      "planned_minutes": 1,
+      "host": "Ubuntu local Chromium",
+      "url": "http://127.0.0.1:16589/market-data",
+      "receiver_browser_same_host_clock": true,
+      "clock_scope": "same host; source clock offset remains unverified"
+    }
+  ],
+  "finishes": [
+    {
+      "event": "finished",
+      "at": 1791254485534,
+      "interrupted": false
+    },
+    {
+      "event": "finished",
+      "at": 1791255533103,
+      "interrupted": false
+    },
+    {
+      "event": "finished",
+      "at": 1791255821297,
+      "interrupted": false
+    }
+  ],
+  "first_block": 1791254455528,
+  "last_block": 1791255821297,
+  "blocks": 18,
+  "snapshots": 297,
+  "heartbeats": 308,
+  "errors": 3,
+  "opened": 3,
+  "symbols": {
+    "EURUSD": {
+      "unique_quotes": 90,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 12,
+        "recovering": 85,
+        "healthy": 182,
+        "stale": 18
+      },
+      "receive_to_browser_ms": {
+        "samples": 90,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 570,
+        "p95_ms": 1190,
+        "p99_ms": 1350
+      },
+      "source_to_browser_ms": {
+        "samples": 90,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 1100,
+        "p95_ms": 2000,
+        "p99_ms": 4660
+      }
+    },
+    "XAUUSD": {
+      "unique_quotes": 271,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 11,
+        "recovering": 84,
+        "healthy": 202
+      },
+      "receive_to_browser_ms": {
+        "samples": 271,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 320,
+        "p95_ms": 980,
+        "p99_ms": 1110
+      },
+      "source_to_browser_ms": {
+        "samples": 271,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 740,
+        "p95_ms": 1420,
+        "p99_ms": 1930
+      }
+    },
+    "USDCHF": {
+      "unique_quotes": 83,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 1,
+        "recovering": 65,
+        "healthy": 165,
+        "stale": 9
+      },
+      "receive_to_browser_ms": {
+        "samples": 82,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 580,
+        "p95_ms": 1120,
+        "p99_ms": 1440
+      },
+      "source_to_browser_ms": {
+        "samples": 82,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 1230,
+        "p95_ms": 1950,
+        "p99_ms": 2170
+      }
+    },
+    "NZDUSD": {
+      "unique_quotes": 75,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 2,
+        "recovering": 65,
+        "healthy": 164,
+        "stale": 9
+      },
+      "receive_to_browser_ms": {
+        "samples": 74,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 540,
+        "p95_ms": 1150,
+        "p99_ms": 1260
+      },
+      "source_to_browser_ms": {
+        "samples": 74,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 1200,
+        "p95_ms": 2080,
+        "p99_ms": 2730
+      }
+    },
+    "EURGBP": {
+      "unique_quotes": 50,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 1,
+        "recovering": 66,
+        "stale": 60,
+        "healthy": 113
+      },
+      "receive_to_browser_ms": {
+        "samples": 49,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 500,
+        "p95_ms": 1070,
+        "p99_ms": 1310
+      },
+      "source_to_browser_ms": {
+        "samples": 49,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 1070,
+        "p95_ms": 2030,
+        "p99_ms": 10960
+      }
+    },
+    "GBPUSD": {
+      "unique_quotes": 87,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 0,
+      "quality_counts": {
+        "unavailable": 2,
+        "recovering": 61,
+        "healthy": 159,
+        "stale": 18
+      },
+      "receive_to_browser_ms": {
+        "samples": 87,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 580,
+        "p95_ms": 1080,
+        "p99_ms": 1250
+      },
+      "source_to_browser_ms": {
+        "samples": 87,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 1120,
+        "p95_ms": 1820,
+        "p99_ms": 2500
+      }
+    },
+    "AUDUSD": {
+      "unique_quotes": 73,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 2,
+        "recovering": 62,
+        "healthy": 174,
+        "stale": 2
+      },
+      "receive_to_browser_ms": {
+        "samples": 72,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 540,
+        "p95_ms": 1170,
+        "p99_ms": 1330
+      },
+      "source_to_browser_ms": {
+        "samples": 72,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 1190,
+        "p95_ms": 2030,
+        "p99_ms": 8540
+      }
+    },
+    "USDJPY": {
+      "unique_quotes": 146,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 2,
+        "recovering": 63,
+        "healthy": 175
+      },
+      "receive_to_browser_ms": {
+        "samples": 145,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 460,
+        "p95_ms": 1010,
+        "p99_ms": 1280
+      },
+      "source_to_browser_ms": {
+        "samples": 145,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 980,
+        "p95_ms": 1690,
+        "p99_ms": 2210
+      }
+    },
+    "EURJPY": {
+      "unique_quotes": 177,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 1,
+        "recovering": 64,
+        "healthy": 175
+      },
+      "receive_to_browser_ms": {
+        "samples": 176,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 420,
+        "p95_ms": 1100,
+        "p99_ms": 1350
+      },
+      "source_to_browser_ms": {
+        "samples": 176,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 850,
+        "p95_ms": 1640,
+        "p99_ms": 2160
+      }
+    },
+    "USDCAD": {
+      "unique_quotes": 117,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 1,
+      "quality_counts": {
+        "unavailable": 1,
+        "recovering": 67,
+        "healthy": 172
+      },
+      "receive_to_browser_ms": {
+        "samples": 116,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 480,
+        "p95_ms": 1100,
+        "p99_ms": 1180
+      },
+      "source_to_browser_ms": {
+        "samples": 116,
+        "invalid_samples": 1,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 990,
+        "p95_ms": 1730,
+        "p99_ms": 1950
+      }
+    }
+  },
+  "meaning": "quote keys observed through browser SSE; invalid timings separate; 1s snapshots can omit upstream updates",
+  "source_clock_offset_verified": false,
+  "two_trading_days_verified": false
+}

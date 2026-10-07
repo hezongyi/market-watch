@@ -5,7 +5,8 @@ from sqlalchemy import select
 
 from .calendar_profile import closures_from
 from .chart_data import bounds
-from .domain import Calendar, bucket_bounds, scheduled_open
+from .chart_series import is_gold
+from .domain import bucket_bounds, calendar_for, scheduled_open
 from .storage import (
     ChartAggregationJob,
     ChartHistoryPlan,
@@ -36,7 +37,7 @@ def history_start(inst, timeframe, end, count):
     """Count scheduled buckets backwards, respecting NY DST and closures."""
     if timeframe not in FRAMES or not 1 <= count <= 6000:
         raise ValueError("Unsupported history window")
-    calendar = Calendar(inst.calendar)
+    calendar = calendar_for(inst)
     closures = closures_from(inst.calendar_profile)
     cursor = instant(end)
     remaining = count
@@ -46,7 +47,7 @@ def history_start(inst, timeframe, end, count):
         left, right = (bounds(probe, timeframe, calendar) if timeframe == "M30"
                        else bucket_bounds(probe, timeframe, calendar))
         if bucket_has_trading(left, min(right, cursor), calendar,
-                              gold=inst.id == "XAUUSD", closures=closures):
+                              gold=is_gold(inst.id), closures=closures):
             remaining -= 1
         cursor = left
         if remaining == 0:
@@ -58,14 +59,14 @@ def history_end(inst, timeframe, start, count):
     """Forward counterpart for bounded pages near a historical navigation target."""
     if timeframe not in FRAMES or not 1 <= count <= 2000:
         raise ValueError("Unsupported navigation window")
-    calendar = Calendar(inst.calendar)
+    calendar = calendar_for(inst)
     closures = closures_from(inst.calendar_profile)
     cursor = instant(start)
     for _ in range(count * 16 + 10000):
         left, right = (bounds(cursor, timeframe, calendar) if timeframe == "M30"
                        else bucket_bounds(cursor, timeframe, calendar))
         if bucket_has_trading(max(left, cursor), right, calendar,
-                              gold=inst.id == "XAUUSD", closures=closures):
+                              gold=is_gold(inst.id), closures=closures):
             count -= 1
         cursor = right
         if count == 0:

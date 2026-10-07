@@ -1,0 +1,66 @@
+{
+  "captured_at": 1791269087111,
+  "host": "Ubuntu local isolated Docker",
+  "project": "market-watch-data-integration",
+  "versions": [
+    {
+      "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+      "dataset_id": "a7da737a76d6e21dd242e74f8468a0d74d0cdb5acd9e3708e01f6053765b0ebd",
+      "status": "published",
+      "start": 1475712000000,
+      "end": 1791244800000,
+      "cursor": 1791244800000,
+      "checksum": "84a66152dc80ed468724c468ff6c3b40998fc7be68f7e7c821e919b7d149db22",
+      "observed_minutes": 3540725,
+      "unknown_minutes": 1718155,
+      "chunks": 814
+    },
+    {
+      "id": "30b7f7ba-cdea-42df-9738-1193e29574b8",
+      "dataset_id": "1da5d39b1d15f8359cd271abc5480e0d081ead7e59edc46e27a7f9d407cdf029",
+      "status": "published",
+      "start": 1475712000000,
+      "end": 1791244800000,
+      "cursor": 1791244800000,
+      "checksum": "7592bc0bd77d9275a3bc16dd72466c83eb85f73203da7ce22d6d236abf9f7c97",
+      "observed_minutes": 3724278,
+      "unknown_minutes": 1534602,
+      "chunks": 859
+    }
+  ],
+  "live": [
+    {
+      "logical_symbol": "EURUSD",
+      "quality": "healthy",
+      "connection_epoch": 50,
+      "calendar_verified": false,
+      "last_confirmed_m1": 1791269040000,
+      "cooldown_until": null
+    },
+    {
+      "logical_symbol": "XAUUSD",
+      "quality": "healthy",
+      "connection_epoch": 50,
+      "calendar_verified": false,
+      "last_confirmed_m1": 1791269040000,
+      "cooldown_until": null
+    }
+  ],
+  "owned_watches": [
+    {
+      "id": "67575ffc-5d15-4e73-aa6b-f9b075700626",
+      "status": "active",
+      "paused_reason": null,
+      "last_event": 1791269040000
+    },
+    {
+      "id": "cab0a0df-6f35-4cad-a6a3-b989656cee7e",
+      "status": "active",
+      "paused_reason": null,
+      "last_event": 1791269040000
+    }
+  ],
+  "api_live_pricing_sha256": "c73dcb17c3f73a580ecca426e90e262c4bbbeb58b99a27388511f1633c855419",
+  "scope": "Read-only current metadata check; full historical content audit and functional exercises are separate linked evidence. Quality acceptance remains pending.",
+  "mt4_deferred": true
+}

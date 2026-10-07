@@ -1,0 +1,32 @@
+{
+  "host": "Ubuntu local isolated Docker; host Chromium/rule observers",
+  "project": "market-watch-data-integration",
+  "phase": "sustained",
+  "event": "new_independent_window_after_disk_cleanup",
+  "started_at": 1791283673719,
+  "planned_end": 1791456473719,
+  "started_at_utc": "2026-10-06T10:47:53.719000+00:00",
+  "planned_end_utc": "2026-10-08T10:47:53.719000+00:00",
+  "observer_pid": 2233613,
+  "planned_minutes": 2880,
+  "raw": "artifacts/data-integration/browser-sustained.jsonl",
+  "code_commit": "64282253f6db892b1e4cfb03331030004f6af292",
+  "prior_disk_interrupted_window": "sustained-observation-window-disk-interrupted.json",
+  "old_raw_preserved": "observation-restart-archives.json",
+  "previous_duration_not_counted": true,
+  "two_trading_days_verified": false,
+  "source_clock_offset_verified": false,
+  "calendar_verified": false,
+  "mt4_deferred": true,
+  "start_record": {
+    "event": "started",
+    "at": 1791283673719,
+    "phase": "sustained",
+    "planned_minutes": 2880,
+    "host": "Ubuntu local Chromium",
+    "url": "http://127.0.0.1:16589/market-data",
+    "receiver_browser_same_host_clock": true,
+    "clock_scope": "same host; source clock offset remains unverified"
+  },
+  "first_full_source_minute": 1791283680000
+}

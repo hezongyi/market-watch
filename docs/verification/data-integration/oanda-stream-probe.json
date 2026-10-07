@@ -1,0 +1,60 @@
+{
+  "environment": "Ubuntu read-only practice probe; no deployed instance",
+  "stream_connections": 1,
+  "prices": {
+    "EUR_USD": {
+      "count": 32,
+      "tradeable": true,
+      "last_source_time": 1791249981895,
+      "age_ms_percentiles": {
+        "50": 269,
+        "95": 538,
+        "99": 581
+      }
+    },
+    "XAU_USD": {
+      "count": 169,
+      "tradeable": true,
+      "last_source_time": 1791249986314,
+      "age_ms_percentiles": {
+        "50": 231,
+        "95": 393,
+        "99": 436
+      }
+    }
+  },
+  "heartbeats": 14,
+  "duration_seconds": 75.045,
+  "sustained_two_day_gate": "not_tested",
+  "catalog": {
+    "EUR_USD": {
+      "type": "CURRENCY",
+      "displayPrecision": 5,
+      "pipLocation": -4
+    },
+    "XAU_USD": {
+      "type": "METAL",
+      "displayPrecision": 3,
+      "pipLocation": -2
+    }
+  },
+  "m1": {
+    "EUR_USD": {
+      "result": {
+        "status": "data",
+        "retry_at": null
+      },
+      "rows": 5,
+      "last_start": 1791249840000
+    },
+    "XAU_USD": {
+      "result": {
+        "status": "data",
+        "retry_at": null
+      },
+      "rows": 5,
+      "last_start": 1791249840000
+    }
+  },
+  "status": "probe_passed"
+}

@@ -102,6 +102,10 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
         return []
     version = current_version(db, alert)
     config = AlertConfig.model_validate(version.config)
+    if config.series_kind == "composite":
+        from .composite_alerts import evaluate as evaluate_composite
+
+        return evaluate_composite(db, alert, version, config, now)
     try:
         rows, meta = stored_rows(db, version, config, now)
     except ValueError as exc:

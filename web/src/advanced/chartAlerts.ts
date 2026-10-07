@@ -37,7 +37,7 @@ export type Association = {
 export type AlertConfig = {
   name: string;
   instrument: string;
-  series_kind: "managed" | "provider";
+  series_kind: "managed" | "provider" | "composite";
   source: string;
   timeframe: string;
   mode: "close" | "intrabar";
@@ -52,11 +52,13 @@ export type AlertConfig = {
   calculation_version: "chart-python-v1";
   calculation_origin?: number | null;
   published?: boolean;
+  composite_revision_id?: string | null;
+  seam_policy?: "reject" | "accept_raw";
 };
 export type AlertContext = {
   request_id: string;
   instrument: string;
-  series_kind: "managed" | "provider";
+  series_kind: "managed" | "provider" | "composite";
   timeframe: string;
   price?: string;
   source?: string;
@@ -65,6 +67,7 @@ export type AlertContext = {
   indicator?: IndicatorSpec;
   calculation_origin?: number | null;
   published?: boolean;
+  composite_revision_id?: string | null;
 };
 export type AlertRow = {
   id: string;
@@ -109,7 +112,7 @@ export type AlertEvent = {
 export type Capabilities = {
   sources: {
     source: string;
-    series_kind: "managed" | "provider";
+    series_kind: "managed" | "provider" | "composite";
     basis: string;
     available: boolean;
     reason: string | null;
@@ -178,8 +181,8 @@ export function validAlertContext(
     typeof v.request_id === "string" &&
     v.request_id.length <= 100 &&
     typeof v.instrument === "string" &&
-    /^[A-Za-z0-9:_-]{1,40}$/.test(v.instrument) &&
-    ["managed", "provider"].includes(v.series_kind) &&
+    (v.series_kind === "composite" ? /^[a-f0-9]{64}$/.test(v.instrument) : /^[A-Za-z0-9:_-]{1,40}$/.test(v.instrument)) &&
+    ["managed", "provider", "composite"].includes(v.series_kind) &&
     ["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"].includes(
       v.timeframe,
     ) &&
@@ -221,5 +224,7 @@ export function freshDraft(context: AlertContext): AlertConfig {
     calculation_version: "chart-python-v1",
     calculation_origin: context.calculation_origin ?? null,
     published: context.published ?? false,
+    ...(context.series_kind === "composite" ? {composite_revision_id:context.composite_revision_id ?? null,
+      seam_policy:"reject" as const} : {}),
   };
 }

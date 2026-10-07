@@ -1,0 +1,116 @@
+{
+  "starts": [
+    {
+      "event": "started",
+      "at": 1791259454900,
+      "phase": "sustained",
+      "planned_minutes": 2880,
+      "host": "Ubuntu local Chromium",
+      "url": "http://127.0.0.1:16589/market-data",
+      "receiver_browser_same_host_clock": true,
+      "clock_scope": "same host; source clock offset remains unverified"
+    }
+  ],
+  "finishes": [],
+  "deployments": [
+    {
+      "event": "deployment_started",
+      "at": 1791262860351,
+      "phase": "sustained",
+      "action": "api_recreate_for_cooldown_health",
+      "commit": "42ec05176b80b46e370d6a630fee78f1c20b3937",
+      "scope": "Ubuntu acceptance API only"
+    },
+    {
+      "event": "deployment_finished",
+      "at": 1791262889349,
+      "phase": "sustained",
+      "action": "api_recreate_for_cooldown_health",
+      "commit": "42ec05176b80b46e370d6a630fee78f1c20b3937",
+      "elapsed_ms": 28998
+    }
+  ],
+  "session_renewals": [],
+  "measurement_since": 1791259454900,
+  "prior_records_retained_in_original": 118,
+  "contains_deployment": true,
+  "first_block": 1791259485335,
+  "last_block": 1791262968558,
+  "blocks": 117,
+  "snapshots": 2876,
+  "heartbeats": 3396,
+  "errors": 3,
+  "zero_heartbeat_blocks": 0,
+  "max_block_interval_ms": 30266,
+  "opened": 2,
+  "symbols": {
+    "EURUSD": {
+      "unique_quotes": 993,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 0,
+      "quality_counts": {
+        "healthy": 2684,
+        "stale": 192
+      },
+      "visible_quote_update_rate": {
+        "updates": 993,
+        "elapsed_seconds": 3513.658,
+        "updates_per_second": 0.28261145507047075,
+        "meaning": "distinct quote keys within each SSE subscription; reload can recount its first quote; includes startup, silent/error blocks and gaps; 1s snapshots can omit source updates",
+        "denominator_status": "single_recorded_window"
+      },
+      "receive_to_browser_ms": {
+        "samples": 993,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 440,
+        "p95_ms": 990,
+        "p99_ms": 1120
+      },
+      "source_to_browser_ms": {
+        "samples": 993,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 840,
+        "p95_ms": 1500,
+        "p99_ms": 1870
+      }
+    },
+    "XAUUSD": {
+      "unique_quotes": 2593,
+      "negative_delays": 0,
+      "missing_quote_snapshots": 0,
+      "epoch_changes": 0,
+      "quality_counts": {
+        "healthy": 2876
+      },
+      "visible_quote_update_rate": {
+        "updates": 2593,
+        "elapsed_seconds": 3513.658,
+        "updates_per_second": 0.7379773444085908,
+        "meaning": "distinct quote keys within each SSE subscription; reload can recount its first quote; includes startup, silent/error blocks and gaps; 1s snapshots can omit source updates",
+        "denominator_status": "single_recorded_window"
+      },
+      "receive_to_browser_ms": {
+        "samples": 2593,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 310,
+        "p95_ms": 940,
+        "p99_ms": 1040
+      },
+      "source_to_browser_ms": {
+        "samples": 2593,
+        "invalid_samples": 0,
+        "histogram_resolution_ms": 10,
+        "p50_ms": 640,
+        "p95_ms": 1300,
+        "p99_ms": 1560
+      }
+    }
+  },
+  "meaning": "quote keys observed through browser SSE; invalid timings separate; 1s snapshots can omit upstream updates",
+  "source_clock_offset_verified": false,
+  "two_trading_days_verified": false
+}

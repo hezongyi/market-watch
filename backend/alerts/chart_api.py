@@ -19,9 +19,10 @@ from .calendar_profile import closures_from
 from .chart_data import FRAMES, chart_rows, future_grid
 from .chart_history_plan import bucket_has_trading
 from .chart_indicators import CATALOG, calculate, validate
-from .chart_series import SeriesKind
-from .domain import Calendar
+from .chart_series import SeriesKind, decode, is_gold
+from .domain import calendar_for
 from .managed_dataset import data as published_data
+from .native_series import OandaParameters
 from .storage import (
     Bar,
     ChartTemplate,
@@ -37,6 +38,12 @@ from .volume import metadata as volume_metadata
 
 class Create(BaseModel):
     name: str = Field(min_length=1, max_length=100)
+
+
+class NativeConfiguration(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    instrument: str = Field(min_length=1, max_length=40)
+    parameters: OandaParameters
 
 
 class Save(Create):
@@ -103,6 +110,8 @@ class DataQuery(BaseModel):
     dataset_start: int | None = Field(default=None, ge=0)
     calculation_origin: int | None = Field(default=None, ge=0)
     provisional: bool = True
+    composite_revision_id: str | None = Field(default=None, max_length=36)
+    input_revision: int | None = Field(default=None, ge=0)
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
     native_reserve: NativeReserve | None = None
@@ -127,7 +136,7 @@ class DataQuery(BaseModel):
                 raise ValueError("图表储备只适用于带原生上下文的纯平台历史缓存读取")
         if self.series_kind == "provider" and self.native_history is None and max(self.limit, self.count_back or 0) > 20000:
             raise ValueError("普通平台单页最多20000根")
-        if self.series_kind == "managed" and self.limit > 2000:
+        if self.series_kind != "provider" and self.limit > 2000:
             raise ValueError("自建单页最多2000根")
         if self.native_history is not None or self.history_observation is not None:
             if self.series_kind != "provider":
@@ -157,6 +166,8 @@ class ExportQuery(BaseModel):
     start: int = Field(ge=0)
     end: int = Field(gt=0)
     indicators: list[dict] = Field(default_factory=list, max_length=12)
+    composite_revision_id: str | None = Field(default=None, max_length=36)
+    input_revision: int | None = Field(default=None, ge=0)
 
 
 class ProviderSubscription(BaseModel):
@@ -206,6 +217,19 @@ def history_check(db, inst, source, visible, body):
 
 
 def checked(document):
+    from .storage import MarketDataset
+
+    with transaction() as db:
+        managed_symbols = {"EURUSD", "XAUUSD", "BTCUSDT"}
+        managed_symbols.update(db.scalars(select(MarketDataset.instrument_id)))
+        from .history_retention import string_values
+        from .series_access import metadata
+
+        for value in string_values(document):
+            if value.startswith(("MWH:", "MWC:")):
+                ident, kind = decode(value)
+                metadata(db, ident, kind)
+                managed_symbols.add(value)
     if len(json.dumps(document, allow_nan=False)) > 2_000_000:
         raise ValueError("工作区过大")
     if document.get("schemaVersion") != 1:
@@ -245,7 +269,7 @@ def checked(document):
             or view["from"] >= view["to"]
         ):
             raise ValueError("无效时间视区")
-        if p.get("instrument") not in ("EURUSD", "XAUUSD", "BTCUSDT"):
+        if p.get("instrument") not in managed_symbols:
             raise ValueError("未知品种")
         if p.get("timeframe") not in FRAMES:
             raise ValueError("未知周期")
@@ -258,7 +282,7 @@ def checked(document):
         raise ValueError("画线数量超出限制")
     for symbol, objects in drawings.items():
         if (
-            symbol not in ("EURUSD", "XAUUSD", "BTCUSDT")
+            symbol not in managed_symbols
             or not isinstance(objects, list)
             or not all(isinstance(o, dict) for o in objects)
         ):
@@ -320,6 +344,17 @@ _RESULT_CACHE = OrderedDict()
 def router(authenticated):
     r = APIRouter(prefix="/api/charts", dependencies=[Depends(authenticated)])
 
+    @r.post("/provider/configure")
+    def native_configuration(body: NativeConfiguration):
+        from .chart_series import encode
+        from .native_series import register
+        from .provider_chart import metadata
+        try:
+            meta = register(metadata(body.instrument), body.parameters.model_dump())
+            return {"ticker": encode(meta["id"], "provider"), "metadata": meta}
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
     @r.post("/provider/subscribe")
     def provider_subscribe(body: ProviderSubscription):
         from .provider_service import subscribe
@@ -369,7 +404,16 @@ def router(authenticated):
 
     @r.get("/catalog")
     def catalog():
-        return {"frames": FRAMES, "indicators": CATALOG}
+        from .storage import MarketDataset
+
+        with transaction() as db:
+            sources = [{"id": row.instrument_id, "symbol": row.logical_symbol,
+                        "source": row.identity["source"], "environment": row.identity["environment"]}
+                       for row in db.scalars(select(MarketDataset))]
+            from .series_access import search
+            sources += [{"id": row["ticker"], "symbol": row["symbol"], "source": row["source"],
+                "environment": row["description"], "series_kind": row["series_kind"]} for row in search(db)]
+        return {"frames": FRAMES, "indicators": CATALOG, "managed_sources": sources}
 
     @r.post("/export")
     def export(body: ExportQuery):
@@ -391,6 +435,26 @@ def router(authenticated):
         try:
             for spec in body.indicators:
                 validate(spec)
+        except (ValueError, TypeError, KeyError, AttributeError) as error:
+            raise HTTPException(422, str(error)) from error
+        try:
+            if body.instrument.startswith(("MWH:", "MWC:")):
+                ident, kind = decode(body.instrument)
+                if body.series_kind not in ("managed", kind):
+                    raise ValueError("行情标识与指定类型不一致")
+                body = body.model_copy(update={"instrument": ident, "series_kind": kind})
+            if body.series_kind in ("history", "composite"):
+                from .chart_series import encode
+                from .series_access import export_page
+
+                with transaction() as db:
+                    page = export_page(db, body)
+                if page.get("export_pending"):
+                    raise HTTPException(409, "；".join(page["pending"]))
+                return Response(chart_csv(page, instrument=encode(body.instrument, body.series_kind),
+                        timeframe=body.timeframe), media_type="text/csv; charset=utf-8",
+                        headers={"Content-Disposition": 'attachment; filename="market-watch.csv"',
+                                 "Cache-Control": "no-store"})
         except (ValueError, TypeError, KeyError, AttributeError) as error:
             raise HTTPException(422, str(error)) from error
         if body.series_kind == "provider":
@@ -422,7 +486,7 @@ def router(authenticated):
                                      "Cache-Control": "no-store"})
         with transaction() as db:
             inst = resolve(db, body.instrument)
-            calendar = Calendar(inst.calendar)
+            calendar = calendar_for(inst)
             boundary = bounds if body.timeframe in ("M30", "W1", "MN") else bucket_bounds
             left = ms(boundary(instant(body.start), body.timeframe, calendar)[0])
             right = min(
@@ -543,6 +607,12 @@ def router(authenticated):
         with transaction() as db:
             if not db.get(ChartWorkspace, id):
                 raise HTTPException(404, "工作区不存在")
+            from .history_retention import lock_reference_values
+
+            try:
+                lock_reference_values(db, body.document)
+            except ValueError as error:
+                raise HTTPException(409, str(error)) from None
             res = db.execute(
                 update(ChartWorkspace)
                 .where(ChartWorkspace.id == id, ChartWorkspace.revision == body.revision)
@@ -675,12 +745,23 @@ def router(authenticated):
 
 def data_sync(body: DataQuery):
     try:
+        ident, kind = decode(body.instrument) if body.instrument.startswith(("MWH:", "MWC:")) else (body.instrument, body.series_kind)
+        if kind in ("history", "composite"):
+            if body.series_kind not in ("managed", kind):
+                raise ValueError("行情标识与指定类型不一致")
+            body = body.model_copy(update={"instrument": ident, "series_kind": kind})
         for spec in body.indicators:
             validate(spec)
+        if body.series_kind in ("history", "composite"):
+            from .series_access import chart_data
+
+            with transaction() as db:
+                return chart_data(db, body)
         if body.series_kind == "provider":
             import httpx
 
             from .provider_chart import data as provider_data
+            from .provider_dukascopy import NativeDataError
             from .provider_yahoo import YahooError
 
             try:
@@ -688,6 +769,9 @@ def data_sync(body: DataQuery):
             except YahooError as error:
                 raise HTTPException(503, {"message":str(error), "status":error.status,
                                           "history_boundary":False}) from None
+            except NativeDataError as error:
+                raise HTTPException(503, {"message": str(error), "status": error.status,
+                                          "history_boundary": False}) from None
             except (httpx.HTTPError, TimeoutError) as error:
                 raise HTTPException(503, "平台行情暂不可用，请重试；尚未确认历史边界") from error
         if body.published:
@@ -696,6 +780,9 @@ def data_sync(body: DataQuery):
             inst = db.get(Instrument, body.instrument)
             if not inst:
                 raise HTTPException(404, "品种不存在")
+            if body.client:
+                from .market_data import renew_demand
+                renew_demand(db, body.client, inst)
             before = body.before or now_ms() + 1
             # All persisted source history is the common recursive indicator prefix.
             # New bars never move its origin; backfill/revisions deliberately invalidate it.
@@ -770,8 +857,8 @@ def data_sync(body: DataQuery):
                     row["gap_before"] = bucket_has_trading(
                         instant(prev["end"]),
                         instant(row["start"]),
-                        Calendar(inst.calendar),
-                        gold=inst.id == "XAUUSD",
+                        calendar_for(inst),
+                        gold=is_gold(inst.id),
                         closures=closures,
                     )
             with _CACHE_LOCK:

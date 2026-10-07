@@ -1,0 +1,42 @@
+{
+  "captured_at": 1791269627514,
+  "host": "Ubuntu local isolated Docker",
+  "connection_events": [
+    {
+      "kind": "pricing_connection",
+      "at": 1791268990933,
+      "details": {
+        "dataset": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+        "epoch": 50
+      }
+    },
+    {
+      "kind": "pricing_connection",
+      "at": 1791268990947,
+      "details": {
+        "dataset": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+        "epoch": 50
+      }
+    },
+    {
+      "kind": "pricing_recovered",
+      "at": 1791269011231,
+      "details": {
+        "dataset": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+        "epoch": 50,
+        "confirmed_end": 1791268980000
+      }
+    },
+    {
+      "kind": "pricing_recovered",
+      "at": 1791269012052,
+      "details": {
+        "dataset": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+        "epoch": 50,
+        "confirmed_end": 1791268980000
+      }
+    }
+  ],
+  "source_clock_offset_verified": false,
+  "two_trading_days_verified": false
+}

@@ -1,0 +1,41 @@
+{
+  "event": "derivation_completed",
+  "host": "Ubuntu local Docker",
+  "original_version": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+  "original_status": "configuration_error",
+  "original_cursor": 1728514980000,
+  "new_version": "30b7f7ba-cdea-42df-9738-1193e29574b8",
+  "new_identity": {
+    "source": "dukascopy",
+    "channel": "python",
+    "environment": "historical",
+    "account_scope": "public",
+    "provider_symbol": "EUR/USD",
+    "basis": "bid",
+    "calendar_version": "ny17-observed-v2"
+  },
+  "new_instrument": "MD:1da5d39b1d15f8359cd271abc:EURUSD",
+  "new_precision": 6,
+  "new_cursor": 1728514980000,
+  "new_status": "pending",
+  "derivation_seconds": 1007.236,
+  "provenance": {
+    "derived_from_version": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+    "original_identity": {
+      "source": "dukascopy",
+      "channel": "python",
+      "environment": "historical",
+      "account_scope": "public",
+      "provider_symbol": "EUR/USD",
+      "basis": "bid",
+      "calendar_version": "ny17-candidate-v1"
+    },
+    "original_cursor": 1728514980000,
+    "copied_minutes": 2986089,
+    "copied_chunks": 685,
+    "original_prefix_checksum": "ec44ef78854cf559dacdb540ca3790d90de3b4cc46ce9e229743b6c4daf6bd80",
+    "method": "verified immutable original chunks; no price rounding or source substitution"
+  },
+  "rounding": "none",
+  "passed": true
+}

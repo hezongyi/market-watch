@@ -68,7 +68,12 @@ try {
   assert.ok(installed.includes('admitCheckpoint(i,e)'));
   // The earlier sync-settings candidate has pause/zoom hooks but no logical
   // Undo routing or save-revision cleanup. Upgrade those exact known bytes.
-  const previousSync = installed
+  run('--disable');
+  const productionSync = path.join(temp, 'production-sync.mjs');
+  fs.writeFileSync(productionSync, execFileSync('git',
+    ['show', 'v1.12.0:advanced-host/patch-native-reserve.mjs'], {cwd:root}));
+  execFileSync(process.execPath, [productionSync, file]);
+  const previousSync = fs.readFileSync(file, 'utf8')
     .replace('if(globalThis.parent?.MWNativeSync?.handleChoice(this,"date",e,Cf))return;', '')
     .replace('if(globalThis.parent?.MWNativeSync?.handleChoice(this,"time",e,Tf))return;', '')
     .replace('_handleChartSaved(e){e&&this._setContentHasChanges(globalThis.parent?.MWNativeSave?.hasUnsavedChanges()===true)}',

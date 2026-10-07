@@ -1,0 +1,42 @@
+{
+  "observed_at": 1791254654673,
+  "host": "unraid production read-only",
+  "revision": [
+    "r19_native_history_loads"
+  ],
+  "identity_mapping": "legacy_unverified; no automatic source rebinding",
+  "inventory": [
+    {
+      "id": "BTCUSD",
+      "source": "dukascopy",
+      "symbol": "btcusd",
+      "basis": "bid",
+      "calendar": "utc0",
+      "bars": 0
+    },
+    {
+      "id": "BTCUSDT",
+      "source": "binance",
+      "symbol": "BTCUSDT",
+      "basis": "last",
+      "calendar": "utc0",
+      "bars": 347645
+    },
+    {
+      "id": "EURUSD",
+      "source": "oanda",
+      "symbol": "EUR_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 246215
+    },
+    {
+      "id": "XAUUSD",
+      "source": "oanda",
+      "symbol": "XAU_USD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "bars": 235303
+    }
+  ]
+}

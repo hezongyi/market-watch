@@ -1,0 +1,18 @@
+{
+  "host": "Ubuntu Chromium",
+  "seam": "local transient 502 before event-stream response",
+  "before": {
+    "calls": 1,
+    "errors": 1,
+    "beats": 0,
+    "ready_state": 2
+  },
+  "after": {
+    "calls": 2,
+    "errors": 2,
+    "beats": 1,
+    "state": 0
+  },
+  "passed": true,
+  "source": "real browser EventSource with 15s watchdog"
+}

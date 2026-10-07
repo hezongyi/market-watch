@@ -1,0 +1,521 @@
+{
+  "captured_at": 1791266624759,
+  "cutoff": 1791266624759,
+  "since": 1791259500000,
+  "complete_minutes_end_exclusive": 1791266580000,
+  "evaluation_first_eligible_close": 1791259740000,
+  "host": "Ubuntu local isolated Docker",
+  "project": "market-watch-data-integration",
+  "snapshot": "PostgreSQL repeatable read, read only",
+  "datasets": [
+    {
+      "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+      "symbol": "XAUUSD",
+      "source": "oanda",
+      "environment": "practice",
+      "evaluation_first_eligible_close": 1791259740000,
+      "total": {
+        "elapsed_complete_minutes": 118,
+        "recorded_minutes": 118,
+        "unobserved_minutes": 0,
+        "unknown_recorded_minutes": 0,
+        "reviewed_closed_minutes": 0,
+        "expectation_counts": {
+          "fresh_source_tradeable": 118
+        },
+        "known_expected_minutes_including_recovery": 118,
+        "known_missing_minutes_including_recovery": 0,
+        "live_expected_minutes": 118,
+        "live_confirmed_minutes": 118,
+        "live_missing_minutes": 0,
+        "live_confirmed_over_30s": 0,
+        "live_missing_over_30s": 0,
+        "recovery_expected_minutes": 0,
+        "recovery_confirmed_minutes": 0,
+        "attempts": 354,
+        "failed_attempts": 3,
+        "confirmation": {
+          "samples": 118,
+          "negative_samples": 0,
+          "p50_ms": 7146,
+          "p95_ms": 10485,
+          "p99_ms": 23438
+        },
+        "source_to_receiver": {
+          "samples": 11322,
+          "negative_samples": 0,
+          "histogram_resolution_ms": 10,
+          "p50_ms": 300,
+          "p95_ms": 1000,
+          "p99_ms": 4140
+        },
+        "quotes": 11322,
+        "accepted_quote_update_rate": {
+          "updates": 11322,
+          "elapsed_seconds": 7080,
+          "updates_per_second": 1.5991525423728814,
+          "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"
+        },
+        "max_interarrival_ms": 10388,
+        "ingestion_and_watch_phase": {
+          "eligible_live_minutes": 115,
+          "minutes_without_target_confirmation_audit": 0,
+          "target_audit_records": 115,
+          "samples": 115,
+          "negative_samples": 0,
+          "p50_ms": 7218,
+          "p95_ms": 10500,
+          "p99_ms": 23671
+        }
+      },
+      "by_utc_hour_and_observation_phase": [
+        {
+          "utc_hour": "2026-10-06T04:00Z",
+          "phase": "other_hours",
+          "first_minute": "2026-10-06T04:05:00+00:00",
+          "last_minute": "2026-10-06T04:59:00+00:00",
+          "elapsed_complete_minutes": 55,
+          "recorded_minutes": 55,
+          "unobserved_minutes": 0,
+          "unknown_recorded_minutes": 0,
+          "reviewed_closed_minutes": 0,
+          "expectation_counts": {
+            "fresh_source_tradeable": 55
+          },
+          "known_expected_minutes_including_recovery": 55,
+          "known_missing_minutes_including_recovery": 0,
+          "live_expected_minutes": 55,
+          "live_confirmed_minutes": 55,
+          "live_missing_minutes": 0,
+          "live_confirmed_over_30s": 0,
+          "live_missing_over_30s": 0,
+          "recovery_expected_minutes": 0,
+          "recovery_confirmed_minutes": 0,
+          "attempts": 165,
+          "failed_attempts": 0,
+          "confirmation": {
+            "samples": 55,
+            "negative_samples": 0,
+            "p50_ms": 6869,
+            "p95_ms": 7993,
+            "p99_ms": 10485
+          },
+          "source_to_receiver": {
+            "samples": 4946,
+            "negative_samples": 0,
+            "histogram_resolution_ms": 10,
+            "p50_ms": 280,
+            "p95_ms": 760,
+            "p99_ms": 1150
+          },
+          "quotes": 4946,
+          "accepted_quote_update_rate": {
+            "updates": 4946,
+            "elapsed_seconds": 3300,
+            "updates_per_second": 1.4987878787878788,
+            "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"
+          },
+          "max_interarrival_ms": 10388,
+          "ingestion_and_watch_phase": {
+            "eligible_live_minutes": 52,
+            "minutes_without_target_confirmation_audit": 0,
+            "target_audit_records": 52,
+            "samples": 52,
+            "negative_samples": 0,
+            "p50_ms": 6889,
+            "p95_ms": 8022,
+            "p99_ms": 10500
+          }
+        },
+        {
+          "utc_hour": "2026-10-06T05:00Z",
+          "phase": "other_hours",
+          "first_minute": "2026-10-06T05:00:00+00:00",
+          "last_minute": "2026-10-06T05:59:00+00:00",
+          "elapsed_complete_minutes": 60,
+          "recorded_minutes": 60,
+          "unobserved_minutes": 0,
+          "unknown_recorded_minutes": 0,
+          "reviewed_closed_minutes": 0,
+          "expectation_counts": {
+            "fresh_source_tradeable": 60
+          },
+          "known_expected_minutes_including_recovery": 60,
+          "known_missing_minutes_including_recovery": 0,
+          "live_expected_minutes": 60,
+          "live_confirmed_minutes": 60,
+          "live_missing_minutes": 0,
+          "live_confirmed_over_30s": 0,
+          "live_missing_over_30s": 0,
+          "recovery_expected_minutes": 0,
+          "recovery_confirmed_minutes": 0,
+          "attempts": 183,
+          "failed_attempts": 3,
+          "confirmation": {
+            "samples": 60,
+            "negative_samples": 0,
+            "p50_ms": 7362,
+            "p95_ms": 11069,
+            "p99_ms": 25987
+          },
+          "source_to_receiver": {
+            "samples": 5874,
+            "negative_samples": 0,
+            "histogram_resolution_ms": 10,
+            "p50_ms": 310,
+            "p95_ms": 1180,
+            "p99_ms": 11880
+          },
+          "quotes": 5874,
+          "accepted_quote_update_rate": {
+            "updates": 5874,
+            "elapsed_seconds": 3600,
+            "updates_per_second": 1.6316666666666666,
+            "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"
+          },
+          "max_interarrival_ms": 8832,
+          "ingestion_and_watch_phase": {
+            "eligible_live_minutes": 60,
+            "minutes_without_target_confirmation_audit": 0,
+            "target_audit_records": 60,
+            "samples": 60,
+            "negative_samples": 0,
+            "p50_ms": 7384,
+            "p95_ms": 11152,
+            "p99_ms": 26134
+          }
+        },
+        {
+          "utc_hour": "2026-10-06T06:00Z",
+          "phase": "other_hours",
+          "first_minute": "2026-10-06T06:00:00+00:00",
+          "last_minute": "2026-10-06T06:02:00+00:00",
+          "elapsed_complete_minutes": 3,
+          "recorded_minutes": 3,
+          "unobserved_minutes": 0,
+          "unknown_recorded_minutes": 0,
+          "reviewed_closed_minutes": 0,
+          "expectation_counts": {
+            "fresh_source_tradeable": 3
+          },
+          "known_expected_minutes_including_recovery": 3,
+          "known_missing_minutes_including_recovery": 0,
+          "live_expected_minutes": 3,
+          "live_confirmed_minutes": 3,
+          "live_missing_minutes": 0,
+          "live_confirmed_over_30s": 0,
+          "live_missing_over_30s": 0,
+          "recovery_expected_minutes": 0,
+          "recovery_confirmed_minutes": 0,
+          "attempts": 6,
+          "failed_attempts": 0,
+          "confirmation": {
+            "samples": 3,
+            "negative_samples": 0,
+            "p50_ms": 9244,
+            "p95_ms": 11171,
+            "p99_ms": 11171
+          },
+          "source_to_receiver": {
+            "samples": 502,
+            "negative_samples": 0,
+            "histogram_resolution_ms": 10,
+            "p50_ms": 320,
+            "p95_ms": 1120,
+            "p99_ms": 1460
+          },
+          "quotes": 502,
+          "accepted_quote_update_rate": {
+            "updates": 502,
+            "elapsed_seconds": 180,
+            "updates_per_second": 2.7888888888888888,
+            "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"
+          },
+          "max_interarrival_ms": 2072,
+          "ingestion_and_watch_phase": {
+            "eligible_live_minutes": 3,
+            "minutes_without_target_confirmation_audit": 0,
+            "target_audit_records": 3,
+            "samples": 3,
+            "negative_samples": 0,
+            "p50_ms": 9441,
+            "p95_ms": 11311,
+            "p99_ms": 11311
+          }
+        }
+      ],
+      "connection_audits": {
+        "pricing_connection": 0,
+        "pricing_recovered": 0,
+        "pricing_confirmed": 119
+      },
+      "current_owned_watches": [
+        {
+          "id": "67575ffc-5d15-4e73-aa6b-f9b075700626",
+          "armed_at": 1791259733075,
+          "status": "active",
+          "paused_reason": null,
+          "last_event": 1791266580000
+        }
+      ]
+    },
+    {
+      "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "symbol": "EURUSD",
+      "source": "oanda",
+      "environment": "practice",
+      "evaluation_first_eligible_close": 1791259740000,
+      "total": {
+        "elapsed_complete_minutes": 118,
+        "recorded_minutes": 118,
+        "unobserved_minutes": 0,
+        "unknown_recorded_minutes": 0,
+        "reviewed_closed_minutes": 0,
+        "expectation_counts": {
+          "fresh_source_tradeable": 118
+        },
+        "known_expected_minutes_including_recovery": 118,
+        "known_missing_minutes_including_recovery": 0,
+        "live_expected_minutes": 118,
+        "live_confirmed_minutes": 118,
+        "live_missing_minutes": 0,
+        "live_confirmed_over_30s": 1,
+        "live_missing_over_30s": 0,
+        "recovery_expected_minutes": 0,
+        "recovery_confirmed_minutes": 0,
+        "attempts": 351,
+        "failed_attempts": 0,
+        "confirmation": {
+          "samples": 118,
+          "negative_samples": 0,
+          "p50_ms": 7977,
+          "p95_ms": 11671,
+          "p99_ms": 18165
+        },
+        "source_to_receiver": {
+          "samples": 3034,
+          "negative_samples": 0,
+          "histogram_resolution_ms": 10,
+          "p50_ms": 370,
+          "p95_ms": 1120,
+          "p99_ms": 9400
+        },
+        "quotes": 3034,
+        "accepted_quote_update_rate": {
+          "updates": 3034,
+          "elapsed_seconds": 7080,
+          "updates_per_second": 0.4285310734463277,
+          "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"
+        },
+        "max_interarrival_ms": 44170,
+        "ingestion_and_watch_phase": {
+          "eligible_live_minutes": 115,
+          "minutes_without_target_confirmation_audit": 0,
+          "target_audit_records": 115,
+          "samples": 115,
+          "negative_samples": 0,
+          "p50_ms": 8016,
+          "p95_ms": 11902,
+          "p99_ms": 19146
+        }
+      },
+      "by_utc_hour_and_observation_phase": [
+        {
+          "utc_hour": "2026-10-06T04:00Z",
+          "phase": "other_hours",
+          "first_minute": "2026-10-06T04:05:00+00:00",
+          "last_minute": "2026-10-06T04:59:00+00:00",
+          "elapsed_complete_minutes": 55,
+          "recorded_minutes": 55,
+          "unobserved_minutes": 0,
+          "unknown_recorded_minutes": 0,
+          "reviewed_closed_minutes": 0,
+          "expectation_counts": {
+            "fresh_source_tradeable": 55
+          },
+          "known_expected_minutes_including_recovery": 55,
+          "known_missing_minutes_including_recovery": 0,
+          "live_expected_minutes": 55,
+          "live_confirmed_minutes": 55,
+          "live_missing_minutes": 0,
+          "live_confirmed_over_30s": 0,
+          "live_missing_over_30s": 0,
+          "recovery_expected_minutes": 0,
+          "recovery_confirmed_minutes": 0,
+          "attempts": 165,
+          "failed_attempts": 0,
+          "confirmation": {
+            "samples": 55,
+            "negative_samples": 0,
+            "p50_ms": 7468,
+            "p95_ms": 9281,
+            "p99_ms": 11624
+          },
+          "source_to_receiver": {
+            "samples": 1350,
+            "negative_samples": 0,
+            "histogram_resolution_ms": 10,
+            "p50_ms": 340,
+            "p95_ms": 840,
+            "p99_ms": 1210
+          },
+          "quotes": 1350,
+          "accepted_quote_update_rate": {
+            "updates": 1350,
+            "elapsed_seconds": 3300,
+            "updates_per_second": 0.4090909090909091,
+            "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"
+          },
+          "max_interarrival_ms": 37616,
+          "ingestion_and_watch_phase": {
+            "eligible_live_minutes": 52,
+            "minutes_without_target_confirmation_audit": 0,
+            "target_audit_records": 52,
+            "samples": 52,
+            "negative_samples": 0,
+            "p50_ms": 7502,
+            "p95_ms": 9303,
+            "p99_ms": 11662
+          }
+        },
+        {
+          "utc_hour": "2026-10-06T05:00Z",
+          "phase": "other_hours",
+          "first_minute": "2026-10-06T05:00:00+00:00",
+          "last_minute": "2026-10-06T05:59:00+00:00",
+          "elapsed_complete_minutes": 60,
+          "recorded_minutes": 60,
+          "unobserved_minutes": 0,
+          "unknown_recorded_minutes": 0,
+          "reviewed_closed_minutes": 0,
+          "expectation_counts": {
+            "fresh_source_tradeable": 60
+          },
+          "known_expected_minutes_including_recovery": 60,
+          "known_missing_minutes_including_recovery": 0,
+          "live_expected_minutes": 60,
+          "live_confirmed_minutes": 60,
+          "live_missing_minutes": 0,
+          "live_confirmed_over_30s": 1,
+          "live_missing_over_30s": 0,
+          "recovery_expected_minutes": 0,
+          "recovery_confirmed_minutes": 0,
+          "attempts": 180,
+          "failed_attempts": 0,
+          "confirmation": {
+            "samples": 60,
+            "negative_samples": 0,
+            "p50_ms": 8207,
+            "p95_ms": 12975,
+            "p99_ms": 32005
+          },
+          "source_to_receiver": {
+            "samples": 1510,
+            "negative_samples": 0,
+            "histogram_resolution_ms": 10,
+            "p50_ms": 390,
+            "p95_ms": 1440,
+            "p99_ms": 16370
+          },
+          "quotes": 1510,
+          "accepted_quote_update_rate": {
+            "updates": 1510,
+            "elapsed_seconds": 3600,
+            "updates_per_second": 0.41944444444444445,
+            "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"
+          },
+          "max_interarrival_ms": 44170,
+          "ingestion_and_watch_phase": {
+            "eligible_live_minutes": 60,
+            "minutes_without_target_confirmation_audit": 0,
+            "target_audit_records": 60,
+            "samples": 60,
+            "negative_samples": 0,
+            "p50_ms": 8252,
+            "p95_ms": 12999,
+            "p99_ms": 32472
+          }
+        },
+        {
+          "utc_hour": "2026-10-06T06:00Z",
+          "phase": "other_hours",
+          "first_minute": "2026-10-06T06:00:00+00:00",
+          "last_minute": "2026-10-06T06:02:00+00:00",
+          "elapsed_complete_minutes": 3,
+          "recorded_minutes": 3,
+          "unobserved_minutes": 0,
+          "unknown_recorded_minutes": 0,
+          "reviewed_closed_minutes": 0,
+          "expectation_counts": {
+            "fresh_source_tradeable": 3
+          },
+          "known_expected_minutes_including_recovery": 3,
+          "known_missing_minutes_including_recovery": 0,
+          "live_expected_minutes": 3,
+          "live_confirmed_minutes": 3,
+          "live_missing_minutes": 0,
+          "live_confirmed_over_30s": 0,
+          "live_missing_over_30s": 0,
+          "recovery_expected_minutes": 0,
+          "recovery_confirmed_minutes": 0,
+          "attempts": 6,
+          "failed_attempts": 0,
+          "confirmation": {
+            "samples": 3,
+            "negative_samples": 0,
+            "p50_ms": 10600,
+            "p95_ms": 12231,
+            "p99_ms": 12231
+          },
+          "source_to_receiver": {
+            "samples": 174,
+            "negative_samples": 0,
+            "histogram_resolution_ms": 10,
+            "p50_ms": 410,
+            "p95_ms": 1140,
+            "p99_ms": 1400
+          },
+          "quotes": 174,
+          "accepted_quote_update_rate": {
+            "updates": 174,
+            "elapsed_seconds": 180,
+            "updates_per_second": 0.9666666666666667,
+            "meaning": "accepted deduplicated stream updates in complete source minutes; elapsed denominator includes unknown, closed and unobserved minutes; not all ticks"
+          },
+          "max_interarrival_ms": 11120,
+          "ingestion_and_watch_phase": {
+            "eligible_live_minutes": 3,
+            "minutes_without_target_confirmation_audit": 0,
+            "target_audit_records": 3,
+            "samples": 3,
+            "negative_samples": 0,
+            "p50_ms": 10834,
+            "p95_ms": 12314,
+            "p99_ms": 12314
+          }
+        }
+      ],
+      "connection_audits": {
+        "pricing_connection": 0,
+        "pricing_recovered": 0,
+        "pricing_confirmed": 119
+      },
+      "current_owned_watches": [
+        {
+          "id": "cab0a0df-6f35-4cad-a6a3-b989656cee7e",
+          "armed_at": 1791259733032,
+          "status": "active",
+          "paused_reason": null,
+          "last_event": 1791266580000
+        }
+      ]
+    }
+  ],
+  "percentile_method": "nearest_rank; completed successful samples, denominators reported separately",
+  "phase_meaning": "London/NY weekday 08:00\u201317:00 observation bins; gold NY17\u201318 is candidate only, not certified closure",
+  "evaluation_meaning": "ingestion and watch phase flush after requested and owned-watch start; excludes commit/delivery; audits do not record individual watch executions or prove continuous watch activity",
+  "retrospective_limit": "minute expectation/attempt/quote totals reflect capture-time rows, not event-time history",
+  "source_clock_offset_verified": false,
+  "two_trading_days_verified": false,
+  "mt4_deferred": true
+}

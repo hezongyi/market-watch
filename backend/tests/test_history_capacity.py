@@ -1,10 +1,10 @@
 import pytest
-from fastapi.testclient import TestClient
 from alerts import api as api_module
-from alerts.config import settings
-from alerts.provider_history_policy import capacity, capabilities, save_capacity
 from alerts import native_history_loads as loads
 from alerts.chart_api import DataQuery
+from alerts.config import settings
+from alerts.provider_history_policy import capabilities, capacity, save_capacity
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
@@ -60,6 +60,7 @@ def test_authenticated_route_strict_input_and_authoritative_result(policy):
 def test_capacity_obeys_cancel_and_expired_provider_context(policy):
     import threading
     import time
+
     from alerts import provider_cache as cache
     token = cache.DEADLINE.set(time.monotonic() - 1)
     try:

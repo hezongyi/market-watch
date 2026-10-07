@@ -47,11 +47,12 @@ def acquire(source, kind, now):
             .where(ImportJob.priority == 0, ImportJob.status.in_(["pending", "running"]))
             .limit(1)
         )
-        if source == "yahoo":
+        if source in ("yahoo", "dukascopy"):
             allowed = (not active and not requests and values.get("cooldown_until", 0) <= now)
         else:
             allowed = (
             not repair
+            and values.get("cooldown_until", 0) <= now
             and sum(e["kind"] == kind for e in active) < capacity
             and sum(e["kind"] == kind for e in requests) < capacity
         )

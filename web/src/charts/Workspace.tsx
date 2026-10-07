@@ -56,7 +56,7 @@ const icons = [
   Layers,
   TrendingUp,
 ];
-const symbols = {
+const legacySymbols = {
   EURUSD: "欧元 / 美元",
   XAUUSD: "黄金 / 美元",
   BTCUSDT: "比特币 / USDT",
@@ -109,6 +109,9 @@ export default function WorkspacePage() {
   const [list, setList] = useState<Workspace[]>([]),
     [workspace, setWorkspace] = useState<Workspace | null>(null),
     [catalog, setCatalog] = useState<Catalog | null>(null);
+  const symbols: Record<string,string> = {...legacySymbols,
+    ...Object.fromEntries((catalog?.managed_sources ?? []).map(row => [row.id,
+      `${row.symbol} · ${row.source} ${row.environment}`]))};
   const [active, setActive] = useState(0),
     [max, setMax] = useState<number | null>(null),
     [mobile, setMobile] = useState(matchMedia("(max-width:760px)").matches),
@@ -771,7 +774,7 @@ export default function WorkspacePage() {
             >
               {Object.entries(symbols).map(([id, label]) => (
                 <option key={id} value={id}>
-                  {id} · {label}
+                  {id.startsWith('MD:') ? label : `${id} · ${label}`}
                 </option>
               ))}
             </select>

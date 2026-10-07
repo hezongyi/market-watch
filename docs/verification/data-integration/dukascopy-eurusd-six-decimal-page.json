@@ -1,0 +1,44 @@
+{
+  "source": "dukascopy",
+  "channel": "python",
+  "provider_symbol": "EUR/USD",
+  "start": 1728514980000,
+  "end": 1730419200000,
+  "request_result": "data",
+  "rows": 5000,
+  "checkpoint": 1728989340000,
+  "original_registered_precision": 5,
+  "actual_price_precision_in_page": 6,
+  "overflowing_rows": 57,
+  "sample": [
+    {
+      "timestamp": 1728515100000,
+      "open": "1.093887",
+      "high": "1.093917",
+      "low": "1.093884",
+      "close": "1.093906",
+      "volume": "0.000000",
+      "complete": true
+    },
+    {
+      "timestamp": 1728515160000,
+      "open": "1.093900",
+      "high": "1.093916",
+      "low": "1.093884",
+      "close": "1.093901",
+      "volume": "0.000000",
+      "complete": true
+    },
+    {
+      "timestamp": 1728515220000,
+      "open": "1.093915",
+      "high": "1.094000",
+      "low": "1.093884",
+      "close": "1.094000",
+      "volume": "0.000000",
+      "complete": true
+    }
+  ],
+  "rounding": "none",
+  "page_skipped": false
+}

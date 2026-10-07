@@ -47,6 +47,8 @@ export type IndicatorResult = {
   }[];
 };
 export type ChartData = {
+  pending?: string[];
+  series_kind?: string;
   history_revision: string;
   bars: Bar[];
   future: { start: number; end: number }[];
@@ -60,6 +62,7 @@ export type ChartData = {
   as_of: number;
 };
 export type Catalog = {
+  managed_sources?: {id: string; symbol: string; source: string; environment: string}[];
   frames: string[];
   indicators: Record<
     string,

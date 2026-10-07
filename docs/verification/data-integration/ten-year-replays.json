@@ -1,0 +1,59 @@
+{
+  "host": "Ubuntu local isolated Docker",
+  "passed": true,
+  "scope": "bounded replay windows pinned to actual published ten-year versions",
+  "runs": [
+    {
+      "symbol": "EURUSD",
+      "version": "30b7f7ba-cdea-42df-9738-1193e29574b8",
+      "run": "fe4ac10e-1e86-4ff1-ac08-a7c41f68fffe",
+      "seek_branch": "1cc5c6c2-c010-4a18-b755-41c75f4110bc",
+      "start": 1728515100000,
+      "end": 1728515700000,
+      "creation_seconds": 410.863,
+      "warmup_bar_count": 2986091,
+      "stepped_cursor": 1728515160000,
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "EUR/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-observed-v2"
+      },
+      "manifest_checksum": "7592bc0bd77d9275a3bc16dd72466c83eb85f73203da7ce22d6d236abf9f7c97",
+      "reimport_version": "50c1e017-a1d8-44a5-91b2-5dc755bfb108",
+      "reimport_rows": 10,
+      "before": "f3b34a5271ae39d1eb2160c78df93dc3b44d11947bd994a2f0deaad27e959ad2",
+      "after": "f3b34a5271ae39d1eb2160c78df93dc3b44d11947bd994a2f0deaad27e959ad2",
+      "pinned_inputs_unchanged": true
+    },
+    {
+      "symbol": "XAUUSD",
+      "version": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+      "run": "26322c23-e024-47dd-ad2b-0fb5ee4c52d0",
+      "seek_branch": "cc2951ba-b419-42ee-bdf4-8d5301b2181c",
+      "start": 1728515100000,
+      "end": 1728515700000,
+      "creation_seconds": 439.491,
+      "warmup_bar_count": 2837507,
+      "stepped_cursor": 1728515160000,
+      "identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "XAU/USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      },
+      "manifest_checksum": "84a66152dc80ed468724c468ff6c3b40998fc7be68f7e7c821e919b7d149db22",
+      "reimport_version": "fca87cc4-c233-4a71-8bc4-1813b303975b",
+      "reimport_rows": 1,
+      "before": "40c3c73dd16f0b97f0541f2eb06f4cf5574c6fd9ee9b7ebdbc4dffbd9e8631fe",
+      "after": "40c3c73dd16f0b97f0541f2eb06f4cf5574c6fd9ee9b7ebdbc4dffbd9e8631fe",
+      "pinned_inputs_unchanged": true
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+.............................................                            [100%]
+=============================== warnings summary ===============================
+backend/tests/test_chart_alert_migration.py::test_full_sqlite_migration_retains_legacy_queue_and_allows_multiple_new_events
+backend/tests/test_chart_alert_migration.py::test_full_sqlite_migration_retains_legacy_queue_and_allows_multiple_new_events
+backend/tests/test_chart_alert_migration.py::test_full_sqlite_migration_retains_legacy_queue_and_allows_multiple_new_events
+backend/tests/test_chart_alert_migration.py::test_full_sqlite_migration_retains_legacy_queue_and_allows_multiple_new_events
+backend/tests/test_chart_alert_migration.py::test_migrated_alert_backup_preserves_rule_checkpoint_evidence_and_retry_queue
+backend/tests/test_chart_alert_migration.py::test_migrated_alert_backup_preserves_rule_checkpoint_evidence_and_retry_queue
+backend/tests/test_chart_alert_migration.py::test_migrated_alert_backup_preserves_rule_checkpoint_evidence_and_retry_queue
+backend/tests/test_chart_alert_migration.py::test_migrated_alert_backup_preserves_rule_checkpoint_evidence_and_retry_queue
+  /home/quant/repos/market-watch-data-integration/.venv/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+45 passed, 8 warnings in 17.92s

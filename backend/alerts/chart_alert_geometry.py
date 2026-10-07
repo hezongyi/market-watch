@@ -19,9 +19,9 @@ class Point(Contract):
 
 
 class GeometryQuery(Contract):
-    instrument: str = Field(min_length=1, max_length=40)
+    instrument: str = Field(min_length=1, max_length=64)
     source: str = Field(min_length=1, max_length=32)
-    series_kind: Literal["managed", "provider"]
+    series_kind: Literal["managed", "provider", "composite"]
     timeframe: str
     kind: Literal["horizontal_line", "horizontal_ray", "trend_line", "ray"]
     scale: Literal["linear", "log"] = "linear"
@@ -29,6 +29,7 @@ class GeometryQuery(Contract):
     extend_left: bool = False
     extend_right: bool = False
     published: bool = False
+    composite_revision_id: str | None = Field(default=None, max_length=36)
 
 
 def geometry(db, query, *, dataset_id=None, now=None):
@@ -38,7 +39,13 @@ def geometry(db, query, *, dataset_id=None, now=None):
         raise ValueError("画线端点数量不匹配")
     if query.timeframe not in FRAMES:
         raise ValueError("未知判定周期")
-    if query.series_kind == "provider":
+    if query.series_kind == "composite":
+        from .composite_alerts import geometry_rows
+
+        rows, meta = geometry_rows(db, query.instrument, query.timeframe, query.points,
+                                   revision_id=query.composite_revision_id, now=now)
+        labels = [row.get("chart_time", row["start"]) for row in rows]
+    elif query.series_kind == "provider":
         dataset = db.get(ProviderDataset, dataset_id)
         if not dataset or dataset.source != query.source or dataset.metadata_json["id"] != query.instrument:
             raise ValueError("画线行情身份不匹配")

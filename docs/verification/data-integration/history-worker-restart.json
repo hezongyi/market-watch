@@ -1,0 +1,77 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "market-watch-data-integration",
+  "fault": "real history worker process restart",
+  "passed": true,
+  "before": {
+    "at": 1791256176286,
+    "versions": [
+      {
+        "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+        "cursor": 1704948000000,
+        "status": "pending",
+        "chunks": 589,
+        "rows": 2571017,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "1808b107514685cabe023a47e2412802487a0aca8ea871b19ebcadc8bee36a54"
+      },
+      {
+        "id": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+        "cursor": 1709251200000,
+        "status": "pending",
+        "chunks": 633,
+        "rows": 2758576,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "e2a965b1bf831713d3eaf37fcfa6a3b0479a900d79acbb63e46d7c70ee88a314"
+      }
+    ]
+  },
+  "halted": {
+    "at": 1791256191337,
+    "versions": [
+      {
+        "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+        "cursor": 1705927920000,
+        "status": "pending",
+        "chunks": 591,
+        "rows": 2581017,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "de3b137989032ae85fd32f20991bff756af61bd849e4cd3c5e818d52737b1293"
+      },
+      {
+        "id": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+        "cursor": 1710195240000,
+        "status": "pending",
+        "chunks": 635,
+        "rows": 2768576,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "0f65e2340102dd1f6108e3c1825cac00242a9c0efc07e61cfc8ca8e07807b4c4"
+      }
+    ]
+  },
+  "after": {
+    "at": 1791256210756,
+    "versions": [
+      {
+        "id": "2794fddd-02a1-4ab6-9a4d-762c73dac6e6",
+        "cursor": 1706242320000,
+        "status": "pending",
+        "chunks": 592,
+        "rows": 2586017,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "f5ef7ec33123342f07fb4b1116263371bee068a5a6a77d0d548458263742b9d9"
+      },
+      {
+        "id": "ceb2577d-0c94-45b4-9952-d6c9c21a38dd",
+        "cursor": 1710497100000,
+        "status": "pending",
+        "chunks": 636,
+        "rows": 2773576,
+        "lease_until": 0,
+        "chunk_prefix_sha256": "39995d1b9ee32b9d96d4a4e218beb1df54a4e62a6bfd64cfb842666d68dd31d1"
+      }
+    ]
+  },
+  "resume_seconds": 11.709,
+  "finished_at": 1791256211089
+}

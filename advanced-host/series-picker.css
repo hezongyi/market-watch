@@ -1,0 +1,18 @@
+.mw-series-picker { --series-bg: #1e2228; --series-ink: #eee; --series-control: #282e36; --series-line: #767e89; --series-muted: #c6cbd3; --series-link: #a8cbff; --series-error: #ffb8b8; width: min(760px, 85vw); max-height: 85vh; box-sizing: border-box; overflow: auto; border: 1px solid var(--series-line); border-radius: 8px; background: var(--series-bg); color: var(--series-ink); padding: 24px; font: 14px/1.5 system-ui, sans-serif; }
+.mw-series-picker[data-theme=light] { --series-bg: #fff; --series-ink: #182026; --series-control: #f5f6f8; --series-line: #69717d; --series-muted: #46515d; --series-link: #18559b; --series-error: #a02727; }
+.mw-series-picker::backdrop { background: rgb(0 0 0 / 65%); }
+.mw-series-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.mw-series-picker h2 { margin: 0; font-size: 20px; }
+.mw-series-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 20px 0; }
+.mw-series-filters label { display: grid; gap: 8px; min-width: 0; }
+.mw-series-picker input, .mw-series-picker select, .mw-series-picker button { font: inherit; color: inherit; background: var(--series-control); border: 1px solid var(--series-line); border-radius: 4px; padding: 10px; min-height: 36px; min-width: 0; }
+.mw-series-picker input, .mw-series-picker select { width: 100%; box-sizing: border-box; }
+.mw-series-picker button { cursor: pointer; }
+.mw-series-picker button:disabled { cursor: default; opacity: .5; }
+.mw-series-picker :focus-visible { outline: 2px solid #8cbdff; outline-offset: 3px; }
+.mw-series-picker a { color: var(--series-link); }
+.mw-series-results { display: grid; gap: 8px; }
+.mw-series-result { text-align: left; display: grid; gap: 4px; overflow-wrap: anywhere; }
+.mw-series-result span { color: var(--series-muted); }
+.mw-series-picker nav { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 20px; }
+.mw-series-picker [role=alert] { color: var(--series-error); overflow-wrap: anywhere; }

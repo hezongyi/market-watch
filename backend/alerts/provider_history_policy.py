@@ -6,8 +6,8 @@ MIN_CAPACITY = 20000
 
 def capacity():
     from .config import settings
-    from .storage import Preference
     from .provider_cache import budget_transaction
+    from .storage import Preference
     with budget_transaction() as db:
         row = db.get(Preference, CAPACITY_KEY)
         value = row.value.get("max_bars") if row else settings.native_history_default_bars
@@ -17,9 +17,10 @@ def capacity():
 
 
 def save_capacity(value):
+    from sqlalchemy import text
+
     from .config import settings
     from .storage import Preference, transaction
-    from sqlalchemy import text
     if type(value) is not int or not MIN_CAPACITY <= value <= settings.native_history_max_bars:
         raise ValueError(f"容量须为 {MIN_CAPACITY:,} 至 {settings.native_history_max_bars:,} 根之间的整数")
     with transaction() as db:
