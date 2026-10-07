@@ -31,6 +31,7 @@
 - 17:12 SGT更新：r3产品220b328真实PG首轮135 passed/5 failed，失败是迁移HEAD常量和失败返回truthiness旧断言；日志保留，PG已停止，未进入性能。测试修正冻结8e06535（产品backend与220b328相同），新独立project `mw-issue13-optimized-r3b`、port19663真实相关回归140 passed/26 warnings（105.03s），完整后端运行中。不得把正在运行的全量或性能标为通过。
 - 17:25 SGT更新：8e06535完整后端1371 passed/2 skipped/65 warnings（778.54s）；提交前真实SIGKILL及新进程接续通过，真实v1.14旧应用在保留additive schema下接续及新候选恢复通过，证据在 `results/optimized-r3b/publication-crash.json` 与 `application-rollback.json`。12次新性能套件已开始，性能及告警/浏览器仍未通过。
 - 17:31 SGT：首个idle完整CPU0.275%、SQL1.544/s、零source/audit读、快照不变。live开始因新ready_ages包含SQLAlchemy Row而无法JSON编码；保留失败及正常PG停止状态。61b9fc2只改证据身份序列化，173个backend/migration文件与8e06535逐字节相同（`results/optimized-r3c/regression-source-equivalence.json`）；新project `mw-issue13-optimized-r3c`、port19673完整重测，未重跑未变更产品的成功回归/进程恢复。
+- 17:49 SGT过程更新：61b9fc2第一份idle CPU0.275%、SQL1.544/s、零source/audit读且快照稳定；live M1可见p95 0.524s、全体就绪最大等待1.441s、未发布/未服务0；backfill全体就绪最大等待6.975s、吞吐2724.31有效bar/s、未服务0。首组回填等待与吞吐同时通过，仍待其余重复、混合/持续轮转与告警/浏览器，不代表整体验收完成。
 
 ## 隔离环境与下一步
 
