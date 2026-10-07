@@ -172,7 +172,7 @@ def measure(scenario, seconds):
                     m._PUBLISH_CURSOR if publish.task_progressed else None)
                 turn = dict(at=at, seconds=elapsed, target=cursor,
                     target_wait=max((time.monotonic()-stamp for stamp in ready_since.values()), default=0),
-                    ready_ages=[dict(target=key,seconds=time.monotonic()-stamp)
+                    ready_ages=[dict(target=list(key),seconds=time.monotonic()-stamp)
                         for key,stamp in sorted(ready_since.items())],
                     aggregate=aggregate, publish_claim=bool(publish), queries=dict(queries))
                 if cursor:
@@ -202,7 +202,7 @@ def measure(scenario, seconds):
             s.ChartPublicationState.requested>s.ChartPublicationState.processed,
             s.ChartPublicationState.next_at<=b.clock)).all())
     ended=time.monotonic()
-    unresolved=[dict(target=key,seconds=ended-ready_since.get(key,ended),right_censored=True)
+    unresolved=[dict(target=list(key),seconds=ended-ready_since.get(key,ended),right_censored=True)
         for key in sorted(final_ready)]
     after = fingerprint()
     after_state = b.snapshot()

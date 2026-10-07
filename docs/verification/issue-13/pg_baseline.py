@@ -324,7 +324,7 @@ def measure(scenario, seconds, repetition):
                         target=target, target_wait=age,
                         target_wait_to_start=wait_to_start,
                         ready_targets=len(ready), queries=dict(queries),
-                        ready_ages=[dict(target=key, seconds=value) for key,value in sorted(ages.items())],
+                        ready_ages=[dict(target=list(key), seconds=value) for key,value in sorted(ages.items())],
                         longest_ready_age=max(ages.values(), default=0))
             turns.append(turn)
             output.write(json.dumps(turn)+"\n")
@@ -341,7 +341,7 @@ def measure(scenario, seconds, repetition):
             s.ChartPublicationState.timeframe).where(
             s.ChartPublicationState.requested > s.ChartPublicationState.processed,
             s.ChartPublicationState.next_at <= clock)).all())
-    unresolved = [dict(target=key, seconds=final_at-ready_since.get(key, final_at),
+    unresolved = [dict(target=list(key), seconds=final_at-ready_since.get(key, final_at),
                        right_censored=True) for key in sorted(final_ready)]
     duration, cpu = time.monotonic()-begun, time.process_time()-cpu_begun
     event.remove(s.engine,"before_cursor_execute",before)
