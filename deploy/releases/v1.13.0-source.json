@@ -1,0 +1,44 @@
+{
+  "version": "1.13.0",
+  "release_tag": "v1.13.0",
+  "previous_source_tag": "v1.12.1",
+  "implementation_prs": [
+    17,
+    18
+  ],
+  "implementation_base_commit": "c18b219782bfbc962451927d26b9ff0c1cc09b52",
+  "tested_implementation_commits": {
+    "chart": "3c3b57b6f1a1d31524bc99d96ee8a92fbee244f8",
+    "ops": "5ba761d16c9c057340bc4c607366cc14d1588259"
+  },
+  "source_commit_resolution": "Resolve v1.13.0^{commit}; annotated tag targets the final main merge of the release metadata PR.",
+  "release_scope": "Source release; no production builds, retagging, migration or switch.",
+  "delivery_document": "docs/chart-maximize-v1.13.0-source-delivery.md",
+  "implementation_sha256": {
+    "advanced-host/bridge.js": "a5c8afcb21c327f83729777c30f4c9ae708339a5a8c5789c29840fd60641ef8d",
+    "advanced-host/chart-maximize.js": "3ea3ea3a599b99875e632c4209d98c3cdb9c5942019e74d24a289db682e14685",
+    "advanced-host/patch-native-reserve.mjs": "8862cff14cb30b848ba8a4010e617ec8a8e3fce2554bf3e5aef00b4e522b577f",
+    "advanced-host/build-assets.mjs": "6a23d7a44c026d31de411a6f2ce24509a2818e7a3d91b42e5cfbedd0b6f337b3",
+    "advanced-host/index.html": "595ce4c440c2963d23824bcba4f4a0372c5eea2c4d80fc11f69ffe58df09d0e9",
+    "advanced-host/Dockerfile": "a59bd2de2a442be655ce0053f813911a1a5bb1b199536df3e4170edb1b796d7e",
+    "advanced-host/.dockerignore": "769a97630d1ef0a51580b53ccbfc4d373bb8dc5455299a36313b2826fc40736f",
+    "deploy/ubuntu/mw_docker.py": "7faab94963ce7ee81a58cc14a230cff82f61636a43755be325dacb8adf15329e",
+    "tests/ops/test_docker_lifecycle.py": "3a4ea70d71420854f5636ed6e1cc1e7eca1495b6b12fb5c6c5db5b94685c905c"
+  },
+  "verification": {
+    "native_browser_normal_checks": 22,
+    "native_browser_cpu4_checks": 22,
+    "compiled_bridge_checks": 4,
+    "ops_unit_tests": 42,
+    "standards_blockers": 0,
+    "spec_blockers": 0,
+    "actual_ubuntu_pg_readonly_identity_checks": 2,
+    "historical_real_market_app_checks": 4,
+    "historical_user_acceptance": "passed; isolated Ubuntu project archived and retired",
+    "new_combined_tag_runtime_acceptance": false
+  },
+  "schema": "u22_chart_alert_actions",
+  "new_migrations": [],
+  "application_dependencies_changed": false,
+  "production_operated": false
+}
