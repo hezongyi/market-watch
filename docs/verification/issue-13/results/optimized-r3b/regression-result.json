@@ -1,0 +1,24 @@
+{
+  "source_commit": "8e06535",
+  "backend_identical_commit": "220b328",
+  "related": {
+    "passed": 140,
+    "warnings": 26,
+    "seconds": 105.03
+  },
+  "full": {
+    "passed": 1371,
+    "skipped": 2,
+    "warnings": 65,
+    "seconds": 778.54
+  },
+  "skipped_reasons": [
+    "optional pandas_market_calendars absent",
+    "matching PostgreSQL dump/restore tools absent"
+  ],
+  "log_paths": [
+    "/tmp/mw-issue13-r3b-related-frozen.log",
+    "/tmp/mw-issue13-r3b-backend-frozen.log"
+  ],
+  "performance_status": "First idle sample passed; live measurement failed due to SQLAlchemy Row evidence serialization, preserved separately"
+}
