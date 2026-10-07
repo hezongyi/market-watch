@@ -26,6 +26,7 @@ def main():
     target = Path('/results/rotation-faults.json')
     assert not target.exists(), 'Preserve previous evidence'
     b.reset()
+    baseline = b.snapshot()
     begun = time.monotonic()
     def clock():
         return b.NOW + int((time.monotonic() - begun) * 1000)
@@ -109,6 +110,11 @@ def main():
                     delayed = [dict(target=[r.instrument_id, r.timeframe], next_at=r.next_at,
                                     attempts=r.attempts, reason=r.blocked_reason)
                                for r in states if r.attempts]
+                # A failed target is unavailable until its durable retry due
+                # time. Keep retry facts separately; restart its runnable age
+                # when it becomes due. A locked identity remains logically
+                # ready in the query and its waiting age is retained.
+                last_service = {key: value for key, value in last_service.items() if key in ready}
                 for key in ready:
                     last_service.setdefault(key, time.monotonic())
                 start = time.monotonic()
@@ -153,7 +159,7 @@ def main():
         outstanding_retries = [(r.instrument_id, r.timeframe) for r in states if r.attempts]
         fault_after = fault_snapshot(db)
     end = time.monotonic()
-    terminal = [dict(target=k, seconds=end-last_service[k], right_censored=True)
+    terminal = [dict(target=k, seconds=end-last_service.get(k, end), right_censored=True)
                 for k in sorted(terminal_ready)]
     maximum = max([maximum] + [r['seconds'] for r in terminal])
     missing = sorted(expected - first.keys())
@@ -173,12 +179,17 @@ def main():
         healthy_services_during_lock=len(healthy_during_lock),
         healthy_services_during_retry=len(healthy_during_retry),
         failed_input_observed_at=fault_observed, fault_before=fault_before, fault_after=fault_after,
+        published_bars_before=baseline['published_bars'],
+        published_bars_after=b.snapshot()['published_bars'],
         scope='45s sustained 90-target rotation, continuous observation, two large backfills, two-second external identity lock and one failed copy; locked age also conservatively counted, retry not ready before due')
+    report['backfill_bars_per_second'] = (
+        report['published_bars_after'] - report['published_bars_before']) / report['duration']
     with target.open('x') as output:
         json.dump(report, output, indent=2)
         output.write('\n')
     assert not missing and min(counts.values()) >= 2
     assert maximum <= 10 and not outstanding_retries
+    assert report['published_bars_after'] > report['published_bars_before'], 'Historical work must progress under faults'
     assert len(failures) == 1 and healthy_during_lock and healthy_during_retry
     assert fault_after['payload']['observed_at'] == fault_observed
     assert fault_after['count'] == fault_before['count']

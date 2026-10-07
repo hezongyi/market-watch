@@ -1,5 +1,18 @@
 # v1.14.0 后回归验收矩阵
 
+2026-10-07 20:40 SGT最新：最终产品冻结ccb2a12，175个backend/实际root migrations文件与当前工作树逐字节一致，v1.14.0 ec00080祖先关系成立。r5相关真实PG178 passed（109.10s）、完整后端1389 passed/2 skipped（771.74s）已通过。首轮idle/live/backfill/revision均结束：idle CPU1.145%、SQL1.544/s；live28输入全可见、p95/p99 0.424/0.431s、最长ready0.969s；backfill2725.72 bars/s、最长ready5.633s、终态ready为空；revision29输入全可见、p95/p99 0.128/0.168s、最长ready0.544s。只证明第一重复，第二轮正在运行；310正常输入、告警/TCP、oracle、浏览器、实际恢复及覆盖最终重放仍未完成，Issue #13不宣布通过。
+
+| r5新增合同 | 当前权威证据 | 判定 |
+| --- | --- | --- |
+| 全局服务序号在固定/回拨时钟及不同历史服务次数下保持轮转 | frozen scheduler SQLite/真实PG合同，相关178与完整1389 | 回归通过；持续90目标容量尚待实际消费者及组合故障探针 |
+| 失败只延后其目标，健康队列使用5ms忙态yield | scheduler失败合同及cadence，相关/完整回归 | 回归通过；同窗90目标/回填/外部锁/重试待最终45秒probe |
+| PG通知提交/回滚/savepoint，扫描到等待竞态与重连 | `test_publication_wakeup_postgres.py`、pure wakeup/cadence；相关178 | 真实PG回归通过；完整长测成本及最终丢失通知进程恢复未结束 |
+| 监控每轮采样2SQL，完整身份/marker/payload保留 | sampling集成32项中的3项；观察/正常timeline独立audit | 逻辑与索引计划通过；330s最终完整分母及延迟待测 |
+| 最终固定origin读取、前驱/缺口/修订及1秒monitor | 完整回归，后续micro/330s/TCP同生产入口 | 回归通过；不得将r4微测/同价成绩记作r5认证 |
+| Ubuntu实际隔离、运行源码、CPU/内存限制与只读挂载 | `results/optimized-r5/environment-performance.json`、product-source-manifest、Compose | 真实性能阶段环境已记录；浏览器及最终停止状态待记录 |
+
+最终状态矩阵与必需原始证据映射见 [r5收口清单](r5-closeout-checklist.md)。以下保留历史r3及更早阶段事实，不作为r5通过证据。
+
 2026-10-07 18:41 SGT。Issue #13 未完成。r3最终产品220b328、完整回归8e06535、性能61b9fc2、补测/消费者b8f25ff的173个backend及迁移文件逐字节一致。真实PG相关140 passed、完整后端1371 passed / 2 skipped / 65 warnings（778.54秒）；进程SIGKILL事务回滚/新进程接续与旧131bf3c应用against additive schema后新版本接续通过。12×300秒性能测量与独立审计完成，回填最长等待6.975–7.214秒、吞吐2712.81–2725.15 bars/s；空闲与M1数字门槛通过。实时窗口末尾右删失补测进行中（live-2排空、最长等待1.622秒；live-3待完成），消费者/告警/浏览器尚未全部运行，不宣布完整验收。详见 [r3实现](r3-implementation.md) 和 [第三候选性能报告](optimized-r3-performance-report.md)。
 
 下表保留15:15 SGT阶段的合同证据，表中“待执行”对应当时状态，不把其他候选结果归为r3通过。最新状态以本段、r3报告及各候选validation-state为准。
