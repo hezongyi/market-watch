@@ -52,7 +52,7 @@ def test_actual_predecessor_upgrade_pending_downgrade_guard_and_schema_roundtrip
         # downgrade when the pending-state guard refuses this unsafe rollback.
         with engine.begin() as conn:
             assert 'market_coverage_projection' in inspect(conn).get_table_names()
-            assert conn.scalar(text('SELECT version_num FROM alembic_version')) == 'ap43_publication_service_order'
+            assert conn.scalar(text('SELECT version_num FROM alembic_version')) == 'aq44_aggregation_service_order'
             conn.execute(text('UPDATE chart_publication_state SET processed=requested'))
         command.downgrade(config, 'am40_chart_revision_demand')
         with engine.connect() as conn:
@@ -62,6 +62,46 @@ def test_actual_predecessor_upgrade_pending_downgrade_guard_and_schema_roundtrip
         with engine.connect() as conn:
             assert conn.execute(text('SELECT * FROM chart_published_bars')).all() == before
             assert conn.scalar(text('SELECT count(*) FROM chart_publication_state')) == 9
+    finally:
+        engine.dispose()
+        with admin.begin() as conn:
+            conn.execute(text(f'DROP SCHEMA {schema} CASCADE'))
+        admin.dispose()
+
+
+def test_aggregation_service_migration_keeps_pending_jobs_and_roundtrips(monkeypatch):
+    schema = 'aggregation_upgrade_' + uuid.uuid4().hex
+    admin = create_engine(os.environ['TEST_POSTGRES_URL'], pool_size=1, max_overflow=0)
+    with admin.begin() as conn:
+        conn.execute(text(f'CREATE SCHEMA {schema}'))
+    url = admin.url.update_query_dict({'options': f'-csearch_path={schema}'})
+    engine = create_engine(url, pool_size=1, max_overflow=0)
+    monkeypatch.setattr(settings, 'database_url', url.render_as_string(hide_password=False))
+    config = Config(str(ROOT / 'alembic.ini'))
+    config.set_main_option('script_location', str(ROOT / 'migrations'))
+    try:
+        command.upgrade(config, 'ap43_publication_service_order')
+        with engine.begin() as conn:
+            conn.execute(text("INSERT INTO instruments (id,label,source,symbol,basis,calendar,precision,quality,enabled) "
+                "VALUES ('BTCUSDT','BTC','binance','BTCUSDT','last','utc0',2,'waiting',false)"))
+            conn.execute(text("INSERT INTO chart_aggregation_jobs "
+                '(id,instrument_id,timeframe,start,"end",created_at,attempts,next_at) '
+                "VALUES ('kept','BTCUSDT','M5',0,86400000,1,0,0)"))
+            before = conn.execute(text('SELECT * FROM chart_aggregation_jobs')).all()
+        command.upgrade(config, 'head')
+        with engine.begin() as conn:
+            assert conn.execute(text('SELECT * FROM chart_aggregation_jobs')).all() == before
+            conn.execute(text("INSERT INTO chart_aggregation_state "
+                "(instrument_id,timeframe,last_service_seq) VALUES ('BTCUSDT','M5',10)"))
+            assert conn.scalar(text("SELECT nextval('chart_aggregation_service_seq')")) == 1
+        command.downgrade(config, 'ap43_publication_service_order')
+        with engine.connect() as conn:
+            assert not inspect(conn).has_table('chart_aggregation_state')
+            assert conn.execute(text('SELECT * FROM chart_aggregation_jobs')).all() == before
+        command.upgrade(config, 'head')
+        with engine.connect() as conn:
+            assert inspect(conn).has_table('chart_aggregation_state')
+            assert conn.execute(text('SELECT * FROM chart_aggregation_jobs')).all() == before
     finally:
         engine.dispose()
         with admin.begin() as conn:

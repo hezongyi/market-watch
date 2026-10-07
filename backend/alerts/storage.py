@@ -1302,10 +1302,22 @@ class ChartViewportDemand(Base):
     expires: Mapped[int] = mapped_column(BigInteger, index=True)
 
 
+AGGREGATION_SERVICE_SEQUENCE = Sequence('chart_aggregation_service_seq', metadata=Base.metadata)
+
+
+class ChartAggregationState(Base):
+    """Durable service order for an identity/period across all its queued slices."""
+    __tablename__ = 'chart_aggregation_state'
+    instrument_id: Mapped[str] = mapped_column(ForeignKey('instruments.id'), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(8), primary_key=True)
+    last_service_seq: Mapped[int] = mapped_column(BigInteger, default=0, server_default='0')
+
+
 class ChartAggregationJob(Base):
     __tablename__ = 'chart_aggregation_jobs'
     kind: Mapped[str] = mapped_column(String(8), default='price', server_default='price')
-    __table_args__ = (UniqueConstraint('instrument_id', 'timeframe', 'start', 'end'),)
+    __table_args__ = (UniqueConstraint('instrument_id', 'timeframe', 'start', 'end'),
+                     Index('ix_aggregation_jobs_ready', 'next_at', 'instrument_id', 'timeframe'))
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     instrument_id: Mapped[str] = mapped_column(String(40), ForeignKey('instruments.id'))
     timeframe: Mapped[str] = mapped_column(String(8))

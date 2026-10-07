@@ -56,6 +56,23 @@ def main():
             if result['complete'] or result.get('maintenance_required') or not args.until_complete:
                 return
     else:
+        from .coverage_projection import invalidate_for_rollback
+        from .storage import MarketCoverageCheckpoint
+        # Include identities with proof checkpoints but no visible publication.
+        # The previous writer does not maintain any of the additive projections.
+        after = ''
+        while True:
+            with transaction() as db:
+                identities = select(ChartPublication.instrument_id).union(
+                    select(MarketCoverageCheckpoint.instrument_id)).subquery()
+                page = list(db.scalars(select(identities.c.instrument_id).where(
+                    identities.c.instrument_id > after).order_by(identities.c.instrument_id).limit(100)))
+            for ident in page:
+                with transaction() as db:
+                    invalidate_for_rollback(db, db.get(Instrument, ident))
+            if len(page) < 100:
+                break
+            after = page[-1]
         with transaction() as db:
             targets = list(db.execute(select(ChartPublication.instrument_id, ChartPublication.timeframe)))
         for ident, frame in targets:

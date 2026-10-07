@@ -169,7 +169,14 @@ def test_locked_identity_does_not_hold_up_another_ready_identity(publication_pg)
         with ThreadPoolExecutor(max_workers=1) as pool:
             future = pool.submit(managed.publish_once)
             try:
-                assert future.result(timeout=2)
+                result = future.result(timeout=2)
+                assert result.task_progressed and result.selected_target[0] == 'EURUSD'
+                # Durable service order may select another EURUSD period first.
+                # Keep the lock held and require M1 to progress within a bounded rotation.
+                for _ in range(len(managed.FRAMES)):
+                    if visible(factory, clock, 'EURUSD') == clock[0]:
+                        break
+                    assert pool.submit(managed.publish_once).result(timeout=2).selected_target[0] == 'EURUSD'
                 assert visible(factory, clock, 'EURUSD') == clock[0]
             finally:
                 db.commit()
@@ -221,3 +228,95 @@ def test_postgres_fixed_clock_preserves_ready_target_fairness(publication_pg, mo
         test_fixed_clock_continuously_runnable_target_does_not_starve_other_ready_targets,
     )
     test_fixed_clock_continuously_runnable_target_does_not_starve_other_ready_targets(publication_pg[0], monkeypatch)
+
+
+def test_postgres_large_aged_aggregation_backlog_yields_to_every_target(publication_pg, monkeypatch):
+    from test_chart_aggregation import (
+        test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts,
+    )
+    test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(publication_pg[0], monkeypatch)
+
+
+def test_postgres_explicit_verify_rechecks_completed_projection(publication_pg):
+    projection_contracts.test_explicit_verify_rechecks_completed_projection_after_old_writer(publication_pg[0])
+
+
+def test_postgres_rollback_invalidates_unpublished_coverage(publication_pg, monkeypatch):
+    from test_publication_admin import (
+        test_rollback_invalidates_every_coverage_identity_including_unpublished,
+    )
+    test_rollback_invalidates_every_coverage_identity_including_unpublished(publication_pg[0], monkeypatch)
+
+
+def test_postgres_locked_aggregation_identity_does_not_block_other_target(publication_pg, monkeypatch):
+    from alerts.chart_aggregation import aggregate_once, enqueue_aggregation
+    factory, clock = publication_pg
+    with factory.begin() as db:
+        for ident in ('BTCUSDT', 'EURUSD'):
+            enqueue_aggregation(db, ident, START, START + MINUTE, clock[0] - 20000)
+    served = []
+    monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kw: served.append(inst.id))
+    with factory.begin() as db:
+        db.execute(text("SELECT id FROM instruments WHERE id='BTCUSDT' FOR UPDATE"))
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            assert pool.submit(aggregate_once).result(timeout=2)
+    assert served == ['EURUSD']
+
+
+def test_old_ingestion_after_rollback_then_new_upgrade_retains_added_coverage(publication_pg, monkeypatch):
+    import subprocess
+    import sys
+    from decimal import Decimal
+    from pathlib import Path
+
+    from alerts import publication_admin
+    from alerts.chart_aggregation import aggregate_once
+    from alerts.coverage_projection import backfill_page
+    from sqlalchemy.engine import make_url
+    old_source = Path(os.environ.get('TEST_OLD_SOURCE', '/oldsource'))
+    if not (old_source / 'backend/alerts/market.py').is_file():
+        pytest.skip('Requires the mounted v1.14.0 source for a real old ingestion process')
+    factory, clock = publication_pg
+    seed(factory, clock)
+    with factory.begin() as db:
+        for _ in range(5):
+            if backfill_page(db, db.get(storage.Instrument, 'BTCUSDT'), administrative=True)['complete']:
+                break
+        state = db.get(storage.MarketCoverageCheckpoint, ('BTCUSDT', 'binance', 'last'))
+        assert state.complete
+        schema = db.scalar(text('SELECT current_schema()'))
+    monkeypatch.setattr(sys, 'argv', ['publication_admin', 'prepare-rollback', '--workers-stopped'])
+    publication_admin.main()
+    clock[0] = START + 31 * MINUTE + 5000
+    url = make_url(os.environ['TEST_POSTGRES_URL']).update_query_dict(
+        {'options': f'-csearch_path={schema}'})
+    code = f'''
+from alerts import market, managed_dataset as managed, storage
+managed.now_ms = storage.now_ms = lambda: {clock[0]}
+with storage.transaction() as db:
+    inst = db.get(storage.Instrument, 'BTCUSDT')
+    market.ingest(db, inst, {{'rows': [dict(timestamp={START + 30 * MINUTE},
+        open=10, high=12, low=9, close=12)]}}, received_at={clock[0]})
+for _ in range(30):
+    managed.publish_once()
+'''
+    result = subprocess.run([sys.executable, '-c', code], cwd=old_source, env={**os.environ,
+        'PYTHONPATH': str(old_source / 'backend'),
+        'ALERTS_DATABASE_URL': url.render_as_string(hide_password=False)},
+        capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, 'Old ingestion process failed; private output withheld'
+    with factory.begin() as db:
+        inst = db.get(storage.Instrument, 'BTCUSDT')
+        assert not db.get(storage.MarketCoverageCheckpoint, (inst.id, inst.source, inst.basis)).complete
+        assert max(s['end'] for s in market.stored_coverage(db, inst, START, clock[0])) == START + 31 * MINUTE
+        assert backfill_page(db, inst, administrative=True)['complete']
+        assert market.stored_coverage(db, inst, START, clock[0]) == [
+            dict(start=START, end=START + 31 * MINUTE)]
+    for _ in range(60):
+        aggregate_once()
+        managed.publish_once()
+    with factory.begin() as db:
+        inst = db.get(storage.Instrument, 'BTCUSDT')
+        rows = managed.read_rows(db, inst, 'M1', clock[0], 100)
+        assert len(rows) == 31 and Decimal(str(rows[-1]['close'])) == 12
+        assert managed.status(db, inst, 'M1')['complete_count'] == 31

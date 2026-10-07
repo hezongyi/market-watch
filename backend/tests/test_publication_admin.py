@@ -44,3 +44,34 @@ def test_rollback_prepares_restartable_old_bucket_jobs_without_changing_snapshot
         result = managed.publish_corrections(db, inst, pub, 'M1', pub.start, pub.end, [], now)
         assert result.snapshot_changed
         assert managed.read_rows(db, inst, 'M1', now, 100)[1]['observed_at'] == now
+
+
+def test_rollback_invalidates_every_coverage_identity_including_unpublished(database, monkeypatch):
+    import sys
+    from alerts import publication_admin
+    from alerts.coverage_projection import backfill_page
+    with database.begin() as db:
+        inst = db.get(storage.Instrument, 'BTCUSDT')
+        db.add(storage.MarketCoverage(id='original', instrument_id=inst.id, source=inst.source,
+            basis=inst.basis, start=0, end=120000))
+    for _ in range(5):
+        with database.begin() as db:
+            done = backfill_page(db, db.get(storage.Instrument, 'BTCUSDT'), administrative=True)['complete']
+        if done:
+            break
+    assert done
+    monkeypatch.setattr(sys, 'argv', ['publication_admin', 'prepare-rollback', '--workers-stopped'])
+    publication_admin.main()
+    with database.begin() as db:
+        inst = db.get(storage.Instrument, 'BTCUSDT')
+        state = db.get(storage.MarketCoverageCheckpoint, (inst.id, inst.source, inst.basis))
+        assert not state.complete
+        db.add(storage.MarketCoverage(id='old-write', instrument_id=inst.id, source=inst.source,
+            basis=inst.basis, start=120000, end=240000))
+    with database.begin() as db:
+        inst = db.get(storage.Instrument, 'BTCUSDT')
+        # Before verification the new application must use all compatible raw proofs.
+        assert max(s['end'] for s in market.stored_coverage(db, inst, 0, 300000)) == 240000
+        result = backfill_page(db, inst, administrative=True)
+        assert result['complete'] and result['examined'] == 2
+        assert market.stored_coverage(db, inst, 0, 300000) == [dict(start=0,end=240000)]

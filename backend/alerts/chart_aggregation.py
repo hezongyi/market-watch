@@ -1,7 +1,13 @@
 """Durable small aggregation slices; focus changes affect the next selection."""
-from sqlalchemy import case, select
+from sqlalchemy import case, func, select
 
-from .storage import ChartAggregationJob, ChartViewportDemand, Instrument
+from .storage import (
+    AGGREGATION_SERVICE_SEQUENCE,
+    ChartAggregationJob,
+    ChartAggregationState,
+    ChartViewportDemand,
+    Instrument,
+)
 
 PERIODS = ('M5', 'M15', 'H1', 'H4', 'D1')
 
@@ -62,12 +68,16 @@ def aggregate_once():
             (exists(*exact, demand.focused.is_(True)), 100), (exists(*exact), 110),
             (exists(*warm, demand.focused.is_(True)), 130), (exists(*warm), 150),
             (exists(*active), 170), else_=300)
-        # Return one candidate and lock only its identity. Older jobs get a
-        # service turn ahead of focus priority, and locked identities are skipped
-        # inside the SQL selection rather than hiding the rest of the queue.
+        state = ChartAggregationState
+        # A whole backlog shares its target's last service turn. Keeping the
+        # original job age for within-target priority must not let every old
+        # slice take a turn ahead of an unrelated ready target.
         selected = db.execute(select(model, Instrument).join(Instrument,
-            Instrument.id == model.instrument_id).where(model.next_at <= now).order_by(
-                priority, case((aged, model.created_at), else_=-model.end), model.created_at, model.id)
+            Instrument.id == model.instrument_id).outerjoin(state,
+                (state.instrument_id == model.instrument_id) & (state.timeframe == model.timeframe)
+            ).where(model.next_at <= now).order_by(
+                func.coalesce(state.last_service_seq, 0), priority,
+                case((aged, model.created_at), else_=-model.end), model.created_at, model.id)
             .limit(1).with_for_update(of=Instrument, skip_locked=True)).first()
         if selected is None:
             return False
@@ -91,6 +101,13 @@ def aggregate_once():
         needed = (source_right - source_left) // 60000
         if budget and budget.available < needed:
             return False
+        from .source_history_store import _insert
+        db.execute(_insert(db)(state).values(instrument_id=inst.id, timeframe=job.timeframe
+            ).on_conflict_do_nothing(index_elements=['instrument_id', 'timeframe']))
+        target = db.get(state, (inst.id, job.timeframe))
+        target.last_service_seq = (db.scalar(AGGREGATION_SERVICE_SEQUENCE.next_value())
+            if db.get_bind().dialect.name == 'postgresql' else
+            (db.scalar(select(func.max(state.last_service_seq))) or 0) + 1)
         touched = {instant(at) for at in range(job.start, slice_end, 60000)}
         try:
             # A failed calculation/write must not publish any partial aggregate.

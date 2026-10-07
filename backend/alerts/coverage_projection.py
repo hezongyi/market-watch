@@ -153,6 +153,8 @@ def backfill_page(db, inst, *, limit=500, administrative=False):
     inst = db.scalar(select(Instrument).where(Instrument.id == inst.id).with_for_update())
     state = checkpoint(db, inst)
     if state.complete:
+        if administrative:
+            return rebuild(db, inst)
         return dict(complete=True, examined=0, version=state.version)
     examined = 0
     if state.phase == 'structured':
@@ -188,19 +190,7 @@ def backfill_page(db, inst, *, limit=500, administrative=False):
         if not administrative:
             return dict(complete=False, examined=0, phase='verify', version=state.version,
                         maintenance_required=True)
-        counter = [0]
-        expected = valid_union(db, inst, quarantine=True, examined=counter)
-        examined = counter[0]
-        # Stable checkpoint IDs alone are insufficient: late commits and UUID
-        # inserts behind the cursor are repaired from the final locked union.
-        merge(db, inst, expected)
-        actual = [[row.start, row.end] for row in db.scalars(select(MarketCoverageProjection).where(
-            *_where(MarketCoverageProjection, inst)).order_by(MarketCoverageProjection.start))]
-        if actual != expected:
-            raise RuntimeError('Coverage projection differs from preserved valid proof union')
-        state.complete, state.phase = True, 'complete'
-        from .publication_schedule import COVERAGE, request
-        request(db, inst.id, reason=COVERAGE)
+        return rebuild(db, inst)
     db.flush()
     return dict(complete=state.complete, examined=examined, phase=state.phase, version=state.version)
 
@@ -267,20 +257,42 @@ def rebuild(db, inst):
         *_where(MarketCoverageProjection, inst)).order_by(MarketCoverageProjection.start))]
     # If migration has not completed, retained published/source intervals are
     # conservatively rechecked rather than trusting a partial proof projection.
-    if not state.complete:
-        from .storage import Bar
+    was_complete = state.complete
+    if not was_complete:
+        from .storage import Bar, ChartPublishedBar
         previous = merged(previous + [(row.start, row.end) for row in db.scalars(select(Bar).where(
-            Bar.instrument_id == inst.id, Bar.timeframe != 'M1', Bar.complete.is_(True)))])
-    state.complete, state.phase = False, 'verify'
-    db.execute(delete(MarketCoverageProjection).where(*_where(MarketCoverageProjection, inst)))
-    state.version += 1
-    result = backfill_page(db, inst, administrative=True)
-    current = [[row.start, row.end] for row in db.scalars(select(MarketCoverageProjection).where(
+            Bar.instrument_id == inst.id, Bar.timeframe != 'M1', Bar.complete.is_(True)))] +
+            [(row.start, row.end) for row in db.scalars(select(ChartPublishedBar).where(
+                ChartPublishedBar.instrument_id == inst.id, ChartPublishedBar.timeframe != 'M1',
+                ChartPublishedBar.complete.is_(True)))])
+    counter = [0]
+    expected = valid_union(db, inst, quarantine=True, examined=counter)
+    actual = [[row.start, row.end] for row in db.scalars(select(MarketCoverageProjection).where(
         *_where(MarketCoverageProjection, inst)).order_by(MarketCoverageProjection.start))]
-    _revoke_dependents(db, inst, removed_intervals(previous, current))
+    if actual != expected:
+        db.execute(delete(MarketCoverageProjection).where(*_where(MarketCoverageProjection, inst)))
+        db.add_all([MarketCoverageProjection(**_keys(inst), start=a, end=b) for a, b in expected])
+        state.version += 1
+    removed = removed_intervals(previous, expected)
+    added = removed_intervals(expected, previous)
+    _revoke_dependents(db, inst, removed)
     from .chart_aggregation import enqueue_aggregation
     from .storage import now_ms
-    for left, right in removed_intervals(current, previous):
+    for left, right in added:
         enqueue_aggregation(db, inst.id, left, right, now_ms())
+    state.complete, state.phase = True, 'complete'
+    if not was_complete or actual != expected or removed:
+        from .publication_schedule import COVERAGE, request
+        request(db, inst.id, reason=COVERAGE)
     db.flush()
-    return result
+    return dict(complete=True, examined=counter[0], phase=state.phase, version=state.version)
+
+
+def invalidate_for_rollback(db, inst):
+    """Fence all retained identities before an old writer can change raw proofs."""
+    db.scalar(select(Instrument).where(Instrument.id == inst.id).with_for_update())
+    db.execute(update(MarketCoverageCheckpoint).where(
+        MarketCoverageCheckpoint.instrument_id == inst.id).values(
+            complete=False, phase='verify', structured_cursor='', audit_cursor=0))
+    from .publication_schedule import COVERAGE, request
+    request(db, inst.id, reason=COVERAGE)

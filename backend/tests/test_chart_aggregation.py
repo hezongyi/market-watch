@@ -186,3 +186,25 @@ def test_old_backfill_gets_service_during_continuous_focused_live_work(database,
     with database.begin() as db:
         assert db.scalar(select(Bar).where(Bar.instrument_id == 'BTCUSDT',
             Bar.timeframe == 'M5', Bar.start == START)) is not None, 'Focused live work must not starve old backfill'
+
+
+def test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(database, monkeypatch):
+    from alerts import market, storage
+    from test_publication_scheduler import MINUTE, START
+    now = START + 180 * 86400000
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        enqueue_aggregation(db, 'BTCUSDT', START, START + 30 * 86400000, now - 20000)
+        enqueue_aggregation(db, 'EURUSD', START, START + MINUTE, now - 15000)
+    served = []
+    monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kw:
+                        served.append((inst.id, kw['timeframes'][0])))
+    # Every call opens a fresh transaction, as on an independent worker restart.
+    for _ in range(10):
+        assert aggregate_once()
+    assert {frame for ident, frame in served if ident == 'EURUSD'} == set(('M5','M15','H1','H4','D1'))
+    with database.begin() as db:
+        assert db.scalar(select(func.count()).select_from(ChartAggregationJob).where(
+            ChartAggregationJob.instrument_id == 'BTCUSDT')) > 0
+        assert db.scalar(select(func.count()).select_from(ChartAggregationJob).where(
+            ChartAggregationJob.instrument_id == 'EURUSD')) == 0

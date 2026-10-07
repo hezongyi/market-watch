@@ -198,3 +198,27 @@ def test_publisher_pages_never_run_full_raw_proof_verification(database):
             assert verified['complete'] and verified['examined'] == 10
     finally:
         event.remove(engine, 'before_cursor_execute', record)
+
+
+def test_explicit_verify_rechecks_completed_projection_after_old_writer(database):
+    from alerts.coverage_projection import backfill_page
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        db.add(MarketCoverage(id='first', instrument_id=inst.id, source=inst.source,
+                              basis=inst.basis, start=0, end=120000))
+    for _ in range(5):
+        with database.begin() as db:
+            done = backfill_page(db, db.get(Instrument, 'BTCUSDT'), administrative=True)['complete']
+        if done:
+            break
+    assert done
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        # The additive schema survives application rollback; old code writes raw proof only.
+        db.add(MarketCoverage(id='old-writer', instrument_id=inst.id, source=inst.source,
+                              basis=inst.basis, start=120000, end=240000))
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        result = backfill_page(db, inst, administrative=True)
+        assert result['complete'] and result['examined'] == 2
+        assert market.stored_coverage(db, inst, 0, 300000) == [dict(start=0,end=240000)]
