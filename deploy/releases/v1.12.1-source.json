@@ -1,0 +1,54 @@
+{
+  "version": "1.12.1",
+  "release_tag": "v1.12.1",
+  "previous_source_tag": "v1.12.0",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/15",
+  "implementation_merge": "ec9403ac72f460ff20b326e97174d62c0c4247dc",
+  "tested_implementation_commit": "ad5bba187027cca234baa5d1ade5db482945ab10",
+  "source_commit_resolution": "Resolve v1.12.1^{commit}; annotated tag points to the final main merge of the release metadata PR.",
+  "release_scope": "Source maintenance release; Ubuntu tooling already installed and verified separately. No production switch or application image retagging.",
+  "delivery_document": "docs/ubuntu-docker-v1.12.1-source-delivery.md",
+  "verification_document": "docs/verification/ubuntu-docker-lifecycle/acceptance-20261007.md",
+  "implementation_sha256": {
+    "deploy/ubuntu/README.md": "05a58398415275dd7a6277bc4e5c737b0822f3a7cc09eb6320c2b308294bc465",
+    "deploy/ubuntu/bootstrap-builder.sh": "2926dc1cd4ca3be33df3f71064a411b73ac8d4b635d3cb5ec59678ab24d48ead",
+    "deploy/ubuntu/buildkitd.toml": "841356c74836aee48ad6bd6c4bc4828186254eb094679451a72434b87800bbfd",
+    "deploy/ubuntu/docker_guard.py": "816a5a0695406e84b4e25befdf3b42f6fd92460a47f673b81a65e6c0848a5f18",
+    "deploy/ubuntu/install.sh": "cda604ff14adedd61cef28214972276e958af148d8b42befa293d27b3bb747c4",
+    "deploy/ubuntu/market-watch-disk-check.service": "dacda0d9ff782014b92c4a1d09e21ce764f7fbbb7d19e612d942d232f3704385",
+    "deploy/ubuntu/market-watch-disk-check.timer": "cf53fe9bb80d2af11776202d1f904dad2819eb52902fd54677b411d0ee3a54fd",
+    "deploy/ubuntu/market-watch-disk-daily.service": "969f8302b2e64996c42a83f801b54900bbfa050c57d2719cb67a4322b27843ee",
+    "deploy/ubuntu/market-watch-disk-daily.timer": "efb7e93e12ceebd6571be6cafb2c18d7f321adbea015f2e878293961203a1abc",
+    "deploy/ubuntu/market-watch-image-cleanup.service": "6d10d9226e0a82e38ebdc3ecf457368d5d3d004bb59fae85d6df458bfe443802",
+    "deploy/ubuntu/market-watch-image-cleanup.timer": "fc4e1b19f8bfc62a684fc035c24ec0c8ff836a3d91a43c0ff95a653bf806790e",
+    "deploy/ubuntu/mw_docker.py": "9ebc9f4337e87291867781182b475f6899bb0e35153a168d91408f07c9913e87",
+    "docs/verification/ubuntu-docker-lifecycle/acceptance-20261007.md": "4675627084056104cfc13a9c0f8e7a11c395a94f41b1ffcbeecd8f065551a1c6",
+    "tests/ops/test_docker_lifecycle.py": "8d59e6f162b7eec557add30597365a431a1e2ae06623504c21645b485cd0fc6d"
+  },
+  "verification": {
+    "tool_unit_cases": 25,
+    "ubuntu_buildkit_and_compose": "passed",
+    "local_base_oci_builds": "passed",
+    "database_restore_fixture_rows": 123,
+    "database_restore_and_project_retirement": "passed",
+    "expired_task_automatic_cleanup": "passed",
+    "user_timers_enabled": 3
+  },
+  "schema": "u22_chart_alert_actions",
+  "new_migrations": [],
+  "application_dependencies_changed": false,
+  "ubuntu_tooling_installed": true,
+  "production_operated": false,
+  "builder": {
+    "name": "market-watch-ubuntu",
+    "buildkit_version": "0.33.1",
+    "runtime_image": "market-watch-buildkit:0.33.1-official",
+    "gc_target_gib": 8,
+    "gc_is_hard_quota": false,
+    "free_space_target_gib": 20
+  },
+  "rollback": {
+    "previous_source_tag": "v1.12.0",
+    "runtime_instructions": "See deploy/ubuntu/README.md for disabling user timers and stopping only the dedicated builder; source tag does not switch production."
+  }
+}

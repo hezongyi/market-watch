@@ -1,6 +1,8 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.12.0**，支持 Yahoo 原生七周期行情、延迟报价和平台品种中文搜索，保留独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲、专业图表菜单、账户及工作区操作。源码发布、启用方法及上游限制见[v1.6.0源码交付记录](docs/yahoo-v1.6.0-source-delivery.md)，操作及既有系列规则见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.12.1**，支持 Yahoo 原生七周期行情、延迟报价和平台品种中文搜索，保留独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲、专业图表菜单、账户及工作区操作。源码发布、启用方法及上游限制见[v1.6.0源码交付记录](docs/yahoo-v1.6.0-source-delivery.md)，操作及既有系列规则见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+
+v1.12.1 增加 Ubuntu 专用 BuildKit、任务归属构建、数据库恢复验证后的验收退役和磁盘监控；维护版本说明见 [v1.12.1 交付](docs/ubuntu-docker-v1.12.1-source-delivery.md)。
 
 v1.12.0 新增多图范围映射、原生同步设置和按实际操作图跟随的柱宽同步；矩形高低价标签只左右避让。源码发布、Ubuntu验收及运行镜像边界见 [v1.12.0 交付](docs/chart-range-v1.12.0-source-delivery.md)。
 
