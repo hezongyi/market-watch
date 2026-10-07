@@ -16,11 +16,11 @@ def main():
     if running:
         raise SystemExit('Own project has running services; no concurrent fixture reset')
     destination.mkdir()
+    proc = None
     try:
         subprocess.run(command(PREFIX+['up','-d','--wait','postgres']), check=True)
         with (destination/'process.log').open('x') as log, (destination/'host.jsonl').open('x') as samples:
             (destination/'process.log').chmod(0o600)
-            # Keep host/log outside the probe's immutable-output guard.
             proc = subprocess.Popen(command(PREFIX+['run','--rm','--name',
                 'mw-issue13-p0-lock','probe','python',
                 'docs/verification/issue-13/lock_contention_probe.py']), stdout=log, stderr=subprocess.STDOUT)
@@ -34,6 +34,9 @@ def main():
             raise SystemExit(f'Lock probe exited {proc.returncode}; inspect private log, no retry')
         print('LOCK CONTENTION COMPLETE', flush=True)
     finally:
+        if proc is not None and proc.poll() is None:
+            subprocess.run(command(['docker','stop','--time','20','mw-issue13-p0-lock']), check=True)
+            proc.wait(timeout=30)
         subprocess.run(command(PREFIX+['stop','postgres']), check=True)
         state = json.loads(subprocess.check_output(command(['docker','inspect',
             'mw-issue13-p0-postgres-1','--format','{{json .State}}']), text=True))
