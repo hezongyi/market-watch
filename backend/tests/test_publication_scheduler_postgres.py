@@ -149,7 +149,8 @@ def test_failed_copy_rolls_back_visible_data_then_retries_durable_input(publicat
         raise RuntimeError('Injected post-copy transaction failure')
     monkeypatch.setattr(managed, 'publish_frame', fail)
     result = managed.publish_once()
-    assert not result and result.blocked_reason == 'RuntimeError'
+    assert not result.snapshot_changed and not result.task_progressed
+    assert result.attempted and result.blocked_reason == 'RuntimeError'
     assert visible(factory, clock) == before
     monkeypatch.setattr(managed, 'publish_frame', original)
     clock[0] += 2000
