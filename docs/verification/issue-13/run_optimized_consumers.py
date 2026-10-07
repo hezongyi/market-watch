@@ -26,6 +26,14 @@ SCRIPTS = (
 def main():
     source = Path(os.environ.get('ISSUE13_ACCEPTANCE_SOURCE', os.environ.get(
         'ISSUE13_SOURCE', '/home/quant/repos/market-watch-issue13-reviewed-baseline')))
+    override=ROOT/'acceptance-source.json'
+    if override.exists():
+        pinned=json.loads(override.read_text())
+        source=Path(pinned['source'])
+        actual=subprocess.check_output(['git','-C',str(source),'rev-parse','HEAD'],text=True).strip()
+        if actual!=pinned['commit'] or subprocess.check_output(
+                ['git','-C',str(source),'status','--porcelain'],text=True).strip():
+            raise SystemExit('Pinned supplementary acceptance source differs or is dirty')
     os.environ['ISSUE13_SOURCE'] = str(source)
     os.environ['ISSUE13_RESULTS'] = str(ROOT)
     state = json.loads((OUTPUT/'state.json').read_text())
