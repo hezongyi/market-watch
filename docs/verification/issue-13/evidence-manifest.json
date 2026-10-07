@@ -1,5 +1,5 @@
 {
-  "scope": "Saved original P0, terminal v1.14 baseline and implementation-candidate evidence; optimized performance and complete Issue13 acceptance remain pending",
+  "scope": "Saved P0, v1.14 baseline, terminal failed earlier candidates and full r3 performance; remaining consumers and complete Issue13 acceptance pending",
   "files": {
     ".gitignore": {
       "sha256": "21ea7e5e1cf73c3b5faecd3b3d27b8b60d0ccce7793b4f1461ee81ce38511d11",
@@ -246,8 +246,8 @@
       "bytes": 5137
     },
     "regression-matrix.md": {
-      "bytes": 4513,
-      "sha256": "a52dba6e9a10c1ac426c858eb28eb5bbd1bdea88feab0c2492a160e153860192"
+      "bytes": 4873,
+      "sha256": "ca135f8037da6423413266a0f35f3da3175fbd1f5845426407831e4ff6c1c682"
     },
     "results/backfill-0-sql.json": {
       "sha256": "5345bfddbdc0692a14ee59dee488f6175af3a811b4b2298b615d47e9e1cad024",
@@ -1262,8 +1262,8 @@
       "bytes": 2637
     },
     "implementation-progress.md": {
-      "bytes": 10187,
-      "sha256": "058c2f9a67d553c6c934a423998c6d7a08f4aebdb7968024642e891b7ab6eef0"
+      "bytes": 11503,
+      "sha256": "e745033126ba0367feb74084ae27e044fa3689bd49b8df81e0d52084a946a82a"
     },
     "results/v114-baseline/live-3-sql.json": {
       "sha256": "124436867775982ca67f78dba3990ef572f0c52f9ffae2d277f2b39bfb426156",
@@ -2158,6 +2158,6 @@
       "bytes": 180157
     }
   },
-  "updated_for_commit": "220b328",
-  "previous_manifest_commit": "ec0d97b"
+  "updated_for_commit": "b654e4b",
+  "previous_manifest_commit": "b654e4b"
 }

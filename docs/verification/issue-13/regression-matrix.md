@@ -1,6 +1,6 @@
 # v1.14.0 后回归验收矩阵
 
-2026-10-07 16:53 SGT。Issue #13 未完成。r2产品冻结599b043完整后端已1356 passed / 2 skipped / 65 warnings（778.23秒），12次长测仍运行；两次回填公平22.794/28.924秒失败，实时两次1.403/1.917秒。新r3产品冻结b2cb5d2已实现两个专项方案，相关SQLite87项、恢复/调度25项及补充合同33项通过（各范围有重叠），PG/全量/性能/消费者尚未运行，详见 [r3实现](r3-implementation.md)。
+2026-10-07 18:41 SGT。Issue #13 未完成。r3最终产品220b328、完整回归8e06535、性能61b9fc2、补测/消费者b8f25ff的173个backend及迁移文件逐字节一致。真实PG相关140 passed、完整后端1371 passed / 2 skipped / 65 warnings（778.54秒）；进程SIGKILL事务回滚/新进程接续与旧131bf3c应用against additive schema后新版本接续通过。12×300秒性能测量与独立审计完成，回填最长等待6.975–7.214秒、吞吐2712.81–2725.15 bars/s；空闲与M1数字门槛通过。实时窗口末尾右删失补测进行中（live-2排空、最长等待1.622秒；live-3待完成），消费者/告警/浏览器尚未全部运行，不宣布完整验收。详见 [r3实现](r3-implementation.md) 和 [第三候选性能报告](optimized-r3-performance-report.md)。
 
 下表保留15:15 SGT阶段的合同证据，表中“待执行”对应当时状态，不把其他候选结果归为r3通过。最新状态以本段、r3报告及各候选validation-state为准。
 
@@ -24,6 +24,6 @@
 | 图表/CSV/MCP/告警消费者一致、告警防重与新鲜度 | 已保留P0报告；优化版scripts冻结 | 新候选高周期oracle、ASGI/TCP、330秒观察、10唯一trigger验收待执行 |
 | 实际网页、原生双图、save/reload、完整API lifespan | owned镜像已build、隔离TLS/login/网络Compose已校验 | 优化版尚未运行；不得把build/config当部署或验收 |
 
-完整回归仅证明实际已执行测试范围。第一候选12×300秒已完成并保留失败数值；r2在独立project/网络/卷/数据库/port19643长测。r3驱动等待r2结束并停止PG后，使用独立project与port19653串行验证；冻结门槛不变。全部开发/验收在Ubuntu本机，未推送、未生产部署。
+完整回归仅证明实际已执行测试范围。第一候选与r2均已完成12×300秒并保留公平等待失败数值；对应PG已停止。最终r3c使用独立project/网络/卷/数据库/port19673串行验证，前序r3/r3b失败证据保留。冻结门槛不变。全部开发/验收在Ubuntu本机，未推送、未生产部署。
 
 历史合并前证据及局限保留在原报告：[合并前收口](premerge-closeout.md)、[PG基线](pg-baseline-report.md)、[高周期oracle](high-period-report.md)、[真实网页P0](browser-report.md)、[持续观察P0](observation-alert-report.md)。这些不能替代优化后候选验收。
