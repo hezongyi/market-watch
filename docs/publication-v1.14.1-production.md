@@ -82,9 +82,9 @@ ssh unraid /mnt/user/appdata/market-watch/releases/v1.14.1-6fd9273/rollback-v1.1
 
 OANDA Practice 账户目录成功读入并注册 127 个明确身份数据集；实际仅 EUR_USD、XAU_USD 为当前常驻订阅，其他按真实需求订阅。保留旧四品种，未将旧历史冒充新账户范围数据。pricing worker 使用 delivery=false，但原 notify worker 仍按既有正式配置工作。原生平台图表订阅与新实时流身份各自保持原口径。
 
-实际验证：11 个常驻服务运行，API healthy，pricing restart=0；单一账户租约存在，鉴权错误为空。两个品种均收到真实报价，REST M1 恢复完成，最终样本 connection=connected、recovery_ready/quote_ready/candle_ready=true，确认分钟继续推进。生产 `/api/market-data/live` 和 SSE snapshot/heartbeat 为 200；四图已真实 dataReady，无模拟行情。用户数据指纹保持一致。
+实际验证：11 个常驻服务运行，API healthy，pricing restart=0；单一账户租约存在，鉴权错误为空。两个品种均收到真实报价，曾有两品种同时 connection=connected、recovery_ready/quote_ready/candle_ready=true 的成功样本，确认分钟继续推进。持续观察后最近样本为 XAUUSD healthy、EURUSD recovering，不能用之前的成功样本宣称当前两品种都稳定。生产 `/api/market-data/live` 和 SSE snapshot/heartbeat 为 200；四图已真实 dataReady，无模拟行情。用户数据指纹保持一致。
 
-观察期间发生上游断开和自动重连，曾短暂显示 recovering；EURUSD 没有新的源价格时真实显示 stale，即使连接心跳及确认 M1 正常。这些状态不被隐藏，短时最终 healthy 不证明长期稳定或报价时效 SLA。新配置备份经 SHA、实际隔离解包、env 内容/权限核对通过，包含更新的启停与回退资料。
+观察期间发生上游反复断开和自动重连，最近账户 connection epoch=11（自动重连 10 次），EURUSD 仍显示 recovering；EURUSD 没有新的源价格时真实显示 stale，即使连接心跳及确认 M1 正常。这些状态不被隐藏，短时最终 healthy 不证明长期稳定或报价时效 SLA。新配置备份经 SHA、实际隔离解包、env 内容/权限核对通过，包含更新的启停与回退资料。
 
 只停 stream 并恢复之前配置，可在明确维护时执行下列正式脚本；它保持 v1.14.1、原有服务和全部已采集数据：
 
