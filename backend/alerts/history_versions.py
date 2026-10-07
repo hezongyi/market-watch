@@ -388,7 +388,7 @@ def main():
         while True:
             from .history_artifacts import artifact_tick
 
-            artifact_tick(version_id)
+            artifacts_worked = artifact_tick(version_id)
             if not version_id:
                 from .composite_aggregates import aggregate_tick
                 from .composite_preparation import preparation_tick
@@ -407,7 +407,7 @@ def main():
             worked = import_page(adapter, version_id=version_id)
             if args.once:
                 return
-            time.sleep(1 if worked or aggregated or indicated else 5)
+            time.sleep(1 if worked or artifacts_worked or aggregated or indicated else 5)
     finally:
         adapter.close()
 

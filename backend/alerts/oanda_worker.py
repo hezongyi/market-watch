@@ -4,6 +4,7 @@ import logging
 import signal
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from .config import settings
 from .live_pricing import (
@@ -31,6 +32,37 @@ def subscription_change(identities, desired, idle_since, now):
         return None, set(desired) != set(identities)
     idle_since = now if idle_since is None else idle_since
     return idle_since, now - idle_since >= settings.oanda_idle_grace_seconds
+
+
+def confirm_pages(adapter, ownership, epoch, identities, cancelled):
+    """Overlap at most two REST waits; fenced commits remain on the caller.
+
+    The shared realtime lane still limits both concurrent slots and request rate.
+    Only one bounded pair is submitted at a time, so subscription changes and
+    auth faults cannot leave a queue of obsolete source requests.
+    """
+    def fetch(identity, window):
+        with lane("realtime"):
+            return adapter.page(identity, *window)
+
+    values = list(identities.values())
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="oanda-confirm-rest") as pool:
+        for offset in range(0, len(values), 2):
+            if cancelled():
+                return None
+            pending = []
+            for identity in values[offset:offset + 2]:
+                window = confirmation_window(ownership, epoch, identity)
+                if window:
+                    pending.append(pool.submit(fetch, identity, window))
+            for future in pending:
+                batch = future.result()
+                if cancelled():
+                    return None
+                commit_confirmation(ownership, epoch, batch)
+                if batch.result.status == "unauthorized":
+                    return batch.result
+    return None
 
 
 def collect(adapter, ownership, identities, stopped):
@@ -74,18 +106,12 @@ def collect(adapter, ownership, identities, stopped):
                         connection_stop.set()
                         return
                     refreshed = time.monotonic()
-                for identity in identities.values():
-                    if stopped.is_set() or connection_stop.is_set():
-                        break
-                    window = confirmation_window(ownership, epoch, identity)
-                    if window:
-                        with lane("realtime"):
-                            batch = adapter.page(identity, *window)
-                        commit_confirmation(ownership, epoch, batch)
-                        if batch.result.status == "unauthorized":
-                            maintenance_error.append(batch.result)
-                            connection_stop.set()
-                            return
+                error = confirm_pages(adapter, ownership, epoch, identities,
+                    lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set())
+                if error:
+                    maintenance_error.append(error)
+                    connection_stop.set()
+                    return
             except TimeoutError:
                 lost.set()
                 return

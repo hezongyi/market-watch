@@ -1,5 +1,8 @@
 """Zero-demand idle and intentional subscription changes are healthy lifecycles."""
 
+import threading
+from types import SimpleNamespace
+
 from alerts import live_pricing as live
 from alerts import oanda_worker as worker
 from alerts.config import settings
@@ -9,6 +12,69 @@ from sqlalchemy import select
 from test_live_pricing import running as _running
 
 running = _running
+
+
+def test_confirmations_overlap_transport_but_commit_serially_with_owner_fencing(monkeypatch):
+    identities = {str(i): SimpleNamespace(key=str(i)) for i in range(10)}
+    peers = threading.Barrier(2)
+    lock = threading.Lock()
+    active, peak, completed = 0, 0, []
+    caller = threading.get_ident()
+    stopped = threading.Event()
+    monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
+
+    class Adapter:
+        def page(self, identity, left, right):
+            nonlocal active, peak
+            with lock:
+                active += 1
+                peak = max(peak, active)
+            peers.wait(timeout=2)
+            with lock:
+                active -= 1
+            return SimpleNamespace(identity=identity, result=RequestResult(status="data"))
+
+    def commit(ownership, epoch, batch):
+        assert ownership == ("account", "owner") and epoch == 42
+        assert threading.get_ident() == caller
+        completed.append(batch.identity.key)
+
+    monkeypatch.setattr(worker, "commit_confirmation", commit)
+    assert worker.confirm_pages(Adapter(), ("account", "owner"), 42, identities, stopped.is_set) is None
+    assert peak == 2 and sorted(completed) == list(identities)
+
+
+def test_confirmation_auth_fault_stops_later_batches_and_keeps_exact_result(monkeypatch):
+    identities = {str(i): SimpleNamespace(key=str(i)) for i in range(10)}
+    calls, committed = [], []
+    denied = RequestResult(status="unauthorized")
+    monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
+
+    class Adapter:
+        def page(self, identity, *_):
+            calls.append(identity.key)
+            return SimpleNamespace(identity=identity, result=denied)
+
+    monkeypatch.setattr(worker, "commit_confirmation", lambda own, epoch, batch: committed.append(batch.identity.key))
+    assert worker.confirm_pages(Adapter(), ("account", "owner"), 42, identities, lambda: False) is denied
+    assert len(calls) <= 2 and len(committed) == 1
+
+
+def test_cancelled_connection_never_commits_completed_peer_requests(monkeypatch):
+    stopped = threading.Event()
+    calls, committed = [], []
+    identities = {str(i): SimpleNamespace(key=str(i)) for i in range(10)}
+    monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
+
+    class Adapter:
+        def page(self, identity, *_):
+            calls.append(identity.key)
+            stopped.set()
+            return SimpleNamespace(identity=identity, result=RequestResult(status="data"))
+
+    monkeypatch.setattr(worker, "commit_confirmation", lambda *args: committed.append(args))
+    assert worker.confirm_pages(Adapter(), ("account", "owner"), 42, identities, stopped.is_set) is None
+    assert len(calls) <= 2 and not committed
 
 
 def test_idle_worker_does_not_claim_account_or_start_stream(database, monkeypatch):
