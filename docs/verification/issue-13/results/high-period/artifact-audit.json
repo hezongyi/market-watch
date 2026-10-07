@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "phases": [
+    {
+      "phase": "initial",
+      "rows": 20014,
+      "targets": 30,
+      "pages": 38
+    },
+    {
+      "phase": "revised",
+      "rows": 20014,
+      "targets": 30,
+      "pages": 38
+    },
+    {
+      "phase": "observation",
+      "rows": 20014,
+      "targets": 30,
+      "pages": 38
+    },
+    {
+      "phase": "duplicate",
+      "rows": 20014,
+      "targets": 30,
+      "pages": 38
+    }
+  ],
+  "changed_payload_fields": {
+    "high": 56,
+    "low": 56,
+    "revision": 56,
+    "volume": 46,
+    "observed_at": 56,
+    "open": 36,
+    "close": 26,
+    "volume_complete": 10
+  },
+  "corruption_rejected": [
+    "end",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "complete",
+    "volume_complete",
+    "revision",
+    "observed_at",
+    "missing_row",
+    "complete_count"
+  ],
+  "final_snapshot_rows": 20014,
+  "final_snapshot_sha256": "2e7ba094d0dcbc5e4855d1d2035ab05ba78ef8524ca29e0ae318bd7dccea70a7",
+  "scope": "Recompute all four oracle phases offline; full actual PG snapshot preserved for final phase only",
+  "limitations": [
+    "Earlier actual snapshots preserved as equality hashes/assertions, not complete raw payload archives",
+    "Consumer responses checked during execution; no full ASGI/CSV/MCP response archive",
+    "Corruption checks mutate copies only, not live product data"
+  ]
+}

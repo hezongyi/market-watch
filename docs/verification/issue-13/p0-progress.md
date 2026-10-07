@@ -1,5 +1,7 @@
 # P0 实施状态（2026-10-07）
 
+**2026-10-07 00:54UTC最新接续：** `754f219`工作树干净后新增high-period-report.md所述120个独立M30/W1/MN案例，每阶段十身份20,014行；价格/量修订实际改变open/close/high/low/量/量完整性/revision/observed_at，同价观察仅改观察，重复输入可见全快照幂等。图表/CSV/MCP官方SDK各152个真实认证ASGI页、告警stored_rows120次一致；最终实际PG快照只读保存，离线重算四阶段且12种副本破坏均拒绝。首次开盘价未被输入改变的范围缺口另存，不替代增强场景。自己的PG再次停止、probe移除；P1–P3仍等待三层合并，M1源生成、DST、并发、持续告警/迁移/回退/容量尚未验收。
+
 **2026-10-07 00:39UTC最新接续：** `fbd8e53`修正浏览器审核JSON无序输出，三种hash seed字节一致、原224份manifest全部校验通过。新增外部PG持锁补测完成：3.066秒锁导致真实发布调用3.275秒，30个明确blocker样本；同期另身份PG读取15.53ms，释放后轮转恢复，26,290行完整bar/可见元信息稳定。首次连接池配置失败独立保存，不计作锁基线。报告见lock-contention-report.md；成功probe已移除，自己的PG再次停止exit0/OOM=false，其余任务未操作。main仍0591e56、开放PR为空；P1–P3仍等待三层合并，Issue #13未完成。
 
 **当前状态（优先于下文逐轮历史）：** 四场景12份300秒长测全部结束、完整artifact审计通过并汇总；非空40身份/周期配置×3次消费者API/evaluate微基线通过；门槛写入acceptance-thresholds.md（未测项明确保留）。suite和finisher已正常结束，自己的PG最后停止为exited0/running false，合成卷保留。核心P1–P3仍等待三层合并；任务没有完成或部署。下文“进行中/当前PID”是阶段历史记录，不能当作实时状态；最新完整报告为pg-baseline-report.md与consumer-report.md。

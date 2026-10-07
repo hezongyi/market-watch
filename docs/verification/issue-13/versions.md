@@ -1,12 +1,12 @@
 # P0 版本与集成边界
 
-核对时间：2026-10-07（Asia/Singapore）；最新远端核对为2026-10-07T00:41:24Z，其余原始样本以自身时间为准。以各证据的采样时间为准。
+核对时间：2026-10-07（Asia/Singapore）；最新远端核对为2026-10-07T00:55:23Z，其余原始样本以自身时间为准。以各证据的采样时间为准。
 
 | 对象 | 当前证据 | 含义 |
 | --- | --- | --- |
-| GitHub main | `git ls-remote origin refs/heads/main` = `0591e56fb4a59de8e847c43a37b2d015ec2d5cf1` | 本任务基线未变 |
+| GitHub main | `9670dae4ffa9d7917dfaf8c4331f1fad9830d56b`，PR#15 Docker管理与PR#16 v1.12.1已合入 | 远端已更新；本轮仍测0591e56，行情发布/聚合/迁移源码无差异；三层未合并 |
 | 三层 PR | `gh pr list --state open` = `[]` | 核心修复合并条件尚未成立 |
-| 本任务 worktree | `analysis/issue13-performance` / `48aa43d`网页基线、`fbd8e53`审核排序及本轮持锁补测，基线`0591e56` | 文档/测量脚本和published告警重复读的小修复；未推送、未部署；其他工作树只读 |
+| 本任务 worktree | `analysis/issue13-performance` / `754f219`持锁补测及本轮高周期独立计算，基线`0591e56` | 文档/测量脚本和published告警重复读的小修复；未推送、未部署；其他工作树只读 |
 | 三层 worktree | `feat/market-data-integration`，初次采样 `22eefb1`，随后仍在变化 | 合并后必须重新核对，不能冻结他人的开发工作 |
 | 正式生产 worker | 只读 Docker 镜像 revision `0591e56`，digest `sha256:0240c0453792e44efc9327fd92855ce651603be3875cb3a8decb56ff2d2c5ad5` | 交接所记生产 `826d316` 已不是当前运行版本 |
 | 本任务 PostgreSQL | 已有本机 `postgres:14-bookworm` 的不可变 image ID `sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872` | 独立 project/network/volume/database，未复用其他数据 |
@@ -15,6 +15,8 @@
 生产只读结果见 [production-readonly-version.txt](production-readonly-version.txt)。managed_dataset、market、chart_data、publication_jobs、bar_batch、chart_aggregation_worker 六个文件与本任务本地 SHA256 全部相等。仅查询镜像/容器状态并读文件哈希；没有停止、配置、数据或部署操作。
 
 三层提交与基线的共享文件差异：managed_dataset 的日历解析改为 `calendar_for(inst)`；market、chart_data、publication_jobs 改动日历及来源入口；storage 增加大量三层模型。bar_batch、chart_aggregation、chart_aggregation_worker 在初次核对的已提交内容中仍一致。这证明不能假定三层自动消除旧发布循环，也不能在旧 schema 上提前实现最终持久调度。
+
+00:55UTC维护发布核对：远端新增PR#15（00:46:29UTC）与#16（00:51:34UTC），没有三层行情PR；本任务只fetch与比较，未整合或切换基线。backend/alerts和迁移路径无差异，关键源码SHA见[维护更新核对](results/main-maintenance-update.json)。主线新增的Docker退役规则要求任务结束后查看清单、数据库归档并实际恢复验证；本Issue13仍active，不把任务标记完成或退役其合成库。三层合并后仍须在当时最新主线完整核对身份/日历/schema并复测。
 
 合并后核对清单：
 

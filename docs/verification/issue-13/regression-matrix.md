@@ -29,3 +29,5 @@
 网页补充：browser-report.md对应真实产品构建/原生库/Ubuntu PG/完整API lifespan六步骤，原始请求及CPU采样可审计。API与publisher外部网络隔离，固定历史/收盘告警可stale；不证明成功供应商线程负载或持续实时新鲜度。仍待新主线完整正确性与三重复验收。
 
 外部锁补充：lock-contention-report.md已实测独立PG事务持有BTCUSDT品种行锁3.066秒，真实publish_once等锁3.275秒、30个明确blocker样本；另身份已发布读取可继续、释放后轮转恢复且完整快照稳定。人工单锁不证明生产锁频率、多锁顺序、世代并发或调度门槛通过；合并后的锁顺序/事务预算回归仍需验证。
+
+高周期独立计算补充：high-period-report.md已完成十身份M30/W1/MN四阶段120案例，图表/CSV/MCP SDK各152页和告警stored_rows全量核对；独立预期不用产品聚合/快照函数，变化覆盖包括open/close/extrema/volume/volume_complete/revision/observed_at。最终实际PG20,014行快照可离线重算，12种副本破坏被拒绝；重复输入包含行revision和publication可见元信息的指纹相同。M15/D1为输入，仍不证明M1生成、DST/节假日、evaluate触发、覆盖撤回或并发世代。

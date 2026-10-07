@@ -124,3 +124,25 @@ sg docker -c 'docker compose --env-file /tmp/mw-issue13-browser-private/compose.
 执行：`python3 -u docs/verification/issue-13/run_lock_contention.py`。仅本任务服务全部停止时允许reset；拒绝覆盖已有证据，runner结束自动停止PG，单独启停见上文。尚待合并后的连续新鲜度、高周期独立oracle、同口径消费者、可比重复与迁移/回退。
 
 证据校验：`python3 docs/verification/issue-13/audit_evidence.py`。路径始终相对证据目录解析，失败列出具体文件且不改写manifest。浏览器审核输出已按容器名排序；修复前不同PYTHONHASHSEED使统计值相同但JSON字节不同，修复后三种seed输出哈希相同。证据哈希通过不等于Issue #13完成。
+
+## 独立高周期计算与图表/CSV/MCP/告警读取
+
+2026-10-07 00:54UTC完成[高周期独立计算](high-period-report.md)：十身份×M30/W1/MN×原始/修订/同价观察/重复四阶段120案例，各阶段20,014行全量快照；图表data、CSV export、官方MCP SDK tools/call各152页真实认证ASGI请求一致，告警stored_rows120次一致。独立预期只用归档M15/D1和明确日历算术，不调用产品聚合或快照读取。最终20,014行PG实际快照另行只读归档；离线重算四阶段，并拒绝12种副本破坏。首次未改变高周期open的范围缺口已独立保存，增强首/末成员后才计作开盘价修订覆盖。
+
+执行及离线审核（已有结果拒绝覆盖，重跑先明确归档）：
+
+```bash
+python3 -u docs/verification/issue-13/run_high_period.py
+python3 docs/verification/issue-13/audit_high_period.py
+python3 docs/verification/issue-13/summarize_high_period.py
+```
+
+runner只启动Ubuntu本任务PG和一个probe，finally定向停止。完成后启动PG，保存最终快照（不reset/写库）：
+
+```bash
+sg docker -c 'docker compose --env-file /tmp/market-watch-issue13-local.env -p mw-issue13-p0 -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/compose.yaml up -d --wait postgres'
+sg docker -c 'docker compose --env-file /tmp/market-watch-issue13-local.env -p mw-issue13-p0 -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/compose.yaml run --rm --name mw-issue13-p0-high-period-capture probe python docs/verification/issue-13/capture_high_period_final.py'
+sg docker -c 'docker compose --env-file /tmp/market-watch-issue13-local.env -p mw-issue13-p0 -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/compose.yaml stop postgres'
+```
+
+审核要求最终快照已归档；runner成功不单独等于离线审核通过。两份探针均已移除，PG再次停止exit0/OOM=false，Ubuntu127.0.0.1:19613不再在线。此范围不包含M1生成高周期源、DST/节假日、覆盖撤回、并发世代、网络/MCP部署、evaluate/信号/通知或SLA；其余正确性和核心P1–P3按三层合并后的合同继续推进。
