@@ -1,0 +1,61 @@
+{
+  "version": "1.14.1",
+  "release_tag": "v1.14.1",
+  "previous_source_tag": "v1.14.0",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/21",
+  "reviewed_pr_head": "4d07139890889fde35863dd9c692a18e8a635b5a",
+  "tested_product_commit": "9e51fcf",
+  "source_commit_resolution": "Resolve v1.14.1^{commit}; annotated tag targets the final main merge of PR #21 including release metadata.",
+  "release_scope": "Source publication; production deployment is separate.",
+  "delivery_document": "docs/publication-v1.14.1-source-delivery.md",
+  "source_input_manifest": "deploy/releases/v1.14.1-source-inputs.json",
+  "source_input_count": 711,
+  "schema": "aq44_aggregation_service_order",
+  "new_migrations": [
+    "migrations/versions/an41_publication_state.py",
+    "migrations/versions/ao42_coverage_projection.py",
+    "migrations/versions/ap43_publication_service_order.py",
+    "migrations/versions/aq44_aggregation_service_order.py"
+  ],
+  "application_dependencies_changed": false,
+  "verification": {
+    "report": "docs/verification/issue-13/pr21-fix/review.md",
+    "full_backend_and_ops_passed": 1455,
+    "skipped": 2,
+    "warnings": 69,
+    "subtests_passed": 8,
+    "seconds": 705.39,
+    "standards_blockers": 0,
+    "spec_blockers": 0,
+    "actual_aggregation_targets": 50,
+    "sustained_longest_ready_wait_seconds": 3.051735766697675,
+    "worker_cpu_quota": 0.75,
+    "postgres_cpu_quota": 0.75,
+    "historical_r6_long_scenarios_repeated_on_current_product": false,
+    "release_metadata_build_checks": {
+      "python_wheel": "passed, package version 1.14.1",
+      "typescript_vite": "passed, existing large chunk warning retained",
+      "reviewed_inputs_preserved_sha256": 711,
+      "root_versions_synchronized": true
+    }
+  },
+  "ubuntu_acceptance": {
+    "project": "mw-pr21-fix",
+    "host": "Ubuntu quant-server local Docker",
+    "retired": true,
+    "actual_database_restore_verified": true,
+    "private_archive_id": "mw-pr21-fix-20261007T220345-1bc312aa",
+    "private_archive_committed": false,
+    "remaining_project_resources": 0,
+    "other_containers_unchanged": 17
+  },
+  "production_operated": false,
+  "release_images": null,
+  "rollback": {
+    "previous_source_tag": "v1.14.0",
+    "application_preparation": "Stop new writers; prepare-rollback --workers-stopped invalidates coverage checkpoints and rebuilds old bucket jobs; keep additive schema/raw proof.",
+    "reupgrade": "Stop old writers and verify each identity with coverage --until-complete --verify before enabling the new publisher.",
+    "schema_downgrade": "Never force past pending state; use separately reviewed maintenance/verified backups.",
+    "production_manifest": "Use actual prior deployment manifest; this source publication does not switch production."
+  }
+}
