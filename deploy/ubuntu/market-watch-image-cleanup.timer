@@ -1,0 +1,8 @@
+[Unit]
+Description=Clean expired completed task images daily (no volumes)
+[Timer]
+OnCalendar=*-*-* 04:40:00
+Persistent=true
+RandomizedDelaySec=5min
+[Install]
+WantedBy=timers.target

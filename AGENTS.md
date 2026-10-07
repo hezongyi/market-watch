@@ -19,3 +19,10 @@
 - 只按明确名称、Compose project/label 和已核实归属删除任务资源；禁止全局 prune 或影响其他任务、生产服务及数据。
 - 数据迁移先验证所需备份和镜像完整，再移除来源实例。
 - 登录信息、env、token、TLS 私钥、许可库和完整浏览器状态不提交仓库。
+
+## Ubuntu Docker 构建和退役入口
+
+- Market Watch构建使用 `mw-docker build` 或 `mw-docker compose-build`，显式提供task、project、用途；详见 `deploy/ubuntu/README.md`。禁止回退legacy builder或直接构建无归属候选镜像。
+- 构建使用Ubuntu专用 `market-watch-ubuntu` BuildKit，缓存回收目标8 GiB。正式与回滚镜像用途必须明确，不参与自动删除。
+- 验收结束后先查看 `mw-docker retire --task TASK --project PROJECT` 清单，再对该已结束任务执行 `--apply`；数据库必须归档且实际恢复校验。进行中任务不标记完成。
+- 自动清理仅针对已完成、过期、无任何容器引用的本工具标签镜像；既有不明归属资源和其他任务不自动删除。

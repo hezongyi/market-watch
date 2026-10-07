@@ -1,0 +1,8 @@
+[Unit]
+Description=Check Ubuntu disk every 15 minutes
+[Timer]
+OnCalendar=*-*-* *:00,15,30,45:00
+Persistent=true
+RandomizedDelaySec=30
+[Install]
+WantedBy=timers.target

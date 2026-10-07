@@ -1,0 +1,8 @@
+[Unit]
+Description=Record detailed Ubuntu disk usage daily
+[Timer]
+OnCalendar=*-*-* 04:20:00
+Persistent=true
+RandomizedDelaySec=5min
+[Install]
+WantedBy=timers.target

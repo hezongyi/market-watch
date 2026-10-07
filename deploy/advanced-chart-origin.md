@@ -7,7 +7,8 @@
 先按现有许可安装脚本将供应商包安装到advanced-host/charting_library，再执行：
 
 ```sh
-docker build -t market-watch-chart-origin:VERSION ./advanced-host
+mw-docker build --repo . --component chart --tag market-watch-chart-origin:VERSION \
+  --task mw-chart-acceptance --project mw-chart-acceptance --purpose acceptance
 ```
 
 构建上下文仅为advanced-host，白名单排除开发服务、缓存和其他文件。镜像显式包含range-sync等适配脚本，不包含后台代码、环境文件、账户凭据或数据库。供应商包不会通过Git分发，需要在实际构建机准备。
@@ -15,7 +16,9 @@ docker build -t market-watch-chart-origin:VERSION ./advanced-host
 主站镜像也需传入隔离来源的外部地址，例如：
 
 ```sh
-docker build --build-arg VITE_ADVANCED_CHART_ORIGIN=https://charts.example.com -t market-watch-web:VERSION ./web
+mw-docker build --repo . --component web --tag market-watch-web:VERSION \
+  --task mw-chart-acceptance --project mw-chart-acceptance --purpose acceptance \
+  --build-arg VITE_ADVANCED_CHART_ORIGIN=https://charts.example.com
 ```
 
 示例域名需替换为实际配置。此参数是公开地址，不可传入token或密码。现有compose默认构建未设置该参数，正式配置需要通过构建覆盖文件传入，不能直接沿用默认开发端口。

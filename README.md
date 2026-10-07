@@ -101,3 +101,7 @@ TA-Lib Python（BSD-2-Clause）、NumPy（BSD-3-Clause）、FastAPI（MIT）、R
 ## 原生 MCP（开发分支）
 
 为 Codex 等受控 agent 提供同进程 Streamable HTTP `/mcp`，通过注册表开放行情、指标、告警及已保存画线。默认关闭；使用独立可撤销 Bearer 凭据。实现、Codex 配置和隔离验收步骤见 [原生 MCP 使用与开发](docs/native-mcp-usage.md)。真实 HTTPS SDK/Codex 与图表告警组合验收见 [MCP 验收](docs/verification/native-mcp/acceptance.md)及 [v1.11.0 交付](docs/chart-alerts-v1.11.0-source-delivery.md)。
+
+## Ubuntu Docker 构建与资源回收
+
+本机使用专用BuildKit、任务归属标签和验收结束退役流程，缓存回收目标8 GiB；每日记录容量，低于20 GiB本地告警。构建与维护命令见 [Ubuntu Docker 生命周期](deploy/ubuntu/README.md)。
