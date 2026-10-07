@@ -146,3 +146,15 @@ sg docker -c 'docker compose --env-file /tmp/market-watch-issue13-local.env -p m
 ```
 
 审核要求最终快照已归档；runner成功不单独等于离线审核通过。两份探针均已移除，PG再次停止exit0/OOM=false，Ubuntu127.0.0.1:19613不再在线。此范围不包含M1生成高周期源、DST/节假日、覆盖撤回、并发世代、网络/MCP部署、evaluate/信号/通知或SLA；其余正确性和核心P1–P3按三层合并后的合同继续推进。
+
+## 持续同价观察与告警新鲜度
+
+330秒实测已完成并审核，见[观察新鲜度报告](observation-alert-report.md)：十身份五批50个同价新观察，50/50准确published marker、50/50准确告警sequence；十个告警在超过120秒观察年龄后stale，恢复输入后ready，最终源/发布/判断标记一致。价格、量、源price/volume revision均未改变，新增signal为0。提交→可见p95/p99=36.234/40.406秒，可见→判断观测p95/p99=1.840/2.400秒，均超冻结目标；功能链路通过不计性能验收通过。
+
+```bash
+python3 -u docs/verification/issue-13/run_observation_alert.py
+python3 docs/verification/issue-13/audit_observation_alert.py
+python3 docs/verification/issue-13/summarize_observation_alert.py
+```
+
+仅本任务无运行服务时允许reset；已有结果拒绝覆盖，重跑先明确归档。runner实际停止probe与PG（exit0/OOM=false），Ubuntu127.0.0.1:19613当前不在线；PG启停见上文。每批目标为10/55/100/235/280秒，时钟随实际monotonic推进，全部1187份PG状态记录保留；采样/池等待误差明确列出，不是精确commit-to-commit SLA。没有新分钟、供应商、API/lifespan/网络服务、浏览器或通知投递，不能替代完整容量或核心优化验收。

@@ -10,12 +10,12 @@
       "bytes": 679
     },
     "README.md": {
-      "sha256": "f3e9d28e33a9ec03f9e91567658b36498b45211a56a3477875df0ba3a04e6982",
-      "bytes": 19300
+      "sha256": "817febbb3400ea6eb049034b4489f72288583ba4ff0cc99a836bf1cafa9175c8",
+      "bytes": 20592
     },
     "acceptance-thresholds.md": {
-      "sha256": "26c87932230e25ba6d9b775ce627c3f6bd17c141ef43854ccea328bbe57a81ab",
-      "bytes": 4525
+      "sha256": "e75c2626b8d03e84c0da44f1909d685341e1896bb03ca327b7d212dd15161186",
+      "bytes": 4951
     },
     "alert-read-baseline.txt": {
       "sha256": "6502132b58a50e8e9994d0be1c2f2b0ce0e6e6d269b3edff2498a8e85b3140ef",
@@ -68,6 +68,10 @@
     "audit_measurements.py": {
       "sha256": "687a14c3aca061fb5043d7d570b6d7fb48a32371f036a6095d3e75172c2ea1e1",
       "bytes": 4876
+    },
+    "audit_observation_alert.py": {
+      "sha256": "f8bca68f28be24a49042b1b7f1e92ea4e5d34c7b1b526aecfdd570cd2dd9fc09",
+      "bytes": 6765
     },
     "audit_supplemental.py": {
       "sha256": "18992c9ae1c7a1fb924b096c3771945fc137d79c1068e6ae2e87ee8b9eca7930",
@@ -185,9 +189,17 @@
       "sha256": "cddc250ed6131af98236a1573c92ed78adf4cbc284384ead2fffa9e9ff95ad1f",
       "bytes": 13412
     },
+    "observation-alert-report.md": {
+      "sha256": "9c8bb53fe0c79fa72e359d17efa327a50ac16b7cddde484fd38836da95e18ff2",
+      "bytes": 5024
+    },
+    "observation_alert_probe.py": {
+      "sha256": "15b69a618629a5dc1cbf6a89ede448530bfa93b94390db92f4ac46f86af09611",
+      "bytes": 13913
+    },
     "p0-progress.md": {
-      "sha256": "5403327ff77f06fc63f6bc62a541969b8e1d7b9047fe3342c712b7d8005cd2bc",
-      "bytes": 15977
+      "sha256": "6aaf829fd350d7d1239285c1b2a9702f06e9016fe0c08e320537a8be39e9fc05",
+      "bytes": 16597
     },
     "pg-baseline-report.md": {
       "sha256": "7c04b22d7197d84d2639b7685c596ad0b8b73671d531bfb36c79eeaec327e051",
@@ -226,8 +238,8 @@
       "bytes": 5137
     },
     "regression-matrix.md": {
-      "sha256": "60d8cffe1d7ac32ba69249f93bf31adf3c13776ce7d4f73aced90327da931d57",
-      "bytes": 5468
+      "sha256": "749ef0ee5512d296a0dfa30551eea6f22828295ac0b380abee0fc617bcca4f0d",
+      "bytes": 5950
     },
     "results/backfill-0-sql.json": {
       "sha256": "5345bfddbdc0692a14ee59dee488f6175af3a811b4b2298b615d47e9e1cad024",
@@ -913,6 +925,30 @@
       "sha256": "1f1d5ab92c9ff2f8488e3fa3b0521ac9242da9ee009bb37a28e63e27d76434cf",
       "bytes": 555
     },
+    "results/observation-alert/artifact-audit.json": {
+      "sha256": "152262fbd386d4780fa477d227f408d266400166fa0acacd66015a74941cc2b5",
+      "bytes": 2871
+    },
+    "results/observation-alert/host.jsonl": {
+      "sha256": "97f1a00ccd267eeb6958b4442e4ae766d558960e6eb4fcba666f4e10ae27817f",
+      "bytes": 335977
+    },
+    "results/observation-alert/postgres-stopped.json": {
+      "sha256": "8f5e1a137db2341de496495e5266464460ee1fed2c81df87011f2013a36046b2",
+      "bytes": 52
+    },
+    "results/observation-alert/process.log": {
+      "sha256": "cc694c10e0f8628d9e84591f2d787d9d307812c34472dfe85683f3b63be4ac8e",
+      "bytes": 938
+    },
+    "results/observation-alert/result.json": {
+      "sha256": "85fd3405f9e1fd873bd0dfa0fd4a4ce1d5c729dab438ba8c6abd3416482a4641",
+      "bytes": 223957
+    },
+    "results/observation-alert/timeline.jsonl": {
+      "sha256": "6f9a43734579514d28598f4b4dee7371a4c96ac8bff9a506a3ce333aa550017e",
+      "bytes": 1709232
+    },
     "results/postgres-version.txt": {
       "sha256": "e96f52d504d113ec9a773820afa671f24ae61332bed67fa078ac817fe5e0d8d3",
       "bytes": 125
@@ -1073,6 +1109,10 @@
       "sha256": "d8cc4785de8e3d21c78e65f601743e184eca391d5844c768b6c1ed9816c7b781",
       "bytes": 2973
     },
+    "run_observation_alert.py": {
+      "sha256": "a3cb52f37a4f4e739a0beb685144b70dd8ef3144be1a233ee59e51cf4639cc71",
+      "bytes": 2097
+    },
     "run_suite.py": {
       "sha256": "45a5ea9cb8e4a557103e4a044a951da731470c953fa7cff631d717ce2eb5e832",
       "bytes": 2994
@@ -1100,6 +1140,10 @@
     "summarize_network_alert.py": {
       "sha256": "a035349215b3ff82d9957cb8982ec4ca2ef23810d80f692b8c28698ea826cebb",
       "bytes": 6329
+    },
+    "summarize_observation_alert.py": {
+      "sha256": "943e46989656cf144fd3fb04d942dcb705ba4abe037b1aed981113c04db01d2b",
+      "bytes": 6012
     },
     "summarize_supplemental.py": {
       "sha256": "0071a807010644b542db1ae03c213e04106b666237b8680adc4fa3351ae9cd69",

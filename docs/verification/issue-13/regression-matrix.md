@@ -31,3 +31,5 @@
 外部锁补充：lock-contention-report.md已实测独立PG事务持有BTCUSDT品种行锁3.066秒，真实publish_once等锁3.275秒、30个明确blocker样本；另身份已发布读取可继续、释放后轮转恢复且完整快照稳定。人工单锁不证明生产锁频率、多锁顺序、世代并发或调度门槛通过；合并后的锁顺序/事务预算回归仍需验证。
 
 高周期独立计算补充：high-period-report.md已完成十身份M30/W1/MN四阶段120案例，图表/CSV/MCP SDK各152页和告警stored_rows全量核对；独立预期不用产品聚合/快照函数，变化覆盖包括open/close/extrema/volume/volume_complete/revision/observed_at。最终实际PG20,014行快照可离线重算，12种副本破坏被拒绝；重复输入包含行revision和publication可见元信息的指纹相同。M15/D1为输入，仍不证明M1生成、DST/节假日、evaluate触发、覆盖撤回或并发世代。
+
+持续观察补充：observation-alert-report.md已完成330秒、50/50准确同价新观察→发布→intrabar告警sequence推进，十个stale→ready且末次标记一致、零新增signal/源修订变化。提交可见与可见判断的p95/p99仍超冻结目标；采样有不确定性，未把功能路径通过当性能达标。仅同一完成M1的样本标记，无新分钟/上游/API/lifespan/网络/浏览器或通知，不替代触发、防丢并发和容量验收。
