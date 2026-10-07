@@ -27,7 +27,16 @@ def main():
     fairness = read('fairness/result.json')
     assert fairness['targets'] == len(fairness['service']) == 90 and not fairness['missing']
     assert len({(r['instrument'],r['frame']) for r in fairness['service']}) == 90
-    outputs.append(dict(scope='fairness',targets=90,seconds=fairness['longest_first_service_seconds']))
+    assert max(row['seconds'] for row in fairness['service']) == fairness['longest_first_service_seconds']
+    assert max(row['longest_ready_age'] for row in fairness['turns']) == fairness['longest_target_wait']
+    counts={tuple(row['target']):0 for row in fairness['rounds']}
+    assert len(counts)==90
+    for turn in fairness['turns']:
+        if turn['task_progressed']:
+            counts[tuple(turn['target'])]+=1
+    assert all(counts[tuple(row['target'])]==row['count']>=2 for row in fairness['rounds'])
+    outputs.append(dict(scope='fairness',targets=90,seconds=fairness['longest_first_service_seconds'],
+        sustained_rounds_recomputed=True))
     micro = read('consumer-microbaseline.json')
     assert len(micro['api_samples']) == len(micro['alert_samples']) == 120
     assert micro['queries'].get('alert_staging_reads',0) == 0
@@ -38,6 +47,8 @@ def main():
     assert not mixed['final_unserved_ready'], 'Mixed workload retains censored runnable targets'
     assert all(v == {'new_bar':1,'observation':1} for v in mixed['inputs_by_identity'].values())
     assert not mixed['lock_sample_errors']
+    mixed_turns=[json.loads(line) for line in (ROOT/'supplemental/mixed.jsonl').read_text().splitlines()]
+    assert max(row['target_wait'] for row in mixed_turns)==mixed['longest_target_wait']
     outputs.append(dict(scope='mixed',inputs=20,exact_payloads=20,terminal_runnable_targets=0))
     high = read('high-period/result.json')
     assert high['outcome'] == 'passed' and high['case_count'] == 120
