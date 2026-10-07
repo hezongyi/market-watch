@@ -109,8 +109,10 @@ def router(authenticated):
         return invoke(list_composites, query=query, page=page, page_size=page_size)
 
     @routes.get("/center/composite-candidates")
-    def possible(query: str = "", page: int = 1, page_size: int = 25):
-        return invoke(candidates, query=query, page=page, page_size=page_size)
+    def possible(query: str = "", page: int = 1, page_size: int = 25,
+                 source: str | None = None, calendar: str | None = None):
+        return invoke(candidates, query=query, page=page, page_size=page_size,
+                      source=source or None, calendar=calendar or None)
 
     @routes.get("/datasets/{dataset_id}/mappings")
     def saved_mappings(dataset_id: str):

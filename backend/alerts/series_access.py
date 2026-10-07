@@ -7,10 +7,11 @@ the first-use command for a saved, eligible composite candidate.
 import hashlib
 import json
 from datetime import datetime, timezone
+from itertools import zip_longest
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from .chart_data import FRAMES, future_grid
 from .chart_series import encode
@@ -47,6 +48,10 @@ def composite_definition(db, ident):
 
 
 def metadata(db, ident, kind):
+    return _metadata(db, ident, kind)
+
+
+def _metadata(db, ident, kind, *, composite_context=None):
     if kind == "history":
         version = db.get(HistoryVersion, ident)
         if not version or version.status != "published" or db.get(HistoryReclamation, ident):
@@ -62,17 +67,20 @@ def metadata(db, ident, kind):
                    "dataset_id": dataset.id, "history_checksum": version.manifest["checksum"]}
         volume_kind, volume_unit = dataset.volume_kind, dataset.volume_unit
     elif kind == "composite":
-        dataset_id, mapping_id, composite = composite_definition(db, ident)
+        dataset_id, mapping_id, composite = composite_context or composite_definition(db, ident)
         dataset = db.get(MarketDataset, dataset_id)
         inst = db.get(Instrument, dataset.instrument_id)
-        mapping = db.get(RealtimeMapping, mapping_id)
-        target = db.get(Instrument, db.get(MarketDataset, mapping.target_dataset_id).instrument_id)
         if composite:
             revision = db.get(CompositeRevision, composite.active_revision_id)
             version = db.get(HistoryVersion, revision.history_version_id)
+            dataset = db.get(MarketDataset, version.dataset_id)
+            inst = db.get(Instrument, dataset.instrument_id)
+            mapping_id = revision.mapping_id
             seam = revision.seam
         else:
             version, seam = baseline(db, dataset.id, inst.calendar)
+        mapping = db.get(RealtimeMapping, mapping_id)
+        target = db.get(Instrument, db.get(MarketDataset, mapping.target_dataset_id).instrument_id)
         frames = FRAMES
         binding = {"composite_id": ident, "dataset_id": dataset.id, "mapping_id": mapping_id,
                    "history_version_id": version.id, "seam": seam, "created": composite is not None}
@@ -235,46 +243,93 @@ def export_page(db, body):
     raise HTTPException(413, "单次导出分页过多，请缩小日期范围")
 
 
+def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None):
+    """Bounded SQL qualification then exact metadata; never scan every snapshot.
+
+    Offset advances through candidates, including invalid seam/account entries.
+    At most 500 are inspected per request. Unknown qualification totals are not
+    presented as counts of usable series; an empty page can still continue.
+    """
+    if (kind not in ("history", "composite") or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
+            or source not in (None, "dukascopy", "oanda", "binance") or calendar not in (None, "ny17", "utc0")):
+        raise ValueError("无效行情搜索范围或筛选")
+    pattern = "%" + query[:100].strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+    eligible_period = select(HistoryArtifact.id).where(HistoryArtifact.version_id == HistoryVersion.id,
+        HistoryArtifact.status == "published", HistoryArtifact.count > 0)
+    if kind == "composite":
+        eligible_period = eligible_period.where(HistoryArtifact.timeframe == "M1")
+    versions = select(HistoryVersion.id.label("version_id"), HistoryVersion.dataset_id,
+        func.row_number().over(partition_by=HistoryVersion.dataset_id,
+            order_by=(HistoryVersion.published_at.desc(), HistoryVersion.id.desc())).label("position"))
+    versions = versions.where(HistoryVersion.status == "published", eligible_period.exists(),
+        ~select(HistoryReclamation.version_id).where(HistoryReclamation.version_id == HistoryVersion.id).exists()).subquery()
+    query_ids = select(MarketDataset.id.label("dataset_id"), versions.c.version_id,
+        Instrument.source.label("source"), MarketDataset.logical_symbol.label("symbol"))
+    query_ids = query_ids.select_from(MarketDataset).join(Instrument).join(versions, (versions.c.dataset_id == MarketDataset.id) & (versions.c.position == 1))
+    query_ids = query_ids.where(~select(DatasetMaintenance.dataset_id).where(
+        DatasetMaintenance.dataset_id == MarketDataset.id, DatasetMaintenance.archived.is_(True)).exists(),
+        or_(MarketDataset.logical_symbol.ilike(pattern, escape="\\"), Instrument.label.ilike(pattern, escape="\\"),
+            Instrument.symbol.ilike(pattern, escape="\\"), MarketDataset.identity["provider_symbol"].as_string().ilike(pattern, escape="\\")))
+    if source:
+        query_ids = query_ids.where(Instrument.source == source)
+    if calendar and kind == "history":
+        query_ids = query_ids.where(Instrument.calendar == calendar)
+    if kind == "composite":
+        from sqlalchemy.orm import aliased
+
+        from .history_catalog import account_scope
+        target = aliased(MarketDataset)
+        query_ids = query_ids.add_columns(RealtimeMapping.id.label("mapping_id")).join(RealtimeMapping,
+            RealtimeMapping.dataset_id == MarketDataset.id).join(target, target.id == RealtimeMapping.target_dataset_id).where(
+                RealtimeMapping.permission_scope == "workspace:default",
+                target.identity["account_scope"].as_string() == account_scope())
+    else:
+        from sqlalchemy import literal
+        query_ids = query_ids.add_columns(literal("").label("mapping_id"))
+    from sqlalchemy import case
+    term = query[:100].strip().upper()
+    code = func.upper(Instrument.symbol)
+    logical = func.upper(MarketDataset.logical_symbol)
+    exact = or_(code == term, logical == term, func.replace(func.replace(code, "_", ""), "/", "") == term)
+    prefix = query[:100].strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+    query_ids = query_ids.add_columns(case((exact, 0), (Instrument.symbol.ilike(prefix, escape="\\"), 1), else_=2).label("match_rank"))
+    candidates = query_ids.subquery()
+    # Source interleaving happens before LIMIT, so a large Duka history catalog
+    # cannot hide an equally relevant OANDA candidate behind thousands of rows.
+    ranked = select(candidates, func.row_number().over(partition_by=(candidates.c.match_rank, candidates.c.source),
+        order_by=(candidates.c.symbol, candidates.c.dataset_id, candidates.c.mapping_id)).label("source_position")).subquery()
+    candidates_query = select(ranked).order_by(ranked.c.match_rank, ranked.c.source_position, ranked.c.source,
+        ranked.c.symbol, ranked.c.dataset_id, ranked.c.mapping_id).offset(offset).limit(501)
+    records = list(db.execute(candidates_query).mappings())
+    items, examined = [], 0
+    for record in records[:500]:
+        examined += 1
+        try:
+            ident = record["version_id"] if kind == "history" else definition(db, record["dataset_id"], record["mapping_id"])[-1]
+            meta = _metadata(db, ident, kind, composite_context=(record["dataset_id"], record["mapping_id"],
+                db.get(MarketComposite, ident)) if kind == "composite" else None)
+        except ValueError:
+            continue
+        if calendar and meta["calendar"] != calendar:
+            continue
+        dataset = db.get(MarketDataset, record["dataset_id"])
+        inst = db.get(Instrument, dataset.instrument_id)
+        items.append({**meta, "ticker": encode(ident, kind), "label": inst.label,
+            "description": f"{'自建' if kind == 'history' else '组合'} · {dataset.identity['source']}"
+                f"{'→OANDA Practice' if kind == 'composite' else ''} · {inst.basis} · {meta['calendar']}", "available": True})
+        if len(items) == page_size:
+            break
+    has_more = examined < len(records)
+    return {"items": items, "offset": offset, "page_size": page_size, "examined": examined,
+        "has_more": has_more, "next_offset": offset + examined if has_more else None}
+
+
 def search(db, query="", *, kind="all", limit=100):
     """No registration, demand, supplier requests, or mutable-version fallback."""
     if kind not in ("all", "history", "composite") or not 1 <= limit <= 250:
         raise ValueError("无效行情搜索范围")
-    results = []
-    term = query.strip().upper()
-    datasets = db.scalars(select(MarketDataset).where(~select(DatasetMaintenance.dataset_id).where(
-        DatasetMaintenance.dataset_id == MarketDataset.id, DatasetMaintenance.archived.is_(True)).exists())
-                         .order_by(MarketDataset.logical_symbol, MarketDataset.id))
-    for dataset in datasets:
-        inst = db.get(Instrument, dataset.instrument_id)
-        if term not in (dataset.logical_symbol + inst.label + dataset.identity["provider_symbol"]).upper():
-            continue
-        if kind in ("all", "history"):
-            versions = db.scalars(select(HistoryVersion).where(HistoryVersion.dataset_id == dataset.id,
-                HistoryVersion.status == "published", ~select(HistoryReclamation.version_id).where(
-                    HistoryReclamation.version_id == HistoryVersion.id).exists())
-                .order_by(HistoryVersion.published_at.desc(), HistoryVersion.id.desc()))
-            for version in versions:
-                try:
-                    meta = metadata(db, version.id, "history")
-                except ValueError:
-                    continue
-                results.append({**meta, "ticker": encode(version.id, "history"), "label": inst.label,
-                    "description": f"自建 · {dataset.identity['source']} · {inst.basis} · {inst.calendar} · 固定发布",
-                    "available": True})
-                break
-        if kind in ("all", "composite"):
-            mappings = db.scalars(select(RealtimeMapping).where(RealtimeMapping.dataset_id == dataset.id,
-                RealtimeMapping.permission_scope == "workspace:default")
-                .order_by(RealtimeMapping.created_at.desc(), RealtimeMapping.id))
-            for mapping in mappings:
-                try:
-                    ident = definition(db, dataset.id, mapping.id)[-1]
-                    meta = metadata(db, ident, "composite")
-                except ValueError:
-                    continue
-                results.append({**meta, "ticker": encode(ident, "composite"), "label": inst.label,
-                    "description": f"组合 · {dataset.identity['source']}→OANDA Practice · {inst.basis} · {inst.calendar}",
-                    "available": True})
-        if len(results) >= limit:
-            break
-    return results[:limit]
+    if kind != "all":
+        return search_page(db, query, kind=kind, page_size=limit)["items"]
+    histories = search_page(db, query, kind="history", page_size=limit)["items"]
+    composites = search_page(db, query, kind="composite", page_size=limit)["items"]
+    return [row for pair in zip_longest(histories, composites) for row in pair if row][:limit]

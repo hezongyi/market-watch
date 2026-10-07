@@ -502,8 +502,15 @@ def router(authenticated):
     r = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
 
     @r.get("/series/search")
-    def series_search(query: str = "", kind: str = "all", limit: int = 100):
-        return search_series(query, kind=kind, limit=limit)
+    def series_search(query: str = "", kind: str = "all", limit: int = 100,
+                      source: str | None = None, calendar: str | None = None):
+        return search_series(query, kind=kind, limit=limit, source=source or None, calendar=calendar or None)
+
+    @r.get("/series/page")
+    def series_page(query: str = "", kind: str = "history", page_size: int = 25,
+                    offset: int = 0, source: str | None = None, calendar: str | None = None):
+        return search_series_page(query, kind=kind, page_size=page_size, offset=offset,
+                                  source=source or None, calendar=calendar or None)
 
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
@@ -937,40 +944,65 @@ def router(authenticated):
     return r
 
 
-def search_series(query="", *, kind="all", limit=100):
+def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None):
+    if kind == "provider":
+        if not 1 <= page_size <= 250 or not 0 <= offset <= 1000000 or calendar:
+            raise HTTPException(422, "无效平台搜索分页或筛选")
+        rows = _provider_series(query, source=source)
+        items = rows[offset:offset + page_size]
+        has_more = offset + len(items) < len(rows)
+        return {"items": items, "total": len(rows), "offset": offset, "page_size": page_size,
+            "has_more": has_more, "next_offset": offset + len(items) if has_more else None}
+    from .series_access import search_page
+    try:
+        with transaction() as db:
+            return search_page(db, query, kind=kind, page_size=page_size, offset=offset, source=source, calendar=calendar)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from None
+
+
+def _provider_series(query, *, source=None):
+    from .chart_series import encode
+    from .history_catalog import account_scope
+
+    if source not in (None, "dukascopy", "oanda", "binance", "yahoo"):
+        raise HTTPException(422, "未知平台来源")
+    result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+        "description": "平台 · " + row["source"] + " · 原生周期"}
+        for row in instrument_catalog(query, limit=None) if not row["id"].startswith("MD:")]
+    with transaction() as db:
+        for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
+                MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True))):
+            if row.metadata_json.get("history_account_scope") != account_scope():
+                continue
+            if query.strip().upper() not in (row.symbol + row.symbol.replace("_", "") + row.label).upper():
+                continue
+            ident = "OANDA:" + row.symbol
+            if any(item["id"] == ident for item in result):
+                continue
+            result.append({"id": ident, "symbol": row.symbol, "label": row.label,
+                "series_kind": "provider", "ticker": encode(ident, "provider"),
+                "source": "oanda", "asset_type": row.asset_type, "available": True,
+                "supported": row.calendar in ("ny17", "utc0"), "precision": row.precision,
+                "description": "平台 · OANDA Practice · Bid · 原生周期"})
+    return _rank_catalog([row for row in result if not source or row["source"] == source], query)
+
+
+def search_series(query="", *, kind="all", limit=100, source=None, calendar=None):
     if kind not in ("all", "provider", "history", "composite") or not 1 <= limit <= 250:
         raise HTTPException(422, "无效行情搜索范围")
-    result = []
-    if kind in ("all", "provider"):
-        from .chart_series import encode
-        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
-            "description": "平台 · " + row["source"] + " · 原生周期"}
-            for row in instrument_catalog(query) if not row["id"].startswith("MD:")]
-        from .history_catalog import account_scope
-        with transaction() as db:
-            for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
-                    MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True))):
-                if row.metadata_json.get("history_account_scope") != account_scope():
-                    continue
-                if query.strip().upper() not in (row.symbol + row.symbol.replace("_", "") + row.label).upper():
-                    continue
-                ident = "OANDA:" + row.symbol
-                if any(item["id"] == ident for item in result):
-                    continue
-                result.append({"id": ident, "symbol": row.symbol, "label": row.label,
-                    "series_kind": "provider", "ticker": encode(ident, "provider"),
-                    "source": "oanda", "asset_type": row.asset_type, "available": True,
-                    "supported": row.calendar in ("ny17", "utc0"), "precision": row.precision,
-                    "description": "平台 · OANDA Practice · Bid · 原生周期"})
-    if kind != "provider":
-        from .series_access import search
-        with transaction() as db:
-            fixed = search(db, query, kind=kind, limit=limit)
-        if kind == "all" and fixed:
-            result = result[:max(1, limit // 3)]
-        result += fixed
-    if kind == "provider":
-        result = _rank_catalog(result, query)
+    if kind != "all":
+        return search_series_page(query, kind=kind, page_size=limit, source=source, calendar=calendar)["items"]
+    if source or calendar:
+        raise HTTPException(422, "筛选请明确平台、自建或组合范围")
+    from itertools import zip_longest
+
+    from .series_access import search_page
+    providers = _provider_series(query)
+    with transaction() as db:
+        histories = search_page(db, query, kind="history", page_size=limit)["items"]
+        composites = search_page(db, query, kind="composite", page_size=limit)["items"]
+    result = [row for group in zip_longest(providers, histories, composites) for row in group if row]
     return result[:limit]
 
 
@@ -995,7 +1027,7 @@ def _rank_catalog(rows, query):
     return result
 
 
-def instrument_catalog(query: str = ""):
+def instrument_catalog(query: str = "", *, limit=250):
     from .config import settings
     from .provider_dukascopy import catalog as dukascopy_catalog
     from .yahoo_catalog import search, seed
@@ -1077,4 +1109,4 @@ def instrument_catalog(query: str = ""):
         ]
     for row in dukascopy:
         row["search_status"] = search_status
-    return _rank_catalog(result + dukascopy, query)[:250]
+    return _rank_catalog(result + dukascopy, query)[:limit]

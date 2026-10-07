@@ -129,10 +129,10 @@ def list_composites(db, *, query="", page=1, page_size=25, permission_scope=SCOP
             "total": total, "page": page, "page_size": page_size}
 
 
-def candidates(db, *, query="", page=1, page_size=25, permission_scope=SCOPE):
+def candidates(db, *, query="", page=1, page_size=25, permission_scope=SCOPE, source=None, calendar=None):
     from .data_center import dataset_list
 
-    result = dataset_list(db, query=query, page=page, page_size=page_size)
+    result = dataset_list(db, query=query, page=page, page_size=page_size, source=source, calendar=calendar)
     output = []
     for dataset in result["items"]:
         reason = None

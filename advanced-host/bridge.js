@@ -421,8 +421,10 @@ const feed = {
     ),
   searchSymbols: async (input, exchange, type, cb) => {
     try {
+      const currentKind = typeof widget !== 'undefined' && ready ? decode(widget.activeChart().symbol()).series_kind : 'provider';
       const rows = await request(
-        { op: "search", args: { query: input } },
+        { op: "search", args: { query: input, kind: currentKind === 'managed' ? 'provider' : currentKind,
+          source: ['DUKASCOPY','OANDA','BINANCE','YAHOO'].includes(exchange?.toUpperCase()) ? exchange.toLowerCase() : undefined } },
         "market",
       );
       cb(
@@ -1547,6 +1549,8 @@ function boot(
           send({type: "error", error: String(e)}));
         alertBridge.attach();
         if (!readonly) {
+          globalThis.MWSeriesPicker?.attach(widget, query => request({op:'searchPage',args:query},'market'),
+            error=>error ? send({type:'error',error:String(error)}) : send({type:'workspace-action',action:'market-data'}));
           const button = widget.createButton(); button.textContent = "创建告警";
           button.setAttribute("title","在当前图表创建告警"); button.addEventListener("click",()=>alertBridge.create());
         }

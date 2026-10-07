@@ -19,3 +19,15 @@ def test_search_mcp_and_browser_share_qualified_candidates_without_creation(mcp,
     assert fixed["structuredContent"]["items"][0]["ticker"] == "MWH:" + parent
     with factory.begin() as db:
         assert db.scalar(select(MarketComposite)) is None and db.scalar(select(MarketDemand)) is None
+
+
+def test_paginated_mcp_and_browser_match_with_filters(mcp, monkeypatch):
+    client, token, factory = mcp
+    from test_series_search_pagination import large_catalog
+
+    large_catalog(factory, count=55)
+    args = {"kind": "history", "page_size": 10, "offset": 15, "source": "dukascopy", "calendar": "utc0"}
+    result = call(client, token, "series_search", args)
+    assert not result["isError"]
+    assert result["structuredContent"] == client.get("/api/market-data/series/page", params=args).json()
+    assert result["structuredContent"]["items"]
