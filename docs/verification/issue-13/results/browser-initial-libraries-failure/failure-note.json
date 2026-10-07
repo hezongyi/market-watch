@@ -1,0 +1,4 @@
+{
+  "phase": "before UI navigation",
+  "reason": "node slim base lacks Chromium shared libraries; task Browser.Dockerfile installs Debian-native dependencies before rerun"
+}

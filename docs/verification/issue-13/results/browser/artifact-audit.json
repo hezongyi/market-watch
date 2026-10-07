@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "phases": [
+    "M1 idle 30s",
+    "M5 period switch",
+    "EURUSD identity switch",
+    "two-chart native layout",
+    "manual save",
+    "reload persisted layout"
+  ],
+  "actual_https_origin": "https://192.168.7.232:19615",
+  "scope": "Built product UI and real native chart with full API lifespan, one publisher and one Chromium instance",
+  "resource": {
+    "mw-issue13-p0-chart-origin-1": {
+      "samples": 9,
+      "mean_single_core_percent": 0.0,
+      "max_single_core_percent": 0.0
+    },
+    "mw-issue13-p0-postgres-1": {
+      "samples": 9,
+      "mean_single_core_percent": 16.894444444444446,
+      "max_single_core_percent": 29.9
+    },
+    "mw-issue13-p0-web-1": {
+      "samples": 9,
+      "mean_single_core_percent": 0.09333333333333334,
+      "max_single_core_percent": 0.63
+    },
+    "mw-issue13-p0-api-1": {
+      "samples": 9,
+      "mean_single_core_percent": 5.382222222222222,
+      "max_single_core_percent": 12.48
+    },
+    "mw-issue13-p0-browser": {
+      "samples": 8,
+      "mean_single_core_percent": 12.528749999999997,
+      "max_single_core_percent": 47.19
+    },
+    "mw-issue13-p0-publisher-1": {
+      "samples": 9,
+      "mean_single_core_percent": 31.868888888888893,
+      "max_single_core_percent": 38.73
+    },
+    "application_total": {
+      "samples": 8,
+      "mean_single_core_percent": 49.31125,
+      "max_single_core_percent": 93.05000000000001,
+      "configured_cpu_limit": 1.45
+    }
+  }
+}

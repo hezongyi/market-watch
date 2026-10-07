@@ -3,6 +3,9 @@
 **当前状态（优先于下文逐轮历史）：** 四场景12份300秒长测全部结束、完整artifact审计通过并汇总；非空40身份/周期配置×3次消费者API/evaluate微基线通过；门槛写入acceptance-thresholds.md（未测项明确保留）。suite和finisher已正常结束，自己的PG最后停止为exited0/running false，合成卷保留。核心P1–P3仍等待三层合并；任务没有完成或部署。下文“进行中/当前PID”是阶段历史记录，不能当作实时状态；最新完整报告为pg-baseline-report.md与consumer-report.md。
 
 
+**2026-10-07 00:31UTC网页接续状态（优先）：** 本任务完整API lifespan、publisher、真实React网页、许可原生图表和单Chromium在Ubuntu隔离project完成六步骤，M1/M5/身份切换/双图/实际保存/刷新恢复均通过。96.61秒、12次图表data请求p95/p99=183ms、0pageerror；配额1.45CPU应用+浏览器、PG0.75CPU/512MiB。API/publisher连接internal网络，不涉及真实上游凭据或成功供应商I/O。所有本任务服务实查已停止，PGexit0/无OOM，publisher init转发TERM exit143；原失败配置证据逐份归档且已修正。报告browser-report.md、原始result/截图/runtime/network/host均保存。核心与迁移仍未完成，三层合并条件尚未成立。
+
+
 **2026-10-07接续最新状态：** 本地提交`d362766`已核对且原135份清单哈希匹配；新增idle/mixed各300秒和TCP/告警120秒均实际执行完并通过artifact审核。26,290行空闲完整bar指纹不变但60个publication更新时间变化，SQL65.39/s；混合十身份两类输入20/20可见、p95 23.64秒超目标。网络120次非空请求p95/p99=450.18/524.08ms，十个输入/可见/判断/唯一signal均10；判断观测p95=1.657秒超1秒目标。真实Ubuntu地址曾为127.0.0.1:19614并已从宿主确认401，probe已移除、自己的PG再次实查exited0。原12份基线保留，未部署、未推送、未修改或清理其他实例。补测内部时钟、线程SQL归因与采样误差限制见supplemental-report.md及network-alert-report.md；provider lifespan/完整网页/浏览器/长期重复与迁移回退仍未验收。P1–P3仍等待三层合并，Issue #13未完成。
 
 本轮收尾：初次消费者W1/MN为空的结果保留consumer-empty-window.json；显式扩大历史计划后120次非空API和120次PG告警求值再次通过（p95 51.33/147.20ms），仍有6次warming单列。套件/接续器结束和PGexited0均以实际进程/容器状态核对。数值门槛已冻结，但P0全范围仍缺网络API、输入到告警、浏览器并发、低竞争复测及完整payload/锁等待等，不能宣称全验收。正式覆盖压缩归档往返与SHA256通过；初次台账被刷新覆盖的证据限制和后续归档规则见inventory-lifecycle.md。未推送、未部署、未清理其他实例。
@@ -58,5 +61,5 @@ consumer_probe.py已准备但未运行；它仅在suite完整结束后允许rese
 1. `d362766` 已保存，首次接续核对工作树干净；原证据清单135份哈希全部匹配。PG实查已停止，suite/finisher无活跃进程。
 2. 2026-10-07T00:01:17Z远端main仍为`0591e56`，开放PR为0；三层合并条件尚未成立，P1–P3保持等待。
 3. 原12份四场景长测、消费者微基线与冻结门槛已完成，不重复启动或覆盖。补充验证单独保存于`results/supplemental/`：实际经过时间推进fixture时钟、完整published bar指纹、每身份新分钟与同价观察，以及两个身份大回填与十身份实时并存，另采事务锁等待。两份300秒已结束且artifact审核通过；26,290行空闲完整bar指纹一致、60个更新时间变化；mixed十身份两种输入20/20可见，p95 23.64秒超15秒目标。详见supplemental-report.md。
-4. 实际TCP与十个新分钟触发并发短测已完成并另有报告；仍缺完整provider lifespan/网页/浏览器与持续输入验收，没有把短窗口或ASGI微基线冒充全部范围。
+4. 实际TCP与十个新分钟触发并发短测已完成并另有报告；完整provider lifespan/网页/单浏览器双图短测已完成；仍缺供应商成功I/O、持续输入和可比重复完整验收，没有把短窗口或ASGI微基线冒充全部范围。
 5. 三层合并后整合最新main、核对身份/日历/迁移与保留旧入口，同fixture复测后实施核心改造及迁移/回退。Issue #13仍未完成。

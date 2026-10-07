@@ -1,0 +1,362 @@
+{
+  "synthetic_market_data": true,
+  "upstream_isolated": true,
+  "scope": "Built product UI and real native chart with full API lifespan, one publisher and one Chromium instance",
+  "phases": [],
+  "page_errors": [
+    "crypto.randomUUID is not a function"
+  ],
+  "requests": [
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 401,
+      "milliseconds": 99
+    },
+    {
+      "path": "/api/login",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 508
+    },
+    {
+      "path": "/api/session-range",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 95
+    },
+    {
+      "path": "/api/candles",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 95
+    },
+    {
+      "path": "/api/watches",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 121
+    },
+    {
+      "path": "/api/signals",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 121
+    },
+    {
+      "path": "/api/instruments",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 210
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 272
+    },
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 158
+    },
+    {
+      "path": "/api/watches",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 236
+    },
+    {
+      "path": "/api/signals",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 238
+    },
+    {
+      "path": "/api/instruments",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 256
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 389
+    },
+    {
+      "path": "/api/advanced-charts/workspaces",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 152
+    },
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 79
+    },
+    {
+      "path": "/api/advanced-charts/workspaces/6a29d22f-5614-4efc-a4db-6721b9f61784/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 51
+    },
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 84
+    },
+    {
+      "path": "/api/advanced-charts/workspaces",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 19
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 149
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 182
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 16
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 57
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 40
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 152
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 22
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 107
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 75
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 197
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 29
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 200
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 34
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 98
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 16
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 81
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 32
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 91
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 15
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 65
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 14
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 58
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 13
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 81
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 36
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 96
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 25
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 70
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 16
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 62
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 25
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 94
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 17
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 67
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 10
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 58
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 27
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 127
+    }
+  ],
+  "failed_requests": [],
+  "checkpoints": [],
+  "outcome": "failed",
+  "failure": "frame.waitForFunction: Timeout 90000ms exceeded.",
+  "status_text": [
+    "正在加载图表"
+  ],
+  "frame_failure_state": {
+    "ready": false,
+    "loading": false,
+    "symbol": null,
+    "dataReady": null,
+    "range": null
+  },
+  "duration_seconds": 96.332
+}

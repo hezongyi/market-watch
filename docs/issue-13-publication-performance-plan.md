@@ -203,3 +203,6 @@ P0 的实例台账与资源观测贯穿全过程；P1–P3 的进入条件是三
 最终交付包含：代码与迁移、回归测试、可重跑性能脚本、前后对照报告、覆盖迁移/回退记录、实例台账、Ubuntu 实际运行地址与带明确 project 的启动/停止命令、已知限制。端口在创建实例前查空闲后确定，实际启动后才填写访问地址。
 
 2026-10-07 最新状态：4 场景 × 3 次 × 300 秒 PostgreSQL 长测已全部结束，12份原始数据审计通过，报告见[PG基线](verification/issue-13/pg-baseline-report.md)。已补[正式覆盖只读对照](verification/issue-13/production-coverage-comparison.md)、[消费者微基线](verification/issue-13/consumer-report.md)、[冻结门槛及未测范围](verification/issue-13/acceptance-thresholds.md)。Ubuntu独立 `mw-issue13-p0` PG测完已停止，合成数据卷保留；实测schema fixture为824,418行candles、388,895行审计。published告警重复读的小修复28个回归通过，仅本地改动。没有核心发布/覆盖修改、其他实例清理或生产部署；P1–P3仍等待三层合并，完整网络API/告警输入延迟/浏览器并发、迁移/回退与核心正确性均未验收。见[执行手册](verification/issue-13/README.md)、[版本矩阵](verification/issue-13/versions.md)和[回归清单](verification/issue-13/regression-matrix.md)。
+
+
+2026-10-07 00:31UTC接续：`d362766`与`10abd44`已本地保存小修复、P0原始/补充基线，未推送或部署。新增[真实网页/原生双图/完整API lifespan短并发](verification/issue-13/browser-report.md)已实际通过；之前[完整payload/混合输入](verification/issue-13/supplemental-report.md)及[TCP/告警短测](verification/issue-13/network-alert-report.md)仍保留超目标指标及局限。P0准备持续推进，但上述不证明核心调度/增量/迁移/回退达标；三层合并条件未成立，P1–P3继续等待。

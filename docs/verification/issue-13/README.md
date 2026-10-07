@@ -90,3 +90,29 @@ python3 -u docs/verification/issue-13/run_network_alert.py
 
 
 补充验证均已实际结束并通过原始artifact审核：[时钟/快照/混合报告](supplemental-report.md)、[TCP/告警报告](network-alert-report.md)。网络API p95/p99=450.18/524.08ms；告警判断观测p95=1.657秒超目标，十个输入均可见且各一个signal。API SQL初次归因只含认证线程，数据路由线程未独立计数；脚本已修正而原结果未重写。PG再次核验停止为exited0，两个probe已移除；19614不再在线。P0全范围与P1–P3仍未完成。
+
+
+## 真实产品网页并发补测
+
+真实React网页与许可原生图表、完整API lifespan、真实publisher、单Chromium已在Ubuntu独立project实际运行并完成六步骤：M1空闲、M5切换、EURUSD切换、EURUSD/XAUUSD双图、Ctrl+S持久保存、刷新恢复两图。报告见[browser-report.md](browser-report.md)。约96.61秒短窗口、12个数据请求p95/p99=183ms、无pageerror。API/publisher仅在本任务internal网络，合成固定历史与stale收盘告警；不证明成功供应商I/O、持续新输入、三重复完整容量或核心优化达标。
+
+实际运行过：Ubuntu `https://192.168.7.232:19615`（网页）及 `https://192.168.7.232:19616`（独立图表），自签验收证书。服务现已全部停止，浏览器已退出；PG exit0/无OOM，publisher由init转发TERM退出143。1.45CPU应用+浏览器配置上限，PG另0.75CPU/512MiB，实际采样及mount/project归属见报告原始证据。
+
+准备和执行（只操作本任务）：
+
+```bash
+/home/quant/repos/market-watch/.venv/bin/python docs/verification/issue-13/prepare_browser.py
+python3 -u docs/verification/issue-13/run_browser.py
+python3 docs/verification/issue-13/summarize_browser.py
+```
+
+准备依赖已有本机npm模块、基础P0私有env、允许使用的本地charting_library和本机mw-docker。构建固定本机Node rootfs与专用Chromium依赖镜像，登记task `issue13-browser-baseline`；许可静态build仅在`/tmp/mw-issue13-browser-assets`，随机登录、hash、证书私钥在`/tmp/mw-issue13-browser-private`（目录0700/秘密0600）。已有私有配置不重置，已有结果不覆盖。初次启动配置失败逐份保留，不以失败或计划冒充通过。
+
+单独启停已有服务（不reset数据）：
+
+```bash
+sg docker -c 'docker compose --env-file /tmp/mw-issue13-browser-private/compose.env -p mw-issue13-p0 -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/compose.yaml -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/browser.compose.yaml up -d postgres api publisher web chart-origin'
+sg docker -c 'docker compose --env-file /tmp/mw-issue13-browser-private/compose.env -p mw-issue13-p0 -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/compose.yaml -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/browser.compose.yaml stop api publisher web chart-origin postgres'
+```
+
+三层仍未合并。完整网页/双图短并发已补实际证据，但连续观察时间到告警、高周期payload全量oracle、外部锁争用、可比重复基线、世代/迁移/回退等仍未完成。核心P1–P3继续按用户已定顺序等待整合主线。
