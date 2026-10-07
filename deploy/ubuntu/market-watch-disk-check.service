@@ -1,0 +1,6 @@
+[Unit]
+Description=Market Watch Ubuntu free disk check (local warning below 20 GiB)
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/mw-docker monitor
+TimeoutStartSec=10min
