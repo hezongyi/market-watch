@@ -1,3 +1,4 @@
+import { centerLink, centerReturn, useCenterRowRestore } from "./navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -103,6 +104,7 @@ export function CompositeList() {
     `/market-data/center/${mode === "candidates" ? "composite-candidates" : "composites"}?query=${encodeURIComponent(query)}&page=${page}`,
     refresh,
   );
+  useCenterRowRestore(result.data);
   function filter(key: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(key, value);
@@ -118,7 +120,7 @@ export function CompositeList() {
         mapping_id: mapping,
         client: client.current,
       });
-      navigate(`/market-data/composites/${row.id}?section=chart`);
+      navigate(centerLink(`/market-data/composites/${row.id}?section=chart`, params));
     } catch (e) {
       setError(String(e));
     } finally {
@@ -234,7 +236,7 @@ export function CompositeList() {
                     }
                     const row = item as Composite;
                     return (
-                      <tr key={row.id}>
+                      <tr key={row.id} id={`composite-${row.id}`} tabIndex={-1}>
                         <td>
                           {row.logical_symbol}
                           <small>
@@ -263,7 +265,7 @@ export function CompositeList() {
                           </small>
                         </td>
                         <td>
-                          <Link to={`/market-data/composites/${row.id}`}>
+                          <Link to={centerLink(`/market-data/composites/${row.id}`, params, `composite-${row.id}`)}>
                             查看详情
                           </Link>
                         </td>
@@ -606,7 +608,7 @@ export function CompositeDetail() {
   }
   return (
     <section className="data-center">
-      <Link to="/market-data?tab=composite">返回组合行情</Link>
+      <Link to={centerReturn(params, "/market-data?tab=composite")}>返回组合行情</Link>
       <Feedback
         error={result.error || error}
         loading={result.loading}

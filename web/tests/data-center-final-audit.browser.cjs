@@ -45,10 +45,13 @@ async function contrast(page){return page.locator('.data-center').evaluate(root=
   const d=datasets.find(r=>r.identity.calendar_version==='user-forex-ny17-v1'&&r.identity.source==='dukascopy');expect(d).toBeTruthy();
   const original='/market-data/datasets/'+d.id;
   const composite=JSON.parse(fs.readFileSync(path.join(artifacts,'cross-source-setup.json'))).records[0].composite_id;
+  const longPage=await get('market-data/center/platform?source=dukascopy&page_size=100');
+  const longItem=[...longPage.items].sort((a,b)=>b.label.length-a.label.length)[0];
+  expect(longItem).toBeTruthy();
   const routes=['/market-data','/market-data?tab=platform&query=EURUSD','/market-data?tab=tasks',
    original,original+'?section=coverage',original+'?section=versions',original+'?section=maintenance',
    original+'?section=references','/market-data/composites/'+composite,
-   '/market-data/composites/'+composite+'?section=usage','/market-data/datasets/new'];
+   '/market-data/composites/'+composite+'?section=usage','/market-data/datasets/new','/market-data?tab=platform&source=dukascopy&query='+encodeURIComponent(longItem.label)];
   const writesBefore=writes.length;
   for(const route of routes){
    await page.goto(base+route);await expect(page.locator('.data-center h1')).toBeVisible({timeout:30000});
@@ -65,6 +68,22 @@ async function contrast(page){return page.locator('.data-center').evaluate(root=
   expect(writes.slice(writesBefore)).toEqual([]);
   report.checks.push('actual list/detail/coverage/version/maintenance/reference/composite/create pages: three desktop widths, 200% content zoom, reduced motion and no management writes');
   await page.goto(base+'/market-data');await expect(page.getByText(/快照：/)).toBeVisible();
+  await page.getByLabel('资产类别').selectOption('metal');
+  const metal=await get('market-data/center/datasets?asset_class=metal&page_size=25');
+  await expect(page.locator('.dc-table tbody tr')).toHaveCount(metal.items.length);
+  expect(metal.items.every(d=>d.asset_class==='metal')).toBe(true);
+  await page.reload();await expect(page.getByLabel('资产类别')).toHaveValue('metal');
+  const backRow=page.locator('.dc-table tbody tr').first();const backId=await backRow.getAttribute('id');
+  await backRow.getByRole('link',{name:'查看',exact:true}).click();
+  await page.getByRole('button',{name:'发布版本',exact:true}).click();
+  await page.getByRole('link',{name:'返回数据中心列表',exact:true}).click();
+  await expect(page.getByLabel('资产类别')).toHaveValue('metal');
+  await expect(page.locator('#'+backId)).toBeFocused();
+  report.checks.push('detail tab change and explicit return preserve originating center filter/page and focus the original stable row once');
+  await page.getByLabel('资产类别').selectOption('');
+  const all=await get('market-data/center/datasets?page_size=25');
+  await expect(page.locator('.dc-table tbody tr')).toHaveCount(all.items.length);
+  report.checks.push('asset category uses actual pre-pagination API filter and survives URL reload; actual catalog long label readable');
   const selector=page.getByLabel('搜索品种'),source=page.getByRole('combobox',{name:/^来源/});await selector.focus();await page.keyboard.press('Tab');await expect(source).toBeFocused();
   const visibleFocus=await source.evaluate(el=>{const s=getComputedStyle(el);return s.outlineStyle!=='none'&&parseFloat(s.outlineWidth)>=2});expect(visibleFocus).toBe(true);
   // Failure injection returns 503 after a successful real snapshot; no fake data.
@@ -86,6 +105,26 @@ async function contrast(page){return page.locator('.data-center').evaluate(root=
   await expect(page.getByRole('alert')).toBeVisible();await expect(page.getByLabel('维护时区')).toHaveValue('Europe/London');
   await context.setOffline(false);
   report.checks.push('periodic real snapshots preserve edited maintenance form and focus; offline submit preserves fields');
+  await page.goto(base+'/market-data?tab=composite&query=EURUSD');
+  const combinedRow=page.locator('.table-scroll tbody tr').first();
+  await expect(combinedRow).toBeVisible({timeout:30000});const combinedId=await combinedRow.getAttribute('id');
+  await combinedRow.getByRole('link',{name:'查看详情',exact:true}).click();
+  await page.getByRole('link',{name:'返回组合行情',exact:true}).click();
+  await expect(page.getByLabel('搜索品种')).toHaveValue('EURUSD');
+  await expect(page.locator('#'+combinedId)).toBeFocused();
+  report.checks.push('composite list/detail return preserves exact filter and original row without collection writes');
+  await page.goto(base+'/market-data/datasets/new');
+  await page.getByRole('button',{name:'下一步',exact:true}).click();
+  const fieldSummary=page.getByRole('alert');await expect(fieldSummary).toBeFocused();
+  await expect(fieldSummary.getByRole('link')).toHaveCount(3);
+  expect(await fieldSummary.evaluate(el=>getComputedStyle(el).outlineStyle!=='none')).toBe(true);
+  await fieldSummary.getByRole('link',{name:/填写1–10/}).click();await expect(page.locator('#create-logical')).toBeFocused();
+  const fieldContrast=await contrast(page);report.pages.push({route:'create multiple-field-error state',contrast:fieldContrast});
+  const targets=await page.locator('.data-center button, .data-center select, .dc-source summary').evaluateAll(elements=>elements.map(el=>{
+    const b=el.getBoundingClientRect();return {name:el.textContent.trim().slice(0,60),width:b.width,height:b.height};
+  }).filter(b=>b.width&&b.height));
+  expect(targets.filter(b=>b.width<24||b.height<24)).toEqual([]);
+  report.checks.push('multiple creation errors have14px inline instructions, linked summary with visible programmatic focus; visible buttons/select/source summary at least24CSSpx');
   await page.screenshot({path:path.join(artifacts,'data-center-final-audit.png'),fullPage:true});
   const low=report.pages.flatMap(p=>p.contrast.failures.map(f=>({route:p.route,...f})));
   report.contrastFailures=low;expect(low).toEqual([]);expect(errors).toEqual([]);report.passed=true;

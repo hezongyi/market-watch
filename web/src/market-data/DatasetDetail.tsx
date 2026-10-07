@@ -1,3 +1,4 @@
+import { centerReturn } from "./navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -186,7 +187,7 @@ export function DatasetDetail() {
   }
   return (
     <section className="data-center">
-      <Link to="/market-data">返回自建行情</Link>
+      <Link to={centerReturn(params)}>返回数据中心列表</Link>
       <Feedback
         error={result.error}
         loading={result.loading}

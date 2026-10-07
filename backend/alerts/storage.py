@@ -126,6 +126,8 @@ class SourceMinute(Base):
 
 class HistoryVersion(Base):
     __tablename__ = "market_history_versions"
+    # Older rows have no recorded mutation time; never backfill a guessed value.
+    updated_at: Mapped[int | None] = mapped_column(BigInteger, onupdate=now_ms)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
     start: Mapped[int] = mapped_column(BigInteger)
@@ -198,6 +200,8 @@ class DatasetMaintenance(Base):
 
 class HistoryRun(Base):
     __tablename__ = "market_history_runs"
+    # Older rows have no recorded mutation time; never backfill a guessed value.
+    updated_at: Mapped[int | None] = mapped_column(BigInteger, onupdate=now_ms)
     __table_args__ = (UniqueConstraint("dataset_id", "request_id"),)
     version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), primary_key=True)
     dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), index=True)
@@ -213,6 +217,8 @@ class HistoryRun(Base):
 
 class HistoryArtifact(Base):
     __tablename__ = "market_history_artifacts"
+    # Older rows have no recorded mutation time; never backfill a guessed value.
+    updated_at: Mapped[int | None] = mapped_column(BigInteger, onupdate=now_ms)
     __table_args__ = (UniqueConstraint("version_id", "timeframe"),)
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)

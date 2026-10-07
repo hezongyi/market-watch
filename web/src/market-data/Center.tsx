@@ -11,9 +11,12 @@ import {
   type Dataset,
   type Page,
   type Task,
+  taskKind,
+  taskError,
 } from "./types";
 import { useSnapshot } from "./useSnapshot";
 import { NativeConfigure } from "./NativeConfigure";
+import { centerLink, useCenterRowRestore } from "./navigation";
 
 export function Feedback({
   error,
@@ -63,11 +66,12 @@ function CenterList() {
     [refresh, setRefresh] = useState(0),
     [notice, setNotice] = useState("");
   const tab = params.get("tab") || "managed",
-    status = params.get("status") || "all";
+    status = params.get("status") || (tab === "tasks" ? "active" : "all");
   const page = Math.max(1, Number(params.get("page")) || 1);
   const query = params.get("query") || "",
     source = params.get("source") || "",
-    calendar = params.get("calendar") || "";
+    calendar = params.get("calendar") || "",
+    asset = params.get("asset_class") || "";
   const dataset = params.get("dataset_id") || "";
   const key = new URLSearchParams({
     page: String(page),
@@ -75,6 +79,7 @@ function CenterList() {
     query,
     source,
     calendar,
+    asset_class: asset,
     status,
   });
   if (dataset) key.set("dataset_id", dataset);
@@ -92,6 +97,7 @@ function CenterList() {
     setParams(next);
   }
   const items = result.data?.items || [];
+  useCenterRowRestore(result.data);
   return (
     <section className="data-center">
       <div className="dc-heading">
@@ -99,7 +105,7 @@ function CenterList() {
           <h1>数据中心</h1>
           <p>维护回测历史，查看来源与组合行情。</p>
         </div>
-        <Link className="primary dc-button" to="/market-data/datasets/new">
+        <Link className="primary dc-button" to={centerLink("/market-data/datasets/new", params)}>
           添加自建行情
         </Link>
       </div>
@@ -119,7 +125,7 @@ function CenterList() {
           </Link>
         ))}
       </nav>
-      <details className="dc-source">
+      <details className="dc-source" open={params.get("connection") === "oanda" || undefined}>
         <summary>来源状态与能力</summary>
         <p>此处显示已接入能力；连接和实际历史范围仍按品种查询结果判断。</p>
         {sources.data?.map((s) => (
@@ -130,6 +136,7 @@ function CenterList() {
             {s.stream ? "支持" : "未开放"}
           </p>
         ))}
+        <p>OANDA Practice 连接由管理员在部署配置中维护。授权异常时核对账户环境与访问授权，更新连接后重试失败范围；此处不显示账户或密钥。</p>
         <Feedback
           error={sources.error}
           loading={sources.loading}
@@ -156,6 +163,15 @@ function CenterList() {
           ))}
         </nav>
       )}
+      {tab === "tasks" && (
+        <nav className="dc-filters" aria-label="任务状态">
+          {[["active", "运行及需处理"], ["attention", "需处理"], ["paused", "已暂停"],
+            ["history", "历史记录"], ["all", "全部任务"]].map(([key, label]) => (
+            <button key={key} aria-pressed={status === key} onClick={() => filter("status", key)}>{label}</button>
+          ))}
+        </nav>
+      )}
+      {dataset && tab === "tasks" && <p>已限定自建行情。<button onClick={() => filter("dataset_id", "")}>查看全部对象</button></p>}
       {tab !== "composite" && (
         <div className="dc-filters">
           <label>
@@ -165,7 +181,7 @@ function CenterList() {
               onChange={(e) => filter("query", e.target.value)}
             />
           </label>
-          {tab !== "tasks" && (
+          {(
             <label>
               来源
               <select
@@ -181,6 +197,10 @@ function CenterList() {
               </select>
             </label>
           )}
+          {tab === "managed" && <label>资产类别<select value={asset} onChange={e => filter("asset_class", e.target.value)}>
+            <option value="">全部类别</option><option value="forex">外汇</option><option value="metal">金属</option>
+            <option value="crypto">加密</option><option value="index">指数</option><option value="other">其他</option>
+          </select></label>}
           {tab === "managed" && (
             <label>
               聚合日界
@@ -216,7 +236,7 @@ function CenterList() {
           {result.data && !items.length && (
             <div className="dc-empty">
               <h2>
-                {query || source || status !== "all"
+                {query || source || asset || status !== "all"
                   ? "没有符合筛选的条目"
                   : tab === "managed"
                     ? "开始维护你的回测历史"
@@ -237,7 +257,7 @@ function CenterList() {
                     {(tab === "managed"
                       ? ["品种与口径", "可用历史", "周期", "维护与状态", "操作"]
                       : tab === "tasks"
-                        ? ["对象", "任务范围", "阶段与进度", "错误", "操作"]
+                        ? ["对象与类型", "固定任务范围", "阶段与进度", "时间与重试", "错误与处理", "操作"]
                         : [
                             "来源品种",
                             "原生周期",
@@ -255,7 +275,7 @@ function CenterList() {
                 <tbody>
                   {tab === "managed" &&
                     (items as Dataset[]).map((d) => (
-                      <tr key={d.id}>
+                      <tr key={d.id} id={`dataset-${d.id}`} tabIndex={-1}>
                         <td>
                           <strong>{d.logical_symbol}</strong>
                           <span>
@@ -292,6 +312,7 @@ function CenterList() {
                                   : "一次性维护"
                               : "未配置维护"}
                           </span>
+                          {d.maintenance.frequency === "daily" && !d.maintenance.paused && d.maintenance.next_at != null && <span>下次维护：{time(d.maintenance.next_at)}</span>}
                           {d.maintenance.task_error && (
                             <span className="error">
                               本次维护：{d.maintenance.task_error}
@@ -299,11 +320,11 @@ function CenterList() {
                           )}
                         </td>
                         <td>
-                          <Link to={`/market-data/datasets/${d.id}`}>查看</Link>
+                          <Link to={centerLink(`/market-data/datasets/${d.id}`, params, `dataset-${d.id}`)}>查看</Link>
                           {d.latest_version_id &&
                             d.usable_timeframes.length > 0 && (
                               <Link
-                                to={`/market-data/datasets/${d.id}?section=chart`}
+                                to={centerLink(`/market-data/datasets/${d.id}?section=chart`, params, `dataset-${d.id}`)}
                               >
                                 打开历史图表
                               </Link>
@@ -313,12 +334,13 @@ function CenterList() {
                     ))}
                   {tab === "tasks" &&
                     (items as Task[]).map((t) => (
-                      <tr key={t.id}>
+                      <tr key={t.id} id={`task-${t.id}`} tabIndex={-1}>
                         <td>
-                          <Link to={`/market-data/datasets/${t.dataset_id}`}>
+                          <Link to={centerLink(`/market-data/datasets/${t.dataset_id}`, params, `task-${t.id}`)}>
                             {t.dataset.logical_symbol}
                           </Link>
-                          <span>{names[t.dataset.identity.source]}</span>
+                          <span>{names[t.dataset.identity.source]} · {phase(t.dataset.aggregation_calendar)}</span>
+                          <span>{taskKind(t.task_kind)}</span>
                         </td>
                         <td>
                           {time(t.start)}
@@ -331,7 +353,21 @@ function CenterList() {
                             t.desired_state !== "running" &&
                             t.status === "running" && <span>正在安全停止</span>}
                         </td>
-                        <td>{t.error || "—"}</td>
+                        <td>
+                          创建：{time(t.created_at)}
+                          <span>开始：{time(t.started_at)}</span>
+                          <span>更新：{time(t.updated_at)}{t.updated_at == null ? "（尚无记录）" : ""}</span>
+                          {t.status === "retrying" && <span>下次尝试：{time(t.next_at)}</span>}
+                          {t.completed_at != null && <span>完成：{time(t.completed_at)}</span>}
+                        </td>
+                        <td>
+                          {t.error ? <>
+                            {taskError(t.error, t.status)}
+                            <details><summary>技术错误详情</summary><code>{t.error}</code>
+                              <p>仅显示安全错误类型，不显示凭据或供应商响应内容。</p></details>
+                            {t.status === "configuration_error" && <Link to="/market-data?tab=tasks&connection=oanda">查看连接配置说明</Link>}
+                          </> : "—"}
+                        </td>
                         <td>
                           {t.controllable && (
                             <TaskActions

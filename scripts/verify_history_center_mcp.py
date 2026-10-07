@@ -3,6 +3,7 @@
 import argparse
 import json
 from pathlib import Path
+from urllib.parse import urlencode
 
 import httpx
 
@@ -13,6 +14,7 @@ def main():
     parser.add_argument("--login", type=Path, default=Path("artifacts/data-integration/three-layer-login.json"))
     parser.add_argument("--token", type=Path, default=Path("artifacts/data-integration/three-layer-read-acceptance-token"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/data-integration/history-center-mcp-real.json"))
+    parser.add_argument("--creation-version", help="Optional existing, owned creation task; reads its fixed request only")
     args = parser.parse_args()
     token = args.token.read_text().strip()
     with httpx.Client(base_url=args.base, timeout=30, trust_env=False) as client:
@@ -41,6 +43,9 @@ def main():
             "history_get_requests": ({"version_id": version}, f"versions/{version}/requests"),
             "history_get_references": ({"dataset_id": dataset}, f"datasets/{dataset}/references"),
             "history_list_tasks": ({"dataset_id": dataset}, f"center/tasks?dataset_id={dataset}"),
+            "history_get_comparison": ({"version_id": version}, f"versions/{version}/comparison"),
+            "history_get_creation": ({"request_id": "acceptance-not-submitted", "source": "dukascopy",
+                "provider_symbol": "EUR/USD"}, "center/creations/acceptance-not-submitted?source=dukascopy&provider_symbol=EUR/USD"),
         }
         listed = {item["name"]: item for item in rpc("tools/list")["tools"]}
         records = []
@@ -50,6 +55,22 @@ def main():
             assert not result["isError"]
             assert result["structuredContent"] == get(path), name
             records.append({"tool": name, "browser_parity": True})
+        for status in ("active", "attention", "history", "paused"):
+            arguments = {"status": status, "query": "EURUSD", "source": "dukascopy", "page_size": 1}
+            result = rpc("tools/call", {"name": "history_list_tasks", "arguments": arguments})
+            assert not result["isError"]
+            assert result["structuredContent"] == get("center/tasks?" + urlencode(arguments))
+            records.append({"tool": "history_list_tasks", "status": status, "browser_parity": True})
+        if args.creation_version:
+            owned = get("versions/" + args.creation_version)["manifest"]["maintenance"]["creation_request"]
+            fields = {key: owned["dataset"][key] for key in ("source", "provider_symbol", "asset_class", "aggregation_calendar")}
+            result = rpc("tools/call", {"name": "history_get_creation",
+                "arguments": {"request_id": owned["request_id"], **fields}})
+            assert not result["isError"]
+            actual = get("center/creations/" + owned["request_id"] + "?" + urlencode(fields))
+            assert actual["found"] and actual["task"]["id"] == args.creation_version
+            assert result["structuredContent"] == actual
+            records.append({"tool": "history_get_creation", "found": True, "browser_parity": True})
         page = rpc("tools/call", {"name": "history_get_bars",
             "arguments": {"version_id": version, "count": 2}})["structuredContent"]
         if page["next_before"] is not None:

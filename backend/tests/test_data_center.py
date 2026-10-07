@@ -56,6 +56,8 @@ def test_atomic_create_rolls_back_invalid_maintenance_and_retry_returns_fixed_ta
         "asset_class": "forex", "precision": 5}, "maintenance": {"target_start": 0, "timeframes": ["M1"]}}
     try:
         with TestClient(api.app) as client:
+            lookup = "/api/market-data/center/creations/initial?source=dukascopy&provider_symbol=EUR/USD&asset_class=forex&aggregation_calendar=ny17"
+            assert client.get(lookup).json() == {"found": False}
             rejected = client.post("/api/market-data/center/datasets", json={**body,
                 "maintenance": {"target_start": 0, "timeframes": ["invalid"]}})
             assert rejected.status_code == 422
@@ -63,6 +65,9 @@ def test_atomic_create_rolls_back_invalid_maintenance_and_retry_returns_fixed_ta
                 assert db.scalar(select(func.count()).select_from(MarketDataset)) == 0
             created = client.post("/api/market-data/center/datasets", json=body)
             assert created.status_code == 201
+            known = client.get(lookup).json()
+            assert known["found"] and known["task"]["id"] == created.json()["task"]["id"]
+            assert client.get(lookup.replace("EUR/USD", "XAU/USD")).json() == {"found": False}
             repeated = client.post("/api/market-data/center/datasets", json=body)
             assert repeated.status_code == 201 and repeated.json()["task"]["id"] == created.json()["task"]["id"]
             for path in ("center/datasets", "center/tasks", "center/platform"):
@@ -71,6 +76,7 @@ def test_atomic_create_rolls_back_invalid_maintenance_and_retry_returns_fixed_ta
             assert client.get(f"/api/market-data/center/datasets/{dataset}").status_code == 200
             assert client.get("/api/market-data/center/datasets/missing").status_code == 404
             assert client.get("/api/market-data/center/datasets?page_size=1000").status_code == 422
+            assert client.get("/api/market-data/center/tasks?status=invalid").status_code == 422
             boundary = client.get("/api/market-data/date-boundary?date=2026-07-06&calendar=ny17").json()
             from datetime import UTC, datetime
             assert boundary["start"] == int(datetime(2026, 7, 5, 21, tzinfo=UTC).timestamp() * 1000)
@@ -128,6 +134,10 @@ def test_create_retry_uses_fixed_request_before_mutable_catalogue(database, monk
             monkeypatch.setattr(history_catalog, "validate_selection", unavailable)
             retry = client.post("/api/market-data/center/datasets", json=body)
             assert retry.status_code == 201 and retry.json()["task"]["id"] == ident
+            result = client.get("/api/market-data/center/creations/catalogue-retry", params={
+                "source": "dukascopy", "provider_symbol": "EUR/USD", "asset_class": "forex",
+                "aggregation_calendar": "ny17"}).json()
+            assert result["found"] and result["task"]["id"] == ident
             changed = client.post("/api/market-data/center/datasets", json={**body,
                 "dataset": {**body["dataset"], "precision": 3}})
             assert changed.status_code == 422 and "创建配置" in changed.text
@@ -163,3 +173,82 @@ def test_chart_api_pins_period_and_exclusive_cursor_to_selected_version(database
             assert db.scalar(select(MarketDemand)) is None
     finally:
         api.app.dependency_overrides.clear()
+
+
+def test_task_filters_before_pagination_include_period_derivation(database):
+    from alerts.storage import HistoryRun
+
+    with database.begin() as db:
+        ids = []
+        for i, code in enumerate(("EURUSD", "XAUUSD", "BTCUSD", "OTHER")):
+            register(db, identity(provider_symbol=code), logical_symbol=code)
+            key = identity(provider_symbol=code).key
+            configure(db, key, target_start=0, timeframes=["M1"])
+            row = create_run(db, key, end=60000, request_id="filters")
+            row.created_at = 100 + i
+            row.status = ("pending", "retrying", "published", "published")[i]
+            if i == 1:
+                row.error, row.next_at = "unauthorized", 987654
+            if i == 3:
+                db.get(HistoryRun, row.id).completed_at = 500
+            ids.append(row.id)
+        db.flush()
+        assert task_list(db)["total"] == 4  # Legacy API default unchanged.
+        first = task_list(db, status="active", page_size=1)
+        assert first["total"] == 3 and first["items"][0]["id"] == ids[2]
+        assert first["items"][0]["status"] == "deriving"
+        assert task_list(db, status="active", page=2, page_size=1)["items"][0]["id"] == ids[1]
+        attention = task_list(db, status="attention")["items"]
+        assert [x["id"] for x in attention] == [ids[1]]
+        assert attention[0]["created_at"] == 101 and attention[0]["next_at"] == 987654
+        assert task_list(db, status="history")["items"][0]["id"] == ids[3]
+        assert task_list(db, query="XAU", status="active")["total"] == 1
+        assert task_list(db, query="%", status="active")["total"] == 0
+        assert task_list(db, source="oanda")["total"] == 0
+        run = db.get(HistoryRun, ids[2])
+        run.desired_state = "paused"
+        db.flush()
+        assert task_list(db, status="active")["total"] == 2
+        paused = task_list(db, status="paused")["items"][0]
+        assert paused["id"] == ids[2] and paused["updated_at"] == run.updated_at
+        run.desired_state = "cancelled"
+        db.flush()
+        assert task_list(db, status="history")["total"] == 2
+        assert db.scalar(select(MarketDemand)) is None
+        with pytest.raises(ValueError):
+            task_list(db, status="invalid")
+
+
+def test_task_times_record_real_processing_and_not_poll_time(database):
+    from alerts.history_maintenance import task_control
+    from alerts.history_versions import version_report
+
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1", "H4"])
+        ident = create_run(db, identity().key, end=120000, request_id="timestamps").id
+        first = version_report(db, ident)
+        assert first["started_at"] is None
+    import_page(Adapter(), version_id=ident)
+    with database.begin() as db:
+        processing = version_report(db, ident)
+        assert processing["started_at"] >= first["created_at"]
+        assert processing["updated_at"] >= processing["started_at"]
+        assert version_report(db, ident)["updated_at"] == processing["updated_at"]
+        task_control(db, ident, "pause")
+        paused = version_report(db, ident)
+        assert paused["task_status"] == "paused" and paused["updated_at"] >= processing["updated_at"]
+
+
+def test_derived_task_kind_is_not_a_supplier_import(database):
+    from alerts.aggregation_policy import change_aggregation
+    from alerts.history_versions import version_report
+
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
+        ident = create_run(db, identity().key, end=120000, request_id="task-kind").id
+    import_page(Adapter(), version_id=ident)
+    with database.begin() as db:
+        _, _, derived = change_aggregation(db, identity().key, "utc0", version_id=ident)
+        assert version_report(db, derived.id)["task_kind"] == "derive"

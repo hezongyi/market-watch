@@ -33,6 +33,8 @@
 .dc-steps li { padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; }
 .dc-steps [aria-current] { color: var(--green); border-color: var(--green); }
 .data-center button, .data-center input, .data-center select { font-size: 14px; min-height: 36px; }
+.data-center tr:focus, .data-center [role="alert"]:focus { outline: 2px solid var(--green); outline-offset: 4px; }
+.data-center .dc-fields small { font-size: 14px; }
 .data-center .error { color: var(--danger); overflow-wrap: anywhere; }
 .data-center a:focus-visible, .data-center summary:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
 .dc-tabs button[aria-pressed="true"] { color: var(--green); box-shadow: inset 0 -3px var(--green); font-weight: 600; }

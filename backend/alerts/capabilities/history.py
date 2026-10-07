@@ -2,6 +2,7 @@
 
 from .. import data_center
 from ..history_artifacts import chart_page
+from ..history_commands import lookup_creation
 from ..history_comparison import report as comparison_report
 from ..history_request_evidence import report as request_report
 from ..history_retention import references
@@ -11,6 +12,7 @@ from .context import CapabilityError
 from .models import (
     ManagedBarsQuery,
     ManagedCoverageQuery,
+    ManagedCreationQuery,
     ManagedDatasetQuery,
     ManagedListQuery,
     ManagedTasksQuery,
@@ -36,6 +38,8 @@ def register_history(registry):
          lambda ctx, q: invoke(data_center.dataset_detail, q.dataset_id)),
         ("history_list_tasks", "Read paginated download/derivation tasks. M1 published is distinct from all requested periods completed.", ManagedTasksQuery,
          lambda ctx, q: invoke(data_center.task_list, **q.model_dump())),
+        ("history_get_creation", "Reconcile an uncertain managed creation by its request ID and exact source identity. Read only; does not create tasks or demand.", ManagedCreationQuery,
+         lambda ctx, q: invoke(lookup_creation, **q.model_dump())),
         ("history_get_version", "Immutable source M1 manifest and payload availability; never substitute another version.", ManagedVersionQuery,
          lambda ctx, q: invoke(version_report, q.version_id)),
         ("history_get_comparison", "Compare a fixed publication with its fixed parent or previous publication: manifests, periods and comparable partition checksums. Does not infer minute price revision counts or create demand.", ManagedVersionQuery,

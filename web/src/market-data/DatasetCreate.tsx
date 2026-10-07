@@ -1,6 +1,7 @@
+import { centerReturn } from "./navigation";
 import { useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { api } from "../api";
+import { api, ApiError } from "../api";
 import { frames, names, phase, time, type Dataset } from "./types";
 import { useSnapshot } from "./useSnapshot";
 import { Feedback, Pager } from "./Center";
@@ -31,7 +32,21 @@ export function DatasetCreate() {
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   const request = useRef(crypto.randomUUID());
-  const errorBox = useRef<HTMLParagraphElement>(null);
+  const errorBox = useRef<HTMLDivElement>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
+  const [uncertain, setUncertain] = useState(false);
+  const pendingBody = useRef<any>(null);
+  const needsLookup = useRef(false);
+  function fail(message: string, fields: Record<string,string> = {}) {
+    setError(message); setFieldErrors(fields);
+    requestAnimationFrame(() => errorBox.current?.focus());
+  }
+  function fieldProps(id: string) {
+    return {id, "aria-invalid": !!fieldErrors[id], "aria-describedby": fieldErrors[id] ? `${id}-error` : undefined};
+  }
+  function fieldError(id: string) {
+    return fieldErrors[id] ? <small id={`${id}-error`} className="error">{fieldErrors[id]}</small> : null;
+  }
   // Resolve dates on the backend using the selected aggregation calendar. A
   // browser's local timezone must not reinterpret a NY17 trading date.
   const [boundary, setBoundary] = useState<number | null>(null);
@@ -63,7 +78,7 @@ export function DatasetCreate() {
       await api("/market-data/history-catalog/refresh", {});
       setCatalogRefresh((v) => v + 1);
     } catch (e) {
-      setError(String(e));
+      fail(String(e));
     } finally {
       setBusy(false);
     }
@@ -81,19 +96,19 @@ export function DatasetCreate() {
   }
   async function next() {
     setError("");
-    if (step === 1 && (!logical || !symbol)) {
-      setError("请填写逻辑品种和准确来源代码。");
-      return;
-    }
-    if (step === 1 && !/^(?:[0-9]|10)$/.test(precision)) {
-      setError("目录未提供价格精度，请在高级登记中明确填写0–10的小数位数。");
-      return;
+    setFieldErrors({});
+    const invalid: Record<string,string> = {};
+    if (step === 1) {
+      if (!/^[A-Z0-9]{1,10}$/.test(logical)) invalid["create-logical"] = "填写1–10位大写字母或数字的逻辑品种。";
+      if (!/^[A-Za-z0-9/_.-]{1,64}$/.test(symbol)) invalid["create-symbol"] = "填写准确来源代码。";
+      if (!/^(?:[0-9]|10)$/.test(precision)) invalid["create-precision"] = "填写0–10的小数位数。";
     }
     if (step === 2) {
-      if (!day || !calendar || !periods.length) {
-        setError("请选择起始交易日期、日界和所需周期。");
-        return;
-      }
+      if (!day) invalid["create-day"] = "选择起始交易日期。";
+      if (!calendar) invalid["create-calendar"] = "明确选择聚合日界。";
+    }
+    if (Object.keys(invalid).length) { fail("请修正以下字段后继续。", invalid); return; }
+    if (step === 2) {
       setBusy(true);
       try {
         const value = await api<{ start: number }>(
@@ -102,7 +117,7 @@ export function DatasetCreate() {
         setBoundary(value.start);
         setStep(3);
       } catch (e) {
-        setError(String(e));
+        fail(String(e));
       } finally {
         setBusy(false);
       }
@@ -112,42 +127,49 @@ export function DatasetCreate() {
   }
   async function submit() {
     if (boundary === null) return;
-    setBusy(true);
-    setError("");
+    setBusy(true); setError(""); setFieldErrors({});
+    const body = pendingBody.current || {
+      request_id: request.current,
+      dataset: {source, logical_symbol: logical, provider_symbol: symbol, asset_class: asset,
+        precision: Number(precision), aggregation_calendar: calendar,
+        ...(selected ? {catalog_id: selected.catalog_id} : {})},
+      maintenance: {target_start: boundary, timeframes: periods, frequency, timezone: "UTC", daily_minute: 15},
+    };
+    const lookup = async () => {
+      const query = new URLSearchParams({source: body.dataset.source,
+        provider_symbol: body.dataset.provider_symbol, asset_class: body.dataset.asset_class,
+        aggregation_calendar: body.dataset.aggregation_calendar});
+      return api<{found: boolean; dataset?: Dataset}>(`/market-data/center/creations/${body.request_id}?${query}`);
+    };
     try {
-      const result = await api<{ dataset: Dataset }>(
-        "/market-data/center/datasets",
-        {
-          request_id: request.current,
-          dataset: {
-            source,
-            logical_symbol: logical,
-            provider_symbol: symbol,
-            asset_class: asset,
-            precision: Number(precision),
-            aggregation_calendar: calendar,
-            ...(selected ? { catalog_id: selected.catalog_id } : {}),
-          },
-          maintenance: {
-            target_start: boundary,
-            timeframes: periods,
-            frequency,
-            timezone: "UTC",
-            daily_minute: 15,
-          },
-        },
-      );
-      navigate(`/market-data/datasets/${result.dataset.id}`);
-    } catch (e) {
-      setError(String(e));
-      requestAnimationFrame(() => errorBox.current?.focus());
-    } finally {
-      setBusy(false);
-    }
+      // An unknown outcome pins the exact submitted body. Reconcile using a
+      // read before permitting another POST with the same idempotency key.
+      if (needsLookup.current) {
+        const known = await lookup();
+        if (known.found && known.dataset) { navigate(`/market-data/datasets/${known.dataset.id}`); return; }
+        needsLookup.current = false; setUncertain(false);
+      }
+      pendingBody.current = body;
+      try {
+        const result = await api<{dataset: Dataset}>("/market-data/center/datasets", body);
+        navigate(`/market-data/datasets/${result.dataset.id}`);
+      } catch (e) {
+        if (e instanceof ApiError && e.status >= 400 && e.status < 500) {
+          pendingBody.current = null; fail(String(e)); return;
+        }
+        needsLookup.current = true; setUncertain(true);
+        try {
+          const known = await lookup();
+          if (known.found && known.dataset) { navigate(`/market-data/datasets/${known.dataset.id}`); return; }
+          fail("尚未查到创建结果。再次操作会先核查，再使用同一提交标识重试。");
+        } catch { fail("创建结果暂无法核实，请核查创建结果后继续；已保留本次提交内容。"); }
+      }
+    } catch (e) { fail("创建结果核查失败，请稍后重试。" + String(e)); }
+    finally { setBusy(false); }
   }
   return (
     <section className="data-center dc-form">
-      <Link to="/market-data">返回自建行情</Link>
+      <Link to={centerReturn(params)}>返回自建行情</Link>
       <h1>添加自建行情</h1>
       <ol className="dc-steps" aria-label="创建步骤">
         {["选择来源品种", "配置历史", "核对并创建"].map((label, i) => (
@@ -157,9 +179,11 @@ export function DatasetCreate() {
         ))}
       </ol>
       {error && (
-        <p ref={errorBox} tabIndex={-1} role="alert" className="error">
-          {error}
-        </p>
+        <div ref={errorBox} tabIndex={-1} role="alert" className="error">
+          <p>{error}</p>
+          {Object.keys(fieldErrors).length > 0 && <ul>{Object.entries(fieldErrors).map(([id,message]) =>
+            <li key={id}><a href={`#${id}`} onClick={e => {e.preventDefault(); document.getElementById(id)?.focus();}}>{message}</a></li>)}</ul>}
+        </div>
       )}
       {step === 1 && (
         <div className="dc-fields">
@@ -269,22 +293,24 @@ export function DatasetCreate() {
           )}
           <label>
             逻辑品种
-            <input
+            <input {...fieldProps("create-logical")}
               value={logical}
               readOnly={selected !== null}
               onChange={(e) => setLogical(e.target.value.toUpperCase())}
               placeholder="例如 EURUSD"
               maxLength={10}
             />
+          {fieldError("create-logical")}
           </label>
           <label>
             准确来源代码
-            <input
+            <input {...fieldProps("create-symbol")}
               value={symbol}
               readOnly={selected !== null}
               onChange={(e) => setSymbol(e.target.value)}
               placeholder={source === "oanda" ? "例如 EUR_USD" : "例如 EUR/USD"}
             />
+          {fieldError("create-symbol")}
           </label>
           <label>
             资产类别
@@ -303,11 +329,11 @@ export function DatasetCreate() {
           {selected && (
             <button onClick={() => setSelected(null)}>改为手工登记</button>
           )}
-          <details open={selected?.precision === null || undefined}>
+          <details open={selected?.precision === null || !!fieldErrors["create-precision"] || undefined}>
             <summary>高级登记：价格精度</summary>
             <label>
               小数位数
-              <input
+              <input {...fieldProps("create-precision")}
                 type="number"
                 min={0}
                 max={10}
@@ -315,7 +341,8 @@ export function DatasetCreate() {
                 readOnly={selected?.precision != null}
                 onChange={(e) => setPrecision(e.target.value)}
               />
-            </label>
+            {fieldError("create-precision")}
+          </label>
             <p>
               {selected?.precision != null
                 ? "精度来自当前账户目录，准确代码与类别已带入。"
@@ -332,7 +359,7 @@ export function DatasetCreate() {
         <div className="dc-fields">
           <label>
             起始交易日期
-            <input
+            <input {...fieldProps("create-day")}
               type="date"
               value={day}
               onChange={(e) => {
@@ -340,10 +367,11 @@ export function DatasetCreate() {
                 setBoundary(null);
               }}
             />
+          {fieldError("create-day")}
           </label>
           <label>
             聚合日界
-            <select
+            <select {...fieldProps("create-calendar")}
               value={calendar}
               onChange={(e) => {
                 setCalendar(e.target.value);
@@ -354,11 +382,12 @@ export function DatasetCreate() {
               <option value="ny17">纽约当地 17:00（随夏令时）</option>
               <option value="utc0">UTC 00:00</option>
             </select>
+          {fieldError("create-calendar")}
           </label>
           <p>
             {calendar === "ny17"
               ? "交易日期从前一天纽约当地 17:00 开始。"
-              : "交易日期从当日 UTC 00:00 开始。"}
+              : calendar === "utc0" ? "交易日期从当日 UTC 00:00 开始。" : "请明确选择聚合日界，以确定起始时刻。"}
             任务固定创建时的历史截止点。
           </p>
           <fieldset>
@@ -417,11 +446,11 @@ export function DatasetCreate() {
       )}
       <div className="dc-actions">
         {step > 1 && (
-          <button disabled={busy} onClick={() => setStep(step - 1)}>
+          <button disabled={busy || uncertain} onClick={() => {pendingBody.current = null; setStep(step - 1);}}>
             上一步
           </button>
         )}
-        <Link to="/market-data">取消</Link>
+        <Link to={uncertain ? `/market-data?tab=tasks&query=${encodeURIComponent(logical)}` : centerReturn(params)}>{uncertain ? "返回列表核查" : "取消"}</Link>
         {step < 3 ? (
           <button
             className="primary"
@@ -436,7 +465,7 @@ export function DatasetCreate() {
             disabled={busy}
             onClick={() => void submit()}
           >
-            {busy ? "正在提交…" : "创建并开始维护"}
+            {busy ? "正在核查与提交…" : uncertain ? "核查创建结果并重试" : "创建并开始维护"}
           </button>
         )}
       </div>

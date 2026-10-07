@@ -1,6 +1,6 @@
 """Pure management queries shared by desktop UI and authenticated callers."""
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import case, func, or_, select
 
 from .history_maintenance import plan_report
 from .storage import (
@@ -99,18 +99,39 @@ def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, 
             "page": page, "page_size": page_size}
 
 
-def task_list(db, *, dataset_id=None, page=1, page_size=25):
+def task_list(db, *, dataset_id=None, query="", source=None, status="all", page=1, page_size=25):
     from .history_api import dataset_report
     from .history_versions import version_report
 
     if page < 1 or not 1 <= page_size <= 100:
         raise ValueError("无效的任务分页")
-    query = select(HistoryVersion.id)
+    if status not in ("all", "active", "attention", "history", "paused"):
+        raise ValueError("无效的任务状态筛选")
+    base = select(HistoryVersion.id).join(MarketDataset).join(Instrument).outerjoin(HistoryRun,
+        HistoryRun.version_id == HistoryVersion.id)
+    # SQL mirrors task_status before pagination, including published M1 with
+    # unfinished period derivation and its requested pause/cancel state.
+    state = case((
+        (HistoryVersion.status == "published") & HistoryRun.version_id.is_not(None)
+        & HistoryRun.completed_at.is_(None),
+        case((HistoryRun.desired_state == "running", "deriving"), else_=HistoryRun.desired_state)
+    ), else_=HistoryVersion.status)
     if dataset_id:
-        query = query.where(HistoryVersion.dataset_id == dataset_id)
-    total = db.scalar(select(func.count()).select_from(query.subquery()))
+        base = base.where(HistoryVersion.dataset_id == dataset_id)
+    if query:
+        value = "%" + query[:100].replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+        base = base.where(or_(MarketDataset.logical_symbol.ilike(value, escape="\\"),
+                              Instrument.symbol.ilike(value, escape="\\")))
+    if source:
+        base = base.where(Instrument.source == source)
+    groups = {"active": ("pending", "running", "deriving", "retrying", "configuration_error"),
+              "attention": ("retrying", "configuration_error"),
+              "history": ("published", "cancelled"), "paused": ("paused",)}
+    if status != "all":
+        base = base.where(state.in_(groups[status]))
+    total = db.scalar(select(func.count()).select_from(base.subquery()))
     items = []
-    for ident in db.scalars(query.order_by(HistoryVersion.created_at.desc(), HistoryVersion.id)
+    for ident in db.scalars(base.order_by(HistoryVersion.created_at.desc(), HistoryVersion.id)
                            .offset((page - 1) * page_size).limit(page_size)):
         report = version_report(db, ident)
         dataset = db.get(MarketDataset, report["dataset_id"])

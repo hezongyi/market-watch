@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
@@ -122,12 +122,13 @@ def router(authenticated):
             raise HTTPException(422, str(error)) from None
 
     @routes.get("/center/tasks")
-    def center_tasks(dataset_id: str | None = None, page: int = 1, page_size: int = 25):
+    def center_tasks(dataset_id: str | None = None, page: int = 1, page_size: int = 25,
+                     query: str = "", source: str | None = None, status: str = "all"):
         from .data_center import task_list
 
         try:
             with transaction() as db:
-                return task_list(db, dataset_id=dataset_id, page=page, page_size=page_size)
+                return task_list(db, dataset_id=dataset_id, query=query, source=source, status=status, page=page, page_size=page_size)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
@@ -173,6 +174,19 @@ def router(authenticated):
                                       "references": error.report}) from None
         except ValueError as error:
             raise HTTPException(409, str(error)) from None
+
+    @routes.get("/center/creations/{request_id}")
+    def creation_result(request_id: str, source: Literal["dukascopy", "oanda"],
+                        provider_symbol: str = Query(min_length=1, max_length=64),
+                        asset_class: AssetClass = "forex", aggregation_calendar: AggregationCalendar | None = None):
+        from .history_commands import lookup_creation
+
+        try:
+            with transaction() as db:
+                return lookup_creation(db, request_id, source=source, provider_symbol=provider_symbol,
+                    asset_class=asset_class, aggregation_calendar=aggregation_calendar)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
 
     @routes.post("/center/datasets", status_code=201)
     def create_managed(body: ManagedRequest):

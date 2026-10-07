@@ -21,6 +21,8 @@ def test_readonly_history_tools_match_browser_without_creating_demand(mcp):
         "history_get_requests": ({"version_id": version}, f"/api/market-data/versions/{version}/requests"),
         "history_get_references": ({"dataset_id": identity().key}, f"/api/market-data/datasets/{identity().key}/references"),
         "history_list_tasks": ({"dataset_id": identity().key}, f"/api/market-data/center/tasks?dataset_id={identity().key}"),
+        "history_get_creation": ({"request_id": "missing", "source": "dukascopy", "provider_symbol": "EUR/USD"},
+            "/api/market-data/center/creations/missing?source=dukascopy&provider_symbol=EUR/USD"),
         "history_list_datasets": ({"status": "archived"}, "/api/market-data/center/datasets?status=archived"),
     }
     listed = rpc(client, token, "tools/list").json()["result"]["tools"]

@@ -26,6 +26,23 @@ def creation_request(body):
     return {**body, "dataset": dataset, "maintenance": maintenance}
 
 
+def lookup_creation(db, request_id, **identity_fields):
+    """Read a scoped durable submission result, without catalog I/O or writes."""
+    from .aggregation_policy import history_dataset_identity
+    from .data_center import dataset_detail
+    from .history_versions import version_report
+
+    if not request_id or len(request_id) > 100:
+        raise ValueError("无效的创建提交标识")
+    identity = history_dataset_identity(**identity_fields)
+    previous = db.scalar(select(HistoryRun).where(HistoryRun.dataset_id == identity.key,
+        HistoryRun.request_id == request_id))
+    version = db.get(HistoryVersion, previous.version_id) if previous else None
+    if not version or not version.manifest.get("maintenance", {}).get("creation_request"):
+        return {"found": False}
+    return {"found": True, "dataset": dataset_detail(db, identity.key), "task": version_report(db, version.id)}
+
+
 def create_managed(db, body):
     from .aggregation_policy import history_dataset_identity, register_history_dataset
     from .data_center import dataset_detail

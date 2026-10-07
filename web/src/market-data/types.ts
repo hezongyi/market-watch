@@ -93,6 +93,11 @@ export type Task = {
   status: string;
   error?: string;
   task_kind: string;
+  created_at?: number;
+  started_at?: number | null;
+  updated_at?: number | null;
+  completed_at?: number | null;
+  next_at?: number | null;
   desired_state?: string;
   controllable: boolean;
   dataset: Dataset;
@@ -103,3 +108,15 @@ export type Page<T> = {
   page: number;
   page_size: number;
 };
+
+export function taskKind(value: string) {
+  return ({update: "更新历史", backfill: "指定区间补数", recheck: "指定区间复查", import: "历史导入", derive: "按新日界派生"} as Record<string,string>)[value] || "历史维护";
+}
+export function taskError(value: string, status: string) {
+  const reason: Record<string,string> = {
+    unauthorized: "来源授权失败，请检查连接配置。", rate_limited: "来源请求受限，等待重试。",
+    timeout: "来源读取超时，等待重试。", invalid_payload: "来源返回数据未通过校验。",
+    source_unavailable: "来源暂不可用。", shared_busy: "共享读取正在进行，等待重试。",
+  };
+  return reason[value] || (status === "configuration_error" ? "来源配置或数据口径需处理，请检查连接。" : "本次处理未完成；已有发布版本仍可使用。");
+}

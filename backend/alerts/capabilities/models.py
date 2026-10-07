@@ -45,9 +45,20 @@ class ManagedCoverageQuery(ManagedVersionQuery):
 
 
 class ManagedTasksQuery(Input):
+    query: str = Field(default="", max_length=100)
+    source: str | None = Field(default=None, max_length=32)
+    status: Literal["all", "active", "attention", "history", "paused"] = "all"
     dataset_id: str | None = Field(default=None, min_length=64, max_length=64)
     page: int = Field(default=1, ge=1)
     page_size: int = Field(default=25, ge=1, le=100)
+
+
+class ManagedCreationQuery(Input):
+    request_id: str = Field(min_length=1, max_length=100)
+    source: Literal["dukascopy", "oanda"]
+    provider_symbol: str = Field(min_length=1, max_length=64)
+    asset_class: Literal["forex", "metal", "crypto", "index", "other", "unspecified"] = "forex"
+    aggregation_calendar: Literal["ny17", "utc0"] | None = None
 
 
 class PageQuery(Input):

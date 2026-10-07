@@ -302,14 +302,29 @@ def version_report(db, ident):
     if not version:
         raise ValueError("Unknown dataset version")
     run = db.get(HistoryRun, version.id)
+    from sqlalchemy import func
+
     from .history_maintenance import task_status
 
+    # Times come from persisted events. Legacy mutation timestamps remain
+    # unknown; poll time and lease deadlines are not task update timestamps.
+    from .storage import HistoryArtifact, HistoryReadAttempt
+
+    started_at = db.scalar(select(func.min(HistoryReadAttempt.started_at)).where(
+        HistoryReadAttempt.version_id == version.id))
+    artifact_at = db.scalar(select(func.max(HistoryArtifact.updated_at)).where(
+        HistoryArtifact.version_id == version.id))
+    recorded = [value for value in (version.updated_at, version.published_at, artifact_at,
+        run.updated_at if run else None, run.completed_at if run else None) if value is not None]
     return {"id": version.id, "dataset_id": version.dataset_id, "start": version.start,
+            "created_at": version.created_at, "started_at": started_at,
+            "updated_at": max(recorded) if recorded else None,
             "end": version.end, "cursor": version.cursor, "status": version.status,
             "published_at": version.published_at,
             "error": version.error, "attempts": version.attempts, "next_at": version.next_at,
             "payload_available": db.get(HistoryReclamation, ident) is None,
-            "manifest": version.manifest, "task_kind": run.kind if run else "import",
+            "manifest": version.manifest, "task_kind": run.kind if run else (
+                "derive" if version.manifest.get("provenance", {}).get("derived_from_version") else "import"),
             "desired_state": run.desired_state if run else None,
             "task_status": task_status(db, version),
             "completed_at": run.completed_at if run else None,
