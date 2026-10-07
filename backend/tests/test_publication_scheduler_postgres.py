@@ -166,6 +166,7 @@ def test_locked_identity_does_not_hold_up_another_ready_identity(publication_pg)
     projection_contracts.test_projection_keeps_legacy_margin_and_unknown_gap_without_audit_reads,
     projection_contracts.test_wrong_source_and_malformed_legacy_proofs_never_certify_coverage,
     projection_contracts.test_checkpoint_catches_late_uuid_behind_cursor_and_proof_removal,
+    projection_contracts.test_publisher_pages_never_run_full_raw_proof_verification,
 ])
 def test_postgres_coverage_contract(publication_pg, contract):
     contract(publication_pg[0])
@@ -174,3 +175,22 @@ def test_postgres_coverage_contract(publication_pg, contract):
 def test_postgres_projection_dual_write_and_compatibility_return(publication_pg, monkeypatch):
     projection_contracts.test_completed_projection_dual_writes_new_proof_and_can_return_to_compatibility(
         publication_pg[0], monkeypatch)
+
+
+def test_postgres_explicit_proof_removal_retracts_published_aggregate(publication_pg, monkeypatch):
+    projection_contracts.test_explicit_proof_removal_retracts_sparse_published_hour(
+        publication_pg[0], monkeypatch)
+
+
+def test_postgres_restart_catches_up_without_new_input(publication_pg, monkeypatch):
+    from test_publication_scheduler import (
+        test_restart_catches_up_more_than_one_source_page_without_further_input,
+    )
+    test_restart_catches_up_more_than_one_source_page_without_further_input(publication_pg[0], monkeypatch)
+
+
+def test_postgres_aggregation_backfill_service_with_continuous_live_work(publication_pg, monkeypatch):
+    from test_chart_aggregation import (
+        test_old_backfill_gets_service_during_continuous_focused_live_work,
+    )
+    test_old_backfill_gets_service_during_continuous_focused_live_work(publication_pg[0], monkeypatch)

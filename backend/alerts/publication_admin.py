@@ -38,6 +38,8 @@ def main():
     coverage.add_argument('--instrument', required=True)
     coverage.add_argument('--limit', type=int, default=500)
     coverage.add_argument('--until-complete', action='store_true')
+    coverage.add_argument('--verify', action='store_true',
+        help='Maintenance operation: final raw union verification may scan all proofs under the identity lock')
     rollback = commands.add_parser('prepare-rollback')
     rollback.add_argument('--workers-stopped', action='store_true', required=True,
                           help='Writers and publisher must be stopped before preparing old bucket jobs')
@@ -49,9 +51,9 @@ def main():
                 inst = db.get(Instrument, args.instrument)
                 if inst is None:
                     raise ValueError('Unknown instrument')
-                result = backfill_page(db, inst, limit=args.limit)
+                result = backfill_page(db, inst, limit=args.limit, administrative=args.verify)
             print(json.dumps(dict(instrument=args.instrument, **result)), flush=True)
-            if result['complete'] or not args.until_complete:
+            if result['complete'] or result.get('maintenance_required') or not args.until_complete:
                 return
     else:
         with transaction() as db:

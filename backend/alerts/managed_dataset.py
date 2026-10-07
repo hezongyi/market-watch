@@ -283,6 +283,20 @@ def publish_frame(db, inst, plan, frame, now):
     # Read bounded pages at the historical edge and at the live edge. Source
     # OHLC can change in staging without mutating the published snapshot.
     tail_start = max(safe_left, ms(_bounds(pub.end - 1, frame, inst)[0])) if pub else safe_left
+    tail_remaining = False
+    if pub:
+        # Catch up from the existing visible edge after a downtime. Selecting
+        # only the newest page leaves an artificial gap and loses old input.
+        multiplier = 2 if frame == 'M30' else 32 if frame == 'MN' else 7 if frame == 'W1' else 1
+        source_budget = (_page_limit(frame) + 1) * multiplier
+        starts = list(db.scalars(select(Bar.start).where(
+            Bar.instrument_id == inst.id, Bar.timeframe == source,
+            Bar.start >= tail_start, Bar.start < right).order_by(Bar.start).limit(source_budget + 1)))
+        if len(starts) > source_budget:
+            boundary = ms(_bounds(starts[-1], frame, inst)[0])
+            if boundary > tail_start:
+                right = min(right, boundary)
+                tail_remaining = True
     tail = chart_rows(db, inst, frame, right, _page_limit(frame), now, observed=True, after=tail_start)
     older = chart_rows(db, inst, frame, pub.start, _page_limit(frame), now, observed=True,
                        after=safe_left) if pub and pub.start > safe_left else []
@@ -418,7 +432,7 @@ def publish_frame(db, inst, plan, frame, now):
     more = db.scalar(select(Bar.start).where(
         Bar.instrument_id == inst.id, Bar.timeframe == source,
         Bar.start >= safe_left, Bar.start < pub.start).limit(1)) is not None
-    return finish(runnable=more, blocked="aggregation" if pending else None,
+    return finish(runnable=more or tail_remaining, blocked="aggregation" if pending else None,
                   next_due=min((job.next_at for job in pending), default=None))
 
 

@@ -1,12 +1,12 @@
 """Normalize legacy complete-minute proofs without changing evidence meaning.
 
-Checkpoint pages and runtime dual writes use the existing Instrument lock. Final
-verification rescans the effective union under that lock, catching inserts with
+Checkpoint pages and runtime dual writes use the existing Instrument lock. Explicit
+administrative final verification rescans the effective union under that lock, catching inserts with
 older audit IDs or UUIDs that landed behind a saved checkpoint. No completion
 flag is published until the independent compatibility union equals projection.
 """
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 
 from .source_history_store import _insert
 from .storage import (
@@ -30,7 +30,7 @@ def normalize(start, end):
 
 def merged(spans):
     result = []
-    for a, b in sorted(spans):
+    for a, b in sorted(spans, key=lambda span: (span[0], span[1])):
         if a >= b:
             continue
         if result and a <= result[-1][1]:
@@ -124,10 +124,12 @@ def _audits(inst):
                               Audit.details['instrument'].as_string() == inst.id)
 
 
-def valid_union(db, inst, *, quarantine=False):
+def valid_union(db, inst, *, quarantine=False, examined=None):
     """One-time verification oracle from preserved raw proofs, independent of projection."""
     spans = []
     for row in db.scalars(_structured(db, inst)):
+        if examined is not None:
+            examined[0] += 1
         try:
             spans.extend(normalize(row.start, row.end))
         except (ValueError, TypeError, KeyError) as error:
@@ -135,6 +137,8 @@ def valid_union(db, inst, *, quarantine=False):
                 _quarantine(db, inst, 'structured:' + row.id, error)
     if inst.source == 'oanda':
         for row in db.scalars(_audits(inst)):
+            if examined is not None:
+                examined[0] += 1
             try:
                 spans.extend(audit_spans(inst, row.details))
             except (ValueError, TypeError, KeyError) as error:
@@ -143,7 +147,7 @@ def valid_union(db, inst, *, quarantine=False):
     return merged(spans)
 
 
-def backfill_page(db, inst, *, limit=500):
+def backfill_page(db, inst, *, limit=500, administrative=False):
     if not 1 <= limit <= 1000:
         raise ValueError('Coverage migration requires bounded pages')
     inst = db.scalar(select(Instrument).where(Instrument.id == inst.id).with_for_update())
@@ -181,7 +185,12 @@ def backfill_page(db, inst, *, limit=500):
         if len(rows) < limit:
             state.phase = 'verify'
     else:
-        expected = valid_union(db, inst, quarantine=True)
+        if not administrative:
+            return dict(complete=False, examined=0, phase='verify', version=state.version,
+                        maintenance_required=True)
+        counter = [0]
+        expected = valid_union(db, inst, quarantine=True, examined=counter)
+        examined = counter[0]
         # Stable checkpoint IDs alone are insufficient: late commits and UUID
         # inserts behind the cursor are repaired from the final locked union.
         merge(db, inst, expected)
@@ -196,11 +205,82 @@ def backfill_page(db, inst, *, limit=500):
     return dict(complete=state.complete, examined=examined, phase=state.phase, version=state.version)
 
 
+def removed_intervals(previous, current):
+    """Exact difference of disjoint proof unions, keeping unrelated history intact."""
+    result = []
+    for left, right in previous:
+        cursor = left
+        for a, b in current:
+            if b <= cursor:
+                continue
+            if a >= right:
+                break
+            if a > cursor:
+                result.append((cursor, min(a, right)))
+            cursor = max(cursor, b)
+            if cursor >= right:
+                break
+        if cursor < right:
+            result.append((cursor, right))
+    return result
+
+
+def _revoke_dependents(db, inst, removed):
+    """Explicit maintenance exception to normal immutable completeness confirmation."""
+    from .chart_aggregation import PERIODS, enqueue_aggregation
+    from .storage import Bar, ChartPublication, ChartPublishedBar, now_ms
+
+    stamp = now_ms()
+    for left, right in removed:
+        # M1 observations remain valid. Only proof-dependent higher periods are
+        # withdrawn, then recomputed from retained minutes and remaining proofs.
+        db.execute(update(Bar).where(Bar.instrument_id == inst.id,
+            Bar.timeframe.in_(PERIODS), Bar.start < right, Bar.end > left,
+            Bar.complete.is_(True)).values(complete=False, volume_complete=False,
+                revision=Bar.revision + 1, volume_revision=Bar.volume_revision + 1))
+        for row in db.scalars(select(ChartPublishedBar).where(
+                ChartPublishedBar.instrument_id == inst.id, ChartPublishedBar.timeframe != 'M1',
+                ChartPublishedBar.start < right, ChartPublishedBar.end > left,
+                ChartPublishedBar.complete.is_(True))):
+            row.complete = False
+            row.payload = {**row.payload, 'complete': False, 'volume_complete': False}
+            row.revision += 1
+            pub = db.get(ChartPublication, (inst.id, row.timeframe))
+            pub.complete_count -= 1
+            pub.revision += 1
+        enqueue_aggregation(db, inst.id, left, right, stamp)
+    if removed:
+        db.add(Audit(kind='coverage_proof_revoked', details=dict(
+            instrument=inst.id, source=inst.source, basis=inst.basis, ranges=[
+                dict(start=a, end=b) for a, b in removed])))
+
+
 def rebuild(db, inst):
-    """Administrative proof removal/correction recomputes provenance and wakes dependents."""
+    """Explicit administrative proof correction; never called from publisher ticks.
+
+    This locked full proof verification and scoped revocation may be expensive.
+    Run in a maintenance window; ordinary checkpoint pages stop before it.
+    """
     db.scalar(select(Instrument).where(Instrument.id == inst.id).with_for_update())
     state = checkpoint(db, inst)
+    previous = [[row.start, row.end] for row in db.scalars(select(MarketCoverageProjection).where(
+        *_where(MarketCoverageProjection, inst)).order_by(MarketCoverageProjection.start))]
+    # If migration has not completed, retained published/source intervals are
+    # conservatively rechecked rather than trusting a partial proof projection.
+    if not state.complete:
+        from .storage import Bar
+        previous = merged(previous + [(row.start, row.end) for row in db.scalars(select(Bar).where(
+            Bar.instrument_id == inst.id, Bar.timeframe != 'M1', Bar.complete.is_(True)))])
     state.complete, state.phase = False, 'verify'
     db.execute(delete(MarketCoverageProjection).where(*_where(MarketCoverageProjection, inst)))
     state.version += 1
-    return backfill_page(db, inst)
+    result = backfill_page(db, inst, administrative=True)
+    current = [[row.start, row.end] for row in db.scalars(select(MarketCoverageProjection).where(
+        *_where(MarketCoverageProjection, inst)).order_by(MarketCoverageProjection.start))]
+    _revoke_dependents(db, inst, removed_intervals(previous, current))
+    from .chart_aggregation import enqueue_aggregation
+    from .storage import now_ms
+    for left, right in removed_intervals(current, previous):
+        enqueue_aggregation(db, inst.id, left, right, now_ms())
+    db.flush()
+    return result

@@ -57,7 +57,7 @@ def main():
             while True:
                 start = time.monotonic()
                 with factory.begin() as db:
-                    result = backfill_page(db, db.get(s.Instrument, ident), limit=500)
+                    result = backfill_page(db, db.get(s.Instrument, ident), limit=500, administrative=True)
                 pages.append(dict(seconds=time.monotonic() - start, **result))
                 if result['complete']:
                     break

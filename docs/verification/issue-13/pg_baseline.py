@@ -139,8 +139,32 @@ def cycle():
 
 
 def warmup():
+    # Candidate migration final verification is explicit maintenance, separated
+    # from timed publisher ticks; the frozen old baseline stays unchanged.
+    if hasattr(s, 'MarketCoverageCheckpoint'):
+        from alerts.coverage_projection import backfill_page
+        for ident in IDENTITIES:
+            while True:
+                with s.transaction() as db:
+                    result = backfill_page(db, db.get(s.Instrument, ident), administrative=True)
+                if result['complete']:
+                    break
     for _ in range(2 * len(IDENTITIES) * len(m.FRAMES)):
         cycle()
+    if hasattr(s, 'ChartPublicationState'):
+        for _ in range(2000):
+            with s.transaction() as db:
+                pending = db.scalar(select(func.count()).select_from(s.ChartPublicationState).where(
+                    s.ChartPublicationState.requested > s.ChartPublicationState.processed))
+            if not pending:
+                break
+            cycle()
+        else:
+            raise AssertionError('Candidate warmup did not drain durable publication requests')
+        with s.transaction() as db:
+            assert not db.scalar(select(func.count()).select_from(s.ChartAggregationJob))
+            assert not db.scalar(select(func.count()).select_from(s.ChartPublicationJob))
+            assert db.scalar(select(func.count()).select_from(s.ChartPublication)) == len(IDENTITIES) * len(m.FRAMES)
     write_json("warmup.json", snapshot())
     freeze()
     print("warmup complete", flush=True)

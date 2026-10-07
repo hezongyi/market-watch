@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-SOURCE = Path('/home/quant/repos/market-watch-issue13-optimized-baseline')
+SOURCE = Path(os.environ.get('ISSUE13_SOURCE', '/home/quant/repos/market-watch-issue13-optimized-baseline'))
 OUTPUT = HERE / 'results/optimized-baseline'
 ENV = Path('/tmp/market-watch-issue13-optimized.env')
 PREFIX = ['docker', 'compose', '--env-file', str(ENV), '-p', 'mw-issue13-optimized',

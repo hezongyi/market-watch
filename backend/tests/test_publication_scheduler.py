@@ -206,3 +206,32 @@ def test_same_price_minute_observation_refreshes_matching_hour_without_price_rev
             k: v for k, v in before.items() if k != 'observed_at'}
         assert db.scalar(select(storage.Bar.revision).where(
             storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1')) == revision
+
+
+def test_restart_catches_up_more_than_one_source_page_without_further_input(database, monkeypatch):
+    now = START + 30 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: now)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        join(db, inst, START, now)
+        market.ingest(db, inst, {'rows': [dict(timestamp=START + i * MINUTE,
+            open=10, high=11, low=9, close=10) for i in range(30)]}, received_at=now)
+    for _ in range(40):
+        managed.publish_once()
+    now = START + 2430 * MINUTE + 5000
+    with database.begin() as db:
+        # This is one committed input while the publisher is offline. Restore
+        # requires all minutes, even when no later source event arrives.
+        market.ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': [
+            dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10)
+            for i in range(30, 2430)]}, received_at=now)
+    for _ in range(100):
+        if not managed.publish_once():
+            break
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        rows = read_rows(db, inst, 'M1', now, 3000)
+        assert len(rows) == 2430
+        assert rows[-1]['start'] == START + 2429 * MINUTE
+        assert status(db, inst, 'M1')['complete_count'] == 2430

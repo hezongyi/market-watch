@@ -145,7 +145,8 @@ def tick(publisher, corrections):
         # generation inside the same publication transaction.
         state.served_at = stamp
         state.attempts = 0
-        if result.runnable_remaining or not coverage_work['complete']:
+        if result.runnable_remaining or (not coverage_work['complete'] and
+                                        not coverage_work.get('maintenance_required')):
             state.next_at = stamp
             state.blocked_reason = None
         elif result.next_due_at is not None and result.blocked_reason == 'source':

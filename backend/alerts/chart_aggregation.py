@@ -1,5 +1,5 @@
 """Durable small aggregation slices; focus changes affect the next selection."""
-from sqlalchemy import select
+from sqlalchemy import case, select
 
 from .storage import ChartAggregationJob, ChartViewportDemand, Instrument
 
@@ -46,20 +46,28 @@ def aggregate_once():
 
     with transaction() as db:
         now = now_ms()
-        jobs = list(db.scalars(select(ChartAggregationJob).where(ChartAggregationJob.next_at <= now)))
-        if not jobs:
+        model, demand = ChartAggregationJob, ChartViewportDemand
+        active = (demand.instrument_id == model.instrument_id, demand.expires > now)
+        source = case((demand.timeframe == 'M30', 'M15'), else_=demand.timeframe)
+        exact = (*active, source == model.timeframe, model.start < demand.end, model.end > demand.start)
+        warm = (*active, model.start < demand.end, model.end > demand.warm_start)
+        def exists(*conditions):
+            return select(demand.id).where(*conditions).exists()
+        aged = model.created_at <= now - 10000
+        priority = case((aged, 0),
+            (exists(*exact, demand.focused.is_(True)), 100), (exists(*exact), 110),
+            (exists(*warm, demand.focused.is_(True)), 130), (exists(*warm), 150),
+            (exists(*active), 170), else_=300)
+        # Return one candidate and lock only its identity. Older jobs get a
+        # service turn ahead of focus priority, and locked identities are skipped
+        # inside the SQL selection rather than hiding the rest of the queue.
+        selected = db.execute(select(model, Instrument).join(Instrument,
+            Instrument.id == model.instrument_id).where(model.next_at <= now).order_by(
+                priority, case((aged, model.created_at), else_=-model.end), model.created_at, model.id)
+            .limit(1).with_for_update(of=Instrument, skip_locked=True)).first()
+        if selected is None:
             return False
-        demands = list(db.scalars(select(ChartViewportDemand).where(
-            ChartViewportDemand.expires > now)))
-        # Match ingestion's lock order. Deletion and aggregate writes commit
-        # together, so a crash leaves the pending slice available for retry.
-        for job in sorted(jobs, key=lambda item: aggregation_priority(item, demands)):
-            inst = db.scalar(select(Instrument).where(
-                Instrument.id == job.instrument_id).with_for_update(skip_locked=True))
-            if inst is not None:
-                break
-        else:
-            return False
+        job, inst = selected
         job = db.scalar(select(ChartAggregationJob).where(
             ChartAggregationJob.id == job.id).with_for_update().execution_options(populate_existing=True))
         if job is None or job.next_at > now:
