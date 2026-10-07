@@ -1,0 +1,98 @@
+{
+  "time_utc": "2026-10-07 14:14:04",
+  "stage": "normal-input-alert in progress",
+  "source_commit": "bcaefcf33d14c4be150e8d2d6e886329cdae74d7",
+  "scope": "Actual live PG and consumer runtime; whitelisted inspect only, no environment secrets",
+  "containers": [
+    {
+      "name": "mw-issue13-optimized-r6-postgres-1",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "StartedAt": "2026-10-07T13:55:58.997690199Z"
+      },
+      "project": "mw-issue13-optimized-r6",
+      "nanocpus": 750000000,
+      "memory": 536870912,
+      "ports": {
+        "5432/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "19703"
+          }
+        ]
+      },
+      "networks": [
+        "mw-issue13-optimized-r6_default"
+      ],
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "mw-issue13-optimized-r6_pgdata",
+          "Source": "/var/lib/docker/volumes/mw-issue13-optimized-r6_pgdata/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "RW": true
+        }
+      ],
+      "command": [
+        "postgres",
+        "-c",
+        "shared_buffers=128MB",
+        "-c",
+        "max_connections=20",
+        "-c",
+        "shared_preload_libraries=pg_stat_statements",
+        "-c",
+        "track_io_timing=on"
+      ]
+    },
+    {
+      "name": "mw-issue13-optimized-r6-consumer",
+      "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "StartedAt": "2026-10-07T14:08:53.110045457Z"
+      },
+      "project": "mw-issue13-optimized-r6",
+      "nanocpus": 750000000,
+      "memory": 805306368,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "mw-issue13-optimized-r6_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-issue13-r6-acceptance",
+          "Destination": "/workspace",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/results/optimized-r6",
+          "Destination": "/results",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/results/optimized-r6-baseline",
+          "Destination": "/performance",
+          "RW": false
+        }
+      ],
+      "command": [
+        "python",
+        "docs/verification/issue-13/optimized_normal_input_probe.py"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "environment": "Ubuntu quant-server local Docker",
+  "project": "mw-issue13-optimized-r6",
+  "pg_address": "127.0.0.1:19703",
+  "browser_address": "https://192.168.7.232:19645",
+  "chart_address": "https://192.168.7.232:19646",
+  "browser_was_actually_tested": true,
+  "currently_online": false,
+  "time_utc": "2026-10-07 14:28:47",
+  "services": [
+    {
+      "name": "mw-issue13-optimized-r6-postgres-1",
+      "project": "mw-issue13-optimized-r6",
+      "service": "postgres",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "OOMKilled": false,
+        "ExitCode": 0,
+        "StartedAt": "2026-10-07T14:18:52.252046423Z",
+        "FinishedAt": "2026-10-07T14:20:30.503319494Z"
+      }
+    },
+    {
+      "name": "mw-issue13-optimized-r6-web-1",
+      "project": "mw-issue13-optimized-r6",
+      "service": "web",
+      "image": "sha256:58ed4d5e68d78f940c4b7065974f0edc034538b2ad86f0e0ba937a42017762ab",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "OOMKilled": false,
+        "ExitCode": 0,
+        "StartedAt": "2026-10-07T14:16:51.405314564Z",
+        "FinishedAt": "2026-10-07T14:18:43.139335406Z"
+      }
+    },
+    {
+      "name": "mw-issue13-optimized-r6-publisher-1",
+      "project": "mw-issue13-optimized-r6",
+      "service": "publisher",
+      "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "OOMKilled": false,
+        "ExitCode": 143,
+        "StartedAt": "2026-10-07T14:16:51.002250835Z",
+        "FinishedAt": "2026-10-07T14:18:43.000114941Z"
+      }
+    },
+    {
+      "name": "mw-issue13-optimized-r6-api-1",
+      "project": "mw-issue13-optimized-r6",
+      "service": "api",
+      "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "OOMKilled": false,
+        "ExitCode": 0,
+        "StartedAt": "2026-10-07T14:16:51.000735278Z",
+        "FinishedAt": "2026-10-07T14:18:45.190117153Z"
+      }
+    },
+    {
+      "name": "mw-issue13-optimized-r6-chart-origin-1",
+      "project": "mw-issue13-optimized-r6",
+      "service": "chart-origin",
+      "image": "sha256:85022544e2c8fdb6ee170869cdc29bfb8189d8ed1b8ce2e01e42f600a38c87cc",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "OOMKilled": false,
+        "ExitCode": 0,
+        "StartedAt": "2026-10-07T14:16:50.515180007Z",
+        "FinishedAt": "2026-10-07T14:18:43.139440651Z"
+      }
+    }
+  ],
+  "retained_volume": "mw-issue13-optimized-r6_pgdata",
+  "retirement": {
+    "preview_attempted": true,
+    "apply_attempted": false,
+    "preview_exit_code": 1,
+    "error": "Only a single owned PG14 data volume is supported automatically",
+    "reason": "Installed tool recognizes postgres tag strings, while reviewed acceptance Compose pins image by sha256 ID. No resource deleted; shared dependency images and evidence retained. Tool correction and retirement are separate infrastructure follow-up."
+  },
+  "private_assets_committed": false
+}

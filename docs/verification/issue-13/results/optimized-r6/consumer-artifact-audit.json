@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "scope": "censored_wait_supplement",
+      "completed": 0
+    },
+    {
+      "scope": "fairness",
+      "targets": 90,
+      "seconds": 4.563436173833907,
+      "sustained_rounds_recomputed": true
+    },
+    {
+      "scope": "consumer_micro",
+      "api": 120,
+      "evaluate": 120
+    },
+    {
+      "scope": "mixed",
+      "inputs": 20,
+      "exact_payloads": 20,
+      "terminal_runnable_targets": 0
+    },
+    {
+      "scope": "independent_high_period",
+      "cases": 120,
+      "duplicate_idempotent": true,
+      "offline_recomputed": true
+    },
+    {
+      "scope": "same_price",
+      "exact_visible": 50,
+      "exact_judged": 50
+    },
+    {
+      "scope": "normal_input",
+      "exact_visible": 310,
+      "exact_judged": 310
+    },
+    {
+      "scope": "tcp_and_triggers",
+      "api": 120,
+      "unique_signals": 10
+    },
+    {
+      "scope": "browser",
+      "six_phases": true,
+      "actual_services": 6
+    }
+  ],
+  "note": "Numeric thresholds assessed separately"
+}

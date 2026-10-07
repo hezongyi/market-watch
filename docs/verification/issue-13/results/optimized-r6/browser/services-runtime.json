@@ -1,0 +1,202 @@
+[
+  {
+    "name": "mw-issue13-optimized-r6-api-1",
+    "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-07T14:16:51.000735278Z"
+    },
+    "networks": [
+      "mw-issue13-optimized-r6_offline"
+    ],
+    "project": "mw-issue13-optimized-r6",
+    "nanocpus": 450000000,
+    "memory": 805306368,
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/results/optimized-r6",
+        "Destination": "/results",
+        "RW": true
+      },
+      {
+        "Type": "bind",
+        "Source": "/home/quant/repos/market-watch-issue13-r6-acceptance",
+        "Destination": "/workspace",
+        "RW": false
+      }
+    ]
+  },
+  {
+    "name": "mw-issue13-optimized-r6-publisher-1",
+    "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-07T14:16:51.002250835Z"
+    },
+    "networks": [
+      "mw-issue13-optimized-r6_offline"
+    ],
+    "project": "mw-issue13-optimized-r6",
+    "nanocpus": 450000000,
+    "memory": 805306368,
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/home/quant/repos/market-watch-issue13-r6-acceptance",
+        "Destination": "/workspace",
+        "RW": false
+      }
+    ]
+  },
+  {
+    "name": "mw-issue13-optimized-r6-web-1",
+    "image": "sha256:58ed4d5e68d78f940c4b7065974f0edc034538b2ad86f0e0ba937a42017762ab",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-07T14:16:51.405314564Z"
+    },
+    "networks": [
+      "mw-issue13-optimized-r6_default",
+      "mw-issue13-optimized-r6_offline"
+    ],
+    "project": "mw-issue13-optimized-r6",
+    "nanocpus": 50000000,
+    "memory": 100663296,
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/tmp/mw-issue13-optimized-browser-private/web-tls.conf",
+        "Destination": "/etc/nginx/conf.d/default.conf",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/tmp/mw-issue13-optimized-browser-private/cert.pem",
+        "Destination": "/certs/cert.pem",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/tmp/mw-issue13-optimized-browser-private/key.pem",
+        "Destination": "/certs/key.pem",
+        "RW": false
+      }
+    ]
+  },
+  {
+    "name": "mw-issue13-optimized-r6-chart-origin-1",
+    "image": "sha256:85022544e2c8fdb6ee170869cdc29bfb8189d8ed1b8ce2e01e42f600a38c87cc",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-07T14:16:50.515180007Z"
+    },
+    "networks": [
+      "mw-issue13-optimized-r6_default"
+    ],
+    "project": "mw-issue13-optimized-r6",
+    "nanocpus": 50000000,
+    "memory": 100663296,
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/tmp/mw-issue13-optimized-browser-private/chart-tls.conf",
+        "Destination": "/etc/nginx/conf.d/default.conf",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/tmp/mw-issue13-optimized-browser-private/cert.pem",
+        "Destination": "/certs/cert.pem",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/tmp/mw-issue13-optimized-browser-private/key.pem",
+        "Destination": "/certs/key.pem",
+        "RW": false
+      }
+    ]
+  },
+  {
+    "name": "mw-issue13-optimized-r6-postgres-1",
+    "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-07T14:16:41.467683915Z"
+    },
+    "networks": [
+      "mw-issue13-optimized-r6_default",
+      "mw-issue13-optimized-r6_offline"
+    ],
+    "project": "mw-issue13-optimized-r6",
+    "nanocpus": 750000000,
+    "memory": 536870912,
+    "mounts": [
+      {
+        "Type": "volume",
+        "Source": "/var/lib/docker/volumes/mw-issue13-optimized-r6_pgdata/_data",
+        "Destination": "/var/lib/postgresql/data",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "name": "mw-issue13-optimized-r6-browser",
+    "image": "sha256:098e9a4c9963bb9aab42332d634957fcd776676a601b1ba6d95abec806efdfba",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-07T14:16:59.49350002Z"
+    },
+    "networks": [
+      "mw-issue13-optimized-r6_default"
+    ],
+    "project": "mw-issue13-optimized-r6",
+    "nanocpus": 450000000,
+    "memory": 1610612736,
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/home/quant/repos/market-watch/web/node_modules",
+        "Destination": "/modules",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/home/quant/.cache/ms-playwright",
+        "Destination": "/browsers",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/tmp/mw-issue13-optimized-browser-private",
+        "Destination": "/private",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/home/quant/repos/market-watch-issue13-r6-acceptance",
+        "Destination": "/workspace",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/results/optimized-r6",
+        "Destination": "/results",
+        "RW": true
+      }
+    ]
+  }
+]
