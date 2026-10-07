@@ -20,10 +20,10 @@ const out = "/tmp/mw-chart-maximize-20261007/product-browser.json";
     page.on('pageerror',e=>report.errors.push(e.message));
     await page.goto(APP+'/advanced-charts');
     await page.frameLocator('iframe').locator('#chart').waitFor();
-    const host=page.frames().find(f=>f.url().startsWith(CHART+'/'));
+    let host=page.frames().find(f=>f.url().startsWith(CHART+'/'));
     assert.ok(host);
     const settle=async()=>{
-      await host.waitForFunction(()=>ready&&!loading&&!MWNativeNavigation.busy()
+      await host.waitForFunction(()=>ready&&!loading&&!nativeSaving&&!MWNativeNavigation.busy()
         && !rangeGuard.busy()&&!edgeGuard.busy()&&!MWChartMaximize.resizing()
         && Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i).dataReady()).every(Boolean));
       await host.evaluate(()=>new Promise(resolve=>{
@@ -41,12 +41,15 @@ const out = "/tmp/mw-chart-maximize-20261007/product-browser.json";
     assert.equal(await host.evaluate(()=>widget.activeChart().symbol()),'MAXFIXTURE');
     await host.evaluate(()=>widget.setLayout('4'));
     await settle();
-    const native=page.frames().find(f=>f.parentFrame()===host);
+    await host.evaluate(()=>widget.chart(3).createStudy('Relative Strength Index',false,false));
+    await settle();
+    let native=page.frames().find(f=>f.parentFrame()===host);
     const state=()=>host.evaluate(()=>({
       layout:widget.layout(),sync:MWSyncCoordinator.snapshot(),
       charts:Array.from({length:widget.chartsCount()},(_,i)=>{
         const c=widget.chart(i);return {symbol:c.symbol(),resolution:c.resolution(),
-          range:c.getVisibleRange(),spacing:c.getTimeScale().barSpacing(),max:c.isMaximized()};
+          range:c.getVisibleRange(),spacing:c.getTimeScale().barSpacing(),max:c.isMaximized(),
+          studies:c.getAllStudies(),shapes:c.getAllShapes()};
       }),
     }));
     const double=async i=>{
@@ -75,10 +78,28 @@ const out = "/tmp/mw-chart-maximize-20261007/product-browser.json";
       assert.deepEqual(restored,before);
       report.cases.push({name:mode+' full application double-click round trip'});
     }
+    await host.evaluate(()=>new Promise((resolve,reject)=>widget.saveChartToServer(resolve,reject)));
+    page.on('dialog',dialog=>dialog.accept());
+    await page.reload();
+    await page.frameLocator('iframe').locator('#chart').waitFor();
+    host=page.frames().find(f=>f.url().startsWith(CHART+'/'));
+    assert.ok(host);
+    await settle();
+    native=page.frames().find(f=>f.parentFrame()===host);
+    const saved=await state();
+    assert.equal(saved.layout,'4');
+    assert.ok(saved.charts.every(c=>c.symbol==='MAXFIXTURE'&&c.range&&c.range.to>c.range.from&&!c.max));
+    assert.equal(saved.charts[3].studies[0].name,'Relative Strength Index');
+    await double(1);
+    assert.ok((await state()).charts[1].max);
+    await page.waitForTimeout(550);
+    await double(1);
+    assert.deepEqual(await state(),saved);
+    report.cases.push({name:'real API and PostgreSQL workspace save, reload, and double-click round trip'});
     report.hostAsset=await host.evaluate(()=>[...document.scripts].map(s=>s.src).find(s=>/host\.[a-f0-9]+\.js$/.test(s))?.split('/').at(-1));
     assert.ok(report.hostAsset);
     assert.deepEqual(report.errors,[]);
-    console.log('PASS: isolated application main page, synthetic PG data, four charts, date and bar-width round trips');
+    console.log('PASS: isolated application, synthetic PG data, four charts + RSI, sync round trips, saved workspace reload');
   } finally {
     fs.writeFileSync(out,JSON.stringify(report,null,2));
     await browser.close();
