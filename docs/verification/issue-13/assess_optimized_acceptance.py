@@ -63,10 +63,65 @@ def main():
             continue
         for name,value,limit in extract(read(path)):
             gate(name,value,limit,value <= limit,'Authenticated 10 identities×4 periods×3 repetitions')
-    for filename in ('fairness/result.json','supplemental/mixed.json','high-period/result.json',
-                     'observation-alert/result.json','network-alert/result.json','browser/result.json'):
-        if not (CONSUMERS/filename).exists():
+    def consumer(filename):
+        path = CONSUMERS/filename
+        if not path.exists():
             missing.append(filename)
+            return None
+        return read(path)
+    fairness = consumer('fairness/result.json')
+    if fairness:
+        gate('fairness_90_targets_first_service_seconds',fairness['longest_first_service_seconds'],10,
+            not fairness['missing'] and fairness['longest_first_service_seconds'] <= 10,
+            'Ten explicit synthetic identities, nine periods, continuous focused input')
+    mixed = consumer('supplemental/mixed.json')
+    if mixed:
+        for percentile,limit in [('p95',15),('p99',30)]:
+            value = mixed['latency_completed_only'][percentile]
+            gate('mixed_input_'+percentile+'_seconds',value,limit,value is not None and value <= limit,
+                 '20 exact M1 payload inputs, two identities backfilling concurrently')
+        gate('mixed_unpublished_before_final30s',mixed['unpublished_before_final30s'],0,
+            mixed['unpublished_before_final30s'] == 0,'All ten identities receive new minute + observation')
+        gate('mixed_runnable_wait_seconds',mixed['longest_target_wait'],10,
+            mixed['longest_target_wait'] <= 10,'Only runnable durable generations included')
+    high = consumer('high-period/result.json')
+    if high:
+        gate('high_period_oracle_cases',high['case_count'],120,
+            high['outcome'] == 'passed' and high['case_count'] == 120,'Independent M30/W1/MN arithmetic and consumers')
+    observation = consumer('observation-alert/result.json')
+    if observation:
+        gate('same_price_exact_visibility_judgment_markers',[observation['visible'],observation['judged']],50,
+            observation['inputs'] == observation['visible'] == observation['judged'] == 50,
+            '50 exact markers over 330s, missed markers remain in denominator')
+        for percentile,limit in [('p95',1),('p99',2)]:
+            value = observation['visible_to_judged_completed'][percentile]
+            gate('same_price_visible_to_judged_'+percentile+'_seconds',value,limit,
+                value is not None and value <= limit,'Sequential PG sampling includes scheduling uncertainty')
+        for percentile,limit in [('p95',15),('p99',30)]:
+            value = observation['commit_to_visible_completed'][percentile]
+            gate('same_price_commit_to_visible_'+percentile+'_seconds',value,limit,
+                value is not None and value <= limit,'Same-price M1 input to observed published marker')
+    network = consumer('network-alert/result.json')
+    if network:
+        for percentile,limit in [('p95',.5),('p99',1)]:
+            value = network['api'][percentile]
+            gate('tcp_api_'+percentile+'_seconds',value,limit,value is not None and value <= limit,
+                 '120 authenticated <=500bar calls alongside publication and alerts; lifespan off')
+        for percentile,limit in [('p95',1),('p99',2)]:
+            value = network['alert_latency_completed_only'][percentile]
+            gate('trigger_visible_to_judged_'+percentile+'_seconds',value,limit,
+                value is not None and value <= limit,'Ten new-minute crossings, exact one signal per input')
+        gate('tcp_exact_input_judgment_denominator',[network['visible'],network['judged']],10,
+            network['inputs'] == network['visible'] == network['judged'] == 10 and not network['errors'],
+            'Exact trigger outcomes with retained visibility/judgment samples')
+    browser = consumer('browser/result.json')
+    if browser:
+        gate('browser_product_flow',browser['outcome'],'passed',browser['outcome'] == 'passed',
+            'Built UI/native dual chart/save/reload/full API lifespan, isolated upstream')
+        runtime = consumer('browser/services-runtime.json')
+        if runtime:
+            cpu = sum(row['nanocpus'] for row in runtime if not row['name'].endswith('postgres-1'))/1e9
+            gate('app_browser_cpu_limit',cpu,1.5,cpu <= 1.5,'Actual live container cgroup limits; PostgreSQL separate')
     report = dict(results=results,all_assessed_gates_passed=all(row['passed'] for row in results),
         missing=missing,complete_acceptance=False,
         note='Saved-evidence numeric assessment; downstream evidence must be separately audited before Issue13 completion')
