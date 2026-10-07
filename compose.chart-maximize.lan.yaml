@@ -1,0 +1,16 @@
+# Ubuntu LAN acceptance; chart host differs from app host to isolate cookies.
+services:
+  api:
+    environment:
+      ALERTS_PUBLIC_URL: https://192.168.7.232:17443
+  web:
+    build:
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: https://charts.192.168.7.232.sslip.io:17444
+    image: market-watch-web:chart-maximize-lan-20261007
+  tls:
+    ports: !override
+      - 127.0.0.1:17443:443
+      - 127.0.0.1:17444:444
+      - 192.168.7.232:17443:443
+      - 192.168.7.232:17444:444

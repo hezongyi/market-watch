@@ -2,9 +2,12 @@
 const { chromium } = require("@playwright/test");
 const fs = require("node:fs");
 const assert = require("node:assert/strict");
-const APP = "https://localhost:17443", CHART = "https://127.0.0.1:17444";
-const report = { environment:"Ubuntu Docker project mw-chart-maximize-20261007", cases:[], errors:[] };
-const out = "/tmp/mw-chart-maximize-20261007/product-browser.json";
+const APP = process.env.MAXIMIZE_APP || "https://localhost:17443";
+const CHART = process.env.MAXIMIZE_CHART || "https://127.0.0.1:17444";
+assert.ok(["https://localhost:17443", "https://192.168.7.232:17443"].includes(APP));
+assert.ok(["https://127.0.0.1:17444", "https://charts.192.168.7.232.sslip.io:17444"].includes(CHART));
+const report = { environment:"Ubuntu Docker project mw-chart-maximize-20261007", app:APP, chart:CHART, cases:[], errors:[], chartCredentialLeaks:[] };
+const out = process.env.MAXIMIZE_PRODUCT_OUTPUT || "/tmp/mw-chart-maximize-20261007/product-browser.json";
 (async()=>{
   const browser = await chromium.launch({
     executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ||
@@ -18,6 +21,12 @@ const out = "/tmp/mw-chart-maximize-20261007/product-browser.json";
     assert.ok(login.ok());
     const page=await context.newPage();
     page.on('pageerror',e=>report.errors.push(e.message));
+    page.on('request',async request=>{
+      if(new URL(request.url()).origin===CHART){
+        const headers=await request.allHeaders();
+        if(headers.cookie||headers.authorization||headers['x-csrf-token'])report.chartCredentialLeaks.push(new URL(request.url()).pathname);
+      }
+    });
     await page.goto(APP+'/advanced-charts');
     await page.frameLocator('iframe').locator('#chart').waitFor();
     let host=page.frames().find(f=>f.url().startsWith(CHART+'/'));
@@ -41,7 +50,11 @@ const out = "/tmp/mw-chart-maximize-20261007/product-browser.json";
     assert.equal(await host.evaluate(()=>widget.activeChart().symbol()),'MAXFIXTURE');
     await host.evaluate(()=>widget.setLayout('4'));
     await settle();
-    await host.evaluate(()=>widget.chart(3).createStudy('Relative Strength Index',false,false));
+    await host.evaluate(()=>{
+      const c=widget.chart(3);
+      if(!c.getAllStudies().some(s=>s.name==='Relative Strength Index'))
+        return c.createStudy('Relative Strength Index',false,false);
+    });
     await settle();
     let native=page.frames().find(f=>f.parentFrame()===host);
     const state=()=>host.evaluate(()=>({
@@ -99,6 +112,7 @@ const out = "/tmp/mw-chart-maximize-20261007/product-browser.json";
     report.hostAsset=await host.evaluate(()=>[...document.scripts].map(s=>s.src).find(s=>/host\.[a-f0-9]+\.js$/.test(s))?.split('/').at(-1));
     assert.ok(report.hostAsset);
     assert.deepEqual(report.errors,[]);
+    assert.deepEqual(report.chartCredentialLeaks,[]);
     console.log('PASS: isolated application, synthetic PG data, four charts + RSI, sync round trips, saved workspace reload');
   } finally {
     fs.writeFileSync(out,JSON.stringify(report,null,2));

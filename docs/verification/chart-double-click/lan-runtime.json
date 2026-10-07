@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-07T02:04:04.907980+00:00",
+  "project": "mw-chart-maximize-20261007",
+  "app": "https://192.168.7.232:17443/advanced-charts",
+  "chart": "https://charts.192.168.7.232.sslip.io:17444",
+  "chartDNS": "192.168.7.232",
+  "ports": {
+    "443/tcp": [
+      {
+        "HostIp": "127.0.0.1",
+        "HostPort": "17443"
+      },
+      {
+        "HostIp": "192.168.7.232",
+        "HostPort": "17443"
+      }
+    ],
+    "444/tcp": [
+      {
+        "HostIp": "127.0.0.1",
+        "HostPort": "17444"
+      },
+      {
+        "HostIp": "192.168.7.232",
+        "HostPort": "17444"
+      }
+    ],
+    "80/tcp": null
+  },
+  "webImage": {
+    "ref": "market-watch-web:chart-maximize-lan-20261007",
+    "id": "sha256:cb4718ac1a59993c5ddf3a26760190fb27b3f2edcdb7fe1da488ad9e6c060d3d",
+    "labels": {
+      "io.market-watch.built-at": "2026-10-07T02:00:00.496265+00:00",
+      "io.market-watch.commit": "fc7084afd65e5fb65094e3c63cf3c8bb723fbb41",
+      "io.market-watch.dirty": "true",
+      "io.market-watch.expires-at": "2026-10-14T02:00:00.496265+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-chart-maximize-20261007",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-chart-maximize-20261007"
+    }
+  },
+  "httpsCertificateSANVerified": true,
+  "httpApp": 200,
+  "httpChart": 200,
+  "acceptancePasswordChanged": false,
+  "productionChanged": false,
+  "runningForUserAcceptance": true
+}

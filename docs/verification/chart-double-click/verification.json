@@ -17,10 +17,11 @@
     "advanced-host/index.html": "595ce4c440c2963d23824bcba4f4a0372c5eea2c4d80fc11f69ffe58df09d0e9",
     "web/tests/advanced-chart-maximize.browser.cjs": "8dd35677285f27436e00eb622e9b0d59c78758a3e14567731d951d7405736267",
     "web/tests/advanced-chart-maximize.bridge.browser.cjs": "0713ffc0b7b921a050e0e83ef396fecb088aa98fe2ea0012e39b0477bbb3fccc",
-    "web/tests/advanced-chart-maximize.product.browser.cjs": "f5a113ff96680f3cb65c3efb6b6d5995b86537346c1d0b09efacccd4356408dc",
+    "web/tests/advanced-chart-maximize.product.browser.cjs": "0754be4be29e0d5a9a83c72897e78297f8a5d4d8a3634f1d7ceb18f0a23d898f",
     "compose.chart-maximize.yaml": "1b1a48675db7e8979c7eec2a516f74101fb520d54ea69658d4e270fb72551017",
     "scripts/prepare_chart_maximize_acceptance.py": "d6a60ab537ae25cd2b594d4a1fb7732e55dc6e0cdd71eb811f3d9199b646d003",
-    "scripts/seed_chart_maximize_acceptance.py": "2dc758062696d0710cb32aa8b6dca20e74dc1954312c868625ba759182436257"
+    "scripts/seed_chart_maximize_acceptance.py": "2dc758062696d0710cb32aa8b6dca20e74dc1954312c868625ba759182436257",
+    "compose.chart-maximize.lan.yaml": "aa312ff07b071cff3649140ac7e6e9064f2071e3121619eb85d63077480f44f0"
   },
   "cpu4Cases": 22,
   "patchChecks": [
@@ -45,5 +46,8 @@
   "dockerVerifiedAt": "2026-10-07T01:06:36.671845+00:00",
   "dockerRuntimeEvidence": "docker-runtime.json",
   "productBrowserEvidence": "product-browser.json",
-  "acceptanceLifecycle": "running for user acceptance; not finished or retired"
+  "acceptanceLifecycle": "running for user acceptance; not finished or retired",
+  "lanBrowserCases": 4,
+  "lanBrowserEvidence": "lan-browser.json",
+  "lanRuntimeEvidence": "lan-runtime.json"
 }

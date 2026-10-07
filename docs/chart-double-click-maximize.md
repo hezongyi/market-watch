@@ -43,9 +43,11 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
 
 本次 project 固定为 `mw-chart-maximize-20261007`，独立默认网络、`maximize-pg` volume、`chart_maximize` 数据库和随机密码。只填充标记为合成行情的 `MAXFIXTURE` H1 数据；不复制生产数据库、配置、通知或凭据，不启动行情采集和通知 worker。
 
-实际入口：`https://localhost:17443/advanced-charts`，独立图表来源 `https://127.0.0.1:17444`。运行主机为 Ubuntu 22.04，Docker 服务端 29.1.3。两个端口仅绑定该 Ubuntu 主机回环地址，其他电脑需要通过 SSH 转发这两个本机端口后访问；自签名验收证书仅用于此隔离实例。
+实际局域网入口：`https://192.168.7.232:17443/advanced-charts`，图表来源 `https://charts.192.168.7.232.sslip.io:17444`。运行主机为 Ubuntu 22.04，Docker 服务端 29.1.3。应用及图表端口分别绑定 Ubuntu 局域网地址和回环地址，数据库不暴露；无需 SSH 转发即可在局域网访问。图表独立域名经 DNS 解析到同一 Ubuntu IP，避免按 IP 登录的 session Cookie 跨端口发送到图表服务。
 
-另一台电脑访问时同时转发两个端口：`ssh -N -L 17443:127.0.0.1:17443 -L 17444:127.0.0.1:17444 quant@192.168.7.232`。浏览器先直接打开 `https://127.0.0.1:17444` 并接受本次验收证书，再回到主站刷新；只接受主站证书不会自动信任图表来源证书。2026-10-07 已复现未信任图表证书时的 `ERR_CERT_AUTHORITY_INVALID`，接受后 HTTP 200；用户补充双端口转发及证书后登录成功，完整应用验收再次通过。
+首次访问先打开图表来源并接受本次验收自签名证书，再打开主站并接受证书。证书包含 Ubuntu IP 和图表域名；若局域网 DNS 拒绝域名解析，将 `192.168.7.232 charts.192.168.7.232.sslip.io` 加到访问电脑的 hosts。域名只解析 IP，网站及图表均由本机 Docker 提供。
+
+之前仅回环部署时，另一台电脑需同时转发两个端口：`ssh -N -L 17443:127.0.0.1:17443 -L 17444:127.0.0.1:17444 quant@192.168.7.232`。2026-10-07 已复现未信任图表证书时的 `ERR_CERT_AUTHORITY_INVALID`，接受后 HTTP 200；用户补充双端口转发及证书后登录成功，完整应用验收再次通过。当前局域网模式不再需要该转发。
 
 应用浏览器验收 **4 项通过**，页面异常为空：关闭同步、柱宽同步、日期同步三种状态下，四图含 RSI 的双击放大／恢复完整往返；通过真实 API 保存工作区到 PostgreSQL，页面重载后四图及 RSI 保留，再次双击往返通过。数据库实际包含 1200 根合成 H1 K 线及对应发布记录。生产构建资产的 SHA-256 与前述浏览器测试资产一致。
 
@@ -64,11 +66,13 @@ mw-docker compose-build --repo . \
   --task mw-chart-maximize-20261007 --project mw-chart-maximize-20261007 \
   --purpose acceptance \
   --env-file /tmp/mw-chart-maximize-20261007/compose.env \
-  --file compose.chart-maximize.yaml
+  --file compose.chart-maximize.yaml --file compose.chart-maximize.lan.yaml
 docker compose --env-file /tmp/mw-chart-maximize-20261007/compose.env \
-  -p mw-chart-maximize-20261007 -f compose.chart-maximize.yaml up -d --no-build --wait
+  -p mw-chart-maximize-20261007 -f compose.chart-maximize.yaml \
+  -f compose.chart-maximize.lan.yaml up -d --no-build --wait
 docker compose --env-file /tmp/mw-chart-maximize-20261007/compose.env \
-  -p mw-chart-maximize-20261007 -f compose.chart-maximize.yaml stop
+  -p mw-chart-maximize-20261007 -f compose.chart-maximize.yaml \
+  -f compose.chart-maximize.lan.yaml stop
 ```
 
 已核实当前进程尚未载入 `docker` 补充组，但用户已加入该组；可用 `sg docker -c '<上面的 docker compose 命令>'` 启动或停止。`mw-docker` 自动处理这个组切换。
@@ -84,6 +88,8 @@ mw-docker retire --task mw-chart-maximize-20261007 --project mw-chart-maximize-2
 
 ```bash
 LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
+  MAXIMIZE_APP=https://192.168.7.232:17443 \
+  MAXIMIZE_CHART=https://charts.192.168.7.232.sslip.io:17444 \
   node web/tests/advanced-chart-maximize.product.browser.cjs
 ```
 
