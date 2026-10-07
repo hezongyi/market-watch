@@ -1,0 +1,14 @@
+{
+  "original_driver_stage": "failed",
+  "original_failure": "Host consumer audit imported DB-only supplemental probe; sqlalchemy unavailable",
+  "followup_audit": "consumer-artifact-audit.json",
+  "followup_numeric": "numeric-assessment.json",
+  "failed_gates": [
+    "same_price_visible_to_judged_p95_seconds",
+    "normal_input_visible_to_judged_p95_seconds"
+  ],
+  "all_input_denominators_complete": true,
+  "complete_acceptance": false,
+  "next_candidate": "bcaefcf/750ms shared monitor",
+  "scope": "Read-only host audit corrected and resumed without database reset or test rerun; original driver failure preserved"
+}

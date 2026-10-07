@@ -1,0 +1,11 @@
+{"checkpoint":"M1 initial","symbol":"BTCUSDT","resolution":"1","ready":true,"range":{"from":1789371600,"to":1789382940},"chart_count":1}
+PHASE M1 idle 30s
+PHASE M5 period switch
+{"checkpoint":"M5","symbol":"BTCUSDT","resolution":"5","ready":true,"range":{"from":1789328400,"to":1789385100},"chart_count":1}
+PHASE EURUSD identity switch
+{"checkpoint":"EURUSD","symbol":"EURUSD","resolution":"5","ready":true,"range":{"from":1789329300,"to":1789385100},"chart_count":1}
+PHASE two-chart native layout
+{"checkpoint":"two chart EURUSD/XAUUSD","symbol":"XAUUSD","resolution":"5","ready":true,"range":{"from":1789358100,"to":1789385100},"chart_count":2}
+PHASE manual save
+PHASE reload persisted layout
+{"outcome":"passed","phases":[{"label":"M1 idle 30s","milliseconds":30002},{"label":"M5 period switch","milliseconds":311},{"label":"EURUSD identity switch","milliseconds":699},{"label":"two-chart native layout","milliseconds":31397},{"label":"manual save","milliseconds":39},{"label":"reload persisted layout","milliseconds":20655}],"data_latency":{"p50":26,"p95":198,"p99":198},"page_errors":[]}

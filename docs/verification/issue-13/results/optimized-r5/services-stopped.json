@@ -1,0 +1,122 @@
+{
+  "project": "mw-issue13-optimized-r5",
+  "all_owned_services_stopped": true,
+  "containers": [
+    {
+      "name": "mw-issue13-optimized-r5-web-1",
+      "image": "sha256:e1d4551950f32d05147b58ce78160b7646f49ef902ca5fbce8a82ff958b989bb",
+      "running": false,
+      "oom_killed": false,
+      "exit_code": 0,
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/tmp/mw-issue13-optimized-browser-private/web-tls.conf",
+          "Destination": "/etc/nginx/conf.d/default.conf",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/tmp/mw-issue13-optimized-browser-private/cert.pem",
+          "Destination": "/certs/cert.pem",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/tmp/mw-issue13-optimized-browser-private/key.pem",
+          "Destination": "/certs/key.pem",
+          "RW": false
+        }
+      ]
+    },
+    {
+      "name": "mw-issue13-optimized-r5-publisher-1",
+      "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "running": false,
+      "oom_killed": false,
+      "exit_code": 143,
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-issue13-r5-acceptance",
+          "Destination": "/workspace",
+          "RW": false
+        }
+      ]
+    },
+    {
+      "name": "mw-issue13-optimized-r5-api-1",
+      "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "running": false,
+      "oom_killed": false,
+      "exit_code": 0,
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/results/optimized-r5",
+          "Destination": "/results",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-issue13-r5-acceptance",
+          "Destination": "/workspace",
+          "RW": false
+        }
+      ]
+    },
+    {
+      "name": "mw-issue13-optimized-r5-chart-origin-1",
+      "image": "sha256:85022544e2c8fdb6ee170869cdc29bfb8189d8ed1b8ce2e01e42f600a38c87cc",
+      "running": false,
+      "oom_killed": false,
+      "exit_code": 0,
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/tmp/mw-issue13-optimized-browser-private/cert.pem",
+          "Destination": "/certs/cert.pem",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/tmp/mw-issue13-optimized-browser-private/key.pem",
+          "Destination": "/certs/key.pem",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/tmp/mw-issue13-optimized-browser-private/chart-tls.conf",
+          "Destination": "/etc/nginx/conf.d/default.conf",
+          "RW": false
+        }
+      ]
+    },
+    {
+      "name": "mw-issue13-optimized-r5-postgres-1",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "running": false,
+      "oom_killed": false,
+      "exit_code": 0,
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "mw-issue13-optimized-r5_pgdata",
+          "Source": "/var/lib/docker/volumes/mw-issue13-optimized-r5_pgdata/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "RW": true
+        }
+      ]
+    }
+  ],
+  "scope": "Read-only own project terminal service evidence; volumes retained, no cleanup"
+}

@@ -3,6 +3,7 @@ import json
 import gzip
 import hashlib
 import os
+import math
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -11,6 +12,13 @@ ROOT = HERE/os.environ.get('ISSUE13_CONSUMER_OUTPUT','results/optimized')
 
 def read(name):
     return json.loads((ROOT/name).read_text())
+
+
+def quantiles(values):
+    """Recompute probe nearest-rank quantiles without importing live DB probes."""
+    ordered = sorted(values)
+    return {name: ordered[math.ceil(len(ordered) * q) - 1] if ordered else None
+            for name, q in [('p50', .5), ('p95', .95), ('p99', .99)]}
 
 
 def main():
@@ -91,7 +99,6 @@ def main():
     if 'sampler_sql' in timeline[0]:
         assert all(row['sampler_sql']==2 for row in timeline)
     from measurement_windows import latency_window
-    from supplemental_probe import quantiles
     def check_intervals(report, samples):
         uppers=[]
         for item in report['events']:
