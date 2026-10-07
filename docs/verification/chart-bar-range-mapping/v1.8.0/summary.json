@@ -1,0 +1,111 @@
+{
+  "base": "v1.8.0 / b700911",
+  "chart_candidate": "candidate12",
+  "browser_groups": [
+    {
+      "name": "main",
+      "cases": 31,
+      "errors": [],
+      "sha256": "a2caf6b3c28a06dde20070307fc4cfeaae78116b812e9267064bc688d3892de8"
+    },
+    {
+      "name": "choices",
+      "cases": 4,
+      "errors": [],
+      "sha256": "47ae7ba856b8991f25387d0ef456eeaea1fba61ec84461dde1e07f98bacc3777"
+    },
+    {
+      "name": "extended",
+      "cases": 20,
+      "errors": [],
+      "sha256": "8d9a31bb91b00a525ab4e3b37541e8590ff993b6a571a80240dd2b122f30fc7e"
+    },
+    {
+      "name": "touch",
+      "cases": 6,
+      "errors": [],
+      "sha256": "da51b6aa3a5d9e44cfa25ab7b744e634de3c889782a500326659b5853e23f31d"
+    },
+    {
+      "name": "geometry",
+      "cases": 5,
+      "errors": [],
+      "sha256": "34e982817e281d36bb909b9440bf0cacc9a4395581832e6a35607d2a426ad706"
+    },
+    {
+      "name": "modal",
+      "cases": 5,
+      "errors": [],
+      "sha256": "ac8590db33900860e2f2838061a2ba0ab5ae6988d36eae278507064e1e6ea257"
+    },
+    {
+      "name": "menu",
+      "cases": 6,
+      "errors": [],
+      "sha256": "fa6ece6bac07ae2bfa63e5a49779576cd911d3a9698d3ecea8822daa9eae53ca"
+    },
+    {
+      "name": "legacy",
+      "cases": 6,
+      "errors": [],
+      "sha256": "c8daa30ab364ab5526a539060747459c29cecaedc3d99b324ef17ae74ea70946"
+    },
+    {
+      "name": "stability",
+      "cases": 9,
+      "errors": [],
+      "sha256": "3cf6c5f4bb7eef33f8e962cf634e53ddd7ddbe5c7239bda3da90415198ac26b5"
+    },
+    {
+      "name": "mapping",
+      "cases": 39,
+      "errors": [],
+      "sha256": "ad4105b57b7be0bb7689f47bc23757582b7602d79d185c21b26fc03ed8eb74fb"
+    },
+    {
+      "name": "matrix",
+      "cases": 20,
+      "errors": [],
+      "sha256": "ca54f9b82338d4326614c3062f4c47f35e9c2602a8114b6df96ba19a6d04af6b"
+    },
+    {
+      "name": "calendar",
+      "cases": 4,
+      "errors": [],
+      "sha256": "5b36979c8f4fef9587dfdc2cb60fd831c9f0d02d55ebcd9a6b0841206a1141aa"
+    },
+    {
+      "name": "lifecycle",
+      "cases": 6,
+      "errors": [],
+      "sha256": "e608064b006d96f3538678b5c7e9d966e009ebf48a7a4bc76c528ca888f697e9"
+    },
+    {
+      "name": "navigation",
+      "cases": 8,
+      "errors": [],
+      "sha256": "75c61f31386e4579dd61618a1fe84afa9400fbbd1832f6baf850260c2e4377d9"
+    }
+  ],
+  "browser_cases": 169,
+  "module_assertion_scripts": 18,
+  "browser_helper_load_checks": 5,
+  "syntax_checks": 51,
+  "native_product": {
+    "passed": true,
+    "count": 4,
+    "fixture_restoration": true,
+    "file": "final-native-continuous.json",
+    "sha256": "7c296294a5b9d094edfad40f8c3d0f3a5e3e1deea1d6bb66937e1c96dec1ce7d",
+    "prefix_revision_passed": true,
+    "restoration_file": "fixture-restoration.json",
+    "restoration_sha256": "f7ef8aab55b685ce502701fbf59101b39fe29348ece6c1e404cedeea462fb34a"
+  },
+  "review": "gpt-6.1-sol / max; final Spec and Standards passed; no unresolved P1/P2 or standards violations",
+  "native_boundary": {
+    "passed": true,
+    "count": 4,
+    "file": "final-native-boundary.json",
+    "sha256": "af6ef0892d689be8690e5b96009343ff8bab6977e82ffce704cae78d7b366099"
+  }
+}

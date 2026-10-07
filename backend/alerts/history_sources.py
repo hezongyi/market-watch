@@ -58,4 +58,3 @@ class HistorySources:
         for source in self.owned:
             self.adapters[source].close()
         self.owned.clear()
-

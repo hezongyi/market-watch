@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-07 Asia/Singapore",
+  "asset": "host.c457e1eb70767468.js",
+  "imageTag": "mw-range-main-chart:horizontal-labels1",
+  "browserGroups": {
+    "geometry": {
+      "count": 13,
+      "passed": true,
+      "file": "geometry.json.gz"
+    },
+    "stability": {
+      "count": 9,
+      "passed": true,
+      "file": "stability.json.gz"
+    },
+    "settings": {
+      "count": 31,
+      "passed": true,
+      "file": "settings.json"
+    },
+    "horizontal-retreat": {
+      "count": 1,
+      "passed": true,
+      "file": "horizontal-retreat.json"
+    }
+  },
+  "browserCases": 54,
+  "exteriorUnitCases": 21,
+  "errors": [],
+  "note": "This candidate: 53 cases in geometry/stability/settings plus 1 actual-horizontal-retreat case. rectangle-ui8 134 browser cases are historical and not counted here.",
+  "retreatedLabels": [
+    {
+      "target": 2,
+      "kind": "low",
+      "pixels": -12.075409836065546
+    },
+    {
+      "target": 3,
+      "kind": "low",
+      "pixels": -20.80705882352936
+    }
+  ],
+  "performance": {
+    "frames": 2799,
+    "labelDraws": 1800,
+    "maxLabelPanes": 7,
+    "p95": 4.100000381469727,
+    "setterSamples": 3512,
+    "maxCalls": 1,
+    "maxWork": 31.90000057220459,
+    "latencySamples": 3073,
+    "latencyP95": 4,
+    "afterRafP95": 4
+  }
+}

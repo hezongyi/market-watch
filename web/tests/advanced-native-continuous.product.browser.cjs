@@ -7,6 +7,9 @@ const APP = process.env.NATIVE_SYNC_APP || "https://192.168.7.232:16343",
   CHART = process.env.NATIVE_SYNC_CHART || "https://192.168.7.232:16344";
 const COMPOSE = process.env.NATIVE_SYNC_COMPOSE ||
   "/home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml";
+if (process.env.NATIVE_REVISION_SCRIPT || process.env.NATIVE_PREFIX_REVISION === "1")
+  assert.ok(process.env.NATIVE_SYNC_COMPOSE,
+    'real database revision requires an explicit isolated NATIVE_SYNC_COMPOSE');
 const shellQuote = value => "'" + value.replaceAll("'", "'\\''") + "'";
 const OUT =
   process.env.NATIVE_SYNC_OUTPUT ||
@@ -162,14 +165,20 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
       });
       await page.route("**/bundles/library.*.js", async (route) => {
         const response = await route.fetch();
-        let s = await response.text(),
-          anchor = "s&&this._drawSources(e,t)}if(null!==this._state)";
+        let s = await response.text();
+        const anchors = [
+          "s&&this._drawSources(e,t)}if(null!==this._state)",
+          "s&&(globalThis.parent?.MWBarRangeRenderer?.draw(this,e,t),this._drawSources(e,t))}if(null!==this._state)",
+        ].filter(anchor => s.includes(anchor));
+        assert.equal(anchors.length,1,'exactly one supported native drawing hook');
+        const anchor = anchors[0];
         assert.equal(
           s.split(anchor).length,
           2,
           "native drawing probe must have one anchor",
         );
-        const hook = `s&&(this._drawSources(e,t),(()=>{const m=this.state().model();if(!this.containsMainSeries())return;(globalThis.__syncModels??=new Map).set(m.id(),{m,canvas:e.canvas});if(!globalThis.__syncRecord)return;const ts=m.timeScale(),r=ts.visibleBarsStrictRange(),bars=m.mainSeries().bars(),w=Math.ceil(e.canvas.width/6),h=e.canvas.height;let pixels=0;const p=e.getImageData(0,30,w,h-60).data;for(let i=0;i<p.length;i+=16){const R=p[i],G=p[i+1],B=p[i+2];if((R>130&&R>G*1.45&&R>B*1.3)||(G>85&&G>R*1.5&&G>B*1.15))pixels++;}(globalThis.__syncFrames??=[]).push({id:m.id(),resolution:m.interval(),first:r?.firstBar(),firstAvailable:bars.firstIndex(),pixels});})())}if(null!==this._state)`;
+        const rangeDraw = anchor.includes('MWBarRangeRenderer') ? 'globalThis.parent?.MWBarRangeRenderer?.draw(this,e,t),' : '';
+        const hook = `s&&(${rangeDraw}this._drawSources(e,t),(()=>{const m=this.state().model();if(!this.containsMainSeries())return;(globalThis.__syncModels??=new Map).set(m.id(),{m,canvas:e.canvas});if(!globalThis.__syncRecord)return;const ts=m.timeScale(),r=ts.visibleBarsStrictRange(),bars=m.mainSeries().bars(),w=Math.ceil(e.canvas.width/6),h=e.canvas.height;let pixels=0;const p=e.getImageData(0,30,w,h-60).data;for(let i=0;i<p.length;i+=16){const R=p[i],G=p[i+1],B=p[i+2];if((R>130&&R>G*1.45&&R>B*1.3)||(G>85&&G>R*1.5&&G>B*1.15))pixels++;}(globalThis.__syncFrames??=[]).push({id:m.id(),resolution:m.interval(),first:r?.firstBar(),firstAvailable:bars.firstIndex(),pixels});})())}if(null!==this._state)`;
         await route.fulfill({ response, body: s.replace(anchor, hook) });
       });
       async function settle() {
@@ -320,6 +329,10 @@ const save = () => fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
         }
         assert.ok(frame);
         await settle();
+        item.runningHostAsset = await frame.evaluate(() =>
+          [...document.scripts].map((s) => s.src)
+            .find((src) => /\/host\.[a-f0-9]+\.js$/.test(src))?.split("/").at(-1),
+        );
         await frame.evaluate((count) => {
           widget.timeSync().setValue(false);
           widget.dateRangeSync().setValue(false);

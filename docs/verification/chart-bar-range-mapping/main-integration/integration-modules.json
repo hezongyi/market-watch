@@ -1,0 +1,32 @@
+[
+  {
+    "name": "advanced-native-save-race",
+    "exit": 0,
+    "output": "{\"saved_offset\":10,\"current_offset\":20,\"dirty\":true,\"messages\":[{\"type\":\"workspace-dirty\"}],\"bug_reproduced\":false}\nNative save preserves edits and workspace switches during async capture; unchanged snapshot acknowledges.\n",
+    "error": ""
+  },
+  {
+    "name": "advanced-indicator-picker",
+    "exit": 0,
+    "output": "Indicator catalog/search: stable identity, source, Chinese/English and match ranking passed\n",
+    "error": ""
+  },
+  {
+    "name": "advanced-python-indicators",
+    "exit": 0,
+    "output": "Python indicator adapter: warmup, real zero, negative values, series keys and time alignment passed\nPython feed retains historical window identity without changing backend symbol\n",
+    "error": ""
+  },
+  {
+    "name": "advanced-progressive-indicators",
+    "exit": 0,
+    "output": "Progressive studies use only ready raw history; empty pages skip calculation\n",
+    "error": ""
+  },
+  {
+    "name": "chart-alerts-bridge.test",
+    "exit": 0,
+    "output": "TAP version 13\n# Subtest: drag previews do not write; mouse up serializes successive versions\nok 1 - drag previews do not write; mouse up serializes successive versions\n  ---\n  duration_ms: 46.451093\n  type: 'test'\n  ...\n# Subtest: timeout queries committed version; failures preserve position until explicit restore\nok 2 - timeout queries committed version; failures preserve position until explicit restore\n  ---\n  duration_ms: 34.187786\n  type: 'test'\n  ...\n# Subtest: explicit removal pauses; symbol, interval and layout changes never pause\nok 3 - explicit removal pauses; symbol, interval and layout changes never pause\n  ---\n  duration_ms: 50.130203\n  type: 'test'\n  ...\n# Subtest: source changes fence drawing edits and menu contexts are captured at open\nok 4 - source changes fence drawing edits and menu contexts are captured at open\n  ---\n  duration_ms: 18.177567\n  type: 'test'\n  ...\n# Subtest: style changes preserve the rule when serialized geometry order or price formatting differs\nok 5 - style changes preserve the rule when serialized geometry order or price formatting differs\n  ---\n  duration_ms: 22.822679\n  type: 'test'\n  ...\n# Subtest: native history events submit restored geometry without resuming a paused alert\nok 6 - native history events submit restored geometry without resuming a paused alert\n  ---\n  duration_ms: 44.317826\n  type: 'test'\n  ...\n# Subtest: price-axis presentation changes cannot silently replace the saved coordinate system\nok 7 - price-axis presentation changes cannot silently replace the saved coordinate system\n  ---\n  duration_ms: 29.100584\n  type: 'test'\n  ...\n1..7\n# tests 7\n# suites 0\n# pass 7\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 268.165077\n",
+    "error": ""
+  }
+]

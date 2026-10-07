@@ -1,0 +1,20 @@
+# Ubuntu LAN acceptance using IP + ports; API-path cookies are scoped by TLS gateway.
+services:
+  api:
+    environment:
+      ALERTS_PUBLIC_URL: https://192.168.7.232:17443
+  web:
+    build:
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: https://192.168.7.232:17444
+    image: market-watch-web:chart-maximize-v1121-lan-ip-20261007
+  tls:
+    volumes: !override
+      - ./deploy/chart-maximize-lan-tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - /tmp/mw-chart-maximize-20261007/cert.pem:/certs/cert.pem:ro
+      - /tmp/mw-chart-maximize-20261007/key.pem:/certs/key.pem:ro
+    ports: !override
+      - 127.0.0.1:17443:443
+      - 127.0.0.1:17444:444
+      - 192.168.7.232:17443:443
+      - 192.168.7.232:17444:444

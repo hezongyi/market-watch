@@ -2,7 +2,8 @@
 
 最新交付（2026-10-07）：完整三层A–E实现与Ubuntu真实环境实现验收通过，已验收实现提交`b0f2c78`。
 [最终逐项核对及启停](verification/three-layer/completion-audit.md)。长期质量观察按用户决定暂缓，
-未推送/PR/生产发布，MT4后续。下面P0–P2和旧观察结论是当时历史，不覆盖此最新三层结论。
+用户已授权提交PR，[主线兼容复验](verification/three-layer/pr-integration.md)通过；未合并或生产发布，MT4后续。
+下面P0–P2和旧观察结论是当时历史，不覆盖此最新三层结论。
 
 日期：2026-10-06。工作区 `/home/quant/repos/market-watch-data-integration`，分支
 `feat/market-data-integration`；`git fetch origin` 后基于 `origin/main` 的 `3c18f60` 创建。

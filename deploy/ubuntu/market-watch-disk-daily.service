@@ -1,0 +1,6 @@
+[Unit]
+Description=Record Market Watch disk / image / database directory sizes
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/mw-docker monitor --detail
+TimeoutStartSec=10min

@@ -1,0 +1,62 @@
+{
+  "scope": "isolated Docker actual provider native calendar",
+  "cases": [],
+  "errors": [],
+  "before": {
+    "ranges": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1710187200,
+          "to": 1710198000
+        },
+        "spacing": 14.432432432432432,
+        "offset": -141,
+        "width": 534
+      },
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1710187200,
+          "to": 1710198000
+        },
+        "spacing": 14.432432432432432,
+        "offset": -141,
+        "width": 534
+      }
+    ],
+    "date": true,
+    "time": true
+  },
+  "after": {
+    "ranges": [
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1710187200,
+          "to": 1710198000
+        },
+        "spacing": 14.432432432432432,
+        "offset": -55,
+        "width": 534
+      },
+      {
+        "symbol": "MWP:EURUSD",
+        "resolution": "5",
+        "range": {
+          "from": 1710187200,
+          "to": 1710198000
+        },
+        "spacing": 14.432432432432432,
+        "offset": -55,
+        "width": 534
+      }
+    ],
+    "date": true,
+    "time": true
+  },
+  "passed": true
+}

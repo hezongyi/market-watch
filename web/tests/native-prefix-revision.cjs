@@ -83,8 +83,9 @@ module.exports = async function prefixRevision({
     { m5, first: before.first },
   );
   await settle();
-  const compose =
-    "/home/quant/repos/.acceptance/native-history-implementation-20261004/compose.yaml";
+  const compose = process.env.NATIVE_SYNC_COMPOSE;
+  assert.ok(compose,'real database revision requires an explicit isolated NATIVE_SYNC_COMPOSE');
+  const shellQuote = value => "'" + String(value).replaceAll("'", "'\\''") + "'";
   const run = (mode, at) =>
     JSON.parse(
       execFileSync(
@@ -92,7 +93,7 @@ module.exports = async function prefixRevision({
         [
           "docker",
           "-c",
-          `docker compose -f ${compose} exec -T --user 0 api python /private/prefix_fixture.py ${mode} ${at}`,
+          `docker compose -f ${shellQuote(compose)} exec -T --user 0 api python /private/prefix_fixture.py ${mode} ${at}`,
         ],
         { encoding: "utf8" },
       ),

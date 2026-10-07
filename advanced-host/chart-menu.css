@@ -201,3 +201,54 @@ html.theme-dark [data-symbol-full][data-active="true"] > [class*="indicators-"]:
 .mw-password-form [role="alert"] { color: #f23645; text-align: left; }
 .mw-password-form [role="alert"][hidden] { display: none; }
 .mw-password-form [class*="footer-"] { gap: 12px; }
+
+/* Cloned menu switches reflect native checked classes (including thumb and
+   track), with no independent transforms competing with the native skin. */
+.mw-sync-row[aria-disabled="true"], .mw-sync-disabled { opacity:.45; cursor:default; }
+.mw-sync-row input { pointer-events:none; }
+.mw-sync-row:focus-visible, .mw-sync-settings-entry:focus-visible { outline:2px solid #2962ff; outline-offset:-2px; }
+.mw-sync-settings-separator { height:1px; background:var(--tv-color-platform-background,#2a2e39); margin:6px 0; }
+/* The entry shares native menu padding and foreground, rather than the
+   muted color inherited by the synchronization group. */
+.mw-sync-settings-entry { width:100%; border:0; background:transparent; font:inherit; text-align:left; justify-content:flex-start; cursor:pointer; padding:5px 12px; }
+/* Native NoticeDialog shell/button/Input/disclosure styles remain authoritative.
+   Rules below only arrange the host-owned fields inside the native modal. */
+.mw-sync-settings { position:relative; width:min(480px,calc(100vw - 32px)); }
+.mw-sync-settings [class*="content-B02"] { padding:0 24px; max-height:calc(100dvh - 170px); overflow-y:auto; }
+.mw-sync-settings [class*="title-B02"] { text-align:left; }
+.mw-sync-settings-form { margin:0; text-align:left; font:14px/1.5 Arial,sans-serif; }
+.mw-sync-settings-form section { padding:16px 0; }
+.mw-sync-settings-form section+section { border-top:1px solid var(--color-border,#434651); }
+.mw-sync-settings-form h3 { margin:0 0 12px; font-size:14px; font-weight:600; }
+.mw-setting-row { display:grid; grid-template-columns:88px minmax(0,1fr); align-items:center; gap:16px; min-height:34px; margin:12px 0; }
+.mw-setting-controls { display:flex; align-items:center; gap:12px; min-width:0; }
+.mw-native-select { display:inline-flex; min-width:0; }
+.mw-native-select>select { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+.mw-native-select>[role="combobox"] { display:inline-flex; align-items:center; justify-content:space-between; width:172px; gap:12px; padding:0 8px; box-sizing:border-box; cursor:pointer; }
+.mw-native-select-text { white-space:nowrap; }
+.mw-sync-options { position:absolute; z-index:200; padding:6px 0; }
+.mw-sync-options [role="option"] { cursor:pointer; }
+.mw-sync-options [role="option"]:focus-visible { outline:2px solid #2962ff; outline-offset:-2px; }
+.mw-sync-settings-form input[type="color"] { width:34px; height:34px; padding:4px; background:transparent; border:1px solid var(--color-border,#434651); border-radius:4px; cursor:pointer; }
+.mw-sync-settings-form input[type="color"]::-webkit-color-swatch-wrapper { padding:0; }
+.mw-sync-settings-form input[type="color"]::-webkit-color-swatch { border:0; border-radius:2px; }
+.mw-sync-settings-form input { font:inherit; accent-color:var(--color-brand,#2962ff); }
+.mw-native-number { width:64px; display:inline-flex; }
+.mw-native-number input { width:100%; padding:0 6px; box-sizing:border-box; }
+.mw-transparency .mw-setting-controls { flex-wrap:nowrap; }
+.mw-transparency input[type="range"] { flex:1; min-width:0; }
+.mw-transparency label { display:flex; align-items:center; gap:6px; }
+.mw-label-checkbox { display:flex; align-items:center; gap:8px; min-height:34px; margin:12px 0; }
+.mw-sync-settings-form :disabled { opacity:.45; cursor:default; }
+.mw-sync-settings-form :focus-visible { outline:2px solid #2962ff; outline-offset:2px; }
+.mw-range-preview { margin-left:104px; min-height:40px; border-radius:4px; display:flex; align-items:center; justify-content:center; }
+.mw-sync-help p,.mw-readonly-note { margin:6px 0; font-size:13px; }
+.mw-sync-settings [class*="footer-B02"] { display:flex; flex-direction:row; justify-content:flex-end; gap:8px; padding:16px 0; margin:0; }
+.mw-sync-settings [data-action="defaults"] { margin-right:auto; }
+@media(max-width:480px) {
+  .mw-sync-settings [class*="content-B02"] { padding:0 16px; }
+  .mw-setting-row { grid-template-columns:72px minmax(0,1fr); gap:8px; }
+  .mw-setting-controls { gap:8px; flex-wrap:wrap; }
+  .mw-native-select>[role="combobox"] { width:152px; }
+  .mw-range-preview { margin-left:80px; }
+}

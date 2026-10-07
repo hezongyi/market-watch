@@ -28,6 +28,9 @@ try {
   run();
   const installed = fs.readFileSync(file, "utf8");
   assert.notEqual(digest(installed), digest(original));
+  assert.ok(installed.includes('Object.assign(this._chartWidgetCollection.state('));
+  assert.ok(installed.includes('_mwBarRangeMapping:globalThis.parent.MWBarRangeMapping.snapshot()'));
+
   run();
   assert.equal(fs.readFileSync(file, "utf8"), installed);
   run("--disable");
@@ -45,6 +48,39 @@ try {
   execFileSync(process.execPath, [legacy, file]);
   run();
   assert.equal(fs.readFileSync(file, "utf8"), installed);
+  run('--disable');
+  const navigation = path.join(temp,'navigation.mjs');
+  fs.writeFileSync(navigation,execFileSync('git',['show','2041869:advanced-host/patch-native-reserve.mjs'],{cwd:root}));
+  execFileSync(process.execPath,[navigation,file]); run();
+  assert.equal(fs.readFileSync(file,'utf8'),installed);
+  run('--disable');
+  for (const ref of ['v1.8.0', 'ed149e1']) {
+    const known = path.join(temp, ref.replaceAll('.', '-') + '.mjs');
+    fs.writeFileSync(known, execFileSync('git', ['show', ref + ':advanced-host/patch-native-reserve.mjs'], {cwd:root}));
+    execFileSync(process.execPath, [known, file]);
+    run();
+    assert.equal(fs.readFileSync(file, 'utf8'), installed);
+    run('--disable');
+  }
+  run();
+  assert.ok(installed.includes('timeScaleUpdated(this)'));
+  assert.ok(installed.includes('engineRangeCurrent()'));
+  assert.ok(installed.includes('admitCheckpoint(i,e)'));
+  // The earlier sync-settings candidate has pause/zoom hooks but no logical
+  // Undo routing or save-revision cleanup. Upgrade those exact known bytes.
+  run('--disable');
+  const productionSync = path.join(temp, 'production-sync.mjs');
+  fs.writeFileSync(productionSync, execFileSync('git',
+    ['show', 'v1.12.0:advanced-host/patch-native-reserve.mjs'], {cwd:root}));
+  execFileSync(process.execPath, [productionSync, file]);
+  const previousSync = fs.readFileSync(file, 'utf8')
+    .replace('if(globalThis.parent?.MWNativeSync?.handleChoice(this,"date",e,Cf))return;', '')
+    .replace('if(globalThis.parent?.MWNativeSync?.handleChoice(this,"time",e,Tf))return;', '')
+    .replace('_handleChartSaved(e){e&&this._setContentHasChanges(globalThis.parent?.MWNativeSave?.hasUnsavedChanges()===true)}',
+      '_handleChartSaved(e){e&&this._setContentHasChanges(!1)}');
+  fs.writeFileSync(file, previousSync);
+  run();
+  assert.equal(fs.readFileSync(file, 'utf8'), installed);
   // A partial installation and an unrelated byte change must fail atomically.
   for (const invalid of [
     installed.replace(

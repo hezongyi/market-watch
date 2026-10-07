@@ -11,6 +11,7 @@ vm.runInContext(fs.readFileSync('../advanced-host/viewports.js','utf8'),context)
    assert.equal(date,false,'native startup layout must be captured without early range synchronization');
    assert.equal(time,false);if(fail)throw Error('native save failed');cb(native);
   }};
+ require("./fixtures/sync-coordinator.cjs")(context,widget);
  const saved=await context.captureChartLayout(widget);
  assert.equal(saved.charts,native.charts,'vendor layout must come directly from the public save API');
  assert.equal(saved.opaque,native.opaque,'opaque supplier content is not rewritten');
@@ -33,9 +34,11 @@ vm.runInContext(fs.readFileSync('../advanced-host/viewports.js','utf8'),context)
  assert.equal(date,false);assert.equal(time,false);
  context.restoreChartSynchronization(widget,desired);
  assert.equal(date,true);assert.equal(time,true);
- date=false;
+ widget._mwSyncCoordinator.configure({date:false,time:true});
  const independent=context.deferLegacyChartSynchronization(widget);
  assert.equal(independent.date,false);assert.equal(independent.time,true);
  assert.equal(time,true,'independent date ranges do not disable time synchronization');
+ assert.deepEqual(JSON.parse(JSON.stringify(context.chartSynchronizationState({dateRangeLock:1,trackTimeLock:0}))),{date:true,time:false,barWidth:false});
+ const modern={date:false,time:true,barWidth:true};assert.equal(context.chartSynchronizationState({_mwSync:modern,dateRangeLock:1}),modern);
  console.log('Public snapshots defer synchronized startup while retaining user choices and vendor content');
 })().catch(error=>{console.error(error);process.exit(1)});

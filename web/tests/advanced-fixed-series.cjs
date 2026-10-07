@@ -8,6 +8,8 @@ for(const file of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../
 (async()=>{
  await vm.runInContext(`(async()=>{
   globalThis.calls=[];
+  globalThis.rangeObservations=[];
+  barRangeMapping={capture:()=> 'fixed-ticket',observeBars:row=>rangeObservations.push(row)};
   const version='abcdefab-1234-1234-1234-123456789abc';
   globalThis.fixedTicker=MWSeries.encode(version,'history');
   globalThis.compositeTicker=MWSeries.encode('a'.repeat(64),'composite');
@@ -22,10 +24,16 @@ for(const file of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../
     await feed.getBars({ticker:ticker.toUpperCase()},'1',{to:1000,countBack:160,firstDataRequest:true},
       (bars,meta)=>{globalThis.page={bars,meta}},e=>{throw Error(e)});
   }
+  const rejectedBefore=rangeObservations.length;
+  await feed.getBars({ticker:fixedTicker},'1',{to:1000,countBack:160,firstDataRequest:true},
+    ()=>false,e=>{throw Error(e)});
+  if(rangeObservations.length!==rejectedBefore)throw Error('Rejected fixed bars entered range mapping');
  })()`,ctx);
+ assert.equal(ctx.rangeObservations.length,2);
+ assert.ok(ctx.rangeObservations.every(row=>row.ticket==='fixed-ticket' && row.bars[0].chart_time===100000));
  assert.equal(ctx.page.bars.length,1);assert.equal(ctx.page.meta.noData,true);
  const calls=vm.runInContext('calls',ctx);
- assert.equal(calls.length,2);assert.equal(calls[0].q.series_kind,'history');
+ assert.equal(calls.length,3);assert.equal(calls[0].q.series_kind,'history');
  assert.equal(calls[0].q.instrument,'abcdefab-1234-1234-1234-123456789abc');
  assert.equal(calls[0].q.client,undefined);
  assert.equal(calls[1].q.series_kind,'composite');assert.equal(calls[1].q.client,'test');

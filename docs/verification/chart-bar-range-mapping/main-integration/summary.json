@@ -1,0 +1,135 @@
+{
+  "at": "2026-10-06T11:59:08.272249+00:00",
+  "main_base": "826d316",
+  "integration_commit": "fd4dcadcea9247107f06650c0de4ccf4c6f99faf",
+  "host_asset": "host.d0a96d61fcfcc340.js",
+  "range_cases": 169,
+  "range_groups": 14,
+  "groups": [
+    {
+      "name": "main",
+      "cases": 31,
+      "file": "final-main.json",
+      "sha256": "ad1b6e21b8553e27443b964884481388600a49492d08039ae87174c4959bdd7d"
+    },
+    {
+      "name": "choices",
+      "cases": 4,
+      "file": "final-choices.json",
+      "sha256": "e89e74e3495742f0a0931a2bdbaa70592eaa4cc4f27ba258f50ece4d089e36ff"
+    },
+    {
+      "name": "extended",
+      "cases": 20,
+      "file": "final-extended.json",
+      "sha256": "c44cca64ae30b52e19d6942e06da185b5e8741fa15e83cd889d141428066dd7a"
+    },
+    {
+      "name": "touch",
+      "cases": 6,
+      "file": "final-touch.json",
+      "sha256": "5d1054b76c8a15ee04ae418c73932bed852d6f229ea352f34627e4b2fdc18f55"
+    },
+    {
+      "name": "geometry",
+      "cases": 5,
+      "file": "final-geometry.json",
+      "sha256": "069271c3ff145c2751e649b8f646f3c879c33d812e90f2b8c250e17c60a38b5c"
+    },
+    {
+      "name": "modal",
+      "cases": 5,
+      "file": "final-modal.json",
+      "sha256": "0b453520a7a26c8e71164ec66df4ed37baa274dd5c107a29262baa22ee7f9049"
+    },
+    {
+      "name": "menu",
+      "cases": 6,
+      "file": "final-menu.json",
+      "sha256": "fb8b4e12e893395b215a2f38a4425da027f2d41aedd315b6395d426d89b65025"
+    },
+    {
+      "name": "legacy",
+      "cases": 6,
+      "file": "final-legacy.json",
+      "sha256": "5374ecac55a1f51b7a97f384ec3ea4412a286dbf4dbdd0eed4dbebf6bdba098f"
+    },
+    {
+      "name": "stability",
+      "cases": 9,
+      "file": "final-stability.json",
+      "sha256": "fdd02369bb22f890267b8351892f6a5d23a1836fe88ff8eb5e14c2c56d2ae3f2"
+    },
+    {
+      "name": "mapping",
+      "cases": 39,
+      "file": "final-mapping.json",
+      "sha256": "1af9e9f0094e04821ab7c507814c9367ca30adb206a568b477aeb4b533713372"
+    },
+    {
+      "name": "lifecycle",
+      "cases": 6,
+      "file": "final-lifecycle.json",
+      "sha256": "c6f1a0d601599630d01b4e76351c687fbba3bcfff556d0bfd32d5d520e082675"
+    },
+    {
+      "name": "navigation",
+      "cases": 8,
+      "file": "final-navigation.json",
+      "sha256": "bf27902ba3fdec4ac4b0835d5dd565b5d7a1ce17816c948fbe54e9c72faeaf28"
+    },
+    {
+      "name": "matrix",
+      "cases": 20,
+      "file": "final-matrix.json",
+      "sha256": "93fd4c78c2c83a7c796837d0a97347b8423c9d2992172d74fe7770af9ea63f58"
+    },
+    {
+      "name": "calendar",
+      "cases": 4,
+      "file": "final-calendar.json",
+      "sha256": "6ebc44ffc5fb7466667688a74946d10056371810a4384770d7a2dfac9227ed72"
+    }
+  ],
+  "backend_passed": 586,
+  "backend_skipped": 46,
+  "postgres_specialized": 13,
+  "postgres_upgrade_paths": 4,
+  "module_scripts": 23,
+  "integration_scripts": 5,
+  "syntax_checks": 30,
+  "indicator": {
+    "full_pass": false,
+    "completed_cases": 19,
+    "instances": 6,
+    "plots": 10,
+    "closed_samples": 90,
+    "console_errors": [
+      "not enough depth: 1791287100000",
+      "not enough depth: 1791287100000",
+      "not enough depth: 1791287100000",
+      "not enough depth: 1791287100000"
+    ],
+    "file": "indicator-product.json",
+    "diagnostic_failure": "page is not defined",
+    "diagnostic_scope_fix_committed": "fd4dcad"
+  },
+  "native_full": {
+    "full_pass": false,
+    "failure": "TimeoutError: frame.waitForFunction: Timeout 90000ms exceeded.",
+    "reset_count": 1,
+    "file": "final-native-continuous.json"
+  },
+  "native_boundary_passed": true,
+  "chart_alert_browser_cases": 8,
+  "chart_alert_worker_cases": 5,
+  "mcp_sdk_checks": 15,
+  "mcp_sdk_tools": 13,
+  "mcp_combined_event_cases": 3,
+  "mcp_drawing_cases": 6,
+  "compatibility_acceptance": "incomplete: Python live timestamp depth and prefix study callback",
+  "manual_acceptance": "pending user after compatibility fixes",
+  "pr_merged": false,
+  "production_deployed": false,
+  "merge_commit": "96709e88aa843618064aca57612040e0ea3bc96e"
+}

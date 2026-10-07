@@ -1,0 +1,263 @@
+{
+  "errors": [],
+  "cases": [
+    {
+      "name": "wheel",
+      "events": [
+        {
+          "phase": "attempt",
+          "kind": "wheel",
+          "event": "wheel",
+          "trusted": true
+        },
+        {
+          "phase": "begin",
+          "id": 1,
+          "kind": "wheel",
+          "event": "wheel"
+        },
+        {
+          "phase": "step",
+          "id": 1,
+          "kind": "wheel",
+          "before": 6,
+          "after": 6.6,
+          "at": 9684.300000190735
+        },
+        {
+          "phase": "end",
+          "id": 1,
+          "kind": "wheel"
+        }
+      ]
+    },
+    {
+      "name": "shortcut-interleaved-program",
+      "events": [
+        {
+          "phase": "attempt",
+          "kind": "zoom-in",
+          "event": "keydown",
+          "trusted": true
+        },
+        {
+          "phase": "begin",
+          "id": 2,
+          "kind": "zoom-in",
+          "event": "keydown"
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 6.6,
+          "after": 6.639439599106613,
+          "at": 10052.199999809265
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 6.639439599106613,
+          "after": 6.797368147944562,
+          "at": 10062.5
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 6.797368147944562,
+          "after": 7.033702139816436,
+          "at": 10078.800000190735
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 7.033702139816436,
+          "after": 7.241667040260155,
+          "at": 10095.5
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 7.241667040260155,
+          "after": 7.419724858039197,
+          "at": 10111.800000190735
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 8.419724858039196,
+          "after": 8.593045934834299,
+          "at": 10128
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 8.593045934834299,
+          "after": 8.742848900187141,
+          "at": 10144.800000190735
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 8.742848900187141,
+          "after": 8.865711289511692,
+          "at": 10161.599999904633
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 8.865711289511692,
+          "after": 8.961852672734562,
+          "at": 10178.5
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 8.961852672734562,
+          "after": 9.03462452303679,
+          "at": 10194.900000095367
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 9.03462452303679,
+          "after": 9.089068340473261,
+          "at": 10211.599999904633
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 9.089068340473261,
+          "after": 9.124978975463494,
+          "at": 10227.800000190735
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 9.124978975463494,
+          "after": 9.148363159494908,
+          "at": 10244.5
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 9.148363159494908,
+          "after": 9.160913272488914,
+          "at": 10260.900000095367
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 9.160913272488914,
+          "after": 9.16633561798544,
+          "at": 10278
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 9.16633561798544,
+          "after": 9.167446170145745,
+          "at": 10295.099999904633
+        },
+        {
+          "phase": "step",
+          "id": 2,
+          "kind": "zoom-in",
+          "before": 9.167446170145745,
+          "after": 9.167453680123801,
+          "at": 10311.599999904633
+        },
+        {
+          "phase": "end",
+          "id": 2,
+          "kind": "zoom-in"
+        }
+      ]
+    },
+    {
+      "name": "focus-program-no-token",
+      "events": []
+    },
+    {
+      "name": "zoom-tool",
+      "events": [
+        {
+          "phase": "attempt",
+          "kind": "zoom-tool",
+          "event": "mouseup",
+          "trusted": true
+        },
+        {
+          "phase": "begin",
+          "id": 3,
+          "kind": "zoom-tool",
+          "event": "mouseup"
+        },
+        {
+          "phase": "step",
+          "id": 3,
+          "kind": "zoom-tool",
+          "before": 8,
+          "after": 19.77777777777778,
+          "at": 11145.900000095367
+        },
+        {
+          "phase": "end",
+          "id": 3,
+          "kind": "zoom-tool"
+        }
+      ]
+    }
+  ],
+  "routed": "https://192.168.7.232:16244/charting_library_e6dde5daa90a4427/bundles/library.e2f8b3a016c9e1a0b7a5.js",
+  "loaded": {
+    "wheel": "_onMousewheel(e){if(!this.hasModel())return;if(!this.model().model().zoomEnabled()||null===this._mouseWheelHelper)return;if(this.model().timeScale().isEmpty())return;const t=this._mouseWheelHelper.processWheel(e),i=t.deltaX,s=-t.deltaY;if(0!==i&&this._options.handleScroll.mouseWheel||0!==s&&this._options.handleScale.mouseWheel){if(e.cancelable&&e.preventDefault(),0!==s&&this._options.handleScale.mouseWheel){const t=Math.sign(s)*Math.min(1,Math.abs(s)),i=(0,n.ensureNotNull)(this._mainDiv).getBoundingClientRect(),r=e.clientX-this._lhsAxesWidth-i.left;if(!Number.isFinite(r)||!Number.isFinite(t))return void bg.logWarn(\"Incorrect mouse wheel processing: scrollPosition: \"+r+\", zoomScale: \"+t);const o=new Er.EnvironmentState(e).mod();(globalThis.parent?.MWNativeSync?globalThis.parent?.MWNativeSync.run(this.model().model(),\"wheel\",()=>this.model().model().zoomTime(r,t,!!o||void 0)):this.model().model().zoomTime(r,t,!!o||void 0)),this._onZoom.fire(o)}\n0!==i&&this._options.handleScroll.mouseWheel&&this.model().scrollChart(-80*i)}}",
+    "frame": true,
+    "spacing": 6
+  },
+  "pause": {
+    "before": {
+      "undo": {
+        "enableUndo": true,
+        "undoCommandCount": 6,
+        "undoText": "缩放",
+        "enableRedo": false,
+        "redoCommandCount": 0,
+        "originalUndoText": "zoom"
+      },
+      "save": true,
+      "dirty": true,
+      "date": false,
+      "time": false
+    },
+    "after": {
+      "undo": {
+        "enableUndo": true,
+        "undoCommandCount": 6,
+        "undoText": "缩放",
+        "enableRedo": false,
+        "redoCommandCount": 0,
+        "originalUndoText": "zoom"
+      },
+      "save": true,
+      "dirty": true,
+      "date": false,
+      "time": false
+    }
+  }
+}

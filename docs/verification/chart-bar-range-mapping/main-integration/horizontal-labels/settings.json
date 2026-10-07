@@ -1,0 +1,2353 @@
+{
+  "at": "2026-10-06T16:10:33.867Z",
+  "APP": "https://192.168.7.232:16843",
+  "CHART": "https://192.168.7.232:16844",
+  "cases": [
+    {
+      "name": "menu rename and styles relocated"
+    },
+    {
+      "name": "enable no-op and date disabled"
+    },
+    {
+      "name": "four-chart wheel",
+      "spacing": [
+        6.6,
+        6.6,
+        6.6,
+        6.6
+      ]
+    },
+    {
+      "name": "wheel over non-active chart synchronizes without click",
+      "before": [
+        6.6,
+        6.6,
+        6.6,
+        6.6
+      ],
+      "after": [
+        7.26,
+        7.26,
+        7.26,
+        7.26
+      ]
+    },
+    {
+      "name": "shortcut animation",
+      "spacing": [
+        8.902058445501853,
+        8.902058445501853,
+        8.902058445501853,
+        8.902058445501853
+      ]
+    },
+    {
+      "name": "focus and program setter excluded"
+    },
+    {
+      "name": "actual native animation remains source through focus change",
+      "spacing": [
+        9.785576260620767,
+        9.785576260620767,
+        9.785576260620767,
+        9.785576260620767
+      ]
+    },
+    {
+      "name": "animation with program setter",
+      "spacing": [
+        11.98846506114771,
+        11.98846506114771,
+        11.98846506114771,
+        11.98846506114771
+      ]
+    },
+    {
+      "name": "box zoom",
+      "spacing": [
+        23.217391304347824,
+        23.217391304347824,
+        23.217391304347824,
+        23.217391304347824
+      ]
+    },
+    {
+      "name": "price scale excluded"
+    },
+    {
+      "name": "reverse mutual exclusion"
+    },
+    {
+      "name": "cancel draft"
+    },
+    {
+      "name": "atomic appearance",
+      "config": {
+        "version": 2,
+        "enabled": true,
+        "style": "rectangle",
+        "colorMode": "custom",
+        "color": "#AABBCC",
+        "transparencyMode": "custom",
+        "transparency": 70,
+        "priceLabels": true
+      }
+    },
+    {
+      "name": "formatted exterior prices and source W1 exclusion",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069990214797136,
+            "to": 1.219486223150358
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 199.70053763440907,
+              "visible": true,
+              "reason": "",
+              "barTime": 1790812800000,
+              "barX": 220.56521739130437,
+              "box": {
+                "x": 209.6347826086957,
+                "y": 171.70053763440907,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 220.06521739130437,
+                  "y": 194.20053763440907,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 220.06521739130437,
+                  "y": 194.20053763440907,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 220.06521739130437,
+                  "y": 191.20053763440907,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 220.56521739130437
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 375.28,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791158400000,
+              "barX": 267,
+              "box": {
+                "x": 232,
+                "y": 383.28,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 266.5,
+                  "y": 377.78,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 266.5,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 266.5,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 267
+            }
+          ],
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789689600,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1127438901848197,
+            "to": 1.1535951372689754
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 167.72195121951296,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 347.3809756097577,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791296100,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099904534606206,
+            "to": 1.1500119331742242
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.1106312494766433,
+            "to": 1.1778259381541958
+          }
+        }
+      ]
+    },
+    {
+      "name": "hover no geometry or history changes"
+    },
+    {
+      "name": "leave clears exterior tags"
+    },
+    {
+      "name": "menu clears labels"
+    },
+    {
+      "name": "axis mode 0",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069990214797136,
+            "to": 1.219486223150358
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 199.70053763440907,
+              "visible": true,
+              "reason": "",
+              "barTime": 1790812800000,
+              "barX": 220.56521739130437,
+              "box": {
+                "x": 209.6347826086957,
+                "y": 171.70053763440907,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 220.06521739130437,
+                  "y": 194.20053763440907,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 220.06521739130437,
+                  "y": 194.20053763440907,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 220.06521739130437,
+                  "y": 191.20053763440907,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 220.56521739130437
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 375.28,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791158400000,
+              "barX": 267,
+              "box": {
+                "x": 232,
+                "y": 383.28,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 266.5,
+                  "y": 377.78,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 266.5,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 266.5,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 267
+            }
+          ],
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789689600,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1127438901848197,
+            "to": 1.1535951372689754
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 167.72195121951296,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 347.3809756097577,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791296100,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099904534606206,
+            "to": 1.1500119331742242
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.1106312494766433,
+            "to": 1.1778259381541958
+          }
+        }
+      ]
+    },
+    {
+      "name": "axis mode 1",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069990214797136,
+            "to": 1.219486223150358
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 198.46885086643786,
+              "visible": true,
+              "reason": "",
+              "barTime": 1790812800000,
+              "barX": 220.56521739130437,
+              "box": {
+                "x": 209.6347826086957,
+                "y": 170.46885086643786,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 220.06521739130437,
+                  "y": 192.96885086643786,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 220.06521739130437,
+                  "y": 192.96885086643786,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 220.06521739130437,
+                  "y": 189.96885086643786,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 220.56521739130437
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 375.28,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791158400000,
+              "barX": 267,
+              "box": {
+                "x": 232,
+                "y": 383.28,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 266.5,
+                  "y": 377.78,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 266.5,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 266.5,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 267
+            }
+          ],
+          "text": "高 1.13360低 1.11602",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789689600,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.112796732953452,
+            "to": 1.1536634793108245
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 167.72195121951296,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 347.3809756097577,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791296100,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099904534606206,
+            "to": 1.1500119331742242
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.1106312494766433,
+            "to": 1.1778259381541958
+          }
+        }
+      ]
+    },
+    {
+      "name": "axis mode 2",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069990214797136,
+            "to": 1.219486223150358
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 536,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13%",
+              "price": 1.1336,
+              "boundary": 199.70053763440905,
+              "visible": true,
+              "reason": "",
+              "barTime": 1790812800000,
+              "barX": 222.56521739130437,
+              "box": {
+                "x": 211.6347826086957,
+                "y": 171.70053763440905,
+                "width": 60,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 222.06521739130437,
+                  "y": 194.20053763440905,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 222.06521739130437,
+                  "y": 194.20053763440905,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 222.06521739130437,
+                  "y": 191.20053763440905,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 222.56521739130437
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12%",
+              "price": 1.11602,
+              "boundary": 375.28,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791158400000,
+              "barX": 269,
+              "box": {
+                "x": 239,
+                "y": 383.28,
+                "width": 60,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 268.5,
+                  "y": 377.78,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 268.5,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 268.5,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 269
+            }
+          ],
+          "text": "高 1.13%低 1.12%",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789689600,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.1127438901848197,
+            "to": 1.1535951372689754
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 167.72195121951296,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 347.3809756097577,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791296100,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099904534606206,
+            "to": 1.1500119331742242
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.1106312494766433,
+            "to": 1.1778259381541958
+          }
+        }
+      ]
+    },
+    {
+      "name": "axis mode 3",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069990214797136,
+            "to": 1.219486223150358
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 540,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13",
+              "price": 1.1336,
+              "boundary": 215.38502226179838,
+              "visible": true,
+              "reason": "",
+              "barTime": 1790812800000,
+              "barX": 226.56521739130437,
+              "box": {
+                "x": 215.6347826086957,
+                "y": 223.38502226179838,
+                "width": 49,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 226.06521739130437,
+                  "y": 217.88502226179838,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 226.06521739130437,
+                  "y": 219.88502226179838,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 226.06521739130437,
+                  "y": 219.88502226179838,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 226.56521739130437
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12",
+              "price": 1.11602,
+              "boundary": 40.900000000000006,
+              "visible": false,
+              "reason": "occupied",
+              "barTime": 1791158400000,
+              "barX": 273,
+              "box": {
+                "x": 248.5,
+                "y": 12.900000000000006,
+                "width": 49,
+                "height": 20
+              }
+            }
+          ],
+          "text": "高 1.13",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789603200,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.153006658891082,
+            "to": 1.1118991763861474
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 167.72195121951296,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 347.3809756097577,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791296100,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099904534606206,
+            "to": 1.1500119331742242
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.1106312494766433,
+            "to": 1.1778259381541958
+          }
+        }
+      ]
+    },
+    {
+      "name": "theme Light",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069990214797136,
+            "to": 1.219486223150358
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 540,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13",
+              "price": 1.1336,
+              "boundary": 215.38502226179838,
+              "visible": true,
+              "reason": "",
+              "barTime": 1790812800000,
+              "barX": 226.56521739130437,
+              "box": {
+                "x": 215.6347826086957,
+                "y": 223.38502226179838,
+                "width": 49,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 226.06521739130437,
+                  "y": 217.88502226179838,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 226.06521739130437,
+                  "y": 219.88502226179838,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 226.06521739130437,
+                  "y": 219.88502226179838,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 226.56521739130437
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12",
+              "price": 1.11602,
+              "boundary": 40.900000000000006,
+              "visible": false,
+              "reason": "occupied",
+              "barTime": 1791158400000,
+              "barX": 273,
+              "box": {
+                "x": 248.5,
+                "y": 12.900000000000006,
+                "width": 49,
+                "height": 20
+              }
+            }
+          ],
+          "text": "高 1.13",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789603200,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.153006658891082,
+            "to": 1.1118991763861474
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 167.72195121951296,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 347.3809756097577,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791296100,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099904534606206,
+            "to": 1.1500119331742242
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.1106312494766433,
+            "to": 1.1778259381541958
+          }
+        }
+      ]
+    },
+    {
+      "name": "theme Dark",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1759276800,
+            "to": 1817154000
+          },
+          "price": {
+            "from": 1.1069990214797136,
+            "to": 1.219486223150358
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 540,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13",
+              "price": 1.1336,
+              "boundary": 215.38502226179838,
+              "visible": true,
+              "reason": "",
+              "barTime": 1790812800000,
+              "barX": 226.56521739130437,
+              "box": {
+                "x": 215.6347826086957,
+                "y": 223.38502226179838,
+                "width": 49,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 226.06521739130437,
+                  "y": 217.88502226179838,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 226.06521739130437,
+                  "y": 219.88502226179838,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 226.06521739130437,
+                  "y": 219.88502226179838,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 226.56521739130437
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12",
+              "price": 1.11602,
+              "boundary": 40.900000000000006,
+              "visible": false,
+              "reason": "occupied",
+              "barTime": 1791158400000,
+              "barX": 273,
+              "box": {
+                "x": 248.5,
+                "y": 12.900000000000006,
+                "width": 49,
+                "height": 20
+              }
+            }
+          ],
+          "text": "高 1.13",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1789603200,
+            "to": 1792443600
+          },
+          "price": {
+            "from": 1.153006658891082,
+            "to": 1.1118991763861474
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 534,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13360",
+              "price": 1.1336,
+              "boundary": 167.72195121951296,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.11602",
+              "price": 1.11602,
+              "boundary": 347.3809756097577,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1791296100,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099904534606206,
+            "to": 1.1500119331742242
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 534,
+            "height": 409
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 23.217391304347824,
+          "range": {
+            "from": 1783900800,
+            "to": 1797199200
+          },
+          "price": {
+            "from": 1.1106312494766433,
+            "to": 1.1778259381541958
+          }
+        }
+      ]
+    },
+    {
+      "name": "transparency 0",
+      "color": "rgba(90,145,255,1)"
+    },
+    {
+      "name": "transparency 100",
+      "color": "rgba(90,145,255,0)"
+    },
+    {
+      "name": "clean nested pause and capture",
+      "pause": {
+        "before": {
+          "undo": {
+            "enableUndo": true,
+            "undoCommandCount": 10,
+            "undoText": "应用图表主题",
+            "enableRedo": false,
+            "redoCommandCount": 0,
+            "originalUndoText": "apply chart theme"
+          },
+          "save": false,
+          "dirty": false,
+          "desired": {
+            "date": true,
+            "barWidth": false,
+            "time": true
+          },
+          "native": {
+            "date": true,
+            "time": true
+          }
+        },
+        "mid": {
+          "undo": {
+            "enableUndo": true,
+            "undoCommandCount": 10,
+            "undoText": "应用图表主题",
+            "enableRedo": false,
+            "redoCommandCount": 0,
+            "originalUndoText": "apply chart theme"
+          },
+          "save": false,
+          "dirty": false,
+          "desired": {
+            "date": true,
+            "barWidth": false,
+            "time": true
+          },
+          "native": {
+            "date": false,
+            "time": false
+          }
+        },
+        "after": {
+          "undo": {
+            "enableUndo": true,
+            "undoCommandCount": 10,
+            "undoText": "应用图表主题",
+            "enableRedo": false,
+            "redoCommandCount": 0,
+            "originalUndoText": "apply chart theme"
+          },
+          "save": false,
+          "dirty": false,
+          "desired": {
+            "date": true,
+            "barWidth": false,
+            "time": true
+          },
+          "native": {
+            "date": true,
+            "time": true
+          }
+        },
+        "captured": {
+          "date": true,
+          "barWidth": false,
+          "time": true
+        }
+      }
+    },
+    {
+      "name": "server saved appearance and logical sync",
+      "config": {
+        "version": 2,
+        "enabled": true,
+        "style": "rectangle",
+        "colorMode": "theme",
+        "color": "#AABBCC",
+        "transparencyMode": "theme",
+        "transparency": 100,
+        "priceLabels": true
+      },
+      "sync": {
+        "date": false,
+        "barWidth": true,
+        "time": false
+      }
+    },
+    {
+      "name": "2 charts",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 534,
+            "height": 849
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 25.539130434782606,
+          "range": {
+            "from": 1791266400,
+            "to": 1791338400
+          },
+          "price": {
+            "from": 1.1194879872838688,
+            "to": 1.1285025158951638
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 540,
+            "height": 849
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13",
+              "price": 1.12624,
+              "boundary": 414.8159322033372,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791302400000,
+              "barX": 220.76086956521743,
+              "box": {
+                "x": 208.43739130434784,
+                "y": 422.8159322033372,
+                "width": 49,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 220.26086956521743,
+                  "y": 417.3159322033372,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 220.26086956521743,
+                  "y": 419.3159322033372,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 220.26086956521743,
+                  "y": 419.3159322033372,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 220.76086956521743
+            },
+            {
+              "kind": "low",
+              "text": "低 1.13",
+              "price": 1.12563,
+              "boundary": 55.443220338895145,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "高 1.13",
+          "spacing": 25.539130434782606,
+          "range": {
+            "from": 1791300000,
+            "to": 1791306000
+          },
+          "price": {
+            "from": 1.1269752875514254,
+            "to": 1.125535890560718
+          }
+        }
+      ]
+    },
+    {
+      "name": "8 charts",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 235,
+            "height": 410
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791298800,
+            "to": 1791327600
+          },
+          "price": {
+            "from": 1.1252351789976134,
+            "to": 1.1270410262529833
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 482,
+            "width": 241,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13",
+              "price": 1.12624,
+              "boundary": 411.7578181818111,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.13",
+              "price": 1.12563,
+              "boundary": 40.900000000000006,
+              "visible": false,
+              "reason": "occupied",
+              "barTime": 1791303000000,
+              "barX": 42.139565217391635,
+              "box": {
+                "x": 17.639565217391635,
+                "y": 12.900000000000006,
+                "width": 49,
+                "height": 20
+              }
+            }
+          ],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791305100
+          },
+          "price": {
+            "from": 1.1262338190083137,
+            "to": 1.1255627262396075
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 355,
+            "y": 42,
+            "width": 235,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 242.93756097561152,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791302400000,
+              "barX": 192.8604347826087,
+              "box": {
+                "x": 157.8604347826087,
+                "y": 214.93756097561152,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 192.3604347826087,
+                  "y": 237.43756097561152,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 192.3604347826087,
+                  "y": 237.43756097561152,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 192.3604347826087,
+                  "y": 234.43756097561152,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 192.8604347826087
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 249.17146341463592,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "高 1.12624",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791300300,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099904534606206,
+            "to": 1.1500119331742242
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 355,
+            "y": 482,
+            "width": 235,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 4.422181818216131,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 375.28,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 383.28,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 41.63956521739121,
+                  "y": 377.78,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 42.13956521739121
+            }
+          ],
+          "text": "低 1.12563",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791305100
+          },
+          "price": {
+            "from": 1.125576180991686,
+            "to": 1.1262472737603924
+          }
+        },
+        {
+          "i": 4,
+          "pane": {
+            "x": 654,
+            "y": 42,
+            "width": 235,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 4.432727272761724,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 376.2,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 384.2,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 41.63956521739121,
+                  "y": 378.7,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 380.7,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 380.7,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 42.13956521739121
+            }
+          ],
+          "text": "低 1.12563",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791305100
+          },
+          "price": {
+            "from": 1.1255761813842482,
+            "to": 1.1262472732696898
+          }
+        },
+        {
+          "i": 5,
+          "pane": {
+            "x": 654,
+            "y": 482,
+            "width": 235,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 4.422181818216131,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 375.28,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 383.28,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 41.63956521739121,
+                  "y": 377.78,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 42.13956521739121
+            }
+          ],
+          "text": "低 1.12563",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791305100
+          },
+          "price": {
+            "from": 1.125576180991686,
+            "to": 1.1262472737603924
+          }
+        },
+        {
+          "i": 6,
+          "pane": {
+            "x": 953,
+            "y": 42,
+            "width": 235,
+            "height": 410
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 4.432727272761724,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 376.2,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 384.2,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 41.63956521739121,
+                  "y": 378.7,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 380.7,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 380.7,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 42.13956521739121
+            }
+          ],
+          "text": "低 1.12563",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791305100
+          },
+          "price": {
+            "from": 1.1255761813842482,
+            "to": 1.1262472732696898
+          }
+        },
+        {
+          "i": 7,
+          "pane": {
+            "x": 953,
+            "y": 482,
+            "width": 235,
+            "height": 409
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 4.422181818216131,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 375.28,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 383.28,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 41.63956521739121,
+                  "y": 377.78,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 41.63956521739121,
+                  "y": 379.78,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 42.13956521739121
+            }
+          ],
+          "text": "低 1.12563",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791305100
+          },
+          "price": {
+            "from": 1.125576180991686,
+            "to": 1.1262472737603924
+          }
+        }
+      ]
+    },
+    {
+      "name": "narrow eight charts",
+      "rows": [
+        {
+          "i": 0,
+          "pane": {
+            "x": 56,
+            "y": 42,
+            "width": 110,
+            "height": 310
+          },
+          "labels": [],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791298800,
+            "to": 1791309600
+          },
+          "price": {
+            "from": 1.1252350394944708,
+            "to": 1.1270412006319115
+          }
+        },
+        {
+          "i": 1,
+          "pane": {
+            "x": 56,
+            "y": 382,
+            "width": 116,
+            "height": 309
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.13",
+              "price": 1.12624,
+              "boundary": 310.81236363635827,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.13",
+              "price": 1.12563,
+              "boundary": 30.900000000000002,
+              "visible": false,
+              "reason": "occupied",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739165,
+              "box": {
+                "x": 17.63956521739165,
+                "y": 2.900000000000002,
+                "width": 49,
+                "height": 20
+              }
+            }
+          ],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791303600
+          },
+          "price": {
+            "from": 1.1262338711466835,
+            "to": 1.1255626610666454
+          }
+        },
+        {
+          "i": 2,
+          "pane": {
+            "x": 230,
+            "y": 42,
+            "width": 110,
+            "height": 310
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 183.5375609756111,
+              "visible": true,
+              "reason": "",
+              "barTime": 1791302400000,
+              "barX": 67.8604347826087,
+              "box": {
+                "x": 32.860434782608706,
+                "y": 155.5375609756111,
+                "width": 70,
+                "height": 20
+              },
+              "leaders": [
+                {
+                  "x": 67.3604347826087,
+                  "y": 178.0375609756111,
+                  "width": 1,
+                  "height": 3
+                },
+                {
+                  "x": 67.3604347826087,
+                  "y": 178.0375609756111,
+                  "width": 1,
+                  "height": 1
+                },
+                {
+                  "x": 67.3604347826087,
+                  "y": 175.0375609756111,
+                  "width": 1,
+                  "height": 4
+                }
+              ],
+              "attachX": 67.8604347826087
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 188.2464634146355,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            }
+          ],
+          "text": "高 1.12624",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791301800,
+            "to": 1791302700
+          },
+          "price": {
+            "from": 1.1099873617693525,
+            "to": 1.1500157977883094
+          }
+        },
+        {
+          "i": 3,
+          "pane": {
+            "x": 230,
+            "y": 382,
+            "width": 110,
+            "height": 309
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 3.3676363636623137,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 283.28,
+              "visible": false,
+              "reason": "outside-pane",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 291.28,
+                "width": 70,
+                "height": 20
+              }
+            }
+          ],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791303600
+          },
+          "price": {
+            "from": 1.1255761288533164,
+            "to": 1.1262473389333545
+          }
+        },
+        {
+          "i": 4,
+          "pane": {
+            "x": 404,
+            "y": 42,
+            "width": 110,
+            "height": 310
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 3.3781818182078496,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 284.2,
+              "visible": false,
+              "reason": "outside-pane",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 292.2,
+                "width": 70,
+                "height": 20
+              }
+            }
+          ],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791303600
+          },
+          "price": {
+            "from": 1.125576129541864,
+            "to": 1.1262473380726699
+          }
+        },
+        {
+          "i": 5,
+          "pane": {
+            "x": 404,
+            "y": 382,
+            "width": 110,
+            "height": 309
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 3.3676363636623137,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 283.28,
+              "visible": false,
+              "reason": "outside-pane",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 291.28,
+                "width": 70,
+                "height": 20
+              }
+            }
+          ],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791303600
+          },
+          "price": {
+            "from": 1.1255761288533164,
+            "to": 1.1262473389333545
+          }
+        },
+        {
+          "i": 6,
+          "pane": {
+            "x": 578,
+            "y": 42,
+            "width": 110,
+            "height": 310
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 3.3781818182078496,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 284.2,
+              "visible": false,
+              "reason": "outside-pane",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 292.2,
+                "width": 70,
+                "height": 20
+              }
+            }
+          ],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791303600
+          },
+          "price": {
+            "from": 1.125576129541864,
+            "to": 1.1262473380726699
+          }
+        },
+        {
+          "i": 7,
+          "pane": {
+            "x": 578,
+            "y": 382,
+            "width": 110,
+            "height": 309
+          },
+          "labels": [
+            {
+              "kind": "high",
+              "text": "高 1.12624",
+              "price": 1.12624,
+              "boundary": 3.3676363636623137,
+              "visible": false,
+              "reason": "unmatched-extreme"
+            },
+            {
+              "kind": "low",
+              "text": "低 1.12563",
+              "price": 1.12563,
+              "boundary": 283.28,
+              "visible": false,
+              "reason": "outside-pane",
+              "barTime": 1791303000000,
+              "barX": 42.13956521739121,
+              "box": {
+                "x": 7.139565217391208,
+                "y": 291.28,
+                "width": 70,
+                "height": 20
+              }
+            }
+          ],
+          "text": "",
+          "spacing": 28.093043478260867,
+          "range": {
+            "from": 1791302700,
+            "to": 1791303600
+          },
+          "price": {
+            "from": 1.1255761288533164,
+            "to": 1.1262473389333545
+          }
+        }
+      ]
+    },
+    {
+      "name": "eight chart 60 second performance",
+      "performance": {
+        "frames": 2799,
+        "labelDraws": 1800,
+        "maxLabelPanes": 7,
+        "p95": 4.100000381469727,
+        "setterSamples": 3512,
+        "maxCalls": 1,
+        "maxWork": 31.90000057220459,
+        "latencySamples": 3073,
+        "latencyP95": 4,
+        "afterRafP95": 4
+      }
+    }
+  ],
+  "errors": [],
+  "runningHostAsset": "host.c457e1eb70767468.js",
+  "lastHover": {
+    "i": 0,
+    "x": 157.1395652173916,
+    "y": 267.5,
+    "index": 197,
+    "contains": true,
+    "time": 1791302400,
+    "hit": {
+      "tag": "CANVAS",
+      "role": null,
+      "name": null,
+      "text": ""
+    },
+    "lastIndex": 197,
+    "source": {
+      "symbol": "MWP:BTCUSDT",
+      "resolution": "60",
+      "chartTime": 1791302400000,
+      "start": 1791302400000,
+      "end": 1791306000000,
+      "high": 85854.3,
+      "low": 85711
+    }
+  },
+  "performance": {
+    "frames": 2799,
+    "labelDraws": 1800,
+    "maxLabelPanes": 7,
+    "p95": 4.100000381469727,
+    "setterSamples": 3512,
+    "maxCalls": 1,
+    "maxWork": 31.90000057220459,
+    "latencySamples": 3073,
+    "latencyP95": 4,
+    "afterRafP95": 4
+  }
+}

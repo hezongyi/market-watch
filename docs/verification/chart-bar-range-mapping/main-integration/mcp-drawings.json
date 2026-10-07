@@ -1,0 +1,164 @@
+{
+  "passed": true,
+  "app": "https://192.168.7.232:16843",
+  "chart_origin": "https://192.168.7.232:16844",
+  "synthetic_market_data": true,
+  "data_source": "acceptance-fixture",
+  "configured_adapter": "binance (routing only; no upstream candles)",
+  "workspace_id": "6226bd16-7faf-4abc-82b7-2b5133c89b7f",
+  "checks": [
+    "real chart public coordinates",
+    "PostgreSQL saved revision",
+    "HTTP MCP projection parity",
+    "unsaved edits invisible",
+    "subsequent save visible",
+    "page refresh persists drawing identities"
+  ],
+  "runningHostAsset": "host.d0a96d61fcfcc340.js",
+  "combinedMappingAndSync": true,
+  "mappingIsNotDrawing": true,
+  "first": {
+    "workspace_id": "6226bd16-7faf-4abc-82b7-2b5133c89b7f",
+    "revision": 4,
+    "saved_at": 1791285994373,
+    "engine": "native",
+    "charts": [
+      {
+        "chart_id": "0",
+        "chart_index": 0,
+        "instrument": "MCPFIXTURE",
+        "source": "binance",
+        "series_kind": "managed",
+        "timeframe": "H1",
+        "drawings": [
+          {
+            "object_id": "lIipUS",
+            "object_type": "horizontal_line",
+            "supported": true,
+            "anchors": [
+              {
+                "time": 1791284400000,
+                "price": "1.1001"
+              }
+            ],
+            "reason": null
+          },
+          {
+            "object_id": "dnrKOY",
+            "object_type": "trend_line",
+            "supported": true,
+            "anchors": [
+              {
+                "time": 1791284400000,
+                "price": "1.1001"
+              },
+              {
+                "time": 1791298800000,
+                "price": "1.1004"
+              }
+            ],
+            "reason": null
+          },
+          {
+            "object_id": "CV90vW",
+            "object_type": "rectangle",
+            "supported": true,
+            "anchors": [
+              {
+                "time": 1791284400000,
+                "price": "1.1001"
+              },
+              {
+                "time": 1791298800000,
+                "price": "1.1004"
+              }
+            ],
+            "reason": null
+          }
+        ],
+        "status": "supported",
+        "time_coordinate": "native_chart_time_ms"
+      }
+    ],
+    "visibility": "saved_only",
+    "projection_version": 1
+  },
+  "second": {
+    "workspace_id": "6226bd16-7faf-4abc-82b7-2b5133c89b7f",
+    "revision": 5,
+    "saved_at": 1791286004036,
+    "engine": "native",
+    "charts": [
+      {
+        "chart_id": "0",
+        "chart_index": 0,
+        "instrument": "MCPFIXTURE",
+        "source": "binance",
+        "series_kind": "managed",
+        "timeframe": "H1",
+        "drawings": [
+          {
+            "object_id": "lIipUS",
+            "object_type": "horizontal_line",
+            "supported": true,
+            "anchors": [
+              {
+                "time": 1791284400000,
+                "price": "1.1001"
+              }
+            ],
+            "reason": null
+          },
+          {
+            "object_id": "dnrKOY",
+            "object_type": "trend_line",
+            "supported": true,
+            "anchors": [
+              {
+                "time": 1791284400000,
+                "price": "1.1001"
+              },
+              {
+                "time": 1791298800000,
+                "price": "1.1004"
+              }
+            ],
+            "reason": null
+          },
+          {
+            "object_id": "CV90vW",
+            "object_type": "rectangle",
+            "supported": true,
+            "anchors": [
+              {
+                "time": 1791284400000,
+                "price": "1.1001"
+              },
+              {
+                "time": 1791298800000,
+                "price": "1.1004"
+              }
+            ],
+            "reason": null
+          },
+          {
+            "object_id": "SqexOO",
+            "object_type": "horizontal_line",
+            "supported": true,
+            "anchors": [
+              {
+                "time": 1791313200000,
+                "price": "1.101"
+              }
+            ],
+            "reason": null
+          }
+        ],
+        "status": "supported",
+        "time_coordinate": "native_chart_time_ms"
+      }
+    ],
+    "visibility": "saved_only",
+    "projection_version": 1
+  }
+}

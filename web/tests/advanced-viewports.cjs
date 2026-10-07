@@ -36,6 +36,8 @@ vm.runInContext(
     }),
     timeSync: () => ({value: () => timeSync,setValue: value => {timeSync=value;}}),
   };
+  const attach=require("./fixtures/sync-coordinator.cjs");
+  attach(context,widget);
   const saved = context.captureChartViewports(widget);
   saved[0].offset = 9;
   saved[0].spacing = 14.7;
@@ -88,6 +90,7 @@ vm.runInContext(
     if(secondReady)callback();else releaseSecond=()=>{secondReady=true;callback()};
   }};
   const multi={...widget,chartsCount:()=>2,chart:index=>index?second:first};
+  attach(context,multi);
   const restoring=context.restoreChartViewports(multi,saved,()=>true);
   await new Promise(resolve=>setTimeout(resolve,10));
   assert.equal(typeof releaseSecond,'function','restoration must observe every pane before the first mutation');
@@ -105,6 +108,7 @@ vm.runInContext(
     order.push(index);
   }}));
   const synced={...widget,chartsCount:()=>2,chart:index=>panes[index],activeChartIndex:()=>1,activeChart:()=>panes[1]};
+  attach(context,synced);
   await context.restoreChartViewports(synced,[saved[0],saved[0]],()=>true);
   assert.deepEqual(order,[1],'only the active pane restores a fully synchronized saved layout');
   order.length=0;

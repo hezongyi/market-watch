@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-04",
+  "host": "Ubuntu",
+  "address": "192.168.7.232",
+  "compose_project": "mw-range-mapping-ubuntu-20261004",
+  "directory": "/home/quant/repos/.acceptance/market-watch-range-mapping",
+  "app": "https://192.168.7.232:16043/advanced-charts",
+  "chart": "https://192.168.7.232:16044",
+  "database": "range_mapping",
+  "delivery_enabled": false,
+  "worker": false,
+  "source_commit": "e91f29e",
+  "chart_image_id": "sha256:e5a1a50db2363fb3a4788c68d3c34b91faf69d375ce69b9b0f7469a9faeaa132",
+  "web_image_id": "sha256:b9198d7901c0764d55376f19b27e7fd1f57e2d09ad9aa1efbe96fbbeea387dfe",
+  "host_asset": "host.482d92dae626ab5a.js",
+  "chart_source_sha_manifest": "source-sha256.json",
+  "web_change": "Acceptance-only replace localhost:16044 with current hostname:16044; product source unchanged",
+  "unraid_cleanup": [
+    "mw-range-mapping-acceptance-20261004",
+    "mw-chart-sync-acceptance-20261004",
+    "mw-chart-sync-acceptance-disabled-20261004"
+  ]
+}

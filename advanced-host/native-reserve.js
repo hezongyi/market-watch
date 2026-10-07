@@ -3,6 +3,7 @@
 const MWNativeReserve = (() => {
   const models = new Map(), threads = new Map(), flights = new Map();
   const retries = new WeakMap(), caches = new WeakMap();
+  const purgeObservers = new WeakSet();
   const key = (symbol, resolution) => `${symbol}|${resolution}`;
   let transport, calculationPrefix = () => 0;
   const enabled = globalThis.MW_NATIVE_RESERVE_ENABLED !== false &&
@@ -102,7 +103,7 @@ const MWNativeReserve = (() => {
       thread._cache === cache && thread._cache.bars[0]?.time === before && !thread._requesting;
     const flight = (async () => {
       try {
-        const result = await transport({symbol, resolution, before:requestBefore,
+        const result = await transport({symbol, resolution, window:thread._symbolInfo.mw_window, before:requestBefore,
           screen_bars: g.screen, batch_screens: mode.batch, warmup_bars: warmup});
         if (!current()) return;
         if (now() - started >= 800)
@@ -112,6 +113,7 @@ const MWNativeReserve = (() => {
         if (rows.length) {
           globalThis.MWNativeNavigation?.admitCached(thread, rows);
           thread._processBars(rows, {noData: result.history_boundary === true});
+          result.accepted?.();
           retry.failures = 0; retry.misses = 0; retry.retryAt = 0;
         } else if (!rows.length) {
           if (result.history_boundary) {thread._setEndOfData(); retry.boundary = true;}
@@ -134,12 +136,24 @@ const MWNativeReserve = (() => {
     configure(read, prefix = () => 0) {transport = read; calculationPrefix = prefix;
       for (const m of models.keys()) schedule(m);},
     bindThread(thread, info, resolution) {
+      if (!purgeObservers.has(thread) && typeof thread._purgeCache === 'function') {
+        purgeObservers.add(thread);
+        const purge = thread._purgeCache;
+        thread._purgeCache = function (...args) {
+          const result = purge.apply(this,args);
+          globalThis.MWBarRangeMapping?.cachePurged();
+          return result;
+        };
+      }
       if (enabled) {
         threads.set(globalThis.MWNativeNavigation?.threadKey(info, resolution) || key(info.ticker || info.name, resolution), thread);
         retryState(thread);
       }
     },
-    unbindThread(thread) {if (threads.get(threadKey(thread)) === thread) threads.delete(threadKey(thread));},
+    unbindThread(thread) {
+      if (threads.get(threadKey(thread)) === thread) threads.delete(threadKey(thread));
+      globalThis.MWBarRangeMapping?.cachePurged();
+    },
     bindModel(m) {
       if (!enabled || models.has(m)) return;
       const state = {identity: '', enhancedUntil: 0};
@@ -181,6 +195,11 @@ const MWNativeReserve = (() => {
         schedule(m);
       }
     },
+    acceptedRanges: () => [...threads.values()].filter(t=>!t._destroyed).map(t=>({
+      symbol:t._symbolInfo.ticker || t._symbolInfo.name,resolution:t._resolution,window:t._symbolInfo.mw_window || '',
+      from:t._cache.bars.length ? t._dealignTime(t._cache.bars[0].time) : undefined,
+      to:t._cache.bars.length ? t._dealignTime(t._cache.bars.at(-1).time) : undefined,
+    })),
     enabled: () => enabled,
     diagnostics: () => ({models: [...models].map(([m, state]) => ({symbol: m.mainSeries().symbol(),
       resolution: m.interval(), state: {...state, ...retries.get(threads.get(identity(m)))}, geometry: (() => {const g = geometry(m);

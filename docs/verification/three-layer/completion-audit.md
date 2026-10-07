@@ -1,7 +1,8 @@
 # 三层行情最终实现验收核对
 
 日期：2026-10-07。已验收实现提交`b0f2c78`，分支`feat/market-data-integration`；
-后续交付记录补录不改变已验收产品代码。依据[主方案](../../market-data-three-layer-plan.md)、
+该记录保留原实现验收基线；用户授权PR后与最新主线的兼容修改及复验见[PR主线兼容复验](pr-integration.md)。
+依据[主方案](../../market-data-three-layer-plan.md)、
 [桌面UI方案](../../market-data-center-ui-plan.md)和原开发交接，保留完整A–E实现范围。
 最终结论：完整A–E实现及本次范围内的Ubuntu真实环境实现验收通过。
 逐项证据见下表；长期质量观察按用户最新决定暂缓，不宣称其已经通过。

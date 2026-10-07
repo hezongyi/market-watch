@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-06T15:16:11.734Z",
+  "errors": [],
+  "runningHostAsset": "host.5d575e453f015c1b.js",
+  "settleFailure": null,
+  "failure": "frame.waitForFunction: Timeout 60000ms exceeded.\n    at Object.settle (/home/quant/repos/market-watch-range-main/web/tests/fixtures/bar-range-acceptance.cjs:67:22)\n    at /home/quant/repos/market-watch-range-main/web/tests/advanced-sync-settings-extended.browser.cjs:451:13",
+  "completedCases": [
+    "time axis drag input",
+    "native zoom in button",
+    "native zoom out button",
+    "different symbol period bar width",
+    "different symbol range label excluded",
+    "boundary -200",
+    "boundary 1000",
+    "Esc cancels",
+    "defaults preserve enabled and sync",
+    "exterior labels with native left axis",
+    "exterior labels with subpane",
+    "maximized chart exterior labels",
+    "horizontal offscreen clears fallback",
+    "20 layout cycles stable resources",
+    "automatic appearance-only save",
+    "pending save A cannot clean host or native config B",
+    "real Save menu persists B and late debounce stays clean",
+    "reload restores choices without uniform spacing",
+    "failed save retains dirty and blocks original-ID overwrite"
+  ],
+  "originalSHA256": "62945f0fe1f6cfacf84475aba8abd2c855feb56d484c4ba77efa8055f6d8980b"
+}

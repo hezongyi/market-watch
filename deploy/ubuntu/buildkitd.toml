@@ -1,0 +1,29 @@
+# Dedicated Ubuntu Market Watch builder. GC thresholds are not hard quotas.
+[worker.oci]
+  gc = true
+  reservedSpace = "1GiB"
+  maxUsedSpace = "8GiB"
+  minFreeSpace = "20GiB"
+  max-parallelism = 2
+
+[[worker.oci.gcpolicy]]
+  filters = ["type==source.local", "type==exec.cachemount", "type==source.git.checkout"]
+  keepDuration = "48h"
+  reservedSpace = "512MiB"
+  maxUsedSpace = "2GiB"
+  minFreeSpace = "20GiB"
+
+[[worker.oci.gcpolicy]]
+  keepDuration = "168h"
+  reservedSpace = "1GiB"
+  maxUsedSpace = "8GiB"
+  minFreeSpace = "20GiB"
+
+[[worker.oci.gcpolicy]]
+  all = true
+  reservedSpace = "1GiB"
+  maxUsedSpace = "8GiB"
+  minFreeSpace = "20GiB"
+
+[worker.containerd]
+  enabled = false

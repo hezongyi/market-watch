@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-06T15:19:30.558Z",
+  "APP": "https://192.168.7.232:16843",
+  "CHART": "https://192.168.7.232:16844",
+  "errors": [],
+  "runningHostAsset": "host.5d575e453f015c1b.js",
+  "failure": "AssertionError [ERR_ASSERTION]: stationary mapped price information flickered between painted frames\n\n'' !== '\u4f4e 1.15886'\n\n    at /home/quant/repos/market-watch-range-main/web/tests/advanced-range-v180-stability.browser.cjs:250:16",
+  "completedCases": [
+    "latest W1 source/crosshair/range",
+    "latest continuous hover: no blank candle frames or model replacement",
+    "continuous far-history click with stationary mouse"
+  ],
+  "originalSHA256": "0a018af8aa66a9c1deeea813935c4c9da6a017ddaf00f0681e048f17e0415859"
+}

@@ -1,0 +1,12 @@
+{
+  "scope": "actual combined Ubuntu Docker HTTPS API/MCP, synthetic task event evidence",
+  "cases": [
+    "MCP and browser return identical chart and legacy events without requiring legacy watch IDs",
+    "read-only MCP denies acknowledgement and leaves all event records unchanged",
+    "authorized MCP acknowledges one chart event idempotently without changing other events or rule count/run/version"
+  ],
+  "external_notifications_sent": false,
+  "verified": true,
+  "chart_event_count": 20,
+  "legacy_event_count": 1
+}

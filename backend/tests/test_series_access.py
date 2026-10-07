@@ -12,7 +12,6 @@ from alerts.composite_definitions import save_mapping
 from alerts.history_retention import lock_reference_values, references
 from alerts.series_access import metadata, search
 from alerts.storage import AdvancedWorkspace, CompositeRevision, MarketComposite, MarketDemand
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 from test_composite_definitions import PROOF, prepare, publish

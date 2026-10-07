@@ -1,0 +1,31 @@
+{
+  "question": "Can public temporary drawing APIs shade the full source bar interval, including future blank space, without changing peers?",
+  "scope": "Isolated v31.1 library; synthetic 24x7 UTC bars; no product or production changes",
+  "cases": [],
+  "errors": [],
+  "fractional": {
+    "from": 1791077825,
+    "to": 1791110875,
+    "points": [
+      {
+        "price": 100,
+        "time": 1791077700
+      },
+      {
+        "price": 100,
+        "time": 1791108000
+      }
+    ],
+    "native": [
+      {
+        "index": 14,
+        "price": 100
+      },
+      {
+        "index": 115,
+        "price": 100
+      }
+    ],
+    "spacing": 6
+  }
+}

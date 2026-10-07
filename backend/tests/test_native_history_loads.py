@@ -142,8 +142,8 @@ def test_successful_empty_pages_fail_after_bounded_no_progress(history, monkeypa
 
 @pytest.mark.parametrize("sqlstate", ["57014", "55P03"])
 def test_snapshot_database_timeout_is_structured_and_next_request_recovers(history, sqlstate):
-    from fastapi.testclient import TestClient
     from alerts import api as api_module
+    from fastapi.testclient import TestClient
 
     class DatabaseTimeout(Exception):
         pass

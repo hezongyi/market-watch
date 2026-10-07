@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-04",
+  "baseline": "62488c6035dbea9533699d569a6605f82c684303",
+  "scope": "Isolated Playwright Chromium using installed licensed v31.1, synthetic 24x7 UTC OHLC; no product changes or production access.",
+  "question": "Do public temporary shapes remain per-chart and avoid save/undo side effects when native drawing sync is enabled?",
+  "config": {
+    "layout": "4",
+    "resolutions": [
+      "1D",
+      "240",
+      "5",
+      "1W"
+    ],
+    "draw_on_all_charts_enabled": true,
+    "shape": "date_range",
+    "disableSave": true,
+    "disableSelection": true,
+    "disableUndo": true,
+    "showInObjectsTree": false,
+    "zOrder": "bottom"
+  },
+  "observations": {
+    "shape_counts_after_create": [
+      {
+        "resolution": "1D",
+        "shape_count": 0
+      },
+      {
+        "resolution": "240",
+        "shape_count": 1
+      },
+      {
+        "resolution": "5",
+        "shape_count": 1
+      },
+      {
+        "resolution": "1W",
+        "shape_count": 0
+      }
+    ],
+    "shape_counts_after_setPoints": [
+      {
+        "resolution": "1D",
+        "shape_count": 0
+      },
+      {
+        "resolution": "240",
+        "shape_count": 1
+      },
+      {
+        "resolution": "5",
+        "shape_count": 1
+      },
+      {
+        "resolution": "1W",
+        "shape_count": 0
+      }
+    ],
+    "shape_counts_after_remove": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "viewport_unchanged_after_create": true,
+    "viewport_unchanged_after_update": true,
+    "undo_before": {
+      "enableUndo": true,
+      "undoCommandCount": 4,
+      "undoText": "应用图表主题",
+      "enableRedo": false,
+      "redoCommandCount": 0,
+      "originalUndoText": "apply chart theme"
+    },
+    "undo_after_create": {
+      "enableUndo": true,
+      "undoCommandCount": 4,
+      "undoText": "应用图表主题",
+      "enableRedo": false,
+      "redoCommandCount": 0,
+      "originalUndoText": "apply chart theme"
+    },
+    "undo_after_update": {
+      "enableUndo": true,
+      "undoCommandCount": 4,
+      "undoText": "应用图表主题",
+      "enableRedo": false,
+      "redoCommandCount": 0,
+      "originalUndoText": "apply chart theme"
+    },
+    "undo_after_remove": {
+      "enableUndo": true,
+      "undoCommandCount": 4,
+      "undoText": "应用图表主题",
+      "enableRedo": false,
+      "redoCommandCount": 0,
+      "originalUndoText": "apply chart theme"
+    },
+    "autosave_events": [],
+    "settle_delay_before_reset_and_after_remove_ms": 5500,
+    "saved_non_main_sources": 0,
+    "page_errors": []
+  },
+  "limits": [
+    "One short D1 background case; no stress test or pointer interaction test.",
+    "Real calendars, rectangle style under drawing sync, multiple-symbol/window races and save concurrently with updates still need verification."
+  ],
+  "temporary_probe": "/tmp/mw-range-mapping-prototype/drawing-sync-probe.cjs",
+  "temporary_probe_sha256": "9b298d507d23932fdfabe9a52f5a01ad57500eb163a887e67a17316372beca5e"
+}

@@ -1,0 +1,108 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend/alerts/provider_history_policy.py:8:5
+   |
+ 7 |   def capacity():
+ 8 | /     from .config import settings
+ 9 | |     from .storage import Preference
+10 | |     from .provider_cache import budget_transaction
+   | |__________________________________________________^
+11 |       with budget_transaction() as db:
+12 |           row = db.get(Preference, CAPACITY_KEY)
+   |
+help: Organize imports
+   |
+8  |     from .config import settings
+9  +     from .provider_cache import budget_transaction
+10 |     from .storage import Preference
+   -     from .provider_cache import budget_transaction
+11 |     with budget_transaction() as db:
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend/alerts/provider_history_policy.py:20:5
+   |
+19 |   def save_capacity(value):
+20 | /     from .config import settings
+21 | |     from .storage import Preference, transaction
+22 | |     from sqlalchemy import text
+   | |_______________________________^
+23 |       if type(value) is not int or not MIN_CAPACITY <= value <= settings.native_history_max_bars:
+24 |           raise ValueError(f"容量须为 {MIN_CAPACITY:,} 至 {settings.native_history_max_bars:,} 根之间的整数")
+   |
+help: Organize imports
+   |
+19 | def save_capacity(value):
+20 +     from sqlalchemy import text
+21 +
+22 |     from .config import settings
+23 |     from .storage import Preference, transaction
+   -     from sqlalchemy import text
+24 |     if type(value) is not int or not MIN_CAPACITY <= value <= settings.native_history_max_bars:
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> backend/tests/test_history_capacity.py:1:1
+  |
+1 | / import pytest
+2 | | from fastapi.testclient import TestClient
+3 | | from alerts import api as api_module
+4 | | from alerts.config import settings
+5 | | from alerts.provider_history_policy import capacity, capabilities, save_capacity
+6 | | from alerts import native_history_loads as loads
+7 | | from alerts.chart_api import DataQuery
+  | |______________________________________^
+help: Organize imports
+  |
+1 | import pytest
+  - from fastapi.testclient import TestClient
+2 | from alerts import api as api_module
+  - from alerts.config import settings
+  - from alerts.provider_history_policy import capacity, capabilities, save_capacity
+3 | from alerts import native_history_loads as loads
+4 | from alerts.chart_api import DataQuery
+5 + from alerts.config import settings
+6 + from alerts.provider_history_policy import capabilities, capacity, save_capacity
+7 + from fastapi.testclient import TestClient
+8 |
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend/tests/test_history_capacity.py:61:5
+   |
+60 |   def test_capacity_obeys_cancel_and_expired_provider_context(policy):
+61 | /     import threading
+62 | |     import time
+63 | |     from alerts import provider_cache as cache
+   | |______________________________________________^
+64 |       token = cache.DEADLINE.set(time.monotonic() - 1)
+65 |       try:
+   |
+help: Organize imports
+   |
+62 |     import time
+63 +
+64 |     from alerts import provider_cache as cache
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> backend/tests/test_native_history_loads.py:145:5
+    |
+143 |   @pytest.mark.parametrize("sqlstate", ["57014", "55P03"])
+144 |   def test_snapshot_database_timeout_is_structured_and_next_request_recovers(history, sqlstate):
+145 | /     from fastapi.testclient import TestClient
+146 | |     from alerts import api as api_module
+    | |________________________________________^
+147 |
+148 |       class DatabaseTimeout(Exception):
+    |
+help: Organize imports
+    |
+144 | def test_snapshot_database_timeout_is_structured_and_next_request_recovers(history, sqlstate):
+145 +     from alerts import api as api_module
+146 |     from fastapi.testclient import TestClient
+    -     from alerts import api as api_module
+147 |
+    |
+
+Found 5 errors.
+[*] 5 fixable with the `--fix` option.
