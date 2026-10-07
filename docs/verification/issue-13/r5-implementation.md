@@ -36,3 +36,5 @@ sg docker -c 'docker compose --env-file /tmp/market-watch-issue13-optimized-r5.e
 20:17 SGT：第五候选完整后端1389 passed/2 skipped/65 warnings（771.74秒、exit0），结果 `results/optimized-r5/full-regression-result.json`，175个实际产品及root migrations文件的冻结源码见 `product-source-manifest.json`。驱动已于20:16:18 SGT进入新12×300秒性能套件，终态未产生，不将启动称通过。最终收口核查表见 [r5-closeout-checklist.md](r5-closeout-checklist.md)，性能/消费者/浏览器/最终恢复适用性仍未完成。
 
 20:20 SGT：最终冻结源恢复复核已安排，由 `/tmp/mw-issue13-r5-recovery-followup.py` 只在主验收终态、全部数值门槛通过且本project无运行服务时启动自己的PG，再串行执行实际SIGKILL/新进程接续与旧v1.14应用回退/新应用恢复，最后停止本PG。主验收失败或缺证据时只记录未启动，不自动绕过失败、重启套件或重置正在测量的库。当前等待状态 `results/optimized-r5/recovery-state.json`，未执行恢复检查，不当作通过。
+
+20:30 SGT：首轮idle300秒CPU1.145%、SQL1.544/s；live28输入全部发布、p95/p99 0.424/0.431秒、最长ready等待0.969秒。仅首轮结果，不代表三重复或310输入通过。最终清单发现已有进程探针仅覆盖提交前终止，新增 `verify_publication_postcommit.py` 覆盖提交后SIGKILL、进程离线时输入提交且历史通知未被接收、新监听进程按持久状态接续，以及无新输入再次重启的计数/revision稳定性。`run_final_recovery_supplement.py` 只在全部主验证及既有恢复结束且本project无运行服务后串行启动，再重放保存的覆盖白名单，状态 `results/optimized-r5/final-contract-state.json`；源码/语法核对不能当作真实PG检查通过。冻结产品及正在运行探针未修改。

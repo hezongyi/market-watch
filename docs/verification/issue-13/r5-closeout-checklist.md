@@ -17,7 +17,7 @@
 | TCP120实际认证请求500bar并发，500/1000ms；10输入10唯一signal | 新network result、输入/提交/可见事件及API样本 | 待测 |
 | M30/W1/MN四阶段120独立oracle与chart/CSV/MCP/告警一致、重复幂等 | 新high-period源码归档、各phase及快照；audit离线重算 | 待测 |
 | 完整后端回归与真实PG并发、generation、失败/锁隔离、历史/聚合推进 | r5 related178、`full-regression-result.json`/私有原日志与冻结SHA | 相关178通过；完整1389通过/2跳过，771.74s |
-| 提交前/后崩溃、事务回滚、恢复及保留additive schema旧应用接续 | `results/optimized-r3b/{publication-crash,application-rollback}.json`，新候选差异/必要重验 | 旧证据保留，r5改唤醒需补最终适用性核查 |
+| 提交前/后崩溃、事务回滚、恢复及保留additive schema旧应用接续 | r5 `{publication-crash,application-rollback}.json` 与 `final-contracts/publication-postcommit.json` | 已安排主验收后串行复核；提交后SIGKILL、丢失历史通知后恢复、重复重启幂等补充探针尚未执行 |
 | PG提交后通知，回滚/savepoint不通知、scan→wait竞态、通知丢失/重连兜底 | r5真实wakeup PG与pure tests；新probe wake/prepare/wait事实 | 真实相关通过；容量/空闲成本待测 |
 | 覆盖补齐raw/structured等价、whole-minute与旧5s边界、并发追赶、显式verify及回退守卫 | reviewed-contracts、完整PG回归、各源码范围及最终差异 | 旧覆盖证据保留；最终适用性核查待做 |
 | 实际UI原生双图、切周期/品种、save/reload、完整API生命周期；≤1.5CPU app+browser | 新browser result/screenshot/live services-runtime/internal network/host samples | 尚未启动，不把build/config当验收 |
@@ -26,3 +26,5 @@
 | 完整逐项审计、已知局限、源码合入与部署分开记录 | 最终候选报告/运行台账/本清单终态映射 | 未完成；未推送、未生产部署 |
 
 浏览器/API离线合成不能证明供应商I/O或生产容量。硬件预算与宿主竞争原始证据保留，不能因最终本机数字通过扩称生产SLA。停止仅本任务明确服务；任务未结束不退役，删除卷前须归档且实际恢复验证。历史失败、截尾与skip不会被新成功覆盖。
+
+最终合同补充由 `run_final_recovery_supplement.py` 等待主验收和现有恢复驱动结束、全部数值门槛通过且本project无运行服务后启动。新探针以独立只读文件挂载，产品仍为冻结ccb2a12；随后用同一冻结产品重新执行62522条白名单覆盖审计/27939条结构化记录重放。旧覆盖核心文件未变化，market源行预算/读取范围及storage迁移有变化，因此使用新真实PG结果证明最终适用性，不将旧重放直接改记r5通过。
