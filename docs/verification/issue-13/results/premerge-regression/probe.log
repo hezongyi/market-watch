@@ -1,0 +1,14 @@
+time="2026-10-07T01:14:56Z" level=warning msg="Found orphan containers ([mw-issue13-p0-web-1 mw-issue13-p0-api-1 mw-issue13-p0-chart-origin-1 mw-issue13-p0-publisher-1]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+........................................................................ [ 84%]
+.............                                                            [100%]
+=============================== warnings summary ===============================
+../usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:469
+  /usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:469: PytestCacheWarning: cache could not write path /workspace/.pytest_cache/v/cache/nodeids: [Errno 30] Read-only file system: '/workspace/.pytest_cache/v/cache/nodeids'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+../usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:423
+  /usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:423: PytestCacheWarning: cache could not write path /workspace/.pytest_cache/v/cache/lastfailed: [Errno 30] Read-only file system: '/workspace/.pytest_cache/v/cache/lastfailed'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+85 passed, 2 warnings in 15.20s

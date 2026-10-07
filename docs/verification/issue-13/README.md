@@ -89,7 +89,7 @@ python3 -u docs/verification/issue-13/run_network_alert.py
 输出在`results/network-alert/result.json`，宿主采样`results/network-alert-host.jsonl`。进程输出先私有检查，不自动提交未脱敏异常。脚本拒绝覆盖现有输出；发生失败应保留并诊断，不自动重新reset数据库或重跑。该探针在开始输入前将按值导入的写入/聚合/发布now_ms统一为fixture epoch加实际经过时间，核验新源received_at和observed_at均不在消费者时钟之后。
 
 
-补充验证均已实际结束并通过原始artifact审核：[时钟/快照/混合报告](supplemental-report.md)、[TCP/告警报告](network-alert-report.md)。网络API p95/p99=450.18/524.08ms；告警判断观测p95=1.657秒超目标，十个输入均可见且各一个signal。API SQL初次归因只含认证线程，数据路由线程未独立计数；脚本已修正而原结果未重写。PG再次核验停止为exited0，两个probe已移除；19614不再在线。P0全范围与P1–P3仍未完成。
+补充验证均已实际结束并通过原始artifact审核：[时钟/快照/混合报告](supplemental-report.md)、[TCP/告警报告](network-alert-report.md)。网络API p95/p99=450.18/524.08ms；告警判断观测p95=1.657秒超目标，十个输入均可见且各一个signal。API SQL初次归因只含认证线程，数据路由线程未独立计数；脚本已修正而原结果未重写。PG再次核验停止为exited0，两个probe已移除；19614不再在线。合并前必要准备已收口；P0整合主线复测与P1–P3仍未完成。
 
 
 ## 真实产品网页并发补测
@@ -115,13 +115,13 @@ sg docker -c 'docker compose --env-file /tmp/mw-issue13-browser-private/compose.
 sg docker -c 'docker compose --env-file /tmp/mw-issue13-browser-private/compose.env -p mw-issue13-p0 -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/compose.yaml -f /home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/browser.compose.yaml stop api publisher web chart-origin postgres'
 ```
 
-三层仍未合并。完整网页/双图短并发已补实际证据，但连续观察时间到告警、高周期payload全量oracle、外部锁争用、可比重复基线、世代/迁移/回退等仍未完成。核心P1–P3继续按用户已定顺序等待整合主线。
+三层仍未合并。完整网页/双图短并发、连续观察时间到告警、高周期payload全量oracle、外部锁争用已补实际证据；可比重复基线、世代/迁移/回退等仍未完成。核心P1–P3继续按用户已定顺序等待整合主线。
 
 ## 外部品种持锁补测与证据校验
 
 2026-10-07 00:39UTC已完成[外部品种锁争用](lock-contention-report.md)：独立PG事务持锁3.066秒，真实发布调用3.275秒、30个明确blocker样本；锁期间另一个身份的10行快照读取15.53ms。释放后原轮转恢复、26,290行完整bar与可见元信息稳定。人工锁不证明生产锁频率或新调度验收，原补充场景的零Lock样本限制仍保留。首次共享连接池失败独立归档；成功probe已移除、PG已停止。
 
-执行：`python3 -u docs/verification/issue-13/run_lock_contention.py`。仅本任务服务全部停止时允许reset；拒绝覆盖已有证据，runner结束自动停止PG，单独启停见上文。尚待合并后的连续新鲜度、高周期独立oracle、同口径消费者、可比重复与迁移/回退。
+执行：`python3 -u docs/verification/issue-13/run_lock_contention.py`。仅本任务服务全部停止时允许reset；拒绝覆盖已有证据，runner结束自动停止PG，单独启停见上文。连续新鲜度、高周期独立oracle和同口径消费者旧链路补测已见后文；尚待合并后的完整正确性、可比重复与迁移/回退。
 
 证据校验：`python3 docs/verification/issue-13/audit_evidence.py`。路径始终相对证据目录解析，失败列出具体文件且不改写manifest。浏览器审核输出已按容器名排序；修复前不同PYTHONHASHSEED使统计值相同但JSON字节不同，修复后三种seed输出哈希相同。证据哈希通过不等于Issue #13完成。
 
@@ -158,3 +158,7 @@ python3 docs/verification/issue-13/summarize_observation_alert.py
 ```
 
 仅本任务无运行服务时允许reset；已有结果拒绝覆盖，重跑先明确归档。runner实际停止probe与PG（exit0/OOM=false），Ubuntu127.0.0.1:19613当前不在线；PG启停见上文。每批目标为10/55/100/235/280秒，时钟随实际monotonic推进，全部1187份PG状态记录保留；采样/池等待误差明确列出，不是精确commit-to-commit SLA。没有新分钟、供应商、API/lifespan/网络服务、浏览器或通知投递，不能替代完整容量或核心优化验收。
+
+## 合并前准备收口
+
+[逐项收口审计](premerge-closeout.md)记录已完成范围、性能红灯与P1–P4剩余关卡。固定Ubuntu probe中的五文件回归85 passed；宿主缺yfinance的失败明确保留，未修改共享环境。合并前必要准备已收口，不继续追加可选旧基线实验；P0整合主线复测和Issue #13仍未完成。三层合并后再整合main、同fixture复测及实施核心改造。当前本任务服务全部停止，卷保留；本地提交未推送、未部署。
