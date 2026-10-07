@@ -1,0 +1,15 @@
+{
+  "source_commit": "ccb2a12b47ea1c9fd06517c2ccf3dec670532ee4",
+  "environment": "Ubuntu quant-server local Docker own mw-issue13-optimized-r5 project PostgreSQL14 127.0.0.1:19693",
+  "command": "python3 /tmp/mw-issue13-test.py r5-backend-frozen -q backend/tests",
+  "passed": 1389,
+  "skipped": 2,
+  "warnings": 65,
+  "seconds": 771.74,
+  "exit_code": 0,
+  "source_manifest": "product-source-manifest.json",
+  "private_raw_log": "/tmp/mw-issue13-r5-full_regression-driver.log",
+  "private_log_sha256": "94d8afa4a7b06e6ba4aeefc23b43561ef09e779b179c4dd15d42ee3a1def31eb",
+  "scope": "All backend/tests against frozen candidate; requires separate performance/consumer/browser/recovery audit",
+  "complete_acceptance": false
+}
