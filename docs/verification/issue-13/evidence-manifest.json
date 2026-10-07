@@ -1,5 +1,5 @@
 {
-  "scope": "Terminal r3 performance and completed consumer artifacts include evaluate and certified alert-latency gate failures; active normal/network/browser and new origin-read candidate acceptance pending",
+  "scope": "Terminal r3c perf and consumer evidence retains failed numeric gates and one normal-input missing marker; network/browser missing; new r4 validation running",
   "files": {
     ".gitignore": {
       "sha256": "21ea7e5e1cf73c3b5faecd3b3d27b8b60d0ccce7793b4f1461ee81ce38511d11",
@@ -2304,6 +2304,26 @@
     "results/optimized-r4/product-delta.json": {
       "bytes": 516,
       "sha256": "5aae5ec98c39d666ade51b7bf3f687f97b0460fd41f226cdae37f3771dea0cc1"
+    },
+    "results/optimized-r3c/normal-input-alert/result.json": {
+      "bytes": 2341258,
+      "sha256": "febc2ffec07c87a22075680094b77807ed8752541a5870fe2f9c6bddea754bb3"
+    },
+    "results/optimized-r3c/normal-input-alert/timeline.jsonl": {
+      "bytes": 5219593,
+      "sha256": "1a76b59752908d7c03ee54f5da368a324e0a09ee4f0af6270cce8e4130a2ac3d"
+    },
+    "results/optimized-r3c/optimized_normal_input_probe-host.jsonl": {
+      "bytes": 339485,
+      "sha256": "860571cbb89e54d3a6d0ba9e5acae5cef0bc22ec961e23540100f356035fcc13"
+    },
+    "results/optimized-r3c/validation-state.json": {
+      "bytes": 189,
+      "sha256": "a27750482cd3c7ce2b9dc6b7bce111df270193e5e686608038e2cb6cc71733d6"
+    },
+    "results/optimized-r3c/numeric-assessment.json": {
+      "bytes": 14983,
+      "sha256": "2ab0526d259b8337e01559b8032a008c965e2962e7018e31b5e082ec7d3c2437"
     }
   },
   "updated_for_commit": "8f67b80",
