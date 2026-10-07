@@ -8,7 +8,7 @@
 | 原始对照与前后同fixture、四场景三重复300s | `results/v114-baseline/`、`results/optimized-r5-baseline/{source,state,measurement-audit}.json` | 新测未结束，不能引用r3c数字作r5通过 |
 | 空闲CPU≤5%且降≥80%；SQL≤2/s且降≥90%；快照稳定零历史/审计读 | 新idle-1/2/3原始JSON/JSONL及宿主记录 | 待测 |
 | 每身份实时/修订输入内容及观察标记；M1 p95≤15s/p99≤30s；缺失分母 | 新live/revision与mixed原始输入、payload、终态pending | 待测 |
-| 全90就绪目标最长等待≤10秒、多轮服务，截尾未服务目标不得漏算 | baseline全ready_ages、fairness轮次、mixed及terminal-wait补测/排空 | 待测；audit独立重算服务轮次/最长年龄 |
+| 全90就绪目标最长等待≤10秒、多轮服务，截尾未服务目标不得漏算 | baseline全ready_ages、fairness轮次、mixed及terminal-wait补测/排空、`final-contracts/rotation-faults.json` | 待测；新增同一45秒窗口内90目标/连续输入/两身份回填/一次失败重试/两秒真实外部锁探针 |
 | 回填有效吞吐≥660.52bars/s且≥可比旧版80%；等待同时通过 | 新backfill-1/2/3及冻结旧对应样本 | 待测 |
 | ASGI100/200ms、evaluate200/350ms；同40非空配置×3热态，零staging读 | 新consumer-microbaseline原始120+120样本 | 待测；r4通过不作新候选认证 |
 | 同价330s50准确marker、stale→ready、OHLC/量/修订不变、零signal | 新observation timeline/events/final、独立audit | 待测 |
@@ -28,3 +28,5 @@
 浏览器/API离线合成不能证明供应商I/O或生产容量。硬件预算与宿主竞争原始证据保留，不能因最终本机数字通过扩称生产SLA。停止仅本任务明确服务；任务未结束不退役，删除卷前须归档且实际恢复验证。历史失败、截尾与skip不会被新成功覆盖。
 
 最终合同补充由 `run_final_recovery_supplement.py` 等待主验收和现有恢复驱动结束、全部数值门槛通过且本project无运行服务后启动。新探针以独立只读文件挂载，产品仍为冻结ccb2a12；随后用同一冻结产品重新执行62522条白名单覆盖审计/27939条结构化记录重放。旧覆盖核心文件未变化，market源行预算/读取范围及storage迁移有变化，因此使用新真实PG结果证明最终适用性，不将旧重放直接改记r5通过。
+
+`verify_rotation_faults.py` 在覆盖重放后恢复同一规范fixture，故障注入发生在真实EURUSD M1观察刷新已copy/flush但未提交时，检查快照回滚、世代待处理、仅该目标退避及健康目标在锁/退避期间继续服务。所有90目标持续重新请求，多轮服务与终态右截尾年龄均保留；BTCUSDT锁等待也保守纳入最长年龄，不通过排除锁目标美化结果。该探针尚未执行，静态检查不代表门槛通过。

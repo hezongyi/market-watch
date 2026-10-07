@@ -37,6 +37,8 @@ def mark(stage, **details):
 def main():
     probe = HERE / 'verify_publication_postcommit.py'
     expected_probe = hashlib.sha256(probe.read_bytes()).hexdigest()
+    rotation = HERE / 'verify_rotation_faults.py'
+    expected_rotation = hashlib.sha256(rotation.read_bytes()).hexdigest()
     env = {**os.environ, 'ISSUE13_SOURCE': str(SOURCE), 'ISSUE13_RESULTS': str(OUTPUT)}
 
     def run(args, label):
@@ -80,15 +82,18 @@ def main():
         for name, expected in manifest['product_files'].items():
             assert hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() == expected, name
         assert hashlib.sha256(probe.read_bytes()).hexdigest() == expected_probe, 'Supplementary probe changed while waiting'
+        assert hashlib.sha256(rotation.read_bytes()).hexdigest() == expected_rotation, 'Rotation probe changed while waiting'
         active = subprocess.check_output(docker(['docker', 'ps', '--filter',
             'label=com.docker.compose.project=' + PROJECT, '--format', '{{.Names}}']), text=True).strip()
         assert not active, 'Owned services still running; no concurrent contract tests'
         assert not OUTPUT.exists(), 'Never overwrite earlier evidence'
         OUTPUT.mkdir()
+        (OUTPUT / 'warmup.json').write_bytes((HERE / 'results/optimized-r5-baseline/warmup.json').read_bytes())
         coverage = SOURCE / 'docs/verification/issue-13/verify_coverage_projection.py'
         executed = dict(source=str(SOURCE), product_commit=COMMIT,
             product_manifest_sha256=hashlib.sha256((ROOT / 'product-source-manifest.json').read_bytes()).hexdigest(),
             postcommit_probe_sha256=expected_probe,
+            rotation_fault_probe_sha256=expected_rotation,
             coverage_probe_sha256=hashlib.sha256(coverage.read_bytes()).hexdigest(),
             runner_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             scope='Separate read-only mounted probe executes immutable product after all primary/recovery services stop')
@@ -100,6 +105,9 @@ def main():
                 '/postcommit_probe.py'], 'publication_postcommit')
             run(PREFIX + ['run', '--rm', '--no-deps', 'probe', 'python',
                 'docs/verification/issue-13/verify_coverage_projection.py'], 'coverage_replay')
+            run(PREFIX + ['run', '--rm', '--no-deps', '-e', 'ISSUE13_PRODUCT_COMMIT=' + COMMIT,
+                '-v', str(rotation) + ':/rotation_faults_probe.py:ro', 'probe', 'python',
+                '/rotation_faults_probe.py'], 'rotation_faults')
         finally:
             subprocess.run(docker(PREFIX + ['stop', 'postgres']), cwd=REPO, env=env, check=True)
         mark('final_contracts_complete_manual_assessment_pending')
