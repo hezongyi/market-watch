@@ -29,6 +29,7 @@
 - 小型逻辑回归与旧r2测量有宿主竞争；其日志保留，不声明旧测量无其他负载。重型PG/全量/性能/消费者严格串行。
 - r2全量1356 passed / 2 skipped / 65 warnings，778.23s；这是599b043，不验证本候选。r2首两回填最长等待22.794/28.924s超10s，实时1.403/1.917s；原始样本继续保留。
 - 17:12 SGT更新：r3产品220b328真实PG首轮135 passed/5 failed，失败是迁移HEAD常量和失败返回truthiness旧断言；日志保留，PG已停止，未进入性能。测试修正冻结8e06535（产品backend与220b328相同），新独立project `mw-issue13-optimized-r3b`、port19663真实相关回归140 passed/26 warnings（105.03s），完整后端运行中。不得把正在运行的全量或性能标为通过。
+- 17:25 SGT更新：8e06535完整后端1371 passed/2 skipped/65 warnings（778.54s）；提交前真实SIGKILL及新进程接续通过，真实v1.14旧应用在保留additive schema下接续及新候选恢复通过，证据在 `results/optimized-r3b/publication-crash.json` 与 `application-rollback.json`。12次新性能套件已开始，性能及告警/浏览器仍未通过。
 
 ## 隔离环境与下一步
 
