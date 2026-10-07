@@ -246,7 +246,7 @@ def matched(expected):
                 ("expected_volume" not in expected or Decimal(row.payload["volume"]) == Decimal(expected["expected_volume"])))
 
 
-def measure(scenario, seconds, repetition):
+def measure(scenario, seconds, repetition, *, drain_seconds=0):
     global clock
     clock = NOW
     m._PUBLISH_CURSOR = None
@@ -289,8 +289,16 @@ def measure(scenario, seconds, repetition):
     sequence, next_input = 0, begun
     raw = ROOT / f"{scenario}-{repetition}.jsonl"
     with raw.open("w") as output:
-        while time.monotonic()-begun < seconds:
-            if scenario in ("live", "revision") and time.monotonic() >= next_input:
+        while time.monotonic()-begun < seconds+drain_seconds:
+            elapsed_window=time.monotonic()-begun
+            if elapsed_window >= seconds:
+                with s.transaction() as db:
+                    due=db.scalar(select(func.count()).select_from(s.ChartPublicationState).where(
+                        s.ChartPublicationState.requested>s.ChartPublicationState.processed,
+                        s.ChartPublicationState.next_at<=clock))
+                if not due and not pending:
+                    break
+            if elapsed_window < seconds and scenario in ("live", "revision") and time.monotonic() >= next_input:
                 scope = "input"
                 sequence += 1
                 item = injection(scenario, sequence)
@@ -359,6 +367,7 @@ def measure(scenario, seconds, repetition):
     def percentile(values,p):
         return values[min(len(values)-1,int((len(values)-1)*p))] if values else None
     result = dict(scenario=scenario,repetition=repetition,duration=duration,process_cpu_seconds=cpu,
+        nominal_input_window_seconds=seconds,drain_limit_seconds=drain_seconds,
         process_cpu_percent=100*cpu/duration, cpu_scope="worker + injection + verification in one capped process",
         queries=dict(queries),worker_sql_seconds=sql_seconds,cycles=len(turns),
         cycle_p50=percentile(ordered,.5),cycle_p95=percentile(ordered,.95),cycle_p99=percentile(ordered,.99),

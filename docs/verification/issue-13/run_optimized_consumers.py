@@ -12,6 +12,7 @@ from run_suite import observe
 HERE = Path(__file__).resolve().parent
 ROOT = HERE / os.environ.get('ISSUE13_CONSUMER_OUTPUT', 'results/optimized')
 SCRIPTS = (
+    'optimized_terminal_wait_probe.py',
     'optimized_fairness_probe.py',
     'optimized_consumer_probe.py',
     'optimized_supplemental_probe.py',
@@ -23,7 +24,8 @@ SCRIPTS = (
 
 
 def main():
-    source = Path(os.environ.get('ISSUE13_SOURCE', '/home/quant/repos/market-watch-issue13-reviewed-baseline'))
+    source = Path(os.environ.get('ISSUE13_ACCEPTANCE_SOURCE', os.environ.get(
+        'ISSUE13_SOURCE', '/home/quant/repos/market-watch-issue13-reviewed-baseline')))
     os.environ['ISSUE13_SOURCE'] = str(source)
     os.environ['ISSUE13_RESULTS'] = str(ROOT)
     state = json.loads((OUTPUT/'state.json').read_text())
@@ -52,6 +54,7 @@ def main():
             with log.open('x') as output, (ROOT/(label+'-host.jsonl')).open('x') as samples:
                 os.chmod(log, 0o600)
                 proc = subprocess.Popen(command(PREFIX+['run', '--rm', '--no-deps',
+                    '-v',str(OUTPUT)+':/performance:ro',
                     '--name', PROJECT+'-consumer', 'probe', 'python',
                     'docs/verification/issue-13/'+script]), stdout=output, stderr=subprocess.STDOUT)
                 while proc.poll() is None:

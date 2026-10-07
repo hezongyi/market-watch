@@ -45,8 +45,14 @@ def main():
             gate(f'{scenario}_{i}_runnable_wait_seconds',row['longest_target_wait'],10,
                 row['longest_target_wait'] <= 10,'Durable runnable target wait, quiet targets excluded')
             if 'final_unserved_ready' in row:
+                tail_path=CONSUMERS/'terminal-wait'/f'{scenario}-{i}.json'
+                tail=read(tail_path) if tail_path.exists() else None
+                resolved=not row['final_unserved_ready'] or tail is not None and (
+                    not tail['final_unserved_ready'] and not tail['unpublished_events'] and
+                    tail['nominal_input_window_seconds']==300 and tail['drain_limit_seconds']==30 and
+                    tail['longest_target_wait']<=10)
                 gate(f'{scenario}_{i}_unresolved_runnable_targets',len(row['final_unserved_ready']),0,
-                    not row['final_unserved_ready'],'Right-censored ready intervals require drain or supplementary evidence')
+                    resolved,'Original censored intervals retained; supplementary same-scenario stop-input drain required')
     for i,(row,baseline) in enumerate(zip(samples['backfill'],old['backfill']),1):
         throughput = row['backfill_bars_per_second']
         gate(f'backfill_{i}_absolute_bars_per_second',throughput,660.52,throughput >= 660.52,'New effective published bars only')

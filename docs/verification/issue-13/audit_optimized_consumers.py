@@ -15,6 +15,15 @@ def read(name):
 
 def main():
     outputs = []
+    terminal=read('terminal-wait/result.json')
+    for scenario,repetition in terminal['required']:
+        report=read(f'terminal-wait/{scenario}-{repetition}.json')
+        raw=[json.loads(line) for line in (ROOT/f'terminal-wait/{scenario}-{repetition}.jsonl').read_text().splitlines()]
+        assert report['nominal_input_window_seconds']==300 and report['drain_limit_seconds']==30
+        assert not report['unpublished_events'] and not report['final_unserved_ready']
+        assert max(row['longest_ready_age'] for row in raw)==report['longest_target_wait']<=10
+    assert terminal['completed']==len(terminal['required'])
+    outputs.append(dict(scope='censored_wait_supplement',completed=terminal['completed']))
     fairness = read('fairness/result.json')
     assert fairness['targets'] == len(fairness['service']) == 90 and not fairness['missing']
     assert len({(r['instrument'],r['frame']) for r in fairness['service']}) == 90
