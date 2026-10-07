@@ -1,0 +1,197 @@
+[
+  {
+    "project": "mw-issue13-optimized-r5",
+    "task": "mw-issue13-optimized-r5",
+    "pg": "mw-issue13-optimized-r5-postgres-1",
+    "retained_images": [
+      "sha256:85022544e2c8fdb6ee170869cdc29bfb8189d8ed1b8ce2e01e42f600a38c87cc",
+      "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "sha256:e1d4551950f32d05147b58ce78160b7646f49ef902ca5fbce8a82ff958b989bb"
+    ],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/optimized-r5/final-contract-state.json",
+        "status": "not_started_prior_recovery_failed_or_incomplete",
+        "pid": 1257393
+      },
+      {
+        "file": "docs/verification/issue-13/results/optimized-r5/recovery-state.json",
+        "status": "not_started_primary_validation_failed",
+        "pid": 1181805
+      },
+      {
+        "file": "docs/verification/issue-13/results/optimized-r5/validation-state.json",
+        "status": "failed",
+        "pid": 1126319
+      },
+      {
+        "file": "docs/verification/issue-13/results/optimized-r5-baseline/state.json",
+        "status": "complete",
+        "pid": null
+      }
+    ],
+    "containers": [
+      "mw-issue13-optimized-r5-web-1",
+      "mw-issue13-optimized-r5-publisher-1",
+      "mw-issue13-optimized-r5-api-1",
+      "mw-issue13-optimized-r5-chart-origin-1",
+      "mw-issue13-optimized-r5-postgres-1"
+    ]
+  },
+  {
+    "project": "mw-issue13-optimized-r4",
+    "task": "mw-issue13-optimized-r4",
+    "pg": "mw-issue13-optimized-r4-postgres-1",
+    "retained_images": [],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/optimized-r4/validation-state.json",
+        "status": "failed",
+        "pid": 975804
+      }
+    ],
+    "containers": [
+      "mw-issue13-optimized-r4-postgres-1"
+    ]
+  },
+  {
+    "project": "mw-issue13-optimized-r3c",
+    "task": "mw-issue13-optimized-r3c",
+    "pg": "mw-issue13-optimized-r3c-postgres-1",
+    "retained_images": [],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/optimized-r3c/validation-state.json",
+        "status": "failed",
+        "pid": 708912
+      },
+      {
+        "file": "docs/verification/issue-13/results/optimized-r3c-baseline/state.json",
+        "status": "complete",
+        "pid": null
+      }
+    ],
+    "containers": [
+      "mw-issue13-optimized-r3c-postgres-1"
+    ]
+  },
+  {
+    "project": "mw-issue13-optimized-r3b",
+    "task": "mw-issue13-optimized-r3b",
+    "pg": "mw-issue13-optimized-r3b-postgres-1",
+    "retained_images": [],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/optimized-r3b/validation-state.json",
+        "status": "failed",
+        "pid": 642868
+      },
+      {
+        "file": "docs/verification/issue-13/results/optimized-r3b-baseline/state.json",
+        "status": "failed",
+        "pid": null
+      }
+    ],
+    "containers": [
+      "mw-issue13-optimized-r3b-postgres-1"
+    ]
+  },
+  {
+    "project": "mw-issue13-optimized-r3",
+    "task": "mw-issue13-optimized-r3",
+    "pg": "mw-issue13-optimized-r3-postgres-1",
+    "retained_images": [],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/optimized-r3/validation-state.json",
+        "status": "failed",
+        "pid": 629222
+      },
+      {
+        "file": "docs/verification/issue-13/results/optimized-r3c/validation-state.json",
+        "status": "failed",
+        "pid": 708912
+      }
+    ],
+    "containers": [
+      "mw-issue13-optimized-r3-postgres-1"
+    ]
+  },
+  {
+    "project": "mw-issue13-optimized-r2",
+    "task": "mw-issue13-optimized-r2",
+    "pg": "mw-issue13-optimized-r2-postgres-1",
+    "retained_images": [],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/optimized-r2/validation-state.json",
+        "status": "performance_complete_consumers_pending",
+        "pid": 290736,
+        "superseded_by": "r6 complete acceptance; failed r2 fairness raw retained"
+      },
+      {
+        "file": "docs/verification/issue-13/results/optimized-r2-baseline/state.json",
+        "status": "complete",
+        "pid": null
+      }
+    ],
+    "containers": [
+      "mw-issue13-optimized-r2-postgres-1"
+    ]
+  },
+  {
+    "project": "mw-issue13-optimized",
+    "task": "issue13-optimized-browser",
+    "pg": "mw-issue13-optimized-postgres-1",
+    "retained_images": [],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/optimized-baseline/state.json",
+        "status": "complete",
+        "pid": null
+      }
+    ],
+    "containers": [
+      "mw-issue13-optimized-postgres-1"
+    ]
+  },
+  {
+    "project": "mw-issue13-v114",
+    "task": "mw-issue13-v114",
+    "pg": "mw-issue13-v114-postgres-1",
+    "retained_images": [],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/v114-baseline/state.json",
+        "status": "complete",
+        "pid": null
+      }
+    ],
+    "containers": [
+      "mw-issue13-v114-postgres-1"
+    ]
+  },
+  {
+    "project": "mw-issue13-p0",
+    "task": "issue13-browser-baseline",
+    "pg": "mw-issue13-p0-postgres-1",
+    "retained_images": [
+      "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "sha256:22fffffc5d3870433c3001fb0ed76acb01d8de23b4ecd531456390e562616719"
+    ],
+    "terminal_evidence": [
+      {
+        "file": "docs/verification/issue-13/results/finish-state.json",
+        "status": "complete",
+        "pid": null
+      }
+    ],
+    "containers": [
+      "mw-issue13-p0-postgres-1",
+      "mw-issue13-p0-web-1",
+      "mw-issue13-p0-api-1",
+      "mw-issue13-p0-chart-origin-1",
+      "mw-issue13-p0-publisher-1"
+    ]
+  }
+]

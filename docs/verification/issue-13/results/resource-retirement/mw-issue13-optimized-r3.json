@@ -1,0 +1,45 @@
+{
+  "project": "mw-issue13-optimized-r3",
+  "task": "mw-issue13-optimized-r3",
+  "at": "2026-10-07T15:01:15.145662+00:00",
+  "containers": 1,
+  "volumes": [
+    "mw-issue13-optimized-r3_pgdata"
+  ],
+  "networks": [
+    "14bb59800040"
+  ],
+  "verified_backups": [
+    {
+      "volume_names": [
+        "mw-issue13-optimized-r3_pgdata"
+      ],
+      "database": "issue13",
+      "file": "70ae51b18dcf8d84.dump",
+      "sha256": "1cc7fa2d7ca53f4f1751d8f089ec28a95d025e84bb7fa95e46c5386cb7f030b6",
+      "tables": {},
+      "table_fingerprints": {},
+      "actual_restore_verified": true
+    },
+    {
+      "volume_names": [
+        "mw-issue13-optimized-r3_pgdata"
+      ],
+      "database": "postgres",
+      "file": "006e08fc04bc1d44.dump",
+      "sha256": "2beddf1dfbdb41ade5b353408095ef87543afb824d966af974c3b2f189028bf5",
+      "tables": {},
+      "table_fingerprints": {},
+      "actual_restore_verified": true
+    }
+  ],
+  "retained_images": [],
+  "private_archive_directory": "/home/quant/.local/share/market-watch-docker/archives/mw-issue13-optimized-r3-20261007T150109-c946310f",
+  "private_archive_mode": "0o700",
+  "post_retirement_containers": 0,
+  "post_retirement_volumes": 0,
+  "post_retirement_networks": 0,
+  "backup_and_restore_content_verified": true,
+  "private_assets_not_committed": true,
+  "shared_images_preserved": []
+}

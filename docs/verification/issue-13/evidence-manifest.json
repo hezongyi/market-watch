@@ -1,5 +1,5 @@
 {
-  "scope": "Final r6 application implementation and acceptance passed on Ubuntu; original historical failures, explicit r5 publisher inheritance and user near-one-second tolerance preserved. Exact stopped environment recorded. Infrastructure resource retirement preview rejected digest-pinned PG, no deletion performed.",
+  "scope": "Complete r6 application acceptance and subsequent PR #21 preparation; all ten ended Issue13 Ubuntu projects archived, actual all-business-schema restore content verified and retired. Shared images and all historical failed/raw evidence retained. No production deployment.",
   "files": {
     ".gitignore": {
       "sha256": "21ea7e5e1cf73c3b5faecd3b3d27b8b60d0ccce7793b4f1461ee81ce38511d11",
@@ -246,8 +246,8 @@
       "bytes": 5137
     },
     "regression-matrix.md": {
-      "bytes": 8224,
-      "sha256": "f0817e1320fa15712fc75198cffa045871bb890ba73a630b310048f784639adc"
+      "bytes": 8606,
+      "sha256": "4e7f7c76b2ffa1ac44e0a92be185c2cdcc591f2c39adacbd2f09a959682c3729"
     },
     "results/backfill-0-sql.json": {
       "sha256": "5345bfddbdc0692a14ee59dee488f6175af3a811b4b2298b615d47e9e1cad024",
@@ -1262,8 +1262,8 @@
       "bytes": 2637
     },
     "implementation-progress.md": {
-      "bytes": 14455,
-      "sha256": "5887b5b2fd08fea6bbb7ffbeaab034ab76ec3e628de7fa7980bcee9ab9c97556"
+      "bytes": 14837,
+      "sha256": "894d913b2e47688af6e2973ede95dc64d8d36ff133ec92b03b75d7d39cedbd12"
     },
     "results/v114-baseline/live-3-sql.json": {
       "sha256": "124436867775982ca67f78dba3990ef572f0c52f9ffae2d277f2b39bfb426156",
@@ -3338,14 +3338,78 @@
       "sha256": "8796ec8b899f9db1162d3cce24f8aefa6f122440bdf43e55953f8e73e88fc002"
     },
     "r6-closeout.md": {
-      "bytes": 8531,
-      "sha256": "35118cada80b97e6126b58d7ea215d0fd8ae387d336841529b6b073c1e0808af"
+      "bytes": 8984,
+      "sha256": "3e0e8ceff1295627881c339465831df2b42046a8efdf5991ca1aef4c5948e69a"
     },
     "results/optimized-r6/final-delivery-audit.json": {
       "bytes": 1384,
       "sha256": "39818ca28a45c5f9a77fa9c534c0e04004505072c030def5f09d10c3292a4a4a"
+    },
+    "results/resource-retirement/mw-issue13-optimized-r4.json": {
+      "bytes": 16299,
+      "sha256": "4faa60a08cd79eb281e84d4bfa59eaea6b0cf0ea7d74b2e13607bf188ee9e36e"
+    },
+    "results/resource-retirement/mw-issue13-optimized-r3b.json": {
+      "bytes": 16303,
+      "sha256": "41a4cd8e804c36d1248a857c3d290ecd19ac9337fcc72ab640af3977532cf6e6"
+    },
+    "results/resource-retirement/mw-issue13-optimized-r5.json": {
+      "bytes": 16800,
+      "sha256": "2cf85147a6bad80b5c7ecc51565c0377db5a7dc720da8c473572aac62ae198f4"
+    },
+    "results/resource-retirement/mw-issue13-optimized-r3.json": {
+      "bytes": 1344,
+      "sha256": "a4c5c8343469d1e3c495164adade1d2ba68a7a46d10697b818e809fdcad8432b"
+    },
+    "results/resource-retirement/mw-issue13-optimized-r6.json": {
+      "bytes": 16642,
+      "sha256": "7ae7a267c1fecd6adb7a7ab5b72780107856cfe73de57db3998a0a2dad013e03"
+    },
+    "results/resource-retirement/mw-issue13-optimized-r3c.json": {
+      "bytes": 16305,
+      "sha256": "fd20152826251b79a77895f15d9465407e35b8bdccfbeffe50504daae31db702"
+    },
+    "results/resource-retirement/mw-issue13-optimized-r2.json": {
+      "bytes": 16297,
+      "sha256": "cbc774df4260d64511c2d5ca7e38f2ef43e33ff59ca977205b2766468f973585"
+    },
+    "release-pr.md": {
+      "bytes": 3608,
+      "sha256": "c0725c6504abb02ac1b7a788685e1129fc43067c7b5369325199d13e417ce18a"
+    },
+    "resource-retirement.md": {
+      "bytes": 2686,
+      "sha256": "071d85d39d1952993518170df36e0a5499423abfe411d8b78950f919ecfdd1a5"
+    },
+    "results/resource-retirement/retirement-tool-verification.json": {
+      "bytes": 844,
+      "sha256": "8aca38ad89a8d281a5c765d5154888e4bfe4193aed6688638257761897389422"
+    },
+    "results/resource-retirement/historical-retirement-plan.json": {
+      "bytes": 5713,
+      "sha256": "af6d026681fe048a1623d64561356b5067e7c9b54b4acfadf6006d9845e239bf"
+    },
+    "results/resource-retirement/other-projects-before.json": {
+      "bytes": 5093,
+      "sha256": "acc0647fa09acff1c31f7e01207fe2fb0dd2bd2daa1cff86677602bb64ebfab9"
+    },
+    "results/resource-retirement/mw-issue13-v114.json": {
+      "bytes": 14771,
+      "sha256": "1993ca9a91b8493371f7aa9be8f803ec355c5c40c0e39d0660e4fb8277fc78b2"
+    },
+    "results/resource-retirement/final-retirement-audit.json": {
+      "bytes": 1189,
+      "sha256": "3bfd1283123fce2c3da8badf27dda36b21b1f4082d9d906022bb7d86faa54393"
+    },
+    "results/resource-retirement/mw-issue13-optimized.json": {
+      "bytes": 16284,
+      "sha256": "9744883c3c55b91d675cfc705f17530649cc5d56a2e5240bf2926451b96a7c6d"
+    },
+    "results/resource-retirement/mw-issue13-p0.json": {
+      "bytes": 8797,
+      "sha256": "74d8324347abb58a65cf23d955c787b821dfa7b92d3a9cce41e71e46313e9272"
     }
   },
-  "updated_for_commit": "63bad46",
-  "previous_manifest_commit": "63bad46"
+  "updated_for_commit": "bf86911",
+  "previous_manifest_commit": "bf86911"
 }
