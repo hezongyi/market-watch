@@ -121,6 +121,15 @@ class RetirementSafetyTests(unittest.TestCase):
     def test_owned_pg_volume_allowed(self):
         m.validate_retirement("mw-test", [self.c], [self.v], [self.c])
 
+    def test_pg_service_alias_with_owned_volume_allowed(self):
+        self.c["Config"]["Labels"]["com.docker.compose.service"] = "pg"
+        m.validate_retirement("mw-test", [self.c], [self.v], [self.c])
+
+    def test_postgres_service_cannot_hide_unknown_database_image(self):
+        self.c["Config"]["Image"] = "unknown:latest"
+        with self.assertRaises(ValueError):
+            m.validate_retirement("mw-test", [self.c], [self.v], [self.c])
+
     def test_shared_volume_refused(self):
         other = copy.deepcopy(self.c)
         other["Id"] = "other"
@@ -142,6 +151,152 @@ class RetirementSafetyTests(unittest.TestCase):
         ]
         with self.assertRaises(ValueError):
             m.validate_retirement("mw-test", [self.c], [], [self.c])
+
+
+class RetirementImageTests(unittest.TestCase):
+    def setUp(self):
+        self.container = {
+            "Image": "sha256:gateway",
+            "Config": {
+                "Image": "nginx:1.28-alpine",
+                "Labels": {
+                    "com.docker.compose.project": "mw-test",
+                    "com.docker.compose.service": "tls",
+                },
+            },
+        }
+        self.image = {
+            "Id": "sha256:gateway",
+            "Config": {"Labels": {}},
+            "RepoDigests": [
+                "nginx@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592"
+            ],
+        }
+
+    def test_verified_shared_tls_image_allowed(self):
+        m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_unverified_gateway_digest_refused(self):
+        self.image["RepoDigests"] = []
+        with self.assertRaises(ValueError):
+            m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_changed_gateway_image_refused(self):
+        self.image["Id"] = "sha256:changed"
+        with self.assertRaises(ValueError):
+            m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_task_or_release_labeled_gateway_refused(self):
+        for labels in ({"task": "another-task"}, {"purpose": "release"}):
+            self.image["Config"]["Labels"] = {m.PREFIX + k: v for k, v in labels.items()}
+            with self.subTest(labels=labels), self.assertRaises(ValueError):
+                m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_unowned_application_cannot_use_gateway_exception(self):
+        self.container["Config"]["Labels"]["com.docker.compose.service"] = "web"
+        with self.assertRaises(ValueError):
+            m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_foreign_task_and_release_images_refused(self):
+        self.container["Config"]["Image"] = "market-watch-api:test"
+        for task, purpose in [("another-task", "acceptance"), ("mw-test", "release")]:
+            self.image["Config"]["Labels"] = {
+                m.PREFIX + key: value
+                for key, value in {
+                    "managed": "true",
+                    "project": "mw-test",
+                    "task": task,
+                    "purpose": purpose,
+                }.items()
+            }
+            with self.assertRaises(ValueError):
+                m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+
+class RetirementPostgresIdentityTests(unittest.TestCase):
+    TRUSTED = "postgres@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872"
+
+    def setUp(self):
+        self.container = {
+            "Image": "sha256:actual-pg",
+            "Config": {
+                "Image": "postgres:14-bookworm",
+                "Labels": {
+                    "com.docker.compose.project": "mw-test",
+                    "com.docker.compose.service": "pg",
+                },
+            },
+        }
+        self.image = {
+            "Id": "sha256:actual-pg",
+            "RepoDigests": [self.TRUSTED],
+            "Config": {"Labels": {}},
+        }
+
+    def validate(self):
+        m.validate_retirement_image("mw-test", "mw-test", self.container, self.image)
+
+    def test_verified_official_pg_alias_allowed(self):
+        self.validate()
+
+    def test_locally_retagged_pg_refused(self):
+        self.image["RepoDigests"] = []
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_unreviewed_pg_digest_refused(self):
+        self.image["RepoDigests"] = ["postgres@sha256:" + "f" * 64]
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_same_digest_under_other_repository_refused(self):
+        self.image["RepoDigests"] = [self.TRUSTED.replace("postgres@", "example/pg@")]
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_docker_io_normalized_official_digest_allowed(self):
+        self.image["RepoDigests"] = ["docker.io/library/" + self.TRUSTED]
+        self.validate()
+
+    def test_actual_pg_image_id_mismatch_refused(self):
+        self.image["Id"] = "sha256:changed"
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_foreign_task_or_release_pg_labels_refused(self):
+        for labels in (
+            {"task": "different-task"},
+            {"purpose": "release"},
+            {"managed": "true", "task": "mw-test", "project": "mw-test", "purpose": "rollback"},
+        ):
+            self.image["Config"]["Labels"] = {m.PREFIX + k: v for k, v in labels.items()}
+            with self.subTest(labels=labels), self.assertRaises(ValueError):
+                self.validate()
+
+    def test_foreign_release_retagged_pg_on_api_service_refused(self):
+        self.container["Config"]["Labels"]["com.docker.compose.service"] = "api"
+        self.image["RepoDigests"] = []
+        self.image["Config"]["Labels"] = {
+            m.PREFIX + "task": "foreign-task",
+            m.PREFIX + "purpose": "release",
+        }
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_application_actual_image_id_mismatch_refused(self):
+        self.container["Config"]["Image"] = "market-watch-api:test"
+        self.image["Id"] = "sha256:changed"
+        self.image["Config"]["Labels"] = {
+            m.PREFIX + k: v
+            for k, v in {
+                "managed": "true",
+                "task": "mw-test",
+                "project": "mw-test",
+                "purpose": "acceptance",
+            }.items()
+        }
+        with self.assertRaises(ValueError):
+            self.validate()
 
 
 class TagOwnershipTests(unittest.TestCase):
