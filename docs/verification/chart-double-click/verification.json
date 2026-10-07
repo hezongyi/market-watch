@@ -49,7 +49,7 @@
   "dockerVerifiedAt": "2026-10-07T01:06:36.671845+00:00",
   "dockerRuntimeEvidence": "docker-runtime.json",
   "productBrowserEvidence": "product-browser.json",
-  "acceptanceLifecycle": "running for user acceptance; not finished or retired",
+  "acceptanceLifecycle": "user accepted; archived with actual restore verified; exact Ubuntu project resources retired",
   "lanBrowserCases": 4,
   "lanBrowserEvidence": "lan-browser.json",
   "lanRuntimeEvidence": "lan-runtime.json",
@@ -73,5 +73,6 @@
   "realMarketFreshnessEvidence": "live-freshness.json",
   "realMarketScreenshot": "live-browser.png",
   "liveSeedIdempotence": "passed; existing workspace and user settings preserved",
-  "businessChangesSinceV1121": "none in backend, web/src or migrations; only chart double-click implementation and build integration"
+  "businessChangesSinceV1121": "none in backend, web/src or migrations; only chart double-click implementation and build integration",
+  "userAcceptanceEvidence": "user-acceptance.json"
 }

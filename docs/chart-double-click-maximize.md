@@ -1,5 +1,7 @@
 # 主图空白处双击放大／恢复
 
+用户于 2026-10-07 确认“验收正常”。本次 Ubuntu 实例已通过 `mw-docker retire --apply` 完成归档、实际恢复校验和精确清理；验收网址现已关闭。备份位于受限私有目录，不提交仓库。用户验收和退役记录见 [验收记录](verification/chart-double-click/user-acceptance.json)。后续启动使用新的任务／project，已结束的任务不能复用；下面的访问、启动和停止命令保留为本次运行记录。
+
 当前基线：v1.12.1 `9670dae`，独立工作树 `/home/quant/repos/market-watch-double-click`、分支 `feat/chart-double-click-maximize`。最初基于生产 v1.12.0（源码 `0591e56`、文档提交 `cf84f03`）；2026-10-07 将本任务七个提交完整移植到 v1.12.1。两基线的行情后端与图表业务代码相同，功能改动仍限于双击钩子及其构建接入；未包含另一个部署认证任务的改动。
 
 ## 操作
@@ -39,7 +41,7 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
   node web/tests/advanced-chart-maximize.bridge.browser.cjs
 ```
 
-## Ubuntu Docker 验收实例（已运行，供用户验收）
+## Ubuntu Docker 验收实例（历史运行记录，已验收归档）
 
 本次 project 固定为 `mw-chart-maximize-20261007`，独立默认网络、`maximize-pg` volume、`chart_maximize` 数据库和随机密码。初版仅有 `MAXFIXTURE` H1 合成数据，不能作为完整真实行情验收；这导致切换其他品种无本地历史行情，默认 Dukascopy 欧元／黄金在平台系列解析时出现 422。当前增加真实行情 overlay：API、Web、图表来源与 PostgreSQL 之外，运行 realtime、chart-history、chart-aggregation、native-history 四个独立 worker。欧元／黄金使用 OANDA，BTC 使用 Binance；行情重新从来源读取，不复用其他实例的数据库或生产数据目录。通知投递、MCP 和 Yahoo 保持关闭。
 
@@ -89,7 +91,7 @@ docker compose --env-file /tmp/mw-chart-maximize-20261007/compose.env \
 
 已核实当前进程尚未载入 `docker` 补充组，但用户已加入该组；可用 `sg docker -c '<上面的 docker compose 命令>'` 启动或停止。`mw-docker` 自动处理这个组切换。
 
-用户验收结束后先查看本任务精确清单，再执行归档、实际恢复校验与清理。验收仍在进行时不得登记任务完成：
+本次已执行以下精确退役流程，实际恢复成功后才删除资源并登记任务完成：
 
 ```bash
 mw-docker retire --task mw-chart-maximize-20261007 --project mw-chart-maximize-20261007
@@ -109,4 +111,4 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
 
 随机验收登录数据仅位于 `/tmp/mw-chart-maximize-20261007/login.json`，其他 env、证书及私钥均在同一受限目录，不提交仓库。
 
-实例保留运行供用户手动验收，Docker 生命周期任务保持进行中；用户验收结束后按上述 `retire` 流程归档、恢复校验及精确清理。功能和应用验收代码均位于隔离分支，未合并、推送或操作 Unraid 生产。
+本次用户验收已通过，12 个本项目容器、1 个独立 PG volume 和网络已清理，无引用的任务镜像已按任务标签回收；共享 PG／Nginx 基础镜像保留。两个非 template 数据库的备份均在 Ubuntu 实际恢复并核对所有 public 表行数通过。初次退役因工具只识别 `postgres` 服务名被拒绝，随后在独立运维分支修正：按受支持 PG 镜像和挂载识别 `pg`，TLS 核验固定官方 digest 与实际镜像 ID，应用镜像仍强制匹配全部任务标签。32 项工具检查通过，工具修正提交为 `7c756d7`。功能代码仍在隔离分支；生产只读状态核实为 v1.12.0，尚未正式发布本次功能。
