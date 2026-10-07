@@ -3374,8 +3374,8 @@
       "sha256": "cbc774df4260d64511c2d5ca7e38f2ef43e33ff59ca977205b2766468f973585"
     },
     "release-pr.md": {
-      "bytes": 3608,
-      "sha256": "c0725c6504abb02ac1b7a788685e1129fc43067c7b5369325199d13e417ce18a"
+      "sha256": "9949702e9378349bc01751e8da1063c6d99e8077635c1287c8381829c6722f20",
+      "bytes": 4915
     },
     "resource-retirement.md": {
       "bytes": 2686,
@@ -3411,5 +3411,14 @@
     }
   },
   "updated_for_commit": "bf86911",
-  "previous_manifest_commit": "bf86911"
+  "previous_manifest_commit": "bf86911",
+  "post_review_amendment": {
+    "product_commit": "9e51fcfe2c518afe4335270f9e160056f247cc52",
+    "scope": "Only release-pr.md operation instructions amended for PR21 blockers; historical raw evidence and their hashes unchanged. These hashes do not certify current product performance. Current evidence is separately under pr21-fix/.",
+    "prior_release_pr": {
+      "bytes": 3608,
+      "sha256": "c0725c6504abb02ac1b7a788685e1129fc43067c7b5369325199d13e417ce18a"
+    },
+    "original_pr_head": "f34a218bd8416bd85042a8ad4368a6409b2e8d64"
+  }
 }

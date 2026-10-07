@@ -1,0 +1,6218 @@
+[
+  {
+    "scenario": "original_30_day_backlog",
+    "cpu_max": "75000 100000",
+    "memory_max": "805306368",
+    "actual_elapsed_seconds": 0.5379883330315351,
+    "actual_worker_cycles": 10,
+    "targets": 10,
+    "missing": [],
+    "service": [
+      {
+        "instrument": "BTCUSDT",
+        "frame": "D1",
+        "first_seconds": 0.15058166719973087,
+        "rounds": 1
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H1",
+        "first_seconds": 0.2010675179772079,
+        "rounds": 1
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H4",
+        "first_seconds": 0.30446640122681856,
+        "rounds": 1
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M15",
+        "first_seconds": 0.25089123705402017,
+        "rounds": 1
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M5",
+        "first_seconds": 0.06266212509945035,
+        "rounds": 1
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "D1",
+        "first_seconds": 0.405937934294343,
+        "rounds": 1
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H1",
+        "first_seconds": 0.4474451211281121,
+        "rounds": 1
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H4",
+        "first_seconds": 0.35651789233088493,
+        "rounds": 1
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M15",
+        "first_seconds": 0.49266885314136744,
+        "rounds": 1
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M5",
+        "first_seconds": 0.5335135222412646,
+        "rounds": 1
+      }
+    ],
+    "longest_ready_wait_seconds": 0.5335135222412646,
+    "eurusd_jobs_remaining": 0,
+    "btcusd_jobs_remaining": 149,
+    "calculation_errors": [],
+    "turns": [
+      {
+        "seconds": 0.062652378808707,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 0.06266212509945035
+      },
+      {
+        "seconds": 0.06781469518318772,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 0.15058166719973087
+      },
+      {
+        "seconds": 0.030385596677660942,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 0.2010675179772079
+      },
+      {
+        "seconds": 0.029732167720794678,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 0.25089123705402017
+      },
+      {
+        "seconds": 0.03344251308590174,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 0.30446640122681856
+      },
+      {
+        "seconds": 0.03195603331550956,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 0.35651789233088493
+      },
+      {
+        "seconds": 0.029328295961022377,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 0.405937934294343
+      },
+      {
+        "seconds": 0.021416158881038427,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 0.4474451211281121
+      },
+      {
+        "seconds": 0.025093419943004847,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 0.49266885314136744
+      },
+      {
+        "seconds": 0.02071566693484783,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 0.5335135222412646
+      }
+    ],
+    "calculation": "actual market.aggregate_touched and worker cycle; real clock; no mocked calculation"
+  },
+  {
+    "scenario": "sustained_50_targets",
+    "cpu_max": "75000 100000",
+    "memory_max": "805306368",
+    "actual_elapsed_seconds": 30.031351608689874,
+    "actual_worker_cycles": 572,
+    "targets": 50,
+    "missing": [],
+    "service": [
+      {
+        "instrument": "BTCUSDT",
+        "frame": "D1",
+        "first_seconds": 0.10060730203986168,
+        "rounds": 12
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H1",
+        "first_seconds": 0.3027151748538017,
+        "rounds": 12
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H4",
+        "first_seconds": 0.4119159090332687,
+        "rounds": 12
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M15",
+        "first_seconds": 0.35745444102212787,
+        "rounds": 12
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M5",
+        "first_seconds": 0.24667664896696806,
+        "rounds": 12
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "D1",
+        "first_seconds": 0.8225544006563723,
+        "rounds": 12
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H1",
+        "first_seconds": 1.9660962079651654,
+        "rounds": 11
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H4",
+        "first_seconds": 2.2862348230555654,
+        "rounds": 11
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M15",
+        "first_seconds": 1.1753972168080509,
+        "rounds": 12
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M5",
+        "first_seconds": 1.3077216306701303,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-0",
+        "frame": "D1",
+        "first_seconds": 1.6748194578103721,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-0",
+        "frame": "H1",
+        "first_seconds": 2.1483295266516507,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-0",
+        "frame": "H4",
+        "first_seconds": 0.5088573349639773,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-0",
+        "frame": "M15",
+        "first_seconds": 2.4883795040659606,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-0",
+        "frame": "M5",
+        "first_seconds": 1.536348208785057,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-1",
+        "frame": "D1",
+        "first_seconds": 1.4069307469762862,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-1",
+        "frame": "H1",
+        "first_seconds": 1.3563297907821834,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-1",
+        "frame": "H4",
+        "first_seconds": 1.130178699735552,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-1",
+        "frame": "M15",
+        "first_seconds": 2.192156905774027,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-1",
+        "frame": "M5",
+        "first_seconds": 0.4607824287377298,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-2",
+        "frame": "D1",
+        "first_seconds": 1.0839969697408378,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-2",
+        "frame": "H1",
+        "first_seconds": 2.5508898459374905,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-2",
+        "frame": "H4",
+        "first_seconds": 0.5993501776829362,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-2",
+        "frame": "M15",
+        "first_seconds": 0.7745875236578286,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-2",
+        "frame": "M5",
+        "first_seconds": 1.4946282710880041,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-3",
+        "frame": "D1",
+        "first_seconds": 0.9792267410084605,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-3",
+        "frame": "H1",
+        "first_seconds": 1.0256458166986704,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-3",
+        "frame": "H4",
+        "first_seconds": 1.628542265854776,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-3",
+        "frame": "M15",
+        "first_seconds": 0.6912561189383268,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-3",
+        "frame": "M5",
+        "first_seconds": 2.235579865053296,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-4",
+        "frame": "D1",
+        "first_seconds": 2.012439297977835,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-4",
+        "frame": "H1",
+        "first_seconds": 1.217412208672613,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-4",
+        "frame": "H4",
+        "first_seconds": 1.4502619788981974,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-4",
+        "frame": "M15",
+        "first_seconds": 0.6450176406651735,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-4",
+        "frame": "M5",
+        "first_seconds": 2.0550946816802025,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-5",
+        "frame": "D1",
+        "first_seconds": 1.722061752807349,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-5",
+        "frame": "H1",
+        "first_seconds": 1.8664954947307706,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-5",
+        "frame": "H4",
+        "first_seconds": 2.5950897219590843,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-5",
+        "frame": "M15",
+        "first_seconds": 1.259423814713955,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-5",
+        "frame": "M5",
+        "first_seconds": 2.4445069530047476,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-6",
+        "frame": "D1",
+        "first_seconds": 0.8780514178797603,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-6",
+        "frame": "H1",
+        "first_seconds": 0.5511196968145669,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-6",
+        "frame": "H4",
+        "first_seconds": 1.5795839298516512,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-6",
+        "frame": "M15",
+        "first_seconds": 2.100255247671157,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-6",
+        "frame": "M5",
+        "first_seconds": 2.3482744838111103,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-7",
+        "frame": "D1",
+        "first_seconds": 1.9237062227912247,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-7",
+        "frame": "H1",
+        "first_seconds": 1.8059690636582673,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-7",
+        "frame": "H4",
+        "first_seconds": 0.9259887346997857,
+        "rounds": 12
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-7",
+        "frame": "M15",
+        "first_seconds": 1.7641846630722284,
+        "rounds": 11
+      },
+      {
+        "instrument": "PR21-SYNTHETIC-7",
+        "frame": "M5",
+        "first_seconds": 0.7332668830640614,
+        "rounds": 12
+      }
+    ],
+    "longest_ready_wait_seconds": 3.051735766697675,
+    "eurusd_jobs_remaining": 5,
+    "btcusd_jobs_remaining": 143,
+    "calculation_errors": [],
+    "turns": [
+      {
+        "seconds": 0.10058299638330936,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 0.10060730203986168
+      },
+      {
+        "seconds": 0.12231217604130507,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 0.24667664896696806
+      },
+      {
+        "seconds": 0.031098120845854282,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 0.3027151748538017
+      },
+      {
+        "seconds": 0.031330463010817766,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 0.35745444102212787
+      },
+      {
+        "seconds": 0.031394443940371275,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 0.4119159090332687
+      },
+      {
+        "seconds": 0.024781720712780952,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 0.4607824287377298
+      },
+      {
+        "seconds": 0.022495954297482967,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 0.5088573349639773
+      },
+      {
+        "seconds": 0.019408842083066702,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 0.5511196968145669
+      },
+      {
+        "seconds": 0.025158270727843046,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 0.5993501776829362
+      },
+      {
+        "seconds": 0.022321315947920084,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 0.6450176406651735
+      },
+      {
+        "seconds": 0.02347011724486947,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 0.6912561189383268
+      },
+      {
+        "seconds": 0.018463436979800463,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 0.7332668830640614
+      },
+      {
+        "seconds": 0.018031971994787455,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 0.7745875236578286
+      },
+      {
+        "seconds": 0.02497184695675969,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 0.8225544006563723
+      },
+      {
+        "seconds": 0.032696628011763096,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 0.8780514178797603
+      },
+      {
+        "seconds": 0.02433517063036561,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 0.9259887346997857
+      },
+      {
+        "seconds": 0.029895265121012926,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 0.9792267410084605
+      },
+      {
+        "seconds": 0.023099344689399004,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 1.0256458166986704
+      },
+      {
+        "seconds": 0.03504420164972544,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 1.0839969697408378
+      },
+      {
+        "seconds": 0.022903937846422195,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 1.130178699735552
+      },
+      {
+        "seconds": 0.02222383115440607,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 1.1753972168080509
+      },
+      {
+        "seconds": 0.019066889770329,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 1.217412208672613
+      },
+      {
+        "seconds": 0.019160881638526917,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 1.259423814713955
+      },
+      {
+        "seconds": 0.024929466657340527,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 1.3077216306701303
+      },
+      {
+        "seconds": 0.025402192026376724,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 1.3563297907821834
+      },
+      {
+        "seconds": 0.02582263620570302,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 1.4069307469762862
+      },
+      {
+        "seconds": 0.019729994237422943,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 1.4502619788981974
+      },
+      {
+        "seconds": 0.02114783739671111,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 1.4946282710880041
+      },
+      {
+        "seconds": 0.018530454952269793,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 1.536348208785057
+      },
+      {
+        "seconds": 0.019873830024152994,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 1.5795839298516512
+      },
+      {
+        "seconds": 0.025590100791305304,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 1.628542265854776
+      },
+      {
+        "seconds": 0.023354502860456705,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 1.6748194578103721
+      },
+      {
+        "seconds": 0.024068066850304604,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 1.722061752807349
+      },
+      {
+        "seconds": 0.019106860272586346,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 1.7641846630722284
+      },
+      {
+        "seconds": 0.01864243159070611,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 1.8059690636582673
+      },
+      {
+        "seconds": 0.03198962099850178,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 1.8664954947307706
+      },
+      {
+        "seconds": 0.031638836953788996,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 1.9237062227912247
+      },
+      {
+        "seconds": 0.018720966298133135,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 1.9660962079651654
+      },
+      {
+        "seconds": 0.023227835074067116,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 2.012439297977835
+      },
+      {
+        "seconds": 0.019912948831915855,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 2.0550946816802025
+      },
+      {
+        "seconds": 0.022442482877522707,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 2.100255247671157
+      },
+      {
+        "seconds": 0.02467502886429429,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 2.1483295266516507
+      },
+      {
+        "seconds": 0.02073427103459835,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 2.192156905774027
+      },
+      {
+        "seconds": 0.01992753939703107,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 2.235579865053296
+      },
+      {
+        "seconds": 0.027409890200942755,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 2.2862348230555654
+      },
+      {
+        "seconds": 0.038980486802756786,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 2.3482744838111103
+      },
+      {
+        "seconds": 0.07292448496446013,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 2.4445069530047476
+      },
+      {
+        "seconds": 0.020437741186469793,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 2.4883795040659606
+      },
+      {
+        "seconds": 0.03088800422847271,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 2.5508898459374905
+      },
+      {
+        "seconds": 0.021173762157559395,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 2.5950897219590843
+      },
+      {
+        "seconds": 0.07237695809453726,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 2.6906214049085975
+      },
+      {
+        "seconds": 0.030919247772544622,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 2.746106044854969
+      },
+      {
+        "seconds": 0.028436727821826935,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 2.797827153932303
+      },
+      {
+        "seconds": 0.030245857778936625,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 2.8522490337491035
+      },
+      {
+        "seconds": 0.056876189075410366,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 2.9390673427842557
+      },
+      {
+        "seconds": 0.023290629032999277,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 2.9853248270228505
+      },
+      {
+        "seconds": 0.03936871187761426,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 3.0475408188067377
+      },
+      {
+        "seconds": 0.05852563679218292,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 3.1321303406730294
+      },
+      {
+        "seconds": 0.02594659198075533,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 3.1811167397536337
+      },
+      {
+        "seconds": 0.01912170834839344,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 3.224334543105215
+      },
+      {
+        "seconds": 0.021206149831414223,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 3.268520970828831
+      },
+      {
+        "seconds": 0.022125997114926577,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 3.313578966073692
+      },
+      {
+        "seconds": 0.025680100079625845,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 3.362460834905505
+      },
+      {
+        "seconds": 0.02677050791680813,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 3.413151079788804
+      },
+      {
+        "seconds": 0.037744577042758465,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 3.474516646936536
+      },
+      {
+        "seconds": 0.021145211067050695,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 3.5185301429592073
+      },
+      {
+        "seconds": 0.027397621888667345,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 3.5691138287074864
+      },
+      {
+        "seconds": 0.02432511793449521,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 3.617546872701496
+      },
+      {
+        "seconds": 0.026439916342496872,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 3.667729014996439
+      },
+      {
+        "seconds": 0.019910304807126522,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 3.7110159657895565
+      },
+      {
+        "seconds": 0.019041075836867094,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 3.752962099853903
+      },
+      {
+        "seconds": 0.029320068657398224,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 3.8059968217276037
+      },
+      {
+        "seconds": 0.06862594000995159,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 3.901500100735575
+      },
+      {
+        "seconds": 0.01970388414338231,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 3.945097710005939
+      },
+      {
+        "seconds": 0.019620751030743122,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 3.9881537067703903
+      },
+      {
+        "seconds": 0.023500862065702677,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 4.036272511817515
+      },
+      {
+        "seconds": 0.02118179714307189,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 4.080551488790661
+      },
+      {
+        "seconds": 0.02169444877654314,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 4.125171343795955
+      },
+      {
+        "seconds": 0.017772147431969643,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 4.166031632106751
+      },
+      {
+        "seconds": 0.023764505051076412,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 4.227581433951855
+      },
+      {
+        "seconds": 0.02104352507740259,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 4.271665561012924
+      },
+      {
+        "seconds": 0.022099279798567295,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 4.31694594072178
+      },
+      {
+        "seconds": 0.024773371405899525,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 4.364559262059629
+      },
+      {
+        "seconds": 0.017744204960763454,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 4.407394493930042
+      },
+      {
+        "seconds": 0.019999050069600344,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 4.450536274816841
+      },
+      {
+        "seconds": 0.02182659087702632,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 4.495373298879713
+      },
+      {
+        "seconds": 0.029083033092319965,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 4.547931065782905
+      },
+      {
+        "seconds": 0.018426556140184402,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 4.589691204018891
+      },
+      {
+        "seconds": 0.029034103266894817,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 4.644842308945954
+      },
+      {
+        "seconds": 0.020379973109811544,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 4.687902493868023
+      },
+      {
+        "seconds": 0.036453383043408394,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 4.747939683031291
+      },
+      {
+        "seconds": 0.05632493179291487,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 4.827220460865647
+      },
+      {
+        "seconds": 0.024037047754973173,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 4.874766715802252
+      },
+      {
+        "seconds": 0.03655875660479069,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 4.935023315716535
+      },
+      {
+        "seconds": 0.02006555302068591,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 4.978865284938365
+      },
+      {
+        "seconds": 0.018237596843391657,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 5.0201385617256165
+      },
+      {
+        "seconds": 0.01907385280355811,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 5.061994834803045
+      },
+      {
+        "seconds": 0.0236136089079082,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 5.111436005681753
+      },
+      {
+        "seconds": 0.020172197837382555,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 5.15494398586452
+      },
+      {
+        "seconds": 0.02009015576913953,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 5.19808532577008
+      },
+      {
+        "seconds": 0.06761835608631372,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 5.290450127795339
+      },
+      {
+        "seconds": 0.03142203390598297,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 5.344745358917862
+      },
+      {
+        "seconds": 0.0291430470533669,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 5.397012800909579
+      },
+      {
+        "seconds": 0.030515929218381643,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 5.450707843992859
+      },
+      {
+        "seconds": 0.029676834121346474,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 5.5074278130196035
+      },
+      {
+        "seconds": 0.019681258127093315,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 5.5507920710369945
+      },
+      {
+        "seconds": 0.034660983830690384,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 5.6087083988823
+      },
+      {
+        "seconds": 0.022788581904023886,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 5.65490844193846
+      },
+      {
+        "seconds": 0.021246985998004675,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 5.699399417731911
+      },
+      {
+        "seconds": 0.02136709215119481,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 5.744268875103444
+      },
+      {
+        "seconds": 0.017677246127277613,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 5.785475728102028
+      },
+      {
+        "seconds": 0.021851452998816967,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 5.830400912091136
+      },
+      {
+        "seconds": 0.04471172858029604,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 5.903704983647913
+      },
+      {
+        "seconds": 0.02806952502578497,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 5.956200652755797
+      },
+      {
+        "seconds": 0.0364206088706851,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 6.015441227704287
+      },
+      {
+        "seconds": 0.018989351112395525,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 6.057661191094667
+      },
+      {
+        "seconds": 0.04037536168470979,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 6.123816922772676
+      },
+      {
+        "seconds": 0.04550386732444167,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 6.194396642036736
+      },
+      {
+        "seconds": 0.02393785584717989,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 6.2415844039060175
+      },
+      {
+        "seconds": 0.020734867081046104,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 6.285272373817861
+      },
+      {
+        "seconds": 0.020397996995598078,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 6.329005070030689
+      },
+      {
+        "seconds": 0.01718988362699747,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 6.369468421675265
+      },
+      {
+        "seconds": 0.017938159871846437,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 6.410813680849969
+      },
+      {
+        "seconds": 0.018233303911983967,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 6.452193527948111
+      },
+      {
+        "seconds": 0.02161599788814783,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 6.496885929722339
+      },
+      {
+        "seconds": 0.0348457139916718,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 6.554940778762102
+      },
+      {
+        "seconds": 0.02746078372001648,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 6.610357240773737
+      },
+      {
+        "seconds": 0.019268469884991646,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 6.653414859902114
+      },
+      {
+        "seconds": 0.022381317801773548,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 6.698551099747419
+      },
+      {
+        "seconds": 0.021323490887880325,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 6.742782802786678
+      },
+      {
+        "seconds": 0.023664572276175022,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 6.789506311994046
+      },
+      {
+        "seconds": 0.029951182194054127,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 6.842757436912507
+      },
+      {
+        "seconds": 0.057334457989782095,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 6.924994291737676
+      },
+      {
+        "seconds": 0.021260468289256096,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 6.986346261110157
+      },
+      {
+        "seconds": 0.01712876930832863,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 7.026814613956958
+      },
+      {
+        "seconds": 0.021012666635215282,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 7.083515886683017
+      },
+      {
+        "seconds": 0.02719129202887416,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 7.134104050695896
+      },
+      {
+        "seconds": 0.03907208703458309,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 7.197070667985827
+      },
+      {
+        "seconds": 0.025025612208992243,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 7.245851228013635
+      },
+      {
+        "seconds": 0.02245601313188672,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 7.291613148059696
+      },
+      {
+        "seconds": 0.019632942974567413,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 7.334497659932822
+      },
+      {
+        "seconds": 0.02108680922538042,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 7.378565494902432
+      },
+      {
+        "seconds": 0.02029219502583146,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 7.423238617833704
+      },
+      {
+        "seconds": 0.025440490804612637,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 7.471570300869644
+      },
+      {
+        "seconds": 0.019756637047976255,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 7.514691134914756
+      },
+      {
+        "seconds": 0.019313291180878878,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 7.557191887870431
+      },
+      {
+        "seconds": 0.022739428095519543,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 7.603177196811885
+      },
+      {
+        "seconds": 0.01964680291712284,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 7.646634183824062
+      },
+      {
+        "seconds": 0.021143813151866198,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 7.6908761090599
+      },
+      {
+        "seconds": 0.02089253393933177,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 7.735009111929685
+      },
+      {
+        "seconds": 0.06681619305163622,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 7.824688143096864
+      },
+      {
+        "seconds": 0.055558746214956045,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 7.90342009998858
+      },
+      {
+        "seconds": 0.03308770200237632,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 7.960908670909703
+      },
+      {
+        "seconds": 0.02685253880918026,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 8.012050079647452
+      },
+      {
+        "seconds": 0.03046376397833228,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 8.067589230835438
+      },
+      {
+        "seconds": 0.03744317404925823,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 8.12845705403015
+      },
+      {
+        "seconds": 0.03061583824455738,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 8.196709956973791
+      },
+      {
+        "seconds": 0.02258055889979005,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 8.273922292981297
+      },
+      {
+        "seconds": 0.022135253995656967,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 8.31912819109857
+      },
+      {
+        "seconds": 0.029112590942531824,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 8.37148327799514
+      },
+      {
+        "seconds": 0.01831513922661543,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 8.41318485699594
+      },
+      {
+        "seconds": 0.01904491614550352,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 8.454942496027797
+      },
+      {
+        "seconds": 0.02272873930633068,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 8.500680881086737
+      },
+      {
+        "seconds": 0.024519332218915224,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 8.5493184318766
+      },
+      {
+        "seconds": 0.03715616185218096,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 8.609024923760444
+      },
+      {
+        "seconds": 0.022374777123332024,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 8.656707680784166
+      },
+      {
+        "seconds": 0.043495133984833956,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 8.723850995767862
+      },
+      {
+        "seconds": 0.02279367297887802,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 8.770165288820863
+      },
+      {
+        "seconds": 0.024058286100625992,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 8.817230985034257
+      },
+      {
+        "seconds": 0.021677187643945217,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 8.862901360727847
+      },
+      {
+        "seconds": 0.02871885895729065,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 8.916268869768828
+      },
+      {
+        "seconds": 0.029404046945273876,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 8.969665954820812
+      },
+      {
+        "seconds": 0.0187807846814394,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 9.01142760971561
+      },
+      {
+        "seconds": 0.019776844885200262,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 9.054376538842916
+      },
+      {
+        "seconds": 0.018592029344290495,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 9.095994703006
+      },
+      {
+        "seconds": 0.03802236961200833,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 9.157336090691388
+      },
+      {
+        "seconds": 0.02284667966887355,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 9.203800238668919
+      },
+      {
+        "seconds": 0.03919178806245327,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 9.267161804717034
+      },
+      {
+        "seconds": 0.024542830418795347,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 9.315086516086012
+      },
+      {
+        "seconds": 0.021391073241829872,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 9.359885110054165
+      },
+      {
+        "seconds": 0.02038007928058505,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 9.404178577940911
+      },
+      {
+        "seconds": 0.023716933093965054,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 9.450557950884104
+      },
+      {
+        "seconds": 0.024269263725727797,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 9.497700445819646
+      },
+      {
+        "seconds": 0.02351559419184923,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 9.544486768078059
+      },
+      {
+        "seconds": 0.019002310000360012,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 9.586346652824432
+      },
+      {
+        "seconds": 0.01933242566883564,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 9.630623129662126
+      },
+      {
+        "seconds": 0.024122954811900854,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 9.67784405266866
+      },
+      {
+        "seconds": 0.022269032895565033,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 9.723080683965236
+      },
+      {
+        "seconds": 0.023628518916666508,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 9.770133177749813
+      },
+      {
+        "seconds": 0.028707976453006268,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 9.82270938809961
+      },
+      {
+        "seconds": 0.024307209998369217,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 9.872524574864656
+      },
+      {
+        "seconds": 0.022940630093216896,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 9.918386666104198
+      },
+      {
+        "seconds": 0.024109942838549614,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 9.96816856181249
+      },
+      {
+        "seconds": 0.019312096294015646,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 10.010857643093914
+      },
+      {
+        "seconds": 0.019401058088988066,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 10.0535006118007
+      },
+      {
+        "seconds": 0.019488772843033075,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 10.09585535665974
+      },
+      {
+        "seconds": 0.018666197080165148,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 10.139485486783087
+      },
+      {
+        "seconds": 0.039567647967487574,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 10.204933088738471
+      },
+      {
+        "seconds": 0.02042302442714572,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 10.24913092609495
+      },
+      {
+        "seconds": 0.021326450165361166,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 10.293715891893953
+      },
+      {
+        "seconds": 0.13852494722232223,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 10.458057988900691
+      },
+      {
+        "seconds": 0.03405222995206714,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 10.51497009396553
+      },
+      {
+        "seconds": 0.026501625776290894,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 10.56431972887367
+      },
+      {
+        "seconds": 0.02480968739837408,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 10.612148588057607
+      },
+      {
+        "seconds": 0.027159682009369135,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 10.661968058906496
+      },
+      {
+        "seconds": 0.025743589736521244,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 10.71075419569388
+      },
+      {
+        "seconds": 0.022177616134285927,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 10.756852131802589
+      },
+      {
+        "seconds": 0.019570800010114908,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 10.799880229867995
+      },
+      {
+        "seconds": 0.020887041930109262,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 10.84354752395302
+      },
+      {
+        "seconds": 0.029133356641978025,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 10.895348327700049
+      },
+      {
+        "seconds": 0.020372443832457066,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 10.938754128757864
+      },
+      {
+        "seconds": 0.019368734676390886,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 10.988223639782518
+      },
+      {
+        "seconds": 0.018166417721658945,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 11.03084429167211
+      },
+      {
+        "seconds": 0.036703177727758884,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 11.095996510703117
+      },
+      {
+        "seconds": 0.032062127720564604,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 11.15091723576188
+      },
+      {
+        "seconds": 0.022811819799244404,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 11.197461297735572
+      },
+      {
+        "seconds": 0.030333756934851408,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 11.250583233777434
+      },
+      {
+        "seconds": 0.024704241659492254,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 11.298724252730608
+      },
+      {
+        "seconds": 0.024606843944638968,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 11.346601518802345
+      },
+      {
+        "seconds": 0.02027569292113185,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 11.390019132755697
+      },
+      {
+        "seconds": 0.020780763123184443,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 11.434087295085192
+      },
+      {
+        "seconds": 0.01963724009692669,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 11.476910172961652
+      },
+      {
+        "seconds": 0.02130110189318657,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 11.522507288958877
+      },
+      {
+        "seconds": 0.024196039885282516,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 11.571085259784013
+      },
+      {
+        "seconds": 0.049476440995931625,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 11.644469319842756
+      },
+      {
+        "seconds": 0.02656897669658065,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 11.694514021743089
+      },
+      {
+        "seconds": 0.022857753094285727,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 11.740494898054749
+      },
+      {
+        "seconds": 0.023351747076958418,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 11.787193377967924
+      },
+      {
+        "seconds": 0.022515921853482723,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 11.832920585758984
+      },
+      {
+        "seconds": 0.02911415882408619,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 11.885696076788008
+      },
+      {
+        "seconds": 0.027877528220415115,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 11.939432682003826
+      },
+      {
+        "seconds": 0.03799056774005294,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 12.001154410652816
+      },
+      {
+        "seconds": 0.041943931952118874,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 12.068306551780552
+      },
+      {
+        "seconds": 0.029274065047502518,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 12.120899351779372
+      },
+      {
+        "seconds": 0.02794154128059745,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 12.172437177971005
+      },
+      {
+        "seconds": 0.030286677181720734,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 12.227643717080355
+      },
+      {
+        "seconds": 0.02560134418308735,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 12.28400760795921
+      },
+      {
+        "seconds": 0.021459850948303938,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 12.32869486976415
+      },
+      {
+        "seconds": 0.030694108922034502,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 12.382709681987762
+      },
+      {
+        "seconds": 0.021496704779565334,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 12.440747094806284
+      },
+      {
+        "seconds": 0.02530207810923457,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 12.492606814019382
+      },
+      {
+        "seconds": 0.01973820012062788,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 12.53750287508592
+      },
+      {
+        "seconds": 0.02104222122579813,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 12.581748757045716
+      },
+      {
+        "seconds": 0.023609639145433903,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 12.629355291835964
+      },
+      {
+        "seconds": 0.024977765046060085,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 12.677125846967101
+      },
+      {
+        "seconds": 0.022729278076440096,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 12.723033140879124
+      },
+      {
+        "seconds": 0.0494157699868083,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 12.795534636825323
+      },
+      {
+        "seconds": 0.02520519634708762,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 12.8439562600106
+      },
+      {
+        "seconds": 0.03407588507980108,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 12.900709019973874
+      },
+      {
+        "seconds": 0.04056197311729193,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 12.966325469780713
+      },
+      {
+        "seconds": 0.0674822828732431,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 13.057334792800248
+      },
+      {
+        "seconds": 0.041571115143597126,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 13.12298878096044
+      },
+      {
+        "seconds": 0.029407288879156113,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 13.175807777792215
+      },
+      {
+        "seconds": 0.030508413910865784,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 13.229504443705082
+      },
+      {
+        "seconds": 0.0342904357239604,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 13.291251314803958
+      },
+      {
+        "seconds": 0.019907073117792606,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 13.333872863091528
+      },
+      {
+        "seconds": 0.020146049093455076,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 13.376909658778459
+      },
+      {
+        "seconds": 0.02670854702591896,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 13.426886689849198
+      },
+      {
+        "seconds": 0.03437799494713545,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 13.484655218664557
+      },
+      {
+        "seconds": 0.02031792188063264,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 13.528498016763479
+      },
+      {
+        "seconds": 0.025897052139043808,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 13.57807170599699
+      },
+      {
+        "seconds": 0.027775804977864027,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 13.630162792745978
+      },
+      {
+        "seconds": 0.0256542363204062,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 13.678989442065358
+      },
+      {
+        "seconds": 0.03148392913863063,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 13.733375784009695
+      },
+      {
+        "seconds": 0.04812902491539717,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 13.80478541366756
+      },
+      {
+        "seconds": 0.03457534406334162,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 13.863050248939544
+      },
+      {
+        "seconds": 0.04550450202077627,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 13.932046359870583
+      },
+      {
+        "seconds": 0.04988027876242995,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 14.00524975778535
+      },
+      {
+        "seconds": 0.02793377684429288,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 14.056312618777156
+      },
+      {
+        "seconds": 0.01947719417512417,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 14.100473714992404
+      },
+      {
+        "seconds": 0.06912666512653232,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 14.196599801070988
+      },
+      {
+        "seconds": 0.01711959159001708,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 14.23695087665692
+      },
+      {
+        "seconds": 0.042921096086502075,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 14.308398982975632
+      },
+      {
+        "seconds": 0.02434074692428112,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 14.357482730876654
+      },
+      {
+        "seconds": 0.025642474181950092,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 14.406237957067788
+      },
+      {
+        "seconds": 0.025591832119971514,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 14.45541687682271
+      },
+      {
+        "seconds": 0.03195361094549298,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 14.511286984663457
+      },
+      {
+        "seconds": 0.023443312849849463,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 14.560049113817513
+      },
+      {
+        "seconds": 0.02307995967566967,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 14.606056580785662
+      },
+      {
+        "seconds": 0.023027699906378984,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 14.65257189096883
+      },
+      {
+        "seconds": 0.023841742891818285,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 14.699437530711293
+      },
+      {
+        "seconds": 0.03115114290267229,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 14.753743569832295
+      },
+      {
+        "seconds": 0.021604666020721197,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 14.799490157980472
+      },
+      {
+        "seconds": 0.03529474837705493,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 14.857913651037961
+      },
+      {
+        "seconds": 0.03974303603172302,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 14.925012807827443
+      },
+      {
+        "seconds": 0.031317907851189375,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 14.979882427956909
+      },
+      {
+        "seconds": 0.032640065997838974,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 15.036782271694392
+      },
+      {
+        "seconds": 0.028881953563541174,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 15.089660710655153
+      },
+      {
+        "seconds": 0.032440707087516785,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 15.148058077786118
+      },
+      {
+        "seconds": 0.024580178316682577,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 15.195883634034544
+      },
+      {
+        "seconds": 0.02220304263755679,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 15.241465315688401
+      },
+      {
+        "seconds": 0.01887834584340453,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 15.283305192831904
+      },
+      {
+        "seconds": 0.017917374148964882,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 15.324438739102334
+      },
+      {
+        "seconds": 0.021510695107281208,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 15.369115578010678
+      },
+      {
+        "seconds": 0.026729969307780266,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 15.419511476065964
+      },
+      {
+        "seconds": 0.019552681129425764,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 15.465021955780685
+      },
+      {
+        "seconds": 0.020722761284559965,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 15.511864229105413
+      },
+      {
+        "seconds": 0.018901291768997908,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 15.553894146811217
+      },
+      {
+        "seconds": 0.02554366923868656,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 15.602373960893601
+      },
+      {
+        "seconds": 0.02144421823322773,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 15.679069980047643
+      },
+      {
+        "seconds": 0.0633222721517086,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 15.76534228399396
+      },
+      {
+        "seconds": 0.029193479102104902,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 15.81712269084528
+      },
+      {
+        "seconds": 0.030026756692677736,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 15.870149031747133
+      },
+      {
+        "seconds": 0.0304169449955225,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 15.923333490733057
+      },
+      {
+        "seconds": 0.02986085508018732,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 15.976228578947484
+      },
+      {
+        "seconds": 0.023027752060443163,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 16.022321439813823
+      },
+      {
+        "seconds": 0.023572560865432024,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 16.0688383737579
+      },
+      {
+        "seconds": 0.02468211203813553,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 16.118366131093353
+      },
+      {
+        "seconds": 0.020194072742015123,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 16.161484677810222
+      },
+      {
+        "seconds": 0.01895093498751521,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 16.20344360265881
+      },
+      {
+        "seconds": 0.021093000657856464,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 16.247583580669016
+      },
+      {
+        "seconds": 0.018418853171169758,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 16.289387905970216
+      },
+      {
+        "seconds": 0.019033242017030716,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 16.331202366854995
+      },
+      {
+        "seconds": 0.025579423177987337,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 16.380333140026778
+      },
+      {
+        "seconds": 0.02970066014677286,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 16.433501705061644
+      },
+      {
+        "seconds": 0.02071812702342868,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 16.47757725790143
+      },
+      {
+        "seconds": 0.02400468196719885,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 16.524851318914443
+      },
+      {
+        "seconds": 0.01996568590402603,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 16.567879694979638
+      },
+      {
+        "seconds": 0.023676590994000435,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 16.614636406768113
+      },
+      {
+        "seconds": 0.021542164031416178,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 16.659374109003693
+      },
+      {
+        "seconds": 0.01970095094293356,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 16.702458649873734
+      },
+      {
+        "seconds": 0.019102528225630522,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 16.74472250090912
+      },
+      {
+        "seconds": 0.024486273992806673,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 16.792195498012006
+      },
+      {
+        "seconds": 0.03672454692423344,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 16.852172669954598
+      },
+      {
+        "seconds": 0.020548013970255852,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 16.896347258705646
+      },
+      {
+        "seconds": 0.026558157987892628,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 16.947203911840916
+      },
+      {
+        "seconds": 0.020567787811160088,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 16.99073815671727
+      },
+      {
+        "seconds": 0.018013122025877237,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 17.03186016296968
+      },
+      {
+        "seconds": 0.01790753612294793,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 17.073060093913227
+      },
+      {
+        "seconds": 0.021802415139973164,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 17.11777900205925
+      },
+      {
+        "seconds": 0.02315621031448245,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 17.163937021046877
+      },
+      {
+        "seconds": 0.022895445115864277,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 17.20997354388237
+      },
+      {
+        "seconds": 0.02539142221212387,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 17.258023479022086
+      },
+      {
+        "seconds": 0.019917887169867754,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 17.30099136987701
+      },
+      {
+        "seconds": 0.018619417678564787,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 17.342547796666622
+      },
+      {
+        "seconds": 0.021188891027122736,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 17.386495194863528
+      },
+      {
+        "seconds": 0.02394056413322687,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 17.434192122891545
+      },
+      {
+        "seconds": 0.020625602919608355,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 17.477794758975506
+      },
+      {
+        "seconds": 0.03071863204240799,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 17.531056456733495
+      },
+      {
+        "seconds": 0.017175600863993168,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 17.57132283085957
+      },
+      {
+        "seconds": 0.020154276862740517,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 17.61759237665683
+      },
+      {
+        "seconds": 0.02488995622843504,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 17.666909501887858
+      },
+      {
+        "seconds": 0.020040870644152164,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 17.71009162068367
+      },
+      {
+        "seconds": 0.01986854476854205,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 17.75295948376879
+      },
+      {
+        "seconds": 0.022066942881792784,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 17.798386635724455
+      },
+      {
+        "seconds": 0.019102429039776325,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 17.840809643734246
+      },
+      {
+        "seconds": 0.021040018182247877,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 17.88496138388291
+      },
+      {
+        "seconds": 0.02364621078595519,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 17.932354409713298
+      },
+      {
+        "seconds": 0.01905296789482236,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 17.97447282774374
+      },
+      {
+        "seconds": 0.035277990624308586,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 18.0336779137142
+      },
+      {
+        "seconds": 0.08600419433787465,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 18.143207177054137
+      },
+      {
+        "seconds": 0.036797390785068274,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 18.20319809485227
+      },
+      {
+        "seconds": 0.023677906021475792,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 18.25403094291687
+      },
+      {
+        "seconds": 0.03658790420740843,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 18.313787850085646
+      },
+      {
+        "seconds": 0.028424397110939026,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 18.36518878582865
+      },
+      {
+        "seconds": 0.01944795297458768,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 18.408030489925295
+      },
+      {
+        "seconds": 0.04106936976313591,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 18.471891943830997
+      },
+      {
+        "seconds": 0.027658299077302217,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 18.52262092102319
+      },
+      {
+        "seconds": 0.036867744754999876,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 18.582932681776583
+      },
+      {
+        "seconds": 0.0291299051605165,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 18.634999324101955
+      },
+      {
+        "seconds": 0.01758788712322712,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 18.6755273710005
+      },
+      {
+        "seconds": 0.035142451990395784,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 18.733894483651966
+      },
+      {
+        "seconds": 0.018706141971051693,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 18.775905922055244
+      },
+      {
+        "seconds": 0.02260451205074787,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 18.82145158201456
+      },
+      {
+        "seconds": 0.02576286718249321,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 18.87016942491755
+      },
+      {
+        "seconds": 0.018876257818192244,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 18.91227733483538
+      },
+      {
+        "seconds": 0.0257034613750875,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 18.960903332103044
+      },
+      {
+        "seconds": 0.019199287984520197,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 19.00624905107543
+      },
+      {
+        "seconds": 0.0387302590534091,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 19.068050318863243
+      },
+      {
+        "seconds": 0.03998315799981356,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 19.1412190948613
+      },
+      {
+        "seconds": 0.07065922999754548,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 19.238746442832053
+      },
+      {
+        "seconds": 0.056342541705816984,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 19.328889440745115
+      },
+      {
+        "seconds": 0.0241310759447515,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 19.37792076775804
+      },
+      {
+        "seconds": 0.03721807384863496,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 19.439572164788842
+      },
+      {
+        "seconds": 0.023806024808436632,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 19.48865684773773
+      },
+      {
+        "seconds": 0.025242678821086884,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 19.540214819833636
+      },
+      {
+        "seconds": 0.020135714206844568,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 19.583988532889634
+      },
+      {
+        "seconds": 0.017817454878240824,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 19.625666139647365
+      },
+      {
+        "seconds": 0.019011489115655422,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 19.667351428885013
+      },
+      {
+        "seconds": 0.022696243599057198,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 19.71337919170037
+      },
+      {
+        "seconds": 0.021101669874042273,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 19.75800356687978
+      },
+      {
+        "seconds": 0.02463291911408305,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 19.805950636975467
+      },
+      {
+        "seconds": 0.04878073185682297,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 19.88120226189494
+      },
+      {
+        "seconds": 0.02557179518043995,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 19.930128912907094
+      },
+      {
+        "seconds": 0.02407710300758481,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 19.97850965289399
+      },
+      {
+        "seconds": 0.030711623840034008,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 20.047283676918596
+      },
+      {
+        "seconds": 0.04820011369884014,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 20.118619166780263
+      },
+      {
+        "seconds": 0.019557527266442776,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 20.162418018095195
+      },
+      {
+        "seconds": 0.02778512705117464,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 20.21307232696563
+      },
+      {
+        "seconds": 0.0204762639477849,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 20.266023757867515
+      },
+      {
+        "seconds": 0.022230911068618298,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 20.31353579973802
+      },
+      {
+        "seconds": 0.02232076320797205,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 20.36175571102649
+      },
+      {
+        "seconds": 0.02943503111600876,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 20.41389265982434
+      },
+      {
+        "seconds": 0.04938825173303485,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 20.490122561808676
+      },
+      {
+        "seconds": 0.04494219459593296,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 20.55855877464637
+      },
+      {
+        "seconds": 0.026513985823839903,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 20.614309013821185
+      },
+      {
+        "seconds": 0.01933796890079975,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 20.65973126795143
+      },
+      {
+        "seconds": 0.017310867086052895,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 20.701146123930812
+      },
+      {
+        "seconds": 0.02210887987166643,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 20.746370284818113
+      },
+      {
+        "seconds": 0.036164186894893646,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 20.805907158646733
+      },
+      {
+        "seconds": 0.265825591981411,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 21.098719366826117
+      },
+      {
+        "seconds": 0.058982095681130886,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 21.18161995569244
+      },
+      {
+        "seconds": 0.03182917693629861,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 21.23724903166294
+      },
+      {
+        "seconds": 0.026843233965337276,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 21.287262711673975
+      },
+      {
+        "seconds": 0.03149389289319515,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 21.341511693783104
+      },
+      {
+        "seconds": 0.019084067083895206,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 21.38392869895324
+      },
+      {
+        "seconds": 0.020678867120295763,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 21.427804314997047
+      },
+      {
+        "seconds": 0.02629000600427389,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 21.477310706861317
+      },
+      {
+        "seconds": 0.029407513793557882,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 21.536308449693024
+      },
+      {
+        "seconds": 0.020053498912602663,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 21.58183591067791
+      },
+      {
+        "seconds": 0.04026106791570783,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 21.645301296841353
+      },
+      {
+        "seconds": 0.020966350100934505,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 21.697140209842473
+      },
+      {
+        "seconds": 0.024080232251435518,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 21.747929071076214
+      },
+      {
+        "seconds": 0.024663770105689764,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 21.795811257790774
+      },
+      {
+        "seconds": 0.07286234805360436,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 21.895087548997253
+      },
+      {
+        "seconds": 0.023456493858247995,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 21.942119319923222
+      },
+      {
+        "seconds": 0.040184007957577705,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 22.00549136288464
+      },
+      {
+        "seconds": 0.018194023985415697,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 22.057984817773104
+      },
+      {
+        "seconds": 0.025699802208691835,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 22.107157634105533
+      },
+      {
+        "seconds": 0.020021046046167612,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 22.15242015104741
+      },
+      {
+        "seconds": 0.018599749077111483,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 22.19395282678306
+      },
+      {
+        "seconds": 0.021602523047477007,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 22.238409352954477
+      },
+      {
+        "seconds": 0.044633446261286736,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 22.306975420098752
+      },
+      {
+        "seconds": 0.034827659372240305,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 22.368384920060635
+      },
+      {
+        "seconds": 0.028676323127001524,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 22.419805193785578
+      },
+      {
+        "seconds": 0.02731131622567773,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 22.470228449907154
+      },
+      {
+        "seconds": 0.020140595734119415,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 22.513733377680182
+      },
+      {
+        "seconds": 0.03984734695404768,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 22.576689071021974
+      },
+      {
+        "seconds": 0.02313718106597662,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 22.63093555998057
+      },
+      {
+        "seconds": 0.01992018288001418,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 22.674235458951443
+      },
+      {
+        "seconds": 0.02901988010853529,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 22.72785769496113
+      },
+      {
+        "seconds": 0.0341255790553987,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 22.78517651092261
+      },
+      {
+        "seconds": 0.04382153507322073,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 22.852347136009485
+      },
+      {
+        "seconds": 0.022693402133882046,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 22.900120662990957
+      },
+      {
+        "seconds": 0.030451875180006027,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 22.955821964889765
+      },
+      {
+        "seconds": 0.022639013826847076,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 23.002130671869963
+      },
+      {
+        "seconds": 0.03448013588786125,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 23.05987102771178
+      },
+      {
+        "seconds": 0.02371679339557886,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 23.10977660305798
+      },
+      {
+        "seconds": 0.03329782001674175,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 23.166335654910654
+      },
+      {
+        "seconds": 0.025741082150489092,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 23.220268739853054
+      },
+      {
+        "seconds": 0.018861395306885242,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 23.262230568099767
+      },
+      {
+        "seconds": 0.01836078893393278,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 23.303453323896974
+      },
+      {
+        "seconds": 0.01898308377712965,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 23.345471631735563
+      },
+      {
+        "seconds": 0.01844115788117051,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 23.386960496660322
+      },
+      {
+        "seconds": 0.03447270207107067,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 23.445760109927505
+      },
+      {
+        "seconds": 0.02380848303437233,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 23.49352237675339
+      },
+      {
+        "seconds": 0.021503645926713943,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 23.539928855840117
+      },
+      {
+        "seconds": 0.047000930178910494,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 23.610146230086684
+      },
+      {
+        "seconds": 0.023110989946871996,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 23.656788507010788
+      },
+      {
+        "seconds": 0.021543174050748348,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 23.70147778093815
+      },
+      {
+        "seconds": 0.08058573585003614,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 23.80497849965468
+      },
+      {
+        "seconds": 0.033793019130825996,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 23.861807655077428
+      },
+      {
+        "seconds": 0.07494436111301184,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 23.960606643930078
+      },
+      {
+        "seconds": 0.05286758812144399,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 24.038082105107605
+      },
+      {
+        "seconds": 0.06944237509742379,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 24.13048022892326
+      },
+      {
+        "seconds": 0.029741464648395777,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 24.185124777723104
+      },
+      {
+        "seconds": 0.02784917177632451,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 24.236588631756604
+      },
+      {
+        "seconds": 0.03163001732900739,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 24.292078921105713
+      },
+      {
+        "seconds": 0.02054019784554839,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 24.337738459929824
+      },
+      {
+        "seconds": 0.0377281429246068,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 24.398548905737698
+      },
+      {
+        "seconds": 0.029191354755312204,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 24.4534419067204
+      },
+      {
+        "seconds": 0.031896212603896856,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 24.508478700648993
+      },
+      {
+        "seconds": 0.023974022828042507,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 24.555917945690453
+      },
+      {
+        "seconds": 0.02420052606612444,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 24.60303029604256
+      },
+      {
+        "seconds": 0.025191520806401968,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 24.651628425810486
+      },
+      {
+        "seconds": 0.024055011104792356,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 24.698907747864723
+      },
+      {
+        "seconds": 0.03182171285152435,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 24.753548421896994
+      },
+      {
+        "seconds": 0.026493659242987633,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 24.803154638037086
+      },
+      {
+        "seconds": 0.041092853993177414,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 24.867499162908643
+      },
+      {
+        "seconds": 0.03838426619768143,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 24.931360804010183
+      },
+      {
+        "seconds": 0.02876463020220399,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 24.983719340059906
+      },
+      {
+        "seconds": 0.018411749973893166,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 25.0262635149993
+      },
+      {
+        "seconds": 0.019596967846155167,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 25.069011153653264
+      },
+      {
+        "seconds": 0.024523167870938778,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 25.116852258797735
+      },
+      {
+        "seconds": 0.020373863633722067,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 25.1604210017249
+      },
+      {
+        "seconds": 0.0256808758713305,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 25.209497614763677
+      },
+      {
+        "seconds": 0.018727883230894804,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 25.252767811063677
+      },
+      {
+        "seconds": 0.025807988829910755,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 25.301597320940346
+      },
+      {
+        "seconds": 0.019353671930730343,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 25.34370196191594
+      },
+      {
+        "seconds": 0.02799323108047247,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 25.39458960806951
+      },
+      {
+        "seconds": 0.022273273672908545,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 25.440754310693592
+      },
+      {
+        "seconds": 0.038298617117106915,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 25.5121441190131
+      },
+      {
+        "seconds": 0.02959337504580617,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 25.565762714948505
+      },
+      {
+        "seconds": 0.028659712057560682,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 25.617783837020397
+      },
+      {
+        "seconds": 0.052663663402199745,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 25.700504505075514
+      },
+      {
+        "seconds": 0.025492247194051743,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 25.749603012111038
+      },
+      {
+        "seconds": 0.025151032954454422,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 25.798067552037537
+      },
+      {
+        "seconds": 0.021605906076729298,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 25.843165148980916
+      },
+      {
+        "seconds": 0.026583367958664894,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 25.893964937888086
+      },
+      {
+        "seconds": 0.0288017513230443,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 25.94688609102741
+      },
+      {
+        "seconds": 0.02265505911782384,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 25.99297459097579
+      },
+      {
+        "seconds": 0.02023886702954769,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 26.036513982806355
+      },
+      {
+        "seconds": 0.05224234564229846,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 26.111866432707757
+      },
+      {
+        "seconds": 0.018487445078790188,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 26.15349963773042
+      },
+      {
+        "seconds": 0.022235665004700422,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 26.198692082893103
+      },
+      {
+        "seconds": 0.021280149929225445,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 26.243079053703696
+      },
+      {
+        "seconds": 0.02209695801138878,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 26.288019531872123
+      },
+      {
+        "seconds": 0.01913908962160349,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 26.330386597663164
+      },
+      {
+        "seconds": 0.018717803061008453,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 26.37190736271441
+      },
+      {
+        "seconds": 0.019808250945061445,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 26.41426330897957
+      },
+      {
+        "seconds": 0.06578616192564368,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 26.503205883782357
+      },
+      {
+        "seconds": 0.028940449934452772,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 26.555174089036882
+      },
+      {
+        "seconds": 0.025205146986991167,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 26.603631706908345
+      },
+      {
+        "seconds": 0.02831433806568384,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 26.654805615078658
+      },
+      {
+        "seconds": 0.02990230591967702,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 26.707727884873748
+      },
+      {
+        "seconds": 0.019962197169661522,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 26.750515868887305
+      },
+      {
+        "seconds": 0.02963271038606763,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 26.802926273085177
+      },
+      {
+        "seconds": 0.025556452106684446,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 26.8514552609995
+      },
+      {
+        "seconds": 0.02484079822897911,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 26.89954793592915
+      },
+      {
+        "seconds": 0.016985773108899593,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 26.939623463898897
+      },
+      {
+        "seconds": 0.01750594610348344,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 26.980097766965628
+      },
+      {
+        "seconds": 0.017604365944862366,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 27.021139785647392
+      },
+      {
+        "seconds": 0.022449519019573927,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 27.066349091939628
+      },
+      {
+        "seconds": 0.02364574372768402,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 27.113594859838486
+      },
+      {
+        "seconds": 0.020612961146980524,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 27.15693899989128
+      },
+      {
+        "seconds": 0.017582724802196026,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 27.197301972657442
+      },
+      {
+        "seconds": 0.022005649283528328,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 27.241887005977333
+      },
+      {
+        "seconds": 0.017284417990595102,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 27.281674484722316
+      },
+      {
+        "seconds": 0.021456213667988777,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 27.32579867867753
+      },
+      {
+        "seconds": 0.018015236128121614,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 27.36625173781067
+      },
+      {
+        "seconds": 0.01706098672002554,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 27.405834472738206
+      },
+      {
+        "seconds": 0.016466937959194183,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 27.44478887086734
+      },
+      {
+        "seconds": 0.0164101580157876,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M15"
+          ]
+        ],
+        "at": 27.484305697958916
+      },
+      {
+        "seconds": 0.016549389343708754,
+        "target": [
+          [
+            "EURUSD",
+            "M5"
+          ]
+        ],
+        "at": 27.52334034908563
+      },
+      {
+        "seconds": 0.01829970022663474,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H1"
+          ]
+        ],
+        "at": 27.56457533687353
+      },
+      {
+        "seconds": 0.04067604523152113,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "D1"
+          ]
+        ],
+        "at": 27.629751678090543
+      },
+      {
+        "seconds": 0.018524859100580215,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H4"
+          ]
+        ],
+        "at": 27.681837439071387
+      },
+      {
+        "seconds": 0.017155248671770096,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M5"
+          ]
+        ],
+        "at": 27.721844150684774
+      },
+      {
+        "seconds": 0.02254560310393572,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M5"
+          ]
+        ],
+        "at": 27.767350025940686
+      },
+      {
+        "seconds": 0.021994735579937696,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H4"
+          ]
+        ],
+        "at": 27.812745943665504
+      },
+      {
+        "seconds": 0.02256152778863907,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H4"
+          ]
+        ],
+        "at": 27.858462176751345
+      },
+      {
+        "seconds": 0.02358866296708584,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "D1"
+          ]
+        ],
+        "at": 27.90519011579454
+      },
+      {
+        "seconds": 0.022903255186975002,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "D1"
+          ]
+        ],
+        "at": 27.9508402380161
+      },
+      {
+        "seconds": 0.01919085020199418,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M15"
+          ]
+        ],
+        "at": 27.99295992590487
+      },
+      {
+        "seconds": 0.01817324012517929,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H1"
+          ]
+        ],
+        "at": 28.03428048780188
+      },
+      {
+        "seconds": 0.01851805206388235,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H1"
+          ]
+        ],
+        "at": 28.07586999097839
+      },
+      {
+        "seconds": 0.0455478266812861,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "D1"
+          ]
+        ],
+        "at": 28.144547580741346
+      },
+      {
+        "seconds": 0.01900806836783886,
+        "target": [
+          [
+            "EURUSD",
+            "H1"
+          ]
+        ],
+        "at": 28.18679260602221
+      },
+      {
+        "seconds": 0.024468437768518925,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "D1"
+          ]
+        ],
+        "at": 28.235068678855896
+      },
+      {
+        "seconds": 0.020301201846450567,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M5"
+          ]
+        ],
+        "at": 28.27828086493537
+      },
+      {
+        "seconds": 0.018640088848769665,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M15"
+          ]
+        ],
+        "at": 28.32018034765497
+      },
+      {
+        "seconds": 0.020593812223523855,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H1"
+          ]
+        ],
+        "at": 28.363646951969713
+      },
+      {
+        "seconds": 0.018032219260931015,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M15"
+          ]
+        ],
+        "at": 28.404801602941006
+      },
+      {
+        "seconds": 0.018282036762684584,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M5"
+          ]
+        ],
+        "at": 28.445860055740923
+      },
+      {
+        "seconds": 0.019122623838484287,
+        "target": [
+          [
+            "EURUSD",
+            "H4"
+          ]
+        ],
+        "at": 28.487636984791607
+      },
+      {
+        "seconds": 0.01787346415221691,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "M5"
+          ]
+        ],
+        "at": 28.52840702002868
+      },
+      {
+        "seconds": 0.023552208673208952,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "M5"
+          ]
+        ],
+        "at": 28.576232970692217
+      },
+      {
+        "seconds": 0.02190262032672763,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "M15"
+          ]
+        ],
+        "at": 28.621122925076634
+      },
+      {
+        "seconds": 0.017236863262951374,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H1"
+          ]
+        ],
+        "at": 28.660956589039415
+      },
+      {
+        "seconds": 0.01872786320745945,
+        "target": [
+          [
+            "PR21-SYNTHETIC-5",
+            "H4"
+          ]
+        ],
+        "at": 28.702384659089148
+      },
+      {
+        "seconds": 0.06569416914135218,
+        "target": [
+          [
+            "BTCUSDT",
+            "D1"
+          ]
+        ],
+        "at": 28.79078078782186
+      },
+      {
+        "seconds": 0.027763997204601765,
+        "target": [
+          [
+            "BTCUSDT",
+            "M5"
+          ]
+        ],
+        "at": 28.84133674390614
+      },
+      {
+        "seconds": 0.031164973974227905,
+        "target": [
+          [
+            "BTCUSDT",
+            "H1"
+          ]
+        ],
+        "at": 28.89628467382863
+      },
+      {
+        "seconds": 0.03743606014177203,
+        "target": [
+          [
+            "BTCUSDT",
+            "M15"
+          ]
+        ],
+        "at": 28.95702453609556
+      },
+      {
+        "seconds": 0.034133817069232464,
+        "target": [
+          [
+            "BTCUSDT",
+            "H4"
+          ]
+        ],
+        "at": 29.01544854277745
+      },
+      {
+        "seconds": 0.021474817767739296,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "M5"
+          ]
+        ],
+        "at": 29.06121756369248
+      },
+      {
+        "seconds": 0.026144441217184067,
+        "target": [
+          [
+            "PR21-SYNTHETIC-0",
+            "H4"
+          ]
+        ],
+        "at": 29.110485184937716
+      },
+      {
+        "seconds": 0.020538093987852335,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "H1"
+          ]
+        ],
+        "at": 29.154987721703947
+      },
+      {
+        "seconds": 0.021823057904839516,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "H4"
+          ]
+        ],
+        "at": 29.199632012750953
+      },
+      {
+        "seconds": 0.021801344119012356,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "M15"
+          ]
+        ],
+        "at": 29.24442688608542
+      },
+      {
+        "seconds": 0.029324871953576803,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "M15"
+          ]
+        ],
+        "at": 29.297320840880275
+      },
+      {
+        "seconds": 0.02266985410824418,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "M5"
+          ]
+        ],
+        "at": 29.34245534799993
+      },
+      {
+        "seconds": 0.029100474901497364,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "M15"
+          ]
+        ],
+        "at": 29.39551202673465
+      },
+      {
+        "seconds": 0.023562009911984205,
+        "target": [
+          [
+            "EURUSD",
+            "D1"
+          ]
+        ],
+        "at": 29.442627702839673
+      },
+      {
+        "seconds": 0.026620702352374792,
+        "target": [
+          [
+            "PR21-SYNTHETIC-6",
+            "D1"
+          ]
+        ],
+        "at": 29.493129028007388
+      },
+      {
+        "seconds": 0.027131540700793266,
+        "target": [
+          [
+            "PR21-SYNTHETIC-7",
+            "H4"
+          ]
+        ],
+        "at": 29.543119929730892
+      },
+      {
+        "seconds": 0.04843532806262374,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "D1"
+          ]
+        ],
+        "at": 29.617200600914657
+      },
+      {
+        "seconds": 0.031747119035571814,
+        "target": [
+          [
+            "PR21-SYNTHETIC-3",
+            "H1"
+          ]
+        ],
+        "at": 29.672733042854816
+      },
+      {
+        "seconds": 0.03433331474661827,
+        "target": [
+          [
+            "PR21-SYNTHETIC-2",
+            "D1"
+          ]
+        ],
+        "at": 29.730824656784534
+      },
+      {
+        "seconds": 0.07776503078639507,
+        "target": [
+          [
+            "PR21-SYNTHETIC-1",
+            "H4"
+          ]
+        ],
+        "at": 29.834258841816336
+      },
+      {
+        "seconds": 0.0352603648789227,
+        "target": [
+          [
+            "EURUSD",
+            "M15"
+          ]
+        ],
+        "at": 29.910760678816587
+      },
+      {
+        "seconds": 0.028932179789990187,
+        "target": [
+          [
+            "PR21-SYNTHETIC-4",
+            "H1"
+          ]
+        ],
+        "at": 29.973882044665515
+      }
+    ],
+    "calculation": "actual market.aggregate_touched and worker cycle; real clock; no mocked calculation"
+  }
+]

@@ -48,6 +48,7 @@ def test_rollback_prepares_restartable_old_bucket_jobs_without_changing_snapshot
 
 def test_rollback_invalidates_every_coverage_identity_including_unpublished(database, monkeypatch):
     import sys
+
     from alerts import publication_admin
     from alerts.coverage_projection import backfill_page
     with database.begin() as db:

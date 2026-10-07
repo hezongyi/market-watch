@@ -1,0 +1,100 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_initial_verify_preserves_calendar_complete_source_and_snapshot[True] ___
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+retain_staging = True
+
+    @pytest.mark.parametrize('retain_staging', [True, False])
+    def test_initial_verify_preserves_calendar_complete_source_and_snapshot(database, retain_staging):
+        from datetime import UTC, datetime
+    
+        from alerts.coverage_projection import backfill_page
+        from alerts.storage import Bar, ChartPublication, ChartPublishedBar, candle_dict, ms
+        from sqlalchemy import delete, select
+    
+        start = ms(datetime(2026, 9, 28, tzinfo=UTC))
+        with database.begin() as db:
+            inst = db.get(Instrument, 'EURUSD')
+            inst.calendar_profile = {'revision': 'reviewed-fixture', 'closures': [{
+                'start': '2026-09-28T00:30:00+00:00', 'end': '2026-09-28T01:00:00+00:00',
+                'reason': 'synthetic reviewed closure', 'source': 'https://example.test/calendar'}]}
+            market.ingest(db, inst, {'rows': [dict(timestamp=start+i*60000,
+                open=10, high=11, low=9, close=10) for i in range(30)]},
+                received_at=start+3600000+5000)
+            source = db.scalar(select(Bar).where(Bar.instrument_id == inst.id, Bar.timeframe == 'H1'))
+            assert source.complete and source.revision == 1
+            payload = candle_dict(source.candle())
+            db.add(ChartPublication(instrument_id=inst.id, timeframe='H1', start=start,
+                end=start+3600000, complete_count=1, revision=7, initialized=True))
+            db.add(ChartPublishedBar(instrument_id=inst.id, timeframe='H1', start=start,
+                end=start+3600000, complete=True, revision=source.revision, payload=payload))
+            if not retain_staging:
+                db.execute(delete(Bar).where(Bar.instrument_id == inst.id))
+        for _ in range(5):
+            with database.begin() as db:
+                result = backfill_page(db, db.get(Instrument, 'EURUSD'), administrative=True)
+            if result['complete']:
+                break
+        assert result['complete']
+        with database.begin() as db:
+            source = db.scalar(select(Bar).where(Bar.instrument_id == 'EURUSD', Bar.timeframe == 'H1'))
+            if retain_staging:
+>               assert source.complete and source.revision == 1
+E               assert (False)
+E                +  where False = <alerts.storage.Bar object at 0x7f823f266310>.complete
+
+backend/tests/test_coverage_projection.py:263: AssertionError
+__ test_initial_verify_preserves_calendar_complete_source_and_snapshot[False] __
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+retain_staging = False
+
+    @pytest.mark.parametrize('retain_staging', [True, False])
+    def test_initial_verify_preserves_calendar_complete_source_and_snapshot(database, retain_staging):
+        from datetime import UTC, datetime
+    
+        from alerts.coverage_projection import backfill_page
+        from alerts.storage import Bar, ChartPublication, ChartPublishedBar, candle_dict, ms
+        from sqlalchemy import delete, select
+    
+        start = ms(datetime(2026, 9, 28, tzinfo=UTC))
+        with database.begin() as db:
+            inst = db.get(Instrument, 'EURUSD')
+            inst.calendar_profile = {'revision': 'reviewed-fixture', 'closures': [{
+                'start': '2026-09-28T00:30:00+00:00', 'end': '2026-09-28T01:00:00+00:00',
+                'reason': 'synthetic reviewed closure', 'source': 'https://example.test/calendar'}]}
+            market.ingest(db, inst, {'rows': [dict(timestamp=start+i*60000,
+                open=10, high=11, low=9, close=10) for i in range(30)]},
+                received_at=start+3600000+5000)
+            source = db.scalar(select(Bar).where(Bar.instrument_id == inst.id, Bar.timeframe == 'H1'))
+            assert source.complete and source.revision == 1
+            payload = candle_dict(source.candle())
+            db.add(ChartPublication(instrument_id=inst.id, timeframe='H1', start=start,
+                end=start+3600000, complete_count=1, revision=7, initialized=True))
+            db.add(ChartPublishedBar(instrument_id=inst.id, timeframe='H1', start=start,
+                end=start+3600000, complete=True, revision=source.revision, payload=payload))
+            if not retain_staging:
+                db.execute(delete(Bar).where(Bar.instrument_id == inst.id))
+        for _ in range(5):
+            with database.begin() as db:
+                result = backfill_page(db, db.get(Instrument, 'EURUSD'), administrative=True)
+            if result['complete']:
+                break
+        assert result['complete']
+        with database.begin() as db:
+            source = db.scalar(select(Bar).where(Bar.instrument_id == 'EURUSD', Bar.timeframe == 'H1'))
+            if retain_staging:
+                assert source.complete and source.revision == 1
+            published = db.get(ChartPublishedBar, ('EURUSD', 'H1', start))
+            pub = db.get(ChartPublication, ('EURUSD', 'H1'))
+>           assert published.complete and published.revision == 1 and published.payload == payload
+E           assert (False)
+E            +  where False = <alerts.storage.ChartPublishedBar object at 0x7f823efb2c50>.complete
+
+backend/tests/test_coverage_projection.py:266: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_coverage_projection.py::test_initial_verify_preserves_calendar_complete_source_and_snapshot[True]
+FAILED backend/tests/test_coverage_projection.py::test_initial_verify_preserves_calendar_complete_source_and_snapshot[False]
+2 failed, 7 deselected in 0.55s
+
