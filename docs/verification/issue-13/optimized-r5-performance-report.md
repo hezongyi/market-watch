@@ -13,6 +13,8 @@
 
 消费者已串行接续。90目标持续轮转首次最长4.417s，持续最长5.413s，每目标至少7轮，缺失0。micro120实际ASGI与120evaluate样本：ASGI p95/p99 48.67/135.91ms，evaluate16.34/29.26ms，均通过各自门槛；告警零staging/audit读取。该微测不等于可见到判断的1/2秒认证，330秒同价与310正常输入、120秒TCP、实际浏览器及最终恢复/覆盖/组合故障仍未完成。
 
+21:25 SGT：300秒实时与两身份大回填混合已完成，20/20准确输入发布，M1 p95/p99 0.480/0.564s、最长就绪等待1.189s，结束时未发布输入与ready目标均空；当前高周期独立oracle进行中，其他待验范围不变。
+
 限制：CPU包含worker、输入及验证；同fixture/配额顺序对照有宿主竞争，host原始观测保留，不是同时受控A/B，也不是生产或供应商SLA。活动回填SQL约192/s，小批次控制等待有查询成本，不能宣称全部场景SQL下降。r5新增监听空闲CPU高于r3c，但原冻结绝对/相对门槛未放宽。UI尚未运行，不把已构建镜像或计划地址称在线交付。
 
 证据：`results/optimized-r5-baseline/measurement-audit.json`、`source.json`、`host.jsonl`，`results/optimized-r5/idle-assessment.json`、`product-source-manifest.json`、`environment-performance.json`、`fairness/result.json`及`consumer-microbaseline.json`。全部最终要求与待验映射见 [收口清单](r5-closeout-checklist.md)。任务服务仅由驱动按明确归属启停，数据卷保留。

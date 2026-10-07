@@ -4,13 +4,13 @@
 
 | 要求 | 权威证据入口 | 目前判定 |
 | --- | --- | --- |
-| v1.14.0整合、明确来源/身份、迁移头及旧链路 | `v114-integration.md`、`results/v114-baseline/source.json`、Git祖先关系 | 原整合已验证；最终候选祖先/源码仍需核查 |
-| 原始对照与前后同fixture、四场景三重复300s | `results/v114-baseline/`、`results/optimized-r5-baseline/{source,state,measurement-audit}.json` | 新测未结束，不能引用r3c数字作r5通过 |
-| 空闲CPU≤5%且降≥80%；SQL≤2/s且降≥90%；快照稳定零历史/审计读 | 新idle-1/2/3原始JSON/JSONL及宿主记录 | 待测 |
+| v1.14.0整合、明确来源/身份、迁移头及旧链路 | `v114-integration.md`、`results/v114-baseline/source.json`、Git祖先关系 | 最终ccb2a12祖先及175产品/root migrations字节一致已核对 |
+| 原始对照与前后同fixture、四场景三重复300s | `results/v114-baseline/`、`results/optimized-r5-baseline/{source,state,measurement-audit}.json` | r5全部12份终态及独立一致性审计通过，源码/host/raw已归档 |
+| 空闲CPU≤5%且降≥80%；SQL≤2/s且降≥90%；快照稳定零历史/审计读 | 新idle-1/2/3原始JSON/JSONL及宿主记录 | CPU1.161%/下降97.20%、SQL1.543/s/下降97.71%；三轮快照稳定及历史/审计/更新均0 |
 | 每身份实时/修订输入内容及观察标记；M1 p95≤15s/p99≤30s；缺失分母 | 新live/revision与mixed原始输入、payload、终态pending | 待测 |
 | 全90就绪目标最长等待≤10秒、多轮服务，截尾未服务目标不得漏算 | baseline全ready_ages、fairness轮次、mixed及terminal-wait补测/排空、`final-contracts/rotation-faults.json` | 待测；新增同一45秒窗口内90目标/连续输入/两身份回填/一次失败重试/两秒真实外部锁探针 |
-| 回填有效吞吐≥660.52bars/s且≥可比旧版80%；等待同时通过 | 新backfill-1/2/3及冻结旧对应样本 | 待测 |
-| ASGI100/200ms、evaluate200/350ms；同40非空配置×3热态，零staging读 | 新consumer-microbaseline原始120+120样本 | 待测；r4通过不作新候选认证 |
+| 回填有效吞吐≥660.52bars/s且≥可比旧版80%；等待同时通过 | 新backfill-1/2/3及冻结旧对应样本 | 2717.99–2726.05bars/s、对应旧比1.87–1.96倍；最长等待5.633–5.751s，终态ready空 |
+| ASGI100/200ms、evaluate200/350ms；同40非空配置×3热态，零staging读 | 新consumer-microbaseline原始120+120样本 | ASGI48.67/135.91ms、evaluate16.34/29.26ms通过；原120+120分位独立复算 |
 | 同价330s50准确marker、stale→ready、OHLC/量/修订不变、零signal | 新observation timeline/events/final、独立audit | 待测 |
 | 正常330s310准确marker、每类payload相等及判断提交，不能合并缺失 | 新normal timeline/events/alert_commits、独立audit | 待测；r3c/r4缺失证据保留 |
 | 可见→判断保守上界p95≤1s/p99≤2s、逐事件独立重建区间/分位 | same-price/normal/network raw query/commit windows及numeric-assessment | 待测；点差不替代上界 |
