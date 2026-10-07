@@ -14,6 +14,7 @@ ROOT = HERE / 'results/optimized'
 SCRIPTS = (
     'optimized_fairness_probe.py',
     'optimized_consumer_probe.py',
+    'optimized_supplemental_probe.py',
     'optimized_high_period_probe.py',
     'optimized_observation_alert_probe.py',
     'optimized_network_alert_probe.py',
