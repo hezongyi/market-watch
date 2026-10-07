@@ -5,13 +5,14 @@ const assert = require("node:assert/strict");
 const APP = process.env.MAXIMIZE_APP || "https://localhost:17443";
 const CHART = process.env.MAXIMIZE_CHART || "https://127.0.0.1:17444";
 assert.ok(["https://localhost:17443", "https://192.168.7.232:17443"].includes(APP));
-assert.ok(["https://127.0.0.1:17444", "https://charts.192.168.7.232.sslip.io:17444"].includes(CHART));
+assert.ok(["https://127.0.0.1:17444", "https://mw-chart.test:17444"].includes(CHART));
 const report = { environment:"Ubuntu Docker project mw-chart-maximize-20261007", app:APP, chart:CHART, cases:[], errors:[], chartCredentialLeaks:[] };
 const out = process.env.MAXIMIZE_PRODUCT_OUTPUT || "/tmp/mw-chart-maximize-20261007/product-browser.json";
 (async()=>{
   const browser = await chromium.launch({
     executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ||
-      "/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",args:["--no-sandbox"],
+      "/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",args:["--no-sandbox",
+        ...(CHART === "https://mw-chart.test:17444" ? ["--host-resolver-rules=MAP mw-chart.test 192.168.7.232", "--no-proxy-server"] : [])],
   });
   try {
     const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1600,height:1000}});

@@ -43,9 +43,9 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
 
 本次 project 固定为 `mw-chart-maximize-20261007`，独立默认网络、`maximize-pg` volume、`chart_maximize` 数据库和随机密码。只填充标记为合成行情的 `MAXFIXTURE` H1 数据；不复制生产数据库、配置、通知或凭据，不启动行情采集和通知 worker。
 
-实际局域网入口：`https://192.168.7.232:17443/advanced-charts`，图表来源 `https://charts.192.168.7.232.sslip.io:17444`。运行主机为 Ubuntu 22.04，Docker 服务端 29.1.3。应用及图表端口分别绑定 Ubuntu 局域网地址和回环地址，数据库不暴露；无需 SSH 转发即可在局域网访问。图表独立域名经 DNS 解析到同一 Ubuntu IP，避免按 IP 登录的 session Cookie 跨端口发送到图表服务。
+实际局域网入口：`https://192.168.7.232:17443/advanced-charts`，图表来源 `https://mw-chart.test:17444`。运行主机为 Ubuntu 22.04，Docker 服务端 29.1.3。应用及图表端口分别绑定 Ubuntu 局域网地址和回环地址，数据库不暴露；无需 SSH 转发即可在局域网访问。图表使用本地 hosts 映射到同一 Ubuntu IP，不使用外部解析；独立主机名避免按 IP 登录的 session Cookie 跨端口发送到图表服务。
 
-首次访问先打开图表来源并接受本次验收自签名证书，再打开主站并接受证书。证书包含 Ubuntu IP 和图表域名；若局域网 DNS 拒绝域名解析，将 `192.168.7.232 charts.192.168.7.232.sslip.io` 加到访问电脑的 hosts。域名只解析 IP，网站及图表均由本机 Docker 提供。
+访问电脑的 hosts 添加 `192.168.7.232 mw-chart.test`（Windows：`C:\Windows\System32\drivers\etc\hosts`；macOS/Linux：`/etc/hosts`）。`.test` 为保留测试域名，仅通过此本地映射访问；不依赖外部 DNS。先打开图表来源并接受本次验收自签名证书，再打开主站并接受证书。证书包含 Ubuntu IP 和本地图表主机名，网站及图表均由 Ubuntu 本机 Docker 提供。自动浏览器检查使用 Chromium 显式 host resolver 映射，等效于客户端 hosts。
 
 之前仅回环部署时，另一台电脑需同时转发两个端口：`ssh -N -L 17443:127.0.0.1:17443 -L 17444:127.0.0.1:17444 quant@192.168.7.232`。2026-10-07 已复现未信任图表证书时的 `ERR_CERT_AUTHORITY_INVALID`，接受后 HTTP 200；用户补充双端口转发及证书后登录成功，完整应用验收再次通过。当前局域网模式不再需要该转发。
 
@@ -89,7 +89,7 @@ mw-docker retire --task mw-chart-maximize-20261007 --project mw-chart-maximize-2
 ```bash
 LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
   MAXIMIZE_APP=https://192.168.7.232:17443 \
-  MAXIMIZE_CHART=https://charts.192.168.7.232.sslip.io:17444 \
+  MAXIMIZE_CHART=https://mw-chart.test:17444 \
   node web/tests/advanced-chart-maximize.product.browser.cjs
 ```
 
