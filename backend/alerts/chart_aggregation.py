@@ -79,7 +79,8 @@ def aggregate_once():
         # Complete buckets only: the largest indivisible D1 uses <=1500 source
         # minutes across DST. No partial bucket is persisted as complete.
         frame_end = ms(bucket_bounds(instant(job.start), job.timeframe, calendar_for(inst))[1])
-        slice_end = min(job.end, max(frame_end, job.start + 120 * 60000))
+        slice_end = min(job.end, frame_end if job.timeframe in ('H4','D1') else
+                        max(frame_end, job.start + 120 * 60000))
         slice_end = min(job.end, ms(bucket_bounds(instant(slice_end - 1),
             job.timeframe, calendar_for(inst))[1]))
         source_left = ms(bucket_bounds(instant(job.start), job.timeframe, calendar_for(inst))[0])
@@ -102,7 +103,7 @@ def aggregate_once():
                         ChartAggregationJob.start == slice_end, ChartAggregationJob.end == job.end))
                     if remaining is None:
                         db.add(ChartAggregationJob(instrument_id=inst.id, timeframe=job.timeframe,
-                            start=slice_end, end=job.end, created_at=now, kind=job.kind))
+                            start=slice_end, end=job.end, created_at=job.created_at, kind=job.kind))
                     elif job.kind == 'price' or job.kind == 'volume' and remaining.kind == 'observed':
                         remaining.kind = job.kind
                 db.delete(job)

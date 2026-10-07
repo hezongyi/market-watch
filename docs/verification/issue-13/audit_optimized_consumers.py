@@ -60,6 +60,26 @@ def main():
     assert observation['outcome'] == 'passed' and not observation['errors']
     assert observation['inputs'] == observation['visible'] == observation['judged'] == 50
     assert len(timeline) == observation['sample_count']
+    from measurement_windows import latency_window
+    from supplemental_probe import quantiles
+    def check_intervals(report, samples):
+        uppers=[]
+        for item in report['events']:
+            ident,marker=item['instrument'],item['source_observed_at']
+            visible=next(r for r in samples if r['identities'][ident]['published_observed_at']==marker)
+            assert visible['identities'][ident]['payload']==item['expected_payload']
+            judged=next(r for r in report['alert_commits'] if r['alert_id']==item['alert_id'] and r['sequence']==marker)
+            absent=[r['query_start_seconds'] for r in samples if
+                r['observed_seconds']<visible['observed_seconds'] and
+                r['identities'][ident]['published_observed_at']!=marker]
+            window=latency_window((max(absent+[item['commit_window_begin_seconds']]),visible['observed_seconds']),
+                (judged['commit_started'],judged['committed']))
+            assert window==item['latency_interval']
+            assert item['visible_seconds']==visible['observed_seconds']
+            assert item['judged_seconds']==judged['committed']
+            uppers.append(window['upper_seconds'])
+        assert report['visible_to_judged_certified_upper']==quantiles(uppers)
+    check_intervals(observation,timeline)
     for item in observation['events']:
         ident, marker = item['instrument'],item['source_observed_at']
         visible = next(r for r in timeline if r['identities'][ident]['published_observed_at'] == marker)
@@ -82,6 +102,9 @@ def main():
     assert normal['outcome']=='passed' and not normal['errors']
     assert normal['inputs']==normal['visible']==normal['judged']==310
     assert {'same_price','new_minute','price_revision','volume_revision'} <= {r['kind'] for r in normal['events']}
+    normal_timeline=[json.loads(line) for line in (ROOT/'normal-input-alert/timeline.jsonl').read_text().splitlines()]
+    assert len(normal_timeline)==normal['sample_count']
+    check_intervals(normal,normal_timeline)
     for item in normal['events']:
         row=next(r for r in normal['alert_commits'] if r['alert_id']==item['alert_id']
             and r['sequence']==item['source_observed_at'])
@@ -91,6 +114,14 @@ def main():
     assert not network['errors'] and network['inputs'] == network['visible'] == network['judged'] == 10
     assert network['api']['count'] == len(network['api_samples']) == 120
     assert all(e['final']['count'] == e['final']['signal_count'] == 1 for e in network['events'])
+    upper=[]
+    for item in network['events']:
+        visible,judged=item['visibility'],item['judgment']
+        window=latency_window((visible['last_absent_start'],visible['at']),
+            (judged['commit_started'],judged['at']))
+        assert window==item['latency_interval'] and window['upper_seconds']==item['visible_to_judged_upper']
+        upper.append(window['upper_seconds'])
+    assert network['alert_latency_certified_upper']==quantiles(upper)
     outputs.append(dict(scope='tcp_and_triggers',api=120,unique_signals=10))
     browser = read('browser/result.json')
     assert browser['outcome'] == 'passed' and not browser['page_errors'] and not browser['failed_requests']

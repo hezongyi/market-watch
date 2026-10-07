@@ -17,12 +17,21 @@ class Budget:
     rows: int = 4096
     deadline: float = field(default_factory=lambda: time.monotonic() + .075)
     started: bool = False
+    history_served: bool = False
+    aggregation_served: bool = False
 
     @property
     def available(self):
         # Allow one minimal slice even if metadata/lock checks consumed the
         # deadline. Otherwise expensive selection could make no work forever.
         return self.rows if not self.started or time.monotonic() < self.deadline else 0
+
+    def reserve_slice(self):
+        # One complete source aggregate has a guaranteed turn, even if the
+        # preceding publication exhausted the cooperative time deadline.
+        if not self.aggregation_served:
+            self.aggregation_served = True
+            self.started = False
 
     def consume(self, rows, *, progressed=True):
         self.started |= progressed

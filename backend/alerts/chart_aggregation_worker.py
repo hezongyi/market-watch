@@ -10,8 +10,9 @@ from .publication_budget import work_budget
 def cycle():
     # Service publication first, then only start aggregation if its complete
     # bucket fits the remaining shared budget. Each transaction commits alone.
-    with work_budget():
+    with work_budget() as budget:
         published = publish_once()
+        budget.reserve_slice()
         worked = aggregate_once()
     return worked, published
 

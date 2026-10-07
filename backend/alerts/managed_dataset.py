@@ -320,6 +320,11 @@ def publish_frame(db, inst, plan, frame, now):
     if not page_limit:
         return finish(runnable=True)
     tail = _page(db, inst, frame, right, page_limit, now, after=tail_start)
+    if current() and pub and pub.start > safe_left and not current().history_served:
+        # Re-reading an unchanged live tail must not steal the only historical
+        # progress opportunity on every turn. Reserve one bounded older page.
+        current().history_served = True
+        current().started = False
     older_deferred = bool(pub and pub.start > safe_left and not _page_limit(frame))
     older = _page(db, inst, frame, pub.start, _page_limit(frame), now,
                   after=safe_left) if pub and pub.start > safe_left and not older_deferred else []

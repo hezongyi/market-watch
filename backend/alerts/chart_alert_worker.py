@@ -233,11 +233,14 @@ def step(*, now=None, on_evaluated=None):
                         business_now=business_now, sequence=row.state.get('sequence') if row else None,
                         count=row.count if row else None, health=row.health if row else None,
                         status=row.status if row else None, commit_started=time.monotonic())
-            if on_evaluated:
-                on_evaluated(dict(**observation, committed=time.monotonic()))
         except Exception as exc:
             log.exception("Chart alert evaluation failed for %s", ident)
             with transaction() as db:
                 row = db.get(ChartAlert, ident)
                 if row and row.status == "active":
                     health(row, "error", "判定失败：" + type(exc).__name__)
+            continue
+        if on_evaluated:
+            # Evidence collection failures propagate to the monitor, without
+            # rewriting the already committed business state as an error.
+            on_evaluated(dict(**observation, committed=time.monotonic()))

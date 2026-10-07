@@ -74,3 +74,44 @@ def test_expired_cooperative_deadline_still_allows_one_resumable_page(monkeypatc
         assert budget.available > 0
         budget.consume(1)
         assert budget.available==0
+
+
+def test_unchanged_tail_cannot_starve_older_history_after_deadline(database,monkeypatch):
+    start=storage.ms(datetime(2026,9,28,tzinfo=UTC))
+    now=start+3000*60000+5000
+    monkeypatch.setattr(managed,'now_ms',lambda:now)
+    monkeypatch.setattr(storage,'now_ms',lambda:now)
+    with database.begin() as db:
+        inst=db.get(storage.Instrument,'BTCUSDT')
+        plan=managed.join(db,inst,start+2400*60000,now)
+        market.ingest(db,inst,dict(rows=[dict(timestamp=start+i*60000,
+            open=10,high=11,low=9,close=10) for i in range(3000)]),received_at=now)
+        managed.publish_frame(db,inst,plan,'M1',now)
+        plan.target_start=start
+        before=db.get(storage.ChartPublication,('BTCUSDT','M1')).start
+    with publication_budget.work_budget() as budget:
+        budget.deadline=-1
+        with database.begin() as db:
+            managed.publish_frame(db,db.get(storage.Instrument,'BTCUSDT'),
+                db.get(storage.ChartHistoryPlan,'BTCUSDT'),'M1',now)
+            assert db.get(storage.ChartPublication,('BTCUSDT','M1')).start < before
+
+
+def test_slow_publication_does_not_starve_durable_aggregate(database,monkeypatch):
+    from alerts import chart_aggregation_worker
+    start=storage.ms(datetime(2026,9,28,tzinfo=UTC))
+    now=start+1440*60000+5000
+    monkeypatch.setattr(storage,'now_ms',lambda:now)
+    with database.begin() as db:
+        db.add(storage.ChartAggregationJob(instrument_id='BTCUSDT',timeframe='M5',
+            start=start,end=start+120*60000,created_at=now))
+    calls=[]
+    monkeypatch.setattr(market,'aggregate_touched',lambda *args,**kwargs:calls.append(True))
+    def slow_publish():
+        budget=publication_budget.current()
+        budget.consume(384)
+        budget.deadline=-1
+        return True
+    monkeypatch.setattr(chart_aggregation_worker,'publish_once',slow_publish)
+    assert chart_aggregation_worker.cycle()==(True,True)
+    assert calls==[True]

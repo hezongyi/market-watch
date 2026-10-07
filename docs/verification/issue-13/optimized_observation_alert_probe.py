@@ -128,6 +128,7 @@ def main():
                     payloads={row.instrument_id:row.payload for row in db.scalars(query)}
                     records={ident:db.get(s.ChartAlert,alert_id) for ident,alert_id in alerts.items()}
                     data={ident:dict(published_observed_at=payloads[ident]['observed_at'],
+                        payload=payloads[ident],
                         sequence=record.state.get('sequence'),health=record.health,count=record.count,
                         status=record.status) for ident,record in records.items()}
                     if not NORMAL:
@@ -186,9 +187,12 @@ def main():
                     assert row.observed_at==source_clock and row.received_at<=clock()
                     if not NORMAL:
                         assert stable_payload(s.candle_dict(row.candle()))==stable_payload(before[ident]['payload'])
+                    expected_payload=s.candle_dict(row.candle())
+                    expected_payload['observed_at']=source_clock
                     commit_begin=time.monotonic()-begun
                 inputs.append(dict(instrument=ident,batch=batch,scheduled_seconds=when,
                     kind=kind,source_start=row.start,
+                    expected_payload=expected_payload,
                     source_observed_at=source_clock,committed_seconds=time.monotonic()-begun,
                     commit_window_begin_seconds=commit_begin,
                     source_price_revision=revision,source_volume_revision=volume_revision))
@@ -224,6 +228,8 @@ def main():
         # remain missing instead of being counted as exact successful events.
         visible=next((sample for sample in samples if
             sample['identities'][ident]['published_observed_at']==expected),None)
+        if visible:
+            assert visible['identities'][ident]['payload']==item['expected_payload'], 'Exact marker payload differs'
         judged=next((row for row in judgments if row['alert_id']==alerts[ident]
             and row['sequence']==expected),None)
         absent=[sample['query_start_seconds'] for sample in samples if visible and

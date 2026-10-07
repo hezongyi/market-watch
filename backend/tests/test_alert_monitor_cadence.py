@@ -77,3 +77,20 @@ def test_each_alert_uses_its_read_time_and_reports_committed_state(database, mon
     monkeypatch.setattr(chart_alert_worker,'evaluate',evaluate)
     chart_alert_worker.step(on_evaluated=committed)
     assert seen==[2000,3000] and {row['alert_id'] for row in reports}==set(ids)
+
+
+def test_observer_failure_does_not_rewrite_committed_health(database,monkeypatch):
+    from alerts.chart_alert_service import create
+    from alerts.storage import ChartAlert
+    from test_chart_alert_worker import config
+    with database.begin() as db:
+        ident=create(db,'observer-error',config(),at=1000).id
+    def evaluate(db,ident,**kwargs):
+        db.get(ChartAlert,ident).health='ready'
+    def observe(row):
+        raise RuntimeError('Evidence sink unavailable')
+    monkeypatch.setattr(chart_alert_worker,'evaluate',evaluate)
+    with pytest.raises(RuntimeError,match='Evidence sink'):
+        chart_alert_worker.step(on_evaluated=observe)
+    with database.begin() as db:
+        assert db.get(ChartAlert,ident).health=='ready'
