@@ -19,6 +19,12 @@ def audit(scenario, repetition):
                   [row['seconds'] for row in result.get('final_unserved_ready', [])])
     assert abs(longest - result['longest_target_wait']) < 1e-8
     assert abs(100 * result['process_cpu_seconds'] / result['duration'] - result['process_cpu_percent']) < 1e-8
+    added_bars = result['after']['published_bars'] - result['before']['published_bars']
+    assert abs(added_bars / result['duration'] - result['backfill_bars_per_second']) < 1e-8
+    latencies = sorted(row['latency_seconds'] for row in result['events'])
+    for name, percentile in (('p50', .5), ('p95', .95), ('p99', .99)):
+        expected = latencies[int((len(latencies) - 1) * percentile)] if latencies else None
+        assert result['latency_' + name] == expected, 'Input latency quantile differs from complete event samples'
     assert pg['statements']
     assert all(row['target'] is None or row['publish_claim'] for row in raw)
     if scenario == 'idle':
