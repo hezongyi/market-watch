@@ -18,9 +18,12 @@ from .storage import (
 
 def creation_request(body):
     dataset = dict(body.get("dataset", {}))
+    maintenance = dict(body.get("maintenance", {}))
     if dataset.get("catalog_id") is None:
         dataset.pop("catalog_id", None)
-    return {**body, "dataset": dataset}
+    if maintenance.get("expected_configuration_revision") is None:
+        maintenance.pop("expected_configuration_revision", None)
+    return {**body, "dataset": dataset, "maintenance": maintenance}
 
 
 def create_managed(db, body):

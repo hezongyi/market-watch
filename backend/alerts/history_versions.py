@@ -306,6 +306,7 @@ def version_report(db, ident):
 
     return {"id": version.id, "dataset_id": version.dataset_id, "start": version.start,
             "end": version.end, "cursor": version.cursor, "status": version.status,
+            "published_at": version.published_at,
             "error": version.error, "attempts": version.attempts, "next_at": version.next_at,
             "payload_available": db.get(HistoryReclamation, ident) is None,
             "manifest": version.manifest, "task_kind": run.kind if run else "import",

@@ -115,10 +115,12 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
             "coverage": "per-bar; query completion and newest M1 are not complete indicator dependencies"}}
 
 
-def list_composites(db, *, query="", page=1, page_size=25, permission_scope=SCOPE):
+def list_composites(db, *, query="", page=1, page_size=25, permission_scope=SCOPE, dataset_id=None):
     if page < 1 or not 1 <= page_size <= 100:
         raise ValueError("无效组合列表分页")
     base = select(MarketComposite.id).join(MarketDataset).where(MarketComposite.permission_scope == permission_scope)
+    if dataset_id:
+        base = base.where(MarketComposite.dataset_id == dataset_id)
     if query:
         value = "%" + query[:100].replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
         base = base.where(MarketDataset.logical_symbol.ilike(value, escape="\\"))

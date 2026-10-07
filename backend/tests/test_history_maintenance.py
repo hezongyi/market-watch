@@ -198,6 +198,29 @@ def test_api_plan_task_and_control_keep_management_reads_pure(database):
         api.app.dependency_overrides.clear()
 
 
+def test_http_stale_plan_returns_conflict_and_preserves_saved_configuration(database):
+    from alerts.history_maintenance import plan_report
+
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"], frequency="once")
+        initial = plan_report(db, identity().key)["configuration_revision"]
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            body = {"target_start": 0, "timeframes": ["M1", "H4"], "frequency": "once",
+                "expected_configuration_revision": initial}
+            response = client.post(f"/api/market-data/datasets/{identity().key}/maintenance", json=body)
+            assert response.status_code == 200
+            saved = response.json()
+            stale = client.post(f"/api/market-data/datasets/{identity().key}/maintenance",
+                json={**body, "timeframes": ["M1", "D1"]})
+            assert stale.status_code == 409 and stale.json()["detail"]["code"] == "MAINTENANCE_CHANGED"
+            assert client.get(f"/api/market-data/datasets/{identity().key}/maintenance").json() == saved
+    finally:
+        api.app.dependency_overrides.clear()
+
+
 def test_maintenance_success_waits_for_all_fixed_requested_artifacts(database):
     from alerts.data_center import task_list
     from alerts.history_versions import version_report

@@ -105,8 +105,8 @@ def router(authenticated):
         return invoke(command)
 
     @routes.get("/center/composites")
-    def composites(query: str = "", page: int = 1, page_size: int = 25):
-        return invoke(list_composites, query=query, page=page, page_size=page_size)
+    def composites(query: str = "", page: int = 1, page_size: int = 25, dataset_id: str | None = None):
+        return invoke(list_composites, query=query, page=page, page_size=page_size, dataset_id=dataset_id)
 
     @routes.get("/center/composite-candidates")
     def possible(query: str = "", page: int = 1, page_size: int = 25,

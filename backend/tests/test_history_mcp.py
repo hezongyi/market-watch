@@ -15,6 +15,7 @@ def test_readonly_history_tools_match_browser_without_creating_demand(mcp):
     expected = {
         "history_get_dataset": ({"dataset_id": identity().key}, f"/api/market-data/center/datasets/{identity().key}"),
         "history_get_version": ({"version_id": version}, f"/api/market-data/versions/{version}"),
+        "history_get_comparison": ({"version_id": version}, f"/api/market-data/versions/{version}/comparison"),
         "history_get_bars": ({"version_id": version, "count": 2}, f"/api/market-data/versions/{version}/chart?count=2"),
         "history_get_coverage": ({"version_id": version}, f"/api/market-data/versions/{version}/coverage"),
         "history_get_requests": ({"version_id": version}, f"/api/market-data/versions/{version}/requests"),

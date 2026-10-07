@@ -17,6 +17,10 @@ class CompositeListQuery(Input):
     page_size: int = Field(default=25, ge=1, le=100)
 
 
+class SavedCompositeListQuery(CompositeListQuery):
+    dataset_id: str | None = Field(default=None, min_length=64, max_length=64)
+
+
 class SeriesSearchQuery(Input):
     query: str = Field(default="", max_length=100)
     kind: Literal["all", "provider", "history", "composite"] = "all"
@@ -62,7 +66,7 @@ def register_composite(registry):
     entries = [
         ("composite_get_quote", "Stored composite price: fresh owner-fenced sampled Bid, otherwise saved confirmed M1 close. Exact price, fixed revision, source evidence and separate quote/tail readiness. No creation, live demand or supplier IO.", CompositeQuery,
          lambda ctx, q: invoke(get_snapshot, q.composite_id)),
-        ("composite_list", "Pure paginated saved composites; no creation, demand or supplier request.", CompositeListQuery,
+        ("composite_list", "Pure paginated saved composites, optionally scoped to an exact managed dataset; no creation, demand or supplier request.", SavedCompositeListQuery,
          lambda ctx, q: invoke(list_composites, **q.model_dump())),
         ("composite_list_candidates", "Pure managed history candidates with explicit saved mapping status. Search never creates a composite.", CompositeListQuery,
          lambda ctx, q: invoke(candidates, **q.model_dump())),

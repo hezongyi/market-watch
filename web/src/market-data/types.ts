@@ -46,6 +46,7 @@ export type Period = {
 };
 export type Plan = {
   configured: boolean;
+  configuration_revision: string;
   target_start: number;
   timeframes: string[];
   frequency: string;

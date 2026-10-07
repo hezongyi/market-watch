@@ -47,6 +47,7 @@ class AggregationRequest(BaseModel):
 
 class MaintenanceRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    expected_configuration_revision: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     target_start: int = Field(ge=0, strict=True)
     timeframes: list[str] = Field(min_length=1, max_length=9)
     frequency: Literal["daily", "once"] = "daily"
@@ -195,6 +196,16 @@ def router(authenticated):
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
+    @routes.get("/versions/{version_id}/comparison")
+    def compare_version(version_id: str, previous_version_id: str | None = None):
+        from .history_comparison import report
+
+        try:
+            with transaction() as db:
+                return report(db, version_id, previous_version_id)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
     @routes.get("/versions/{version_id}/requests")
     def history_requests(version_id: str, page: int = 1, page_size: int = 25):
         from .history_request_evidence import report
@@ -254,10 +265,13 @@ def router(authenticated):
     @routes.post("/datasets/{dataset_id}/maintenance")
     def configure_maintenance(dataset_id: str, body: MaintenanceRequest):
         from .history_commands import configure_maintenance as command
+        from .history_maintenance import MaintenanceConflict
 
         try:
             with transaction() as db:
                 return command(db, dataset_id, body)
+        except MaintenanceConflict as error:
+            raise HTTPException(409, {"code": "MAINTENANCE_CHANGED", "message": str(error)}) from None
         except (ValueError, KeyError) as error:
             raise HTTPException(422, str(error)) from None
 

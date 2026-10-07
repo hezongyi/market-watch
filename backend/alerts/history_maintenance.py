@@ -47,8 +47,21 @@ def latest_version(db, dataset_id):
             HistoryVersion.published_at.desc(), HistoryVersion.id).limit(1))
 
 
+class MaintenanceConflict(ValueError):
+    """An editor may not overwrite another saved maintenance configuration."""
+
+
+def configuration_revision(plan):
+    if plan is None:
+        return hashlib.sha256(b"unconfigured-maintenance-v1").hexdigest()
+    fields = ("target_start", "timeframes", "frequency", "timezone", "daily_minute",
+              "overlap_minutes", "paused", "archived")
+    return hashlib.sha256(json.dumps({key: getattr(plan, key) for key in fields},
+        sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
 def configure(db, dataset_id, *, target_start, timeframes, frequency="daily", timezone="UTC",
-              daily_minute=15, overlap_minutes=2880):
+              daily_minute=15, overlap_minutes=2880, expected_configuration_revision=None):
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
     if not dataset:
         raise ValueError("数据集不存在")
@@ -61,6 +74,9 @@ def configure(db, dataset_id, *, target_start, timeframes, frequency="daily", ti
         raise ValueError("不支持的维护频率或复查窗口")
     next_at = next_daily(now_ms(), daily_minute, timezone)
     plan = db.get(DatasetMaintenance, dataset_id)
+    if (expected_configuration_revision is not None and
+            expected_configuration_revision != configuration_revision(plan)):
+        raise MaintenanceConflict("维护配置已被其他窗口修改；你的输入已保留，请载入最新配置后重新核对。")
     if plan is None:
         latest = latest_version(db, dataset_id)
         plan = DatasetMaintenance(dataset_id=dataset_id, latest_version_id=latest.id if latest else None)
@@ -302,10 +318,11 @@ def schedule_tick():
 def plan_report(db, dataset_id):
     plan = db.get(DatasetMaintenance, dataset_id)
     if not plan:
-        return {"configured": False}
+        return {"configured": False, "configuration_revision": configuration_revision(None)}
     latest = db.get(HistoryVersion, plan.latest_version_id) if plan.latest_version_id else latest_version(db, dataset_id)
     active = db.get(HistoryVersion, plan.active_version_id) if plan.active_version_id else None
-    return {"configured": True, "target_start": plan.target_start, "timeframes": plan.timeframes,
+    return {"configured": True, "configuration_revision": configuration_revision(plan),
+        "target_start": plan.target_start, "timeframes": plan.timeframes,
         "frequency": plan.frequency, "timezone": plan.timezone, "daily_minute": plan.daily_minute,
         "overlap_minutes": plan.overlap_minutes, "paused": plan.paused, "archived": plan.archived,
         "next_at": plan.next_at if plan.frequency == "daily" and not plan.paused and not plan.archived else None,

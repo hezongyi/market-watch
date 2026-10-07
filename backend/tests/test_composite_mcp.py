@@ -37,5 +37,10 @@ def test_composite_mcp_matches_browser_and_never_creates_live_demand(mcp, monkey
         assert result["structuredContent"] == client.get("/api/market-data" + path).json()
     invalid = call(client, token, "composite_get_bars", {"composite_id": ident, "count": 2001})
     assert invalid["isError"]
+    for dataset_id, expected_count in ((identity().key, 1), ("0" * 64, 0)):
+        args = {"dataset_id": dataset_id}
+        listed = call(client, token, "composite_list", args)["structuredContent"]
+        assert listed == client.get("/api/market-data/center/composites", params=args).json()
+        assert listed["total"] == expected_count
     with factory.begin() as db:
         assert db.scalar(select(MarketDemand)) is None

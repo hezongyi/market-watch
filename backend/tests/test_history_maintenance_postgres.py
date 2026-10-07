@@ -25,6 +25,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
     contracts.test_daily_schedule_is_separate_from_pause_and_read_has_no_live_demand,
     contracts.test_maintenance_success_waits_for_all_fixed_requested_artifacts,
     contracts.test_cancel_artifact_stage_preserves_m1_and_partial_periods,
+    contracts.test_http_stale_plan_returns_conflict_and_preserves_saved_configuration,
 ], ids=lambda contract: contract.__name__)
 def test_postgres_maintenance_contract(provider_pg, contract):
     factory, _ = provider_pg
@@ -46,6 +47,53 @@ def test_concurrent_task_submission_keeps_one_fixed_version(provider_pg):
     assert len(set(ids)) == 1
     with factory.begin() as db:
         assert db.scalar(select(func.count()).select_from(HistoryRun)) == 1
+
+
+def test_parallel_plan_edits_reject_stale_configuration_without_losing_winner(provider_pg):
+    from alerts.history_maintenance import MaintenanceConflict, plan_report
+
+    factory, _ = provider_pg
+    with factory.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"], frequency="once")
+        initial = plan_report(db, identity().key)["configuration_revision"]
+
+    def edit(minute):
+        try:
+            with factory.begin() as db:
+                configure(db, identity().key, target_start=0, timeframes=["M1", "H4"],
+                    frequency="once", daily_minute=minute, expected_configuration_revision=initial)
+            return "saved", minute
+        except MaintenanceConflict:
+            return "conflict", minute
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(edit, (15, 30)))
+    assert sorted(r[0] for r in results) == ["conflict", "saved"]
+    winner = next(minute for result, minute in results if result == "saved")
+    with factory.begin() as db:
+        current = plan_report(db, identity().key)
+        assert current["daily_minute"] == winner and current["timeframes"] == ["M1", "H4"]
+        assert current["configuration_revision"] != initial
+
+
+def test_task_progress_does_not_invalidate_plan_edit_revision(provider_pg):
+    from alerts.history_maintenance import plan_report
+    from alerts.storage import DatasetMaintenance
+
+    factory, _ = provider_pg
+    with factory.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"], frequency="once")
+        initial = plan_report(db, identity().key)["configuration_revision"]
+        plan = db.get(DatasetMaintenance, identity().key)
+        plan.updated_at += 1000
+        plan.last_success = 120000
+        plan.next_at += 60000
+    with factory.begin() as db:
+        assert plan_report(db, identity().key)["configuration_revision"] == initial
+        configure(db, identity().key, target_start=0, timeframes=["M1", "D1"],
+            frequency="once", expected_configuration_revision=initial)
 
 
 def test_parallel_artifacts_complete_shared_task_once(provider_pg):

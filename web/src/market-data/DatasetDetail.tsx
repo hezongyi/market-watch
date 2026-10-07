@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Link,
   useNavigate,
@@ -11,6 +11,7 @@ import { Feedback, Pager } from "./Center";
 import { useSnapshot } from "./useSnapshot";
 import { MaintenanceSettings } from "./MaintenanceSettings";
 import { DatasetReferences } from "./DatasetReferences";
+import { VersionComparison } from "./VersionComparison";
 import { names, phase, time, type Dataset, type Period } from "./types";
 
 export function DatasetDetail() {
@@ -24,6 +25,8 @@ export function DatasetDetail() {
     [calendar, setCalendar] = useState(""),
     [from, setFrom] = useState(""),
     [to, setTo] = useState("");
+  const [rangeKind, setRangeKind] = useState<"backfill" | "recheck">("backfill");
+  const submission = useRef<{key: string; request: string} | null>(null);
   const section = params.get("section") || "overview",
     frame = params.get("frame") || "M1";
   const result = useSnapshot<Dataset>(
@@ -134,7 +137,7 @@ export function DatasetDetail() {
   }
   async function backfill() {
     if (!from || !to) {
-      setError("请选择补数的起止交易日期（结束日不包含）。");
+      setError("请选择任务的起止交易日期（结束日不包含）。");
       return;
     }
     setBusy(true);
@@ -147,14 +150,16 @@ export function DatasetDetail() {
           ),
         ),
       );
+      const key = JSON.stringify([id, rangeKind, left.start, right.start]);
+      if (submission.current?.key !== key) submission.current = {key, request: crypto.randomUUID()};
       await api(`/market-data/datasets/${id}/tasks`, {
-        kind: "backfill",
+        kind: rangeKind,
         start: left.start,
         end: right.start,
-        request_id: crypto.randomUUID(),
+        request_id: submission.current.request,
       });
       setRefresh((r) => r + 1);
-      setNotice("指定区间补数已提交。");
+      setNotice(rangeKind === "recheck" ? "指定区间复查已提交，旧版本保持固定。" : "指定区间补数已提交。");
     } catch (e) {
       setError(String(e));
     } finally {
@@ -545,6 +550,7 @@ export function DatasetDetail() {
                     <tr>
                       <th>固定范围</th>
                       <th>状态</th>
+                      <th>发布时间</th>
                       <th>观测/未知分钟</th>
                       <th>操作</th>
                     </tr>
@@ -562,24 +568,26 @@ export function DatasetDetail() {
                             : names[v.status] || v.status}
                         </td>
                         <td>
+                          {time(v.published_at)}
+                        </td>
+                        <td>
                           {v.manifest?.rows ?? "—"} /{" "}
                           {v.manifest?.unknown_minutes ?? "—"}
                         </td>
                         <td>
                           {v.status === "published" &&
                             v.payload_available !== false && (
-                              <Link
-                                to={`?section=chart&version=${v.id}&frame=M1`}
-                              >
-                                查看固定版本
-                              </Link>
+                              <><Link to={`?section=chart&version=${v.id}&frame=M1`}>查看固定版本</Link>
+                              <span><Link to={`/replay?dataset_version=${v.id}`}>用于回测</Link></span></>
                             )}
+                          {v.status === "published" && <button onClick={() => select("version", v.id)}>与前版差异</button>}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+              {selectedVersion && <VersionComparison version={selectedVersion} refresh={refresh}/>}
             </>
           )}
           {section === "maintenance" && (
@@ -633,7 +641,10 @@ export function DatasetDetail() {
                 暂停定时维护保留已发布版本，策略需要的实时行情继续运行。归档隐藏默认列表，引用仍保留。
               </p>
               <fieldset>
-                <legend>指定区间补数</legend>
+                <legend>指定区间维护</legend>
+                <label>任务类型<select aria-label="任务类型" value={rangeKind} onChange={e => setRangeKind(e.target.value as "backfill" | "recheck")}>
+                  <option value="backfill">补数</option><option value="recheck">复查已有区间</option>
+                </select></label>
                 <label>
                   起始交易日期
                   <input
@@ -651,7 +662,7 @@ export function DatasetDetail() {
                   />
                 </label>
                 <button disabled={busy} onClick={() => void backfill()}>
-                  提交补数
+                  {rangeKind === "recheck" ? "提交复查" : "提交补数"}
                 </button>
               </fieldset>
               <fieldset>

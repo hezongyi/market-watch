@@ -2,6 +2,7 @@
 
 from .. import data_center
 from ..history_artifacts import chart_page
+from ..history_comparison import report as comparison_report
 from ..history_request_evidence import report as request_report
 from ..history_retention import references
 from ..history_versions import version_report
@@ -37,6 +38,8 @@ def register_history(registry):
          lambda ctx, q: invoke(data_center.task_list, **q.model_dump())),
         ("history_get_version", "Immutable source M1 manifest and payload availability; never substitute another version.", ManagedVersionQuery,
          lambda ctx, q: invoke(version_report, q.version_id)),
+        ("history_get_comparison", "Compare a fixed publication with its fixed parent or previous publication: manifests, periods and comparable partition checksums. Does not infer minute price revision counts or create demand.", ManagedVersionQuery,
+         lambda ctx, q: invoke(comparison_report, q.version_id)),
         ("history_get_bars", "Fixed-version published period bars with separate closure, confirmation and coverage facts. Latest-first pages return ascending UTC bars and an exclusive next_before cursor. No download or realtime demand.", ManagedBarsQuery,
          lambda ctx, q: invoke(chart_page, q.version_id, q.timeframe, before=q.before, count=q.count)),
         ("history_get_coverage", "Fixed-version observed/unknown/confirmed-closed/conflict intervals with finite source evidence, never infer closures from empty responses.", ManagedCoverageQuery,

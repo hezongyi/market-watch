@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../api";
-import { Feedback } from "./Center";
+import { Feedback, Pager } from "./Center";
 import { useSnapshot } from "./useSnapshot";
 
 type ReferenceReport = {
@@ -23,6 +24,12 @@ export function DatasetReferences({
     `/market-data/datasets/${id}/references`,
     refresh,
   );
+  const mappings = useSnapshot<{items: {id: string; current_account: boolean;
+    target_identity: {provider_symbol: string; environment: string}; match: {rationale: string}}[]}>(`/market-data/datasets/${id}/mappings`, refresh);
+  const [page, setPage] = useState(1);
+  const composites = useSnapshot<{items: {id: string; calendar: string; active_revision_id: string;
+    historical_source: string; mapping: {target_identity: {provider_symbol: string}}}[]; total: number}>(
+    `/market-data/center/composites?dataset_id=${id}&page=${page}&page_size=25`, refresh);
   const [review, setReview] = useState(false),
     [busy, setBusy] = useState(false);
   const [error, setError] = useState(""),
@@ -59,7 +66,21 @@ export function DatasetReferences({
       )}
       {report.data && (
         <>
-          <p>实时映射与组合入口正在接入；查看引用不会建立实时需求。</p>
+          <p>管理此数据集的实时映射与组合；查看引用不会建立实时需求。</p>
+          <Link to={`/market-data/datasets/${id}/mapping`}>配置与查看实时映射</Link>
+          <Feedback error={mappings.error} loading={mappings.loading} empty={!mappings.data}/>
+          {mappings.data && <details><summary>已保存映射（{mappings.data.items.length}）</summary>
+            {mappings.data.items.length ? mappings.data.items.map(m => <p key={m.id}>
+              OANDA · {m.target_identity.provider_symbol} · Bid · {m.target_identity.environment} · {m.current_account ? "当前账户" : "其他账户，需重新配置"}<br/>{m.match.rationale}
+            </p>) : <p>尚未保存实时映射，查看此页不会建立组合。</p>}
+          </details>}
+          <Feedback error={composites.error} loading={composites.loading} empty={!composites.data}/>
+          {composites.data && <><h3>已建立组合</h3>
+            {composites.data.items.length ? composites.data.items.map(c => <p key={c.id}>
+              <Link to={`/market-data/composites/${c.id}`}>{c.historical_source} → OANDA {c.mapping.target_identity.provider_symbol} · {c.calendar.toUpperCase()} · 查看组合与固定修订</Link>
+            </p>) : <p>尚未建立组合；首次实际使用时准备。</p>}
+            <Pager total={composites.data.total} page={page} size={25} change={setPage}/>
+          </>}
           {report.data.items.length > 0 ? (
             <div className="dc-table">
               <table>
