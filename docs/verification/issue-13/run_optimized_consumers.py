@@ -6,11 +6,11 @@ import subprocess
 import time
 from pathlib import Path
 
-from run_optimized_baseline import PREFIX, command
+from run_optimized_baseline import OUTPUT, PREFIX, PROJECT, command
 from run_suite import observe
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE / 'results/optimized'
+ROOT = HERE / os.environ.get('ISSUE13_CONSUMER_OUTPUT', 'results/optimized')
 SCRIPTS = (
     'optimized_fairness_probe.py',
     'optimized_consumer_probe.py',
@@ -25,11 +25,11 @@ def main():
     source = Path(os.environ.get('ISSUE13_SOURCE', '/home/quant/repos/market-watch-issue13-reviewed-baseline'))
     os.environ['ISSUE13_SOURCE'] = str(source)
     os.environ['ISSUE13_RESULTS'] = str(ROOT)
-    state = json.loads((HERE/'results/optimized-baseline/state.json').read_text())
+    state = json.loads((OUTPUT/'state.json').read_text())
     if state['status'] != 'complete':
         raise SystemExit('Performance suite is not complete; no shared database reset')
     running = subprocess.check_output(command(['docker', 'ps', '--filter',
-        'label=com.docker.compose.project=mw-issue13-optimized', '--format', '{{.Names}}']), text=True).strip()
+        'label=com.docker.compose.project='+PROJECT, '--format', '{{.Names}}']), text=True).strip()
     if running:
         raise SystemExit('Own other measurement running; never reset its live fixture')
     ROOT.mkdir(exist_ok=True)
@@ -42,7 +42,7 @@ def main():
     # Fixture reset reads its canonical warmup snapshot from /results. Copy only
     # that small immutable initial snapshot into the distinct consumer output.
     with (ROOT/'warmup.json').open('x') as output:
-        output.write((HERE/'results/optimized-baseline/warmup.json').read_text())
+        output.write((OUTPUT/'warmup.json').read_text())
     try:
         subprocess.run(command(PREFIX+['up', '-d', '--wait', 'postgres']), check=True)
         for script in SCRIPTS:
@@ -51,7 +51,7 @@ def main():
             with log.open('x') as output, (ROOT/(label+'-host.jsonl')).open('x') as samples:
                 os.chmod(log, 0o600)
                 proc = subprocess.Popen(command(PREFIX+['run', '--rm', '--no-deps',
-                    '--name', 'mw-issue13-optimized-consumer', 'probe', 'python',
+                    '--name', PROJECT+'-consumer', 'probe', 'python',
                     'docs/verification/issue-13/'+script]), stdout=output, stderr=subprocess.STDOUT)
                 while proc.poll() is None:
                     observe(samples, label)

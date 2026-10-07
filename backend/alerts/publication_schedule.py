@@ -138,12 +138,12 @@ def tick(publisher, corrections):
         except Exception as error:
             state.attempts += 1
             state.next_at = stamp + min(300_000, 1000 * 2 ** min(state.attempts, 8))
-            state.served_at = stamp
+            state.served_at = max(stamp, state.served_at + 1)
             state.blocked_reason = type(error).__name__[:40]
             return PublicationResult(next_due_at=state.next_at, blocked_reason=state.blocked_reason)
         # The equality condition also protects callers that enqueue another
         # generation inside the same publication transaction.
-        state.served_at = stamp
+        state.served_at = max(stamp, state.served_at + 1)
         state.attempts = 0
         if result.runnable_remaining or (not coverage_work['complete'] and
                                         not coverage_work.get('maintenance_required')):

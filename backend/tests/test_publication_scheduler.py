@@ -235,3 +235,55 @@ def test_restart_catches_up_more_than_one_source_page_without_further_input(data
         assert len(rows) == 2430
         assert rows[-1]['start'] == START + 2429 * MINUTE
         assert status(db, inst, 'M1')['complete_count'] == 2430
+
+
+def test_incomplete_older_source_bucket_does_not_keep_publication_runnable(database, monkeypatch):
+    from sqlalchemy import select
+    now = START + 120 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: now)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        join(db, inst, START, now)
+        market.ingest(db, inst, {'rows': [dict(timestamp=START+i*MINUTE,
+            open=10, high=11, low=9, close=10) for i in range(120)]}, received_at=now)
+    for _ in range(40):
+        managed.publish_once()
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        pub = db.get(storage.ChartPublication, (inst.id, 'M30'))
+        # First visible half-hour has been copied; an older incomplete M15
+        # source member exists but cannot produce a confirmed target bucket.
+        pub.start = START + 30 * MINUTE
+        db.query(storage.ChartPublishedBar).filter(
+            storage.ChartPublishedBar.instrument_id == inst.id,
+            storage.ChartPublishedBar.timeframe == 'M30',
+            storage.ChartPublishedBar.start == START).delete()
+        pub.complete_count -= 1
+        source = db.scalar(select(storage.Bar).where(storage.Bar.instrument_id == inst.id,
+            storage.Bar.timeframe == 'M15', storage.Bar.start == START))
+        source.complete = False
+        plan = db.get(storage.ChartHistoryPlan, inst.id)
+        result = managed.publish_frame(db, inst, plan, 'M30', now)
+        assert pub.start == START + 30 * MINUTE
+        assert not result.runnable_remaining, 'Unavailable older target bucket must await new evidence'
+
+
+def test_fixed_clock_continuously_runnable_target_does_not_starve_other_ready_targets(database, monkeypatch):
+    from alerts.publication_result import PublicationResult
+    now = START + 30 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: now)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        for ident in ('BTCUSDT', 'EURUSD'):
+            inst = db.get(Instrument, ident)
+            join(db, inst, START, now)
+    served = []
+    def publish(db, inst, plan, frame, stamp):
+        served.append((inst.id, frame))
+        return PublicationResult(runnable_remaining=True)
+    monkeypatch.setattr(managed, 'publish_frame', publish)
+    for _ in range(2 * 18):
+        managed.publish_once()
+    assert len(set(served[:18])) == 18
+    assert len(set(served[18:36])) == 18, 'Fixed observation clock must preserve fair worker turns'

@@ -237,6 +237,7 @@ def _publication_stamp(pub):
 def publish_frame(db, inst, plan, frame, now):
     pub = db.get(ChartPublication, (inst.id, frame))
     before = _publication_stamp(pub)
+    had_publication = pub is not None
     corrections = PublicationResult()
 
     def finish(*, runnable=False, blocked=None, next_due=None):
@@ -432,7 +433,12 @@ def publish_frame(db, inst, plan, frame, now):
     more = db.scalar(select(Bar.start).where(
         Bar.instrument_id == inst.id, Bar.timeframe == source,
         Bar.start >= safe_left, Bar.start < pub.start).limit(1)) is not None
-    return finish(runnable=more or tail_remaining, blocked="aggregation" if pending else None,
+    # An older source row may belong to an incomplete target bucket. Only
+    # an edge that actually advanced proves another available history page;
+    # unchanged unavailable prefixes must wait for their durable source input.
+    older_progress = more and (not had_publication or pub.start < old_start)
+    return finish(runnable=older_progress or tail_remaining,
+                  blocked="aggregation" if pending else "source" if more and not older_progress else None,
                   next_due=min((job.next_at for job in pending), default=None))
 
 

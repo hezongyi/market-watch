@@ -194,3 +194,17 @@ def test_postgres_aggregation_backfill_service_with_continuous_live_work(publica
         test_old_backfill_gets_service_during_continuous_focused_live_work,
     )
     test_old_backfill_gets_service_during_continuous_focused_live_work(publication_pg[0], monkeypatch)
+
+
+def test_postgres_unavailable_older_bucket_waits_for_input(publication_pg, monkeypatch):
+    from test_publication_scheduler import (
+        test_incomplete_older_source_bucket_does_not_keep_publication_runnable,
+    )
+    test_incomplete_older_source_bucket_does_not_keep_publication_runnable(publication_pg[0], monkeypatch)
+
+
+def test_postgres_fixed_clock_preserves_ready_target_fairness(publication_pg, monkeypatch):
+    from test_publication_scheduler import (
+        test_fixed_clock_continuously_runnable_target_does_not_starve_other_ready_targets,
+    )
+    test_fixed_clock_continuously_runnable_target_does_not_starve_other_ready_targets(publication_pg[0], monkeypatch)

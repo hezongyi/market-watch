@@ -1,11 +1,12 @@
 """Assess frozen numeric gates from saved evidence; never adjust limits to results."""
 import json
+import os
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-NEW = HERE/'results/optimized-baseline'
+NEW = HERE/os.environ.get('ISSUE13_OUTPUT', 'results/optimized-baseline')
 OLD = HERE/'results/v114-baseline'
-CONSUMERS = HERE/'results/optimized'
+CONSUMERS = HERE/os.environ.get('ISSUE13_CONSUMER_OUTPUT', 'results/optimized')
 
 
 def read(path):

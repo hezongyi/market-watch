@@ -1,6 +1,6 @@
 # Issue #13：v1.14.0 后实施进展
 
-2026-10-07 14:36 SGT。实现候选，尚未完成 Issue #13。
+2026-10-07 14:50 SGT。实现候选，尚未完成 Issue #13。
 
 已整合 v1.14.0（ec00080），独立冻结基线 131bf3c 的 4 场景 × 3 次 × 300 秒已结束；12 个原始样本审计通过，本任务基线 PG 已正常停止。空闲平均 CPU 41.438% 单核、worker SQL 67.274/s，实时样本 p95 19.551–23.347 秒；修订 p95 24.080–24.456 秒。原始 P0 证据保留。期间 Ubuntu 其他任务及本任务逻辑回归负载由 host.jsonl 记录；这些是实际宿主条件，不当作生产指标或无竞争实验。
 
@@ -50,4 +50,11 @@ python -m alerts.publication_admin coverage --instrument EURUSD --limit 500 --un
 
 不带 `--verify` 只执行有界页面，到 verify 返回 `maintenance_required`，不会忙循环。优化基线 warmup 在计时前执行维护验证并确认持久请求、聚合和修订队列已排空。性能数字门槛保持不变。
 
-当前长测已启动，预计约 65 分钟，启动时间与冻结源由 results/optimized-baseline/source.json 和 state.json 记录；当前不作为通过结论。完整 Issue13 收口仍以全部冻结门槛和消费者/浏览器实际结果为准，目标窗口 18:00–20:00 SGT。
+当前长测实际于 14:45:03 SGT 启动，预计约 65 分钟，启动时间与冻结源由 results/optimized-baseline/source.json 和 state.json 记录；当前不作为通过结论。完整 Issue13 收口仍以全部冻结门槛和消费者/浏览器实际结果为准，目标窗口 18:00–20:00 SGT。
+
+
+15:03 SGT 首轮性能：idle-1 CPU 0.265% / SQL 1.046/s、无历史/审计读取；live-1 M1 p95 0.344 秒，但可运行最长等待 11.351 秒超 10 秒门槛、CPU 49.299% / SQL 497.598/s。原始轮次完整保留并继续 serial suite，不作为完成。live-1 XAUUSD M30 被选择 4648 次，源前缀存在但无法生成完整目标桶仍声明 runnable，固定观察时钟 served_at 同值放大饥饿。工作树已补“确实前移历史边界才继续页”和 served_at 同时钟递增的修复及用例；未跑、未冻结，不进入当前测量。
+
+warmup 实际对照：90 目标的 start/end/count 与 26,290 published bars 全部相同，聚合/修订队列均为空。EURUSD/XAUUSD M30 新候选初始化为 true、revision 2，旧基线 false、revision 1；新候选计时前排空所有持久请求，不能宣称元数据全等。见 results/optimized/warmup-comparison.json。
+
+15:07 SGT 工作树修复已通过两项 SQLite 逻辑用例（0.90 秒）：不完整旧源桶不会保持 runnable；固定时钟连续请求每轮公平遍历全部目标。该小测试在独立 mw-issue13-optimized-r2 probe 与原候选 revision-1 采样重叠，未创建第二 PG 或并跑重型回归，宿主证据仍记录竞争，不声明无争抢。真实 PG、全量及新长测仍未运行。新 r2 project/port19643/独立网络配置和 private env 已准备，未启动 PG。

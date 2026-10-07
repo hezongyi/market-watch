@@ -10,10 +10,11 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SOURCE = Path(os.environ.get('ISSUE13_SOURCE', '/home/quant/repos/market-watch-issue13-optimized-baseline'))
-OUTPUT = HERE / 'results/optimized-baseline'
-ENV = Path('/tmp/market-watch-issue13-optimized.env')
-PREFIX = ['docker', 'compose', '--env-file', str(ENV), '-p', 'mw-issue13-optimized',
-          '-f', str(HERE / 'optimized.compose.yaml')]
+OUTPUT = HERE / os.environ.get('ISSUE13_OUTPUT', 'results/optimized-baseline')
+ENV = Path(os.environ.get('ISSUE13_ENV', '/tmp/market-watch-issue13-optimized.env'))
+PROJECT = os.environ.get('ISSUE13_PROJECT', 'mw-issue13-optimized')
+COMPOSE = Path(os.environ.get('ISSUE13_COMPOSE', str(HERE / 'optimized.compose.yaml')))
+PREFIX = ['docker', 'compose', '--env-file', str(ENV), '-p', PROJECT, '-f', str(COMPOSE)]
 
 
 def command(args):
@@ -50,26 +51,26 @@ def main():
     commit = subprocess.check_output(['git', '-C', str(SOURCE), 'rev-parse', 'HEAD'], text=True).strip()
     (OUTPUT / 'source.json').write_text(json.dumps(dict(
         started_at=datetime.now(timezone.utc).isoformat(), commit=commit,
-        project='mw-issue13-optimized', source=str(SOURCE), pid=os.getpid(),
+        project=PROJECT, source=str(SOURCE), pid=os.getpid(),
         files={str(p.relative_to(SOURCE)): hashlib.sha256(p.read_bytes()).hexdigest()
                for p in sorted((SOURCE / 'backend/alerts').rglob('*.py'))}), indent=2) + '\n')
     state = OUTPUT / 'state.json'
     try:
         run(['up', '-d', '--wait', 'postgres'], 'start')
         # Validate the existing dependency image rather than installing in shared venv.
-        run(['run', '--rm', '--no-deps', '--name', 'mw-issue13-optimized-dependencies', 'probe', 'python', '-c',
+        run(['run', '--rm', '--no-deps', '--name', PROJECT+'-dependencies', 'probe', 'python', '-c',
              'import pytest, yfinance, dukascopy_python, alembic, psycopg; print("dependencies available")'], 'dependencies')
         for action in ('setup', 'warmup'):
-            run(['run', '--rm', '--no-deps', '--name', 'mw-issue13-optimized-prepare', 'probe', 'python',
+            run(['run', '--rm', '--no-deps', '--name', PROJECT+'-prepare', 'probe', 'python',
                  'docs/verification/issue-13/pg_baseline.py', action], action)
         # Scenario-first pass gives all four scenes before additional repetitions.
         for repetition in range(1, 4):
             for scenario in ('idle', 'live', 'backfill', 'revision'):
                 label = f'{scenario}-{repetition}'
                 state.write_text(json.dumps(dict(status='running', current=label, pid=os.getpid())) + '\n')
-                run(['run', '--rm', '--no-deps', '--name', 'mw-issue13-optimized-measure', 'probe', 'python',
+                run(['run', '--rm', '--no-deps', '--name', PROJECT+'-measure', 'probe', 'python',
                      'docs/verification/issue-13/pg_baseline.py', 'reset'], label + '-reset')
-                run(['run', '--rm', '--no-deps', '--name', 'mw-issue13-optimized-measure', 'probe', 'python',
+                run(['run', '--rm', '--no-deps', '--name', PROJECT+'-measure', 'probe', 'python',
                      'docs/verification/issue-13/pg_baseline.py', 'measure', '--scenario', scenario,
                      '--seconds', '300', '--repetition', str(repetition)], label)
         state.write_text(json.dumps(dict(status='complete', commit=commit, runs=12)) + '\n')
