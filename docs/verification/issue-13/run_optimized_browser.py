@@ -45,16 +45,16 @@ def main():
         deadline=time.monotonic()+90
         while True:
             try:
-                with urllib.request.urlopen('https://192.168.7.232:19635/readyz',timeout=2,context=ssl._create_unverified_context()) as response:
+                with urllib.request.urlopen('https://192.168.7.232:19645/readyz',timeout=2,context=ssl._create_unverified_context()) as response:
                     if response.status==200:break
             except (OSError,urllib.error.HTTPError):pass
             if time.monotonic()>deadline:raise SystemExit('Own API readiness timeout; no browser verdict')
             time.sleep(1)
         # Check actual iframe static access too; private credentials remain 0700,
         # but the mounted licensed static directory must be readable by Nginx.
-        with urllib.request.urlopen('https://192.168.7.232:19636/',timeout=3,context=ssl._create_unverified_context()) as response:
+        with urllib.request.urlopen('https://192.168.7.232:19646/',timeout=3,context=ssl._create_unverified_context()) as response:
             if response.status!=200:raise SystemExit('Own chart-origin is unavailable before browser launch')
-        with urllib.request.urlopen('https://192.168.7.232:19635/',timeout=3,context=ssl._create_unverified_context()) as response:
+        with urllib.request.urlopen('https://192.168.7.232:19645/',timeout=3,context=ssl._create_unverified_context()) as response:
             if response.status!=200:raise SystemExit('Own built frontend is unavailable before browser launch')
         with (target/'browser-process.log').open('x') as out,(target/'host.jsonl').open('x') as samples:
             proc=subprocess.Popen(command(PREFIX+['run','--rm','--name',PROJECT+'-browser',
