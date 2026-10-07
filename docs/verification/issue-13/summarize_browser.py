@@ -24,7 +24,7 @@ def main():
     assert isolated['internal']
     rows=[json.loads(line) for line in (ROOT/'host.jsonl').read_text().splitlines()]
     own={s['name'] for s in state}
-    samples={name:[] for name in own}
+    samples={name:[] for name in sorted(own)}
     for row in rows:
         for c in row.get('containers',[]):
             if c['Name'] in samples:samples[c['Name']].append(float(c['CPUPerc'].rstrip('%')))
