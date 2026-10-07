@@ -27,3 +27,5 @@
 
 
 网页补充：browser-report.md对应真实产品构建/原生库/Ubuntu PG/完整API lifespan六步骤，原始请求及CPU采样可审计。API与publisher外部网络隔离，固定历史/收盘告警可stale；不证明成功供应商线程负载或持续实时新鲜度。仍待新主线完整正确性与三重复验收。
+
+外部锁补充：lock-contention-report.md已实测独立PG事务持有BTCUSDT品种行锁3.066秒，真实publish_once等锁3.275秒、30个明确blocker样本；另身份已发布读取可继续、释放后轮转恢复且完整快照稳定。人工单锁不证明生产锁频率、多锁顺序、世代并发或调度门槛通过；合并后的锁顺序/事务预算回归仍需验证。

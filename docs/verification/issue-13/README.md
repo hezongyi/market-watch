@@ -116,3 +116,11 @@ sg docker -c 'docker compose --env-file /tmp/mw-issue13-browser-private/compose.
 ```
 
 三层仍未合并。完整网页/双图短并发已补实际证据，但连续观察时间到告警、高周期payload全量oracle、外部锁争用、可比重复基线、世代/迁移/回退等仍未完成。核心P1–P3继续按用户已定顺序等待整合主线。
+
+## 外部品种持锁补测与证据校验
+
+2026-10-07 00:39UTC已完成[外部品种锁争用](lock-contention-report.md)：独立PG事务持锁3.066秒，真实发布调用3.275秒、30个明确blocker样本；锁期间另一个身份的10行快照读取15.53ms。释放后原轮转恢复、26,290行完整bar与可见元信息稳定。人工锁不证明生产锁频率或新调度验收，原补充场景的零Lock样本限制仍保留。首次共享连接池失败独立归档；成功probe已移除、PG已停止。
+
+执行：`python3 -u docs/verification/issue-13/run_lock_contention.py`。仅本任务服务全部停止时允许reset；拒绝覆盖已有证据，runner结束自动停止PG，单独启停见上文。尚待合并后的连续新鲜度、高周期独立oracle、同口径消费者、可比重复与迁移/回退。
+
+证据校验：`python3 docs/verification/issue-13/audit_evidence.py`。路径始终相对证据目录解析，失败列出具体文件且不改写manifest。浏览器审核输出已按容器名排序；修复前不同PYTHONHASHSEED使统计值相同但JSON字节不同，修复后三种seed输出哈希相同。证据哈希通过不等于Issue #13完成。

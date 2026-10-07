@@ -206,3 +206,5 @@ P0 的实例台账与资源观测贯穿全过程；P1–P3 的进入条件是三
 
 
 2026-10-07 00:31UTC接续：`d362766`与`10abd44`已本地保存小修复、P0原始/补充基线，未推送或部署。新增[真实网页/原生双图/完整API lifespan短并发](verification/issue-13/browser-report.md)已实际通过；之前[完整payload/混合输入](verification/issue-13/supplemental-report.md)及[TCP/告警短测](verification/issue-13/network-alert-report.md)仍保留超目标指标及局限。P0准备持续推进，但上述不证明核心调度/增量/迁移/回退达标；三层合并条件未成立，P1–P3继续等待。
+
+2026-10-07 00:39UTC补充[外部PG品种锁实验](verification/issue-13/lock-contention-report.md)：3.066秒人工持锁使真实发布调用等待3.275秒，30个明确blocker样本；另身份已发布读取15.53ms，释放后轮转恢复、完整快照稳定。它说明串行发布可受单品种锁阻塞，不估算自然争用频率、不支持提前改锁顺序或锁外计算。浏览器审核输出排序修正后证据哈希校验通过；P1–P3继续等待三层合并。

@@ -1,5 +1,7 @@
 # P0 实施状态（2026-10-07）
 
+**2026-10-07 00:39UTC最新接续：** `fbd8e53`修正浏览器审核JSON无序输出，三种hash seed字节一致、原224份manifest全部校验通过。新增外部PG持锁补测完成：3.066秒锁导致真实发布调用3.275秒，30个明确blocker样本；同期另身份PG读取15.53ms，释放后轮转恢复，26,290行完整bar/可见元信息稳定。首次连接池配置失败独立保存，不计作锁基线。报告见lock-contention-report.md；成功probe已移除，自己的PG再次停止exit0/OOM=false，其余任务未操作。main仍0591e56、开放PR为空；P1–P3仍等待三层合并，Issue #13未完成。
+
 **当前状态（优先于下文逐轮历史）：** 四场景12份300秒长测全部结束、完整artifact审计通过并汇总；非空40身份/周期配置×3次消费者API/evaluate微基线通过；门槛写入acceptance-thresholds.md（未测项明确保留）。suite和finisher已正常结束，自己的PG最后停止为exited0/running false，合成卷保留。核心P1–P3仍等待三层合并；任务没有完成或部署。下文“进行中/当前PID”是阶段历史记录，不能当作实时状态；最新完整报告为pg-baseline-report.md与consumer-report.md。
 
 
