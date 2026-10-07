@@ -1,0 +1,174 @@
+{
+  "at": "2026-10-07T02:36:38.742042+00:00",
+  "environment": "Ubuntu local Docker",
+  "host": "192.168.7.232",
+  "project": "mw-chart-maximize-20261007",
+  "baseline": "9670dae",
+  "baselineVersion": "1.12.1",
+  "app": "https://192.168.7.232:17443/advanced-charts",
+  "chart": "https://192.168.7.232:17444",
+  "externalDNS": false,
+  "services": [
+    {
+      "name": "mw-chart-maximize-20261007-pg-1",
+      "service": "pg",
+      "image": "postgres:14-bookworm",
+      "imageID": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": "running",
+      "health": "healthy",
+      "restartCount": 0,
+      "taskLabels": {}
+    },
+    {
+      "name": "mw-chart-maximize-20261007-api-1",
+      "service": "api",
+      "image": "market-watch-api:chart-maximize-v1121-20261007",
+      "imageID": "sha256:a56143270f33c6fecd3d28616ab22b806ddc13a24016fe494e2bc048f5abdfe0",
+      "state": "running",
+      "health": "healthy",
+      "restartCount": 0,
+      "taskLabels": {
+        "io.market-watch.built-at": "2026-10-07T02:28:35.324811+00:00",
+        "io.market-watch.commit": "796a4656ccf4716172f8323335b70c9837376b66",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-14T02:28:35.324811+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-chart-maximize-20261007",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-chart-maximize-20261007"
+      }
+    },
+    {
+      "name": "mw-chart-maximize-20261007-web-1",
+      "service": "web",
+      "image": "market-watch-web:chart-maximize-v1121-lan-ip-20261007",
+      "imageID": "sha256:193dba326bb5392da2fb5b0f24e6021f5da831c6fa390540751c18591ea5fc0e",
+      "state": "running",
+      "health": null,
+      "restartCount": 0,
+      "taskLabels": {
+        "io.market-watch.built-at": "2026-10-07T02:28:35.324811+00:00",
+        "io.market-watch.commit": "796a4656ccf4716172f8323335b70c9837376b66",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-14T02:28:35.324811+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-chart-maximize-20261007",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-chart-maximize-20261007"
+      }
+    },
+    {
+      "name": "mw-chart-maximize-20261007-chart-origin-1",
+      "service": "chart-origin",
+      "image": "market-watch-chart-origin:chart-maximize-v1121-20261007",
+      "imageID": "sha256:bde021cfa1f6633e69f4064ed644c48efeda76f4a635414cf770eea36c62294f",
+      "state": "running",
+      "health": null,
+      "restartCount": 0,
+      "taskLabels": {
+        "io.market-watch.built-at": "2026-10-07T02:28:35.324811+00:00",
+        "io.market-watch.commit": "796a4656ccf4716172f8323335b70c9837376b66",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-14T02:28:35.324811+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-chart-maximize-20261007",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-chart-maximize-20261007"
+      }
+    },
+    {
+      "name": "mw-chart-maximize-20261007-tls-1",
+      "service": "tls",
+      "image": "nginx:1.28-alpine",
+      "imageID": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "health": null,
+      "restartCount": 0,
+      "taskLabels": {}
+    },
+    {
+      "name": "mw-chart-maximize-20261007-realtime-worker-1",
+      "service": "realtime-worker",
+      "image": "market-watch-api:chart-maximize-v1121-20261007",
+      "imageID": "sha256:a56143270f33c6fecd3d28616ab22b806ddc13a24016fe494e2bc048f5abdfe0",
+      "state": "running",
+      "health": null,
+      "restartCount": 0,
+      "taskLabels": {
+        "io.market-watch.built-at": "2026-10-07T02:28:35.324811+00:00",
+        "io.market-watch.commit": "796a4656ccf4716172f8323335b70c9837376b66",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-14T02:28:35.324811+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-chart-maximize-20261007",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-chart-maximize-20261007"
+      }
+    },
+    {
+      "name": "mw-chart-maximize-20261007-chart-history-worker-1",
+      "service": "chart-history-worker",
+      "image": "market-watch-api:chart-maximize-v1121-20261007",
+      "imageID": "sha256:a56143270f33c6fecd3d28616ab22b806ddc13a24016fe494e2bc048f5abdfe0",
+      "state": "running",
+      "health": null,
+      "restartCount": 0,
+      "taskLabels": {
+        "io.market-watch.built-at": "2026-10-07T02:28:35.324811+00:00",
+        "io.market-watch.commit": "796a4656ccf4716172f8323335b70c9837376b66",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-14T02:28:35.324811+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-chart-maximize-20261007",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-chart-maximize-20261007"
+      }
+    },
+    {
+      "name": "mw-chart-maximize-20261007-chart-aggregation-worker-1",
+      "service": "chart-aggregation-worker",
+      "image": "market-watch-api:chart-maximize-v1121-20261007",
+      "imageID": "sha256:a56143270f33c6fecd3d28616ab22b806ddc13a24016fe494e2bc048f5abdfe0",
+      "state": "running",
+      "health": null,
+      "restartCount": 0,
+      "taskLabels": {
+        "io.market-watch.built-at": "2026-10-07T02:28:35.324811+00:00",
+        "io.market-watch.commit": "796a4656ccf4716172f8323335b70c9837376b66",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-14T02:28:35.324811+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-chart-maximize-20261007",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-chart-maximize-20261007"
+      }
+    },
+    {
+      "name": "mw-chart-maximize-20261007-native-history-worker-1",
+      "service": "native-history-worker",
+      "image": "market-watch-api:chart-maximize-v1121-20261007",
+      "imageID": "sha256:a56143270f33c6fecd3d28616ab22b806ddc13a24016fe494e2bc048f5abdfe0",
+      "state": "running",
+      "health": null,
+      "restartCount": 0,
+      "taskLabels": {
+        "io.market-watch.built-at": "2026-10-07T02:28:35.324811+00:00",
+        "io.market-watch.commit": "796a4656ccf4716172f8323335b70c9837376b66",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-14T02:28:35.324811+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-chart-maximize-20261007",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-chart-maximize-20261007"
+      }
+    }
+  ],
+  "productionChanged": false,
+  "notificationsEnabled": false,
+  "independentDatabase": "chart_maximize",
+  "independentVolume": "mw-chart-maximize-20261007_maximize-pg",
+  "credentialProvenance": "Only OANDA market-data connection fields from existing Ubuntu development instance; no database or production configuration copied",
+  "userAcceptance": "running; task remains active",
+  "managedCandles": " instrument_id | timeframe | count |     latest_bar_end     \n---------------+-----------+-------+------------------------\n BTCUSDT       | D1        |     1 | 2026-10-08 00:00:00+00\n BTCUSDT       | H1        |     3 | 2026-10-07 03:00:00+00\n BTCUSDT       | H4        |     1 | 2026-10-07 04:00:00+00\n BTCUSDT       | M1        |   126 | 2026-10-07 02:36:00+00\n BTCUSDT       | M15       |     9 | 2026-10-07 02:45:00+00\n BTCUSDT       | M5        |    26 | 2026-10-07 02:40:00+00\n EURUSD        | D1        |     1 | 2026-10-07 21:00:00+00\n EURUSD        | H1        |     3 | 2026-10-07 03:00:00+00\n EURUSD        | H4        |     2 | 2026-10-07 05:00:00+00\n EURUSD        | M1        |   125 | 2026-10-07 02:36:00+00\n EURUSD        | M15       |     9 | 2026-10-07 02:45:00+00\n EURUSD        | M5        |    26 | 2026-10-07 02:40:00+00\n MAXFIXTURE    | H1        |  1200 | 2026-10-07 01:00:00+00\n XAUUSD        | D1        |     1 | 2026-10-07 21:00:00+00\n XAUUSD        | H1        |     3 | 2026-10-07 03:00:00+00\n XAUUSD        | H4        |     2 | 2026-10-07 05:00:00+00\n XAUUSD        | M1        |   125 | 2026-10-07 02:36:00+00\n XAUUSD        | M15       |     9 | 2026-10-07 02:45:00+00\n XAUUSD        | M5        |    26 | 2026-10-07 02:40:00+00\n(19 rows)\n\n",
+  "apiPackageVersion": "1.12.1"
+}

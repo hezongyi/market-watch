@@ -1,5 +1,5 @@
 {
-  "baseline": "cf84f03",
+  "baseline": "9670dae",
   "productionSource": "0591e56",
   "at": "2026-10-07T00:43:05.233500+00:00",
   "asset": "host.b094dc92d30c3ed8.js",
@@ -17,12 +17,14 @@
     "advanced-host/index.html": "595ce4c440c2963d23824bcba4f4a0372c5eea2c4d80fc11f69ffe58df09d0e9",
     "web/tests/advanced-chart-maximize.browser.cjs": "8dd35677285f27436e00eb622e9b0d59c78758a3e14567731d951d7405736267",
     "web/tests/advanced-chart-maximize.bridge.browser.cjs": "0713ffc0b7b921a050e0e83ef396fecb088aa98fe2ea0012e39b0477bbb3fccc",
-    "web/tests/advanced-chart-maximize.product.browser.cjs": "6bd07f63a4bc7fa9853e04f335038758ca3deec6bbd9eff28e2f59dd7ce2da53",
-    "compose.chart-maximize.yaml": "1b1a48675db7e8979c7eec2a516f74101fb520d54ea69658d4e270fb72551017",
+    "web/tests/advanced-chart-maximize.product.browser.cjs": "756a4667e70a9a90f21e456783cf51ccfc67facc64bca1e1b388f1c0a89f0719",
+    "compose.chart-maximize.yaml": "59da7c6fc2b2d512e9eb81d6a817101686a3e1cbf04204b8d4181746e8980b93",
     "scripts/prepare_chart_maximize_acceptance.py": "d6a60ab537ae25cd2b594d4a1fb7732e55dc6e0cdd71eb811f3d9199b646d003",
     "scripts/seed_chart_maximize_acceptance.py": "2dc758062696d0710cb32aa8b6dca20e74dc1954312c868625ba759182436257",
-    "compose.chart-maximize.lan.yaml": "052a960a17c601ae359f68e4e38ecd0636ab60572c00641f6c07cf745fe81098",
-    "deploy/chart-maximize-lan-tls.conf": "6b7ba2e10fbd77c1008d73c78052a696dce6a41ec414b653dec0463599d49be6"
+    "compose.chart-maximize.lan.yaml": "d94f7dc4d80bdd9668e8fea1c6852ae37302e45e32ffd26bf12600372d6019ca",
+    "deploy/chart-maximize-lan-tls.conf": "6b7ba2e10fbd77c1008d73c78052a696dce6a41ec414b653dec0463599d49be6",
+    "compose.chart-maximize.live.yaml": "fd1068f2c09ca34259b855dec6eb97c9760d5a96044571c2a330d2e03d2f8e49",
+    "scripts/configure_chart_maximize_live.py": "c123ca2550cd34c679b42514f80a6d6580029f8b42124c0a4ef025a301c7a99f"
   },
   "cpu4Cases": 22,
   "patchChecks": [
@@ -54,5 +56,22 @@
   "lanExternalDNS": false,
   "lanAccess": "direct IP; no hosts configuration or DNS",
   "lanCookieScope": "/api",
-  "lanAuthenticationVerified": true
+  "lanAuthenticationVerified": true,
+  "originalBaseline": "cf84f03",
+  "baselineVersion": "1.12.1",
+  "realMarketBrowserCases": 4,
+  "realMarketBrowserEvidence": "live-browser.json",
+  "realMarketRuntimeEvidence": "live-runtime.json",
+  "realMarketVerifiedAt": "2026-10-07T02:39:11.133673+00:00",
+  "chartAssetServedSHA256": "b094dc92d30c3ed83e9110a3ea2e0d4754140dbd9d474223a1afa24b7175a209",
+  "realMarketSources": [
+    "OANDA EURUSD",
+    "OANDA XAUUSD",
+    "Binance BTCUSDT"
+  ],
+  "historicalSyntheticReports": "native-browser, built-bridge, product-browser and lan-browser remain historical; real-market result is live-browser",
+  "realMarketFreshnessEvidence": "live-freshness.json",
+  "realMarketScreenshot": "live-browser.png",
+  "liveSeedIdempotence": "passed; existing workspace and user settings preserved",
+  "businessChangesSinceV1121": "none in backend, web/src or migrations; only chart double-click implementation and build integration"
 }

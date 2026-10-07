@@ -7,7 +7,7 @@ services:
     build:
       args:
         VITE_ADVANCED_CHART_ORIGIN: https://192.168.7.232:17444
-    image: market-watch-web:chart-maximize-lan-ip-20261007
+    image: market-watch-web:chart-maximize-v1121-lan-ip-20261007
   tls:
     volumes: !override
       - ./deploy/chart-maximize-lan-tls.conf:/etc/nginx/conf.d/default.conf:ro

@@ -1,6 +1,6 @@
 # 主图空白处双击放大／恢复
 
-基线：生产 v1.12.0（源码 `0591e56`），从带生产验证文档的 `cf84f03` 建立独立工作树 `/home/quant/repos/market-watch-double-click` 和分支 `feat/chart-double-click-maximize`。
+当前基线：v1.12.1 `9670dae`，独立工作树 `/home/quant/repos/market-watch-double-click`、分支 `feat/chart-double-click-maximize`。最初基于生产 v1.12.0（源码 `0591e56`、文档提交 `cf84f03`）；2026-10-07 将本任务七个提交完整移植到 v1.12.1。两基线的行情后端与图表业务代码相同，功能改动仍限于双击钩子及其构建接入；未包含另一个部署认证任务的改动。
 
 ## 操作
 
@@ -41,7 +41,7 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
 
 ## Ubuntu Docker 验收实例（已运行，供用户验收）
 
-本次 project 固定为 `mw-chart-maximize-20261007`，独立默认网络、`maximize-pg` volume、`chart_maximize` 数据库和随机密码。只填充标记为合成行情的 `MAXFIXTURE` H1 数据；不复制生产数据库、配置、通知或凭据，不启动行情采集和通知 worker。
+本次 project 固定为 `mw-chart-maximize-20261007`，独立默认网络、`maximize-pg` volume、`chart_maximize` 数据库和随机密码。初版仅有 `MAXFIXTURE` H1 合成数据，不能作为完整真实行情验收；这导致切换其他品种无本地历史行情，默认 Dukascopy 欧元／黄金在平台系列解析时出现 422。当前增加真实行情 overlay：API、Web、图表来源与 PostgreSQL 之外，运行 realtime、chart-history、chart-aggregation、native-history 四个独立 worker。欧元／黄金使用 OANDA，BTC 使用 Binance；行情重新从来源读取，不复用其他实例的数据库或生产数据目录。通知投递、MCP 和 Yahoo 保持关闭。
 
 实际局域网入口：`https://192.168.7.232:17443/advanced-charts`，图表来源 `https://192.168.7.232:17444`。运行主机为 Ubuntu 22.04，Docker 服务端 29.1.3。应用及图表端口分别绑定 Ubuntu 局域网地址和回环地址，数据库不暴露；直接使用 IP 和端口，无需 SSH 转发、hosts 修改或任何 DNS 解析。`17443` 是登录和完整应用入口，`17444` 是嵌入图表的静态服务，单独打开后不会显示完整应用。
 
@@ -49,19 +49,21 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
 
 浏览器 Cookie 按主机与路径匹配，不按端口隔离；因此此前采用独立图表主机名。当前仅在此独立验收实例的 TLS 网关将应用 session Cookie 的路径改为 `/api`，登录和退出时清除旧的根路径 session。图表常规资源请求不携带该 Cookie；图表端口拒绝 `/api`、`/api/` 路径，并在静态代理中移除 Cookie、Authorization 和 CSRF 请求头。实际浏览器验证登录后的路径、旧 Cookie 清理、图表请求无凭据、退出后 session 为 401。Cookie Path 不提供不同主机的安全隔离，生产继续使用独立图表域名；这一 IP 配置仅服务于隔离的 Ubuntu 验收。
 
-直接 IP 验收 **4 项通过**，页面异常和图表请求凭据检查均为空；登录、退出与真实 API 保存／重载均正常。运行与浏览器证据见 [局域网运行证据](verification/chart-double-click/lan-runtime.json) 和 [局域网浏览器验收](verification/chart-double-click/lan-browser.json)。验收密码保持不变，凭据不会写入这些报告。
+初版合成数据的直接 IP 验收 **4 项通过**，覆盖登录、退出与真实 API 保存／重载；此历史结果不代表欧元／黄金的真实行情已验证。当前真实行情检查和修复另见下文。运行与浏览器证据见 [局域网运行证据](verification/chart-double-click/lan-runtime.json) 和 [局域网浏览器验收](verification/chart-double-click/lan-browser.json)。验收密码保持不变，凭据不会写入这些报告。
 
 之前仅回环部署时，另一台电脑需同时转发两个端口：`ssh -N -L 17443:127.0.0.1:17443 -L 17444:127.0.0.1:17444 quant@192.168.7.232`。2026-10-07 已复现未信任图表证书时的 `ERR_CERT_AUTHORITY_INVALID`，接受后 HTTP 200；用户补充双端口转发及证书后登录成功，完整应用验收再次通过。当前局域网模式不再需要该转发。
 
-应用浏览器验收 **4 项通过**，页面异常为空：关闭同步、柱宽同步、日期同步三种状态下，四图含 RSI 的双击放大／恢复完整往返；通过真实 API 保存工作区到 PostgreSQL，页面重载后四图及 RSI 保留，再次双击往返通过。数据库实际包含 1200 根合成 H1 K 线及对应发布记录。生产构建资产的 SHA-256 与前述浏览器测试资产一致。
+初版合成数据浏览器验收 **4 项通过**，仅覆盖四图含 RSI 的交互、API 保存和 PostgreSQL 重载；当时页面异常检查没有覆盖行情 API 的 422 及原生图表错误提示，不能证明真实行情可用。相关历史报告保留在 `product-browser.json`。当前真实行情检查将黄金 H1、欧元 H4、BTC M15、黄金 H1 放入四图，核验三个品种真实报价、同步状态与双击完整往返、RSI 保留、保存重载、Cookie 路径、退出和行情 API 无错误，另检查所有 frame 内不存在 ApiError 提示。切换同步状态后等待平台视区调整；跨真实市场的日期同步按原生日期对齐规则允许小于 0.1 px 的柱宽修正，但日期范围、品种周期、指标、画线和同步选择必须完全相同。无同步及柱宽同步仍要求全部状态严格相同；功能与同步实现没有为此修改。当前真实行情应用验收 **4 项通过**，行情 API 错误、页面异常和图表凭据泄漏均为空。当前报告见 [真实行情应用验收](verification/chart-double-click/live-browser.json)，另外已核验四图最新 K 线时间均处于各自当前周期、界面自选表三个品种报价均正常，见 [行情新鲜度](verification/chart-double-click/live-freshness.json) 和 [最终页面](verification/chart-double-click/live-browser.png)。图表合并资产仍为前述 `host.b094dc92d30c3ed8.js`。
 
-实例运行、镜像任务标签、网络／卷归属、数据库及关闭通知／MCP／Yahoo 的结果见 [Docker 运行证据](verification/chart-double-click/docker-runtime.json)，完整应用浏览器结果见 [应用验收报告](verification/chart-double-click/product-browser.json)。迁移和合成数据 seed 均成功退出；API、PG 健康，Web、图表来源及 TLS 正常运行。未使用生产数据或配置，未启动采集和通知 worker。
+实例运行、镜像任务标签、网络／卷归属、数据库及关闭通知／MCP／Yahoo 的结果见 [Docker 运行证据](verification/chart-double-click/docker-runtime.json)，完整应用浏览器结果见 [应用验收报告](verification/chart-double-click/product-browser.json)。迁移和合成数据 seed 均成功退出；API、PG 健康，Web、图表来源及 TLS 正常运行。这些是初版合成环境的历史证据；当前启用了行情 worker，通知投递仍关闭。当前服务与镜像状态见 [真实行情运行证据](verification/chart-double-click/live-runtime.json)。
 
-准备私有配置（已有时拒绝覆盖）：
+准备私有配置（已有时拒绝覆盖；已有验收密码继续保留）：
 
 ```bash
 python scripts/prepare_chart_maximize_acceptance.py
 ```
+
+真实行情额外需要在受限 `api.env` 配置 `ALERTS_FX_SOURCE=oanda`、OANDA 账户与 token，以及必要的代理。当前只取用了 Ubuntu 既有开发实例的行情连接字段，用于行情读取；未复制其数据库、登录密码或其他配置。`configure_chart_maximize_live.py` 仅接受本任务数据库，校准无历史观测的欧元／黄金来源并创建“**双击放大验收 · 真实行情**”工作区，保留原合成工作区和用户内容，重复启动不重置工作区。
 
 构建必须使用 Ubuntu 专用 `market-watch-ubuntu` BuildKit，登记本任务及验收用途；启动时不再次隐式构建：
 
@@ -70,14 +72,20 @@ mw-docker compose-build --repo . \
   --task mw-chart-maximize-20261007 --project mw-chart-maximize-20261007 \
   --purpose acceptance \
   --env-file /tmp/mw-chart-maximize-20261007/compose.env \
-  --file compose.chart-maximize.yaml --file compose.chart-maximize.lan.yaml
+  --file compose.chart-maximize.yaml --file compose.chart-maximize.lan.yaml \
+  --file compose.chart-maximize.live.yaml
 docker compose --env-file /tmp/mw-chart-maximize-20261007/compose.env \
   -p mw-chart-maximize-20261007 -f compose.chart-maximize.yaml \
-  -f compose.chart-maximize.lan.yaml up -d --no-build --wait
+  -f compose.chart-maximize.lan.yaml -f compose.chart-maximize.live.yaml up -d --no-build --wait
 docker compose --env-file /tmp/mw-chart-maximize-20261007/compose.env \
   -p mw-chart-maximize-20261007 -f compose.chart-maximize.yaml \
-  -f compose.chart-maximize.lan.yaml stop
+  -f compose.chart-maximize.lan.yaml -f compose.chart-maximize.live.yaml exec tls nginx -s reload
+docker compose --env-file /tmp/mw-chart-maximize-20261007/compose.env \
+  -p mw-chart-maximize-20261007 -f compose.chart-maximize.yaml \
+  -f compose.chart-maximize.lan.yaml -f compose.chart-maximize.live.yaml stop
 ```
+
+上面的 TLS reload 在上游容器重建后重新解析本 project 内部服务地址，避免 Nginx 继续使用旧容器 IP。
 
 已核实当前进程尚未载入 `docker` 补充组，但用户已加入该组；可用 `sg docker -c '<上面的 docker compose 命令>'` 启动或停止。`mw-docker` 自动处理这个组切换。
 
@@ -96,6 +104,8 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
   MAXIMIZE_CHART=https://192.168.7.232:17444 \
   node web/tests/advanced-chart-maximize.product.browser.cjs
 ```
+
+当前浏览器会打开最新的“**双击放大验收 · 真实行情**”工作区；若其他窗口仍显示 MAXFIXTURE，请刷新并在原生工作区菜单选择真实行情工作区。
 
 随机验收登录数据仅位于 `/tmp/mw-chart-maximize-20261007/login.json`，其他 env、证书及私钥均在同一受限目录，不提交仓库。
 
