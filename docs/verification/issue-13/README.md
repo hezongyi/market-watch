@@ -162,3 +162,9 @@ python3 docs/verification/issue-13/summarize_observation_alert.py
 ## 合并前准备收口
 
 [逐项收口审计](premerge-closeout.md)记录已完成范围、性能红灯与P1–P4剩余关卡。固定Ubuntu probe中的五文件回归85 passed；宿主缺yfinance的失败明确保留，未修改共享环境。合并前必要准备已收口，不继续追加可选旧基线实验；P0整合主线复测和Issue #13仍未完成。三层合并后再整合main、同fixture复测及实施核心改造。当前本任务服务全部停止，卷保留；本地提交未推送、未部署。
+
+## v1.14.0整合复测（进行中）
+
+用户指定的三层v1.14.0已合入main，已整合为131bf3c；原等待条件解除。[接口/身份/迁移头与新隔离环境](v114-integration.md)记录实际边界。冻结源码和全新独立PG在Ubuntu `mw-issue13-v114`运行四场景复测，输出独立于原证据。`python3 docs/verification/issue-13/audit_v114_baseline.py`只审核已完成份数；`--complete`要求12份实际300秒artifact、成功进程终态和本任务PG停止。当前不声明整个套件结束。
+
+新增`backend/tests/test_publication_scheduler.py`通过真实ingest→publish_once→read_rows/status验证空闲等待，已实测1 failed（0.74秒），与原idle探针同一缺陷；不是依赖失败。原始红灯分别在`results/v114-baseline/idle-red.log`与`scheduler-idle-red.log`，后续按同一反馈链修复。
