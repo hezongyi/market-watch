@@ -1,0 +1,8751 @@
+{
+  "environment": "Ubuntu isolated PostgreSQL; 0.75 CPU worker / 0.75 CPU PG",
+  "synthetic_identities": [
+    "EURUSD",
+    "XAUUSD",
+    "BTCUSDT",
+    "SYNTH00",
+    "SYNTH01",
+    "SYNTH02",
+    "SYNTH03",
+    "SYNTH04",
+    "SYNTH05",
+    "SYNTH06"
+  ],
+  "frames": [
+    "M1",
+    "M5",
+    "M15",
+    "M30",
+    "H1",
+    "H4",
+    "D1",
+    "W1",
+    "MN"
+  ],
+  "targets": 90,
+  "focused_identity": "BTCUSDT",
+  "service": [
+    {
+      "instrument": "BTCUSDT",
+      "frame": "D1",
+      "seconds": 0.21724327094852924
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "H1",
+      "seconds": 0.27147688576951623
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "H4",
+      "seconds": 0.31617667293176055
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M1",
+      "seconds": 3.8979097409173846
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M15",
+      "seconds": 0.40108524868264794
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M30",
+      "seconds": 0.45590934669598937
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M5",
+      "seconds": 3.3136455388739705
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "MN",
+      "seconds": 0.6098409527912736
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "W1",
+      "seconds": 0.658564168959856
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "D1",
+      "seconds": 0.7189796180464327
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "H1",
+      "seconds": 0.8051720410585403
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "H4",
+      "seconds": 0.855226983781904
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M1",
+      "seconds": 3.9278250178322196
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M15",
+      "seconds": 0.8886584639549255
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M30",
+      "seconds": 3.3762274687178433
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M5",
+      "seconds": 3.4136089510284364
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "MN",
+      "seconds": 0.9186755917035043
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "W1",
+      "seconds": 0.9502096138894558
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "D1",
+      "seconds": 1.0074763000011444
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "H1",
+      "seconds": 1.0522980219684541
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "H4",
+      "seconds": 1.0957335466518998
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M1",
+      "seconds": 3.99484491860494
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M15",
+      "seconds": 1.155342378653586
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M30",
+      "seconds": 1.229844078887254
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M5",
+      "seconds": 3.44857515161857
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "MN",
+      "seconds": 1.2574179470539093
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "W1",
+      "seconds": 1.2851039497181773
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "D1",
+      "seconds": 1.3137679300270975
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "H1",
+      "seconds": 1.346856395713985
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "H4",
+      "seconds": 1.3795222216285765
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M1",
+      "seconds": 4.05779197299853
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M15",
+      "seconds": 1.415978946723044
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M30",
+      "seconds": 1.452872515656054
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M5",
+      "seconds": 3.5351405809633434
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "MN",
+      "seconds": 1.509993763640523
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "W1",
+      "seconds": 1.5502013666555285
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "D1",
+      "seconds": 1.5857932209037244
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "H1",
+      "seconds": 1.642798822838813
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "H4",
+      "seconds": 1.6886136159300804
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M1",
+      "seconds": 4.125508232042193
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M15",
+      "seconds": 1.7155923126265407
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M30",
+      "seconds": 1.749083397909999
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M5",
+      "seconds": 3.5786644918844104
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "MN",
+      "seconds": 1.7859771880321205
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "W1",
+      "seconds": 1.8146614329889417
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "D1",
+      "seconds": 1.8402203698642552
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "H1",
+      "seconds": 1.866053587757051
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "H4",
+      "seconds": 1.8924317276105285
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M1",
+      "seconds": 4.1669188886880875
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M15",
+      "seconds": 1.9165601320564747
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M30",
+      "seconds": 1.9595292429439723
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M5",
+      "seconds": 3.6298044808208942
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "MN",
+      "seconds": 2.0169079466722906
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "W1",
+      "seconds": 2.056963704060763
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "D1",
+      "seconds": 2.1085027186200023
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "H1",
+      "seconds": 2.1826182259246707
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "H4",
+      "seconds": 2.2256051348522305
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M1",
+      "seconds": 4.2862751837819815
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M15",
+      "seconds": 2.253354938700795
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M30",
+      "seconds": 2.2778499987907708
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M5",
+      "seconds": 3.696745994966477
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "MN",
+      "seconds": 2.3072469946928322
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "W1",
+      "seconds": 2.3467685016803443
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "D1",
+      "seconds": 2.384406102821231
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "H1",
+      "seconds": 2.4928146940656006
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "H4",
+      "seconds": 2.534130380023271
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M1",
+      "seconds": 4.324590940028429
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M15",
+      "seconds": 2.5757241076789796
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M30",
+      "seconds": 2.653967087622732
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M5",
+      "seconds": 3.7522466368973255
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "MN",
+      "seconds": 2.6963113476522267
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "W1",
+      "seconds": 2.7252434389665723
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "D1",
+      "seconds": 2.753814022988081
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "H1",
+      "seconds": 2.7816226156428456
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "H4",
+      "seconds": 2.809650443959981
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M1",
+      "seconds": 4.366267730947584
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M15",
+      "seconds": 2.8425158807076514
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M30",
+      "seconds": 2.87613378604874
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M5",
+      "seconds": 3.7835735990665853
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "MN",
+      "seconds": 2.9036671416833997
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "W1",
+      "seconds": 2.9342024056240916
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "D1",
+      "seconds": 3.0056485068053007
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "H1",
+      "seconds": 3.0524722416885197
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "H4",
+      "seconds": 3.1146250599995255
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M1",
+      "seconds": 4.417235957924277
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M15",
+      "seconds": 3.1591662210412323
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M30",
+      "seconds": 3.823381823953241
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M5",
+      "seconds": 3.8564119138754904
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "MN",
+      "seconds": 3.21731378370896
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "W1",
+      "seconds": 3.2482165219262242
+    }
+  ],
+  "missing": [],
+  "longest_first_service_seconds": 4.417235957924277,
+  "turns": [
+    {
+      "at": 0.16606299066916108,
+      "seconds": 0.11993973096832633,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "longest_ready_age": 0.21724327094852924
+    },
+    {
+      "at": 0.29111123364418745,
+      "seconds": 0.049580978229641914,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "longest_ready_age": 0.27147688576951623
+    },
+    {
+      "at": 0.3458464159630239,
+      "seconds": 0.03992217080667615,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "longest_ready_age": 0.31617667293176055
+    },
+    {
+      "at": 0.3909124629572034,
+      "seconds": 0.07996494369581342,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "longest_ready_age": 0.40108524868264794
+    },
+    {
+      "at": 0.47599984193220735,
+      "seconds": 0.06908476771786809,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "longest_ready_age": 0.45590934669598937
+    },
+    {
+      "at": 0.5950634866021574,
+      "seconds": 0.08356205327436328,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "longest_ready_age": 0.6098409527912736
+    },
+    {
+      "at": 0.6837148698978126,
+      "seconds": 0.044207340106368065,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "longest_ready_age": 0.658564168959856
+    },
+    {
+      "at": 0.7330724657513201,
+      "seconds": 0.054477446246892214,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "D1"
+      ],
+      "longest_ready_age": 0.7189796180464327
+    },
+    {
+      "at": 0.7926406916230917,
+      "seconds": 0.08180764131247997,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H1"
+      ],
+      "longest_ready_age": 0.8051720410585403
+    },
+    {
+      "at": 0.8795744869858027,
+      "seconds": 0.04658474260941148,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H4"
+      ],
+      "longest_ready_age": 0.855226983781904
+    },
+    {
+      "at": 0.9312915080226958,
+      "seconds": 0.026202671695500612,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M15"
+      ],
+      "longest_ready_age": 0.8886584639549255
+    },
+    {
+      "at": 0.9626182508654892,
+      "seconds": 0.02450054371729493,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "MN"
+      ],
+      "longest_ready_age": 0.9186755917035043
+    },
+    {
+      "at": 0.9922434408217669,
+      "seconds": 0.026507870759814978,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "W1"
+      ],
+      "longest_ready_age": 0.9502096138894558
+    },
+    {
+      "at": 1.0419619209133089,
+      "seconds": 0.03386975871399045,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "D1"
+      ],
+      "longest_ready_age": 1.0074763000011444
+    },
+    {
+      "at": 1.0809629787690938,
+      "seconds": 0.039843961130827665,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H1"
+      ],
+      "longest_ready_age": 1.0522980219684541
+    },
+    {
+      "at": 1.1258895117789507,
+      "seconds": 0.037920812144875526,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H4"
+      ],
+      "longest_ready_age": 1.0957335466518998
+    },
+    {
+      "at": 1.1689264178276062,
+      "seconds": 0.07169188605621457,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M15"
+      ],
+      "longest_ready_age": 1.155342378653586
+    },
+    {
+      "at": 1.2457363056018949,
+      "seconds": 0.052251949440687895,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M30"
+      ],
+      "longest_ready_age": 1.229844078887254
+    },
+    {
+      "at": 1.303119502030313,
+      "seconds": 0.02348737558349967,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "MN"
+      ],
+      "longest_ready_age": 1.2574179470539093
+    },
+    {
+      "at": 1.3316855300217867,
+      "seconds": 0.021344703622162342,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "W1"
+      ],
+      "longest_ready_age": 1.2851039497181773
+    },
+    {
+      "at": 1.358217584900558,
+      "seconds": 0.02358141401782632,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "D1"
+      ],
+      "longest_ready_age": 1.3137679300270975
+    },
+    {
+      "at": 1.3868785039521754,
+      "seconds": 0.028704409021884203,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H1"
+      ],
+      "longest_ready_age": 1.346856395713985
+    },
+    {
+      "at": 1.4206893215887249,
+      "seconds": 0.027366300113499165,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H4"
+      ],
+      "longest_ready_age": 1.3795222216285765
+    },
+    {
+      "at": 1.4531557126902044,
+      "seconds": 0.030923462938517332,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M15"
+      ],
+      "longest_ready_age": 1.415978946723044
+    },
+    {
+      "at": 1.4892003806307912,
+      "seconds": 0.032551893033087254,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M30"
+      ],
+      "longest_ready_age": 1.452872515656054
+    },
+    {
+      "at": 1.546761323697865,
+      "seconds": 0.031416045036166906,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "MN"
+      ],
+      "longest_ready_age": 1.509993763640523
+    },
+    {
+      "at": 1.5832921545952559,
+      "seconds": 0.035139985382556915,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "W1"
+      ],
+      "longest_ready_age": 1.5502013666555285
+    },
+    {
+      "at": 1.623491688631475,
+      "seconds": 0.030896701384335756,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "D1"
+      ],
+      "longest_ready_age": 1.5857932209037244
+    },
+    {
+      "at": 1.6594808688387275,
+      "seconds": 0.0517094898968935,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H1"
+      ],
+      "longest_ready_age": 1.642798822838813
+    },
+    {
+      "at": 1.716315170750022,
+      "seconds": 0.04040730791166425,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H4"
+      ],
+      "longest_ready_age": 1.6886136159300804
+    },
+    {
+      "at": 1.7618383797816932,
+      "seconds": 0.022042282857000828,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M15"
+      ],
+      "longest_ready_age": 1.7155923126265407
+    },
+    {
+      "at": 1.789011892862618,
+      "seconds": 0.028797923121601343,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M30"
+      ],
+      "longest_ready_age": 1.749083397909999
+    },
+    {
+      "at": 1.8229052037931979,
+      "seconds": 0.0325658000074327,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "MN"
+      ],
+      "longest_ready_age": 1.7859771880321205
+    },
+    {
+      "at": 1.8605586299672723,
+      "seconds": 0.022324373945593834,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "W1"
+      ],
+      "longest_ready_age": 1.8146614329889417
+    },
+    {
+      "at": 1.8880001557990909,
+      "seconds": 0.01993558881804347,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "D1"
+      ],
+      "longest_ready_age": 1.8402203698642552
+    },
+    {
+      "at": 1.9130482906475663,
+      "seconds": 0.022270857356488705,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H1"
+      ],
+      "longest_ready_age": 1.866053587757051
+    },
+    {
+      "at": 1.9404117628000677,
+      "seconds": 0.01984471920877695,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H4"
+      ],
+      "longest_ready_age": 1.8924317276105285
+    },
+    {
+      "at": 1.9653693069703877,
+      "seconds": 0.019189191050827503,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M15"
+      ],
+      "longest_ready_age": 1.9165601320564747
+    },
+    {
+      "at": 1.9896394447423518,
+      "seconds": 0.037994537968188524,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M30"
+      ],
+      "longest_ready_age": 1.9595292429439723
+    },
+    {
+      "at": 2.0499096186831594,
+      "seconds": 0.03516956930980086,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "MN"
+      ],
+      "longest_ready_age": 2.0169079466722906
+    },
+    {
+      "at": 2.0901983538642526,
+      "seconds": 0.035281841177493334,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "W1"
+      ],
+      "longest_ready_age": 2.056963704060763
+    },
+    {
+      "at": 2.1305704875849187,
+      "seconds": 0.04697770345956087,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "D1"
+      ],
+      "longest_ready_age": 2.1085027186200023
+    },
+    {
+      "at": 2.1826502778567374,
+      "seconds": 0.06901776092126966,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H1"
+      ],
+      "longest_ready_age": 2.1826182259246707
+    },
+    {
+      "at": 2.256768002640456,
+      "seconds": 0.03762088203802705,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H4"
+      ],
+      "longest_ready_age": 2.2256051348522305
+    },
+    {
+      "at": 2.3003848348744214,
+      "seconds": 0.020779371727257967,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M15"
+      ],
+      "longest_ready_age": 2.253354938700795
+    },
+    {
+      "at": 2.326277405023575,
+      "seconds": 0.019503519870340824,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M30"
+      ],
+      "longest_ready_age": 2.2778499987907708
+    },
+    {
+      "at": 2.3508644569665194,
+      "seconds": 0.030426174867898226,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "MN"
+      ],
+      "longest_ready_age": 2.3072469946928322
+    },
+    {
+      "at": 2.386379195842892,
+      "seconds": 0.030065814964473248,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "W1"
+      ],
+      "longest_ready_age": 2.3467685016803443
+    },
+    {
+      "at": 2.421529858838767,
+      "seconds": 0.08040155190974474,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "D1"
+      ],
+      "longest_ready_age": 2.384406102821231
+    },
+    {
+      "at": 2.525542063638568,
+      "seconds": 0.03561758529394865,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H1"
+      ],
+      "longest_ready_age": 2.4928146940656006
+    },
+    {
+      "at": 2.56627566087991,
+      "seconds": 0.036227621138095856,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H4"
+      ],
+      "longest_ready_age": 2.534130380023271
+    },
+    {
+      "at": 2.607587289996445,
+      "seconds": 0.03747928887605667,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M15"
+      ],
+      "longest_ready_age": 2.5757241076789796
+    },
+    {
+      "at": 2.650198214687407,
+      "seconds": 0.07298422791063786,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M30"
+      ],
+      "longest_ready_age": 2.653967087622732
+    },
+    {
+      "at": 2.7283245199359953,
+      "seconds": 0.03626336669549346,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "MN"
+      ],
+      "longest_ready_age": 2.6963113476522267
+    },
+    {
+      "at": 2.7697188947349787,
+      "seconds": 0.02457726700231433,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "W1"
+      ],
+      "longest_ready_age": 2.7252434389665723
+    },
+    {
+      "at": 2.799477810971439,
+      "seconds": 0.023394068703055382,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "D1"
+      ],
+      "longest_ready_age": 2.753814022988081
+    },
+    {
+      "at": 2.827994746621698,
+      "seconds": 0.021648524329066277,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H1"
+      ],
+      "longest_ready_age": 2.7816226156428456
+    },
+    {
+      "at": 2.854737685993314,
+      "seconds": 0.02382331993430853,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H4"
+      ],
+      "longest_ready_age": 2.809650443959981
+    },
+    {
+      "at": 2.8836545678786933,
+      "seconds": 0.02809441974386573,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M15"
+      ],
+      "longest_ready_age": 2.8425158807076514
+    },
+    {
+      "at": 2.916875567752868,
+      "seconds": 0.027807150036096573,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M30"
+      ],
+      "longest_ready_age": 2.87613378604874
+    },
+    {
+      "at": 2.949780453927815,
+      "seconds": 0.022109799087047577,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "MN"
+      ],
+      "longest_ready_age": 2.9036671416833997
+    },
+    {
+      "at": 2.9769825129769742,
+      "seconds": 0.026012517977505922,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "W1"
+      ],
+      "longest_ready_age": 2.9342024056240916
+    },
+    {
+      "at": 3.030236965045333,
+      "seconds": 0.044879852794110775,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "D1"
+      ],
+      "longest_ready_age": 3.0056485068053007
+    },
+    {
+      "at": 3.080213285982609,
+      "seconds": 0.04072019970044494,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H1"
+      ],
+      "longest_ready_age": 3.0524722416885197
+    },
+    {
+      "at": 3.1279109488241374,
+      "seconds": 0.054955550003796816,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H4"
+      ],
+      "longest_ready_age": 3.1146250599995255
+    },
+    {
+      "at": 3.187988927587867,
+      "seconds": 0.04004610702395439,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M15"
+      ],
+      "longest_ready_age": 3.1591662210412323
+    },
+    {
+      "at": 3.2331589637324214,
+      "seconds": 0.05342346429824829,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "MN"
+      ],
+      "longest_ready_age": 3.21731378370896
+    },
+    {
+      "at": 3.292397619690746,
+      "seconds": 0.0242446712218225,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "W1"
+      ],
+      "longest_ready_age": 3.2482165219262242
+    },
+    {
+      "at": 3.3217740627005696,
+      "seconds": 0.062029174994677305,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "longest_ready_age": 3.3136455388739705
+    },
+    {
+      "at": 3.388893739785999,
+      "seconds": 0.06000582780689001,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M30"
+      ],
+      "longest_ready_age": 3.3762274687178433
+    },
+    {
+      "at": 3.4539877278730273,
+      "seconds": 0.028534822165966034,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M5"
+      ],
+      "longest_ready_age": 3.4136089510284364
+    },
+    {
+      "at": 3.487622963730246,
+      "seconds": 0.029813864268362522,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M5"
+      ],
+      "longest_ready_age": 3.44857515161857
+    },
+    {
+      "at": 3.5458182636648417,
+      "seconds": 0.05784656200557947,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M5"
+      ],
+      "longest_ready_age": 3.5351405809633434
+    },
+    {
+      "at": 3.60876307496801,
+      "seconds": 0.03813248872756958,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M5"
+      ],
+      "longest_ready_age": 3.5786644918844104
+    },
+    {
+      "at": 3.6519810897298157,
+      "seconds": 0.04692029906436801,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M5"
+      ],
+      "longest_ready_age": 3.6298044808208942
+    },
+    {
+      "at": 3.704018424730748,
+      "seconds": 0.060957692097872496,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M5"
+      ],
+      "longest_ready_age": 3.696745994966477
+    },
+    {
+      "at": 3.7700979285873473,
+      "seconds": 0.0507105253636837,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M5"
+      ],
+      "longest_ready_age": 3.7522466368973255
+    },
+    {
+      "at": 3.8258999888785183,
+      "seconds": 0.02588804205879569,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M5"
+      ],
+      "longest_ready_age": 3.7835735990665853
+    },
+    {
+      "at": 3.856874937657267,
+      "seconds": 0.034417490009218454,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M30"
+      ],
+      "longest_ready_age": 3.823381823953241
+    },
+    {
+      "at": 3.896388149820268,
+      "seconds": 0.02789142681285739,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M5"
+      ],
+      "longest_ready_age": 3.8564119138754904
+    },
+    {
+      "at": 3.929365868680179,
+      "seconds": 0.0367556712590158,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "longest_ready_age": 3.8979097409173846
+    },
+    {
+      "at": 3.971210496034473,
+      "seconds": 0.025946805719286203,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "longest_ready_age": 3.9278250178322196
+    },
+    {
+      "at": 4.0209595137275755,
+      "seconds": 0.04197555407881737,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M1"
+      ],
+      "longest_ready_age": 3.99484491860494
+    },
+    {
+      "at": 4.068049689754844,
+      "seconds": 0.058861575089395046,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M1"
+      ],
+      "longest_ready_age": 4.05779197299853
+    },
+    {
+      "at": 4.132402666844428,
+      "seconds": 0.06173089798539877,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M1"
+      ],
+      "longest_ready_age": 4.125508232042193
+    },
+    {
+      "at": 4.199299398809671,
+      "seconds": 0.036156666930764914,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M1"
+      ],
+      "longest_ready_age": 4.1669188886880875
+    },
+    {
+      "at": 4.240790344774723,
+      "seconds": 0.11379202594980597,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M1"
+      ],
+      "longest_ready_age": 4.2862751837819815
+    },
+    {
+      "at": 4.359693320002407,
+      "seconds": 0.03459182381629944,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M1"
+      ],
+      "longest_ready_age": 4.324590940028429
+    },
+    {
+      "at": 4.399410231038928,
+      "seconds": 0.03737481776624918,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M1"
+      ],
+      "longest_ready_age": 4.366267730947584
+    },
+    {
+      "at": 4.441891430877149,
+      "seconds": 0.04428911302238703,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M1"
+      ],
+      "longest_ready_age": 4.417235957924277
+    },
+    {
+      "at": 4.491347707808018,
+      "seconds": 0.02274230122566223,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "longest_ready_age": 4.2268748776987195
+    },
+    {
+      "at": 4.540962014812976,
+      "seconds": 0.058580426033586264,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "longest_ready_age": 4.259089500177652
+    },
+    {
+      "at": 4.604627633932978,
+      "seconds": 0.06449397979304194,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "longest_ready_age": 4.284033617936075
+    },
+    {
+      "at": 4.6742474269121885,
+      "seconds": 0.04388750484213233,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "longest_ready_age": 4.2486156220547855
+    },
+    {
+      "at": 4.723238181788474,
+      "seconds": 0.07460628217086196,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "longest_ready_age": 4.270863266196102
+    },
+    {
+      "at": 4.80297613888979,
+      "seconds": 0.04279988491907716,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "longest_ready_age": 4.16650043707341
+    },
+    {
+      "at": 4.850928341969848,
+      "seconds": 0.024879036005586386,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "longest_ready_age": 4.148168059065938
+    },
+    {
+      "at": 4.8809081157669425,
+      "seconds": 0.027885335963219404,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "D1"
+      ],
+      "longest_ready_age": 4.120717017911375
+    },
+    {
+      "at": 4.913881199900061,
+      "seconds": 0.024429816752672195,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H1"
+      ],
+      "longest_ready_age": 4.064605002757162
+    },
+    {
+      "at": 4.943415695801377,
+      "seconds": 0.022634745109826326,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H4"
+      ],
+      "longest_ready_age": 4.042203818913549
+    },
+    {
+      "at": 4.9711579750292,
+      "seconds": 0.039401642978191376,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M15"
+      ],
+      "longest_ready_age": 4.051051679998636
+    },
+    {
+      "at": 5.0548274158500135,
+      "seconds": 0.04882036615163088,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "MN"
+      ],
+      "longest_ready_age": 4.116162348072976
+    },
+    {
+      "at": 5.108763071708381,
+      "seconds": 0.054672721307724714,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "W1"
+      ],
+      "longest_ready_age": 4.144480522722006
+    },
+    {
+      "at": 5.168523778673261,
+      "seconds": 0.06485887803137302,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "D1"
+      ],
+      "longest_ready_age": 4.157310259062797
+    },
+    {
+      "at": 5.23854943504557,
+      "seconds": 0.045004629995673895,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H1"
+      ],
+      "longest_ready_age": 4.1626896490342915
+    },
+    {
+      "at": 5.2886640527285635,
+      "seconds": 0.03439758624881506,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H4"
+      ],
+      "longest_ready_age": 4.158966043964028
+    },
+    {
+      "at": 5.328187834005803,
+      "seconds": 0.025691558606922626,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M15"
+      ],
+      "longest_ready_age": 4.1297156903892756
+    },
+    {
+      "at": 5.35896741785109,
+      "seconds": 0.044690308161079884,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M30"
+      ],
+      "longest_ready_age": 4.104949372820556
+    },
+    {
+      "at": 5.408745439723134,
+      "seconds": 0.02723189303651452,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "MN"
+      ],
+      "longest_ready_age": 4.110092664603144
+    },
+    {
+      "at": 5.44106959970668,
+      "seconds": 0.04450047807767987,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "W1"
+      ],
+      "longest_ready_age": 4.119559204205871
+    },
+    {
+      "at": 5.49066462693736,
+      "seconds": 0.02019757078960538,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "D1"
+      ],
+      "longest_ready_age": 4.129353872034699
+    },
+    {
+      "at": 5.53132154699415,
+      "seconds": 0.033911960665136576,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H1"
+      ],
+      "longest_ready_age": 4.150596535298973
+    },
+    {
+      "at": 5.57041528262198,
+      "seconds": 0.05162139516323805,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H4"
+      ],
+      "longest_ready_age": 4.174754754174501
+    },
+    {
+      "at": 5.627124881837517,
+      "seconds": 0.038795978762209415,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M15"
+      ],
+      "longest_ready_age": 4.181137606035918
+    },
+    {
+      "at": 5.671079660765827,
+      "seconds": 0.05102085182443261,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M30"
+      ],
+      "longest_ready_age": 4.19935607817024
+    },
+    {
+      "at": 5.727231539785862,
+      "seconds": 0.04492797004058957,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "MN"
+      ],
+      "longest_ready_age": 4.193333071190864
+    },
+    {
+      "at": 5.777525686658919,
+      "seconds": 0.023828404024243355,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "W1"
+      ],
+      "longest_ready_age": 4.1826408402994275
+    },
+    {
+      "at": 5.806452970951796,
+      "seconds": 0.048565713688731194,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "D1"
+      ],
+      "longest_ready_age": 4.200717210769653
+    },
+    {
+      "at": 5.860161846037954,
+      "seconds": 0.02579858200624585,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H1"
+      ],
+      "longest_ready_age": 4.171375189907849
+    },
+    {
+      "at": 5.891088099684566,
+      "seconds": 0.07250951835885644,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H4"
+      ],
+      "longest_ready_age": 4.203832573723048
+    },
+    {
+      "at": 5.969213435892016,
+      "seconds": 0.03011341579258442,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M15"
+      ],
+      "longest_ready_age": 4.215649790130556
+    },
+    {
+      "at": 6.030806425958872,
+      "seconds": 0.038122841622680426,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M30"
+      ],
+      "longest_ready_age": 4.250661750789732
+    },
+    {
+      "at": 6.074779593851417,
+      "seconds": 0.036165658850222826,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "MN"
+      ],
+      "longest_ready_age": 4.256349172908813
+    },
+    {
+      "at": 6.11607137368992,
+      "seconds": 0.04123972123488784,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "W1"
+      ],
+      "longest_ready_age": 4.274022310972214
+    },
+    {
+      "at": 6.162438317667693,
+      "seconds": 0.04268212802708149,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "D1"
+      ],
+      "longest_ready_age": 4.2962930160574615
+    },
+    {
+      "at": 6.210206946823746,
+      "seconds": 0.056569747161120176,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H1"
+      ],
+      "longest_ready_age": 4.332079513929784
+    },
+    {
+      "at": 6.271888584829867,
+      "seconds": 0.023019334767013788,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H4"
+      ],
+      "longest_ready_age": 4.332918879110366
+    },
+    {
+      "at": 6.3000344736501575,
+      "seconds": 0.022212723270058632,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M15"
+      ],
+      "longest_ready_age": 4.337626830674708
+    },
+    {
+      "at": 6.327378951944411,
+      "seconds": 0.023414556868374348,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M30"
+      ],
+      "longest_ready_age": 4.322328954935074
+    },
+    {
+      "at": 6.355903055984527,
+      "seconds": 0.036915748845785856,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "MN"
+      ],
+      "longest_ready_age": 4.307647206354886
+    },
+    {
+      "at": 6.397912248969078,
+      "seconds": 0.04255111189559102,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "W1"
+      ],
+      "longest_ready_age": 4.314282959792763
+    },
+    {
+      "at": 6.445568363647908,
+      "seconds": 0.040143109392374754,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "D1"
+      ],
+      "longest_ready_age": 4.308589679189026
+    },
+    {
+      "at": 6.490817943587899,
+      "seconds": 0.024069583043456078,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H1"
+      ],
+      "longest_ready_age": 4.2638106578961015
+    },
+    {
+      "at": 6.537844908889383,
+      "seconds": 0.05342445382848382,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H4"
+      ],
+      "longest_ready_age": 4.297152759041637
+    },
+    {
+      "at": 6.596358397044241,
+      "seconds": 0.037637668661773205,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M15"
+      ],
+      "longest_ready_age": 4.310557906981558
+    },
+    {
+      "at": 6.639102109707892,
+      "seconds": 0.03144966531544924,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M30"
+      ],
+      "longest_ready_age": 4.324530411977321
+    },
+    {
+      "at": 6.675641157664359,
+      "seconds": 0.04790661996230483,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "MN"
+      ],
+      "longest_ready_age": 4.3479230953380466
+    },
+    {
+      "at": 6.728670018725097,
+      "seconds": 0.03507361514493823,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "W1"
+      ],
+      "longest_ready_age": 4.34887081803754
+    },
+    {
+      "at": 6.768864825833589,
+      "seconds": 0.026267901062965393,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "D1"
+      ],
+      "longest_ready_age": 4.342251625843346
+    },
+    {
+      "at": 6.800256961025298,
+      "seconds": 0.02339955884963274,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H1"
+      ],
+      "longest_ready_age": 4.2621764237992465
+    },
+    {
+      "at": 6.8287884327583015,
+      "seconds": 0.025305749848484993,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H4"
+      ],
+      "longest_ready_age": 4.251826585736126
+    },
+    {
+      "at": 6.859284394886345,
+      "seconds": 0.01906215911731124,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M15"
+      ],
+      "longest_ready_age": 4.234782759100199
+    },
+    {
+      "at": 6.883521854877472,
+      "seconds": 0.01985553978011012,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M30"
+      ],
+      "longest_ready_age": 4.181331604253501
+    },
+    {
+      "at": 6.908490470610559,
+      "seconds": 0.020292920991778374,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "MN"
+      ],
+      "longest_ready_age": 4.164844145998359
+    },
+    {
+      "at": 6.933897736016661,
+      "seconds": 0.02074177097529173,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "W1"
+      ],
+      "longest_ready_age": 4.161001642700285
+    },
+    {
+      "at": 6.959754726849496,
+      "seconds": 0.02105728117749095,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "D1"
+      ],
+      "longest_ready_age": 4.158950583077967
+    },
+    {
+      "at": 6.985914713703096,
+      "seconds": 0.019913182128220797,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H1"
+      ],
+      "longest_ready_age": 4.156383669003844
+    },
+    {
+      "at": 7.027638711966574,
+      "seconds": 0.031237934716045856,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H4"
+      ],
+      "longest_ready_age": 4.181180784013122
+    },
+    {
+      "at": 7.063961311709136,
+      "seconds": 0.03163970122113824,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M15"
+      ],
+      "longest_ready_age": 4.185528848320246
+    },
+    {
+      "at": 7.10068126488477,
+      "seconds": 0.04931549495086074,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M30"
+      ],
+      "longest_ready_age": 4.205942519940436
+    },
+    {
+      "at": 7.155110846739262,
+      "seconds": 0.03250816697254777,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "MN"
+      ],
+      "longest_ready_age": 4.21596937905997
+    },
+    {
+      "at": 7.192720219027251,
+      "seconds": 0.03347699483856559,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "W1"
+      ],
+      "longest_ready_age": 4.224155367352068
+    },
+    {
+      "at": 7.231310599017888,
+      "seconds": 0.024382049683481455,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "D1"
+      ],
+      "longest_ready_age": 4.181597374845296
+    },
+    {
+      "at": 7.260789427906275,
+      "seconds": 0.03304757270962,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H1"
+      ],
+      "longest_ready_age": 4.17222418403253
+    },
+    {
+      "at": 7.298943181987852,
+      "seconds": 0.034188422840088606,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H4"
+      ],
+      "longest_ready_age": 4.141389252617955
+    },
+    {
+      "at": 7.338253660593182,
+      "seconds": 0.025334945414215326,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M15"
+      ],
+      "longest_ready_age": 4.133478716947138
+    },
+    {
+      "at": 7.368676487822086,
+      "seconds": 0.03723076498135924,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "MN"
+      ],
+      "longest_ready_age": 4.119464803952724
+    },
+    {
+      "at": 7.411047221627086,
+      "seconds": 0.036202399991452694,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "W1"
+      ],
+      "longest_ready_age": 4.12691532401368
+    },
+    {
+      "at": 7.452392604667693,
+      "seconds": 0.051648684311658144,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "longest_ready_age": 4.121756046079099
+    },
+    {
+      "at": 7.526915621943772,
+      "seconds": 0.046506703831255436,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M30"
+      ],
+      "longest_ready_age": 4.1285215760581195
+    },
+    {
+      "at": 7.578527272678912,
+      "seconds": 0.1120449360460043,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M5"
+      ],
+      "longest_ready_age": 4.20839301077649
+    },
+    {
+      "at": 7.695693250745535,
+      "seconds": 0.05728233326226473,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M5"
+      ],
+      "longest_ready_age": 4.236128776334226
+    },
+    {
+      "at": 7.758429997600615,
+      "seconds": 0.043391249142587185,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M5"
+      ],
+      "longest_ready_age": 4.1981195588596165
+    },
+    {
+      "at": 7.806964942719787,
+      "seconds": 0.03962349612265825,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M5"
+      ],
+      "longest_ready_age": 4.199074059724808
+    },
+    {
+      "at": 7.851675176993012,
+      "seconds": 0.026061302982270718,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M5"
+      ],
+      "longest_ready_age": 4.179674345999956
+    },
+    {
+      "at": 7.882851682603359,
+      "seconds": 0.022789373993873596,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M5"
+      ],
+      "longest_ready_age": 4.1410594009794295
+    },
+    {
+      "at": 7.910754908807576,
+      "seconds": 0.026004694867879152,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M5"
+      ],
+      "longest_ready_age": 4.116381541825831
+    },
+    {
+      "at": 7.941877283621579,
+      "seconds": 0.025302179157733917,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M5"
+      ],
+      "longest_ready_age": 4.1157709788531065
+    },
+    {
+      "at": 7.972262918949127,
+      "seconds": 0.05022395309060812,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M30"
+      ],
+      "longest_ready_age": 4.130553220864385
+    },
+    {
+      "at": 8.046666096895933,
+      "seconds": 0.06944236671552062,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M5"
+      ],
+      "longest_ready_age": 4.161277704872191
+    },
+    {
+      "at": 8.12120894761756,
+      "seconds": 0.04361824132502079,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "longest_ready_age": 4.198868779931217
+    },
+    {
+      "at": 8.169936970807612,
+      "seconds": 0.03558072913438082,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "longest_ready_age": 4.208803474903107
+    },
+    {
+      "at": 8.21064471360296,
+      "seconds": 0.05619909334927797,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M1"
+      ],
+      "longest_ready_age": 4.203810243401676
+    },
+    {
+      "at": 8.27192454971373,
+      "seconds": 0.04037224594503641,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M1"
+      ],
+      "longest_ready_age": 4.185893950983882
+    },
+    {
+      "at": 8.31739172898233,
+      "seconds": 0.026471121702343225,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M1"
+      ],
+      "longest_ready_age": 4.149532661773264
+    },
+    {
+      "at": 8.348957448732108,
+      "seconds": 0.024177018087357283,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M1"
+      ],
+      "longest_ready_age": 4.137611598242074
+    },
+    {
+      "at": 8.378233322873712,
+      "seconds": 0.02487593377009034,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M1"
+      ],
+      "longest_ready_age": 4.04874216299504
+    },
+    {
+      "at": 8.408187040593475,
+      "seconds": 0.022969358135014772,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M1"
+      ],
+      "longest_ready_age": 4.038705158978701
+    },
+    {
+      "at": 8.436255168635398,
+      "seconds": 0.0431837011128664,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M1"
+      ],
+      "longest_ready_age": 4.026712323073298
+    },
+    {
+      "at": 8.484537926968187,
+      "seconds": 0.028537758626043797,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M1"
+      ],
+      "longest_ready_age": 4.02751200273633
+    },
+    {
+      "at": 8.537950689904392,
+      "seconds": 0.02893887786194682,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "longest_ready_age": 4.05471141403541
+    },
+    {
+      "at": 8.571975845843554,
+      "seconds": 0.0650337478145957,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "longest_ready_age": 4.036825054790825
+    },
+    {
+      "at": 8.642131245695055,
+      "seconds": 0.05035613616928458,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "longest_ready_age": 4.023400135803968
+    },
+    {
+      "at": 8.69757734099403,
+      "seconds": 0.04438326181843877,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "longest_ready_age": 4.024189122021198
+    },
+    {
+      "at": 8.74709305493161,
+      "seconds": 0.03691074997186661,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "longest_ready_age": 3.989066865760833
+    },
+    {
+      "at": 8.789103043731302,
+      "seconds": 0.02159612625837326,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "longest_ready_age": 3.9658819818869233
+    },
+    {
+      "at": 8.815823566634208,
+      "seconds": 0.022146756295114756,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "longest_ready_age": 3.962256332859397
+    },
+    {
+      "at": 8.843101441860199,
+      "seconds": 0.025419193785637617,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "D1"
+      ],
+      "longest_ready_age": 3.959959535859525
+    },
+    {
+      "at": 8.87361759878695,
+      "seconds": 0.023469731211662292,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H1"
+      ],
+      "longest_ready_age": 3.9587556212209165
+    },
+    {
+      "at": 8.90220920694992,
+      "seconds": 0.021417391952127218,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H4"
+      ],
+      "longest_ready_age": 3.9582116222009063
+    },
+    {
+      "at": 8.928729862906039,
+      "seconds": 0.025206733960658312,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M15"
+      ],
+      "longest_ready_age": 3.9462322229519486
+    },
+    {
+      "at": 8.95916897803545,
+      "seconds": 0.024051212705671787,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "MN"
+      ],
+      "longest_ready_age": 3.8782205381430686
+    },
+    {
+      "at": 8.988368734717369,
+      "seconds": 0.026566280983388424,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "W1"
+      ],
+      "longest_ready_age": 3.8489882783032954
+    },
+    {
+      "at": 9.037429044954479,
+      "seconds": 0.05201869597658515,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "D1"
+      ],
+      "longest_ready_age": 3.856015205848962
+    },
+    {
+      "at": 9.094539743848145,
+      "seconds": 0.03968788776546717,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H1"
+      ],
+      "longest_ready_age": 3.8503639600239694
+    },
+    {
+      "at": 9.139421852771193,
+      "seconds": 0.03896616492420435,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H4"
+      ],
+      "longest_ready_age": 3.8549186270684004
+    },
+    {
+      "at": 9.183479954022914,
+      "seconds": 0.03074567299336195,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M15"
+      ],
+      "longest_ready_age": 3.8606832777149975
+    },
+    {
+      "at": 9.219339856877923,
+      "seconds": 0.038568245712667704,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M30"
+      ],
+      "longest_ready_age": 3.8536212742328644
+    },
+    {
+      "at": 9.263031555805355,
+      "seconds": 0.021440552081912756,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "MN"
+      ],
+      "longest_ready_age": 3.8484233771450818
+    },
+    {
+      "at": 9.289576455950737,
+      "seconds": 0.020328583661466837,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "W1"
+      ],
+      "longest_ready_age": 3.8371463087387383
+    },
+    {
+      "at": 9.315013263840228,
+      "seconds": 0.02182481111958623,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "D1"
+      ],
+      "longest_ready_age": 3.8258217498660088
+    },
+    {
+      "at": 9.34192555071786,
+      "seconds": 0.047456938307732344,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H1"
+      ],
+      "longest_ready_age": 3.8207305376417935
+    },
+    {
+      "at": 9.394489125814289,
+      "seconds": 0.029210589826107025,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H4"
+      ],
+      "longest_ready_age": 3.7994743050076067
+    },
+    {
+      "at": 9.428793545812368,
+      "seconds": 0.020896248053759336,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M15"
+      ],
+      "longest_ready_age": 3.7845568931661546
+    },
+    {
+      "at": 9.454850038979203,
+      "seconds": 0.020929706748574972,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M30"
+      ],
+      "longest_ready_age": 3.755512428935617
+    },
+    {
+      "at": 9.480876847635955,
+      "seconds": 0.02627558819949627,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "MN"
+      ],
+      "longest_ready_age": 3.7362704761326313
+    },
+    {
+      "at": 9.53255261760205,
+      "seconds": 0.044440333265811205,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "W1"
+      ],
+      "longest_ready_age": 3.7716597327962518
+    },
+    {
+      "at": 9.582115403842181,
+      "seconds": 0.03337567811831832,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "D1"
+      ],
+      "longest_ready_age": 3.760747093241662
+    },
+    {
+      "at": 9.620575977955014,
+      "seconds": 0.03494502883404493,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H1"
+      ],
+      "longest_ready_age": 3.773324084933847
+    },
+    {
+      "at": 9.660606206860393,
+      "seconds": 0.08282452588900924,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H4"
+      ],
+      "longest_ready_age": 3.7828921522013843
+    },
+    {
+      "at": 9.74865978071466,
+      "seconds": 0.029661884997040033,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M15"
+      ],
+      "longest_ready_age": 3.778938185889274
+    },
+    {
+      "at": 9.783415734767914,
+      "seconds": 0.030406579840928316,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M30"
+      ],
+      "longest_ready_age": 3.7447363450191915
+    },
+    {
+      "at": 9.818922719918191,
+      "seconds": 0.025058885104954243,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "MN"
+      ],
+      "longest_ready_age": 3.732409762684256
+    },
+    {
+      "at": 9.849071787670255,
+      "seconds": 0.023206073325127363,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "W1"
+      ],
+      "longest_ready_age": 3.713951112702489
+    },
+    {
+      "at": 9.87735608778894,
+      "seconds": 0.019404579885303974,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "D1"
+      ],
+      "longest_ready_age": 3.6926122209988534
+    },
+    {
+      "at": 9.901889516040683,
+      "seconds": 0.018964388873428106,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H1"
+      ],
+      "longest_ready_age": 3.6550704622641206
+    },
+    {
+      "at": 9.925936218816787,
+      "seconds": 0.019564151763916016,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H4"
+      ],
+      "longest_ready_age": 3.651842867024243
+    },
+    {
+      "at": 9.950608434621245,
+      "seconds": 0.02169620105996728,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M15"
+      ],
+      "longest_ready_age": 3.6494576348923147
+    },
+    {
+      "at": 9.977393512614071,
+      "seconds": 0.021617528051137924,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M30"
+      ],
+      "longest_ready_age": 3.64898837916553
+    },
+    {
+      "at": 10.0260214000009,
+      "seconds": 0.033967257011681795,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "MN"
+      ],
+      "longest_ready_age": 3.6671224855817854
+    },
+    {
+      "at": 10.065110062714666,
+      "seconds": 0.05285458127036691,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "W1"
+      ],
+      "longest_ready_age": 3.6781735462136567
+    },
+    {
+      "at": 10.123078112956136,
+      "seconds": 0.04128521075472236,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "D1"
+      ],
+      "longest_ready_age": 3.677937002852559
+    },
+    {
+      "at": 10.169494110625237,
+      "seconds": 0.04427353711798787,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H1"
+      ],
+      "longest_ready_age": 3.696862086188048
+    },
+    {
+      "at": 10.218902932014316,
+      "seconds": 0.033531810622662306,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H4"
+      ],
+      "longest_ready_age": 3.6609077691100538
+    },
+    {
+      "at": 10.25752766104415,
+      "seconds": 0.020957006607204676,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M15"
+      ],
+      "longest_ready_age": 3.646345593035221
+    },
+    {
+      "at": 10.283575383014977,
+      "seconds": 0.021399663761258125,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M30"
+      ],
+      "longest_ready_age": 3.6340771298855543
+    },
+    {
+      "at": 10.31014095665887,
+      "seconds": 0.02395931724458933,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "MN"
+      ],
+      "longest_ready_age": 3.6105579417198896
+    },
+    {
+      "at": 10.339232578873634,
+      "seconds": 0.02334315376356244,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "W1"
+      ],
+      "longest_ready_age": 3.5985554163344204
+    },
+    {
+      "at": 10.367670124862343,
+      "seconds": 0.02181494887918234,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "D1"
+      ],
+      "longest_ready_age": 3.5945871411822736
+    },
+    {
+      "at": 10.394580038730055,
+      "seconds": 0.021100024227052927,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H1"
+      ],
+      "longest_ready_age": 3.5926358979195356
+    },
+    {
+      "at": 10.420837478712201,
+      "seconds": 0.03542183991521597,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H4"
+      ],
+      "longest_ready_age": 3.599216666072607
+    },
+    {
+      "at": 10.46137130772695,
+      "seconds": 0.04127245210111141,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M15"
+      ],
+      "longest_ready_age": 3.6231889110058546
+    },
+    {
+      "at": 10.524620785843581,
+      "seconds": 0.04112434992566705,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M30"
+      ],
+      "longest_ready_age": 3.6622577677480876
+    },
+    {
+      "at": 10.570883192587644,
+      "seconds": 0.043154207058250904,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "MN"
+      ],
+      "longest_ready_age": 3.676207037176937
+    },
+    {
+      "at": 10.619166827760637,
+      "seconds": 0.05355921620503068,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "W1"
+      ],
+      "longest_ready_age": 3.7180593963712454
+    },
+    {
+      "at": 10.677840707823634,
+      "seconds": 0.04480984387919307,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "D1"
+      ],
+      "longest_ready_age": 3.7411956498399377
+    },
+    {
+      "at": 10.7277677427046,
+      "seconds": 0.058784079272300005,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H1"
+      ],
+      "longest_ready_age": 3.7798111774027348
+    },
+    {
+      "at": 10.791651201900095,
+      "seconds": 0.024419788736850023,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H4"
+      ],
+      "longest_ready_age": 3.756826017051935
+    },
+    {
+      "at": 10.821199064608663,
+      "seconds": 0.02215585531666875,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M15"
+      ],
+      "longest_ready_age": 3.7469077426940203
+    },
+    {
+      "at": 10.848443677648902,
+      "seconds": 0.022146256174892187,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M30"
+      ],
+      "longest_ready_age": 3.7188864769414067
+    },
+    {
+      "at": 10.875679452903569,
+      "seconds": 0.02468066569417715,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "MN"
+      ],
+      "longest_ready_age": 3.712571383919567
+    },
+    {
+      "at": 10.90547856874764,
+      "seconds": 0.020043700002133846,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "W1"
+      ],
+      "longest_ready_age": 3.699154668021947
+    },
+    {
+      "at": 10.930608639959246,
+      "seconds": 0.020934332627803087,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "D1"
+      ],
+      "longest_ready_age": 3.695662777405232
+    },
+    {
+      "at": 10.95665601361543,
+      "seconds": 0.02143891341984272,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H1"
+      ],
+      "longest_ready_age": 3.685225097928196
+    },
+    {
+      "at": 10.983209380879998,
+      "seconds": 0.02502549486234784,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H4"
+      ],
+      "longest_ready_age": 3.683764469344169
+    },
+    {
+      "at": 11.052916282787919,
+      "seconds": 0.062337234150618315,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M15"
+      ],
+      "longest_ready_age": 3.7546963947825134
+    },
+    {
+      "at": 11.120352926664054,
+      "seconds": 0.03745845705270767,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "MN"
+      ],
+      "longest_ready_age": 3.752181596122682
+    },
+    {
+      "at": 11.16293331887573,
+      "seconds": 0.0446509481407702,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "W1"
+      ],
+      "longest_ready_age": 3.7636993410997093
+    },
+    {
+      "at": 11.212674730923027,
+      "seconds": 0.07485906267538667,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "longest_ready_age": 3.7839514929801226
+    },
+    {
+      "at": 11.292649184819311,
+      "seconds": 0.0373291471041739,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M30"
+      ],
+      "longest_ready_age": 3.757434051949531
+    },
+    {
+      "at": 11.335110156796873,
+      "seconds": 0.03563045198097825,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M5"
+      ],
+      "longest_ready_age": 3.6787746571935713
+    },
+    {
+      "at": 11.375864622648805,
+      "seconds": 0.035458090249449015,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M5"
+      ],
+      "longest_ready_age": 3.6533093047328293
+    },
+    {
+      "at": 11.416425888892263,
+      "seconds": 0.026413358747959137,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M5"
+      ],
+      "longest_ready_age": 3.6413912288844585
+    },
+    {
+      "at": 11.449955902993679,
+      "seconds": 0.04498045891523361,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M5"
+      ],
+      "longest_ready_age": 3.648192197084427
+    },
+    {
+      "at": 11.518265252932906,
+      "seconds": 0.0533874686807394,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M5"
+      ],
+      "longest_ready_age": 3.6942532579414546
+    },
+    {
+      "at": 11.576740367803723,
+      "seconds": 0.03433189308270812,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M5"
+      ],
+      "longest_ready_age": 3.7052174038253725
+    },
+    {
+      "at": 11.616183160804212,
+      "seconds": 0.03346348786726594,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M5"
+      ],
+      "longest_ready_age": 3.712840123102069
+    },
+    {
+      "at": 11.654740408994257,
+      "seconds": 0.03987767780199647,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M5"
+      ],
+      "longest_ready_age": 3.727155697066337
+    },
+    {
+      "at": 11.699729380663484,
+      "seconds": 0.04785326914861798,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M30"
+      ],
+      "longest_ready_age": 3.725561107043177
+    },
+    {
+      "at": 11.752672730013728,
+      "seconds": 0.027485004626214504,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M5"
+      ],
+      "longest_ready_age": 3.694411135278642
+    },
+    {
+      "at": 11.785286712925881,
+      "seconds": 0.033124980982393026,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "longest_ready_age": 3.6532684438861907
+    },
+    {
+      "at": 11.823549824766815,
+      "seconds": 0.027973997872322798,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "longest_ready_age": 3.6465867669321597
+    },
+    {
+      "at": 11.85661224462092,
+      "seconds": 0.02378236409276724,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M1"
+      ],
+      "longest_ready_age": 3.613191270735115
+    },
+    {
+      "at": 11.885486050043255,
+      "seconds": 0.02492273459210992,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M1"
+      ],
+      "longest_ready_age": 3.5983555638231337
+    },
+    {
+      "at": 11.91550185577944,
+      "seconds": 0.02961550885811448,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M1"
+      ],
+      "longest_ready_age": 3.6006413800641894
+    },
+    {
+      "at": 11.950269190594554,
+      "seconds": 0.03976178402081132,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M1"
+      ],
+      "longest_ready_age": 3.6165449377149343
+    },
+    {
+      "at": 11.995133844669908,
+      "seconds": 0.044154939241707325,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M1"
+      ],
+      "longest_ready_age": 3.634913707152009
+    },
+    {
+      "at": 12.06973729468882,
+      "seconds": 0.052051115315407515,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M1"
+      ],
+      "longest_ready_age": 3.6896286900155246
+    },
+    {
+      "at": 12.126904096920043,
+      "seconds": 0.04269181191921234,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M1"
+      ],
+      "longest_ready_age": 3.707494600676
+    },
+    {
+      "at": 12.174694237764925,
+      "seconds": 0.05742680607363582,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M1"
+      ],
+      "longest_ready_age": 3.71883679414168
+    },
+    {
+      "at": 12.237261511851102,
+      "seconds": 0.04396126279607415,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "longest_ready_age": 3.713064275216311
+    },
+    {
+      "at": 12.286376494914293,
+      "seconds": 0.033545671962201595,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "longest_ready_age": 3.684136763215065
+    },
+    {
+      "at": 12.325046941637993,
+      "seconds": 0.022495718207210302,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "longest_ready_age": 3.6555213602259755
+    },
+    {
+      "at": 12.352671215776354,
+      "seconds": 0.048645713832229376,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "longest_ready_age": 3.6586592802777886
+    },
+    {
+      "at": 12.40642121899873,
+      "seconds": 0.031358223874121904,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "longest_ready_age": 3.6525486982427537
+    },
+    {
+      "at": 12.443453220650554,
+      "seconds": 0.024039353244006634,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "longest_ready_age": 3.654931712895632
+    },
+    {
+      "at": 12.47258277470246,
+      "seconds": 0.023196901194751263,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "longest_ready_age": 3.658420355990529
+    },
+    {
+      "at": 12.51858827797696,
+      "seconds": 0.05659446585923433,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "D1"
+      ],
+      "longest_ready_age": 3.7055181697942317
+    },
+    {
+      "at": 12.580278644803911,
+      "seconds": 0.03570060292258859,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H1"
+      ],
+      "longest_ready_age": 3.7183653339743614
+    },
+    {
+      "at": 12.62344558397308,
+      "seconds": 0.04196133464574814,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H4"
+      ],
+      "longest_ready_age": 3.741097949910909
+    },
+    {
+      "at": 12.67050379794091,
+      "seconds": 0.04919516667723656,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M15"
+      ],
+      "longest_ready_age": 3.764367135707289
+    },
+    {
+      "at": 12.724826314952224,
+      "seconds": 0.04423147579655051,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "MN"
+      ],
+      "longest_ready_age": 3.787021721713245
+    },
+    {
+      "at": 12.77415800280869,
+      "seconds": 0.05442272499203682,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "W1"
+      ],
+      "longest_ready_age": 3.8025045599788427
+    },
+    {
+      "at": 12.833696533925831,
+      "seconds": 0.020468218717724085,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "D1"
+      ],
+      "longest_ready_age": 3.765434477943927
+    },
+    {
+      "at": 12.859284363687038,
+      "seconds": 0.026850528083741665,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H1"
+      ],
+      "longest_ready_age": 3.7528209476731718
+    },
+    {
+      "at": 12.89125670073554,
+      "seconds": 0.020929185207933187,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H4"
+      ],
+      "longest_ready_age": 3.7345301900058985
+    },
+    {
+      "at": 12.917380346916616,
+      "seconds": 0.020987190771847963,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M15"
+      ],
+      "longest_ready_age": 3.7235772581771016
+    },
+    {
+      "at": 12.943418359849602,
+      "seconds": 0.020400454755872488,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M30"
+      ],
+      "longest_ready_age": 3.7073491187766194
+    },
+    {
+      "at": 12.968975919764489,
+      "seconds": 0.02269988087937236,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "MN"
+      ],
+      "longest_ready_age": 3.706781255081296
+    },
+    {
+      "at": 12.996764780953526,
+      "seconds": 0.02202194882556796,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "W1"
+      ],
+      "longest_ready_age": 3.7085535172373056
+    },
+    {
+      "at": 13.042072118725628,
+      "seconds": 0.035272878129035234,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "D1"
+      ],
+      "longest_ready_age": 3.7397599457763135
+    },
+    {
+      "at": 13.08243506681174,
+      "seconds": 0.05194615898653865,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H1"
+      ],
+      "longest_ready_age": 3.748148379381746
+    },
+    {
+      "at": 13.139467967674136,
+      "seconds": 0.031080276239663363,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H4"
+      ],
+      "longest_ready_age": 3.7489981218241155
+    },
+    {
+      "at": 13.17564706504345,
+      "seconds": 0.03424690058454871,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M15"
+      ],
+      "longest_ready_age": 3.7601804747246206
+    },
+    {
+      "at": 13.21503858268261,
+      "seconds": 0.02819013223052025,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M30"
+      ],
+      "longest_ready_age": 3.7680779360234737
+    },
+    {
+      "at": 13.248355384916067,
+      "seconds": 0.01903868606314063,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "MN"
+      ],
+      "longest_ready_age": 3.7598305358551443
+    },
+    {
+      "at": 13.272481566760689,
+      "seconds": 0.020016117952764034,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "W1"
+      ],
+      "longest_ready_age": 3.7198934690095484
+    },
+    {
+      "at": 13.297595218755305,
+      "seconds": 0.026047196239233017,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "D1"
+      ],
+      "longest_ready_age": 3.7074106819927692
+    },
+    {
+      "at": 13.328767181839794,
+      "seconds": 0.02372249076142907,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H1"
+      ],
+      "longest_ready_age": 3.6962966872379184
+    },
+    {
+      "at": 13.357587851583958,
+      "seconds": 0.02790349628776312,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H4"
+      ],
+      "longest_ready_age": 3.6371099348179996
+    },
+    {
+      "at": 13.390577781014144,
+      "seconds": 0.03313387092202902,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M15"
+      ],
+      "longest_ready_age": 3.644427288323641
+    },
+    {
+      "at": 13.42880858387798,
+      "seconds": 0.027583003044128418,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M30"
+      ],
+      "longest_ready_age": 3.6432809298858047
+    },
+    {
+      "at": 13.461495753843337,
+      "seconds": 0.0345803271047771,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "MN"
+      ],
+      "longest_ready_age": 3.6532163079828024
+    },
+    {
+      "at": 13.51799919269979,
+      "seconds": 0.05591184413060546,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "W1"
+      ],
+      "longest_ready_age": 3.702287033200264
+    },
+    {
+      "at": 13.579123372677714,
+      "seconds": 0.03991334326565266,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "D1"
+      ],
+      "longest_ready_age": 3.7212182017974555
+    },
+    {
+      "at": 13.624173092655838,
+      "seconds": 0.040882281959056854,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H1"
+      ],
+      "longest_ready_age": 3.7421907926909626
+    },
+    {
+      "at": 13.670189533848315,
+      "seconds": 0.04565374692901969,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H4"
+      ],
+      "longest_ready_age": 3.769457117188722
+    },
+    {
+      "at": 13.720975258853287,
+      "seconds": 0.036770947743207216,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M15"
+      ],
+      "longest_ready_age": 3.785266678314656
+    },
+    {
+      "at": 13.762840710580349,
+      "seconds": 0.02795276138931513,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M30"
+      ],
+      "longest_ready_age": 3.791436083614826
+    },
+    {
+      "at": 13.795894222799689,
+      "seconds": 0.03211549809202552,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "MN"
+      ],
+      "longest_ready_age": 3.7667441782541573
+    },
+    {
+      "at": 13.83316130982712,
+      "seconds": 0.023951521143317223,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "W1"
+      ],
+      "longest_ready_age": 3.7389838648959994
+    },
+    {
+      "at": 13.862256201915443,
+      "seconds": 0.024458040948957205,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "D1"
+      ],
+      "longest_ready_age": 3.723376320209354
+    },
+    {
+      "at": 13.891846299637109,
+      "seconds": 0.026117361150681973,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H1"
+      ],
+      "longest_ready_age": 3.706240387633443
+    },
+    {
+      "at": 13.923071436583996,
+      "seconds": 0.022621740121394396,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H4"
+      ],
+      "longest_ready_age": 3.693353452719748
+    },
+    {
+      "at": 13.950791654642671,
+      "seconds": 0.02547896420583129,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M15"
+      ],
+      "longest_ready_age": 3.694257422350347
+    },
+    {
+      "at": 13.98141508596018,
+      "seconds": 0.037628051824867725,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M30"
+      ],
+      "longest_ready_age": 3.714008443057537
+    },
+    {
+      "at": 14.044749971013516,
+      "seconds": 0.03898132871836424,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "MN"
+      ],
+      "longest_ready_age": 3.748770060017705
+    },
+    {
+      "at": 14.088856519665569,
+      "seconds": 0.040629526134580374,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "W1"
+      ],
+      "longest_ready_age": 3.7657290189526975
+    },
+    {
+      "at": 14.134589666035026,
+      "seconds": 0.045436703599989414,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "D1"
+      ],
+      "longest_ready_age": 3.7892472981475294
+    },
+    {
+      "at": 14.185117514804006,
+      "seconds": 0.09277219278737903,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H1"
+      ],
+      "longest_ready_age": 3.861291006207466
+    },
+    {
+      "at": 14.283018193673342,
+      "seconds": 0.038602191023528576,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H4"
+      ],
+      "longest_ready_age": 3.8676313757896423
+    },
+    {
+      "at": 14.326735723763704,
+      "seconds": 0.03607526887208223,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M15"
+      ],
+      "longest_ready_age": 3.860590035095811
+    },
+    {
+      "at": 14.36794105079025,
+      "seconds": 0.027862268965691328,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M30"
+      ],
+      "longest_ready_age": 3.8299183063209057
+    },
+    {
+      "at": 14.400901255663484,
+      "seconds": 0.028097989968955517,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "MN"
+      ],
+      "longest_ready_age": 3.8220308660529554
+    },
+    {
+      "at": 14.43410561280325,
+      "seconds": 0.023942407220602036,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "W1"
+      ],
+      "longest_ready_age": 3.782881256658584
+    },
+    {
+      "at": 14.467317366972566,
+      "seconds": 0.04797059902921319,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "D1"
+      ],
+      "longest_ready_age": 3.7930468427948654
+    },
+    {
+      "at": 14.550886353012174,
+      "seconds": 0.04013660456985235,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H1"
+      ],
+      "longest_ready_age": 3.8045821776613593
+    },
+    {
+      "at": 14.596153563819826,
+      "seconds": 0.06368801090866327,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H4"
+      ],
+      "longest_ready_age": 3.8436277909204364
+    },
+    {
+      "at": 14.66494727274403,
+      "seconds": 0.04050190094858408,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M15"
+      ],
+      "longest_ready_age": 3.860323257278651
+    },
+    {
+      "at": 14.710899715777487,
+      "seconds": 0.05695813009515405,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M30"
+      ],
+      "longest_ready_age": 3.8954412057064474
+    },
+    {
+      "at": 14.773242099676281,
+      "seconds": 0.058676963206380606,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "MN"
+      ],
+      "longest_ready_age": 3.9312483612447977
+    },
+    {
+      "at": 14.837017409969121,
+      "seconds": 0.02615931862965226,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "W1"
+      ],
+      "longest_ready_age": 3.936255639884621
+    },
+    {
+      "at": 14.86828509485349,
+      "seconds": 0.033382422756403685,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "D1"
+      ],
+      "longest_ready_age": 3.947891316842288
+    },
+    {
+      "at": 14.906764114741236,
+      "seconds": 0.03575946390628815,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H1"
+      ],
+      "longest_ready_age": 3.9629480759613216
+    },
+    {
+      "at": 14.94761411473155,
+      "seconds": 0.03075879393145442,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H4"
+      ],
+      "longest_ready_age": 3.9696734766475856
+    },
+    {
+      "at": 14.983423705678433,
+      "seconds": 0.02997735934332013,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M15"
+      ],
+      "longest_ready_age": 3.8943108380772173
+    },
+    {
+      "at": 15.043177184648812,
+      "seconds": 0.04411275498569012,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "MN"
+      ],
+      "longest_ready_age": 3.9297192548401654
+    },
+    {
+      "at": 15.092384282965213,
+      "seconds": 0.037037822883576155,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "W1"
+      ],
+      "longest_ready_age": 3.921422926709056
+    },
+    {
+      "at": 15.134557806886733,
+      "seconds": 0.0647868630476296,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "longest_ready_age": 3.910470290109515
+    },
+    {
+      "at": 15.204436143860221,
+      "seconds": 0.072116709779948,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M30"
+      ],
+      "longest_ready_age": 3.9450781689956784
+    },
+    {
+      "at": 15.281695638783276,
+      "seconds": 0.044325731229037046,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M5"
+      ],
+      "longest_ready_age": 3.9548934497870505
+    },
+    {
+      "at": 15.331153193023056,
+      "seconds": 0.027484498918056488,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M5"
+      ],
+      "longest_ready_age": 3.9514270033687353
+    },
+    {
+      "at": 15.363779357634485,
+      "seconds": 0.04494649497792125,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M5"
+      ],
+      "longest_ready_age": 3.965155295096338
+    },
+    {
+      "at": 15.413827253039926,
+      "seconds": 0.042810019571334124,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M5"
+      ],
+      "longest_ready_age": 3.9622042160481215
+    },
+    {
+      "at": 15.461732791736722,
+      "seconds": 0.0992033570073545,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M5"
+      ],
+      "longest_ready_age": 3.98817482823506
+    },
+    {
+      "at": 15.58459690073505,
+      "seconds": 0.04489512508735061,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M5"
+      ],
+      "longest_ready_age": 4.018078612163663
+    },
+    {
+      "at": 15.634606922976673,
+      "seconds": 0.047380794771015644,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M5"
+      ],
+      "longest_ready_age": 4.031374185811728
+    },
+    {
+      "at": 15.687119003850967,
+      "seconds": 0.059334015008062124,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M5"
+      ],
+      "longest_ready_age": 4.051221000961959
+    },
+    {
+      "at": 15.751543311867863,
+      "seconds": 0.05423082085326314,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M30"
+      ],
+      "longest_ready_age": 4.0519615528173745
+    },
+    {
+      "at": 15.810867968946695,
+      "seconds": 0.04473091196268797,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M5"
+      ],
+      "longest_ready_age": 4.074233041610569
+    },
+    {
+      "at": 15.860709230881184,
+      "seconds": 0.034557980950921774,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "longest_ready_age": 4.076924632303417
+    },
+    {
+      "at": 15.900363554712385,
+      "seconds": 0.02680190932005644,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "longest_ready_age": 4.07519335206598
+    },
+    {
+      "at": 15.93225403688848,
+      "seconds": 0.02448457106947899,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M1"
+      ],
+      "longest_ready_age": 4.0768978651613
+    },
+    {
+      "at": 15.96186619065702,
+      "seconds": 0.041300828102976084,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M1"
+      ],
+      "longest_ready_age": 4.092820258811116
+    },
+    {
+      "at": 16.034977776929736,
+      "seconds": 0.04085146402940154,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M1"
+      ],
+      "longest_ready_age": 4.131893111858517
+    },
+    {
+      "at": 16.080926487687975,
+      "seconds": 0.04228924214839935,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M1"
+      ],
+      "longest_ready_age": 4.13361549237743
+    },
+    {
+      "at": 16.128350534942,
+      "seconds": 0.041402650997042656,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M1"
+      ],
+      "longest_ready_age": 4.1315702917054296
+    },
+    {
+      "at": 16.17486638063565,
+      "seconds": 0.07805323228240013,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M1"
+      ],
+      "longest_ready_age": 4.1302350126206875
+    },
+    {
+      "at": 16.258024781011045,
+      "seconds": 0.0550546576268971,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M1"
+      ],
+      "longest_ready_age": 4.14224486798048
+    },
+    {
+      "at": 16.31820998992771,
+      "seconds": 0.0403043027035892,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M1"
+      ],
+      "longest_ready_age": 4.125838017091155
+    },
+    {
+      "at": 16.363608572632074,
+      "seconds": 0.03267721924930811,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "longest_ready_age": 4.115582718048245
+    },
+    {
+      "at": 16.401394842658192,
+      "seconds": 0.025159148033708334,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "longest_ready_age": 4.106963261961937
+    },
+    {
+      "at": 16.431643918622285,
+      "seconds": 0.02614585217088461,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "longest_ready_age": 4.106186042074114
+    },
+    {
+      "at": 16.462919182609767,
+      "seconds": 0.023430966306477785,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "longest_ready_age": 4.085327859967947
+    },
+    {
+      "at": 16.491425468586385,
+      "seconds": 0.026423095259815454,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "longest_ready_age": 4.078759517055005
+    },
+    {
+      "at": 16.540607364848256,
+      "seconds": 0.05540689080953598,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "longest_ready_age": 4.129792225081474
+    },
+    {
+      "at": 16.601157994009554,
+      "seconds": 0.05526153789833188,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "longest_ready_age": 4.160591416992247
+    },
+    {
+      "at": 16.661516615655273,
+      "seconds": 0.0527795753441751,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "D1"
+      ],
+      "longest_ready_age": 4.13968257419765
+    },
+    {
+      "at": 16.71945514297113,
+      "seconds": 0.03820968372747302,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H1"
+      ],
+      "longest_ready_age": 4.141982047818601
+    },
+    {
+      "at": 16.76280006673187,
+      "seconds": 0.03281743498519063,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H4"
+      ],
+      "longest_ready_age": 4.130291340872645
+    },
+    {
+      "at": 16.80070916004479,
+      "seconds": 0.027235671877861023,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M15"
+      ],
+      "longest_ready_age": 4.1087530283257365
+    },
+    {
+      "at": 16.83306367183104,
+      "seconds": 0.024230741895735264,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "MN"
+      ],
+      "longest_ready_age": 4.08872389420867
+    },
+    {
+      "at": 16.862411386799067,
+      "seconds": 0.024123154114931822,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "W1"
+      ],
+      "longest_ready_age": 4.071522534824908
+    },
+    {
+      "at": 16.891622313763946,
+      "seconds": 0.020864167250692844,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "D1"
+      ],
+      "longest_ready_age": 4.057961547747254
+    },
+    {
+      "at": 16.917578267864883,
+      "seconds": 0.020961284171789885,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H1"
+      ],
+      "longest_ready_age": 4.051711276173592
+    },
+    {
+      "at": 16.94364895997569,
+      "seconds": 0.025219779927283525,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H4"
+      ],
+      "longest_ready_age": 4.055377325974405
+    },
+    {
+      "at": 16.974004009738564,
+      "seconds": 0.022634699009358883,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M15"
+      ],
+      "longest_ready_age": 4.05922625772655
+    },
+    {
+      "at": 17.018676548730582,
+      "seconds": 0.031329403165727854,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M30"
+      ],
+      "longest_ready_age": 4.084888685029
+    },
+    {
+      "at": 17.055098440032452,
+      "seconds": 0.04749744990840554,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "MN"
+      ],
+      "longest_ready_age": 4.111129690892994
+    },
+    {
+      "at": 17.107678908854723,
+      "seconds": 0.03492105705663562,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "W1"
+      ],
+      "longest_ready_age": 4.124387113843113
+    },
+    {
+      "at": 17.147678701672703,
+      "seconds": 0.036181842908263206,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "D1"
+      ],
+      "longest_ready_age": 4.107130479998887
+    },
+    {
+      "at": 17.18895798176527,
+      "seconds": 0.05605326220393181,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H1"
+      ],
+      "longest_ready_age": 4.109402678906918
+    },
+    {
+      "at": 17.25018990598619,
+      "seconds": 0.025084784720093012,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H4"
+      ],
+      "longest_ready_age": 4.104166970122606
+    },
+    {
+      "at": 17.280363614670932,
+      "seconds": 0.02378614991903305,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M15"
+      ],
+      "longest_ready_age": 4.094126142095774
+    },
+    {
+      "at": 17.309262631926686,
+      "seconds": 0.027530486695468426,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M30"
+      ],
+      "longest_ready_age": 4.090080237016082
+    },
+    {
+      "at": 17.341881102882326,
+      "seconds": 0.027050140779465437,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "MN"
+      ],
+      "longest_ready_age": 4.100355261005461
+    },
+    {
+      "at": 17.37427390087396,
+      "seconds": 0.038485205732285976,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "W1"
+      ],
+      "longest_ready_age": 4.118074742145836
+    },
+    {
+      "at": 17.417888910975307,
+      "seconds": 0.0278138630092144,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "D1"
+      ],
+      "longest_ready_age": 4.121484464965761
+    },
+    {
+      "at": 17.450794575735927,
+      "seconds": 0.025287019088864326,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H1"
+      ],
+      "longest_ready_age": 4.123671154025942
+    },
+    {
+      "at": 17.4811728047207,
+      "seconds": 0.021366295870393515,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H4"
+      ],
+      "longest_ready_age": 4.122093987185508
+    },
+    {
+      "at": 17.52384727494791,
+      "seconds": 0.03796937968581915,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M15"
+      ],
+      "longest_ready_age": 4.138547698035836
+    },
+    {
+      "at": 17.567687780596316,
+      "seconds": 0.06644225819036365,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M30"
+      ],
+      "longest_ready_age": 4.170660144183785
+    },
+    {
+      "at": 17.639266056008637,
+      "seconds": 0.037008292973041534,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "MN"
+      ],
+      "longest_ready_age": 4.179760175291449
+    },
+    {
+      "at": 17.681407373864204,
+      "seconds": 0.03319298382848501,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "W1"
+      ],
+      "longest_ready_age": 4.141283553093672
+    },
+    {
+      "at": 17.71969880675897,
+      "seconds": 0.03709272528067231,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "D1"
+      ],
+      "longest_ready_age": 4.1377662611193955
+    },
+    {
+      "at": 17.761925930622965,
+      "seconds": 0.022952715400606394,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H1"
+      ],
+      "longest_ready_age": 4.1212592432275414
+    },
+    {
+      "at": 17.789997352752835,
+      "seconds": 0.025092169176787138,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H4"
+      ],
+      "longest_ready_age": 4.098931776825339
+    },
+    {
+      "at": 17.820231650024652,
+      "seconds": 0.026957429014146328,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M15"
+      ],
+      "longest_ready_age": 4.088759496808052
+    },
+    {
+      "at": 17.85228428663686,
+      "seconds": 0.024007356259971857,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M30"
+      ],
+      "longest_ready_age": 4.085806865245104
+    },
+    {
+      "at": 17.881415349896997,
+      "seconds": 0.0219505256973207,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "MN"
+      ],
+      "longest_ready_age": 4.075647477991879
+    },
+    {
+      "at": 17.908490845002234,
+      "seconds": 0.020528805907815695,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "W1"
+      ],
+      "longest_ready_age": 4.072428750805557
+    },
+    {
+      "at": 17.934144875966012,
+      "seconds": 0.021226932760328054,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "D1"
+      ],
+      "longest_ready_age": 4.068591177929193
+    },
+    {
+      "at": 17.96052436484024,
+      "seconds": 0.027886144816875458,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H1"
+      ],
+      "longest_ready_age": 4.068752199411392
+    },
+    {
+      "at": 17.993527818005532,
+      "seconds": 0.022751591634005308,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H4"
+      ],
+      "longest_ready_age": 4.0705028139054775
+    },
+    {
+      "at": 18.038560857996345,
+      "seconds": 0.05899141263216734,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M15"
+      ],
+      "longest_ready_age": 4.1246155658736825
+    },
+    {
+      "at": 18.10264653386548,
+      "seconds": 0.03619750076904893,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M30"
+      ],
+      "longest_ready_age": 4.1201792121864855
+    },
+    {
+      "at": 18.14396673301235,
+      "seconds": 0.03129321662709117,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "MN"
+      ],
+      "longest_ready_age": 4.0918044382706285
+    },
+    {
+      "at": 18.18037470104173,
+      "seconds": 0.03352917591109872,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "W1"
+      ],
+      "longest_ready_age": 4.085676776710898
+    },
+    {
+      "at": 18.21903466572985,
+      "seconds": 0.03555939486250281,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "D1"
+      ],
+      "longest_ready_age": 4.075473770964891
+    },
+    {
+      "at": 18.259682960808277,
+      "seconds": 0.020324232056736946,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H1"
+      ],
+      "longest_ready_age": 4.003184048924595
+    },
+    {
+      "at": 18.285142535809427,
+      "seconds": 0.021154962945729494,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H4"
+      ],
+      "longest_ready_age": 3.985259775072336
+    },
+    {
+      "at": 18.311416623648256,
+      "seconds": 0.022666010074317455,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M15"
+      ],
+      "longest_ready_age": 3.971498284023255
+    },
+    {
+      "at": 18.339219064917415,
+      "seconds": 0.021627680864185095,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M30"
+      ],
+      "longest_ready_age": 3.965016258880496
+    },
+    {
+      "at": 18.36597700091079,
+      "seconds": 0.023926835972815752,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "MN"
+      ],
+      "longest_ready_age": 3.960528542753309
+    },
+    {
+      "at": 18.39503781264648,
+      "seconds": 0.02116804337128997,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "W1"
+      ],
+      "longest_ready_age": 3.960806904360652
+    },
+    {
+      "at": 18.421453669667244,
+      "seconds": 0.022155242040753365,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "D1"
+      ],
+      "longest_ready_age": 3.9280136502347887
+    },
+    {
+      "at": 18.44870480382815,
+      "seconds": 0.02393948519602418,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H1"
+      ],
+      "longest_ready_age": 3.881641501095146
+    },
+    {
+      "at": 18.47774932999164,
+      "seconds": 0.023897758685052395,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H4"
+      ],
+      "longest_ready_age": 3.841793323867023
+    },
+    {
+      "at": 18.525979770813137,
+      "seconds": 0.038709231186658144,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M15"
+      ],
+      "longest_ready_age": 3.860587236005813
+    },
+    {
+      "at": 18.5698134098202,
+      "seconds": 0.07984909694641829,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M30"
+      ],
+      "longest_ready_age": 3.8838894781656563
+    },
+    {
+      "at": 18.654801429715008,
+      "seconds": 0.043438480235636234,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "MN"
+      ],
+      "longest_ready_age": 3.8664910160005093
+    },
+    {
+      "at": 18.70333734387532,
+      "seconds": 0.048158273100852966,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "W1"
+      ],
+      "longest_ready_age": 3.8896219469606876
+    },
+    {
+      "at": 18.7565825288184,
+      "seconds": 0.059587826021015644,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "D1"
+      ],
+      "longest_ready_age": 3.9167947699315846
+    },
+    {
+      "at": 18.821269164793193,
+      "seconds": 0.056962025817483664,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H1"
+      ],
+      "longest_ready_age": 3.936180021148175
+    },
+    {
+      "at": 18.88387532066554,
+      "seconds": 0.021953415125608444,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H4"
+      ],
+      "longest_ready_age": 3.928405773360282
+    },
+    {
+      "at": 18.910923279821873,
+      "seconds": 0.031004983000457287,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M15"
+      ],
+      "longest_ready_age": 3.925875147804618
+    },
+    {
+      "at": 18.947058998979628,
+      "seconds": 0.028770942706614733,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "MN"
+      ],
+      "longest_ready_age": 3.888403748162091
+    },
+    {
+      "at": 18.98093144176528,
+      "seconds": 0.02766659390181303,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "W1"
+      ],
+      "longest_ready_age": 3.8793407939374447
+    },
+    {
+      "at": 19.066178016830236,
+      "seconds": 0.03917462797835469,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "longest_ready_age": 3.9068885566666722
+    },
+    {
+      "at": 19.110453196801245,
+      "seconds": 0.06567879114300013,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M30"
+      ],
+      "longest_ready_age": 3.8989302739501
+    },
+    {
+      "at": 19.1812632069923,
+      "seconds": 0.04458634462207556,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M5"
+      ],
+      "longest_ready_age": 3.901624382007867
+    },
+    {
+      "at": 19.230960492044687,
+      "seconds": 0.03782041696831584,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M5"
+      ],
+      "longest_ready_age": 3.909964659716934
+    },
+    {
+      "at": 19.273903934750706,
+      "seconds": 0.04061616584658623,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M5"
+      ],
+      "longest_ready_age": 3.906002778094262
+    },
+    {
+      "at": 19.31960667669773,
+      "seconds": 0.030022405087947845,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M5"
+      ],
+      "longest_ready_age": 3.892974490299821
+    },
+    {
+      "at": 19.354732192587107,
+      "seconds": 0.029402309097349644,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M5"
+      ],
+      "longest_ready_age": 3.823087417986244
+    },
+    {
+      "at": 19.389230066910386,
+      "seconds": 0.03038588911294937,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M5"
+      ],
+      "longest_ready_age": 3.789978665765375
+    },
+    {
+      "at": 19.424709824845195,
+      "seconds": 0.03821821976453066,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M5"
+      ],
+      "longest_ready_age": 3.781045409385115
+    },
+    {
+      "at": 19.46805398678407,
+      "seconds": 0.027382145170122385,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M5"
+      ],
+      "longest_ready_age": 3.7494011279195547
+    },
+    {
+      "at": 19.517877500038594,
+      "seconds": 0.04322022758424282,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M30"
+      ],
+      "longest_ready_age": 3.7612630701623857
+    },
+    {
+      "at": 19.566223359666765,
+      "seconds": 0.06264070607721806,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M5"
+      ],
+      "longest_ready_age": 3.773963103070855
+    },
+    {
+      "at": 19.633984226733446,
+      "seconds": 0.04171620588749647,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "longest_ready_age": 3.780617670621723
+    },
+    {
+      "at": 19.680795878637582,
+      "seconds": 0.05338581511750817,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "longest_ready_age": 3.807306118309498
+    },
+    {
+      "at": 19.739305201917887,
+      "seconds": 0.07167877303436399,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M1"
+      ],
+      "longest_ready_age": 3.853696600999683
+    },
+    {
+      "at": 19.81610278459266,
+      "seconds": 0.027335326187312603,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M1"
+      ],
+      "longest_ready_age": 3.8397902231663465
+    },
+    {
+      "at": 19.84855226194486,
+      "seconds": 0.04007488302886486,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M1"
+      ],
+      "longest_ready_age": 3.8113991860300303
+    },
+    {
+      "at": 19.893729507923126,
+      "seconds": 0.02449831971898675,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M1"
+      ],
+      "longest_ready_age": 3.7952221408486366
+    },
+    {
+      "at": 19.923356778919697,
+      "seconds": 0.024451241828501225,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M1"
+      ],
+      "longest_ready_age": 3.7777373674325645
+    },
+    {
+      "at": 19.952930356841534,
+      "seconds": 0.024831084068864584,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M1"
+      ],
+      "longest_ready_age": 3.726609908975661
+    },
+    {
+      "at": 19.982879482675344,
+      "seconds": 0.03167402325198054,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M1"
+      ],
+      "longest_ready_age": 3.702031033113599
+    },
+    {
+      "at": 20.038154723588377,
+      "seconds": 0.050077044405043125,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M1"
+      ],
+      "longest_ready_age": 3.729954545851797
+    },
+    {
+      "at": 20.100748505908996,
+      "seconds": 0.04016156867146492,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "longest_ready_age": 3.7453065221197903
+    },
+    {
+      "at": 20.14603492198512,
+      "seconds": 0.060159023851156235,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "longest_ready_age": 3.7777202427387238
+    },
+    {
+      "at": 20.21128923399374,
+      "seconds": 0.037061482667922974,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "longest_ready_age": 3.794237812049687
+    },
+    {
+      "at": 20.253438698593527,
+      "seconds": 0.03283888241276145,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "longest_ready_age": 3.799918201752007
+    },
+    {
+      "at": 20.29137178696692,
+      "seconds": 0.02451743884012103,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "longest_ready_age": 3.8001335128210485
+    },
+    {
+      "at": 20.321004303637892,
+      "seconds": 0.02279582805931568,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "longest_ready_age": 3.748604740947485
+    },
+    {
+      "at": 20.348913711030036,
+      "seconds": 0.023012025747448206,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "longest_ready_age": 3.7138931551016867
+    },
+    {
+      "at": 20.377053848002106,
+      "seconds": 0.020073479041457176,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "D1"
+      ],
+      "longest_ready_age": 3.684316457249224
+    },
+    {
+      "at": 20.402214693836868,
+      "seconds": 0.025261077098548412,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H1"
+      ],
+      "longest_ready_age": 3.6704939091578126
+    },
+    {
+      "at": 20.43255888763815,
+      "seconds": 0.025082656182348728,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H4"
+      ],
+      "longest_ready_age": 3.662545211147517
+    },
+    {
+      "at": 20.466748548671603,
+      "seconds": 0.022297959309071302,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M15"
+      ],
+      "longest_ready_age": 3.6615042476914823
+    },
+    {
+      "at": 20.494159925729036,
+      "seconds": 0.01973818428814411,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "MN"
+      ],
+      "longest_ready_age": 3.6570695252157748
+    },
+    {
+      "at": 20.533971761818975,
+      "seconds": 0.03174668876454234,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "W1"
+      ],
+      "longest_ready_age": 3.6797813181765378
+    },
+    {
+      "at": 20.573120879009366,
+      "seconds": 0.052866353653371334,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "D1"
+      ],
+      "longest_ready_age": 3.7116661123000085
+    },
+    {
+      "at": 20.631072502583265,
+      "seconds": 0.06669438816606998,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H1"
+      ],
+      "longest_ready_age": 3.758176614996046
+    },
+    {
+      "at": 20.702889756765217,
+      "seconds": 0.0345131941139698,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H4"
+      ],
+      "longest_ready_age": 3.76939057931304
+    },
+    {
+      "at": 20.742491484619677,
+      "seconds": 0.05039123725146055,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M15"
+      ],
+      "longest_ready_age": 3.795162077061832
+    },
+    {
+      "at": 20.799446715973318,
+      "seconds": 0.038779671769589186,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M30"
+      ],
+      "longest_ready_age": 3.785924600902945
+    },
+    {
+      "at": 20.845021860674024,
+      "seconds": 0.04278350109234452,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "MN"
+      ],
+      "longest_ready_age": 3.7853872659616172
+    },
+    {
+      "at": 20.89293055795133,
+      "seconds": 0.03714807378128171,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "W1"
+      ],
+      "longest_ready_age": 3.785374223254621
+    },
+    {
+      "at": 20.935202199034393,
+      "seconds": 0.02100243791937828,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "D1"
+      ],
+      "longest_ready_age": 3.7724720193073153
+    },
+    {
+      "at": 20.961298869922757,
+      "seconds": 0.029608896933496,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H1"
+      ],
+      "longest_ready_age": 3.745713912881911
+    },
+    {
+      "at": 20.996027554851025,
+      "seconds": 0.02255223598331213,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H4"
+      ],
+      "longest_ready_age": 3.740659736096859
+    },
+    {
+      "at": 21.043865154031664,
+      "seconds": 0.03714291099458933,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M15"
+      ],
+      "longest_ready_age": 3.7762986551970243
+    },
+    {
+      "at": 21.08613919885829,
+      "seconds": 0.03592067211866379,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M30"
+      ],
+      "longest_ready_age": 3.787764527834952
+    },
+    {
+      "at": 21.12718441383913,
+      "seconds": 0.05219217296689749,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "MN"
+      ],
+      "longest_ready_age": 3.8114837910979986
+    },
+    {
+      "at": 21.184483390767127,
+      "seconds": 0.032303831074386835,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "W1"
+      ],
+      "longest_ready_age": 3.8062373539432883
+    },
+    {
+      "at": 21.221903163008392,
+      "seconds": 0.040022235829383135,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "D1"
+      ],
+      "longest_ready_age": 3.8088319371454418
+    },
+    {
+      "at": 21.26704368367791,
+      "seconds": 0.02201950829476118,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H1"
+      ],
+      "longest_ready_age": 3.81298483395949
+    },
+    {
+      "at": 21.294197683688253,
+      "seconds": 0.03061150712892413,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H4"
+      ],
+      "longest_ready_age": 3.818412798922509
+    },
+    {
+      "at": 21.329870954621583,
+      "seconds": 0.021725752390921116,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M15"
+      ],
+      "longest_ready_age": 3.7906093508936465
+    },
+    {
+      "at": 21.356722068972886,
+      "seconds": 0.05702835088595748,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M30"
+      ],
+      "longest_ready_age": 3.7823278810828924
+    },
+    {
+      "at": 21.418841338716447,
+      "seconds": 0.03733697906136513,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "MN"
+      ],
+      "longest_ready_age": 3.7802960998378694
+    },
+    {
+      "at": 21.461271345615387,
+      "seconds": 0.022333999164402485,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "W1"
+      ],
+      "longest_ready_age": 3.7688663150183856
+    },
+    {
+      "at": 21.488726214971393,
+      "seconds": 0.036091221030801535,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "D1"
+      ],
+      "longest_ready_age": 3.768691312056035
+    },
+    {
+      "at": 21.55164372175932,
+      "seconds": 0.06427982915192842,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H1"
+      ],
+      "longest_ready_age": 3.830201811157167
+    },
+    {
+      "at": 21.621012425981462,
+      "seconds": 0.04454837599769235,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H4"
+      ],
+      "longest_ready_age": 3.8511594380252063
+    },
+    {
+      "at": 21.670649726875126,
+      "seconds": 0.03967296285554767,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M15"
+      ],
+      "longest_ready_age": 3.8643790422938764
+    },
+    {
+      "at": 21.715420024935156,
+      "seconds": 0.034207339864224195,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M30"
+      ],
+      "longest_ready_age": 3.8733857357874513
+    },
+    {
+      "at": 21.754723290912807,
+      "seconds": 0.05179267609491944,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "MN"
+      ],
+      "longest_ready_age": 3.9016172448173165
+    },
+    {
+      "at": 21.81166546884924,
+      "seconds": 0.03634970774874091,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "W1"
+      ],
+      "longest_ready_age": 3.9159453981556
+    },
+    {
+      "at": 21.853145548608154,
+      "seconds": 0.043233024422079325,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "D1"
+      ],
+      "longest_ready_age": 3.93156258482486
+    },
+    {
+      "at": 21.901475477963686,
+      "seconds": 0.0302376807667315,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H1"
+      ],
+      "longest_ready_age": 3.9453463605605066
+    },
+    {
+      "at": 21.936812077648938,
+      "seconds": 0.021445557940751314,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H4"
+      ],
+      "longest_ready_age": 3.942748012021184
+    },
+    {
+      "at": 21.96340457163751,
+      "seconds": 0.021077275276184082,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M15"
+      ],
+      "longest_ready_age": 3.8874315158464015
+    },
+    {
+      "at": 21.989598724991083,
+      "seconds": 0.03395405877381563,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M30"
+      ],
+      "longest_ready_age": 3.8834161860868335
+    },
+    {
+      "at": 22.047755387611687,
+      "seconds": 0.056111074052751064,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "MN"
+      ],
+      "longest_ready_age": 3.928452123887837
+    },
+    {
+      "at": 22.108961671590805,
+      "seconds": 0.038751892279833555,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "W1"
+      ],
+      "longest_ready_age": 3.931566528044641
+    },
+    {
+      "at": 22.152905765920877,
+      "seconds": 0.04465888673439622,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "D1"
+      ],
+      "longest_ready_age": 3.9427882647141814
+    },
+    {
+      "at": 22.202663760632277,
+      "seconds": 0.03417075518518686,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H1"
+      ],
+      "longest_ready_age": 3.9561749640852213
+    },
+    {
+      "at": 22.24196001375094,
+      "seconds": 0.04783169226720929,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H4"
+      ],
+      "longest_ready_age": 3.98235023021698
+    },
+    {
+      "at": 22.29491675971076,
+      "seconds": 0.024520074017345905,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M15"
+      ],
+      "longest_ready_age": 3.9841314051300287
+    },
+    {
+      "at": 22.324541488662362,
+      "seconds": 0.020374710205942392,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M30"
+      ],
+      "longest_ready_age": 3.984538688790053
+    },
+    {
+      "at": 22.350761217996478,
+      "seconds": 0.03411283902823925,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "MN"
+      ],
+      "longest_ready_age": 3.9875173764303327
+    },
+    {
+      "at": 22.389973715879023,
+      "seconds": 0.031366935931146145,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "W1"
+      ],
+      "longest_ready_age": 4.004014433827251
+    },
+    {
+      "at": 22.426573514007032,
+      "seconds": 0.03309673769399524,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "D1"
+      ],
+      "longest_ready_age": 4.015754661057144
+    },
+    {
+      "at": 22.46476591192186,
+      "seconds": 0.024284429848194122,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H1"
+      ],
+      "longest_ready_age": 4.01656186580658
+    },
+    {
+      "at": 22.494174269028008,
+      "seconds": 0.02392706461250782,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H4"
+      ],
+      "longest_ready_age": 4.016890665981919
+    },
+    {
+      "at": 22.543564941734076,
+      "seconds": 0.036801707930862904,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M15"
+      ],
+      "longest_ready_age": 4.016130442731082
+    },
+    {
+      "at": 22.585450963582844,
+      "seconds": 0.03720705723389983,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M30"
+      ],
+      "longest_ready_age": 3.973928281106055
+    },
+    {
+      "at": 22.627763747703284,
+      "seconds": 0.059986846055835485,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "MN"
+      ],
+      "longest_ready_age": 3.9893755558878183
+    },
+    {
+      "at": 22.692874625790864,
+      "seconds": 0.03627921920269728,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "W1"
+      ],
+      "longest_ready_age": 3.9772328110411763
+    },
+    {
+      "at": 22.734503095038235,
+      "seconds": 0.04770331596955657,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "D1"
+      ],
+      "longest_ready_age": 3.959920316003263
+    },
+    {
+      "at": 22.789793972857296,
+      "seconds": 0.02969825081527233,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H1"
+      ],
+      "longest_ready_age": 3.9405736019834876
+    },
+    {
+      "at": 22.824598926585168,
+      "seconds": 0.037255432456731796,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H4"
+      ],
+      "longest_ready_age": 3.9547462458722293
+    },
+    {
+      "at": 22.866946487687528,
+      "seconds": 0.03197828307747841,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M15"
+      ],
+      "longest_ready_age": 3.9627107162959874
+    },
+    {
+      "at": 22.905095719732344,
+      "seconds": 0.02525770803913474,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "MN"
+      ],
+      "longest_ready_age": 3.9544573822058737
+    },
+    {
+      "at": 22.935416977852583,
+      "seconds": 0.04676375212147832,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "W1"
+      ],
+      "longest_ready_age": 3.969705961178988
+    },
+    {
+      "at": 22.987287416588515,
+      "seconds": 0.0751760471612215,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "longest_ready_age": 3.952398815192282
+    },
+    {
+      "at": 23.10201508179307,
+      "seconds": 0.051409678068012,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M30"
+      ],
+      "longest_ready_age": 3.9771580421365798
+    },
+    {
+      "at": 23.15853047464043,
+      "seconds": 0.12332138838246465,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M5"
+      ],
+      "longest_ready_age": 4.055779990274459
+    },
+    {
+      "at": 23.286962577607483,
+      "seconds": 0.06383981322869658,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M5"
+      ],
+      "longest_ready_age": 4.082338836975396
+    },
+    {
+      "at": 23.355902475770563,
+      "seconds": 0.04448162205517292,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M5"
+      ],
+      "longest_ready_age": 4.081644027959555
+    },
+    {
+      "at": 23.405472385697067,
+      "seconds": 0.06007432611659169,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M5"
+      ],
+      "longest_ready_age": 4.114811558742076
+    },
+    {
+      "at": 23.470647437963635,
+      "seconds": 0.029728073626756668,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M5"
+      ],
+      "longest_ready_age": 4.116972606629133
+    },
+    {
+      "at": 23.526116317603737,
+      "seconds": 0.07166676502674818,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M5"
+      ],
+      "longest_ready_age": 4.176497221924365
+    },
+    {
+      "at": 23.602889596950263,
+      "seconds": 0.09013933269307017,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M5"
+      ],
+      "longest_ready_age": 4.225272178649902
+    },
+    {
+      "at": 23.698161297943443,
+      "seconds": 0.05888067279011011,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M5"
+      ],
+      "longest_ready_age": 4.2611846518702805
+    },
+    {
+      "at": 23.764412024989724,
+      "seconds": 0.054946512915194035,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M30"
+      ],
+      "longest_ready_age": 4.258014063816518
+    },
+    {
+      "at": 23.824453878682107,
+      "seconds": 0.045034995302557945,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M5"
+      ],
+      "longest_ready_age": 4.239449278917164
+    },
+    {
+      "at": 23.874594082590193,
+      "seconds": 0.04156296933069825,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "longest_ready_age": 4.238520351238549
+    },
+    {
+      "at": 23.92125103669241,
+      "seconds": 0.0266207093372941,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "longest_ready_age": 4.213263017591089
+    },
+    {
+      "at": 23.952965676784515,
+      "seconds": 0.0385121782310307,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M1"
+      ],
+      "longest_ready_age": 4.179761259816587
+    },
+    {
+      "at": 23.996587895788252,
+      "seconds": 0.03573167184367776,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M1"
+      ],
+      "longest_ready_age": 4.189572020899504
+    },
+    {
+      "at": 24.05777663877234,
+      "seconds": 0.04901509312912822,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M1"
+      ],
+      "longest_ready_age": 4.219438807107508
+    },
+    {
+      "at": 24.11189451487735,
+      "seconds": 0.0478694629855454,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M1"
+      ],
+      "longest_ready_age": 4.241182496771216
+    },
+    {
+      "at": 24.164872334804386,
+      "seconds": 0.04711468797177076,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M1"
+      ],
+      "longest_ready_age": 4.2646615649573505
+    },
+    {
+      "at": 24.217116076033562,
+      "seconds": 0.0403405106626451,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M1"
+      ],
+      "longest_ready_age": 4.2791255582123995
+    },
+    {
+      "at": 24.262704220600426,
+      "seconds": 0.05780973518267274,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M1"
+      ],
+      "longest_ready_age": 4.307336953934282
+    },
+    {
+      "at": 24.325731394812465,
+      "seconds": 0.028593537863343954,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M1"
+      ],
+      "longest_ready_age": 4.266912913881242
+    },
+    {
+      "at": 24.359427058603615,
+      "seconds": 0.04054896114394069,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "longest_ready_age": 4.2485923897475
+    },
+    {
+      "at": 24.405103826895356,
+      "seconds": 0.07461279211565852,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "longest_ready_age": 4.258366149384528
+    },
+    {
+      "at": 24.48483494669199,
+      "seconds": 0.055413620080798864,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "longest_ready_age": 4.289804989937693
+    },
+    {
+      "at": 24.576103794854134,
+      "seconds": 0.06610429286956787,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "longest_ready_age": 4.337632830254734
+    },
+    {
+      "at": 24.647345318924636,
+      "seconds": 0.04879362694919109,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "longest_ready_age": 4.379463682882488
+    },
+    {
+      "at": 24.701276027597487,
+      "seconds": 0.06968459906056523,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "longest_ready_age": 4.426254021003842
+    },
+    {
+      "at": 24.776086494792253,
+      "seconds": 0.058096873108297586,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "longest_ready_age": 4.460524131078273
+    },
+    {
+      "at": 24.83929943991825,
+      "seconds": 0.05904873088002205,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "D1"
+      ],
+      "longest_ready_age": 4.492910145781934
+    },
+    {
+      "at": 24.908057021908462,
+      "seconds": 0.04431220609694719,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H1"
+      ],
+      "longest_ready_age": 4.520517285913229
+    },
+    {
+      "at": 24.957485090009868,
+      "seconds": 0.04108466301113367,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "H4"
+      ],
+      "longest_ready_age": 4.534625548869371
+    },
+    {
+      "at": 25.03605392575264,
+      "seconds": 0.041093177162110806,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M15"
+      ],
+      "longest_ready_age": 4.587704688310623
+    },
+    {
+      "at": 25.08225632691756,
+      "seconds": 0.20420366106554866,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "MN"
+      ],
+      "longest_ready_age": 4.706915326882154
+    },
+    {
+      "at": 25.292515692766756,
+      "seconds": 0.07300597988069057,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "W1"
+      ],
+      "longest_ready_age": 4.787143895868212
+    },
+    {
+      "at": 25.370626950636506,
+      "seconds": 0.04498083516955376,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "D1"
+      ],
+      "longest_ready_age": 4.7877448527142406
+    },
+    {
+      "at": 25.420703519601375,
+      "seconds": 0.0593552952632308,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H1"
+      ],
+      "longest_ready_age": 4.782446411903948
+    },
+    {
+      "at": 25.48518692376092,
+      "seconds": 0.029564824886620045,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "H4"
+      ],
+      "longest_ready_age": 4.777041560038924
+    },
+    {
+      "at": 25.53725207177922,
+      "seconds": 0.03441389696672559,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M15"
+      ],
+      "longest_ready_age": 4.779984821099788
+    },
+    {
+      "at": 25.576785882934928,
+      "seconds": 0.033999742940068245,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M30"
+      ],
+      "longest_ready_age": 4.775900898966938
+    },
+    {
+      "at": 25.615947468671948,
+      "seconds": 0.05258065927773714,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "MN"
+      ],
+      "longest_ready_age": 4.780617171898484
+    },
+    {
+      "at": 25.67364293988794,
+      "seconds": 0.03113726293668151,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "W1"
+      ],
+      "longest_ready_age": 4.776186839677393
+    },
+    {
+      "at": 25.709897678811103,
+      "seconds": 0.0361132500693202,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "D1"
+      ],
+      "longest_ready_age": 4.788507597986609
+    },
+    {
+      "at": 25.7511318908073,
+      "seconds": 0.020762288011610508,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H1"
+      ],
+      "longest_ready_age": 4.78238901309669
+    },
+    {
+      "at": 25.777004841715097,
+      "seconds": 0.01972719421610236,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "H4"
+      ],
+      "longest_ready_age": 4.781242166180164
+    },
+    {
+      "at": 25.80182262090966,
+      "seconds": 0.025639439933001995,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M15"
+      ],
+      "longest_ready_age": 4.747096396051347
+    },
+    {
+      "at": 25.832553011830896,
+      "seconds": 0.027301453053951263,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M30"
+      ],
+      "longest_ready_age": 4.73541567614302
+    },
+    {
+      "at": 25.864986506756395,
+      "seconds": 0.023000653833150864,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "MN"
+      ],
+      "longest_ready_age": 4.708593203686178
+    },
+    {
+      "at": 25.89311349671334,
+      "seconds": 0.02865051804110408,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "W1"
+      ],
+      "longest_ready_age": 4.70388094894588
+    },
+    {
+      "at": 25.92689223587513,
+      "seconds": 0.024738392792642117,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "D1"
+      ],
+      "longest_ready_age": 4.697673180606216
+    },
+    {
+      "at": 25.956761991605163,
+      "seconds": 0.025176665280014277,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H1"
+      ],
+      "longest_ready_age": 4.692977295722812
+    },
+    {
+      "at": 25.98702753568068,
+      "seconds": 0.021627310197800398,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "H4"
+      ],
+      "longest_ready_age": 4.686928991228342
+    },
+    {
+      "at": 26.03098307084292,
+      "seconds": 0.053814537823200226,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M15"
+      ],
+      "longest_ready_age": 4.732843484729528
+    },
+    {
+      "at": 26.089924389030784,
+      "seconds": 0.044712111819535494,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M30"
+      ],
+      "longest_ready_age": 4.72552961204201
+    },
+    {
+      "at": 26.139766625594348,
+      "seconds": 0.0570801580324769,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "MN"
+      ],
+      "longest_ready_age": 4.731684646103531
+    },
+    {
+      "at": 26.201994409784675,
+      "seconds": 0.05189277324825525,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "W1"
+      ],
+      "longest_ready_age": 4.769303112756461
+    },
+    {
+      "at": 26.259048345964402,
+      "seconds": 0.05664151906967163,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "D1"
+      ],
+      "longest_ready_age": 4.789458667859435
+    },
+    {
+      "at": 26.321045481599867,
+      "seconds": 0.027100207284092903,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H1"
+      ],
+      "longest_ready_age": 4.732744892593473
+    },
+    {
+      "at": 26.353262435644865,
+      "seconds": 0.0255443942733109,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "H4"
+      ],
+      "longest_ready_age": 4.713517805095762
+    },
+    {
+      "at": 26.383894828613847,
+      "seconds": 0.03193101705983281,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M15"
+      ],
+      "longest_ready_age": 4.704885550774634
+    },
+    {
+      "at": 26.420918633695692,
+      "seconds": 0.03296438418328762,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M30"
+      ],
+      "longest_ready_age": 4.701169079169631
+    },
+    {
+      "at": 26.459272352978587,
+      "seconds": 0.04764855979010463,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "MN"
+      ],
+      "longest_ready_age": 4.699885864276439
+    },
+    {
+      "at": 26.535440435633063,
+      "seconds": 0.06774548115208745,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "W1"
+      ],
+      "longest_ready_age": 4.757285193074495
+    },
+    {
+      "at": 26.608281032647938,
+      "seconds": 0.03818156709894538,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "D1"
+      ],
+      "longest_ready_age": 4.759194028098136
+    },
+    {
+      "at": 26.651557847857475,
+      "seconds": 0.03666431084275246,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H1"
+      ],
+      "longest_ready_age": 4.756533815059811
+    },
+    {
+      "at": 26.693315256852657,
+      "seconds": 0.036068460904061794,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "H4"
+      ],
+      "longest_ready_age": 4.769941580016166
+    },
+    {
+      "at": 26.734525145031512,
+      "seconds": 0.03778644185513258,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M15"
+      ],
+      "longest_ready_age": 4.785499812103808
+    },
+    {
+      "at": 26.777422474697232,
+      "seconds": 0.021480361931025982,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M30"
+      ],
+      "longest_ready_age": 4.776735992636532
+    },
+    {
+      "at": 26.803970173932612,
+      "seconds": 0.031486277002841234,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "MN"
+      ],
+      "longest_ready_age": 4.731216273736209
+    },
+    {
+      "at": 26.842615980654955,
+      "seconds": 0.04302835324779153,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "W1"
+      ],
+      "longest_ready_age": 4.739500300958753
+    },
+    {
+      "at": 26.890780619811267,
+      "seconds": 0.030992330983281136,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "D1"
+      ],
+      "longest_ready_age": 4.72340547805652
+    },
+    {
+      "at": 26.926875618752092,
+      "seconds": 0.034885460045188665,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H1"
+      ],
+      "longest_ready_age": 4.724953790660948
+    },
+    {
+      "at": 26.96691510360688,
+      "seconds": 0.06131111830472946,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "H4"
+      ],
+      "longest_ready_age": 4.738414857070893
+    },
+    {
+      "at": 27.058574806898832,
+      "seconds": 0.044915981125086546,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M15"
+      ],
+      "longest_ready_age": 4.780838476959616
+    },
+    {
+      "at": 27.108594046905637,
+      "seconds": 0.1858592457138002,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M30"
+      ],
+      "longest_ready_age": 4.948844468221068
+    },
+    {
+      "at": 27.299593152944,
+      "seconds": 0.04060084093362093,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "MN"
+      ],
+      "longest_ready_age": 4.9645726275630295
+    },
+    {
+      "at": 27.34529713075608,
+      "seconds": 0.14244920294731855,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "W1"
+      ],
+      "longest_ready_age": 5.057524261064827
+    },
+    {
+      "at": 27.493377794977278,
+      "seconds": 0.070651781745255,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "D1"
+      ],
+      "longest_ready_age": 5.100763075053692
+    },
+    {
+      "at": 27.603456483688205,
+      "seconds": 0.039049576967954636,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H1"
+      ],
+      "longest_ready_age": 5.153310575056821
+    },
+    {
+      "at": 27.647588327992707,
+      "seconds": 0.032903088722378016,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "H4"
+      ],
+      "longest_ready_age": 5.161542828194797
+    },
+    {
+      "at": 27.685589974746108,
+      "seconds": 0.03438344690948725,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M15"
+      ],
+      "longest_ready_age": 5.139701677951962
+    },
+    {
+      "at": 27.72509740991518,
+      "seconds": 0.08347331173717976,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M30"
+      ],
+      "longest_ready_age": 5.183993058744818
+    },
+    {
+      "at": 27.813661576714367,
+      "seconds": 0.04892418906092644,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "MN"
+      ],
+      "longest_ready_age": 5.174309454858303
+    },
+    {
+      "at": 27.86767724575475,
+      "seconds": 0.025712238159030676,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "W1"
+      ],
+      "longest_ready_age": 5.1641587959602475
+    },
+    {
+      "at": 27.89851254504174,
+      "seconds": 0.027532776817679405,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "D1"
+      ],
+      "longest_ready_age": 5.150319971144199
+    },
+    {
+      "at": 27.93116642301902,
+      "seconds": 0.05563365900889039,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H1"
+      ],
+      "longest_ready_age": 5.146137943025678
+    },
+    {
+      "at": 27.991916520986706,
+      "seconds": 0.03304632380604744,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "H4"
+      ],
+      "longest_ready_age": 5.156067445874214
+    },
+    {
+      "at": 28.091654288582504,
+      "seconds": 0.0420008460059762,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M15"
+      ],
+      "longest_ready_age": 5.2354260347783566
+    },
+    {
+      "at": 28.138772232923657,
+      "seconds": 0.05540958698838949,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "MN"
+      ],
+      "longest_ready_age": 5.259490186814219
+    },
+    {
+      "at": 28.19932033168152,
+      "seconds": 0.0408024312928319,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "W1"
+      ],
+      "longest_ready_age": 5.262598203029484
+    },
+    {
+      "at": 28.24522002087906,
+      "seconds": 0.05175057286396623,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "longest_ready_age": 5.239449501037598
+    },
+    {
+      "at": 28.302100956905633,
+      "seconds": 0.06055049179121852,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M30"
+      ],
+      "longest_ready_age": 5.209941381122917
+    },
+    {
+      "at": 28.367777891922742,
+      "seconds": 0.040062660817056894,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M5"
+      ],
+      "longest_ready_age": 5.119891689624637
+    },
+    {
+      "at": 28.4129346748814,
+      "seconds": 0.04178388975560665,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M5"
+      ],
+      "longest_ready_age": 5.101758737117052
+    },
+    {
+      "at": 28.459815750829875,
+      "seconds": 0.04886205913498998,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M5"
+      ],
+      "longest_ready_age": 5.107498947996646
+    },
+    {
+      "at": 28.558786660898477,
+      "seconds": 0.10697659384459257,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M5"
+      ],
+      "longest_ready_age": 5.201674610842019
+    },
+    {
+      "at": 28.6708862259984,
+      "seconds": 0.074322700034827,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M5"
+      ],
+      "longest_ready_age": 5.242567188106477
+    },
+    {
+      "at": 28.75030205398798,
+      "seconds": 0.10555451503023505,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M5"
+      ],
+      "longest_ready_age": 5.246032042428851
+    },
+    {
+      "at": 28.86098569398746,
+      "seconds": 0.08070581499487162,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M5"
+      ],
+      "longest_ready_age": 5.254000649321824
+    },
+    {
+      "at": 28.94681953266263,
+      "seconds": 0.03878042520955205,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M5"
+      ],
+      "longest_ready_age": 5.228054567240179
+    },
+    {
+      "at": 28.990725337993354,
+      "seconds": 0.033799788914620876,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M30"
+      ],
+      "longest_ready_age": 5.205152329988778
+    },
+    {
+      "at": 29.052790865767747,
+      "seconds": 0.047037252224981785,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M5"
+      ],
+      "longest_ready_age": 5.232108558993787
+    },
+    {
+      "at": 29.10495627578348,
+      "seconds": 0.07172968005761504,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "longest_ready_age": 5.260373970028013
+    },
+    {
+      "at": 29.18178499303758,
+      "seconds": 0.07231409288942814,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "longest_ready_age": 5.306080859154463
+    },
+    {
+      "at": 29.259221200831234,
+      "seconds": 0.07583695882931352,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH00",
+        "M1"
+      ],
+      "longest_ready_age": 5.341503289993852
+    },
+    {
+      "at": 29.340173081029207,
+      "seconds": 0.04863167367875576,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH01",
+        "M1"
+      ],
+      "longest_ready_age": 5.355904089286923
+    },
+    {
+      "at": 29.39394141267985,
+      "seconds": 0.03978043235838413,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH02",
+        "M1"
+      ],
+      "longest_ready_age": 5.325056592933834
+    },
+    {
+      "at": 29.438860916998237,
+      "seconds": 0.03338103974238038,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH03",
+        "M1"
+      ],
+      "longest_ready_age": 5.311324776150286
+    },
+    {
+      "at": 29.477345707826316,
+      "seconds": 0.04407437378540635,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH04",
+        "M1"
+      ],
+      "longest_ready_age": 5.307992944959551
+    },
+    {
+      "at": 29.549303027801216,
+      "seconds": 0.05850694701075554,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH05",
+        "M1"
+      ],
+      "longest_ready_age": 5.342561852186918
+    },
+    {
+      "at": 29.612913080956787,
+      "seconds": 0.07484614476561546,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "SYNTH06",
+        "M1"
+      ],
+      "longest_ready_age": 5.366679443977773
+    },
+    {
+      "at": 29.692885567899793,
+      "seconds": 0.05973757104948163,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "XAUUSD",
+        "M1"
+      ],
+      "longest_ready_age": 5.39700911520049
+    },
+    {
+      "at": 29.757742404937744,
+      "seconds": 0.045787346083670855,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "longest_ready_age": 5.4129929430782795
+    },
+    {
+      "at": 29.808627851773053,
+      "seconds": 0.051143595948815346,
+      "aggregate": true,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "longest_ready_age": 5.394384779967368
+    },
+    {
+      "at": 29.864871689584106,
+      "seconds": 0.028344438411295414,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "longest_ready_age": 5.355655150022358
+    },
+    {
+      "at": 29.898351615760475,
+      "seconds": 0.02498534321784973,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "longest_ready_age": 5.299187117721885
+    },
+    {
+      "at": 29.92844489077106,
+      "seconds": 0.028049096930772066,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "longest_ready_age": 5.260945138055831
+    },
+    {
+      "at": 29.961596784647554,
+      "seconds": 0.04149737721309066,
+      "aggregate": false,
+      "publication": true,
+      "task_progressed": true,
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "longest_ready_age": 5.232119997963309
+    }
+  ],
+  "longest_target_wait": 5.4129929430782795,
+  "rounds": [
+    {
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "count": 8
+    },
+    {
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "count": 8
+    },
+    {
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "count": 8
+    },
+    {
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "count": 8
+    },
+    {
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "count": 8
+    },
+    {
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "count": 8
+    },
+    {
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "EURUSD",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH00",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH01",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH02",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH03",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH04",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH05",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "SYNTH06",
+        "W1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "D1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "H1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "H4"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "M1"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "M15"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "M30"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "M5"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "MN"
+      ],
+      "count": 7
+    },
+    {
+      "target": [
+        "XAUUSD",
+        "W1"
+      ],
+      "count": 7
+    }
+  ],
+  "ready_committed_seconds": 0.06419237097725272,
+  "scope": "Runnable 10x9 target selection under continuous same-price focus input; not provider latency"
+}
