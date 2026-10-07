@@ -1,37 +1,27 @@
-# 合并后回归准备
+# v1.14.0 后回归验收矩阵
 
-合并前必要准备已收口，详见[收口审计](premerge-closeout.md)。这是分项执行清单，不表示整体验收已通过。核心修复在三层合并后按一条失败用例、一条修复的顺序推进；现有缺陷探针仅用作基线，不固定缺陷行为。
+2026-10-07 15:15 SGT。当前完成范围与性能结论分开记录；Issue #13 未完成。核心冻结 e529bb1 完整后端 1352 passed / 2 skipped / 65 warnings（758.70 秒）；后续性能发现旧不可用桶忙转和固定时钟轮转问题，修复冻结 599b043 尚待完整 PG/全量/长测验证。
 
-| 合同 / 场景 | 调用链与证据 | 当前状态 |
+| 合同 / 场景 | 实际证据 | 当前状态 |
 | --- | --- | --- |
-| 无输入、无队列、无到期工作进入等待 | `aggregate_once → publish_once`；idle_probe 比较完整可见 snapshot 并断言进展为零 | 已实际运行，主线预期红灯；9/9 假进展 |
-| 同价格新观察仍刷新匹配快照 | `write_bars → publish_once → published M1.payload.observed_at` | PG live/mixed和持续330秒50/50 M1观察可见、告警sequence推进与十个stale→ready已通过；独立M30/W1/MN四阶段观察读取一致。新合同触发/延迟仍待验收，当前延迟超目标 |
-| 新分钟、覆盖扩展触发发布 | `ingest(defer_aggregation=True) → aggregate_once → publish_once` | PG live 输入与预期 M1 匹配，完整尾部缺口合同待修复期验证 |
-| 显式扩大历史起点、跨页回填 | `join → publish_once`；比较快照行数和边界 | PG backfill 三份300秒长测已完成；队列空不代表全部历史补齐 |
-| 区间内价格与量修订 | `write_bars + enqueue_aggregation → aggregate_once → publish_once` | PG revision跟踪M1价格/volume；高周期独立oracle已核对十身份M30/W1/MN四阶段完整差分（含OHLC/量/complete/revision/观察）；M1生成、覆盖撤回和并发修订仍待验证 |
-| 无差异任务消费、空数据初始化、聚合阻塞 | 与真实持久任务、重试及消费者 API 联动 | 尚未编写最终回归；不能靠现有布尔值证明 |
-| 并发 g+1 不被 g 确认清除 | 两个独立 PG 事务，源写入与变化同事务；消费旧世代期间提交新输入 | 需新 schema/合同后加入 PG 并发用例 |
-| 计数幂等、事务回滚、提交前后崩溃 | 比较重试前后 OHLC/量/complete/计数/revision，并重启真实 worker | 未实施 |
-| DST、NY17 日界、M30/W1/MN、unknown/闭市 | 构造跨日历桶的已知输入，通过统一图表/CSV/MCP读口核对 | 独立oracle已验证固定日历M15/D1输入到M30/W1/MN的120案例和消费者读取；不证明M1生成、DST/节假日、unknown/闭市完整合同 |
-| 覆盖补齐与切换 | coverage_probe 的区间差集、原 received_at 五秒余量、完整分钟 | 八个合成案例与正式只读覆盖差集已完成；迁移补齐/并发追赶/下游等价与回退尚未演练 |
-| 异常覆盖隔离与来源身份 | source/basis、缺 bounds、重复、分数分钟、损坏 range_start、缺 received_at | 已记录兼容链缺陷；不能把损坏数据猜测补齐 |
-| 移除/修正覆盖、迟到修订与缓存失效 | 更新证明版本，验证下游及身份分离 | 未实施 |
-| 10 目标公平性，实时与回填并存 | worker 轮转间隔、事件提交到可见、最老队列年龄 | PG各场景及新增300秒混合记录90目标轮转；20/20两类输入可见，最长等待29.55秒超目标；新调度待合并实施 |
-| API/告警、防重、视区历史修订 | 实际消费者接口 + 同口径 CSV/MCP + 通知 outbox | 非空120次真实认证ASGI路由及120次PG evaluate微基线通过；新增120次实际TCP请求与十个M1触发/十唯一signal，短并发通过artifact审核；新增完整lifespan/真实网页/单浏览器双图/保存刷新短测通过；持续输入/成功供应商I/O未验收，不计整体通过；alert_read_probe验证published价格隔离/起点/观察时间且修复后零staging读 |
-| 升级/回退、通知丢失（如采用） | 加法迁移演练，旧/新 worker 排他拥有；旧任务重建 | 未实施 |
+| 真正无输入空闲等待、不重算、不写可见快照 | scheduler SQLite/PG、冻结长测 idle-1/2 | CPU约0.26%、SQL1.046/s、零source/audit读，可见稳定；第三次尚未结束 |
+| 新分钟及同价观察刷新 | scheduler 触发、H1同价传播、延迟来源stamp、live-1 M1 | 实时M1 p95 0.344s；完整330秒告警及混合消费者新候选仍待执行 |
+| 多页尾部追赶、无后续输入 | SQLite与真实PG2430分钟恢复用例 | e529bb1回归通过；599b043未全量验证 |
+| 历史页推进、计数/幂等、价格/量修订、unknown量 | managed_dataset、volume、PG managed/composite revisions | e529bb1完整回归通过；backfill-1吞吐2713.73 bars/s但公平等待136.82s失败 |
+| 无完整旧目标桶必须等待源输入 | 新SQLite回归、r2冻结 | 两项快速逻辑通过；PG/全量/新性能待执行 |
+| 固定观察时钟持续runnable公平轮转 | 新SQLite18目标两轮不重复、r2冻结 | 快速逻辑通过；当前旧候选长测实时/回填公平等待超门槛，不能计验收通过 |
+| g+1、品种锁、SKIP LOCKED、事务失败回滚重试 | publication_scheduler_postgres独立事务/线程 | e529bb1回归通过；实际进程kill/restart不由这些事务测试直接证明 |
+| 聚合焦点连续输入不饿死历史、SQL单候选 | chart_aggregation SQLite与真实PG | e529bb1通过，固定queue年龄十秒优先；持续90目标/mixed新验收待执行 |
+| DST、NY17/UTC0桶界、闭市与unknown | 完整回归中的domain/calendar/history_plan/volume/managed tests | e529bb1通过，pandas_market_calendars可选模块一项skip明确保留；新高周期消费者oracle待执行 |
+| 覆盖whole-minute、原received_at五秒余量、异常隔离 | coverage_projection SQLite/PG合同 | e529bb1通过，source/basis不猜测、异常quarantine、raw保留 |
+| 并发迟到UUID、双写、兼容读回退 | PG覆盖合同、保存正式白名单raw重放 | 682818d真实PG重放62522audit/27939structured与独立union等价，完成后audit读0 |
+| 覆盖分页普通tick禁止全量验证 | SQLite/PG SQL预算回归 | e529bb1通过；显式maintenance --verify才全量核对，真实examined计数，兼容读保留 |
+| 显式撤销proof撤回完整性/计数、恢复proof排队重算 | SQLite及真实PG稀疏H1撤销/幂等/恢复 | e529bb1通过；M1来源保留，作用区间审计，published/source同事务撤回 |
+| schema升级/回退守卫 | 真实am40→head→pending拒绝downgrade→am40→head | e529bb1完整回归通过 |
+| 旧应用回退接续 | 真131bf3c publisher进程→新候选再接续、保留additive schema | 682818d复核通过，独立schema，不同时启动两个版本拥有者 |
+| 图表/CSV/MCP/告警消费者一致、告警防重与新鲜度 | 已保留P0报告；优化版scripts冻结 | 新候选高周期oracle、ASGI/TCP、330秒观察、10唯一trigger验收待执行 |
+| 实际网页、原生双图、save/reload、完整API lifespan | owned镜像已build、隔离TLS/login/网络Compose已校验 | 优化版尚未运行；不得把build/config当部署或验收 |
 
-真实供应商可用性、行情确认质量和三层就绪合同仍按三层方案验收。本任务合成负载不证明十个真实品种或来源 SLA。
+完整回归仅证明实际已执行测试范围。当前旧候选12×300秒长测继续，原始失败数值不会删除或替换。r2会在其结束并停止PG后，使用独立project/网络/卷/数据库/port19643进行回归和新测量；冻结门槛不变。全部开发/验收在Ubuntu本机，未推送、未生产部署。
 
-
-接续补测（`d362766`之后新增，2026-10-07）：`supplemental_probe.py`已完成完整持久bar指纹、每身份两类输入及混合负载，结果见supplemental-report.md；`audit_supplemental.py`已通过原始事件分母、90目标、锁采样和300秒范围审核。`network_alert_probe.py`与`run_network_alert.py`已完成实际TCP API、发布循环和每秒告警step并发，十个新分钟各一个signal且无重复；network-alert-report.md保留超时指标及采样/SQL归因限制。它不包含provider lifespan、完整网页/浏览器或高周期触发合同。
-
-
-网页补充：browser-report.md对应真实产品构建/原生库/Ubuntu PG/完整API lifespan六步骤，原始请求及CPU采样可审计。API与publisher外部网络隔离，固定历史/收盘告警可stale；不证明成功供应商线程负载或持续实时新鲜度。仍待新主线完整正确性与三重复验收。
-
-外部锁补充：lock-contention-report.md已实测独立PG事务持有BTCUSDT品种行锁3.066秒，真实publish_once等锁3.275秒、30个明确blocker样本；另身份已发布读取可继续、释放后轮转恢复且完整快照稳定。人工单锁不证明生产锁频率、多锁顺序、世代并发或调度门槛通过；合并后的锁顺序/事务预算回归仍需验证。
-
-高周期独立计算补充：high-period-report.md已完成十身份M30/W1/MN四阶段120案例，图表/CSV/MCP SDK各152页和告警stored_rows全量核对；独立预期不用产品聚合/快照函数，变化覆盖包括open/close/extrema/volume/volume_complete/revision/observed_at。最终实际PG20,014行快照可离线重算，12种副本破坏被拒绝；重复输入包含行revision和publication可见元信息的指纹相同。M15/D1为输入，仍不证明M1生成、DST/节假日、evaluate触发、覆盖撤回或并发世代。
-
-持续观察补充：observation-alert-report.md已完成330秒、50/50准确同价新观察→发布→intrabar告警sequence推进，十个stale→ready且末次标记一致、零新增signal/源修订变化。提交可见与可见判断的p95/p99仍超冻结目标；采样有不确定性，未把功能路径通过当性能达标。仅同一完成M1的样本标记，无新分钟/上游/API/lifespan/网络/浏览器或通知，不替代触发、防丢并发和容量验收。
-
-既有定向回归：Ubuntu隔离probe同五文件85 passed、0 failed（15.20秒）；宿主venv缺yfinance导致的82/3失败明确保留为环境问题。命令、原始输出及限制见[收口审计](premerge-closeout.md)。
+历史合并前证据及局限保留在原报告：[合并前收口](premerge-closeout.md)、[PG基线](pg-baseline-report.md)、[高周期oracle](high-period-report.md)、[真实网页P0](browser-report.md)、[持续观察P0](observation-alert-report.md)。这些不能替代优化后候选验收。
