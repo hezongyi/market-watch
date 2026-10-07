@@ -19,3 +19,14 @@ r4完整后端1374 passed/2 skipped，相关119 passed。micro evaluate p95/p99 
 ruff、编译、diff whitespace通过。真实PG新增提交/回滚/savepoint与scan-to-wait/reconnect测试已写，尚未运行；新完整回归及容量、空闲SQL、310输入、告警/TCP/浏览器全部待新冻结运行。新增notify SQL及listener连接成本计入实际结果，不能以设计估算宣布通过。
 
 下一候选只在Ubuntu独立project、网络、volume、数据库和端口运行，并等待原r4驱动停止。新发布路径改变，需要新12×300秒性能套件及同消费者验证，不能复用r3c吞吐/等待作为新代码通过。完整回归/性能/消费者/浏览器串行执行，预计完成时间须按启动和真实结果更新。
+
+20:02 SGT实际运行：冻结ccb2a12，源码 `/home/quant/repos/market-watch-issue13-r5-acceptance`，driver `/tmp/mw-issue13-r5-driver.py`、PID1126319。Ubuntu独立project `mw-issue13-optimized-r5`、PG127.0.0.1:19693、Compose `optimized-r5.compose.yaml`，PG0.75CPU/512MiB、probe0.75CPU/768MiB；状态 `results/optimized-r5/validation-state.json`。完整验证预计22:00–22:30 SGT，以实测通过为前提。浏览器https://192.168.7.232:19635及chart :19636尚未启动，不能当作在线交付。
+
+启动/停止（在主工作树执行；测量中由driver独占管理，勿手工停止）：
+
+```bash
+sg docker -c 'docker compose --env-file /tmp/market-watch-issue13-optimized-r5.env -p mw-issue13-optimized-r5 -f docs/verification/issue-13/optimized-r5.compose.yaml up -d --wait postgres'
+sg docker -c 'docker compose --env-file /tmp/market-watch-issue13-optimized-r5.env -p mw-issue13-optimized-r5 -f docs/verification/issue-13/optimized-r5.compose.yaml stop postgres'
+```
+
+私有env/TLS/login不进仓库。停止保留本任务volume和失败证据，不删除其他实例、不全局清理、不在unraid开发验收。
