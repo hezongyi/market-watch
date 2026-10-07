@@ -11,6 +11,7 @@ from sqlalchemy import (
     Index,
     LargeBinary,
     Numeric,
+    Sequence,
     String,
     UniqueConstraint,
     create_engine,
@@ -1073,6 +1074,38 @@ class MarketCoverage(Base):
     queried_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
 
 
+class MarketCoverageCheckpoint(Base):
+    """Per actual identity proof migration, fenced by the Instrument row lock."""
+    __tablename__ = "market_coverage_checkpoints"
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
+    source: Mapped[str] = mapped_column(String(32), primary_key=True)
+    basis: Mapped[str] = mapped_column(String(16), primary_key=True)
+    phase: Mapped[str] = mapped_column(String(20), default="structured", server_default="structured")
+    structured_cursor: Mapped[str] = mapped_column(String(40), default="", server_default="")
+    audit_cursor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    complete: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    version: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+
+
+class MarketCoverageProjection(Base):
+    """Disjoint whole-minute proof intervals; raw proof/audit rows remain intact."""
+    __tablename__ = "market_coverage_projection"
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
+    source: Mapped[str] = mapped_column(String(32), primary_key=True)
+    basis: Mapped[str] = mapped_column(String(16), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    end: Mapped[int] = mapped_column(BigInteger)
+
+
+class MarketCoverageQuarantine(Base):
+    __tablename__ = "market_coverage_quarantine"
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
+    source: Mapped[str] = mapped_column(String(32), primary_key=True)
+    basis: Mapped[str] = mapped_column(String(16), primary_key=True)
+    record_id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    reason: Mapped[str] = mapped_column(String(40))
+
+
 class MarketCatalog(Base):
     __tablename__ = "market_instrument_catalog"
     id: Mapped[str] = mapped_column(String(80), primary_key=True)
@@ -1166,6 +1199,26 @@ class ChartPublicationJob(Base):
     end: Mapped[int] = mapped_column(BigInteger)
 
 
+PUBLICATION_SERVICE_SEQUENCE = Sequence('chart_publication_service_seq', metadata=Base.metadata)
+
+
+class ChartPublicationState(Base):
+    """Durable requests for one registered instrument/period, never display symbols."""
+    __tablename__ = "chart_publication_state"
+    __table_args__ = (Index("ix_publication_state_ready", "next_at", "last_service_seq"),)
+    instrument_id: Mapped[str] = mapped_column(ForeignKey("instruments.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(8), primary_key=True)
+    requested: Mapped[int] = mapped_column(BigInteger, default=1, server_default="1")
+    processed: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    reasons: Mapped[int] = mapped_column(default=1, server_default="1")
+    requested_at: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    served_at: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    last_service_seq: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    next_at: Mapped[int | None] = mapped_column(BigInteger, default=0)
+    attempts: Mapped[int] = mapped_column(default=0, server_default="0")
+    blocked_reason: Mapped[str | None] = mapped_column(String(40))
+
+
 class ProviderDataset(Base):
     """Native provider cache identity and proven ranges, never managed coverage."""
     __tablename__ = "provider_datasets"
@@ -1249,10 +1302,22 @@ class ChartViewportDemand(Base):
     expires: Mapped[int] = mapped_column(BigInteger, index=True)
 
 
+AGGREGATION_SERVICE_SEQUENCE = Sequence('chart_aggregation_service_seq', metadata=Base.metadata)
+
+
+class ChartAggregationState(Base):
+    """Durable service order for an identity/period across all its queued slices."""
+    __tablename__ = 'chart_aggregation_state'
+    instrument_id: Mapped[str] = mapped_column(ForeignKey('instruments.id'), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(8), primary_key=True)
+    last_service_seq: Mapped[int] = mapped_column(BigInteger, default=0, server_default='0')
+
+
 class ChartAggregationJob(Base):
     __tablename__ = 'chart_aggregation_jobs'
     kind: Mapped[str] = mapped_column(String(8), default='price', server_default='price')
-    __table_args__ = (UniqueConstraint('instrument_id', 'timeframe', 'start', 'end'),)
+    __table_args__ = (UniqueConstraint('instrument_id', 'timeframe', 'start', 'end'),
+                     Index('ix_aggregation_jobs_ready', 'next_at', 'instrument_id', 'timeframe'))
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     instrument_id: Mapped[str] = mapped_column(String(40), ForeignKey('instruments.id'))
     timeframe: Mapped[str] = mapped_column(String(8))

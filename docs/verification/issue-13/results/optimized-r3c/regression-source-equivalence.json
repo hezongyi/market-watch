@@ -1,0 +1,13 @@
+{
+  "regression_source": "8e06535",
+  "measurement_source": "61b9fc2",
+  "product_files": 173,
+  "product_bytes_equal": true,
+  "regression": {
+    "related_passed": 140,
+    "full_passed": 1371,
+    "full_skipped": 2
+  },
+  "prior_recovery_evidence": "../optimized-r3b",
+  "note": "Only evidence serialization/orchestration changed; no additional product mutation"
+}

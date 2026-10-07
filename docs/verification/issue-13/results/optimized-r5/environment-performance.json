@@ -1,0 +1,90 @@
+{
+  "at": "2026-10-07T12:40:34.400105+00:00",
+  "host": "quant-server",
+  "os": "PRETTY_NAME=\"Ubuntu 22.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"22.04\"\nVERSION=\"22.04.5 LTS (Jammy Jellyfish)\"\nVERSION_CODENAME=jammy\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=jammy\n",
+  "docker_os": "Ubuntu 22.04.5 LTS",
+  "project": "mw-issue13-optimized-r5",
+  "product_commit": "ccb2a12b47ea1c9fd06517c2ccf3dec670532ee4",
+  "validation": {
+    "stage": "performance",
+    "time_utc": "2026-10-07 12:16:18",
+    "pid": 1126319,
+    "source_commit": "ccb2a12b47ea1c9fd06517c2ccf3dec670532ee4"
+  },
+  "performance": {
+    "status": "running",
+    "current": "idle-2",
+    "pid": 1172558
+  },
+  "containers": [
+    {
+      "name": "mw-issue13-optimized-r5-measure",
+      "id": "23f39c7bcf8437a173d795475cffb618cdb7b24b5ea91546fdb88e57244c4536",
+      "image_id": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+      "created": "2026-10-07T12:37:45.345918259Z",
+      "service": "probe",
+      "compose_files": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/optimized-r5.compose.yaml",
+      "running": true,
+      "oom_killed": false,
+      "exit_code": 0,
+      "nano_cpus": 750000000,
+      "memory": 805306368,
+      "ports": {
+        "8000/tcp": null
+      },
+      "networks": [
+        "mw-issue13-optimized-r5_default"
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-issue13-r5-acceptance",
+          "Destination": "/workspace",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/results/optimized-r5-baseline",
+          "Destination": "/results",
+          "RW": true
+        }
+      ]
+    },
+    {
+      "name": "mw-issue13-optimized-r5-postgres-1",
+      "id": "9741e7dfb7c33718c0983bc737530ff16b0b149142eda0ca89ea5c6cd15a181f",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "created": "2026-10-07T12:01:13.858147052Z",
+      "service": "postgres",
+      "compose_files": "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/optimized-r5.compose.yaml",
+      "running": true,
+      "oom_killed": false,
+      "exit_code": 0,
+      "nano_cpus": 750000000,
+      "memory": 536870912,
+      "ports": {
+        "5432/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "19693"
+          }
+        ]
+      },
+      "networks": [
+        "mw-issue13-optimized-r5_default"
+      ],
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "mw-issue13-optimized-r5_pgdata",
+          "Source": "/var/lib/docker/volumes/mw-issue13-optimized-r5_pgdata/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "RW": true
+        }
+      ]
+    }
+  ],
+  "scope": "Read-only live task-owned inspect during performance; no environment, command, credential, or other task data; not final stopped-state evidence"
+}

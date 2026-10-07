@@ -1,0 +1,8 @@
+time="2026-10-07T01:00:17Z" level=warning msg="Found orphan containers ([mw-issue13-p0-web-1 mw-issue13-p0-api-1 mw-issue13-p0-chart-origin-1 mw-issue13-p0-publisher-1]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+canonical fixture restored
+Observation batch 1/5 committed for ten identities
+Observation batch 2/5 committed for ten identities
+Observation batch 3/5 committed for ten identities
+Observation batch 4/5 committed for ten identities
+Observation batch 5/5 committed for ten identities
+{"outcome": "passed", "duration": 330.00034503499046, "inputs": 50, "visible": 50, "judged": 50, "commit_to_visible_completed": {"p50": 16.902200132142752, "p95": 36.23354358179495, "p99": 40.4055459019728}, "visible_to_judged_completed": {"p50": 0.6802881970070302, "p95": 1.840258589014411, "p99": 2.399629407096654}, "errors": []}

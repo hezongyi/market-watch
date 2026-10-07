@@ -1,0 +1,77 @@
+{
+  "checked_utc": "2026-10-07T00:55:23Z",
+  "remote_main": "9670dae4ffa9d7917dfaf8c4331f1fad9830d56b",
+  "measured_baseline": "0591e56fb4a59de8e847c43a37b2d015ec2d5cf1",
+  "merged_prs": [
+    {
+      "number": 15,
+      "title": "Ubuntu Docker build lifecycle and disk monitoring",
+      "merged_at": "2026-10-07T00:46:29Z"
+    },
+    {
+      "number": 16,
+      "title": "v1.12.1 maintenance release",
+      "merged_at": "2026-10-07T00:51:34Z"
+    }
+  ],
+  "open_prs": [],
+  "three_layer_merged": false,
+  "changed_paths": [
+    ".dockerignore",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "README.md",
+    "deploy/advanced-chart-origin.md",
+    "deploy/releases/v1.12.1-source.json",
+    "deploy/ubuntu/README.md",
+    "deploy/ubuntu/bootstrap-builder.sh",
+    "deploy/ubuntu/buildkitd.toml",
+    "deploy/ubuntu/docker_guard.py",
+    "deploy/ubuntu/install.sh",
+    "deploy/ubuntu/market-watch-disk-check.service",
+    "deploy/ubuntu/market-watch-disk-check.timer",
+    "deploy/ubuntu/market-watch-disk-daily.service",
+    "deploy/ubuntu/market-watch-disk-daily.timer",
+    "deploy/ubuntu/market-watch-image-cleanup.service",
+    "deploy/ubuntu/market-watch-image-cleanup.timer",
+    "deploy/ubuntu/mw_docker.py",
+    "docs/ubuntu-docker-v1.12.1-source-delivery.md",
+    "docs/verification/ubuntu-docker-lifecycle/acceptance-20261007.md",
+    "docs/versioning.md",
+    "pyproject.toml",
+    "tests/ops/test_docker_lifecycle.py",
+    "web/package-lock.json",
+    "web/package.json"
+  ],
+  "identical_market_source_sha256": {
+    "backend/alerts/managed_dataset.py": {
+      "0591e56fb4a59de8e847c43a37b2d015ec2d5cf1": "79afcc77125e83689708421acbe7ede2b58a8e6fc3ee642ee0281aee6b544ace",
+      "9670dae4ffa9d7917dfaf8c4331f1fad9830d56b": "79afcc77125e83689708421acbe7ede2b58a8e6fc3ee642ee0281aee6b544ace"
+    },
+    "backend/alerts/chart_data.py": {
+      "0591e56fb4a59de8e847c43a37b2d015ec2d5cf1": "c0d956ae6d4e3d697ee7a824b1d6450e814352baa933e194ece44c6e1ccba6d5",
+      "9670dae4ffa9d7917dfaf8c4331f1fad9830d56b": "c0d956ae6d4e3d697ee7a824b1d6450e814352baa933e194ece44c6e1ccba6d5"
+    },
+    "backend/alerts/market.py": {
+      "0591e56fb4a59de8e847c43a37b2d015ec2d5cf1": "e0d57d7263577ae019de5a6b8e669227b67cb0af1f3ba2a74ae9a7d44b43e097",
+      "9670dae4ffa9d7917dfaf8c4331f1fad9830d56b": "e0d57d7263577ae019de5a6b8e669227b67cb0af1f3ba2a74ae9a7d44b43e097"
+    },
+    "backend/alerts/publication_jobs.py": {
+      "0591e56fb4a59de8e847c43a37b2d015ec2d5cf1": "0a26427e02154c96a994fc2eb2ebe2cf0ee1b9bbbf23982590936caadf22d2b0",
+      "9670dae4ffa9d7917dfaf8c4331f1fad9830d56b": "0a26427e02154c96a994fc2eb2ebe2cf0ee1b9bbbf23982590936caadf22d2b0"
+    },
+    "backend/alerts/bar_batch.py": {
+      "0591e56fb4a59de8e847c43a37b2d015ec2d5cf1": "398d2ab393f99cdfa6e7d965ed02295f99853430ea86d1fa26f3e29ede44b73c",
+      "9670dae4ffa9d7917dfaf8c4331f1fad9830d56b": "398d2ab393f99cdfa6e7d965ed02295f99853430ea86d1fa26f3e29ede44b73c"
+    },
+    "backend/alerts/chart_aggregation.py": {
+      "0591e56fb4a59de8e847c43a37b2d015ec2d5cf1": "381b4b95595bafcc0d9e37e2cdfb63077acbed55d225ad991b83e797f8a2e314",
+      "9670dae4ffa9d7917dfaf8c4331f1fad9830d56b": "381b4b95595bafcc0d9e37e2cdfb63077acbed55d225ad991b83e797f8a2e314"
+    },
+    "backend/alerts/storage.py": {
+      "0591e56fb4a59de8e847c43a37b2d015ec2d5cf1": "1e20527187502c092cdcf9e5ce0fa5f72e83c056b7e3bdd2be5f83472f5876a4",
+      "9670dae4ffa9d7917dfaf8c4331f1fad9830d56b": "1e20527187502c092cdcf9e5ce0fa5f72e83c056b7e3bdd2be5f83472f5876a4"
+    }
+  },
+  "scope": "Read-only fetch/version comparison; measured worktree remains on pre-three-layer baseline"
+}

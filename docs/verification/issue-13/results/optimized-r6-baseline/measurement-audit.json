@@ -1,0 +1,139 @@
+{
+  "complete": true,
+  "runs": [
+    {
+      "run": "idle-1",
+      "scenario": "idle",
+      "cpu_percent": 1.144596650459029,
+      "sql_per_second": 1.5438153296361197,
+      "audit_reads": 0,
+      "latency_p95": null,
+      "latency_p99": null,
+      "longest_runnable_wait": 0,
+      "backfill_bars_per_second": 0.0
+    },
+    {
+      "run": "idle-2",
+      "scenario": "idle",
+      "cpu_percent": 1.1523353790359647,
+      "sql_per_second": 1.5437504893972893,
+      "audit_reads": 0,
+      "latency_p95": null,
+      "latency_p99": null,
+      "longest_runnable_wait": 0,
+      "backfill_bars_per_second": 0.0
+    },
+    {
+      "run": "idle-3",
+      "scenario": "idle",
+      "cpu_percent": 1.1864023226992304,
+      "sql_per_second": 1.5422079636311077,
+      "audit_reads": 0,
+      "latency_p95": null,
+      "latency_p99": null,
+      "longest_runnable_wait": 0,
+      "backfill_bars_per_second": 0.0
+    },
+    {
+      "run": "live-1",
+      "scenario": "live",
+      "cpu_percent": 5.312893397683331,
+      "sql_per_second": 50.7768169401422,
+      "audit_reads": 0,
+      "latency_p95": 0.4235478909686208,
+      "latency_p99": 0.4306479608640075,
+      "longest_runnable_wait": 0.9694068692624569,
+      "backfill_bars_per_second": 0.16262919341571133
+    },
+    {
+      "run": "live-2",
+      "scenario": "live",
+      "cpu_percent": 5.614401588808621,
+      "sql_per_second": 50.64683531827391,
+      "audit_reads": 0,
+      "latency_p95": 0.4182613380253315,
+      "latency_p99": 0.4316231897100806,
+      "longest_runnable_wait": 1.2368522114120424,
+      "backfill_bars_per_second": 0.16288362631894338
+    },
+    {
+      "run": "live-3",
+      "scenario": "live",
+      "cpu_percent": 5.213044728569293,
+      "sql_per_second": 50.43577099977743,
+      "audit_reads": 0,
+      "latency_p95": 0.43570637609809637,
+      "latency_p99": 0.4822431281208992,
+      "longest_runnable_wait": 0.9923035888932645,
+      "backfill_bars_per_second": 0.1628139389280647
+    },
+    {
+      "run": "backfill-1",
+      "scenario": "backfill",
+      "cpu_percent": 35.28166420714983,
+      "sql_per_second": 192.09637533077324,
+      "audit_reads": 0,
+      "latency_p95": null,
+      "latency_p99": null,
+      "longest_runnable_wait": 5.632871686015278,
+      "backfill_bars_per_second": 2725.716934145051
+    },
+    {
+      "run": "backfill-2",
+      "scenario": "backfill",
+      "cpu_percent": 35.37978372746832,
+      "sql_per_second": 192.08962953372955,
+      "audit_reads": 0,
+      "latency_p95": null,
+      "latency_p99": null,
+      "longest_runnable_wait": 5.727834437042475,
+      "backfill_bars_per_second": 2726.046724821935
+    },
+    {
+      "run": "backfill-3",
+      "scenario": "backfill",
+      "cpu_percent": 35.41078469652993,
+      "sql_per_second": 191.55196914364322,
+      "audit_reads": 0,
+      "latency_p95": null,
+      "latency_p99": null,
+      "longest_runnable_wait": 5.750854145269841,
+      "backfill_bars_per_second": 2717.9921805636336
+    },
+    {
+      "run": "revision-1",
+      "scenario": "revision",
+      "cpu_percent": 4.290245449295687,
+      "sql_per_second": 33.29504850965343,
+      "audit_reads": 0,
+      "latency_p95": 0.12763597490265965,
+      "latency_p99": 0.16760537866503,
+      "longest_runnable_wait": 0.543520615901798,
+      "backfill_bars_per_second": 0.0
+    },
+    {
+      "run": "revision-2",
+      "scenario": "revision",
+      "cpu_percent": 4.2164283005445276,
+      "sql_per_second": 33.39096013240131,
+      "audit_reads": 0,
+      "latency_p95": 0.16154490783810616,
+      "latency_p99": 0.16705668391659856,
+      "longest_runnable_wait": 0.5711855138652027,
+      "backfill_bars_per_second": 0.0
+    },
+    {
+      "run": "revision-3",
+      "scenario": "revision",
+      "cpu_percent": 4.456720179783049,
+      "sql_per_second": 33.23429593111164,
+      "audit_reads": 0,
+      "latency_p95": 0.1618904429487884,
+      "latency_p99": 0.16461875708773732,
+      "longest_runnable_wait": 0.47636321978643537,
+      "backfill_bars_per_second": 0.0
+    }
+  ],
+  "missing": [],
+  "note": "Consistency audit. Performance thresholds and downstream correctness are separately assessed."
+}

@@ -1,0 +1,121 @@
+[
+  {
+    "id": "5b5b72d564259ae26a5ca9cb1559b0b049949d2a05ce3dd15b5342b47ac62c7d",
+    "name": "/buildx_buildkit_market-watch-ubuntu0",
+    "image": "sha256:cb5db47f0937991f7a4820b70b546b9c8721b1d0a368bc66d33ebfce08da78ce",
+    "status": "running",
+    "project": null
+  },
+  {
+    "id": "8222264b5bf512c0a3b32170b005dc58f62379cecf40acabc0e7642d006361a5",
+    "name": "/market-watch-three-layer-history-worker-1",
+    "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "status": "running",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "66d91b0bf383908dc92348957bc09d8ec81d0ce14e964b614ffaf0ae696167bd",
+    "name": "/market-watch-three-layer-composite-aggregate-worker-1",
+    "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "status": "running",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "025d2df59ca845e3daec8b6515073ea19b6a8edb1ad3838fd201014f8c5d0171",
+    "name": "/market-watch-three-layer-native-history-worker-1",
+    "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "status": "running",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "689a1333987dfad2f754b50e020c0468cb527b521008e49109219f0b16b137cc",
+    "name": "/market-watch-three-layer-chart-origin-1",
+    "image": "sha256:4abd9b251ae2dcec56ec20cb36bfd054e364c67cf5e5fdb985136af7e2f17eb2",
+    "status": "running",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "9a9387c6dccc7f3080fe4b52566bfebc30b6f35a61e6c1251c3c00587f0cace0",
+    "name": "/market-watch-three-layer-pricing-worker-1",
+    "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "status": "running",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "92645ab9bdac8699bed0a2db20fce3d0912ee6a67688e857b24159b2ab4f786b",
+    "name": "/market-watch-three-layer-api-1",
+    "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "status": "running",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "e344bdb3edfc767152b98dc81492757e6d01e75212bae1e9f42501c0cc705542",
+    "name": "/market-watch-three-layer-migrate-1",
+    "image": "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "status": "exited",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "6a89353acbde9ae333384305273c1932266a05479c637f6f6d3115dcca4277a5",
+    "name": "/market-watch-three-layer-web-1",
+    "image": "sha256:417b45c88cb7c26f7676b5afdba00b25a8309dd2c7c11d373151cfb205c4f23b",
+    "status": "running",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "623e8edcaed735fd481241376667aa0f1e41620e6987c3da5769da05817fc938",
+    "name": "/market-watch-three-layer-postgres-1",
+    "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "status": "running",
+    "project": "market-watch-three-layer"
+  },
+  {
+    "id": "030ca18b110041895ca674f57cd7476b80e1fcaf35e8563eaa0261a9bd0aef01",
+    "name": "/market-watch-data-integration-api-1",
+    "image": "sha256:1ff7548c52b3c25e3d0901abe10a5cfb50d3c063ae579774b77434926857e3d7",
+    "status": "running",
+    "project": "market-watch-data-integration"
+  },
+  {
+    "id": "a46a03670babb856ee8193a5c56e0288d7bb6fc8e749f1b111eb72928a701079",
+    "name": "/market-watch-data-integration-history-worker-1",
+    "image": "sha256:454f75edb49bbf76dcd96ab45f62f6e06ea824d2a406b6f03e3d809e10771417",
+    "status": "running",
+    "project": "market-watch-data-integration"
+  },
+  {
+    "id": "645b5113f1fcdaf80b5514b5cb0f2c319a281cb0844a1953f73640fd9af69786",
+    "name": "/market-watch-data-integration-oanda-worker-1",
+    "image": "sha256:4b052ec4b8e594252c12240048cb8105a7091e3485c36b3f22584824c183aac1",
+    "status": "running",
+    "project": "market-watch-data-integration"
+  },
+  {
+    "id": "bc909bee1879ef611a307af0f086168da2dcacd3e1b1f9502188bb9230c1a24d",
+    "name": "/market-watch-data-integration-aggregation-worker-1",
+    "image": "sha256:49239660cf653e3322818bd7f4a905430d97e0beb710e25db634ff6279b612ae",
+    "status": "running",
+    "project": "market-watch-data-integration"
+  },
+  {
+    "id": "47da0b29c3fd398c7fc67560efe8a83026f006d92467823b1ab6a58375908fb9",
+    "name": "/market-watch-data-integration-migrate-1",
+    "image": "sha256:1444bd2776f64c270384455aa7e14a701d14eb39f6e07ad01ad65efe02f00c7e",
+    "status": "exited",
+    "project": "market-watch-data-integration"
+  },
+  {
+    "id": "6f4e8e814bd29e04a8c90eabc3630804d9f92e33e18423f3b4a79cf9d7ddeed2",
+    "name": "/market-watch-data-integration-web-1",
+    "image": "sha256:417b45c88cb7c26f7676b5afdba00b25a8309dd2c7c11d373151cfb205c4f23b",
+    "status": "running",
+    "project": "market-watch-data-integration"
+  },
+  {
+    "id": "af4060babedbb6bbe0d9439795ed65ae2d5f7aae47557bead5d09a60240f70c8",
+    "name": "/market-watch-data-integration-postgres-1",
+    "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "status": "running",
+    "project": "market-watch-data-integration"
+  }
+]

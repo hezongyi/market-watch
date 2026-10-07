@@ -1,0 +1,6 @@
+{
+  "phase": "before UI navigation",
+  "reason": "cached headless-shell is host-specific wrapper with absolute executable path; explicit mounted Chromium executable fixes container launch",
+  "dotenv": "first attempt hash interpolation warnings redacted; private dotenv hash now single-quoted; no hash value committed",
+  "publisher_stop": "exit137 after default grace timeout, OOM status must be checked separately"
+}

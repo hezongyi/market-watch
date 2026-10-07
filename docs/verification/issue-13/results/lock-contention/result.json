@@ -1,0 +1,840 @@
+{
+  "outcome": "passed",
+  "scope": "One synthetic instrument-row lock, real publish_once, fixed fixture clock",
+  "locked_identity": "BTCUSDT",
+  "holder_pid": 60,
+  "worker_pid": 51,
+  "acquired_seconds": 0.2870921050198376,
+  "released_seconds": 3.3532366030849516,
+  "lock_hold_seconds": 3.066144498065114,
+  "control": {
+    "label": "unlocked control",
+    "target": [
+      "BTCUSDT",
+      "M1"
+    ],
+    "claim": true,
+    "start_seconds": 1.453794538974762e-06,
+    "end_seconds": 0.27075222600251436,
+    "duration_seconds": 0.2707514753565192
+  },
+  "blocked": {
+    "label": "external instrument lock",
+    "target": [
+      "BTCUSDT",
+      "M1"
+    ],
+    "claim": true,
+    "start_seconds": 0.28729372285306454,
+    "end_seconds": 3.562002379912883,
+    "duration_seconds": 3.2747090589255095
+  },
+  "lock_wait_samples": 30,
+  "samples": [
+    {
+      "at_seconds": 0.32100634509697556,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 0.4225407848134637,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 0.523794992826879,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 0.625272620934993,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 0.7265304019674659,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 0.8281231061555445,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 0.929083407856524,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.0299970488995314,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.1309022600762546,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.2319472287781537,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.3329622349701822,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.4337494461797178,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.53631661972031,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.637227863073349,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.7379533178173006,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.8387873489409685,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 1.9395784977823496,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.0404110001400113,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.141214945819229,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.241991356946528,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.3427686039358377,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.4436125429347157,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.5466648531146348,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.6475359220057726,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.7486065551638603,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.8494339240714908,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 2.9501782287843525,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 3.051028747111559,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 3.151857249904424,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    },
+    {
+      "at_seconds": 3.2526079630479217,
+      "publisher_done": false,
+      "activity": [
+        {
+          "pid": 51,
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "blocking_pids": [
+            60
+          ]
+        },
+        {
+          "pid": 60,
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "blocking_pids": []
+        }
+      ]
+    }
+  ],
+  "turns": [
+    {
+      "label": "unlocked control",
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "claim": true,
+      "start_seconds": 1.453794538974762e-06,
+      "end_seconds": 0.27075222600251436,
+      "duration_seconds": 0.2707514753565192
+    },
+    {
+      "label": "external instrument lock",
+      "target": [
+        "BTCUSDT",
+        "M1"
+      ],
+      "claim": true,
+      "start_seconds": 0.28729372285306454,
+      "end_seconds": 3.562002379912883,
+      "duration_seconds": 3.2747090589255095
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "BTCUSDT",
+        "M5"
+      ],
+      "claim": true,
+      "start_seconds": 3.562465025112033,
+      "end_seconds": 3.6980948420241475,
+      "duration_seconds": 0.13563034171238542
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "BTCUSDT",
+        "M15"
+      ],
+      "claim": true,
+      "start_seconds": 3.6980988760478795,
+      "end_seconds": 3.8431955398991704,
+      "duration_seconds": 0.14509743684902787
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "BTCUSDT",
+        "M30"
+      ],
+      "claim": true,
+      "start_seconds": 3.8432008558884263,
+      "end_seconds": 4.276295960880816,
+      "duration_seconds": 0.43309595296159387
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "BTCUSDT",
+        "H1"
+      ],
+      "claim": true,
+      "start_seconds": 4.276302163023502,
+      "end_seconds": 4.364649926777929,
+      "duration_seconds": 0.08834863174706697
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "BTCUSDT",
+        "H4"
+      ],
+      "claim": true,
+      "start_seconds": 4.364654649980366,
+      "end_seconds": 4.44870269484818,
+      "duration_seconds": 0.08404859807342291
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "BTCUSDT",
+        "D1"
+      ],
+      "claim": true,
+      "start_seconds": 4.448708305135369,
+      "end_seconds": 4.464780942071229,
+      "duration_seconds": 0.016073353588581085
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "BTCUSDT",
+        "W1"
+      ],
+      "claim": true,
+      "start_seconds": 4.464785412885249,
+      "end_seconds": 4.485409603919834,
+      "duration_seconds": 0.02062478195875883
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "BTCUSDT",
+        "MN"
+      ],
+      "claim": true,
+      "start_seconds": 4.48542201705277,
+      "end_seconds": 4.50476320181042,
+      "duration_seconds": 0.019341900944709778
+    },
+    {
+      "label": "normal rotation after release",
+      "target": [
+        "EURUSD",
+        "M1"
+      ],
+      "claim": true,
+      "start_seconds": 4.5047685988247395,
+      "end_seconds": 4.704167507123202,
+      "duration_seconds": 0.1993996980600059
+    }
+  ],
+  "other_identity": {
+    "identity": "EURUSD",
+    "pg_read_seconds": 0.015534786973148584,
+    "row_count": 10,
+    "payload_sha256": "b0ef5843198f2e330a01e0f90635b9279a1ec8cd136aac5e5c8713a99ed888fd",
+    "first_publisher_turn_seconds": 4.5047685988247395,
+    "first_publisher_completion_seconds": 4.704167507123202
+  },
+  "full_bar_sha256": "abbae79d3c6e07282d45137ace65099ef3e792c4f1bd1d438a337108279be287",
+  "full_bar_rows": 26290,
+  "visible_metadata_unchanged": true,
+  "source_sha256": {
+    "/workspace/docs/verification/issue-13/lock_contention_probe.py": "80fe912e66d408f735bd3610a1186476fb7b9790191117f3c04d2a5899be6fc0",
+    "backend/alerts/managed_dataset.py": "79afcc77125e83689708421acbe7ede2b58a8e6fc3ee642ee0281aee6b544ace",
+    "docs/verification/issue-13/pg_baseline.py": "9fb438e22cdc112964254be6fa83a3562e84a277b3b48e7618648adc6b519703"
+  },
+  "limitations": [
+    "Single forced 3-second lock; not natural contention frequency or production cost",
+    "Read checks PG snapshot only; no HTTP/API/alert/provider/browser workload",
+    "Fixed-clock idle payload stability; no concurrent source revisions or new generations",
+    "Healthy target latency includes normal nine-period rotation and host scheduling"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "runs": {
+    "idle": {
+      "cycles": 1065,
+      "targets": 90,
+      "lock_samples": 589,
+      "inputs": 0,
+      "visible": 0
+    },
+    "mixed": {
+      "cycles": 1057,
+      "targets": 90,
+      "lock_samples": 587,
+      "inputs": 20,
+      "visible": 20
+    }
+  },
+  "host": {
+    "idle": {
+      "samples": 25,
+      "busy_percent": 72.72348475378551,
+      "steal_percent": 3.4834204188438043,
+      "swap_in": 14,
+      "swap_out": 0
+    },
+    "mixed": {
+      "samples": 26,
+      "busy_percent": 56.09352914400709,
+      "steal_percent": 4.1797433378852125,
+      "swap_in": 18,
+      "swap_out": 0
+    }
+  }
+}

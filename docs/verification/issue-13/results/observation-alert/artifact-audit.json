@@ -1,0 +1,97 @@
+{
+  "passed": true,
+  "input_denominator": 50,
+  "exact_visible": 50,
+  "exact_judged": 50,
+  "missing_exact_visible": 0,
+  "missing_exact_judged": 0,
+  "lifecycle": [
+    {
+      "instrument": "BTCUSDT",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.307,
+      "first_recovered": 249.23887052107602,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "EURUSD",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.369,
+      "first_recovered": 252.97407420584932,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "SYNTH00",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.29,
+      "first_recovered": 256.53932702867314,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "SYNTH01",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.275,
+      "first_recovered": 258.93810790171847,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "SYNTH02",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.258,
+      "first_recovered": 261.5445745298639,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "SYNTH03",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.239,
+      "first_recovered": 264.2100266381167,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "SYNTH04",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.224,
+      "first_recovered": 266.5210884818807,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "SYNTH05",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.202,
+      "first_recovered": 237.53628097800538,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "SYNTH06",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.183,
+      "first_recovered": 240.0930259609595,
+      "latest_marker_confirmed": true
+    },
+    {
+      "instrument": "XAUUSD",
+      "first_stale": 221.3699139249511,
+      "age_at_stale_seconds": 121.328,
+      "first_recovered": 243.92796547384933,
+      "latest_marker_confirmed": true
+    }
+  ],
+  "timeline_samples": 1187,
+  "negative_observed_judgment_delays": 0,
+  "commit_to_visible": {
+    "p50": 16.902200132142752,
+    "p95": 36.23354358179495,
+    "p99": 40.4055459019728
+  },
+  "visible_to_judged": {
+    "p50": 0.6802881970070302,
+    "p95": 1.840258589014411,
+    "p99": 2.399629407096654
+  },
+  "scope": "Full 330s timeline, all 50 exact markers, ten stale/recovery lifecycles, latest-marker propagation",
+  "limitations": [
+    "Sequential read-committed samples cannot prove exact commit-to-commit ordering or SLA",
+    "No price crossing events; zero signal counts prove no spurious trigger in this fixed condition only"
+  ]
+}

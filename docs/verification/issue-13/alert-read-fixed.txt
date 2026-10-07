@@ -1,0 +1,16 @@
+{
+  "scenario": "published_alert",
+  "rows": 60,
+  "staging_correction_hidden": true,
+  "stored_rows_queries": {
+    "sql": 5,
+    "published_reads": 1
+  },
+  "evaluate_queries": {
+    "sql": 22,
+    "published_reads": 3
+  },
+  "evaluate_repetitions": 3,
+  "elapsed": 0.03340142499655485,
+  "scope": "SQLite logic and duplicate read evidence only; not PostgreSQL CPU attribution"
+}

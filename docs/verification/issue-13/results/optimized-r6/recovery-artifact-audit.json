@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "product_commit": "bcaefcf33d14c4be150e8d2d6e886329cdae74d7",
+  "checks": [
+    "precommit kill/restart",
+    "old application additive-schema rollback",
+    "postcommit kill/absent notification/idempotent restart",
+    "62522/27939 proof replay",
+    "90-target concurrent lock/retry/backfill wait and historical progress"
+  ],
+  "complete_acceptance": false,
+  "scope": "Final contracts only; final delivery/environment audit remains separate"
+}

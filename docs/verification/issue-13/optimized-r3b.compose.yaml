@@ -1,0 +1,37 @@
+# Isolated optimized candidate and PostgreSQL acceptance database.
+services:
+  postgres:
+    image: ${ISSUE13_PG_IMAGE:?set fixed image ID}
+    pull_policy: never
+    environment:
+      POSTGRES_USER: issue13
+      POSTGRES_DB: issue13
+      POSTGRES_PASSWORD: ${ISSUE13_PG_PASSWORD:?set private password}
+    ports: ["127.0.0.1:19663:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    cpus: 0.75
+    mem_limit: 512m
+    shm_size: 128m
+    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "max_connections=20", "-c", "shared_preload_libraries=pg_stat_statements", "-c", "track_io_timing=on"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U issue13 -d issue13"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  probe:
+    profiles: [tools]
+    image: ${ISSUE13_PROBE_IMAGE:?set fixed dependency image ID}
+    pull_policy: never
+    user: "1000:1000"
+    working_dir: /workspace
+    environment:
+      PYTHONPATH: /workspace/backend
+      ALERTS_DATABASE_URL: postgresql+psycopg://issue13:${ISSUE13_PG_PASSWORD}@postgres:5432/issue13
+      ALERTS_FX_SOURCE: oanda
+    volumes:
+      - ${ISSUE13_SOURCE:?set candidate source worktree}:/workspace:ro
+      - ${ISSUE13_RESULTS:?set independent results directory}:/results
+    cpus: 0.75
+    mem_limit: 768m
+volumes:
+  pgdata:

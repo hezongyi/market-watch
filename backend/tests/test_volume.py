@@ -373,7 +373,9 @@ def test_confirmed_old_snapshot_volume_publishes_without_current_coverage(databa
         row.volume = D(2)
         db.add(ChartPublicationJob(instrument_id=inst.id, timeframe='M1', start=0, end=60000))
         db.flush()
-        assert not publish_frame(db, inst, plan, 'M1', 305000)
+        result = publish_frame(db, inst, plan, 'M1', 305000)
+        assert result.snapshot_changed and result.task_progressed
+        assert result.blocked_reason == "coverage"
         assert old.payload['volume'] == '2' and old.payload['volume_complete']
         assert old.complete and (pub.start, pub.end, pub.complete_count) == (0, 60000, 1)
         assert db.scalar(select(ChartPublicationJob.start)) is None

@@ -1,0 +1,16 @@
+{
+  "base_image": "node@sha256:89b30bf5b6a8d1d0c7f0b1b77e12794a81924120740a724cd73bb270d3528f6c",
+  "rootfs_archive_sha256": "065a0f5bef3b4bea6e987332ab8bc6954184ac5bd929b8e41f51d9fdcd3bdfdf",
+  "rootfs_scope": "Own stopped docker create from existing node image, exported then exact container removed; private tar not committed",
+  "build_tool": "mw-docker / dedicated market-watch-ubuntu BuildKit; task issue13-browser-baseline, project mw-issue13-p0",
+  "build_failures": [
+    "Image ID used as BuildKit FROM resolved as a registry name and timed out; replaced by exported local rootfs",
+    "Four apt package names mistakenly capitalized X; corrected to Debian lowercase names before rebuild"
+  ],
+  "frontend_build": "VITE_ADVANCED_CHART_ORIGIN=http://192.168.7.232:19616 npm run build --prefix web; succeeded",
+  "licensed_asset_build": "Private copy of permitted charting_library from chart-sync worktree; task-source patch-native-reserve and build-assets; no license assets committed",
+  "credentials": "Private random browser login and bcrypt-independent Argon2 hash; dotenv hash single-quoted, never committed",
+  "browser_image": "sha256:098e9a4c9963bb9aab42332d634957fcd776676a601b1ba6d95abec806efdfba",
+  "browser_smoke": "Own Compose browser run, explicit mounted Chromium executable, about:blank, version153.0.8010.12, exit0",
+  "frontend_final_build": "VITE_ADVANCED_CHART_ORIGIN=https://192.168.7.232:19616 npm run build --prefix web; succeeded; task dist permissions755/644"
+}

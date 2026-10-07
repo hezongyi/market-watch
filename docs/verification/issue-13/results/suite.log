@@ -1,0 +1,64 @@
+START idle-1
+canonical fixture restored
+
+{"scenario": "idle", "repetition": 1, "cycles": 625, "process_cpu_percent": 24.62902953695361, "queries": {"total": 11106, "coverage_reads": 1666, "candle_reads": 1668, "audit_reads": 201}, "latency_p95": null, "longest_target_wait": 51.757298880722374}
+
+START idle-2
+canonical fixture restored
+
+{"scenario": "idle", "repetition": 2, "cycles": 659, "process_cpu_percent": 25.854150202820325, "queries": {"total": 11720, "coverage_reads": 1756, "candle_reads": 1758, "audit_reads": 225}, "latency_p95": null, "longest_target_wait": 50.05688125919551}
+
+START idle-3
+canonical fixture restored
+
+{"scenario": "idle", "repetition": 3, "cycles": 688, "process_cpu_percent": 27.628834502917048, "queries": {"total": 12229, "coverage_reads": 1834, "candle_reads": 1836, "audit_reads": 225}, "latency_p95": null, "longest_target_wait": 46.50005695782602}
+
+START live-1
+canonical fixture restored
+
+{"scenario": "live", "repetition": 1, "cycles": 643, "process_cpu_percent": 28.324048419018002, "queries": {"total": 13510, "audit_reads": 235, "coverage_reads": 1801, "candle_reads": 1986, "publication_updates": 629, "snapshot_insert_statements": 120}, "latency_p95": 38.98209354002029, "longest_target_wait": 45.16416568309069}
+
+START live-2
+canonical fixture restored
+
+{"scenario": "live", "repetition": 2, "cycles": 489, "process_cpu_percent": 23.078239908791254, "queries": {"total": 10576, "audit_reads": 184, "coverage_reads": 1389, "candle_reads": 1555, "publication_updates": 505, "snapshot_insert_statements": 111}, "latency_p95": 41.973872715141624, "longest_target_wait": 73.96701255487278}
+
+START live-3
+canonical fixture restored
+
+{"scenario": "live", "repetition": 3, "cycles": 523, "process_cpu_percent": 24.59858821794006, "queries": {"total": 11219, "audit_reads": 184, "coverage_reads": 1481, "candle_reads": 1647, "publication_updates": 538, "snapshot_insert_statements": 122}, "latency_p95": 45.08587181381881, "longest_target_wait": 82.15319006284699}
+
+START backfill-1
+canonical fixture restored
+
+{"scenario": "backfill", "repetition": 1, "cycles": 442, "process_cpu_percent": 21.725493389923983, "queries": {"total": 8635, "coverage_reads": 1122, "candle_reads": 1326, "snapshot_insert_statements": 199, "publication_updates": 398, "audit_reads": 136}, "latency_p95": null, "longest_target_wait": 72.60688314214349}
+
+START backfill-2
+canonical fixture restored
+
+{"scenario": "backfill", "repetition": 2, "cycles": 398, "process_cpu_percent": 20.015817466696472, "queries": {"total": 7835, "coverage_reads": 1014, "candle_reads": 1194, "snapshot_insert_statements": 190, "publication_updates": 380, "audit_reads": 135}, "latency_p95": null, "longest_target_wait": 73.04766376595944}
+
+START backfill-3
+canonical fixture restored
+
+{"scenario": "backfill", "repetition": 3, "cycles": 319, "process_cpu_percent": 16.923184453539363, "queries": {"total": 6356, "coverage_reads": 817, "candle_reads": 957, "snapshot_insert_statements": 172, "publication_updates": 344, "audit_reads": 105}, "latency_p95": null, "longest_target_wait": 107.5777498348616}
+
+START revision-1
+canonical fixture restored
+
+{"scenario": "revision", "repetition": 1, "cycles": 562, "process_cpu_percent": 30.765168142996426, "queries": {"total": 13340, "audit_reads": 220, "coverage_reads": 1665, "candle_reads": 1947, "publication_updates": 533}, "latency_p95": 53.014919721055776, "longest_target_wait": 73.88423261977732}
+
+START revision-2
+canonical fixture restored
+
+{"scenario": "revision", "repetition": 2, "cycles": 976, "process_cpu_percent": 43.433863688369726, "queries": {"total": 21092, "audit_reads": 345, "coverage_reads": 2776, "candle_reads": 3071, "publication_updates": 819}, "latency_p95": 25.275813492946327, "longest_target_wait": 31.71878624195233}
+
+START revision-3
+canonical fixture restored
+
+{"scenario": "revision", "repetition": 3, "cycles": 970, "process_cpu_percent": 42.72889029044342, "queries": {"total": 20958, "audit_reads": 345, "coverage_reads": 2757, "candle_reads": 3051, "publication_updates": 811}, "latency_p95": 24.943081823643297, "longest_target_wait": 29.92143800202757}
+
+SUITE COMPLETE
+ Container mw-issue13-p0-postgres-1  Stopping
+ Container mw-issue13-p0-postgres-1  Stopped
+Own PostgreSQL stopped; fixture volume retained

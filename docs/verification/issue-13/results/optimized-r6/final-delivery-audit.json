@@ -1,0 +1,26 @@
+{
+  "application_implementation_and_acceptance_complete": true,
+  "complete_acceptance": true,
+  "merge_commit": "63bad46122c69977400d538c4b949eb4467c9aab",
+  "frozen_commit": "bcaefcf33d14c4be150e8d2d6e886329cdae74d7",
+  "time_utc": "2026-10-07 14:31:53",
+  "numeric_gate_count": 79,
+  "numeric_all_pass": true,
+  "missing": [],
+  "all_175_product_migration_files_match": true,
+  "independent_consumer_and_recovery_audits_passed": true,
+  "private_credential_and_key_scan_passed": true,
+  "private_env_mode": "0600",
+  "stopped_owned_services": 5,
+  "push_performed": false,
+  "production_deployment_performed": false,
+  "resource_retirement_complete": false,
+  "resource_retirement_followup": "Installed mw-docker rejects sha256-ID pinned PG in preview. No apply/deletion; owned stopped containers and evidence volume retained. Requires infrastructure compatibility follow-up before verified-backup retirement.",
+  "limitations": [
+    "1389 backend tests passed, 2 optional/tool dependency skips retained",
+    "Publisher-only repeated performance evidence explicitly inherited from byte-equal r5 components; all r6 consumers/recovery measured anew",
+    "Synthetic Ubuntu workload, recorded host contention; no supplier I/O, production SLA or external notification delivery certification"
+  ],
+  "scanned_delivery_file_count": 66,
+  "reviewed_screenshot": "browser/product.png"
+}

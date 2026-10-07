@@ -1,0 +1,571 @@
+{
+  "results": [
+    {
+      "name": "idle_cpu_percent",
+      "value": 1.161111450731408,
+      "limit": 5,
+      "passed": true,
+      "scope": "3x300s mean, single-core percent"
+    },
+    {
+      "name": "idle_cpu_reduction",
+      "value": 0.9719796069393443,
+      "limit": 0.8,
+      "passed": true,
+      "scope": "versus frozen v1.14 mean; recorded host contention"
+    },
+    {
+      "name": "idle_sql_per_second",
+      "value": 1.5432575698053796,
+      "limit": 2,
+      "passed": true,
+      "scope": "Timed worker SQL, maintenance separately recorded"
+    },
+    {
+      "name": "idle_sql_reduction",
+      "value": 0.9770601025203692,
+      "limit": 0.9,
+      "passed": true,
+      "scope": "versus frozen v1.14 mean"
+    },
+    {
+      "name": "live_1_m1_p95_seconds",
+      "value": 0.4235478909686208,
+      "limit": 15,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "live_1_m1_p99_seconds",
+      "value": 0.4306479608640075,
+      "limit": 30,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "live_1_unpublished_before_final30s",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Final30s truncation excluded"
+    },
+    {
+      "name": "live_2_m1_p95_seconds",
+      "value": 0.4182613380253315,
+      "limit": 15,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "live_2_m1_p99_seconds",
+      "value": 0.4316231897100806,
+      "limit": 30,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "live_2_unpublished_before_final30s",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Final30s truncation excluded"
+    },
+    {
+      "name": "live_3_m1_p95_seconds",
+      "value": 0.43570637609809637,
+      "limit": 15,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "live_3_m1_p99_seconds",
+      "value": 0.4822431281208992,
+      "limit": 30,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "live_3_unpublished_before_final30s",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Final30s truncation excluded"
+    },
+    {
+      "name": "revision_1_m1_p95_seconds",
+      "value": 0.12763597490265965,
+      "limit": 15,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "revision_1_m1_p99_seconds",
+      "value": 0.16760537866503,
+      "limit": 30,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "revision_1_unpublished_before_final30s",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Final30s truncation excluded"
+    },
+    {
+      "name": "revision_2_m1_p95_seconds",
+      "value": 0.16154490783810616,
+      "limit": 15,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "revision_2_m1_p99_seconds",
+      "value": 0.16705668391659856,
+      "limit": 30,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "revision_2_unpublished_before_final30s",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Final30s truncation excluded"
+    },
+    {
+      "name": "revision_3_m1_p95_seconds",
+      "value": 0.1618904429487884,
+      "limit": 15,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "revision_3_m1_p99_seconds",
+      "value": 0.16461875708773732,
+      "limit": 30,
+      "passed": true,
+      "scope": "Completed input\u2192M1 visibility"
+    },
+    {
+      "name": "revision_3_unpublished_before_final30s",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Final30s truncation excluded"
+    },
+    {
+      "name": "idle_1_runnable_wait_seconds",
+      "value": 0,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "idle_1_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "idle_2_runnable_wait_seconds",
+      "value": 0,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "idle_2_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "idle_3_runnable_wait_seconds",
+      "value": 0,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "idle_3_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "live_1_runnable_wait_seconds",
+      "value": 0.9694068692624569,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "live_1_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "live_2_runnable_wait_seconds",
+      "value": 1.2368522114120424,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "live_2_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "live_3_runnable_wait_seconds",
+      "value": 0.9923035888932645,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "live_3_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "backfill_1_runnable_wait_seconds",
+      "value": 5.632871686015278,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "backfill_1_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "backfill_2_runnable_wait_seconds",
+      "value": 5.727834437042475,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "backfill_2_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "backfill_3_runnable_wait_seconds",
+      "value": 5.750854145269841,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "backfill_3_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "revision_1_runnable_wait_seconds",
+      "value": 0.543520615901798,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "revision_1_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "revision_2_runnable_wait_seconds",
+      "value": 0.5711855138652027,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "revision_2_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "revision_3_runnable_wait_seconds",
+      "value": 0.47636321978643537,
+      "limit": 10,
+      "passed": true,
+      "scope": "Durable runnable target wait, quiet targets excluded"
+    },
+    {
+      "name": "revision_3_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "Original censored intervals retained; supplementary same-scenario stop-input drain required"
+    },
+    {
+      "name": "backfill_1_absolute_bars_per_second",
+      "value": 2725.716934145051,
+      "limit": 660.52,
+      "passed": true,
+      "scope": "New effective published bars only"
+    },
+    {
+      "name": "backfill_1_relative_throughput",
+      "value": 1.8665036198801097,
+      "limit": 0.8,
+      "passed": true,
+      "scope": "Same seeded fixture and quota; host contention recorded"
+    },
+    {
+      "name": "backfill_2_absolute_bars_per_second",
+      "value": 2726.046724821935,
+      "limit": 660.52,
+      "passed": true,
+      "scope": "New effective published bars only"
+    },
+    {
+      "name": "backfill_2_relative_throughput",
+      "value": 1.9017192324306362,
+      "limit": 0.8,
+      "passed": true,
+      "scope": "Same seeded fixture and quota; host contention recorded"
+    },
+    {
+      "name": "backfill_3_absolute_bars_per_second",
+      "value": 2717.9921805636336,
+      "limit": 660.52,
+      "passed": true,
+      "scope": "New effective published bars only"
+    },
+    {
+      "name": "backfill_3_relative_throughput",
+      "value": 1.962938071401387,
+      "limit": 0.8,
+      "passed": true,
+      "scope": "Same seeded fixture and quota; host contention recorded"
+    },
+    {
+      "name": "asgi_p95_ms",
+      "value": 48.67155198007822,
+      "limit": 100,
+      "passed": true,
+      "scope": "Authenticated 10 identities\u00d74 periods\u00d73 repetitions"
+    },
+    {
+      "name": "asgi_p99_ms",
+      "value": 135.9054739587009,
+      "limit": 200,
+      "passed": true,
+      "scope": "Authenticated 10 identities\u00d74 periods\u00d73 repetitions"
+    },
+    {
+      "name": "evaluate_p95_ms",
+      "value": 16.337567940354347,
+      "limit": 200,
+      "passed": true,
+      "scope": "Authenticated 10 identities\u00d74 periods\u00d73 repetitions"
+    },
+    {
+      "name": "evaluate_p99_ms",
+      "value": 29.258589260280132,
+      "limit": 350,
+      "passed": true,
+      "scope": "Authenticated 10 identities\u00d74 periods\u00d73 repetitions"
+    },
+    {
+      "name": "fairness_90_targets_first_service_seconds",
+      "value": 4.417235957924277,
+      "limit": 10,
+      "passed": true,
+      "scope": "Ten explicit synthetic identities, nine periods, continuous focused input"
+    },
+    {
+      "name": "fairness_90_targets_sustained_wait_seconds",
+      "value": 5.4129929430782795,
+      "limit": 10,
+      "passed": true,
+      "scope": "All 90 targets remain runnable; repeated service and unserved ages included"
+    },
+    {
+      "name": "mixed_input_p95_seconds",
+      "value": 0.47971006482839584,
+      "limit": 15,
+      "passed": true,
+      "scope": "20 exact M1 payload inputs, two identities backfilling concurrently"
+    },
+    {
+      "name": "mixed_input_p99_seconds",
+      "value": 0.5637573204003274,
+      "limit": 30,
+      "passed": true,
+      "scope": "20 exact M1 payload inputs, two identities backfilling concurrently"
+    },
+    {
+      "name": "mixed_unpublished_before_final30s",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "All ten identities receive new minute + observation"
+    },
+    {
+      "name": "mixed_runnable_wait_seconds",
+      "value": 1.1891870871186256,
+      "limit": 10,
+      "passed": true,
+      "scope": "Only runnable durable generations included"
+    },
+    {
+      "name": "mixed_unresolved_runnable_targets",
+      "value": 0,
+      "limit": 0,
+      "passed": true,
+      "scope": "All terminal runnable targets remain in the acceptance denominator"
+    },
+    {
+      "name": "high_period_oracle_cases",
+      "value": 120,
+      "limit": 120,
+      "passed": true,
+      "scope": "Independent M30/W1/MN arithmetic and consumers"
+    },
+    {
+      "name": "same_price_exact_visibility_judgment_markers",
+      "value": [
+        50,
+        50
+      ],
+      "limit": 50,
+      "passed": true,
+      "scope": "50 exact markers over 330s, missed markers remain in denominator"
+    },
+    {
+      "name": "same_price_visible_to_judged_p95_seconds",
+      "value": 1.001389121171087,
+      "limit": 1,
+      "passed": false,
+      "scope": "Sequential PG sampling includes scheduling uncertainty"
+    },
+    {
+      "name": "same_price_visible_to_judged_p99_seconds",
+      "value": 1.027082724031061,
+      "limit": 2,
+      "passed": true,
+      "scope": "Sequential PG sampling includes scheduling uncertainty"
+    },
+    {
+      "name": "same_price_commit_to_visible_p95_seconds",
+      "value": 4.400929949712008,
+      "limit": 15,
+      "passed": true,
+      "scope": "Same-price M1 input to observed published marker"
+    },
+    {
+      "name": "same_price_commit_to_visible_p99_seconds",
+      "value": 4.545990664046258,
+      "limit": 30,
+      "passed": true,
+      "scope": "Same-price M1 input to observed published marker"
+    },
+    {
+      "name": "normal_input_exact_markers",
+      "value": [
+        310,
+        310,
+        310
+      ],
+      "limit": 310,
+      "passed": true,
+      "scope": "330s continuous input across ten identities; new minutes and price/volume revisions"
+    },
+    {
+      "name": "normal_input_visible_to_judged_p95_seconds",
+      "value": 1.0186565383337438,
+      "limit": 1,
+      "passed": false,
+      "scope": "Conservative visibility and per-alert commit intervals"
+    },
+    {
+      "name": "normal_input_visible_to_judged_p99_seconds",
+      "value": 1.1348263858817518,
+      "limit": 2,
+      "passed": true,
+      "scope": "Conservative visibility and per-alert commit intervals"
+    },
+    {
+      "name": "tcp_api_p95_seconds",
+      "value": 0.18312962632626295,
+      "limit": 0.5,
+      "passed": true,
+      "scope": "120 authenticated <=500bar calls alongside publication and alerts; lifespan off"
+    },
+    {
+      "name": "tcp_api_p99_seconds",
+      "value": 0.24586285185068846,
+      "limit": 1,
+      "passed": true,
+      "scope": "120 authenticated <=500bar calls alongside publication and alerts; lifespan off"
+    },
+    {
+      "name": "trigger_visible_to_judged_p95_seconds",
+      "value": 0.7349209669046104,
+      "limit": 1,
+      "passed": true,
+      "scope": "Ten new-minute crossings, exact one signal per input"
+    },
+    {
+      "name": "trigger_visible_to_judged_p99_seconds",
+      "value": 0.7349209669046104,
+      "limit": 2,
+      "passed": true,
+      "scope": "Ten new-minute crossings, exact one signal per input"
+    },
+    {
+      "name": "tcp_exact_input_judgment_denominator",
+      "value": [
+        10,
+        10
+      ],
+      "limit": 10,
+      "passed": true,
+      "scope": "Exact trigger outcomes with retained visibility/judgment samples"
+    },
+    {
+      "name": "browser_product_flow",
+      "value": "passed",
+      "limit": "passed",
+      "passed": true,
+      "scope": "Built UI/native dual chart/save/reload/full API lifespan, isolated upstream"
+    },
+    {
+      "name": "app_browser_cpu_limit",
+      "value": 1.45,
+      "limit": 1.5,
+      "passed": true,
+      "scope": "Actual live container cgroup limits; PostgreSQL separate"
+    }
+  ],
+  "all_assessed_gates_passed": false,
+  "missing": [],
+  "complete_acceptance": false,
+  "note": "Saved-evidence numeric assessment; downstream evidence must be separately audited before Issue13 completion"
+}

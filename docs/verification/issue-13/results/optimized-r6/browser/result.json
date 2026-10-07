@@ -1,0 +1,888 @@
+{
+  "synthetic_market_data": true,
+  "upstream_isolated": true,
+  "scope": "Built product UI and real native chart with full API lifespan, one publisher and one Chromium instance",
+  "phases": [
+    {
+      "label": "M1 idle 30s",
+      "milliseconds": 30003
+    },
+    {
+      "label": "M5 period switch",
+      "milliseconds": 414
+    },
+    {
+      "label": "EURUSD identity switch",
+      "milliseconds": 593
+    },
+    {
+      "label": "two-chart native layout",
+      "milliseconds": 31600
+    },
+    {
+      "label": "manual save",
+      "milliseconds": 91
+    },
+    {
+      "label": "reload persisted layout",
+      "milliseconds": 20419
+    }
+  ],
+  "page_errors": [],
+  "requests": [
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 401,
+      "milliseconds": 91
+    },
+    {
+      "path": "/api/login",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 513
+    },
+    {
+      "path": "/api/candles",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 308
+    },
+    {
+      "path": "/api/instruments",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 433
+    },
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 408
+    },
+    {
+      "path": "/api/session-range",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 515
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 1004
+    },
+    {
+      "path": "/api/signals",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 1004
+    },
+    {
+      "path": "/api/watches",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 1004
+    },
+    {
+      "path": "/api/advanced-charts/workspaces",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 496
+    },
+    {
+      "path": "/api/watches",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 301
+    },
+    {
+      "path": "/api/instruments",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 301
+    },
+    {
+      "path": "/api/signals",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 304
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 304
+    },
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 195
+    },
+    {
+      "path": "/api/advanced-charts/workspaces/0be24422-b22d-47bc-b114-7f242f221b2d/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 14
+    },
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 97
+    },
+    {
+      "path": "/api/advanced-charts/workspaces",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 19
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 327
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 419
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 94
+    },
+    {
+      "path": "/api/advanced-charts/catalog",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 38
+    },
+    {
+      "path": "/api/charts/history-capabilities",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 38
+    },
+    {
+      "path": "/api/advanced-charts/preferences",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 38
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 3119
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 1406
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 1457
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 1464
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 608
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 185
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 185
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 185
+    },
+    {
+      "path": "/api/market-data/dataset",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 207
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 109
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 102
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 102
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 211
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 113
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 188
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 299
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 32
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 120
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 87
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 177
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 181
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 103
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 467
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 116
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 21
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 2459
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 21
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 32
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 266
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 3109
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 41
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 166
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 34
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 148
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 2188
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 26
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 27
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 136
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 22
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 81
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 46
+    },
+    {
+      "path": "/api/market-data/dataset",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 18
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 96
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 93
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 303
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 13
+    },
+    {
+      "path": "/api/market-data/dataset",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 1
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 1
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 2284
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 94
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 105
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 187
+    },
+    {
+      "path": "/api/market-data/dataset",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 15
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 88
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 91
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 101
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 88
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 3
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 13
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 89
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 15
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 13
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 66
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 32
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 140
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 18
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 74
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 2181
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 25
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 68
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 18
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 66
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 22
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 142
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 28
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 84
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 72
+    },
+    {
+      "path": "/api/session",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 11
+    },
+    {
+      "path": "/api/advanced-charts/workspaces",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 88
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 91
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 185
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 5
+    },
+    {
+      "path": "/api/advanced-charts/catalog",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 96
+    },
+    {
+      "path": "/api/charts/history-capabilities",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 96
+    },
+    {
+      "path": "/api/advanced-charts/preferences",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 96
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 390
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 606
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 122
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 184
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 174
+    },
+    {
+      "path": "/api/market-data/dataset",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 99
+    },
+    {
+      "path": "/api/market-data/dataset",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 17
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 17
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 203
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 103
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 92
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 94
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 27
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 112
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 227
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 2157
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 25
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 121
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 3091
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 11
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST",
+      "status": 200,
+      "milliseconds": 3083
+    },
+    {
+      "path": "/api/chart-alerts/events",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 16
+    },
+    {
+      "path": "/api/chart-alerts",
+      "method": "GET",
+      "status": 200,
+      "milliseconds": 110
+    }
+  ],
+  "failed_requests": [],
+  "checkpoints": [
+    {
+      "label": "M1 initial",
+      "symbol": "BTCUSDT",
+      "resolution": "1",
+      "ready": true,
+      "range": {
+        "from": 1789371600,
+        "to": 1789382940
+      },
+      "chart_count": 1
+    },
+    {
+      "label": "M5",
+      "symbol": "BTCUSDT",
+      "resolution": "5",
+      "ready": true,
+      "range": {
+        "from": 1789328400,
+        "to": 1789385100
+      },
+      "chart_count": 1
+    },
+    {
+      "label": "EURUSD",
+      "symbol": "EURUSD",
+      "resolution": "5",
+      "ready": true,
+      "range": {
+        "from": 1789329300,
+        "to": 1789385100
+      },
+      "chart_count": 1
+    },
+    {
+      "label": "two chart EURUSD/XAUUSD",
+      "symbol": "XAUUSD",
+      "resolution": "5",
+      "ready": true,
+      "range": {
+        "from": 1789358100,
+        "to": 1789385100
+      },
+      "chart_count": 2
+    }
+  ],
+  "persisted": {
+    "count": 2,
+    "symbols": [
+      "EURUSD",
+      "XAUUSD"
+    ]
+  },
+  "data_request_count": 10,
+  "data_latency": {
+    "p50": 68,
+    "p95": 203,
+    "p99": 203
+  },
+  "outcome": "passed",
+  "duration_seconds": 100.863
+}

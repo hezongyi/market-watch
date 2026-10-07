@@ -1,0 +1,15 @@
+{
+  "project": "mw-pr21-fix",
+  "task": "mw-pr21-fix",
+  "apply": false,
+  "containers": [
+    "mw-pr21-fix-postgres-1"
+  ],
+  "volumes": [
+    "mw-pr21-fix_pgdata"
+  ],
+  "networks": [
+    "16aaf0c39f6f"
+  ],
+  "retained_images": []
+}

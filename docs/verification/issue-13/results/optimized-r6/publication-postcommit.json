@@ -1,0 +1,77 @@
+{
+  "environment": "Ubuntu isolated unique PostgreSQL schema",
+  "source_commit": "bcaefcf33d14c4be150e8d2d6e886329cdae74d7",
+  "executed_probe_sha256": "72d16cc080de8273e27049c727792fb868d73aea1c42e4f43620e778cb4b94a4",
+  "postcommit_process_killed": true,
+  "kill_returncode": -9,
+  "committed_snapshot_preserved": true,
+  "notification_absent_restart": {
+    "old_hint_absent": true,
+    "durable_input_resumed": true
+  },
+  "repeated_restart_snapshot_count_revision_stable": true,
+  "initial": {
+    "payload": {
+      "start": 1790555340000,
+      "end": 1790555400000,
+      "open": "10.0000000000",
+      "high": "11.0000000000",
+      "low": "9.0000000000",
+      "close": "10.0000000000",
+      "complete": true,
+      "revision": 1,
+      "volume": null,
+      "volume_complete": false,
+      "observed_at": 1790555405000
+    },
+    "row_revision": 1,
+    "complete_count": 30,
+    "publication_revision": 1,
+    "requested": 3,
+    "processed": 3,
+    "pending_jobs": 0
+  },
+  "committed": {
+    "payload": {
+      "start": 1790555340000,
+      "end": 1790555400000,
+      "open": "10.0000000000",
+      "high": "12.0000000000",
+      "low": "9.0000000000",
+      "close": "11.0000000000",
+      "complete": true,
+      "revision": 2,
+      "volume": null,
+      "volume_complete": false,
+      "observed_at": 1790555406000
+    },
+    "row_revision": 2,
+    "complete_count": 30,
+    "publication_revision": 2,
+    "requested": 5,
+    "processed": 5,
+    "pending_jobs": 0
+  },
+  "resumed": {
+    "payload": {
+      "start": 1790555340000,
+      "end": 1790555400000,
+      "open": "10.0000000000",
+      "high": "12.0000000000",
+      "low": "9.0000000000",
+      "close": "11.0000000000",
+      "complete": true,
+      "revision": 2,
+      "volume": null,
+      "volume_complete": false,
+      "observed_at": 1790555407000
+    },
+    "row_revision": 3,
+    "complete_count": 30,
+    "publication_revision": 3,
+    "requested": 6,
+    "processed": 6,
+    "pending_jobs": 0
+  },
+  "scope": "Postcommit SIGKILL, offline committed input without retained hint, fresh-process durable recovery and idempotent restart; no production writes"
+}

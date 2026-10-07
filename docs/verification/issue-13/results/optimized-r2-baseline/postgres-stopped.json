@@ -1,0 +1,52 @@
+{
+  "name": "mw-issue13-optimized-r2-postgres-1",
+  "state": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-07T07:47:40.881693052Z",
+    "FinishedAt": "2026-10-07T09:04:39.650048124Z",
+    "Health": {
+      "Status": "unhealthy",
+      "FailingStreak": 0,
+      "Log": [
+        {
+          "Start": "2026-10-07T09:04:30.716728997Z",
+          "End": "2026-10-07T09:04:30.797395984Z",
+          "ExitCode": 0,
+          "Output": "/var/run/postgresql:5432 - accepting connections\n"
+        },
+        {
+          "Start": "2026-10-07T09:04:32.798639919Z",
+          "End": "2026-10-07T09:04:32.883286526Z",
+          "ExitCode": 0,
+          "Output": "/var/run/postgresql:5432 - accepting connections\n"
+        },
+        {
+          "Start": "2026-10-07T09:04:34.884120257Z",
+          "End": "2026-10-07T09:04:34.949561654Z",
+          "ExitCode": 0,
+          "Output": "/var/run/postgresql:5432 - accepting connections\n"
+        },
+        {
+          "Start": "2026-10-07T09:04:36.950903722Z",
+          "End": "2026-10-07T09:04:37.015722475Z",
+          "ExitCode": 0,
+          "Output": "/var/run/postgresql:5432 - accepting connections\n"
+        },
+        {
+          "Start": "2026-10-07T09:04:39.016970185Z",
+          "End": "2026-10-07T09:04:39.11645982Z",
+          "ExitCode": 0,
+          "Output": "/var/run/postgresql:5432 - accepting connections\n"
+        }
+      ]
+    }
+  }
+}

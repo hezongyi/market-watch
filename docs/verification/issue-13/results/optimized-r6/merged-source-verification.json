@@ -1,0 +1,17 @@
+{
+  "merge_commit": "63bad46122c69977400d538c4b949eb4467c9aab",
+  "frozen_commit": "bcaefcf33d14c4be150e8d2d6e886329cdae74d7",
+  "product_and_migration_count": 175,
+  "all_product_files_byte_equal": true,
+  "consumer_scripts_byte_equal": true,
+  "browser_host_runner_equals_actually_executed_bytes": true,
+  "merge_conflict_resolution": "Retained exact executed configurable browser host runner; frozen URL differences provided through ISSUE13_BROWSER_* variables",
+  "full_backend_regression": {
+    "passed": 1389,
+    "skipped": 2
+  },
+  "postmerge_repeated_full_regression": false,
+  "reason": "No additional product change; entire product and migrations byte-equal to already fully tested r6",
+  "no_push": true,
+  "no_production_deployment": true
+}

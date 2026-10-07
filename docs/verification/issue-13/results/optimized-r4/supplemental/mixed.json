@@ -1,0 +1,4464 @@
+{
+  "scenario": "mixed",
+  "seconds_requested": 300,
+  "duration": 301.3876873869449,
+  "cycles": 782,
+  "clock": "Fixed fixture epoch + actual monotonic elapsed milliseconds; no event-count jumps or future observations",
+  "process_cpu_percent": 10.000029455518334,
+  "queries": {
+    "total": 20365,
+    "coverage_reads": 5,
+    "source_reads": 3342,
+    "snapshot_insert_statements": 530,
+    "publication_updates": 1291
+  },
+  "worker_sql_per_second": 67.57077628673608,
+  "cgroup_before": {
+    "cpu.stat": "usage_usec 1978234\nuser_usec 1760949\nsystem_usec 217284\nnr_periods 36\nnr_throttled 24\nthrottled_usec 890651\n",
+    "memory.current": "104669184\n",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+  },
+  "cgroup_after": {
+    "cpu.stat": "usage_usec 32117923\nuser_usec 28626163\nsystem_usec 3491760\nnr_periods 1209\nnr_throttled 29\nthrottled_usec 1001755\n",
+    "memory.current": "111202304\n",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+  },
+  "cpu_scope": "Worker, input, M1 validation and wait-sampler in same capped Python process; final full hash excluded",
+  "before": {
+    "sha256": "abbae79d3c6e07282d45137ace65099ef3e792c4f1bd1d438a337108279be287",
+    "counts": {
+      "BTCUSDT/H1": 32,
+      "BTCUSDT/H4": 7,
+      "BTCUSDT/M1": 2000,
+      "BTCUSDT/M15": 132,
+      "BTCUSDT/M30": 66,
+      "BTCUSDT/M5": 400,
+      "EURUSD/H1": 32,
+      "EURUSD/H4": 7,
+      "EURUSD/M1": 2000,
+      "EURUSD/M15": 132,
+      "EURUSD/M30": 27,
+      "EURUSD/M5": 400,
+      "SYNTH00/H1": 32,
+      "SYNTH00/H4": 7,
+      "SYNTH00/M1": 2000,
+      "SYNTH00/M15": 132,
+      "SYNTH00/M30": 66,
+      "SYNTH00/M5": 400,
+      "SYNTH01/H1": 32,
+      "SYNTH01/H4": 7,
+      "SYNTH01/M1": 2000,
+      "SYNTH01/M15": 132,
+      "SYNTH01/M30": 66,
+      "SYNTH01/M5": 400,
+      "SYNTH02/H1": 32,
+      "SYNTH02/H4": 7,
+      "SYNTH02/M1": 2000,
+      "SYNTH02/M15": 132,
+      "SYNTH02/M30": 66,
+      "SYNTH02/M5": 400,
+      "SYNTH03/H1": 32,
+      "SYNTH03/H4": 7,
+      "SYNTH03/M1": 2000,
+      "SYNTH03/M15": 132,
+      "SYNTH03/M30": 66,
+      "SYNTH03/M5": 400,
+      "SYNTH04/H1": 32,
+      "SYNTH04/H4": 7,
+      "SYNTH04/M1": 2000,
+      "SYNTH04/M15": 132,
+      "SYNTH04/M30": 66,
+      "SYNTH04/M5": 400,
+      "SYNTH05/H1": 32,
+      "SYNTH05/H4": 7,
+      "SYNTH05/M1": 2000,
+      "SYNTH05/M15": 132,
+      "SYNTH05/M30": 66,
+      "SYNTH05/M5": 400,
+      "SYNTH06/H1": 32,
+      "SYNTH06/H4": 7,
+      "SYNTH06/M1": 2000,
+      "SYNTH06/M15": 132,
+      "SYNTH06/M30": 66,
+      "SYNTH06/M5": 400,
+      "XAUUSD/H1": 32,
+      "XAUUSD/H4": 7,
+      "XAUUSD/M1": 2000,
+      "XAUUSD/M15": 132,
+      "XAUUSD/M30": 25,
+      "XAUUSD/M5": 400
+    },
+    "publications": [
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 66,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "D1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "H4",
+        "start": 1789275600000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "M30",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "complete_count": 27,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "MN",
+        "start": 1790802000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "W1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 66,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 66,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 66,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 66,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 66,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 66,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 66,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "D1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "complete_count": 32,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "H4",
+        "start": 1789275600000,
+        "end": 1789382400000,
+        "complete_count": 7,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 2000,
+        "revision": 6,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "complete_count": 132,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "M30",
+        "start": 1789336800000,
+        "end": 1789382400000,
+        "complete_count": 25,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "complete_count": 400,
+        "revision": 2,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "MN",
+        "start": 1790802000000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "W1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      }
+    ]
+  },
+  "after": {
+    "sha256": "21d612cb4a29b5ea7b82a2ccee5f9dad35ae99f4838e16ab81a5e531c3c8fe26",
+    "counts": {
+      "BTCUSDT/D1": 1,
+      "BTCUSDT/H1": 33,
+      "BTCUSDT/H4": 8,
+      "BTCUSDT/M1": 2001,
+      "BTCUSDT/M15": 133,
+      "BTCUSDT/M30": 67,
+      "BTCUSDT/M5": 401,
+      "BTCUSDT/W1": 1,
+      "EURUSD/D1": 44,
+      "EURUSD/H1": 1067,
+      "EURUSD/H4": 267,
+      "EURUSD/M1": 64001,
+      "EURUSD/M15": 4267,
+      "EURUSD/M30": 1468,
+      "EURUSD/M5": 12801,
+      "EURUSD/MN": 1,
+      "EURUSD/W1": 7,
+      "SYNTH00/D1": 1,
+      "SYNTH00/H1": 33,
+      "SYNTH00/H4": 8,
+      "SYNTH00/M1": 2001,
+      "SYNTH00/M15": 133,
+      "SYNTH00/M30": 67,
+      "SYNTH00/M5": 401,
+      "SYNTH00/W1": 1,
+      "SYNTH01/D1": 1,
+      "SYNTH01/H1": 33,
+      "SYNTH01/H4": 8,
+      "SYNTH01/M1": 2001,
+      "SYNTH01/M15": 133,
+      "SYNTH01/M30": 67,
+      "SYNTH01/M5": 401,
+      "SYNTH01/W1": 1,
+      "SYNTH02/D1": 1,
+      "SYNTH02/H1": 33,
+      "SYNTH02/H4": 8,
+      "SYNTH02/M1": 2001,
+      "SYNTH02/M15": 133,
+      "SYNTH02/M30": 67,
+      "SYNTH02/M5": 401,
+      "SYNTH02/W1": 1,
+      "SYNTH03/D1": 1,
+      "SYNTH03/H1": 33,
+      "SYNTH03/H4": 8,
+      "SYNTH03/M1": 2001,
+      "SYNTH03/M15": 133,
+      "SYNTH03/M30": 67,
+      "SYNTH03/M5": 401,
+      "SYNTH03/W1": 1,
+      "SYNTH04/D1": 1,
+      "SYNTH04/H1": 33,
+      "SYNTH04/H4": 8,
+      "SYNTH04/M1": 2001,
+      "SYNTH04/M15": 133,
+      "SYNTH04/M30": 67,
+      "SYNTH04/M5": 401,
+      "SYNTH04/W1": 1,
+      "SYNTH05/D1": 1,
+      "SYNTH05/H1": 33,
+      "SYNTH05/H4": 8,
+      "SYNTH05/M1": 2001,
+      "SYNTH05/M15": 133,
+      "SYNTH05/M30": 67,
+      "SYNTH05/M5": 401,
+      "SYNTH05/W1": 1,
+      "SYNTH06/D1": 1,
+      "SYNTH06/H1": 33,
+      "SYNTH06/H4": 8,
+      "SYNTH06/M1": 2001,
+      "SYNTH06/M15": 133,
+      "SYNTH06/M30": 67,
+      "SYNTH06/M5": 401,
+      "SYNTH06/W1": 1,
+      "XAUUSD/D1": 44,
+      "XAUUSD/H1": 1067,
+      "XAUUSD/H4": 267,
+      "XAUUSD/M1": 64001,
+      "XAUUSD/M15": 4267,
+      "XAUUSD/M30": 1406,
+      "XAUUSD/M5": 12801,
+      "XAUUSD/MN": 1,
+      "XAUUSD/W1": 7
+    },
+    "publications": [
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382527178
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "complete_count": 32,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382527081
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "complete_count": 7,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382527237
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 2001,
+        "revision": 8,
+        "initialized": true,
+        "updated_at": 1789382526668
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 132,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382526767
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 66,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382526841
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 400,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382526933
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "BTCUSDT",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382527127
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "D1",
+        "start": 1785618000000,
+        "end": 1789382460000,
+        "complete_count": 43,
+        "revision": 5,
+        "initialized": true,
+        "updated_at": 1789382515919
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "H1",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "complete_count": 1066,
+        "revision": 7,
+        "initialized": true,
+        "updated_at": 1789382515303
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "H4",
+        "start": 1785546000000,
+        "end": 1789382460000,
+        "complete_count": 266,
+        "revision": 5,
+        "initialized": true,
+        "updated_at": 1789382515457
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "M1",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "complete_count": 64001,
+        "revision": 170,
+        "initialized": true,
+        "updated_at": 1789382515163
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "M15",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "complete_count": 4266,
+        "revision": 15,
+        "initialized": true,
+        "updated_at": 1789382515730
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "M30",
+        "start": 1785704400000,
+        "end": 1789382460000,
+        "complete_count": 1467,
+        "revision": 18,
+        "initialized": false,
+        "updated_at": 1789382515798
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "M5",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "complete_count": 12800,
+        "revision": 37,
+        "initialized": true,
+        "updated_at": 1789382515368
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "MN",
+        "start": 1788210000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 5,
+        "initialized": true,
+        "updated_at": 1789382515583
+      },
+      {
+        "instrument_id": "EURUSD",
+        "timeframe": "W1",
+        "start": 1785704400000,
+        "end": 1789382460000,
+        "complete_count": 6,
+        "revision": 5,
+        "initialized": true,
+        "updated_at": 1789382515672
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382531932
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "complete_count": 32,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382531636
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "complete_count": 7,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382531983
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 2001,
+        "revision": 8,
+        "initialized": true,
+        "updated_at": 1789382531298
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 132,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382531827
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 66,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382531882
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 400,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382531399
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH00",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382531733
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382536568
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "complete_count": 32,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382536250
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "complete_count": 7,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382536618
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 2001,
+        "revision": 8,
+        "initialized": true,
+        "updated_at": 1789382536097
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 132,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382536395
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 66,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382536462
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 400,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382536176
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH01",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382536515
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382541251
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "complete_count": 32,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382540772
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "complete_count": 7,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382540849
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 2001,
+        "revision": 8,
+        "initialized": true,
+        "updated_at": 1789382540679
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 132,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382541084
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 66,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382541150
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 400,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382541201
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH02",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382541021
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382545806
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "complete_count": 32,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382545706
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "complete_count": 7,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382545472
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 2001,
+        "revision": 8,
+        "initialized": true,
+        "updated_at": 1789382545312
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 132,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382545547
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 66,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382545863
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 400,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382545401
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH03",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382545752
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382552486
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "complete_count": 32,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382552032
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "complete_count": 7,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382552108
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 2001,
+        "revision": 8,
+        "initialized": true,
+        "updated_at": 1789382551944
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 132,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382552252
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 66,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382552340
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 400,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382552179
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH04",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382552436
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382556857
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "complete_count": 32,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382557038
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "complete_count": 7,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382557091
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 2001,
+        "revision": 8,
+        "initialized": true,
+        "updated_at": 1789382556559
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 132,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382556931
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 66,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382556979
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 400,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382556791
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH05",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382556716
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382561737
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "complete_count": 32,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382561356
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "complete_count": 7,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382561250
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 2001,
+        "revision": 8,
+        "initialized": true,
+        "updated_at": 1789382561151
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 132,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382561488
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "complete_count": 66,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382561581
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "complete_count": 400,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382561419
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "complete_count": 0,
+        "revision": 1,
+        "initialized": true,
+        "updated_at": 1789382405000
+      },
+      {
+        "instrument_id": "SYNTH06",
+        "timeframe": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 4,
+        "initialized": true,
+        "updated_at": 1789382561686
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "D1",
+        "start": 1785618000000,
+        "end": 1789382460000,
+        "complete_count": 43,
+        "revision": 5,
+        "initialized": true,
+        "updated_at": 1789382520596
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "H1",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "complete_count": 1066,
+        "revision": 7,
+        "initialized": true,
+        "updated_at": 1789382520253
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "H4",
+        "start": 1785546000000,
+        "end": 1789382460000,
+        "complete_count": 266,
+        "revision": 5,
+        "initialized": true,
+        "updated_at": 1789382520178
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "M1",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "complete_count": 64001,
+        "revision": 170,
+        "initialized": true,
+        "updated_at": 1789382520000
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "M15",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "complete_count": 4266,
+        "revision": 15,
+        "initialized": true,
+        "updated_at": 1789382520324
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "M30",
+        "start": 1785708000000,
+        "end": 1789382460000,
+        "complete_count": 1405,
+        "revision": 18,
+        "initialized": false,
+        "updated_at": 1789382520528
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "M5",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "complete_count": 12800,
+        "revision": 37,
+        "initialized": true,
+        "updated_at": 1789382520107
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "MN",
+        "start": 1788210000000,
+        "end": 1789382460000,
+        "complete_count": 0,
+        "revision": 5,
+        "initialized": true,
+        "updated_at": 1789382520417
+      },
+      {
+        "instrument_id": "XAUUSD",
+        "timeframe": "W1",
+        "start": 1785704400000,
+        "end": 1789382460000,
+        "complete_count": 6,
+        "revision": 5,
+        "initialized": true,
+        "updated_at": 1789382520472
+      }
+    ]
+  },
+  "before_state": {
+    "publications": [
+      {
+        "instrument": "BTCUSDT",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "D1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H4",
+        "start": 1789275600000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M30",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 27,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "MN",
+        "start": 1790802000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "W1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 66,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "D1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382400000,
+        "count": 32,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "H4",
+        "start": 1789275600000,
+        "end": 1789382400000,
+        "count": 7,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 2000,
+        "revision": 6,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382400000,
+        "count": 132,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M30",
+        "start": 1789336800000,
+        "end": 1789382400000,
+        "count": 25,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382400000,
+        "count": 400,
+        "revision": 2,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "MN",
+        "start": 1790802000000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "W1",
+        "start": 1789333200000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      }
+    ],
+    "published_bars": 26290,
+    "aggregation_jobs": 0,
+    "publication_jobs": 0
+  },
+  "after_state": {
+    "publications": [
+      {
+        "instrument": "BTCUSDT",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 2001,
+        "revision": 8,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "BTCUSDT",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "D1",
+        "start": 1785618000000,
+        "end": 1789382460000,
+        "count": 43,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H1",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "count": 1066,
+        "revision": 7,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "H4",
+        "start": 1785546000000,
+        "end": 1789382460000,
+        "count": 266,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M1",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "count": 64001,
+        "revision": 170,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M15",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "count": 4266,
+        "revision": 15,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M30",
+        "start": 1785704400000,
+        "end": 1789382460000,
+        "count": 1467,
+        "revision": 18,
+        "initialized": false
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "M5",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "count": 12800,
+        "revision": 37,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "MN",
+        "start": 1788210000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "EURUSD",
+        "frame": "W1",
+        "start": 1785704400000,
+        "end": 1789382460000,
+        "count": 6,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 2001,
+        "revision": 8,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH00",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 2001,
+        "revision": 8,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH01",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 2001,
+        "revision": 8,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH02",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 2001,
+        "revision": 8,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH03",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 2001,
+        "revision": 8,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH04",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 2001,
+        "revision": 8,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH05",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "D1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "H1",
+        "start": 1789264800000,
+        "end": 1789382460000,
+        "count": 32,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "H4",
+        "start": 1789272000000,
+        "end": 1789382460000,
+        "count": 7,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M1",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 2001,
+        "revision": 8,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M15",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 132,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M30",
+        "start": 1789263000000,
+        "end": 1789382460000,
+        "count": 66,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "M5",
+        "start": 1789262400000,
+        "end": 1789382460000,
+        "count": 400,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "MN",
+        "start": 1790812800000,
+        "end": 1789382400000,
+        "count": 0,
+        "revision": 1,
+        "initialized": true
+      },
+      {
+        "instrument": "SYNTH06",
+        "frame": "W1",
+        "start": 1789344000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 4,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "D1",
+        "start": 1785618000000,
+        "end": 1789382460000,
+        "count": 43,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "H1",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "count": 1066,
+        "revision": 7,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "H4",
+        "start": 1785546000000,
+        "end": 1789382460000,
+        "count": 266,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M1",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "count": 64001,
+        "revision": 170,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M15",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "count": 4266,
+        "revision": 15,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M30",
+        "start": 1785708000000,
+        "end": 1789382460000,
+        "count": 1405,
+        "revision": 18,
+        "initialized": false
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "M5",
+        "start": 1785542400000,
+        "end": 1789382460000,
+        "count": 12800,
+        "revision": 37,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "MN",
+        "start": 1788210000000,
+        "end": 1789382460000,
+        "count": 0,
+        "revision": 5,
+        "initialized": true
+      },
+      {
+        "instrument": "XAUUSD",
+        "frame": "W1",
+        "start": 1785704400000,
+        "end": 1789382460000,
+        "count": 6,
+        "revision": 5,
+        "initialized": true
+      }
+    ],
+    "published_bars": 188944,
+    "aggregation_jobs": 0,
+    "publication_jobs": 0
+  },
+  "payload_unchanged": false,
+  "visible_metadata_unchanged": false,
+  "publications_timestamp_changed": 82,
+  "events": [
+    {
+      "instrument": "EURUSD",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "100.0000000000",
+        "high": "101.0000000000",
+        "low": "99.0000000000",
+        "close": "100.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382465654
+      },
+      "committed_seconds": 60.713841430842876,
+      "visible_seconds": 61.3325126292184,
+      "latency_seconds": 0.618672049138695
+    },
+    {
+      "instrument": "XAUUSD",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "101.0000000000",
+        "high": "102.0000000000",
+        "low": "100.0000000000",
+        "close": "101.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382470469
+      },
+      "committed_seconds": 65.50693566026166,
+      "visible_seconds": 66.09238346805796,
+      "latency_seconds": 0.5854483097791672
+    },
+    {
+      "instrument": "BTCUSDT",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "102.0000000000",
+        "high": "103.0000000000",
+        "low": "101.0000000000",
+        "close": "102.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382475231
+      },
+      "committed_seconds": 70.26905170502141,
+      "visible_seconds": 70.82007037987933,
+      "latency_seconds": 0.5510194711387157
+    },
+    {
+      "instrument": "SYNTH00",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "103.0000000000",
+        "high": "104.0000000000",
+        "low": "102.0000000000",
+        "close": "103.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382481977
+      },
+      "committed_seconds": 77.00671937223524,
+      "visible_seconds": 77.56834208825603,
+      "latency_seconds": 0.5616229996085167
+    },
+    {
+      "instrument": "SYNTH01",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "104.0000000000",
+        "high": "105.0000000000",
+        "low": "103.0000000000",
+        "close": "104.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382486716
+      },
+      "committed_seconds": 81.76610951684415,
+      "visible_seconds": 82.38273133803159,
+      "latency_seconds": 0.6166226831264794
+    },
+    {
+      "instrument": "SYNTH02",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "105.0000000000",
+        "high": "106.0000000000",
+        "low": "104.0000000000",
+        "close": "105.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382491568
+      },
+      "committed_seconds": 86.6056735641323,
+      "visible_seconds": 87.14204040681943,
+      "latency_seconds": 0.5363676170818508
+    },
+    {
+      "instrument": "SYNTH03",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "106.0000000000",
+        "high": "107.0000000000",
+        "low": "105.0000000000",
+        "close": "106.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382496274
+      },
+      "committed_seconds": 91.30925950920209,
+      "visible_seconds": 91.81366404285654,
+      "latency_seconds": 0.5044049429707229
+    },
+    {
+      "instrument": "SYNTH04",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "107.0000000000",
+        "high": "108.0000000000",
+        "low": "106.0000000000",
+        "close": "107.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382501038
+      },
+      "committed_seconds": 96.06684800190851,
+      "visible_seconds": 96.55369197623804,
+      "latency_seconds": 0.4868444623425603
+    },
+    {
+      "instrument": "SYNTH05",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "108.0000000000",
+        "high": "109.0000000000",
+        "low": "107.0000000000",
+        "close": "108.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382505703
+      },
+      "committed_seconds": 100.73539691697806,
+      "visible_seconds": 101.21545112412423,
+      "latency_seconds": 0.48005465418100357
+    },
+    {
+      "instrument": "SYNTH06",
+      "kind": "new_bar",
+      "start": 1789382400000,
+      "expected_payload": {
+        "start": 1789382400000,
+        "end": 1789382460000,
+        "open": "109.0000000000",
+        "high": "110.0000000000",
+        "low": "108.0000000000",
+        "close": "109.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382510385
+      },
+      "committed_seconds": 105.4183557741344,
+      "visible_seconds": 105.98801999306306,
+      "latency_seconds": 0.5696644419804215
+    },
+    {
+      "instrument": "EURUSD",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "100.0000000000",
+        "high": "101.0000000000",
+        "low": "99.0000000000",
+        "close": "100.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382515163
+      },
+      "committed_seconds": 110.20967152900994,
+      "visible_seconds": 110.28381275990978,
+      "latency_seconds": 0.07414166815578938
+    },
+    {
+      "instrument": "XAUUSD",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "101.0000000000",
+        "high": "102.0000000000",
+        "low": "100.0000000000",
+        "close": "101.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382520000
+      },
+      "committed_seconds": 115.02020134916529,
+      "visible_seconds": 115.08726416202262,
+      "latency_seconds": 0.06706332368776202
+    },
+    {
+      "instrument": "BTCUSDT",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "102.0000000000",
+        "high": "103.0000000000",
+        "low": "101.0000000000",
+        "close": "102.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382526668
+      },
+      "committed_seconds": 121.70413633994758,
+      "visible_seconds": 121.7478725751862,
+      "latency_seconds": 0.04373682988807559
+    },
+    {
+      "instrument": "SYNTH00",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "103.0000000000",
+        "high": "104.0000000000",
+        "low": "102.0000000000",
+        "close": "103.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382531298
+      },
+      "committed_seconds": 126.32023298507556,
+      "visible_seconds": 126.3793561370112,
+      "latency_seconds": 0.05912444880232215
+    },
+    {
+      "instrument": "SYNTH01",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "104.0000000000",
+        "high": "105.0000000000",
+        "low": "103.0000000000",
+        "close": "104.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382536097
+      },
+      "committed_seconds": 131.11522033717483,
+      "visible_seconds": 131.15623360918835,
+      "latency_seconds": 0.04101358400657773
+    },
+    {
+      "instrument": "SYNTH02",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "105.0000000000",
+        "high": "106.0000000000",
+        "low": "104.0000000000",
+        "close": "105.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382540679
+      },
+      "committed_seconds": 135.7019390282221,
+      "visible_seconds": 135.75254906713963,
+      "latency_seconds": 0.05061047663912177
+    },
+    {
+      "instrument": "SYNTH03",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "106.0000000000",
+        "high": "107.0000000000",
+        "low": "105.0000000000",
+        "close": "106.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382545312
+      },
+      "committed_seconds": 140.33168100612238,
+      "visible_seconds": 140.38121253624558,
+      "latency_seconds": 0.04953191801905632
+    },
+    {
+      "instrument": "SYNTH04",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "107.0000000000",
+        "high": "108.0000000000",
+        "low": "106.0000000000",
+        "close": "107.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382551944
+      },
+      "committed_seconds": 146.9666659119539,
+      "visible_seconds": 147.01256960304454,
+      "latency_seconds": 0.045904471073299646
+    },
+    {
+      "instrument": "SYNTH05",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "108.0000000000",
+        "high": "109.0000000000",
+        "low": "107.0000000000",
+        "close": "108.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382556559
+      },
+      "committed_seconds": 151.57630217913538,
+      "visible_seconds": 151.64055575989187,
+      "latency_seconds": 0.06425408693030477
+    },
+    {
+      "instrument": "SYNTH06",
+      "kind": "observation",
+      "start": 1789382340000,
+      "expected_payload": {
+        "start": 1789382340000,
+        "end": 1789382400000,
+        "open": "109.0000000000",
+        "high": "110.0000000000",
+        "low": "108.0000000000",
+        "close": "109.0000000000",
+        "complete": true,
+        "revision": 1,
+        "volume": "1.000000000000000000",
+        "volume_complete": true,
+        "observed_at": 1789382561151
+      },
+      "committed_seconds": 156.1775409518741,
+      "visible_seconds": 156.22995120519772,
+      "latency_seconds": 0.052410759031772614
+    }
+  ],
+  "unpublished_events": [],
+  "inputs_by_identity": {
+    "EURUSD": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "XAUUSD": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "BTCUSDT": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "SYNTH00": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "SYNTH01": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "SYNTH02": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "SYNTH03": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "SYNTH04": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "SYNTH05": {
+      "new_bar": 1,
+      "observation": 1
+    },
+    "SYNTH06": {
+      "new_bar": 1,
+      "observation": 1
+    }
+  },
+  "latency_completed_only": {
+    "p50": 0.07414166815578938,
+    "p95": 0.6166226831264794,
+    "p99": 0.618672049138695
+  },
+  "unpublished_before_final30s": 0,
+  "longest_target_wait": 1.8930362616665661,
+  "final_unserved_ready": [],
+  "by_target": {
+    "('EURUSD', 'D1')": {
+      "turns": 4,
+      "last_seen_seconds": 110.96072398591787
+    },
+    "('EURUSD', 'H1')": {
+      "turns": 5,
+      "last_seen_seconds": 110.348522759974
+    },
+    "('EURUSD', 'H4')": {
+      "turns": 4,
+      "last_seen_seconds": 110.56304221088067
+    },
+    "('EURUSD', 'M15')": {
+      "turns": 13,
+      "last_seen_seconds": 110.77870573010296
+    },
+    "('EURUSD', 'MN')": {
+      "turns": 3,
+      "last_seen_seconds": 110.65192438010126
+    },
+    "('EURUSD', 'W1')": {
+      "turns": 3,
+      "last_seen_seconds": 110.71071217022836
+    },
+    "('XAUUSD', 'D1')": {
+      "turns": 4,
+      "last_seen_seconds": 115.62720663985237
+    },
+    "('XAUUSD', 'H1')": {
+      "turns": 5,
+      "last_seen_seconds": 115.30360836815089
+    },
+    "('XAUUSD', 'H4')": {
+      "turns": 4,
+      "last_seen_seconds": 115.23221407597885
+    },
+    "('XAUUSD', 'M15')": {
+      "turns": 13,
+      "last_seen_seconds": 115.39718334795907
+    },
+    "('XAUUSD', 'MN')": {
+      "turns": 3,
+      "last_seen_seconds": 115.45248138904572
+    },
+    "('XAUUSD', 'W1')": {
+      "turns": 3,
+      "last_seen_seconds": 115.50800454616547
+    },
+    "('EURUSD', 'M30')": {
+      "turns": 15,
+      "last_seen_seconds": 110.89928169781342
+    },
+    "('EURUSD', 'M5')": {
+      "turns": 35,
+      "last_seen_seconds": 110.43684160616249
+    },
+    "('XAUUSD', 'M30')": {
+      "turns": 15,
+      "last_seen_seconds": 115.57628769613802
+    },
+    "('XAUUSD', 'M5')": {
+      "turns": 35,
+      "last_seen_seconds": 115.15842662891373
+    },
+    "('EURUSD', 'M1')": {
+      "turns": 164,
+      "last_seen_seconds": 110.28216946683824
+    },
+    "('XAUUSD', 'M1')": {
+      "turns": 164,
+      "last_seen_seconds": 115.08567472593859
+    },
+    "('BTCUSDT', 'D1')": {
+      "turns": 3,
+      "last_seen_seconds": 122.21739110723138
+    },
+    "('BTCUSDT', 'H1')": {
+      "turns": 2,
+      "last_seen_seconds": 122.10772283701226
+    },
+    "('BTCUSDT', 'H4')": {
+      "turns": 3,
+      "last_seen_seconds": 122.26541964709759
+    },
+    "('BTCUSDT', 'M15')": {
+      "turns": 2,
+      "last_seen_seconds": 121.82086061825976
+    },
+    "('BTCUSDT', 'M30')": {
+      "turns": 2,
+      "last_seen_seconds": 121.90200366219506
+    },
+    "('BTCUSDT', 'MN')": {
+      "turns": 2,
+      "last_seen_seconds": 122.06110510323197
+    },
+    "('BTCUSDT', 'W1')": {
+      "turns": 2,
+      "last_seen_seconds": 122.15836373902857
+    },
+    "('BTCUSDT', 'M5')": {
+      "turns": 2,
+      "last_seen_seconds": 122.00345176504925
+    },
+    "('BTCUSDT', 'M1')": {
+      "turns": 2,
+      "last_seen_seconds": 121.746519444976
+    },
+    "('SYNTH00', 'D1')": {
+      "turns": 3,
+      "last_seen_seconds": 126.96307089086622
+    },
+    "('SYNTH00', 'H1')": {
+      "turns": 2,
+      "last_seen_seconds": 126.71297004725784
+    },
+    "('SYNTH00', 'H4')": {
+      "turns": 3,
+      "last_seen_seconds": 127.01412506680936
+    },
+    "('SYNTH00', 'M15')": {
+      "turns": 2,
+      "last_seen_seconds": 126.86249085795134
+    },
+    "('SYNTH00', 'M30')": {
+      "turns": 2,
+      "last_seen_seconds": 126.9126186100766
+    },
+    "('SYNTH00', 'MN')": {
+      "turns": 2,
+      "last_seen_seconds": 126.61618207022548
+    },
+    "('SYNTH00', 'W1')": {
+      "turns": 2,
+      "last_seen_seconds": 126.80756184924394
+    },
+    "('SYNTH00', 'M5')": {
+      "turns": 3,
+      "last_seen_seconds": 127.05692417314276
+    },
+    "('SYNTH00', 'M1')": {
+      "turns": 2,
+      "last_seen_seconds": 126.37165587302297
+    },
+    "('SYNTH01', 'D1')": {
+      "turns": 3,
+      "last_seen_seconds": 131.5985279371962
+    },
+    "('SYNTH01', 'H1')": {
+      "turns": 3,
+      "last_seen_seconds": 131.3223215881735
+    },
+    "('SYNTH01', 'H4')": {
+      "turns": 3,
+      "last_seen_seconds": 131.6460624798201
+    },
+    "('SYNTH01', 'M15')": {
+      "turns": 2,
+      "last_seen_seconds": 131.44238759484142
+    },
+    "('SYNTH01', 'M30')": {
+      "turns": 2,
+      "last_seen_seconds": 131.4950650651008
+    },
+    "('SYNTH01', 'MN')": {
+      "turns": 2,
+      "last_seen_seconds": 131.3751642741263
+    },
+    "('SYNTH01', 'W1')": {
+      "turns": 2,
+      "last_seen_seconds": 131.5482283141464
+    },
+    "('SYNTH01', 'M5')": {
+      "turns": 2,
+      "last_seen_seconds": 131.23053488181904
+    },
+    "('SYNTH01', 'M1')": {
+      "turns": 2,
+      "last_seen_seconds": 131.15471610007808
+    },
+    "('SYNTH02', 'D1')": {
+      "turns": 3,
+      "last_seen_seconds": 136.2787494538352
+    },
+    "('SYNTH02', 'H1')": {
+      "turns": 3,
+      "last_seen_seconds": 135.82907640421763
+    },
+    "('SYNTH02', 'H4')": {
+      "turns": 2,
+      "last_seen_seconds": 135.94872099813074
+    },
+    "('SYNTH02', 'M15')": {
+      "turns": 2,
+      "last_seen_seconds": 136.13063145894557
+    },
+    "('SYNTH02', 'M30')": {
+      "turns": 2,
+      "last_seen_seconds": 136.18125909892842
+    },
+    "('SYNTH02', 'MN')": {
+      "turns": 2,
+      "last_seen_seconds": 136.00155479181558
+    },
+    "('SYNTH02', 'W1')": {
+      "turns": 2,
+      "last_seen_seconds": 136.06430352805182
+    },
+    "('SYNTH02', 'M5')": {
+      "turns": 2,
+      "last_seen_seconds": 136.2315726550296
+    },
+    "('SYNTH02', 'M1')": {
+      "turns": 2,
+      "last_seen_seconds": 135.7505830861628
+    },
+    "('SYNTH03', 'D1')": {
+      "turns": 3,
+      "last_seen_seconds": 140.84355114400387
+    },
+    "('SYNTH03', 'H1')": {
+      "turns": 2,
+      "last_seen_seconds": 140.7321003852412
+    },
+    "('SYNTH03', 'H4')": {
+      "turns": 3,
+      "last_seen_seconds": 140.52726674685255
+    },
+    "('SYNTH03', 'M15')": {
+      "turns": 3,
+      "last_seen_seconds": 140.62495304690674
+    },
+    "('SYNTH03', 'M30')": {
+      "turns": 3,
+      "last_seen_seconds": 140.90662991581485
+    },
+    "('SYNTH03', 'MN')": {
+      "turns": 2,
+      "last_seen_seconds": 140.68646155390888
+    },
+    "('SYNTH03', 'W1')": {
+      "turns": 2,
+      "last_seen_seconds": 140.78651959681883
+    },
+    "('SYNTH03', 'M5')": {
+      "turns": 2,
+      "last_seen_seconds": 140.45190566405654
+    },
+    "('SYNTH03', 'M1')": {
+      "turns": 2,
+      "last_seen_seconds": 140.37947544408962
+    },
+    "('SYNTH04', 'D1')": {
+      "turns": 3,
+      "last_seen_seconds": 147.51352054299787
+    },
+    "('SYNTH04', 'H1')": {
+      "turns": 2,
+      "last_seen_seconds": 147.0882202819921
+    },
+    "('SYNTH04', 'H4')": {
+      "turns": 3,
+      "last_seen_seconds": 147.15923836221918
+    },
+    "('SYNTH04', 'M15')": {
+      "turns": 2,
+      "last_seen_seconds": 147.32001266581938
+    },
+    "('SYNTH04', 'M30')": {
+      "turns": 2,
+      "last_seen_seconds": 147.37548971688375
+    },
+    "('SYNTH04', 'MN')": {
+      "turns": 2,
+      "last_seen_seconds": 147.41628685500473
+    },
+    "('SYNTH04', 'W1')": {
+      "turns": 2,
+      "last_seen_seconds": 147.46607139706612
+    },
+    "('SYNTH04', 'M5')": {
+      "turns": 2,
+      "last_seen_seconds": 147.23193722218275
+    },
+    "('SYNTH04', 'M1')": {
+      "turns": 2,
+      "last_seen_seconds": 147.01100877393037
+    },
+    "('SYNTH05', 'D1')": {
+      "turns": 3,
+      "last_seen_seconds": 151.91120521118864
+    },
+    "('SYNTH05', 'H1')": {
+      "turns": 3,
+      "last_seen_seconds": 152.07165638310835
+    },
+    "('SYNTH05', 'H4')": {
+      "turns": 3,
+      "last_seen_seconds": 152.11834262218326
+    },
+    "('SYNTH05', 'M15')": {
+      "turns": 2,
+      "last_seen_seconds": 151.95936923800036
+    },
+    "('SYNTH05', 'M30')": {
+      "turns": 2,
+      "last_seen_seconds": 152.01827976992354
+    },
+    "('SYNTH05', 'MN')": {
+      "turns": 2,
+      "last_seen_seconds": 151.6961845322512
+    },
+    "('SYNTH05', 'W1')": {
+      "turns": 2,
+      "last_seen_seconds": 151.7711780280806
+    },
+    "('SYNTH05', 'M5')": {
+      "turns": 2,
+      "last_seen_seconds": 151.83735772687942
+    },
+    "('SYNTH05', 'M1')": {
+      "turns": 2,
+      "last_seen_seconds": 151.63853811612353
+    },
+    "('SYNTH06', 'D1')": {
+      "turns": 3,
+      "last_seen_seconds": 156.76783925900236
+    },
+    "('SYNTH06', 'H1')": {
+      "turns": 3,
+      "last_seen_seconds": 156.39961095992476
+    },
+    "('SYNTH06', 'H4')": {
+      "turns": 3,
+      "last_seen_seconds": 156.33637823117897
+    },
+    "('SYNTH06', 'M15')": {
+      "turns": 2,
+      "last_seen_seconds": 156.56073585292324
+    },
+    "('SYNTH06', 'M30')": {
+      "turns": 2,
+      "last_seen_seconds": 156.6270840340294
+    },
+    "('SYNTH06', 'MN')": {
+      "turns": 2,
+      "last_seen_seconds": 156.6657519112341
+    },
+    "('SYNTH06', 'W1')": {
+      "turns": 2,
+      "last_seen_seconds": 156.7171192909591
+    },
+    "('SYNTH06', 'M5')": {
+      "turns": 2,
+      "last_seen_seconds": 156.4682505298406
+    },
+    "('SYNTH06', 'M1')": {
+      "turns": 2,
+      "last_seen_seconds": 156.22841795906425
+    }
+  },
+  "lock_sample_count": 602,
+  "lock_wait_samples": 0,
+  "lock_sample_errors": [],
+  "limitations": [
+    "Single supplemental run, not replacement for frozen three-repetition suite",
+    "Full before/after bar hash proves idle stability, not independent high-period OHLC correctness",
+    "No external lock holders; sampled absence cannot exclude short waits",
+    "No network API, alert threads, provider, browser, notifications or production SLA"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "source_commit": "ccb2a12b47ea1c9fd06517c2ccf3dec670532ee4",
+  "repetitions": 3,
+  "cpu_mean_percent": 1.161111450731408,
+  "old_cpu_mean_percent": 41.438085761964466,
+  "cpu_reduction": 0.9719796069393443,
+  "sql_per_second": 1.5432575698053796,
+  "old_sql_per_second": 67.2739523433224,
+  "sql_reduction": 0.9770601025203692,
+  "stable_snapshots": true,
+  "historical_audit_reads_and_publication_updates": [
+    {
+      "candle_reads": 0,
+      "audit_reads": 0,
+      "publication_updates": 0
+    },
+    {
+      "candle_reads": 0,
+      "audit_reads": 0,
+      "publication_updates": 0
+    },
+    {
+      "candle_reads": 0,
+      "audit_reads": 0,
+      "publication_updates": 0
+    }
+  ],
+  "assessed_idle_gates_passed": true,
+  "complete_acceptance": false,
+  "scope": "Three completed 300s idle observations against integrated v1.14 frozen fixture/quota; host competition retained in growing raw host records, not a controlled simultaneous A/B or production SLA"
+}

@@ -1,0 +1,38 @@
+{
+  "published_bars": 26290,
+  "targets": 90,
+  "source_fixture_equal": true,
+  "all_published_ranges_counts_equal": true,
+  "queues_empty": true,
+  "metadata_differences": [
+    {
+      "instrument": "EURUSD",
+      "frame": "M30",
+      "differences": {
+        "revision": [
+          1,
+          2
+        ],
+        "initialized": [
+          false,
+          true
+        ]
+      }
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M30",
+      "differences": {
+        "revision": [
+          1,
+          2
+        ],
+        "initialized": [
+          false,
+          true
+        ]
+      }
+    }
+  ],
+  "note": "Candidate drains all durable work before timing; old EURUSD/XAUUSD M30 initialization remained false. Source workload/ranges/counts retained; do not claim all metadata equal."
+}

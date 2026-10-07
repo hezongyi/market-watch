@@ -125,6 +125,10 @@ class RetirementSafetyTests(unittest.TestCase):
         self.c["Config"]["Labels"]["com.docker.compose.service"] = "pg"
         m.validate_retirement("mw-test", [self.c], [self.v], [self.c])
 
+    def test_full_fixed_pg_id_with_owned_volume_allowed(self):
+        self.c['Image'] = self.c['Config']['Image'] = 'sha256:' + 'a' * 64
+        m.validate_retirement('mw-test', [self.c], [self.v], [self.c])
+
     def test_postgres_service_cannot_hide_unknown_database_image(self):
         self.c["Config"]["Image"] = "unknown:latest"
         with self.assertRaises(ValueError):
@@ -239,6 +243,23 @@ class RetirementPostgresIdentityTests(unittest.TestCase):
     def test_verified_official_pg_alias_allowed(self):
         self.validate()
 
+    def test_fixed_pg_id_requires_actual_image_and_official_digest(self):
+        fixed = 'sha256:' + 'a' * 64
+        self.container['Image'] = self.container['Config']['Image'] = fixed
+        self.image['Id'] = fixed
+        self.assertTrue(m.retirement_postgres(self.container))
+        self.validate()
+        self.image['RepoDigests'] = []
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_fixed_pg_id_mismatch_and_wrong_service_are_not_postgres(self):
+        self.container['Config']['Image'] = 'sha256:' + 'a' * 64
+        self.assertFalse(m.retirement_postgres(self.container))
+        self.container['Image'] = self.container['Config']['Image']
+        self.container['Config']['Labels']['com.docker.compose.service'] = 'api'
+        self.assertFalse(m.retirement_postgres(self.container))
+
     def test_locally_retagged_pg_refused(self):
         self.image["RepoDigests"] = []
         with self.assertRaises(ValueError):
@@ -297,6 +318,66 @@ class RetirementPostgresIdentityTests(unittest.TestCase):
         }
         with self.assertRaises(ValueError):
             self.validate()
+
+
+class RetainedDependencyTests(unittest.TestCase):
+    def setUp(self):
+        self.ident = 'sha256:' + 'c' * 64
+        self.container = {'Image': self.ident, 'Config': {'Image': self.ident,
+            'Labels': {'com.docker.compose.service': 'api'}}}
+        self.image = {'Id': self.ident, 'Config': {'Labels': {}}}
+
+    def validate(self):
+        m.validate_retirement_image('mw-test', 'mw-test', self.container, self.image, {self.ident})
+
+    def test_unowned_fixed_dependency_requires_explicit_retention(self):
+        with self.assertRaises(ValueError):
+            m.validate_retirement_image('mw-test', 'mw-test', self.container, self.image)
+        self.validate()
+
+    def test_other_acceptance_dependency_can_be_retained(self):
+        self.image['Config']['Labels'] = {m.PREFIX + k: v for k,v in
+            {'managed': 'true', 'task': 'mw-other', 'project': 'mw-other', 'purpose': 'acceptance'}.items()}
+        self.validate()
+
+    def test_retention_never_accepts_release_rollback_or_partial_labels(self):
+        for labels in [{'purpose': 'release'}, {'purpose': 'rollback'}, {'managed': 'true'}]:
+            self.image['Config']['Labels'] = {m.PREFIX + k: v for k,v in labels.items()}
+            with self.subTest(labels=labels), self.assertRaises(ValueError):
+                self.validate()
+
+    def test_retention_rejects_mutable_tag_and_changed_actual_image(self):
+        self.container['Config']['Image'] = 'dependency:latest'
+        with self.assertRaises(ValueError):
+            self.validate()
+        self.container['Config']['Image'] = self.ident
+        self.image['Id'] = 'sha256:' + 'd' * 64
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_automatic_cleanup_preserves_recorded_retained_dependency(self):
+        image = {'Id': self.ident}
+        docker = SimpleNamespace(images=lambda: [image], containers=lambda: [], run=mock.Mock())
+        with mock.patch.object(m, 'task_records', return_value={'mw-test': {'retained_images': [self.ident]}}), \
+             mock.patch.object(m, 'candidates', return_value=[{'id': self.ident}]), \
+             mock.patch('builtins.print'):
+            self.assertEqual(m.cleanup(docker, automatic=True, apply=True), [])
+        docker.run.assert_not_called()
+
+    def test_restore_counts_include_nonpublic_schema_and_quote_identifiers(self):
+        with mock.patch.object(m, 'pg', side_effect=['["public", "normal"]\n["a\\\"b", "custom"]', '4', '7']) as query:
+            counts = m.table_counts(None, 'pg', 'user', 'db')
+        self.assertEqual(counts, {'"public"."normal"': 4, '"a""b"."custom"': 7})
+        self.assertNotIn("schemaname='public'", query.call_args_list[0].args[-1])
+        self.assertEqual(query.call_args_list[2].args[-1], 'SELECT count(*) FROM "a""b"."custom"')
+
+    def test_restore_fingerprints_detect_content_change_at_equal_row_count(self):
+        docker = SimpleNamespace(run=mock.Mock(side_effect=[
+            SimpleNamespace(stdout=b'{"price":1}\n'), SimpleNamespace(stdout=b'{"price":2}\n')]))
+        source = m.table_fingerprints(docker, 'pg', 'user', 'original', {'"custom"."prices"': 1})
+        restored = m.table_fingerprints(docker, 'pg', 'user', 'restored', {'"custom"."prices"': 1})
+        self.assertNotEqual(source, restored)
+        self.assertIn('ORDER BY row_to_json(t)::text COLLATE "C"', docker.run.call_args.args[-1])
 
 
 class TagOwnershipTests(unittest.TestCase):

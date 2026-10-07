@@ -253,6 +253,7 @@ def test_postgres_weekly_demand_dedup_and_concurrent_claim(monkeypatch):
 def test_postgres_weekly_migration_roundtrip():
     """Exercise actual Alembic scripts, without bootstrap creating the new table."""
     import subprocess
+    import sys
     import uuid
     from pathlib import Path
 
@@ -272,7 +273,7 @@ def test_postgres_weekly_migration_roundtrip():
             {"options":f"-csearch_path={schema}"}).render_as_string(hide_password=False)
         env["PYTHONPATH"] = str(root / "backend")
         for action, target in [("upgrade","head"),("downgrade","h9_chart_preferences"),("upgrade","head")]:
-            result = subprocess.run([str(root / ".venv/bin/alembic"),action,target],
+            result = subprocess.run([sys.executable, '-m', 'alembic', action, target],
                 cwd=root,env=env,capture_output=True,text=True,timeout=60)
             # Do not print the captured output: connection failures may include credentials.
             assert result.returncode == 0, f"Alembic {action} failed (output withheld)"

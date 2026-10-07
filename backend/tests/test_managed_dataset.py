@@ -79,8 +79,18 @@ def test_publication_turn_is_bounded_and_rotates_across_all_periods_and_symbols(
     assert len(calls) == 2 * len(managed.FRAMES)
     assert set(calls) == {(ident, frame) for ident in ("BTCUSDT", "EURUSD")
                           for frame in managed.FRAMES}
-    managed.publish_once()
-    assert calls[-1] == calls[0], "completed rotation starts another pass for realtime changes"
+    # Completing a coverage migration requests a newer input generation for all
+    # dependent periods. It must drain fairly rather than run forever.
+    for _ in range(2 * len(managed.FRAMES) + 1):
+        before = len(calls)
+        result = managed.publish_once()
+        assert len(calls) - before <= 1
+        if not result:
+            break
+    assert not result, "unchanged targets wait after coverage requests have drained"
+    drained = len(calls)
+    assert not managed.publish_once()
+    assert len(calls) == drained
 
 
 def test_viewing_unmaintained_never_creates_plan_or_task(database):
@@ -313,7 +323,7 @@ def test_derived_corrections_wait_for_aggregation_and_survive_rollback(database,
         inst = db.get(Instrument, "BTCUSDT")
         plan = join(db, inst, START, now)
         market.ingest(db, inst, payload(START, 180), received_at=now)
-        for _ in range(4):
+        for _ in range(8):
             publish_frame(db, inst, plan, "M30", now)
         assert len(read_rows(db, inst, "M30", end, 100)) == 6
         market.ingest(db, inst, payload(START + 59 * MINUTE, 1, 30),

@@ -1,0 +1,22 @@
+{
+  "same_visible_snapshot": true,
+  "queues": [
+    0,
+    0
+  ],
+  "cycles": 9,
+  "aggregation_work": 0,
+  "publication_claims": 9,
+  "queries": {
+    "sql_total": 121,
+    "coverage_reads": 18,
+    "candle_reads": 19,
+    "published_count_queries": 1,
+    "publication_updates": 1
+  }
+}
+Traceback (most recent call last):
+  File "/home/quant/repos/market-watch-issue13-plan/docs/verification/issue-13/idle_probe.py", line 55, in <module>
+    assert not any(p for a,p in results), 'BUG: idle publication reports progress and selects 0.1s sleep'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: BUG: idle publication reports progress and selects 0.1s sleep

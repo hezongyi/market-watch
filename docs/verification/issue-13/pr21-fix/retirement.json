@@ -1,0 +1,43 @@
+{
+  "project": "mw-pr21-fix",
+  "task": "mw-pr21-fix",
+  "at": "2026-10-07T22:03:51.951842+00:00",
+  "containers": 1,
+  "volumes": [
+    "mw-pr21-fix_pgdata"
+  ],
+  "networks": [
+    "16aaf0c39f6f"
+  ],
+  "verified_backups": [
+    {
+      "volume_names": [
+        "mw-pr21-fix_pgdata"
+      ],
+      "database": "postgres",
+      "file": "8de794373c923b81.dump",
+      "sha256": "af8f145a91f06044732f71b42d237506c8d23a929edd7d6ea398368d6ed1a346",
+      "tables": {},
+      "table_fingerprints": {},
+      "actual_restore_verified": true
+    },
+    {
+      "volume_names": [
+        "mw-pr21-fix_pgdata"
+      ],
+      "database": "pr21",
+      "file": "94ab7dc74aabc9d8.dump",
+      "sha256": "53a7cdb43e929f713b3380495e14559deb261547e46c1b4f1a341f41f687b427",
+      "tables": {},
+      "table_fingerprints": {},
+      "actual_restore_verified": true
+    }
+  ],
+  "retained_images": [],
+  "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-pr21-fix-20261007T220345-1bc312aa",
+  "other_containers_unchanged": 17,
+  "remaining_project_containers": 0,
+  "remaining_project_volumes": 0,
+  "remaining_project_networks": 0,
+  "note": "All test/probe schemas already removed by finally. At retirement both postgres/pr21 databases had no business tables; both were dumped and actually restored. Private archive not committed."
+}

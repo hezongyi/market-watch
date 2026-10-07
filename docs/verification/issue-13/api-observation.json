@@ -1,0 +1,2921 @@
+{
+  "at": "2026-10-06T22:39:50.680047+00:00",
+  "samples": [
+    {
+      "at": "2026-10-06T22:39:38.073228+00:00",
+      "errors": [],
+      "containers": [
+        {
+          "name": "market-watch-three-layer-api-1",
+          "host_pid": 2429983,
+          "seconds": 5.00854496890679,
+          "threads": [
+            {
+              "tid": 2429983,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.19965878437910262
+            },
+            {
+              "tid": 2430420,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430421,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430422,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430892,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431361,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431362,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965878437910262
+            },
+            {
+              "tid": 2431363,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965878437910262
+            },
+            {
+              "tid": 2431364,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965878437910262
+            },
+            {
+              "tid": 2431366,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.39931756875820523
+            },
+            {
+              "tid": 2431367,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965878437910262
+            },
+            {
+              "tid": 2431371,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431375,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965878437910262
+            },
+            {
+              "tid": 2431376,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965878437910262
+            },
+            {
+              "tid": 2431377,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5989763531373078
+            },
+            {
+              "tid": 2431378,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2465202,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2465203,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2629476,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 2.395905412549231
+        },
+        {
+          "name": "mw-range-main-20261006-api-1",
+          "host_pid": 3123445,
+          "seconds": 5.008528233971447,
+          "threads": [
+            {
+              "tid": 3123445,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.3993189029932105
+            },
+            {
+              "tid": 3123748,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3123749,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3123750,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124008,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965945149660524
+            },
+            {
+              "tid": 3124459,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965945149660524
+            },
+            {
+              "tid": 3124460,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965945149660524
+            },
+            {
+              "tid": 3124461,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.3993189029932105
+            },
+            {
+              "tid": 3124463,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 1.3976161604762367
+            },
+            {
+              "tid": 3124464,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124465,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 22.56151801911639
+            },
+            {
+              "tid": 3124466,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5989783544898157
+            },
+            {
+              "tid": 3124467,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3142727,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3142729,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965945149660524
+            },
+            {
+              "tid": 3191725,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3404458,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3811866,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3813093,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19965945149660524
+            },
+            {
+              "tid": 3813095,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2630169,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 26.355047597551888
+        },
+        {
+          "name": "mw-chart-alerts-integration-api-1",
+          "host_pid": 4099854,
+          "seconds": 5.008051311131567,
+          "threads": [
+            {
+              "tid": 4099854,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.19967846530990324
+            },
+            {
+              "tid": 4100180,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100181,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100182,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100514,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101535,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.3993569306198065
+            },
+            {
+              "tid": 4101540,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19967846530990324
+            },
+            {
+              "tid": 4101541,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 1.1980707918594196
+            },
+            {
+              "tid": 4101550,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.9983923265495163
+            },
+            {
+              "tid": 4101562,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101573,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 23.162701975948774
+            },
+            {
+              "tid": 4101575,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101576,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4102823,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 26.157878955597322
+        },
+        {
+          "name": "market-watch-data-integration-api-1",
+          "host_pid": 2864971,
+          "seconds": 5.0082034901715815,
+          "threads": [
+            {
+              "tid": 2864971,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 1.1980343873356551
+            },
+            {
+              "tid": 2865359,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2865360,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2865361,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2866313,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.7986895915571034
+            },
+            {
+              "tid": 2867046,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.3993447957785517
+            },
+            {
+              "tid": 2867047,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19967239788927585
+            },
+            {
+              "tid": 2867048,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19967239788927585
+            },
+            {
+              "tid": 2867051,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19967239788927585
+            },
+            {
+              "tid": 2867057,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867063,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867065,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2877238,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5990171936678276
+            },
+            {
+              "tid": 2472279,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 1.397706785224931
+            },
+            {
+              "tid": 2568234,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.7986895915571034
+            },
+            {
+              "tid": 2624411,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19967239788927585
+            }
+          ],
+          "cpu_percent": 5.9901719366782755
+        },
+        {
+          "name": "mw-chart-alerts-acceptance-api-1",
+          "host_pid": 2363897,
+          "seconds": 5.0088801882229745,
+          "threads": [
+            {
+              "tid": 2363897,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.19964542221457587
+            },
+            {
+              "tid": 2364373,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364374,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364375,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364661,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365488,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19964542221457587
+            },
+            {
+              "tid": 2365489,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19964542221457587
+            },
+            {
+              "tid": 2365490,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.39929084442915175
+            },
+            {
+              "tid": 2365491,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 1.1978725332874551
+            },
+            {
+              "tid": 2365493,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365494,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 23.957450665749104
+            },
+            {
+              "tid": 2365495,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365496,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2375642,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2378143,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2383010,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2384067,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 26.153550310109438
+        },
+        {
+          "name": "mw-native-mcp-acceptance-api-1",
+          "host_pid": 2019312,
+          "seconds": 5.009107058867812,
+          "threads": [
+            {
+              "tid": 2019312,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.1996363799471329
+            },
+            {
+              "tid": 2019904,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2019905,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2019906,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2020357,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021137,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1996363799471329
+            },
+            {
+              "tid": 2021138,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1996363799471329
+            },
+            {
+              "tid": 2021139,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1996363799471329
+            },
+            {
+              "tid": 2021140,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021142,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021143,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021144,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2028632,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032498,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032499,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032500,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032503,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032504,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032532,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2054000,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 0.7985455197885316
+        },
+        {
+          "name": "mw-range-v180-20261006-api-1",
+          "host_pid": 4015725,
+          "seconds": 5.0090972180478275,
+          "threads": [
+            {
+              "tid": 4015725,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.19963677215067616
+            },
+            {
+              "tid": 4015823,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015824,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015825,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015971,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016542,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016543,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19963677215067616
+            },
+            {
+              "tid": 4016544,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 0.19963677215067616
+            },
+            {
+              "tid": 4016545,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016546,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016548,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016560,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4019160,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4019693,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4046680,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176648,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176653,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176685,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 143271,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 0.5989103164520284
+        }
+      ]
+    },
+    {
+      "at": "2026-10-06T22:39:43.100025+00:00",
+      "errors": [],
+      "containers": [
+        {
+          "name": "market-watch-three-layer-api-1",
+          "host_pid": 2429983,
+          "seconds": 5.020001954399049,
+          "threads": [
+            {
+              "tid": 2429983,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.1992031096967394
+            },
+            {
+              "tid": 2430420,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430421,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430422,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430892,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431361,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992031096967394
+            },
+            {
+              "tid": 2431362,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431363,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431364,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.3984062193934788
+            },
+            {
+              "tid": 2431366,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992031096967394
+            },
+            {
+              "tid": 2431367,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992031096967394
+            },
+            {
+              "tid": 2431371,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431375,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992031096967394
+            },
+            {
+              "tid": 2431376,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5976093290902182
+            },
+            {
+              "tid": 2431377,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431378,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2465202,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2465203,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2629476,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 1.9920310969673942
+        },
+        {
+          "name": "mw-range-main-20261006-api-1",
+          "host_pid": 3123445,
+          "seconds": 5.011573204305023,
+          "threads": [
+            {
+              "tid": 3123445,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": true,
+              "cpu_percent": 0.19953814086582308
+            },
+            {
+              "tid": 3123748,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3123749,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3123750,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124008,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124459,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19953814086582308
+            },
+            {
+              "tid": 3124460,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124461,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 1.5963051269265847
+            },
+            {
+              "tid": 3124463,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19953814086582308
+            },
+            {
+              "tid": 3124464,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124465,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 32.12564067939751
+            },
+            {
+              "tid": 3124466,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124467,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3142727,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3142729,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3191725,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3404458,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3811866,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3813093,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3813095,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2630169,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 34.320560228921565
+        },
+        {
+          "name": "mw-chart-alerts-integration-api-1",
+          "host_pid": 4099854,
+          "seconds": 5.010381780099124,
+          "threads": [
+            {
+              "tid": 4099854,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100180,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100181,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100182,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100514,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101535,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101540,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101541,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.39917117852053835
+            },
+            {
+              "tid": 4101550,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19958558926026918
+            },
+            {
+              "tid": 4101562,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101573,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 33.72996458498549
+            },
+            {
+              "tid": 4101575,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101576,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4102823,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 34.328721352766294
+        },
+        {
+          "name": "market-watch-data-integration-api-1",
+          "host_pid": 2864971,
+          "seconds": 5.01059330208227,
+          "threads": [
+            {
+              "tid": 2864971,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.3991543275262139
+            },
+            {
+              "tid": 2865359,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2865360,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2865361,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2866313,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5987314912893208
+            },
+            {
+              "tid": 2867046,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867047,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19957716376310694
+            },
+            {
+              "tid": 2867048,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19957716376310694
+            },
+            {
+              "tid": 2867051,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19957716376310694
+            },
+            {
+              "tid": 2867057,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867063,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867065,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2877238,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.7983086550524278
+            },
+            {
+              "tid": 2472279,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19957716376310694
+            },
+            {
+              "tid": 2568234,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2624411,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2635186,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 2.59450312892039
+        },
+        {
+          "name": "mw-chart-alerts-acceptance-api-1",
+          "host_pid": 2363897,
+          "seconds": 5.009598285891116,
+          "threads": [
+            {
+              "tid": 2363897,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.19961680416898306
+            },
+            {
+              "tid": 2364373,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364374,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364375,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364661,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365488,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19961680416898306
+            },
+            {
+              "tid": 2365489,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365490,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.3992336083379661
+            },
+            {
+              "tid": 2365491,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.3992336083379661
+            },
+            {
+              "tid": 2365493,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365494,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 31.140221450361356
+            },
+            {
+              "tid": 2365495,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.7984672166759322
+            },
+            {
+              "tid": 2365496,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19961680416898306
+            },
+            {
+              "tid": 2375642,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2378143,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2383010,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2384067,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 33.33600629622017
+        },
+        {
+          "name": "mw-native-mcp-acceptance-api-1",
+          "host_pid": 2019312,
+          "seconds": 5.011287055909634,
+          "threads": [
+            {
+              "tid": 2019312,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": true,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2019904,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2019905,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2019906,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2020357,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021137,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021138,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19954953464913477
+            },
+            {
+              "tid": 2021139,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19954953464913477
+            },
+            {
+              "tid": 2021140,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19954953464913477
+            },
+            {
+              "tid": 2021142,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021143,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.7981981385965391
+            },
+            {
+              "tid": 2021144,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2028632,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032498,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032499,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032500,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032503,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032504,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032532,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2054000,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 1.3968467425439435
+        },
+        {
+          "name": "mw-range-v180-20261006-api-1",
+          "host_pid": 4015725,
+          "seconds": 5.0113398670218885,
+          "threads": [
+            {
+              "tid": 4015725,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.19954743173192013
+            },
+            {
+              "tid": 4015823,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015824,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015825,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015971,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016542,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19954743173192013
+            },
+            {
+              "tid": 4016543,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19954743173192013
+            },
+            {
+              "tid": 4016544,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016545,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19954743173192013
+            },
+            {
+              "tid": 4016546,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016548,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016560,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4019160,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4019693,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4046680,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176648,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176653,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176685,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 143271,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19954743173192013
+            }
+          ],
+          "cpu_percent": 0.9977371586596007
+        }
+      ]
+    },
+    {
+      "at": "2026-10-06T22:39:48.132231+00:00",
+      "errors": [],
+      "containers": [
+        {
+          "name": "market-watch-three-layer-api-1",
+          "host_pid": 2429983,
+          "seconds": 5.024276158772409,
+          "threads": [
+            {
+              "tid": 2429983,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430420,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430421,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430422,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2430892,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431361,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1990336455240414
+            },
+            {
+              "tid": 2431362,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1990336455240414
+            },
+            {
+              "tid": 2431363,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1990336455240414
+            },
+            {
+              "tid": 2431364,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1990336455240414
+            },
+            {
+              "tid": 2431366,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1990336455240414
+            },
+            {
+              "tid": 2431367,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1990336455240414
+            },
+            {
+              "tid": 2431371,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431375,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1990336455240414
+            },
+            {
+              "tid": 2431376,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431377,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2431378,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2465202,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2465203,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2629476,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 1.3932355186682897
+        },
+        {
+          "name": "mw-range-main-20261006-api-1",
+          "host_pid": 3123445,
+          "seconds": 5.0176720400340855,
+          "threads": [
+            {
+              "tid": 3123445,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": true,
+              "cpu_percent": 0.1992956080073354
+            },
+            {
+              "tid": 3123748,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3123749,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3123750,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124008,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992956080073354
+            },
+            {
+              "tid": 3124459,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992956080073354
+            },
+            {
+              "tid": 3124460,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.3985912160146708
+            },
+            {
+              "tid": 3124461,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992956080073354
+            },
+            {
+              "tid": 3124463,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992956080073354
+            },
+            {
+              "tid": 3124464,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124465,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 23.71617735287291
+            },
+            {
+              "tid": 3124466,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3124467,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992956080073354
+            },
+            {
+              "tid": 3142727,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3142729,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3191725,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3404458,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3811866,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3813093,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 3813095,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1992956080073354
+            },
+            {
+              "tid": 2630169,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 25.50983782493893
+        },
+        {
+          "name": "mw-chart-alerts-integration-api-1",
+          "host_pid": 4099854,
+          "seconds": 5.017297065351158,
+          "threads": [
+            {
+              "tid": 4099854,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.19931050264212538
+            },
+            {
+              "tid": 4100180,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100181,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100182,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4100514,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101535,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19931050264212538
+            },
+            {
+              "tid": 4101540,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.39862100528425076
+            },
+            {
+              "tid": 4101541,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.39862100528425076
+            },
+            {
+              "tid": 4101550,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.7972420105685015
+            },
+            {
+              "tid": 4101562,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101573,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 25.9103653434763
+            },
+            {
+              "tid": 4101575,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4101576,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4102823,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 27.903470369897555
+        },
+        {
+          "name": "market-watch-data-integration-api-1",
+          "host_pid": 2864971,
+          "seconds": 5.016322787385434,
+          "threads": [
+            {
+              "tid": 2864971,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 1.196095278216191
+            },
+            {
+              "tid": 2865359,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2865360,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2865361,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2866313,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5980476391080956
+            },
+            {
+              "tid": 2867046,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867047,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867048,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867051,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19934921303603187
+            },
+            {
+              "tid": 2867057,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867063,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2867065,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.7973968521441275
+            },
+            {
+              "tid": 2877238,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.7973968521441275
+            },
+            {
+              "tid": 2472279,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5980476391080956
+            },
+            {
+              "tid": 2568234,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 1.395444491252223
+            },
+            {
+              "tid": 2635186,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5980476391080956
+            }
+          ],
+          "cpu_percent": 6.179825604116988
+        },
+        {
+          "name": "mw-chart-alerts-acceptance-api-1",
+          "host_pid": 2363897,
+          "seconds": 5.016338685993105,
+          "threads": [
+            {
+              "tid": 2363897,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": true,
+              "cpu_percent": 0.39869716245127335
+            },
+            {
+              "tid": 2364373,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364374,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364375,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2364661,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365488,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365489,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19934858122563667
+            },
+            {
+              "tid": 2365490,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.39869716245127335
+            },
+            {
+              "tid": 2365491,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.39869716245127335
+            },
+            {
+              "tid": 2365493,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19934858122563667
+            },
+            {
+              "tid": 2365494,
+              "comm": "uvicorn",
+              "state": "R",
+              "is_main": false,
+              "cpu_percent": 25.317269815655855
+            },
+            {
+              "tid": 2365495,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2365496,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2375642,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2378143,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2383010,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2384067,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 26.912058465460948
+        },
+        {
+          "name": "mw-native-mcp-acceptance-api-1",
+          "host_pid": 2019312,
+          "seconds": 5.016568124759942,
+          "threads": [
+            {
+              "tid": 2019312,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.1993394637789062
+            },
+            {
+              "tid": 2019904,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2019905,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2019906,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2020357,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021137,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1993394637789062
+            },
+            {
+              "tid": 2021138,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1993394637789062
+            },
+            {
+              "tid": 2021139,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1993394637789062
+            },
+            {
+              "tid": 2021140,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1993394637789062
+            },
+            {
+              "tid": 2021142,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021143,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2021144,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5980183913367186
+            },
+            {
+              "tid": 2028632,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032498,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032499,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032500,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032503,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032504,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2032532,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 2054000,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.1993394637789062
+            }
+          ],
+          "cpu_percent": 1.7940551740101558
+        },
+        {
+          "name": "mw-range-v180-20261006-api-1",
+          "host_pid": 4015725,
+          "seconds": 5.009322084020823,
+          "threads": [
+            {
+              "tid": 4015725,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": true,
+              "cpu_percent": 0.19962781055542186
+            },
+            {
+              "tid": 4015823,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015824,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015825,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4015971,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016542,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19962781055542186
+            },
+            {
+              "tid": 4016543,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19962781055542186
+            },
+            {
+              "tid": 4016544,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19962781055542186
+            },
+            {
+              "tid": 4016545,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.19962781055542186
+            },
+            {
+              "tid": 4016546,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4016548,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.5988834316662657
+            },
+            {
+              "tid": 4016560,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4019160,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4019693,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4046680,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176648,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176653,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 4176685,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            },
+            {
+              "tid": 143271,
+              "comm": "uvicorn",
+              "state": "S",
+              "is_main": false,
+              "cpu_percent": 0.0
+            }
+          ],
+          "cpu_percent": 1.5970224844433751
+        }
+      ]
+    }
+  ],
+  "traffic": [
+    {
+      "name": "market-watch-three-layer-api-1",
+      "window_seconds": 60,
+      "access_requests": 133,
+      "health_requests": 22,
+      "by_method_status": {
+        "GET 200": 127,
+        "POST 201": 3,
+        "POST 200": 3
+      },
+      "note": "Access logs only; disabled access logging/SSE/messages not observable"
+    },
+    {
+      "name": "mw-range-main-20261006-api-1",
+      "window_seconds": 60,
+      "access_requests": 16,
+      "health_requests": 13,
+      "by_method_status": {
+        "GET 200": 15,
+        "POST 200": 1
+      },
+      "note": "Access logs only; disabled access logging/SSE/messages not observable"
+    },
+    {
+      "name": "mw-chart-alerts-integration-api-1",
+      "window_seconds": 60,
+      "access_requests": 17,
+      "health_requests": 17,
+      "by_method_status": {
+        "GET 200": 17
+      },
+      "note": "Access logs only; disabled access logging/SSE/messages not observable"
+    },
+    {
+      "name": "market-watch-data-integration-api-1",
+      "window_seconds": 60,
+      "access_requests": 68,
+      "health_requests": 17,
+      "by_method_status": {
+        "GET 200": 67,
+        "POST 200": 1
+      },
+      "note": "Access logs only; disabled access logging/SSE/messages not observable"
+    },
+    {
+      "name": "mw-chart-alerts-acceptance-api-1",
+      "window_seconds": 60,
+      "access_requests": 16,
+      "health_requests": 16,
+      "by_method_status": {
+        "GET 200": 16
+      },
+      "note": "Access logs only; disabled access logging/SSE/messages not observable"
+    },
+    {
+      "name": "mw-native-mcp-acceptance-api-1",
+      "window_seconds": 60,
+      "access_requests": 17,
+      "health_requests": 17,
+      "by_method_status": {
+        "GET 200": 17
+      },
+      "note": "Access logs only; disabled access logging/SSE/messages not observable"
+    },
+    {
+      "name": "mw-range-v180-20261006-api-1",
+      "window_seconds": 60,
+      "access_requests": 17,
+      "health_requests": 17,
+      "by_method_status": {
+        "GET 200": 17
+      },
+      "note": "Access logs only; disabled access logging/SSE/messages not observable"
+    }
+  ],
+  "scope": "Existing Ubuntu APIs read-only; no stack attribution, DB access, or configuration changes"
+}

@@ -1,0 +1,5 @@
+{
+  "phase": "iframe initial ready before M1 check",
+  "reason": "chart-origin index returned403; nginx permission-denied log proved static assets root0700. Corrected task static root0755, credential root stays0700. Host static HTTP200 verified after fix.",
+  "guard_change": "run_browser now requires static origin HTTP200 before launching browser"
+}

@@ -1,0 +1,46 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_low_frequency_reconciliation_recovers_a_missed_request_for_existing_dirty_bucket _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f078e04ddd0>
+
+    def test_low_frequency_reconciliation_recovers_a_missed_request_for_existing_dirty_bucket(database, monkeypatch):
+        from alerts import publication_schedule as schedule
+        from alerts.storage import ChartPublicationState
+        from sqlalchemy import update
+
+        elapsed = [100]
+        monkeypatch.setattr(schedule.time, 'monotonic', lambda: elapsed[0])
+        now = START + 30 * MINUTE + 5000
+        monkeypatch.setattr(managed, 'now_ms', lambda: now)
+        monkeypatch.setattr(storage, 'now_ms', lambda: now)
+        with database.begin() as db:
+            inst = db.get(Instrument, 'BTCUSDT')
+            join(db, inst, START, now)
+            market.ingest(db, inst, {'rows': [
+                dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10)
+                for i in range(30)]}, received_at=now)
+        for _ in range(3 * len(managed.FRAMES)):
+            managed.publish_once()
+        now += 1000
+        with database.begin() as db:
+            market.ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': [
+                dict(timestamp=START + 29 * MINUTE, open=10, high=11, low=9, close=10)]}, received_at=now)
+            # An older application writes bucket jobs without the new state table.
+            # Preserve that dirty job but remove its new wakeup, reproducing a missed
+            # event without mocking either publication or the published reader.
+            db.execute(update(ChartPublicationState).values(
+                processed=ChartPublicationState.requested, next_at=None))
+        assert not managed.publish_once()
+        elapsed[0] += 61
+        for _ in range(len(managed.FRAMES)):
+            managed.publish_once()
+        with database.begin() as db:
+>           assert read_rows(db, db.get(Instrument, 'BTCUSDT'), 'M1', now, 1)[0]['observed_at'] == now
+E           assert 1790555405000 == 1790555406000
+
+backend/tests/test_publication_scheduler.py:169: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_publication_scheduler.py::test_low_frequency_reconciliation_recovers_a_missed_request_for_existing_dirty_bucket
+1 failed, 4 deselected in 1.11s

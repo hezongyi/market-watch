@@ -13,10 +13,11 @@ class Changes:
     price: set[int] = field(default_factory=set)
     volume: set[int] = field(default_factory=set)
     conflicts: set[int] = field(default_factory=set)
+    observation: set[int] = field(default_factory=set)
 
 
 def write_bars(db, instrument_id, timeframe, candles, *, observed_at=None,
-               volume_only=False, authoritative_volume=False):
+               volume_only=False, authoritative_volume=False, observation_only=False):
     # Caller holds the instrument lock; a page is bounded and last occurrence wins.
     db.scalar(select(Instrument).where(Instrument.id == instrument_id).with_for_update())
     unique = {ms(c.start): c for c in candles}
@@ -36,12 +37,16 @@ def write_bars(db, instrument_id, timeframe, candles, *, observed_at=None,
             row = old.get(start)
             price_changed = row is None or row.end != ms(c.end) or any(
                 getattr(row, k) != getattr(c, k) for k in keys)
-            if volume_only and (row is None or price_changed):
+            if (volume_only or observation_only) and (row is None or price_changed):
                 changes.conflicts.add(start)
                 continue
             if row and (observation < row.observed_at or row.complete and not c.complete):
                 continue
+            if row is None or observation > row.observed_at:
+                changes.observation.add(start)
             amount, final = c.volume, bool(c.volume_complete)
+            if observation_only:
+                amount, final = row.volume, row.volume_complete
             if row and not price_changed:
                 if observation < row.volume_received_at:
                     amount, final = row.volume, row.volume_complete
@@ -87,6 +92,23 @@ def write_bars(db, instrument_id, timeframe, candles, *, observed_at=None,
         for row in old.values():
             db.expire(row)
     from .publication_jobs import enqueue_publication
-    enqueue_publication(db, instrument_id, timeframe, changes.price | changes.volume)
+    enqueue_publication(db, instrument_id, timeframe, changes.price | changes.volume | changes.observation)
+    from .publication_schedule import request, source_frames
+    if changes.price or changes.volume or changes.observation:
+        request(db, instrument_id, frames=source_frames(timeframe))
+    if timeframe == 'M1':
+        # Metadata-only observations must reach matching stored aggregates too.
+        # Price/volume updates already trigger their full aggregation in callers.
+        observed_only = sorted(changes.observation - changes.price - changes.volume)
+        from .chart_aggregation import enqueue_aggregation
+        ranges = []
+        for start in observed_only:
+            if ranges and start == ranges[-1][1]:
+                ranges[-1][1] += 60000
+            else:
+                ranges.append([start, start + 60000])
+        for left, right in ranges:
+            enqueue_aggregation(db, instrument_id, left, right,
+                                stamp if observed_at is None else observed_at, kind='observed')
     db.flush()
     return changes

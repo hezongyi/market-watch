@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     oanda_idle_grace_seconds: int = Field(default=60, ge=0, le=900)
     session_hours: int = 24
     market_poll_seconds: int = 15
+    coverage_projection_enabled: bool = True
     import_poll_seconds: int = 30
     initial_history_days: int = Field(default=180, ge=0, le=366)
     postgres_bin_dir: str = ""

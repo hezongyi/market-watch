@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "all_requested_retirements_complete": true,
+  "environment": "Ubuntu quant-server local Docker",
+  "time_utc": "2026-10-07 15:14:18",
+  "project_count": 10,
+  "container_count": 22,
+  "volume_count": 10,
+  "network_count": 13,
+  "restored_database_count": 20,
+  "verified_table_count": 749,
+  "all_backup_sha256_verified": true,
+  "all_business_schema_counts_and_row_fingerprints_verified": true,
+  "all_private_archive_directories_mode": "0700",
+  "post_retirement_owned_containers_volumes_networks": 0,
+  "preserved_shared_images": [
+    "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+    "sha256:22fffffc5d3870433c3001fb0ed76acb01d8de23b4ecd531456390e562616719",
+    "sha256:85022544e2c8fdb6ee170869cdc29bfb8189d8ed1b8ce2e01e42f600a38c87cc",
+    "sha256:8ddc9b93c3a767a845353c8ce6072f2b72a899a2db9f6167a00d866bb39c1e12",
+    "sha256:e1d4551950f32d05147b58ce78160b7646f49ef902ca5fbce8a82ff958b989bb"
+  ],
+  "other_project_container_ids_images_statuses_unchanged": true,
+  "other_project_container_count": 17,
+  "no_global_prune": true,
+  "no_production_deployment": true,
+  "pr_url": "https://github.com/hezongyi/market-watch/pull/21"
+}

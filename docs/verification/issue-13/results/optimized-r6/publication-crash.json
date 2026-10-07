@@ -1,0 +1,49 @@
+{
+  "environment": "Ubuntu isolated unique PostgreSQL schema",
+  "precommit_process_killed": true,
+  "kill_returncode": -9,
+  "uncommitted_visibility_unchanged": true,
+  "pending_generation_retained": true,
+  "actual_new_process_resumed": true,
+  "before": {
+    "payload": {
+      "start": 1790555340000,
+      "end": 1790555400000,
+      "open": "10.0000000000",
+      "high": "11.0000000000",
+      "low": "9.0000000000",
+      "close": "10.0000000000",
+      "complete": true,
+      "revision": 1,
+      "volume": null,
+      "volume_complete": false,
+      "observed_at": 1790555405000
+    },
+    "row_revision": 1,
+    "complete_count": 30,
+    "publication_revision": 1,
+    "requested": 5,
+    "processed": 3
+  },
+  "after": {
+    "payload": {
+      "start": 1790555340000,
+      "end": 1790555400000,
+      "open": "10.0000000000",
+      "high": "11.0000000000",
+      "low": "9.0000000000",
+      "close": "10.0000000000",
+      "complete": true,
+      "revision": 1,
+      "volume": null,
+      "volume_complete": false,
+      "observed_at": 1790555406000
+    },
+    "row_revision": 2,
+    "complete_count": 30,
+    "publication_revision": 2,
+    "requested": 5,
+    "processed": 5
+  },
+  "scope": "Actual publisher process SIGKILL before transaction commit and fresh process resume; no production writes"
+}

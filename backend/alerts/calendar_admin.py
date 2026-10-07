@@ -89,6 +89,8 @@ def apply_profile(db, instrument_id, data, *, apply=False):
     }
     if apply:
         instrument.calendar_profile = profile
+        from .publication_schedule import RULES, request
+        request(db, instrument_id, reason=RULES)
         for bar in affected:
             if bar.complete:
                 db.add(
@@ -104,6 +106,8 @@ def apply_profile(db, instrument_id, data, *, apply=False):
                 )
                 bar.complete = False
                 bar.revision += 1
+                from .publication_jobs import enqueue_publication
+                enqueue_publication(db, instrument_id, bar.timeframe, {bar.start})
         for start, end in sorted(repair):
             db.add(
                 ImportJob(

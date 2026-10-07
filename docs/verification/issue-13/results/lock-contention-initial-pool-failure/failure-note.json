@@ -1,0 +1,7 @@
+{
+  "outcome": "failed",
+  "cause": "Probe shared app pool_size=2/max_overflow=0 between external holder, worker and reader; third connection timed out after 15s. No valid contention baseline.",
+  "source_sha256": "8008b7149d1d1ad61349e4900ba6daa35e6848fe236e189e78307a62ca442605",
+  "correction": "Use a separate NullPool engine for external holder/observer; preserve application pool configuration.",
+  "postgres_running": false
+}

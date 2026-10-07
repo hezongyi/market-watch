@@ -1,0 +1,16 @@
+{
+  "test_command": "python3 -m unittest discover -s tests/ops -p test_docker_lifecycle.py -q",
+  "test_count": 52,
+  "exit_code": 0,
+  "output": "----------------------------------------------------------------------\nRan 52 tests in 0.023s\n\nOK",
+  "tool_sha256": "a98f6a4932a3a5e81678e3f8555f2c98ab6d67742544c3e4b4c9ef161f0a5b56",
+  "installed_tool_bytes_equal": true,
+  "scope": [
+    "fixed local PG image ID with official digest validation",
+    "foreign release/rollback and partial ownership refusal",
+    "full schema count and row content fingerprints",
+    "explicit retained dependencies protected from immediate and later automatic cleanup",
+    "exact project volume/container/network ownership guards"
+  ],
+  "live_restore_evidence": "Per-project terminal reports in this directory; ongoing projects excluded from completion"
+}

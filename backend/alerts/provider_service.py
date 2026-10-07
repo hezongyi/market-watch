@@ -656,15 +656,8 @@ def start():
             _STOP.wait(60)
 
     def alerts():
-        from .chart_alert_worker import step
-        from .composite_watches import step as watch_step
-        while not _STOP.is_set():
-            try:
-                step()
-                watch_step()
-            except Exception:
-                log.exception("Chart alert monitor iteration failed")
-            _STOP.wait(1)
+        from .alert_monitor import run
+        run(_STOP)
 
     _FUTURES = [_EXECUTOR.submit(warmer, source) for source in enabled_sources()]
     _FUTURES.extend(_EXECUTOR.submit(live, source) for source in enabled_sources())
