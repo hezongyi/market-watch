@@ -44,7 +44,7 @@ fixture：EURUSD/XAUUSD/BTCUSDT 及 7 个显式合成身份，每身份 64,000 �
 
 时钟口径：虚拟源时钟每输入前进60秒，每个身份的新bar每10次输入推进一分钟；实际输入间隔为上一输入完成后10秒，因此有处理时间漂移。延迟以真实monotonic输入提交到published M1匹配测量，不是供应商确认或告警新鲜度SLA。新bar摄入received_at为虚拟worker时钟+65秒，这种人工时序不能用于证明消费者的“观察时间不在未来”合同；独立消费者验收必须采用一致的时钟/事件顺序。实时身份的奇偶分配固定为新分钟或同价观察，完整身份×两种输入覆盖尚待补测；保留原套件不在运行中改变输入，以保证三次可比。
 
-长测与数值门槛尚未完成；当前宿主 CPU 接近满载，时间样本标记竞争污染，不能用短测或 SQL 次数宣称 CPU 改善。完成汇总后在核心代码变动前冻结门槛，三层合并后再跑同样负载。
+12份长测已完成且门槛已冻结，报告和限制见下文。原样本宿主竞争较高且不一致，不能由CPU高低或SQL次数宣称性能改善；三层合并后复测同样负载。
 
 API开销已另做三次5秒只读线程采样和60秒access数量统计，见 [api-observation.md](api-observation.md)。热点集中在后台线程，具体业务函数尚未通过堆栈定位；没有把健康请求或无页面访问直接认定为根因。
 
@@ -65,3 +65,28 @@ API开销已另做三次5秒只读线程采样和60秒access数量统计，见 [
 台账刷新与早期记录限制见 [inventory-lifecycle.md](inventory-lifecycle.md)；早期完整inspect记录已被覆盖，不能以最新17容器台账替代初次66容器的详细字段。各文件哈希见evidence-manifest.json（内容证据保全，不代表全任务完成）。
 
 最新状态：12份长测和完整artifact审计已结束，见 [PG报告](pg-baseline-report.md)；非空四周期消费者微基线已完成，见 [消费者报告](consumer-report.md)。[冻结门槛](acceptance-thresholds.md)包含实测口径与尚未测的网络/告警/并发要求。此前进行中/PID是历史记录；suite与finisher均已结束，PG最后核验exited0、running false。合成volume保留；P1–P3仍等待三层合并。
+
+
+## 接续保存与补充验证
+
+方案、脚本、原始测量及published告警小修复已由本地提交 `d362766` 保存，未推送、未开PR、未部署。2026-10-06T23:49:24Z main仍为`0591e56`且开放PR为0，P1–P3保持等待。
+
+`run_supplemental.py` 串行启动本任务PG、执行300秒idle与300秒mixed，finally停止自己的PG；已存在补充输出时拒绝重跑。`supplemental_probe.py`采用fixture epoch加monotonic实际经过时间推进发布/观察时钟（bar_batch内部received_at仍取系统wall clock，保留此限制）；完整published bar指纹含payload和行revision，可见元信息与updated_at分开比较。mixed向十身份各提交一个新分钟和一个同价观察，两个身份同时扩展历史；源M1字段独立构造预期payload。每500ms通过独立PG连接采样等待；不存在外部持锁者且短等待可能漏采，不能从零Lock样本宣称无锁争用。
+
+```bash
+python3 -u docs/verification/issue-13/run_supplemental.py
+```
+
+补充原始输出保存于 `results/supplemental/`，不覆盖原12份长测。单份补测不能替代三重复性能基线或高周期完整正确性证明；网络API、告警线程、供应商、网页/浏览器并发仍不在此探针范围。
+
+
+`run_network_alert.py`在补充idle/mixed完成且容器已退出后运行；使用同project独立PG，probe映射Ubuntu `127.0.0.1:19614` 到真实Uvicorn。运行期含十个published收盘告警、实际发布循环与每秒alert step；网络客户端串行读取10身份×4周期×3次。关闭provider lifespan，无供应商采集/预热和通知投递；完成后probe移除、PG停止，地址不再在线。主机端实际检查受保护API返回401，认证请求在容器内TCP完成。完整网页/浏览器与全应用线程仍需另测。
+
+```bash
+python3 -u docs/verification/issue-13/run_network_alert.py
+```
+
+输出在`results/network-alert/result.json`，宿主采样`results/network-alert-host.jsonl`。进程输出先私有检查，不自动提交未脱敏异常。脚本拒绝覆盖现有输出；发生失败应保留并诊断，不自动重新reset数据库或重跑。该探针在开始输入前将按值导入的写入/聚合/发布now_ms统一为fixture epoch加实际经过时间，核验新源received_at和observed_at均不在消费者时钟之后。
+
+
+补充验证均已实际结束并通过原始artifact审核：[时钟/快照/混合报告](supplemental-report.md)、[TCP/告警报告](network-alert-report.md)。网络API p95/p99=450.18/524.08ms；告警判断观测p95=1.657秒超目标，十个输入均可见且各一个signal。API SQL初次归因只含认证线程，数据路由线程未独立计数；脚本已修正而原结果未重写。PG再次核验停止为exited0，两个probe已移除；19614不再在线。P0全范围与P1–P3仍未完成。

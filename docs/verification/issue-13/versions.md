@@ -1,12 +1,12 @@
 # P0 版本与集成边界
 
-核对时间：2026-10-07（Asia/Singapore）；UTC 原始样本为 2026-10-06 22 时。以各证据的采样时间为准。
+核对时间：2026-10-07（Asia/Singapore）；最新远端核对为2026-10-07T00:01:17Z，其余原始样本以自身时间为准。以各证据的采样时间为准。
 
 | 对象 | 当前证据 | 含义 |
 | --- | --- | --- |
 | GitHub main | `git ls-remote origin refs/heads/main` = `0591e56fb4a59de8e847c43a37b2d015ec2d5cf1` | 本任务基线未变 |
 | 三层 PR | `gh pr list --state open` = `[]` | 核心修复合并条件尚未成立 |
-| 本任务 worktree | `analysis/issue13-performance` / `0591e56` 基线 | 文档/测量脚本和published告警重复读的小修复；其他工作树只读 |
+| 本任务 worktree | `analysis/issue13-performance` / `d362766`，基线`0591e56` | 文档/测量脚本和published告警重复读的小修复；其他工作树只读 |
 | 三层 worktree | `feat/market-data-integration`，初次采样 `22eefb1`，随后仍在变化 | 合并后必须重新核对，不能冻结他人的开发工作 |
 | 正式生产 worker | 只读 Docker 镜像 revision `0591e56`，digest `sha256:0240c0453792e44efc9327fd92855ce651603be3875cb3a8decb56ff2d2c5ad5` | 交接所记生产 `826d316` 已不是当前运行版本 |
 | 本任务 PostgreSQL | 已有本机 `postgres:14-bookworm` 的不可变 image ID `sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872` | 独立 project/network/volume/database，未复用其他数据 |

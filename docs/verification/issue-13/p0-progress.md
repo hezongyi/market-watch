@@ -2,9 +2,12 @@
 
 **当前状态（优先于下文逐轮历史）：** 四场景12份300秒长测全部结束、完整artifact审计通过并汇总；非空40身份/周期配置×3次消费者API/evaluate微基线通过；门槛写入acceptance-thresholds.md（未测项明确保留）。suite和finisher已正常结束，自己的PG最后停止为exited0/running false，合成卷保留。核心P1–P3仍等待三层合并；任务没有完成或部署。下文“进行中/当前PID”是阶段历史记录，不能当作实时状态；最新完整报告为pg-baseline-report.md与consumer-report.md。
 
+
+**2026-10-07接续最新状态：** 本地提交`d362766`已核对且原135份清单哈希匹配；新增idle/mixed各300秒和TCP/告警120秒均实际执行完并通过artifact审核。26,290行空闲完整bar指纹不变但60个publication更新时间变化，SQL65.39/s；混合十身份两类输入20/20可见、p95 23.64秒超目标。网络120次非空请求p95/p99=450.18/524.08ms，十个输入/可见/判断/唯一signal均10；判断观测p95=1.657秒超1秒目标。真实Ubuntu地址曾为127.0.0.1:19614并已从宿主确认401，probe已移除、自己的PG再次实查exited0。原12份基线保留，未部署、未推送、未修改或清理其他实例。补测内部时钟、线程SQL归因与采样误差限制见supplemental-report.md及network-alert-report.md；provider lifespan/完整网页/浏览器/长期重复与迁移回退仍未验收。P1–P3仍等待三层合并，Issue #13未完成。
+
 本轮收尾：初次消费者W1/MN为空的结果保留consumer-empty-window.json；显式扩大历史计划后120次非空API和120次PG告警求值再次通过（p95 51.33/147.20ms），仍有6次warming单列。套件/接续器结束和PGexited0均以实际进程/容器状态核对。数值门槛已冻结，但P0全范围仍缺网络API、输入到告警、浏览器并发、低竞争复测及完整payload/锁等待等，不能宣称全验收。正式覆盖压缩归档往返与SHA256通过；初次台账被刷新覆盖的证据限制和后续归档规则见inventory-lifecycle.md。未推送、未部署、未清理其他实例。
 
-任务工作树 `market-watch-issue13-plan` / `analysis/issue13-performance`，基线 `0591e56`。文档和脚本仍未跟踪，勿 reset/clean。其他工作树持续变化，仅只读检查。
+任务工作树 `market-watch-issue13-plan` / `analysis/issue13-performance`，基线 `0591e56`。已由本地提交 `d362766` 保存方案、脚本、原始测量与published告警小修复；未推送、未开PR、未部署。其他工作树持续变化，仅只读检查。
 
 已完成：等待三层合并条件写入正式方案；空闲最小复现重跑（预期退出 1）；生产只读版本与六文件哈希一致核对；66 容器标签/资源台账；Ubuntu 独立 PG 的真实 Alembic upgrade、固定规模 fixture、预热及初始发布快照保存；四场景 smoke（0号）、八种覆盖格式/异常差集、EXPLAIN ANALYZE BUFFERS；回归矩阵及运行手册。
 
@@ -50,17 +53,10 @@ consumer_probe.py已准备但未运行；它仅在suite完整结束后允许rese
 
 进行中：`python3 -u docs/verification/issue-13/run_suite.py`，当前父 PID `2584143`、终端 exec session ID `44506`；句柄/PID跨会话必须核对命令行与运行状态，不能只信此记录。`results/suite.log`、逐场景 JSONL 与 `suite-host.jsonl` 持续写入。每场景 5 分钟、重复 3 次，顺序 idle/live/backfill/revision；每次先恢复相同 fixture。当前自己的测量容器名 `mw-issue13-p0-measure`，PG `mw-issue13-p0-postgres-1`。只读 `docker inspect ... .State` 与父进程状态确认是否活跃，文件/锁不证明运行；观测超时不自动重启。
 
-下一步：
+下一步（2026-10-07接续校正，替代上文历史待办）：
 
-1. 等待**当前已启动**的套件完成，不重启/覆盖其输出；查父进程退出、`SUITE COMPLETE` 和12份完整结果是否一致。失败先诊断已保存日志，不能伪称完成。
-2. 使用 `python3 docs/verification/issue-13/summarize.py` 汇总正式1–3号结果；未出现 SUITE COMPLETE 时该命令拒绝生成完成报告。检查原始宿主竞争、CPU限流、swap增量、各身份最长等待；同价观察/修订未发布事件不能排除或隐藏。脚本生成数值门槛候选，需要审核竞争与未测消费者后才能冻结；不自动视为验收通过。
-3. 在核心代码变动前冻结数值门槛；竞争污染样本单列，必要时低竞争窗口复测。API/告警延迟与浏览器并发尚未测，保留为未完成项；不得从纯worker基线宣称整体验收。
-4. 检查覆盖案例的安全余量、来源/basis与格式异常；现有其他任务或生产数据库覆盖差集未核实，合成案例不等同于迁移数据等价。
-5. 长测结束脚本自动停止自己的PG，核验停止状态与磁盘空间；保留本任务合成数据卷，不清理其他项目。补充最终 P0 报告、启动/停止方式和残余范围。
-6. 刷新三层 PR/main。无合并则继续保持核心改造等待，不称 Issue #13 完成；合并后同负载复测、确认旧链路，再按方案实施。
-
-短测发现（不是数值验收）：真正空闲20秒49轮、worker执行872条SQL，包括15次审计和130次结构化覆盖读、进程CPU30.55%，snapshot不变。10身份一轮未全部走完，因此20秒live/revision没有足够可见事件延迟样本；正式300秒保留未完成分母。
-
-覆盖案例已证明 legacy 无bounds/source 的有效区间不在结构化表里；分数分钟按ceil/floor裁切且旧received_at五秒余量不得延伸；wrong basis排除，但wrong source当前未排除；非数字bounds报DataError、缺received_at报KeyError。一次热缓存审计查询118.7ms、结构化0.018ms，仅对本合成库；完整原始计划已保存，不是CPU收益。
-
-机器负载：四核Ubuntu采样load约11，CPU user+system接近100%，swap满但短窗口si/so为0。其他任务持续运行；不能按名称/时长推断闲置。本任务PG/probe各0.75CPU，内存512/768MiB，`127.0.0.1:19613`，独立volume/network/db。
+1. `d362766` 已保存，首次接续核对工作树干净；原证据清单135份哈希全部匹配。PG实查已停止，suite/finisher无活跃进程。
+2. 2026-10-07T00:01:17Z远端main仍为`0591e56`，开放PR为0；三层合并条件尚未成立，P1–P3保持等待。
+3. 原12份四场景长测、消费者微基线与冻结门槛已完成，不重复启动或覆盖。补充验证单独保存于`results/supplemental/`：实际经过时间推进fixture时钟、完整published bar指纹、每身份新分钟与同价观察，以及两个身份大回填与十身份实时并存，另采事务锁等待。两份300秒已结束且artifact审核通过；26,290行空闲完整bar指纹一致、60个更新时间变化；mixed十身份两种输入20/20可见，p95 23.64秒超15秒目标。详见supplemental-report.md。
+4. 实际TCP与十个新分钟触发并发短测已完成并另有报告；仍缺完整provider lifespan/网页/浏览器与持续输入验收，没有把短窗口或ASGI微基线冒充全部范围。
+5. 三层合并后整合最新main、核对身份/日历/迁移与保留旧入口，同fixture复测后实施核心改造及迁移/回退。Issue #13仍未完成。
