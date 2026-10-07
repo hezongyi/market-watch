@@ -43,7 +43,7 @@ def health(alert, state, reason=None):
     alert.health, alert.health_reason = state, reason
 
 
-def stored_rows(db, version, config, now):
+def stored_rows(db, version, config, now, *, fixed_origin=None):
     if version.dataset_id:
         dataset = db.get(ProviderDataset, version.dataset_id)
         from .provider_cache import identity
@@ -66,8 +66,17 @@ def stored_rows(db, version, config, now):
         raise ValueError("持久行情身份已改变，需显式编辑告警")
     if config.published:
         from .managed_dataset import read_rows
+        origin = config.calculation_origin
+        if fixed_origin is not None:
+            fixed_origin = max(fixed_origin, config.calculation_origin) if config.calculation_origin is not None else fixed_origin
+            # The first retained row must keep its original gap_before value.
+            # Read its nearest predecessor within the configured history, then
+            # let calculation_rows segment before evaluate filters the origin.
+            previous = read_rows(db, instrument, config.timeframe, fixed_origin, 1,
+                                 dataset_start=config.calculation_origin)
+            origin = previous[0]["start"] if previous else fixed_origin
         rows = read_rows(db, instrument, config.timeframe, now + 1, 100_000,
-                         dataset_start=config.calculation_origin)
+                         dataset_start=origin)
     else:
         rows = chart_rows(db, instrument, config.timeframe, now + 1, 100_000, now, observed=True)
     rows = [{**row, "chart_time": managed_label(row, config.timeframe, config.instrument),
@@ -109,7 +118,8 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
 
         return evaluate_composite(db, alert, version, config, now)
     try:
-        rows, meta = stored_rows(db, version, config, now)
+        rows, meta = stored_rows(db, version, config, now,
+                                 fixed_origin=alert.runtime.get("origin"))
     except ValueError as exc:
         health(alert, "blocked", str(exc))
         return []

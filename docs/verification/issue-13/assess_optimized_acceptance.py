@@ -98,6 +98,8 @@ def main():
             mixed['unpublished_before_final30s'] == 0,'All ten identities receive new minute + observation')
         gate('mixed_runnable_wait_seconds',mixed['longest_target_wait'],10,
             mixed['longest_target_wait'] <= 10,'Only runnable durable generations included')
+        gate('mixed_unresolved_runnable_targets',len(mixed['final_unserved_ready']),0,
+             not mixed['final_unserved_ready'],'All terminal runnable targets remain in the acceptance denominator')
     high = consumer('high-period/result.json')
     if high:
         gate('high_period_oracle_cases',high['case_count'],120,

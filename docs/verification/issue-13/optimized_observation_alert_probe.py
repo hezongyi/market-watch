@@ -139,7 +139,7 @@ def main():
                 samples.append(row)
                 output.write(json.dumps(row)+'\n')
                 output.flush()
-                stop.wait(.2)
+                stop.wait(.05)
 
     workers=[threading.Thread(target=lambda scope=scope,fn=fn:run_guard(scope,fn),name=scope)
         for scope,fn in [('observation-publisher',publisher),('observation-alert',monitor),

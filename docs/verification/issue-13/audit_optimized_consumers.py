@@ -35,9 +35,10 @@ def main():
     outputs.append(dict(scope='consumer_micro',api=120,evaluate=120))
     mixed = read('supplemental/mixed.json')
     assert len(mixed['events']) == 20 and not mixed['unpublished_events']
+    assert not mixed['final_unserved_ready'], 'Mixed workload retains censored runnable targets'
     assert all(v == {'new_bar':1,'observation':1} for v in mixed['inputs_by_identity'].values())
     assert not mixed['lock_sample_errors']
-    outputs.append(dict(scope='mixed',inputs=20,exact_payloads=20))
+    outputs.append(dict(scope='mixed',inputs=20,exact_payloads=20,terminal_runnable_targets=0))
     high = read('high-period/result.json')
     assert high['outcome'] == 'passed' and high['case_count'] == 120
     assert len(high['phases']) == 4
