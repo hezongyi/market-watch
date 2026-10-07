@@ -1,5 +1,9 @@
 # Git与版本维护
 
+## v1.12.1 Ubuntu Docker 运维维护发布
+
+PR #15 在 `ec9403a` 合入main，落地专用BuildKit、任务归属构建、备份及实际恢复验证后的验收退役、定时镜像清理与空间告警。按维护版本1.12.1同步Python/web及锁文件根包、CHANGELOG和源码清单，发布整理不改变受测工具逻辑。用户授权创建并推送附注标签v1.12.1，指向发布元数据PR最终main合并提交，保留旧标签。工具25项测试及Ubuntu实际构建、恢复和清理通过；schema/业务逻辑/依赖不变。见 deploy/releases/v1.12.1-source.json 和 docs/ubuntu-docker-v1.12.1-source-delivery.md。本次发布源码，不切换Unraid生产。
+
 ## v1.12.0 范围映射与柱宽同步源码发布
 
 PR #12 在 `77834e5` 合入main，新增范围映射、原生同步设置及柱宽同步，采用兼容功能次版本1.12.0。Python/web/锁文件根版本和CHANGELOG同步，发布整理分支只调整版本及记录，不改变受测功能源码。用户授权合并及推tag；以发布整理PR的最终main合并提交创建、推送附注标签v1.12.0，保留旧标签。当前Ubuntu候选54项/4组浏览器和21项模块通过，两轴审核无开放P1/P2；候选镜像保持实际来源。见 deploy/releases/v1.12.0-source.json 和 docs/chart-range-v1.12.0-source-delivery.md；本次只发布源码，生产另行授权。
