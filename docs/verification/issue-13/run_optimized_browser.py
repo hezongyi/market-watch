@@ -13,10 +13,13 @@ from run_suite import command, observe, HERE
 ROOT = HERE / os.environ.get('ISSUE13_CONSUMER_OUTPUT', 'results/optimized')
 
 PROJECT = os.environ.get('ISSUE13_PROJECT', 'mw-issue13-optimized')
+BROWSER_COMPOSE = Path(os.environ.get('ISSUE13_BROWSER_COMPOSE', str(HERE/'optimized_browser.compose.yaml')))
+APP_URL = os.environ.get('ISSUE13_BROWSER_APP_URL', 'https://192.168.7.232:19635')
+CHART_URL = os.environ.get('ISSUE13_BROWSER_CHART_URL', 'https://192.168.7.232:19636')
 PREFIX=['docker','compose','--env-file',os.environ.get('ISSUE13_BROWSER_ENV',
     '/tmp/mw-issue13-optimized-browser-private/compose.env'), '-p',PROJECT,
     '-f',os.environ.get('ISSUE13_COMPOSE',str(HERE/'optimized.compose.yaml')),
-    '-f',str(HERE/'optimized_browser.compose.yaml')]
+    '-f',str(BROWSER_COMPOSE)]
 SERVICES=['api','publisher','web','chart-origin']
 
 
@@ -27,13 +30,16 @@ def main():
         'label=com.docker.compose.project='+PROJECT,'--format','{{.Names}}']),text=True).strip()
     if running:raise SystemExit('Own other measurement still running; no concurrent fixture reset')
     target.mkdir()
-    paths=[HERE/name for name in ('optimized_browser_probe.cjs','browser_setup.py','optimized_browser.compose.yaml',
-        'run_optimized_browser.py','capture_optimized_browser_environment.py')]
-    (target/'executed-source-manifest.json').write_text(json.dumps({str(p.relative_to(HERE)):
-        hashlib.sha256(p.read_bytes()).hexdigest() for p in paths},indent=2)+'\n')
-    assets={str(p.relative_to(HERE.parents[2])):hashlib.sha256(p.read_bytes()).hexdigest()
+    source = Path(os.environ['ISSUE13_SOURCE'])
+    paths={name:source/'docs/verification/issue-13'/name for name in
+        ('optimized_browser_probe.cjs','browser_setup.py')}
+    paths.update(optimized_browser_compose=BROWSER_COMPOSE,
+        run_optimized_browser=Path(__file__),capture_environment=HERE/'capture_optimized_browser_environment.py')
+    (target/'executed-source-manifest.json').write_text(json.dumps({name:
+        hashlib.sha256(p.read_bytes()).hexdigest() for name,p in paths.items()},indent=2)+'\n')
+    assets={str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest()
         for directory in ('backend/alerts','web/src','advanced-host')
-        for p in (HERE.parents[2]/directory).rglob('*') if p.is_file()
+        for p in (source/directory).rglob('*') if p.is_file()
         and '__pycache__' not in p.parts and 'charting_library' not in p.parts}
     (target/'built-source-manifest.json').write_text(json.dumps(assets,indent=2)+'\n')
     try:
@@ -45,16 +51,16 @@ def main():
         deadline=time.monotonic()+90
         while True:
             try:
-                with urllib.request.urlopen('https://192.168.7.232:19635/readyz',timeout=2,context=ssl._create_unverified_context()) as response:
+                with urllib.request.urlopen(APP_URL+'/readyz',timeout=2,context=ssl._create_unverified_context()) as response:
                     if response.status==200:break
             except (OSError,urllib.error.HTTPError):pass
             if time.monotonic()>deadline:raise SystemExit('Own API readiness timeout; no browser verdict')
             time.sleep(1)
         # Check actual iframe static access too; private credentials remain 0700,
         # but the mounted licensed static directory must be readable by Nginx.
-        with urllib.request.urlopen('https://192.168.7.232:19636/',timeout=3,context=ssl._create_unverified_context()) as response:
+        with urllib.request.urlopen(CHART_URL+'/',timeout=3,context=ssl._create_unverified_context()) as response:
             if response.status!=200:raise SystemExit('Own chart-origin is unavailable before browser launch')
-        with urllib.request.urlopen('https://192.168.7.232:19635/',timeout=3,context=ssl._create_unverified_context()) as response:
+        with urllib.request.urlopen(APP_URL+'/',timeout=3,context=ssl._create_unverified_context()) as response:
             if response.status!=200:raise SystemExit('Own built frontend is unavailable before browser launch')
         with (target/'browser-process.log').open('x') as out,(target/'host.jsonl').open('x') as samples:
             proc=subprocess.Popen(command(PREFIX+['run','--rm','--name',PROJECT+'-browser',
