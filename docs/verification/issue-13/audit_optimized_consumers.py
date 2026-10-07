@@ -1,5 +1,7 @@
 """Saved consumer evidence audit, preserving failures and exact denominators."""
 import json
+import gzip
+import hashlib
 import os
 from pathlib import Path
 
@@ -35,7 +37,24 @@ def main():
         assert len(phase['cases']) == 30
         assert all(row['chart_csv_mcp_alert_read_equal'] and
                    row['expected_sha256'] == row['actual_sha256'] for row in phase['cases'])
-    outputs.append(dict(scope='independent_high_period',cases=120,duplicate_idempotent=True))
+    from high_period_oracle import expected
+    def sha(value):
+        return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+    fixture=json.loads((HERE/os.environ.get('ISSUE13_OUTPUT','results/optimized-baseline')/'fixture.json').read_text())
+    for phase in high['phases']:
+        raw=gzip.decompress((ROOT/'high-period'/(phase['label']+'-sources.json.gz')).read_bytes())
+        assert hashlib.sha256(raw).hexdigest()==phase['source_archive_sha256']
+        inputs=json.loads(raw)
+        stamp=max(fixture['now'],max(row['observed_at'] for data in inputs.values()
+            for rows in data['frames'].values() for row in rows))
+        for case in phase['cases']:
+            data=inputs[case['instrument']]
+            rows=expected(data['frames']['M15' if case['timeframe']=='M30' else 'D1'],
+                case['timeframe'],data['meta'],fixture['start'],fixture['now']-5000,stamp)
+            assert sha(rows)==case['expected_sha256']
+    snapshots=json.loads(gzip.decompress((ROOT/'high-period/final-snapshots.json.gz').read_bytes()))
+    assert sha(snapshots)==high['phases'][-1]['snapshot_sha256']
+    outputs.append(dict(scope='independent_high_period',cases=120,duplicate_idempotent=True,offline_recomputed=True))
     observation = read('observation-alert/result.json')
     timeline = [json.loads(line) for line in (ROOT/'observation-alert/timeline.jsonl').read_text().splitlines()]
     assert observation['outcome'] == 'passed' and not observation['errors']

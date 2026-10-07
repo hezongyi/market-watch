@@ -261,6 +261,11 @@ async def main():
             [Path(__file__),Path(__file__).with_name('high_period_oracle.py'),
                 Path('backend/alerts/managed_dataset.py'),Path('backend/alerts/chart_data.py'),
                 Path('backend/alerts/chart_alert_worker.py'),Path('backend/alerts/bar_batch.py')]})
+    # Preserve actual terminal PG payloads before another consumer resets it.
+    snapshots=full_snapshots()
+    assert sha(snapshots)==reports[-1]['snapshot_sha256']
+    with (ROOT/'final-snapshots.json.gz').open('xb') as output:
+        output.write(gzip.compress(json.dumps(snapshots,sort_keys=True).encode(),mtime=0))
     (ROOT/'result.json').write_text(json.dumps(report,indent=2)+'\n')
     print('HIGH PERIOD COMPLETE: 120 independent cases; duplicate full snapshot idempotent',flush=True)
 
