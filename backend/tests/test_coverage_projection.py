@@ -1,5 +1,6 @@
 """Legacy proof preservation through the published coverage read interface."""
 
+import pytest
 from alerts import market
 from alerts.storage import Audit, Instrument, MarketCoverage
 from sqlalchemy import event
@@ -222,3 +223,70 @@ def test_explicit_verify_rechecks_completed_projection_after_old_writer(database
         result = backfill_page(db, inst, administrative=True)
         assert result['complete'] and result['examined'] == 2
         assert market.stored_coverage(db, inst, 0, 300000) == [dict(start=0,end=240000)]
+
+
+@pytest.mark.parametrize('retain_staging', [True, False])
+def test_initial_verify_preserves_calendar_complete_source_and_snapshot(database, retain_staging):
+    from datetime import UTC, datetime
+
+    from alerts.coverage_projection import backfill_page
+    from alerts.storage import Bar, ChartPublication, ChartPublishedBar, candle_dict, ms
+    from sqlalchemy import delete, select
+
+    start = ms(datetime(2026, 9, 28, tzinfo=UTC))
+    with database.begin() as db:
+        inst = db.get(Instrument, 'EURUSD')
+        inst.calendar_profile = {'revision': 'reviewed-fixture', 'closures': [{
+            'start': '2026-09-28T00:30:00+00:00', 'end': '2026-09-28T01:00:00+00:00',
+            'reason': 'synthetic reviewed closure', 'source': 'https://example.test/calendar'}]}
+        market.ingest(db, inst, {'rows': [dict(timestamp=start+i*60000,
+            open=10, high=11, low=9, close=10) for i in range(30)]},
+            received_at=start+3600000+5000)
+        source = db.scalar(select(Bar).where(Bar.instrument_id == inst.id, Bar.timeframe == 'H1'))
+        assert source.complete and source.revision == 1
+        payload = candle_dict(source.candle())
+        db.add(ChartPublication(instrument_id=inst.id, timeframe='H1', start=start,
+            end=start+3600000, complete_count=1, revision=7, initialized=True))
+        db.add(ChartPublishedBar(instrument_id=inst.id, timeframe='H1', start=start,
+            end=start+3600000, complete=True, revision=source.revision, payload=payload))
+        if not retain_staging:
+            db.execute(delete(Bar).where(Bar.instrument_id == inst.id))
+    for _ in range(5):
+        with database.begin() as db:
+            result = backfill_page(db, db.get(Instrument, 'EURUSD'), administrative=True)
+        if result['complete']:
+            break
+    assert result['complete']
+    with database.begin() as db:
+        source = db.scalar(select(Bar).where(Bar.instrument_id == 'EURUSD', Bar.timeframe == 'H1'))
+        if retain_staging:
+            assert source.complete and source.revision == 1
+        published = db.get(ChartPublishedBar, ('EURUSD', 'H1', start))
+        pub = db.get(ChartPublication, ('EURUSD', 'H1'))
+        assert published.complete and published.revision == 1 and published.payload == payload
+        assert pub.complete_count == 1 and pub.revision == 7
+
+
+def test_proof_removal_keeps_hour_supported_by_complete_actual_minutes(database):
+    from alerts.coverage_projection import backfill_page, rebuild
+    from alerts.storage import Bar
+    from sqlalchemy import delete, select
+
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        market.ingest(db, inst, {'rows': [dict(timestamp=i*60000,
+            open=10, high=11, low=9, close=10) for i in range(60)]}, received_at=3605000)
+    for _ in range(5):
+        with database.begin() as db:
+            result = backfill_page(db, db.get(Instrument, 'BTCUSDT'), administrative=True)
+        if result['complete']:
+            break
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        row = db.scalar(select(Bar).where(Bar.instrument_id == inst.id, Bar.timeframe == 'H1'))
+        assert row.complete and row.revision == 1
+        db.execute(delete(MarketCoverage).where(MarketCoverage.instrument_id == inst.id))
+        assert rebuild(db, inst)['complete']
+        db.refresh(row)
+        assert row.complete and row.revision == 1
+        assert market.stored_coverage(db, inst, 0, 3600000) == []

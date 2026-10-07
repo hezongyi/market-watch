@@ -245,6 +245,33 @@ def _revoke_dependents(db, inst, removed):
                 dict(start=a, end=b) for a, b in removed])))
 
 
+def _unproven_open_intervals(db, inst, removed):
+    """Loss of query proof does not invalidate actual minutes or known closure.
+
+    Administrative verification only: use the same calendar interpretation as
+    aggregation, keeping this independent evidence out of the raw projection.
+    """
+    from .calendar_profile import closures_from
+    from .domain import calendar_for, scheduled_open
+    from .market import is_gold
+    from .storage import Bar, instant
+
+    calendar, closures = calendar_for(inst), closures_from(inst.calendar_profile)
+    result = []
+    for left, right in removed:
+        observed = merged((row.start, row.end) for row in db.scalars(select(Bar).where(
+            Bar.instrument_id == inst.id, Bar.timeframe == 'M1', Bar.complete.is_(True),
+            Bar.start < right, Bar.end > left)))
+        for a, b in removed_intervals([(left, right)], observed):
+            for at in range(a, b, MINUTE):
+                if scheduled_open(instant(at), calendar, gold=is_gold(inst.id), closures=closures):
+                    if result and result[-1][1] == at:
+                        result[-1][1] = min(at + MINUTE, b)
+                    else:
+                        result.append([at, min(at + MINUTE, b)])
+    return result
+
+
 def rebuild(db, inst):
     """Explicit administrative proof correction; never called from publisher ticks.
 
@@ -273,7 +300,7 @@ def rebuild(db, inst):
         db.execute(delete(MarketCoverageProjection).where(*_where(MarketCoverageProjection, inst)))
         db.add_all([MarketCoverageProjection(**_keys(inst), start=a, end=b) for a, b in expected])
         state.version += 1
-    removed = removed_intervals(previous, expected)
+    removed = _unproven_open_intervals(db, inst, removed_intervals(previous, expected))
     added = removed_intervals(expected, previous)
     _revoke_dependents(db, inst, removed)
     from .chart_aggregation import enqueue_aggregation

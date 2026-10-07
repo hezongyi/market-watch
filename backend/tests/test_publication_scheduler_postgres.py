@@ -241,6 +241,12 @@ def test_postgres_explicit_verify_rechecks_completed_projection(publication_pg):
     projection_contracts.test_explicit_verify_rechecks_completed_projection_after_old_writer(publication_pg[0])
 
 
+@pytest.mark.parametrize('retain_staging', [True, False])
+def test_postgres_initial_verify_preserves_calendar_complete_snapshot(publication_pg, retain_staging):
+    projection_contracts.test_initial_verify_preserves_calendar_complete_source_and_snapshot(
+        publication_pg[0], retain_staging)
+
+
 def test_postgres_rollback_invalidates_unpublished_coverage(publication_pg, monkeypatch):
     from test_publication_admin import (
         test_rollback_invalidates_every_coverage_identity_including_unpublished,
