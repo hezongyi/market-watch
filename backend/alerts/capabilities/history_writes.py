@@ -22,6 +22,10 @@ class DatasetWrite(WriteInput):
     dataset_id: str = Field(min_length=64, max_length=64)
 
 
+class ReclaimDataset(DatasetWrite):
+    expected_review_revision: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+
+
 class ConfigureMaintenance(DatasetWrite):
     maintenance: MaintenanceRequest
 
@@ -74,9 +78,16 @@ def submit(ctx, body, db):
 
 
 def reclaim(ctx, body, db):
+    from ..history_retention import ReclamationConflict
     from ..history_retention import reclaim as command
 
-    return invoke(command, db, body.dataset_id, request_id(ctx, body, "reclaim"))
+    try:
+        return command(db, body.dataset_id, request_id(ctx, body, "reclaim"),
+                       expected_review_revision=body.expected_review_revision)
+    except ReclamationConflict as error:
+        raise CapabilityError("RECLAMATION_CHANGED", str(error), context={"references": error.report}) from None
+    except ValueError as error:
+        raise CapabilityError("DATA_UNAVAILABLE", str(error)) from None
 
 
 def register_history_writes(registry):
@@ -93,7 +104,7 @@ def register_history_writes(registry):
          lambda ctx, body, db: invoke(commands.change_aggregation, db, body.dataset_id, body.aggregation)),
         ("history_request_artifacts", "Queue specified period artifacts from a published immutable M1 version. Pending periods stay unavailable until publication; no download or live demand.", RequestArtifacts,
          lambda ctx, body, db: invoke(commands.request_artifacts, db, body.version_id, body.timeframes)),
-        ("history_reclaim_dataset", "Physically reclaim prices only from a paused archived managed dataset with no surviving business references or active tasks. Rechecks under locks; preserves shared reachable blocks and evidence. Explicit destructive operation.", DatasetWrite, reclaim),
+        ("history_reclaim_dataset", "Physically reclaim prices only from a paused archived managed dataset with no surviving business references or active tasks. Optionally pins reviewed impact revision; conflicts return current impact. Rechecks under locks; preserves shared reachable blocks and evidence. Explicit destructive operation.", ReclaimDataset, reclaim),
     ]
     for name, description, model, handler in entries:
         registry.register(Capability(name, description, model, Record,

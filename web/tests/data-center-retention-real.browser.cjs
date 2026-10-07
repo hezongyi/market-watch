@@ -55,7 +55,7 @@ const credentials = JSON.parse(fs.readFileSync(path.join(root, 'artifacts/data-i
     await page.goto(base + `/market-data/datasets/${id}?section=references`);
     await page.getByRole('button', {name: '查看回收影响', exact: true}).click();
     const deletion = page.waitForResponse(r => r.url().endsWith(`/datasets/${id}/reclaim`) && r.request().method() === 'POST');
-    await page.getByRole('button', {name: '回收无引用历史价格', exact: true}).click();
+    await page.getByRole('button', {name: '删除所列数据', exact: true}).click();
     const removed = await deletion;
     expect(removed.status()).toBe(200);
     const result = await removed.json();

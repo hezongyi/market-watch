@@ -226,12 +226,22 @@ def references(db, dataset_id):
                 if count and table.name not in ("market_history_chunks", "market_history_artifacts"):
                     add("dependency", table.name, f"{count} 条固定版本依赖")
     plan = db.get(DatasetMaintenance, dataset_id)
-    return {"dataset_id": dataset_id, "items": refs, "can_reclaim": not refs and bool(plan and plan.archived and plan.paused),
+    result = {"dataset_id": dataset_id, "items": refs, "can_reclaim": not refs and bool(plan and plan.archived and plan.paused),
             "requires_archive": not bool(plan and plan.archived and plan.paused),
             "retains": "来源与数据集身份、发布清单和回收记录保留；无引用价格数据物理回收"}
+    from .history_reclamation_impact import report
+
+    result["impact"] = report(db, dataset, result)
+    return result
 
 
-def reclaim(db, dataset_id, request_id):
+class ReclamationConflict(ValueError):
+    def __init__(self, report, message):
+        self.report = report
+        super().__init__(message)
+
+
+def reclaim(db, dataset_id, request_id, *, expected_review_revision=None):
     if not request_id or len(request_id) > 100:
         raise ValueError("请提供有效回收提交标识")
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
@@ -242,10 +252,13 @@ def reclaim(db, dataset_id, request_id):
     if previous:
         return previous.summary
     report = references(db, dataset_id)
+    if (expected_review_revision is not None and
+            expected_review_revision != report["impact"]["review_revision"]):
+        raise ReclamationConflict(report, "回收影响或引用已变化，所列数据未删除；请重新查看影响并核对。")
     if report["items"]:
-        raise ValueError("历史仍被引用或有活动任务，请先处理引用；不能回收")
+        raise ReclamationConflict(report, "历史仍被引用或有活动任务，请先处理引用；不能回收")
     if report["requires_archive"]:
-        raise ValueError("请先暂停维护并归档，再回收无引用历史")
+        raise ReclamationConflict(report, "请先暂停维护并归档，再回收无引用历史")
     versions = list(db.scalars(select(HistoryVersion.id).where(HistoryVersion.dataset_id == dataset_id,
         ~select(HistoryReclamation.version_id).where(HistoryReclamation.version_id == HistoryVersion.id).exists())))
     artifacts = select(HistoryArtifact.id).where(HistoryArtifact.version_id.in_(versions))

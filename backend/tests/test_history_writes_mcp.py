@@ -131,11 +131,15 @@ def test_aggregation_artifacts_and_reference_guarded_reclamation(mcp):
     for action in ("pause", "archive"):
         assert not call(client, writer, "history_control_maintenance", {"dataset_id": destination,
             "action": action, "idempotency_key": "destination-" + action})["isError"]
+    reviewed = call(client, writer, "history_get_references", {"dataset_id": destination})["structuredContent"]
     with factory.begin() as db:
         db.add(ChartWorkspace(name="protect destination", document={"version": derived}))
     guard = call(client, writer, "history_reclaim_dataset", {"dataset_id": destination,
-        "idempotency_key": "saved-reference"})
+        "expected_review_revision": reviewed["impact"]["review_revision"], "idempotency_key": "saved-reference"})
     assert guard["isError"]
+    error = guard["structuredContent"]["error"]
+    assert error["code"] == "RECLAMATION_CHANGED"
+    assert error["context"]["references"]["items"][0]["kind"] == "workspace"
     with factory.begin() as db:
         for row in db.scalars(select(ChartWorkspace)):
             db.delete(row)

@@ -82,6 +82,7 @@ class ArtifactRequest(BaseModel):
 class ReclamationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     request_id: str = Field(min_length=1, max_length=100)
+    expected_review_revision: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
 
 
 class ManagedRequest(BaseModel):
@@ -162,11 +163,14 @@ def router(authenticated):
 
     @routes.post("/datasets/{dataset_id}/reclaim")
     def reclaim_history(dataset_id: str, body: ReclamationRequest):
-        from .history_retention import reclaim
+        from .history_retention import ReclamationConflict, reclaim
 
         try:
             with transaction() as db:
-                return reclaim(db, dataset_id, body.request_id)
+                return reclaim(db, dataset_id, body.request_id, expected_review_revision=body.expected_review_revision)
+        except ReclamationConflict as error:
+            raise HTTPException(409, {"code": "RECLAMATION_CHANGED", "message": str(error),
+                                      "references": error.report}) from None
         except ValueError as error:
             raise HTTPException(409, str(error)) from None
 
