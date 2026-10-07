@@ -63,6 +63,12 @@ def revalidate_page(instrument_id, *, after=0, published=False, limit=500):
                 row.received_at = now_ms()
             affected.append({"timeframe": row.timeframe, "start": row.start, "end": row.end})
         if affected:
+            if not published:
+                from .publication_jobs import enqueue_publication
+                from .publication_schedule import RULES, request, source_frames
+                for item in affected:
+                    enqueue_publication(db, inst.id, item['timeframe'], {item['start']})
+                    request(db, inst.id, frames=source_frames(item['timeframe']), reason=RULES)
             db.add(Audit(kind="candidate_completeness_retracted", details={
                 "instrument": inst.id, "published": published, "bars": affected,
                 "reason": "unreviewed phase cannot certify unobserved minutes as closed"}))

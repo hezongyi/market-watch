@@ -2,9 +2,11 @@
 
 from datetime import UTC, datetime
 
-from alerts import managed_dataset as managed, market, storage
+from alerts import managed_dataset as managed
+from alerts import market, storage
 from alerts.managed_dataset import join, read_rows, status
 from alerts.storage import Instrument, ms
+from sqlalchemy import event
 
 START = ms(datetime(2026, 9, 28, tzinfo=UTC))
 MINUTE = 60000
@@ -35,3 +37,172 @@ def test_finished_publication_enters_wait_without_rewriting_visible_snapshot(dat
                  for frame in managed.FRAMES}
     assert before == after
     assert not result, 'An idle target is not progress and must allow worker waiting'
+
+
+def test_idle_ready_check_does_not_read_source_history(database, monkeypatch):
+    now = START + 30 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: now)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        join(db, inst, START, now)
+        market.ingest(db, inst, {'rows': [
+            dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10)
+            for i in range(30)]}, received_at=now)
+    for _ in range(3 * len(managed.FRAMES)):
+        managed.publish_once()
+    # SQL is an external work-budget observation, not a mocked collaborator.
+    reads = []
+    engine = database.kw['bind']
+
+    def record(conn, cursor, statement, parameters, context, many):
+        if 'FROM candles' in statement:
+            reads.append(statement)
+
+    event.listen(engine, 'before_cursor_execute', record)
+    try:
+        for _ in managed.FRAMES:
+            managed.publish_once()
+    finally:
+        event.remove(engine, 'before_cursor_execute', record)
+    assert not reads, 'Idle ready checks must not reconstruct unchanged history'
+
+
+def test_same_price_new_observation_wakes_only_its_persisted_snapshot(database, monkeypatch):
+    now = START + 30 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: now)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    rows = [dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10)
+            for i in range(30)]
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        join(db, inst, START, now)
+        market.ingest(db, inst, {'rows': rows}, received_at=now)
+    for _ in range(3 * len(managed.FRAMES)):
+        managed.publish_once()
+    now += 1000
+    with database.begin() as db:
+        market.ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': rows[-1:]}, received_at=now)
+    progressed = False
+    for _ in managed.FRAMES:
+        result = managed.publish_once()
+        progressed |= result.snapshot_changed
+        with database.begin() as db:
+            visible = read_rows(db, db.get(Instrument, 'BTCUSDT'), 'M1', now, 1)[0]
+        if visible['observed_at'] == now:
+            break
+    assert progressed and visible['observed_at'] == now
+    assert float(visible['close']) == 10
+
+
+def test_single_observation_does_not_reload_a_full_published_history_page(database, monkeypatch):
+    from sqlalchemy.orm import Session
+
+    now = START + 2400 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: now)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        join(db, inst, START, now)
+        market.ingest(db, inst, {'rows': [
+            dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10)
+            for i in range(2400)]}, received_at=now)
+        plan = db.get(storage.ChartHistoryPlan, inst.id)
+        for _ in range(3):
+            managed.publish_frame(db, inst, plan, 'M1', now)
+    now += 1000
+    with database.begin() as db:
+        market.ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': [
+            dict(timestamp=now - 5000 - 1000 - MINUTE, open=10, high=11, low=9, close=10)]}, received_at=now)
+    returned = []
+
+    def observe(query):
+        result = query.invoke_statement()
+        if query.is_select and 'FROM candles' in str(query.statement):
+            snapshot = result.freeze()
+            returned.append(len(snapshot.data))
+            return snapshot()
+        return result
+
+    event.listen(Session, 'do_orm_execute', observe, retval=True)
+    try:
+        with database.begin() as db:
+            inst = db.get(Instrument, 'BTCUSDT')
+            managed.publish_frame(db, inst, db.get(storage.ChartHistoryPlan, inst.id), 'M1', now)
+            assert read_rows(db, inst, 'M1', now, 1)[0]['observed_at'] == now
+    finally:
+        event.remove(Session, 'do_orm_execute', observe)
+    assert sum(returned) <= 10, 'One changed minute must not reload thousands of unchanged source bars'
+
+
+def test_low_frequency_reconciliation_recovers_a_missed_request_for_existing_dirty_bucket(database, monkeypatch):
+    from alerts import publication_schedule as schedule
+    from alerts.storage import ChartPublicationState
+    from sqlalchemy import update
+
+    elapsed = [100]
+    monkeypatch.setattr(schedule.time, 'monotonic', lambda: elapsed[0])
+    now = START + 30 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: now)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        join(db, inst, START, now)
+        market.ingest(db, inst, {'rows': [
+            dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10)
+            for i in range(30)]}, received_at=now)
+    for _ in range(3 * len(managed.FRAMES)):
+        managed.publish_once()
+    now += 1000
+    with database.begin() as db:
+        market.ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': [
+            dict(timestamp=START + 29 * MINUTE, open=10, high=11, low=9, close=10)]}, received_at=now)
+        # An older application writes bucket jobs without the new state table.
+        # Preserve that dirty job but remove its new wakeup, reproducing a missed
+        # event without mocking either publication or the published reader.
+        db.execute(update(ChartPublicationState).values(
+            processed=ChartPublicationState.requested, next_at=None))
+    assert not managed.publish_once()
+    elapsed[0] += 61
+    for _ in range(len(managed.FRAMES)):
+        managed.publish_once()
+    with database.begin() as db:
+        assert read_rows(db, db.get(Instrument, 'BTCUSDT'), 'M1', now, 1)[0]['observed_at'] == now
+
+
+def test_same_price_minute_observation_refreshes_matching_hour_without_price_revision(database, monkeypatch):
+    from alerts.chart_aggregation import aggregate_once
+    from sqlalchemy import select
+    now = START + 60 * MINUTE + 5000
+    monkeypatch.setattr(managed, 'now_ms', lambda: now)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        join(db, inst, START, now)
+        market.ingest(db, inst, {'rows': [
+            dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10)
+            for i in range(60)]}, received_at=now)
+    for _ in range(40):
+        managed.publish_once()
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        before = read_rows(db, inst, 'H1', now, 1)[0]
+        revision = db.scalar(select(storage.Bar.revision).where(
+            storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1'))
+    now += 1000
+    with database.begin() as db:
+        market.ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': [
+            dict(timestamp=START + 59 * MINUTE, open=10, high=11, low=9, close=10)]}, received_at=now)
+    observed = now
+    now += 10000  # Delay the worker; calculation time cannot invent freshness.
+    for _ in range(40):
+        aggregate_once()
+        managed.publish_once()
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        after = read_rows(db, inst, 'H1', now, 1)[0]
+        assert after['observed_at'] == observed
+        assert {k: v for k, v in after.items() if k != 'observed_at'} == {
+            k: v for k, v in before.items() if k != 'observed_at'}
+        assert db.scalar(select(storage.Bar.revision).where(
+            storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1')) == revision

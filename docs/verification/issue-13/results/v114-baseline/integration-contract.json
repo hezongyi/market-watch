@@ -1,0 +1,57 @@
+{
+  "release_commit": "ec00080ff52e34e737eea6ab2bc2ec3d27b52f76",
+  "integrated_commit": "131bf3caf2fa170638c7136d1c29f33c59654975",
+  "migration_head": "am40_chart_revision_demand",
+  "scope": "Old managed compatibility chain; fixed histories/composites retain independent version identities",
+  "module_comparison": {
+    "backend/alerts/managed_dataset.py": {
+      "old_sha256": "79afcc77125e83689708421acbe7ede2b58a8e6fc3ee642ee0281aee6b544ace",
+      "release_sha256": "b9c258b8d5ebb319332deab06c6f462680bf59b36b9c9a1588d30a22af564984",
+      "integrated_sha256": "b9c258b8d5ebb319332deab06c6f462680bf59b36b9c9a1588d30a22af564984",
+      "release_equals_old": false,
+      "integrated_equals_release": true
+    },
+    "backend/alerts/chart_aggregation_worker.py": {
+      "old_sha256": "0279a42624870916b969d436abb23fe8b4a0371ce5a296294cc1c42bc5dde1c4",
+      "release_sha256": "0279a42624870916b969d436abb23fe8b4a0371ce5a296294cc1c42bc5dde1c4",
+      "integrated_sha256": "0279a42624870916b969d436abb23fe8b4a0371ce5a296294cc1c42bc5dde1c4",
+      "release_equals_old": true,
+      "integrated_equals_release": true
+    },
+    "backend/alerts/chart_aggregation.py": {
+      "old_sha256": "381b4b95595bafcc0d9e37e2cdfb63077acbed55d225ad991b83e797f8a2e314",
+      "release_sha256": "381b4b95595bafcc0d9e37e2cdfb63077acbed55d225ad991b83e797f8a2e314",
+      "integrated_sha256": "381b4b95595bafcc0d9e37e2cdfb63077acbed55d225ad991b83e797f8a2e314",
+      "release_equals_old": true,
+      "integrated_equals_release": true
+    },
+    "backend/alerts/bar_batch.py": {
+      "old_sha256": "398d2ab393f99cdfa6e7d965ed02295f99853430ea86d1fa26f3e29ede44b73c",
+      "release_sha256": "398d2ab393f99cdfa6e7d965ed02295f99853430ea86d1fa26f3e29ede44b73c",
+      "integrated_sha256": "398d2ab393f99cdfa6e7d965ed02295f99853430ea86d1fa26f3e29ede44b73c",
+      "release_equals_old": true,
+      "integrated_equals_release": true
+    },
+    "backend/alerts/publication_jobs.py": {
+      "old_sha256": "0a26427e02154c96a994fc2eb2ebe2cf0ee1b9bbbf23982590936caadf22d2b0",
+      "release_sha256": "307a256fe02766ce70983346cd08817a362e52185e3fa6933358a3f8e5097dc6",
+      "integrated_sha256": "307a256fe02766ce70983346cd08817a362e52185e3fa6933358a3f8e5097dc6",
+      "release_equals_old": false,
+      "integrated_equals_release": true
+    },
+    "backend/alerts/market.py": {
+      "old_sha256": "e0d57d7263577ae019de5a6b8e669227b67cb0af1f3ba2a74ae9a7d44b43e097",
+      "release_sha256": "f1794f4c29447bf696328706a6996aa08dcff42345fef6af5e429093a92444f5",
+      "integrated_sha256": "f1794f4c29447bf696328706a6996aa08dcff42345fef6af5e429093a92444f5",
+      "release_equals_old": false,
+      "integrated_equals_release": true
+    },
+    "backend/alerts/chart_data.py": {
+      "old_sha256": "c0d956ae6d4e3d697ee7a824b1d6450e814352baa933e194ece44c6e1ccba6d5",
+      "release_sha256": "78b2fdf5c096b4e4dcfe35ec56e0acdff223f5a995fa6116f6c753c7d4603f7b",
+      "integrated_sha256": "78b2fdf5c096b4e4dcfe35ec56e0acdff223f5a995fa6116f6c753c7d4603f7b",
+      "release_equals_old": false,
+      "integrated_equals_release": true
+    }
+  }
+}

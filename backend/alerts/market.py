@@ -11,7 +11,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import httpx
-from sqlalchemy import BigInteger, func, or_, select, update
+from sqlalchemy import func, or_, select, update
 
 from .bar_batch import write_bars
 from .calendar_profile import closures_from
@@ -68,6 +68,13 @@ def upsert(db, instrument_id, timeframe, c):
 
 
 def stored_coverage(db, instrument, left, right):
+    from .config import settings
+    from .coverage_projection import audit_spans, normalize
+    if settings.coverage_projection_enabled:
+        from .coverage_projection import read
+        projected = read(db, instrument, left, right)
+        if projected is not None:
+            return projected
     coverage = []
     if instrument.source == "oanda":
         db.flush()
@@ -75,22 +82,13 @@ def stored_coverage(db, instrument, left, right):
             select(Audit).where(
                 Audit.kind == "provider_query_coverage",
                 Audit.details["instrument"].as_string() == instrument.id,
-                or_(
-                    Audit.details["range_start"].as_string().cast(BigInteger).is_(None),
-                    (Audit.details["range_start"].as_string().cast(BigInteger) < right)
-                    & (Audit.details["range_end"].as_string().cast(BigInteger) > left),
-                ),
             )
         ):
-            details = audit.details
-            if (
-                details.get("instrument") != instrument.id
-                or details.get("basis") != instrument.basis
-            ):
+            try:
+                spans = audit_spans(instrument, audit.details)
+            except (ValueError, TypeError, KeyError):
                 continue
-            final_cutoff = ((details["received_at"] - 5000) // 60000) * 60000
-            for span in details["ranges"]:
-                coverage.append({"start": span["start"], "end": min(span["end"], final_cutoff)})
+            coverage.extend(dict(start=a, end=b) for a, b in spans if a < right and b > left)
     for span in db.scalars(
         select(MarketCoverage).where(
             MarketCoverage.instrument_id == instrument.id,
@@ -100,7 +98,10 @@ def stored_coverage(db, instrument, left, right):
             MarketCoverage.end > left,
         )
     ):
-        coverage.append({"start": span.start, "end": span.end})
+        try:
+            coverage.extend(dict(start=a, end=b) for a, b in normalize(span.start, span.end))
+        except (ValueError, TypeError):
+            continue
     # Live adapters may query from a sub-minute wall-clock instant. Only full
     # M1 intervals certify maintenance; never leak fractional download cursors.
     return [{'start': (s['start'] + 59999) // 60000 * 60000,
@@ -171,6 +172,7 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
             {'start': int(r['timestamp']), 'end': int(r['timestamp']) + 60000}
             for r in payload['rows'] if not batch or
             (r['complete'] and int(r['timestamp']) + 60000 <= received_at - 5000)])]
+    coverage_changed = False
     for span in spans:
         end = min(span["end"], (received_at - 5000) // 60000 * 60000)
         if end <= span["start"]:
@@ -188,6 +190,7 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
             existing.queried_at = received_at
             existing.observed = span.get("returned", 0)
         else:
+            coverage_changed = True
             db.add(
                 MarketCoverage(
                     instrument_id=instrument.id,
@@ -199,6 +202,12 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
                     queried_at=received_at,
                 )
             )
+    if coverage_changed:
+        from .publication_schedule import COVERAGE, request
+        request(db, instrument.id, reason=COVERAGE, stamp=received_at)
+        from .coverage_projection import merge
+        merge(db, instrument, [(span['start'], min(span['end'], (received_at - 5000) // 60000 * 60000))
+                               for span in spans if span['start'] < min(span['end'], (received_at - 5000) // 60000 * 60000)])
     changed = []
     minute_candles = []
     for raw in payload["rows"]:
@@ -332,7 +341,7 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
                 c = replace(c, volume=amount)
                 c = replace(c, complete=complete, volume_complete=complete and c.volume_complete)
                 outputs.append(c)
-        if kind == "volume":
+        if kind in ("volume", "observed"):
             # Never pair a new quantity with staging prices being repaired.
             from .storage import ChartAggregationJob
             if db.scalar(select(ChartAggregationJob.id).where(
@@ -342,8 +351,15 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
                     ChartAggregationJob.start < latest_boundary,
                     ChartAggregationJob.end > earliest).limit(1)):
                 continue
-        write_bars(db, instrument.id, timeframe, outputs, observed_at=received_at,
-                   volume_only=kind == "volume", authoritative_volume=True)
+        if kind == 'observed':
+            for candle in outputs:
+                members = grouped[(candle.start, candle.end)]
+                write_bars(db, instrument.id, timeframe, [candle],
+                    observed_at=max(row.observed_at for row in members),
+                    authoritative_volume=True, observation_only=True)
+        else:
+            write_bars(db, instrument.id, timeframe, outputs, observed_at=received_at,
+                       volume_only=kind == "volume", authoritative_volume=True)
 
 
 

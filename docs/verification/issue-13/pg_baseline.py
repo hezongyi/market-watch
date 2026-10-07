@@ -26,6 +26,7 @@ if (url.get_backend_name(), url.host, url.database, url.username) != ("postgresq
 from alerts import managed_dataset as m, storage as s
 from alerts.bar_batch import write_bars
 from alerts.chart_aggregation import aggregate_once
+from alerts.chart_aggregation_worker import wait_seconds
 from alerts.market import ingest, stored_coverage
 
 MINUTE = 60000
@@ -37,6 +38,14 @@ ROOT = Path("/results")
 clock = NOW
 m.now_ms = lambda: clock
 s.now_ms = lambda: clock
+
+
+def fixture_tables():
+    from sqlalchemy import inspect
+    available = set(inspect(s.engine).get_table_names())
+    names = ['chart_published_bars', 'chart_publications', 'chart_history_plans']
+    return names + [name for name in ('chart_publication_state', 'market_coverage_checkpoints',
+        'market_coverage_projection', 'market_coverage_quarantine') if name in available]
 
 
 def write_json(name, data):
@@ -139,7 +148,7 @@ def warmup():
 
 def freeze():
     with s.engine.begin() as conn:
-        for name in ('chart_published_bars','chart_publications','chart_history_plans'):
+        for name in fixture_tables():
             conn.execute(text(f'CREATE TABLE fixture_{name} AS TABLE {name}'))
         conn.execute(text('CHECKPOINT'))
     print("initial publication saved", flush=True)
@@ -150,8 +159,9 @@ def reset():
     global clock
     clock=NOW
     with s.engine.begin() as conn:
-        conn.execute(text('TRUNCATE chart_aggregation_jobs, chart_publication_jobs, chart_published_bars, chart_publications, chart_history_plans'))
-        for name in ('chart_published_bars','chart_publications','chart_history_plans'):
+        names = fixture_tables()
+        conn.execute(text('TRUNCATE chart_aggregation_jobs, chart_publication_jobs, ' + ','.join(names)))
+        for name in names:
             conn.execute(text(f'INSERT INTO {name} SELECT * FROM fixture_{name}'))
         conn.execute(text('DELETE FROM candles WHERE start<:start OR "end">:stop'),dict(start=START,stop=NOW-5000))
         conn.execute(text('DELETE FROM audit_events WHERE id>388895'))
@@ -247,7 +257,8 @@ def measure(scenario, seconds, repetition):
     event.listen(s.engine,"before_cursor_execute",before)
     event.listen(s.engine,"after_cursor_execute",after)
     begun, cpu_begun = time.monotonic(), time.process_time()
-    pending, completed, turns, fairness = [], [], [], {}
+    pending, completed, turns = [], [], []
+    ready_since = {}
     sequence, next_input = 0, begun
     raw = ROOT / f"{scenario}-{repetition}.jsonl"
     with raw.open("w") as output:
@@ -259,15 +270,27 @@ def measure(scenario, seconds, repetition):
                 item["committed_seconds"] = time.monotonic()-begun
                 pending.append(item)
                 next_input = time.monotonic()+10
+            # Measure runnable wait, excluding quiet targets waiting for new
+            # evidence. Legacy rotation had every target perpetually runnable.
+            scope = 'verification'
+            with s.transaction() as db:
+                ready = set(db.execute(select(s.ChartPublicationState.instrument_id,
+                    s.ChartPublicationState.timeframe).where(
+                    s.ChartPublicationState.requested > s.ChartPublicationState.processed,
+                    s.ChartPublicationState.next_at <= clock)).all())
+            at = time.monotonic()
+            ready_since = {key: ready_since.get(key, at) for key in ready}
             scope = "worker"
             t = time.monotonic()
             a,p = cycle()
             elapsed = time.monotonic()-t
-            target = m._PUBLISH_CURSOR
-            age = time.monotonic()-fairness.get(target,begun)
-            fairness[target] = time.monotonic()
-            turn = dict(at=time.monotonic()-begun, seconds=elapsed, aggregate=a, publish_claim=p,
-                        target=target, target_wait=age, queries=dict(queries))
+            target = m._PUBLISH_CURSOR if p else None
+            age = time.monotonic()-ready_since.get(target, time.monotonic()) if target else 0
+            age = max(0, age)
+            if target:
+                ready_since[target] = time.monotonic()
+            turn = dict(at=time.monotonic()-begun, seconds=elapsed, aggregate=a, publish_claim=bool(p),
+                        target=target, target_wait=age, ready_targets=len(ready), queries=dict(queries))
             turns.append(turn)
             output.write(json.dumps(turn)+"\n")
             output.flush()
@@ -276,7 +299,7 @@ def measure(scenario, seconds, repetition):
                 if matched(item):
                     completed.append(dict(**item, latency_seconds=time.monotonic()-begun-item["committed_seconds"]))
                     pending.remove(item)
-            time.sleep(.1 if a or p else 1)
+            time.sleep(wait_seconds(a, p))
     duration, cpu = time.monotonic()-begun, time.process_time()-cpu_begun
     event.remove(s.engine,"before_cursor_execute",before)
     event.remove(s.engine,"after_cursor_execute",after)

@@ -38,7 +38,7 @@ def test_old_manual_queue_drained_before_plan_work_and_realtime_excluded(monkeyp
     assert calls==[False,False,True]
 
 
-@pytest.mark.parametrize("publication_pending,expected_sleep", [(True, 0.1), (False, 1)])
+@pytest.mark.parametrize("publication_pending,expected_sleep", [(True, 0.02), (False, 2)])
 def test_publication_rotation_does_not_sleep_as_an_idle_worker(monkeypatch, publication_pending, expected_sleep):
     from alerts import chart_aggregation_worker as publisher
 

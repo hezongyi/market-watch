@@ -1,0 +1,44 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_same_price_minute_observation_refreshes_matching_hour_without_price_revision _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa9cb079f10>
+
+    def test_same_price_minute_observation_refreshes_matching_hour_without_price_revision(database, monkeypatch):
+        from alerts.chart_aggregation import aggregate_once
+        from sqlalchemy import select
+        now = START + 60 * MINUTE + 5000
+        monkeypatch.setattr(managed, 'now_ms', lambda: now)
+        monkeypatch.setattr(storage, 'now_ms', lambda: now)
+        with database.begin() as db:
+            inst = db.get(Instrument, 'BTCUSDT')
+            join(db, inst, START, now)
+            market.ingest(db, inst, {'rows': [
+                dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10)
+                for i in range(60)]}, received_at=now)
+        for _ in range(40):
+            managed.publish_once()
+        with database.begin() as db:
+            inst = db.get(Instrument, 'BTCUSDT')
+            before = read_rows(db, inst, 'H1', now, 1)[0]
+            revision = db.scalar(select(storage.Bar.revision).where(
+                storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1'))
+        now += 1000
+        with database.begin() as db:
+            market.ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': [
+                dict(timestamp=START + 59 * MINUTE, open=10, high=11, low=9, close=10)]}, received_at=now)
+        for _ in range(40):
+            aggregate_once()
+            managed.publish_once()
+        with database.begin() as db:
+            inst = db.get(Instrument, 'BTCUSDT')
+            after = read_rows(db, inst, 'H1', now, 1)[0]
+>           assert after['observed_at'] == now
+E           assert 1790557205000 == 1790557206000
+
+backend/tests/test_publication_scheduler.py:202: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_publication_scheduler.py::test_same_price_minute_observation_refreshes_matching_hour_without_price_revision
+1 failed, 5 deselected in 0.96s
+

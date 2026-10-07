@@ -64,8 +64,8 @@ def expected_days(left, right, calendar, gold, closures):
     return frozenset(expected)
 
 
-def chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
-    rows = _chart_rows(db, instrument, frame, before, limit, now, observed=observed)
+def chart_rows(db, instrument, frame, before, limit, now, *, observed=False, after=None):
+    rows = _chart_rows(db, instrument, frame, before, limit, now, observed=observed, after=after)
     if not rows or frame == "M1":
         return rows
     source = "M15" if frame == "M30" else "D1" if frame in ("W1", "MN") else frame
@@ -82,13 +82,15 @@ def chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
     return rows
 
 
-def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
+def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False, after=None):
     if frame not in FRAMES:
         raise ValueError("未知图表周期")
     if frame not in ("M30", "W1", "MN"):
+        query = select(Bar).where(Bar.instrument_id == instrument.id, Bar.timeframe == frame, Bar.start < before)
+        if after is not None:
+            query = query.where(Bar.start >= after)
         rows = db.scalars(
-            select(Bar)
-            .where(Bar.instrument_id == instrument.id, Bar.timeframe == frame, Bar.start < before)
+            query
             .order_by(Bar.start.desc())
             .limit(limit)
         ).all()[::-1]
@@ -98,8 +100,13 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False):
     # Paginate whole target buckets, so a request never cuts a source bucket in half.
     cutoff_end = bounds(instant(before - 1), frame, calendar)[1]
     source_limit = limit * (2 if source == "M15" else 32 if frame == "MN" else 7) + 32
+    query = select(Bar)
+    if after is not None:
+        # Lower bound is a complete target bucket, including all its M15/D1
+        # members. Calendar boundaries remain authoritative across DST/months.
+        query = query.where(Bar.start >= ms(bounds(instant(after), frame, calendar)[0]))
     rows = db.scalars(
-        select(Bar)
+        query
         .where(
             Bar.instrument_id == instrument.id, Bar.timeframe == source, Bar.start < ms(cutoff_end)
         )

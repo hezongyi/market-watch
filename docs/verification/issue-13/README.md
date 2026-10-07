@@ -168,3 +168,7 @@ python3 docs/verification/issue-13/summarize_observation_alert.py
 用户指定的三层v1.14.0已合入main，已整合为131bf3c；原等待条件解除。[接口/身份/迁移头与新隔离环境](v114-integration.md)记录实际边界。冻结源码和全新独立PG在Ubuntu `mw-issue13-v114`运行四场景复测，输出独立于原证据。`python3 docs/verification/issue-13/audit_v114_baseline.py`只审核已完成份数；`--complete`要求12份实际300秒artifact、成功进程终态和本任务PG停止。当前不声明整个套件结束。
 
 新增`backend/tests/test_publication_scheduler.py`通过真实ingest→publish_once→read_rows/status验证空闲等待，已实测1 failed（0.74秒），与原idle探针同一缺陷；不是依赖失败。原始红灯分别在`results/v114-baseline/idle-red.log`与`scheduler-idle-red.log`，后续按同一反馈链修复。
+
+## v1.14.0 后实施候选
+
+基线 12 次已结束且正常停止。持久调度、增量发布与覆盖投影的当前实现、已测范围及剩余关卡见[implementation-progress.md](implementation-progress.md)。新的 Ubuntu 数据库验证 project 为 `mw-issue13-optimized`，PG 仅监听 `127.0.0.1:19633`；私有 env 不进仓库。优化后的长测使用 [run_optimized_baseline.py](run_optimized_baseline.py)、[optimized.compose.yaml](optimized.compose.yaml) 和冻结候选源码，原始 P0 与 v1.14 基线数据库及结果均保留；不能复用旧输出目录。

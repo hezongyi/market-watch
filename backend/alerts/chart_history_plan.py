@@ -318,4 +318,6 @@ def control_plan(db, instrument, action, now):
                 job.attempts = 0
     plan.updated_at = now
     db.flush()
+    from .publication_schedule import INITIAL, request
+    request(db, instrument, reason=INITIAL, stamp=now, approved=True)
     return plan
