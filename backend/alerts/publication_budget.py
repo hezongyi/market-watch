@@ -24,7 +24,8 @@ class Budget:
     def available(self):
         # Allow one minimal slice even if metadata/lock checks consumed the
         # deadline. Otherwise expensive selection could make no work forever.
-        return self.rows if not self.started or time.monotonic() < self.deadline else 0
+        available = self.rows if self.aggregation_served else max(0, self.rows - 1500)
+        return available if not self.started or time.monotonic() < self.deadline else 0
 
     def reserve_slice(self):
         # One complete source aggregate has a guaranteed turn, even if the

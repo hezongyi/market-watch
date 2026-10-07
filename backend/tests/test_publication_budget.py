@@ -76,6 +76,17 @@ def test_expired_cooperative_deadline_still_allows_one_resumable_page(monkeypatc
         assert budget.available==0
 
 
+def test_shared_source_budget_reserves_one_complete_daily_aggregate():
+    with publication_budget.work_budget() as budget:
+        assert budget.available==2596
+        budget.consume(2596)
+        assert budget.available==0
+        budget.reserve_slice()
+        assert budget.available==1500
+        budget.consume(1500)
+        assert budget.rows==0
+
+
 def test_unchanged_tail_cannot_starve_older_history_after_deadline(database,monkeypatch):
     start=storage.ms(datetime(2026,9,28,tzinfo=UTC))
     now=start+3000*60000+5000
