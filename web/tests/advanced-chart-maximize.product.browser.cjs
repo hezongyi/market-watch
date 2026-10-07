@@ -5,21 +5,30 @@ const assert = require("node:assert/strict");
 const APP = process.env.MAXIMIZE_APP || "https://localhost:17443";
 const CHART = process.env.MAXIMIZE_CHART || "https://127.0.0.1:17444";
 assert.ok(["https://localhost:17443", "https://192.168.7.232:17443"].includes(APP));
-assert.ok(["https://127.0.0.1:17444", "https://mw-chart.test:17444"].includes(CHART));
+assert.ok(["https://127.0.0.1:17444", "https://192.168.7.232:17444"].includes(CHART));
 const report = { environment:"Ubuntu Docker project mw-chart-maximize-20261007", app:APP, chart:CHART, cases:[], errors:[], chartCredentialLeaks:[] };
 const out = process.env.MAXIMIZE_PRODUCT_OUTPUT || "/tmp/mw-chart-maximize-20261007/product-browser.json";
 (async()=>{
   const browser = await chromium.launch({
     executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ||
-      "/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",args:["--no-sandbox",
-        ...(CHART === "https://mw-chart.test:17444" ? ["--host-resolver-rules=MAP mw-chart.test 192.168.7.232", "--no-proxy-server"] : [])],
+      "/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",args:["--no-sandbox", "--no-proxy-server"],
   });
   try {
     const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1600,height:1000}});
+    if(APP === "https://192.168.7.232:17443")await context.addCookies([
+      {name:'session',value:'legacy-root-cookie',domain:'192.168.7.232',path:'/',secure:true,httpOnly:true,sameSite:'Strict'}
+    ]);
     const login=await context.request.post(APP+'/api/login',{
       data:JSON.parse(fs.readFileSync('/tmp/mw-chart-maximize-20261007/login.json','utf8')),
     });
     assert.ok(login.ok());
+    const identity=await login.json();
+    if(APP === "https://192.168.7.232:17443"){
+      const sessions=(await context.cookies()).filter(c=>c.name==='session');
+      assert.equal(sessions.length,1);assert.equal(sessions[0].path,'/api');
+      assert.ok(sessions[0].secure&&sessions[0].httpOnly);
+      report.cookieScope='/api';report.legacyRootCookieCleared=true;
+    }
     const page=await context.newPage();
     page.on('pageerror',e=>report.errors.push(e.message));
     page.on('request',async request=>{
@@ -114,6 +123,9 @@ const out = process.env.MAXIMIZE_PRODUCT_OUTPUT || "/tmp/mw-chart-maximize-20261
     assert.ok(report.hostAsset);
     assert.deepEqual(report.errors,[]);
     assert.deepEqual(report.chartCredentialLeaks,[]);
+    assert.equal((await context.request.post(APP+'/api/logout',{data:{},headers:{'X-CSRF-Token':identity.csrf}})).status(),200);
+    assert.equal((await context.request.get(APP+'/api/session')).status(),401);
+    report.logoutVerified=true;
     console.log('PASS: isolated application, synthetic PG data, four charts + RSI, sync round trips, saved workspace reload');
   } finally {
     fs.writeFileSync(out,JSON.stringify(report,null,2));

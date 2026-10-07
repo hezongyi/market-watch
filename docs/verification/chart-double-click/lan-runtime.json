@@ -1,8 +1,8 @@
 {
-  "at": "2026-10-07T02:10:33.049191+00:00",
+  "at": "2026-10-07T02:15:41.822560+00:00",
   "project": "mw-chart-maximize-20261007",
   "app": "https://192.168.7.232:17443/advanced-charts",
-  "chart": "https://mw-chart.test:17444",
+  "chart": "https://192.168.7.232:17444",
   "chartDNS": null,
   "ports": {
     "443/tcp": [
@@ -28,17 +28,21 @@
     "80/tcp": null
   },
   "webImage": {
-    "ref": "market-watch-web:chart-maximize-lan-local-20261007",
-    "id": "sha256:d9b38b85311469e79bb0c97ca00c68e3824da03ec0ddcc53831927452e93ae25",
+    "ref": "market-watch-web:chart-maximize-lan-ip-20261007",
+    "id": "sha256:0b03a9b813198a47a256521a8b2bf60d452dcd23c9b7af78d584f1ebf0232b8c",
     "labels": {
-      "io.market-watch.built-at": "2026-10-07T02:08:53.693081+00:00",
-      "io.market-watch.commit": "4204565fb92936298b854acc3aabc6aabce43217",
+      "com.docker.compose.project": "mw-chart-maximize-20261007",
+      "com.docker.compose.service": "web",
+      "com.docker.compose.version": "2.40.3",
+      "io.market-watch.built-at": "2026-10-07T02:13:32.960536+00:00",
+      "io.market-watch.commit": "ba6a041eb7428001adb296d2b511cdd416c6e730",
       "io.market-watch.dirty": "true",
-      "io.market-watch.expires-at": "2026-10-14T02:08:53.693081+00:00",
+      "io.market-watch.expires-at": "2026-10-14T02:13:32.960536+00:00",
       "io.market-watch.managed": "true",
       "io.market-watch.project": "mw-chart-maximize-20261007",
       "io.market-watch.purpose": "acceptance",
-      "io.market-watch.task": "mw-chart-maximize-20261007"
+      "io.market-watch.task": "mw-chart-maximize-20261007",
+      "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
     }
   },
   "httpsCertificateSANVerified": true,
@@ -48,8 +52,13 @@
   "productionChanged": false,
   "runningForUserAcceptance": true,
   "chartResolution": {
-    "method": "local hosts mapping",
-    "entry": "192.168.7.232 mw-chart.test",
+    "method": "direct IP",
     "externalDNS": false
-  }
+  },
+  "tlsConfig": "deploy/chart-maximize-lan-tls.conf",
+  "cookieScope": "/api",
+  "legacyRootCookieCleared": true,
+  "chartAPIRoutesHTTP": 404,
+  "chartCredentialLeaks": [],
+  "logoutSessionHTTP": 401
 }

@@ -43,9 +43,13 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
 
 本次 project 固定为 `mw-chart-maximize-20261007`，独立默认网络、`maximize-pg` volume、`chart_maximize` 数据库和随机密码。只填充标记为合成行情的 `MAXFIXTURE` H1 数据；不复制生产数据库、配置、通知或凭据，不启动行情采集和通知 worker。
 
-实际局域网入口：`https://192.168.7.232:17443/advanced-charts`，图表来源 `https://mw-chart.test:17444`。运行主机为 Ubuntu 22.04，Docker 服务端 29.1.3。应用及图表端口分别绑定 Ubuntu 局域网地址和回环地址，数据库不暴露；无需 SSH 转发即可在局域网访问。图表使用本地 hosts 映射到同一 Ubuntu IP，不使用外部解析；独立主机名避免按 IP 登录的 session Cookie 跨端口发送到图表服务。
+实际局域网入口：`https://192.168.7.232:17443/advanced-charts`，图表来源 `https://192.168.7.232:17444`。运行主机为 Ubuntu 22.04，Docker 服务端 29.1.3。应用及图表端口分别绑定 Ubuntu 局域网地址和回环地址，数据库不暴露；直接使用 IP 和端口，无需 SSH 转发、hosts 修改或任何 DNS 解析。`17443` 是登录和完整应用入口，`17444` 是嵌入图表的静态服务，单独打开后不会显示完整应用。
 
-访问电脑的 hosts 添加 `192.168.7.232 mw-chart.test`（Windows：`C:\Windows\System32\drivers\etc\hosts`；macOS/Linux：`/etc/hosts`）。`.test` 为保留测试域名，仅通过此本地映射访问；不依赖外部 DNS。先打开图表来源并接受本次验收自签名证书，再打开主站并接受证书。证书包含 Ubuntu IP 和本地图表主机名，网站及图表均由 Ubuntu 本机 Docker 提供。自动浏览器检查使用 Chromium 显式 host resolver 映射，等效于客户端 hosts。
+先打开 `https://192.168.7.232:17444/` 并接受本次验收自签名证书，再打开应用入口；主站若仍提示证书，接受同一验收证书即可。证书包含 Ubuntu IP。自动浏览器检查直接使用 IP，不设置 host resolver；另用 curl 显式信任本次证书，验证 IP SAN 和两个端口的 HTTPS 响应。
+
+浏览器 Cookie 按主机与路径匹配，不按端口隔离；因此此前采用独立图表主机名。当前仅在此独立验收实例的 TLS 网关将应用 session Cookie 的路径改为 `/api`，登录和退出时清除旧的根路径 session。图表常规资源请求不携带该 Cookie；图表端口拒绝 `/api`、`/api/` 路径，并在静态代理中移除 Cookie、Authorization 和 CSRF 请求头。实际浏览器验证登录后的路径、旧 Cookie 清理、图表请求无凭据、退出后 session 为 401。Cookie Path 不提供不同主机的安全隔离，生产继续使用独立图表域名；这一 IP 配置仅服务于隔离的 Ubuntu 验收。
+
+直接 IP 验收 **4 项通过**，页面异常和图表请求凭据检查均为空；登录、退出与真实 API 保存／重载均正常。运行与浏览器证据见 [局域网运行证据](verification/chart-double-click/lan-runtime.json) 和 [局域网浏览器验收](verification/chart-double-click/lan-browser.json)。验收密码保持不变，凭据不会写入这些报告。
 
 之前仅回环部署时，另一台电脑需同时转发两个端口：`ssh -N -L 17443:127.0.0.1:17443 -L 17444:127.0.0.1:17444 quant@192.168.7.232`。2026-10-07 已复现未信任图表证书时的 `ERR_CERT_AUTHORITY_INVALID`，接受后 HTTP 200；用户补充双端口转发及证书后登录成功，完整应用验收再次通过。当前局域网模式不再需要该转发。
 
@@ -89,7 +93,7 @@ mw-docker retire --task mw-chart-maximize-20261007 --project mw-chart-maximize-2
 ```bash
 LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
   MAXIMIZE_APP=https://192.168.7.232:17443 \
-  MAXIMIZE_CHART=https://mw-chart.test:17444 \
+  MAXIMIZE_CHART=https://192.168.7.232:17444 \
   node web/tests/advanced-chart-maximize.product.browser.cjs
 ```
 
