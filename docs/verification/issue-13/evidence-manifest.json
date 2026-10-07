@@ -1262,8 +1262,8 @@
       "bytes": 2637
     },
     "implementation-progress.md": {
-      "bytes": 6627,
-      "sha256": "1d243d1edc55711b858db48ba073adce842d8b6379f4976f479cc2a678c2ef74"
+      "bytes": 7555,
+      "sha256": "e4eef2c1ffac42452b01f54779d0bbfbbd9e05537e3c894e4cfd557c212f11d0"
     },
     "results/v114-baseline/live-3-sql.json": {
       "sha256": "124436867775982ca67f78dba3990ef572f0c52f9ffae2d277f2b39bfb426156",
@@ -1492,6 +1492,22 @@
     "assess_optimized_acceptance.py": {
       "bytes": 8399,
       "sha256": "6c3b13a4257a5628309560f2161d9c3f563eb8b4af4ba7a573368b9c1e6ac293"
+    },
+    "results/optimized/backend-reviewed-frozen-summary.json": {
+      "bytes": 438,
+      "sha256": "f6ceccbac9d27005920309f505ad1517f4bed9b38f32fe03470035b6f9d8bdc0"
+    },
+    "results/reviewed-contracts/verification-context.json": {
+      "bytes": 530,
+      "sha256": "88617b249ec32a944db095cbda97e95cd347896ee3ee1591085124864c37cda5"
+    },
+    "results/reviewed-contracts/coverage-replay.json": {
+      "bytes": 32553,
+      "sha256": "6240aeaa45e6dad657518e4bdeee6710dc5bb29f48b2779bda17e9c956c68de6"
+    },
+    "results/reviewed-contracts/application-rollback.json": {
+      "bytes": 409,
+      "sha256": "5aac3211944d194d058f25f2354f4316e1ec70f8408deb5baacbac3f7d8a5e44"
     }
   }
 }

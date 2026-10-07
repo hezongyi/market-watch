@@ -1,0 +1,12 @@
+{
+  "source_commit": "682818d",
+  "full_backend_regression_commit": "e529bb1",
+  "backend_sources_identical": true,
+  "coverage_output_directory_failure": {
+    "both_identity_unions_passed": true,
+    "report_save_failed": true,
+    "error": "PermissionError: Docker-created result bind directory initially root-owned",
+    "private_log_sha256": "9ff7f6a8c2932c643ad3bdfe37cf85f501ee7cb34b77c5c13af0ff997e682f07"
+  },
+  "successful_replay_private_log_sha256": "11fcdd568f2e66d7f96060017b1128d4ec42fb5c9d1ed42b298c296e6df8332e"
+}

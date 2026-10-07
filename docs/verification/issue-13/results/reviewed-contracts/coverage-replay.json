@@ -1,0 +1,1324 @@
+{
+  "environment": "Ubuntu isolated mw-issue13-optimized PostgreSQL",
+  "raw_audits": 62522,
+  "raw_structured": 27939,
+  "targets": [
+    {
+      "instrument": "EURUSD",
+      "seconds": 7.727522483561188,
+      "pages": [
+        {
+          "seconds": 0.032456560991704464,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 1
+        },
+        {
+          "seconds": 0.018687705043703318,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 1
+        },
+        {
+          "seconds": 0.170620686840266,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 2
+        },
+        {
+          "seconds": 0.022754451259970665,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 3
+        },
+        {
+          "seconds": 0.02906098822131753,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 4
+        },
+        {
+          "seconds": 0.022840546909719706,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 5
+        },
+        {
+          "seconds": 0.024646001867949963,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 6
+        },
+        {
+          "seconds": 0.018979075830429792,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 6
+        },
+        {
+          "seconds": 0.022853985894471407,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 6
+        },
+        {
+          "seconds": 0.01746537908911705,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 6
+        },
+        {
+          "seconds": 0.019670680165290833,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 7
+        },
+        {
+          "seconds": 0.017913614865392447,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 7
+        },
+        {
+          "seconds": 0.01816491223871708,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 7
+        },
+        {
+          "seconds": 0.0205343309789896,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 8
+        },
+        {
+          "seconds": 0.018120478838682175,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 8
+        },
+        {
+          "seconds": 0.017956333234906197,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 8
+        },
+        {
+          "seconds": 0.019960215780884027,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.017696230672299862,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.01874695997685194,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.017265660222619772,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.0172873567789793,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.02712516486644745,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 10
+        },
+        {
+          "seconds": 0.019671550951898098,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 10
+        },
+        {
+          "seconds": 0.01906554726883769,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 11
+        },
+        {
+          "seconds": 0.018675491213798523,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 12
+        },
+        {
+          "seconds": 0.01645287685096264,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 12
+        },
+        {
+          "seconds": 0.017006936017423868,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 12
+        },
+        {
+          "seconds": 0.019008173141628504,
+          "complete": false,
+          "examined": 471,
+          "phase": "audit",
+          "version": 13
+        },
+        {
+          "seconds": 0.16048022592440248,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 14
+        },
+        {
+          "seconds": 0.21509597403928638,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 15
+        },
+        {
+          "seconds": 0.12730306526646018,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 16
+        },
+        {
+          "seconds": 0.18243060214444995,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 17
+        },
+        {
+          "seconds": 0.12591803120449185,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 18
+        },
+        {
+          "seconds": 0.146554053761065,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 19
+        },
+        {
+          "seconds": 0.12012616405263543,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 20
+        },
+        {
+          "seconds": 0.12306072190403938,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 21
+        },
+        {
+          "seconds": 0.12326889671385288,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 22
+        },
+        {
+          "seconds": 0.14063388528302312,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 23
+        },
+        {
+          "seconds": 0.1135600027628243,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 24
+        },
+        {
+          "seconds": 0.1192307430319488,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 25
+        },
+        {
+          "seconds": 0.11363216117024422,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 26
+        },
+        {
+          "seconds": 0.11461012018844485,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 27
+        },
+        {
+          "seconds": 0.1367918038740754,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 28
+        },
+        {
+          "seconds": 0.10085544176399708,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 29
+        },
+        {
+          "seconds": 0.11272891517728567,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 30
+        },
+        {
+          "seconds": 0.18967845803126693,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 31
+        },
+        {
+          "seconds": 0.10203011892735958,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 32
+        },
+        {
+          "seconds": 0.10495526995509863,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 33
+        },
+        {
+          "seconds": 0.10958939604461193,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 34
+        },
+        {
+          "seconds": 0.09170426614582539,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 35
+        },
+        {
+          "seconds": 0.09906142996624112,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 36
+        },
+        {
+          "seconds": 0.09334667306393385,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 37
+        },
+        {
+          "seconds": 0.1005326621234417,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 38
+        },
+        {
+          "seconds": 0.09072540886700153,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 39
+        },
+        {
+          "seconds": 0.082013132981956,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 40
+        },
+        {
+          "seconds": 0.08394036069512367,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 41
+        },
+        {
+          "seconds": 0.13532771868631244,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 42
+        },
+        {
+          "seconds": 0.07573382277041674,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 43
+        },
+        {
+          "seconds": 0.07318230206146836,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 44
+        },
+        {
+          "seconds": 0.07735401997342706,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 45
+        },
+        {
+          "seconds": 0.08053957810625434,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 46
+        },
+        {
+          "seconds": 0.06641562469303608,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.07716654101386666,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.06174871977418661,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.06519189709797502,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.06151733314618468,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.08990808390080929,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.060932911932468414,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.060438168700784445,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.07016814826056361,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.09959935722872615,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.0547350668348372,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.049795875791460276,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.058559391181916,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.051590563263744116,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.046978969126939774,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.20140516897663474,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.054826314095407724,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.03840995812788606,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.035132198594510555,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.03370460495352745,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.03214156208559871,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.03306943271309137,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.028947853948920965,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.028767606243491173,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.033987849950790405,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.025569923222064972,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.02242316771298647,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.02074346784502268,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.019698512740433216,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.012360597960650921,
+          "complete": false,
+          "examined": 138,
+          "phase": "verify",
+          "version": 47
+        },
+        {
+          "seconds": 1.5392174161970615,
+          "complete": true,
+          "examined": 45109,
+          "phase": "complete",
+          "version": 47
+        }
+      ],
+      "intervals": [
+        [
+          1775062620000,
+          1791327720000
+        ]
+      ],
+      "equivalent": true,
+      "audit_reads_after_completion": 0
+    },
+    {
+      "instrument": "XAUUSD",
+      "seconds": 4.368052452336997,
+      "pages": [
+        {
+          "seconds": 0.03487729327753186,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 1
+        },
+        {
+          "seconds": 0.029257446993142366,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 2
+        },
+        {
+          "seconds": 0.024535784032195807,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 3
+        },
+        {
+          "seconds": 0.023036730010062456,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 4
+        },
+        {
+          "seconds": 0.02406159369274974,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 5
+        },
+        {
+          "seconds": 0.02260857680812478,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 6
+        },
+        {
+          "seconds": 0.023427548818290234,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 7
+        },
+        {
+          "seconds": 0.019614134915173054,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 7
+        },
+        {
+          "seconds": 0.022352079395204782,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 8
+        },
+        {
+          "seconds": 0.019449508748948574,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 8
+        },
+        {
+          "seconds": 0.01846452383324504,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 8
+        },
+        {
+          "seconds": 0.02288245316594839,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.020170920062810183,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.03497349424287677,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.026068259961903095,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.019309321884065866,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.01815614476799965,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.017955472692847252,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.018248460721224546,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.01782807521522045,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.017581970896571875,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.01735334564000368,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 9
+        },
+        {
+          "seconds": 0.02011727634817362,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 10
+        },
+        {
+          "seconds": 0.020524704828858376,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 11
+        },
+        {
+          "seconds": 0.021876154001802206,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 12
+        },
+        {
+          "seconds": 0.019571220967918634,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 13
+        },
+        {
+          "seconds": 0.01614881306886673,
+          "complete": false,
+          "examined": 500,
+          "phase": "structured",
+          "version": 13
+        },
+        {
+          "seconds": 0.01596665382385254,
+          "complete": false,
+          "examined": 468,
+          "phase": "audit",
+          "version": 13
+        },
+        {
+          "seconds": 0.14447751874104142,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 14
+        },
+        {
+          "seconds": 0.19042331911623478,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 15
+        },
+        {
+          "seconds": 0.24002818763256073,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 16
+        },
+        {
+          "seconds": 0.2130684731528163,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 17
+        },
+        {
+          "seconds": 0.1939878249540925,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 18
+        },
+        {
+          "seconds": 0.025444363709539175,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 19
+        },
+        {
+          "seconds": 0.04015632625669241,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 20
+        },
+        {
+          "seconds": 0.01780577003955841,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 21
+        },
+        {
+          "seconds": 0.02014276711270213,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 22
+        },
+        {
+          "seconds": 0.017931232694536448,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 23
+        },
+        {
+          "seconds": 0.01804365823045373,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 24
+        },
+        {
+          "seconds": 0.01869612606242299,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 25
+        },
+        {
+          "seconds": 0.019661436788737774,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 26
+        },
+        {
+          "seconds": 0.018673245329409838,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 27
+        },
+        {
+          "seconds": 0.018090646248310804,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 28
+        },
+        {
+          "seconds": 0.019711477681994438,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 29
+        },
+        {
+          "seconds": 0.019968375097960234,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 30
+        },
+        {
+          "seconds": 0.019350117072463036,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 31
+        },
+        {
+          "seconds": 0.01755133317783475,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 32
+        },
+        {
+          "seconds": 0.018662729766219854,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 33
+        },
+        {
+          "seconds": 0.02057119505479932,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 34
+        },
+        {
+          "seconds": 0.02342909388244152,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 35
+        },
+        {
+          "seconds": 0.018391977064311504,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 36
+        },
+        {
+          "seconds": 0.017491168808192015,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 37
+        },
+        {
+          "seconds": 0.01895372662693262,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 38
+        },
+        {
+          "seconds": 0.019462335854768753,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 39
+        },
+        {
+          "seconds": 0.02204279787838459,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 40
+        },
+        {
+          "seconds": 0.01912711374461651,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 41
+        },
+        {
+          "seconds": 0.02837740583345294,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 42
+        },
+        {
+          "seconds": 0.018106861971318722,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 43
+        },
+        {
+          "seconds": 0.018769098911434412,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 44
+        },
+        {
+          "seconds": 0.019875639118254185,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 45
+        },
+        {
+          "seconds": 0.019756103865802288,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 46
+        },
+        {
+          "seconds": 0.01808413164690137,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 47
+        },
+        {
+          "seconds": 0.01817400101572275,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.016386569943279028,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.021404112223535776,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.016794381197541952,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.015471703838557005,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.01813204400241375,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.015661577694118023,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.01784369582310319,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.018152649980038404,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.016679856926202774,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.017092601861804724,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.018370493780821562,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.19076373567804694,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.015956545248627663,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.015423973090946674,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.028197629377245903,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.02926167706027627,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.017049372661858797,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.01637532887980342,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.015627312008291483,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.016569722909480333,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.01733373710885644,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.016054200939834118,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.015550939831882715,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.016580509021878242,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.02198596904054284,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.016746255103498697,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.017123410012573004,
+          "complete": false,
+          "examined": 500,
+          "phase": "audit",
+          "version": 48
+        },
+        {
+          "seconds": 0.014499945100396872,
+          "complete": false,
+          "examined": 384,
+          "phase": "verify",
+          "version": 48
+        },
+        {
+          "seconds": 1.4924791539087892,
+          "complete": true,
+          "examined": 45352,
+          "phase": "complete",
+          "version": 48
+        }
+      ],
+      "intervals": [
+        [
+          1774990800000,
+          1791327660000
+        ]
+      ],
+      "equivalent": true,
+      "audit_reads_after_completion": 0
+    }
+  ],
+  "scope": "Archived source/basis proof union equality and checkpoint/query behavior; no production writes"
+}
