@@ -41,6 +41,13 @@ def main():
     assert len(micro['api_samples']) == len(micro['alert_samples']) == 120
     assert micro['queries'].get('alert_staging_reads',0) == 0
     assert all(r['bars'] > 0 for r in micro['api_samples'])
+    def micro_stats(samples):
+        values=sorted(row['seconds'] for row in samples)
+        return dict(count=len(values),p50=values[int((len(values)-1)*.5)],
+            p95=values[int((len(values)-1)*.95)],p99=values[int((len(values)-1)*.99)],
+            maximum=max(values))
+    assert micro['api_latency']==micro_stats(micro['api_samples'])
+    assert micro['alert_latency']==micro_stats(micro['alert_samples'])
     outputs.append(dict(scope='consumer_micro',api=120,evaluate=120))
     mixed = read('supplemental/mixed.json')
     assert len(mixed['events']) == 20 and not mixed['unpublished_events']
@@ -138,6 +145,7 @@ def main():
     network = read('network-alert/result.json')
     assert not network['errors'] and network['inputs'] == network['visible'] == network['judged'] == 10
     assert network['api']['count'] == len(network['api_samples']) == 120
+    assert network['api']==dict(count=120,**quantiles([row['seconds'] for row in network['api_samples']]))
     assert all(e['final']['count'] == e['final']['signal_count'] == 1 for e in network['events'])
     upper=[]
     for item in network['events']:
