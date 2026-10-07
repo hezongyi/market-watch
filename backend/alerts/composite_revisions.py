@@ -6,7 +6,7 @@ Activation serializes against another activation and records an event boundary.
 """
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from sqlalchemy import select
+from sqlalchemy import BigInteger, cast, select
 
 from .chart_data import FRAMES
 from .composite_definitions import RULES, key
@@ -309,7 +309,7 @@ def preparation_tick():
             CompositeRevision.activated_at.is_(None), or_(
                 CompositePreparation.state["activation_ready"].as_boolean().is_(None),
                 CompositePreparation.state["activation_ready"].as_boolean().is_(False))
-        ).order_by(CompositePreparation.state["activation_checked_at"].as_integer().asc().nullsfirst(),
+        ).order_by(cast(CompositePreparation.state["activation_checked_at"].as_string(), BigInteger).asc().nullsfirst(),
             CompositeRevision.created_at).limit(20)))
     for ident in revisions:
         with transaction() as db:

@@ -221,6 +221,9 @@ def test_pending_revision_polling_rotates_past_twenty_waiting_tasks(database, mo
     with database.begin() as db:
         for index in range(21):
             ids.append(create(db, composite, {**body, "request_id": "fair-" + str(index)}).id)
+    # Real epoch milliseconds exceed PostgreSQL INTEGER; fixture event times
+    # used for creating revisions must not hide overflow in polling state.
+    monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: 1791333261616)
     preparation_tick()
     with database() as db:
         visited = [ident for ident in ids if "activation_checked_at" in db.get(CompositePreparation, ident).state]
