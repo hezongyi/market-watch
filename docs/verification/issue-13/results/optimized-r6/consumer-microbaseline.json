@@ -1,0 +1,1595 @@
+{
+  "duration": 4.1397767211310565,
+  "process_cpu_percent": 72.18080880419065,
+  "api_latency": {
+    "count": 120,
+    "p50": 0.02445689681917429,
+    "p95": 0.04906137194484472,
+    "p99": 0.10816657682880759,
+    "maximum": 0.21210321970283985
+  },
+  "alert_latency": {
+    "count": 120,
+    "p50": 0.006552373059093952,
+    "p95": 0.013863790780305862,
+    "p99": 0.017635471187531948,
+    "maximum": 0.031637141946703196
+  },
+  "queries": {
+    "api_sql": 480,
+    "api_published_reads": 120,
+    "alert_sql": 840,
+    "alert_published_reads": 240
+  },
+  "api_samples": [
+    {
+      "instrument": "EURUSD",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.061485945247113705,
+      "bars": 500
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.03193931095302105,
+      "bars": 500
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.013074586633592844,
+      "bars": 6
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.1899067391641438,
+      "bars": 1
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.02639273786917329,
+      "bars": 500
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.04906137194484472,
+      "bars": 500
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.022081999108195305,
+      "bars": 6
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.21210321970283985,
+      "bars": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.025532006286084652,
+      "bars": 500
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.026539256796240807,
+      "bars": 500
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.00916179921478033,
+      "bars": 6
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.007502976804971695,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.058540238067507744,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.03867437411099672,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.02174759702757001,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.007898211944848299,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.02624656306579709,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.02900852309539914,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.008510057348757982,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.008390241302549839,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.038899924140423536,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.026486593764275312,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.007436309941112995,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.007064705714583397,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.027039825916290283,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.048790873028337955,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.010137928649783134,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.009407550562173128,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.03106999769806862,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.043174796272069216,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.008450126275420189,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.007227233611047268,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.025854371953755617,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.0329003999941051,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.007149268873035908,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.008604880888015032,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M1",
+      "repetition": 0,
+      "seconds": 0.026268317829817533,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M30",
+      "repetition": 0,
+      "seconds": 0.024843425024300814,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "W1",
+      "repetition": 0,
+      "seconds": 0.009820893872529268,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "MN",
+      "repetition": 0,
+      "seconds": 0.02405005879700184,
+      "bars": 2
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.028141112066805363,
+      "bars": 500
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.028376108966767788,
+      "bars": 500
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.008424601051956415,
+      "bars": 6
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.007016914896667004,
+      "bars": 1
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.04620267590507865,
+      "bars": 500
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.07410622108727694,
+      "bars": 500
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.008963081054389477,
+      "bars": 6
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.011562801897525787,
+      "bars": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.028337834868580103,
+      "bars": 500
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.03607345139607787,
+      "bars": 500
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.008834314066916704,
+      "bars": 6
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.015801650006324053,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.025104899890720844,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.02479156106710434,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.021118537988513708,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.006718397606164217,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.10816657682880759,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.02458880376070738,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.00741954380646348,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.006564564071595669,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.0454456708393991,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.02445689681917429,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.007264285814017057,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.0071362946182489395,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.030818816740065813,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.03794785030186176,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.007633174303919077,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.007538223173469305,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.02667129598557949,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.04261050978675485,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.0074544851668179035,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.006841844879090786,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.03170335106551647,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.02945095021277666,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.021884750109165907,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.010421679820865393,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M1",
+      "repetition": 1,
+      "seconds": 0.025746371131390333,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M30",
+      "repetition": 1,
+      "seconds": 0.023814006242901087,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "W1",
+      "repetition": 1,
+      "seconds": 0.006458770018070936,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "MN",
+      "repetition": 1,
+      "seconds": 0.006401293911039829,
+      "bars": 2
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.039546189829707146,
+      "bars": 500
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.02445298619568348,
+      "bars": 500
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.0159936030395329,
+      "bars": 6
+    },
+    {
+      "instrument": "EURUSD",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.007041787263005972,
+      "bars": 1
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.03799832006916404,
+      "bars": 500
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.03763965331017971,
+      "bars": 500
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.007346514146775007,
+      "bars": 6
+    },
+    {
+      "instrument": "XAUUSD",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.006852192338556051,
+      "bars": 1
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.025551506783813238,
+      "bars": 500
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.030288555193692446,
+      "bars": 500
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.00827154703438282,
+      "bars": 6
+    },
+    {
+      "instrument": "BTCUSDT",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.007449560798704624,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.028233449906110764,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.04295245977118611,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.006981099955737591,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH00",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.006821224000304937,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.025089608039706945,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.02798562729731202,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.007654429879039526,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH01",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.006927215028554201,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.026303556747734547,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.02468557422980666,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.007531350012868643,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH02",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.03324955003336072,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.031216539908200502,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.0297578452154994,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.008715828880667686,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH03",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.01881167944520712,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.025083203800022602,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.029535137116909027,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.007736360188573599,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH04",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.00711043132469058,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.04203727887943387,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.028145183343440294,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.007677725050598383,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH05",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.006865187082439661,
+      "bars": 2
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M1",
+      "repetition": 2,
+      "seconds": 0.04056659294292331,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "M30",
+      "repetition": 2,
+      "seconds": 0.025398375932127237,
+      "bars": 500
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "W1",
+      "repetition": 2,
+      "seconds": 0.007340048439800739,
+      "bars": 6
+    },
+    {
+      "instrument": "SYNTH06",
+      "frame": "MN",
+      "repetition": 2,
+      "seconds": 0.0067156353034079075,
+      "bars": 2
+    }
+  ],
+  "alert_samples": [
+    {
+      "alert_index": 0,
+      "repetition": 0,
+      "seconds": 0.006952719762921333,
+      "health": "ready"
+    },
+    {
+      "alert_index": 1,
+      "repetition": 0,
+      "seconds": 0.006888511124998331,
+      "health": "ready"
+    },
+    {
+      "alert_index": 2,
+      "repetition": 0,
+      "seconds": 0.007448157295584679,
+      "health": "ready"
+    },
+    {
+      "alert_index": 3,
+      "repetition": 0,
+      "seconds": 0.010399492923170328,
+      "health": "warming"
+    },
+    {
+      "alert_index": 4,
+      "repetition": 0,
+      "seconds": 0.014626891352236271,
+      "health": "ready"
+    },
+    {
+      "alert_index": 5,
+      "repetition": 0,
+      "seconds": 0.017635471187531948,
+      "health": "ready"
+    },
+    {
+      "alert_index": 6,
+      "repetition": 0,
+      "seconds": 0.0085207000374794,
+      "health": "ready"
+    },
+    {
+      "alert_index": 7,
+      "repetition": 0,
+      "seconds": 0.00628857733681798,
+      "health": "warming"
+    },
+    {
+      "alert_index": 8,
+      "repetition": 0,
+      "seconds": 0.00982289807870984,
+      "health": "ready"
+    },
+    {
+      "alert_index": 9,
+      "repetition": 0,
+      "seconds": 0.008999322075396776,
+      "health": "ready"
+    },
+    {
+      "alert_index": 10,
+      "repetition": 0,
+      "seconds": 0.009482100140303373,
+      "health": "ready"
+    },
+    {
+      "alert_index": 11,
+      "repetition": 0,
+      "seconds": 0.010398515965789557,
+      "health": "ready"
+    },
+    {
+      "alert_index": 12,
+      "repetition": 0,
+      "seconds": 0.006872247904539108,
+      "health": "ready"
+    },
+    {
+      "alert_index": 13,
+      "repetition": 0,
+      "seconds": 0.009157759137451649,
+      "health": "ready"
+    },
+    {
+      "alert_index": 14,
+      "repetition": 0,
+      "seconds": 0.0077765160240232944,
+      "health": "ready"
+    },
+    {
+      "alert_index": 15,
+      "repetition": 0,
+      "seconds": 0.008150266017764807,
+      "health": "ready"
+    },
+    {
+      "alert_index": 16,
+      "repetition": 0,
+      "seconds": 0.008535172790288925,
+      "health": "ready"
+    },
+    {
+      "alert_index": 17,
+      "repetition": 0,
+      "seconds": 0.0064953831024467945,
+      "health": "ready"
+    },
+    {
+      "alert_index": 18,
+      "repetition": 0,
+      "seconds": 0.0065022059716284275,
+      "health": "ready"
+    },
+    {
+      "alert_index": 19,
+      "repetition": 0,
+      "seconds": 0.006227895151823759,
+      "health": "ready"
+    },
+    {
+      "alert_index": 20,
+      "repetition": 0,
+      "seconds": 0.007725397124886513,
+      "health": "ready"
+    },
+    {
+      "alert_index": 21,
+      "repetition": 0,
+      "seconds": 0.006284084636718035,
+      "health": "ready"
+    },
+    {
+      "alert_index": 22,
+      "repetition": 0,
+      "seconds": 0.006185635924339294,
+      "health": "ready"
+    },
+    {
+      "alert_index": 23,
+      "repetition": 0,
+      "seconds": 0.00608456926420331,
+      "health": "ready"
+    },
+    {
+      "alert_index": 24,
+      "repetition": 0,
+      "seconds": 0.005970417056232691,
+      "health": "ready"
+    },
+    {
+      "alert_index": 25,
+      "repetition": 0,
+      "seconds": 0.005869693122804165,
+      "health": "ready"
+    },
+    {
+      "alert_index": 26,
+      "repetition": 0,
+      "seconds": 0.007259372156113386,
+      "health": "ready"
+    },
+    {
+      "alert_index": 27,
+      "repetition": 0,
+      "seconds": 0.006569064222276211,
+      "health": "ready"
+    },
+    {
+      "alert_index": 28,
+      "repetition": 0,
+      "seconds": 0.009847749024629593,
+      "health": "ready"
+    },
+    {
+      "alert_index": 29,
+      "repetition": 0,
+      "seconds": 0.0064025139436125755,
+      "health": "ready"
+    },
+    {
+      "alert_index": 30,
+      "repetition": 0,
+      "seconds": 0.006407630164176226,
+      "health": "ready"
+    },
+    {
+      "alert_index": 31,
+      "repetition": 0,
+      "seconds": 0.01674220385029912,
+      "health": "ready"
+    },
+    {
+      "alert_index": 32,
+      "repetition": 0,
+      "seconds": 0.006555612199008465,
+      "health": "ready"
+    },
+    {
+      "alert_index": 33,
+      "repetition": 0,
+      "seconds": 0.006224257871508598,
+      "health": "ready"
+    },
+    {
+      "alert_index": 34,
+      "repetition": 0,
+      "seconds": 0.006522178649902344,
+      "health": "ready"
+    },
+    {
+      "alert_index": 35,
+      "repetition": 0,
+      "seconds": 0.006251645274460316,
+      "health": "ready"
+    },
+    {
+      "alert_index": 36,
+      "repetition": 0,
+      "seconds": 0.0067709521390497684,
+      "health": "ready"
+    },
+    {
+      "alert_index": 37,
+      "repetition": 0,
+      "seconds": 0.006601526867598295,
+      "health": "ready"
+    },
+    {
+      "alert_index": 38,
+      "repetition": 0,
+      "seconds": 0.006690431851893663,
+      "health": "ready"
+    },
+    {
+      "alert_index": 39,
+      "repetition": 0,
+      "seconds": 0.00752856582403183,
+      "health": "ready"
+    },
+    {
+      "alert_index": 0,
+      "repetition": 1,
+      "seconds": 0.006552373059093952,
+      "health": "ready"
+    },
+    {
+      "alert_index": 1,
+      "repetition": 1,
+      "seconds": 0.00604694290086627,
+      "health": "ready"
+    },
+    {
+      "alert_index": 2,
+      "repetition": 1,
+      "seconds": 0.006531296297907829,
+      "health": "ready"
+    },
+    {
+      "alert_index": 3,
+      "repetition": 1,
+      "seconds": 0.00618961313739419,
+      "health": "warming"
+    },
+    {
+      "alert_index": 4,
+      "repetition": 1,
+      "seconds": 0.005963312927633524,
+      "health": "ready"
+    },
+    {
+      "alert_index": 5,
+      "repetition": 1,
+      "seconds": 0.005462692119181156,
+      "health": "ready"
+    },
+    {
+      "alert_index": 6,
+      "repetition": 1,
+      "seconds": 0.005773826036602259,
+      "health": "ready"
+    },
+    {
+      "alert_index": 7,
+      "repetition": 1,
+      "seconds": 0.006005984265357256,
+      "health": "warming"
+    },
+    {
+      "alert_index": 8,
+      "repetition": 1,
+      "seconds": 0.006146999076008797,
+      "health": "ready"
+    },
+    {
+      "alert_index": 9,
+      "repetition": 1,
+      "seconds": 0.0064483629539608955,
+      "health": "ready"
+    },
+    {
+      "alert_index": 10,
+      "repetition": 1,
+      "seconds": 0.006369130685925484,
+      "health": "ready"
+    },
+    {
+      "alert_index": 11,
+      "repetition": 1,
+      "seconds": 0.005948708858340979,
+      "health": "ready"
+    },
+    {
+      "alert_index": 12,
+      "repetition": 1,
+      "seconds": 0.005537861026823521,
+      "health": "ready"
+    },
+    {
+      "alert_index": 13,
+      "repetition": 1,
+      "seconds": 0.005939798895269632,
+      "health": "ready"
+    },
+    {
+      "alert_index": 14,
+      "repetition": 1,
+      "seconds": 0.005986410658806562,
+      "health": "ready"
+    },
+    {
+      "alert_index": 15,
+      "repetition": 1,
+      "seconds": 0.0061615691520273685,
+      "health": "ready"
+    },
+    {
+      "alert_index": 16,
+      "repetition": 1,
+      "seconds": 0.005805667955428362,
+      "health": "ready"
+    },
+    {
+      "alert_index": 17,
+      "repetition": 1,
+      "seconds": 0.012084320187568665,
+      "health": "ready"
+    },
+    {
+      "alert_index": 18,
+      "repetition": 1,
+      "seconds": 0.013863790780305862,
+      "health": "ready"
+    },
+    {
+      "alert_index": 19,
+      "repetition": 1,
+      "seconds": 0.0106316520832479,
+      "health": "ready"
+    },
+    {
+      "alert_index": 20,
+      "repetition": 1,
+      "seconds": 0.007877319119870663,
+      "health": "ready"
+    },
+    {
+      "alert_index": 21,
+      "repetition": 1,
+      "seconds": 0.008189980871975422,
+      "health": "ready"
+    },
+    {
+      "alert_index": 22,
+      "repetition": 1,
+      "seconds": 0.0076190149411559105,
+      "health": "ready"
+    },
+    {
+      "alert_index": 23,
+      "repetition": 1,
+      "seconds": 0.031637141946703196,
+      "health": "ready"
+    },
+    {
+      "alert_index": 24,
+      "repetition": 1,
+      "seconds": 0.006663770880550146,
+      "health": "ready"
+    },
+    {
+      "alert_index": 25,
+      "repetition": 1,
+      "seconds": 0.006492468062788248,
+      "health": "ready"
+    },
+    {
+      "alert_index": 26,
+      "repetition": 1,
+      "seconds": 0.006305463146418333,
+      "health": "ready"
+    },
+    {
+      "alert_index": 27,
+      "repetition": 1,
+      "seconds": 0.007136139087378979,
+      "health": "ready"
+    },
+    {
+      "alert_index": 28,
+      "repetition": 1,
+      "seconds": 0.006276698317378759,
+      "health": "ready"
+    },
+    {
+      "alert_index": 29,
+      "repetition": 1,
+      "seconds": 0.006652545649558306,
+      "health": "ready"
+    },
+    {
+      "alert_index": 30,
+      "repetition": 1,
+      "seconds": 0.006263254210352898,
+      "health": "ready"
+    },
+    {
+      "alert_index": 31,
+      "repetition": 1,
+      "seconds": 0.006227150093764067,
+      "health": "ready"
+    },
+    {
+      "alert_index": 32,
+      "repetition": 1,
+      "seconds": 0.006816474720835686,
+      "health": "ready"
+    },
+    {
+      "alert_index": 33,
+      "repetition": 1,
+      "seconds": 0.006828593090176582,
+      "health": "ready"
+    },
+    {
+      "alert_index": 34,
+      "repetition": 1,
+      "seconds": 0.005904377903789282,
+      "health": "ready"
+    },
+    {
+      "alert_index": 35,
+      "repetition": 1,
+      "seconds": 0.005858337972313166,
+      "health": "ready"
+    },
+    {
+      "alert_index": 36,
+      "repetition": 1,
+      "seconds": 0.00642813416197896,
+      "health": "ready"
+    },
+    {
+      "alert_index": 37,
+      "repetition": 1,
+      "seconds": 0.006078694015741348,
+      "health": "ready"
+    },
+    {
+      "alert_index": 38,
+      "repetition": 1,
+      "seconds": 0.006466129794716835,
+      "health": "ready"
+    },
+    {
+      "alert_index": 39,
+      "repetition": 1,
+      "seconds": 0.006204424891620874,
+      "health": "ready"
+    },
+    {
+      "alert_index": 0,
+      "repetition": 2,
+      "seconds": 0.00597947183996439,
+      "health": "ready"
+    },
+    {
+      "alert_index": 1,
+      "repetition": 2,
+      "seconds": 0.005933564621955156,
+      "health": "ready"
+    },
+    {
+      "alert_index": 2,
+      "repetition": 2,
+      "seconds": 0.0058341617695987225,
+      "health": "ready"
+    },
+    {
+      "alert_index": 3,
+      "repetition": 2,
+      "seconds": 0.00747503200545907,
+      "health": "warming"
+    },
+    {
+      "alert_index": 4,
+      "repetition": 2,
+      "seconds": 0.008734500035643578,
+      "health": "ready"
+    },
+    {
+      "alert_index": 5,
+      "repetition": 2,
+      "seconds": 0.006796310190111399,
+      "health": "ready"
+    },
+    {
+      "alert_index": 6,
+      "repetition": 2,
+      "seconds": 0.006007547955960035,
+      "health": "ready"
+    },
+    {
+      "alert_index": 7,
+      "repetition": 2,
+      "seconds": 0.005856029689311981,
+      "health": "warming"
+    },
+    {
+      "alert_index": 8,
+      "repetition": 2,
+      "seconds": 0.006171954330056906,
+      "health": "ready"
+    },
+    {
+      "alert_index": 9,
+      "repetition": 2,
+      "seconds": 0.006360229104757309,
+      "health": "ready"
+    },
+    {
+      "alert_index": 10,
+      "repetition": 2,
+      "seconds": 0.006100765895098448,
+      "health": "ready"
+    },
+    {
+      "alert_index": 11,
+      "repetition": 2,
+      "seconds": 0.006322936154901981,
+      "health": "ready"
+    },
+    {
+      "alert_index": 12,
+      "repetition": 2,
+      "seconds": 0.006507042795419693,
+      "health": "ready"
+    },
+    {
+      "alert_index": 13,
+      "repetition": 2,
+      "seconds": 0.006235502660274506,
+      "health": "ready"
+    },
+    {
+      "alert_index": 14,
+      "repetition": 2,
+      "seconds": 0.006693215109407902,
+      "health": "ready"
+    },
+    {
+      "alert_index": 15,
+      "repetition": 2,
+      "seconds": 0.006659858860075474,
+      "health": "ready"
+    },
+    {
+      "alert_index": 16,
+      "repetition": 2,
+      "seconds": 0.006461848970502615,
+      "health": "ready"
+    },
+    {
+      "alert_index": 17,
+      "repetition": 2,
+      "seconds": 0.00626304792240262,
+      "health": "ready"
+    },
+    {
+      "alert_index": 18,
+      "repetition": 2,
+      "seconds": 0.005883140955120325,
+      "health": "ready"
+    },
+    {
+      "alert_index": 19,
+      "repetition": 2,
+      "seconds": 0.0066040498204529285,
+      "health": "ready"
+    },
+    {
+      "alert_index": 20,
+      "repetition": 2,
+      "seconds": 0.006013778038322926,
+      "health": "ready"
+    },
+    {
+      "alert_index": 21,
+      "repetition": 2,
+      "seconds": 0.016192510724067688,
+      "health": "ready"
+    },
+    {
+      "alert_index": 22,
+      "repetition": 2,
+      "seconds": 0.00662376219406724,
+      "health": "ready"
+    },
+    {
+      "alert_index": 23,
+      "repetition": 2,
+      "seconds": 0.008722454309463501,
+      "health": "ready"
+    },
+    {
+      "alert_index": 24,
+      "repetition": 2,
+      "seconds": 0.006707094144076109,
+      "health": "ready"
+    },
+    {
+      "alert_index": 25,
+      "repetition": 2,
+      "seconds": 0.007547800894826651,
+      "health": "ready"
+    },
+    {
+      "alert_index": 26,
+      "repetition": 2,
+      "seconds": 0.006952247116714716,
+      "health": "ready"
+    },
+    {
+      "alert_index": 27,
+      "repetition": 2,
+      "seconds": 0.007125427946448326,
+      "health": "ready"
+    },
+    {
+      "alert_index": 28,
+      "repetition": 2,
+      "seconds": 0.007213503122329712,
+      "health": "ready"
+    },
+    {
+      "alert_index": 29,
+      "repetition": 2,
+      "seconds": 0.00788326095789671,
+      "health": "ready"
+    },
+    {
+      "alert_index": 30,
+      "repetition": 2,
+      "seconds": 0.006916266866028309,
+      "health": "ready"
+    },
+    {
+      "alert_index": 31,
+      "repetition": 2,
+      "seconds": 0.005900863092392683,
+      "health": "ready"
+    },
+    {
+      "alert_index": 32,
+      "repetition": 2,
+      "seconds": 0.009356718976050615,
+      "health": "ready"
+    },
+    {
+      "alert_index": 33,
+      "repetition": 2,
+      "seconds": 0.01009947806596756,
+      "health": "ready"
+    },
+    {
+      "alert_index": 34,
+      "repetition": 2,
+      "seconds": 0.006455305963754654,
+      "health": "ready"
+    },
+    {
+      "alert_index": 35,
+      "repetition": 2,
+      "seconds": 0.006522228941321373,
+      "health": "ready"
+    },
+    {
+      "alert_index": 36,
+      "repetition": 2,
+      "seconds": 0.01289324089884758,
+      "health": "ready"
+    },
+    {
+      "alert_index": 37,
+      "repetition": 2,
+      "seconds": 0.010689668823033571,
+      "health": "ready"
+    },
+    {
+      "alert_index": 38,
+      "repetition": 2,
+      "seconds": 0.022169269155710936,
+      "health": "ready"
+    },
+    {
+      "alert_index": 39,
+      "repetition": 2,
+      "seconds": 0.00913110887631774,
+      "health": "ready"
+    }
+  ],
+  "scope": "Sequential in-process authenticated ASGI + isolated PostgreSQL; warm alert evaluations; local small read fix present",
+  "fixture": "Explicit expanded history plan; all 40 instrument-period read inputs nonempty, not entire history backfill completion",
+  "limitations": [
+    "No API network server/lifespan, provider threads, browser, concurrent workload or input-to-alert delay",
+    "Synthetic clock fixed consistently for alert evaluation; this is service time, not upstream SLA",
+    "Read-side expected payload comes from published read_rows; not independent correctness oracle for stored OHLC"
+  ]
+}
