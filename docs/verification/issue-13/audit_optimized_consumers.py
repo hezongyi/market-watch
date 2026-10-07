@@ -1,0 +1,83 @@
+"""Saved consumer evidence audit, preserving failures and exact denominators."""
+import json
+import os
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE/os.environ.get('ISSUE13_CONSUMER_OUTPUT','results/optimized')
+
+
+def read(name):
+    return json.loads((ROOT/name).read_text())
+
+
+def main():
+    outputs = []
+    fairness = read('fairness/result.json')
+    assert fairness['targets'] == len(fairness['service']) == 90 and not fairness['missing']
+    assert len({(r['instrument'],r['frame']) for r in fairness['service']}) == 90
+    outputs.append(dict(scope='fairness',targets=90,seconds=fairness['longest_first_service_seconds']))
+    micro = read('consumer-microbaseline.json')
+    assert len(micro['api_samples']) == len(micro['alert_samples']) == 120
+    assert micro['queries'].get('alert_staging_reads',0) == 0
+    assert all(r['bars'] > 0 for r in micro['api_samples'])
+    outputs.append(dict(scope='consumer_micro',api=120,evaluate=120))
+    mixed = read('supplemental/mixed.json')
+    assert len(mixed['events']) == 20 and not mixed['unpublished_events']
+    assert all(v == {'new_bar':1,'observation':1} for v in mixed['inputs_by_identity'].values())
+    assert not mixed['lock_sample_errors']
+    outputs.append(dict(scope='mixed',inputs=20,exact_payloads=20))
+    high = read('high-period/result.json')
+    assert high['outcome'] == 'passed' and high['case_count'] == 120
+    assert len(high['phases']) == 4
+    assert high['phases'][-1]['snapshot_sha256'] == high['phases'][-2]['snapshot_sha256']
+    for phase in high['phases']:
+        assert len(phase['cases']) == 30
+        assert all(row['chart_csv_mcp_alert_read_equal'] and
+                   row['expected_sha256'] == row['actual_sha256'] for row in phase['cases'])
+    outputs.append(dict(scope='independent_high_period',cases=120,duplicate_idempotent=True))
+    observation = read('observation-alert/result.json')
+    timeline = [json.loads(line) for line in (ROOT/'observation-alert/timeline.jsonl').read_text().splitlines()]
+    assert observation['outcome'] == 'passed' and not observation['errors']
+    assert observation['inputs'] == observation['visible'] == observation['judged'] == 50
+    assert len(timeline) == observation['sample_count']
+    for item in observation['events']:
+        ident, marker = item['instrument'],item['source_observed_at']
+        visible = next(r for r in timeline if r['identities'][ident]['published_observed_at'] == marker)
+        judged = next(r for r in timeline if r['identities'][ident]['sequence'] == marker)
+        assert item['visible_seconds'] == visible['observed_seconds']
+        assert item['judged_seconds'] == judged['observed_seconds']
+    for ident, final in observation['final'].items():
+        assert final['count'] == final['signal_count'] == 0
+        assert final['source_observed_at'] == final['published_payload']['observed_at'] == final['sequence']
+        before = observation['before'][ident]
+        stable = lambda r:{k:v for k,v in r.items() if k != 'observed_at'}
+        assert stable(final['published_payload']) == stable(before['payload'])
+        assert final['source_price_revision'] == before['source_price_revision']
+        assert final['source_volume_revision'] == before['source_volume_revision']
+        assert final['health'] == 'ready'
+    assert observation['queries'].get('alert_staging_reads',0) == 0
+    outputs.append(dict(scope='same_price',exact_visible=50,exact_judged=50))
+    network = read('network-alert/result.json')
+    assert not network['errors'] and network['inputs'] == network['visible'] == network['judged'] == 10
+    assert network['api']['count'] == len(network['api_samples']) == 120
+    assert all(e['final']['count'] == e['final']['signal_count'] == 1 for e in network['events'])
+    outputs.append(dict(scope='tcp_and_triggers',api=120,unique_signals=10))
+    browser = read('browser/result.json')
+    assert browser['outcome'] == 'passed' and not browser['page_errors'] and not browser['failed_requests']
+    assert browser['persisted'] == dict(count=2,symbols=['EURUSD','XAUUSD'])
+    assert [p['label'] for p in browser['phases']] == ['M1 idle 30s','M5 period switch',
+        'EURUSD identity switch','two-chart native layout','manual save','reload persisted layout']
+    runtime = read('browser/services-runtime.json')
+    assert len(runtime) == 6 and all(r['state']['Running'] for r in runtime)
+    assert sum(r['nanocpus'] for r in runtime if not r['name'].endswith('postgres-1')) <= 1500000000
+    assert read('browser/network-isolation.json')['internal']
+    outputs.append(dict(scope='browser',six_phases=True,actual_services=6))
+    with (ROOT/'consumer-artifact-audit.json').open('x') as output:
+        json.dump(dict(passed=True,checks=outputs,note='Numeric thresholds assessed separately'),output,indent=2)
+        output.write('\n')
+    print(json.dumps(outputs,indent=2))
+
+
+if __name__ == '__main__':
+    main()

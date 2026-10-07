@@ -47,7 +47,7 @@ def main():
         subprocess.run(command(PREFIX+['up', '-d', '--wait', 'postgres']), check=True)
         for script in SCRIPTS:
             label = script.removesuffix('.py')
-            log = Path('/tmp')/('mw-issue13-'+label+'.log')
+            log = Path('/tmp')/(PROJECT+'-'+label+'.log')
             with log.open('x') as output, (ROOT/(label+'-host.jsonl')).open('x') as samples:
                 os.chmod(log, 0o600)
                 proc = subprocess.Popen(command(PREFIX+['run', '--rm', '--no-deps',

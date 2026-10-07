@@ -23,7 +23,7 @@ def command(args):
 
 def run(args, label):
     # Exceptions may contain DB parameters: raw process output stays private.
-    log = Path('/tmp') / ('mw-issue13-optimized-' + label + '.log')
+    log = Path('/tmp') / (PROJECT + '-' + label + '.log')
     with log.open('x') as output:
         os.chmod(log, 0o600)
         process = subprocess.Popen(command(PREFIX + args), stdout=output, stderr=subprocess.STDOUT)
@@ -52,6 +52,8 @@ def main():
     (OUTPUT / 'source.json').write_text(json.dumps(dict(
         started_at=datetime.now(timezone.utc).isoformat(), commit=commit,
         project=PROJECT, source=str(SOURCE), pid=os.getpid(),
+        executed_runner_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        executed_compose_sha256=hashlib.sha256(COMPOSE.read_bytes()).hexdigest(),
         files={str(p.relative_to(SOURCE)): hashlib.sha256(p.read_bytes()).hexdigest()
                for p in sorted((SOURCE / 'backend/alerts').rglob('*.py'))}), indent=2) + '\n')
     state = OUTPUT / 'state.json'
