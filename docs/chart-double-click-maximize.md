@@ -45,6 +45,8 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
 
 实际入口：`https://localhost:17443/advanced-charts`，独立图表来源 `https://127.0.0.1:17444`。运行主机为 Ubuntu 22.04，Docker 服务端 29.1.3。两个端口仅绑定该 Ubuntu 主机回环地址，其他电脑需要通过 SSH 转发这两个本机端口后访问；自签名验收证书仅用于此隔离实例。
 
+另一台电脑访问时同时转发两个端口：`ssh -N -L 17443:127.0.0.1:17443 -L 17444:127.0.0.1:17444 quant@192.168.7.232`。浏览器先直接打开 `https://127.0.0.1:17444` 并接受本次验收证书，再回到主站刷新；只接受主站证书不会自动信任图表来源证书。2026-10-07 已复现未信任图表证书时的 `ERR_CERT_AUTHORITY_INVALID`，接受后 HTTP 200；用户补充双端口转发及证书后登录成功，完整应用验收再次通过。
+
 应用浏览器验收 **4 项通过**，页面异常为空：关闭同步、柱宽同步、日期同步三种状态下，四图含 RSI 的双击放大／恢复完整往返；通过真实 API 保存工作区到 PostgreSQL，页面重载后四图及 RSI 保留，再次双击往返通过。数据库实际包含 1200 根合成 H1 K 线及对应发布记录。生产构建资产的 SHA-256 与前述浏览器测试资产一致。
 
 实例运行、镜像任务标签、网络／卷归属、数据库及关闭通知／MCP／Yahoo 的结果见 [Docker 运行证据](verification/chart-double-click/docker-runtime.json)，完整应用浏览器结果见 [应用验收报告](verification/chart-double-click/product-browser.json)。迁移和合成数据 seed 均成功退出；API、PG 健康，Web、图表来源及 TLS 正常运行。未使用生产数据或配置，未启动采集和通知 worker。
