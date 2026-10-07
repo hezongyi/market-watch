@@ -29,6 +29,16 @@ LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
 
 最终正常速度和 CPU 四倍限速各 **22 项通过**，页面异常均为空。原有 `advanced-sync-coordinator.cjs`、`advanced-sync-native-choices.cjs`、Web 构建、补丁升级／撤回／拒绝篡改、合并图表资产语法及模块包含、Python lint、Compose 配置校验均通过。最终测试报告和源码 SHA-256 绑定见 [验证清单](verification/chart-double-click/verification.json)、[正常速度](verification/chart-double-click/native-browser.json)及 [CPU 四倍限速](verification/chart-double-click/native-browser-cpu4.json)。合并图表资产为 `host.b094dc92d30c3ed8.js`。
 
+补充生产构建接入检查 **4 项通过**：用上述合并资产运行真实 bridge，在关闭同步、柱宽同步、日期同步三种状态下双击并恢复含 RSI 的四图工作区；保存到内存父窗口 RPC 后重载，再次双击正常。报告见 [合并资产与 bridge 验证](verification/chart-double-click/built-bridge-browser.json)。此检查只替代父窗口存储和行情 RPC，不启动后端或数据库，不能作为完整 Docker 应用链路验收。
+
+复跑该检查需先将 `advanced-host` 与私有许可库复制到临时构建目录并在该目录执行 `node patch-native-reserve.mjs`、`node build-assets.mjs`，以免改写源码目录的 `index.html`：
+
+```bash
+LD_LIBRARY_PATH=/tmp/mw-v170-browser-deps/root/usr/lib/x86_64-linux-gnu \
+  MAXIMIZE_ASSETS=<临时构建目录> \
+  node web/tests/advanced-chart-maximize.bridge.browser.cjs
+```
+
 ## Ubuntu Docker 验收实例（待启动）
 
 本次 project 固定为 `mw-chart-maximize-20261007`，独立默认网络、`maximize-pg` volume、`chart_maximize` 数据库和随机密码。只填充标记为合成行情的 `MAXFIXTURE` H1 数据；不复制生产数据库、配置、通知或凭据，不启动行情采集和通知 worker。

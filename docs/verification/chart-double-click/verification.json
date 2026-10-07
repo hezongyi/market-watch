@@ -15,7 +15,8 @@
     "advanced-host/Dockerfile": "a59bd2de2a442be655ce0053f813911a1a5bb1b199536df3e4170edb1b796d7e",
     "advanced-host/.dockerignore": "769a97630d1ef0a51580b53ccbfc4d373bb8dc5455299a36313b2826fc40736f",
     "advanced-host/index.html": "595ce4c440c2963d23824bcba4f4a0372c5eea2c4d80fc11f69ffe58df09d0e9",
-    "web/tests/advanced-chart-maximize.browser.cjs": "8dd35677285f27436e00eb622e9b0d59c78758a3e14567731d951d7405736267"
+    "web/tests/advanced-chart-maximize.browser.cjs": "8dd35677285f27436e00eb622e9b0d59c78758a3e14567731d951d7405736267",
+    "web/tests/advanced-chart-maximize.bridge.browser.cjs": "0713ffc0b7b921a050e0e83ef396fecb088aa98fe2ea0012e39b0477bbb3fccc"
   },
   "cpu4Cases": 22,
   "patchChecks": [
@@ -33,5 +34,7 @@
     "hostAssetBuildAndSyntax": "passed",
     "pythonRuff": "passed",
     "composeConfig": "passed"
-  }
+  },
+  "builtBridgeCases": 4,
+  "builtBridgeTest": "real compiled host and bridge; memory parent RPC; no Docker/API/PG"
 }

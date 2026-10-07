@@ -1,0 +1,82 @@
+{
+  "environment": "Ubuntu Playwright routed built host with real bridge and synthetic parent RPC",
+  "cases": [
+    {
+      "name": "none compiled host bridge + RSI double-click round trip"
+    },
+    {
+      "name": "barWidth compiled host bridge + RSI double-click round trip"
+    },
+    {
+      "name": "date compiled host bridge + RSI double-click round trip"
+    },
+    {
+      "name": "saved workspace reload rebinds compiled host gesture to current charts"
+    }
+  ],
+  "errors": [],
+  "hostAsset": "host.b094dc92d30c3ed8.js",
+  "lastState": {
+    "layout": "4",
+    "sync": {
+      "date": true,
+      "barWidth": false,
+      "time": false
+    },
+    "charts": [
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "60",
+        "range": {
+          "from": 1790521200,
+          "to": 1790672400
+        },
+        "spacing": 12.55813953488372,
+        "max": false,
+        "studies": [],
+        "shapes": []
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "60",
+        "range": {
+          "from": 1790521200,
+          "to": 1790672400
+        },
+        "spacing": 12.644444444444444,
+        "max": false,
+        "studies": [],
+        "shapes": []
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "60",
+        "range": {
+          "from": 1790521200,
+          "to": 1790672400
+        },
+        "spacing": 12.55813953488372,
+        "max": false,
+        "studies": [
+          {
+            "id": "8hC16z",
+            "name": "Relative Strength Index"
+          }
+        ],
+        "shapes": []
+      },
+      {
+        "symbol": "MWP:BTCUSDT",
+        "resolution": "60",
+        "range": {
+          "from": 1790521200,
+          "to": 1790672400
+        },
+        "spacing": 12.55813953488372,
+        "max": false,
+        "studies": [],
+        "shapes": []
+      }
+    ]
+  }
+}
