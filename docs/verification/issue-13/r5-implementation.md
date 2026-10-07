@@ -30,3 +30,5 @@ sg docker -c 'docker compose --env-file /tmp/market-watch-issue13-optimized-r5.e
 ```
 
 私有env/TLS/login不进仓库。停止保留本任务volume和失败证据，不删除其他实例、不全局清理、不在unraid开发验收。
+
+20:04 SGT：冻结第五候选相关回归178 passed/20 warnings（109.10秒、exit0），包含真实PG事务提交/回滚/savepoint通知及扫描后提交、等待/重连用例。完整后端回归已开始，其后12次性能/消费者/浏览器尚未执行，不当作已通过。结果见 `results/optimized-r5/related-regression-result.json`。

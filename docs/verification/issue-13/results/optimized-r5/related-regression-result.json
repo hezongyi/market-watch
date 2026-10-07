@@ -1,0 +1,18 @@
+{
+  "source_commit": "ccb2a12b47ea1c9fd06517c2ccf3dec670532ee4",
+  "environment": "Ubuntu quant-server local Docker; own project mw-issue13-optimized-r5; PostgreSQL14 127.0.0.1:19693",
+  "passed": 178,
+  "warnings": 20,
+  "seconds": 109.1,
+  "exit_code": 0,
+  "includes": [
+    "PostgreSQL transaction commit-delivered notifications",
+    "rollback/savepoint discard",
+    "listener registration before scan, commit before wait and reconnect",
+    "publication retry/locks/fairness",
+    "history/aggregation progress",
+    "alert calculation origin/gaps/revisions"
+  ],
+  "full_regression": "running",
+  "complete_acceptance": false
+}
