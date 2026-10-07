@@ -1,0 +1,79 @@
+{
+  "version": "1.14.0",
+  "release_tag": "v1.14.0",
+  "previous_source_tag": "v1.13.0",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/20",
+  "tested_functional_commit": "b261423bf6747ccc858dea6eb525181181374d14",
+  "source_commit_resolution": "Resolve v1.14.0^{commit}; annotated tag targets the final main merge of PR #20 including release metadata.",
+  "release_scope": "Source publication; production deployment is separate.",
+  "delivery_document": "docs/market-data-v1.14.0-source-delivery.md",
+  "source_input_manifest": "deploy/releases/v1.14.0-source-inputs.json",
+  "source_input_count": 762,
+  "schema": "am40_chart_revision_demand",
+  "new_migrations": [
+    "migrations/versions/aa28_history_maintenance.py",
+    "migrations/versions/ab29_history_artifacts.py",
+    "migrations/versions/ac30_history_reclamation.py",
+    "migrations/versions/ad31_history_read_attempts.py",
+    "migrations/versions/ae32_composite_definitions.py",
+    "migrations/versions/af33_composite_inputs.py",
+    "migrations/versions/ag34_composite_aggregates.py",
+    "migrations/versions/ah35_fixed_indicators.py",
+    "migrations/versions/ai36_composite_alerts.py",
+    "migrations/versions/aj37_composite_revision_changes.py",
+    "migrations/versions/ak38_composite_watch_bindings.py",
+    "migrations/versions/al39_history_task_activity.py",
+    "migrations/versions/am40_chart_revision_demand.py",
+    "migrations/versions/s20_market_datasets.py",
+    "migrations/versions/t21_history_snapshots.py",
+    "migrations/versions/u22_replay_dataset_version.py",
+    "migrations/versions/v23_live_pricing.py",
+    "migrations/versions/w24_merge_market_data.py",
+    "migrations/versions/x25_dataset_asset_class.py",
+    "migrations/versions/y26_source_series.py",
+    "migrations/versions/z27_source_m1_store.py"
+  ],
+  "application_dependencies_changed_from_v1_13_0": true,
+  "new_application_dependencies": [
+    "dukascopy-python==4.0.1"
+  ],
+  "release_metadata_dependencies_changed_from_tested_commit": false,
+  "verification": {
+    "report": "docs/verification/pr20-review-20261007.md",
+    "backend_passed": 1324,
+    "backend_skipped": 2,
+    "skipped_checks_followup_passed": {
+      "optional_calendar": 4,
+      "postgres_dump_restore": 1
+    },
+    "backend_warnings": 59,
+    "backend_seconds": 682.3,
+    "standards_blockers": 0,
+    "spec_blockers": 0,
+    "ubuntu_container_contracts_passed": 56,
+    "migration_fixture_contracts_passed": 8,
+    "final_image_contracts_passed": 13,
+    "release_metadata_build_checks": {
+      "python_wheel": "passed, package version 1.14.0",
+      "typescript_vite": "passed, existing large chunk warning retained",
+      "tested_input_sha256_files": 762,
+      "application_dependencies_unchanged_from_tested_commit": true
+    }
+  },
+  "ubuntu_acceptance": {
+    "project": "mw-pr20-review-fix",
+    "host": "Ubuntu 22.04.5 quant-server local Docker",
+    "retired": true,
+    "actual_database_restore_verified": true,
+    "private_archive_id": "mw-pr20-review-fix-20261007T042213-f1a42422",
+    "private_archive_committed": false
+  },
+  "long_term_quality_observation": "Deferred at user request; not verified.",
+  "production_operated": false,
+  "release_images": null,
+  "rollback": {
+    "previous_source_tag": "v1.13.0",
+    "schema_restore_required_for_rollback": true,
+    "note": "Use the verified pre-upgrade backup and actual deployment manifest; source publication does not switch production."
+  }
+}

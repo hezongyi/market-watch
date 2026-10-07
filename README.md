@@ -1,6 +1,8 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.13.0**，支持 Yahoo 原生七周期行情、延迟报价和平台品种中文搜索，保留独立 Advanced Charts、平台/自建双系列、自建历史修订、Volume、原生历史缓冲、专业图表菜单、账户及工作区操作。源码发布、启用方法及上游限制见[v1.6.0源码交付记录](docs/yahoo-v1.6.0-source-delivery.md)，操作及既有系列规则见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.14.0**，支持平台、自建及组合三层行情与数据中心，保留独立 Advanced Charts、Yahoo 原生行情、自建历史修订、Volume、原生历史缓冲、专业图表菜单、账户及工作区操作。源码发布、迁移与验收边界见 [v1.14.0 交付记录](docs/market-data-v1.14.0-source-delivery.md)，既有操作见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+
+v1.14.0 增加固定自建历史、实时接续组合、可审计修订及按实际来源需求共享采集；数据中心提供维护、覆盖、周期发布、版本比较和引用保护。部署新代码前需升级至 `am40_chart_revision_demand`；本次为源码发布。
 
 v1.13.0 新增主图空白处双击最大化／恢复，并加强 Ubuntu 验收退役的 PG/TLS 镜像身份校验；发布范围见 [v1.13.0 交付](docs/chart-maximize-v1.13.0-source-delivery.md)。
 

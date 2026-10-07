@@ -1,5 +1,11 @@
 # Git与版本维护
 
+## v1.14.0 三层行情与数据中心源码发布
+
+PR #20 新增平台、自建及组合三层行情、数据中心维护与固定输入修订，按兼容新增功能使用次版本 1.14.0。用户授权合并并推 tag 后，同步 Python/web/锁文件根包、CHANGELOG 与源码清单，以 PR #20 最终 main 合并提交创建和推送附注标签 `v1.14.0`；保留旧标签。运行实现、迁移与测试保持复审通过的 `b261423` 输入，发布整理仅修改版本及交付资料。
+
+新增 dukascopy-python 依赖及迁移至 `am40_chart_revision_demand`。完整后端 1324 passed / 2 skipped，跳过项分别补验日历 4 项和 PG 备份恢复 1 项通过；独立 Standards/Spec 无阻塞，Ubuntu 独立资源已备份、实际恢复核对并退役。来源、哈希与迁移/回退边界见 [交付记录](market-data-v1.14.0-source-delivery.md)和 `deploy/releases/v1.14.0-source.json`。本次发布源码，长期观察按用户决定暂缓，生产部署另行执行。
+
 ## v1.13.0 双击最大化与验收退役身份校验
 
 PR #17（`699e6ec`）新增兼容的图表双击操作，采用次版本1.13.0；PR #18（`c18b219`）补齐 PG/TLS 共享镜像身份校验。同步 Python/web 及锁文件根包、CHANGELOG 和源码清单后，以发布整理 PR 的最终 main 合并提交创建并推送附注标签 `v1.13.0`，保留旧标签。来源与验证边界见 [交付记录](chart-maximize-v1.13.0-source-delivery.md)及 `deploy/releases/v1.13.0-source.json`。本次发布源码，生产部署另行执行。
