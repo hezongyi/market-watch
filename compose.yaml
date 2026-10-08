@@ -45,6 +45,15 @@ services:
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
+  market-stream-worker:
+    build: .
+    command: ["python", "-m", "alerts.market_stream_worker"]
+    env_file: .env
+    environment:
+      ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
   import-worker:
     build: .
     command: ["python", "-m", "alerts.market", "--imports-only"]

@@ -97,7 +97,7 @@ def _metadata(db, ident, kind, *, composite_context=None):
         "volume_unit": volume_unit, **binding}
 
 
-def chart_data(db, body):
+def chart_data(db, body, *, realtime=None):
     from .composite_chart import chart_page as composite_page
     from .history_artifacts import chart_page as history_page
     from .market_data import renew_demand
@@ -121,7 +121,7 @@ def chart_data(db, body):
             raise ValueError("组合尚未建立；请从图表实际使用入口打开")
         page = composite_page(db, composite.id, body.timeframe, before=body.before, count=body.limit,
             revision_id=body.composite_revision_id, input_revision=body.input_revision,
-            provisional=body.provisional and body.input_revision is None, now=stamp)
+            provisional=body.provisional and body.input_revision is None, now=stamp, realtime=realtime)
         selected = db.get(CompositeRevision, page["revision_id"])
         parent = db.get(HistoryVersion, selected.history_version_id)
         meta["calendar"] = selected.rules["aggregation_calendar"]

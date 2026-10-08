@@ -58,18 +58,20 @@ def live_snapshot(db, revision, *, now=None):
         "connection_epoch": state.epoch if state else None, "live_revision": state.revision if state else None}
 
 
-def snapshot(db, composite, *, now=None):
+def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
     stamp = now_ms() if now is None else now
-    revision = db.get(CompositeRevision, composite.active_revision_id)
+    revision = db.get(CompositeRevision, revision_id or composite.active_revision_id)
+    if not revision or revision.composite_id != composite.id:
+        raise ValueError("组合修订不属于所选系列")
     prep = db.get(CompositePreparation, revision.id)
     live = live_snapshot(db, revision, now=stamp)
     result = {"composite_id": composite.id, "revision_id": revision.id,
-        "input_revision": prep.input_revision, "history_version_id": revision.history_version_id,
+        "input_revision": prep.input_revision if input_revision is None else input_revision, "history_version_id": revision.history_version_id,
         "seam": revision.seam, "queried_at": stamp,
         "quote_ready": live["quote_ready"], "confirmed_tail_ready": live["confirmed_tail_ready"],
         "connection": live["connection"], "price": None, "observed_at": None,
         "quality": "pending", "price_type": None, "provenance": None}
-    if live["quote_ready"] and live["quote"]["source_time"] >= revision.seam:
+    if input_revision is None and live["quote_ready"] and live["quote"]["source_time"] >= revision.seam:
         result.update(price=str(live["quote"]["bid"]), observed_at=live["quote"]["source_time"],
             quality="sampled", price_type="sampled_bid", provenance={
                 "target_dataset_id": db.get(RealtimeMapping, revision.mapping_id).target_dataset_id,
@@ -78,7 +80,8 @@ def snapshot(db, composite, *, now=None):
         return result
     # Uses the same pinned M1 input as the chart; never raw target history that
     # has not been accepted by this composite revision. Historical side is <T.
-    page = chart_page(db, composite.id, "M1", before=stamp//60000*60000, count=1, provisional=False, now=stamp)
+    page = chart_page(db, composite.id, "M1", before=stamp//60000*60000, count=1, provisional=False, now=stamp,
+                      revision_id=revision.id, input_revision=input_revision)
     bars = [bar for bar in page["bars"] if bar["source_confirmed"] and bar["end"] <= stamp]
     if bars:
         bar = bars[-1]

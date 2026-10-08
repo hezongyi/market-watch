@@ -227,15 +227,20 @@ export default function AdvancedWorkspace() {
       api,
       (client) =>
         new EventSource(
-          "/api/charts/provider/events?client=" + encodeURIComponent(client),
+          "/api/charts/stream/events?client=" + encodeURIComponent(client),
         ),
       (event) =>
         frame.current?.contentWindow?.postMessage(
-          { channel, type: "provider-event", event },
+          { channel, type: "market-event", event },
           origin,
         ),
       (error) => setError(String(error)),
+      {subscribe: '/charts/stream/subscribe', unsubscribe: '/charts/stream/unsubscribe'},
     );
+    const legacyProvider = providerSubscriptions(api,
+      client => new EventSource('/api/charts/provider/events?client=' + encodeURIComponent(client)),
+      event => frame.current?.contentWindow?.postMessage({channel, type:'provider-event', event}, origin),
+      error => setError(String(error)));
     const listener = async (e: MessageEvent) => {
       if (
         e.source !== frame.current?.contentWindow ||
@@ -283,8 +288,9 @@ export default function AdvancedWorkspace() {
         return;
       }
       if (
-        m.type === "provider-subscribe" ||
-        m.type === "provider-unsubscribe"
+        m.type === "market-subscribe" ||
+        m.type === "market-unsubscribe" ||
+        m.type === "provider-subscribe" || m.type === "provider-unsubscribe"
       ) {
         const args = m.args;
         if (
@@ -295,10 +301,11 @@ export default function AdvancedWorkspace() {
         )
           return;
         try {
-          if (m.type === "provider-subscribe") {
-            await provider.subscribe(args);
+          const transport = m.type.startsWith('provider-') ? legacyProvider : provider;
+          if (m.type.endsWith('-subscribe')) {
+            await transport.subscribe(args);
           } else {
-            await provider.unsubscribe(args);
+            await transport.unsubscribe(args);
           }
         } catch (error) {
           setError(String(error));
@@ -512,6 +519,7 @@ export default function AdvancedWorkspace() {
       }
       if (m.type === "loaded") {
         await provider.clear();
+        await legacyProvider.clear();
         try {
           if (!mobile) await api("/advanced-charts/preferences/migrate", {});
           const [catalog, preferences, capabilities] = await Promise.all([
@@ -1140,6 +1148,7 @@ export default function AdvancedWorkspace() {
     return () => {
       removeEventListener("message", listener);
       void provider.dispose();
+      void legacyProvider.dispose();
       for (const requests of marketRequests.values())
         for (const controller of requests.values()) controller.abort();
     };
@@ -1258,7 +1267,7 @@ export default function AdvancedWorkspace() {
           ref={frame}
           title="专业图表工作区"
           data-workspace-id={active.id}
-          src={`${origin}/?parent=${encodeURIComponent(location.origin)}`}
+          src={`${origin}/?parent=${encodeURIComponent(location.origin)}${new URLSearchParams(location.search).get('marketPolling') === '1' ? '&marketPolling=1' : ''}`}
           sandbox="allow-scripts allow-same-origin allow-downloads"
           allowFullScreen
           referrerPolicy="no-referrer"

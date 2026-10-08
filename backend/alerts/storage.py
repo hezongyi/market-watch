@@ -1271,6 +1271,53 @@ class NativeHistoryLoad(Base):
     error_json: Mapped[dict | None] = mapped_column(JSON)
 
 
+class MarketStreamClient(Base):
+    __tablename__ = "market_stream_clients"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    session_hash: Mapped[str] = mapped_column(String(64), index=True)
+    client: Mapped[str] = mapped_column(String(64))
+    expires: Mapped[int] = mapped_column(BigInteger, index=True)
+
+
+class MarketStreamTask(Base):
+    __tablename__ = "market_stream_tasks"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    identity: Mapped[dict] = mapped_column(JSON)
+    query: Mapped[dict] = mapped_column(JSON)
+    sequence: Mapped[int] = mapped_column(BigInteger, default=0)
+    payload: Mapped[dict] = mapped_column(JSON, default=dict)
+    fingerprint: Mapped[str] = mapped_column(String(64), default="")
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    owner_token: Mapped[str | None] = mapped_column(String(36))
+    owner_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    input_signal: Mapped[str] = mapped_column(String(64), default="")
+    result_epoch: Mapped[str] = mapped_column(String(36), default=uid)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0, index=True)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    expires: Mapped[int] = mapped_column(BigInteger, index=True)
+
+
+class MarketStreamSubscription(Base):
+    __tablename__ = "market_stream_subscriptions"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    client_id: Mapped[str] = mapped_column(ForeignKey("market_stream_clients.id"), index=True)
+    listener: Mapped[str] = mapped_column(String(100))
+    generation: Mapped[int] = mapped_column(BigInteger)
+    task_id: Mapped[str | None] = mapped_column(ForeignKey("market_stream_tasks.id"), index=True)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    state: Mapped[dict] = mapped_column(JSON, default=dict)
+    expires: Mapped[int] = mapped_column(BigInteger, index=True)
+
+
+class MarketStreamResult(Base):
+    __tablename__ = "market_stream_results"
+    task_id: Mapped[str] = mapped_column(ForeignKey("market_stream_tasks.id"), primary_key=True)
+    sequence: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    payload: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
 class ProviderInterest(Base):
     """Session-owned finite targets; dataset data/leases are shared globally."""
     __tablename__ = "provider_interests"

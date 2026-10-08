@@ -63,6 +63,77 @@ const frames = {
 };
 const subscriptions = new Map();
 const quoteSubscriptions = new Map();
+const marketPollingFallback = new URLSearchParams(location.search).get('marketPolling') === '1';
+const marketHistoryState = new Map();
+let marketGeneration = 0;
+
+function marketQuery(ticker, res) {
+  const identity = decode(ticker);
+  return {instrument:identity.symbol, series_kind:identity.series_kind, timeframe:frames[res] || 'M1',
+    ...(identity.spec ? {indicators:[{...identity.spec,
+      calculation_origin:alertCalculationOrigins.get(MWSeries.encode(identity.symbol,identity.series_kind)+'|'+res) ?? null}]} : {}),
+    ...(identity.series_kind === 'managed' ? {published:true,
+      dataset_start:managedSessions.get(identity.symbol+'|'+res)?.start} : {})};
+}
+function registerMarketBar(sub) {
+  if (marketPollingFallback || !sub.marketListener || sub.marketPaused) return;
+  const state = marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || '')) || {};
+  if(!state.accepted && !sub.last) return;
+  sub.marketGeneration = ++marketGeneration;
+  sub.marketSequence = 0;
+  send({type:'market-subscribe',args:{client:clientId,listener:sub.marketListener,
+    generation:sub.marketGeneration,kind:'bars',query:marketQuery(sub.symbol,sub.res),
+    cursor:sub.last || 0,sequence:0,
+    loaded_after:state.first ?? firstHistory.get(sub.symbol+'|'+sub.res) ?? null,
+    loaded_before:state.last ?? sub.last ?? null,
+    history_revision:state.history_revision ?? null,observed_at:state.observed_at || 0,
+    binding:state.binding || null,initial_input_revision:state.input_revision ?? null,initial_indicator_pending:!!sub.initialIndicatorPending,historical:!!sub.historical}});
+}
+function acceptMarketHistory(ticker,res,page,window = '') {
+  if(marketPollingFallback || !page.bars?.length) return;
+  const key=ticker+'|'+res+'|'+(window || ''), old=marketHistoryState.get(key) || {};
+  marketHistoryState.set(key,{first:Math.min(old.first ?? Infinity,page.bars[0].start),
+    accepted:true,
+    last:Math.max(old.last || 0,page.bars.at(-1).start),observed_at:page.as_of || Date.now(),
+    input_revision:page.input_revision ?? null,
+    binding:page.revision_id || null,history_revision:page.history_check?.next_revision || null});
+  for(const sub of subscriptions.values()) if(sub.symbol===ticker && sub.res===res && (sub.window || '')===(window || '')) {
+    const historyKey=ticker+'|'+res+(decode(ticker).series_kind==='provider' ? '|'+(window || '') : '');
+    sub.last=Math.max(sub.last || 0,lastHistory.get(historyKey) || 0);
+    registerMarketBar(sub);
+  }
+}
+async function recoverMarketBar(sub) {
+  if(sub.marketRecovering || ![...subscriptions.values()].includes(sub)) return;
+  sub.marketRecovering=true;
+  try {
+    const restored=await reloadHistory(sub.symbol,sub.res,chart=>!sub.window || providerWindowMatches(chart,sub));
+    if(![...subscriptions.values()].includes(sub)) return;
+    if(restored) {
+      sub.needsHistoryReload=false;
+      registerMarketBar(sub);
+    } else sub.marketRetry=setTimeout(()=>recoverMarketBar(sub),500);
+  } catch(error) {
+    send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:String(error)});
+    if([...subscriptions.values()].includes(sub)) sub.marketRetry=setTimeout(()=>recoverMarketBar(sub),1000);
+  } finally {sub.marketRecovering=false;}
+}
+function synchronizeMarketVisibility() {
+  if(marketPollingFallback || !ready || loading) return;
+  for(const sub of subscriptions.values()) {
+    if(!sub.marketListener) continue;
+    const visible=hasHistoryViewer({instrument:sub.symbol,timeframe:frames[sub.res]});
+    if(!visible && !sub.marketPaused) {
+      sub.marketPaused=true;
+      clearTimeout(sub.marketRetry);
+      send({type:'market-unsubscribe',args:{client:clientId,listener:sub.marketListener,generation:sub.marketGeneration}});
+    } else if(visible && sub.marketPaused) {
+      sub.marketPaused=false;
+      sub.needsHistoryReload=true;
+      void recoverMarketBar(sub);
+    }
+  }
+}
 const symbolPresentations = new Map();
 const alertSourceMetadata = new Map();
 const alertCalculationOrigins = new Map();
@@ -405,8 +476,16 @@ const feed = {
       .catch((e) => err(String(e)));
   },
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
+    feed.unsubscribeQuotes(id);
     const all=[...new Set([...symbols, ...fastSymbols])];
-    quoteSubscriptions.set(id, {symbols:all,cb});
+    const quoteSub={symbols:all,cb,listeners:[]};
+    quoteSubscriptions.set(id, quoteSub);
+    if(!marketPollingFallback) for(const ticker of all) {
+      const listener=crypto.randomUUID(),generation=++marketGeneration;
+      quoteSub.listeners.push({listener,generation,ticker,sequence:0});
+      send({type:'market-subscribe',args:{client:clientId,listener,generation,
+        kind:'quotes',query:marketQuery(ticker,'1'),sequence:0}});
+    }
     const presented=all.filter(ticker=>{
       const identity=decode(ticker);
       return identity.symbol.startsWith("YAHOO:") || ['history','composite'].includes(identity.series_kind);
@@ -420,7 +499,11 @@ const feed = {
         error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}));
     }
   },
-  unsubscribeQuotes: (id) => quoteSubscriptions.delete(id),
+  unsubscribeQuotes: (id) => {
+    for(const entry of quoteSubscriptions.get(id)?.listeners || [])
+      send({type:'market-unsubscribe',args:{client:clientId,listener:entry.listener,generation:entry.generation}});
+    quoteSubscriptions.delete(id);
+  },
   onReady: (cb) =>
     setTimeout(
       () =>
@@ -525,6 +608,7 @@ const feed = {
   },
   getBars: async (s, res, p, cb, err) => {
     const loadEpoch=workspaceEpoch;
+    let marketHistoryPage;
     const loadId=crypto.randomUUID();
     const rangeTicket=barRangeMapping?.capture(s.ticker,res,s.mw_window);
     const historyKey=s.ticker+'|'+res;
@@ -634,7 +718,7 @@ const feed = {
         }
         send({type:'native-load-applying',id:loadId,epoch:loadEpoch,count:rows.length});
         const accepted = cb(rows,{noData:boundary,mw_historyPages:page.history_pages || 0}) !== false;
-        if (accepted) observeRangeBars(s.ticker,res,page.bars,rows,s.mw_window,rangeTicket);
+        if (accepted) {observeRangeBars(s.ticker,res,page.bars,rows,s.mw_window,rangeTicket); acceptMarketHistory(s.ticker,res,page,s.mw_window);}
         if (globalThis.MWNativeReserve)
           requestAnimationFrame(() => MWNativeReserve.delivered(s, res, performance.now() - reserveStarted));
         if(!rows.length) finishTerminal();
@@ -648,6 +732,7 @@ const feed = {
         let rows=[], rawRows=[], boundary=false, fixed={};
         for (let partition=0; rows.length<requested && partition<32; partition++) {
           const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed});
+          marketHistoryPage ||= page;
           if (identity.spec) fixedIndicatorPending.set(historyKey,
             page.indicator_progress?.some(item=>item.status!=='complete') || false);
           if(page.bars?.length)
@@ -675,7 +760,7 @@ const feed = {
           lastHistory.set(historyKey,Math.max(lastHistory.get(historyKey)||0,rows.at(-1).time));
         }
         const accepted = cb(rows,{noData:boundary}) !== false;
-        if (accepted) observeRangeBars(s.ticker,res,rawRows,rows,s.mw_window,rangeTicket);
+        if (accepted) {observeRangeBars(s.ticker,res,rawRows,rows,s.mw_window,rangeTicket); acceptMarketHistory(s.ticker,res,{...marketHistoryPage,bars:[...rawRows].sort((a,b)=>a.start-b.start)},s.mw_window);}
         if(!rows.length) finishTerminal();
         return;
       }
@@ -707,6 +792,7 @@ const feed = {
       let rows=[], rawRows=[], boundary=false;
       while(rows.length < requested) {
         const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length)});
+        marketHistoryPage ||= page;
         if(epoch!==workspaceEpoch || !hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) {
           const error=Error('已取消旧图表的历史加载');error.code='HISTORY_CANCELLED';throw error;
         }
@@ -724,7 +810,7 @@ const feed = {
         lastHistory.set(s.ticker+'|'+res,Math.max(lastHistory.get(s.ticker+'|'+res)||0,rows.at(-1).time));
       }
       const accepted = cb(rows,{noData:boundary}) !== false;
-      if (accepted) observeRangeBars(s.ticker,res,rawRows,rows,'',rangeTicket);
+      if (accepted) {observeRangeBars(s.ticker,res,rawRows,rows,'',rangeTicket); acceptMarketHistory(s.ticker,res,{...marketHistoryPage,bars:[...rawRows].sort((a,b)=>a.start-b.start)},s.mw_window);}
       if(!rows.length) finishTerminal();
     } catch (e) {
       err(isProvider ? e : String(e));
@@ -760,6 +846,9 @@ const feed = {
       if (sub.historical) sub.last=MWNativeNavigation.coverage(s.mw_window)?.last || sub.last;
     }
     if(identity.series_kind==='provider') {
+      if(!marketPollingFallback) {
+        sub.marketListener=crypto.randomUUID(); registerMarketBar(sub); return;
+      }
       sub.providerListener=crypto.randomUUID();
       const state=providerHistoryState.get(s.ticker+'|'+res)||{};
       send({type:'provider-subscribe',args:{client:clientId,listener:sub.providerListener,
@@ -767,9 +856,13 @@ const feed = {
         revision:state.revision||0,observed_at:state.observed_at||0,
         indicators:identity.spec?[{...identity.spec,calculation_origin:alertCalculationOrigins.get(MWSeries.encode(identity.symbol,identity.series_kind)+'|'+res) ?? null}]:[]}});
     }
+    if(!marketPollingFallback) {sub.marketListener=crypto.randomUUID(); registerMarketBar(sub);}
   },
   unsubscribeBars: id => {
     const sub=subscriptions.get(id);
+    clearTimeout(sub?.marketRetry);
+    if(sub?.marketListener)
+      send({type:'market-unsubscribe',args:{client:clientId,listener:sub.marketListener,generation:sub.marketGeneration}});
     if(sub?.providerListener)
       send({type:'provider-unsubscribe',args:{client:clientId,listener:sub.providerListener}});
     subscriptions.delete(id);
@@ -1009,6 +1102,7 @@ async function refreshManagedHistory(instrument) {
   }
 }
 async function tick() {
+  if(!marketPollingFallback) return;
   if (polling) return;
   polling = true;
   try {
@@ -1752,7 +1846,9 @@ function boot(
       send({type:'native-load-reset',epoch:workspaceEpoch});
       syncCoordinator.resetWorkspace(pendingSync);
       workspaceLoadPause = syncCoordinator.acquirePause("workspace-load",["date","time","barWidth"]);
-      for(const [id,sub] of subscriptions) if(sub.providerListener) feed.unsubscribeBars(id);
+      for(const [id] of subscriptions) feed.unsubscribeBars(id);
+      for(const [id] of quoteSubscriptions) feed.unsubscribeQuotes(id);
+      marketHistoryState.clear();
       providerHistoryState.clear();
       providerHistoryWork.clear();
       lastHistory.clear();
@@ -1795,6 +1891,7 @@ function boot(
     bindEdgeSync();
     bindViewports();
     widget.subscribe("layout_changed", () => {
+      synchronizeMarketVisibility();
       syncCoordinator.refreshCharts();
       if (!loading) barRangeMapping.refreshCharts();
       send({type: "viewport-notice", key: "*", text: ""});
@@ -1817,8 +1914,7 @@ function boot(
     demandReporter?.dispose();
     demandReporter=undefined;
     poll = setInterval(() => {
-      tick();
-      flushProviderCorrections();
+      if(marketPollingFallback) {tick(); flushProviderCorrections();}
       demandReporter?.tick();
       if (manualSavePending) snapshot();
     }, 15000);
@@ -1853,6 +1949,51 @@ addEventListener("message", async (e) => {
     for (const key of acknowledgedNotices) if (!live.has(key)) acknowledgedNotices.delete(key);
     chartMenu?.setDraftBlocked(m.draftBlocked === true);
     showNextNotice();
+    return;
+  }
+  if(m.type==='market-event') {
+    const event=m.event;
+    const quote=[...quoteSubscriptions.values()].find(item=>item.listeners.some(entry=>entry.listener===event?.listener));
+    if(quote) {
+      const entry=quote.listeners.find(entry=>entry.listener===event.listener);
+      if(event.generation!==entry.generation) return;
+      if(entry.result_epoch && event.result_epoch && entry.result_epoch!==event.result_epoch) entry.sequence=0;
+      if(event.result_epoch) entry.result_epoch=event.result_epoch;
+      if(event.sequence<=entry.sequence) return;
+      entry.sequence=event.sequence;
+      if(event.type==='quotes') quote.cb(event.quotes.map(({s,v})=>({s,n:entry.ticker,v})));
+      if(event.type==='reset') {
+        entry.generation=++marketGeneration;entry.sequence=0;
+        send({type:'market-subscribe',args:{client:clientId,listener:entry.listener,generation:entry.generation,
+          kind:'quotes',query:marketQuery(entry.ticker,'1'),sequence:0}});
+      }
+      return;
+    }
+    const sub=[...subscriptions.values()].find(item=>item.marketListener===event?.listener);
+    if(!sub || event.generation!==sub.marketGeneration) return;
+    if(sub.marketResultEpoch && event.result_epoch && sub.marketResultEpoch!==event.result_epoch) {
+      sub.marketSequence=0;
+      event.type='reset';event.reason='result_epoch_changed';
+    }
+    if(event.result_epoch) sub.marketResultEpoch=event.result_epoch;
+    if(event.sequence<=sub.marketSequence) return;
+    sub.marketSequence=event.sequence;
+    if(event.type==='reset') {
+      sub.needsHistoryReload=true;
+      marketHistoryState.delete(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
+      sub.last=0;
+      await recoverMarketBar(sub);
+    } else if(event.type==='bars' && !sub.historical && !sub.needsHistoryReload) {
+      const rows=barsOf(event,sub.res,sub.symbol);
+      for(const bar of rows) if(bar.time>=sub.last) {
+        sub.cb({...bar}); observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;
+      }
+      if(event.pending?.length) send({type:'status',text:event.pending.join('；')});
+      if(event.status?.error) send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.status.error});
+      else send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:''});
+    } else if(event.type==='status' && event.error) {
+      send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.error});
+    }
     return;
   }
   if(m.type==='provider-event') {
