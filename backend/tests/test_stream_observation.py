@@ -114,6 +114,26 @@ def decoded(pipeline, event):
     pipeline.yielded(event)
 
 
+@pytest.mark.parametrize("data,kind", [(b"!\n", "JSONDecodeError"),
+                                      (b"\xff", "UnicodeDecodeError"),
+                                      (b"12345", "ValueError")])
+def test_parse_errors_keep_bounded_categories_without_exception_text(data, kind, monkeypatch):
+    from alerts import oanda_stream
+
+    def stream(*_, **__):
+        oanda_stream.NDJSONDecoder(max_bytes=4).feed(data)
+        yield  # unreachable; preserve the original iterator seam
+
+    monkeypatch.setattr(oanda_stream.OandaPractice, "stream", stream)
+    registry = observation.ObservationRegistry({"EUR_USD": "EURUSD"})
+    with observation.observe_pipeline(registry):
+        with pytest.raises((ValueError, UnicodeDecodeError)):
+            next(object.__new__(OandaPractice).stream({}, epoch=1))
+    snapshot = registry.snapshot()["epochs"][0]
+    assert snapshot["decode_errors"] == snapshot["decode_error_kinds"][kind] == 1
+    assert "private-data" not in json.dumps(snapshot)
+
+
 def test_committed_filters_and_rollbacks_have_exact_receive_accounting(running, monkeypatch):
     factory, ownership, epoch, identities = running
     identity = identities["EUR_USD"]

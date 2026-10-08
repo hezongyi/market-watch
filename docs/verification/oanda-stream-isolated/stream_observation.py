@@ -7,6 +7,7 @@ original publish_event transaction has returned successfully.
 """
 
 import copy
+import json
 import threading
 import time
 from collections import deque
@@ -35,6 +36,8 @@ class PipelineObservation:
                      "end": None, "chunks": 0, "chunk_bytes": 0, "last_chunk_at": None,
                      "records": 0, "heartbeats": 0, "last_record_at": None,
                      "buffer_bytes": 0, "buffer_peak_bytes": 0, "decode_errors": 0,
+                     "decode_error_kinds": {k: 0 for k in
+                         ("JSONDecodeError", "UnicodeDecodeError", "ValueError", "Other")},
                      "decode_max_ms": 0, "yielded": 0, "last_yield_at": None,
                      "consumer_max_ms": 0, "consumer_total_ms": 0,
                      "next_active_since": None, "next_max_ms": 0,
@@ -51,7 +54,7 @@ class PipelineObservation:
                 "last_received_at": None, "last_accepted_at": None,
                 "source_age_ms_histogram": {}}
 
-    def decoded(self, chunk, decoder, raw_records, started, failed=False):
+    def decoded(self, chunk, decoder, raw_records, started, error=None):
         now = self.clock()
         pending_utf8 = decoder.decoder.getstate()[0]
         buffered = len(decoder.buffer.encode()) + len(pending_utf8)
@@ -62,8 +65,11 @@ class PipelineObservation:
             self.data["decode_max_ms"] = max(self.data["decode_max_ms"], (now-started)*1000)
             self.data["buffer_bytes"] = buffered
             self.data["buffer_peak_bytes"] = max(self.data["buffer_peak_bytes"], buffered)
-            if failed:
+            if error is not None:
                 self.data["decode_errors"] += 1
+                kind = next((kind for kind in ("JSONDecodeError", "UnicodeDecodeError", "ValueError")
+                             if type(error).__name__ == kind), "Other")
+                self.data["decode_error_kinds"][kind] += 1
                 return
             self.data["records"] += len(raw_records)
             if raw_records:
@@ -191,7 +197,6 @@ class SnapshotRecorder:
         self.thread = threading.Thread(target=self.run, name="oanda-observation", daemon=True)
 
     def run(self):
-        import json
         from datetime import UTC, datetime
 
         scheduled = time.monotonic()
@@ -243,8 +248,8 @@ def observe_pipeline(registry):
         started = observation.clock()
         try:
             records = original_feed(decoder, chunk)
-        except BaseException:
-            observation.decoded(chunk, decoder, (), started, failed=True)
+        except BaseException as error:
+            observation.decoded(chunk, decoder, (), started, error=error)
             raise
         observation.decoded(chunk, decoder, records, started)
         return records
