@@ -1,0 +1,35 @@
+{
+  "project": "mw-data-center-impl-20261008",
+  "task": "mw-data-center-impl-20261008",
+  "at": "2026-10-08T12:03:08.301780+00:00",
+  "containers": 10,
+  "volumes": [
+    "mw-data-center-impl-20261008_data-center-pg"
+  ],
+  "networks": [
+    "e891dd0fa521"
+  ],
+  "retained_images": [],
+  "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-data-center-impl-20261008-20261008T120128-04ba8177",
+  "restore_verified": true,
+  "backup_verification": [
+    {
+      "database": "data_center",
+      "dump_sha256": "545fa1329ad1398caa6c9a00ff37bc489a80eb4e9d71e02045e9a3344c0bb651",
+      "tables_verified": 83,
+      "rows_verified": 149894,
+      "actual_restore_verified": true,
+      "row_counts_and_content_fingerprints_matched": true,
+      "source_stability_verified": true
+    },
+    {
+      "database": "postgres",
+      "dump_sha256": "3b1ff5ca89756747c1e201618730d58772e94f10a9d49810e4eeeb61128af00e",
+      "tables_verified": 0,
+      "rows_verified": 0,
+      "actual_restore_verified": true,
+      "row_counts_and_content_fingerprints_matched": true,
+      "source_stability_verified": true
+    }
+  ]
+}
