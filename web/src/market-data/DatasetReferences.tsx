@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link, useActionLock } from "./router";
+import { useEffect, useRef, useState } from "react";
+import { Link, useActionLock, useMounted, useSearchParams } from "./router";
 import { api, ApiError } from "./api";
 import { Feedback, Pager } from "./Center";
 import { useSnapshot } from "./useSnapshot";
@@ -27,10 +27,16 @@ export function DatasetReferences({
   id,
   refresh,
   onDone,
+  deletion = false,
+  archiveAvailable = false,
+  onCancel,
 }: {
   id: string;
   refresh: number;
   onDone: () => void;
+  deletion?: boolean;
+  archiveAvailable?: boolean;
+  onCancel?: () => void;
 }) {
   const report = useSnapshot<ReferenceReport>(
     `/market-data/datasets/${id}/references`,
@@ -47,18 +53,54 @@ export function DatasetReferences({
   const [error, setError] = useState(""),
     [result, setResult] = useState<any>(null);
   const request = useRef(crypto.randomUUID());
+  const [params] = useSearchParams();
+  const referencesParams = new URLSearchParams(params);
+  referencesParams.delete("view"); referencesParams.set("section", "references");
+  const maintenanceParams = new URLSearchParams(referencesParams);
+  maintenanceParams.set("section", "maintenance");
   const actionLock = useActionLock();
+  const mounted = useMounted(), startedReview = useRef(false);
   const reviewButton = useRef<HTMLButtonElement>(null), errorBox = useRef<HTMLParagraphElement>(null);
+  const reviewHeading = useRef<HTMLHeadingElement>(null);
   const [conflict, setConflict] = useState<ReferenceReport | null>(null);
   const current = conflict || report.data;
+  useEffect(() => {
+    if (!deletion) { startedReview.current = false; return; }
+    if (!deletion || startedReview.current || !report.data) return;
+    startedReview.current = true;
+    setReview(report.data); request.current = crypto.randomUUID();
+    requestAnimationFrame(() => reviewHeading.current?.focus());
+  }, [deletion, report.data]);
   async function openReview() {
+    if (!actionLock.acquire()) return;
     setBusy(true); setError("");
     try {
       const latest = await api<ReferenceReport>(`/market-data/datasets/${id}/references`);
+      if (!mounted.current) return;
       setConflict(null); setReview(latest); request.current = crypto.randomUUID();
+      requestAnimationFrame(() => reviewHeading.current?.focus());
     } catch (e) {
+      if (!mounted.current) return;
       setError(String(e)); requestAnimationFrame(() => errorBox.current?.focus());
-    } finally {setBusy(false);}
+    } finally {actionLock.release(); if (mounted.current) setBusy(false);}
+  }
+  async function archive() {
+    if (!actionLock.acquire()) return;
+    setBusy(true); setError("");
+    // Both commands are idempotent. Stop scheduling before hiding the entry;
+    // active tasks/references remain protected by the final server review.
+    try {
+      await api(`/market-data/datasets/${id}/maintenance/control`, { action: "pause" });
+      await api(`/market-data/datasets/${id}/maintenance/control`, { action: "archive" });
+      const latest = await api<ReferenceReport>(`/market-data/datasets/${id}/references`);
+      if (!mounted.current) return;
+      setConflict(latest); setReview(latest); request.current = crypto.randomUUID(); onDone();
+      requestAnimationFrame(() => reviewHeading.current?.focus());
+    } catch (e) {
+      if (!mounted.current) return;
+      setError(String(e)); setReview(null); onDone();
+      requestAnimationFrame(() => errorBox.current?.focus());
+    } finally {actionLock.release(); if (mounted.current) setBusy(false);}
   }
   async function reclaim() {
     if (!review || !actionLock.acquire()) return;
@@ -69,25 +111,33 @@ export function DatasetReferences({
         request_id: request.current,
         expected_review_revision: review.impact.review_revision,
       });
+      if (!mounted.current) return;
       setResult(response);
       setReview(null); setConflict(null);
       onDone();
     } catch (e) {
+      if (!mounted.current) return;
       setError(String(e));
       if (e instanceof ApiError && e.code === "RECLAMATION_CHANGED") {
         setReview(null);
-        try {setConflict(await api<ReferenceReport>(`/market-data/datasets/${id}/references`));}
-        catch {setError("回收影响已变化，所列数据未删除；暂时无法读取最新清单，请稍后重新查看影响。");}
+        try {
+          const latest = await api<ReferenceReport>(`/market-data/datasets/${id}/references`);
+          if (!mounted.current) return;
+          setConflict(latest);
+        } catch {
+          if (!mounted.current) return;
+          setError("回收影响已变化，所列数据未删除；暂时无法读取最新清单，请稍后重新查看影响。");
+        }
       }
       requestAnimationFrame(() => errorBox.current?.focus());
     } finally {
       actionLock.release();
-      setBusy(false);
+      if (mounted.current) setBusy(false);
     }
   }
   return (
     <div className="dc-fields">
-      <h2>引用与历史回收</h2>
+      <h2>{deletion ? "删除历史数据" : "引用与历史回收"}</h2>
       <Feedback
         error={report.error}
         loading={report.loading}
@@ -100,6 +150,9 @@ export function DatasetReferences({
       )}
       {current && (
         <>
+          <p>暂停维护并归档后，条目从默认列表移除，可在“已归档”列表查看；确认删除后才回收历史价格及周期。来源身份、发布清单和引用记录保留。</p>
+          {deletion && <Link to={`/market-data/datasets/${id}?${referencesParams}`}>查看组合与引用</Link>}
+          {!deletion && <>
           <p>管理此数据集的实时映射与组合；查看引用不会建立实时需求。</p>
           <Link to={`/market-data/datasets/${id}/mapping`}>配置与查看实时映射</Link>
           <Feedback error={mappings.error} loading={mappings.loading} empty={!mappings.data}/>
@@ -114,6 +167,7 @@ export function DatasetReferences({
               <Link to={`/market-data/composites/${c.id}`}>{c.historical_source} → OANDA {c.mapping.target_display_symbol || c.mapping.target_identity.provider_symbol} · {c.calendar.toUpperCase()} · 查看组合与固定修订</Link>
             </p>) : <p>尚未建立组合；首次实际使用时准备。</p>}
             <Pager total={composites.data.total} page={page} size={25} change={setPage}/>
+          </>}
           </>}
           {current.items.length > 0 ? (
             <div className="dc-table">
@@ -149,22 +203,29 @@ export function DatasetReferences({
             <p>当前未发现阻止回收的引用。</p>
           )}
           {current.requires_archive && (
-            <p>回收前请先在维护设置中暂停定时维护并归档。</p>
+            <div className="dc-fields">
+              <p>删除前需要暂停定时维护并归档。已有价格和引用会保留，正在运行的任务不会被取消。</p>
+              {archiveAvailable ? <button disabled={busy || !!report.error} onClick={() => void archive()}>
+                {busy ? "正在处理…" : "暂停维护并归档"}
+              </button> : <Link to={`/market-data/datasets/${id}?${maintenanceParams}`}>查看维护设置</Link>}
+            </div>
           )}
           <p>
             {current.retains}。共享来源缓存和其他数据集仍引用的分块保留。
           </p>
           {!review ? (
-            <button
+            <div className="dc-actions"><button
               ref={reviewButton}
               disabled={busy || !!report.error}
               onClick={() => void openReview()}
             >
               查看回收影响
             </button>
+            {deletion && <button disabled={busy} onClick={onCancel}>返回列表</button>}
+            </div>
           ) : (
             <section className="panel" aria-label="确认历史回收">
-              <h3>删除影响清单</h3>
+              <h3 ref={reviewHeading} tabIndex={-1}>删除影响清单</h3>
               <p>{review.impact.dataset.display_symbol || review.impact.dataset.logical_symbol} · {names[review.impact.dataset.identity.source]} · {review.impact.dataset.provider_display_symbol || review.impact.dataset.identity.provider_symbol} · {review.impact.dataset.identity.basis.toUpperCase()} · {phase(review.impact.dataset.aggregation_calendar)} · {review.impact.dataset.identity.environment}</p>
               <div className="dc-table"><table><caption>所列固定版本与价格范围</caption>
                 <thead><tr><th>版本与范围</th><th>观测 / 未知分钟</th><th>周期</th><th>处理</th></tr></thead>
@@ -177,6 +238,7 @@ export function DatasetReferences({
               </table></div>
               <p>压缩内容统计：独立M1 {review.impact.payload_totals.inline_m1_payload_bytes} 字节；周期 {review.impact.payload_totals.period_payload_bytes} 字节；指标 {review.impact.payload_totals.indicator_payload_bytes} 字节；唯一来源内容 {review.impact.payload_totals.unique_source_payload_bytes} 字节。其中共享内容保留 {review.impact.payload_totals.retained_shared_source_blobs} 块 / {review.impact.payload_totals.retained_shared_source_payload_bytes} 字节。</p>
               <p>{review.impact.space_meaning}</p>
+              {review.impact.payload_totals.target_versions === 0 && <p role="status">没有可删除的历史价格。归档后可在“已归档”列表查看保留记录。</p>}
               <p>
                 回收此数据集全部无引用历史价格及周期产物。此操作不能撤销；原版本仅保留身份和发布清单，不能再用于图表或回测。以后重新维护会产生新版本。
               </p>
@@ -187,8 +249,8 @@ export function DatasetReferences({
                 >
                   删除所列数据
                 </button>
-                <button disabled={busy} onClick={() => {setReview(null); requestAnimationFrame(() => reviewButton.current?.focus());}}>
-                  取消回收
+                <button disabled={busy} onClick={() => {if (deletion) onCancel?.(); else {setReview(null); requestAnimationFrame(() => reviewButton.current?.focus());}}}>
+                  {deletion ? "取消删除" : "取消回收"}
                 </button>
               </div>
             </section>

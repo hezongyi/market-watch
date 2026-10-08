@@ -117,6 +117,7 @@ export function DatasetDetail() {
   function select(name: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(name, value);
+    if (name === "section") next.delete("view");
     if (name === "version" || name === "frame") next.delete("before");
     setParams(next);
   }
@@ -209,6 +210,11 @@ export function DatasetDetail() {
               </p>
             </div>
             <div className="dc-actions">
+              <button onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set("section", "references"); next.set("view", "delete");
+                setParams(next);
+              }}>删除历史数据</button>
               {dataset.usable_timeframes.length > 0 && (
                 <OpenChart ticker={`MWH:${dataset.periods.find(p => p.timeframe === "M1")?.available_version_id || dataset.latest_version_id}`} />
               )}
@@ -699,6 +705,9 @@ export function DatasetDetail() {
               id={id!}
               refresh={refresh}
               onDone={() => setRefresh((r) => r + 1)}
+              deletion={params.get("view") === "delete"}
+              archiveAvailable={dataset.maintenance.configured}
+              onCancel={() => navigate(centerReturn(params))}
             />
           )}
           {section === "chart" && (

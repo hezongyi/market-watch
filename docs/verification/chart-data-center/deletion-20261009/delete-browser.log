@@ -1,0 +1,8 @@
+PASS real list exposes deletion; opening/cancelling only reads and restores originating row/page
+PASS archive prerequisite pauses first, prevents repeated commands and never deletes prices
+PASS explicit confirmation submits latest reviewed token once and displays completion
+PASS durable references remain visible and block deletion
+PASS empty or already reclaimed history cannot submit deletion
+PASS review conflict resets confirmation and preserves prices
+PASS partial archive failure is visible; idempotent retry never reclaims prices
+PASS detail entry and maintenance guidance preserve return context

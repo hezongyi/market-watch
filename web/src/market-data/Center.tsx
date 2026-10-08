@@ -287,6 +287,7 @@ export function CenterList() {
                         </td>
                         <td>
                           <Link to={centerLink(`/market-data/datasets/${d.id}`, params, `dataset-${d.id}`)}>查看</Link>
+                          <Link to={centerLink(`/market-data/datasets/${d.id}?section=references&view=delete`, params, `dataset-${d.id}`)}>删除历史数据</Link>
                           {d.latest_version_id &&
                             d.usable_timeframes.length > 0 && (
                               <OpenChart ticker={`MWH:${d.periods.find(p => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`} frame={d.usable_timeframes[0]} />
