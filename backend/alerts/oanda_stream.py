@@ -2,6 +2,7 @@
 
 import codecs
 import json
+import logging
 import time
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
@@ -10,6 +11,8 @@ import httpx
 
 from .market_contracts import CandleBatch, MinuteRow, QuoteEvent, RequestResult, failed_request
 from .market_resources import cooldown, request_slot
+
+log = logging.getLogger(__name__)
 
 
 def timestamp(value):
@@ -168,16 +171,56 @@ class OandaPractice:
     def stream(self, identities, *, epoch, stopped=None):
         decoder = NDJSONDecoder()
         sequence = 0
-        with self.stream_client.stream("GET",
-                f"https://stream-fxpractice.oanda.com/v3/accounts/{self.account_id}/pricing/stream",
-                headers=self.headers, params={"instruments": ",".join(sorted(identities)),
-                                              "snapshot": "true"}) as response:
-            response.raise_for_status()
-            for chunk in response.iter_bytes():
-                if stopped and stopped():
-                    return
-                for raw in decoder.feed(chunk):
-                    sequence += 1
-                    yield price_event(raw, identities, epoch=epoch, sequence=sequence,
-                                      received_at=self.clock())
-            decoder.finish()
+        started = time.monotonic()
+        last_record = None
+        phase, failed_phase = "request", None
+        response = None
+
+        def trace(name, info):
+            nonlocal phase, failed_phase
+            # HTTPcore metadata includes request URLs and exceptions. Only
+            # translate known event names; never log that metadata or payloads.
+            phases = {"connect_tcp": "connect", "start_tls": "tls",
+                      "send_request_headers": "send_headers", "send_request_body": "send_body",
+                      "receive_response_headers": "receive_headers", "receive_response_body": "receive_body"}
+            parts = name.split(".")
+            if len(parts) != 3 or parts[0] not in ("connection", "proxy", "http11", "http2"):
+                return
+            if parts[1] in phases:
+                if parts[2] == "started":
+                    phase = phases[parts[1]]
+                elif parts[2] == "failed":
+                    failed_phase = phases[parts[1]]
+
+        try:
+            with self.stream_client.stream("GET",
+                    f"https://stream-fxpractice.oanda.com/v3/accounts/{self.account_id}/pricing/stream",
+                    headers=self.headers, params={"instruments": ",".join(sorted(identities)),
+                                                  "snapshot": "true"},
+                    extensions={"trace": trace}) as response:
+                response.raise_for_status()
+                for chunk in response.iter_bytes():
+                    if stopped and stopped():
+                        return
+                    for raw in decoder.feed(chunk):
+                        sequence += 1
+                        last_record = time.monotonic()
+                        yield price_event(raw, identities, epoch=epoch, sequence=sequence,
+                                          received_at=self.clock())
+                decoder.finish()
+        except httpx.HTTPError as error:
+            stamp = time.monotonic()
+            if isinstance(error, httpx.HTTPStatusError):
+                phase = "http_status"
+            else:
+                phase = failed_phase or phase
+            content_type = response.headers.get("content-type", "") if response is not None else ""
+            body_kind = ("json" if content_type.startswith("application/json") else
+                         "html" if content_type.startswith("text/html") else "other")
+            log.warning("pricing_transport_failed phase=%s type=%s epoch=%s http_status=%s "
+                        "body_kind=%s elapsed_ms=%s since_record_ms=%s records=%s",
+                        phase, type(error).__name__, epoch,
+                        response.status_code if response is not None else "-", body_kind,
+                        round((stamp - started) * 1000),
+                        round((stamp - last_record) * 1000) if last_record is not None else "-", sequence)
+            raise
