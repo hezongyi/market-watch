@@ -331,3 +331,56 @@ unfinished. Its isolated database/project and images are retained, not retired
 or marked complete; resumption requires pausing production pricing again before
 opening any Ubuntu account stream. The sanitized temporary handoff references
 the existing documents and private evidence instead of duplicating them.
+
+## Execution of returned diagnosis plan
+
+The user explicitly requested execution of the returned plan in
+`/tmp/market-watch-oanda-timeout-handoff-gn0gxojl/analysis-resumed.md`.
+Production pricing stopped again at **02:31:41 UTC**, with no concurrent Ubuntu
+account stream. Existing task/project remains active. A private host-side probe
+holds the same account flock used inside the bind-mounted debug container.
+
+Fixed Japan VMess/WebSocket outbound, HTTP/1.1, account, symbols, snapshot=true,
+User-Agent/Accept/Accept-Encoding/date/auth headers, fresh client/process per
+attempt, five seconds of records and two seconds after full close. ABBA order
+compared HTTPX 0.28.1/HTTPcore 1.0.9 with curl 7.81.0. No extra catalog or REST
+requests ran inside that comparison. Raw curl verbose lines are parsed only in
+memory and immediately discarded; account/token are supplied through stdin
+config, never argv or persisted traces. The valid batch is
+`compare-abba-final.jsonl`; the earlier harness parser failure is preserved and
+excluded rather than combined. Host Python used OpenSSL 3.6.3, curl OpenSSL 3.0.2;
+these version differences remain explicit.
+
+Curl's 60-second total timeout is only an insurance deadline. The observer starts
+its 15-second header inactivity deadline after GET is sent, resets only for
+received upstream header/body data, and labels observer termination separately
+from curl exit 28. HTTPX keeps real connect5/read15 timing. At every exit the
+subprocess/client/socket closes before the next attempt. Authentication or rate
+limit responses stop the batch.
+
+The 24-attempt batch completed with **HTTPX 7/12 success, five header stalls** and
+**curl 9/12 success, three header stalls**. All failed requests had completed TLS,
+then no status/record until the header deadline. Both stacks reproduce the
+remaining symptom; this does not justify replacing HTTPX. Header serialization
+and TLS fingerprints are not identical, so the counts are diagnostic batches,
+not equivalent randomized SLA estimates.
+
+A separate fixed-client snapshot false/true/true/false comparison completed with
+12/12 snapshot=false successful attempts and 11/12 snapshot=true successful
+attempts. One failure is insufficient to establish snapshot causality; the
+product snapshot parameter is unchanged. Two authenticated DoH resolvers through
+the existing isolated outlet agree on OANDA addresses that differ from Ubuntu's
+ordinary DNS. A separate isolated-proxy hosts mapping retains original Host/SNI
+and certificate checks; it still reproduced one header stall among twelve curl
+attempts. Therefore a static address mapping is not deployed as a fix.
+
+REST boundaries now use the same bounded trace mapping as the stream. Safe
+`oanda_rest_failed` warnings retain catalog/candles, network or local-slot phase,
+route, exception class, numeric status, body category and elapsed time; they do
+not log URLs, SQL, identities, tokens, content or exception strings. Catalog
+errors still raise unchanged; page errors still become the same failed
+CandleBatch and cooldown behavior. Four real local header/body timeout cases
+were red before instrumentation, then green; two 401 cases verify preserved
+classification and secret exclusion. The 56 relevant source tests passed.
+Final observation will also keep every failed REST batch cumulatively and
+supplier/receiver quote timestamps; no readiness or freshness thresholds change.
