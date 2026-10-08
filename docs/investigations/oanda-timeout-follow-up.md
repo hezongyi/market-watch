@@ -384,3 +384,155 @@ were red before instrumentation, then green; two 401 cases verify preserved
 classification and secret exclusion. The 56 relevant source tests passed.
 Final observation will also keep every failed REST batch cumulatively and
 supplier/receiver quote timestamps; no readiness or freshness thresholds change.
+
+
+### Further controlled path and timing evidence
+
+The pinned-address HTTPX batch also retained two header stalls among twelve
+attempts (10/12 success); the proxy controller verified the actual destination
+as 104.18.39.182. Fixed address does not establish a cure. After restoring domain
+routing, fresh HTTPX attempts with **15 seconds after complete close** still
+failed twice among eight (6/8 success), including the first two attempts. This
+is not a demonstrated benefit of extending product backoff.
+
+Ordinary Ubuntu DNS returns unrelated addresses; two authenticated DoH resolvers
+through the existing exit agree on the OANDA addresses. A new controlled ABBA
+path comparison pins **104.18.39.182 for both direct and isolated Japan proxy**,
+retains original Host/SNI and certificate validation, fixes HTTPX and request
+headers, and closes completely before the same two-second gap. Direct completed
+**5/6**, proxy **5/6**, with one upstream-header ReadTimeout each. The direct
+failure completed TLS in 174 ms then waited about 15 seconds without status or
+records. Thus this proxy is not a necessary condition for the symptom. These
+small batches do not establish equal reliability; Cloudflare anycast does not
+guarantee the same physical edge from different exits. Direct trace initially
+labels TCP as proxy_connect_tcp due to a harness label, not actual proxy use.
+
+The new installed image `market-watch-api:oanda-rest-diagnostics-20261008`
+(source 6f2af8f) passed **83 relevant installed-package tests**; five runtime
+module SHA256 hashes match the worktree and import from site-packages. Both
+Standards and Spec reviews report no findings. The source test result of 56
+covered a narrower selected set; it is not combined with installed counts.
+
+A new fresh database `oanda_rest_final` in the existing isolated Ubuntu project
+runs the real worker, confirmation, publisher and authenticated API. This window
+explicitly uses the **original configured production proxy path**, not the
+isolated Japan comparison exit. Configured recovery remains 1500 minutes,
+delivery is disabled, and no freshness/readiness or timeout gate changes.
+After both symbols were healthy and both publications caught up, observation
+started **03:34:44 UTC** for 600 seconds. Earlier failed records remain intact.
+The observer records every failed confirmation batch cumulatively plus source,
+receiver and local sample timestamps. Final results will follow below.
+
+
+### Latest completed real window: strict acceptance failed
+
+**03:34:44.151–03:44:44.158 UTC**, **600.026 seconds / 121 samples**,
+observer exit **1**. This was the immutable 6f2af8f diagnostic image on Ubuntu,
+original configured production proxy, real practice account, fresh isolated PG
+database. It is not a successful final acceptance and is not superseded by a
+selected later green window.
+
+- Connection: epoch **1 -> 2**. After **713 decoded records**, the established
+  stream stalled in `receive_body`, `ReadTimeout`, **15,030 ms** since its last
+  record, status 200. It automatically reconnected, then both symbols became
+  healthy by **03:41:46.694 UTC**; neither pool exhaustion nor DB deadlock
+  prevented recovery. This adds a mature-stream failure to the initial-header
+  stalls; the remaining problem cannot be described as initial-only.
+- Confirmation: **six cumulative REST failures**, three paired episodes at
+  03:37:10, 03:39:10 and 03:41:30 UTC. All show `phase=tls route=proxy_tls`,
+  **5,011–5,019 ms**, three ConnectTimeout and three ConnectError. Therefore
+  these confirmation failures are TLS establishment faults, distinct from
+  initial upstream response-header stalls. The five-second connect limit is
+  unchanged. Each symbol's confirmed M1 still advanced **600,000 ms**.
+- Publication: each symbol's M1 publication advanced **600,000 ms**; **zero
+  cumulative publication failures**, zero pending publication error counts.
+- DB/ownership: **zero PostgreSQL deadlocks**, positive leases throughout, zero
+  long idle transactions. Delivery remained off and outbox empty.
+- Quote quality: of 242 symbol samples, **230 healthy, three stale, three
+  unavailable and six recovering**. EURUSD stale samples had source ages
+  **17.4, 15.261 and 19.043 seconds**, corresponding source-to-receive delays
+  **366, 176 and 809 ms**, with fresh heartbeats and XAUUSD quotes. These show
+  the latest accepted EURUSD quote did not advance sufficiently, not a
+  persistently delayed delivery of that quote or a whole-stream outage in
+  those samples. Existing minute metrics corroborate accepted quote gaps:
+  **19,164 ms** at 03:38, **15,922 ms** at 03:39, **18,736 ms** at 03:44.
+  They only count accepted records, so they cannot prove the supplier sent
+  nothing or that no old/duplicate record was filtered. No filtering defect
+  was found: newer source time is accepted even when prices do not change.
+  The 15-second stale gate remains correct and unchanged.
+- Separate API/SSE check: **30.393 seconds**, 22 snapshots, 30 heartbeats,
+  epoch 1, no unhealthy snapshot in that short subwindow. This is not the
+  whole-window verdict.
+
+Private evidence: `live-rest-final-evidence/report.json`, `observation.jsonl`,
+`fault-recovery.jsonl`, `warnings.json`, `live-rest-final.log`,
+`quote-gap-evidence.json`, and `live-rest-final-sse.json`. Earlier failures
+remain in their original directories.
+
+### Remaining discriminants and conclusion
+
+After the observation worker and account lock exited, a **direct curl/HTTPX
+ABBA** batch pinned the same trusted IP with original Host/SNI and certificate
+validation, disabled all proxies, and retained identical safe headers and
+phase timing. **Curl 5/6, HTTPX 5/6**, one upstream-header deadline each. Both
+stacks therefore reproduce on the direct path as well as the proxy path. A
+second direct HTTPX batch changes only request headers: **adapter default
+headers 3/4, comparison headers 1/4**, header stalls in both. These bounded
+samples establish reproduction; they do not estimate relative reliability or
+show a header-level fix. Host OpenSSL differs from the installed image and
+Cloudflare anycast is not a fixed physical backend.
+
+Two independent agents reviewed the evidence and quote filtering: no additional
+proved code defect. The local pool recovery and lock-order changes remain
+validated, but initial response headers, REST TLS establishment and stream body
+loss still occur. Do not change library, route, backoff, pool size or timeout
+without a successful controlled counterfactual. For responsibility assignment,
+next useful evidence is a genuinely controlled dedicated outlet or supplier-side
+request handling, and per-symbol receive/accept/reject counters plus byte/chunk
+arrival and local processing timing for a new targeted stream window. Existing
+DB cannot retrospectively supply those counters. No supplier messages were sent.
+
+The task/project stays **active**; no retirement or production release occurs.
+Ubuntu account processes all exited and the account flock was free, debug and
+proxy containers were confirmed stopped, then the original production pricing
+container was started again. Its original v1.14.1 image remains unchanged; the
+new repair is not deployed to production. Post-resume status is recorded below.
+
+
+Production resumed at **03:51:08.393 UTC** with image
+`market-watch-api:v1.14.1-6fd9273`. At **03:52:06 UTC** it was running but
+pricing epoch 236 was disconnected/unavailable; neither symbol was ready and
+confirmed M1 had not caught up. Restart is not described as healthy restoration.
+The unchanged production does not contain the verified application repairs.
+
+
+### Ubuntu instance operation
+
+Observed API/ready address: **http://127.0.0.1:19756/readyz**, authenticated live
+API on the same port. This address served the Ubuntu installed-image observation,
+not an SSH forwarding to production. The API process has exited and both debug
+and isolated-proxy services are now stopped. Only the task's PostgreSQL remains
+running; the task is unresolved and its volume/evidence are retained.
+
+Private files are in `/home/quant/repos/.production/mw-oanda-live-debug-20261008`.
+Exact idle-service startup and service stop commands (no build, no production
+volume, no account stream starts merely by starting the sleep container):
+
+```sh
+sg docker -c 'docker compose --env-file /home/quant/repos/.production/mw-oanda-live-debug-20261008/compose.env -p mw-oanda-live-debug-20261008 -f /home/quant/repos/.production/mw-oanda-live-debug-20261008/compose.yaml up -d --no-build postgres debug proxy'
+sg docker -c 'docker compose --env-file /home/quant/repos/.production/mw-oanda-live-debug-20261008/compose.env -p mw-oanda-live-debug-20261008 -f /home/quant/repos/.production/mw-oanda-live-debug-20261008/compose.yaml stop -t 30 debug proxy'
+```
+
+A new account observation requires: production pricing stopped and confirmed
+exited, no pending account process and exclusive `/verify/account-stream.lock`,
+a **new independent empty DB** selected privately in runtime.env and debug
+recreated, then run the installed harness with a unique new evidence directory:
+
+```sh
+sg docker -c 'docker exec mw-oanda-live-debug-20261008-debug-1 python -u /verify/run_live_final.py --seconds 600 --output /verify/NEW-UNIQUE-EVIDENCE-DIRECTORY'
+```
+
+Do not reuse `oanda_rest_final` or overwrite the preserved failure directories.
+The fresh-owner assertion deliberately rejects them. Confirm the account process
+has exited before stopping Ubuntu services and restoring the exact original
+production container. This operation is not production deployment authorization.
