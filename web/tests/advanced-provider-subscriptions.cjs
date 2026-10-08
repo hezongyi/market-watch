@@ -56,6 +56,14 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   streams[1].readyState=2;streams[1].onerror({});
   await transport.clear();assert.equal(streams[1].closed,true);
   assert.equal(timers.size,0,'canceling the final listener cancels reconnection');
+  await transport.subscribe({client:'quotes',listener:'watchlist',generation:1,sequence:0});
+  const quoteStream=streams.at(-1);
+  quoteStream.onmessage({data:JSON.stringify({listener:'watchlist',generation:1,sequence:1,
+    type:'quotes',quotes:[{s:'ok',snapshot:{revision_id:'accepted-revision'},v:{lp:1.1}}]})});
+  quoteStream.onopen({});await flush();await flush();
+  assert.equal(calls.filter(c=>c.path.endsWith('/subscribe')&&c.args.listener==='watchlist').at(-1)
+    .args.binding,'accepted-revision','quote reconnect retains the previously delivered binding');
+  await transport.clear();
   assert.equal(errors.length,0);
   let finish;
   const pending=new Promise(resolve=>finish=resolve);

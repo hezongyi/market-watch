@@ -53,10 +53,12 @@ class Calculator:
         else:
             inst, revision_id = db.get(Instrument, query.instrument), None
         client = "stream:" + work["id"][:32]
+        demand = db.get(MarketDemand, demand_id(client, inst.id, composite_revision_id=revision_id))
         if self.demand_at.get(work["id"], 0) > now_ms():
-            demand = db.get(MarketDemand, demand_id(client, inst.id, composite_revision_id=revision_id))
             if demand and demand.expires > now_ms():
                 return
+        if query.series_kind == "composite" and query.composite_revision_id is None and not demand:
+            stream._release_demand(db, db.get(MarketStreamTask, work["id"]), keep_revision=revision_id)
         renew_demand(db, client, inst, composite_revision_id=revision_id)
         self.demand_at[work["id"]] = now_ms() + 30000
 

@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 import test_market_stream as contracts
 import test_market_stream_api as http_contracts
+import test_market_stream_quotes as quote_contracts
 import test_market_stream_worker as worker_contracts
 from alerts import market_stream as stream
 from alerts.storage import MarketStreamTask
@@ -64,10 +65,28 @@ def test_worker_contract_postgres(provider_pg, monkeypatch, contract):
 
 
 @pytest.mark.parametrize("contract", [
+    quote_contracts.test_quote_only_clients_share_work_and_report_expiry_without_new_price,
+    quote_contracts.test_fixed_quote_input_remains_on_accepted_confirmation,
+    quote_contracts.test_follow_active_switch_releases_only_previous_task_revision_demand,
+    quote_contracts.test_quote_only_provider_task_keeps_supplier_cadence_without_history_interest,
+    quote_contracts.test_replacing_last_quote_consumer_retires_previous_series_demand,
+    quote_contracts.test_replacement_retains_demand_for_another_page_and_late_cancel_is_fenced,
+    quote_contracts.test_cancel_after_active_switch_before_worker_runs_retires_previous_demand,
+    quote_contracts.test_explicit_quote_revision_does_not_follow_active_switch,
+])
+def test_quote_contract_postgres(provider_pg, monkeypatch, contract):
+    from alerts import storage
+
+    storage.bootstrap(provider_pg[1])
+    contract(provider_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize("contract", [
     http_contracts.test_http_authentication_csrf_and_same_client_name_do_not_cross_sessions,
     http_contracts.test_registration_cannot_mutate_fixed_identity_in_the_same_generation,
     worker_contracts.test_managed_preparation_waits_for_native_dataset_readiness,
     worker_contracts.test_published_stream_signal_uses_publication_evidence_without_scanning_staging_history,
+    quote_contracts.test_managed_quote_cancellation_releases_only_task_demand,
 ])
 def test_managed_and_http_contract_postgres(provider_pg, contract):
     from alerts import storage

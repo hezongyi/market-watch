@@ -12,12 +12,12 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 
 ## 已执行验证
 
-- `unit-tests.txt`：121 passed、25 skipped（2026-10-09 发布状态检测与 PostgreSQL 入口检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复和 HTTP 权限。
+- `unit-tests.txt`：130 passed、34 skipped（2026-10-09 报价与需求释放检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复和 HTTP 权限。
 - `regression-tests.txt`：105 passed，既有 provider_service、market_data、managed_dataset、fixed_indicators 回归。
 - `node tests/advanced-market-stream.cjs`：实际 bridge 回调的世代/序号拒收、确认后极值缩小、报价交付、取消迟到回调与常态 tick 无行情请求；新增空首屏准备、HTTP 历史接受后的单次重注册、尾部撤回、拒收及窗口过滤凭据检查、Python 指标值交付。
 - `node tests/advanced-fixed-series.cjs` 与 `advanced-provider-subscriptions.cjs`：既有身份、首用边界、连接共享和取消顺序通过。
 - `npm run build`：TypeScript/Vite 构建通过；既有 chunk size 提示仍存在。
-- `test_market_stream_postgres.py`：25 skipped，未配置隔离 TEST_POSTGRES_URL；未运行的并发检查不算通过。新增独立进程注册/领取、worker 与 HTTP 契约。
+- `test_market_stream_postgres.py`：34 skipped，未配置隔离 TEST_POSTGRES_URL；未运行的并发检查不算通过。包含独立进程注册/领取、worker、报价与 HTTP 契约。
 - 新模块 Ruff、`node --check advanced-host/bridge.js`、`git diff --check` 通过；Alembic 单 head 为 `ar45_market_stream`。
 
 ## Ubuntu Docker 验收入口（尚未运行）
@@ -81,3 +81,11 @@ OHLC 没有变化时，指标变化对应的柱仍进入增量事件，原生指
 SQL 观察测试先复现 published 图表的状态检查仍扫描原始 candles 统计，再改为按 instrument/timeframe 主键读取 ChartPublication 的边界、修订、完整数量和初始化证据。发布修订仍使输入信号变化；该路径不再查询原始 staging 历史。未发布与报价路径保留既有检测。
 
 统一套件 121 passed、25 PostgreSQL skipped；market_data/managed_dataset 本轮回归 78 passed。Ruff、diff check、Alembic 单 head 检查通过。没有据此推断实际 PostgreSQL 扫描量、CPU、容量或 P95，完整 Docker 性能矩阵仍待运行。
+
+## 报价绑定与需求释放检查点
+
+`test_market_stream_quotes.py` 九项检查通过：仅报价客户端共享计算/需求，无新价格的过期通知，固定输入不采用实时 bid，显式固定修订不跟随活跃切换，平台报价保持来源检查节奏且不创建周期历史需求，订阅替换/迟到取消/最后消费者释放，活跃修订切换前后精确释放本任务需求并保留独立预警。
+
+修复前已复现：跟随修订切换留下旧 revision demand；同监听器替换系列留下旧 task demand；报价绑定改变直接交付新报价而未 reset；前端重连未保存已交付 binding。修复按任务派生的准确 demand ID 释放，注册替换/取消与提交使用 task 行锁协调，报价切换先 reset 并重注册，传输保存 binding 用于重连。SQLite 行为通过不证明 PostgreSQL 行锁并发通过。
+
+完整统一套件含报价入口：130 passed、34 PostgreSQL skipped；既有回归105 passed。Node bar/quote 世代及订阅重连测试、web 构建、Ruff和diff check通过。平台 cadence 检查使用模拟 OANDA quote reader，尚未运行真实供应商或许可浏览器；不能由该检查宣称各供应商已验收。

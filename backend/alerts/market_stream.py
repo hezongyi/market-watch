@@ -72,7 +72,14 @@ def register(session_hash, client, listener, generation, identity, query, state)
         db.execute(_insert(db)(MarketStreamTask).values(id=key, identity=identity, query=query,
             sequence=0, payload={}, fingerprint="", lease_until=0, next_at=0,
             updated_at=stamp, expires=stamp + LEASE_MS).on_conflict_do_nothing(index_elements=["id"]))
-        task = db.get(MarketStreamTask, key)
+        previous_task = old.task_id if old else None
+        # Replacement and last-consumer cancellation share task-row fencing
+        # with publication. Consistent ordering also covers two clients that
+        # concurrently exchange their old and new calculation identities.
+        tasks = {task.id: task for task in db.scalars(select(MarketStreamTask).where(
+            MarketStreamTask.id.in_(sorted({key, previous_task} - {None})))
+            .order_by(MarketStreamTask.id).with_for_update())}
+        task = tasks[key]
         if not old:
             old = MarketStreamSubscription(id=ident, client_id=owner.id, listener=listener)
             db.add(old)
@@ -90,6 +97,13 @@ def register(session_hash, client, listener, generation, identity, query, state)
         old.state, old.expires = state, stamp + LEASE_MS
         owner.expires = stamp + LEASE_MS
         task.expires = max(task.expires, old.expires)
+        if previous_task and previous_task != key:
+            db.flush()
+            if not db.scalar(select(MarketStreamSubscription.id).where(
+                    MarketStreamSubscription.task_id == previous_task,
+                    MarketStreamSubscription.active.is_(True),
+                    MarketStreamSubscription.expires > stamp).limit(1)):
+                _release_demand(db, tasks[previous_task])
         return {"generation": generation, "identity": identity, "sequence": task.sequence,
                 "task_id": key, "result_epoch": task.result_epoch}
 
@@ -106,16 +120,18 @@ def cancel(session_hash, client, listener, generation):
                                            state={}, expires=now_ms() + LEASE_MS)
             db.add(sub)
         task_id = sub.task_id
+        task = db.scalar(select(MarketStreamTask).where(MarketStreamTask.id == task_id)
+                         .with_for_update()) if task_id else None
         sub.generation, sub.active = generation, False
         sub.task_id = None
         db.flush()
         if task_id and not db.scalar(select(MarketStreamSubscription.id).where(
                 MarketStreamSubscription.task_id == task_id,
                 MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > now_ms()).limit(1)):
-            _release_demand(db, db.get(MarketStreamTask, task_id))
+            _release_demand(db, task)
 
 
-def _release_demand(db, task):
+def _release_demand(db, task, *, keep_revision=None):
     """Delete only this calculation's browser demand; alerts keep their owners."""
     from .storage import MarketComposite, MarketDemand, ProviderInterest
 
@@ -124,16 +140,22 @@ def _release_demand(db, task):
         db.execute(delete(ProviderInterest).where(ProviderInterest.client == "stream_" + task.id[:32]))
     elif identity.get("series_kind") in ("managed", "composite"):
         ident = identity["instrument"]
-        revision = None
         if identity["series_kind"] == "composite":
             composite = db.get(MarketComposite, ident)
             if not composite:
                 return
             ident = composite.instrument_id
-            revision = identity.get("revision_id") or composite.active_revision_id
         from .market_data import demand_id
-        ident = demand_id("stream:" + task.id[:32], ident, composite_revision_id=revision)
-        db.execute(delete(MarketDemand).where(MarketDemand.id == ident))
+        # A follow-active task may have created demand before a revision switch
+        # or before another worker took over. Match exact task-owned IDs among
+        # this instrument's demands rather than guessing its current revision.
+        owned = [row.id for row in db.scalars(select(MarketDemand).where(
+            MarketDemand.instrument_id == ident)) if (keep_revision is None or
+            row.composite_revision_id != keep_revision) and
+            row.id == demand_id("stream:" + task.id[:32], ident,
+                                composite_revision_id=row.composite_revision_id)]
+        if owned:
+            db.execute(delete(MarketDemand).where(MarketDemand.id.in_(owned)))
 
 
 def renew(session_hash, client):
@@ -277,6 +299,16 @@ def events(session_hash, client, cursors):
                     result_sequence = task.sequence
                 if payload.get("type") == "bars":
                     payload = delivery(db, task, sub, payload, cursors)
+                elif payload.get("type") == "quotes":
+                    snapshots = [quote["snapshot"] for quote in payload.get("quotes", [])
+                                 if quote.get("snapshot")]
+                    binding = snapshots[0].get("revision_id") if snapshots else None
+                    previous_binding = initial.get("binding")
+                    if binding:
+                        initial["binding"] = binding
+                    if binding and previous_binding and binding != previous_binding:
+                        payload = {"type": "reset", "reason": "binding_changed",
+                                   "resolved_revision_id": binding}
                 if epoch_changed:
                     payload = {"type": "reset", "reason": "result_epoch_changed"}
                 event = {**common, **payload, "sequence": result_sequence}

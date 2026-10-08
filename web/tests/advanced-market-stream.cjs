@@ -56,6 +56,16 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
   await deliver({listener:quoteRegistration.listener,generation:quoteRegistration.generation,
     sequence:1,type:'quotes',quotes:[{s:'ok',n:context.symbol,v:{lp:1.12,quote_ready:true}}]});
   assert.equal(context.quotes.at(-1).v.lp,1.12);
+  await deliver({listener:quoteRegistration.listener,generation:quoteRegistration.generation,
+    sequence:2,type:'reset',reason:'binding_changed'});
+  const quoteRebound=sent.filter(row=>row.type==='market-subscribe').at(-1).args;
+  assert.ok(quoteRebound.generation>quoteRegistration.generation);
+  await deliver({listener:quoteRegistration.listener,generation:quoteRegistration.generation,
+    sequence:3,type:'quotes',quotes:[{s:'ok',n:context.symbol,v:{lp:9}}]});
+  assert.equal(context.quotes.at(-1).v.lp,1.12,'quote reset rejects the previous revision generation');
+  await deliver({listener:quoteRebound.listener,generation:quoteRebound.generation,
+    sequence:1,type:'quotes',quotes:[{s:'ok',n:context.symbol,v:{lp:1.13}}]});
+  assert.equal(context.quotes.at(-1).v.lp,1.13,'rebound quotes reach the current native callback');
   evaluate("feed.unsubscribeQuotes('watchlist')");
   const beforePreparation=sent.filter(row=>row.type==='market-subscribe').length;
   evaluate(`feed.subscribeBars({ticker:'EURUSD'},'1',bar=>received.push(bar),'preparing',()=>{});`);
