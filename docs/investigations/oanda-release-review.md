@@ -1,5 +1,11 @@
 # OANDA recovery patch: production release review
 
+Subsequent execution: reviewed PR #22 was merged and annotated v1.14.2 pushed.
+The tag-built backend was formally deployed with an Ubuntu-verified production
+backup, one authorized retry and a complete 600s production window. Strict
+acceptance remains failed. See `../oanda-v1.14.2-production-delivery.md` for actual
+deployment and rollback evidence; the preparation record below is historical.
+
 Status: **prepared on Ubuntu, not deployed**. This is a proposal for releasing
 the validated local recovery repairs; it is not a claim that all external
 timeouts or quote-quality failures have been resolved. Decision basis:
@@ -25,7 +31,7 @@ b7376b9 candidate below while preserving this preparation evidence. See
   `ee9bd337b0848593dcfb2148e83719838c8810efc6a3910b7ae31de0942e0556`;
   304197120 bytes. Nothing has been transferred to or loaded on unraid.
 
-The product diff against running v1.14.1 (`6fd9273`) contains seven modules:
+The product diff against running v1.14.1 (`6fd9273`) contains six modules:
 `chart_history_plan`, `history_retention`, `managed_dataset` (consistent reference
 and lifecycle lock ordering); `oanda_stream` (owned stream pool cleanup and safe
 transport/REST phases); `oanda_worker` (safe failure-stage diagnostics);
