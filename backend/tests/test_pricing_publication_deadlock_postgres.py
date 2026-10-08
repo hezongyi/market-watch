@@ -5,16 +5,23 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
+from alerts import chart_history_plan, managed_dataset, publication_schedule
 from alerts import live_pricing as live
-from alerts import managed_dataset, publication_schedule
 from alerts.config import settings
 from alerts.history_retention import reclaim
-from alerts.storage import ChartHistoryPlan, ChartPublicationState, MarketDataset, PricingOwner
+from alerts.market import ingest
+from alerts.storage import (
+    ChartHistoryPlan,
+    ChartPublicationState,
+    Instrument,
+    MarketDataset,
+    PricingOwner,
+)
 from sqlalchemy import event, select
 from sqlalchemy.exc import OperationalError
 from test_history_retention import prepared
 from test_live_pricing import candles
-from test_market_contracts import identity
+from test_market_contracts import batch, identity
 from test_market_datasets import register
 from test_provider_postgres import provider_pg as _provider_pg
 
@@ -149,3 +156,185 @@ def test_existing_plan_progress_still_prevents_actual_reclamation(provider_pg, s
         with factory.begin() as reclaiming:
             with pytest.raises(ValueError, match="引用"):
                 reclaim(reclaiming, identity().key, "while-plan-progresses")
+
+
+@pytest.mark.parametrize("action", ["complete", "cancel", "resume", "join", "reactivate", "adopt"])
+def test_plan_lifecycle_does_not_deadlock_confirmed_pricing(provider_pg, monkeypatch, action):
+    factory, engine = provider_pg
+    monkeypatch.setattr(settings, "oanda_resident_symbols", "EUR_USD")
+    monkeypatch.setattr(settings, "oanda_recovery_minutes", 2)
+    monkeypatch.setattr(live, "now_ms", lambda: 125000)
+    live.ensure_catalog([{"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5}],
+                        "plan-completion-account")
+    identities = live.desired_datasets("plan-completion-account")
+    identity = identities["EUR_USD"]
+    ownership = live.claim("plan-completion-account")
+    epoch = live.begin_connection(ownership, identities)
+    live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
+    with factory.begin() as db:
+        instrument_id = db.get(MarketDataset, identity.key).instrument_id
+        if action not in ("join", "adopt"):
+            db.add(ChartHistoryPlan(instrument_id=instrument_id, target_start=0,
+                target_end=120000, cursor=120000,
+                status="cancelled" if action in ("resume", "reactivate") else "pending",
+                realtime_enabled=action != "reactivate"))
+
+    confirmation_locked = threading.Event()
+    plan_at_lock = threading.Event()
+
+    def before_sql(connection, cursor, statement, parameters, context, executemany):
+        if (action != "adopt" and threading.current_thread().name.startswith("plan")
+                and "FROM market_datasets" in statement and "FOR UPDATE" in statement):
+            plan_at_lock.set()
+
+    def after_sql(connection, cursor, statement, parameters, context, executemany):
+        if "FOR UPDATE" not in statement:
+            return
+        if (threading.current_thread().name.startswith("confirmation")
+                and "FROM market_datasets" in statement):
+            confirmation_locked.set()
+            assert plan_at_lock.wait(5)
+        if (threading.current_thread().name.startswith("plan")
+                and ("FROM instruments" in statement
+                     or action == "adopt" and "FROM market_datasets" in statement)):
+            plan_at_lock.set()
+
+    def complete_plan():
+        if action == "adopt":
+            managed_dataset.adopt_legacy_once()
+            return
+        with factory.begin() as db:
+            if action == "complete":
+                plan = db.get(ChartHistoryPlan, instrument_id)
+                chart_history_plan.advance_plan(db, plan, 125000)
+            elif action in ("join", "reactivate"):
+                managed_dataset.join(db, db.get(Instrument, instrument_id), 0, 125000)
+            else:
+                chart_history_plan.control_plan(db, instrument_id, action, 125000)
+
+    event.listen(engine, "before_cursor_execute", before_sql)
+    event.listen(engine, "after_cursor_execute", after_sql)
+    try:
+        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="confirmation") as confirmation_pool:
+            confirmed = confirmation_pool.submit(live.commit_confirmation, ownership, epoch,
+                                                  candles(identity), now=125000)
+            assert confirmation_locked.wait(5)
+            with ThreadPoolExecutor(max_workers=1, thread_name_prefix="plan") as plan_pool:
+                completed = plan_pool.submit(complete_plan)
+                errors = []
+                for pending in (completed, confirmed):
+                    try:
+                        pending.result(timeout=10)
+                    except Exception as error:
+                        errors.append(type(error).__name__)
+                assert not errors, f"plan lifecycle or confirmation aborted: {errors}"
+        with factory.begin() as db:
+            expected = {"complete": "complete", "cancel": "cancelled", "resume": "pending",
+                        "join": "pending", "reactivate": "pending"}
+            plan = db.get(ChartHistoryPlan, instrument_id)
+            if action == "adopt":
+                assert plan is None
+            else:
+                assert plan.status == expected[action]
+                assert plan.realtime_enabled
+            assert db.get(PricingOwner, ownership[0]).epoch == epoch
+        if action == "adopt":
+            managed_dataset.adopt_legacy_once()
+            with factory.begin() as db:
+                assert db.get(ChartHistoryPlan, instrument_id).status == "complete"
+    finally:
+        event.remove(engine, "before_cursor_execute", before_sql)
+        event.remove(engine, "after_cursor_execute", after_sql)
+
+
+def test_planner_rechecks_a_plan_cancelled_since_it_was_loaded(provider_pg):
+    factory, _ = provider_pg
+    with factory.begin() as db:
+        instrument_id = register(db).id
+        db.add(ChartHistoryPlan(instrument_id=instrument_id, target_start=0,
+            target_end=120000, cursor=120000, status="pending", realtime_enabled=True))
+
+    with factory.begin() as planner:
+        stale_plan = planner.get(ChartHistoryPlan, instrument_id)
+        with factory.begin() as user:
+            chart_history_plan.control_plan(user, instrument_id, "cancel", 125000)
+        assert not chart_history_plan.advance_plan(planner, stale_plan, 125000)
+    with factory.begin() as db:
+        assert db.get(ChartHistoryPlan, instrument_id).status == "cancelled"
+
+
+@pytest.mark.parametrize("action", ["join", "control"])
+def test_plan_writer_reloads_a_preloaded_approved_range(provider_pg, action):
+    factory, _ = provider_pg
+    with factory.begin() as db:
+        instrument_id = register(db).id
+        db.add(ChartHistoryPlan(instrument_id=instrument_id, target_start=60000,
+            target_end=120000, cursor=120000, status="pending", realtime_enabled=True))
+
+    with factory.begin() as stale:
+        preloaded = stale.get(ChartHistoryPlan, instrument_id)
+        with factory.begin() as user:
+            plan = managed_dataset.join(user, user.get(Instrument, instrument_id), 0, 125000)
+            chart_history_plan.control_plan(user, instrument_id, "cancel", 125000)
+            plan.realtime_enabled = False
+        if action == "join":
+            result = managed_dataset.join(stale, stale.get(Instrument, instrument_id), 60000, 185000)
+            assert result.status == "pending" and result.realtime_enabled
+        else:
+            result = chart_history_plan.control_plan(stale, instrument_id, "resume", 185000)
+        assert result is preloaded
+        assert (result.target_start, result.target_end) == (0, 120000)
+    with factory.begin() as db:
+        assert db.get(ChartHistoryPlan, instrument_id).target_start == 0
+
+
+@pytest.mark.parametrize("action", ["advance", "control", "join"])
+def test_plan_writer_preserves_unflushed_approved_range(provider_pg, action):
+    factory, _ = provider_pg
+    with factory.begin() as db:
+        instrument_id = register(db).id
+        db.add(ChartHistoryPlan(instrument_id=instrument_id, target_start=60000,
+            target_end=120000, cursor=120000, status="pending", realtime_enabled=True))
+    with factory.begin() as db:
+        plan = db.get(ChartHistoryPlan, instrument_id)
+        plan.target_start = 0
+        if action == "advance":
+            chart_history_plan.advance_plan(db, plan, 125000)
+        elif action == "control":
+            chart_history_plan.control_plan(db, instrument_id, "cancel", 125000)
+        else:
+            managed_dataset.join(db, db.get(Instrument, instrument_id), 60000, 125000)
+        assert plan.target_start == 0
+    with factory.begin() as db:
+        assert db.get(ChartHistoryPlan, instrument_id).target_start == 0
+
+
+@pytest.mark.parametrize("locked_row", ["dataset", "instrument"])
+def test_adoption_skips_busy_dataset_or_instrument_then_retries(provider_pg, locked_row):
+    factory, _ = provider_pg
+    with factory.begin() as db:
+        inst = register(db)
+        instrument_id = inst.id
+        ingest(db, inst, batch().ingestion_payload())
+
+    blocker = factory()
+    try:
+        if locked_row == "dataset":
+            blocker.scalar(select(MarketDataset).where(MarketDataset.instrument_id == instrument_id)
+                           .with_for_update())
+        else:
+            blocker.scalar(select(Instrument).where(Instrument.id == instrument_id).with_for_update())
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            adopted = pool.submit(managed_dataset.adopt_legacy_once)
+            try:
+                adopted.result(timeout=5)
+                assert blocker.get(ChartHistoryPlan, instrument_id) is None
+            finally:
+                blocker.rollback()
+    finally:
+        blocker.close()
+    managed_dataset.adopt_legacy_once()
+    with factory.begin() as db:
+        plan = db.get(ChartHistoryPlan, instrument_id)
+        assert plan.status == "complete" and not plan.realtime_enabled
+        assert (plan.target_start, plan.target_end) == (0, 120000)

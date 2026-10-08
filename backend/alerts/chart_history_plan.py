@@ -99,6 +99,31 @@ def priority_regions(db, plan, now):
     return [(plan.target_start, plan.target_end, 300)]
 
 
+def lock_plan_instrument(db, instrument, *, skip_locked=False):
+    """Serialize plan writers in ingestion's Dataset -> Instrument order.
+
+    Delay autoflush until both locks are held, then preserve intentional caller
+    edits before reloading a preloaded plan. Legacy instruments have no dataset.
+    """
+    from .storage import MarketDataset
+
+    with db.no_autoflush:
+        if instrument.startswith('MD:'):
+            dataset = db.scalar(select(MarketDataset.id).where(
+                MarketDataset.instrument_id == instrument).with_for_update(skip_locked=skip_locked))
+            if dataset is None:
+                if skip_locked:
+                    return None
+                raise ValueError('Dataset not found')
+        inst = db.scalar(select(Instrument).where(
+            Instrument.id == instrument).with_for_update(skip_locked=skip_locked))
+    if inst is None and not skip_locked:
+        raise ValueError('Instrument not found')
+    if inst is not None:
+        db.flush()
+    return inst
+
+
 def advance_plan(db, plan, now):
     """Newest missing segment first, one bounded segment in flight per instrument."""
     from .market import stored_coverage
@@ -107,8 +132,12 @@ def advance_plan(db, plan, now):
 
     if plan.status != 'pending':
         return False
-    inst = db.scalar(select(Instrument).where(
-        Instrument.id == plan.instrument_id).with_for_update())
+    inst = lock_plan_instrument(db, plan.instrument_id)
+    # The caller loads the plan before waiting for these locks. A user may have
+    # cancelled or changed its approved range in the meantime.
+    db.refresh(plan)
+    if plan.status != 'pending':
+        return False
     coverage = stored_coverage(db, inst, plan.target_start, plan.target_end)
     missing = list(missing_intervals(coverage, plan.target_start, plan.target_end))
     plan.cursor = missing[-1][1] if missing else plan.target_start
@@ -283,8 +312,8 @@ def control_plan(db, instrument, action, now):
 
     if action not in ('cancel', 'resume', 'retry'):
         raise ValueError('Unknown plan action')
-    db.scalar(select(Instrument).where(Instrument.id == instrument).with_for_update())
-    plan = db.get(ChartHistoryPlan, instrument)
+    lock_plan_instrument(db, instrument)
+    plan = db.get(ChartHistoryPlan, instrument, populate_existing=True)
     if plan is None:
         raise ValueError('History plan not found')
     jobs = list(db.scalars(select(ImportJob).where(

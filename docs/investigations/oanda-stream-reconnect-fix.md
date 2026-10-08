@@ -60,6 +60,22 @@ reactivation, rebinding and inactive-plan updates exclude a competing reclamatio
 lock, and that actual reclamation remains rejected while an existing blocking
 plan advances.
 
+Review also exposed the same reversed locks when the planner completes a pending
+plan, a user cancels/resumes history or joins maintenance, or the publisher adopts
+existing verified history. All four supported plan writers now use one scoped
+Dataset -> Instrument locking helper. Legacy instruments still lock only
+Instrument; adoption skips either busy row rather than blocking the publisher.
+The helper defers autoflush until the locks are held, then flushes deliberate
+caller changes. Writers reload preloaded plans under the locks so a concurrent
+cancellation or approved-range change is respected without discarding intentional
+unflushed edits. New and changed references retain the original reclamation guard.
+
+Real PostgreSQL lifecycle tests reproduced completion, cancellation, resume and
+maintenance-join deadlocks before the lock-order repair. The expanded cases cover
+reactivation, stale cancellation and approved ranges, preservation of unflushed
+approved ranges, and adoption skipping either busy row before a later successful
+pass. These tests call the production plan functions and real confirmation writes.
+
 Worker warnings now include the constant stage, exception class, validated
 five-character SQLSTATE and epoch. `stream` means upstream iteration, `publish`
 means local event persistence, and maintenance stages identify renewal,
