@@ -570,3 +570,116 @@ previous failed final-window evidence is preserved. No dedicated controlled
 outlet is currently established, so first-response-header responsibility remains
 undetermined. A request for availability of such an outlet is pending; it does
 not block the independent local attribution work.
+
+
+## Completed layered attribution window
+
+Product runtime image: `market-watch-api:oanda-layer-observation-20261008`,
+clean runtime source **b7376b9**. Verification-only bind modules include the
+**45a5a44** snapshot timing fix and **1a3e408** bounded decoding error categories;
+their hashes are recorded separately from installed application hashes. The
+installed image passed 72 relevant tests; the subsequently extended pipeline
+selection passed all ten tests, including three decoding categories. The image
+contains no runtime changes after b7376b9. Reviews found no remaining product
+issues; private recorder/cleanup findings were fixed before account observation.
+
+Production pricing was confirmed exited at **04:57:58 UTC** before taking the
+account lock. The first bootstrap failed at **04:58:16 UTC** on catalog
+`ConnectTimeout phase=tls route=proxy_tls elapsed_ms=5007`; it never reached the
+steady window. `live-layer-attribution.log` and its directory are preserved.
+The private harness was extended to observe catalog too, then used a different
+empty database `oanda_layer_observed_2` and a new evidence directory. This is a
+preserved failed startup plus one completed attribution window, not a selected
+green rerun. Original proxy path and connect5/read15 stayed unchanged.
+
+Completed window: **04:59:38.490–05:09:38.498 UTC**, **600.025 seconds**,
+**121 API samples** and **600 independent diagnostic samples within the window**.
+Maximum observer scheduling delay **5.183 ms**; no recorder failure or cleanup
+error. Strict observer exit **1**. **233 healthy / nine stale** symbol samples;
+all stale samples are EURUSD. Epoch remained 1; confirmed and published M1 each
+advanced exactly ten minutes for both symbols. Zero REST confirmation failures,
+publication failures, transport failures, PostgreSQL deadlocks, long idle
+transactions or notifications in this completed window. These zeros do not
+remove the preserved historical and bootstrap failures.
+
+The new receive-before-filter evidence resolves a specific local ambiguity. Four
+EURUSD episodes reached maximum source ages **18.547, 23.555, 47.672 and
+16.439 seconds**. Within each episode received and accepted stayed equal and
+unchanged (97, 148, 175 and 188 respectively); all reject/error/pending counters
+were zero, as were incomplete buffer and decoding errors. The first three
+episodes continued receiving XAUUSD, heartbeat and TLS data. The fourth is only
+two sampled summaries without other-input increments, so it cannot be described
+as proving continuing traffic during that exact short interval. No publish was
+active in those summaries; cumulative publish/consumer maxima stayed unchanged
+at about 843 ms from recovery. The whole process's longest network read was
+**4.298 seconds**, not a new 15-second stall.
+
+This supports an **EURUSD complete-record input gap before quote filtering**,
+with no evidence that normal new quotes were dropped or delayed by local publish.
+It does not identify the supplier, an intermediary or a particular edge as
+responsible. Existing accepted-only metrics could not make this distinction;
+receive/accept/reject counters now can. The source-to-arrival delays of the
+quotes themselves are much shorter than their subsequent ages. Newer source
+timestamps with identical prices still commit; heartbeats do not refresh quotes.
+
+The first gap also demonstrates the sampling limitation: API samples at
+05:04:05.024 (EUR age 14.982s) and 05:04:10.055 (age 0.607s) both looked healthy,
+but four one-second diagnostics between them saw source age above 15s. These
+known observations remain failures even if a future five-second API check misses
+them. No freshness gate was relaxed.
+
+Whole-process totals, including recovery and shutdown, are **1437 records =
+198 EURUSD PRICE + 1118 XAUUSD PRICE + 121 heartbeats**; received equals accepted
+for both symbols and no unmatched publish occurred. They are not the exact
+steady-window totals. The terminal verification `end=eof` denotes normal
+iterator exhaustion during deliberate worker shutdown; it is not evidence of
+remote EOF (network read failures and empty reads remained zero).
+
+Evidence is private under
+`/home/quant/repos/.production/mw-oanda-live-debug-20261008/`:
+`live-layer-attribution-evidence-2/{report.json,pipeline.jsonl,observation.jsonl,diagnostic-final.json,attribution-summary.json}`
+and `live-layer-attribution-2.log`. The report contains installed and diagnostic
+module hashes. `run_live_observed.py` is the private harness; it checks its new
+DB identity/fresh owner, unique evidence directory, window-local recorder count
+and scheduling delay. Repeat only with a new intended variable or repair, after
+adapting its private DB assertion to another empty independent database.
+
+A read-only 100-sample original proxy control-plane observation returned 200
+and one anonymized route-chain fingerprint throughout its sampled period.
+Destination IP was absent, so this cannot identify the actual remote edge.
+It did not issue supplier/account requests or change route. Raw node names and
+credentials were excluded. Evidence: `live-layer-original-route.jsonl`.
+
+### What remains unresolved after this attribution
+
+- Initial headers: cross-stack/cross-path evidence remains; no controlled
+  dedicated outlet or supplier-side handling record is available yet. Do not
+  repeat random shared-node trials or change timeout/library to claim a cure.
+- REST TLS: upstream TLS inside CONNECT is confirmed by the real local
+  handshake regression and unchanged HTTPcore path. The first catalog startup
+  still failed; the completed window's 36 REST calls (two catalog plus 34 pages,
+  22 TLS handshakes) succeeded, with TLS maximum 3.503s. Responsibility is not
+  established; a successful window cannot prove the prior TLS fault disappeared.
+- Mature stream: not reproduced in this window. Synthetic read/body, partial
+  record and slow-publish tests prove the observer can distinguish them. No
+  evidence supports introducing asynchronous queues or changing publication
+  behavior now. A future actual failure can be analysed with these counters.
+- EURUSD freshness: this window's input gaps, rather than filters or local
+  publish, explain its stale observations. Meeting the unchanged 15s gate
+  requires evidence about source/path behavior; artificially refreshing source
+  time, replaying prices, changing dataset source or adding blind reconnects
+  would not repair missing observations.
+
+The user was asked whether a verified dedicated outlet is available; none has
+been established in this session. Next useful external work is that controlled
+comparison or supplier-side evidence. No supplier messages were sent, no
+production candidate was released and the unresolved task remains active.
+
+Ubuntu account process exited, exclusive lock was free, debug/proxy confirmed
+stopped, then original production pricing restarted at **05:10:49.562 UTC**.
+At **05:11:49 UTC** it was running on original v1.14.1, but epoch 297 was
+disconnected/unavailable, invalid lease and neither symbol ready. Container
+restart is therefore not claimed as healthy restoration. The isolated PG volume
+and failed evidence remain; no retire/finish or broad Docker cleanup occurred.
+
+A redacted, unsent supplier-support draft is prepared at `/tmp/market-watch-oanda-layer-findings-kxj4gjxb/supplier-evidence-draft.md`; no credentials or raw trace are included.
