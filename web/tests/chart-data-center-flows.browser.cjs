@@ -1,11 +1,12 @@
+const fixture=require('./chart-data-center-fixture.cjs');
 const {chromium,expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
-const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base='https://192.168.7.232:19943';
+const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base=fixture.base;
 const report={environment:'Ubuntu isolated Docker, real supplier and licensed native engine',passed:false,checks:[],errors:[]};
 (async()=>{
- const b=await chromium.launch({executablePath:'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',args:['--no-sandbox']});
+ const b=await fixture.launch();
  const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
- const native=()=>p.frames().find(f=>f.url().startsWith('blob:')),host=()=>p.frames().find(f=>f.url().includes(':19944/?')),dc=()=>p.frames().find(f=>f.url().includes('/chart-data-center?'));
+ const native=()=>fixture.frames(p).native(),host=()=>fixture.frames(p).host(),dc=()=>fixture.frames(p).center();
  const record=(name,data={})=>{console.log('PASS',name);report.checks.push({name,...data})};
  const get=async route=>{const r=await p.request.get(base+'/api/'+route);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const post=async(route,data)=>{const {csrf}=await get('session');const r=await p.request.post(base+'/api/'+route,{data,headers:{'X-CSRF-Token':csrf}});expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
@@ -15,7 +16,7 @@ const report={environment:'Ubuntu isolated Docker, real supplier and licensed na
  const created=JSON.parse(fs.readFileSync(path.join(art,'created.json'))),dataset=created.dataset.id,version=created.task.id;
  try {
   await p.goto(base+`/market-data/datasets/${dataset}?section=versions&version=${version}&frame=M1`);
-  await p.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync(path.join(art,'login.json'))).password);await p.getByRole('button',{name:'登录工作台'}).click();
+  await fixture.login(p);
   await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().getByRole('heading',{name:'EURUSD',exact:true})).toBeVisible();
   await expect(dc().getByRole('button',{name:'打开此版本',exact:true}).first()).toBeVisible();
   record('old fixed-version link opens exact dataset, version and section in dialog');

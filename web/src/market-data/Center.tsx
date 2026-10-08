@@ -66,6 +66,7 @@ export function CenterList() {
   const [params, setParams] = useSearchParams(),
     [refresh, setRefresh] = useState(0),
     [notice, setNotice] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const tab = params.get("tab") || "managed",
     status = params.get("status") || (tab === "tasks" ? "active" : "all");
   const page = Math.max(1, Number(params.get("page")) || 1);
@@ -105,6 +106,8 @@ export function CenterList() {
         <h1>{{ managed: "自建行情", platform: "平台品种", composite: "组合行情", tasks: "任务与记录" }[tab] || "自建行情"}</h1>
         {tab === "managed" && <Link className="primary dc-button" to={centerLink("/market-data/datasets/new", params)}>添加行情</Link>}
       </div>
+      {tab !== "composite" && <button className="dc-filter-toggle" aria-expanded={filtersOpen} onClick={() => setFiltersOpen(value => !value)}>筛选与搜索</button>}
+      {tab !== "composite" && <div className={`dc-list-filter-group${filtersOpen ? " is-open" : ""}`}>
       {tab === "managed" && (
         <nav className="dc-filters" aria-label="自建状态">
           {[
@@ -179,6 +182,7 @@ export function CenterList() {
           <button onClick={() => setRefresh((v) => v + 1)}>刷新</button>
         </div>
       )}
+      </div>}
       {notice && <p role="status">{notice}</p>}
       {tab === "composite" ? (
         <CompositeList />

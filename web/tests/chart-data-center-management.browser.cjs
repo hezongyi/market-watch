@@ -1,14 +1,15 @@
+const fixture=require('./chart-data-center-fixture.cjs');
 const {chromium,expect}=require('@playwright/test'),fs=require('fs'),path=require('path');
-const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base='https://192.168.7.232:19943';
+const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base=fixture.base;
 const report={environment:'Ubuntu isolated real APIs/supplier/workers',passed:false,checks:[],errors:[]};
-(async()=>{const b=await chromium.launch({executablePath:'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',args:['--no-sandbox']});const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
- const dc=()=>p.frames().find(f=>f.url().includes('/chart-data-center?')),native=()=>p.frames().find(f=>f.url().startsWith('blob:')),host=()=>p.frames().find(f=>f.url().includes(':19944/?'));
+(async()=>{const b=await fixture.launch();const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
+ const dc=()=>fixture.frames(p).center(),native=()=>fixture.frames(p).native(),host=()=>fixture.frames(p).host();
  const get=async route=>{const r=await p.request.get(base+'/api/'+route);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const record=(name,data={})=>{console.log('PASS',name);report.checks.push({name,...data})};
  const choose=async name=>{await dc().getByRole('button',{name,exact:true}).click();await expect(dc().getByRole('heading',{name,exact:true})).toBeVisible()};
  const created=JSON.parse(fs.readFileSync(path.join(art,'created.json'))),dataset=created.dataset.id;
  try {
-  await p.goto(base+`/market-data/datasets/${dataset}/mapping`);await p.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync(path.join(art,'login.json'))).password);await p.getByRole('button',{name:'登录工作台'}).click();await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();
+  await p.goto(base+`/market-data/datasets/${dataset}/mapping`);await fixture.login(p);await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();
   await expect(dc().getByRole('heading',{name:'配置实时来源'})).toBeVisible();
   await dc().getByLabel('查找目标准确品种').fill('EUR_USD');
   await expect.poll(()=>dc().getByLabel('目标准确品种（OANDA Practice）').locator('option').count()).toBeGreaterThan(1);
@@ -29,6 +30,7 @@ const report={environment:'Ubuntu isolated real APIs/supplier/workers',passed:fa
   await dc().getByRole('button',{name:'已建立组合',exact:true}).click();await dc().getByRole('link',{name:'查看详情',exact:true}).first().click();await expect(dc().getByRole('heading',{name:'EURUSD 组合行情'})).toBeVisible();
   for(const name of ['接续与修订','使用与健康','概览']){await dc().getByRole('button',{name,exact:true}).click();}
   expect(await dc().locator('canvas').count()).toBe(0);record('composite detail uses same window with no embedded live chart');
+  const ownIdentity=JSON.parse(fs.readFileSync(path.join(art,'ui-created.json'))).dataset.id;const session=await get('session');await p.request.post(base+'/api/market-data/datasets/'+ownIdentity+'/maintenance/control',{data:{action:'unarchive'},headers:{'X-CSRF-Token':session.csrf}});
   await choose('自建行情');await dc().getByRole('link',{name:'添加行情',exact:true}).click();
   await dc().getByRole('combobox').first().selectOption('oanda');await dc().getByLabel('搜索来源目录').fill('GBP_USD');
   await dc().getByRole('button',{name:'选择 GBP_USD',exact:true}).click();await dc().getByRole('button',{name:'下一步',exact:true}).click();
@@ -38,7 +40,7 @@ const report={environment:'Ubuntu isolated real APIs/supplier/workers',passed:fa
   await expect(dc().getByRole('heading',{name:'GBPUSD',exact:true})).toBeVisible();await dc().getByRole('button',{name:'关闭数据中心'}).click();await expect.poll(()=>!!dc()).toBeFalsy();
   await expect.poll(async()=> (await get('market-data/center/datasets/'+own)).availability,{timeout:180000,intervals:[1000,3000,5000]}).toBe('available');
   record('UI create, background real supplier publication continues after close',{dataset:own});
-  fs.writeFileSync(path.join(art,'ui-created.json'),JSON.stringify(result,null,2));
+  fs.writeFileSync(path.join(art,'ui-created.json'),JSON.stringify(result,null,2));await p.goto(base+'/market-data/datasets/'+own);await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await dc().getByRole('button',{name:'在当前图表打开',exact:true}).click();await expect.poll(()=>!!dc(),{timeout:35000}).toBeFalsy();expect((await host().evaluate(()=>widget.activeChart().symbol())).toLowerCase()).toBe('mwh:'+(await get('market-data/center/datasets/'+own)).latest_version_id);record('newly UI-published real history opens in main chart');
   expect(report.errors).toEqual([]);report.passed=true;
  } finally {fs.writeFileSync(path.join(art,'management-report.json'),JSON.stringify(report,null,2));await b.close()}
 })().catch(e=>{console.error(e.message);process.exitCode=1});

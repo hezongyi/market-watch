@@ -84,7 +84,9 @@ export default function AdvancedWorkspace() {
   const flushWaiters = useRef<
     { resolve: () => void; reject: (e: Error) => void }[]
   >([]);
-  const mobile = matchMedia("(max-width:700px), (pointer:coarse)").matches;
+  // Browser zoom narrows CSS pixels on a desktop. It must not remove editing
+  // and management; coarse-pointer devices retain the existing read-only view.
+  const mobile = matchMedia("(pointer:coarse)").matches;
   const queue = useRef<Promise<void>>(Promise.resolve()),
     blocked = useRef(false),
     inflight = useRef(0);

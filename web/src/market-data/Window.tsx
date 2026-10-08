@@ -138,6 +138,8 @@ export default function DataCenterWindow() {
       if (event.key === "Escape") {
         if (event.defaultPrevented) return;
         event.preventDefault(); event.stopPropagation();
+        const filters = document.querySelector<HTMLButtonElement>('.dc-filter-toggle[aria-expanded="true"]');
+        if (filters?.getClientRects().length) { filters.click(); filters.focus(); return; }
         const menu = (event.target as HTMLElement).closest<HTMLDetailsElement>("details[open]");
         if (menu) { menu.open = false; menu.querySelector("summary")?.focus(); return; }
         if (guard) { setGuard(null); guardFocus.current?.focus(); } else close();

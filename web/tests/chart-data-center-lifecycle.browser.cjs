@@ -1,20 +1,21 @@
+const fixture=require('./chart-data-center-fixture.cjs');
 // Exact task/project only. Fault state applies solely to the task created here.
 const {chromium,expect}=require('@playwright/test'),fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
-const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base='https://192.168.7.232:19943';
+const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base=fixture.base;
 const project='mw-data-center-impl-20261008';
 const compose='docker compose --env-file artifacts/data-center/compose.env -p '+project+' -f artifacts/data-center/compose.yaml';
 const docker=cmd=>execFileSync('sg',['docker','-c',cmd],{cwd:root,stdio:['pipe','pipe','pipe']}).toString();
 const report={environment:'Ubuntu isolated real APIs/PG; exact created-task failure state injection',passed:false,checks:[],errors:[]};
 (async()=>{
- const b=await chromium.launch({executablePath:'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',args:['--no-sandbox']});const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
- const dc=()=>p.frames().find(f=>f.url().includes('/chart-data-center?'));
+ const b=await fixture.launch();const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
+ const dc=()=>fixture.frames(p).center();
  const get=async route=>{const r=await p.request.get(base+'/api/'+route);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const post=async(route,data)=>{const {csrf}=await get('session');const r=await p.request.post(base+'/api/'+route,{data,headers:{'X-CSRF-Token':csrf}});expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const record=(name,data={})=>{console.log('PASS',name);report.checks.push({name,...data})};
  const own=JSON.parse(fs.readFileSync(path.join(art,'ui-created.json'))).dataset.id,protectedId=JSON.parse(fs.readFileSync(path.join(art,'created.json'))).dataset.id;
  let task,stopped=false;
  try {
-  await p.goto(base+'/market-data/datasets/'+own+'?section=maintenance');await p.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync(path.join(art,'login.json'))).password);await p.getByRole('button',{name:'登录工作台'}).click();await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().getByRole('heading',{name:'GBPUSD',exact:true})).toBeVisible();
+  await p.goto(base+'/market-data/datasets/'+own+'?section=maintenance');await fixture.login(p);await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().getByRole('heading',{name:'GBPUSD',exact:true})).toBeVisible();await dc().getByRole('button',{name:'关闭数据中心'}).click();await p.goto(base+'/market-data/datasets/'+own+'?section=maintenance');await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();
   docker(compose+' stop history-worker');stopped=true;
   await dc().getByLabel('任务类型',{exact:true}).selectOption('recheck');await dc().getByLabel('起始交易日期',{exact:true}).fill('2026-10-07');await dc().getByLabel('结束交易日期（不包含）',{exact:true}).fill('2026-10-08');
   const response=p.waitForResponse(r=>r.url().includes('/datasets/'+own+'/tasks')&&r.request().method()==='POST');await dc().getByRole('button',{name:'提交复查'}).click();task=(await (await response).json()).id;expect(task).toMatch(/^[a-f0-9-]{36}$/);

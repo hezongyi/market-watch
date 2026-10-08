@@ -77,23 +77,29 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
     if (applying) { childPost({ type: "apply-result", id: m.id, error: "正在应用行情，请等待结果" }); return; }
     applying = true;
     let error;
+    const captured = target;
+    const validTarget = () => captured && target === captured && !captured.invalid && !disposed &&
+      workspace()?.id === captured.workspace && epoch() === captured.epoch &&
+      captured.index < widget.chartsCount() && widget.chart(captured.index) === captured.chart &&
+      widget.activeChart() === captured.chart && widget.layout() === captured.layout;
     try {
       if (!current() || m.target !== target.id || m.workspace !== target.workspace) throw Error("目标图格或工作区已变化，请关闭并重新打开数据中心。");
       const identity = MWSeries.decode(m.ticker);
       const resolution = {M1:"1",M5:"5",M15:"15",M30:"30",H1:"60",H4:"240",D1:"1D",W1:"1W",MN:"1M"}[m.frame];
       if (!resolution || !["provider","history","composite"].includes(identity.series_kind)) throw Error("无效行情或周期");
-      const meta = await resolve({ instrument: identity.symbol, series_kind: identity.series_kind, timeframe: m.frame });
+      const meta = await timeout(resolve({ instrument: identity.symbol, series_kind: identity.series_kind, timeframe: m.frame }), 15000);
       if (!current()) throw Error("目标图格已变化，请重新打开数据中心。");
       if (!meta.frames?.includes(m.frame)) throw Error("所选周期尚不可用");
       // Turning either lock back on immediately broadcasts the active chart.
       // Keep these two locks off so every other chart retains its identity.
       widget.symbolSync().setValue(false); widget.intervalSync().setValue(false);
       const others = Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).filter(c=>c!==target.chart).map(c=>[c,c.symbol(),c.resolution()]);
-      const changed = await timeout(target.chart.setSymbol(m.ticker, {doNotActivateChart:true}), 20000);
-      if (changed === false && !MWSeries.same(target.chart.symbol(), m.ticker)) throw Error("图表未接受所选行情，请重试");
-      if (epoch() !== target.epoch || widget.chart(target.index) !== target.chart) throw Error("工作区已变化，停止后续应用");
-      await timeout(target.chart.setResolution(resolution, {doNotActivateChart:true}), 20000);
-      if (!MWSeries.same(target.chart.symbol(), m.ticker) || target.chart.resolution() !== resolution) throw Error("图表未完成应用，请核查后重试");
+      const changed = await timeout(captured.chart.setSymbol(m.ticker, {doNotActivateChart:true}), 20000);
+      if (!validTarget()) throw Error("目标图格或工作区已变化，停止后续应用。请重新打开数据中心。");
+      if (changed === false && !MWSeries.same(captured.chart.symbol(), m.ticker)) throw Error("图表未接受所选行情，请重试");
+      await timeout(captured.chart.setResolution(resolution, {doNotActivateChart:true}), 20000);
+      if (!validTarget()) throw Error("目标图格或工作区已变化，请核查目标图格并重新打开数据中心。");
+      if (!MWSeries.same(captured.chart.symbol(), m.ticker) || captured.chart.resolution() !== resolution) throw Error("图表未完成应用，请核查后重试");
       if (others.some(([chart,symbol,res])=>chart.symbol()!==symbol || chart.resolution()!==res)) throw Error("其他图格发生变化，请核查同步设置");
       target.symbol = target.chart.symbol(); target.resolution = target.chart.resolution();
     } catch (e) { error = String(e); }
@@ -113,7 +119,7 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
   dialog.addEventListener("cancel", event => { event.preventDefault(); childPost({type:"request-close"}); });
   const theme = () => { dialog.dataset.theme = widget.getTheme().toLowerCase(); childPost({ type: "theme", theme: dialog.dataset.theme }); };
   widget.subscribe("chart_theme_changed", theme);
-  const invalidate = () => { if (dialog.open && target && !applying) target.invalid = true; };
+  const invalidate = () => { if (dialog.open && target) target.invalid = true; };
   const events = ["layout_changed", "chart_load_requested", "activeChartChanged"];
   for (const name of events) widget.subscribe(name, invalidate);
   return { open, dispose() { disposed = true; close(); observer.disconnect(); style.remove(); dialog.remove(); widget.removeButton(buttonId); window.removeEventListener("message",listener); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };

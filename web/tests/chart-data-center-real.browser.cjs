@@ -1,25 +1,25 @@
+const fixture=require('./chart-data-center-fixture.cjs');
 // Ubuntu isolated Docker only. Uses real authenticated APIs and licensed chart.
 const {chromium, expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../..'),privateDir=path.join(root,'artifacts/data-center');
-const base=process.env.MW_DATA_CENTER_URL || 'https://192.168.7.232:19943';
+const base=fixture.base;
 const report={environment:'Ubuntu quant-server Docker',project:'mw-data-center-impl-20261008',base,passed:false,checks:[],errors:[]};
 (async()=>{
- const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || '/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',args:['--no-sandbox']});
+ const browser=await fixture.launch();
  const page=await browser.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});
  page.on('pageerror',e=>report.errors.push(e.message));
  const posts=[];page.on('request',r=>{if(r.method()==='POST')posts.push({path:new URL(r.url()).pathname,body:r.postDataJSON()})});
  const record=(name,data={})=>{report.checks.push({name,...data});console.log('PASS',name)};
  const get=async route=>{const r=await page.request.get(base+'/api/'+route);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const post=async(route,data)=>{const {csrf}=await get('session');const r=await page.request.post(base+'/api/'+route,{data,headers:{'X-CSRF-Token':csrf}});expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
- const host=()=>page.frames().find(f=>f.url().includes(':19944/?'));
- const native=()=>page.frames().find(f=>f.url().startsWith('blob:'));
- const center=()=>page.frames().find(f=>f.url().includes('/chart-data-center?'));
+ const host=()=>fixture.frames(page).host();
+ const native=()=>fixture.frames(page).native();
+ const center=()=>fixture.frames(page).center();
  const open=async()=>{await native().getByRole('button',{name:'数据中心',exact:true}).click();await expect.poll(()=>!!center(),{timeout:15000}).toBeTruthy();await expect(center().getByRole('heading',{name:'自建行情',exact:true})).toBeVisible({timeout:15000})};
  try {
   await page.goto(base+'/market-data');
-  await page.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync(path.join(privateDir,'login.json'))).password);
-  await page.getByRole('button',{name:'登录工作台'}).click();
+  await fixture.login(page);
   await expect.poll(()=>!!center(),{timeout:30000}).toBeTruthy();
   await expect(center().getByRole('heading',{name:'自建行情',exact:true})).toBeVisible({timeout:15000});
   expect(new URL(page.url()).pathname).toBe('/advanced-charts');

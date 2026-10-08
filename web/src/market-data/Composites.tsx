@@ -93,6 +93,7 @@ const clientId = () => {
 
 export function CompositeList() {
   const [params, setParams] = useSearchParams();
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [refresh, setRefresh] = useState(0),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -134,6 +135,8 @@ export function CompositeList() {
   }
   return (
     <>
+      <button className="dc-filter-toggle" aria-expanded={filtersOpen} onClick={() => setFiltersOpen(value => !value)}>筛选与搜索</button>
+      <div className={`dc-list-filter-group${filtersOpen ? " is-open" : ""}`}>
       <div className="dc-filters">
         <button
           aria-pressed={mode === "existing"}
@@ -160,6 +163,7 @@ export function CompositeList() {
         固定自建历史接续 OANDA Practice
         确认M1及实时观察，供策略与人工交易辅助使用。浏览此列表不会启动采集。
       </p>
+      </div>
       <Feedback
         error={result.error || error}
         loading={result.loading}
@@ -176,7 +180,7 @@ export function CompositeList() {
               暂无符合筛选的条目。可切换到“可建立候选”配置已有自建历史的实时映射。
             </p>
           ) : (
-            <div className="table-scroll">
+            <div className="dc-table table-scroll">
               <table>
                 <thead>
                   <tr>

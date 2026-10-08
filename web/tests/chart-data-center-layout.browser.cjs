@@ -1,13 +1,14 @@
+const fixture=require('./chart-data-center-fixture.cjs');
 const {chromium,expect}=require('@playwright/test'),fs=require('node:fs'),path=require('node:path');
-const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base='https://192.168.7.232:19943';
+const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base=fixture.base;
 const report={environment:'Ubuntu isolated Docker; long text/empty-workspace browser fixtures',passed:false,checks:[],errors:[]};
-(async()=>{const b=await chromium.launch({executablePath:'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',args:['--no-sandbox']});const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
- const dc=()=>p.frames().find(f=>f.url().includes('/chart-data-center?')),native=()=>p.frames().find(f=>f.url().startsWith('blob:')),host=()=>p.frames().find(f=>f.url().includes(':19944/?'));
+(async()=>{const b=await fixture.launch();const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
+ const dc=()=>fixture.frames(p).center(),native=()=>fixture.frames(p).native(),host=()=>fixture.frames(p).host();
  const record=(name,data={})=>{console.log('PASS',name);report.checks.push({name,...data})};
  const get=async route=>{const r=await p.request.get(base+'/api/'+route);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const created=JSON.parse(fs.readFileSync(path.join(art,'created.json'))),dataset=created.dataset.id;
  try {
-  await p.goto(base+'/market-data?query=EURUSD&status=available');await p.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync(path.join(art,'login.json'))).password);await p.getByRole('button',{name:'登录工作台'}).click();await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().locator('#dataset-'+dataset)).toBeVisible();
+  await p.goto(base+'/market-data?query=EURUSD&status=available');await fixture.login(p);await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().locator('#dataset-'+dataset)).toBeVisible();
   const longText='这是用于桌面验收的长中文品种与来源说明'.repeat(8)+'LONG_PROVIDER_SYMBOL_WITH_NO_BREAKS_'.repeat(8),routePattern='**/api/market-data/center/datasets?*';const long=async route=>{const res=await route.fetch(),body=await res.json();body.items=body.items.map((d,i)=>i?d:{...d,logical_symbol:longText});await route.fulfill({json:body})};await p.route(routePattern,long);await dc().getByRole('button',{name:'刷新',exact:true}).click();await expect(dc().getByText(longText,{exact:true})).toBeVisible();
   for(const theme of ['Dark','Light']){
    await host().evaluate(t=>widget.changeTheme(t),theme);await expect(dc().locator('.dc-window')).toHaveAttribute('data-theme',theme.toLowerCase());

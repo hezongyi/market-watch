@@ -1360,47 +1360,54 @@ function boot(
   const loadContent = layouts.getChartContent;
   const saveLayout = layouts.saveChart;
   let initialNativeSave = false;
+  let initialNativeSaveError;
   let busySaveNoticeShown = false;
   layouts.saveChart = async (data) => {
-    if (viewportRestoring || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
-      dirty = true;
-      if (!busySaveNoticeShown) {
-        busySaveNoticeShown = true;
-        widget.showNoticeDialog({
-          title: "等待图表就绪",
-          body: "图表正在切换，数据就绪后自动保存",
-          callback: () => {},
-        });
+    try {
+      if (viewportRestoring || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
+        dirty = true;
+        if (!busySaveNoticeShown) {
+          busySaveNoticeShown = true;
+          widget.showNoticeDialog({
+            title: "等待图表就绪",
+            body: "图表正在切换，数据就绪后自动保存",
+            callback: () => {},
+          });
+        }
+        // Native save callbacks serialize rejection values; Error becomes {}.
+        return Promise.reject("图表正在切换，数据就绪后自动保存");
       }
-      // Native save callbacks serialize rejection values; Error becomes {}.
-      return Promise.reject("图表正在切换，数据就绪后自动保存");
+      busySaveNoticeShown = false;
+      // An explicit initial native save binds its returned server ID without
+      // reloading the chart. Only this boot call may target the existing empty
+      // workspace when the native library has no ID; later Save As stays a copy.
+      if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
+      const revision = editRevision, epoch = workspaceEpoch;
+      const state = await captureChartLayout(widget);
+      alertBridge.persist(state);
+      state._mwGridStyle = grid.value;
+      state._mwBarRangeMapping = barRangeMapping.snapshot();
+      state._mwDrawingProjection = captureDrawingProjection(widget);
+      if (epoch !== workspaceEpoch || editRevision !== revision) {
+        dirty = true;
+        throw new Error("图表在保存期间已修改，请重试保存");
+      }
+      // Native save metadata uses the resolved display name, which omits MWP:
+      // and can belong to a different active pane. Pin it to the captured first
+      // chart's public identity so list/load metadata retains the series kind.
+      const primary = state._mwViewports[0];
+      const result = await saveLayout({ ...data, symbol: primary.symbol,
+        resolution: primary.resolution, content: JSON.stringify(state) });
+      if (epoch === workspaceEpoch && editRevision === revision) {
+        dirty = false;
+        send({type: "native-saved"});
+      }
+      return result;
+    } catch (error) {
+      // Native callbacks serialize Error and lose its non-enumerable message.
+      if (initialNativeSave) initialNativeSaveError = String(error);
+      throw error;
     }
-    busySaveNoticeShown = false;
-    // An explicit initial native save binds its returned server ID without
-    // reloading the chart. Only this boot call may target the existing empty
-    // workspace when the native library has no ID; later Save As stays a copy.
-    if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
-    const revision = editRevision, epoch = workspaceEpoch;
-    const state = await captureChartLayout(widget);
-    alertBridge.persist(state);
-    state._mwGridStyle = grid.value;
-    state._mwBarRangeMapping = barRangeMapping.snapshot();
-    state._mwDrawingProjection = captureDrawingProjection(widget);
-    if (epoch !== workspaceEpoch || editRevision !== revision) {
-      dirty = true;
-      throw new Error("图表在保存期间已修改，请重试保存");
-    }
-    // Native save metadata uses the resolved display name, which omits MWP:
-    // and can belong to a different active pane. Pin it to the captured first
-    // chart's public identity so list/load metadata retains the series kind.
-    const primary = state._mwViewports[0];
-    const result = await saveLayout({ ...data, symbol: primary.symbol,
-      resolution: primary.resolution, content: JSON.stringify(state) });
-    if (epoch === workspaceEpoch && editRevision === revision) {
-      dirty = false;
-      send({type: "native-saved"});
-    }
-    return result;
   };
   const viewportBindings = new Map();
   const symbolResolutionBindings = new Map();
@@ -1607,8 +1614,9 @@ function boot(
           await new Promise((resolve, reject) => widget.saveChartToServer(resolve, reject,
             {chartName: workspace.name}));
         } catch (e) {
-          send({ type: "error", error: "工作区初始化失败：" + String(e) });
-          return;
+          send({ type: "error", error: "工作区初始化失败：" + (initialNativeSaveError || e?.message || String(e)) });
+          // Saving can fail while the chart is usable. Keep the toolbar and
+          // draft recovery available rather than abandoning initialization.
         } finally {
           initialNativeSave = false;
         }

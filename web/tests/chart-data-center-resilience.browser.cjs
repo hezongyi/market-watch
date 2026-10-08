@@ -1,11 +1,12 @@
+const fixture=require('./chart-data-center-fixture.cjs');
 // Real chart/API integration; network fault fixtures are explicitly recorded.
 const {chromium,expect}=require('@playwright/test'),fs=require('node:fs'),path=require('node:path');
-const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base=process.env.MW_DATA_CENTER_URL||'https://192.168.7.232:19943';
+const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base=fixture.base;
 const report={environment:'Ubuntu isolated Docker, real engine/APIs; controlled browser network faults',passed:false,checks:[],errors:[]};
 (async()=>{
- const b=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',args:['--no-sandbox']});
+ const b=await fixture.launch();
  const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
- const dc=()=>p.frames().find(f=>f.url().includes('/chart-data-center?')),native=()=>p.frames().find(f=>f.url().startsWith('blob:')),host=()=>p.frames().find(f=>f.url().includes(':19944/?'));
+ const dc=()=>fixture.frames(p).center(),native=()=>fixture.frames(p).native(),host=()=>fixture.frames(p).host();
  const record=(name,data={})=>{console.log('PASS',name);report.checks.push({name,...data})};
  const get=async route=>{const r=await p.request.get(base+'/api/'+route);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const close=async()=>{await dc().getByRole('button',{name:'关闭数据中心'}).click();await expect.poll(()=>!!dc()).toBeFalsy()};
@@ -13,7 +14,7 @@ const report={environment:'Ubuntu isolated Docker, real engine/APIs; controlled 
  const choose=async name=>{await dc().getByRole('button',{name,exact:true}).click();await expect(dc().getByRole('heading',{name,exact:true})).toBeVisible()};
  const created=JSON.parse(fs.readFileSync(path.join(art,'created.json'))),dataset=created.dataset.id;
  try {
-  await p.goto(base+'/market-data');await p.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync(path.join(art,'login.json'))).password);await p.getByRole('button',{name:'登录工作台'}).click();await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().getByRole('heading',{name:'自建行情',exact:true})).toBeVisible();
+  await p.goto(base+'/market-data');await fixture.login(p);await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().getByRole('heading',{name:'自建行情',exact:true})).toBeVisible();
   const originalHost=host(),originalNative=native();
   await dc().getByLabel('搜索品种',{exact:true}).fill('EURUSD');await dc().getByRole('button',{name:'可用',exact:true}).click();
   await dc().locator('#dataset-'+dataset).getByRole('link',{name:'查看',exact:true}).click();await expect(dc().getByRole('heading',{name:'EURUSD',exact:true})).toBeVisible();await dc().getByRole('link',{name:'返回数据中心列表'}).click();
@@ -44,6 +45,12 @@ const report={environment:'Ubuntu isolated Docker, real engine/APIs; controlled 
   await choose('自建行情');await dc().locator('#dataset-'+dataset).getByRole('link',{name:'查看',exact:true}).click();await dc().getByRole('button',{name:'维护设置',exact:true}).click();const details=dc().locator('details').first();await details.locator('summary').click();await p.keyboard.press('Escape');await expect(details).not.toHaveAttribute('open','');expect(!!dc()).toBeTruthy();
   await dc().getByLabel('更新频率',{exact:true}).focus();await p.keyboard.press('Space');await p.keyboard.press('Escape');expect(!!dc()).toBeTruthy();await dc().getByRole('button',{name:'关闭数据中心'}).focus();await p.keyboard.press('Escape');await expect.poll(()=>!!dc()).toBeFalsy();
   record('Escape closes native select/details before management window');
+  await open();await dc().getByRole('button',{name:'概览',exact:true}).click();
+  await host().evaluate(()=>{const chart=widget.activeChart();window.dcRaceOriginal=chart.setResolution;window.dcRaceWaiting=false;chart.setResolution=function(...args){return new Promise((resolve,reject)=>{window.dcRaceRelease=()=>Promise.resolve(window.dcRaceOriginal.apply(chart,args)).then(resolve,reject);window.dcRaceWaiting=true})}});
+  await dc().getByRole('button',{name:'在当前图表打开',exact:true}).click();await expect.poll(()=>host().evaluate(()=>window.dcRaceWaiting)).toBeTruthy();
+  await host().evaluate(()=>{workspaceEpoch++;window.dcRaceRelease()});await expect(dc().locator('.dc-window-content > [role=alert]')).toContainText('工作区已变化');expect(!!dc()).toBeTruthy();
+  await host().evaluate(()=>{widget.activeChart().setResolution=window.dcRaceOriginal});await close();record('workspace generation changes during delayed resolution are rejected and never reported successful');
+
   await open();await dc().getByRole('button',{name:'维护设置',exact:true}).click();await dc().getByLabel('更新频率',{exact:true}).selectOption('daily');await dc().getByText('高级维护设置',{exact:true}).click();const timezone=dc().getByLabel('维护时区',{exact:true});await timezone.fill('UTC');await timezone.fill('Asia/Shanghai');
   let prompted=false;p.once('dialog',async d=>{prompted=d.type()==='beforeunload';await d.dismiss()});await p.reload({timeout:5000}).catch(()=>{});expect(prompted).toBeTruthy();await expect(timezone).toHaveValue('Asia/Shanghai');await dc().getByRole('link',{name:'返回数据中心列表'}).click();await expect(dc().getByRole('alertdialog')).toBeVisible();await dc().getByRole('button',{name:'放弃修改'}).click();
   record('refresh and return protect unsaved input');

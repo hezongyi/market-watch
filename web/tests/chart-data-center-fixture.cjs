@@ -1,0 +1,10 @@
+const fs=require('node:fs'),path=require('node:path');
+const {chromium}=require('@playwright/test');
+const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center');
+const base=new URL(process.env.MW_DATA_CENTER_URL||'https://192.168.7.232:19943').origin;
+const chartOrigin=new URL(process.env.MW_DATA_CENTER_CHART_ORIGIN||'https://192.168.7.232:19944').origin;
+const executablePath=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
+const launch=()=>chromium.launch({executablePath,args:['--no-sandbox']});
+const frames=p=>({host:()=>p.frames().find(f=>f.url().startsWith(chartOrigin+'/?')),native:()=>p.frames().find(f=>f.url().startsWith('blob:')),center:()=>p.frames().find(f=>f.url().startsWith(base+'/chart-data-center?'))});
+const login=async p=>{await p.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync(path.join(art,'login.json'))).password);await p.getByRole('button',{name:'登录工作台'}).click()};
+module.exports={root,art,base,chartOrigin,launch,frames,login};
