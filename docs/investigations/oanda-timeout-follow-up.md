@@ -123,6 +123,41 @@ both recovered at epoch 3 before the new 600-second window started at
 defects were addressed. This final window, rather than the earlier run, determines
 the application-chain acceptance result.
 
+The final isolated window ran **01:18:16.270 to 01:28:16.280 UTC** (09:18 to
+09:28 Singapore), **600.024 seconds / 121 samples**, and the harness exited 0.
+All eleven checks passed: constant epoch 3, fresh healthy/readiness results for
+both symbols, positive leases, each symbol's confirmed M1 and M1 publication
+advancing ten minutes, no cumulative publication failures, zero PostgreSQL
+deadlocks, no old currently-idle transactions, no notifications and no new
+warnings during the steady window. The four expected warnings correspond to
+two deliberate timeouts and are outside that window. The supplier was contacted
+three times in total, exactly the injected first and second attempts plus the
+healthy third connection. Safe synthetic evidence is committed at
+`docs/verification/oanda-stream-isolated/result.json`.
+
+The final run's separate SSE client received 30 heartbeat events and 31 snapshots
+over 30.25 seconds, epoch 3 throughout, with no unhealthy row. Its login/logout
+completed normally. The initial run's 600-second report remains private with its
+original failed instantaneous-idle check; it was not relabeled as passed.
+
+The application-chain repair and controlled timeout recovery are verified in
+isolation. The actual historical nine transport failures remain unproven: no
+real supplier/production proxy stream was opened during this isolated run.
+Testing that path can also be done on Ubuntu with a separate practice account;
+it does not require first deploying to production. No production image/file was
+changed, and the prior production-switch request is deferred by user direction.
+
+After successful observation, `mw-docker retire` preview and `--apply` archived
+and actually restored every non-template database, including both populated
+synthetic observation databases. Table counts and source stability matched.
+The private archive is
+`/home/quant/.local/share/market-watch-docker/archives/mw-oanda-timeout-20261008-20261008T012902-4f5c9290`.
+Exactly three project-owned containers, its network and PostgreSQL volume were
+removed; label-filtered inventory is empty. The acceptance image was retired;
+the separately owned formal release candidate remains retained and undeployed.
+Local addresses `19750` through `19754` no longer serve this task. A repeat
+requires a fresh task/project and database rather than reusing the completed one.
+
 During the first isolated window, a separate actual API SSE client received
 45 heartbeat events and 46 snapshots in 45.33 seconds, all at epoch 3 with no
 unhealthy rows. PostgreSQL's cumulative deadlock count was zero. Authentication

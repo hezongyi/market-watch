@@ -58,5 +58,10 @@ volume, built through `mw-docker`. Retire the finished acceptance project throug
 the exact `mw-docker retire` preview and `--apply`; actual dump/restore validation
 must precede removal. A retired task must not be reused.
 
-The final evidence and retirement state are recorded in the investigation report
-after observation completes. No production deployment is performed by this run.
+The final strengthened window passed all eleven checks over 600.024 seconds and
+121 samples; see `result.json`. Both symbols' confirmed M1 and publication advanced
+ten minutes, epoch stayed 3, and no new failures or warnings occurred. The initial
+run's failed instantaneous-idle check is preserved privately. Both populated
+databases were actually restored and verified before exact project retirement;
+the addresses above are now closed. The investigation report records the archive
+and full limits. No production deployment was performed by this run.
