@@ -5,6 +5,12 @@ the validated local recovery repairs; it is not a claim that all external
 timeouts or quote-quality failures have been resolved. Decision basis:
 `/tmp/market-watch-oanda-priority-handoff-25selfw1/decision-analysis.md`.
 
+Subsequent authorization: the user approved executing the recommendation and
+requires PR review, merge and a pushed tag for the local patch. The formal
+release will use **v1.14.2 built from its reviewed merge/tag**, superseding the
+b7376b9 candidate below while preserving this preparation evidence. See
+`../oanda-v1.14.2-source-delivery.md`. No deployment is implied by authorization.
+
 ## Fixed artifact and scope
 
 - Runtime source: `b7376b9a067384789fe7b19344ae1f193502d1d4`, detached private
