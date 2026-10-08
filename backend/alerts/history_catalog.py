@@ -6,6 +6,7 @@ import re
 from sqlalchemy import select
 
 from .config import settings
+from .market_names import display_code, matches_code
 from .storage import MarketCatalog, now_ms, transaction
 
 
@@ -39,11 +40,12 @@ def catalog(db, *, source, query="", page=1, page_size=25):
             logical = re.sub(r"[^A-Z0-9]", "", symbol.upper())
             if not 0 < len(logical) <= 10:
                 continue
-            if query.casefold() not in (symbol + logical).casefold():
+            if not matches_code(query, symbol, source, asset_class(name, symbol), logical):
                 continue
             items.append({"source": source, "provider_symbol": symbol, "logical_symbol": logical,
                 "catalog_id": "DK:" + hashlib.sha256(symbol.encode()).hexdigest()[:36],
-                "label": symbol, "asset_class": asset_class(name, symbol), "precision": None,
+                "label": symbol, "display_symbol": display_code(symbol, source, asset_class(name, symbol)),
+                "asset_class": asset_class(name, symbol), "precision": None,
                 "precision_status": "manual_required", "availability": "sdk_symbol; coverage_not_verified",
                 "metadata_origin": "dukascopy-python instruments", "updated_at": None})
     else:
@@ -55,12 +57,13 @@ def catalog(db, *, source, query="", page=1, page_size=25):
         items = [{"source": source, "provider_symbol": row.symbol,
             "catalog_id": row.id,
             "logical_symbol": re.sub(r"[^A-Z0-9]", "", row.symbol.upper()),
+            "display_symbol": display_code(row.symbol, source, row.asset_type),
             "label": row.label, "asset_class": asset_class(row.asset_type, row.symbol),
             "precision": row.precision, "precision_status": "source_catalog",
             "availability": "account_catalog; coverage_not_verified", "updated_at": row.updated_at,
             "metadata_origin": "OANDA Practice account instruments"}
             for row in rows
-            if query.casefold() in (row.symbol + row.label).casefold() and
+            if matches_code(query, row.symbol, source, row.asset_type, row.label) and
             len(re.sub(r"[^A-Z0-9]", "", row.symbol)) <= 10]
     items.sort(key=lambda row: row["provider_symbol"])
     # Read-only lookup never refreshes, registers a dataset or opens streaming.

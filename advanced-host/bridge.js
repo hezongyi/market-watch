@@ -384,7 +384,7 @@ function seriesPresentationRows(symbols) {
   return symbols.flatMap(ticker => {
     const identity = decode(ticker);
     const meta = symbolPresentations.get(identity.symbol);
-    return meta ? [{s:"ok",n:ticker,v:{short_name:meta.symbol,
+    return meta ? [{s:"ok",n:ticker,v:{short_name:meta.display_symbol || meta.symbol,
       description:meta.name + (meta.source === 'yahoo' ? " · Yahoo 市场报价" :
         identity.series_kind === 'provider' ? " · 平台原生行情" :
         identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情"),
@@ -448,7 +448,7 @@ const feed = {
       );
       cb(
         rows.map(s => ({
-          symbol: s.symbol,
+          symbol: s.display_symbol || s.symbol,
           ticker: s.ticker || MWSeries.encode(s.id, "provider"),
           description: s.label + " · " + (s.description || "平台行情") +
             (s.series_kind && s.series_kind !== 'provider' || s.supported ? "" : " · 日历待接入"),
@@ -484,14 +484,15 @@ const feed = {
         while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       }
       cb({
-        name: meta.symbol || MWSeries.display(symbol),
+        name: meta.display_symbol || meta.symbol || MWSeries.display(symbol),
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
         mw_historyPageBars: meta.native_page_capacity || (meta.source === "binance" ? 1000 : 4000),
-        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
+        description: (meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
         mw_range_source: meta.source,
+        ...(meta.source === "yahoo" ? { mw_display_precision: meta.display_precision } : {}),
         type: ({CRYPTO:"crypto", METAL:"commodity", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures", OTHER:"commodity"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
         session: meta.session || (meta.source === "yahoo" ? "0000-0000:23456" : meta.calendar === "utc0" ? "24x7" : "1700-1700:23456"),
         timezone: meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York"),
@@ -1540,6 +1541,7 @@ function boot(
       ? { timeframe: "3M" }
       : {}),
     locale: "zh",
+    custom_formatters: { priceFormatterFactory: chartPriceFormatter },
     custom_translate_function: (original, singular, translated) => {
       if ([original, singular, translated].some(text => /^object tree$/i.test(String(text)))) return "对象树";
       if (['No data here', 'No data', 'Loading', 'Loading...'].includes(original)) return '';

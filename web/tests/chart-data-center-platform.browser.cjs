@@ -25,7 +25,7 @@ const report = { environment: 'Ubuntu isolated Docker; enabled Yahoo and legacy 
       expect(selected?.available).toBe(true);
       await center().getByLabel('来源', { exact: true }).selectOption(source);
       await center().getByLabel('搜索品种', { exact: true }).fill(symbol);
-      const row = center().locator('tbody tr').filter({ hasText: symbol });
+      const row = center().locator('tbody tr').filter({ hasText: selected.display_symbol || symbol });
       await expect(row).toHaveCount(1);
       await expect(row.getByRole('button', { name: '打开平台图表', exact: true })).toBeVisible();
       await page.screenshot({ path: path.join(art, 'platform-' + source + '.png') });

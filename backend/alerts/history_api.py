@@ -14,6 +14,7 @@ from .aggregation_policy import (
 )
 from .history_versions import create_version, version_report
 from .market_datasets import legacy_inventory
+from .market_names import display_code
 from .storage import (
     HistoryVersion,
     Instrument,
@@ -95,6 +96,8 @@ class ManagedRequest(BaseModel):
 def dataset_report(row, inst):
     return {"id": row.id, "instrument_id": row.instrument_id,
             "logical_symbol": row.logical_symbol, "identity": row.identity,
+            "display_symbol": display_code(row.logical_symbol, asset_type=row.asset_class),
+            "provider_display_symbol": display_code(row.identity["provider_symbol"], row.identity["source"], row.asset_class),
             "volume_kind": row.volume_kind, "volume_unit": row.volume_unit,
             "precision": inst.precision, "asset_class": row.asset_class,
             "aggregation_calendar": inst.calendar}

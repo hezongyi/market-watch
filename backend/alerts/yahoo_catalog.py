@@ -10,6 +10,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from .config import settings
+from .market_names import display_code
 from .storage import (
     MarketCatalog,
     ProviderBar,
@@ -116,6 +117,7 @@ def _store(details):
 
 def chart_metadata(ident, *, deadline=None, cached_only=False):
     from .chart_series import decode
+    from .provider_yahoo import display_precision
     ident = decode(ident)[0]
     if not settings.yahoo_enabled:
         raise HTTPException(422, "Yahoo 行情源未启用")
@@ -163,9 +165,11 @@ def chart_metadata(ident, *, deadline=None, cached_only=False):
         "name": name,
         "source": "yahoo",
         "symbol": symbol,
+        "display_symbol": display_code(symbol, "yahoo", details.get("asset_type")),
         "basis": "adjusted" if details["adjustment"] == "auto" else "last",
         "calendar": "yahoo",
         "precision": max(8, precision),
+        "display_precision": display_precision(details),
         "series_kind": "provider",
         "series_kinds": ["provider"],
     }

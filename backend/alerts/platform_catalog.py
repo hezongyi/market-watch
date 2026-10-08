@@ -4,6 +4,7 @@ from sqlalchemy import select
 
 from .config import settings
 from .history_catalog import account_scope, asset_class
+from .market_names import display_code, matches_code
 from .provider_dukascopy import catalog as dukascopy_catalog
 from .source_registry import capabilities
 from .storage import Instrument, MarketCatalog, MarketDataset
@@ -28,7 +29,7 @@ def catalog(db, *, query="", source=None, page=1, page_size=25):
         if key in items:
             continue
         items[key] = {"id": "OANDA:" + row.symbol if scoped else row.id,
-            "source": row.source, "provider_symbol": row.symbol, "label": row.label,
+            "source": row.source, "provider_symbol": row.symbol, "label": row.label, "asset_type": row.asset_type,
             "asset_class": asset_class(row.asset_type, row.symbol), "precision": row.precision,
             "history_precision": row.precision, "precision_status": "source_catalog",
             "available": row.available and (row.source != "yahoo" or settings.yahoo_enabled),
@@ -51,10 +52,10 @@ def catalog(db, *, query="", source=None, page=1, page_size=25):
             items[("dukascopy", row["symbol"])] = {**row, "provider_symbol": row["symbol"],
                 "history_precision": None, "updated_at": None,
                 "capabilities": capabilities("dukascopy")}
-    term = query[:100].strip().casefold()
-    rows = sorted((row for row in items.values() if term in
-        (row["provider_symbol"] + row["label"] +
-         row.get("logical_symbol", "")).casefold()),
+    for row in items.values():
+        row["display_symbol"] = display_code(row["provider_symbol"], row["source"], row.get("asset_type", row.get("asset_class")))
+    rows = sorted((row for row in items.values() if matches_code(query, row["provider_symbol"],
+        row["source"], row.get("asset_type", row.get("asset_class")), row["label"], row.get("logical_symbol", ""))),
         key=lambda row: (row["provider_symbol"], row["source"], row["id"]))
     start = (page - 1) * page_size
     return {"items": rows[start:start + page_size], "total": len(rows),

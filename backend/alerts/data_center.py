@@ -2,6 +2,7 @@
 
 from sqlalchemy import case, func, or_, select
 
+from .market_names import code_search
 from .history_maintenance import plan_report
 from .storage import (
     DatasetMaintenance,
@@ -66,9 +67,7 @@ def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, 
     base = select(MarketDataset.id).join(Instrument).outerjoin(DatasetMaintenance)
     if query:
         # Literal substring search: user wildcards must not expand the query.
-        value = "%" + query[:100].replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
-        base = base.where(or_(MarketDataset.logical_symbol.ilike(value, escape="\\"),
-                             Instrument.symbol.ilike(value, escape="\\")))
+        base = base.where(code_search(query, MarketDataset.logical_symbol, Instrument.symbol))
     if source:
         base = base.where(Instrument.source == source)
     if calendar:
@@ -119,9 +118,7 @@ def task_list(db, *, dataset_id=None, query="", source=None, status="all", page=
     if dataset_id:
         base = base.where(HistoryVersion.dataset_id == dataset_id)
     if query:
-        value = "%" + query[:100].replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
-        base = base.where(or_(MarketDataset.logical_symbol.ilike(value, escape="\\"),
-                              Instrument.symbol.ilike(value, escape="\\")))
+        base = base.where(code_search(query, MarketDataset.logical_symbol, Instrument.symbol))
     if source:
         base = base.where(Instrument.source == source)
     groups = {"active": ("pending", "running", "deriving", "retrying", "configuration_error"),

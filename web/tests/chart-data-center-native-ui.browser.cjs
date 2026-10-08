@@ -61,6 +61,11 @@ const report = { environment: 'Ubuntu isolated Docker; comparison with current n
         await expect(center().locator('.dc-table')).toBeVisible();
         await expect(center().locator('.dc-window-header h2 svg')).toHaveAttribute('aria-hidden', 'true');
         await expect(center().locator('.dc-window-header h2')).toHaveText('数据中心');
+        // Opening installs theme tokens; buttons inherit a short color transition.
+        await expect.poll(() => center().evaluate(() => {
+          const ink = getComputedStyle(document.querySelector('.dc-window')).color;
+          return [...document.querySelectorAll('.dc-window-nav button')].every(button => getComputedStyle(button).color === ink);
+        })).toBeTruthy();
         const actual = await center().evaluate(() => {
           const window = document.querySelector('.dc-window'), style = getComputedStyle(window);
           const header = document.querySelector('.dc-window-header'), title = header.querySelector('h2');

@@ -23,7 +23,7 @@ const weekdays = [
 export function NativeConfigure() {
   const [query] = useSearchParams(), instrument = query.get("instrument") || "";
   const [values, setValues] = useState(defaults);
-  const [meta, setMeta] = useState<{ name: string; symbol: string } | null>(null);
+  const [meta, setMeta] = useState<{ name: string; symbol: string; display_symbol?: string } | null>(null);
   const [error, setError] = useState(""), [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(0);
   const [result, setResult] = useState<{ ticker: string; metadata: { name: string } } | null>(null);
@@ -32,7 +32,7 @@ export function NativeConfigure() {
   useEffect(() => {
     const controller = new AbortController();
     setMeta(null); setResult(null); setError(""); setValues(defaults);
-    void api<{ name: string; symbol: string; source: string; native_parameters: Parameters }>(
+    void api<{ name: string; symbol: string; display_symbol?: string; source: string; native_parameters: Parameters }>(
       "/market-data/resolve", { instrument, series_kind: "provider", timeframe: "M1" }, controller.signal,
     ).then(data => {
       if (controller.signal.aborted) return;
@@ -54,7 +54,7 @@ export function NativeConfigure() {
   return <section className="data-center">
     <Link to={centerReturn(query, "/market-data?tab=platform")}>返回平台品种</Link>
     <h1>配置原生行情</h1>
-    <p>{meta ? `${meta.name} · ${meta.symbol} · OANDA Practice` : "正在核对平台品种…"}</p>
+    <p>{meta ? `${meta.name} · ${meta.display_symbol || meta.symbol} · OANDA Practice` : "正在核对平台品种…"}</p>
     <p>直接读取 OANDA 返回的各周期原始柱。参数改变会使用独立配置和缓存。</p>
     <form className="dc-form" onSubmit={submit}>
       <fieldset className="dc-native-fields" disabled={!meta || busy}>

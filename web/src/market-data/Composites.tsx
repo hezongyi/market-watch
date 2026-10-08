@@ -17,6 +17,7 @@ import { frames, names, phase, time, type Dataset, type Page } from "./types";
 type Mapping = {
   id: string;
   current_account: boolean;
+  target_display_symbol?: string;
   target_identity: { provider_symbol: string; environment: string };
   match: any;
 };
@@ -25,6 +26,7 @@ type Composite = {
   instrument_id: string;
   dataset_id: string;
   logical_symbol: string;
+  display_symbol?: string;
   precision: number;
   calendar: string;
   historical_source: string;
@@ -199,10 +201,10 @@ export function CompositeList() {
                       return (
                         <tr key={d.id} id={`candidate-${d.id}`} tabIndex={-1}>
                           <td>
-                            {d.logical_symbol}
+                            {d.display_symbol || d.logical_symbol}
                             <small>
                               {names[d.identity.source]} ·{" "}
-                              {d.identity.provider_symbol} → OANDA Practice ·
+                              {d.provider_display_symbol || d.identity.provider_symbol} → OANDA Practice ·
                               Bid
                             </small>
                           </td>
@@ -247,10 +249,10 @@ export function CompositeList() {
                     return (
                       <tr key={row.id} id={`composite-${row.id}`} tabIndex={-1}>
                         <td>
-                          {row.logical_symbol}
+                          {row.display_symbol || row.logical_symbol}
                           <small>
                             {names[row.historical_source]} → OANDA Practice ·{" "}
-                            {row.mapping.target_identity.provider_symbol} · Bid
+                            {row.mapping.target_display_symbol || row.mapping.target_identity.provider_symbol} · Bid
                           </small>
                         </td>
                         <td>{phase(row.calendar)}</td>
@@ -381,9 +383,9 @@ export function MappingForm() {
       {dataset.data && (
         <>
           <p>
-            {dataset.data.logical_symbol} ·{" "}
+            {dataset.data.display_symbol || dataset.data.logical_symbol} ·{" "}
             {names[dataset.data.identity.source]} ·{" "}
-            {dataset.data.identity.provider_symbol} · Bid ·{" "}
+            {dataset.data.provider_display_symbol || dataset.data.identity.provider_symbol} · Bid ·{" "}
             {phase(dataset.data.aggregation_calendar)}
           </p>
           <p>
@@ -445,14 +447,14 @@ export function MappingForm() {
                 <option value="">请选择当前账户品种</option>
                 {catalog.data?.items.map((row) => (
                   <option key={row.catalog_id} value={row.catalog_id}>
-                    {row.provider_symbol} · {row.label} · {row.asset_class}
+                    {row.display_symbol || row.provider_symbol} · {row.label} · {row.asset_class}
                   </option>
                 ))}
               </select>
             </label>
             {selected && (
               <p>
-                Practice · {selected.provider_symbol} · 来源精度{" "}
+                Practice · {selected.display_symbol || selected.provider_symbol} · 来源精度{" "}
                 {selected.precision} · Bid；未授权交易执行。
               </p>
             )}
@@ -595,7 +597,7 @@ export function CompositeDetail() {
         <>
           <div className="dc-heading">
             <div>
-              <h1>{row.logical_symbol} 组合行情</h1>
+              <h1>{row.display_symbol || row.logical_symbol} 组合行情</h1>
               <p>
                 {names[row.historical_source]} → OANDA Practice · Bid ·{" "}
                 {phase(row.calendar)}
@@ -708,7 +710,7 @@ export function CompositeDetail() {
                       <td>确认尾部</td>
                       <td>
                         OANDA Practice ·{" "}
-                        {row.mapping.target_identity.provider_symbol}
+                        {row.mapping.target_display_symbol || row.mapping.target_identity.provider_symbol}
                       </td>
                       <td>[{time(row.revision.seam)}, 最新确认观测)</td>
                     </tr>

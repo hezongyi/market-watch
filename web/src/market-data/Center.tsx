@@ -243,7 +243,7 @@ export function CenterList() {
                     (items as Dataset[]).map((d) => (
                       <tr key={d.id} id={`dataset-${d.id}`} tabIndex={-1}>
                         <td>
-                          <strong>{d.logical_symbol}</strong>
+                          <strong>{d.display_symbol || d.logical_symbol}</strong>
                           <span>
                             {names[d.identity.source]} · {d.identity.basis} ·{" "}
                             {phase(d.aggregation_calendar)}
@@ -299,7 +299,7 @@ export function CenterList() {
                       <tr key={t.id} id={`task-${t.id}`} tabIndex={-1}>
                         <td>
                           <Link to={centerLink(`/market-data/datasets/${t.dataset_id}`, params, `task-${t.id}`)}>
-                            {t.dataset.logical_symbol}
+                            {t.dataset.display_symbol || t.dataset.logical_symbol}
                           </Link>
                           <span>{names[t.dataset.identity.source]} · {phase(t.dataset.aggregation_calendar)}</span>
                           <span>{taskKind(t.task_kind)}</span>
@@ -345,9 +345,9 @@ export function CenterList() {
                     items.map((p) => (
                       <tr key={p.id} id={`platform-${p.id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`} tabIndex={-1}>
                         <td>
-                          <strong>{p.label}</strong>
+                          <strong>{p.display_symbol || p.provider_symbol}</strong>
                           <span>
-                            {names[p.source]} · {p.provider_symbol}
+                            {p.label === p.provider_symbol ? names[p.source] : p.label + " · " + names[p.source]}
                           </span>
                         </td>
                         <td>

@@ -201,11 +201,11 @@ export function DatasetDetail() {
         <>
           <div className="dc-heading">
             <div>
-              <h1>{dataset.logical_symbol}</h1>
+              <h1>{dataset.display_symbol || dataset.logical_symbol}</h1>
               <p>
                 {names[dataset.identity.source]} · Bid ·{" "}
                 {phase(dataset.aggregation_calendar)} ·{" "}
-                {dataset.identity.provider_symbol}
+                {dataset.provider_display_symbol || dataset.identity.provider_symbol}
               </p>
             </div>
             <div className="dc-actions">

@@ -38,9 +38,9 @@ globalThis.MWSeriesPicker = (() => {
           results.replaceChildren();nextOffset=page.next_offset;
           for(const row of page.items){
             const item=document.createElement('button');item.type='button';item.className='mw-series-result';
-            const title=document.createElement('strong');title.textContent=row.symbol;
+            const title=document.createElement('strong');title.textContent=row.display_symbol || row.symbol;
             const detail=document.createElement('span');detail.textContent=row.description;
-            item.append(title,detail);item.setAttribute('aria-label',row.symbol+' · '+row.description);
+            item.append(title,detail);item.setAttribute('aria-label',(row.display_symbol || row.symbol)+' · '+row.description);
             item.addEventListener('click',async()=>{
               item.disabled=true;
               dialog.close();

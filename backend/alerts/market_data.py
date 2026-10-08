@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
-from .chart_series import SeriesKind, decode, display_symbol, is_gold
+from .chart_series import SeriesKind, decode, is_gold
 from .coverage import covers_interval
 from .domain import (
     bucket_bounds,
@@ -19,7 +19,7 @@ from .domain import (
     session_bounds,
 )
 from .market import stored_coverage
-from .market_names import chinese_name
+from .market_names import chinese_name, display_code, matches_code, pair_query
 from .providers import fetch_oanda_catalog
 from .storage import (
     Bar,
@@ -538,7 +538,7 @@ def router(authenticated):
                 with transaction() as db:
                     try:
                         meta = metadata(db, ident, kind)
-                        values = {"short_name": meta["symbol"], "description": meta["name"] + (
+                        values = {"short_name": meta["display_symbol"], "description": meta["name"] + (
                             " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
                         facts = None
                         if kind == "composite":
@@ -582,7 +582,7 @@ def router(authenticated):
                     description += " · 延迟 " + str(delay//60) + " 分钟" if delay is not None and delay>0 else " · 延迟未知" if delay is None else " · 实时"
                     if snapshot["status"] != "ok":
                         description += " · 抓取失败，保留上次报价"
-                    values = {"short_name":meta["symbol"], "description":description,
+                    values = {"short_name":meta["display_symbol"], "description":description,
                               "exchange":meta["exchange"], "lp":float(snapshot["price"]),
                               "quote_time":stamp, "fetched_at":snapshot["fetched_at"],
                               "delay_seconds":delay, "fetch_status":snapshot["status"]}
@@ -596,7 +596,7 @@ def router(authenticated):
                     continue
                 page = quote_page(meta)
                 latest = page["bars"][-1] if page["bars"] else None
-                values = {"short_name": display_symbol(meta["symbol"]), "description": display_symbol(meta["symbol"]) + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
+                values = {"short_name": meta["display_symbol"], "description": meta["display_symbol"] + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
                           "exchange": meta["source"].upper()}
                 if latest:
                     values["lp"] = float(latest["close"])
@@ -644,8 +644,8 @@ def router(authenticated):
                 if not bar:
                     if inst:
                         result.append({"s": "ok", "n": ident, "quality": "pending", "v": {
-                            "short_name": display_symbol(inst.symbol),
-                            "description": display_symbol(inst.symbol) + " · 报价准备中",
+                            "short_name": display_code(inst.symbol, inst.source),
+                            "description": display_code(inst.symbol, inst.source) + " · 报价准备中",
                             "exchange": inst.source.upper(),
                         }})
                     else:
@@ -654,8 +654,8 @@ def router(authenticated):
                     continue
                 values = {
                     "lp": float(bar.close),
-                    "short_name": display_symbol(inst.symbol),
-                    "description": display_symbol(inst.symbol) + " · " + inst.basis + " · M1",
+                    "short_name": display_code(inst.symbol, inst.source),
+                    "description": display_code(inst.symbol, inst.source) + " · " + inst.basis + " · M1",
                     "exchange": inst.source.upper(),
                 }
                 if inst.basis == "bid":
@@ -749,6 +749,8 @@ def router(authenticated):
             return {
                 "id": inst.id,
                 "name": inst.label,
+                "symbol": inst.symbol,
+                "display_symbol": display_code(inst.symbol, inst.source),
                 "source": inst.source,
                 "basis": inst.basis,
                 "precision": inst.precision,
@@ -982,12 +984,13 @@ def _provider_series(query, *, source=None):
                 MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True))):
             if row.metadata_json.get("history_account_scope") != account_scope():
                 continue
-            if query.strip().upper() not in (row.symbol + row.symbol.replace("_", "") + row.label).upper():
+            if not matches_code(query, row.symbol, row.source, row.asset_type, row.label):
                 continue
             ident = "OANDA:" + row.symbol
             if any(item["id"] == ident for item in result):
                 continue
             result.append({"id": ident, "symbol": row.symbol, "label": row.label,
+                "display_symbol": display_code(row.symbol, row.source, row.asset_type),
                 "series_kind": "provider", "ticker": encode(ident, "provider"),
                 "source": "oanda", "asset_type": row.asset_type, "available": True,
                 "supported": row.calendar in ("ny17", "utc0"), "precision": row.precision,
@@ -1020,7 +1023,8 @@ def _rank_catalog(rows, query):
     term = query.strip().casefold()
     groups = defaultdict(lambda: defaultdict(list))
     for row in rows:
-        codes = [row.get("symbol", "").casefold(), row.get("logical_symbol", "").casefold(),
+        row["display_symbol"] = display_code(row["symbol"], row["source"], row.get("asset_type"))
+        codes = [row["display_symbol"].casefold(), row["display_symbol"].replace("/", "").casefold(), row.get("symbol", "").casefold(), row.get("logical_symbol", "").casefold(),
                  row.get("symbol", "").replace("_", "").replace("/", "").casefold()]
         rank = 0 if term and term in codes else 1 if term and any(c.startswith(term) for c in codes) else 2
         groups[rank][row["source"]].append(row)
@@ -1044,12 +1048,14 @@ def instrument_catalog(query: str = "", *, limit=250):
     if query.strip() and settings.yahoo_enabled:
         # Exact codes/names and known Chinese aliases remain local. A
         # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
-        term = query.strip().upper()
+        term = pair_query(query) or query.strip().upper()
         with transaction() as db:
             local = list(db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))) + list(db.scalars(select(Instrument)))
-            known = any(term in {row["symbol"].upper(), row["logical_symbol"]}
+            known = any(term in {row["symbol"].upper(), row["logical_symbol"], row["display_symbol"]}
                         for row in dukascopy) or any(
-                term in {x.symbol.upper(), x.label.upper(),
+                term in {x.symbol.upper(), x.label.upper(), display_code(x.symbol, x.source,
+                         getattr(x, "asset_type", None)),
+                         display_code(x.symbol, x.source, getattr(x, "asset_type", None)).replace("/", ""),
                          (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
                 or not term.isascii() and term in
                 (x.label + (chinese_name(x.source, x.symbol) or "")).upper()
@@ -1112,7 +1118,8 @@ def instrument_catalog(query: str = "", *, limit=250):
         result = [
             x
             for x in entries.values()
-            if x["available"] and query.upper() in (x["id"] + x["label"] + x["symbol"] + x.get("english_name", "")).upper()
+            if x["available"] and matches_code(query, x["symbol"], x["source"],
+                x["asset_type"], x["id"], x["label"], x.get("english_name", ""))
         ]
     for row in dukascopy:
         row["search_status"] = search_status

@@ -5,6 +5,7 @@ export type QualifiedSeries = {
   id: string;
   ticker: string;
   symbol: string;
+  display_symbol?: string;
   series_kind: "history" | "composite";
   dataset_id: string;
   historical_source: string;
@@ -17,7 +18,7 @@ export type QualifiedSeries = {
 export function seriesLabel(row: QualifiedSeries) {
   const source = row.historical_source === "dukascopy" ? "Dukascopy" : row.historical_source === "oanda" ? "OANDA" : row.historical_source;
   const phase = row.calendar === "ny17" ? "NY17" : row.calendar === "utc0" ? "UTC 00:00" : row.calendar;
-  return `${row.symbol} · ${source}${row.series_kind === "composite" ? " → OANDA Practice" : ""} · ${row.basis === "bid" ? "Bid" : row.basis} · ${phase}`;
+  return `${row.display_symbol || row.symbol} · ${source}${row.series_kind === "composite" ? " → OANDA Practice" : ""} · ${row.basis === "bid" ? "Bid" : row.basis} · ${phase}`;
 }
 
 /** Pure search; only its caller's explicit submit/open may create live demand. */
@@ -89,7 +90,7 @@ export default function SeriesPicker({ kind, selected, onSelect }: {
     {pendingTotal > 0 && <details><summary>查看{title}准备与配置（本页待处理 {pending.length} 条）</summary>
       <ul>{pending.map(row => {
         const dataset = kind === "history" ? row : row.dataset;
-        return <li key={dataset.id}>{dataset.logical_symbol} · {dataset.identity.source} · {dataset.aggregation_calendar === "ny17" ? "NY17" : "UTC 00:00"} · {kind === "history" ? "尚无可用发布" : row.reason || (row.status === "needs_mapping" ? "缺少实时映射" : "历史待维护")}
+        return <li key={dataset.id}>{dataset.display_symbol || dataset.logical_symbol} · {dataset.identity.source} · {dataset.aggregation_calendar === "ny17" ? "NY17" : "UTC 00:00"} · {kind === "history" ? "尚无可用发布" : row.reason || (row.status === "needs_mapping" ? "缺少实时映射" : "历史待维护")}
           。请从图表顶部的数据中心维护与配置。</li>;
       })}</ul>
       {pending.length === 0 && <p>本页没有待准备或配置项，可继续翻页查看其他自建行情。</p>}

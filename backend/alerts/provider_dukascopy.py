@@ -19,6 +19,7 @@ from .dukascopy_history import DukascopyHistory
 from .market_resources import cooldown, request_slot
 from .storage import instant, ms, now_ms
 from .volume import encoded
+from .market_names import display_code, matches_code
 
 INTERVALS = dict(zip(FRAMES, ("1MIN", "5MIN", "15MIN", "30MIN", "1HOUR", "4HOUR", "1DAY", "1WEEK", "1MONTH")))
 WIDTHS = dict(zip(FRAMES[:-1], (60000, 300000, 900000, 1800000, 3600000, 14400000, 86400000, 604800000)))
@@ -42,6 +43,7 @@ def _catalog():
         logical = re.sub(r"[^A-Z0-9]", "", symbol.upper())
         kind = asset_class(name, symbol)
         rows[symbol] = {"id": stable_id(symbol), "symbol": symbol, "label": symbol,
+            "display_symbol": display_code(symbol, "dukascopy", kind),
             "logical_symbol": logical, "source": "dukascopy", "asset_type": {
                 "forex": "CURRENCY", "metal": "METAL", "crypto": "CRYPTO", "index": "INDEX"}.get(kind, "OTHER"),
             "asset_class": kind, "available": True, "supported": True, "series_kinds": ["provider"],
@@ -52,9 +54,8 @@ def _catalog():
 
 
 def catalog(query=""):
-    term = query.strip().casefold()
-    return [dict(row) for row in _catalog() if term in
-            (row["symbol"] + row["logical_symbol"]).casefold()]
+    return [dict(row) for row in _catalog() if matches_code(query, row["symbol"],
+        "dukascopy", row["asset_type"], row["logical_symbol"])]
 
 
 class NativeDataError(ValueError):

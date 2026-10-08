@@ -6,7 +6,7 @@ import { time } from "./types";
 import { useSnapshot } from "./useSnapshot";
 
 type Choice = {version_id:string;dataset_id:string;calendar:string;start:number;end:number;
-  recommended_seam:number|null;mappings:{id:string;provider_symbol:string;environment:string}[]};
+  recommended_seam:number|null;mappings:{id:string;display_symbol?:string;provider_symbol:string;environment:string}[]};
 type Revision = {id:string;request_id:string;parent_revision_id:string|null;history_version_id:string;
   seam:number;rules:{aggregation_calendar:string};reason:string;activated_at:number|null;
   change:{affected_rules:{id:string;name:string;revision_id:string}[]}|null;
@@ -88,7 +88,7 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
       <label>实时映射版本<select required value={mapping} onChange={e=>setMapping(e.target.value)} disabled={busy||!selected}>
         <option value="">选择已审核映射</option>
         {selected?.mappings.map(row=><option key={row.id} value={row.id}>
-          OANDA {row.environment} · {row.provider_symbol} · {row.id.slice(0,8)}</option>)}
+          OANDA {row.environment} · {row.display_symbol || row.provider_symbol} · {row.id.slice(0,8)}</option>)}
       </select></label>
       {selected&&!selected.mappings.length&&<p>该日界数据集尚无明确映射。<Link to={`/market-data/datasets/${selected.dataset_id}/mapping`}>保存实时映射</Link></p>}
       <label>拼接时刻（UTC）<input type="datetime-local" required value={seam} onChange={e=>setSeam(e.target.value)} disabled={busy}/></label>

@@ -9,6 +9,7 @@ import { Feedback, Pager } from "./Center";
 type CatalogItem = {
   catalog_id: string;
   provider_symbol: string;
+  display_symbol?: string;
   logical_symbol: string;
   label: string;
   asset_class: string;
@@ -242,9 +243,9 @@ export function DatasetCreate() {
                     </thead>
                     <tbody>
                       {catalog.data.items.map((item) => (
-                        <tr key={item.provider_symbol}>
+                        <tr key={item.display_symbol || item.provider_symbol}>
                           <td>
-                            {item.provider_symbol}
+                            {item.display_symbol || item.provider_symbol}
                             <span>{item.label}</span>
                           </td>
                           <td>
