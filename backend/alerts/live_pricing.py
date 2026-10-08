@@ -193,6 +193,7 @@ def begin_connection(ownership, identities, *, now=None):
 
 
 def publish_event(ownership, epoch, event, identities, *, now=None):
+    """Return a bounded outcome only after the fenced transaction commits."""
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
@@ -206,19 +207,20 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
                 if state.connection == "connecting":
                     state.connection = "recovering"
                 state.revision += 1
-            return
+            return "heartbeat"
         if event.connection_epoch != epoch or event.identity not in identities.values():
             raise ValueError("Quote belongs to another connection or dataset")
         state = db.get(LiveState, event.identity.key)
         if state.epoch != epoch:
             raise TimeoutError("Quote generation is obsolete")
         previous = state.quote
-        if previous and (event.source_time < previous["source_time"] or
-                (previous["connection_epoch"] == epoch and event.sequence <= previous["sequence"])):
-            return
+        if previous and event.source_time < previous["source_time"]:
+            return "rejected_old_source"
+        if previous and previous["connection_epoch"] == epoch and event.sequence <= previous["sequence"]:
+            return "rejected_sequence"
         if previous and previous["source_time"] == event.source_time and all(
                 previous.get(field) == getattr(event, field) for field in ("bid", "ask", "tradeable")):
-            return
+            return "rejected_duplicate"
         state.quote = event.model_dump(mode="json")
         state.received_at = event.received_at
         state.connection = "connected" if state.ready else "recovering"
@@ -266,6 +268,7 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
             from .service import evaluate_quote
 
             evaluate_quote(db, inst, event.source_time, Decimal(event.bid), Decimal(event.ask))
+        return "accepted"
 
 
 def disconnected(ownership, epoch, identities, result, *, now=None, intentional=False):

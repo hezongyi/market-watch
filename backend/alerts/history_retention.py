@@ -8,7 +8,7 @@ history chunk or acquisition cache still points to it.
 
 import re
 
-from sqlalchemy import delete, func, or_, select
+from sqlalchemy import delete, func, inspect, or_, select
 
 from .storage import (
     AdvancedPreference,
@@ -102,8 +102,27 @@ def reference_values(row):
     return None
 
 
+def plan_blocks_reclamation(plan):
+    return bool(plan and (plan.realtime_enabled
+                         or plan.status not in ("done", "completed", "cancelled")))
+
+
 def guard_reference_writes(db):
-    lock_reference_values(db, [reference_values(row) for row in set(db.new) | set(db.dirty)])
+    documents = []
+    for row in set(db.new) | set(db.dirty):
+        if isinstance(row, ChartHistoryPlan):
+            state = inspect(row)
+            # Publishing advances an existing plan while owning Instrument.
+            # Its unchanged reference is already visible to reclamation; taking
+            # Dataset here reverses ingestion's Dataset -> Instrument order.
+            # Creation, rebinding and changes to reclamation eligibility still
+            # fence against concurrent reclamation with the dataset lock.
+            reference_changed = any(state.attrs[key].history.has_changes()
+                                    for key in ("instrument_id", "status", "realtime_enabled"))
+            if state.persistent and plan_blocks_reclamation(row) and not reference_changed:
+                continue
+        documents.append(reference_values(row))
+    lock_reference_values(db, documents)
     content_ids = sorted({row.content_id for row in db.new if isinstance(row, HistoryChunk) and row.content_id})
     if content_ids:
         found = set(db.scalars(select(SourceBlob.id).where(SourceBlob.id.in_(content_ids))
@@ -206,7 +225,7 @@ def references(db, dataset_id):
                                                  model.status.notin_(("done", "completed", "cancelled")))):
             add("task", job.id, "图表历史任务")
     plan = db.get(ChartHistoryPlan, dataset.instrument_id)
-    if plan and (plan.realtime_enabled or plan.status not in ("done", "completed", "cancelled")):
+    if plan_blocks_reclamation(plan):
         add("demand", dataset.instrument_id, "图表持续维护计划")
     # New FK-backed modules (e.g. composites) cannot be accidentally omitted.
     owned = {DatasetMaintenance.__table__.name, DatasetReclamation.__table__.name,
