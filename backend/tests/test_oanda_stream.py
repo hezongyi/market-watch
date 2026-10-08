@@ -2,12 +2,13 @@ import hashlib
 import json
 import threading
 import time
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 
 import httpx
 import pytest
 from alerts.market_contracts import QuoteEvent
 from alerts.oanda_stream import NDJSONDecoder, OandaPractice, price_event
+from httpcore._backends.sync import SyncStream
 from test_market_contracts import identity
 
 
@@ -172,3 +173,88 @@ def test_stream_http_auth_failure_keeps_status_without_response_secrets(caplog):
     record = next(r for r in caplog.records if r.message.startswith("pricing_transport_failed"))
     assert "phase=http_status" in record.message and "http_status=401" in record.message
     assert "private-token" not in caplog.text and "private-account" not in caplog.text
+
+
+@pytest.mark.parametrize("failure", ["ConnectTimeout", "ConnectError"])
+def test_proxy_tls_failure_does_not_poison_next_stream_pool(monkeypatch, caplog, failure):
+    """Exercise the real CONNECT pool state left ACTIVE after TLS failure."""
+    class Proxy(BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.1"
+
+        def log_message(self, *_):
+            pass
+
+        def do_CONNECT(self):
+            self.send_response(200)
+            self.end_headers()
+
+        def do_GET(self):
+            body = b'{"type":"HEARTBEAT","time":"61.0"}\n'
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            self.wfile.flush()
+
+    import httpcore
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Proxy)
+    serving = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.01})
+    serving.start()
+    handshakes = []
+
+    def handshake(stream, *_, **__):
+        handshakes.append(stream)
+        if len(handshakes) == 1:
+            raise getattr(httpcore, failure)("synthetic TLS failure")
+        # Keep only TLS cryptography synthetic; socket, CONNECT, HTTPcore pool,
+        # HTTPX timeout mapping and the adapter's reconnect are all real.
+        return stream
+
+    monkeypatch.setattr(SyncStream, "start_tls", handshake)
+    real_client = httpx.Client
+
+    def client(**kwargs):
+        kwargs["timeout"] = httpx.Timeout(0.05, connect=1)
+        return real_client(**kwargs)
+
+    monkeypatch.setattr(httpx, "Client", client)
+    adapter = OandaPractice(token="test", account_id="test-account",
+                            proxy=f"http://127.0.0.1:{server.server_port}")
+    try:
+        with pytest.raises(getattr(httpx, failure)):
+            list(adapter.stream({"EUR_USD": oanda_identity()}, epoch=1))
+        assert "phase=tls route=proxy_tls" in caplog.text
+        events = list(adapter.stream({"EUR_USD": oanda_identity()}, epoch=2))
+        assert len(events) == 1 and events[0]["type"] == "heartbeat"
+        assert len(handshakes) == 2
+    finally:
+        adapter.close()
+        server.shutdown()
+        serving.join(timeout=2)
+        server.server_close()
+
+
+def test_owned_stream_pool_closes_when_consumer_stops_early(monkeypatch):
+    clients = []
+    real_client = httpx.Client
+
+    def client(**kwargs):
+        kwargs["transport"] = httpx.MockTransport(lambda _: httpx.Response(
+            200, content=b'{"type":"HEARTBEAT","time":"61.0"}\n'))
+        result = real_client(**kwargs)
+        clients.append(result)
+        return result
+
+    monkeypatch.setattr(httpx, "Client", client)
+    with real_client() as rest:
+        adapter = OandaPractice(token="test", account_id="test-account", rest_client=rest)
+        try:
+            for epoch in (1, 2):
+                events = adapter.stream({}, epoch=epoch)
+                assert next(events)["type"] == "heartbeat"
+                events.close()
+                assert clients[-1].is_closed
+            assert len(clients) == 2 and not rest.is_closed
+        finally:
+            adapter.close()

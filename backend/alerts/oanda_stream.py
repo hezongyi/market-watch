@@ -86,11 +86,10 @@ class OandaPractice:
         if not token or not account_id:
             raise ValueError("OANDA practice backend credentials are required")
         self.token, self.account_id = token, account_id
+        self.proxy = proxy or None
         self.rest = rest_client or httpx.Client(proxy=proxy or None, trust_env=False,
                                                 timeout=httpx.Timeout(15, connect=5))
-        # Stream never holds a REST request slot or shares its connection pool.
-        self.stream_client = stream_client or httpx.Client(proxy=proxy or None, trust_env=False,
-            timeout=httpx.Timeout(15, connect=5), limits=httpx.Limits(max_connections=1))
+        self.stream_client = stream_client
         self.owns_rest = rest_client is None
         self.owns_stream = stream_client is None
         self.clock = clock or (lambda: int(time.time() * 1000))
@@ -98,7 +97,7 @@ class OandaPractice:
     def close(self):
         if self.owns_rest:
             self.rest.close()
-        if self.owns_stream:
+        if self.owns_stream and self.stream_client is not None:
             self.stream_client.close()
 
     @property
@@ -174,10 +173,19 @@ class OandaPractice:
         started = time.monotonic()
         last_record = None
         phase, failed_phase = "request", None
+        route = "upstream"
         response = None
+        # A failed proxy TLS upgrade can leave HTTPcore's CONNECT connection
+        # ACTIVE, occupying the only pool slot. Each owned stream attempt has
+        # its own pool, closed on every exit, including partial iteration.
+        client = self.stream_client
+        if client is None:
+            client = httpx.Client(proxy=self.proxy, trust_env=False,
+                timeout=httpx.Timeout(15, connect=5), limits=httpx.Limits(max_connections=1))
+            self.stream_client = client
 
         def trace(name, info):
-            nonlocal phase, failed_phase
+            nonlocal phase, failed_phase, route
             # HTTPcore metadata includes request URLs and exceptions. Only
             # translate known event names; never log that metadata or payloads.
             phases = {"connect_tcp": "connect", "start_tls": "tls",
@@ -186,6 +194,11 @@ class OandaPractice:
             parts = name.split(".")
             if len(parts) != 3 or parts[0] not in ("connection", "proxy", "http11", "http2"):
                 return
+            if parts[1] == "send_request_headers" and parts[2] == "started":
+                method = getattr(info.get("request"), "method", None)
+                route = "proxy_connect" if method == b"CONNECT" else "upstream"
+            elif parts[0] == "proxy" and parts[1] == "start_tls":
+                route = "proxy_tls"
             if parts[1] in phases:
                 if parts[2] == "started":
                     phase = phases[parts[1]]
@@ -193,7 +206,7 @@ class OandaPractice:
                     failed_phase = phases[parts[1]]
 
         try:
-            with self.stream_client.stream("GET",
+            with client.stream("GET",
                     f"https://stream-fxpractice.oanda.com/v3/accounts/{self.account_id}/pricing/stream",
                     headers=self.headers, params={"instruments": ",".join(sorted(identities)),
                                                   "snapshot": "true"},
@@ -214,13 +227,19 @@ class OandaPractice:
                 phase = "http_status"
             else:
                 phase = failed_phase or phase
+            if isinstance(error, httpx.PoolTimeout):
+                phase, route = "pool", "pool"
             content_type = response.headers.get("content-type", "") if response is not None else ""
             body_kind = ("json" if content_type.startswith("application/json") else
                          "html" if content_type.startswith("text/html") else "other")
-            log.warning("pricing_transport_failed phase=%s type=%s epoch=%s http_status=%s "
+            log.warning("pricing_transport_failed phase=%s route=%s type=%s epoch=%s http_status=%s "
                         "body_kind=%s elapsed_ms=%s since_record_ms=%s records=%s",
-                        phase, type(error).__name__, epoch,
+                        phase, route, type(error).__name__, epoch,
                         response.status_code if response is not None else "-", body_kind,
                         round((stamp - started) * 1000),
                         round((stamp - last_record) * 1000) if last_record is not None else "-", sequence)
             raise
+        finally:
+            if self.owns_stream:
+                client.close()
+                self.stream_client = None

@@ -162,3 +162,65 @@ During the first isolated window, a separate actual API SSE client received
 45 heartbeat events and 46 snapshots in 45.33 seconds, all at epoch 3 with no
 unhealthy rows. PostgreSQL's cumulative deadlock count was zero. Authentication
 used only the isolated synthetic password and each client logged out normally.
+
+## Authorized live-account investigation
+
+The user subsequently authorized pausing the production pricing service and
+exclusive use of the same practice account in Ubuntu isolation. This supersedes
+the earlier account-use restriction; production product deployment remains
+outside the current authorization. The exact existing production pricing
+container stopped at **2026-10-08 01:36:21 UTC**. All debugging instances run on
+Ubuntu, fresh task/project `mw-oanda-live-debug-20261008`, PostgreSQL on
+`127.0.0.1:19755` and isolated API on `127.0.0.1:19756`. Only whitelisted supplier
+settings were copied privately; no production database, notifications or account
+changes are used. Recovery remains the configured 1500 minutes.
+
+Three initial sequential 30-second real streams succeeded. A subsequent bounded
+reconnect probe reproduced **ReadTimeout after 15.837 seconds, zero records,
+receive_headers**, without any pricing publication or confirmation work. This
+reproduces the historical timing signature independently of the database lock
+inversion. A separate attempt failed proxy TLS after 5.005 seconds; every later
+attempt on that client's single-slot pool failed PoolTimeout after 15 seconds.
+The probe was stopped instead of retrying indefinitely.
+
+Ranked, falsifiable hypotheses were proxy/route stalls, account reconnect timing,
+and HTTP client pool state. HTTPcore trace then showed a successful CONNECT
+followed by a stalled TLS upgrade. With the repaired pool lifecycle, further
+real attempts distinguished **receive_headers / upstream** stalls (15.7-16.0
+seconds, zero records): the CONNECT and TLS stages had already succeeded.
+These are separate faults; the nine old warnings lack the fields needed to
+assign each one retrospectively.
+
+### Deterministic pool failure and repair
+
+Installed dependencies are HTTPX 0.28.1 and HTTPcore 1.0.9. HTTPcore's
+TunnelHTTPConnection starts an HTTP CONNECT request, leaving its underlying
+HTTP11Connection ACTIVE after upgrade. If the subsequent start_tls raises, the
+tunnel never becomes connected, but delegates availability/idle/closed checks
+to that ACTIVE connection. It occupies the sole stream pool slot indefinitely;
+next requests wait for a slot and raise PoolTimeout without contacting OANDA.
+
+`test_proxy_tls_failure_does_not_poison_next_stream_pool` uses a real local CONNECT
+proxy and actual HTTPX/HTTPcore/socket/pool path. Only the TLS handshake is
+injected, first failing and then succeeding. With `a4a006f` the second attempt
+fails PoolTimeout; after the fix it receives a heartbeat. ConnectTimeout and
+ConnectError both exercise this seam. Early consumer termination also closes the
+owned pool. Caller-supplied test clients retain caller ownership.
+
+Each owned stream attempt now gets its own client/pool, closed in finally on
+normal EOF, transport error, invalid payload or generator close. REST remains
+separate; the connection/read timeouts stay 5/15 seconds. Worker backoff,
+authentication fencing, dataset identity and recovery/readiness gates are intact.
+Safe diagnostics distinguish proxy CONNECT, proxy TLS, upstream and pool routes,
+without printing metadata, request URLs or credentials.
+
+### Route comparison in progress
+
+Direct authenticated catalog access from Ubuntu fails ConnectError after about
+five seconds, matching the previous production direct check. The configured
+Mihomo proxy applies an existing dedicated OANDA selector; its fallback had
+selected US node 01. Only this OANDA selector is temporarily changed for a
+sequential route comparison, with the original selector saved privately. No
+shared/general selector, proxy rule or other provider group is changed.
+This separates route behavior from the now-proven client pool defect; final
+route and full real ten-minute results follow below.
