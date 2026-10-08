@@ -224,3 +224,110 @@ sequential route comparison, with the original selector saved privately. No
 shared/general selector, proxy rule or other provider group is changed.
 This separates route behavior from the now-proven client pool defect; final
 route and full real ten-minute results follow below.
+
+The alternate US node also reproduced upstream receive-header stalls, so the
+comparison does **not** justify attributing the stalls to node 01 or changing the
+shared proxy policy. The original dedicated OANDA selector has been restored.
+An A/B/A handoff mistakenly started the next probe before the prior one had
+fully exited; the overlap was stopped and its interval is excluded from causal
+comparison. All later probe/worker harnesses hold a nonblocking account-wide file
+lock in the private Ubuntu project. No production stream ran during the probes.
+
+The application pool repair alone eliminates the reproducible permanent local
+PoolTimeout state; it does not make the network infallible. In a separate
+post-repair sequential probe, actual upstream read-header timeouts were followed
+by successful connections instead of permanently occupied pool slots. A
+60-second continuous stream on the original route received 183 prices and 11
+heartbeats without reconnecting.
+
+The clean repaired acceptance image is
+`market-watch-api:oanda-live-repaired-20261008`, runtime source
+`7dfc223f7e12771289758eb395c1c639e746365e`, image ID
+`sha256:8594e2221ebb2f33e9c62ef8bea6cffe89bbd9cae9525c8849aa1394f0fff906`.
+Its 50 targeted adapter/worker/history-source/live-pricing regression tests
+passed in 5.33 seconds; the earlier broader 184-test deadlock/transport suite
+remains the preceding validation, not an additional disjoint test count.
+All five affected/runtime-adjacent module SHA256 values match installed
+site-packages against the isolated worktree; no source import override is used
+in final runtime observation. Standards and Spec review of `a4a006f...7dfc223`
+each found zero new findings, and both retained the unproven-stall limitation.
+
+The actual supplier/worker/PostgreSQL/confirmation/publication/API chain restored
+both symbols healthy at epoch 1 with the original proxy selection and configured
+1500-minute recovery. Its final real 600-second observation began
+**2026-10-08 01:51:36 UTC** (09:51:36 Singapore). Results are recorded after the
+complete window; intermediate healthy snapshots do not constitute acceptance.
+
+## First complete real window and remaining findings
+
+The original real observation ran **01:51:36.815 to 02:01:36.827 UTC**
+(09:51:36 to 10:01:36 Singapore), **600.037 seconds / 121 samples**.
+Stream epoch stayed 1 throughout; no transport warning, reconnect, database
+deadlock, long idle transaction, cumulative publication failure or notification
+occurred. Both confirmed M1 watermarks advanced exactly ten minutes. Each M1
+publication advanced at least ten minutes (EURUSD was still completing initial
+publication catch-up in the first snapshot, so its difference was 70 minutes).
+The isolated SSE check lasted 30.401 seconds, with 29 snapshots and 30 API
+heartbeats at epoch 1 and no unhealthy snapshot during that shorter check.
+
+The strict every-sample-healthy assertion **failed**, and the original report and
+nonzero harness result are preserved, not overwritten. Across 242 symbol samples,
+236 were healthy, four were degraded (two simultaneous confirmation-fault
+samples at 01:55:13 and 01:58:14), and two were EURUSD quote-stale at the end
+(source quote age 19.1/20.5 seconds, fresh stream heartbeats and confirmed M1).
+The three transport/confirmation/readiness outcomes are reported separately.
+Short M1 request failures recovered automatically; minute failure counters retain
+those failures even after last_result becomes data. No new database latency
+regression was observed: confirmation processing was at most 189 ms, with
+observed completed-minute evaluation latency up to 16.51 seconds. The sparse
+samples cannot retrospectively identify the first two REST exception classes.
+No gate or quote freshness threshold is relaxed to turn this failed assertion
+into a passing result.
+
+Further sequential protocol comparison negotiated actual HTTP/2 but still had
+three upstream header ReadTimeouts and one connection error among twelve
+attempts, followed by recovery on fresh pools. Therefore HTTP/2 is not enabled
+in the product. Twelve separate REST-only confirmation requests succeeded;
+that shorter check does not negate the intermittent faults in the real window.
+The official OANDA development guide states 20 active streams per requesting IP,
+120 REST requests/sec and at most two new connections/sec. The sole-account
+sequential probe cadence is well below the last limit; a shared outbound IP's
+other usage remains outside the captured evidence.
+Reference: https://developer.oanda.com/rest-live-v20/development-guide/
+
+## Handoff-stage additional isolation
+
+Read-only inspection of the existing production Mihomo logs correlates the two
+01:55:13 and 01:58:14 degraded samples with preceding OANDA REST dial warnings
+at 01:55:10.996/10.998 and 01:58:10.298/10.301 UTC (`connect error: context
+canceled`). Cancellation may be an effect of an application deadline; these
+warnings do not by themselves identify the originating network cause. Proxy
+health tests continued to report the selected nodes alive, and test a generic
+Cloudflare endpoint rather than actual OANDA.
+
+An additional proxy ran only on Ubuntu, within the exact same isolated acceptance
+project/network. It executes the copied existing Mihomo v1.19.31 binary, mounted
+read-only, with a private minimal fixed-node configuration, no provider refresh,
+no fallback, no sniffing and no production volume. HTTP mixed/controller ports
+are loopback 19757/19758. The binary and node credentials are private and are
+not repository artifacts. Production pricing was temporarily resumed at
+02:08:48 UTC then paused again at 02:14:26 UTC for this sole-account comparison.
+No production product image was changed.
+
+Twelve attempts through this Ubuntu proxy using the same US01 outbound produced
+six successes, four TLS ConnectTimeout/ConnectError failures and two upstream
+response-header ReadTimeout failures. Changing only the isolated proxy's fixed
+outbound to a different supplier's Japan VMess/WebSocket node gave eight
+successes and four response-header ReadTimeouts (16.0–16.3 seconds, zero records).
+This disproves an exclusive VLESS/xhttp explanation and does not justify a
+permanent production route change. A preceding same-endpoint SOCKS probe also
+failed TLS in seven of twelve attempts; no SOCKS dependency or policy is added
+to the product.
+
+The user requested `$handoff` to let another agent investigate this remaining
+blocker. Independent read-only deep analysis has been delegated; live probes
+are closed before restoring original production pricing. The task remains
+unfinished. Its isolated database/project and images are retained, not retired
+or marked complete; resumption requires pausing production pricing again before
+opening any Ubuntu account stream. The sanitized temporary handoff references
+the existing documents and private evidence instead of duplicating them.
