@@ -12,7 +12,7 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 
 ## 已执行验证
 
-- `unit-tests.txt`：130 passed、34 skipped（2026-10-09 报价与需求释放检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复和 HTTP 权限。
+- `unit-tests.txt`：136 passed、34 skipped（2026-10-09 浏览器fixture检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复、HTTP 权限及验收fixture保护。
 - `regression-tests.txt`：105 passed，既有 provider_service、market_data、managed_dataset、fixed_indicators 回归。
 - `node tests/advanced-market-stream.cjs`：实际 bridge 回调的世代/序号拒收、确认后极值缩小、报价交付、取消迟到回调与常态 tick 无行情请求；新增空首屏准备、HTTP 历史接受后的单次重注册、尾部撤回、拒收及窗口过滤凭据检查、Python 指标值交付。
 - `node tests/advanced-fixed-series.cjs` 与 `advanced-provider-subscriptions.cjs`：既有身份、首用边界、连接共享和取消顺序通过。
@@ -48,6 +48,26 @@ docker compose --env-file artifacts/unified-sse/compose.env \
 停止不删除 volume。结束验收后按 mw-docker retire 预览/归档/恢复核验/精确退役流程操作；当前任务未结束，不标记完成。生产发布未授权。
 
 `postgres-gates` 仅在 migrate 成功后运行，使用同一 task API 镜像，每个测试创建独立随机 PostgreSQL schema 并精确清理该 schema。其环境变量设置 TEST_POSTGRES_URL，避免把跳过当成通过。若直接使用本机 .venv 跑该套检查，载入私有 tests.env 后设置环境变量，连接仅限本项目的 127.0.0.1:15645。
+
+### 原生浏览器合成行情入口（待真实运行）
+
+完成上述构建、迁移和启动后，从 worktree 根目录运行：
+
+```bash
+node web/tests/unified-sse.browser.cjs
+```
+
+脚本先核对 Ubuntu、本机 Docker socket、四个服务的 Compose project 与 mw-docker 镜像 task/project/purpose/commit。只接受当前 HEAD 的 acceptance 镜像。经 `compose exec -T api python -` 发送 `scripts/unified_sse_acceptance_fixture.py`，无需修改生产镜像的 Dockerfile 或复制许可资源。写入前再次核对数据库 application_name、host/name/user 和 delivery_disabled；迁移必须已完成，不自动建表。
+
+fixture 仅创建本任务的 `SSEFIXTURE`/`unified-sse-synthetic`，1400 根合成发布 M1 柱，无供应商行情响应模拟，也不启用采集。重复 seed 保留数据，更新指定尾柱或追加完成柱；无效 OHLC 会回滚。初始尾部留出30分钟，重复追加耗尽后明确失败，不伪造未来完成柱。
+
+脚本通过正常 UI 登录及许可图表打开合成工作区，记录原生 `subscribeBars` 的真实回调（先调用图表库回调，再记录成功接受）、HTTP 首屏及实际 EventSource 消息。检查12次同柱更新/高值缩小、浏览器离线时追加3柱、重连逐柱回放，以及跨15秒 tick 的常态行情无轮询/历史重读。P95≤3秒仅针对本脚本12个串行合成 managed M1 输入，不代表正式负载矩阵或供应商验收。
+
+结果与截图写入忽略且私有的 `artifacts/unified-sse/unified-sse-browser*`；不保存 cookie、完整浏览器状态或密码。失败退出非零；preflight 失败会覆盖结果为 passed=false，避免误用上次成功记录。脚本未修改业务代码加入验收专用回调钩子。
+
+2026-10-09 已运行该命令：在 `compose ps -q api` 阶段遇到 Ubuntu Docker socket permission denied，浏览器未启动、fixture 未写入。`test_unified_sse_acceptance_fixture.py` 的6项SQLite检查通过，仅证明保护和fixture→真实Calculator/持久事件的输入契约，不算Docker或许可浏览器验收通过。
+
+完整统一Python套件重跑包含原11个模块加 `backend/tests/test_unified_sse_acceptance_fixture.py`，结果136 passed、34 skipped。Node脚本语法、新增Python文件Ruff及diff check通过。当前阻塞仍为quant用户无本机Docker socket访问权限；需恢复权限后才能执行正式构建、PostgreSQL gates和浏览器验收。
 
 ## 完成审计：尚缺的证据和工作
 
