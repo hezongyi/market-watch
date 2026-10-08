@@ -39,6 +39,7 @@ const report = { environment: 'Ubuntu isolated Docker; native chart with determi
     const buttons = center().getByRole('button', { name: '打开平台图表', exact: true });
     await expect.poll(() => buttons.count()).toBeGreaterThan(1);
     const originalCount = await buttons.count();
+    const firstSymbol = await center().locator('tbody strong').first().innerText();
     // Hold only the command acknowledgement to inspect the React list state.
     await host().evaluate(() => { window.dcOpeningHolding = true; });
     await page.route('**/api/market-data/resolve', slow);
@@ -73,8 +74,11 @@ const report = { environment: 'Ubuntu isolated Docker; native chart with determi
     held = new Promise(resolve => { release = resolve; });
     await native().getByRole('button', { name: '数据中心', exact: true }).click();
     await expect.poll(() => !!center()).toBeTruthy();
-    await center().getByLabel('搜索品种', { exact: true }).fill('MSFT');
-    await expect(center().locator('tbody strong')).toHaveText('MSFT');
+    // A repeated selection can reuse the native cache and make no candle
+    // request. Pick a different series so this check actually holds history.
+    const nextSymbol = firstSymbol === 'SPY' ? 'QQQ' : 'SPY';
+    await center().getByLabel('搜索品种', { exact: true }).fill(nextSymbol);
+    await expect(center().locator('tbody strong')).toHaveText(nextSymbol);
     await page.route(candles, slow);
     const candleClick = Date.now();
     await center().getByRole('button', { name: '打开平台图表', exact: true }).click();

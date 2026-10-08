@@ -407,7 +407,8 @@ const feed = {
     Promise.resolve(initialHistoryGate?.promise)
       .then(() => request({ op: "quotes", args: { symbols } }, "market",
         () => epoch === workspaceEpoch))
-      .then((rows) => cb(rows.map(({ s, n, v }) => ({ s, n, v }))))
+      .then((rows) => cb(rows.map(row => chartQuotePresentation(row,
+        symbolPresentations.get(decode(row.n).symbol)))))
       .catch((e) => err(String(e)));
   },
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
@@ -1042,7 +1043,8 @@ async function tick() {
           sub.cb(
             rows
               .filter((r) => sub.symbols.includes(r.n))
-              .map(({ s, n, v }) => ({ s, n, v })),
+              .map(row => chartQuotePresentation(row,
+                symbolPresentations.get(decode(row.n).symbol))),
           );
         send({ type: "feed-poll-state", key: "@quotes", error: "" });
       } catch (e) {

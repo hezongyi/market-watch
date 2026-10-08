@@ -1,0 +1,6 @@
+PASS MSFT native price axis defaults to cents while symbol data precision remains eight
+PASS manual native precision overrides automatic default and can return to automatic
+PASS EURUSD=X adapts by source/type rather than using stock precision
+PASS CL=F adapts by source/type rather than using stock precision
+PASS existing Binance datafeed price scale remains unchanged
+PASS existing workspace reload retains automatic MSFT formatting

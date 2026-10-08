@@ -18,12 +18,16 @@ const report = { environment: 'Ubuntu isolated Docker; real Yahoo symbols and na
     await expect(center().getByRole('heading', { name: '平台品种', exact: true })).toBeVisible();
     await center().getByRole('button', { name: '打开平台图表', exact: true }).click();
     await expect.poll(() => !!center(), { timeout: 60000 }).toBeFalsy();
-    await expect.poll(() => host().evaluate(() => widget.activeChart().dataReady()), { timeout: 60000 }).toBeTruthy();
+    await expect.poll(() => host().evaluate(() =>
+      new Promise((resolve, reject) => feed.resolveSymbol(widget.activeChart().symbol(), resolve, reject)).then(info => info.name)
+    ), { timeout: 60000 }).toBe('MSFT');
+    await expect.poll(() => host().evaluate(() => ready && widget.activeChart().dataReady()), { timeout: 60000 }).toBeTruthy();
+    await expect(native().locator('.mw-data-center-load')).toHaveCount(0, { timeout: 60000 });
     const actual = await host().evaluate(async () => {
       const chart = widget.activeChart();
       const info = await new Promise((resolve, reject) => feed.resolveSymbol(chart.symbol(), resolve, reject));
       return { symbol: info.name, pricescale: info.pricescale, displayPrecision: info.mw_display_precision,
-        formatted: chart.priceFormatter().format(530.82456789), smallChange: chart.priceFormatter().format(0.01456789) };
+        formatted: chart.priceFormatter().format(530.82456789), smallChange: chart.priceFormatter().formatChange(530.83456789, 530.82) };
     });
     expect(actual.symbol).toBe('MSFT');
     expect(actual.pricescale).toBe(100000000);
@@ -50,10 +54,12 @@ const report = { environment: 'Ubuntu isolated Docker; real Yahoo symbols and na
     expect(legacy.pricescale).toBe(100);
     expect(legacy.mw_display_precision).toBeUndefined();
     record('existing Binance datafeed price scale remains unchanged');
+    await expect.poll(() => host().evaluate(() => !globalThis.MWNativeNavigation?.busy() &&
+      !rangeGuard?.busy() && !edgeGuard?.busy()), { timeout: 60000 }).toBeTruthy();
     await host().evaluate(() => new Promise((resolve, reject) => widget.saveChartToServer(resolve, reject)));
     await page.reload();
     await expect.poll(() => !!host() && !!native(), { timeout: 30000 }).toBeTruthy();
-    await expect.poll(() => host().evaluate(() => widget.activeChart().dataReady()), { timeout: 60000 }).toBeTruthy();
+    await expect.poll(() => host().evaluate(() => ready && widget.activeChart().dataReady()), { timeout: 60000 }).toBeTruthy();
     expect(await host().evaluate(() => new Promise((resolve, reject) => feed.resolveSymbol(widget.activeChart().symbol(), resolve, reject)).then(info => info.name))).toBe('MSFT');
     expect(await host().evaluate(() => widget.activeChart().priceFormatter().format(530.82456789))).toBe('530.82');
     record('existing workspace reload retains automatic MSFT formatting');

@@ -1,0 +1,35 @@
+{
+  "environment": "Ubuntu isolated Docker; native public price formatter",
+  "project": "mw-data-center-review-20261008",
+  "metadataMode": "legacy",
+  "passed": true,
+  "checks": [
+    {
+      "name": "AAPL automatic native price axis uses cents",
+      "symbol": "AAPL",
+      "source": "yahoo",
+      "pricescale": 100000000,
+      "formatted": "252.29"
+    },
+    {
+      "name": "native quote details use automatic display scale; raw price stays unrounded",
+      "displayScale": 100,
+      "raw": 338.27,
+      "displayed": "338.27"
+    },
+    {
+      "name": "automatic precision adapts at render time without rounding source data",
+      "low": "0.00123",
+      "tiny": "0.00000001",
+      "highAgain": "252.29",
+      "change": "0.01"
+    },
+    {
+      "name": "manual four/eight decimals remain available; returning to automatic restores cents"
+    },
+    {
+      "name": "saved automatic chart restores cents with startup metadata"
+    }
+  ],
+  "errors": []
+}
