@@ -1627,6 +1627,11 @@ function boot(
       .then(async () => {
         if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
           send({type: "error", error: String(e)}));
+        // Public left-aligned buttons retain their creation order in the header.
+        if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
+          workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send,
+          suspendIndicators: () => indicatorPicker?.close(),
+          resolve: args => request({op:"resolve",args},"market")});
         alertBridge.attach();
         if (!readonly) {
           globalThis.MWSeriesPicker?.attach(widget, query => request({op:'searchPage',args:query},'market'),
@@ -1673,10 +1678,6 @@ function boot(
           ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave, () => snapshot(), body => request(body, "account-password"), barRangeMapping, syncCoordinator,
         );
 
-        if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
-          workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send,
-          suspendIndicators: () => indicatorPicker?.close(),
-          resolve: args => request({op:"resolve",args},"market")});
       })
       .catch((e) => send({ type: "error", error: String(e) }));
     // Mobile is a temporary single-chart view of the saved desktop workspace.

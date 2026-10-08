@@ -4,7 +4,7 @@ const {chromium, expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../..'),privateDir=path.join(root,'artifacts/data-center');
 const base=fixture.base;
-const report={environment:'Ubuntu quant-server Docker',project:'mw-data-center-impl-20261008',base,passed:false,checks:[],errors:[]};
+const report={environment:'Ubuntu quant-server Docker',project:process.env.MW_DATA_CENTER_PROJECT||'mw-data-center-impl-20261008',base,passed:false,checks:[],errors:[]};
 (async()=>{
  const browser=await fixture.launch();
  const page=await browser.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});

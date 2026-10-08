@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { X, Database, Layers, ListChecks, Radio, Settings2 } from "lucide-react";
+import { Database, Layers, ListChecks, Radio, Settings2 } from "lucide-react";
 import { api } from "./api";
 import Center from "./Center";
 import { CenterContext, type CenterNavigation } from "./router";
@@ -28,6 +28,7 @@ export default function DataCenterWindow() {
   const content = useRef<HTMLDivElement>(null), closeButton = useRef<HTMLButtonElement>(null), guardBox = useRef<HTMLDivElement>(null);
   const positions = useRef<Record<string, Position>>(readMemory("mw-data-center-positions", {}));
   const tabLocations = useRef<Record<string, string>>(readMemory("mw-data-center-tabs", {}));
+  const restoreScope = useRef<string | null>(null);
   const guardFocus = useRef<HTMLElement | null>(null);
   routeRef.current = route; contextRef.current = context;
   const post = useCallback((value: object) => parent.parent.postMessage({ channel, session, ...value }, host), [session, host]);
@@ -113,6 +114,13 @@ export default function DataCenterWindow() {
       sessionStorage.setItem("mw-data-center-tabs", JSON.stringify(tabLocations.current));
     }
     post({ type: "location", location: route });
+    const parsed = new URL(route, "https://center.invalid");
+    const scope = parsed.pathname + "?tab=" + centerTab(route) + parsed.hash;
+    const sameScope = restoreScope.current === scope;
+    restoreScope.current = scope;
+    // Filters/page changes keep the user's active control. Restore position
+    // only when entering a section/detail or returning to a specific row.
+    if (sameScope) return;
     let restored = false;
     const restore = () => {
       if (restored) return;
@@ -157,7 +165,7 @@ export default function DataCenterWindow() {
   }, [close, guard]);
   return <CenterContext value={{ location: route, navigate, apply, setDirty, clearDirty, busy }}>
     <main className="dc-window" data-theme={context?.theme || "dark"}>
-      <header className="dc-window-header"><h2>数据中心</h2><button ref={closeButton} aria-label="关闭数据中心" onClick={close}><X aria-hidden="true" size={20} /></button></header>
+      <header className="dc-window-header"><h2><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" /></svg>数据中心</h2><button ref={closeButton} aria-label="关闭数据中心" onClick={close}><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path stroke="currentColor" strokeWidth="1.2" d="m1.5 1.5 15 15m0-15-15 15" /></svg></button></header>
       <div className="dc-window-body" inert={guard !== null}>
         <nav className="dc-window-nav" aria-label="数据中心分区">{tabs.map(([key, label, Icon]) => <button key={key} aria-current={centerTab(route) === key ? "page" : undefined} onClick={() => navigate(tabLocations.current[key] || `/market-data?tab=${key}`)}><Icon size={18} aria-hidden="true" />{label}</button>)}</nav>
         <div className="dc-window-content" ref={content}>

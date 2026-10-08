@@ -74,6 +74,22 @@ function chartIndicatorPicker(chartWidget, catalog, report) {
       open();
     },
   });
+  // Restore the four-column/rising-line silhouette from chart-menu.css on the
+  // public custom button, since the built-in indicator entry is now disabled.
+  const toolbarStyle = doc.createElement("style");
+  toolbarStyle.textContent = ".mw-indicator-button .js-button-text{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:100%}.mw-indicator-button svg{width:28px;height:28px;display:block;flex-shrink:0}";
+  doc.head.append(toolbarStyle);
+  function decorateButton() {
+    for (const button of doc.querySelectorAll('button[data-name="custom-tradingview-styled-button"][aria-label="指标"]')) {
+      if (button.classList.contains("mw-indicator-button")) continue;
+      button.classList.add("mw-indicator-button");
+      (button.querySelector(".js-button-text") || button).insertAdjacentHTML("afterbegin",
+        '<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6.5 11.5 5-5 4 4 7-5"/><path d="M6.5 22.5v-4h4v-3h4v2h4v-5h4v10h-16Zm4 0v-4m4 4v-5m4 5v-5"/></svg>');
+    }
+  }
+  const toolbarObserver = new MutationObserver(decorateButton);
+  toolbarObserver.observe(doc.body, { childList: true, subtree: true });
+  decorateButton();
   const entries = indicatorEntries(chartWidget, catalog);
   const dialog = doc.createElement("dialog");
   dialog.className = "mw-indicator-picker";
@@ -464,6 +480,8 @@ function chartIndicatorPicker(chartWidget, catalog, report) {
     dispose() {
       disposed = true;
       observer.disconnect();
+      toolbarObserver.disconnect();
+      toolbarStyle.remove();
       dialog.remove();
       doc.removeEventListener("keydown", keyboard, true);
       doc.removeEventListener("pointerdown", rememberPointer, true);

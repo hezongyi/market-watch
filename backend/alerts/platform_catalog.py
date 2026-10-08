@@ -2,10 +2,11 @@
 
 from sqlalchemy import select
 
+from .config import settings
 from .history_catalog import account_scope, asset_class
 from .provider_dukascopy import catalog as dukascopy_catalog
 from .source_registry import capabilities
-from .storage import MarketCatalog
+from .storage import Instrument, MarketCatalog, MarketDataset
 
 
 def catalog(db, *, query="", source=None, page=1, page_size=25):
@@ -30,8 +31,21 @@ def catalog(db, *, query="", source=None, page=1, page_size=25):
             "source": row.source, "provider_symbol": row.symbol, "label": row.label,
             "asset_class": asset_class(row.asset_type, row.symbol), "precision": row.precision,
             "history_precision": row.precision, "precision_status": "source_catalog",
-            "available": row.available, "updated_at": row.updated_at,
+            "available": row.available and (row.source != "yahoo" or settings.yahoo_enabled),
+            "updated_at": row.updated_at or None,
             "capabilities": capabilities(row.source)}
+    # Bootstrap/legacy native identities live in instruments, before a source
+    # catalog refresh. Retain those IDs so listing and chart resolution agree.
+    for row in db.scalars(select(Instrument).where(Instrument.source.in_(("oanda", "binance")),
+            Instrument.id.not_in(select(MarketDataset.instrument_id)))):
+        if source and row.source != source:
+            continue
+        items.setdefault((row.source, row.symbol), {"id": row.id,
+            "source": row.source, "provider_symbol": row.symbol, "label": row.label,
+            "asset_class": "crypto" if row.source == "binance" else asset_class("CURRENCY", row.symbol),
+            "precision": row.precision, "history_precision": row.precision,
+            "precision_status": "registered_instrument", "available": True, "updated_at": None,
+            "capabilities": capabilities(row.source)})
     if not source or source == "dukascopy":
         for row in dukascopy_catalog():
             items[("dukascopy", row["symbol"])] = {**row, "provider_symbol": row["symbol"],

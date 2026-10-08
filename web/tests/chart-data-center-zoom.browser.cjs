@@ -27,7 +27,9 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
   }, { base, value });
   const compositePattern = /\/api\/market-data\/center\/(composites|composite-candidates)\?/;
   const fixtureRows = async route => {
-    const response = await route.fetch(), body = await response.json();
+    const seedUrl = new URL(route.request().url());
+    seedUrl.searchParams.set('query', '');
+    const response = await route.fetch({ url: seedUrl.href }), body = await response.json();
     expect(body.items.length).toBeGreaterThan(0);
     const seed = body.items[0];
     body.items = Array.from({ length: 25 }, (_, index) => 'dataset' in seed
@@ -94,7 +96,11 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
         const comboFilter = center().getByRole('button', { name: '筛选与搜索', exact: true });
         if (await comboFilter.isVisible() && await comboFilter.getAttribute('aria-expanded') !== 'true') await comboFilter.click();
         await center().getByRole('button', { name: mode, exact: true }).click();
-        await center().getByLabel('搜索品种', { exact: true }).fill('');
+        const search = center().getByLabel('搜索品种', { exact: true });
+        await search.fill(mode === '已建立组合' ? '布局验收' : '');
+        // Filtering within a section must retain input focus after rendering.
+        await center().evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+        await expect(search).toBeFocused();
         await closeFilters();
         await expect(center().locator('.dc-table tbody tr').last().locator('td').first()).toContainText(`${mode === '已建立组合' ? '已建立组合' : '组合候选'}布局验收-24`);
         const table = center().locator('.dc-table');

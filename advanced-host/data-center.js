@@ -1,6 +1,6 @@
 /* Public toolbar/dialog host. Business UI and API session remain in the app. */
 function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators }) {
-  const probe = widget.createButton({ align: "right", useTradingViewStyle: false });
+  const probe = widget.createButton({ align: "left", useTradingViewStyle: false });
   const doc = probe.ownerDocument;
   widget.removeButton(probe);
   const session = crypto.randomUUID(), channel = "mw-data-center-v1";
@@ -13,17 +13,18 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
   frame.src = `${appOrigin}/chart-data-center?session=${encodeURIComponent(session)}`;
   dialog.append(frame);
   const style = doc.createElement("style");
-  style.textContent = `.mw-data-center-dialog{width:min(1120px,calc(100vw - 32px));height:min(720px,calc(100dvh - 32px));max-width:none;max-height:none;padding:0;border:1px solid #434651;border-radius:8px;background:#131722;overflow:hidden;box-sizing:border-box}.mw-data-center-dialog[data-theme=light]{background:#fff;border-color:#d1d4dc}.mw-data-center-dialog::backdrop{background:rgb(0 0 0 / 50%)}.mw-data-center-dialog iframe{width:100%;height:100%;border:0;display:block}.mw-data-center-button{width:38px!important;padding:0!important}.mw-data-center-button .js-button-text{display:none!important}.mw-data-center-button svg{width:20px;height:20px;display:block}.mw-data-center-button:focus-visible{outline:2px solid #2962ff;outline-offset:-3px}.mw-data-center-button[aria-expanded=true]{color:#2962ff;background:rgba(41,98,255,.12)}`;
+  style.textContent = `.mw-data-center-dialog{width:min(1120px,calc(100vw - 32px));height:min(720px,calc(100dvh - 32px));max-width:none;max-height:none;padding:0;border:0;border-radius:6px;background:#1f1f1f;box-shadow:0 2px 4px rgb(0 0 0 / 40%);overflow:hidden;box-sizing:border-box}.mw-data-center-dialog[data-theme=light]{background:#fff;box-shadow:0 2px 4px rgb(0 0 0 / 20%)}.mw-data-center-dialog::backdrop{background:transparent}.mw-data-center-dialog iframe{width:100%;height:100%;border:0;display:block}.mw-data-center-button{padding:0 12px!important}.mw-data-center-button .js-button-text{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:100%}.mw-data-center-button svg{width:20px;height:20px;display:block;flex-shrink:0}.mw-data-center-button:focus-visible{outline:2px solid #2962ff;outline-offset:-3px}.mw-data-center-button[aria-expanded=true]{background:#2b2b2b}html:not(.theme-dark) .mw-data-center-button[aria-expanded=true]{background:#f2f2f2}`;
   doc.head.append(style);
   let mounted = false, childReady = false, target = null, disposed = false, applying = false;
   let remembered, pendingLocation;
   let lastFocus;
-  const buttonId = widget.createButton({ align: "right", useTradingViewStyle: true, text: "数据中心", title: "数据中心", onClick: () => open() });
+  const buttonId = widget.createButton({ align: "left", useTradingViewStyle: true, text: "数据中心", title: "数据中心", onClick: () => open() });
   const icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>`;
   function decorate() {
     for (const button of doc.querySelectorAll('button[data-name="custom-tradingview-styled-button"][aria-label="数据中心"]')) {
       if (!button.classList.contains("mw-data-center-button")) {
-        button.classList.add("mw-data-center-button"); button.insertAdjacentHTML("afterbegin", icon);
+        button.classList.add("mw-data-center-button");
+        (button.querySelector(".js-button-text") || button).insertAdjacentHTML("afterbegin", icon);
         button.setAttribute("aria-haspopup", "dialog");
       }
       const value = String(dialog.open);

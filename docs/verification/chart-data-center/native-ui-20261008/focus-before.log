@@ -1,0 +1,13 @@
+expect(locator).toBeFocused() failed
+
+Locator:  getByLabel('搜索品种', { exact: true })
+Expected: focused
+Received: inactive
+Timeout:  5000ms
+
+Call log:
+  - Expect "toBeFocused" getByLabel('搜索品种', { exact: true }) with timeout 5000ms
+  - waiting for getByLabel('搜索品种', { exact: true })
+    14 × locator resolved to <input value="布局验收"/>
+       - unexpected value "inactive"
+
