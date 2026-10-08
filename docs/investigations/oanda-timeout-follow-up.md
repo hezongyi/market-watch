@@ -693,3 +693,66 @@ with recovery, quote and candle readiness false; the owner lease was invalid.
 No account request, service restart, configuration change or release was made
 during this verification. Production startup remains confirmed; healthy
 restoration remains unconfirmed.
+
+### Quote cadence, proxy path and the quiet-session hypothesis
+
+Read-only inspection confirmed the stopped Ubuntu debug container's two proxy
+settings target **http://192.168.7.33:7890**. That endpoint is provided by the
+running production `mihomo` Docker container on unraid, image
+`metacubex/mihomo:v1.19.31`, with published ports 7890 and 9090. SSH is the
+management connection, not the pricing-data transport in this window. The
+100 saved controller samples show one stream connection start and route-chain
+fingerprint, but no destination IP; they do not establish actual remote edge.
+
+Further analysis of the same preserved 600-second window (no new account
+request) counted **187 EURUSD** and **1083 XAUUSD** complete PRICE records in the
+window, about 0.312/s and 1.805/s, or 3.209s and 0.554s per record respectively.
+These are window-local counts, unlike the previously reported whole-process
+198 and 1118. The first diagnostic sample's latest per-symbol arrivals preceded
+the window start, and the first post-window sample had unchanged counts, making
+the boundary attribution possible.
+
+One-second summaries retain the last arrival and cumulative count, not every
+individual timestamp. Therefore full interval bins are bounded rather than
+invented exact percentiles:
+
+| Consecutive arrival interval | EURUSD count bounds | XAUUSD count bounds |
+| --- | --- | --- |
+| <=1s | 71–79 | 796–974 |
+| >1–5s | 72–82 | 106–286 |
+| >5–15s | 30–32 | 1–3 |
+| >15–30s | 3 | 0 |
+| >30–60s | 1 | 0 |
+
+The ranges are per-bin uncertainty bounds and must not be summed as exact
+counts. EURUSD's four long intervals are **18.234s, 23.150–24.082s, 47.440s,
+15.765–16.640s**. The intervals between first stale diagnostic samples were
+about 136s, 80s and 90s; four episodes in ten minutes do not establish a periodic
+failure rate. There are 48 stale one-second diagnostics, versus nine stale
+five-second API samples, not nine independent incidents. Received EURUSD
+records' source-to-decode age was <=1s for **173/187**, and >1–5s for **14/187**;
+XAUUSD was <=1s for **1041/1083**, and >1–5s for **42/1083**. These ages include
+source/local clock alignment uncertainty and are not measured network RTTs.
+Derived evidence: private `live-layer-attribution-evidence-2/quote-cadence-summary.json`.
+
+The observation was Thursday **12:59–13:09 Singapore time**, in the Asian
+session, not a weekend. A quieter EURUSD source and an active gold source are
+compatible with these results. OANDA's public pricing-stream specification,
+checked through the configured proxy, states **at most four prices per second
+per instrument** and heartbeats every five seconds; it does not promise a
+minimum per-symbol quote frequency or a <=15s maximum quote gap:
+https://developer.oanda.com/rest-live-v20/pricing-ep/
+This is a source-cadence hypothesis, not a proven explanation of a 47s gap.
+The unchanged application freshness gate still fails.
+
+The first three EURUSD gaps coexist with later XAUUSD and heartbeat records on
+the same validated TLS/TCP stream. Ordinary CONNECT forwarding cannot inspect
+encrypted symbol names, and ordered TCP/TLS transport cannot selectively hold
+an earlier EURUSD record while delivering later bytes of that same stream.
+Thus a whole-stream proxy stall is a poorer explanation of these particular
+single-symbol gaps than sparse source updates. This reasoning does not clear
+the proxy path of the separately observed TLS/initial-header failures, nor
+establish where missing source observations were generated or omitted. The
+instrumentation places the gap before the application's complete-record
+receive/filter boundary, not specifically outside the public-network exit.
+Market inactivity also does not explain failure to complete TLS.
