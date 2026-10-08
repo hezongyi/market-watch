@@ -27,6 +27,8 @@ const report={environment:'Ubuntu isolated Docker, real supplier and licensed na
   await expect(dc().getByRole('status').last()).toContainText('关闭品种和周期同步');
   await dc().getByRole('button',{name:'打开此版本',exact:true}).first().click();
   await expect.poll(()=>!!dc(),{timeout:35000}).toBeFalsy();
+  await expect.poll(()=>host().evaluate(()=>widget.activeChart().symbol().toLowerCase()),{timeout:30000}).toBe('mwh:'+version);
+  await expect.poll(()=>host().evaluate(()=>widget.activeChart().resolution())).toBe('1');
   const after=await host().evaluate(()=>({symbols:[widget.chart(0).symbol(),widget.chart(1).symbol()],res:[widget.chart(0).resolution(),widget.chart(1).resolution()],active:widget.activeChartIndex(),sync:[widget.symbolSync().value(),widget.intervalSync().value()]}));
   expect(after.symbols[before.active].toLowerCase()).toBe('mwh:'+version);expect(after.res[before.active]).toBe('1');
   expect(after.symbols[1-before.active]).toBe(before.symbols[1-before.active]);expect(after.res[1-before.active]).toBe(before.res[1-before.active]);expect(after.sync).toEqual([false,false]);
@@ -44,6 +46,7 @@ const report={environment:'Ubuntu isolated Docker, real supplier and licensed na
   await dc().getByRole('button',{name:'关闭数据中心'}).click();await expect(dc().getByRole('alertdialog')).toBeVisible();await dc().getByRole('button',{name:'继续编辑'}).click();
   await dc().getByRole('button',{name:'保存原生配置',exact:true}).click();await expect(dc().getByRole('button',{name:'打开配置图表',exact:true})).toBeVisible();
   await dc().getByRole('button',{name:'打开配置图表',exact:true}).click();await expect.poll(()=>!!dc(),{timeout:35000}).toBeFalsy();
+  await expect.poll(()=>host().evaluate(()=>widget.activeChart().symbol()),{timeout:30000}).toMatch(/^MWP:NATIVE:[a-f0-9]{32}$/i);
   const ticker=await host().evaluate(()=>widget.activeChart().symbol());expect(ticker).toMatch(/^MWP:NATIVE:[a-f0-9]{32}$/i);
   record('native parameter form dirty guard, save and exact configured provider identity',{ticker});
   await open();await choose('自建行情');

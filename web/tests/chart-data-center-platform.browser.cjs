@@ -31,8 +31,8 @@ const report = { environment: 'Ubuntu isolated Docker; enabled Yahoo and legacy 
       await page.screenshot({ path: path.join(art, 'platform-' + source + '.png') });
       await row.getByRole('button', { name: '打开平台图表', exact: true }).click();
       await expect.poll(() => !!center(), { timeout: 60000 }).toBeFalsy();
-      expect((await host().evaluate(() => widget.activeChart().symbol())).toLowerCase()).toBe(('MWP:' + selected.id).toLowerCase());
-      expect(await host().evaluate(() => widget.activeChart().resolution())).toBe('60');
+      await expect.poll(() => host().evaluate(() => widget.activeChart().symbol().toLowerCase()), { timeout: 30000 }).toBe(('MWP:' + selected.id).toLowerCase());
+      await expect.poll(() => host().evaluate(() => widget.activeChart().resolution())).toBe('60');
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
       record(source + ' directory/filter and exact chart identity', { total: directory.total, symbol, id: selected.id });
       await native().getByRole('button', { name: '数据中心', exact: true }).click();

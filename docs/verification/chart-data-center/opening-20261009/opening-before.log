@@ -1,0 +1,5 @@
+PASS only the selected action shows opening feedback { openingCount: 25, unchangedCount: 0, originalCount: 25 }
+expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 1
+Received:    25

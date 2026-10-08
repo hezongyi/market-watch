@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Database, Layers, ListChecks, Radio, Settings2 } from "lucide-react";
-import { api } from "./api";
 import Center from "./Center";
 import { CenterContext, type CenterNavigation } from "./router";
 import { centerLocation, centerTab } from "./location";
@@ -72,21 +71,18 @@ export default function DataCenterWindow() {
     try {
       const kind = ticker.startsWith("MWP:") ? "provider" : ticker.startsWith("MWH:") ? "history" : ticker.startsWith("MWC:") ? "composite" : "";
       if (!kind) throw Error("无效行情身份");
-      const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 15000);
-      try {
-        const meta = await api<{ frames: string[] }>("/market-data/resolve", { instrument: ticker.slice(4), series_kind: kind, timeframe: frame }, controller.signal);
-        if (!meta.frames?.includes(frame)) throw Error("所选行情尚未提供该周期，请选择可用周期。");
-      } finally { clearTimeout(timer); }
+      // The host acknowledges the command before loading its market data.
+      // Keep source validation in one place and save selection before unmount.
+      rememberPosition();
       await new Promise<void>((resolve, reject) => {
         const id = crypto.randomUUID();
-        const timer = setTimeout(() => { if (request.current?.id === id) { request.current = null; reject(Error("图表应用结果暂未返回。请查看目标图格后重新打开窗口核查。")); } }, 60000);
+        const timer = setTimeout(() => { if (request.current?.id === id) { request.current = null; reject(Error("图表未接收打开请求，请重新打开窗口核查。")); } }, 5000);
         request.current = { id, resolve, reject, timer };
         post({ type: "apply", id, target: contextRef.current!.target, workspace: contextRef.current!.workspace, ticker, frame });
       });
-      post({ type: "close" });
     } catch (e) { setError(String(e)); throw e; }
     finally { applying.current = false; setBusy(false); }
-  }, [post]);
+  }, [post, rememberPosition]);
   useEffect(() => {
     if (parent === window || !/^[a-f0-9-]{36}$/.test(session)) { setError("请从图表顶部的数据中心打开窗口。"); return; }
     const listener = (event: MessageEvent) => {
