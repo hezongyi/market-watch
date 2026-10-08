@@ -90,15 +90,20 @@ class Calculator:
                 HistoryArtifact.version_id == ident)))
             return [version.manifest, [list(r) for r in artifacts], self._indicators(db, version_id=ident)]
         inst = db.get(Instrument, ident)
-        facts = db.execute(select(func.count(Bar.id), func.max(Bar.received_at),
-            func.sum(Bar.revision + Bar.volume_revision)).where(Bar.instrument_id == ident)).one()
         from .storage import ChartHistoryPlan, ChartPublication
-        publications = list(db.execute(select(ChartPublication.timeframe, ChartPublication.revision,
-            ChartPublication.initialized, ChartPublication.complete_count).where(
-            ChartPublication.instrument_id == ident))) if query.published else []
         plan = db.get(ChartHistoryPlan, ident)
         preparation = [plan.status, plan.cursor, plan.error] if plan else None
-        return [list(facts), inst.calendar_profile, [list(r) for r in publications], preparation, stamp // 60000]
+        if query.published and work["identity"]["kind"] == "bars":
+            # Published native data depends on its atomic publication, not on
+            # every staging candle. This primary-key read is independent of
+            # the amount of retained acquisition history.
+            publication = db.get(ChartPublication, (ident, query.timeframe))
+            facts = [publication.start, publication.end, publication.revision,
+                     publication.initialized, publication.complete_count] if publication else None
+        else:
+            facts = list(db.execute(select(func.count(Bar.id), func.max(Bar.received_at),
+                func.sum(Bar.revision + Bar.volume_revision)).where(Bar.instrument_id == ident)).one())
+        return [facts, inst.calendar_profile, preparation, stamp // 60000]
 
     @staticmethod
     def _indicators(db, *, revision_id=None, version_id=None):

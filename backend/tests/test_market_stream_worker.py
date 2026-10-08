@@ -291,3 +291,37 @@ def test_historical_window_credentials_do_not_expand_to_realtime_tail(database, 
     stream.commit(work, payload, delay_ms=0)
     assert stream.events(owner, "page", cursors)[0]["type"] == "reset", \
         "corrections inside the unchanged historical window still require reload"
+
+
+def test_published_stream_signal_uses_publication_evidence_without_scanning_staging_history(database):
+    from alerts.storage import ChartPublication
+    from sqlalchemy import event
+
+    query = DataQuery(instrument="BTCUSDT", series_kind="managed", timeframe="M1", published=True)
+    identity, serialized = resolve(Subscription(client="page", listener="chart", generation=1,
+        kind="bars", query=query))
+    work = {"identity": identity}
+    calculator = Calculator()
+    with database.begin() as db:
+        db.add(ChartPublication(instrument_id="BTCUSDT", timeframe="M1", start=60000,
+            end=120000, complete_count=1, initialized=True, revision=1))
+    with database() as db:
+        engine = db.get_bind()
+    statements = []
+
+    def observe(connection, cursor, statement, parameters, context, executemany):
+        statements.append(statement)
+
+    event.listen(engine, "before_cursor_execute", observe)
+    try:
+        with database.begin() as db:
+            original = calculator._signal(db, work, query)
+        with database.begin() as db:
+            db.get(ChartPublication, ("BTCUSDT", "M1")).revision += 1
+        with database.begin() as db:
+            corrected = calculator._signal(db, work, query)
+    finally:
+        event.remove(engine, "before_cursor_execute", observe)
+    assert original != corrected, "publication corrections remain a change trigger"
+    assert not any("FROM candles" in sql for sql in statements), \
+        "published stream freshness must not rescan raw staging history on every check"

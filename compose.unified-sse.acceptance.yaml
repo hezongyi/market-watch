@@ -18,6 +18,7 @@ services:
       POSTGRES_USER: alerts
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes: ["postgres-data:/var/lib/postgresql/data"]
+    ports: ["127.0.0.1:15645:5432"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U alerts -d alerts"]
       interval: 3s
@@ -47,6 +48,16 @@ services:
     <<: *api
     command: ["python", "-m", "alerts.market_stream_worker"]
     profiles: ["takeover"]
+  postgres-gates:
+    <<: *api
+    profiles: ["verification"]
+    environment:
+      TEST_POSTGRES_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DELIVERY_ENABLED: "false"
+      PYTHONPATH: /app/backend
+    command: ["python", "-m", "pytest", "-q", "--tb=short",
+      "backend/tests/test_market_stream_postgres.py"]
   composite-aggregate-worker:
     <<: *api
     command: ["python", "-m", "alerts.composite_aggregate_worker"]

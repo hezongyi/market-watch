@@ -1,10 +1,13 @@
 """Ubuntu isolated PostgreSQL concurrency gates; skips are not acceptance."""
 
+import multiprocessing
 import os
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 import test_market_stream as contracts
+import test_market_stream_api as http_contracts
+import test_market_stream_worker as worker_contracts
 from alerts import market_stream as stream
 from alerts.storage import MarketStreamTask
 from sqlalchemy import func, select
@@ -44,3 +47,69 @@ def test_concurrent_clients_and_workers_share_one_task_and_one_claim(provider_pg
         claims = [work for work in pool.map(lambda i: stream.claim(owner="worker" + str(i)), range(4)) if work]
     assert len(claims) == 1
     stream.commit(claims[0], {"type": "status", "status": "ready"})
+
+
+@pytest.mark.parametrize("contract", [
+    worker_contracts.test_shared_worker_detects_history_only_correction_and_consumers_have_distinct_windows,
+    worker_contracts.test_current_bucket_reader_uses_delta_and_replaces_expired_stream_observation,
+    worker_contracts.test_shared_page_cache_matches_authoritative_high_period_overlay,
+    worker_contracts.test_canceling_last_browser_demand_preserves_other_internal_owners,
+    worker_contracts.test_canceled_inflight_computation_does_not_leave_a_browser_demand,
+    worker_contracts.test_indicator_initialization_is_shared_and_completion_requests_history_recovery,
+    worker_contracts.test_correction_to_previously_streamed_bar_requires_native_history_reset,
+    worker_contracts.test_historical_window_credentials_do_not_expand_to_realtime_tail,
+])
+def test_worker_contract_postgres(provider_pg, monkeypatch, contract):
+    contract(provider_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize("contract", [
+    http_contracts.test_http_authentication_csrf_and_same_client_name_do_not_cross_sessions,
+    http_contracts.test_registration_cannot_mutate_fixed_identity_in_the_same_generation,
+    worker_contracts.test_managed_preparation_waits_for_native_dataset_readiness,
+    worker_contracts.test_published_stream_signal_uses_publication_evidence_without_scanning_staging_history,
+])
+def test_managed_and_http_contract_postgres(provider_pg, contract):
+    from alerts import storage
+
+    storage.bootstrap(provider_pg[1])
+    contract(provider_pg[0])
+
+
+def process_operation(args):
+    """Spawned processes have independent engines and no inherited pool state."""
+    from alerts import storage
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    url, schema, operation, owner, number = args
+    engine = create_engine(url, connect_args={"options": f"-csearch_path={schema}"},
+                           pool_size=1, max_overflow=0)
+    storage.Session = sessionmaker(engine, expire_on_commit=False)
+    try:
+        if operation == "register":
+            return contracts.register(owner, client="process-page-" + str(number))
+        return stream.claim(owner="process-worker-" + str(number))
+    finally:
+        engine.dispose()
+
+
+def test_separate_api_and_worker_processes_share_one_task_and_claim(provider_pg):
+    from sqlalchemy import text
+
+    factory, engine = provider_pg
+    owner = contracts.session(factory)
+    with engine.connect() as connection:
+        schema = connection.scalar(text("SELECT current_schema()"))
+    assert schema.startswith("provider_")
+    url = engine.url.render_as_string(hide_password=False)
+    with multiprocessing.get_context("spawn").Pool(4) as pool:
+        registrations = pool.map(process_operation, [
+            (url, schema, "register", owner, number) for number in range(8)])
+        assert len({row["task_id"] for row in registrations}) == 1
+        claims = [work for work in pool.map(process_operation, [
+            (url, schema, "claim", owner, number) for number in range(4)]) if work]
+    assert len(claims) == 1, "independent worker processes must acquire one shared calculation"
+    stream.commit(claims[0], {"type": "bars", "bars": [{"start": 60000}]})
+    events = [stream.events(owner, "process-page-" + str(number), {}) for number in range(8)]
+    assert all(len(rows) == 1 and rows[0]["bars"][0]["start"] == 60000 for rows in events)
