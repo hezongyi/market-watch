@@ -1,0 +1,221 @@
+{
+  "runtime_image_commit": "1e8e45a",
+  "runs": [
+    {
+      "passed": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "app": "http://127.0.0.1:15643",
+      "chart": "http://127.0.0.1:15644",
+      "synthetic": true,
+      "checks": [
+        "native first screen and unified subscription",
+        "same-bar updates and authoritative high contraction",
+        "real EventSource reconnect after gateway outage across three appended buckets",
+        "actual worker process stop and successor takeover of the same task",
+        "API process restart reconnects and preserves native delivery"
+      ],
+      "samples": [
+        {
+          "committed_at": 1791491195332,
+          "callback_at": 1791491196132,
+          "latency_ms": 800,
+          "close": 101.01,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491197423,
+          "callback_at": 1791491197722,
+          "latency_ms": 299,
+          "close": 101.02,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491199097,
+          "callback_at": 1791491199398,
+          "latency_ms": 301,
+          "close": 101.03,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491200750,
+          "callback_at": 1791491201084,
+          "latency_ms": 334,
+          "close": 101.04,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491202712,
+          "callback_at": 1791491203325,
+          "latency_ms": 613,
+          "close": 101.05,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491204732,
+          "callback_at": 1791491205456,
+          "latency_ms": 724,
+          "close": 101.06,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491206817,
+          "callback_at": 1791491207652,
+          "latency_ms": 835,
+          "close": 101.07,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491209036,
+          "callback_at": 1791491209789,
+          "latency_ms": 753,
+          "close": 101.08,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491211057,
+          "callback_at": 1791491211439,
+          "latency_ms": 382,
+          "close": 101.09,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491212946,
+          "callback_at": 1791491213688,
+          "latency_ms": 742,
+          "close": 101.1,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491215303,
+          "callback_at": 1791491215926,
+          "latency_ms": 623,
+          "close": 101.11,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491217359,
+          "callback_at": 1791491218101,
+          "latency_ms": 742,
+          "close": 101.12,
+          "high": 110
+        }
+      ],
+      "p95_ms": 835,
+      "latency_scope": "12 sequential synthetic managed M1 updates; not the full load matrix",
+      "takeover": {
+        "task_id": "8f7efa39133057d2b95f3d54c7b0c1c3e008b6f24765b68a76f36164f05f1cf6",
+        "owner_changed": true,
+        "previous_sequence": 58,
+        "recovered_sequence": 59
+      }
+    },
+    {
+      "passed": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "app": "http://127.0.0.1:15643",
+      "chart": "http://127.0.0.1:15644",
+      "synthetic": true,
+      "checks": [
+        "native first screen and unified subscription",
+        "same-bar updates and authoritative high contraction",
+        "Python EMA worker output reaches native study callbacks for every update",
+        "real EventSource reconnect after gateway outage across three appended buckets"
+      ],
+      "samples": [
+        {
+          "committed_at": 1791491356873,
+          "callback_at": 1791491357328,
+          "latency_ms": 455,
+          "close": 101.01,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491358757,
+          "callback_at": 1791491359063,
+          "latency_ms": 306,
+          "close": 101.02,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491361440,
+          "callback_at": 1791491361877,
+          "latency_ms": 437,
+          "close": 101.03,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491363268,
+          "callback_at": 1791491364093,
+          "latency_ms": 825,
+          "close": 101.04,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491365322,
+          "callback_at": 1791491365747,
+          "latency_ms": 425,
+          "close": 101.05,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491367211,
+          "callback_at": 1791491367527,
+          "latency_ms": 316,
+          "close": 101.06,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491368804,
+          "callback_at": 1791491369861,
+          "latency_ms": 1057,
+          "close": 101.07,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491371714,
+          "callback_at": 1791491372257,
+          "latency_ms": 543,
+          "close": 101.08,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491373586,
+          "callback_at": 1791491373957,
+          "latency_ms": 371,
+          "close": 101.09,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491375137,
+          "callback_at": 1791491376191,
+          "latency_ms": 1054,
+          "close": 101.1,
+          "high": 110
+        },
+        {
+          "committed_at": 1791491377523,
+          "callback_at": 1791491378431,
+          "latency_ms": 908,
+          "close": 101.11,
+          "high": 140
+        },
+        {
+          "committed_at": 1791491379662,
+          "callback_at": 1791491380118,
+          "latency_ms": 456,
+          "close": 101.12,
+          "high": 110
+        }
+      ],
+      "p95_ms": 1057,
+      "latency_scope": "12 sequential synthetic managed M1 updates; not the full load matrix",
+      "indicator": {
+        "name": "EMA",
+        "period": 31,
+        "ticker": "MWPY_eyJzeW1ib2wiOiJTU0VGSVhUVVJFIiwic3BlYyI6eyJuYW1lIjoiRU1BIiwicGFyYW1zIjp7InBlcmlvZCI6MzF9fSwia2V5IjoidmFsdWUifQ=="
+      }
+    }
+  ]
+}

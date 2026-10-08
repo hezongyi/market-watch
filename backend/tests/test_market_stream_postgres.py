@@ -33,6 +33,11 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
     contracts.test_indicator_only_change_delivers_native_bar_at_its_own_time,
 ])
 def test_durable_contract(provider_pg, contract):
+    # These managed contracts use the same baseline instrument catalogue as
+    # the SQLite database fixture. create_all alone leaves this schema empty.
+    from alerts import storage
+
+    storage.bootstrap(provider_pg[1])
     contract(provider_pg[0])
 
 

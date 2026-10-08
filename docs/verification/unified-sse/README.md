@@ -17,14 +17,14 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 - `node tests/advanced-market-stream.cjs`：实际 bridge 回调的世代/序号拒收、确认后极值缩小、报价交付、取消迟到回调与常态 tick 无行情请求；新增空首屏准备、HTTP 历史接受后的单次重注册、尾部撤回、拒收及窗口过滤凭据检查、Python 指标值交付。
 - `node tests/advanced-fixed-series.cjs` 与 `advanced-provider-subscriptions.cjs`：既有身份、首用边界、连接共享和取消顺序通过。
 - `npm run build`：TypeScript/Vite 构建通过；既有 chunk size 提示仍存在。
-- `test_market_stream_postgres.py`：34 skipped，未配置隔离 TEST_POSTGRES_URL；未运行的并发检查不算通过。包含独立进程注册/领取、worker、报价与 HTTP 契约。
+- `test_market_stream_postgres.py`：Ubuntu隔离PostgreSQL上34 passed，见 `postgres-tests.txt`。包含独立进程注册/领取、worker、报价与HTTP契约；这次使用本机.venv连接本项目15645端口。初次容器运行31 passed、3 failed，原因是测试schema缺少基础品种；补齐fixture后重跑通过，容器内当前提交复核继续进行。
 - 新模块 Ruff、`node --check advanced-host/bridge.js`、`git diff --check` 通过；Alembic 单 head 为 `ar45_market_stream`。
 
-## Ubuntu Docker 验收入口（尚未运行）
+## Ubuntu Docker 验收实例（已运行，整体验收进行中）
 
-2026-10-09 再次检查，`docker info` 对 `/var/run/docker.sock` 返回 permission denied；quant 未加入 docker 组，`sudo -n true` 要求密码，没有可用的非交互提权入口。已请求配置本机 Docker 权限，尚未收到确认。尚未创建本任务 Docker 实例、镜像或 volume。以下地址是配置预留，**尚不可作为已部署访问地址**。
+2026-10-09 用户授权并配置Ubuntu Docker权限，docker组已包含quant；旧进程附加组未刷新，使用 `sg docker -c 'COMMAND'` 成功访问本机Docker29.1.3。API/web/chart均通过mw-docker及market-watch-ubuntu构建。已创建本项目独立network和postgres-data volume并启动服务，主API健康检查通过；查询数据库alembic_version确认 `ar45_market_stream`。没有访问或修改unraid。
 
-Compose：`compose.unified-sse.acceptance.yaml`，task/project `mw-unified-sse-20261008`。独立 PG volume/network；API 15641、第二 API 15642、web 15643、chart 15644、PG 15645，全部绑定 127.0.0.1。`config --quiet` 已解析通过，不代表容器启动通过。
+Compose：`compose.unified-sse.acceptance.yaml`，task/project `mw-unified-sse-20261008`。Ubuntu本机实际地址：网页 http://127.0.0.1:15643，chart http://127.0.0.1:15644，主API http://127.0.0.1:15641，第二API http://127.0.0.1:15642，PG 127.0.0.1:15645；全部仅绑定loopback。凭据在私有 `artifacts/unified-sse/login.json`。启动/停止命令如下；旧进程使用sg docker包装。
 
 已运行 `.venv/bin/python scripts/prepare_unified_sse_acceptance.py`，在仓库忽略目录 `artifacts/unified-sse` 创建独立随机开发凭据、acceptance.env、compose.env、tests.env、login.json。目录 0700、文件 0600，重复运行拒绝覆盖。认证哈希经 dotenv/Compose 导出转义核对与 Argon2 校验通过；不含真实供应商配置。仅生成文件，尚未构建或启动实例。新增供应商测试配置也必须留在该私有目录；不得使用生产数据或目录。构建示例：
 
@@ -49,32 +49,38 @@ docker compose --env-file artifacts/unified-sse/compose.env \
 
 `postgres-gates` 仅在 migrate 成功后运行，使用同一 task API 镜像，每个测试创建独立随机 PostgreSQL schema 并精确清理该 schema。其环境变量设置 TEST_POSTGRES_URL，避免把跳过当成通过。若直接使用本机 .venv 跑该套检查，载入私有 tests.env 后设置环境变量，连接仅限本项目的 127.0.0.1:15645。
 
-### 原生浏览器合成行情入口（待真实运行）
+### 原生浏览器合成行情入口（基础/指标/恢复已实测）
 
 完成上述构建、迁移和启动后，从 worktree 根目录运行：
 
 ```bash
-node web/tests/unified-sse.browser.cjs
+LD_LIBRARY_PATH=/home/quant/.local/share/playwright-deps-jammy/usr/lib/x86_64-linux-gnu \
+  node web/tests/unified-sse.browser.cjs
+# 可独立运行，也可组合：
+# node web/tests/unified-sse.browser.cjs --indicators
+# node web/tests/unified-sse.browser.cjs --takeover
 ```
 
 脚本先核对 Ubuntu、本机 Docker socket、四个服务的 Compose project 与 mw-docker 镜像 task/project/purpose/commit。只接受当前 HEAD 的 acceptance 镜像。经 `compose exec -T api python -` 发送 `scripts/unified_sse_acceptance_fixture.py`，无需修改生产镜像的 Dockerfile 或复制许可资源。写入前再次核对数据库 application_name、host/name/user 和 delivery_disabled；迁移必须已完成，不自动建表。
 
 fixture 仅创建本任务的 `SSEFIXTURE`/`unified-sse-synthetic`，1400 根合成发布 M1 柱，无供应商行情响应模拟，也不启用采集。重复 seed 保留数据，更新指定尾柱或追加完成柱；无效 OHLC 会回滚。初始尾部留出30分钟，重复追加耗尽后明确失败，不伪造未来完成柱。
 
-脚本通过正常 UI 登录及许可图表打开合成工作区，记录原生 `subscribeBars` 的真实回调（先调用图表库回调，再记录成功接受）、HTTP 首屏及实际 EventSource 消息。检查12次同柱更新/高值缩小、浏览器离线时追加3柱、重连逐柱回放，以及跨15秒 tick 的常态行情无轮询/历史重读。P95≤3秒仅针对本脚本12个串行合成 managed M1 输入，不代表正式负载矩阵或供应商验收。
+脚本通过正常UI登录及许可图表打开合成工作区，记录原生subscribeBars真实回调（先调用图表库回调，再记录成功接受）、HTTP首屏及实际EventSource消息。等待首屏有限报价请求结束后测量12次同柱更新/高值缩小，停止本任务web网关断开实际TCP连接，期间追加3柱，恢复后逐柱回放；跨15秒tick的常态窗口无行情轮询/历史重读。Chromium setOffline在本机不会断开既有localhost SSE，不能据此宣称已断线。
+
+`--takeover`实际启动本任务successor，停止主worker，确认同一task换owner并继续原生交付，再重启主API检查重连；finally恢复主worker并停止successor。`--indicators`通过原生createStudy创建period31的Python EMA，逐次核对worker指标值与原生研究callback。两个场景实测通过，摘要 `browser-runtime-summary.json`；P95分别835ms和1057ms。仅12个串行合成managed M1输入，不代表正式负载矩阵、组合增量成本或供应商验收。没有测量worker/API故障期间的正常负载P95。
 
 结果与截图写入忽略且私有的 `artifacts/unified-sse/unified-sse-browser*`；不保存 cookie、完整浏览器状态或密码。失败退出非零；preflight 失败会覆盖结果为 passed=false，避免误用上次成功记录。脚本未修改业务代码加入验收专用回调钩子。
 
 2026-10-09 已运行该命令：在 `compose ps -q api` 阶段遇到 Ubuntu Docker socket permission denied，浏览器未启动、fixture 未写入。`test_unified_sse_acceptance_fixture.py` 的6项SQLite检查通过，仅证明保护和fixture→真实Calculator/持久事件的输入契约，不算Docker或许可浏览器验收通过。
 
-完整统一Python套件重跑包含原11个模块加 `backend/tests/test_unified_sse_acceptance_fixture.py`，结果136 passed、34 skipped。Node脚本语法、新增Python文件Ruff及diff check通过。当前阻塞仍为quant用户无本机Docker socket访问权限；需恢复权限后才能执行正式构建、PostgreSQL gates和浏览器验收。
+完整统一Python套件本地136 passed、34 skipped，随后在实际隔离PostgreSQL上补跑34项全部通过；两个结果证据分开保存。Node脚本语法、新增Python文件Ruff及diff check通过。Docker权限阻塞已解除。真实OANDA测试配置路径已向用户询问，尚未配置token/account，不能将合成fixture当作供应商验收。
 
 ## 完成审计：尚缺的证据和工作
 
-- Ubuntu 真实 PostgreSQL 迁移、双 API、双 worker 并发和进程故障接管；不能用 SQLite 行为测试替代。
-- 原生许可图表在浏览器中的首屏与实时竞争、分页范围更新、隐藏布局释放/恢复、切周期/工作区、跨多个 bucket 断线和重启；VM bridge 测试只证明回调处理代码。
+- 已有真实PostgreSQL迁移、独立进程竞争、双API运行、worker接管及API重启证据；仍需容器内当前提交全套复核和多API实际连接矩阵。
+- 原生首屏、同柱更新、三bucket断线、worker/API重启及managed EMA已实测；分页范围更新、隐藏布局释放/恢复、切周期/工作区和更长断线仍待扩展。
 - 所有供应商仅自选表需求及身份切换、固定组合报价绑定、预警独立需求保持，需真实路径检查。
-- 指标初始化、修订、临时递归更新及同规格跨连接共享，需实际 worker/数据库运行验证。
+- managed EMA逐次回调已实测；固定/组合指标初始化、修订、临时递归更新及同规格跨连接共享仍需实际worker/数据库验证。
 - SQL/扫描/写入、CPU/内存、发送量/队列、1/多图、4–8 周期 W1/MN、含/不含指标、多组合和多连接基线/对比；提交到原生回调 P95≤3秒尚未测量。
 - worker 检查节奏、负载预算、发送合并窗口及流队列预算需由测量确认；目前500ms是待验收的实现参数，不是性能承诺。
 - 历史准备职责、reset 时首屏接受与新游标的实际协调、长期有界任务/缓存回收，仍需进一步核查。

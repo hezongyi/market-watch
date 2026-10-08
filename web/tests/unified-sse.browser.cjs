@@ -17,6 +17,21 @@ const compose = ['compose', '--env-file', path.join(directory, 'compose.env'),
   '-p', task, '-f', path.join(root, 'compose.unified-sse.acceptance.yaml')];
 const fixtureSource = fs.readFileSync(path.join(root, 'scripts/unified_sse_acceptance_fixture.py'), 'utf8');
 const samples = [], checks = [], errors = [], requests = [];
+let gatewayStopped = false;
+let primaryStopped = false;
+let successorStarted = false;
+
+async function gateway(online) {
+  await run('docker', [...compose, ...(online ? ['start', 'web'] : ['stop', '-t', '1', 'web'])],
+    {cwd:root, timeout:30000, maxBuffer:1024*1024});
+  gatewayStopped = !online;
+}
+
+async function service(action, name) {
+  assert.ok(['start','stop','restart'].includes(action));
+  assert.ok(['api','market-stream-worker','market-stream-successor'].includes(name));
+  await run('docker', [...compose, action, name], {cwd:root, timeout:30000, maxBuffer:1024*1024});
+}
 
 function preflight() {
   assert.match(fs.readFileSync('/etc/os-release', 'utf8'), /^ID=ubuntu$/m, 'Ubuntu is required');
@@ -61,6 +76,10 @@ async function fixture(action, ...args) {
     }, null, 2), {mode:0o600});
     throw error;
   }
+  fs.writeFileSync(path.join(directory, 'unified-sse-browser.json'), JSON.stringify({
+    passed:false, stage:'starting', environment:'Ubuntu local Docker', task,
+    synthetic:true, started_at:Date.now(),
+  }, null, 2), {mode:0o600});
   const initial = await fixture('seed');
   const browser = await chromium.launch({headless:true,
     executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
@@ -70,8 +89,13 @@ async function fixture(action, ...args) {
   const report = {passed:false, environment:'Ubuntu local Docker', task, app, chart,
     synthetic:true, checks, samples, errors};
   page.on('pageerror', error => errors.push(error.message));
+  const initialRequests = new Set();
+  const initialPath = url => ['/api/charts/data', '/api/market-data/quotes'].includes(new URL(url).pathname);
+  page.on('requestfinished', request => initialRequests.delete(request));
+  page.on('requestfailed', request => initialRequests.delete(request));
   page.on('request', request => {
     const url = new URL(request.url());
+    if (initialPath(request.url())) initialRequests.add(request);
     if (/^\/api\/(charts|market-data)\//.test(url.pathname))
       requests.push({at:Date.now(), path:url.pathname, method:request.method(),
         body:request.method() === 'POST' ? request.postDataJSON() : null});
@@ -89,7 +113,7 @@ async function fixture(action, ...args) {
           const value = JSON.parse(event.data);
           window.__sseTrace.events.push({at:Date.now(), type:value.type,
             reason:value.reason, listener:value.listener, generation:value.generation,
-            sequence:value.sequence, bars:value.bars});
+            sequence:value.sequence, bars:value.bars, indicators:value.indicators});
         });
       }
     };
@@ -122,6 +146,23 @@ async function fixture(action, ...args) {
     assert.ok(requests.some(item => item.path === '/api/charts/data' &&
       item.body?.instrument === symbol), 'First screen must use real HTTP history');
     checks.push('native first screen and unified subscription');
+    let indicatorTicker;
+    if (process.argv.includes('--indicators')) {
+      const study = await frame.evaluate(() => widget.activeChart().createStudy(
+        '守望 Python EMA', false, false, {period:31}));
+      assert.ok(study, 'Native Python EMA study was created');
+      await frame.waitForFunction(() => [...subscriptions.values()].some(sub =>
+        decode(sub.symbol).spec?.name === 'EMA' && sub.marketListener && sub.last),
+        null, {timeout:60000});
+      indicatorTicker = await frame.evaluate(() => [...subscriptions.values()].find(sub =>
+        decode(sub.symbol).spec?.name === 'EMA').symbol);
+      report.indicator = {name:'EMA', period:31, ticker:indicatorTicker};
+    }
+    // dataReady can fire before native details/watchlist snapshot requests.
+    // Wait for those finite first reads; SSE itself must remain connected.
+    await expect.poll(() => initialRequests.size === 0 && Date.now() - Math.max(0,
+      ...requests.filter(item => initialPath(app + item.path)).map(item => item.at)) >= 1500,
+      {timeout:30000}).toBe(true);
     const measurementStart = Date.now();
     for (let index = 1; index <= 12; index++) {
       const close = (101 + index / 100).toFixed(2), high = index % 2 ? '140' : '110';
@@ -133,11 +174,28 @@ async function fixture(action, ...args) {
         bar.time === time && bar.close === close), {time:committed.bar.start, close:Number(close)});
       samples.push({committed_at:committed.committed_at, callback_at:delivered.at,
         latency_ms:delivered.at-committed.committed_at, close:delivered.close, high:delivered.high});
+      if (indicatorTicker) {
+        const tail = committed.bar.start;
+        await expect.poll(async () => {
+          const event = await page.evaluate(({tail,close}) => [...window.__sseTrace.events].reverse().find(event =>
+            event.type === 'bars' && event.bars?.some(bar => bar.start === tail && Number(bar.close) === close) &&
+            event.indicators?.some(indicator => indicator.name === 'EMA' || indicator.spec?.name === 'EMA')),
+            {tail, close:Number(close)});
+          const value = event?.indicators?.[0]?.series?.[0]?.values?.find(item => item.time === tail)?.value;
+          if (!Number.isFinite(value)) return false;
+          return frame.evaluate(({ticker,time,value}) => window.__nativeBars.some(bar =>
+            bar.ticker === ticker && bar.time === time && bar.close === value),
+            {ticker:indicatorTicker, time:tail, value});
+        }, {timeout:15000}).toBe(true);
+      }
     }
     checks.push('same-bar updates and authoritative high contraction');
+    if (indicatorTicker) checks.push('Python EMA worker output reaches native study callbacks for every update');
     const disconnects = await page.evaluate(() => window.__sseTrace.errors);
     const opens = await page.evaluate(() => window.__sseTrace.opens);
-    await context.setOffline(true);
+    // Chromium's offline emulation leaves established localhost SSE sockets
+    // alive on this host. Stop this task's gateway to sever the real TCP stream.
+    await gateway(false);
     await page.waitForFunction(previous => window.__sseTrace.errors > previous, disconnects, {timeout:15000});
     const offlineCount = await frame.evaluate(() => window.__nativeBars.length);
     let latest;
@@ -145,7 +203,7 @@ async function fixture(action, ...args) {
     await page.waitForTimeout(1000);
     assert.equal(await frame.evaluate(() => window.__nativeBars.length), offlineCount,
       'Disconnected browser must not receive fixture updates');
-    await context.setOffline(false);
+    await gateway(true);
     await page.waitForFunction(previous => window.__sseTrace.opens > previous, opens, {timeout:30000});
     await frame.waitForFunction(({time,close}) => window.__nativeBars.some(bar =>
       bar.time === time && bar.close === close),
@@ -153,7 +211,34 @@ async function fixture(action, ...args) {
     const recovered = await frame.evaluate(() => window.__nativeBars.slice());
     for (let offset = 1; offset <= 3; offset++) assert.ok(recovered.some(bar =>
       bar.time === initial.bar.start + offset * 60000), 'Recover every disconnected bucket');
-    checks.push('real EventSource reconnect across three appended buckets');
+    checks.push('real EventSource reconnect after gateway outage across three appended buckets');
+    if (process.argv.includes('--takeover')) {
+      const before = (await fixture('state')).tasks.filter(task => task.kind === 'bars' && task.indicator_count === 0);
+      assert.equal(before.length, 1, 'One shared synthetic bar task before takeover');
+      const existing = await run('docker', [...compose, '--profile', 'takeover', 'ps', '-q', 'market-stream-successor'], {cwd:root});
+      assert.equal(existing.stdout.trim(), '', 'Takeover harness requires its successor to be stopped');
+      await run('docker', [...compose, '--profile', 'takeover', 'up', '-d', '--no-build', 'market-stream-successor'],
+        {cwd:root, timeout:30000, maxBuffer:1024*1024});
+      successorStarted = true;
+      await service('stop', 'market-stream-worker');
+      primaryStopped = true;
+      const committed = await fixture('update', '--close', '103.01');
+      await frame.waitForFunction(time => window.__nativeBars.some(bar =>
+        bar.time === time && bar.close === 103.01), committed.bar.start, {timeout:60000});
+      const after = (await fixture('state')).tasks.find(task => task.id === before[0].id);
+      assert.ok(after && after.owner && after.owner !== before[0].owner, 'Another process owns the same durable task');
+      assert.ok(after.sequence > before[0].sequence);
+      report.takeover = {task_id:after.id, owner_changed:true,
+        previous_sequence:before[0].sequence, recovered_sequence:after.sequence};
+      checks.push('actual worker process stop and successor takeover of the same task');
+      const priorOpens = await page.evaluate(() => window.__sseTrace.opens);
+      await service('restart', 'api');
+      await page.waitForFunction(previous => window.__sseTrace.opens > previous, priorOpens, {timeout:60000});
+      const next = await fixture('update', '--close', '103.02');
+      await frame.waitForFunction(time => window.__nativeBars.some(bar =>
+        bar.time === time && bar.close === 103.02), next.bar.start, {timeout:15000});
+      checks.push('API process restart reconnects and preserves native delivery');
+    }
     // Include at least one legacy 15-second tick in the observation window.
     await page.waitForTimeout(Math.max(0, 16000 - (Date.now()-measurementStart)));
     const normal = requests.filter(item => item.at >= measurementStart);
@@ -162,15 +247,15 @@ async function fixture(action, ...args) {
     assert.ok(!normal.some(item => item.path === '/api/charts/data'),
       'Ordinary updates and short replay must not poll/reload historical bars');
     assert.deepEqual(errors, []);
-    report.nativeBars = recovered;
+    report.nativeBars = await frame.evaluate(() => window.__nativeBars.slice());
     report.stream = await page.evaluate(() => window.__sseTrace);
     report.requests = normal;
     const sorted = samples.map(item => item.latency_ms).sort((a,b) => a-b);
     report.p95_ms = sorted[Math.ceil(sorted.length*.95)-1];
     report.latency_scope = '12 sequential synthetic managed M1 updates; not the full load matrix';
     assert.ok(report.p95_ms <= 3000, `Smoke callback P95 ${report.p95_ms}ms exceeds 3000ms`);
-    report.passed = true;
     await page.screenshot({path:path.join(directory, 'unified-sse-browser.png'), fullPage:true});
+    report.passed = true;
   } catch (error) {
     report.error = String(error);
     report.requests = requests;
@@ -180,7 +265,9 @@ async function fixture(action, ...args) {
     throw error;
   } finally {
     fs.writeFileSync(path.join(directory, 'unified-sse-browser.json'), JSON.stringify(report, null, 2), {mode:0o600});
-    await context.setOffline(false).catch(() => {});
+    if (gatewayStopped) await gateway(true);
+    if (primaryStopped) await service('start', 'market-stream-worker');
+    if (successorStarted) await service('stop', 'market-stream-successor');
     await browser.close();
   }
   console.log(JSON.stringify({passed:report.passed, checks, p95_ms:report.p95_ms, synthetic:true}));

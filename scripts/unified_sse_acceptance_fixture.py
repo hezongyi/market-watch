@@ -14,6 +14,7 @@ from alerts.storage import (
     ChartPublication,
     ChartPublishedBar,
     Instrument,
+    MarketStreamTask,
     Preference,
     now_ms,
     transaction,
@@ -52,7 +53,7 @@ def payload(start, value):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("seed", "tail", "update", "append"))
+    parser.add_argument("action", choices=("seed", "tail", "update", "append", "state"))
     parser.add_argument("--close", type=Decimal)
     parser.add_argument("--high", type=Decimal, default=Decimal("110"))
     parser.add_argument("--low", type=Decimal, default=Decimal("90"))
@@ -123,6 +124,14 @@ def main():
             workspace.updated_at = now_ms()
         result = {"synthetic": True, "instrument": SYMBOL, "workspace": WORKSPACE,
                   "action": args.action, "bar": row.payload, "publication_revision": pub.revision}
+        if args.action == "state":
+            result["tasks"] = [{"id": task.id, "kind": task.identity.get("kind"),
+                "indicator_count": len(task.query.get("indicators", [])),
+                "owner": task.owner_token, "owner_until": task.owner_until,
+                "sequence": task.sequence, "expires": task.expires}
+                for task in db.scalars(select(MarketStreamTask).where(
+                    MarketStreamTask.expires > now_ms()))
+                if task.query.get("instrument") == SYMBOL]
     # This timestamp follows the transaction's commit, excluding Docker exec startup.
     result["committed_at"] = now_ms()
     print(json.dumps(result))
