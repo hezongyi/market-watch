@@ -239,5 +239,38 @@
     "auth_hold_reset": false
   },
   "temporary_unraid_instances_created": 0,
-  "production_notification_or_order_tests": 0
+  "production_notification_or_order_tests": 0,
+  "operational_acceptance": {
+    "decision_recorded_on": "2026-10-08",
+    "usage": "personal market monitoring and alerts",
+    "status": "accepted_for_personal_use",
+    "delivery_closed": true,
+    "user_stated_basis": "Allow brief failures when operation is predominantly normal and recovers automatically; zero external request failures is not required.",
+    "assessment_scope": "Existing 601.381-second production observation and retained recovery evidence; no new observation or runtime configuration change.",
+    "evidence": {
+      "stream_reconnects": 0,
+      "lease_losses": 0,
+      "new_deadlocks": 0,
+      "unauthorized_recurred": false,
+      "rest_failures": 2,
+      "rest_failures_automatically_recovered": true,
+      "confirmation_and_publication_advanced_both_symbols": true,
+      "both_symbols_healthy_at_window_end": true,
+      "startup_recovery_seconds_observed": 20.0
+    },
+    "zero_fault_result_preserved": true,
+    "external_root_causes_resolved": false,
+    "long_term_failure_rate_established": false,
+    "follow_up": "Monitor; pause EURUSD root-cause work and do not repeat existing exit-node experiments.",
+    "reopen_triggers": [
+      "Automatic recovery fails or sustained unavailability",
+      "Confirmation or publication remains stalled",
+      "Database deadlock, permanent connection-pool occupancy or lease loss recurs"
+    ],
+    "authentication_rejection_action": "Preserve unauthorized protection; do not automatically clear the hold.",
+    "runtime_freshness_timeout_auth_lease_identity_gates_changed": false,
+    "ubuntu_debug_project_retired": false,
+    "resource_retirement_separate_from_delivery_closure": true,
+    "decision_document": "docs/oanda-v1.14.2-production-delivery.md"
+  }
 }
