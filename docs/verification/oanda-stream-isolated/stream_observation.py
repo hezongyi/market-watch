@@ -144,9 +144,9 @@ class PipelineObservation:
                 row["pending"] = 0
 
     def snapshot(self):
-        now = self.clock()
         with self.lock:
             result = copy.deepcopy(self.data)
+        now = self.clock()
         for key in ("publish", "next"):
             active = result[key+"_active_since"]
             result[key+"_active_ms"] = (now-active)*1000 if active is not None else 0
