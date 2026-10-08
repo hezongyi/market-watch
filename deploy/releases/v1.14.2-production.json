@@ -1,0 +1,243 @@
+{
+  "version": "1.14.2",
+  "release_tag": "v1.14.2",
+  "source_commit": "ccc7e0a88b61d48ecf03a166327ae6ba12decdc6",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/22",
+  "reviewed_head": "09d94d4c491a4e83047f17f2478309e573c10cb9",
+  "standards_blockers": 0,
+  "spec_blockers": 0,
+  "tag_annotated_and_pushed": true,
+  "deployment_environment": "unraid existing formal production",
+  "build_environment": "Ubuntu quant-server local Docker; market-watch-ubuntu BuildKit",
+  "build_task": "mw-oanda-v1.14.2-release-20261008",
+  "build_purpose": "release",
+  "production_project": "market-watch",
+  "production_root": "/mnt/user/appdata/market-watch",
+  "public_url": "https://trade.kookvv.com:8443",
+  "deployed_utc": "2026-10-08T09:00:52.798886+00:00",
+  "active_release": "releases/v1.14.2-ccc7e0a",
+  "image_ref": "market-watch-api:v1.14.2-ccc7e0a",
+  "ubuntu_image_id": "sha256:38e07873717085bb025b4bfa9be8e2e36cce9a580e1c8311c31c95e8e183b026",
+  "production_image_id": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+  "archive_config_digest": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+  "image_archive_sha256": "9f9291929bbd498d305d5adbef2366b1b0a114b68f0c7ef5527ad8e36c3a8c61",
+  "source_archive_sha256": "2a121f70d14b35ba61f20ad216acffb0c0811166c54acca87697bc39ad8c36fa",
+  "docker_id_difference": "Ubuntu OCI manifest ID versus unraid configuration digest; all archive configuration fields and 15 rootfs diff_ids equal; only false/empty legacy defaults added",
+  "runtime_modules": 126,
+  "installed_modules_match_tag_and_previous_acceptance": true,
+  "dependencies_equal_except_project_version": true,
+  "latest_installed_regressions_passed": 45,
+  "tests_additive_to_historical_selection": false,
+  "schema": "aq44_aggregation_service_order",
+  "migrations_executed": false,
+  "service_images": {
+    "api": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "chart-aggregation-worker": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "chart-history-worker": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "chart-origin": {
+      "before": "sha256:949fde14005efd34931beef041c44d67b05c9b697ef2d19c0e578549105ba2b6",
+      "after": "sha256:949fde14005efd34931beef041c44d67b05c9b697ef2d19c0e578549105ba2b6",
+      "changed": false
+    },
+    "composite-aggregate-worker": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "history-worker": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "native-history-worker": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "notify-worker": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "pricing-worker": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "realtime-worker": {
+      "before": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+      "after": "sha256:bd77247d63f8ee05a81fd1d925a90cfb48b304f3dc872260cacf3bcd963dd580",
+      "changed": true
+    },
+    "web": {
+      "before": "sha256:a9a481d00f86c69dcfd2ab4bb68333168d1033b56cb3915ec381c0c85717fd80",
+      "after": "sha256:a9a481d00f86c69dcfd2ab4bb68333168d1033b56cb3915ec381c0c85717fd80",
+      "changed": false
+    }
+  },
+  "changed_services": [
+    "api",
+    "pricing-worker",
+    "chart-aggregation-worker",
+    "chart-history-worker",
+    "history-worker",
+    "composite-aggregate-worker",
+    "native-history-worker",
+    "realtime-worker",
+    "notify-worker"
+  ],
+  "web_chart_backup_migrate_images_preserved": true,
+  "other_config_fields_preserved": true,
+  "all_compose_profiles_compared": true,
+  "raw_compose_sha256": "d730b70bfca318948ceb2315e413635171711bec33c53dfccb263e6aac3fab12",
+  "backup": {
+    "dump_file": "alerts-20261008T085908826532Z.dump",
+    "dump_sha256": "0b24fe532282064bb0a9fa1ed36774170a339bd8040a83453f135f801de56e28",
+    "dump_bytes": 66819248,
+    "snapshot_tables": 82,
+    "config_file": "config-20261008T085921Z-ZvMy9l.tar.gz",
+    "config_sha256": "210c4620c07bcafab07c71c1196c5d8a65287a2078fe51718063818717063d90",
+    "config_stream_integrity_verified": true
+  },
+  "actual_ubuntu_pg14_restore": {
+    "verified": true,
+    "tables": 82,
+    "all_snapshot_counts_equal": true
+  },
+  "operator_auth_retry": {
+    "attempts": 1,
+    "http_status": 200,
+    "reset_configuration_faults": 1,
+    "automatic_retries": 0
+  },
+  "observation": {
+    "environment": "unraid existing formal production",
+    "url": "https://trade.kookvv.com:8443",
+    "start_utc": "2026-10-08T09:06:22.397219+00:00",
+    "end_utc": "2026-10-08T09:16:23.952628+00:00",
+    "duration_seconds": 601.381,
+    "samples": 121,
+    "read_errors": 0,
+    "strict_passed": false,
+    "auth_retry_attempts": 1,
+    "unauthorized_recurred": false,
+    "epochs": [
+      353
+    ],
+    "quality_counts": {
+      "EURUSD": {
+        "unavailable": 1,
+        "recovering": 3,
+        "healthy": 117
+      },
+      "XAUUSD": {
+        "unavailable": 1,
+        "recovering": 3,
+        "healthy": 116,
+        "degraded": 1
+      }
+    },
+    "watermarks": {
+      "EURUSD": {
+        "confirmed_before": 1791437280000,
+        "confirmed_after": 1791450960000,
+        "confirmation_advanced": true,
+        "published_before": 1791437280000,
+        "published_after": 1791450960000,
+        "publication_advanced": true
+      },
+      "XAUUSD": {
+        "confirmed_before": 1791438960000,
+        "confirmed_after": 1791450960000,
+        "confirmation_advanced": true,
+        "published_before": 1791438960000,
+        "published_after": 1791450960000,
+        "publication_advanced": true
+      }
+    },
+    "deadlocks_delta": 0,
+    "infrastructure_event_count": 0,
+    "failure_counts": [
+      {
+        "event": "oanda_rest_failed",
+        "status": "",
+        "phase": "tls",
+        "stage": "",
+        "count": 1
+      },
+      {
+        "event": "oanda_rest_failed",
+        "status": "",
+        "phase": "http_status",
+        "stage": "",
+        "count": 1
+      }
+    ],
+    "four_layer_probes_enabled": false,
+    "rest_failure_count": 2,
+    "stream_or_startup_failure_count": 0,
+    "rest_failure_events": [
+      {
+        "utc": "2026-10-08T09:08:10.838737473Z",
+        "event": "oanda_rest_failed",
+        "phase": "tls",
+        "route": "proxy_tls",
+        "type": "ConnectTimeout",
+        "http_status": "-",
+        "elapsed_ms": "5013"
+      },
+      {
+        "utc": "2026-10-08T09:11:14.484096457Z",
+        "event": "oanda_rest_failed",
+        "phase": "http_status",
+        "route": "upstream",
+        "type": "HTTPStatusError",
+        "http_status": "504",
+        "elapsed_ms": "9307"
+      }
+    ]
+  },
+  "post_recovery_quality_counts": {
+    "EURUSD": {
+      "healthy": 117
+    },
+    "XAUUSD": {
+      "healthy": 116,
+      "degraded": 1
+    }
+  },
+  "recovery_ready_elapsed_seconds": 20.0,
+  "final_quote_and_candle_ready_both_symbols": true,
+  "full_end_to_end_acceptance_passed": false,
+  "residual_risks": [
+    "First response-header stalls not resolved or re-tested as a connection success-rate matrix",
+    "REST TLS failure seen in final production window; proxy_tls means upstream TLS inside CONNECT tunnel; responsibility unknown",
+    "Historical mature-stream timeouts not proven eliminated",
+    "EURUSD stale root-cause work paused; previous strict freshness failure remains recorded"
+  ],
+  "four_layer_production_probes_enabled": false,
+  "freshness_seconds": 15,
+  "rollback": {
+    "compose": "/mnt/user/appdata/market-watch/deploy/oanda-v1.14.2-switch-20261008/compose.before.yaml",
+    "active_release": "releases/v1.14.1-6fd9273",
+    "active_release_backup": "/mnt/user/appdata/market-watch/deploy/oanda-v1.14.2-switch-20261008/active-release.before",
+    "image_ref": "market-watch-api:v1.14.1-6fd9273",
+    "image_id": "sha256:eef235c1020d0de799dfa4115bfcef8c59be727cd8bc5d02065f7d135418b65a",
+    "database_or_schema_downgrade": false,
+    "auth_hold_reset": false
+  },
+  "temporary_unraid_instances_created": 0,
+  "production_notification_or_order_tests": 0
+}
