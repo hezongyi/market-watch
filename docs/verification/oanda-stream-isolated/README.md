@@ -15,7 +15,11 @@ starts. Warnings from injection/recovery are counted separately.
 
 Each five-second observation checks actual API snapshots, account epoch/lease,
 confirmed minutes, M1 publication watermarks, publication error counters, outbox
-rows and idle transactions. The report fails for an incomplete window, further
+rows and transactions idle for more than five seconds. A publisher observer also
+records every cycle's abnormal publication result, including internally caught
+exceptions which can recover between samples. Publication progress is checked
+separately for EURUSD and XAUUSD, and PostgreSQL's cumulative deadlock count must
+remain zero. The report fails for an incomplete window, further
 epoch changes, unhealthy readiness, stalled minute/publication progress, warnings,
 publication errors or notifications. All prices and account identities are
 synthetic; actual supplier or proxy reliability is outside this harness's claim.
@@ -29,14 +33,17 @@ are absent and notifications are disabled. No auth secrets appear in reports.
 
 Ubuntu Compose project/task: `mw-oanda-timeout-20261008`.
 Database: `127.0.0.1:19750`, independent PostgreSQL14 database and named volume.
-API: `http://127.0.0.1:19751/readyz`.
-Synthetic supplier: `http://127.0.0.1:19752`.
+Initial API: `http://127.0.0.1:19751/readyz`; supplier: `127.0.0.1:19752`.
+Final strengthened run: fresh database `oanda_observe_final` in the same isolated
+PostgreSQL, API `http://127.0.0.1:19753/readyz`, supplier `127.0.0.1:19754`.
 
 The private env and Compose files are in
 `/home/quant/repos/.production/mw-oanda-timeout-20261008`. The harness is mounted
 read-only, while application modules load from installed site-packages.
 `runtime-evidence` contains injection samples, steady samples, warnings and the
 final report. Synthetic login passwords are kept only in the private env.
+The final run uses `compose-runtime-final.yaml`, service `isolated-runtime-final`
+and `runtime-final-evidence`; the initial run's raw results are retained.
 
 ```sh
 sg docker -c 'docker compose --env-file /home/quant/repos/.production/mw-oanda-timeout-20261008/acceptance.env -p mw-oanda-timeout-20261008 -f /home/quant/repos/.production/mw-oanda-timeout-20261008/compose.yaml -f /home/quant/repos/.production/mw-oanda-timeout-20261008/compose-runtime.yaml up -d --no-build isolated-runtime'

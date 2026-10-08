@@ -44,6 +44,7 @@ CATALOG = [
 ACCOUNT = "isolated-synthetic-account"
 STOP = threading.Event()
 WARNINGS = []
+PUBLICATION_FAILURES = []
 FAULTS = []
 SERVER_LOCK = threading.Lock()
 CONNECTIONS = 0
@@ -146,9 +147,16 @@ class LocalClient(httpx.Client):
 
 
 def publisher():
+    def observe(result):
+        publication = result["publication_result"]
+        if publication.blocked_reason not in (None, "locked", "source", "coverage", "aggregation", "gap"):
+            PUBLICATION_FAILURES.append({"at": timestamp(), "reason": publication.blocked_reason})
+            logging.getLogger("alerts.isolated_publisher").warning(
+                "publication_failed type=%s", publication.blocked_reason)
+
     while not STOP.is_set():
         try:
-            worked, published = cycle()
+            worked, published = cycle(observer=observe)
             STOP.wait(wait_seconds(worked, published))
         except Exception as error:
             logging.getLogger("alerts.isolated_publisher").warning(
@@ -169,21 +177,30 @@ def snapshot(client):
     response.raise_for_status()
     fields = ("logical_symbol", "quality", "connection", "connection_epoch", "recovery_ready",
               "quote_ready", "candle_ready", "quote_age_ms", "heartbeat_at", "last_confirmed_m1")
-    rows = [{key: row[key] for key in fields} for row in response.json()]
+    rows = sorted([{key: row[key] for key in fields} for row in response.json()],
+                  key=lambda row: row["logical_symbol"])
     with storage.transaction() as db:
         db.execute(text("SET TRANSACTION READ ONLY"))
         owners = [{"epoch": row.epoch, "failures": row.failures,
                    "error": row.error, "lease_remaining_ms": row.expires - storage.now_ms()}
                   for row in db.scalars(select(PricingOwner))]
-        publications = [{"frame": row.timeframe, "end": row.end, "revision": row.revision}
-                        for row in db.scalars(select(ChartPublication).where(ChartPublication.timeframe == "M1"))]
+        publications = [{"symbol": symbol, "frame": row.timeframe,
+                         "end": row.end, "revision": row.revision}
+                        for row, symbol in db.execute(select(ChartPublication, MarketDataset.logical_symbol)
+                            .join(MarketDataset, MarketDataset.instrument_id == ChartPublication.instrument_id)
+                            .where(ChartPublication.timeframe == "M1"))]
         publication_errors = db.scalar(select(func.count()).select_from(ChartPublicationState).where(
             ChartPublicationState.attempts > 0))
         outbox = db.scalar(select(func.count()).select_from(Outbox))
         waiting = db.scalar(text("SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() "
                                  "AND state='idle in transaction'"))
+        long_waiting = db.scalar(text("SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() "
+            "AND state='idle in transaction' AND xact_start < clock_timestamp()-interval '5 seconds'"))
+        deadlocks = db.scalar(text("SELECT deadlocks FROM pg_stat_database WHERE datname=current_database()"))
     return {"at": timestamp(), "rows": rows, "owners": owners, "publications": publications,
-            "publication_errors": publication_errors, "outbox": outbox, "idle_transactions": waiting}
+            "publication_errors": publication_errors, "publication_failure_count": len(PUBLICATION_FAILURES),
+            "outbox": outbox, "idle_transactions": waiting,
+            "long_idle_transactions": long_waiting, "deadlocks": deadlocks}
 
 
 def main():
@@ -293,18 +310,24 @@ def main():
                 "confirmed_minutes_advance": all(samples[-1]["rows"][i]["last_confirmed_m1"]
                     - samples[0]["rows"][i]["last_confirmed_m1"] >= (args.seconds // 60 - 1) * 60000
                     for i in range(2)),
-                "publication_advances": bool(samples[0]["publications"]) and
-                    max(p["end"] for p in samples[-1]["publications"]) >
-                    max(p["end"] for p in samples[0]["publications"]),
-                "no_publication_errors": all(s["publication_errors"] == 0 for s in samples),
+                "publication_advances": all(
+                    symbol in {p["symbol"] for p in samples[0]["publications"]}
+                    and symbol in {p["symbol"] for p in samples[-1]["publications"]}
+                    and next(p["end"] for p in samples[-1]["publications"] if p["symbol"] == symbol)
+                    - next(p["end"] for p in samples[0]["publications"] if p["symbol"] == symbol)
+                    >= (args.seconds // 60 - 1) * 60000 for symbol in ("EURUSD", "XAUUSD")),
+                "no_publication_errors": not PUBLICATION_FAILURES
+                    and all(s["publication_errors"] == 0 for s in samples),
                 "no_notifications": all(s["outbox"] == 0 for s in samples),
-                "no_idle_transactions": all(s["idle_transactions"] == 0 for s in samples),
+                "no_long_idle_transactions": all(s["long_idle_transactions"] == 0 for s in samples),
+                "no_database_deadlocks": all(s["deadlocks"] == 0 for s in samples),
                 "no_new_warnings": len(WARNINGS) == warning_start,
             }
             report = {"environment": "Ubuntu Docker / synthetic supplier / installed application",
                       "start": samples[0]["at"], "end": samples[-1]["at"],
                       "elapsed_seconds": round(elapsed, 3), "samples": len(samples), "checks": checks,
-                      "faults": FAULTS, "warnings": WARNINGS, "module_hashes": module_hashes,
+                      "faults": FAULTS, "warnings": WARNINGS, "publication_failures": PUBLICATION_FAILURES,
+                      "module_hashes": module_hashes,
                       "supplier_connections": CONNECTIONS, "first": samples[0], "last": samples[-1]}
             save(args.output / "report.json", report)
             print(json.dumps({"event": "observation_finished", "checks": checks}), flush=True)
