@@ -22,6 +22,13 @@ proxy URLs or response payloads were printed. This does not establish which part
 returned the earlier stream authentication response, and is not justification
 for replacing the configured route.
 
+Rechecking all nine original timeout epochs against the continuous samples found
+each failed 15.589-15.718 seconds after connection creation, with no new heartbeat
+or quote persisted before that exit. This supports an initial-data stall rather
+than a later healthy stream becoming idle, but does not distinguish response
+headers from response body, routing failure from upstream failure, or rule out
+unobserved local processing. New transport phase diagnostics are necessary.
+
 A normal HTTPS password login and existing `/api/market-data/live/retry` call
 cleared exactly one expired configuration fault. Logout succeeded; credentials
 and cookies remained in memory. No second supplier stream or owner was created.
