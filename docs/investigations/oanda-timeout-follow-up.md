@@ -105,3 +105,25 @@ in `docs/verification/oanda-stream-isolated/`. API address:
 `http://127.0.0.1:19751/readyz`; synthetic supplier: `127.0.0.1:19752`.
 These isolated results establish application recovery/lock behavior, not the cause
 or disappearance of the historical real-supplier timeout events.
+
+Independent harness review found that the initial publication check compared
+only the greatest watermark and could miss a stalled symbol; five-second
+`attempts` samples could miss recovered publication failures. Both were corrected:
+each symbol now has its own publication watermark check, and every publisher
+cycle records abnormal results cumulatively. PostgreSQL deadlocks are checked
+independently. A momentary `idle in transaction` sample between normal SQL
+statements is retained but distinguished from a transaction older than five
+seconds which is currently idle. The original run's raw result is preserved.
+
+The strengthened observation restarted against fresh database
+`oanda_observe_final` in the same isolated project, API `127.0.0.1:19753`, synthetic
+supplier `127.0.0.1:19754`. The two deliberate 16-second faults were repeated;
+both recovered at epoch 3 before the new 600-second window started at
+2026-10-08 01:18:16 UTC. Re-review confirmed the previously found observation
+defects were addressed. This final window, rather than the earlier run, determines
+the application-chain acceptance result.
+
+During the first isolated window, a separate actual API SSE client received
+45 heartbeat events and 46 snapshots in 45.33 seconds, all at epoch 3 with no
+unhealthy rows. PostgreSQL's cumulative deadlock count was zero. Authentication
+used only the isolated synthetic password and each client logged out normally.

@@ -15,7 +15,8 @@ starts. Warnings from injection/recovery are counted separately.
 
 Each five-second observation checks actual API snapshots, account epoch/lease,
 confirmed minutes, M1 publication watermarks, publication error counters, outbox
-rows and transactions idle for more than five seconds. A publisher observer also
+rows and transactions currently idle whose transaction age exceeds five seconds.
+A publisher observer also
 records every cycle's abnormal publication result, including internally caught
 exceptions which can recover between samples. Publication progress is checked
 separately for EURUSD and XAUUSD, and PostgreSQL's cumulative deadlock count must
