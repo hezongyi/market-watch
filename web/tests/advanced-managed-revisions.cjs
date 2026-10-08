@@ -13,7 +13,7 @@ assert.equal(python.status, 0, python.stderr);
 const responses = JSON.parse(python.stdout);
 const events = [];
 const ctx = vm.createContext({URL, URLSearchParams, Map, Set, Promise, Date, Intl, Error,
-  location: {search: '?parent=http://localhost'}, parent: {postMessage() {}},
+  location: {search: '?parent=http://localhost&marketPolling=1'}, parent: {postMessage() {}},
   crypto: {randomUUID: () => 'test'}, addEventListener() {}, setTimeout, clearTimeout,
   events, responses});
 for (const name of ['series.js', 'bridge.js'])

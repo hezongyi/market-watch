@@ -8,7 +8,7 @@ const generated=spawnSync(path.join(repo,'.venv/bin/python'),
 assert.equal(generated.status,0,generated.stderr);
 const responses=JSON.parse(generated.stdout),events=[],queries=[];
 const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
-  location:{search:'?parent=http://localhost'},parent:{postMessage(){}},
+  location:{search:'?parent=http://localhost&marketPolling=1'},parent:{postMessage(){}},
   crypto:{randomUUID:()=> 'test'},addEventListener(){},setTimeout,clearTimeout,
   responses,events,queries});
 for(const name of ['series.js','bridge.js'])

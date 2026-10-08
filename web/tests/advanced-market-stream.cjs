@@ -37,6 +37,17 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
   evaluate("feed.unsubscribeBars('chart')");
   await deliver({...event,sequence:4});
   assert.equal(context.received.length,2,'late event after unsubscribe has no native callback');
+  context.indicatorTicker='MWPY_'+Buffer.from(JSON.stringify({symbol:context.symbol,
+    spec:{name:'EMA',params:{period:2}},key:'value'})).toString('base64');
+  evaluate(`lastHistory.set(indicatorTicker+'|1',60000);
+    feed.subscribeBars({ticker:indicatorTicker},'1',bar=>received.push(bar),'indicator',()=>{});`);
+  const indicatorRegistration=sent.filter(row=>row.type==='market-subscribe').at(-1).args;
+  await deliver({listener:indicatorRegistration.listener,generation:indicatorRegistration.generation,
+    sequence:1,type:'bars',bars:event.bars,
+    indicators:[{series:[{key:'value',values:[{time:60000,value:1.2}]}]}]});
+  assert.equal(context.received.at(-1).close,1.2,
+    'indicator callback applies changed study values even when its OHLC is unchanged');
+  evaluate("feed.unsubscribeBars('indicator')");
   const cancellation=sent.find(row=>row.type==='market-unsubscribe').args;
   assert.equal(cancellation.generation,registration.generation);
   evaluate(`initialHistoryGate={promise:new Promise(()=>{})};

@@ -2002,6 +2002,12 @@ addEventListener("message", async (e) => {
       for(const bar of rows) if(bar.time>=sub.last) {
         sub.cb({...bar}); observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;
       }
+      const state=marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
+      if(state) {
+        if(event.loaded_before != null) state.last=event.loaded_before;
+        if(event.history_revision != null) state.history_revision=event.history_revision;
+        if(event.initial_input_revision != null) state.input_revision=event.initial_input_revision;
+      }
       if(event.pending?.length) send({type:'status',text:event.pending.join('；')});
       if(event.status?.error) send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.status.error});
       else send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:''});

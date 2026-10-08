@@ -26,6 +26,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
     contracts.test_empty_first_history_receives_status_then_recovery_before_native_bars,
     contracts.test_replay_checks_each_committed_result_without_looking_ahead,
     contracts.test_disconnect_beyond_retained_bar_window_requires_reset,
+    contracts.test_indicator_only_change_delivers_native_bar_at_its_own_time,
 ])
 def test_durable_contract(provider_pg, contract):
     contract(provider_pg[0])

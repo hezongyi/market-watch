@@ -160,3 +160,23 @@ def test_disconnect_beyond_retained_bar_window_requires_reset(database):
     stream.commit(stream.claim(), {"type": "bars", "bars": [{"start": 12000000}, {"start": 12060000}]}, delay_ms=0)
     event = stream.events(owner, "page", cursor)[0]
     assert event["type"] == "reset", "bounded tail cannot prove an arbitrarily long gap is complete"
+
+
+def test_indicator_only_change_delivers_native_bar_at_its_own_time(database):
+    import copy
+
+    owner = session(database)
+    register(owner)
+    payload = {"type": "bars", "bars": [{"start": at, "close": "1.1"} for at in (60000, 120000)],
+        "indicators": [{"id": "ema", "series": [{"key": "value", "values": [
+            {"time": at, "value": 1.1} for at in (60000, 120000)]}]}]}
+    stream.commit(stream.claim(), payload, delay_ms=0)
+    cursors = {}
+    stream.events(owner, "page", cursors)
+    changed = copy.deepcopy(payload)
+    changed["indicators"][0]["series"][0]["values"][-1]["value"] = 1.2
+    stream.commit(stream.claim(), changed, delay_ms=0)
+    event = stream.events(owner, "page", cursors)[0]
+    assert [bar["start"] for bar in event["bars"]] == [120000], \
+        "native indicator feed derives its callbacks from the accompanying bars"
+    assert event["indicators"][0]["series"][0]["values"] == [{"time": 120000, "value": 1.2}]

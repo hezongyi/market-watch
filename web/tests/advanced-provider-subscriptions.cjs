@@ -35,11 +35,15 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   assert.equal(received.length,1);
   await transport.unsubscribe({client:'c',listener:'two'});
   assert.equal(streams[0].closed,false,'another listener remains active');
-  streams[0].onmessage({data:JSON.stringify({listener:'three',type:'bars',cursor:12000,revision:3,as_of:1000})});
+  streams[0].onmessage({data:JSON.stringify({listener:'three',type:'bars',cursor:12000,revision:3,as_of:1000,
+    loaded_before:12000,history_revision:'loaded-prefix',initial_input_revision:4})});
   streams[0].onopen({});await flush();await flush();
   const resumed=calls.filter(c=>c.path.endsWith('/subscribe')&&c.args.listener==='three').at(-1);
   assert.equal(resumed.args.cursor,12000,'reconnect restores the last delivered cursor');
   assert.equal(resumed.args.revision,3);
+  assert.equal(resumed.args.loaded_before,12000,'reconnect retains the expanded loaded range');
+  assert.equal(resumed.args.history_revision,'loaded-prefix');
+  assert.equal(resumed.args.initial_input_revision,4);
   streams[0].readyState=2;
   streams[0].onerror({});
   assert.equal(timers.size,1,'terminal EventSource errors schedule transport recovery');

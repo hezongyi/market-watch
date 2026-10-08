@@ -194,3 +194,100 @@ def test_canceled_inflight_computation_does_not_leave_a_browser_demand(database,
     with database.begin() as db:
         assert db.scalar(select(MarketDemand)) is not None, \
             "a renewed consumer must restore demand immediately, even inside the old renewal interval"
+
+
+def test_indicator_initialization_is_shared_and_completion_requests_history_recovery(database, monkeypatch):
+    from test_fixed_indicators import SPEC, drain, history
+
+    version = history(database, monkeypatch, count=50)
+    owner = session(database)
+    query = DataQuery(instrument=version, series_kind="history", timeframe="M1", indicators=[SPEC])
+    identity, serialized = resolve(Subscription(client="page", listener="chart", generation=1,
+        kind="bars", query=query))
+    for client in ("page", "other"):
+        stream.register(owner, client, "chart", 1, identity, serialized, {"initial_indicator_pending": True})
+    calculator = Calculator()
+    work = stream.claim()
+    payload, _ = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    a, b = {}, {}
+    assert stream.events(owner, "page", a)[0]["pending"]
+    assert stream.events(owner, "other", b)[0]["pending"]
+    drain(payload["indicator_progress"][0]["run_id"])
+    work = stream.claim()
+    payload, _ = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    assert stream.events(owner, "page", a)[0]["type"] == "reset"
+    assert stream.events(owner, "other", b)[0]["type"] == "reset"
+    assert calculator.computations == 2
+    with database.begin() as db:
+        from alerts.storage import FixedIndicatorRun
+        from sqlalchemy import func, select
+        assert db.scalar(select(func.count()).select_from(FixedIndicatorRun)) == 1
+    stream.register(owner, "page", "chart", 2, identity, serialized, {})
+    event = stream.events(owner, "page", {})[0]
+    assert event["type"] == "bars" and not event["pending"]
+    assert event["indicators"][0]["series"][0]["values"][-1]["value"] is not None
+
+
+def test_correction_to_previously_streamed_bar_requires_native_history_reset(database, monkeypatch):
+    composite, revision, seam = populated(database, monkeypatch)
+    owner = session(database)
+    query = DataQuery(instrument=composite, series_kind="composite", timeframe="M1", provisional=False)
+    identity, serialized = resolve(Subscription(client="page", listener="chart", generation=1,
+        kind="bars", query=query))
+    consumer = {"cursor": seam + 540000, "loaded_after": seam, "loaded_before": seam + 540000,
+                "initial_input_revision": 1}
+    stream.register(owner, "page", "chart", 1, identity, serialized, consumer)
+    calculator, cursors = Calculator(), {}
+
+    def publish():
+        work = stream.claim()
+        payload, _ = calculator.build(work)
+        stream.commit(work, payload, delay_ms=0)
+        return stream.events(owner, "page", cursors)[0]
+
+    assert publish()["type"] == "bars"
+    for offset in (600000, 660000):
+        with database.begin() as db:
+            correction(db, revision, seam + offset, 200001000 + offset)
+        event = publish()
+        assert event["bars"][-1]["start"] == seam + offset
+    assert event.get("loaded_before") == seam + 660000, \
+        "reconnecting clients need the accepted appended range credential"
+    consumer.update({key: event[key] for key in ("loaded_before", "history_revision", "initial_input_revision")})
+    consumer.update(cursor=seam + 660000, sequence=event["sequence"])
+    stream.register(owner, "page", "chart", 1, identity, serialized, consumer)
+    cursors = {}
+    with database.begin() as db:
+        correction(db, revision, seam + 600000, 201000000, "1.119")
+    event = publish()
+    assert event["type"] == "reset" and event["reason"] == "history_changed", \
+        "the loaded native range includes bars appended by SSE, not only the first HTTP response"
+
+
+def test_historical_window_credentials_do_not_expand_to_realtime_tail(database, monkeypatch):
+    composite, revision, seam = populated(database, monkeypatch)
+    owner = session(database)
+    query = DataQuery(instrument=composite, series_kind="composite", timeframe="M1", provisional=False)
+    identity, serialized = resolve(Subscription(client="page", listener="chart", generation=1,
+        kind="bars", query=query))
+    stream.register(owner, "page", "chart", 1, identity, serialized,
+        {"cursor": seam + 300000, "loaded_after": seam, "loaded_before": seam + 300000,
+         "initial_input_revision": 1, "historical": True})
+    calculator, cursors = Calculator(), {}
+    for offset in (600000, 660000, 720000, 780000):
+        work = stream.claim()
+        payload, _ = calculator.build(work)
+        stream.commit(work, payload, delay_ms=0)
+        assert stream.events(owner, "page", cursors)[0]["type"] == "status", \
+            "tail appends must not invalidate an unchanged historical window"
+        with database.begin() as db:
+            correction(db, revision, seam + offset, 200001000 + offset)
+    with database.begin() as db:
+        correction(db, revision, seam + 60000, 201000000, "1.119")
+    work = stream.claim()
+    payload, _ = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    assert stream.events(owner, "page", cursors)[0]["type"] == "reset", \
+        "corrections inside the unchanged historical window still require reload"

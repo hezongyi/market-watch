@@ -196,8 +196,18 @@ def commit(ownership, payload, *, delay_ms=500):
                     # metadata; emit current authoritative changed/new bars.
                     def prices(bar):
                         return {k: v for k, v in bar.items() if k not in ("input_revision", "segments")}
+
+                    def indicator_values(page):
+                        return {(indicator.get("id", index), series["key"], value["time"]): value
+                                for index, indicator in enumerate(page.get("indicators", []))
+                                for series in indicator["series"] for value in series["values"]}
+
+                    previous_values, values = indicator_values(task.payload), indicator_values(payload)
+                    indicator_changed = {key[2] for key in previous_values.keys() | values.keys()
+                                         if previous_values.get(key) != values.get(key)}
                     changed = [bar for bar in payload.get("bars", []) if
-                        bar["start"] not in old or prices(bar) != prices(old[bar["start"]])]
+                        bar["start"] not in old or prices(bar) != prices(old[bar["start"]])
+                        or bar["start"] in indicator_changed]
                     wire = {**payload, "bars": changed,
                             "recovery_floor": payload["bars"][0].get("chart_time", payload["bars"][0]["start"])
                                 if payload.get("bars") else None,
@@ -360,7 +370,10 @@ def delivery(db, task, sub, payload, cursors):
                 return {"type": "reset", "reason": "history_changed"}
     if check:
         previous = state.get("history_revision")
-        state["history_revision"] = check["revision"]
+        # The next comparison follows the loaded tail after this delivery.
+        # Advancing that boundary must not mistake normal appends for repairs.
+        state["history_revision"] = (check["revision"] if state.get("historical") else
+                                     check.get("next_revision", check["revision"]))
         if previous and previous != check["revision"]:
             return {"type": "reset", "reason": "history_changed"}
     progress = [(item.get("id"), min(item.get("cursor", 0), before or item.get("cursor", 0)),
@@ -384,6 +397,10 @@ def delivery(db, task, sub, payload, cursors):
     page["bars"] = [bar for bar in page.get("bars", []) if bar.get("chart_time", bar["start"]) >= cursor]
     if page["bars"]:
         state["cursor"] = page["bars"][-1].get("chart_time", page["bars"][-1]["start"])
+        state["loaded_before"] = page["bars"][-1]["start"]
+    for name in ("loaded_before", "history_revision", "initial_input_revision"):
+        if name in state:
+            page[name] = state[name]
     page.pop("latest_bar", None)
     return page
 

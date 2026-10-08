@@ -12,12 +12,12 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 
 ## 已执行验证
 
-- `unit-tests.txt`：116 passed、11 skipped（2026-10-09 修复检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复和 HTTP 权限。
+- `unit-tests.txt`：120 passed、12 skipped（2026-10-09 指标与加载范围修复检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复和 HTTP 权限。
 - `regression-tests.txt`：105 passed，既有 provider_service、market_data、managed_dataset、fixed_indicators 回归。
-- `node tests/advanced-market-stream.cjs`：实际 bridge 回调的世代/序号拒收、确认后极值缩小、报价交付、取消迟到回调与常态 tick 无行情请求；新增空首屏准备、HTTP 历史接受后的单次重注册、尾部撤回、拒收及窗口过滤凭据检查。
+- `node tests/advanced-market-stream.cjs`：实际 bridge 回调的世代/序号拒收、确认后极值缩小、报价交付、取消迟到回调与常态 tick 无行情请求；新增空首屏准备、HTTP 历史接受后的单次重注册、尾部撤回、拒收及窗口过滤凭据检查、Python 指标值交付。
 - `node tests/advanced-fixed-series.cjs` 与 `advanced-provider-subscriptions.cjs`：既有身份、首用边界、连接共享和取消顺序通过。
 - `npm run build`：TypeScript/Vite 构建通过；既有 chunk size 提示仍存在。
-- `test_market_stream_postgres.py`：11 skipped，未配置隔离 TEST_POSTGRES_URL；未运行的并发检查不算通过。
+- `test_market_stream_postgres.py`：12 skipped，未配置隔离 TEST_POSTGRES_URL；未运行的并发检查不算通过。
 - 新模块 Ruff、`node --check advanced-host/bridge.js`、`git diff --check` 通过；Alembic 单 head 为 `ar45_market_stream`。
 
 ## Ubuntu Docker 验收入口（尚未运行）
@@ -64,3 +64,9 @@ docker compose --env-file artifacts/unified-sse/compose.env \
 回放历史检查使用各条持久结果的尾部证据；完整保留窗口以外的断线游标要求 reset。最后订阅取消后，已领取任务的迟到提交会复核有效消费者并精确释放自己的需求；再次订阅时核对持久需求是否仍存在，避免续期节流阻止恢复采集。预警需求保留测试仍通过。
 
 这些测试使用本机 Python/Node 和 SQLite，不是 Docker 部署或真实图表/供应商验收。尚缺证据的清单仍有效。
+
+## 指标值与加载范围修复检查点
+
+OHLC 没有变化时，指标变化对应的柱仍进入增量事件，原生指标数据源由该柱驱动回调。实时加载范围随 SSE 追加推进，前缀修订凭据同步推进并由前端保留用于重连；历史窗口仍固定边界。实测复现/修复见 `indicator-range-fixes-20261009.md`。
+
+`advanced-fixed-indicators.cjs` 使用 Python 实际共享 worker 发布的指标完成 reset，驱动 bridge 重读并接受历史指标值；不是手写完成事件。`advanced-fixed-revisions.cjs`、`advanced-managed-revisions.cjs` 显式开启 `marketPolling=1` 验证保留的回退链路。上述三个测试，以及 `advanced-managed.cjs`、`advanced-python-indicators.cjs`、原有三个 SSE 测试均通过。前端构建、Ruff、JS syntax、diff check 通过；实际浏览器和 PostgreSQL 尚未运行。
