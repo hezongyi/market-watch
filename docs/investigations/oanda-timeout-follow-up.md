@@ -683,3 +683,13 @@ restart is therefore not claimed as healthy restoration. The isolated PG volume
 and failed evidence remain; no retire/finish or broad Docker cleanup occurred.
 
 A redacted, unsent supplier-support draft is prepared at `/tmp/market-watch-oanda-layer-findings-kxj4gjxb/supplier-evidence-draft.md`; no credentials or raw trace are included.
+
+Follow-up read-only verification at **05:18–05:19 UTC** confirmed Ubuntu
+debug/proxy exited, PostgreSQL healthy and the exclusive account lock free at
+the check. Production pricing was still running the original v1.14.1 image
+with the same 05:10:49 start time. A single repeatable-read, read-only transaction
+at **05:19:07 UTC** showed both symbols disconnected/unavailable at epoch 303,
+with recovery, quote and candle readiness false; the owner lease was invalid.
+No account request, service restart, configuration change or release was made
+during this verification. Production startup remains confirmed; healthy
+restoration remains unconfirmed.
