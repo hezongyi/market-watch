@@ -756,3 +756,71 @@ establish where missing source observations were generated or omitted. The
 instrumentation places the gap before the application's complete-record
 receive/filter boundary, not specifically outside the public-network exit.
 Market inactivity also does not explain failure to complete TLS.
+
+## Execution of the priority decision
+
+The user adopted
+`/tmp/market-watch-oanda-priority-handoff-25selfw1/decision-analysis.md`:
+pause EURUSD root-cause work, make REST concurrency a conditional fallback,
+monitor mature-stream faults and check path-attribution feasibility before any
+new account window. Its correction that production has no four-layer wrappers
+is preserved; publishing the runtime image would not enable those wrappers.
+
+Read-only path preparation on **2026-10-08 06:03–06:09 UTC** obtained current
+mihomo controller connection metadata, unraid network-namespace `ss` TCP_INFO
+and conntrack. Logical inbound tuples can be associated with inbound sockets,
+including NAT records; the controller provides no outbound local port/fd/inode
+pair linking each logical connection to a specific proxy exit socket.
+Destination IP remained absent. Its additional opaque `remoteDestination`
+field was not established as an exact socket peer and can be shared by multiple
+logical connections. There is no verified complete app/logical-proxy/exit-socket
+mapping. A short SSH/date bracket bounded remote clock offset to approximately
+[-24ms,+144ms] at that check; this is not a long-term synchronization guarantee.
+**Preparation stopped here: no 20-minute account window, extra provider request,
+route change, production pause or unraid debug instance.** REST fallback was not
+triggered merely by the earlier catalog failure.
+
+Current production was independently checked, not inferred from the old 05:19
+snapshot. At **06:03:52** and **06:11:05 UTC**, both symbols were disconnected
+and unavailable, with epoch 352 and invalid owner lease. The owner now had a
+persisted **unauthorized** fault. Stored confirmation/audit evidence identifies
+an unauthorized EURUSD confirmation at about **06:00:45**, followed by stream
+disconnection at **06:00:53 UTC**. Existing classification maps HTTP 401/403 to
+this outcome; the old retained logs do not identify the precise status code,
+response category or upstream/intermediary responsibility. Account/token/proxy
+configuration equals the previously successful verification configuration,
+which is not proof of current authorization validity.
+
+This explains the frozen epoch without treating it as a new timeout: existing
+`live_pricing.claim()` refuses `owner.error=unauthorized` even after next_at has
+elapsed. The preserved auth fence prevents a reconnect storm. An existing
+authenticated `POST /api/market-data/live/retry` operator action can reset expired
+configuration faults. It was **not called**, and no DB rows or credentials were
+edited. Releasing the local patch alone cannot clear this persisted hold.
+
+The initial preceding-20-minute log query found **17 generic timeout stream
+exits and 35 maintenance OperationalErrors**, without safe stages/SQLSTATE in
+this old release. These are counted log events, not assigned causes. A later
+three-sample read-only monitor at **06:16:15–06:16:28 UTC** confirmed the same
+unauthorized epoch/lease and unchanged per-symbol confirmed/published M1
+watermarks. Production deadlocks were **699 cumulative**, unchanged across
+those three samples; neither an attribution of all OperationalErrors to deadlock
+nor 699 new deadlocks is claimed.
+
+Reusable local read-only monitor and evidence:
+`/home/quant/repos/.production/mw-oanda-release-review-20261008/{capture_production_health.py,production-health-20261008.jsonl,path-preflight.json}`.
+The monitor streams read-only Python to the existing production container; it
+does not start market workers, provider requests or temporary unraid instances.
+
+A concrete fixed-source release artifact, image-only raw Compose proposal,
+configuration/content checks and rollback procedure were prepared on Ubuntu.
+See **[release review](oanda-release-review.md)**. The release-purpose image
+contains exactly the same 126 Python modules and dependency versions as the
+tested acceptance image. No account/timeout library/config changes or repeated
+acceptance tests were introduced. The proposed raw YAML preserves environment
+references and all 13 services, including the maintenance-profile backup.
+
+Formal production release remains unauthorized and unexecuted. The limited
+local repair delivery, current auth hold and failed strict freshness acceptance
+are separate decisions. No notification test, auth retry, task retirement or
+resource cleanup occurred. Task evidence and independent Ubuntu PG remain.
