@@ -1220,7 +1220,7 @@ function snapshot(manual = true) {
         schemaVersion: 1,
         state: {...state, _mwBarRangeMapping:barRangeMapping.snapshot(),
           _mwDrawingProjection: captureDrawingProjection(widget)},
-        theme: savedDoc.theme || "Dark",
+        theme: chartThemeName(widget.getTheme()) || "Dark",
         templates: savedDoc.templates || {},
       },
     }),
@@ -1253,6 +1253,16 @@ function boot(
     }
   }
   let grid;
+  let selectedTheme = chartInitialTheme(preferences, doc, chartState);
+  let pendingThemeState = chartState || {}, themeRestoring = false;
+  const restoreTheme = async () => {
+    if (pendingThemeState === undefined) return;
+    const state = pendingThemeState;
+    pendingThemeState = undefined;
+    themeRestoring = true;
+    try { await restoreChartTheme(widget, state, selectedTheme); }
+    finally { themeRestoring = false; }
+  };
   const pendingGridStyle = chartState?._mwGridStyle;
   let pendingBarRange = doc.state?._mwBarRangeMapping || chartState?._mwBarRangeMapping;
   let pendingViewports = storedViewports || chartState?._mwViewports;
@@ -1286,6 +1296,7 @@ function boot(
     delete chartState._mwGridStyle;
     delete chartState._mwBarRangeMapping;
     delete chartState._mwDrawingProjection;
+    delete chartState._mwTheme;
   }
   let viewportRestoring = false, workspaceLoadPause;
   const restoreViewports = async () => {
@@ -1389,6 +1400,7 @@ function boot(
       const state = await captureChartLayout(widget);
       alertBridge.persist(state);
       state._mwGridStyle = grid.value;
+      state._mwTheme = chartThemeName(widget.getTheme());
       state._mwBarRangeMapping = barRangeMapping.snapshot();
       state._mwDrawingProjection = captureDrawingProjection(widget);
       if (epoch !== workspaceEpoch || editRevision !== revision) {
@@ -1452,6 +1464,7 @@ function boot(
         throw Error("当前布局有未保存更改，请先保存布局再打开其他布局");
       }
       const state = JSON.parse(await loadContent(id));
+      pendingThemeState = state;
       alertBridge.reset(state);
       grid.restore(state._mwGridStyle);
       pendingBarRange = state._mwBarRangeMapping;
@@ -1463,6 +1476,9 @@ function boot(
       prepareLegacyViewports(state);
       delete state._mwViewports;
       delete state._mwSync;
+      // Keep the marker out of the native document but available for restore.
+      pendingThemeState = { _mwTheme: state._mwTheme };
+      delete state._mwTheme;
       return JSON.stringify(nativeLayoutContent(state, currentNativeWorkspace));
     } catch (e) {
       loading = false;
@@ -1550,11 +1566,7 @@ function boot(
       return null;
     },
     autosize: true,
-    theme:
-      preferences.find((p) => p.kind === "setting" && p.name === "mw.theme")
-        ?.content.value ||
-      doc.theme ||
-      "Dark",
+    theme: selectedTheme,
     saved_data: chartState,
     saved_data_meta_info: workspace
       ? { uid: workspace.id, name: workspace.name, description: workspace.name }
@@ -1592,6 +1604,7 @@ function boot(
     ],
   });
   widget.onChartReady(async () => {
+    await restoreTheme();
     globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
     syncCoordinator.refreshCharts();
@@ -1704,8 +1717,11 @@ function boot(
           })
           .catch(e => send({type: "error", error: "网格线样式恢复失败：" + String(e)}));
       }
-      if (readonly || !standard || onlyActive) return;
+      if (themeRestoring || !standard || onlyActive) return;
       const theme = String(name).toLowerCase() === "light" ? "Light" : "Dark";
+      selectedTheme = theme;
+      savedDoc.theme = theme;
+      if (readonly) return;
       prefs
         .savePreference("setting", "mw.theme", theme)
         .catch((e) =>
@@ -1789,6 +1805,8 @@ function boot(
     });
     widget.subscribe("chart_loaded", async () => {
       const epoch = workspaceEpoch;
+      await restoreTheme();
+      if (epoch !== workspaceEpoch) return;
       await restoreViewports();
       if (epoch !== workspaceEpoch) return;
       // load() emits chart_loaded again for the rebuilt single chart. Only that

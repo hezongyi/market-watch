@@ -1,0 +1,161 @@
+{
+  "environment": "Ubuntu isolated Docker; comparison with current native indicator dialog",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "Dark 1024: indicator → data center → search; native dialog style, frame and focus retained",
+      "reference": {
+        "surface": "rgb(31, 31, 31)",
+        "radius": "6px",
+        "shadow": "rgba(0, 0, 0, 0.4) 0px 2px 4px 0px",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(219, 219, 219)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600"
+      },
+      "actual": {
+        "surface": "rgb(31, 31, 31)",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(219, 219, 219)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600",
+        "selectedColor": "rgb(219, 219, 219)",
+        "controlColor": "rgb(219, 219, 219)",
+        "tableRadius": "0px",
+        "muted": "rgb(168, 168, 168)"
+      }
+    },
+    {
+      "name": "Dark 1440: indicator → data center → search; native dialog style, frame and focus retained",
+      "reference": {
+        "surface": "rgb(31, 31, 31)",
+        "radius": "6px",
+        "shadow": "rgba(0, 0, 0, 0.4) 0px 2px 4px 0px",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(219, 219, 219)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600"
+      },
+      "actual": {
+        "surface": "rgb(31, 31, 31)",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(219, 219, 219)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600",
+        "selectedColor": "rgb(219, 219, 219)",
+        "controlColor": "rgb(219, 219, 219)",
+        "tableRadius": "0px",
+        "muted": "rgb(168, 168, 168)"
+      }
+    },
+    {
+      "name": "Dark 1920: indicator → data center → search; native dialog style, frame and focus retained",
+      "reference": {
+        "surface": "rgb(31, 31, 31)",
+        "radius": "6px",
+        "shadow": "rgba(0, 0, 0, 0.4) 0px 2px 4px 0px",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(219, 219, 219)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600"
+      },
+      "actual": {
+        "surface": "rgb(31, 31, 31)",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(219, 219, 219)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600",
+        "selectedColor": "rgb(219, 219, 219)",
+        "controlColor": "rgb(219, 219, 219)",
+        "tableRadius": "0px",
+        "muted": "rgb(168, 168, 168)"
+      }
+    },
+    {
+      "name": "Light 1024: indicator → data center → search; native dialog style, frame and focus retained",
+      "reference": {
+        "surface": "rgb(255, 255, 255)",
+        "radius": "6px",
+        "shadow": "rgba(0, 0, 0, 0.2) 0px 2px 4px 0px",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(15, 15, 15)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600"
+      },
+      "actual": {
+        "surface": "rgb(255, 255, 255)",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(15, 15, 15)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600",
+        "selectedColor": "rgb(15, 15, 15)",
+        "controlColor": "rgb(15, 15, 15)",
+        "tableRadius": "0px",
+        "muted": "rgb(112, 112, 112)"
+      }
+    },
+    {
+      "name": "Light 1440: indicator → data center → search; native dialog style, frame and focus retained",
+      "reference": {
+        "surface": "rgb(255, 255, 255)",
+        "radius": "6px",
+        "shadow": "rgba(0, 0, 0, 0.2) 0px 2px 4px 0px",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(15, 15, 15)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600"
+      },
+      "actual": {
+        "surface": "rgb(255, 255, 255)",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(15, 15, 15)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600",
+        "selectedColor": "rgb(15, 15, 15)",
+        "controlColor": "rgb(15, 15, 15)",
+        "tableRadius": "0px",
+        "muted": "rgb(112, 112, 112)"
+      }
+    },
+    {
+      "name": "Light 1920: indicator → data center → search; native dialog style, frame and focus retained",
+      "reference": {
+        "surface": "rgb(255, 255, 255)",
+        "radius": "6px",
+        "shadow": "rgba(0, 0, 0, 0.2) 0px 2px 4px 0px",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(15, 15, 15)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600"
+      },
+      "actual": {
+        "surface": "rgb(255, 255, 255)",
+        "font": "-apple-system, BlinkMacSystemFont, \"Trebuchet MS\", Roboto, Ubuntu, sans-serif",
+        "ink": "rgb(15, 15, 15)",
+        "headerHeight": 68,
+        "titleSize": "20px",
+        "titleWeight": "600",
+        "selectedColor": "rgb(15, 15, 15)",
+        "controlColor": "rgb(15, 15, 15)",
+        "tableRadius": "0px",
+        "muted": "rgb(112, 112, 112)"
+      }
+    },
+    {
+      "name": "reload retains immediate adjacency after indicator"
+    }
+  ],
+  "errors": []
+}

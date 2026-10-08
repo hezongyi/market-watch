@@ -1,0 +1,157 @@
+{
+  "recorded_at": "2026-10-08T18:14:39.820745+00:00",
+  "host": "quant-server",
+  "environment": "Ubuntu 22.04 local Docker; isolated acceptance Compose network, PG volume, DB and ports",
+  "project": "mw-data-center-review-20261008",
+  "task_status": "in_progress; retained for user acceptance",
+  "url": "https://192.168.7.232:19943/advanced-charts",
+  "chart_origin": "https://192.168.7.232:19944",
+  "services": [
+    {
+      "name": "/mw-data-center-review-20261008-api-1",
+      "image": "sha256:1be1318f16a9001103ebc6ca281461a16d16b5cf3ab1ee97a26d3165c49c6f0c",
+      "status": "running",
+      "health": "healthy",
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "api",
+        "io.market-watch.built-at": "2026-10-08T16:18:33.056711+00:00",
+        "io.market-watch.commit": "f83ca062f0b7e04d22d7705d816438a62a3e101f",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-15T16:18:33.056711+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    },
+    {
+      "name": "/mw-data-center-review-20261008-chart-origin-1",
+      "image": "sha256:b2237a12e0f571605d9f57df260e5c466b34210a455437796b801922b89d7bac",
+      "status": "running",
+      "health": null,
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "chart-origin",
+        "io.market-watch.built-at": "2026-10-08T18:07:08.833332+00:00",
+        "io.market-watch.commit": "2b7f677810a856f7a0f349930619863e3f86a1b7",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-15T18:07:08.833332+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    },
+    {
+      "name": "/mw-data-center-review-20261008-composite-aggregate-worker-1",
+      "image": "sha256:1be1318f16a9001103ebc6ca281461a16d16b5cf3ab1ee97a26d3165c49c6f0c",
+      "status": "running",
+      "health": null,
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "composite-aggregate-worker",
+        "io.market-watch.built-at": "2026-10-08T16:18:33.056711+00:00",
+        "io.market-watch.commit": "f83ca062f0b7e04d22d7705d816438a62a3e101f",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-15T16:18:33.056711+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    },
+    {
+      "name": "/mw-data-center-review-20261008-history-worker-1",
+      "image": "sha256:1be1318f16a9001103ebc6ca281461a16d16b5cf3ab1ee97a26d3165c49c6f0c",
+      "status": "running",
+      "health": null,
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "history-worker",
+        "io.market-watch.built-at": "2026-10-08T16:18:33.056711+00:00",
+        "io.market-watch.commit": "f83ca062f0b7e04d22d7705d816438a62a3e101f",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-15T16:18:33.056711+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    },
+    {
+      "name": "/mw-data-center-review-20261008-native-history-worker-1",
+      "image": "sha256:1be1318f16a9001103ebc6ca281461a16d16b5cf3ab1ee97a26d3165c49c6f0c",
+      "status": "running",
+      "health": null,
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "native-history-worker",
+        "io.market-watch.built-at": "2026-10-08T16:18:33.056711+00:00",
+        "io.market-watch.commit": "f83ca062f0b7e04d22d7705d816438a62a3e101f",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-15T16:18:33.056711+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    },
+    {
+      "name": "/mw-data-center-review-20261008-pg-1",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "health": "healthy",
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "pg"
+      }
+    },
+    {
+      "name": "/mw-data-center-review-20261008-pricing-worker-1",
+      "image": "sha256:1be1318f16a9001103ebc6ca281461a16d16b5cf3ab1ee97a26d3165c49c6f0c",
+      "status": "running",
+      "health": null,
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "pricing-worker",
+        "io.market-watch.built-at": "2026-10-08T16:18:33.056711+00:00",
+        "io.market-watch.commit": "f83ca062f0b7e04d22d7705d816438a62a3e101f",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-15T16:18:33.056711+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    },
+    {
+      "name": "/mw-data-center-review-20261008-tls-1",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "health": null,
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "tls"
+      }
+    },
+    {
+      "name": "/mw-data-center-review-20261008-web-1",
+      "image": "sha256:a25342fe85381bff0f0ca22117e88c6682b1b091849d098c4652d14122ded459",
+      "status": "running",
+      "health": null,
+      "labels": {
+        "com.docker.compose.project": "mw-data-center-review-20261008",
+        "com.docker.compose.service": "web",
+        "io.market-watch.built-at": "2026-10-08T17:53:45.955937+00:00",
+        "io.market-watch.commit": "be763233f635bd9e0007f4904a6669bc4940cba1",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-15T17:53:45.955937+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    }
+  ]
+}

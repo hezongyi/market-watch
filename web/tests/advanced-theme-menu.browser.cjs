@@ -79,10 +79,17 @@ const output = process.env.THEME_MENU_OUTPUT || '/tmp/mw-theme-menu.json';
       await page.reload();
       ({frame, ui} = await chart());
       assert.equal((await frame.evaluate(() => widget.getTheme())).toLowerCase(), theme.toLowerCase());
+      const canvas = await frame.evaluate(() => new Promise(resolve => widget.save(state => resolve(
+        state.charts.map(chart => ({ background: chart.chartProperties.paneProperties.background,
+          textColor: chart.chartProperties.scalesProperties.textColor }))))));
+      for (const colors of canvas) {
+        assert.equal(colors.background.toLowerCase(), theme === 'Dark' ? '#0f0f0f' : '#ffffff', 'canvas must restore with toolbar theme');
+        assert.equal(colors.textColor.toLowerCase(), theme === 'Dark' ? '#b8b8b8' : '#0f0f0f', 'axis colors must restore with theme');
+      }
       await ui.getByRole('button', {name: /图表菜单/}).filter({visible: true}).click();
       assert.equal(await ui.getByRole('switch', {name: '暗色主题'}).getAttribute('aria-checked'), String(theme === 'Dark'));
       await page.keyboard.press('Escape');
-      report.cases.push({theme,menu_box:box,symbol_box:symbolBox,clicked:true,server_saved:true,reloaded:true});
+      report.cases.push({theme,menu_box:box,symbol_box:symbolBox,clicked:true,server_saved:true,reloaded:true,canvas});
     }
     // Exercise the same menu without a mouse, including Escape dismissal.
     const {ui} = await chart();

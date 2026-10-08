@@ -1,0 +1,9 @@
+PASS legacy white layout + remembered Dark restores canvas, axes, toolbar, host and data center together {}
+PASS Light: menu choice persists with layout autosave off {}
+PASS Dark: menu choice persists with layout autosave off {}
+PASS same-theme custom canvas, candle color and axis font survive native save/reload {}
+PASS unmarked custom canvas is preserved during legacy repair {}
+PASS in-place native layout load restores current theme with no iframe recreation {}
+PASS legacy dark two-chart layout restores Light across both panes {}
+PASS marked older layout restores the newer remembered theme across both panes {}
+PASS old native theme preference remains usable when mw.theme is absent {}
