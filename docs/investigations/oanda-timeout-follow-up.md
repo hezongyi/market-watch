@@ -536,3 +536,37 @@ Do not reuse `oanda_rest_final` or overwrite the preserved failure directories.
 The fresh-owner assertion deliberately rejects them. Confirm the account process
 has exited before stopping Ubuntu services and restoring the exact original
 production container. This operation is not production deployment authorization.
+
+
+## Minimal observation requested by the resumed plan
+
+The next requested plan is
+`/tmp/market-watch-oanda-remaining-handoff-0qyejpbu/analysis-resumed.md`.
+Current-session Ubuntu `sg docker` works and the task containers were actually
+rechecked; the prior read-only session's setgroups restriction did not recur.
+The debug sleep container is running for local synthetic tests while production
+pricing remains running. No account probe ran during those tests.
+
+New verification-only wrappers measure the original transport, content-decoded
+chunk, complete NDJSON, consumer/publish and per-symbol filtering stages without
+introducing a queue or changing timeout/data gates. They preserve the original
+stream iterator, HTTPX/socket classes and exceptions. Transport read counters
+separate plaintext CONNECT traffic from TLS-decrypted upstream reads; TLS here
+is inside the tunnel, not proof of a proxy-specific cause. Module semantics and
+synthetic scenarios are documented in the isolated observation README.
+
+The only product contract extension returns a bounded publish outcome after the
+fenced transaction exits successfully. The original combined old-source/sequence
+filter is split with old-source priority and exactly the same accept/reject set.
+The caller cannot count accepted before commit; an actual rollback raises instead.
+A new test failed for missing outcome before this addition. Real localhost
+header/body/fragment observer tests failed before instrumenting the network and
+then passed. **72 related source tests** passed; another selected run included
+real isolated PostgreSQL fencing/cooldown tests (11 total including pipeline
+tests). Ruff and diff check passed. These diagnostics are not a timeout cure.
+
+A new fixed image and targeted real attribution window follow only after review;
+previous failed final-window evidence is preserved. No dedicated controlled
+outlet is currently established, so first-response-header responsibility remains
+undetermined. A request for availability of such an outlet is pending; it does
+not block the independent local attribution work.

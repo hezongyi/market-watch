@@ -1,5 +1,47 @@
 # Isolated OANDA stream observation
 
+## Opt-in real-chain diagnostics
+
+`stream_observation.py` and `transport_observation.py` are verification-only
+wrappers for the original synchronous pipeline. They are not installed or
+enabled by the production worker. Enter `observe_pipeline(registry)` before
+starting the worker, and join every worker thread before exiting the context.
+The context restores original methods on exit; it does not change HTTP timeouts,
+readiness, quote freshness, subscription or pool lifecycle.
+
+`NetworkObservation` separates plaintext CONNECT reads from established TLS
+reads, even when a reused REST connection was negotiated in a previous request.
+It measures TLS-decrypted network-stream read returns (including HTTP framing),
+not kernel TCP arrival. `proxy.start_tls` means upstream TLS inside CONNECT; it
+does not assign responsibility to the proxy endpoint. Scope one observation per
+REST request/thread to avoid conflating concurrent confirmations with the stream.
+
+Pipeline snapshots separately count `iter_bytes()` outputs, complete NDJSON
+records, incomplete buffer bytes, yield/resume and publish timing. Per-symbol
+received counts start when PRICE records decode, before yield; accepted and
+mutually exclusive rejection counts advance only after `publish_event` returns
+from its transaction. Old source time takes precedence over old sequence when
+both apply. An exception, including rollback, is counted as an error; pending
+decoded records cancelled on close remain explicitly classified. The invariant
+is received = accepted + rejected + errors + pending. Heartbeats do not refresh
+quotes. No payload, price, URL, account identity or exception text is retained.
+
+`SnapshotRecorder` writes on an independent thread, records its scheduling delay
+and reports recorder failure. Business threads only update bounded in-memory
+aggregates; no file or log I/O occurs there. The registry keeps at most 16 recent
+epochs and exposes eviction rather than silently claiming complete evidence.
+Snapshots across layers are sampled, not one atomic network/DB transaction.
+
+Synthetic regressions in `test_transport_observation.py` and
+`test_stream_observation.py` exercise real localhost HTTPX/socket stalls, verified
+TLS and CONNECT failure, incomplete lines, slow consumption, committed filtering,
+rollback, fencing and early close. Synthetic tests shorten only their injected
+client deadlines; real-account windows retain connect=5/read=15. The real
+installed-image private harness and unique evidence directories are referenced
+in `docs/investigations/oanda-timeout-follow-up.md`.
+
+## Original synthetic-chain harness
+
 `run.py` runs inside the installed application image on Ubuntu. It redirects only
 the adapter's REST and stream destinations to a local synthetic HTTP server;
 HTTPX/httpcore streaming, the real worker, leases, minute confirmation, shared
