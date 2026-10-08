@@ -70,9 +70,10 @@ New isolated Ubuntu task/project `mw-oanda-timeout-20261008`, PostgreSQL 14 on
 `127.0.0.1:19750`, independent database/network/volume and synthetic credentials.
 Private Compose/env/logs are under
 `/home/quant/repos/.production/mw-oanda-timeout-20261008`. Builds use `mw-docker`.
-The prior completed acceptance project is not reused. Final image tests,
-production activation approval and the requested post-repair ten-minute window
-remain pending until their evidence is recorded here.
+The prior completed acceptance project is not reused. The user subsequently
+directed continued debugging and observation in isolation. Production activation
+is deferred; no production image or file is changed. The ten-minute isolated
+observation is running as described below.
 
 The installed acceptance image passed **65 PostgreSQL** and **119 SQLite/worker**
 tests (184 total, no skips); standards and spec reviews found no new issues.
@@ -85,3 +86,22 @@ runtime modules were verified loaded from installed site-packages. A concrete
 image-only backend Compose change and explicit rollback scripts are prepared
 privately. Activating production remains pending explicit authorization under
 AGENTS.md; no fixed release tag has been overwritten.
+
+## Continued isolated observation
+
+The real installed worker/HTTPX/PostgreSQL/publication/API chain is running on
+Ubuntu against a local synthetic supplier. The first response deliberately stalls
+before headers for 16 seconds; the second sends two quotes and a heartbeat, then
+stalls its response body. Both exceed the unmodified 15-second read timeout.
+The logged faults were `ReadTimeout phase=receive_headers records=0` at epoch 1
+and `ReadTimeout phase=receive_body records=3` at epoch 2. The worker automatically
+reconnected and restored both symbols to healthy at epoch 3.
+
+The separate 600-second steady observation started 2026-10-08 01:11:52 UTC
+(09:11:52 Singapore), after injection and recovery. It samples real authenticated
+API results and independent database queries every five seconds, without supplier
+connections or production data. The harness and reproduction instructions are
+in `docs/verification/oanda-stream-isolated/`. API address:
+`http://127.0.0.1:19751/readyz`; synthetic supplier: `127.0.0.1:19752`.
+These isolated results establish application recovery/lock behavior, not the cause
+or disappearance of the historical real-supplier timeout events.
