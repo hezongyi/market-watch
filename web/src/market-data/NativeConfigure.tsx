@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { api } from "../api";
+import { Link, useSearchParams, useDirtyForm, useActionLock } from "./router";
+import { OpenChart } from "./OpenChart";
+import { api } from "./api";
+import { centerReturn } from "./navigation";
 
 type Parameters = {
   price: "B" | "A" | "M";
@@ -23,7 +25,10 @@ export function NativeConfigure() {
   const [values, setValues] = useState(defaults);
   const [meta, setMeta] = useState<{ name: string; symbol: string } | null>(null);
   const [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(0);
   const [result, setResult] = useState<{ ticker: string; metadata: { name: string } } | null>(null);
+  const actionLock = useActionLock();
+  useDirtyForm("native-configure", values, `${meta?.symbol || ""}:${saved}`);
   useEffect(() => {
     const controller = new AbortController();
     setMeta(null); setResult(null); setError(""); setValues(defaults);
@@ -40,14 +45,14 @@ export function NativeConfigure() {
     setValues(current => ({ ...current, [key]: value })); setResult(null); setError("");
   }
   async function submit(event: React.FormEvent) {
-    event.preventDefault(); setBusy(true); setError("");
+    event.preventDefault(); if (!actionLock.acquire()) return; setBusy(true); setError("");
     try {
-      setResult(await api("/charts/provider/configure", { instrument, parameters: values }));
+      setResult(await api("/charts/provider/configure", { instrument, parameters: values })); setSaved(v => v + 1);
     } catch (e) { setError(String(e)); }
-    finally { setBusy(false); }
+    finally { actionLock.release(); setBusy(false); }
   }
   return <section className="data-center">
-    <Link to="/market-data?tab=platform">返回平台品种</Link>
+    <Link to={centerReturn(query, "/market-data?tab=platform")}>返回平台品种</Link>
     <h1>配置原生行情</h1>
     <p>{meta ? `${meta.name} · ${meta.symbol} · OANDA Practice` : "正在核对平台品种…"}</p>
     <p>直接读取 OANDA 返回的各周期原始柱。参数改变会使用独立配置和缓存。</p>
@@ -76,7 +81,7 @@ export function NativeConfigure() {
     </form>
     {error && <p role="alert" className="error">{error}。已填写的参数保留。</p>}
     {result && <div role="status"><p>配置已保存：{result.metadata.name}</p>
-      <Link className="dc-button primary" to={`/advanced-charts?platform=${encodeURIComponent(result.ticker)}`}>打开配置图表</Link>
+      <OpenChart ticker={result.ticker} frame="M1" label="打开配置图表" />
     </div>}
   </section>;
 }

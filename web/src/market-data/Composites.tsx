@@ -5,9 +5,10 @@ import {
   useNavigate,
   useParams,
   useSearchParams,
-} from "react-router-dom";
-import { api, type Bar } from "../api";
-import Chart from "../Chart";
+} from "./router";
+import { api } from "./api";
+import { OpenChart } from "./OpenChart";
+import { useCenter, useDirtyForm, useMounted, useActionLock } from "./router";
 import { Feedback, Pager } from "./Center";
 import { CompositeRevisions } from "./CompositeRevisions";
 import { useSnapshot } from "./useSnapshot";
@@ -95,8 +96,10 @@ export function CompositeList() {
   const [refresh, setRefresh] = useState(0),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
-  const navigate = useNavigate(),
-    client = useRef(clientId());
+  const { apply } = useCenter();
+  const mounted = useMounted();
+  const actionLock = useActionLock();
+  const client = useRef(clientId());
   const mode = params.get("view") === "candidates" ? "candidates" : "existing",
     query = params.get("query") || "",
     page = Math.max(1, Number(params.get("page")) || 1);
@@ -112,6 +115,7 @@ export function CompositeList() {
     setParams(next);
   }
   async function open(dataset: string, mapping: string) {
+    if (!actionLock.acquire()) return;
     setBusy(true);
     setError("");
     try {
@@ -120,10 +124,11 @@ export function CompositeList() {
         mapping_id: mapping,
         client: client.current,
       });
-      navigate(centerLink(`/market-data/composites/${row.id}?section=chart`, params));
+      if (mounted.current) await apply(`MWC:${row.id}`, "M1");
     } catch (e) {
       setError(String(e));
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
@@ -188,7 +193,7 @@ export function CompositeList() {
                       const row = item as Candidate,
                         d = row.dataset;
                       return (
-                        <tr key={d.id}>
+                        <tr key={d.id} id={`candidate-${d.id}`} tabIndex={-1}>
                           <td>
                             {d.logical_symbol}
                             <small>
@@ -208,12 +213,12 @@ export function CompositeList() {
                           <td>
                             <div className="dc-actions">
                               {row.status === "needs_maintenance" ? (
-                                <Link to={`/market-data/datasets/${d.id}`}>
+                                <Link to={centerLink(`/market-data/datasets/${d.id}`, params, `candidate-${d.id}`)}>
                                   去维护
                                 </Link>
                               ) : (
                                 <Link
-                                  to={`/market-data/datasets/${d.id}/mapping`}
+                                  to={centerLink(`/market-data/datasets/${d.id}/mapping`, params, `candidate-${d.id}`)}
                                 >
                                   配置实时来源
                                 </Link>
@@ -291,6 +296,7 @@ export function CompositeList() {
 export function MappingForm() {
   const { id } = useParams(),
     navigate = useNavigate();
+  const [params] = useSearchParams();
   const [targetQuery, setTargetQuery] = useState(""),
     [catalogPage, setCatalogPage] = useState(1),
     [catalogRefresh, setCatalogRefresh] = useState(0);
@@ -313,7 +319,9 @@ export function MappingForm() {
     [reviewed, setReviewed] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  useDirtyForm("mapping", [code, underlying, currency, historicalProduct, liveProduct, relationship, historicalEvidence, liveEvidence, rationale, reviewed]);
   const errorRef = useRef<HTMLParagraphElement>(null);
+  const actionLock = useActionLock();
   useEffect(() => {
     if (error) errorRef.current?.focus();
   }, [error]);
@@ -329,6 +337,7 @@ export function MappingForm() {
   ];
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (!actionLock.acquire()) return;
     setBusy(true);
     setError("");
     try {
@@ -347,17 +356,18 @@ export function MappingForm() {
         },
       });
       navigate(
-        `/market-data?tab=composite&view=candidates&query=${encodeURIComponent(dataset.data?.logical_symbol || "")}`,
+        `/market-data?tab=composite&view=candidates&query=${encodeURIComponent(dataset.data?.logical_symbol || "")}`, {saved: true},
       );
     } catch (e) {
       setError(String(e));
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
   return (
     <section className="data-center">
-      <Link to="/market-data?tab=composite&view=candidates">返回组合候选</Link>
+      <Link to={centerReturn(params, "/market-data?tab=composite&view=candidates")}>返回组合候选</Link>
       <h1>配置实时来源</h1>
       <Feedback
         error={dataset.error || catalog.error}
@@ -415,7 +425,7 @@ export function MappingForm() {
               change={setCatalogPage}
             />
           )}
-          <form onSubmit={save} className="dc-form">
+          <form onSubmit={save} className="dc-form" inert={busy}>
             {error && (
               <p ref={errorRef} tabIndex={-1} role="alert" className="error">
                 {error}
@@ -539,7 +549,7 @@ export function MappingForm() {
               <button className="primary" disabled={busy || !catalog.data}>
                 保存映射版本
               </button>
-              <Link to="/market-data?tab=composite&view=candidates">取消</Link>
+              <Link to={centerReturn(params, "/market-data?tab=composite&view=candidates")}>取消</Link>
             </div>
           </form>
         </>
@@ -553,53 +563,16 @@ export function CompositeDetail() {
     [params, setParams] = useSearchParams();
   const [refresh, setRefresh] = useState(0),
     [error, setError] = useState("");
-  const client = useRef(clientId()),
-    section = params.get("section") || "overview",
-    frame = params.get("frame") || "M1",
-    before = params.get("before");
+  const section = params.get("section") || "overview", frame = params.get("frame") || "M1";
   const result = useSnapshot<Composite>(
       `/market-data/composites/${id}`,
       refresh,
     ),
     row = result.data;
-  const page = useSnapshot<{
-    bars: Bar[];
-    next_before: number | null;
-    revision_id: string;
-    input_revision: number;
-    pending: string[];
-  }>(
-    row && section === "chart"
-      ? `/market-data/composites/${id}/chart?timeframe=${frame}&count=300&provisional=true${before ? `&before=${before}` : ""}`
-      : null,
-    refresh,
-  );
   const requests = useSnapshot<Page<any>>(
     row && section === "seam" ? `/market-data/composites/${id}/requests` : null,
     refresh,
   );
-  useEffect(() => {
-    if (!row || section !== "chart") return;
-    const abort = new AbortController();
-    const renew = () =>
-      api(
-        "/market-data/composites/use",
-        {
-          dataset_id: row.dataset_id,
-          mapping_id: row.mapping.id,
-          client: client.current,
-        },
-        abort.signal,
-      ).catch((e) => {
-        if (!abort.signal.aborted) setError(String(e));
-      });
-    void renew();
-    const timer = setInterval(renew, 60000);
-    return () => {
-      abort.abort();
-      clearInterval(timer);
-    };
-  }, [row?.id, section]);
   function select(key: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(key, value);
@@ -624,12 +597,11 @@ export function CompositeDetail() {
                 {phase(row.calendar)}
               </p>
             </div>
-            <button onClick={() => setRefresh((v) => v + 1)}>刷新</button>
+            <div className="dc-actions"><OpenChart ticker={`MWC:${row.id}`} frame={frame} label="打开组合图表" /><button onClick={() => setRefresh((v) => v + 1)}>刷新</button></div>
           </div>
           <nav className="dc-tabs" aria-label="组合详情页签">
             {[
               ["overview", "概览"],
-              ["chart", "打开组合图表"],
               ["seam", "接续与修订"],
               ["usage", "使用与健康"],
             ].map(([key, label]) => (
@@ -705,113 +677,7 @@ export function CompositeDetail() {
               </Link>
             </>
           )}
-          {section === "chart" && (
-            <>
-              <div className="dc-filters">
-                <label>
-                  周期
-                  <select
-                    aria-label="周期"
-                    value={frame}
-                    onChange={(e) => select("frame", e.target.value)}
-                  >
-                    {frames.map((f) => (
-                      <option key={f}>{f}</option>
-                    ))}
-                  </select>
-                </label>
-                {before && (
-                  <button
-                    onClick={() => {
-                      const next = new URLSearchParams(params);
-                      next.delete("before");
-                      setParams(next);
-                    }}
-                  >
-                    返回最新
-                  </button>
-                )}
-                <button
-                  disabled={!page.data?.next_before}
-                  onClick={() =>
-                    select("before", String(page.data?.next_before))
-                  }
-                >
-                  更早历史
-                </button>
-              </div>
-              <p>
-                打开图表会维持临时行情需求，关闭后按租约和宽限释放。当前未确认分钟来自采样流。
-              </p>
-              <Feedback
-                error={page.error}
-                loading={page.loading}
-                empty={!page.data}
-              />
-              {page.data?.pending.map((reason) => (
-                <p key={reason} role="status">
-                  {reason}
-                </p>
-              ))}
-              {page.data && (
-                <>
-                  <details className="dc-source">
-                    <summary>查看输入版本依据</summary>
-                    <p>
-                      固定组合修订 {page.data.revision_id} · 输入修订{" "}
-                      {page.data.input_revision}
-                    </p>
-                  </details>
-                  <Chart
-                    key={`${id}-${frame}`}
-                    bars={page.data.bars}
-                    precision={row.precision}
-                  />
-                  <div className="table-scroll">
-                    <table>
-                      <caption>最近20根柱的确认、覆盖与接缝事实</caption>
-                      <thead>
-                        <tr>
-                          <th>UTC起点</th>
-                          <th>时间结束</th>
-                          <th>来源确认</th>
-                          <th>覆盖完整</th>
-                          <th>接缝</th>
-                          <th>量口径</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {page.data.bars.slice(-20).map((b: any) => (
-                          <tr key={b.start}>
-                            <td>{time(b.start)}</td>
-                            <td>{b.time_closed ? "是" : "否"}</td>
-                            <td>{b.source_confirmed ? "是" : "临时观察"}</td>
-                            <td>
-                              {b.coverage_complete
-                                ? "是"
-                                : `未知 ${b.unknown_minutes ?? "—"} 分钟`}
-                            </td>
-                            <td>
-                              {b.seam_crossing
-                                ? "跨接缝"
-                                : b.seam_at_start
-                                  ? "接续首柱"
-                                  : "—"}
-                            </td>
-                            <td>
-                              {b.mixed_source
-                                ? "跨源总量为空"
-                                : `${b.volume_kind} · ${b.volume_unit || "—"}`}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
-            </>
-          )}
+          {section === "chart" && <div className="dc-fields"><label>周期<select value={frame} onChange={e => select("frame", e.target.value)}>{frames.map(f => <option key={f}>{f}</option>)}</select></label><OpenChart ticker={`MWC:${row.id}`} frame={frame} /></div>}
           {section === "seam" && (
             <>
               <CompositeRevisions key={id} id={id!} active={row.active_revision_id} onChanged={()=>setRefresh(value=>value+1)}/>

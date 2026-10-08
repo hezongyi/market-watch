@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "./router";
 
 /** Preserve the originating center filter/page and a stable row on return. */
 export function centerLink(path: string, params: URLSearchParams, row?: string) {
@@ -18,6 +18,7 @@ export function centerReturn(params: URLSearchParams, fallback = "/market-data")
 
 export function useCenterRowRestore(snapshot: unknown) {
   const location = useLocation(), restored = useRef(false);
+  useEffect(() => { restored.current = false; }, [location.pathname, location.search, location.hash]);
   useEffect(() => {
     if (restored.current || !snapshot) return;
     const target = location.hash ? document.getElementById(location.hash.slice(1)) : null;

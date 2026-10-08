@@ -1,7 +1,7 @@
 import { centerReturn } from "./navigation";
 import { useRef, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { api, ApiError } from "../api";
+import { Link, useNavigate, useSearchParams, useDirtyForm, useActionLock } from "./router";
+import { api, ApiError } from "./api";
 import { frames, names, phase, time, type Dataset } from "./types";
 import { useSnapshot } from "./useSnapshot";
 import { Feedback, Pager } from "./Center";
@@ -31,7 +31,9 @@ export function DatasetCreate() {
     [frequency, setFrequency] = useState("daily");
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
+  useDirtyForm("dataset-create", [source, symbol, logical, asset, calendar, precision, day, periods, frequency]);
   const request = useRef(crypto.randomUUID());
+  const actionLock = useActionLock();
   const errorBox = useRef<HTMLDivElement>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
   const [uncertain, setUncertain] = useState(false);
@@ -126,7 +128,7 @@ export function DatasetCreate() {
     setStep(step + 1);
   }
   async function submit() {
-    if (boundary === null) return;
+    if (boundary === null || !actionLock.acquire()) return;
     setBusy(true); setError(""); setFieldErrors({});
     const body = pendingBody.current || {
       request_id: request.current,
@@ -146,13 +148,13 @@ export function DatasetCreate() {
       // read before permitting another POST with the same idempotency key.
       if (needsLookup.current) {
         const known = await lookup();
-        if (known.found && known.dataset) { navigate(`/market-data/datasets/${known.dataset.id}`); return; }
+        if (known.found && known.dataset) { navigate(`/market-data/datasets/${known.dataset.id}`, {saved: true}); return; }
         needsLookup.current = false; setUncertain(false);
       }
       pendingBody.current = body;
       try {
         const result = await api<{dataset: Dataset}>("/market-data/center/datasets", body);
-        navigate(`/market-data/datasets/${result.dataset.id}`);
+        navigate(`/market-data/datasets/${result.dataset.id}`, {saved: true});
       } catch (e) {
         if (e instanceof ApiError && e.status >= 400 && e.status < 500) {
           pendingBody.current = null; fail(String(e)); return;
@@ -160,12 +162,12 @@ export function DatasetCreate() {
         needsLookup.current = true; setUncertain(true);
         try {
           const known = await lookup();
-          if (known.found && known.dataset) { navigate(`/market-data/datasets/${known.dataset.id}`); return; }
+          if (known.found && known.dataset) { navigate(`/market-data/datasets/${known.dataset.id}`, {saved: true}); return; }
           fail("尚未查到创建结果。再次操作会先核查，再使用同一提交标识重试。");
         } catch { fail("创建结果暂无法核实，请核查创建结果后继续；已保留本次提交内容。"); }
       }
     } catch (e) { fail("创建结果核查失败，请稍后重试。" + String(e)); }
-    finally { setBusy(false); }
+    finally { actionLock.release(); setBusy(false); }
   }
   return (
     <section className="data-center dc-form">
@@ -189,7 +191,7 @@ export function DatasetCreate() {
         <div className="dc-fields">
           <label>
             来源
-            <select
+            <select aria-label="来源"
               value={source}
               onChange={(e) => {
                 setSource(e.target.value);

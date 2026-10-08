@@ -2,7 +2,7 @@ FROM node:22-bookworm-slim AS assets
 WORKDIR /assets
 COPY index.html build-assets.mjs patch-native-reserve.mjs native-reserve.js native-navigation.js bar-range-mapping.js series.js series-picker.js series-picker.css drawing-projection.js chart-alerts.js bridge.js indicators.js indicator-picker.js indicator-picker.css preferences.js chart-style.js chart-autosave.js workspaces.js watchlists.js sync-coordinator.js range-sync.js viewports.js history-demand.js progressive-history.js chart-account.js sync-settings.js chart-menu.js chart-menu.css ./
 COPY charting_library/ ./charting_library/
-COPY chart-maximize.js ./
+COPY chart-maximize.js data-center.js ./
 ARG NATIVE_RESERVE_ENABLED=true
 ENV NATIVE_RESERVE_ENABLED=${NATIVE_RESERVE_ENABLED}
 RUN if [ "$NATIVE_RESERVE_ENABLED" = "true" ]; then node patch-native-reserve.mjs; \

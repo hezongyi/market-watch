@@ -3,6 +3,7 @@ import {
   type HistoryCapabilities,
 } from "./nativeHistoryLoads";
 import { useEffect, useRef, useState } from "react";
+import { centerLocation } from "../market-data/location";
 import { api, apiErrorDetails } from "../api";
 import "./advanced.css";
 import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
@@ -78,6 +79,8 @@ export default function AdvancedWorkspace() {
   const frame = useRef<HTMLIFrameElement>(null),
     current = useRef<Workspace | null>(null);
   const unsaved = useRef(false);
+  const centerSession = useRef<string | null>(null);
+  const deepCenter = useRef(new URLSearchParams(location.search).get("data_center"));
   const flushWaiters = useRef<
     { resolve: () => void; reject: (e: Error) => void }[]
   >([]);
@@ -208,7 +211,10 @@ export default function AdvancedWorkspace() {
           history.replaceState(null, "", location.pathname);
           return [row];
         })
-      : refresh(1);
+      : refresh(1).then(async list => {
+          if (!list.length && deepCenter.current) return [await api<Workspace>("/advanced-charts/workspaces", {name: "图表工作区"})];
+          return list;
+        });
     opening
       .then((list) => {
         if (!cancelled) {
@@ -247,6 +253,14 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
+        centerSession.current = m.open === true ? m.session : null;
+        if (m.open) { setAlertsOpen(false); setCapacityDialog(null); setExportSelection(null); }
+        return;
+      }
+      if (m.type === "data-center-replay" && m.session === centerSession.current && /^\/replay(?:\?dataset_version=[a-f0-9-]{36})?$/.test(m.path)) {
+        location.assign(m.path); return;
+      }
       if (m.type === "chart-alert-context") {
         if (mobile || !validAlertContext(m.context, current.current?.id)) return;
         setAlertContext(m.context); setAlertsOpen(true);
@@ -547,7 +561,7 @@ export default function AdvancedWorkspace() {
           setExportSelection(value);
       } else if (m.type === "workspace-action") {
         if (m.action === "home") location.assign("/");
-        else if (m.action === "market-data") location.assign("/market-data");
+
         else if (m.action === "logout") {
           try {
             if (!mobile && unsaved.current) await flush();
@@ -563,6 +577,11 @@ export default function AdvancedWorkspace() {
           setChartTheme(m.theme.toLowerCase());
       } else if (m.type === "ready") {
         setNativeReady(true);
+        if (deepCenter.current) {
+          reply({type: "data-center-open", location: centerLocation(deepCenter.current)});
+          deepCenter.current = null;
+          const url = new URL(location.href); url.searchParams.delete("data_center"); history.replaceState(null, "", url.pathname + url.search);
+        }
         setStatus("已加载 · 行情每15秒检查");
       } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
@@ -1259,7 +1278,7 @@ export default function AdvancedWorkspace() {
           title="专业图表工作区"
           data-workspace-id={active.id}
           src={`${origin}/?parent=${encodeURIComponent(location.origin)}`}
-          sandbox="allow-scripts allow-same-origin allow-downloads"
+          sandbox="allow-scripts allow-same-origin allow-downloads allow-forms"
           allowFullScreen
           referrerPolicy="no-referrer"
         />

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState, lazy, Suspense } from 
 import { createRoot } from "react-dom/client";
 import {
   BrowserRouter,
+  Navigate,
   NavLink,
   Route,
   Routes,
@@ -38,7 +39,8 @@ import {
 } from "./api";
 import "./style.css";
 import AdvancedWorkspacePage from "./advanced/AdvancedWorkspace";
-import MarketDataPage from "./market-data/Center";
+import DataCenterWindow from "./market-data/Window";
+import { centerLocation } from "./market-data/location";
 import SeriesPicker, { type QualifiedSeries } from "./market-data/SeriesPicker";
 
 const names: Record<string, string> = {
@@ -140,6 +142,8 @@ function App() {
         </section>
       </main>
     );
+  if (appLocation.pathname === "/chart-data-center") return <DataCenterWindow />;
+  if (appLocation.pathname.startsWith("/market-data")) return <Navigate replace to={`/advanced-charts?data_center=${encodeURIComponent(centerLocation(appLocation.pathname + appLocation.search + appLocation.hash))}`} />;
   if (appLocation.pathname === "/advanced-charts")
     return <Suspense fallback={<div className="loading">正在加载专业图表…</div>}><AdvancedWorkspacePage /></Suspense>;
   if (appLocation.pathname.startsWith("/chart-workspaces"))
@@ -253,7 +257,6 @@ function Shell({ logout }: { logout: () => void }) {
             ["/advanced-charts", "专业图表（验证版）", Square],
             ["/signals", "信号中心", Bell],
             ["/replay", "历史演练", Clock3],
-            ["/market-data", "数据中心", Radio],
             ["/settings", "提醒与设置", Settings2],
           ].map(([path, label, Icon]: any) => (
             <NavLink key={path} end={path === "/"} to={path}>
@@ -323,7 +326,6 @@ function Shell({ logout }: { logout: () => void }) {
             </div>
           )}
           <Routes>
-            <Route path="/market-data/*" element={<MarketDataPage/>}/>
             <Route
               path="/"
               element={
@@ -1132,14 +1134,14 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
           </button>
           {inputMode==='legacy'&&<button type="button" className="secondary" disabled={busy||!start||!end} onClick={importHistory}>补齐所选历史</button>}
         </form>
-        {inputMode==='history'&&!selectedHistory&&<p>回测使用自建历史。选择来源和日界后，再明确选择发布版本及区间；<a href="/market-data">去数据中心维护历史</a>。</p>}
+        {inputMode==='history'&&!selectedHistory&&<p>回测使用自建历史。选择来源和日界后，再明确选择发布版本及区间；请从图表顶部的数据中心维护历史。</p>}
         {inputMode==='legacy'&&<p>保留旧版历史及演练绑定；该入口不替代自建行情的固定版本回测。</p>}
         {fixedDataset&&<div aria-live="polite">
           <p>固定历史 · {fixedDataset.identity.source==='oanda'?'OANDA':fixedDataset.identity.source==='dukascopy'?'Dukascopy':fixedDataset.identity.source} · {fixedDataset.aggregation_calendar==='ny17'?'NY17':'UTC 00:00'}。演练保留所选版本和周期；未观察区间仍可能存在缺口。</p>
           {datasetVersion&&historyVersions.filter(v=>v.id===datasetVersion).map(v=><p key={v.id}>所选固定版本：{date(v.start)} — {date(v.end)} · {v.id.slice(0,8)}</p>)}
           {datasetVersion&&(periodsLoading?<p>正在核对回测周期…</p>:periodsError?<p role="alert">{periodsError}</p>:missingPeriods.length?<p>等待准备：{missingPeriods.join('、')}。D1 用于前日数据。</p>:<p>回测周期与前日数据已发布。</p>)}
           {datasetVersion&&missingPeriods.length>0&&!periodsLoading&&<button type="button" className="secondary" disabled={preparingPeriods} onClick={prepareReplayPeriods}>{preparingPeriods?'正在提交…':'准备回测周期'}</button>}
-          <a href={`/market-data/datasets/${fixedDataset.id}`}>查看历史覆盖与维护</a>
+          <span>请从图表顶部的数据中心查看历史覆盖与维护。</span>
         </div>}
       </section>
       {jobSummary?.weekly_requests?.length>0&&<section className="panel">

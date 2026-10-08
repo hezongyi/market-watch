@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link, Route, Routes, useSearchParams } from "react-router-dom";
-import { api } from "../api";
+import { Link, useLocation, useSearchParams, useActionLock } from "./router";
+import { OpenChart } from "./OpenChart";
+import { api } from "./api";
 import { DatasetDetail } from "./DatasetDetail";
 import { DatasetCreate } from "./DatasetCreate";
 import { CompositeDetail, CompositeList, MappingForm } from "./Composites";
@@ -61,7 +62,7 @@ export function Pager({
     </nav>
   );
 }
-function CenterList() {
+export function CenterList() {
   const [params, setParams] = useSearchParams(),
     [refresh, setRefresh] = useState(0),
     [notice, setNotice] = useState("");
@@ -86,10 +87,10 @@ function CenterList() {
   const endpoint =
     tab === "tasks" ? "tasks" : tab === "platform" ? "platform" : "datasets";
   const result = useSnapshot<Page<any>>(
-    tab === "composite" ? null : `/market-data/center/${endpoint}?${key}`,
+    ["composite", "sources"].includes(tab) ? null : `/market-data/center/${endpoint}?${key}`,
     refresh,
   );
-  const sources = useSnapshot<any[]>("/market-data/sources");
+
   function filter(name: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(name, value);
@@ -99,50 +100,11 @@ function CenterList() {
   const items = result.data?.items || [];
   useCenterRowRestore(result.data);
   return (
-    <section className="data-center">
+    <section className="data-center dc-list">
       <div className="dc-heading">
-        <div>
-          <h1>数据中心</h1>
-          <p>维护回测历史，查看来源与组合行情。</p>
-        </div>
-        <Link className="primary dc-button" to={centerLink("/market-data/datasets/new", params)}>
-          添加自建行情
-        </Link>
+        <h1>{{ managed: "自建行情", platform: "平台品种", composite: "组合行情", tasks: "任务与记录" }[tab] || "自建行情"}</h1>
+        {tab === "managed" && <Link className="primary dc-button" to={centerLink("/market-data/datasets/new", params)}>添加行情</Link>}
       </div>
-      <nav className="dc-tabs" aria-label="数据中心分区">
-        {[
-          ["managed", "自建行情"],
-          ["platform", "平台品种"],
-          ["composite", "组合行情"],
-          ["tasks", "任务与记录"],
-        ].map(([key, label]) => (
-          <Link
-            key={key}
-            aria-current={tab === key ? "page" : undefined}
-            to={`/market-data?tab=${key}`}
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
-      <details className="dc-source" open={params.get("connection") === "oanda" || undefined}>
-        <summary>来源状态与能力</summary>
-        <p>此处显示已接入能力；连接和实际历史范围仍按品种查询结果判断。</p>
-        {sources.data?.map((s) => (
-          <p key={s.source}>
-            {names[s.source] || s.source}：原生周期{" "}
-            {s.native_periods.join("、") || "尚未接入"}；M1 历史
-            {s.history_m1 ? "支持" : "未开放"}；实时流
-            {s.stream ? "支持" : "未开放"}
-          </p>
-        ))}
-        <p>OANDA Practice 连接由管理员在部署配置中维护。授权异常时核对账户环境与访问授权，更新连接后重试失败范围；此处不显示账户或密钥。</p>
-        <Feedback
-          error={sources.error}
-          loading={sources.loading}
-          empty={!sources.data}
-        />
-      </details>
       {tab === "managed" && (
         <nav className="dc-filters" aria-label="自建状态">
           {[
@@ -184,7 +146,7 @@ function CenterList() {
           {(
             <label>
               来源
-              <select
+              <select aria-label="来源"
                 value={source}
                 onChange={(e) => filter("source", e.target.value)}
               >
@@ -323,11 +285,7 @@ function CenterList() {
                           <Link to={centerLink(`/market-data/datasets/${d.id}`, params, `dataset-${d.id}`)}>查看</Link>
                           {d.latest_version_id &&
                             d.usable_timeframes.length > 0 && (
-                              <Link
-                                to={centerLink(`/market-data/datasets/${d.id}?section=chart`, params, `dataset-${d.id}`)}
-                              >
-                                打开历史图表
-                              </Link>
+                              <OpenChart ticker={`MWH:${d.periods.find(p => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`} frame={d.usable_timeframes[0]} />
                             )}
                         </td>
                       </tr>
@@ -365,7 +323,7 @@ function CenterList() {
                             {taskError(t.error, t.status)}
                             <details><summary>技术错误详情</summary><code>{t.error}</code>
                               <p>仅显示安全错误类型，不显示凭据或供应商响应内容。</p></details>
-                            {t.status === "configuration_error" && <Link to="/market-data?tab=tasks&connection=oanda">查看连接配置说明</Link>}
+                            {t.status === "configuration_error" && <Link to="/market-data?tab=sources&connection=oanda">查看连接配置说明</Link>}
                           </> : "—"}
                         </td>
                         <td>
@@ -381,7 +339,7 @@ function CenterList() {
                     ))}
                   {tab === "platform" &&
                     items.map((p) => (
-                      <tr key={p.id}>
+                      <tr key={p.id} id={`platform-${p.id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`} tabIndex={-1}>
                         <td>
                           <strong>{p.label}</strong>
                           <span>
@@ -399,19 +357,17 @@ function CenterList() {
                         <td>{time(p.updated_at)}</td>
                         <td>
                           {p.available && p.capabilities.native_periods.length > 0 && (
-                            <Link to={`/advanced-charts?platform=${encodeURIComponent(`MWP:${p.id}`)}`}>
-                              打开平台图表
-                            </Link>
+                            <OpenChart ticker={`MWP:${p.id}`} frame={p.capabilities.native_periods.includes("H1") ? "H1" : p.capabilities.native_periods[0]} label="打开平台图表" />
                           )}
                           {p.available && p.source === "oanda" && (
-                            <Link to={`/market-data/platform/configure?instrument=${encodeURIComponent(p.id)}`}>
+                            <Link to={centerLink(`/market-data/platform/configure?instrument=${encodeURIComponent(p.id)}`, params, `platform-${p.id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`)}>
                               配置原生参数
                             </Link>
                           )}
                           {p.capabilities.history_m1 &&
                             (!p.logical_symbol || p.logical_symbol.length <= 10) && (
                             <Link
-                              to={`/market-data/datasets/new?source=${p.source}&symbol=${encodeURIComponent(p.provider_symbol)}${p.history_precision == null ? "" : `&precision=${p.history_precision}`}`}
+                              to={centerLink(`/market-data/datasets/new?source=${p.source}&symbol=${encodeURIComponent(p.provider_symbol)}${p.history_precision == null ? "" : `&precision=${p.history_precision}`}`, params, `platform-${p.id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`)}
                             >
                               添加为自建行情
                             </Link>
@@ -450,7 +406,9 @@ export function TaskActions({
   onError: (e: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
+  const actionLock = useActionLock();
   async function action(value: string) {
+    if (!actionLock.acquire()) return;
     setBusy(true);
     try {
       await api(`/market-data/tasks/${task.id}/control`, { action: value });
@@ -458,6 +416,7 @@ export function TaskActions({
     } catch (e) {
       onError(String(e));
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
@@ -483,15 +442,23 @@ export function TaskActions({
     </div>
   );
 }
+export function Sources() {
+  const result = useSnapshot<any[]>("/market-data/sources");
+  return <section className="data-center"><h1>来源与能力</h1>
+    <p>已接入能力与实际连接健康分别判断；此处不推测连接状态。</p>
+    <Feedback error={result.error} loading={result.loading} empty={!result.data} />
+    {result.data?.map(s => <div className="dc-source" key={s.source}><h2>{names[s.source] || s.source}</h2>
+      <p>原生周期：{s.native_periods.join("、") || "尚未接入"}</p><p>M1 历史：{s.history_m1 ? "支持" : "未开放"}；实时流：{s.stream ? "支持" : "未开放"}</p></div>)}
+    <p>OANDA Practice 连接由管理员在部署配置中维护。授权异常时核对账户环境与访问授权，更新连接后重试失败范围。此处不显示账户或密钥。</p>
+  </section>;
+}
 export default function Center() {
-  return (
-    <Routes>
-      <Route index element={<CenterList />} />
-      <Route path="platform/configure" element={<NativeConfigure />} />
-      <Route path="datasets/new" element={<DatasetCreate />} />
-      <Route path="datasets/:id" element={<DatasetDetail />} />
-      <Route path="datasets/:id/mapping" element={<MappingForm />} />
-      <Route path="composites/:id" element={<CompositeDetail />} />
-    </Routes>
-  );
+  const { pathname } = useLocation(), [params] = useSearchParams();
+  if (pathname === "/market-data/platform/configure") return <NativeConfigure key={params.get("instrument")} />;
+  if (pathname === "/market-data/datasets/new") return <DatasetCreate />;
+  if (pathname.endsWith("/mapping")) return <MappingForm key={pathname} />;
+  if (pathname.includes("/datasets/")) return <DatasetDetail key={pathname + ":" + params.get("section")} />;
+  if (pathname.includes("/composites/")) return <CompositeDetail key={pathname} />;
+  if (params.get("tab") === "sources") return <Sources />;
+  return <CenterList />;
 }

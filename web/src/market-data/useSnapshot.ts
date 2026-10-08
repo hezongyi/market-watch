@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../api";
+import { api } from "./api";
 
 export function useSnapshot<T>(path: string | null, refresh = 0) {
   const [snapshot, setSnapshot] = useState<{

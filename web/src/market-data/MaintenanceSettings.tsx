@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { api, ApiError } from "../api";
+import { useDirtyForm, useActionLock } from "./router";
+import { api, ApiError } from "./api";
 import { frames, time, type Dataset, type Plan } from "./types";
 
 function tradingDate(start: number, calendar: string) {
@@ -36,7 +37,10 @@ export function MaintenanceSettings({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
+  const [saved, setSaved] = useState(0);
+  useDirtyForm("maintenance-settings", [day, periods, frequency, timezone, clock, overlap], saved);
   const revision = useRef(plan.configuration_revision);
+  const actionLock = useActionLock();
   const [conflict, setConflict] = useState<Plan | null>(null);
   function loadLatest() {
     if (!conflict) return;
@@ -52,6 +56,7 @@ export function MaintenanceSettings({
   }
   async function save(event: React.FormEvent) {
     event.preventDefault();
+    if (!actionLock.acquire()) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -74,6 +79,7 @@ export function MaintenanceSettings({
       setNotice(
         "维护配置已保存；新增周期将在后台派生。已有运行任务保留原固定范围。",
       );
+      setSaved(value => value + 1);
       onSaved();
     } catch (e) {
       setError(String(e));
@@ -85,11 +91,12 @@ export function MaintenanceSettings({
         }
       }
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
   return (
-    <form className="dc-fields" onSubmit={save}>
+    <form className="dc-fields" onSubmit={save} inert={busy}>
       <label>
         目标起始交易日期
         <input
@@ -123,7 +130,7 @@ export function MaintenanceSettings({
       </fieldset>
       <label>
         更新频率
-        <select
+        <select aria-label="更新频率"
           value={frequency}
           onChange={(e) => setFrequency(e.target.value)}
         >

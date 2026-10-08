@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
+import { api } from "./api";
 
 export type QualifiedSeries = {
   id: string;
@@ -83,14 +83,14 @@ export default function SeriesPicker({ kind, selected, onSelect }: {
       <span>第 {offsets.length} 页</span>
       <button type="button" disabled={loading || error !== "" || nextOffset === null} onClick={() => setOffsets(current => [...current,nextOffset!])}>下一页行情</button>
     </nav>
-    {!loading&&!error&&!rows.length&&<p>可以缩小或更换品种关键词，或<a href="/market-data">去数据中心维护与配置</a>。</p>}
+    {!loading&&!error&&!rows.length&&<p>可以缩小或更换品种关键词，请从图表顶部的数据中心维护与配置。</p>}
     {error && <p role="alert">{error} <button type="button" className="secondary" onClick={() => setRetry(n => n + 1)}>重试搜索</button></p>}
     {selected && <p>{seriesLabel(selected)} · {kind === "history" ? "下一步选择固定发布版本及区间" : "提交规则后维护实时需求；搜索不会启动采集"}</p>}
     {pendingTotal > 0 && <details><summary>查看{title}准备与配置（本页待处理 {pending.length} 条）</summary>
       <ul>{pending.map(row => {
         const dataset = kind === "history" ? row : row.dataset;
         return <li key={dataset.id}>{dataset.logical_symbol} · {dataset.identity.source} · {dataset.aggregation_calendar === "ny17" ? "NY17" : "UTC 00:00"} · {kind === "history" ? "尚无可用发布" : row.reason || (row.status === "needs_mapping" ? "缺少实时映射" : "历史待维护")}
-          {" "}<a href={`/market-data/datasets/${dataset.id}${kind === "composite" && row.status === "needs_mapping" ? "/mapping" : ""}`}>{kind === "composite" && row.status === "needs_mapping" ? "配置映射" : "查看进度与维护"}</a></li>;
+          。请从图表顶部的数据中心维护与配置。</li>;
       })}</ul>
       {pending.length === 0 && <p>本页没有待准备或配置项，可继续翻页查看其他自建行情。</p>}
       <nav className="dc-actions" aria-label="准备与配置分页">

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { api, ApiError } from "../api";
+import { Link, useActionLock } from "./router";
+import { api, ApiError } from "./api";
 import { Feedback, Pager } from "./Center";
 import { useSnapshot } from "./useSnapshot";
 import { names, phase, time } from "./types";
@@ -47,6 +47,7 @@ export function DatasetReferences({
   const [error, setError] = useState(""),
     [result, setResult] = useState<any>(null);
   const request = useRef(crypto.randomUUID());
+  const actionLock = useActionLock();
   const reviewButton = useRef<HTMLButtonElement>(null), errorBox = useRef<HTMLParagraphElement>(null);
   const [conflict, setConflict] = useState<ReferenceReport | null>(null);
   const current = conflict || report.data;
@@ -60,7 +61,7 @@ export function DatasetReferences({
     } finally {setBusy(false);}
   }
   async function reclaim() {
-    if (!review) return;
+    if (!review || !actionLock.acquire()) return;
     setBusy(true);
     setError("");
     try {
@@ -80,6 +81,7 @@ export function DatasetReferences({
       }
       requestAnimationFrame(() => errorBox.current?.focus());
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
@@ -129,11 +131,11 @@ export function DatasetReferences({
                       <td>{item.detail}</td>
                       <td>
                         {item.kind === "replay" ? (
-                          <a href="/replay">查看历史演练</a>
+                          <Link to="/replay">查看历史演练</Link>
                         ) : item.kind === "task" ? (
-                          <a href={`/market-data?tab=tasks&dataset_id=${id}`}>
+                          <Link to={`/market-data?tab=tasks&dataset_id=${id}`}>
                             查看任务
-                          </a>
+                          </Link>
                         ) : (
                           "保留引用，禁止回收"
                         )}

@@ -1,0 +1,44 @@
+const {chromium,expect}=require('@playwright/test'),fs=require('fs'),path=require('path');
+const root=path.resolve(__dirname,'../..'),art=path.join(root,'artifacts/data-center'),base='https://192.168.7.232:19943';
+const report={environment:'Ubuntu isolated real APIs/supplier/workers',passed:false,checks:[],errors:[]};
+(async()=>{const b=await chromium.launch({executablePath:'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',args:['--no-sandbox']});const p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});p.on('pageerror',e=>report.errors.push(e.message));
+ const dc=()=>p.frames().find(f=>f.url().includes('/chart-data-center?')),native=()=>p.frames().find(f=>f.url().startsWith('blob:')),host=()=>p.frames().find(f=>f.url().includes(':19944/?'));
+ const get=async route=>{const r=await p.request.get(base+'/api/'+route);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
+ const record=(name,data={})=>{console.log('PASS',name);report.checks.push({name,...data})};
+ const choose=async name=>{await dc().getByRole('button',{name,exact:true}).click();await expect(dc().getByRole('heading',{name,exact:true})).toBeVisible()};
+ const created=JSON.parse(fs.readFileSync(path.join(art,'created.json'))),dataset=created.dataset.id;
+ try {
+  await p.goto(base+`/market-data/datasets/${dataset}/mapping`);await p.getByLabel('管理员密码').fill(JSON.parse(fs.readFileSync(path.join(art,'login.json'))).password);await p.getByRole('button',{name:'登录工作台'}).click();await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();
+  await expect(dc().getByRole('heading',{name:'配置实时来源'})).toBeVisible();
+  await dc().getByLabel('查找目标准确品种').fill('EUR_USD');
+  await expect.poll(()=>dc().getByLabel('目标准确品种（OANDA Practice）').locator('option').count()).toBeGreaterThan(1);
+  const option=await dc().getByLabel('目标准确品种（OANDA Practice）').locator('option').allTextContents();
+  const values=await dc().getByLabel('目标准确品种（OANDA Practice）').locator('option').evaluateAll(items=>items.map(e=>({value:e.value,text:e.textContent})));
+  await dc().getByLabel('目标准确品种（OANDA Practice）').selectOption(values.find(v=>v.text.includes('EUR_USD')).value);
+  await dc().getByLabel('标的代码').fill('EUR');await dc().getByLabel('历史产品官方依据').fill('https://developer.oanda.com/rest-live-v20/instrument-ep/');
+  await dc().getByLabel('匹配复核说明').fill('Ubuntu isolated UI acceptance: exact EUR_USD Practice bid and underlying currency reviewed.');
+  await dc().getByLabel('已核对标的、币种、产品类型及Bid口径，接受两来源原价差异。').check();
+  await dc().getByRole('button',{name:'关闭数据中心'}).click();await expect(dc().getByRole('alertdialog')).toBeVisible();await dc().getByRole('button',{name:'继续编辑'}).click();
+  await dc().getByRole('button',{name:'保存映射版本'}).click();await expect(dc().getByRole('heading',{name:'组合行情',exact:true})).toBeVisible();
+  record('mapping deep link, unsaved guard and reviewed mapping submission');
+  await dc().getByRole('button',{name:'打开组合行情',exact:true}).first().click();await expect.poll(()=>!!dc(),{timeout:35000}).toBeFalsy();
+  const ticker=await host().evaluate(()=>widget.activeChart().symbol());expect(ticker).toMatch(/^MWC:[a-f0-9]{64}$/i);
+  const composites=await get('market-data/center/composites');expect(composites.items.length).toBeGreaterThan(0);const composite=composites.items.find(c=>c.id.toLowerCase()===ticker.slice(4).toLowerCase());expect(composite).toBeTruthy();
+  record('candidate explicit open creates composite and applies exact series',{ticker});
+  await native().getByRole('button',{name:'数据中心',exact:true}).click();await expect.poll(()=>!!dc()).toBeTruthy();await choose('组合行情');
+  await dc().getByRole('button',{name:'已建立组合',exact:true}).click();await dc().getByRole('link',{name:'查看详情',exact:true}).first().click();await expect(dc().getByRole('heading',{name:'EURUSD 组合行情'})).toBeVisible();
+  for(const name of ['接续与修订','使用与健康','概览']){await dc().getByRole('button',{name,exact:true}).click();}
+  expect(await dc().locator('canvas').count()).toBe(0);record('composite detail uses same window with no embedded live chart');
+  await choose('自建行情');await dc().getByRole('link',{name:'添加行情',exact:true}).click();
+  await dc().getByRole('combobox').first().selectOption('oanda');await dc().getByLabel('搜索来源目录').fill('GBP_USD');
+  await dc().getByRole('button',{name:'选择 GBP_USD',exact:true}).click();await dc().getByRole('button',{name:'下一步',exact:true}).click();
+  await dc().getByLabel('起始交易日期',{exact:true}).fill('2026-10-07');await dc().getByLabel('维护计划').selectOption('once');await dc().getByRole('button',{name:'下一步',exact:true}).click();
+  const response=p.waitForResponse(r=>r.url().endsWith('/api/market-data/center/datasets')&&r.request().method()==='POST');
+  await dc().getByRole('button',{name:'创建并开始维护',exact:true}).click();const result=await (await response).json();expect(result.dataset.id).toMatch(/^[a-f0-9]{64}$/);const own=result.dataset.id;
+  await expect(dc().getByRole('heading',{name:'GBPUSD',exact:true})).toBeVisible();await dc().getByRole('button',{name:'关闭数据中心'}).click();await expect.poll(()=>!!dc()).toBeFalsy();
+  await expect.poll(async()=> (await get('market-data/center/datasets/'+own)).availability,{timeout:180000,intervals:[1000,3000,5000]}).toBe('available');
+  record('UI create, background real supplier publication continues after close',{dataset:own});
+  fs.writeFileSync(path.join(art,'ui-created.json'),JSON.stringify(result,null,2));
+  expect(report.errors).toEqual([]);report.passed=true;
+ } finally {fs.writeFileSync(path.join(art,'management-report.json'),JSON.stringify(report,null,2));await b.close()}
+})().catch(e=>{console.error(e.message);process.exitCode=1});

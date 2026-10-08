@@ -2,13 +2,19 @@
 const parentOrigin = new URLSearchParams(location.search).get("parent");
 if (!parentOrigin || new URL(parentOrigin).origin !== parentOrigin)
   throw Error("Missing parent origin");
+// Narrow the header's HTTP(S) frame allowance to this authenticated app before
+// creating any chart or management iframe. Blob documents inherit this policy.
+const framePolicy = document.createElement("meta");
+framePolicy.httpEquiv = "Content-Security-Policy";
+framePolicy.content = `frame-src 'self' blob: ${parentOrigin}`;
+document.head.append(framePolicy);
 const send = (value) =>
   parent.postMessage({ channel: "mw-chart-v1", ...value }, parentOrigin);
 const pending = new Map();
 // Use public native dialogs. The widget has no public non-modal toast API.
 // Keep acknowledged conditions deduplicated until the parent clears them.
 const acknowledgedNotices = new Set();
-let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge;
+let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, dataCenter;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
@@ -693,7 +699,7 @@ const feed = {
         if (!dataset.ready) {
           if (dataset.reason==='unmaintained' && !nativeReadonly && !maintenanceAsked.has(symbol)) {
             maintenanceAsked.add(symbol);
-            send({type:'maintenance-required',instrument:symbol,calendar:s.calendar});
+            send({type:'error',error:'历史尚未配置，请从图表顶部的数据中心维护。'});
           }
           cb([],{noData:true});
           finishTerminal();
@@ -1475,6 +1481,7 @@ function boot(
   progressivePages = undefined;
   managedSessions.clear();
   maintenanceAsked.clear();
+  dataCenter?.dispose();
   indicatorPicker?.dispose();
   barRangeMapping?.dispose();
   barRangeMapping = chartBarRangeMapping({widget:()=>widget,initial:pendingBarRange,readonly,changed:()=>{
@@ -1546,6 +1553,7 @@ function boot(
       "support_multicharts",
       "determine_first_data_request_size_using_visible_range",
       "header_layouttoggle",
+      "header_in_fullscreen_mode",
       "disable_resolution_rebuild",
       "prefer_quote_short_name",
       "use_symbol_name_for_header_toolbar",
@@ -1646,16 +1654,10 @@ function boot(
                 send({ type: "error", error: String(error) });
               }
             }}] : []),
-            ...(!readonly ? [{label: "维护历史", title: "填写历史起点，并持续维护最新行情", run: () => {
-              const identity = decode(widget.activeChart().symbol());
-              if (identity.series_kind === "managed") send({type: "maintenance-required", instrument: identity.symbol});
-              else send({type: "history-plans-open"});
-            }}] : []),
             {label: "刷新历史", title: "载入新发布历史，保留柱宽与查看位置", run: async () => {
               await refreshProviderHistoryCorrections();
               await refreshManagedHistory();
             }},
-            {label: "历史任务", run: () => send({type: "history-plans-open"})},
             {label: "修改密码", run: () => chartMenu.changePassword()},
             {label: "登出", run: () => send({type: "workspace-action", action: "logout"})},
             ...(!readonly ? [{label: "复制恢复草稿", recovery: true,
@@ -1663,6 +1665,10 @@ function boot(
           ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave, () => snapshot(), body => request(body, "account-password"), barRangeMapping, syncCoordinator,
         );
 
+        if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
+          workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send,
+          suspendIndicators: () => indicatorPicker?.close(),
+          resolve: args => request({op:"resolve",args},"market")});
       })
       .catch((e) => send({ type: "error", error: String(e) }));
     // Mobile is a temporary single-chart view of the saved desktop workspace.
@@ -1839,6 +1845,7 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if (m.type === "data-center-open" && ready && !loading && typeof m.location === "string" && m.location.length <= 4000) { dataCenter?.open(m.location); return; }
   if (m.type === "chart-alert-create" && ready && !loading) {void alertBridge?.create(); return;}
   if (m.type === "chart-alert-drawing-action" && typeof m.alert_id === "string" && ["retry","restore"].includes(m.action) && ready && !loading) {void alertBridge?.drawingAction(m.alert_id,m.action); return;}
   if (m.type === "chart-alert-rows" && Array.isArray(m.rows)) {alertBridge?.setRows(m.rows); return;}

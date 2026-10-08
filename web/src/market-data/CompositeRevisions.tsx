@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { api, ApiError } from "../api";
+import { Link, useDirtyForm, useActionLock } from "./router";
+import { api, ApiError } from "./api";
 import { Feedback } from "./Center";
 import { time } from "./types";
 import { useSnapshot } from "./useSnapshot";
@@ -20,6 +20,9 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
   const [refresh,setRefresh]=useState(0),[listPage,setListPage]=useState(1),[version,setVersion]=useState(""),[mapping,setMapping]=useState(""),
     [seam,setSeam]=useState(""),[reason,setReason]=useState(""),[nonDay,setNonDay]=useState(false),
     [busy,setBusy]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState("");
+  const [saved, setSaved] = useState(0);
+  const actionLock = useActionLock();
+  useDirtyForm("composite-revision", [version, mapping, seam, reason, nonDay], saved);
   const options=useSnapshot<{items:Choice[]}>(`/market-data/composites/${id}/revision-options`,refresh),
     revisions=useSnapshot<{items:Revision[];total:number;page_size:number}>(`/market-data/composites/${id}/revisions?page=${listPage}`,refresh);
   const submission=useRef<{signature:string;body:any}|null>(null),activationIds=useRef(new Map<string,string>());
@@ -30,13 +33,14 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
     setSeam(row?.recommended_seam!=null ? utcInput(row.recommended_seam) : "");
   }
   async function prepare(event:React.FormEvent) {
-    event.preventDefault();setBusy(true);setError("");setMessage("");
+    event.preventDefault();if(!actionLock.acquire())return;setBusy(true);setError("");setMessage("");
     const fields={history_version_id:version,mapping_id:mapping,seam:Date.parse(seam+":00Z"),
       reason,allow_non_day_boundary:nonDay},signature=JSON.stringify(fields);
     if(submission.current?.signature!==signature)submission.current={signature,body:{...fields,
       expected_revision_id:active,request_id:crypto.randomUUID()}};
     function submitted(row:Revision) {
       setMessage("新修订已提交后台准备。当前图表与已有规则保持原输入，请准备完成后明确启用。");
+      setSaved(value => value + 1);
       submission.current=null;setListPage(1);setRefresh(v=>v+1);onChanged();
       document.getElementById("composite-revision-"+row.id)?.focus();
     }
@@ -51,9 +55,10 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
           if(found.items.length)submitted(found.items[0]);else setError(String(e));
         }catch{setError("提交结果暂时无法确认。再次提交会使用相同请求编号核对结果。");}
       }
-    }finally{setBusy(false);}
+    }finally{actionLock.release();setBusy(false);}
   }
   async function activate(row:Revision) {
+    if(!actionLock.acquire())return;
     setBusy(true);setError("");setMessage("");
     const token=activationIds.current.get(row.id)||crypto.randomUUID();activationIds.current.set(row.id,token);
     try {
@@ -67,7 +72,7 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
         if(current.activated_at){setMessage("已核对：此修订已经启用。已有规则保持原输入。");setRefresh(v=>v+1);onChanged();}
         else setError(String(e));
       }catch{setError("启用结果暂时无法确认。请刷新核对；再次启用仍使用相同请求编号。");}
-    }finally{setBusy(false);}
+    }finally{actionLock.release();setBusy(false);}
   }
   return <section aria-label="显式组合修订">
     <h2>准备新修订</h2>

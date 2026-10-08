@@ -460,6 +460,7 @@ function chartIndicatorPicker(chartWidget, catalog, report) {
     chartWidget.subscribe(event, callback);
   return {
     open,
+    close: () => { suspended = false; sawNativeDialog = false; close(); },
     dispose() {
       disposed = true;
       observer.disconnect();
