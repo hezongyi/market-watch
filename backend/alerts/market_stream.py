@@ -131,11 +131,9 @@ def _release_demand(db, task):
                 return
             ident = composite.instrument_id
             revision = identity.get("revision_id") or composite.active_revision_id
-        lease_key = "stream:" + task.id[:32] + "|" + ident
-        if revision:
-            lease_key += "|" + revision
-        demand_id = hashlib.sha256(lease_key.encode()).hexdigest()[:40]
-        db.execute(delete(MarketDemand).where(MarketDemand.id == demand_id))
+        from .market_data import demand_id
+        ident = demand_id("stream:" + task.id[:32], ident, composite_revision_id=revision)
+        db.execute(delete(MarketDemand).where(MarketDemand.id == ident))
 
 
 def renew(session_hash, client):
@@ -201,6 +199,9 @@ def commit(ownership, payload, *, delay_ms=500):
                     changed = [bar for bar in payload.get("bars", []) if
                         bar["start"] not in old or prices(bar) != prices(old[bar["start"]])]
                     wire = {**payload, "bars": changed,
+                            "recovery_floor": payload["bars"][0].get("chart_time", payload["bars"][0]["start"])
+                                if payload.get("bars") else None,
+                            "latest_bar": payload["bars"][-1:] if payload.get("bars") else [],
                             "latest_time": payload["bars"][-1].get("chart_time", payload["bars"][-1]["start"])
                                 if payload.get("bars") else None}
                     if changed:
@@ -220,6 +221,16 @@ def commit(ownership, payload, *, delay_ms=500):
         if "new_input_signal" in ownership:
             task.input_signal = ownership["new_input_signal"]
         task.next_at, task.updated_at = stamp + delay_ms, stamp
+        if not db.scalar(select(MarketStreamSubscription.id).join(MarketStreamClient,
+                MarketStreamSubscription.client_id == MarketStreamClient.id).join(LoginSession,
+                MarketStreamClient.session_hash == LoginSession.token_hash).where(
+                    MarketStreamSubscription.task_id == task.id,
+                    MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp,
+                    LoginSession.expires > stamp).limit(1)):
+            # Cancellation may precede an already claimed worker's demand IO.
+            # Publication finishes that work under the task lock and retires
+            # only its browser demand if no valid consumer remains.
+            _release_demand(db, task)
         return task.sequence
 
 
@@ -291,7 +302,19 @@ def delivery(db, task, sub, payload, cursors):
     state = cursors.setdefault((*key, "delivery"), dict(sub.state))
     query = DataQuery.model_validate(task.query)
     page = dict(payload)
-    check_page = {**page, "bars": task.payload.get("bars", [])[-1:]}
+    check_page = {**page, "bars": page.get("latest_bar", page.get("bars", [])[-1:])}
+    if not state.get("history_accepted", True):
+        if query.series_kind == "managed" and query.published:
+            from .chart_indicators import history_requirement
+            from .managed_dataset import status
+            ready = status(db, db.get(Instrument, query.instrument), query.timeframe,
+                width=state.get("history_plot_width", 960), spacing=state.get("history_bar_spacing", 6),
+                lookback=max([0] + [history_requirement(spec) for spec in query.indicators]))
+            if not ready["ready"]:
+                return {"type": "status", "status": ready["reason"]}
+        if check_page["bars"]:
+            return {"type": "reset", "reason": "initial_history_ready"}
+        return {"type": "status", "status": "preparing", "pending": page.get("pending", [])}
     revision = payload.get("resolved_revision_id")
     previous_binding = state.get("binding", sub.state.get("binding"))
     if revision and previous_binding and previous_binding != revision:
@@ -351,6 +374,8 @@ def delivery(db, task, sub, payload, cursors):
     if state.get("historical"):
         return {"type": "status", "status": "history_current"}
     cursor = state.get("cursor", 0)
+    if cursor and page.get("recovery_floor") is not None and cursor < page["recovery_floor"]:
+        return {"type": "reset", "reason": "history_gap"}
     if cursor and page.get("bars") and cursor > (page.get("latest_time") or
             page["bars"][-1].get("chart_time", page["bars"][-1]["start"])):
         return {"type": "reset", "reason": "tail_retracted", "status": page.get("status")}
@@ -359,6 +384,7 @@ def delivery(db, task, sub, payload, cursors):
     page["bars"] = [bar for bar in page.get("bars", []) if bar.get("chart_time", bar["start"]) >= cursor]
     if page["bars"]:
         state["cursor"] = page["bars"][-1].get("chart_time", page["bars"][-1]["start"])
+    page.pop("latest_bar", None)
     return page
 
 

@@ -12,17 +12,17 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 
 ## 已执行验证
 
-- `unit-tests.txt`：111 passed（当前开发检查点；后续新增修改需重跑并更新）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复和 HTTP 权限。
+- `unit-tests.txt`：116 passed、11 skipped（2026-10-09 修复检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复和 HTTP 权限。
 - `regression-tests.txt`：105 passed，既有 provider_service、market_data、managed_dataset、fixed_indicators 回归。
-- `node tests/advanced-market-stream.cjs`：实际 bridge 回调的世代/序号拒收、确认后极值缩小、报价交付、取消迟到回调与常态 tick 无行情请求。
+- `node tests/advanced-market-stream.cjs`：实际 bridge 回调的世代/序号拒收、确认后极值缩小、报价交付、取消迟到回调与常态 tick 无行情请求；新增空首屏准备、HTTP 历史接受后的单次重注册、尾部撤回、拒收及窗口过滤凭据检查。
 - `node tests/advanced-fixed-series.cjs` 与 `advanced-provider-subscriptions.cjs`：既有身份、首用边界、连接共享和取消顺序通过。
 - `npm run build`：TypeScript/Vite 构建通过；既有 chunk size 提示仍存在。
-- `test_market_stream_postgres.py`：8 skipped，未配置隔离 TEST_POSTGRES_URL；未运行的并发检查不算通过。
+- `test_market_stream_postgres.py`：11 skipped，未配置隔离 TEST_POSTGRES_URL；未运行的并发检查不算通过。
 - 新模块 Ruff、`node --check advanced-host/bridge.js`、`git diff --check` 通过；Alembic 单 head 为 `ar45_market_stream`。
 
 ## Ubuntu Docker 验收入口（尚未运行）
 
-当前工具对 `/var/run/docker.sock` 返回 permission denied；本会话禁止提权。尚未创建本任务 Docker 实例、镜像或 volume。以下地址是配置预留，**尚不可作为已部署访问地址**。
+2026-10-09 再次检查，`docker info` 对 `/var/run/docker.sock` 返回 permission denied；quant 未加入 docker 组，`sudo -n true` 要求密码，没有可用的非交互提权入口。已请求配置本机 Docker 权限，尚未收到确认。尚未创建本任务 Docker 实例、镜像或 volume。以下地址是配置预留，**尚不可作为已部署访问地址**。
 
 Compose：`compose.unified-sse.acceptance.yaml`，task/project `mw-unified-sse-20261008`。独立 PG volume/network；API 15641、第二 API 15642、web 15643、chart 15644，全部绑定 127.0.0.1。
 
@@ -56,3 +56,11 @@ docker compose --env-file artifacts/unified-sse/compose.env \
 - 构建前重新核对 Docker 权限与 mw-docker 生命周期登记目录的写权限；遵守现有入口，不能直接构建绕过。
 
 任务继续开发；上述全部证据齐备后再修改方案状态和交付结论。
+
+## 2026-10-09 恢复与取消竞争修复
+
+本轮先运行可失败的回调/持久任务测试，再应用修复。诊断及重跑入口见 `recovery-fixes-20261009.md`。空首屏订阅保持准备通知，但 bars 在原生 HTTP 历史接受前不交付；managed 准备条件复用原有 dataset status 和图表几何/指标历史需求，不以少量已发布柱代替首屏准备完成。恢复清理旧游标并隔离旧世代，避免尾部撤回后重新绑定旧位置。首读凭据只记录原生接受的窗口内柱。
+
+回放历史检查使用各条持久结果的尾部证据；完整保留窗口以外的断线游标要求 reset。最后订阅取消后，已领取任务的迟到提交会复核有效消费者并精确释放自己的需求；再次订阅时核对持久需求是否仍存在，避免续期节流阻止恢复采集。预警需求保留测试仍通过。
+
+这些测试使用本机 Python/Node 和 SQLite，不是 Docker 部署或真实图表/供应商验收。尚缺证据的清单仍有效。

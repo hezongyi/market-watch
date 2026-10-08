@@ -33,6 +33,9 @@ class Subscription(Consumer):
     loaded_before: int | None = Field(default=None, ge=0)
     history_revision: str | None = Field(default=None, max_length=128)
     historical: bool = False
+    history_accepted: bool = True
+    history_plot_width: float = Field(default=960, gt=0, le=16384)
+    history_bar_spacing: float = Field(default=6, gt=0, le=1000)
     binding: str | None = Field(default=None, max_length=64)
     observed_at: int = Field(default=0, ge=0)
     initial_input_revision: int | None = Field(default=None, ge=0)

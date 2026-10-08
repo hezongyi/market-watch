@@ -232,6 +232,15 @@ class QuoteQuery(BaseModel):
     input_revision: int | None = Field(default=None, ge=0)
 
 
+def demand_id(client, instrument_id, *, composite_revision_id=None):
+    import hashlib
+
+    lease_key = client + "|" + instrument_id
+    if composite_revision_id is not None:
+        lease_key += "|" + composite_revision_id
+    return hashlib.sha256(lease_key.encode()).hexdigest()[:40]
+
+
 def renew_demand(db, client, inst, *, composite_revision_id=None):
     # Searching/selecting/refusing an unmaintained managed series does not
     # authorize even a temporary M1 maintenance lease.
@@ -246,12 +255,7 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
     live_source = dataset and dataset.identity["source"] == "oanda"
     if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
         return
-    import hashlib
-
-    lease_key = client + "|" + inst.id
-    if composite_revision_id is not None:
-        lease_key += "|" + composite_revision_id
-    ident = hashlib.sha256(lease_key.encode()).hexdigest()[:40]
+    ident = demand_id(client, inst.id, composite_revision_id=composite_revision_id)
     demand = db.get(MarketDemand, ident)
     if not demand:
         demand = MarketDemand(id=ident, instrument_id=inst.id, composite_revision_id=composite_revision_id)

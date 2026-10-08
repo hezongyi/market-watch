@@ -44,16 +44,20 @@ class Calculator:
     def _demand(self, db, work, query):
         if query.series_kind not in ("managed", "composite"):
             return
-        if self.demand_at.get(work["id"], 0) > now_ms():
-            return
-        from .market_data import renew_demand
+        from .market_data import demand_id, renew_demand
+        from .storage import MarketDemand
         if query.series_kind == "composite":
             composite = db.get(MarketComposite, query.instrument)
             inst = db.get(Instrument, composite.instrument_id)
             revision_id = query.composite_revision_id or composite.active_revision_id
         else:
             inst, revision_id = db.get(Instrument, query.instrument), None
-        renew_demand(db, "stream:" + work["id"][:32], inst, composite_revision_id=revision_id)
+        client = "stream:" + work["id"][:32]
+        if self.demand_at.get(work["id"], 0) > now_ms():
+            demand = db.get(MarketDemand, demand_id(client, inst.id, composite_revision_id=revision_id))
+            if demand and demand.expires > now_ms():
+                return
+        renew_demand(db, client, inst, composite_revision_id=revision_id)
         self.demand_at[work["id"]] = now_ms() + 30000
 
     def _signal(self, db, work, query):
@@ -90,7 +94,7 @@ class Calculator:
             func.sum(Bar.revision + Bar.volume_revision)).where(Bar.instrument_id == ident)).one()
         from .storage import ChartHistoryPlan, ChartPublication
         publications = list(db.execute(select(ChartPublication.timeframe, ChartPublication.revision,
-            ChartPublication.initialized).where(
+            ChartPublication.initialized, ChartPublication.complete_count).where(
             ChartPublication.instrument_id == ident))) if query.published else []
         plan = db.get(ChartHistoryPlan, ident)
         preparation = [plan.status, plan.cursor, plan.error] if plan else None

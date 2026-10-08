@@ -144,3 +144,53 @@ def test_canceling_last_browser_demand_preserves_other_internal_owners(database,
     assert stream.claim() is None
     with database.begin() as db:
         assert [row.id for row in db.scalars(select(MarketDemand))] == ["independent-alert-demand"]
+
+
+def test_managed_preparation_waits_for_native_dataset_readiness(database):
+    from alerts.storage import ChartPublication
+
+    owner = session(database)
+    query = DataQuery(instrument="BTCUSDT", series_kind="managed", timeframe="M1", published=True)
+    identity, serialized = resolve(Subscription(client="page", listener="chart", generation=1,
+        kind="bars", query=query))
+    stream.register(owner, "page", "chart", 1, identity, serialized, {"history_accepted": False})
+    with database.begin() as db:
+        db.add(ChartPublication(instrument_id="BTCUSDT", timeframe="M1", start=60000,
+            end=120000, complete_count=1, initialized=False, revision=1))
+    cursors = {}
+    stream.commit(stream.claim(), {"type": "bars", "bars": [{"start": 60000}]}, delay_ms=0)
+    assert stream.events(owner, "page", cursors)[0]["type"] == "status", \
+        "a partial publication must not restart a first screen that still cannot load"
+    with database.begin() as db:
+        db.get(ChartPublication, ("BTCUSDT", "M1")).initialized = True
+    stream.commit(stream.claim(), {"type": "bars", "bars": [{"start": 60000}],
+        "publication_revision": 2}, delay_ms=0)
+    event = stream.events(owner, "page", cursors)[0]
+    assert event["type"] == "reset" and event["reason"] == "initial_history_ready"
+
+
+def test_canceled_inflight_computation_does_not_leave_a_browser_demand(database, monkeypatch):
+    from alerts.storage import MarketDemand
+    from sqlalchemy import select
+
+    composite, revision, seam = populated(database, monkeypatch)
+    owner = session(database)
+    query = DataQuery(instrument=composite, series_kind="composite", timeframe="M1", provisional=False)
+    identity, serialized = resolve(Subscription(client="page", listener="chart", generation=1,
+        kind="bars", query=query))
+    stream.register(owner, "page", "chart", 1, identity, serialized, {})
+    work = stream.claim()
+    stream.cancel(owner, "page", "chart", 1)
+    calculator = Calculator()
+    payload, delay = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    with database.begin() as db:
+        assert db.scalar(select(MarketDemand)) is None, \
+            "late worker demand must be retired when its final consumer was canceled"
+    stream.register(owner, "page", "chart", 2, identity, serialized, {})
+    work = stream.claim()
+    payload, delay = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    with database.begin() as db:
+        assert db.scalar(select(MarketDemand)) is not None, \
+            "a renewed consumer must restore demand immediately, even inside the old renewal interval"

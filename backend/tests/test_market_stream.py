@@ -123,3 +123,40 @@ def test_worker_affinity_keeps_current_bucket_owner_until_failure_takeover(datab
     with database.begin() as db:
         db.get(MarketStreamTask, info["task_id"]).owner_until = 0
     assert stream.claim(owner="worker-two") is not None
+
+
+def test_empty_first_history_receives_status_then_recovery_before_native_bars(database):
+    owner = session(database)
+    register(owner, state={"history_accepted": False})
+    cursor = {}
+    stream.commit(stream.claim(), {"type": "bars", "bars": [], "pending": ["preparing"]}, delay_ms=0)
+    first = stream.events(owner, "page", cursor)[0]
+    assert first["type"] == "status" and first["status"] == "preparing"
+    stream.commit(stream.claim(), {"type": "bars", "bars": [{"start": 60000}]}, delay_ms=0)
+    ready = stream.events(owner, "page", cursor)[0]
+    assert ready["type"] == "reset" and ready["reason"] == "initial_history_ready"
+    assert "bars" not in ready
+
+
+def test_replay_checks_each_committed_result_without_looking_ahead(database):
+    owner = session(database)
+    register(owner, state={"cursor": 60000})
+    stream.commit(stream.claim(), {"type": "bars", "bars": [{"start": 60000}]}, delay_ms=0)
+    cursor = {}
+    stream.events(owner, "page", cursor)
+    for at in (120000, 180000):
+        stream.commit(stream.claim(), {"type": "bars", "bars": [{"start": 60000}, {"start": at}]}, delay_ms=0)
+    rows = stream.events(owner, "page", cursor)
+    assert [event["type"] for event in rows] == ["bars", "reset"]
+    assert rows[0]["bars"][-1]["start"] == 120000
+
+
+def test_disconnect_beyond_retained_bar_window_requires_reset(database):
+    owner = session(database)
+    register(owner, state={"cursor": 60000})
+    stream.commit(stream.claim(), {"type": "bars", "bars": [{"start": 60000}]}, delay_ms=0)
+    cursor = {}
+    stream.events(owner, "page", cursor)
+    stream.commit(stream.claim(), {"type": "bars", "bars": [{"start": 12000000}, {"start": 12060000}]}, delay_ms=0)
+    event = stream.events(owner, "page", cursor)[0]
+    assert event["type"] == "reset", "bounded tail cannot prove an arbitrarily long gap is complete"
