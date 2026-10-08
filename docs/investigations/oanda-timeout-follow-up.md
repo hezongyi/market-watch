@@ -29,6 +29,12 @@ The original worker resumed, and its unchanged code again produced database
 failures and repeated epochs. The permanent authentication fence is preserved;
 there is no blind retry of authentication failures.
 
+The 180-second retry observation (00:37:45 to 00:40:45 UTC) recorded 37 samples,
+epoch 134 -> 139, twelve per-symbol unavailable audits, and no advance of either
+confirmed M1 watermark. Both quotes changed, so this was repeated partial
+recovery rather than complete absence of supplier traffic. It is a failing
+baseline, not the requested post-repair ten-minute check.
+
 ## Hypotheses and diagnostic change
 
 The remaining distinguishable possibilities are transport stalls waiting for
@@ -60,3 +66,15 @@ Private Compose/env/logs are under
 The prior completed acceptance project is not reused. Final image tests,
 production activation approval and the requested post-repair ten-minute window
 remain pending until their evidence is recorded here.
+
+The installed acceptance image passed **65 PostgreSQL** and **119 SQLite/worker**
+tests (184 total, no skips); standards and spec reviews found no new issues.
+The formal image `market-watch-api:oanda-repair-3f311bc` uses clean immutable
+source `3f311bca31fffd916a06cd9641cc0d4323344169` and release lifecycle labels;
+its image ID is
+`sha256:3553da9b90a41739c404ebc8e61914fdb2e05db6a5fa81d6cb6e9213f6c68d93`.
+It separately passed 24 stream/diagnostics/lifecycle tests, and all five changed
+runtime modules were verified loaded from installed site-packages. A concrete
+image-only backend Compose change and explicit rollback scripts are prepared
+privately. Activating production remains pending explicit authorization under
+AGENTS.md; no fixed release tag has been overwritten.
