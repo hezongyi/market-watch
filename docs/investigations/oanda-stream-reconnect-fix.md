@@ -96,7 +96,8 @@ Private env, Compose files and detailed test logs live under
 `/home/quant/repos/.production/mw-oanda-fix-20261008`, excluded from the repository.
 Existing Docker group membership is activated with `sg docker`.
 
-Start and stop this exact acceptance environment:
+Commands used to start and stop this exact acceptance environment before its
+retirement (the completed task must not be reused for a later run):
 
 ```sh
 sg docker -c 'docker compose --env-file /home/quant/repos/.production/mw-oanda-fix-20261008/acceptance.env -p mw-oanda-fix-20261008 -f /home/quant/repos/.production/mw-oanda-fix-20261008/compose.yaml up -d --no-build --wait postgres'
@@ -105,12 +106,70 @@ sg docker -c 'docker compose --env-file /home/quant/repos/.production/mw-oanda-f
 
 Source validation additionally uses the private `compose-source.yaml` override.
 Final image validation omits that override, exercising the installed candidate
+package. A separate read-only `/oldsource` mount of immutable v1.14.0 enabled the
+old-ingestion rollback/re-upgrade regression; it did not replace the candidate
 package. Test commands use `python -m pytest -q -p no:cacheprovider`; the permanent
 tests are in `test_pricing_publication_deadlock_postgres.py` and
 `test_oanda_worker_diagnostics.py`.
 
-Final image results, independent review and retirement status will be recorded
-after these checks complete. The task remains active during validation. No claim
-of production recovery is made until a separately authorized release is deployed
-and the original observation loop is rerun; transport timeout responsibility is
-still unproven.
+## Final validation
+
+The final candidate `market-watch-api:oanda-fix-final-20261008` was built through
+`mw-docker` from clean source `25a1af28027de02a475de6122459a41443660f2a`. Its image ID
+was `sha256:8504181de7fc6521ace637c0f4df8e4467b86783f36ff923038fad3003ac6c2f`.
+All four modified runtime modules loaded from the installed site-packages path,
+with SHA-256 matching the worktree, and no source override or PYTHONPATH.
+
+- PostgreSQL final image suite: **65 passed**, no skips, in 85.13 seconds. Includes
+  publication/confirmation and plan-lifecycle races, reclamation, history writes,
+  live fencing, dataset/migration checks and real v1.14.0 ingestion rollback.
+- SQLite and worker/plan lifecycle final image suite: **116 passed**, no skips,
+  in 20.17 seconds. Includes transport, safe diagnostics, recovery/readiness,
+  history retention, managed publication, approved boundaries and scheduling.
+- Ruff checks on all changed Python files and `git diff --check` passed.
+- Three existing Alembic `path_separator` deprecation warnings were emitted by
+  the PostgreSQL migration checks; no test failures.
+
+Acceptance finished and the exact project was retired at 2026-10-08 00:23:48 UTC
+(08:23:48 Singapore), through `mw-docker retire` preview followed by `--apply`.
+Both non-template databases were dumped and actually restored into temporary
+databases; table counts and source stability matched. A synthetic public probe
+table with two rows ensured the restore verified nonempty data. The one PostgreSQL
+container, its dedicated volume/network and all three task-owned acceptance
+images were removed. Follow-up label-filtered inventory found no project
+containers, volumes or networks. `127.0.0.1:19749` is therefore no longer serving.
+
+The private backup archive is
+`/home/quant/.local/share/market-watch-docker/archives/mw-oanda-fix-20261008-20261008T002340-9bfa260c`.
+It contains sensitive env/global-role material and is not in the repository.
+The isolated worktree and branch remain available for code review. A future
+acceptance run must register a fresh task/project and rebuild from this branch.
+
+## Standards
+
+Independent review of `6fd9273...25a1af2` found zero documented-standard
+violations and zero reportable baseline smells. The first review found the
+adjacent plan-lifecycle inversion; the final review confirmed the four writers'
+shared lock order, stale-plan handling, caller-edit preservation and adoption
+skip behavior. Environment, identity and confidentiality constraints are retained.
+
+## Spec
+
+Independent review of the same final difference found zero omissions, scope
+violations or incorrect implementations against this report's requirements.
+The lifecycle extension follows reproduced deadlocks, and safe diagnostics do
+not change timeout, classification, lease or recovery behavior.
+
+## Limits
+
+No claim of production recovery is made until a separately authorized release
+is deployed and the original observation loop is rerun. The nine observed
+timeout exits remain unclassified; the new stage diagnostics make a
+later distinction possible. Production is unchanged by this repair task.
+
+The guard deliberately retains dataset locking for an inactive plan
+(`cancelled` with `realtime_enabled=False`). Publication of such a plan still
+has the pre-existing reversed lock possibility if additional coverage later
+arrives. Public history cancellation retains realtime enablement, and the
+observed production plans remain reclamation-blocking; this inactive corner
+was not reproduced in the original incident or claimed fixed here.
