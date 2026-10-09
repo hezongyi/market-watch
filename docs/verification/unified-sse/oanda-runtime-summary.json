@@ -85,6 +85,70 @@
         21,
         42
       ]
+    },
+    {
+      "passed": true,
+      "synthetic": false,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "087b1356be1d8aa0845fb0d2989d9a7a286cf511",
+      "harness_sha256": "5fb9140201190e6d76b8ec7be520503950a2bfc45462d1e3eb147902e71ef948",
+      "fixture_sha256": "69642b72731dac41b8003f29bcb58cd8f704fcda4ab74919178ba345d770f5a7",
+      "checks": [
+        "real Practice fixed M1 history and stream-backed composite update licensed chart through SSE",
+        "real composite first screen receives bars after idle without a period switch"
+      ],
+      "series_kind": "composite",
+      "private_evidence": "artifacts/unified-sse/oanda-composite-first-screen-087b135-passed.json",
+      "private_evidence_sha256": "0897aae37a2c57e3ae9f20bb46f921424eb6308edc9208f8ccac3c813327b1bc",
+      "native_bar_callbacks": 2,
+      "quote_only_callbacks": 0
+    },
+    {
+      "passed": true,
+      "synthetic": false,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "087b1356be1d8aa0845fb0d2989d9a7a286cf511",
+      "harness_sha256": "5fb9140201190e6d76b8ec7be520503950a2bfc45462d1e3eb147902e71ef948",
+      "fixture_sha256": "69642b72731dac41b8003f29bcb58cd8f704fcda4ab74919178ba345d770f5a7",
+      "checks": [
+        "real Practice fixed M1 history and stream-backed composite update licensed chart through SSE",
+        "real supplier demand with all bars closed keeps native quote callback delivery",
+        "real pricing worker stop retracts sampled-BID readiness; restart restores actual source prices",
+        "after final browser cancellation real OANDA prices and tick rule evaluation continue for independent active watch",
+        "last independent demand release removes real source from desired acquisition"
+      ],
+      "series_kind": "composite",
+      "private_evidence": "artifacts/unified-sse/oanda-composite-owner-087b135-passed.json",
+      "private_evidence_sha256": "1903718f0d7bdb65e4f1f173c5f938d212d7eae9d3e1a2f20ea1ec09375b5fab",
+      "native_bar_callbacks": 2,
+      "quote_only_callbacks": 17,
+      "owner_failure_status_rows": 1,
+      "owner_recovery_status_rows": 13,
+      "watch_evaluation_advanced": true
+    },
+    {
+      "passed": true,
+      "synthetic": false,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "087b1356be1d8aa0845fb0d2989d9a7a286cf511",
+      "harness_sha256": "5fb9140201190e6d76b8ec7be520503950a2bfc45462d1e3eb147902e71ef948",
+      "fixture_sha256": "69642b72731dac41b8003f29bcb58cd8f704fcda4ab74919178ba345d770f5a7",
+      "checks": [
+        "real supplier demand with all bars closed keeps native quote callback delivery",
+        "real alternate Practice account delivers separately; original history/identity preserved, old account sampled prices fenced, original account restored",
+        "after final browser cancellation real OANDA prices and tick rule evaluation continue for independent active watch",
+        "last independent demand release removes real source from desired acquisition"
+      ],
+      "series_kind": "composite",
+      "private_evidence": "artifacts/unified-sse/oanda-account-switch-087b135-passed.json",
+      "private_evidence_sha256": "868f011cbfa90bcd509fad4fdf79da1bbbb96231945e9bc8135ec46a0e8c13e3",
+      "immutable_identity_preserved": true,
+      "alternate_account_real_prices": true,
+      "old_account_fenced": true,
+      "original_account_restored": true
     }
   ],
   "scope": "Real Practice upstream in isolated Ubuntu containers: provider native M1, managed/composite quote-only, real fixed M1 composite, owner stop/recovery, alternate-account fencing and independent watch demand. No trades/notification delivery.",

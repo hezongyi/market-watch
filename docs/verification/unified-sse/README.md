@@ -1,6 +1,6 @@
 # 统一行情订阅：开发验证记录
 
-本记录不构成验收交付。实施范围及完成门槛仍以 `../../market-data-unified-subscriptions-plan.md` 为准。
+技术验收与交付记录已完成；Ubuntu 实例保留供用户验收，未生产发布、未退役。实施范围以 `../../market-data-unified-subscriptions-plan.md` 为准。
 
 ## 当前环境与实现
 
@@ -23,15 +23,11 @@ sg docker -c 'python scripts/unified_sse_resources.py --scenario idle --seconds 
 实测与限制见 [resource-cost-report.md](resource-cost-report.md)；原始哈希及计数见
 [resource-probe-summary.json](resource-probe-summary.json)。比较不是旧发布版本净增量。
 
-当前运行API/chart/web源码为 `95d501e`，均经mw-docker重建。
-同镜像PG gates58 passed in222.30s（38统一订阅、7组合成本、13固定指标），
-测试schema残留0。本机选定统一/组合套件139 passed、45 PG skipped，PG另证；
-fixture10项通过，web构建及Node桥接检查通过。
-固定首屏/分页/EMA/M5及workspace切换整组许可浏览器通过；真实网关断开130027ms
-跨三柱恢复通过，正常回调P95 867ms。95修复后的八周期/隐藏布局释放恢复复核通过，
-八周期P95 965ms；EMA/worker接管/API重启组合复核P95 1239ms。
-组合EMA四周期真实native回调/资源复测P95 1711ms。
-后续未提交修改是验收入口和证据文档，业务运行版本仍95d501e。
+当前运行 API/chart/web 及行情 worker 镜像为 `087b135`，均通过 mw-docker / market-watch-ubuntu 构建。
+修复后本地选定组合/统一订阅/固定版本套件 132 passed；同镜像 PostgreSQL gates 60 passed。
+真实 Practice 闲置后组合首屏、组合只报价、pricing-owner 停止/恢复、双账户切换、独立预警
+及最后来源释放均通过，原账户已恢复。当前无未解决技术验收卡点。
+最终证据及历史负载矩阵见 [completion-audit.md](completion-audit.md)。
 
 2026-10-09按用户授权从原market-watch本机.env获取Practice配置，私有保存，未输出凭据。
 本机直连失败，已有代理实测REST127品种、EURUSD/XAUUSD各5根确认M1；
@@ -54,7 +50,7 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 - `test_market_stream_postgres.py`：Ubuntu隔离PostgreSQL上34 passed，见 `postgres-tests.txt`。包含独立进程注册/领取、worker、报价与HTTP契约；这次使用本机.venv连接本项目15645端口。初次容器运行31 passed、3 failed，原因是测试schema缺少基础品种；补齐fixture后重跑通过，`c251b9d` 容器内34项复核通过（postgres-container-tests.txt）；最新快照成本和慢消费者检查加入下次镜像 gates。
 - 新模块 Ruff、`node --check advanced-host/bridge.js`、`git diff --check` 通过；Alembic 单 head 为 `ar45_market_stream`。
 
-## Ubuntu Docker 验收实例（主验收通过，首屏闲置复核进行中）
+## Ubuntu Docker 验收实例（技术验收通过，保留供用户查看）
 
 2026-10-09 用户授权并配置Ubuntu Docker权限，docker组已包含quant；旧进程附加组未刷新，使用 `sg docker -c 'COMMAND'` 成功访问本机Docker29.1.3。API/web/chart均通过mw-docker及market-watch-ubuntu构建。已创建本项目独立network和postgres-data volume并启动服务，主API健康检查通过；查询数据库alembic_version确认 `ar45_market_stream`。没有访问或修改unraid。
 
@@ -113,7 +109,7 @@ fixture 仅创建本任务的 `SSEFIXTURE`/`unified-sse-synthetic`，九周期�
 
 早期2026-10-09首次运行该命令：在 `compose ps -q api` 阶段遇到 Ubuntu Docker socket permission denied，浏览器未启动、fixture 未写入。`test_unified_sse_acceptance_fixture.py` 的6项SQLite检查通过，仅证明保护和fixture→真实Calculator/持久事件的输入契约。该早期权限失败已被后续Ubuntu实测取代；fixture现有7项检查通过。
 
-完整统一Python套件本地142 passed、37 skipped，随后在实际隔离PostgreSQL上补跑34项全部通过；两个结果证据分开保存。Node脚本语法、新增Python文件Ruff及diff check通过。Docker权限阻塞已解除。真实OANDA测试配置路径已向用户询问，尚未配置token/account，不能将合成fixture当作供应商验收。
+完整统一Python套件本地142 passed、37 skipped，随后在实际隔离PostgreSQL上补跑34项全部通过；两个结果证据分开保存。Node脚本语法、新增Python文件Ruff及diff check通过。Docker权限阻塞已解除。后续已从本机 market-watch .env 获取 Practice 配置并完成真实供应商验收；未访问 unraid。
 
 ## 完成审计
 
@@ -159,5 +155,22 @@ HTTP首次读取120秒需求租约退尽后EUR_USD退出desired_datasets。
 完整报告oanda-composite-owner-0eb7f6c-passed.json留私有，摘要/哈希在oanda-runtime-summary.json。
 真实组合冷恢复产生tail_retracted/history_changed与native重读，单独记录；
 source探针对应owner未就绪/报价过期及确认修订，稳定普通窗口不允许市场HTTP。
-账户切换、资源范围已完成；闲置后组合首屏无 bar 订阅仍在复现，最终审计保持未收口。
+账户切换、资源范围已完成；087b135 修复并通过闲置首屏及故障场景复验，最终技术审计已完成。
 物理磁盘净增量及长期生产容量明确列为测量限制。
+
+## 最终修复版本复验（2026-10-09，087b135）
+
+组合读取先保留 LiveState 与 PricingOwner 强引用，再捕获 freshness 评估时间；防止数据库读取期间
+到达的报价被旧时间误判为未来并触发 tail_retracted。真正未来的报价仍被拒收，组合修订归属仍校验。
+实际 LiveState 读取时间竞争红/绿证据分别为 live-observation-clock-source-red.txt / green.txt。
+最终本地 132 项与镜像内 PG 60 项输出为 final-local-087b135.txt / final-postgres-087b135.txt；
+Node market-stream、fixed-series、provider-subscriptions 三组通过，修改模块 Ruff 与 diff check 通过。
+
+真实 Practice 复验：--composite --first-screen、--composite --owner-restart、
+--composite --account-switch 均通过，报告摘要和私有原始文件 SHA-256 已归档到
+[oanda-runtime-summary.json](oanda-runtime-summary.json)。首屏包含来源从闲置/connecting 到有效报价的恢复；
+其后稳定窗口至少两个原生 K 线回调且没有行情 HTTP 重读。并不要求冷恢复完全没有历史重读。
+账户切换只作用于 Ubuntu 本项目，备用账户实价、旧账户隔离和原账户恢复均验证成功。
+
+工程交付完成，用户验收及实例退役尚未结束；不执行 mw-docker finish/retire --apply。
+用户验收结束后，按 AGENTS.md 要求先 retire 预览，再备份并实际恢复核验后精确退役。
