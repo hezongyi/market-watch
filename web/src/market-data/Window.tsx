@@ -1,24 +1,32 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Database, Layers, ListChecks, Radio, Settings2 } from "lucide-react";
 import Center from "./Center";
 import { CenterContext, type CenterNavigation } from "./router";
 import { centerLocation, centerTab } from "./location";
 import "./window.css";
+import { NativeSlot, NativeSidebar, NativeUiContext } from "./NativeControls";
 
+const navIcon = (key:string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${({managed:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',platform:'<circle cx="12" cy="12" r="2"/><path d="M16 8a6 6 0 0 1 0 8M8 8a6 6 0 0 0 0 8M19 5a10 10 0 0 1 0 14M5 5a10 10 0 0 0 0 14"/>',composite:'<path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/>',tasks:'<path d="m3 6 2 2 4-4M12 6h9M3 13h6M12 13h9M3 20h6M12 20h9"/>',sources:'<path d="M3 6h5M12 6h9M3 12h9M16 12h5M3 18h2M9 18h12"/><circle cx="10" cy="6" r="2"/><circle cx="14" cy="12" r="2"/><circle cx="7" cy="18" r="2"/>'} as Record<string,string>)[key]}</svg>`;
 const channel = "mw-data-center-v1";
 const tabs = [["managed", "自建行情", Database], ["platform", "平台品种", Radio], ["composite", "组合行情", Layers], ["tasks", "任务与记录", ListChecks], ["sources", "来源与能力", Settings2]] as const;
 type Context = { workspace: string; target: string; theme: string; symbolSync: boolean; intervalSync: boolean; location?: string };
 type Position = { top: number; tableTop: number; tableLeft: number; focus: string | null };
+export type HostedCenter = {
+  context: Context;
+  post: (message: any) => void;
+  subscribe: (listener: (message: any) => void) => () => void;
+};
 function readMemory<T>(key: string, fallback: T): T {
   try { return JSON.parse(sessionStorage.getItem(key) || "null") || fallback; } catch { return fallback; }
 }
 
 /** React owns business state; the public chart host owns the fullscreen dialog. */
-export default function DataCenterWindow() {
+export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } = {}) {
+  const nativeUi = useContext(NativeUiContext);
   const session = new URLSearchParams(location.search).get("session") || "";
-  const host = new URL((import.meta as any).env.VITE_ADVANCED_CHART_ORIGIN || `${location.protocol}//${location.hostname}:5187`).origin;
-  const [context, setContext] = useState<Context | null>(null);
-  const [route, setRoute] = useState(() => centerLocation(sessionStorage.getItem("mw-data-center-location") || "/market-data"));
+  const host = hosted ? location.origin : new URL((import.meta as any).env?.VITE_ADVANCED_CHART_ORIGIN || `${location.protocol}//${location.hostname}:5187`).origin;
+  const [context, setContext] = useState<Context | null>(hosted?.context || null);
+  const [route, setRoute] = useState(() => centerLocation(hosted?.context.location || sessionStorage.getItem("mw-data-center-location") || "/market-data"));
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
   const [guard, setGuard] = useState<(() => void) | null>(null);
   const dirty = useRef(new Set<string>()), routeRef = useRef(route), contextRef = useRef(context);
@@ -30,7 +38,7 @@ export default function DataCenterWindow() {
   const restoreScope = useRef<string | null>(null);
   const guardFocus = useRef<HTMLElement | null>(null);
   routeRef.current = route; contextRef.current = context;
-  const post = useCallback((value: object) => parent.parent.postMessage({ channel, session, ...value }, host), [session, host]);
+  const post = useCallback((value: object) => hosted ? hosted.post(value) : parent.parent.postMessage({ channel, session, ...value }, host), [session, host, hosted]);
   const setDirty = useCallback((key: string, value: boolean) => { value ? dirty.current.add(key) : dirty.current.delete(key); }, []);
   const clearDirty = useCallback(() => dirty.current.clear(), []);
   const protect = useCallback((action: () => void) => {
@@ -84,10 +92,8 @@ export default function DataCenterWindow() {
     finally { applying.current = false; setBusy(false); }
   }, [post, rememberPosition]);
   useEffect(() => {
-    if (parent === window || !/^[a-f0-9-]{36}$/.test(session)) { setError("请从图表顶部的数据中心打开窗口。"); return; }
-    const listener = (event: MessageEvent) => {
-      if (event.source !== parent.parent || event.origin !== host || event.data?.channel !== channel || event.data.session !== session) return;
-      const m = event.data;
+    if (!hosted && (parent === window || !/^[a-f0-9-]{36}$/.test(session))) { setError("请从图表顶部的数据中心打开窗口。"); return; }
+    const receive = (m: any) => {
       if (m.type === "context" && typeof m.context?.target === "string" && typeof m.context?.workspace === "string") {
         setContext(m.context);
         if (m.context.location) { dirty.current.clear(); setRoute(centerLocation(m.context.location)); }
@@ -95,14 +101,23 @@ export default function DataCenterWindow() {
       } else if (m.type === "theme" && /^(dark|light)$/.test(m.theme)) {
         setContext(value => value ? { ...value, theme: m.theme } : value);
       } else if (m.type === "request-close") close();
+      else if (m.type === "navigate" && typeof m.location === "string") navigate(m.location);
       else if (m.type === "apply-result" && m.id === request.current?.id) {
         const pending = request.current!; request.current = null; clearTimeout(pending.timer);
         m.error ? pending.reject(Error(String(m.error))) : pending.resolve();
       }
     };
+    if (hosted) {
+      const unsubscribe = hosted.subscribe(receive); post({ type: "ready" });
+      return () => {unsubscribe(); if(request.current) {clearTimeout(request.current.timer); request.current.reject(Error("窗口已关闭"));request.current=null;}};
+    }
+    const listener = (event: MessageEvent) => {
+      if (event.source !== parent.parent || event.origin !== host || event.data?.channel !== channel || event.data.session !== session) return;
+      receive(event.data);
+    };
     addEventListener("message", listener); post({ type: "ready" });
     return () => { removeEventListener("message", listener); if (request.current) { clearTimeout(request.current.timer); request.current.reject(Error("窗口已关闭，请核查图表结果")); request.current = null; } };
-  }, [post, close, session, host]);
+  }, [post, close, session, host, hosted, navigate]);
   useEffect(() => {
     sessionStorage.setItem("mw-data-center-location", route);
     if (new URL(route, "https://center.invalid").pathname === "/market-data") {
@@ -139,6 +154,16 @@ export default function DataCenterWindow() {
   useEffect(() => {
     const unload = (event: BeforeUnloadEvent) => { if (dirty.current.size) { event.preventDefault(); event.returnValue = ""; } };
     const keyboard = (event: KeyboardEvent) => {
+      if (hosted && !guard && event.key === "Escape" && !event.defaultPrevented) {
+        const filters = content.current?.querySelector<HTMLButtonElement>('.dc-filter-toggle[aria-expanded="true"]');
+        // A native Select/picker owns Escape while its separate popup is open.
+        const ownPopup = (event.target as HTMLElement).closest('[role="dialog"],[role="listbox"]');
+        if (filters?.getClientRects().length && (!ownPopup || ownPopup.contains(content.current))) {
+          event.preventDefault(); event.stopImmediatePropagation(); filters.click(); filters.focus(); return;
+        }
+      }
+      if (hosted && !guard) return;
+      if (hosted && guard && event.key === "Escape") {event.preventDefault();event.stopImmediatePropagation();setGuard(null);guardFocus.current?.focus();return;}
       if (event.key === "Escape") {
         if (event.defaultPrevented) return;
         event.preventDefault(); event.stopPropagation();
@@ -156,14 +181,14 @@ export default function DataCenterWindow() {
         else if (!event.shiftKey && (active === last || !scope?.contains(active))) { event.preventDefault(); first?.focus(); }
       }
     };
-    addEventListener("beforeunload", unload); addEventListener("keydown", keyboard);
-    return () => { removeEventListener("beforeunload", unload); removeEventListener("keydown", keyboard); };
-  }, [close, guard]);
+    addEventListener("beforeunload", unload); addEventListener("keydown", keyboard, true);
+    return () => { removeEventListener("beforeunload", unload); removeEventListener("keydown", keyboard, true); };
+  }, [close, guard, hosted]);
   return <CenterContext value={{ location: route, navigate, apply, setDirty, clearDirty, busy }}>
-    <main className="dc-window" data-theme={context?.theme || "dark"}>
-      <header className="dc-window-header"><h2><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" /></svg>数据中心</h2><button ref={closeButton} aria-label="关闭数据中心" onClick={close}><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path stroke="currentColor" strokeWidth="1.2" d="m1.5 1.5 15 15m0-15-15 15" /></svg></button></header>
+    <main className={`dc-window${hosted ? " dc-window-native" : ""}`} data-theme={context?.theme || "dark"}>
+      {!hosted && <header className="dc-window-header"><h2><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" /></svg>数据中心</h2><button ref={closeButton} aria-label="关闭数据中心" onClick={close}><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path stroke="currentColor" strokeWidth="1.2" d="m1.5 1.5 15 15m0-15-15 15" /></svg></button></header>}
       <div className="dc-window-body" inert={guard !== null}>
-        <nav className="dc-window-nav" aria-label="数据中心分区">{tabs.map(([key, label, Icon]) => <button key={key} aria-current={centerTab(route) === key ? "page" : undefined} onClick={() => navigate(tabLocations.current[key] || `/market-data?tab=${key}`)}><Icon size={18} aria-hidden="true" />{label}</button>)}</nav>
+        <nav className="dc-window-nav" aria-label="数据中心分区">{nativeUi ? <NativeSidebar>{tabs.map(([key,label])=><NativeSlot key={key} kind="sidebarItem" props={{title:label,icon:{default:navIcon(key),bold:navIcon(key)},tag:"button",isActive:centerTab(route)===key,"aria-current":centerTab(route)===key?"page":undefined,onClick:()=>navigate(tabLocations.current[key] || `/market-data?tab=${key}`)}} />)}</NativeSidebar> : <>{tabs.map(([key,label,Icon])=><button key={key} aria-current={centerTab(route)===key?"page":undefined} onClick={()=>navigate(tabLocations.current[key] || `/market-data?tab=${key}`)}><Icon size={18} aria-hidden="true" />{label}</button>)}</>}</nav>
         <div className="dc-window-content" ref={content}>
           {error && <p role="alert" className="error">{error}</p>}
           {!context ? <p role="status">正在连接图表工作区…</p> : <Center />}

@@ -45,13 +45,14 @@ const report = { environment: 'Ubuntu isolated Docker; native widget with in-mem
     }
     await expect(page.locator('.advanced-workspace')).toHaveAttribute('data-theme', theme.toLowerCase());
     await frames.native().getByRole('button', { name: '数据中心', exact: true }).click();
-    await expect.poll(() => !!frames.center()).toBeTruthy();
-    await expect(frames.center().locator('.dc-window')).toHaveAttribute('data-theme', theme.toLowerCase());
-    await frames.center().getByRole('button', { name: '关闭数据中心' }).click();
+    await expect(frames.native().locator(".dc-window")).toBeVisible();
+    await expect(frames.native().locator('.dc-window')).toHaveAttribute('data-theme', theme.toLowerCase());
+    await frames.native().getByRole('button', { name: '关闭数据中心' }).click();
     return state;
   };
   let layout, rows, nativeSaves = 0, writes = [];
   try {
+    if(process.env.LOCAL) await fixture.localNativeAssets(page);
     // Only read existing layout/preferences. No migration is needed to seed.
     await page.route('**/api/advanced-charts/preferences/migrate', route => route.fulfill({ json: { migrated: 0 } }));
     const seedReadOnly = route => {

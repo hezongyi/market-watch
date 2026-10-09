@@ -120,17 +120,21 @@ const clientId = crypto.randomUUID();
 const requests = [];
 let initialHistoryGate;
 function drain() {
-  while (pending.size < 4 && requests.length) {
+  while (requests.length) {
+    const managementBusy=[...pending.values()].filter(entry=>entry.management).length;
+    const management=requests.findIndex(entry=>entry.type === "data-center-api");
+    const managementSlot=management>=0 && managementBusy<2;
+    if(!managementSlot && pending.size-managementBusy>=4) break;
     // Pointer-driven viewport checks must not sit behind queued prewarming.
     // Keep the same four in-flight limit and leave ongoing reads untouched.
     const quoteBusy = [...pending.values()].some(entry => entry.quote);
     const reserveBusy = [...pending.values()].filter(entry => entry.reserve).length;
-    const eligible = entry => (entry.query.op !== 'quotes' || !quoteBusy) &&
+    const eligible = entry => entry.type !== 'data-center-api' && (entry.query.op !== 'quotes' || !quoteBusy) &&
       (!entry.query.native_reserve || reserveBusy < 2);
-    let interaction = requests.findIndex(entry => entry.query.op === "viewport");
+    let interaction = managementSlot ? management : requests.findIndex(entry => entry.query.op === "viewport");
     if (interaction < 0) interaction = requests.findIndex(entry =>
       entry.query.op === "historyCache" && !entry.query.background);
-    if (interaction < 0) interaction = requests.findIndex(entry => !entry.query.op && !entry.query.native_reserve);
+    if (interaction < 0) interaction = requests.findIndex(entry => eligible(entry) && !entry.query.op && !entry.query.native_reserve);
     if (interaction < 0) interaction = requests.findIndex(entry => entry.type === 'workspace');
     if (interaction < 0) interaction = requests.findIndex(eligible);
     if (interaction < 0) break;
@@ -150,7 +154,7 @@ function drain() {
       drain();
     }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
     const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
-      reserve: !!query.native_reserve };
+      reserve: !!query.native_reserve, management:type === "data-center-api" };
     pending.set(id, entry);
     if (isCurrent) {
       const check = () => {
@@ -391,6 +395,33 @@ function seriesPresentationRows(symbols) {
       exchange:meta.exchange || meta.source?.toUpperCase()}}] : [];
   });
 }
+// Vendor start counts returned rows; backend cursors count qualified candidates.
+// Keep that translation local to each immutable query, with bounded memory.
+const nativeSearchPages = new Map();
+async function searchNativeSymbols(options) {
+  const epoch = workspaceEpoch;
+  const key = JSON.stringify([options.userInput,options.exchange,options.symbolType,epoch]);
+  const start = options.start || 0;
+  let pages = nativeSearchPages.get(key);
+  if (!pages || start === 0) {pages=new Map([[0,null]]);nativeSearchPages.set(key,pages);}
+  while(nativeSearchPages.size>20) nativeSearchPages.delete(nativeSearchPages.keys().next().value);
+  if (!pages.has(start)) throw Error("搜索分页已失效，请重新搜索");
+  let cursor=pages.get(start),page;
+  for(let scan=0;scan<5;scan++) {
+    page=await request({op:"searchPage",args:{kind:"all",query:options.userInput || "",page_size:50,
+      source:options.exchange ? options.exchange.toLowerCase() : undefined,
+      symbol_type:options.symbolType || "",cursor:cursor || undefined}},"market",()=>epoch===workspaceEpoch);
+    cursor=page.next_cursor;
+    if(page.items.length || !cursor) break;
+  }
+  if(epoch!==workspaceEpoch) throw Error("工作区已切换");
+  if(cursor) pages.set(start+page.items.length,cursor);
+  while(pages.size>256) pages.delete(pages.keys().next().value);
+  return {items:page.items.map(s=>({symbol:s.display_symbol || s.symbol,ticker:s.ticker,
+    description:s.label+" · "+s.description,exchange:s.source === "composite" ? (s.historical_source || "").toUpperCase() : s.source.toUpperCase(),
+    type:s.type || "other"})),remaining:cursor ? 1 : 0};
+}
+
 const feed = {
   // The native price-axis countdown requires server time in UNIX seconds.
   // Authenticated/network access stays in the trusted parent origin.
@@ -432,6 +463,11 @@ const feed = {
     setTimeout(
       () =>
         cb({
+          exchanges: [{value:"",name:"全部来源",desc:"全部行情来源"},
+            ...["Dukascopy","OANDA","Binance","Yahoo"].map(name=>({value:name.toUpperCase(),name,desc:name+" 行情来源"}))],
+          symbols_types: [{name:"全部",value:""},{name:"外汇",value:"forex"},{name:"股票",value:"stock"},
+            {name:"加密",value:"crypto"},{name:"指数",value:"index"},{name:"基金",value:"fund"},
+            {name:"期货",value:"futures"},{name:"金属",value:"commodity"},{name:"其他",value:"other"}],
           supported_resolutions: resolutions,
           supports_marks: false,
           supports_timescale_marks: false,
@@ -439,28 +475,13 @@ const feed = {
         }),
       0,
     ),
-  searchSymbols: async (input, exchange, type, cb) => {
-    try {
-      const currentKind = typeof widget !== 'undefined' && ready ? decode(widget.activeChart().symbol()).series_kind : 'provider';
-      const rows = await request(
-        { op: "search", args: { query: input, kind: currentKind === 'managed' ? 'provider' : currentKind,
-          source: ['DUKASCOPY','OANDA','BINANCE','YAHOO'].includes(exchange?.toUpperCase()) ? exchange.toLowerCase() : undefined } },
-        "market",
-      );
-      cb(
-        rows.map(s => ({
-          symbol: s.display_symbol || s.symbol,
-          ticker: s.ticker || MWSeries.encode(s.id, "provider"),
-          description: s.label + " · " + (s.description || "平台行情") +
-            (s.series_kind && s.series_kind !== 'provider' || s.supported ? "" : " · 日历待接入"),
-          exchange: s.exchange || s.source.toUpperCase(),
-          type: ({CRYPTO:"crypto", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[s.asset_type] || "forex",
-        })),
-      );
-    } catch (e) {
-      cb([]);
-      send({ type: "error", error: String(e) });
-    }
+  searchSymbols: (input, exchange, type, cb) => {
+    searchNativeSymbols({userInput:input,exchange,symbolType:type,start:0})
+      .then(page=>cb(page.items)).catch(error=>{cb([]);send({type:"error",error:String(error)});});
+  },
+  searchSymbolsPaginated: (options, cb) => {
+    searchNativeSymbols(options).then(page=>cb(page.items,page.remaining))
+      .catch(error=>{cb([],0);send({type:"error",error:String(error)});});
   },
   resolveSymbol: async (ticker, cb, err) => {
     try {
@@ -1603,6 +1624,19 @@ function boot(
         : []),
     ],
   });
+  widget
+    .headerReady()
+    .then(async () => {
+      if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
+        send({type: "error", error: String(e)}));
+      // Public left-aligned buttons retain their creation order in the header.
+      if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
+        workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send,
+        suspendIndicators: () => indicatorPicker?.close(),
+        managementRequest: (args, signal) => request(args, "data-center-api", () => !signal.aborted),
+        resolve: args => request({op:"resolve",args},"market")});
+    })
+    .catch((e) => send({ type: "error", error: String(e) }));
   widget.onChartReady(async () => {
     await restoreTheme();
     globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
@@ -1639,20 +1673,9 @@ function boot(
         }
       }
     }
-    widget
-      .headerReady()
-      .then(async () => {
-        if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
-          send({type: "error", error: String(e)}));
-        // Public left-aligned buttons retain their creation order in the header.
-        if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
-          workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send,
-          suspendIndicators: () => indicatorPicker?.close(),
-          resolve: args => request({op:"resolve",args},"market")});
+    widget.headerReady().then(async()=>{
         alertBridge.attach();
         if (!readonly) {
-          globalThis.MWSeriesPicker?.attach(widget, query => request({op:'searchPage',args:query},'market'),
-            error=>error ? send({type:'error',error:String(error)}) : send({type:'workspace-action',action:'market-data'}));
           const button = widget.createButton(); button.textContent = "创建告警";
           button.setAttribute("title","在当前图表创建告警"); button.addEventListener("click",()=>alertBridge.create());
         }

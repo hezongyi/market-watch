@@ -1,3 +1,5 @@
+import { NativeCatalogPicker } from "./NativeCatalogPicker";
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { centerReturn } from "./navigation";
 import { useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams, useDirtyForm, useActionLock } from "./router";
@@ -192,7 +194,7 @@ export function DatasetCreate() {
         <div className="dc-fields">
           <label>
             来源
-            <select aria-label="来源"
+            <NativeSelect aria-label="来源"
               value={source}
               onChange={(e) => {
                 setSource(e.target.value);
@@ -205,11 +207,12 @@ export function DatasetCreate() {
             >
               <option value="dukascopy">Dukascopy</option>
               <option value="oanda">OANDA Practice</option>
-            </select>
+            </NativeSelect>
           </label>
+          <NativeCatalogPicker source={source} onSelect={choose} disabled={busy} />
           <label>
             搜索来源目录
-            <input
+            <NativeInput type="search" maxLength={100}
               value={catalogQuery}
               onChange={(e) => {
                 setCatalogQuery(e.target.value);
@@ -296,7 +299,7 @@ export function DatasetCreate() {
           )}
           <label>
             逻辑品种
-            <input {...fieldProps("create-logical")}
+            <NativeInput {...fieldProps("create-logical")}
               value={logical}
               readOnly={selected !== null}
               onChange={(e) => setLogical(e.target.value.toUpperCase())}
@@ -307,7 +310,7 @@ export function DatasetCreate() {
           </label>
           <label>
             准确来源代码
-            <input {...fieldProps("create-symbol")}
+            <NativeInput {...fieldProps("create-symbol")}
               value={symbol}
               readOnly={selected !== null}
               onChange={(e) => setSymbol(e.target.value)}
@@ -317,7 +320,7 @@ export function DatasetCreate() {
           </label>
           <label>
             资产类别
-            <select
+            <NativeSelect
               value={asset}
               disabled={selected !== null}
               onChange={(e) => changeAsset(e.target.value)}
@@ -327,7 +330,7 @@ export function DatasetCreate() {
               <option value="crypto">加密</option>
               <option value="index">指数</option>
               <option value="other">其他</option>
-            </select>
+            </NativeSelect>
           </label>
           {selected && (
             <button onClick={() => setSelected(null)}>改为手工登记</button>
@@ -336,7 +339,7 @@ export function DatasetCreate() {
             <summary>高级登记：价格精度</summary>
             <label>
               小数位数
-              <input {...fieldProps("create-precision")}
+              <NativeInput {...fieldProps("create-precision")}
                 type="number"
                 min={0}
                 max={10}
@@ -362,7 +365,7 @@ export function DatasetCreate() {
         <div className="dc-fields">
           <label>
             起始交易日期
-            <input {...fieldProps("create-day")}
+            <NativeInput {...fieldProps("create-day")}
               type="date"
               value={day}
               onChange={(e) => {
@@ -374,7 +377,7 @@ export function DatasetCreate() {
           </label>
           <label>
             聚合日界
-            <select {...fieldProps("create-calendar")}
+            <NativeSelect {...fieldProps("create-calendar")}
               value={calendar}
               onChange={(e) => {
                 setCalendar(e.target.value);
@@ -384,7 +387,7 @@ export function DatasetCreate() {
               <option value="">请选择日界</option>
               <option value="ny17">纽约当地 17:00（随夏令时）</option>
               <option value="utc0">UTC 00:00</option>
-            </select>
+            </NativeSelect>
           {fieldError("create-calendar")}
           </label>
           <p>
@@ -398,7 +401,7 @@ export function DatasetCreate() {
             <div className="dc-checks">
               {frames.map((frame) => (
                 <label key={frame}>
-                  <input
+                  <NativeInput
                     type="checkbox"
                     checked={periods.includes(frame)}
                     disabled={frame === "M1"}
@@ -417,13 +420,13 @@ export function DatasetCreate() {
           </fieldset>
           <label>
             维护计划
-            <select
+            <NativeSelect
               value={frequency}
               onChange={(e) => setFrequency(e.target.value)}
             >
               <option value="daily">每日 00:15 UTC</option>
               <option value="once">仅本次维护</option>
-            </select>
+            </NativeSelect>
           </label>
         </div>
       )}

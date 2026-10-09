@@ -1,3 +1,4 @@
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { useRef, useState } from "react";
 import { Link, useDirtyForm, useActionLock } from "./router";
 import { api, ApiError } from "./api";
@@ -80,19 +81,19 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
     <Feedback error={error||options.error||revisions.error} loading={options.loading||revisions.loading} empty={false}/>
     {message&&<p role="status">{message}</p>}
     <form className="dc-form" onSubmit={prepare}>
-      <label>新历史基线<select required value={version} onChange={e=>choose(e.target.value)} disabled={busy}>
+      <label>新历史基线<NativeSelect required value={version} onChange={e=>choose(e.target.value)} disabled={busy}>
         <option value="">选择已发布固定M1版本</option>
         {options.data?.items.map(row=><option key={row.version_id} value={row.version_id}>
           {row.calendar.toUpperCase()} · {time(row.start)} — {time(row.end)} · {row.version_id.slice(0,8)}</option>)}
-      </select></label>
-      <label>实时映射版本<select required value={mapping} onChange={e=>setMapping(e.target.value)} disabled={busy||!selected}>
+      </NativeSelect></label>
+      <label>实时映射版本<NativeSelect required value={mapping} onChange={e=>setMapping(e.target.value)} disabled={busy||!selected}>
         <option value="">选择已审核映射</option>
         {selected?.mappings.map(row=><option key={row.id} value={row.id}>
           OANDA {row.environment} · {row.display_symbol || row.provider_symbol} · {row.id.slice(0,8)}</option>)}
-      </select></label>
+      </NativeSelect></label>
       {selected&&!selected.mappings.length&&<p>该日界数据集尚无明确映射。<Link to={`/market-data/datasets/${selected.dataset_id}/mapping`}>保存实时映射</Link></p>}
-      <label>拼接时刻（UTC）<input type="datetime-local" required value={seam} onChange={e=>setSeam(e.target.value)} disabled={busy}/></label>
-      <label className="dc-inline-check"><input type="checkbox" checked={nonDay} onChange={e=>setNonDay(e.target.checked)} disabled={busy}/>
+      <label>拼接时刻（UTC）<NativeInput type="datetime-local" required value={seam} onChange={e=>setSeam(e.target.value)} disabled={busy}/></label>
+      <label className="dc-inline-check"><NativeInput type="checkbox" checked={nonDay} onChange={e=>setNonDay(e.target.checked)} disabled={busy}/>
         明确使用非日界分钟拼接规则</label>
       <label>修订原因<textarea required minLength={3} maxLength={1000} value={reason} onChange={e=>setReason(e.target.value)} disabled={busy}/></label>
       <div className="dc-actions"><button className="primary" disabled={busy||!!options.error||!selected||!mapping}>

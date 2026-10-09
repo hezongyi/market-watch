@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { NativeUiContext } from "./NativeControls";
 import { useEffect, useRef, useState } from "react";
 import { Link, useActionLock, useMounted, useSearchParams } from "./router";
 import { api, ApiError } from "./api";
@@ -38,6 +40,7 @@ export function DatasetReferences({
   archiveAvailable?: boolean;
   onCancel?: () => void;
 }) {
+  const nativeUi=useContext(NativeUiContext);
   const report = useSnapshot<ReferenceReport>(
     `/market-data/datasets/${id}/references`,
     refresh,
@@ -104,6 +107,7 @@ export function DatasetReferences({
   }
   async function reclaim() {
     if (!review || !actionLock.acquire()) return;
+    if(nativeUi && !await nativeUi.confirm({title:"确认删除历史数据",body:`将删除清单中的 ${review.impact.payload_totals.target_versions} 个版本的价格数据。此操作不能撤销；身份和发布清单保留。`})) {actionLock.release();return;}
     setBusy(true);
     setError("");
     try {

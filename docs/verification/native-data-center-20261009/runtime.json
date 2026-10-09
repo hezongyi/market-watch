@@ -1,0 +1,221 @@
+{
+  "environment": "Ubuntu local Docker",
+  "host": "quant-server",
+  "project": "mw-data-center-review-20261008",
+  "url": "https://192.168.7.232:19943/advanced-charts",
+  "chart_origin": "https://192.168.7.232:19944",
+  "services": [
+    {
+      "Service": "api",
+      "Name": "mw-data-center-review-20261008-api-1",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "healthy",
+      "Status": "Up 6 minutes (healthy)",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 8000,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "Service": "chart-origin",
+      "Name": "mw-data-center-review-20261008-chart-origin-1",
+      "Image": "market-watch-chart-origin:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 19 minutes",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 80,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "Service": "composite-aggregate-worker",
+      "Name": "mw-data-center-review-20261008-composite-aggregate-worker-1",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 5 minutes",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 8000,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "Service": "history-worker",
+      "Name": "mw-data-center-review-20261008-history-worker-1",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 5 minutes",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 8000,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "Service": "native-history-worker",
+      "Name": "mw-data-center-review-20261008-native-history-worker-1",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 5 minutes",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 8000,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "Service": "pg",
+      "Name": "mw-data-center-review-20261008-pg-1",
+      "Image": "postgres:14-bookworm",
+      "State": "running",
+      "Health": "healthy",
+      "Status": "Up 12 hours (healthy)",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 5432,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "Service": "pricing-worker",
+      "Name": "mw-data-center-review-20261008-pricing-worker-1",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 5 minutes",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 8000,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "Service": "tls",
+      "Name": "mw-data-center-review-20261008-tls-1",
+      "Image": "nginx:1.28-alpine",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 51 seconds",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 80,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        },
+        {
+          "URL": "192.168.7.232",
+          "TargetPort": 443,
+          "PublishedPort": 19943,
+          "Protocol": "tcp"
+        },
+        {
+          "URL": "192.168.7.232",
+          "TargetPort": 444,
+          "PublishedPort": 19944,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "Service": "web",
+      "Name": "mw-data-center-review-20261008-web-1",
+      "Image": "market-watch-web:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Status": "Up About a minute",
+      "Networks": "mw-data-center-review-20261008_default",
+      "Publishers": [
+        {
+          "URL": "",
+          "TargetPort": 80,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "tag": "market-watch-api:mw-data-center-review-20261008",
+      "id": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "created": "2026-10-09T01:16:21.983959327Z",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-09T01:15:31.029335+00:00",
+        "io.market-watch.commit": "4dfdf5b01d0e0088d99b96d4ff15d79c3e791eb0",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-16T01:15:31.029335+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    },
+    {
+      "tag": "market-watch-web:mw-data-center-review-20261008",
+      "id": "sha256:2988cc97dbb8f607753dba73b22b2558bd30c31308636023122c2ed4a3f2524d",
+      "created": "2026-10-09T01:25:15.336516598Z",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-09T01:24:30.386743+00:00",
+        "io.market-watch.commit": "4dfdf5b01d0e0088d99b96d4ff15d79c3e791eb0",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-16T01:24:30.386743+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    },
+    {
+      "tag": "market-watch-chart-origin:mw-data-center-review-20261008",
+      "id": "sha256:27c0e2a1a4f7889ec32ab50fae1967abb079d50bf4fef7de72eb436fb3efc2c8",
+      "created": "2026-10-09T01:06:55.485622237Z",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-09T01:06:32.191301+00:00",
+        "io.market-watch.commit": "4dfdf5b01d0e0088d99b96d4ff15d79c3e791eb0",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-16T01:06:32.191301+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-data-center-review-20261008",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-data-center-review-20261008"
+      }
+    }
+  ]
+}

@@ -55,3 +55,27 @@ def test_explicit_history_identity_is_never_listed_as_native_platform(database):
                                        provider_symbol="EUR_USD", basis="bid"))
         rows = catalog(db, source="oanda")["items"]
         assert dataset.id not in {row["id"] for row in rows}
+
+
+def test_platform_asset_filter_qualifies_before_paging(database, monkeypatch):
+    monkeypatch.setattr(settings, "yahoo_enabled", True)
+    with database.begin() as db:
+        for index, asset in enumerate(("EQUITY", "ETF", "EQUITY", "INDEX")):
+            db.add(MarketCatalog(id=f"YAHOO:asset{index}", source="yahoo", symbol=f"T{index}",
+                label=f"Ticker{index}", asset_type=asset, precision=8, calendar="yahoo", available=True))
+        db.flush()
+        first = catalog(db, source="yahoo", asset="equity", page_size=1)
+        second = catalog(db, source="yahoo", asset="equity", page_size=1, page=2)
+        assert first["total"] == second["total"] == 2
+        assert first["items"][0]["id"] != second["items"][0]["id"]
+        assert catalog(db, source="yahoo", asset="etf")["items"][0]["asset_class"] == "etf"
+        assert not db.new and not db.dirty
+def test_search_asset_names_cover_provider_and_dataset_vocabularies():
+    from alerts.search_types import symbol_type
+
+    for names, expected in ((["EQUITY", "equity", "STOCK", "stock"], "stock"),
+                            (["ETF", "etf", "FUND", "fund"], "fund"),
+                            (["FUTURE", "future", "FUTURES", "futures"], "futures"),
+                            (["METAL", "metal", "commodity"], "commodity")):
+        assert all(symbol_type(name) == expected for name in names)
+    assert symbol_type("unknown") == "other"

@@ -5,6 +5,7 @@ import os
 import pytest
 from test_provider_postgres import provider_pg as provider_pg
 from test_series_search_pagination import (
+    test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query as all_cursor,
     test_composite_pages_use_known_mapping_without_scanning_other_products as composite_pages,
 )
 from test_series_search_pagination import (
@@ -34,3 +35,7 @@ def test_sql_cost_and_authenticated_page(provider_pg):
 
 def test_composite_mapping_pages_and_active_revision_calendar(provider_pg, monkeypatch):
     composite_pages(provider_pg[0], monkeypatch)
+
+
+def test_all_kind_cursor_and_asset_filter(provider_pg, monkeypatch):
+    all_cursor(provider_pg[0], monkeypatch)

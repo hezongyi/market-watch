@@ -263,6 +263,25 @@ export default function AdvancedWorkspace() {
       if (m.type === "data-center-replay" && m.session === centerSession.current && /^\/replay(?:\?dataset_version=[a-f0-9-]{36})?$/.test(m.path)) {
         location.assign(m.path); return;
       }
+      if (m.type === "data-center-api") {
+        const q = m.query;
+        if (mobile || !Number.isSafeInteger(m.id) || m.id <= 0 || !q || q.session !== centerSession.current || typeof q.path !== "string" || q.path.length > 4000 ||
+          JSON.stringify(q).length > 100000 || !/^\/market-data\/(?:center|datasets|history-catalog|date-boundary|composites|tasks|versions|series|resolve|capabilities|sources)(?:\/[A-Za-z0-9_-]+)*(?:\?[^#]*)?$/.test(q.path) && q.path !== "/charts/provider/configure") {
+          reply({type:"result",id:m.id,error:"数据中心请求不允许",errorDetails:{status:403,code:"FORBIDDEN"}});return;
+        }
+        const controller = new AbortController();
+        if (!marketRequests.has(source)) marketRequests.set(source, new Map());
+        marketRequests.get(source)!.set(m.id, controller);
+        try {
+          const result = await api(q.path, q.body, controller.signal);
+          reply({type:"result",id:m.id,result});
+        } catch (error: any) {
+          reply({type:"result",id:m.id,error:error.message || String(error),errorDetails:{...apiErrorDetails(error),status:error.status}});
+        } finally {
+          marketRequests.get(source)?.delete(m.id);
+        }
+        return;
+      }
       if (m.type === "chart-alert-context") {
         if (mobile || !validAlertContext(m.context, current.current?.id)) return;
         setAlertContext(m.context); setAlertsOpen(true);
@@ -894,9 +913,11 @@ export default function AdvancedWorkspace() {
               endpoints[q.op] +
                 (q.op === "searchPage"
                   ? "?" + new URLSearchParams({query:String(q.args?.query || ""),
-                    kind:["provider","history","composite"].includes(q.args?.kind) ? q.args.kind : "provider",
+                    kind:["provider","history","composite","all"].includes(q.args?.kind) ? q.args.kind : "provider",
                     source:String(q.args?.source || ""),calendar:String(q.args?.calendar || ""),
-                    page_size:"25",offset:String(Number.isSafeInteger(q.args?.offset) ? q.args.offset : 0)})
+                    symbol_type:String(q.args?.symbol_type || ""),cursor:String(q.args?.cursor || ""),
+                    page_size:String(Number.isSafeInteger(q.args?.page_size) ? Math.max(1,Math.min(100,q.args.page_size)) : 25),
+                    offset:String(Number.isSafeInteger(q.args?.offset) ? q.args.offset : 0)})
                   : q.op === "search"
                   ? "?query=" + encodeURIComponent(String(q.args?.query || "")) +
                     "&kind=" + encodeURIComponent(["provider", "history", "composite", "all"].includes(q.args?.kind) ? q.args.kind : "all") +

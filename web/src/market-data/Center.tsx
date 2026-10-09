@@ -1,3 +1,4 @@
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { useState } from "react";
 import { Link, useLocation, useSearchParams, useActionLock } from "./router";
 import { OpenChart } from "./OpenChart";
@@ -141,7 +142,7 @@ export function CenterList() {
         <div className="dc-filters">
           <label>
             搜索品种
-            <input
+            <NativeInput type="search" maxLength={100} placeholder="品种代码或名称"
               value={query}
               onChange={(e) => filter("query", e.target.value)}
             />
@@ -149,7 +150,7 @@ export function CenterList() {
           {(
             <label>
               来源
-              <select aria-label="来源"
+              <NativeSelect aria-label="来源"
                 value={source}
                 onChange={(e) => filter("source", e.target.value)}
               >
@@ -159,24 +160,24 @@ export function CenterList() {
                     {names[s]}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
           )}
-          {tab === "managed" && <label>资产类别<select value={asset} onChange={e => filter("asset_class", e.target.value)}>
+          {["managed","platform"].includes(tab) && <label>资产类别<NativeSelect value={asset} onChange={e => filter("asset_class", e.target.value)}>
             <option value="">全部类别</option><option value="forex">外汇</option><option value="metal">金属</option>
-            <option value="crypto">加密</option><option value="index">指数</option><option value="other">其他</option>
-          </select></label>}
+            <option value="crypto">加密</option><option value="index">指数</option>{tab === "platform" && <><option value="equity">股票</option><option value="etf">基金</option><option value="future">期货</option></>}<option value="other">其他</option>
+          </NativeSelect></label>}
           {tab === "managed" && (
             <label>
               聚合日界
-              <select
+              <NativeSelect
                 value={calendar}
                 onChange={(e) => filter("calendar", e.target.value)}
               >
                 <option value="">全部日界</option>
                 <option value="ny17">NY17</option>
                 <option value="utc0">UTC0</option>
-              </select>
+              </NativeSelect>
             </label>
           )}
           <button onClick={() => setRefresh((v) => v + 1)}>刷新</button>

@@ -1,3 +1,4 @@
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { useEffect, useState } from "react";
 import { api } from "./api";
 
@@ -66,18 +67,18 @@ export default function SeriesPicker({ kind, selected, onSelect }: {
   const options = selected ? [selected, ...rows.filter(row => kind === "history"
     ? row.dataset_id !== selected.dataset_id : row.id !== selected.id)] : rows;
   return <div className="qualified-series-picker">
-    <label>查找{title}<input type="search" value={query} maxLength={100}
+    <label>查找{title}<NativeInput type="search" value={query} maxLength={100}
       onChange={e => { setQuery(e.target.value); resetPages(); }} placeholder="品种或准确来源代码" /></label>
-    <label>历史来源<select aria-label="历史来源" value={source} onChange={e => { setSource(e.target.value); resetPages(); }}>
+    <label>历史来源<NativeSelect aria-label="历史来源" value={source} onChange={e => { setSource(e.target.value); resetPages(); }}>
       <option value="">全部来源</option><option value="dukascopy">Dukascopy</option><option value="oanda">OANDA</option><option value="binance">Binance</option>
-    </select></label>
-    <label>聚合日界<select aria-label="聚合日界" value={calendar} onChange={e => { setCalendar(e.target.value); resetPages(); }}>
+    </NativeSelect></label>
+    <label>聚合日界<NativeSelect aria-label="聚合日界" value={calendar} onChange={e => { setCalendar(e.target.value); resetPages(); }}>
       <option value="">全部日界</option><option value="ny17">NY17</option><option value="utc0">UTC 00:00</option>
-    </select></label>
-    <label>品种<select disabled={loading} value={selected?.id ?? ""} onChange={e => onSelect(options.find(row => row.id === e.target.value) ?? null)}>
+    </NativeSelect></label>
+    <label>品种<NativeSelect disabled={loading} value={selected?.id ?? ""} onChange={e => onSelect(options.find(row => row.id === e.target.value) ?? null)}>
       <option value="">选择{title}</option>
       {options.map(row => <option key={row.id} value={row.id}>{seriesLabel(row)} · {kind === "history" ? "已发布" : row.created ? "已建立" : "首次使用时准备"}</option>)}
-    </select></label>
+    </NativeSelect></label>
     <div role="status">{loading ? "正在查找…" : error ? "查找失败，所选行情保留。" : !rows.length ? "没有符合条件的可用行情。" : `本页 ${rows.length} 条${title}。`}</div>
     <nav className="dc-actions" aria-label={`${title}搜索分页`}>
       <button type="button" disabled={loading || offsets.length === 1} onClick={() => setOffsets(current => current.slice(0,-1))}>上一页行情</button>

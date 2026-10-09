@@ -1,3 +1,5 @@
+import { NativeCatalogPicker } from "./NativeCatalogPicker";
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { centerLink, centerReturn, useCenterRowRestore } from "./navigation";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -154,7 +156,7 @@ export function CompositeList() {
         </button>
         <label>
           搜索品种
-          <input
+          <NativeInput
             value={query}
             onChange={(e) => filter("query", e.target.value)}
           />
@@ -331,7 +333,8 @@ export function MappingForm() {
   useEffect(() => {
     if (error) errorRef.current?.focus();
   }, [error]);
-  const selected = catalog.data?.items.find((row) => row.catalog_id === code);
+  const [picked,setPicked]=useState<any>(null);
+  const selected = picked?.catalog_id === code ? picked : catalog.data?.items.find((row) => row.catalog_id === code);
   const products = [
     ["spot_fx", "现货外汇"],
     ["spot_metal", "现货金属"],
@@ -397,7 +400,7 @@ export function MappingForm() {
           <div className="dc-filters">
             <label>
               查找目标准确品种
-              <input
+              <NativeInput
                 value={targetQuery}
                 onChange={(e) => {
                   setTargetQuery(e.target.value);
@@ -437,20 +440,21 @@ export function MappingForm() {
                 {error}
               </p>
             )}
+            <NativeCatalogPicker source="oanda" disabled={busy} onSelect={row=>{setPicked(row);setCode(row.catalog_id);}} />
             <label>
               目标准确品种（OANDA Practice）
-              <select
+              <NativeSelect
                 required
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
               >
                 <option value="">请选择当前账户品种</option>
-                {catalog.data?.items.map((row) => (
+                {[...(picked && !catalog.data?.items.some(row=>row.catalog_id===picked.catalog_id) ? [picked] : []),...(catalog.data?.items || [])].map((row) => (
                   <option key={row.catalog_id} value={row.catalog_id}>
                     {row.display_symbol || row.provider_symbol} · {row.label} · {row.asset_class}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
             {selected && (
               <p>
@@ -460,7 +464,7 @@ export function MappingForm() {
             )}
             <label>
               标的代码
-              <input
+              <NativeInput
                 required
                 pattern="[A-Z0-9]{1,30}"
                 value={underlying}
@@ -469,7 +473,7 @@ export function MappingForm() {
             </label>
             <label>
               报价币种
-              <input
+              <NativeInput
                 required
                 pattern="[A-Z]{3,8}"
                 value={currency}
@@ -478,7 +482,7 @@ export function MappingForm() {
             </label>
             <label>
               历史产品类型
-              <select
+              <NativeSelect
                 value={historicalProduct}
                 onChange={(e) => setHistoricalProduct(e.target.value)}
               >
@@ -487,11 +491,11 @@ export function MappingForm() {
                     {l}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
             <label>
               实时产品类型
-              <select
+              <NativeSelect
                 value={liveProduct}
                 onChange={(e) => setLiveProduct(e.target.value)}
               >
@@ -500,11 +504,11 @@ export function MappingForm() {
                     {l}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
             <label>
               产品关系
-              <select
+              <NativeSelect
                 value={relationship}
                 onChange={(e) => setRelationship(e.target.value)}
               >
@@ -512,11 +516,11 @@ export function MappingForm() {
                 <option value="same_underlying_different_product">
                   相同标的、不同产品
                 </option>
-              </select>
+              </NativeSelect>
             </label>
             <label>
               历史产品官方依据
-              <input
+              <NativeInput
                 required
                 type="url"
                 value={historicalEvidence}
@@ -525,7 +529,7 @@ export function MappingForm() {
             </label>
             <label>
               实时产品官方依据
-              <input
+              <NativeInput
                 required
                 type="url"
                 value={liveEvidence}
@@ -543,7 +547,7 @@ export function MappingForm() {
               />
             </label>
             <label>
-              <input
+              <NativeInput
                 required
                 type="checkbox"
                 checked={reviewed}
@@ -683,7 +687,7 @@ export function CompositeDetail() {
               </Link>
             </>
           )}
-          {section === "chart" && <div className="dc-fields"><label>周期<select value={frame} onChange={e => select("frame", e.target.value)}>{frames.map(f => <option key={f}>{f}</option>)}</select></label><OpenChart ticker={`MWC:${row.id}`} frame={frame} /></div>}
+          {section === "chart" && <div className="dc-fields"><label>周期<NativeSelect value={frame} onChange={e => select("frame", e.target.value)}>{frames.map(f => <option key={f}>{f}</option>)}</NativeSelect></label><OpenChart ticker={`MWC:${row.id}`} frame={frame} /></div>}
           {section === "seam" && (
             <>
               <CompositeRevisions key={id} id={id!} active={row.active_revision_id} onChanged={()=>setRefresh(value=>value+1)}/>

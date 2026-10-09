@@ -1,3 +1,4 @@
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { centerReturn } from "./navigation";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -314,7 +315,7 @@ export function DatasetDetail() {
               <h2>已发布 M1 覆盖</h2>
               <label>
                 覆盖固定版本
-                <select
+                <NativeSelect
                   value={selectedVersion || ""}
                   onChange={(e) => {
                     const next = new URLSearchParams(params);
@@ -335,7 +336,7 @@ export function DatasetDetail() {
                         {time(v.start)} — {time(v.end)}
                       </option>
                     ))}
-                </select>
+                </NativeSelect>
               </label>
               <p>
                 {time(dataset.available_start)} 至 {time(dataset.available_end)}
@@ -653,12 +654,12 @@ export function DatasetDetail() {
               </p>
               <fieldset disabled={busy}>
                 <legend>指定区间维护</legend>
-                <label>任务类型<select aria-label="任务类型" value={rangeKind} onChange={e => setRangeKind(e.target.value as "backfill" | "recheck")}>
+                <label>任务类型<NativeSelect aria-label="任务类型" value={rangeKind} onChange={e => setRangeKind(e.target.value as "backfill" | "recheck")}>
                   <option value="backfill">补数</option><option value="recheck">复查已有区间</option>
-                </select></label>
+                </NativeSelect></label>
                 <label>
                   起始交易日期
-                  <input
+                  <NativeInput
                     type="date"
                     value={from}
                     onChange={(e) => setFrom(e.target.value)}
@@ -666,7 +667,7 @@ export function DatasetDetail() {
                 </label>
                 <label>
                   结束交易日期（不包含）
-                  <input
+                  <NativeInput
                     type="date"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
@@ -680,14 +681,14 @@ export function DatasetDetail() {
                 <legend>按新日界创建数据集</legend>
                 <label>
                   目标日界
-                  <select
+                  <NativeSelect
                     value={calendar}
                     onChange={(e) => setCalendar(e.target.value)}
                   >
                     <option value="">请选择</option>
                     <option value="ny17">NY17</option>
                     <option value="utc0">UTC0</option>
-                  </select>
+                  </NativeSelect>
                 </label>
                 <p>复用最新发布 M1；旧回测和组合保留原口径。</p>
                 <button
@@ -715,7 +716,7 @@ export function DatasetDetail() {
               <div className="dc-filters">
                 <label>
                   周期
-                  <select
+                  <NativeSelect
                     value={frame}
                     onChange={(e) => select("frame", e.target.value)}
                   >
@@ -740,11 +741,11 @@ export function DatasetDetail() {
                             : ""}
                       </option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 </label>
                 <label>
                   固定版本
-                  <select
+                  <NativeSelect
                     value={selectedVersion}
                     onChange={(e) => select("version", e.target.value)}
                   >
@@ -759,7 +760,7 @@ export function DatasetDetail() {
                           {time(v.end)}
                         </option>
                       ))}
-                  </select>
+                  </NativeSelect>
                 </label>
               </div>
               <Feedback

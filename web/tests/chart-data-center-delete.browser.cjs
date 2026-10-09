@@ -9,7 +9,8 @@ const report = { environment: 'Ubuntu isolated Docker; read-only existing datase
 (async () => {
   const browser = await fixture.launch();
   const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1440, height: 1000 } });
-  const { center } = fixture.frames(page);
+  const {host,native}=fixture.frames(page);
+  const center=()=>native();
   page.on('pageerror', error => report.errors.push(error.message));
   const commands = [], unexpected = [];
   let id, detail, state, mock = false, release = () => {}, held = null;
@@ -84,9 +85,11 @@ const report = { environment: 'Ubuntu isolated Docker; read-only existing datase
     await expect(center().locator(`#dataset-${id}`)).toBeVisible();
   };
   try {
+    if(process.env.LOCAL) await fixture.localNativeAssets(page);
     await page.goto(base + '/market-data?tab=managed&page=1');
     await fixture.login(page);
-    await expect.poll(() => !!center(), { timeout: 30000 }).toBeTruthy();
+    await expect.poll(() => !!native(), {timeout:30000}).toBeTruthy();
+    await expect(native().locator(".dc-window")).toBeVisible({timeout:30000});
     await expect(center().getByRole('heading', { name: '自建行情', exact: true })).toBeVisible();
     const first = center().locator('tbody tr').first();
     await expect(first).toBeVisible();
@@ -117,8 +120,12 @@ const report = { environment: 'Ubuntu isolated Docker; read-only existing datase
     expect(commands.map(c => c.action)).toEqual(['pause', 'archive']); expect(state.targets).toBe(1);
     record('archive prerequisite pauses first, prevents repeated commands and never deletes prices');
 
+    await center().getByRole('button',{name:'删除所列数据',exact:true}).click();
+    await center().getByRole('button',{name:'否',exact:true}).click();expect(commands.map(c=>c.action)).toEqual(['pause','archive']);
+    record('native final confirmation cancel sends no destructive request');
     held = new Promise(resolve => { release = resolve; });
     await center().getByRole('button', { name: '删除所列数据', exact: true }).evaluate(button => { button.click(); button.click(); });
+    await center().getByRole('button',{name:'是',exact:true}).click();
     await expect.poll(() => commands.length).toBe(3);
     expect(commands[2].expected_review_revision).toBe('true:true');
     expect(commands[2].request_id).toMatch(/^[a-f0-9-]{36}$/);
@@ -142,6 +149,7 @@ const report = { environment: 'Ubuntu isolated Docker; read-only existing datase
 
     reset({ paused: true, archived: true, conflict: true }); await enter();
     await center().getByRole('button', { name: '删除所列数据', exact: true }).click();
+    await center().getByRole('button',{name:'是',exact:true}).click();
     await expect(center().getByRole('alert').filter({ hasText: '回收影响或引用已变化' })).toBeVisible();
     await expect(center().getByRole('table', { name: '阻止历史回收的引用与任务' })).toContainText('新保存的图表工作区');
     await expect(center().getByRole('heading', { name: '删除影响清单' })).toHaveCount(0);

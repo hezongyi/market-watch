@@ -1,3 +1,4 @@
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { useRef, useState } from "react";
 import { useDirtyForm, useActionLock } from "./router";
 import { api, ApiError } from "./api";
@@ -99,7 +100,7 @@ export function MaintenanceSettings({
     <form className="dc-fields" onSubmit={save} inert={busy}>
       <label>
         目标起始交易日期
-        <input
+        <NativeInput
           type="date"
           required
           value={day}
@@ -111,7 +112,7 @@ export function MaintenanceSettings({
         <div className="dc-checks">
           {frames.map((frame) => (
             <label key={frame}>
-              <input
+              <NativeInput
                 type="checkbox"
                 disabled={frame === "M1"}
                 checked={periods.includes(frame)}
@@ -130,19 +131,19 @@ export function MaintenanceSettings({
       </fieldset>
       <label>
         更新频率
-        <select aria-label="更新频率"
+        <NativeSelect aria-label="更新频率"
           value={frequency}
           onChange={(e) => setFrequency(e.target.value)}
         >
           <option value="daily">每日</option>
           <option value="once">一次性</option>
-        </select>
+        </NativeSelect>
       </label>
       {frequency === "daily" && (
         <div className="dc-filters">
           <label>
             维护时间
-            <input
+            <NativeInput
               type="time"
               required
               value={clock}
@@ -151,7 +152,7 @@ export function MaintenanceSettings({
           </label>
           <label>
             维护时区
-            <input
+            <NativeInput
               required
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
@@ -164,7 +165,7 @@ export function MaintenanceSettings({
         <summary>高级维护设置</summary>
         <label>
           重叠复查窗口（分钟）
-          <input
+          <NativeInput
             type="number"
             min={0}
             max={44640}

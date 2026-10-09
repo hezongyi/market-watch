@@ -136,12 +136,12 @@ def router(authenticated):
             raise HTTPException(422, str(error)) from None
 
     @routes.get("/center/platform")
-    def center_platform(query: str = "", source: str | None = None, page: int = 1, page_size: int = 25):
+    def center_platform(query: str = "", source: str | None = None, page: int = 1, page_size: int = 25, asset_class: str | None = None):
         from .platform_catalog import catalog
 
         try:
             with transaction() as db:
-                return catalog(db, query=query, source=source, page=page, page_size=page_size)
+                return catalog(db, query=query, source=source, page=page, page_size=page_size, asset=asset_class or None)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
@@ -208,12 +208,12 @@ def router(authenticated):
         return [capabilities(source) for source in ("dukascopy", "oanda", "binance", "yahoo")]
 
     @routes.get("/history-catalog")
-    def history_catalog(source: str, query: str = "", page: int = 1, page_size: int = 25):
+    def history_catalog(source: str, query: str = "", page: int = 1, page_size: int = 25, symbol_type: str = ""):
         from .history_catalog import catalog
 
         try:
             with transaction() as db:
-                return catalog(db, source=source, query=query, page=page, page_size=page_size)
+                return catalog(db, source=source, query=query, page=page, page_size=page_size, symbol_type=symbol_type)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 

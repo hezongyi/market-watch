@@ -2,7 +2,7 @@ const { chromium, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const path = require('node:path');
 const fixture = require('./chart-data-center-fixture.cjs');
-const { art, base } = fixture;
+const base = fixture.base, art = path.join(fixture.root, 'artifacts/native-ui-implementation');
 const extension = path.join(art, 'zoom-extension');
 const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser zoom; composite row-count layout fixture', passed: false, checks: [], errors: [] };
 
@@ -18,7 +18,9 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
   const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
   const page = context.pages()[0];
   page.on('pageerror', error => report.errors.push(error.message));
-  const { host, native, center } = fixture.frames(page);
+  if (process.env.LOCAL) await fixture.localNativeAssets(page);
+  const { host, native } = fixture.frames(page);
+  const center = () => native()?.locator('.dc-window');
   const record = (name, data) => { console.log('PASS', name); report.checks.push({ name, ...data }); };
   const zoom = value => worker.evaluate(async ({ base, value }) => {
     const tab = (await chrome.tabs.query({})).find(tab => tab.url?.startsWith(base));
@@ -26,15 +28,18 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
     return chrome.tabs.getZoom(tab.id);
   }, { base, value });
   const compositePattern = /\/api\/market-data\/center\/(composites|composite-candidates)\?/;
+  const fixtureSeeds = new Map();
   const fixtureRows = async route => {
     const seedUrl = new URL(route.request().url());
     seedUrl.searchParams.set('query', '');
-    const response = await route.fetch({ url: seedUrl.href }), body = await response.json();
+    const key = seedUrl.pathname;
+    if (!fixtureSeeds.has(key)) fixtureSeeds.set(key, route.fetch({ url: seedUrl.href }).then(r => r.json()));
+    const body = structuredClone(await fixtureSeeds.get(key));
     expect(body.items.length).toBeGreaterThan(0);
     const seed = body.items[0];
     body.items = Array.from({ length: 25 }, (_, index) => 'dataset' in seed
-      ? { ...seed, dataset: { ...seed.dataset, id: seed.dataset.id + '-' + index, logical_symbol: '组合候选布局验收-' + index } }
-      : { ...seed, id: seed.id + '-' + index, logical_symbol: '已建立组合布局验收-' + index });
+      ? { ...seed, dataset: { ...seed.dataset, id: seed.dataset.id + '-' + index, logical_symbol: '组合候选布局验收-' + index, display_symbol: '组合候选布局验收-' + index } }
+      : { ...seed, id: seed.id + '-' + index, logical_symbol: '已建立组合布局验收-' + index, display_symbol: '已建立组合布局验收-' + index });
     body.total = 50;
     await route.fulfill({ json: body });
   };
@@ -51,8 +56,9 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
   try {
     await page.goto(base + '/market-data?query=EURUSD&status=available');
     await fixture.login(page);
-    await expect.poll(() => !!center(), { timeout: 30000 }).toBeTruthy();
-    await center().getByRole('button', { name: '关闭数据中心' }).click();
+    await expect.poll(() => !!native(), { timeout: 30000 }).toBeTruthy();
+    await expect(center()).toBeVisible({ timeout: 20000 });
+    await native().getByRole('button', { name: '关闭数据中心' }).click();
     await page.route(compositePattern, fixtureRows);
     const session = await context.newCDPSession(page);
     const target = await session.send('Target.getTargetInfo');
@@ -71,8 +77,8 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await expect.poll(() => !!host() && !!native(), { timeout: 30000 }).toBeTruthy();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeVisible({ timeout: 30000 });
       await native().getByRole('button', { name: '数据中心', exact: true }).click();
-      await expect.poll(() => !!center()).toBeTruthy();
-      await expect(center().getByRole('button', { name: '关闭数据中心' })).toBeInViewport();
+      await expect(center()).toBeVisible({ timeout: 20000 });
+      await expect(native().getByRole('button', { name: '关闭数据中心' })).toBeInViewport();
       await center().getByRole('button', { name: '自建行情', exact: true }).click();
       const filter = center().getByRole('button', { name: '筛选与搜索', exact: true });
       if (await filter.isVisible()) await filter.click();
@@ -82,7 +88,7 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       const action = center().getByRole('button', { name: '在当前图表打开', exact: true }).first();
       await action.scrollIntoViewIfNeeded();
       await expect(action).toBeInViewport();
-      expect(await center().evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBeTruthy();
+      expect(await center().evaluate(n => n.scrollWidth <= n.clientWidth + 1)).toBeTruthy();
       await expect(center().getByRole('heading', { name: '自建行情', exact: true })).toBeInViewport();
       await expect(center().getByRole('navigation', { name: '列表分页' })).toBeInViewport();
       await closeFilters();
@@ -90,7 +96,7 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       // Switching with the previous filter open must not leave an empty overlay.
       if (await filter.isVisible()) await filter.click();
       await center().getByRole('button', { name: '组合行情', exact: true }).click();
-      await expect.poll(() => center().locator('.dc-table tbody tr').count()).toBe(25);
+      await expect.poll(() => center().locator('.dc-table tbody tr').count(), { timeout: 20000 }).toBe(25);
       await expect(center().locator('.dc-filter-toggle')).toHaveCount(1);
       for (const mode of ['已建立组合', '可建立候选']) {
         const comboFilter = center().getByRole('button', { name: '筛选与搜索', exact: true });
@@ -111,10 +117,10 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
         expect((await heading.boundingBox()).y).toBe(before.y);
         await expect(heading).toBeInViewport();
         await expect(center().getByRole('navigation', { name: '列表分页' })).toBeInViewport();
-        expect(await center().evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBeTruthy();
+        expect(await center().evaluate(n => n.scrollWidth <= n.clientWidth + 1)).toBeTruthy();
       }
       await screenshot(`browser-zoom200-composite-${width}.png`);
-      await center().getByRole('button', { name: '关闭数据中心' }).click();
+      await native().getByRole('button', { name: '关闭数据中心' }).click();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
       record('real 200% browser zoom retains native entry, primary actions and both composite lists at ' + width, { physicalWidth: width, cssWidth: await page.evaluate(() => innerWidth), dpr: await page.evaluate(() => devicePixelRatio) });
     }
@@ -124,9 +130,10 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
     report.errors.push(error.message);
     throw error;
   } finally {
-    if (!report.passed && center()) report.content = await center().locator('body').innerText().catch(() => '');
+    if (!report.passed && center()) report.content = await center().innerText().catch(() => '');
     if (!report.passed) await page.screenshot({ path: path.join(art, 'browser-zoom-failed.png') }).catch(() => {});
     fs.writeFileSync(path.join(art, 'zoom-report.json'), JSON.stringify(report, null, 2));
+    await page.unrouteAll({ behavior: 'ignoreErrors' });
     await context.close();
   }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

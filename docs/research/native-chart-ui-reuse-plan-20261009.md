@@ -1,5 +1,7 @@
 # 原生图表 UI 复用调查与数据中心方案（2026-10-09）
 
+> 实施更新：本轮已采用同一原生文档内的业务界面和独立 vendor React roots，复用真实弹窗、侧栏、搜索、输入、下拉、复选框及纯品种选择。HTTP、认证和 CSRF 留在可信主应用。跨源业务 iframe 仅作失败兼容路径；下文调研时的“现状／尚未验证”描述保留作为研究记录。最终实现与逐项验收见 [实施验收报告](../verification/native-data-center-20261009/README.md)。
+
 ## 调查边界与来源
 
 本笔记核对当前安装的 TradingView Trading Platform **v31.1.0**，版本证据是 [package.json:3](../../advanced-host/charting_library/package.json#L3)。声明文件是厂商随许可库交付的第一方 API 合约；以下 `d.ts` 行号均指 [charting_library.d.ts](../../advanced-host/charting_library/charting_library.d.ts)，不是其他版本的网上示例。本笔记不复制许可实现，不改产品代码，不操作生产或用户行情数据。

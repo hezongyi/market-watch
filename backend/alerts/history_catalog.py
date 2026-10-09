@@ -26,8 +26,9 @@ def asset_class(kind, symbol):
     return "other"
 
 
-def catalog(db, *, source, query="", page=1, page_size=25):
-    if source not in ("dukascopy", "oanda") or page < 1 or not 1 <= page_size <= 100:
+def catalog(db, *, source, query="", page=1, page_size=25, symbol_type=""):
+    from .search_types import TYPES, symbol_type as search_type
+    if symbol_type not in TYPES or source not in ("dukascopy", "oanda") or page < 1 or not 1 <= page_size <= 100:
         raise ValueError("无效的自建来源目录查询")
     requires_refresh = False
     if source == "dukascopy":
@@ -65,6 +66,8 @@ def catalog(db, *, source, query="", page=1, page_size=25):
             for row in rows
             if matches_code(query, row.symbol, source, row.asset_type, row.label) and
             len(re.sub(r"[^A-Z0-9]", "", row.symbol)) <= 10]
+    if symbol_type:
+        items = [row for row in items if search_type(row["asset_class"]) == symbol_type]
     items.sort(key=lambda row: row["provider_symbol"])
     # Read-only lookup never refreshes, registers a dataset or opens streaming.
     start = (page - 1) * page_size
