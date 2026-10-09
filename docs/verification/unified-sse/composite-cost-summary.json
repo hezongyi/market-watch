@@ -1,6 +1,220 @@
 {
   "reports": [
     {
+      "frame": "M1",
+      "consumers": 1,
+      "confirmed_m1": 5000,
+      "indicators": [
+        {
+          "name": "EMA",
+          "params": {
+            "period": 31
+          }
+        }
+      ],
+      "shared_tasks": 1,
+      "computations": 9,
+      "bucket_builds": 1,
+      "cold_calculation_ms": 7765.379,
+      "cold_sql": {
+        "SELECT": 75,
+        "selected_rows": 2070,
+        "UPDATE": 4,
+        "INSERT": 3,
+        "minute_selected_rows": 1,
+        "DELETE": 1
+      },
+      "warm_samples": [
+        {
+          "calculation_ms": 169.975,
+          "SELECT": 66,
+          "selected_rows": 67,
+          "UPDATE": 4,
+          "minute_selected_rows": 2,
+          "INSERT": 2,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 164.662,
+          "SELECT": 66,
+          "selected_rows": 67,
+          "UPDATE": 4,
+          "minute_selected_rows": 2,
+          "INSERT": 2,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 161.559,
+          "SELECT": 66,
+          "selected_rows": 67,
+          "UPDATE": 4,
+          "minute_selected_rows": 2,
+          "INSERT": 2,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 188.399,
+          "SELECT": 66,
+          "selected_rows": 67,
+          "UPDATE": 4,
+          "minute_selected_rows": 2,
+          "INSERT": 2,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 164.812,
+          "SELECT": 66,
+          "selected_rows": 67,
+          "UPDATE": 4,
+          "minute_selected_rows": 2,
+          "INSERT": 2,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 172.138,
+          "SELECT": 66,
+          "selected_rows": 67,
+          "UPDATE": 4,
+          "minute_selected_rows": 2,
+          "INSERT": 2,
+          "DELETE": 1
+        }
+      ],
+      "idle_sql": {
+        "SELECT": 17,
+        "selected_rows": 18,
+        "UPDATE": 1
+      },
+      "synthetic": true,
+      "confirmed_delta_ms": 357.758,
+      "confirmed_delta_sql": {
+        "SELECT": 74,
+        "selected_rows": 70,
+        "UPDATE": 4,
+        "minute_selected_rows": 4,
+        "minute_rows_yielded": 1,
+        "INSERT": 3,
+        "DELETE": 1
+      },
+      "indicator_repair_ms": 174.344,
+      "indicator_repair_sql": {
+        "SELECT": 68,
+        "selected_rows": 69,
+        "UPDATE": 4,
+        "minute_selected_rows": 2,
+        "INSERT": 2,
+        "DELETE": 1
+      },
+      "scope": "real PostgreSQL Calculator/SQL cost with a frozen source clock; not browser or supplier SLA"
+    },
+    {
+      "frame": "M1",
+      "consumers": 8,
+      "confirmed_m1": 5000,
+      "indicators": [
+        {
+          "name": "EMA",
+          "params": {
+            "period": 31
+          }
+        }
+      ],
+      "shared_tasks": 1,
+      "computations": 9,
+      "bucket_builds": 1,
+      "cold_calculation_ms": 6012.801,
+      "cold_sql": {
+        "SELECT": 117,
+        "selected_rows": 2112,
+        "UPDATE": 4,
+        "INSERT": 10,
+        "minute_selected_rows": 1,
+        "DELETE": 1
+      },
+      "warm_samples": [
+        {
+          "calculation_ms": 162.554,
+          "SELECT": 115,
+          "selected_rows": 116,
+          "UPDATE": 4,
+          "minute_selected_rows": 9,
+          "INSERT": 9,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 169.179,
+          "SELECT": 115,
+          "selected_rows": 116,
+          "UPDATE": 4,
+          "minute_selected_rows": 9,
+          "INSERT": 9,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 168.233,
+          "SELECT": 115,
+          "selected_rows": 116,
+          "UPDATE": 4,
+          "minute_selected_rows": 9,
+          "INSERT": 9,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 183.75,
+          "SELECT": 115,
+          "selected_rows": 116,
+          "UPDATE": 4,
+          "minute_selected_rows": 9,
+          "INSERT": 9,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 320.758,
+          "SELECT": 115,
+          "selected_rows": 116,
+          "UPDATE": 4,
+          "minute_selected_rows": 9,
+          "INSERT": 9,
+          "DELETE": 1
+        },
+        {
+          "calculation_ms": 166.377,
+          "SELECT": 115,
+          "selected_rows": 116,
+          "UPDATE": 4,
+          "minute_selected_rows": 9,
+          "INSERT": 9,
+          "DELETE": 1
+        }
+      ],
+      "idle_sql": {
+        "SELECT": 17,
+        "selected_rows": 18,
+        "UPDATE": 1
+      },
+      "synthetic": true,
+      "confirmed_delta_ms": 177.146,
+      "confirmed_delta_sql": {
+        "SELECT": 123,
+        "selected_rows": 119,
+        "UPDATE": 4,
+        "minute_selected_rows": 11,
+        "minute_rows_yielded": 1,
+        "INSERT": 10,
+        "DELETE": 1
+      },
+      "indicator_repair_ms": 162.659,
+      "indicator_repair_sql": {
+        "SELECT": 117,
+        "selected_rows": 118,
+        "UPDATE": 4,
+        "minute_selected_rows": 9,
+        "INSERT": 9,
+        "DELETE": 1
+      },
+      "scope": "real PostgreSQL Calculator/SQL cost with a frozen source clock; not browser or supplier SLA"
+    },
+    {
       "frame": "MN",
       "consumers": 1,
       "confirmed_m1": 5000,

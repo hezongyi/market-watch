@@ -33,6 +33,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
     contracts.test_indicator_only_change_delivers_native_bar_at_its_own_time,
     contracts.test_idle_lease_and_delivery_do_not_read_retained_history_snapshot,
     contracts.test_slow_consumer_does_not_block_fast_delivery_and_replay_is_bounded,
+    contracts.test_composite_history_snapshot_budget_allows_windowed_native_delivery,
 ])
 def test_durable_contract(provider_pg, contract):
     # These managed contracts use the same baseline instrument catalogue as

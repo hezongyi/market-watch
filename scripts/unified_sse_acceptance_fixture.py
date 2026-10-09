@@ -13,9 +13,11 @@ from alerts.config import settings
 from alerts.domain import Calendar, bucket_bounds
 from alerts.storage import (
     AdvancedWorkspace,
+    Bar,
     ChartPublication,
     ChartPublishedBar,
     Instrument,
+    MarketStreamClient,
     MarketStreamSubscription,
     MarketStreamTask,
     Preference,
@@ -71,6 +73,28 @@ def seed_period(db, frame):
         right = left
     db.add(ChartPublication(instrument_id=SYMBOL, timeframe=frame, start=right,
         end=end, complete_count=count, initialized=True, revision=1))
+
+
+def quote_input(db, row):
+    """Keep the normal managed quote reader on the same synthetic M1 input."""
+    bar = db.scalar(select(Bar).where(Bar.instrument_id == SYMBOL, Bar.timeframe == "M1",
+                                      Bar.start == row.start))
+    if not bar:
+        bar = Bar(instrument_id=SYMBOL,timeframe="M1",start=row.start,end=row.end)
+        db.add(bar)
+    for field in ("open", "high", "low", "close"):
+        setattr(bar,field,Decimal(row.payload[field]))
+    bar.complete, bar.revision, bar.received_at = True, row.revision, now_ms()
+    bar.volume, bar.volume_complete = None, False
+
+
+def consumers(db, task_id):
+    return [{"client":client,"listener":listener,"generation":generation}
+            for client,listener,generation in db.execute(select(MarketStreamClient.client,
+                MarketStreamSubscription.listener,MarketStreamSubscription.generation).join(
+                MarketStreamClient,MarketStreamClient.id == MarketStreamSubscription.client_id).where(
+                MarketStreamSubscription.task_id == task_id,
+                MarketStreamSubscription.active.is_(True),MarketStreamSubscription.expires > now_ms()))]
 
 
 def main():
@@ -153,6 +177,8 @@ def main():
             if workspace is None:
                 raise SystemExit("Missing owned fixture workspace")
             workspace.updated_at = now_ms()
+        if args.timeframe == "M1" and args.action in ("seed", "update", "append"):
+            quote_input(db,row)
         result = {"synthetic": True, "instrument": SYMBOL, "workspace": WORKSPACE,
                   "action": args.action, "timeframe": args.timeframe,
                   "bar": row.payload, "publication_revision": pub.revision}
@@ -162,6 +188,7 @@ def main():
                 "timeframe": task.query.get("timeframe"),
                 "owner": task.owner_token, "owner_until": task.owner_until,
                 "sequence": task.sequence, "expires": task.expires,
+                "consumers":consumers(db,task.id),
                 "active_consumers": len(list(db.scalars(select(MarketStreamSubscription.id).where(
                     MarketStreamSubscription.task_id == task.id,
                     MarketStreamSubscription.active.is_(True),

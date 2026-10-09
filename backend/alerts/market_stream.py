@@ -25,7 +25,9 @@ from .storage import (
 LEASE_MS = 120000
 RESULT_LIMIT = 128
 SUBSCRIPTION_LIMIT = 256
-PAYLOAD_BYTES = 2 * 1024 * 1024
+# The retained 2000-bar composite snapshot includes per-bar provenance and
+# indicator values. It is larger than the window-filtered/delta wire result.
+PAYLOAD_BYTES = 8 * 1024 * 1024
 DELIVERY_BYTES = 4 * 1024 * 1024
 
 

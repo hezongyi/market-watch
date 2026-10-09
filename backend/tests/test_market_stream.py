@@ -68,6 +68,18 @@ def test_idle_lease_and_delivery_do_not_read_retained_history_snapshot(database)
         "Idle delivery/lease checks must not transfer the full 2000-bar snapshot")
 
 
+def test_composite_history_snapshot_budget_allows_windowed_native_delivery(database):
+    owner = session(database)
+    tail = 2000 * 60000
+    register(owner,state={"cursor":tail,"history_accepted":True})
+    payload = {"type":"bars","bars":[{"start":index * 60000,"close":"1.1",
+        "segments":[{"evidence":"x" * 1100}]} for index in range(1,2001)]}
+    stream.commit(stream.claim(),payload)
+    rows = stream.events(owner,"page",{})
+    assert len(rows) == 1 and rows[0]["type"] == "bars"
+    assert len(rows[0]["bars"]) == 1 and rows[0]["bars"][0]["start"] == tail
+
+
 def test_old_cancel_duplicate_register_and_late_register_do_not_remove_new_generation(database):
     owner = session(database)
     register(owner, generation=2)

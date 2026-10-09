@@ -12,7 +12,7 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 
 ## 已执行验证
 
-- `unit-tests.txt`：139 passed、36 skipped（2026-10-09 快照成本/慢消费者检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复、HTTP 权限及验收fixture保护。
+- `unit-tests.txt`：142 passed、37 skipped（2026-10-09 快照成本/慢消费者检查点；跳过项均为未运行的 PostgreSQL gates）。覆盖九个周期、UTC/NY17/DST、极值缩小、临时撤回、差分聚合、固定历史与组合报价、共享任务、租约、恢复、HTTP 权限及验收fixture保护。
 - `regression-tests.txt`：105 passed，既有 provider_service、market_data、managed_dataset、fixed_indicators 回归。
 - `node tests/advanced-market-stream.cjs`：实际 bridge 回调的世代/序号拒收、确认后极值缩小、报价交付、取消迟到回调与常态 tick 无行情请求；新增空首屏准备、HTTP 历史接受后的单次重注册、尾部撤回、拒收及窗口过滤凭据检查、Python 指标值交付。
 - `node tests/advanced-fixed-series.cjs` 与 `advanced-provider-subscriptions.cjs`：既有身份、首用边界、连接共享和取消顺序通过。
@@ -76,7 +76,7 @@ fixture 仅创建本任务的 `SSEFIXTURE`/`unified-sse-synthetic`，九周期�
 
 早期2026-10-09首次运行该命令：在 `compose ps -q api` 阶段遇到 Ubuntu Docker socket permission denied，浏览器未启动、fixture 未写入。`test_unified_sse_acceptance_fixture.py` 的6项SQLite检查通过，仅证明保护和fixture→真实Calculator/持久事件的输入契约。该早期权限失败已被后续Ubuntu实测取代；fixture现有7项检查通过。
 
-完整统一Python套件本地139 passed、36 skipped，随后在实际隔离PostgreSQL上补跑34项全部通过；两个结果证据分开保存。Node脚本语法、新增Python文件Ruff及diff check通过。Docker权限阻塞已解除。真实OANDA测试配置路径已向用户询问，尚未配置token/account，不能将合成fixture当作供应商验收。
+完整统一Python套件本地142 passed、37 skipped，随后在实际隔离PostgreSQL上补跑34项全部通过；两个结果证据分开保存。Node脚本语法、新增Python文件Ruff及diff check通过。Docker权限阻塞已解除。真实OANDA测试配置路径已向用户询问，尚未配置token/account，不能将合成fixture当作供应商验收。
 
 ## 完成审计：尚缺的证据和工作
 
@@ -130,3 +130,15 @@ API重启复现Nginx connect等待约60秒后504；运行实例临时配置proxy
 八周期Docker资源记录发现大量DB输出。最小SQL回归先失败：空闲保活/领取/提交/投递读取market_stream_tasks.payload，即完整2000柱快照。该列改为按需延迟读取，首次绑定和发布差分保留权威快照；32项相关检查及实际PG的单项回归通过。另加快消费者持续读、慢消费者停止读133结果的检查：保留结果上限128，慢消费者收到明确reset，快消费者持续交付。最新全部代码待提交/镜像重建与实际资源复测。
 
 上述日期早期的SQLite/无Docker段落是历史检查点；当前真实部署与未完成门槛以本文件开头和完成审计为准。任务未完成，不退役实例。
+
+## 2026-10-09 重建后复核与组合EMA预算修复
+
+`5347299` API/chart/web全部经mw-docker重建并实际启动，API healthy。镜像中的Nginx配置测试成功，确认proxy_connect_timeout 3s。容器内53项PG检查通过（36共享订阅、4组合成本、13固定指标）。重建后八周期P95 1036ms、M1 971ms；隐藏期间M5值105.19经实际native getBars回调接受。managed EMA/API重启P95 1028ms、重连17375ms；双页面双API四同周期图一共享任务，P95 1275ms；EMA+真实worker停止/接管/API重启P95 2455ms。所有值仅正常synthetic输入窗口，故障时间另记。
+
+相同八周期场景Docker累计网络计数差分：API入站约23MB、worker约38MB；旧轮约560MB/750MB。运行时长与后台输入存在差异，不能把此比例当容量保证，但与SQL回归排除空闲快照读取一致。CPU/内存前后快照保存在每轮摘要。
+
+新增组合M1+EMA31、1/8消费者成本探针通过：每场景一共享任务、1 bucket build，6次warm报价不读取M1；warm计算约162–321ms。2000柱首次计算约6–8秒，初始化成本不隐藏。确认修订发reset，等待固定指标修复后再发进度reset，新指标与权威读取一致；idle不重复计算。
+
+探针先复现组合EMA结果2228241 bytes超过2MiB保存预算，持续发布只能result_budget reset。新增原生窗口过滤回归先失败，再将保存快照预算调为8MiB；单次投递预算保持4MiB、结果条数上限128。SQLite与实际PG预算回归通过。此业务修复仍待再次镜像重建。
+
+新增受同一guard保护的合成组合fixture，通过真实注册、固定history blob/checksum、first_use、confirmed_minutes/apply_minutes和pricing owner输入，使用专属身份与workspace；无supplier凭据时才允许，拒绝接管其他owner。两项输入回归通过；后续许可浏览器将验证组合M1/D1/W1/MN，不能把该合成输入称为OANDA验收。仅报价真实原生回调场景已通过（P95 916ms），最新harness按本client核对消费者，避免前一浏览器租约宽限污染释放断言；新镜像重跑时归档完整报告。

@@ -33,9 +33,9 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
                                reason="Requires task-local PostgreSQL")
 
 
-@pytest.mark.parametrize("frame", ["W1", "MN"])
+@pytest.mark.parametrize("frame,with_indicators", [("W1",False), ("MN",False), ("M1",True)])
 @pytest.mark.parametrize("consumers", [1, 8])
-def test_shared_composite_quote_cost(provider_pg, monkeypatch, frame, consumers):
+def test_shared_composite_quote_cost(provider_pg, monkeypatch, frame, with_indicators, consumers):
     factory, engine = provider_pg
     composite, revision_id, seam = populated(factory, monkeypatch)
     count = 5000
@@ -57,7 +57,20 @@ def test_shared_composite_quote_cost(provider_pg, monkeypatch, frame, consumers)
     assert owner
     epoch = live.begin_connection(owner, {identity.provider_symbol:identity}, now=clock)
     auth = session(factory)
-    query = DataQuery(instrument=composite, series_kind="composite", timeframe=frame, provisional=True)
+    query = DataQuery(instrument=composite, series_kind="composite", timeframe=frame, provisional=True,
+                     indicators=[{"name":"EMA","params":{"period":31}}] if with_indicators else [])
+    if with_indicators:
+        from alerts import fixed_indicators
+        from alerts.series_access import chart_data
+        from test_composite_aggregates import drain as aggregate_drain
+        from test_fixed_indicators import drain as indicator_drain
+
+        aggregate_drain(revision_id,frame)
+        with factory.begin() as db:
+            requested = chart_data(db,query)
+        for progress in requested["indicator_progress"]:
+            indicator_drain(progress["run_id"])
+        monkeypatch.setattr(fixed_indicators,"now_ms",lambda:clock)
     shared, serialized = resolve(Subscription(client="cost-0", listener="chart", generation=1,
         kind="bars", query=query))
     registrations = [stream.register(auth, "cost-"+str(index), "chart", 1, shared, serialized, {})
@@ -98,7 +111,7 @@ def test_shared_composite_quote_cost(provider_pg, monkeypatch, frame, consumers)
             tradeable=True, connection_epoch=epoch, sequence=sequence),
             {identity.provider_symbol:identity}, now=clock)
 
-    def compute():
+    def compute(expected_type="bars"):
         work = stream.claim()
         assert work
         started = time.perf_counter()
@@ -108,7 +121,11 @@ def test_shared_composite_quote_cost(provider_pg, monkeypatch, frame, consumers)
         stream.commit(work, payload, delay_ms=0)
         for index in range(consumers):
             delivered = stream.events(auth, "cost-"+str(index), cursors[index])
-            assert delivered and delivered[-1]["type"] == "bars"
+            assert delivered and delivered[-1]["type"] == expected_type, {
+                "delivered_types":[(row["type"],row.get("reason")) for row in delivered],
+                "payload_bytes":len(json.dumps(payload).encode()),"bar_count":len(payload["bars"])}
+        if with_indicators:
+            assert payload["indicators"][0]["series"][0]["values"][-1]["value"] is not None
         return payload, elapsed
 
     quote(1)
@@ -116,27 +133,36 @@ def test_shared_composite_quote_cost(provider_pg, monkeypatch, frame, consumers)
     try:
         initial, cold_ms = compute()
         initial_sql = dict(sql)
-        assert calculator.buckets.builds == 1
+        initial_builds = calculator.buckets.builds
+        assert initial_builds >= 1
         for sequence in range(2, 8):
             quote(sequence)
             sql.clear()
             payload, elapsed = compute()
             samples.append({"calculation_ms":round(elapsed,3), **dict(sql)})
-            assert calculator.buckets.builds == 1, "Quote changes cannot reconstruct the current bucket"
+            assert calculator.buckets.builds == initial_builds, "Quote changes cannot reconstruct the current bucket"
             assert sql["minute_rows_yielded"] < count, "Warm quote changes must not reread all 5000 M1 inputs"
         with factory.begin() as db:
             correction(db, revision_id, seam + (count - 1) * 60000, clock, "1.115")
         sql.clear()
-        payload, delta_ms = compute()
+        payload, delta_ms = compute("reset" if with_indicators else "bars")
         delta_sql = dict(sql)
-        assert calculator.buckets.builds == 1
-        assert calculator.buckets.delta_reads == 1
+        assert calculator.buckets.builds == initial_builds
+        assert calculator.buckets.delta_reads == (0 if frame == "M1" else 1)
         assert sql["minute_rows_yielded"] < count, "One confirmed correction must use indexed deltas"
+        repair_ms = None
+        if with_indicators:
+            aggregate_drain(revision_id,frame)
+            for progress in payload["indicator_progress"]:
+                indicator_drain(progress["run_id"])
+            sql.clear()
+            payload, repair_ms = compute("reset")
+            repair_sql = dict(sql)
         work = stream.claim()
         sql.clear()
         idle, _ = calculator.build(work)
         stream.commit(work, idle, delay_ms=0)
-        assert idle is None and calculator.computations == 8
+        assert idle is None and calculator.computations == (9 if with_indicators else 8)
         idle_sql = dict(sql)
     finally:
         event.remove(engine, "after_cursor_execute", observe)
@@ -144,15 +170,19 @@ def test_shared_composite_quote_cost(provider_pg, monkeypatch, frame, consumers)
         from alerts.series_access import chart_data
 
         authoritative = chart_data(db, query.model_copy(update={"limit":2000}))
+        assert payload["indicators"] == authoritative["indicators"]
         for produced, expected in zip(payload["bars"], authoritative["bars"], strict=True):
             differences = {key:[produced.get(key),expected.get(key)] for key in produced.keys() | expected.keys()
                            if produced.get(key) != expected.get(key)}
             assert not differences, json.dumps(differences)
     report = {"frame":frame,"consumers":consumers,"confirmed_m1":count,
+        "indicators":query.indicators,
         "shared_tasks":1,"computations":calculator.computations,"bucket_builds":calculator.buckets.builds,
         "cold_calculation_ms":round(cold_ms,3),"cold_sql":initial_sql,
         "warm_samples":samples,"idle_sql":idle_sql,"synthetic":True,
         "confirmed_delta_ms":round(delta_ms,3),"confirmed_delta_sql":delta_sql,
+        "indicator_repair_ms":round(repair_ms,3) if repair_ms is not None else None,
+        "indicator_repair_sql":repair_sql if with_indicators else None,
         "scope":"real PostgreSQL Calculator/SQL cost with a frozen source clock; not browser or supplier SLA"}
     print(json.dumps(report))
     if output := os.getenv("MARKET_STREAM_COST_REPORT"):

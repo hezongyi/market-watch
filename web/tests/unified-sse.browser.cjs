@@ -354,11 +354,13 @@ async function fixture(action, ...args) {
       await frame.evaluate(() => widget.setActiveChart(0));
       await frame.evaluate(() => widget.setLayout('s'));
       await frame.waitForFunction(() => widget.chartsCount() === 1 && widget.activeChart().dataReady());
+      const ownClient = await frame.evaluate(() => clientId);
       assert.equal(await frame.evaluate(() => widget.activeChart().resolution()), '1');
       report.visibility = {retained_resolution:'1'};
       await expect.poll(async () => {
         const tasks = (await fixture('state')).tasks.filter(task => task.kind === 'bars' && task.indicator_count === 0);
-        return tasks.filter(task => task.timeframe !== 'M1').every(task => task.active_consumers === 0);
+        return tasks.filter(task => task.timeframe !== 'M1').every(task =>
+          !task.consumers.some(consumer => consumer.client === ownClient));
       }, {timeout:15000}).toBe(true);
       await frame.evaluate(() => {
         window.__nativeHistory = [];
@@ -378,10 +380,48 @@ async function fixture(action, ...args) {
         result.bars.some(bar => bar.time === time && bar.close === 105.19)), hidden.bar.start,{timeout:60000});
       await expect.poll(async () => {
         const tasks = (await fixture('state')).tasks.filter(task => task.kind === 'bars' && task.indicator_count === 0);
-        return matrixFrames.every(period => tasks.some(task => task.timeframe === period && task.active_consumers > 0));
+        return matrixFrames.every(period => tasks.some(task => task.timeframe === period &&
+          task.consumers.some(consumer => consumer.client === ownClient)));
       }, {timeout:15000}).toBe(true);
       checks.push('layout reduction releases hidden period consumers and restoration reloads missed data');
       report.visibility.restored_close = 105.19;
+    }
+    if (process.argv.includes('--quotes-only')) {
+      report.stage = 'quote-only';
+      assert.ok(!sharing, 'Quote-only scenario needs one browser');
+      const ownClient = await frame.evaluate(() => clientId);
+      await frame.evaluate(() => {
+        window.__nativeQuotes = [];
+        for (const sub of quoteSubscriptions.values()) {
+          const original = sub.cb;
+          sub.cb = rows => {original(rows);window.__nativeQuotes.push({at:Date.now(),rows});};
+        }
+        for (const id of [...subscriptions.keys()]) feed.unsubscribeBars(id);
+      });
+      await expect.poll(async () => {
+        const tasks = (await fixture('state')).tasks;
+        return tasks.filter(task => task.kind === 'bars').every(task =>
+          !task.consumers.some(consumer => consumer.client === ownClient)) &&
+          tasks.some(task => task.kind === 'quotes' &&
+            task.consumers.some(consumer => consumer.client === ownClient));
+      }, {timeout:15000}).toBe(true);
+      const count = await frame.evaluate(() => window.__nativeBars.length);
+      for (const close of ['106.01','106.02','106.03']) {
+        const quoteCount = await frame.evaluate(() => window.__nativeQuotes.length);
+        const committed = await fixture('update','--close',close);
+        await frame.waitForFunction(({close,quoteCount}) => window.__nativeQuotes.slice(quoteCount).some(
+          sample => sample.rows.some(row => row.n === 'SSEFIXTURE' && row.v.lp === close)),
+          {close:Number(close),quoteCount},{timeout:15000});
+        report.quote_only = {last_close:Number(close),committed_at:committed.committed_at};
+      }
+      assert.equal(await frame.evaluate(() => window.__nativeBars.length), count);
+      await frame.evaluate(() => {
+        for (const id of [...quoteSubscriptions.keys()]) feed.unsubscribeQuotes(id);
+      });
+      await expect.poll(async () => (await fixture('state')).tasks.every(task =>
+        !task.consumers.some(consumer => consumer.client === ownClient)),
+        {timeout:15000}).toBe(true);
+      checks.push('native quote callbacks continue after all bar subscriptions are released and last quote cancellation releases consumers');
     }
     report.nativeBars = await frame.evaluate(() => window.__nativeBars.slice());
     report.stream = await page.evaluate(() => window.__sseTrace);
