@@ -23,7 +23,8 @@ function chartNativeUi(widget, doc) {
       const SearchRow = req(620748).SymbolSearchDialogContentItem;
       if(!Search || !SearchContext || !BodyContext || !SearchRow) throw Error("原生平台行情搜索不可用");
       const PlatformContext = R.createContext(null);
-      const listClasses = req(198629), rowClasses = req(910890);
+      const listClasses = req(198629), rowClasses = req(910890), headerClasses = req(86731);
+      const Select = req(221339).Select, createPortal = req(129365).createPortal;
       const platformStyle = doc.createElement("style");
       platformStyle.textContent = `
         .mw-platform-search,.mw-platform-inline{height:100%;min-height:0;display:flex;flex-direction:column;width:100%}
@@ -36,6 +37,7 @@ function chartNativeUi(widget, doc) {
         .mw-platform-inline .mw-platform-action:hover{background:var(--card)}
         .mw-platform-inline .mw-platform-action:disabled{opacity:.5;cursor:default}
         .mw-platform-inline .mw-platform-action:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+        .mw-platform-source{margin-left:auto;min-width:120px;max-width:180px}
         .mw-platform-status{font-size:12px;color:var(--muted);padding:8px 20px;flex-shrink:0}
         .mw-platform-status[role=alert]{color:var(--danger)}
         @media(max-width:800px){.mw-platform-inline .${rowClasses.actionsCell}{min-width:0;width:auto}}
@@ -47,21 +49,15 @@ function chartNativeUi(widget, doc) {
       function PlatformInline(props) {
         const ctx = R.useContext(SearchContext), platform = R.useContext(PlatformContext);
         const container=R.useRef(null);
+        const [sourceHeader,setSourceHeader]=R.useState(null);
         const [source, setSource] = R.useState(platform.latest.current.source || "");
         const selected = ctx.searchSources.find(item => item.value().toLowerCase() === source) || ctx.searchSources.find(item => item.value() === "");
         // The native controller normally persists its source to the main
         // symbol-search settings. Give this embedded search its own source.
         const scoped = {...ctx, selectedSearchSource:selected, setSelectedSearchSource:item=>setSource(item.value().toLowerCase()),
-          symbolSearchContent:{...ctx.symbolSearchContent,currentSelectedSearchSource:selected},
+          symbolSearchContent:{...ctx.symbolSearchContent,currentSelectedSearchSource:selected,canChangeExchange:false},
           handleListWidth:ctx.handleListWidth};
         function keyboard(event) {
-          if(event.target.closest?.('[data-qa-id="sources-button"]') && ["Enter"," "].includes(event.key)) {
-            event.preventDefault();event.stopPropagation();event.target.closest('[data-qa-id="sources-button"]').click();return;
-          }
-          if (event.key === "Escape" && ctx.mode === "exchange") {
-            event.preventDefault();event.stopPropagation();ctx.setMode("symbolSearch");
-            win.requestAnimationFrame(()=>ctx.searchRef.current?.focus());return;
-          }
           if (event.target !== ctx.searchRef.current || ctx.mode !== "symbolSearch") return;
           if (event.key === "ArrowDown" || event.key === "ArrowUp") {
             event.preventDefault();event.stopPropagation();
@@ -72,17 +68,22 @@ function chartNativeUi(widget, doc) {
             event.preventDefault();event.stopPropagation();void platform.open(ctx.feedItems[ctx.selectedIndex]?.item?.ticker).catch(()=>{});
           }
         }
-        R.useEffect(()=>{
+        R.useLayoutEffect(()=>{
           const input=container.current?.querySelector('input[role="searchbox"]');
-          if(input) input.setAttribute("aria-label",ctx.mode === "exchange" ? "搜索来源" : "搜索品种");
+          if(input) input.setAttribute("aria-label","搜索品种");
           ctx.listWrapRef.current?.classList.add("dc-platform-scroll");
-          const trigger=container.current?.querySelector('[data-qa-id="sources-button"]');
-          if(trigger){trigger.tabIndex=0;trigger.setAttribute("role","button");trigger.setAttribute("aria-label","来源");}
+          // The native header keeps its code/description columns. Render the
+          // same Select used by management forms into its right-hand cell.
+          const header=container.current?.querySelector(`.${headerClasses.wrap} > .${headerClasses.item}:last-child`);
+          setSourceHeader(header || null);
         });
-        R.useEffect(()=>{if(ctx.mode === "exchange")container.current?.querySelector('input[role="searchbox"]')?.focus();},[ctx.mode]);
+        const items=ctx.searchSources.map(item=>({value:item.value().toLowerCase(),content:item.value() ? item.name() : "全部来源"}));
         return R.createElement(SearchContext.Provider,{value:scoped},R.createElement("div",{
-          ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":ctx.mode === "exchange"?"选择行情来源":"平台行情搜索",
-        },props.render()));
+          ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":"平台行情搜索",
+        },props.render(),sourceHeader && createPortal(R.createElement("div",{className:"dc-select-control mw-platform-source"},
+          R.createElement("div",{className:"dc-native-slot","data-native-component":"select"},
+            R.createElement(Select,{value:source,items,onChange:value=>{setSource(value);ctx.setSelectedIndex(-1);},
+              "aria-label":"来源",size:"small",className:"dc-native-select"}))),sourceHeader)));
       }
       function PlatformRow(props) {
         const platform = R.useContext(PlatformContext), [opening,setOpening]=R.useState(false);
@@ -132,7 +133,7 @@ function chartNativeUi(widget, doc) {
             return {symbols:[],symbols_remaining:0};
           }
         },[]);
-        // The native renderer owns search, round category tabs, source screen,
+        // The native renderer owns search, round category tabs, the table header,
         // result rows and the scrolling sentinel. It does not own chart apply.
         return R.createElement(PlatformContext.Provider,{value:{latest,alive,lock,state,open}},R.createElement(Search,{
           initialMode:"symbolSearch",dialogTitle:"平台行情",defaultValue:props.query||"",placeholder:"品种代码或名称",

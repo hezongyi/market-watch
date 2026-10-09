@@ -19,7 +19,7 @@ const out=path.join(f.root,'artifacts/native-ui-implementation'),report={environ
   await open('/market-data?tab=platform&source=binance&query=BTC');await expect(dc().getByRole('searchbox',{name:'搜索品种',exact:true})).toBeVisible();
   await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).focus();await p.keyboard.type('中文');expect(await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).inputValue()).toContain('中文');
   for(const key of ['Tab','Shift+Tab'])for(let i=0;i<18;i++){await p.keyboard.press(key);const focused=await native().evaluate(()=>({inside:!!document.activeElement.closest('[data-name="mw-data-center-dialog"]'),html:document.activeElement.tagName+" "+document.activeElement.getAttribute("aria-label")}));expect(focused.inside,focused.html).toBe(true);}
-  await dc().locator('[data-qa-id=sources-button]').click();await expect(dc().getByRole('searchbox',{name:'搜索来源'})).toBeFocused();await p.keyboard.press('Escape');await expect(dc().getByRole('searchbox',{name:'搜索来源'})).toHaveCount(0);await expect(dc()).toBeVisible();await close();
+  await dc().getByRole('button',{name:'来源',exact:true}).click();await expect(native().getByRole('option',{name:'全部来源',exact:true})).toBeVisible();await p.keyboard.press('Escape');await expect(dc().getByRole('button',{name:'来源',exact:true})).toBeFocused();await expect(dc()).toBeVisible();await close();
   record('Tab/Shift+Tab stay in modal; native filter Escape closes menu only; Chinese text does not reach chart shortcuts');
   const initial=await host().evaluate(()=>new Promise(resolve=>widget.save(resolve)));
   for(const action of ['chartProperties','compareOrAdd','insertIndicator']){

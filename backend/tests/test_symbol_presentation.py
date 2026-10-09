@@ -59,9 +59,12 @@ def test_slash_search_reaches_history_tasks_and_composite_without_first_use(data
     from alerts.series_access import search_page
     from alerts.storage import MarketComposite, MarketDemand
     from sqlalchemy import select
+    from alerts.history_maintenance import configure
+    from test_market_contracts import identity
 
     fixture(database, monkeypatch)
     with database.begin() as db:
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
         for query in ("EUR/USD", "eurusd", "EUR_USD"):
             for kind in ("history", "composite"):
                 row = search_page(db, query, kind=kind)["items"][0]

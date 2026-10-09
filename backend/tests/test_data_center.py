@@ -41,6 +41,7 @@ def test_server_pagination_and_literal_filters(database):
     with database.begin() as db:
         for code in ("EURUSD", "XAUUSD", "BTCUSD"):
             register(db, identity(provider_symbol=code), logical_symbol=code)
+            configure(db, identity(provider_symbol=code).key, target_start=0, timeframes=["M1"])
         first = dataset_list(db, page_size=1)
         assert first["total"] == 3 and first["items"][0]["logical_symbol"] == "BTCUSD"
         assert dataset_list(db, page=2, page_size=1)["items"][0]["logical_symbol"] == "EURUSD"
@@ -48,6 +49,52 @@ def test_server_pagination_and_literal_filters(database):
         assert dataset_list(db, query="%")["total"] == 0
         with pytest.raises(ValueError):
             dataset_list(db, page_size=1000)
+
+
+def test_managed_list_excludes_registered_only_before_filters_and_paging(database):
+    with database.begin() as db:
+        for code in ("AAA", "BBB", "CCC", "DDD"):
+            register(db, identity(provider_symbol=code), logical_symbol=code)
+        for code in ("BBB", "DDD"):
+            configure(db, identity(provider_symbol=code).key, target_start=0, timeframes=["M1"])
+        db.get(DatasetMaintenance, identity(provider_symbol="DDD").key).paused = True
+        db.flush()
+        first = dataset_list(db, page_size=1)
+        assert first["total"] == 2 and first["items"][0]["logical_symbol"] == "BBB"
+        assert dataset_list(db, page=2, page_size=1)["items"][0]["logical_symbol"] == "DDD"
+        assert dataset_list(db, query="AAA")["total"] == 0
+        assert dataset_list(db, status="attention")["total"] == 2
+        assert dataset_list(db, status="paused")["total"] == 1
+        assert all(row["maintenance"]["configured"] for row in dataset_list(db)["items"])
+        db.get(DatasetMaintenance, identity(provider_symbol="BBB").key).archived = True
+        db.flush()
+        assert dataset_list(db)["total"] == 1
+        archived = dataset_list(db, status="archived")
+        assert archived["total"] == 1 and archived["items"][0]["logical_symbol"] == "BBB"
+        # A provider-only identity still has a detail endpoint for configuration.
+        assert not dataset_detail(db, identity(provider_symbol="AAA").key)["maintenance"]["configured"]
+
+
+def test_managed_api_and_candidates_share_configured_scope(database):
+    with database.begin() as db:
+        for code in ("AAA", "BBB"):
+            register(db, identity(provider_symbol=code), logical_symbol=code)
+        configure(db, identity(provider_symbol="BBB").key, target_start=0, timeframes=["M1"])
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            managed = client.get("/api/market-data/center/datasets?page_size=1").json()
+            candidates = client.get("/api/market-data/center/composite-candidates?page_size=1").json()
+            assert managed["total"] == candidates["total"] == 1
+            assert managed["items"][0]["id"] == candidates["items"][0]["dataset"]["id"] == identity(provider_symbol="BBB").key
+            assert candidates["items"][0]["status"] == "needs_maintenance"
+            assert client.get("/api/market-data/center/datasets?query=AAA").json()["total"] == 0
+            assert client.get("/api/market-data/center/composite-candidates?query=AAA").json()["total"] == 0
+            # Browsing either list must not create realtime collection demand.
+            with database.begin() as db:
+                assert db.scalar(select(MarketDemand)) is None
+    finally:
+        api.app.dependency_overrides.clear()
 
 
 def test_atomic_create_rolls_back_invalid_maintenance_and_retry_returns_fixed_task(database):

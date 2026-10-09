@@ -10,6 +10,8 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
 
 
 @pytest.mark.parametrize("contract", [
+    contracts.test_managed_list_excludes_registered_only_before_filters_and_paging,
+    contracts.test_managed_api_and_candidates_share_configured_scope,
     contracts.test_task_filters_before_pagination_include_period_derivation,
     contracts.test_task_times_record_real_processing_and_not_poll_time,
     contracts.test_atomic_create_rolls_back_invalid_maintenance_and_retry_returns_fixed_task,

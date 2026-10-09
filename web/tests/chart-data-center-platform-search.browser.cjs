@@ -8,7 +8,7 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
  const record=(name,data={})=>{report.checks.push({name,...data});console.log('PASS',name)};
  const open=async route=>{await host().evaluate(route=>dataCenter.open(route),route);await expect(dc()).toBeVisible({timeout:30000});};
  const close=async()=>{await native().getByRole('button',{name:'关闭数据中心',exact:true}).click();await expect(dc()).toHaveCount(0);};
- const source=async name=>{await dc().locator('[data-qa-id=sources-button]').click();await expect(dc().getByRole('searchbox',{name:'搜索来源'})).toBeVisible();await dc().getByText(name,{exact:true}).click();};
+ const source=async name=>{await dc().getByRole('button',{name:'来源',exact:true}).click();await native().getByRole('option',{name,exact:true}).click();};
  const scroll=async()=>dc().locator('.dc-platform-scroll').evaluate(n=>{n.scrollTop=n.scrollHeight;});
  p.on('pageerror',error=>{report.errors.push(error.message);console.log('PAGEERROR',error.stack)});
  let release=()=>{};
@@ -19,6 +19,7 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   await open('/market-data?tab=platform&source=yahoo&query=MSFT');await expect(rows()).toHaveCount(1,{timeout:15000});await expect(rows()).toContainText('微软公司');
   await expect(dc().getByRole('button',{name:'平台行情',exact:true})).toHaveAttribute('aria-current','page');await expect(dc().getByRole('button',{name:'平台品种',exact:true})).toHaveCount(0);await expect(dc().getByRole('navigation',{name:'列表分页'})).toHaveCount(0);
   expect(await dc().locator('[data-native-component=platformSearch] [data-name=round-tabs-buttons]').count()).toBe(1);
+  await expect(dc().locator('.mw-platform-source [data-native-component=select]')).toHaveCount(1);await expect(dc().getByRole('button',{name:'来源',exact:true})).toContainText('Yahoo');await expect(dc().locator('[data-qa-id=sources-button]')).toHaveCount(0);
   await expect(dc().getByRole('heading',{name:'平台行情',exact:true})).toBeInViewport();
   const title=await dc().getByRole('heading',{name:'平台行情',exact:true}).boundingBox(),search=await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).boundingBox(),tabs=await dc().locator('[data-name=round-tabs-buttons]').boundingBox();expect(search.y).toBeGreaterThanOrEqual(title.y+title.height);expect(search.width).toBeGreaterThan(800);expect(tabs.y).toBeGreaterThan(search.y);
   await p.screenshot({path:path.join(out,'platform-yahoo.png')});record('platform name, full-width native search, actual round category tabs, native source in table heading and no pagination');
@@ -27,9 +28,9 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   expect(await native().evaluate(()=>({source:platformTestReq(371996).getValue('symboledit.exchangefilter',''),type:platformTestReq(371996).getValue('symboledit.filter','')}))).toEqual(settings);
   expect(await host().evaluate(()=>({symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution()}))).toEqual(baseline);record('real Yahoo MSFT and Binance BTC/USDT; source/type combined filtering does not mutate main-search settings or chart');
   await dc().getByRole('button',{name:'详情',exact:true}).click();await expect(dc().getByRole('complementary',{name:'行情详情'})).toContainText('原生周期');await expect(dc().getByRole('link',{name:'添加为自建行情'})).toBeVisible();await dc().getByRole('button',{name:'关闭行情详情'}).click();await expect(dc().getByRole('button',{name:'详情',exact:true})).toBeFocused();
-  await dc().locator('[data-qa-id=sources-button]').click();await expect(dc().getByRole('searchbox',{name:'搜索来源'})).toBeFocused();await p.keyboard.press('Escape');await expect(dc().getByRole('searchbox',{name:'搜索品种',exact:true})).toBeFocused();await expect(dc()).toBeVisible();
+  await dc().getByRole('button',{name:'来源',exact:true}).click();await expect(native().getByRole('option',{name:'全部来源',exact:true})).toBeVisible();await p.keyboard.press('Escape');await expect(dc().getByRole('button',{name:'来源',exact:true})).toBeFocused();await expect(dc().getByRole('searchbox',{name:'搜索来源'})).toHaveCount(0);await expect(dc()).toBeVisible();
   for(const key of ['Tab','Shift+Tab'])for(let i=0;i<16;i++){await p.keyboard.press(key);expect(await native().evaluate(()=>!!document.activeElement.closest('[data-name=mw-data-center-dialog]'))).toBe(true);}
-  record('details preserve capability/maintenance actions; close restores focus; source Escape and keyboard focus stay inside data center');await close();
+  record('details preserve capability/maintenance actions; close restores focus; source Select Escape and keyboard focus stay inside data center');await close();
   // Real directory beyond first batch; no first-screen truncation.
   const response=await p.request.get(f.base+'/api/market-data/center/platform?source=dukascopy&asset_class=forex&page=1&page_size=100');expect(response.ok()).toBe(true);const directory=await response.json();expect(directory.total).toBeGreaterThan(50);
   await open('/market-data?tab=platform&source=dukascopy&asset_class=forex&query=');await expect(rows()).toHaveCount(50,{timeout:15000});await scroll();await expect.poll(()=>rows().count(),{timeout:15000}).toBeGreaterThan(50);

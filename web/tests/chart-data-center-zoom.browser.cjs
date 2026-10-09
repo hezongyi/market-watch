@@ -40,7 +40,7 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
     body.items = Array.from({ length: 25 }, (_, index) => 'dataset' in seed
       ? { ...seed, dataset: { ...seed.dataset, id: seed.dataset.id + '-' + index, logical_symbol: '组合候选布局验收-' + index, display_symbol: '组合候选布局验收-' + index } }
       : { ...seed, id: seed.id + '-' + index, logical_symbol: '已建立组合布局验收-' + index, display_symbol: '已建立组合布局验收-' + index });
-    body.total = 50;
+    body.total = 25;
     await route.fulfill({ json: body });
   };
   const closeFilters = async () => {
@@ -85,19 +85,19 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await center().getByLabel('搜索品种', { exact: true }).fill('EURUSD');
       await center().getByRole('button', { name: '可用', exact: true }).click();
       if (await filter.isVisible()) await filter.click();
-      const action = center().getByRole('button', { name: '在当前图表打开', exact: true }).first();
+      const action = center().getByRole('button', { name: '打开图表', exact: true }).first();
       await action.scrollIntoViewIfNeeded();
       await expect(action).toBeInViewport();
       expect(await center().evaluate(n => n.scrollWidth <= n.clientWidth + 1)).toBeTruthy();
       await expect(center().getByRole('heading', { name: '自建行情', exact: true })).toBeInViewport();
-      await expect(center().getByRole('navigation', { name: '列表分页' })).toBeInViewport();
+      await expect(center().getByRole('navigation', { name: '列表分页' })).toHaveCount(0);
       await closeFilters();
       await screenshot(`browser-zoom200-${width}.png`);
       // Switching with the previous filter open must not leave an empty overlay.
       if (await filter.isVisible()) await filter.click();
       await center().getByRole('button', { name: '组合行情', exact: true }).click();
-      await expect.poll(() => center().locator('.dc-table tbody tr').count(), { timeout: 20000 }).toBe(25);
-      await expect(center().locator('.dc-filter-toggle')).toHaveCount(1);
+      await expect.poll(() => center().locator('.dc-market-row').count(), { timeout: 20000 }).toBe(25);
+      await expect(center().locator('.dc-filter-toggle')).toHaveCount(0);
       for (const mode of ['已建立组合', '可建立候选']) {
         const comboFilter = center().getByRole('button', { name: '筛选与搜索', exact: true });
         if (await comboFilter.isVisible() && await comboFilter.getAttribute('aria-expanded') !== 'true') await comboFilter.click();
@@ -108,15 +108,15 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
         await center().evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
         await expect(search).toBeFocused();
         await closeFilters();
-        await expect(center().locator('.dc-table tbody tr').last().locator('td').first()).toContainText(`${mode === '已建立组合' ? '已建立组合' : '组合候选'}布局验收-24`);
-        const table = center().locator('.dc-table');
+        await expect(center().locator('.dc-market-row').last().locator('.dc-market-main')).toContainText(`${mode === '已建立组合' ? '已建立组合' : '组合候选'}布局验收-24`);
+        const table = center().locator('.dc-market-list');
         const heading = center().getByRole('heading', { name: '组合行情', exact: true });
         const before = await heading.boundingBox();
         await table.evaluate(element => { element.scrollTop = element.scrollHeight; });
         expect(await table.evaluate(element => element.scrollHeight > element.clientHeight && element.scrollTop > 0)).toBeTruthy();
         expect((await heading.boundingBox()).y).toBe(before.y);
         await expect(heading).toBeInViewport();
-        await expect(center().getByRole('navigation', { name: '列表分页' })).toBeInViewport();
+        await expect(center().getByRole('navigation', { name: '列表分页' })).toHaveCount(0);
         expect(await center().evaluate(n => n.scrollWidth <= n.clientWidth + 1)).toBeTruthy();
       }
       await screenshot(`browser-zoom200-composite-${width}.png`);

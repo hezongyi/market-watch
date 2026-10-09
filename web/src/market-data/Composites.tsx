@@ -1,13 +1,14 @@
 import { NativeCatalogPicker } from "./NativeCatalogPicker";
 import { NativeInput, NativeSelect } from "./NativeControls";
-import { centerLink, centerReturn, useCenterRowRestore } from "./navigation";
-import { useEffect, useRef, useState } from "react";
 import {
-  Link,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "./router";
+  MarketListHeader,
+  MarketListStatus,
+  MarketTabs,
+  useMarketRows,
+} from "./MarketList";
+import { centerLink, centerReturn } from "./navigation";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useParams, useSearchParams } from "./router";
 import { api } from "./api";
 import { OpenChart } from "./OpenChart";
 import { useCenter, useDirtyForm, useMounted, useActionLock } from "./router";
@@ -49,8 +50,15 @@ type Composite = {
     input_revision: number;
     error: string | null;
   };
-  periods: {timeframe:string;status:string;applied_input_revision:number;input_revision:number;
-    updated_at:number|null;error:string|null;next_at:number}[];
+  periods: {
+    timeframe: string;
+    status: string;
+    applied_input_revision: number;
+    input_revision: number;
+    updated_at: number | null;
+    error: string | null;
+    next_at: number;
+  }[];
   usage: {
     charts: number;
     strategies: number;
@@ -63,7 +71,14 @@ type Composite = {
     confirmed_tail_ready: boolean;
     quote_age_ms: number | null;
     strategy_readiness: string;
-    rules?: {id:string;name:string;health:string;reason:string|null;revision_id:string;seam_policy:string}[];
+    rules?: {
+      id: string;
+      name: string;
+      health: string;
+      reason: string | null;
+      revision_id: string;
+      seam_policy: string;
+    }[];
   };
 };
 type Candidate = {
@@ -97,31 +112,29 @@ const clientId = () => {
 
 export function CompositeList() {
   const [params, setParams] = useSearchParams();
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const [refresh, setRefresh] = useState(0),
-    [busy, setBusy] = useState(false),
+    [opening, setOpening] = useState(""),
     [error, setError] = useState("");
-  const { apply } = useCenter();
-  const mounted = useMounted();
-  const actionLock = useActionLock();
+  const { apply, busy } = useCenter(),
+    mounted = useMounted(),
+    actionLock = useActionLock();
   const client = useRef(clientId());
   const mode = params.get("view") === "candidates" ? "candidates" : "existing",
-    query = params.get("query") || "",
-    page = Math.max(1, Number(params.get("page")) || 1);
-  const result = useSnapshot<Page<Composite | Candidate>>(
-    `/market-data/center/${mode === "candidates" ? "composite-candidates" : "composites"}?query=${encodeURIComponent(query)}&page=${page}`,
+    query = params.get("query") || "";
+  const rows = useMarketRows<Composite | Candidate>(
+    `/market-data/center/${mode === "candidates" ? "composite-candidates" : "composites"}`,
+    new URLSearchParams({ query }),
     refresh,
   );
-  useCenterRowRestore(result.data);
   function filter(key: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(key, value);
-    if (key !== "page") next.delete("page");
-    setParams(next);
+    next.delete("page");
+    setParams(next, { replace: true });
   }
   async function open(dataset: string, mapping: string) {
-    if (!actionLock.acquire()) return;
-    setBusy(true);
+    if (busy || !actionLock.acquire()) return;
+    setOpening(dataset);
     setError("");
     try {
       const row = await api<Composite>("/market-data/composites/use", {
@@ -131,173 +144,175 @@ export function CompositeList() {
       });
       if (mounted.current) await apply(`MWC:${row.id}`, "M1");
     } catch (e) {
-      setError(String(e));
+      if (mounted.current) setError(String(e));
     } finally {
       actionLock.release();
-      setBusy(false);
+      if (mounted.current) setOpening("");
     }
   }
   return (
-    <>
-      <button className="dc-filter-toggle" aria-expanded={filtersOpen} onClick={() => setFiltersOpen(value => !value)}>筛选与搜索</button>
-      <div className={`dc-list-filter-group${filtersOpen ? " is-open" : ""}`}>
-      <div className="dc-filters">
-        <button
-          aria-pressed={mode === "existing"}
-          onClick={() => filter("view", "existing")}
-        >
-          已建立组合
-        </button>
-        <button
-          aria-pressed={mode === "candidates"}
-          onClick={() => filter("view", "candidates")}
-        >
-          可建立候选
-        </button>
-        <label>
-          搜索品种
-          <NativeInput
-            value={query}
-            onChange={(e) => filter("query", e.target.value)}
-          />
-        </label>
-        <button onClick={() => setRefresh((v) => v + 1)}>刷新</button>
-      </div>
-      <p>
-        固定自建历史接续 OANDA Practice
-        确认M1及实时观察，供策略与人工交易辅助使用。浏览此列表不会启动采集。
-      </p>
-      </div>
-      <Feedback
-        error={result.error || error}
-        loading={result.loading}
-        empty={!result.data}
+    <section className="data-center dc-market-page">
+      <MarketListHeader
+        title="组合行情"
+        query={query}
+        onQuery={(value) => filter("query", value)}
+        refresh={() => setRefresh((value) => value + 1)}
       />
-      {result.data && (
-        <>
-          <p className="dc-subtle">
-            快照：{time(result.at)}
-            {result.error ? " · 刷新失败，实时健康未知" : ""}
-          </p>
-          {!result.data.items.length ? (
-            <p>
-              暂无符合筛选的条目。可切换到“可建立候选”配置已有自建历史的实时映射。
-            </p>
-          ) : (
-            <div className="dc-table table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th>品种与来源</th>
-                    <th>日界</th>
-                    <th>历史基线 / 确认尾部（UTC）</th>
-                    <th>需求与状态</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.data.items.map((item) => {
-                    if ("dataset" in item) {
-                      const row = item as Candidate,
-                        d = row.dataset;
-                      return (
-                        <tr key={d.id} id={`candidate-${d.id}`} tabIndex={-1}>
-                          <td>
-                            {d.display_symbol || d.logical_symbol}
-                            <small>
-                              {names[d.identity.source]} ·{" "}
-                              {d.provider_display_symbol || d.identity.provider_symbol} → OANDA Practice ·
-                              Bid
-                            </small>
-                          </td>
-                          <td>{phase(d.aggregation_calendar)}</td>
-                          <td>
-                            {time(d.available_start)} — {time(d.available_end)}
-                          </td>
-                          <td>
-                            {statusNames[row.status]}
-                            {row.reason && <small>{row.reason}</small>}
-                          </td>
-                          <td>
-                            <div className="dc-actions">
-                              {row.status === "needs_maintenance" ? (
-                                <Link to={centerLink(`/market-data/datasets/${d.id}`, params, `candidate-${d.id}`)}>
-                                  去维护
-                                </Link>
-                              ) : (
-                                <Link
-                                  to={centerLink(`/market-data/datasets/${d.id}/mapping`, params, `candidate-${d.id}`)}
-                                >
-                                  配置实时来源
-                                </Link>
-                              )}
-                              {row.status === "ready_to_open" &&
-                                row.recommended_mapping_id && (
-                                  <button
-                                    disabled={busy}
-                                    onClick={() =>
-                                      open(d.id, row.recommended_mapping_id!)
-                                    }
-                                  >
-                                    打开组合行情
-                                  </button>
-                                )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    }
-                    const row = item as Composite;
-                    return (
-                      <tr key={row.id} id={`composite-${row.id}`} tabIndex={-1}>
-                        <td>
-                          {row.display_symbol || row.logical_symbol}
-                          <small>
-                            {names[row.historical_source]} → OANDA Practice ·{" "}
-                            {row.mapping.target_display_symbol || row.mapping.target_identity.provider_symbol} · Bid
-                          </small>
-                        </td>
-                        <td>{phase(row.calendar)}</td>
-                        <td>
-                          基线 {time(row.revision.seam)}
-                          <small>
-                            确认至{" "}
-                            {row.preparation.confirmed_end
-                              ? time(row.preparation.confirmed_end)
-                              : "尚无确认M1"}
-                          </small>
-                        </td>
-                        <td>
-                          {row.usage.total} 个需求 ·{" "}
-                          {result.error ? "健康未知" : statusNames[row.status]}
-                          <small>
-                            {row.health.strategy_readiness === "no_strategies"
-                              ? "暂无策略"
-                              : row.health.strategy_readiness === "ready" ? "规则依赖就绪"
-                              : "策略依赖待检查"}
-                          </small>
-                        </td>
-                        <td>
-                          <Link to={centerLink(`/market-data/composites/${row.id}`, params, `composite-${row.id}`)}>
-                            查看详情
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <Pager
-            total={result.data.total}
-            page={page}
-            size={25}
-            change={(value) => filter("page", String(value))}
-          />
-        </>
+      <MarketTabs
+        label="组合列表"
+        value={mode}
+        items={[
+          ["existing", "已建立组合"],
+          ["candidates", "可建立候选"],
+        ]}
+        change={(value) => filter("view", value)}
+      />
+      <div className="dc-market-table-head dc-composite-head">
+        <span>品种与来源</span>
+        <span>日界</span>
+        <span>{mode === "existing" ? "接续状态" : "建立条件"}</span>
+        <span>操作</span>
+      </div>
+      {error && (
+        <p role="alert" className="error">
+          {error}
+        </p>
       )}
-    </>
+      <div className="dc-market-list" ref={rows.list}>
+        {rows.items.map((item) => {
+          if ("dataset" in item) {
+            const d = item.dataset,
+              id = `candidate-${d.id}`;
+            return (
+              <article
+                className="dc-market-row"
+                key={d.id}
+                id={id}
+                tabIndex={-1}
+              >
+                <div className="dc-market-main">
+                  <strong>{d.display_symbol || d.logical_symbol}</strong>
+                  <span>{names[d.identity.source]} → OANDA Practice · Bid</span>
+                </div>
+                <span>{phase(d.aggregation_calendar)}</span>
+                <span>{statusNames[item.status] || item.status}</span>
+                <div className="dc-market-actions">
+                  {item.status === "ready_to_open" &&
+                    item.recommended_mapping_id && (
+                      <button
+                        aria-disabled={!!opening || busy}
+                        aria-busy={opening === d.id || undefined}
+                        onClick={() =>
+                          void open(d.id, item.recommended_mapping_id!)
+                        }
+                      >
+                        {opening === d.id ? "正在打开…" : "打开组合行情"}
+                      </button>
+                    )}
+                  <Link
+                    to={centerLink(
+                      item.status === "needs_maintenance"
+                        ? `/market-data/datasets/${d.id}`
+                        : `/market-data/datasets/${d.id}/mapping`,
+                      params,
+                      id,
+                    )}
+                  >
+                    {item.status === "needs_maintenance"
+                      ? "去维护"
+                      : "配置实时来源"}
+                  </Link>
+                </div>
+                <details className="dc-market-row-details">
+                  <summary>详情</summary>
+                  <p>
+                    自建历史：{time(d.available_start)} 至{" "}
+                    {time(d.available_end)}
+                  </p>
+                  {item.reason && <p>{item.reason}</p>}
+                  <p>
+                    准确来源代码：
+                    {d.provider_display_symbol || d.identity.provider_symbol} ·
+                    日界：{phase(d.aggregation_calendar)}
+                  </p>
+                </details>
+              </article>
+            );
+          }
+          const row = item,
+            id = `composite-${row.id}`;
+          return (
+            <article
+              className="dc-market-row"
+              key={row.id}
+              id={id}
+              tabIndex={-1}
+            >
+              <div className="dc-market-main">
+                <strong>{row.display_symbol || row.logical_symbol}</strong>
+                <span>
+                  {names[row.historical_source]} → OANDA Practice · Bid
+                </span>
+              </div>
+              <span>{phase(row.calendar)}</span>
+              <span>
+                {rows.error
+                  ? "健康未知"
+                  : statusNames[row.status] || row.status}
+                <small>{row.usage.total} 个需求</small>
+              </span>
+              <div className="dc-market-actions">
+                <OpenChart ticker={`MWC:${row.id}`} label="打开图表" />
+                <Link
+                  to={centerLink(
+                    `/market-data/composites/${row.id}`,
+                    params,
+                    id,
+                  )}
+                >
+                  查看详情
+                </Link>
+              </div>
+              <details className="dc-market-row-details">
+                <summary>接续信息</summary>
+                <p>
+                  历史基线：{time(row.revision.seam)} · 确认至：
+                  {row.preparation.confirmed_end
+                    ? time(row.preparation.confirmed_end)
+                    : "尚无确认M1"}
+                </p>
+                <p>
+                  实时来源代码：
+                  {row.mapping.target_display_symbol ||
+                    row.mapping.target_identity.provider_symbol}
+                </p>
+                <p>
+                  {rows.error
+                    ? "实时健康未知"
+                    : row.health.strategy_readiness === "no_strategies"
+                      ? "暂无策略"
+                      : row.health.strategy_readiness === "ready"
+                        ? "规则依赖就绪"
+                        : "策略依赖待检查"}
+                </p>
+              </details>
+            </article>
+          );
+        })}
+        <div ref={rows.sentinel}>
+          <MarketListStatus
+            loading={rows.loading}
+            error={rows.error}
+            count={rows.items.length}
+            total={rows.total}
+            retry={rows.retry}
+          />
+        </div>
+      </div>
+      <p className="dc-market-note">
+        固定自建历史接续 OANDA Practice 确认M1及实时观察。浏览列表不会启动采集。
+      </p>
+    </section>
   );
 }
 

@@ -1,0 +1,16 @@
+{
+  "environment": "Ubuntu isolated Docker; actual native controls, scoped submit fixture",
+  "passed": true,
+  "checks": [
+    {
+      "name": "scoped native source picker applies metal filter before pagination; cancelling preserves empty draft and keeps parent open"
+    },
+    {
+      "name": "creation validates fields; actual native checkbox labels, disabled M1 and checked-state changes work"
+    },
+    {
+      "name": "one submit carries correct draft; closing does not cancel submitted mutation and late completion cannot navigate a reopened window"
+    }
+  ],
+  "errors": []
+}

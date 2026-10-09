@@ -10,7 +10,7 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
  const get=async url=>{const r=await p.request.get(f.base+'/api'+url);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const post=async(url,data)=>{const {csrf}=await get('/session');const r=await p.request.post(f.base+'/api'+url,{data,headers:{'X-CSRF-Token':csrf}});expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const dc=()=>native().locator('.dc-window');
- const select=async(label,text)=>{if(label==='来源' && await dc().locator('.dc-platform').count()){await dc().locator('[data-qa-id=sources-button]').click();await dc().getByText(text,{exact:true}).click();}else{const control=dc().getByRole('button',{name:label,exact:true});await control.click();await native().getByRole('option',{name:text,exact:true}).click();}};
+ const select=async(label,text)=>{await dc().getByRole('button',{name:label,exact:true}).click();await native().getByRole('option',{name:text,exact:true}).click();};
  const open=async()=>{await native().getByRole('button',{name:'数据中心',exact:true}).click();await expect(dc()).toBeVisible({timeout:30000});};
  const close=async()=>{await native().getByRole('button',{name:'关闭数据中心',exact:true}).click();await expect(dc()).toHaveCount(0);await expect(native().getByRole('button',{name:'数据中心',exact:true})).toBeFocused().catch(async error=>{console.log('FOCUS',await native().evaluate(()=>({active:document.activeElement.outerHTML,buttons:[...document.querySelectorAll('.mw-data-center-button')].map(n=>({html:n.outerHTML,visibility:getComputedStyle(n).visibility,display:getComputedStyle(n).display,rect:n.getBoundingClientRect().toJSON()}))})));throw error;});};
  let workspace;

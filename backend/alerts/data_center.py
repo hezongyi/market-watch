@@ -64,7 +64,10 @@ def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, 
     if not 1 <= page_size <= 100 or page < 1 or status not in (
             "all", "available", "preparing", "attention", "paused", "archived"):
         raise ValueError("无效的列表范围或状态")
-    base = select(MarketDataset.id).join(Instrument).outerjoin(DatasetMaintenance)
+    # Registration also creates provider-only identities and mapping targets.
+    # A saved maintenance plan is what makes an identity managed history.
+    # Restrict before counting/paging, so directory rows cannot displace it.
+    base = select(MarketDataset.id).join(Instrument).join(DatasetMaintenance)
     if query:
         # Literal substring search: user wildcards must not expand the query.
         base = base.where(code_search(query, MarketDataset.logical_symbol, Instrument.symbol))
@@ -77,7 +80,7 @@ def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, 
     if status == "archived":
         base = base.where(DatasetMaintenance.archived.is_(True))
     else:
-        base = base.where(or_(DatasetMaintenance.archived.is_(False), DatasetMaintenance.dataset_id.is_(None)))
+        base = base.where(DatasetMaintenance.archived.is_(False))
     usable = select(HistoryVersion.id).join(HistoryArtifact).where(
         HistoryVersion.dataset_id == MarketDataset.id, HistoryVersion.status == "published",
         HistoryArtifact.status == "published", HistoryArtifact.count > 0).exists()

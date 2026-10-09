@@ -2,6 +2,7 @@
 
 from alerts import api
 from alerts.storage import MarketComposite, MarketDemand
+from alerts.history_maintenance import configure
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from test_composite_definitions import PROOF, prepare, publish
@@ -11,6 +12,8 @@ from test_market_contracts import identity
 def test_mapping_candidate_first_use_and_chart_api(database, monkeypatch):
     catalog = prepare(database, monkeypatch)
     publish(database)
+    with database.begin() as db:
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
     monkeypatch.setattr("alerts.composite_definitions.now_ms", lambda: 165725000)
     api.app.dependency_overrides[api.authenticated] = lambda: "test"
     try:
@@ -55,6 +58,7 @@ def test_candidate_requires_history_before_day_seam_without_creating_demand(data
     catalog = prepare(database, monkeypatch)
     publish(database, end=7200000)
     with database.begin() as db:
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
         save_mapping(db, identity().key, catalog, PROOF)
         item = next(row for row in candidates(db)["items"] if row["dataset"]["id"] == identity().key)
         assert item["status"] == "needs_maintenance" and "日界拼接点" in item["reason"]

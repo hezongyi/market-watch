@@ -50,7 +50,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
   }, []);
   const rememberPosition = useCallback(() => {
     const active = document.activeElement as HTMLElement;
-    const table = content.current?.querySelector<HTMLElement>(".dc-table,.dc-platform-scroll");
+    const table = content.current?.querySelector<HTMLElement>(".dc-table,.dc-platform-scroll,.dc-market-list");
     positions.current[routeRef.current] = { top: content.current?.scrollTop || 0,
       tableTop: table?.scrollTop || 0, tableLeft: table?.scrollLeft || 0,
       focus: active.id || active.closest("tr[id]")?.id || null };
@@ -139,7 +139,8 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
     const saved = positions.current[route];
     const restore = () => {
       if (restored) return;
-      const table = content.current?.querySelector<HTMLElement>(".dc-table,.dc-platform-scroll");
+      const table = content.current?.querySelector<HTMLElement>(".dc-table,.dc-platform-scroll,.dc-market-list");
+      if (table?.matches(".dc-market-list") && !table.querySelector(".dc-market-row")) return;
       if (content.current?.querySelector(".dc-platform") && !table) return;
       if (table?.matches(".dc-platform-scroll") && !table.querySelector('[data-role="list-item"]')) return;
       if (table?.matches(".dc-platform-scroll") && !platformSettled) {
@@ -151,7 +152,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
       if (saved && (saved.tableTop || saved.tableLeft) && !table) return;
       if (content.current) content.current.scrollTop = saved?.top || 0;
       if (table && saved) { table.scrollTop = saved.tableTop; table.scrollLeft = saved.tableLeft; }
-      const focus = (saved?.focus ? document.getElementById(saved.focus) : null) || content.current?.querySelector<HTMLElement>('.dc-platform input[role="searchbox"],h1');
+      const focus = (saved?.focus ? document.getElementById(saved.focus) : null) || content.current?.querySelector<HTMLElement>('.dc-platform input[role="searchbox"],.dc-market-page input[role="searchbox"],h1');
       if (focus) { if (!focus.matches("button,a,input,select,textarea")) focus.tabIndex = -1; focus.focus({ preventScroll: true }); restored = true; }
     };
     const frame = requestAnimationFrame(restore);
