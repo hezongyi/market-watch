@@ -1,6 +1,7 @@
 """One leased multi-instrument stream plus an independent REST confirmation loop."""
 
 import logging
+import re
 import signal
 import threading
 import time
@@ -25,6 +26,17 @@ from .oanda_stream import OandaPractice
 from .storage import now_ms
 
 log = logging.getLogger(__name__)
+
+
+def log_failure(event, error, *, stage, epoch=None):
+    """Keep classification useful without exception text or SQL parameters."""
+    result = failed_request(error, observed_at=now_ms())
+    sqlstate = getattr(getattr(error, "orig", None), "sqlstate", None)
+    if not isinstance(sqlstate, str) or not re.fullmatch(r"[0-9A-Z]{5}", sqlstate):
+        sqlstate = "-"
+    log.warning("%s status=%s stage=%s type=%s sqlstate=%s epoch=%s",
+                event, result.status, stage, type(error).__name__, sqlstate, epoch)
+    return result
 
 
 def subscription_change(identities, desired, idle_since, now):
@@ -77,10 +89,12 @@ def collect(adapter, ownership, identities, stopped):
         while not stopped.is_set() and not connection_stop.is_set():
             try:
                 if not renew(ownership):
+                    log.warning("pricing_ownership_lost reason=lease_not_renewed stage=guard epoch=%s", epoch)
                     lost.set()
                     return
-            except Exception:
+            except Exception as error:
                 # Any inability to prove ownership fences publishing immediately.
+                log_failure("pricing_ownership_lost", error, stage="guard", epoch=epoch)
                 lost.set()
                 return
             connection_stop.wait(5)
@@ -89,34 +103,41 @@ def collect(adapter, ownership, identities, stopped):
         refreshed = 0
         idle_since = None
         while not stopped.is_set() and not connection_stop.is_set():
+            stage = "renew"
             try:
                 if not renew(ownership):
+                    log.warning("pricing_ownership_lost reason=lease_not_renewed stage=maintenance epoch=%s", epoch)
                     lost.set()
                     return
                 if time.monotonic() - refreshed >= 10:
+                    stage = "subscription"
                     desired = desired_datasets(adapter.account_id)
                     current = time.monotonic()
                     idle_since, changed = subscription_change(identities, desired, idle_since, current)
                     if changed:
+                        log.info("pricing_connection_stopping reason=subscription_change epoch=%s", epoch)
                         intentional_stop.set()
                         connection_stop.set()
                         return
                     if any(minutes > requirements[key] for key, minutes in recovery_requirements(identities).items()):
+                        log.info("pricing_connection_stopping reason=recovery_requirement epoch=%s", epoch)
                         intentional_stop.set()
                         connection_stop.set()
                         return
                     refreshed = time.monotonic()
+                stage = "confirmation"
                 error = confirm_pages(adapter, ownership, epoch, identities,
                     lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set())
                 if error:
                     maintenance_error.append(error)
                     connection_stop.set()
                     return
-            except TimeoutError:
+            except TimeoutError as error:
+                log_failure("pricing_ownership_lost", error, stage=stage, epoch=epoch)
                 lost.set()
                 return
             except Exception as error:
-                log.warning("pricing_maintenance_failed type=%s", type(error).__name__)
+                log_failure("pricing_maintenance_failed", error, stage=stage, epoch=epoch)
             connection_stop.wait(1)
 
     # SDK REST requests have bounded timeouts. Network waits never hold a DB
@@ -126,18 +147,23 @@ def collect(adapter, ownership, identities, stopped):
     guardian.start()
     thread.start()
     result = RequestResult(status="unavailable")
+    stage = "stream"
     try:
         for event in adapter.stream(identities, epoch=epoch,
                 stopped=lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set()):
             if stopped.is_set() or connection_stop.is_set() or lost.is_set():
                 break
+            stage = "publish"
             publish_event(ownership, epoch, event, identities)
+            stage = "stream"
     except Exception as error:
-        result = failed_request(error, observed_at=now_ms())
-        log.warning("pricing_stream_ended status=%s", result.status)
+        result = log_failure("pricing_stream_ended", error, stage=stage, epoch=epoch)
         if result.status == "rate_limited":
             seconds = max(1, (result.retry_at - now_ms()) / 1000) if result.retry_at else None
             cooldown("oanda", retry_seconds=seconds)
+    else:
+        if not (stopped.is_set() or connection_stop.is_set() or lost.is_set()):
+            log.info("pricing_stream_closed reason=eof epoch=%s", epoch)
     finally:
         connection_stop.set()
         thread.join(timeout=20)
@@ -182,8 +208,7 @@ def main():
                 run(adapter, stopped)
             except Exception as error:
                 # Auth/config faults remain quiet and bounded, without account URLs.
-                result = failed_request(error, observed_at=now_ms())
-                log.warning("pricing_start_failed status=%s", result.status)
+                result = log_failure("pricing_start_failed", error, stage="startup")
                 stopped.wait(60 if result.status == "unauthorized" else 15)
     finally:
         adapter.close()

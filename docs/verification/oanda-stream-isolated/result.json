@@ -1,0 +1,175 @@
+{
+  "environment": "Ubuntu Docker / synthetic supplier / installed application",
+  "start": "2026-10-08T01:18:16.270219+00:00",
+  "end": "2026-10-08T01:28:16.280862+00:00",
+  "elapsed_seconds": 600.024,
+  "samples": 121,
+  "checks": {
+    "full_window": true,
+    "constant_epoch": true,
+    "fresh_healthy_rows": true,
+    "leases_valid": true,
+    "confirmed_minutes_advance": true,
+    "publication_advances": true,
+    "no_publication_errors": true,
+    "no_notifications": true,
+    "no_long_idle_transactions": true,
+    "no_database_deadlocks": true,
+    "no_new_warnings": true
+  },
+  "faults": [
+    {
+      "at": "2026-10-08T01:17:42.387707+00:00",
+      "mode": "receive_headers",
+      "connection": 1
+    },
+    {
+      "at": "2026-10-08T01:17:58.495439+00:00",
+      "mode": "receive_body",
+      "connection": 2
+    }
+  ],
+  "warnings": [
+    {
+      "at": "2026-10-08T01:17:57.398528+00:00",
+      "logger": "alerts.oanda_stream",
+      "message": "pricing_transport_failed phase=receive_headers type=ReadTimeout epoch=1 http_status=- body_kind=other elapsed_ms=15016 since_record_ms=- records=0"
+    },
+    {
+      "at": "2026-10-08T01:17:57.398651+00:00",
+      "logger": "alerts.oanda_worker",
+      "message": "pricing_stream_ended status=timeout stage=stream type=ReadTimeout sqlstate=- epoch=1"
+    },
+    {
+      "at": "2026-10-08T01:18:13.606446+00:00",
+      "logger": "alerts.oanda_stream",
+      "message": "pricing_transport_failed phase=receive_body type=ReadTimeout epoch=2 http_status=200 body_kind=json elapsed_ms=15120 since_record_ms=15051 records=3"
+    },
+    {
+      "at": "2026-10-08T01:18:13.606549+00:00",
+      "logger": "alerts.oanda_worker",
+      "message": "pricing_stream_ended status=timeout stage=stream type=ReadTimeout sqlstate=- epoch=2"
+    }
+  ],
+  "publication_failures": [],
+  "module_hashes": {
+    "alerts.live_pricing": "1c7624995e4e47941c8e10a89ee3198072cc47216b4ab87311e791a1ef0468c1",
+    "alerts.oanda_worker": "275c838b5d62ddc987a2604ed6ce936463692e536267b7b35b76807b684ae5e3",
+    "alerts.storage": "fcf6e0e798da8f236eb77638e41f56ab1e11db4bd87250ede1c562d913d975b8"
+  },
+  "supplier_connections": 3,
+  "first": {
+    "at": "2026-10-08T01:18:16.270219+00:00",
+    "rows": [
+      {
+        "logical_symbol": "EURUSD",
+        "quality": "healthy",
+        "connection": "connected",
+        "connection_epoch": 3,
+        "recovery_ready": true,
+        "quote_ready": true,
+        "candle_ready": true,
+        "quote_age_ms": 567,
+        "heartbeat_at": 1791422295718,
+        "last_confirmed_m1": 1791422280000
+      },
+      {
+        "logical_symbol": "XAUUSD",
+        "quality": "healthy",
+        "connection": "connected",
+        "connection_epoch": 3,
+        "recovery_ready": true,
+        "quote_ready": true,
+        "candle_ready": true,
+        "quote_age_ms": 567,
+        "heartbeat_at": 1791422295718,
+        "last_confirmed_m1": 1791422280000
+      }
+    ],
+    "owners": [
+      {
+        "epoch": 3,
+        "failures": 0,
+        "error": null,
+        "lease_remaining_ms": 29451
+      }
+    ],
+    "publications": [
+      {
+        "symbol": "EURUSD",
+        "frame": "M1",
+        "end": 1791422280000,
+        "revision": 124
+      },
+      {
+        "symbol": "XAUUSD",
+        "frame": "M1",
+        "end": 1791422280000,
+        "revision": 124
+      }
+    ],
+    "publication_errors": 0,
+    "publication_failure_count": 0,
+    "outbox": 0,
+    "idle_transactions": 0,
+    "long_idle_transactions": 0,
+    "deadlocks": 0
+  },
+  "last": {
+    "at": "2026-10-08T01:28:16.280862+00:00",
+    "rows": [
+      {
+        "logical_symbol": "EURUSD",
+        "quality": "healthy",
+        "connection": "connected",
+        "connection_epoch": 3,
+        "recovery_ready": true,
+        "quote_ready": true,
+        "candle_ready": true,
+        "quote_age_ms": 207,
+        "heartbeat_at": 1791422896069,
+        "last_confirmed_m1": 1791422880000
+      },
+      {
+        "logical_symbol": "XAUUSD",
+        "quality": "healthy",
+        "connection": "connected",
+        "connection_epoch": 3,
+        "recovery_ready": true,
+        "quote_ready": true,
+        "candle_ready": true,
+        "quote_age_ms": 207,
+        "heartbeat_at": 1791422896069,
+        "last_confirmed_m1": 1791422880000
+      }
+    ],
+    "owners": [
+      {
+        "epoch": 3,
+        "failures": 0,
+        "error": null,
+        "lease_remaining_ms": 29956
+      }
+    ],
+    "publications": [
+      {
+        "symbol": "EURUSD",
+        "frame": "M1",
+        "end": 1791422880000,
+        "revision": 274
+      },
+      {
+        "symbol": "XAUUSD",
+        "frame": "M1",
+        "end": 1791422880000,
+        "revision": 274
+      }
+    ],
+    "publication_errors": 0,
+    "publication_failure_count": 0,
+    "outbox": 0,
+    "idle_transactions": 0,
+    "long_idle_transactions": 0,
+    "deadlocks": 0
+  }
+}

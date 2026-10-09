@@ -47,11 +47,13 @@ def date_start(inst, value):
 
 
 def join(db, inst, start, now):
+    from .chart_history_plan import lock_plan_instrument
+
     end = (now - 5000) // 60000 * 60000
     if start < 0 or start % 60000 or start >= end:
         raise ValueError("历史起点必须早于最新已完成分钟")
-    db.scalar(select(Instrument).where(Instrument.id == inst.id).with_for_update())
-    plan = db.get(ChartHistoryPlan, inst.id)
+    lock_plan_instrument(db, inst.id)
+    plan = db.get(ChartHistoryPlan, inst.id, populate_existing=True)
     if plan is None:
         plan = ChartHistoryPlan(
             instrument_id=inst.id,
@@ -483,6 +485,7 @@ def adopt_legacy_once(*, limit=None):
     maintenance setting. A disabled catalog entry with no stored coverage is
     never adopted merely because somebody searched or opened its chart.
     """
+    from .chart_history_plan import lock_plan_instrument
     from .market import stored_coverage
     from .storage import MarketCoverage
 
@@ -494,7 +497,7 @@ def adopt_legacy_once(*, limit=None):
         ids = list(db.scalars(query.limit(limit) if limit is not None else query))
     for ident in ids:
         with transaction() as db:
-            inst = db.scalar(select(Instrument).where(Instrument.id == ident).with_for_update(skip_locked=True))
+            inst = lock_plan_instrument(db, ident, skip_locked=True)
             if inst is None:
                 continue
             if db.get(ChartHistoryPlan, ident):
