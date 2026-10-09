@@ -123,9 +123,10 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await native().getByRole('button', { name: '关闭数据中心' }).click();
       await host().evaluate(() => dataCenter.open('/market-data?tab=platform&source=yahoo&query=MSFT'));
       await expect(center().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1, { timeout: 15000 });
+      await expect(center().getByRole('heading', { name: '平台行情', exact: true })).toBeInViewport();
       await expect(center().getByRole('searchbox', { name: '搜索品种', exact: true })).toBeInViewport();
       await expect(center().getByRole('button', { name: '来源', exact: true })).toBeInViewport();
-      await expect(center().getByRole('button', { name: '打开图表', exact: true })).toBeInViewport();
+      await expect(center().getByRole('button', { name: '打开图表', exact: true })).toBeInViewport({ ratio: 1 });
       await expect(center().getByRole('navigation', { name: '列表分页' })).toHaveCount(0);
       expect(await center().locator('.dc-platform').evaluate(n => n.scrollWidth <= n.clientWidth + 1)).toBeTruthy();
       await screenshot(`browser-zoom200-platform-${width}.png`);

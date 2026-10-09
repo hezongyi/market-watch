@@ -80,7 +80,7 @@ export function PlatformMarket() {
   useCenterRowRestore(revision);
   useEffect(() => { if (detail) document.getElementById("platform-detail")?.focus(); }, [detail]);
   return <section className="data-center dc-platform">
-    <h1 className="dc-visually-hidden">平台行情</h1>
+    <h1 className="dc-platform-title">平台行情</h1>
     {error && <p role="alert" className="error">{error}</p>}
     {ui ? <NativeSlot key={refresh} kind="platformSearch" className="dc-platform-search" props={{
       query, source, asset: Object.entries(assetTypes).find(([, value]) => value === asset)?.[0] || asset,

@@ -213,7 +213,14 @@
 
 /* Platform markets follow the native symbol-search layout, without page controls. */
 .dc-window .data-center.dc-platform {height:100%;min-height:0;padding:0;gap:0;display:flex;flex-direction:column;overflow:hidden;}
-.dc-visually-hidden {position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap;border:0!important;}
+.dc-platform-title {flex-shrink:0;padding:12px 20px;}
+@media(max-height:650px){
+ .dc-platform-title {padding-block:4px;}
+ .dc-platform .mw-platform-inline>div:has([data-name=round-tabs-buttons]),
+ .dc-platform [data-name=round-tabs-buttons] {padding-block:0;}
+ .dc-platform .mw-platform-status {padding-block:0;}
+ .dc-window:has(.dc-platform) .dc-window-footer {padding-block:4px;}
+}
 .dc-platform-search {flex:1;min-height:0;width:100%;}
 .dc-platform-detail {flex:0 1 auto;max-height:40%;overflow:auto;border-top:1px solid var(--line);padding:12px 20px;}
 .dc-platform-detail .dc-heading {margin-bottom:8px;}
