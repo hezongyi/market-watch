@@ -19,6 +19,7 @@ import {
 import { useSnapshot } from "./useSnapshot";
 import { NativeConfigure } from "./NativeConfigure";
 import { centerLink, useCenterRowRestore } from "./navigation";
+import { PlatformMarket } from "./PlatformMarket";
 
 export function Feedback({
   error,
@@ -86,8 +87,7 @@ export function CenterList() {
     status,
   });
   if (dataset) key.set("dataset_id", dataset);
-  const endpoint =
-    tab === "tasks" ? "tasks" : tab === "platform" ? "platform" : "datasets";
+  const endpoint = tab === "tasks" ? "tasks" : "datasets";
   const result = useSnapshot<Page<any>>(
     ["composite", "sources"].includes(tab) ? null : `/market-data/center/${endpoint}?${key}`,
     refresh,
@@ -104,7 +104,7 @@ export function CenterList() {
   return (
     <section className="data-center dc-list">
       <div className="dc-heading">
-        <h1>{{ managed: "自建行情", platform: "平台品种", composite: "组合行情", tasks: "任务与记录" }[tab] || "自建行情"}</h1>
+        <h1>{{ managed: "自建行情", composite: "组合行情", tasks: "任务与记录" }[tab] || "自建行情"}</h1>
         {tab === "managed" && <Link className="primary dc-button" to={centerLink("/market-data/datasets/new", params)}>添加行情</Link>}
       </div>
       {tab !== "composite" && <button className="dc-filter-toggle" aria-expanded={filtersOpen} onClick={() => setFiltersOpen(value => !value)}>筛选与搜索</button>}
@@ -163,9 +163,9 @@ export function CenterList() {
               </NativeSelect>
             </label>
           )}
-          {["managed","platform"].includes(tab) && <label>资产类别<NativeSelect value={asset} onChange={e => filter("asset_class", e.target.value)}>
+          {tab === "managed" && <label>资产类别<NativeSelect value={asset} onChange={e => filter("asset_class", e.target.value)}>
             <option value="">全部类别</option><option value="forex">外汇</option><option value="metal">金属</option>
-            <option value="crypto">加密</option><option value="index">指数</option>{tab === "platform" && <><option value="equity">股票</option><option value="etf">基金</option><option value="future">期货</option></>}<option value="other">其他</option>
+            <option value="crypto">加密</option><option value="index">指数</option><option value="other">其他</option>
           </NativeSelect></label>}
           {tab === "managed" && (
             <label>
@@ -225,13 +225,7 @@ export function CenterList() {
                       ? ["品种与口径", "可用历史", "周期", "维护与状态", "操作"]
                       : tab === "tasks"
                         ? ["对象与类型", "固定任务范围", "阶段与进度", "时间与重试", "错误与处理", "操作"]
-                        : [
-                            "来源品种",
-                            "原生周期",
-                            "M1 历史",
-                            "目录更新时间",
-                            "操作",
-                          ]
+                        : []
                     ).map((label) => (
                       <th key={label} scope="col">
                         {label}
@@ -343,44 +337,6 @@ export function CenterList() {
                         </td>
                       </tr>
                     ))}
-                  {tab === "platform" &&
-                    items.map((p) => (
-                      <tr key={p.id} id={`platform-${p.id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`} tabIndex={-1}>
-                        <td>
-                          <strong>{p.display_symbol || p.provider_symbol}</strong>
-                          <span>
-                            {p.label === p.provider_symbol ? names[p.source] : p.label + " · " + names[p.source]}
-                          </span>
-                        </td>
-                        <td>
-                          {p.capabilities.native_periods.join(" · ") ||
-                            "尚未接入"}
-                          {p.capabilities.native_confirmation === "not_supplied" && (
-                            <span>来源未提供确认标记；按周期结束时间显示</span>
-                          )}
-                        </td>
-                        <td>{p.capabilities.history_m1 ? "支持" : "未开放"}</td>
-                        <td>{time(p.updated_at)}</td>
-                        <td>
-                          {p.available && p.capabilities.native_periods.length > 0 && (
-                            <OpenChart ticker={`MWP:${p.id}`} frame={p.capabilities.native_periods.includes("H1") ? "H1" : p.capabilities.native_periods[0]} label="打开平台图表" />
-                          )}
-                          {p.available && p.source === "oanda" && (
-                            <Link to={centerLink(`/market-data/platform/configure?instrument=${encodeURIComponent(p.id)}`, params, `platform-${p.id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`)}>
-                              配置原生参数
-                            </Link>
-                          )}
-                          {p.capabilities.history_m1 &&
-                            (!p.logical_symbol || p.logical_symbol.length <= 10) && (
-                            <Link
-                              to={centerLink(`/market-data/datasets/new?source=${p.source}&symbol=${encodeURIComponent(p.provider_symbol)}${p.history_precision == null ? "" : `&precision=${p.history_precision}`}`, params, `platform-${p.id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`)}
-                            >
-                              添加为自建行情
-                            </Link>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
                 </tbody>
               </table>
             </div>
@@ -466,5 +422,6 @@ export default function Center() {
   if (pathname.includes("/datasets/")) return <DatasetDetail key={pathname + ":" + params.get("section")} />;
   if (pathname.includes("/composites/")) return <CompositeDetail key={pathname} />;
   if (params.get("tab") === "sources") return <Sources />;
+  if (params.get("tab") === "platform") return <PlatformMarket />;
   return <CenterList />;
 }

@@ -1,0 +1,22 @@
+{
+  "environment": "Ubuntu isolated Docker; actual licensed native dialogs",
+  "passed": true,
+  "checks": [
+    {
+      "name": "only selected row shows loading; double clicks are ignored; rejected acceptance restores row state"
+    },
+    {
+      "name": "Tab/Shift+Tab stay in modal; native filter Escape closes menu only; Chinese text does not reach chart shortcuts"
+    },
+    {
+      "name": "real chart settings cancel, compare and indicator dialogs still open/close without chart-property mutation"
+    },
+    {
+      "name": "version mismatch cleans up and opens functional compatibility window; corrected version retries native path"
+    },
+    {
+      "name": "failed native asset uses compatibility window and successful retry remounts complete native UI"
+    }
+  ],
+  "errors": []
+}

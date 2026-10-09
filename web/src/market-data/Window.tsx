@@ -8,7 +8,7 @@ import { NativeSlot, NativeSidebar, NativeUiContext } from "./NativeControls";
 
 const navIcon = (key:string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${({managed:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',platform:'<circle cx="12" cy="12" r="2"/><path d="M16 8a6 6 0 0 1 0 8M8 8a6 6 0 0 0 0 8M19 5a10 10 0 0 1 0 14M5 5a10 10 0 0 0 0 14"/>',composite:'<path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/>',tasks:'<path d="m3 6 2 2 4-4M12 6h9M3 13h6M12 13h9M3 20h6M12 20h9"/>',sources:'<path d="M3 6h5M12 6h9M3 12h9M16 12h5M3 18h2M9 18h12"/><circle cx="10" cy="6" r="2"/><circle cx="14" cy="12" r="2"/><circle cx="7" cy="18" r="2"/>'} as Record<string,string>)[key]}</svg>`;
 const channel = "mw-data-center-v1";
-const tabs = [["managed", "自建行情", Database], ["platform", "平台品种", Radio], ["composite", "组合行情", Layers], ["tasks", "任务与记录", ListChecks], ["sources", "来源与能力", Settings2]] as const;
+const tabs = [["managed", "自建行情", Database], ["platform", "平台行情", Radio], ["composite", "组合行情", Layers], ["tasks", "任务与记录", ListChecks], ["sources", "来源与能力", Settings2]] as const;
 type Context = { workspace: string; target: string; theme: string; symbolSync: boolean; intervalSync: boolean; location?: string };
 type Position = { top: number; tableTop: number; tableLeft: number; focus: string | null };
 export type HostedCenter = {
@@ -37,6 +37,8 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
   const tabLocations = useRef<Record<string, string>>(readMemory("mw-data-center-tabs", {}));
   const restoreScope = useRef<string | null>(null);
   const guardFocus = useRef<HTMLElement | null>(null);
+  const parsedRoute = new URL(route, "https://center.invalid");
+  const routeScope = parsedRoute.pathname + "?tab=" + centerTab(route) + parsedRoute.hash;
   routeRef.current = route; contextRef.current = context;
   const post = useCallback((value: object) => hosted ? hosted.post(value) : parent.parent.postMessage({ channel, session, ...value }, host), [session, host, hosted]);
   const setDirty = useCallback((key: string, value: boolean) => { value ? dirty.current.add(key) : dirty.current.delete(key); }, []);
@@ -48,7 +50,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
   }, []);
   const rememberPosition = useCallback(() => {
     const active = document.activeElement as HTMLElement;
-    const table = content.current?.querySelector<HTMLElement>(".dc-table");
+    const table = content.current?.querySelector<HTMLElement>(".dc-table,.dc-platform-scroll");
     positions.current[routeRef.current] = { top: content.current?.scrollTop || 0,
       tableTop: table?.scrollTop || 0, tableLeft: table?.scrollLeft || 0,
       focus: active.id || active.closest("tr[id]")?.id || null };
@@ -125,29 +127,38 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
       sessionStorage.setItem("mw-data-center-tabs", JSON.stringify(tabLocations.current));
     }
     post({ type: "location", location: route });
-    const parsed = new URL(route, "https://center.invalid");
-    const scope = parsed.pathname + "?tab=" + centerTab(route) + parsed.hash;
-    const sameScope = restoreScope.current === scope;
-    restoreScope.current = scope;
+  }, [route, post]);
+  useEffect(() => {
+    const sameScope = restoreScope.current === routeScope;
+    restoreScope.current = routeScope;
     // Filters/page changes keep the user's active control. Restore position
     // only when entering a section/detail or returning to a specific row.
     if (sameScope) return;
     let restored = false;
+    let platformSettled = false, platformFrame = 0;
+    const saved = positions.current[route];
     const restore = () => {
       if (restored) return;
-      const saved = positions.current[route];
-      const table = content.current?.querySelector<HTMLElement>(".dc-table");
+      const table = content.current?.querySelector<HTMLElement>(".dc-table,.dc-platform-scroll");
+      if (content.current?.querySelector(".dc-platform") && !table) return;
+      if (table?.matches(".dc-platform-scroll") && !table.querySelector('[data-role="list-item"]')) return;
+      if (table?.matches(".dc-platform-scroll") && !platformSettled) {
+        if (!platformFrame) platformFrame = requestAnimationFrame(() => {
+          platformFrame = requestAnimationFrame(() => { platformSettled = true; restore(); });
+        });
+        return;
+      }
       if (saved && (saved.tableTop || saved.tableLeft) && !table) return;
       if (content.current) content.current.scrollTop = saved?.top || 0;
       if (table && saved) { table.scrollTop = saved.tableTop; table.scrollLeft = saved.tableLeft; }
-      const focus = saved?.focus ? document.getElementById(saved.focus) : content.current?.querySelector<HTMLElement>("h1");
+      const focus = (saved?.focus ? document.getElementById(saved.focus) : null) || content.current?.querySelector<HTMLElement>('.dc-platform input[role="searchbox"],h1');
       if (focus) { if (!focus.matches("button,a,input,select,textarea")) focus.tabIndex = -1; focus.focus({ preventScroll: true }); restored = true; }
     };
     const frame = requestAnimationFrame(restore);
     const observer = new MutationObserver(restore);
     if (content.current) observer.observe(content.current, { childList: true, subtree: true });
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); };
-  }, [route, post]);
+    return () => { cancelAnimationFrame(frame); cancelAnimationFrame(platformFrame); observer.disconnect(); };
+  }, [routeScope, post]);
   useEffect(() => {
     if (guard) guardBox.current?.querySelector<HTMLButtonElement>("button")?.focus();
   }, [guard]);

@@ -17,6 +17,131 @@ function chartNativeUi(widget, doc) {
       const chunks = [50591,83159,82593,43946,34663,74219,1355,52485,50160,85997,17039,10162,16651,70221,18566,55578,50779,85715,15043,67351,69437,96868,84551,34853,10627,4500,43296,16687,97839,39983,8117,15211,88090,75856,23819,32327,38729,47649,29520,1644,9876,60451,55921,5840,87829,16468,19937,39047,57818,13885,31049,72414,39919,93041,30714,79086,8318,99224,84277,26703,70814,20774,29365,50254,91947,36145,83520,32171,50225,3854,36702,34540,39218,56595,50625];
       await Promise.all([req(114063).loadNewSymbolSearch(), ...chunks.map(id => req.e(id))]);
       const R = req(779474), createRoot = req(590263).createReactRoot;
+      const Search = req(154676).SymbolSearchItemsDialog;
+      const SearchContext = req(886925).SymbolSearchItemsDialogContext;
+      const BodyContext = req(48591).SymbolSearchDialogBodyContext;
+      const SearchRow = req(620748).SymbolSearchDialogContentItem;
+      if(!Search || !SearchContext || !BodyContext || !SearchRow) throw Error("原生平台行情搜索不可用");
+      const PlatformContext = R.createContext(null);
+      const listClasses = req(198629), rowClasses = req(910890);
+      const platformStyle = doc.createElement("style");
+      platformStyle.textContent = `
+        .mw-platform-search,.mw-platform-inline{height:100%;min-height:0;display:flex;flex-direction:column;width:100%}
+        .mw-platform-inline>div{min-width:0;flex-shrink:0}
+        .mw-platform-inline>.${listClasses.wrap}{width:100%;flex:1;min-height:0}
+        .mw-platform-inline .${listClasses.scrollContainer}{scroll-padding-top:40px}
+        .mw-platform-inline .${rowClasses.actionsCell}{width:auto;min-width:124px;padding-inline:4px}
+        .mw-platform-inline .${rowClasses.symbolTitle}{max-width:200px}
+        .mw-platform-inline .mw-platform-action{font:inherit;font-size:13px;color:var(--ink);border:0;border-radius:4px;background:transparent;cursor:pointer;white-space:nowrap;padding:6px;min-height:32px}
+        .mw-platform-inline .mw-platform-action:hover{background:var(--card)}
+        .mw-platform-inline .mw-platform-action:disabled{opacity:.5;cursor:default}
+        .mw-platform-inline .mw-platform-action:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+        .mw-platform-status{font-size:12px;color:var(--muted);padding:8px 20px;flex-shrink:0}
+        .mw-platform-status[role=alert]{color:var(--danger)}
+        @media(max-width:800px){.mw-platform-inline .${rowClasses.actionsCell}{min-width:0;width:auto}}
+      `;
+      doc.head.append(platformStyle);
+      function PlatformWrapper(props) {
+        return R.createElement("div", {className:"mw-platform-search"}, props.children);
+      }
+      function PlatformInline(props) {
+        const ctx = R.useContext(SearchContext), platform = R.useContext(PlatformContext);
+        const container=R.useRef(null);
+        const [source, setSource] = R.useState(platform.latest.current.source || "");
+        const selected = ctx.searchSources.find(item => item.value().toLowerCase() === source) || ctx.searchSources.find(item => item.value() === "");
+        // The native controller normally persists its source to the main
+        // symbol-search settings. Give this embedded search its own source.
+        const scoped = {...ctx, selectedSearchSource:selected, setSelectedSearchSource:item=>setSource(item.value().toLowerCase()),
+          symbolSearchContent:{...ctx.symbolSearchContent,currentSelectedSearchSource:selected},
+          handleListWidth:ctx.handleListWidth};
+        function keyboard(event) {
+          if(event.target.closest?.('[data-qa-id="sources-button"]') && ["Enter"," "].includes(event.key)) {
+            event.preventDefault();event.stopPropagation();event.target.closest('[data-qa-id="sources-button"]').click();return;
+          }
+          if (event.key === "Escape" && ctx.mode === "exchange") {
+            event.preventDefault();event.stopPropagation();ctx.setMode("symbolSearch");
+            win.requestAnimationFrame(()=>ctx.searchRef.current?.focus());return;
+          }
+          if (event.target !== ctx.searchRef.current || ctx.mode !== "symbolSearch") return;
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();event.stopPropagation();
+            const next = Math.max(0, Math.min(ctx.feedItems.length-1,ctx.selectedIndex+(event.key === "ArrowDown"?1:-1)));
+            ctx.setSelectedIndex(next);return;
+          }
+          if (event.key === "Enter" && !event.isComposing && ctx.selectedIndex >= 0) {
+            event.preventDefault();event.stopPropagation();void platform.open(ctx.feedItems[ctx.selectedIndex]?.item?.ticker).catch(()=>{});
+          }
+        }
+        R.useEffect(()=>{
+          const input=container.current?.querySelector('input[role="searchbox"]');
+          if(input) input.setAttribute("aria-label",ctx.mode === "exchange" ? "搜索来源" : "搜索品种");
+          ctx.listWrapRef.current?.classList.add("dc-platform-scroll");
+          const trigger=container.current?.querySelector('[data-qa-id="sources-button"]');
+          if(trigger){trigger.tabIndex=0;trigger.setAttribute("role","button");trigger.setAttribute("aria-label","来源");}
+        });
+        R.useEffect(()=>{if(ctx.mode === "exchange")container.current?.querySelector('input[role="searchbox"]')?.focus();},[ctx.mode]);
+        return R.createElement(SearchContext.Provider,{value:scoped},R.createElement("div",{
+          ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":ctx.mode === "exchange"?"选择行情来源":"平台行情搜索",
+        },props.render()));
+      }
+      function PlatformRow(props) {
+        const platform = R.useContext(PlatformContext), [opening,setOpening]=R.useState(false);
+        const ticker=props.item.ticker;
+        async function open(event) {
+          event?.stopPropagation();
+          if(platform.lock.current || platform.latest.current.busy || !props.item.available) return;
+          setOpening(true);
+          try {await platform.open(ticker);}
+          catch(error) { /* The business root displays the apply error. */ }
+          finally {if(platform.alive.current)setOpening(false);}
+        }
+        const actions=R.createElement(R.Fragment,null,
+          props.item.available && R.createElement("button",{id:props.item.rowId+"-open",type:"button",className:"mw-platform-action",onClick:open,"aria-busy":opening||undefined,"aria-disabled":platform.latest.current.busy},opening?"正在打开…":"打开图表"),
+          R.createElement("button",{id:props.item.rowId+"-details",type:"button",className:"mw-platform-action",onClick:event=>{event.stopPropagation();platform.latest.current.onDetails(ticker);}},"详情"));
+        return R.createElement(SearchRow,{...props,
+          title:props.item.symbol,dangerousTitleHTML:undefined,description:props.item.description,dangerousDescriptionHTML:undefined,
+          itemRef:node=>{if(typeof props.itemRef === "function")props.itemRef(node);else if(props.itemRef)props.itemRef.current=node;if(node){node.id=props.item.rowId;node.tabIndex=-1;}},
+          marketType:props.item.category,exchangeName:props.item.sourceName,onClick:open,actions});
+      }
+      function PlatformStatus() {
+        const platform=R.useContext(PlatformContext),ctx=R.useContext(SearchContext),body=R.useContext(BodyContext);
+        const {error,request,remaining,loading}=platform.state;
+        return R.createElement("div",{className:"mw-platform-status",role:error?"alert":"status"},
+          error ? R.createElement(R.Fragment,null,"读取失败，已有结果保留。",R.createElement("button",{type:"button",className:"mw-platform-action",disabled:loading,onClick:()=>body.updateRecommends(request.text,request.type,ctx.selectedSearchSource,request.start)},loading?"正在重试…":"重试")) : !loading && remaining === 0 && ctx.symbolSearchState === "good" ? "已全部加载" : "");
+      }
+      function PlatformSearch(props) {
+        const latest=R.useRef(props);latest.current=props;
+        const alive=R.useRef(true),lock=R.useRef(false);
+        const open=R.useCallback(async ticker=>{
+          if(lock.current || latest.current.busy) return;
+          lock.current=true;
+          try {await latest.current.onOpen(ticker);}
+          finally {lock.current=false;}
+        },[]);
+        const [state,setState]=R.useState({error:"",loading:false,remaining:null,request:null});
+        R.useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
+        const search=R.useCallback(async request=>{
+          if(alive.current)setState({error:"",loading:true,remaining:null,request});
+          try {
+            const result=await latest.current.getPage(request);
+            if(!request.signal.aborted && alive.current)setState({error:"",loading:false,remaining:result.symbols_remaining,request});
+            return result;
+          } catch(error) {
+            if(request.signal.aborted) throw new win.DOMException("查询已取消","AbortError");
+            if(alive.current)setState({error:String(error),loading:false,remaining:null,request});
+            return {symbols:[],symbols_remaining:0};
+          }
+        },[]);
+        // The native renderer owns search, round category tabs, source screen,
+        // result rows and the scrolling sentinel. It does not own chart apply.
+        return R.createElement(PlatformContext.Provider,{value:{latest,alive,lock,state,open}},R.createElement(Search,{
+          initialMode:"symbolSearch",dialogTitle:"平台行情",defaultValue:props.query||"",placeholder:"品种代码或名称",
+          wrapper:PlatformWrapper,dialog:PlatformInline,contentItem:PlatformRow,footer:R.createElement(PlatformStatus),
+          autofocus:false,selectSearchOnInit:false,shouldReturnFocus:false,disableRecents:true,showRecents:false,showSpreadActions:false,
+          symbolTypes:props.symbolTypes,selectedSymbolSettingsKey:"mw.data-center.platform.category",filterValuesSettingsKey:"mw.data-center.platform.filters",
+          customSearchSymbols:search,onClose:()=>{},onSearchComplete:()=>{},
+        }));
+      }
       const components = {
         dialog: req(450259).AdaptivePopupDialog,
         sidebar: req(649867).DialogSidebarWrapper,
@@ -25,6 +150,7 @@ function chartNativeUi(widget, doc) {
         input: req(909536).InputControl,
         checkbox: req(343577).Checkbox,
         select: req(221339).Select,
+        platformSearch: PlatformSearch,
       };
       for (const [name, component] of Object.entries(components))
         if (!component) throw Error(`原生控件不可用：${name}`);
@@ -32,6 +158,7 @@ function chartNativeUi(widget, doc) {
         const component = components[kind];
         if (!component) throw Error("未知原生控件");
         node.dataset.nativeComponent = kind;
+        if(kind === "platformSearch") req(371996).setValue("mw.data-center.platform.category",props.asset || "");
         const element = value => kind === "sidebar" ? R.createElement(component, {className:value.className},
           R.createElement("div", {ref:value.contentRef})) : R.createElement(component, value);
         let root = createRoot(element(props), node);

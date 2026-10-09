@@ -1,0 +1,80 @@
+{
+  "capturedAt": "2026-10-09T05:30:56.770385+00:00",
+  "host": "quant-server",
+  "environment": "Ubuntu 22.04.5 LTS",
+  "project": "mw-data-center-review-20261008",
+  "services": [
+    {
+      "Name": "mw-data-center-review-20261008-api-1",
+      "Service": "api",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "healthy",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-chart-origin-1",
+      "Service": "chart-origin",
+      "Image": "market-watch-chart-origin:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-composite-aggregate-worker-1",
+      "Service": "composite-aggregate-worker",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-history-worker-1",
+      "Service": "history-worker",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-native-history-worker-1",
+      "Service": "native-history-worker",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-pg-1",
+      "Service": "pg",
+      "Image": "postgres:14-bookworm",
+      "State": "running",
+      "Health": "healthy",
+      "Ports": "5432/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-pricing-worker-1",
+      "Service": "pricing-worker",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-tls-1",
+      "Service": "tls",
+      "Image": "nginx:1.28-alpine",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp, 192.168.7.232:19943->443/tcp, 192.168.7.232:19944->444/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-web-1",
+      "Service": "web",
+      "Image": "market-watch-web:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp"
+    }
+  ]
+}

@@ -37,7 +37,7 @@ export function NativeConfigure() {
       "/market-data/resolve", { instrument, series_kind: "provider", timeframe: "M1" }, controller.signal,
     ).then(data => {
       if (controller.signal.aborted) return;
-      if (data.source !== "oanda") throw Error("请选择 OANDA 平台品种");
+      if (data.source !== "oanda") throw Error("请选择 OANDA 平台行情");
       setMeta(data); setValues(data.native_parameters);
     }).catch(e => { if (!controller.signal.aborted) setError(String(e)); });
     return () => controller.abort();
@@ -53,9 +53,9 @@ export function NativeConfigure() {
     finally { actionLock.release(); setBusy(false); }
   }
   return <section className="data-center">
-    <Link to={centerReturn(query, "/market-data?tab=platform")}>返回平台品种</Link>
+    <Link to={centerReturn(query, "/market-data?tab=platform")}>返回平台行情</Link>
     <h1>配置原生行情</h1>
-    <p>{meta ? `${meta.name} · ${meta.display_symbol || meta.symbol} · OANDA Practice` : "正在核对平台品种…"}</p>
+    <p>{meta ? `${meta.name} · ${meta.display_symbol || meta.symbol} · OANDA Practice` : "正在核对平台行情…"}</p>
     <p>直接读取 OANDA 返回的各周期原始柱。参数改变会使用独立配置和缓存。</p>
     <form className="dc-form" onSubmit={submit}>
       <fieldset className="dc-native-fields" disabled={!meta || busy}>

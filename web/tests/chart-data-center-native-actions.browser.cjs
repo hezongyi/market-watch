@@ -11,14 +11,14 @@ const out=path.join(f.root,'artifacts/native-ui-implementation'),report={environ
   if(process.env.LOCAL) await f.localNativeAssets(p);
   await p.goto(f.base+'/advanced-charts');await f.login(p);await expect.poll(()=>!!native(),{timeout:40000}).toBeTruthy();await expect(native().getByRole('button',{name:'数据中心',exact:true})).toBeVisible({timeout:30000});
   await host().waitForFunction(()=>ready,null,{timeout:60000});
-  await open('/market-data?tab=platform&source=yahoo&query=MSFT');await expect(dc().locator('tbody tr')).toHaveCount(1);
+  await open('/market-data?tab=platform&source=yahoo&query=MSFT');await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1);
   await host().evaluate(()=>widget.setLayout('2h'));await expect.poll(()=>host().evaluate(()=>widget.chartsCount())).toBe(2);
-  await dc().getByRole('button',{name:'打开平台图表',exact:true}).click();await expect(dc().locator('.dc-window-content > [role=alert]')).toContainText('目标图格');await expect(dc()).toBeVisible();await close();
+  await dc().getByRole('button',{name:'打开图表',exact:true}).click();await expect(dc().locator('.dc-platform > [role=alert]')).toContainText('目标图格');await expect(dc()).toBeVisible();await close();
   record('stale layout is rejected without closing or changing chart');
   const before=await host().evaluate(()=>Array.from({length:widget.chartsCount()},(_,i)=>({symbol:widget.chart(i).symbol(),resolution:widget.chart(i).resolution()})));
-  await open('/market-data?tab=platform&source=yahoo&query=MSFT');await expect(dc().locator('tbody tr')).toHaveCount(1);
+  await open('/market-data?tab=platform&source=yahoo&query=MSFT');await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1);
   const fail=r=>r.fulfill({status:503,json:{detail:'验收注入：行情来源暂不可用'}});await p.route('**/api/market-data/resolve',fail);
-  const t=Date.now();await dc().getByRole('button',{name:'打开平台图表',exact:true}).click();await expect(dc()).toHaveCount(0,{timeout:1500});expect(Date.now()-t).toBeLessThan(1500);
+  const t=Date.now();await dc().getByRole('button',{name:'打开图表',exact:true}).click();await expect(dc()).toHaveCount(0,{timeout:1500});expect(Date.now()-t).toBeLessThan(1500);
   const notice=native().locator('.mw-data-center-load');await expect(notice).toContainText('行情来源暂不可用');await expect(notice).toHaveAttribute('role','alert');
   expect(await host().evaluate(()=>Array.from({length:widget.chartsCount()},(_,i)=>({symbol:widget.chart(i).symbol(),resolution:widget.chart(i).resolution()})))).toEqual(before);
   await p.unroute('**/api/market-data/resolve',fail);
@@ -27,8 +27,8 @@ const out=path.join(f.root,'artifacts/native-ui-implementation'),report={environ
   // Hold one resolve, then select another pane before releasing it. The old
   // accepted command must not mutate either the old pane or the new one.
   let blocked=false;const held=new Promise(r=>release=r);const slow=async r=>{blocked=true;await held;await r.continue().catch(()=>{})};
-  await open('/market-data?tab=platform&source=yahoo&query=MSFT');await expect(dc().locator('tbody tr')).toHaveCount(1);await p.route('**/api/market-data/resolve',slow);
-  await dc().getByRole('button',{name:'打开平台图表',exact:true}).click();await expect(dc()).toHaveCount(0);await expect.poll(()=>blocked).toBe(true);
+  await open('/market-data?tab=platform&source=yahoo&query=MSFT');await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1);await p.route('**/api/market-data/resolve',slow);
+  await dc().getByRole('button',{name:'打开图表',exact:true}).click();await expect(dc()).toHaveCount(0);await expect.poll(()=>blocked).toBe(true);
   await host().evaluate(()=>widget.setActiveChart(widget.activeChartIndex()===0?1:0));release();await p.unroute('**/api/market-data/resolve',slow);
   await expect(notice).toHaveCount(0);expect(await host().evaluate(()=>Array.from({length:widget.chartsCount()},(_,i)=>({symbol:widget.chart(i).symbol(),resolution:widget.chart(i).resolution()})))).toEqual(before);
   record('late resolve after active-pane switch cannot mutate any chart');

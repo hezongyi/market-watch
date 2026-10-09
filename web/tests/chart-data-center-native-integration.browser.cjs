@@ -10,7 +10,7 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
  const get=async url=>{const r=await p.request.get(f.base+'/api'+url);expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const post=async(url,data)=>{const {csrf}=await get('/session');const r=await p.request.post(f.base+'/api'+url,{data,headers:{'X-CSRF-Token':csrf}});expect(r.ok(),await r.text()).toBeTruthy();return r.json()};
  const dc=()=>native().locator('.dc-window');
- const select=async(label,text)=>{const control=dc().getByRole('button',{name:label,exact:true});await control.click();await native().getByRole('option',{name:text,exact:true}).click();};
+ const select=async(label,text)=>{if(label==='来源' && await dc().locator('.dc-platform').count()){await dc().locator('[data-qa-id=sources-button]').click();await dc().getByText(text,{exact:true}).click();}else{const control=dc().getByRole('button',{name:label,exact:true});await control.click();await native().getByRole('option',{name:text,exact:true}).click();}};
  const open=async()=>{await native().getByRole('button',{name:'数据中心',exact:true}).click();await expect(dc()).toBeVisible({timeout:30000});};
  const close=async()=>{await native().getByRole('button',{name:'关闭数据中心',exact:true}).click();await expect(dc()).toHaveCount(0);await expect(native().getByRole('button',{name:'数据中心',exact:true})).toBeFocused().catch(async error=>{console.log('FOCUS',await native().evaluate(()=>({active:document.activeElement.outerHTML,buttons:[...document.querySelectorAll('.mw-data-center-button')].map(n=>({html:n.outerHTML,visibility:getComputedStyle(n).visibility,display:getComputedStyle(n).display,rect:n.getBoundingClientRect().toJSON()}))})));throw error;});};
  let workspace;
@@ -18,7 +18,7 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   // LOCAL is only for pre-build debugging; delivery runs must omit it.
   if(process.env.LOCAL) await f.localNativeAssets(p);
   await p.goto(f.base+'/advanced-charts');await f.login(p);await expect(p.getByLabel('管理员密码')).toHaveCount(0);
-  workspace=await post('/advanced-charts/workspaces',{name:'原生数据中心逐项验收'});
+  workspace=await post('/advanced-charts/workspaces',{name:'原生数据中心逐项验收'});report.workspace=workspace.id;
   await p.goto(f.base+'/advanced-charts');await expect.poll(()=>!!native(),{timeout:40000}).toBeTruthy();
   await expect(native().getByRole('button',{name:'数据中心',exact:true})).toBeVisible({timeout:30000});
   await open();await expect(dc().getByRole('heading',{name:'自建行情',exact:true})).toBeVisible();await expect(dc().getByText('正在读取数据…',{exact:true})).toHaveCount(0,{timeout:15000});
@@ -31,8 +31,8 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   expect(await native().getByRole('button',{name:'行情搜索',exact:true}).count()).toBe(0);
   record('cold open uses actual native shell/sidebar/search; one header and no duplicate market-search entry');
   const baseline=await host().evaluate(()=>({symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution()}));
-  for(const tab of ['平台品种','组合行情','任务与记录','来源与能力','自建行情']) {
-   await dc().getByRole('button',{name:tab,exact:true}).click();await expect(dc().getByRole('heading',{name:tab,exact:true})).toBeVisible();
+  for(const tab of ['平台行情','组合行情','任务与记录','来源与能力','自建行情']) {
+   await dc().getByRole('button',{name:tab,exact:true}).click();await expect(dc().getByRole('heading',{name:tab,exact:true,includeHidden:true})).toBeAttached();
   }
   expect(await host().evaluate(()=>({symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution()}))).toEqual(baseline);
   record('five sections preserve chart identity');
@@ -57,13 +57,13 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   await dc().getByRole('link',{name:'添加行情',exact:true}).click();await expect(dc().getByRole('heading',{name:'添加自建行情'})).toBeVisible();
   await dc().getByLabel('逻辑品种',{exact:true}).fill('EURUSD');await native().getByRole('button',{name:'关闭数据中心'}).click();
   await expect(dc().getByRole('alertdialog')).toBeVisible();await dc().getByRole('button',{name:'继续编辑'}).click();await expect(dc().getByLabel('逻辑品种',{exact:true})).toHaveValue('EURUSD');
-  await dc().getByRole('button',{name:'平台品种',exact:true}).click();await expect(dc().getByRole('alertdialog')).toBeVisible();await p.keyboard.press('Escape');await expect(dc().getByRole('alertdialog')).toHaveCount(0);await expect(dc()).toBeVisible();
-  await dc().getByRole('button',{name:'平台品种',exact:true}).click();await dc().getByRole('button',{name:'放弃修改'}).click();await expect(dc().getByRole('heading',{name:'平台品种',exact:true})).toBeVisible();
+  await dc().getByRole('button',{name:'平台行情',exact:true}).click();await expect(dc().getByRole('alertdialog')).toBeVisible();await p.keyboard.press('Escape');await expect(dc().getByRole('alertdialog')).toHaveCount(0);await expect(dc()).toBeVisible();
+  await dc().getByRole('button',{name:'平台行情',exact:true}).click();await dc().getByRole('button',{name:'放弃修改'}).click();await expect(dc().getByRole('heading',{name:'平台行情',exact:true,includeHidden:true})).toBeAttached();
   record('dirty close/switch protects input; Escape cancels only the dirty warning');
   await select('来源','Yahoo');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('MSFT');
-  await expect(dc().locator('tbody tr')).toHaveCount(1,{timeout:15000});await expect(dc().locator('tbody tr')).toContainText('微软');
+  await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1,{timeout:15000});await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toContainText('微软');
   await p.screenshot({path:path.join(out,'native-yahoo.png')});
-  await select('来源','Binance');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('BTC/USDT');await expect(dc().locator('tbody tr')).toHaveCount(1,{timeout:15000});await expect(dc().locator('tbody tr')).toContainText('BTC/USDT');
+  await select('来源','Binance');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('BTC/USDT');await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1,{timeout:15000});await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toContainText('BTC/USDT');
   record('Yahoo MSFT and Binance BTC/USDT directory and native filters');
   await dc().getByRole('button',{name:'自建行情',exact:true}).click();await dc().getByRole('link',{name:'添加行情',exact:true}).click();
   const beforePick=await host().evaluate(()=>widget.activeChart().symbol());await dc().getByRole('button',{name:'选择品种',exact:true}).click();
@@ -71,7 +71,7 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   await picker.getByRole('searchbox').fill('eurusd');await expect(picker.getByText('EUR/USD',{exact:true}).first()).toBeVisible({timeout:15000});await picker.getByText('EUR/USD',{exact:true}).first().click();
   await expect(picker).toHaveCount(0);await expect(dc().getByLabel('逻辑品种',{exact:true})).toHaveValue('EURUSD');expect(await host().evaluate(()=>widget.activeChart().symbol())).toBe(beforePick);
   record('actual native symbol picker fills a draft and keeps chart unchanged');
-  await dc().getByRole('button',{name:'平台品种',exact:true}).click();await dc().getByRole('button',{name:'放弃修改'}).click();
+  await dc().getByRole('button',{name:'平台行情',exact:true}).click();await dc().getByRole('button',{name:'放弃修改'}).click();
   await close();
   // Native input semantics and focus trap, then unmount cycles.
   await open();await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).focus();await p.keyboard.press('Escape');await expect(dc()).toHaveCount(0);

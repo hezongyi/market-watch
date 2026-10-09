@@ -121,8 +121,17 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       }
       await screenshot(`browser-zoom200-composite-${width}.png`);
       await native().getByRole('button', { name: '关闭数据中心' }).click();
+      await host().evaluate(() => dataCenter.open('/market-data?tab=platform&source=yahoo&query=MSFT'));
+      await expect(center().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1, { timeout: 15000 });
+      await expect(center().getByRole('searchbox', { name: '搜索品种', exact: true })).toBeInViewport();
+      await expect(center().getByRole('button', { name: '来源', exact: true })).toBeInViewport();
+      await expect(center().getByRole('button', { name: '打开图表', exact: true })).toBeInViewport();
+      await expect(center().getByRole('navigation', { name: '列表分页' })).toHaveCount(0);
+      expect(await center().locator('.dc-platform').evaluate(n => n.scrollWidth <= n.clientWidth + 1)).toBeTruthy();
+      await screenshot(`browser-zoom200-platform-${width}.png`);
+      await native().getByRole('button', { name: '关闭数据中心' }).click();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
-      record('real 200% browser zoom retains native entry, primary actions and both composite lists at ' + width, { physicalWidth: width, cssWidth: await page.evaluate(() => innerWidth), dpr: await page.evaluate(() => devicePixelRatio) });
+      record('real 200% browser zoom retains native entry, both composite lists and continuous platform search at ' + width, { physicalWidth: width, cssWidth: await page.evaluate(() => innerWidth), dpr: await page.evaluate(() => devicePixelRatio) });
     }
     expect(report.errors).toEqual([]);
     report.passed = true;

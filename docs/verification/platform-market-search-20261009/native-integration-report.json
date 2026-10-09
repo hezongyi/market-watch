@@ -1,0 +1,29 @@
+{
+  "environment": "Ubuntu local Docker",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "cold open uses actual native shell/sidebar/search; one header and no duplicate market-search entry"
+    },
+    {
+      "name": "five sections preserve chart identity"
+    },
+    {
+      "name": "dark/light, 375–1920 widths, centered window, native dragging and close focus"
+    },
+    {
+      "name": "dirty close/switch protects input; Escape cancels only the dirty warning"
+    },
+    {
+      "name": "Yahoo MSFT and Binance BTC/USDT directory and native filters"
+    },
+    {
+      "name": "actual native symbol picker fills a draft and keeps chart unchanged"
+    },
+    {
+      "name": "Escape closes native center; repeated open/close releases business roots"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,19 @@
+{
+  "environment": "Ubuntu isolated Docker; scoped delayed reads; real native chart/mobile",
+  "passed": true,
+  "checks": [
+    {
+      "name": "four held chart reads do not block management dialog and directory loading"
+    },
+    {
+      "name": "closing cancels outstanding read; late old reply cannot replace reopened source/query/results"
+    },
+    {
+      "name": "management browsing preserves real studies, drawings, chart range, layout and workspace epoch"
+    },
+    {
+      "name": "actual touch/mobile session stays read-only and has no management entry"
+    }
+  ],
+  "errors": []
+}

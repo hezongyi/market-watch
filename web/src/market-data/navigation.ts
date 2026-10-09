@@ -21,9 +21,18 @@ export function useCenterRowRestore(snapshot: unknown) {
   useEffect(() => { restored.current = false; }, [location.pathname, location.search, location.hash]);
   useEffect(() => {
     if (restored.current || !snapshot) return;
-    const target = location.hash ? document.getElementById(location.hash.slice(1)) : null;
-    if (location.hash && !target) return;
-    restored.current = true;
-    if (target) { target.scrollIntoView({block: "center"}); target.focus({preventScroll: true}); }
+    const restore = () => {
+      if (restored.current) return;
+      const target = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+      if (location.hash && !target) return;
+      restored.current = true;
+      if (target) { target.scrollIntoView({block: "center"}); target.focus({preventScroll: true}); }
+    };
+    restore();
+    if (restored.current) return;
+    // Independent native roots may publish their rows after the business snapshot.
+    const observer = new MutationObserver(restore), root = document.querySelector(".dc-window-content");
+    if (root) observer.observe(root, { childList: true, subtree: true });
+    return () => observer.disconnect();
   }, [snapshot, location.hash]);
 }
