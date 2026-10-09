@@ -1,0 +1,30 @@
+{
+  "checked_utc": "2026-10-09T22:00:19.853213+00:00",
+  "environment": "unraid existing production pricing-worker",
+  "endpoint_environment": "practice",
+  "same_current_production_credentials_and_proxy_route": true,
+  "read_only": true,
+  "accounts_http": [
+    200,
+    200
+  ],
+  "configured_account_visible": true,
+  "configured_account_summary_http": [
+    503,
+    503
+  ],
+  "current_token_accepted_for_accounts_endpoint": true,
+  "token_expiration_as_current_cause_supported": false,
+  "persisted_owner_error": "unauthorized",
+  "persisted_owner_epoch": 360,
+  "worker_claim_block": "alerts.live_pricing.claim returns None while owner.error == unauthorized",
+  "owner_state_unchanged": true,
+  "historical_fault_root_cause_proven": false,
+  "service_unavailable_root_cause_proven": false,
+  "operator_retry_performed": false,
+  "stream_auth_and_fresh_pricing_not_verified": true,
+  "private_evidence_sha256": {
+    "oanda-auth-current.json": "db2cca1cd0813cf5028a1f8c0e55132997f6d1526f75ea94457c09c53ad7992d",
+    "oanda-auth-current-runtime-route.json": "04e6cf7f503a75ef50ddced96fa8f9489c73b9268eba61b05351b2958734a60c"
+  }
+}

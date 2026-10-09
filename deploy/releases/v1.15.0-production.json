@@ -284,7 +284,16 @@
       "error": "unauthorized"
     },
     "operator_retry_performed": false,
-    "credentials_or_account_changed": false
+    "credentials_or_account_changed": false,
+    "current_credential_probe": {
+      "accounts_http": 200,
+      "configured_account_visible": true,
+      "account_summary_http": 503,
+      "current_token_accepted_for_accounts_endpoint": true,
+      "owner_unauthorized_hold_unchanged": true,
+      "operator_retry_performed": false,
+      "record": "docs/verification/unified-sse/v1.15.0-production-oanda-auth.json"
+    }
   },
   "browser_acceptance": {
     "passed": false,
