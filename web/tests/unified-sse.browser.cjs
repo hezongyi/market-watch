@@ -239,10 +239,20 @@ async function fixture(action, ...args) {
       {cwd:root,timeout:10000})).stdout.trim().split('\n');
     if (costOnly) {
       report.stage='cost-consumer-drain'; persistReport();
-      const ownClient=await frame.evaluate(()=>clientId);
+      await frame.evaluate(()=>{
+        for (const [id,sub] of quoteSubscriptions)
+          if(sub.symbols.some(ticker=>ticker!=='SSEFIXTURE')) feed.unsubscribeQuotes(id);
+      });
+      if(secondFrame) await secondFrame.evaluate(()=>{
+        for (const [id,sub] of quoteSubscriptions)
+          if(sub.symbols.some(ticker=>ticker!=='SSEFIXTURE')) feed.unsubscribeQuotes(id);
+      });
+      const ownClients=[await frame.evaluate(()=>clientId),...(secondFrame ? [await secondFrame.evaluate(()=>clientId)] : [])];
       await expect.poll(async()=> (await fixture('state')).all_consumers.every(consumer=>
-        consumer.client===ownClient),{timeout:130000}).toBe(true);
-      const scenario = (polling ? 'polling' : 'sse') + (matrix ? '-eight-periods' : '-single-period');
+        ownClients.includes(consumer.client)),{timeout:130000}).toBe(true);
+      assert.ok(!polling || !sharing,'Mixed SSE/polling sharing is not a comparable baseline');
+      const scenario = (polling ? 'polling' : 'sse') + (matrix ? '-eight-periods' :
+        sharing ? '-four-charts-two-connections' : '-single-period');
       const probe = run('python',[path.join(root,'scripts/unified_sse_resources.py'),
         '--scenario',scenario,'--seconds','60','--interval','5'],{cwd:root,timeout:90000,maxBuffer:1024*1024});
       const costStart = Date.now();
@@ -253,19 +263,37 @@ async function fixture(action, ...args) {
       report.stage='cost-measurement'; persistReport();
       for (let index=1;index<=inputCount;index++) {
         await page.waitForTimeout(Math.max(0,costStart+index*inputInterval-Date.now()));
-        for (const period of matrix ? matrixFrames : ['M1']) {
-          const close=(107+index/100).toFixed(2);
+        const close=(107+index/100).toFixed(2);
+        const updates=await Promise.all((matrix ? matrixFrames : ['M1']).map(async period=>{
           const committed=await fixture('update','--timeframe',period,'--close',close);
-          report.cost.inputs.push({period,close,committed_at:committed.committed_at});
-        }
+          return {period,close,committed_at:committed.committed_at};
+        }));
+        report.cost.inputs.push(...updates);
       }
       assert.ok(Date.now()-costStart<=60000,'Scheduled inputs exceeded resource measurement window');
       await page.waitForTimeout(Math.max(0,costStart+60000-Date.now()));
       report.cost.resources=JSON.parse((await probe).stdout);
       persistReport();
       const latest=report.cost.inputs.at(-1);
-      await frame.waitForFunction(price=>window.__nativeBars.some(bar=>bar.close===price),Number(latest.close),{timeout:20000});
+      await frame.waitForFunction(({price,at})=>window.__nativeBars.some(bar=>bar.close===price && bar.at>=at),
+        {price:Number(latest.close),at:latest.committed_at},{timeout:20000});
       report.nativeBars=await frame.evaluate(()=>window.__nativeBars);
+      report.cost.callbacks=report.cost.inputs.flatMap(input=>{
+        const res=matrixResolutions[matrixFrames.indexOf(input.period)] || '1';
+        const bar=report.nativeBars.find(bar=>bar.res===res && bar.close===Number(input.close) && bar.at>=input.committed_at);
+        return bar ? [{period:input.period,committed_at:input.committed_at,callback_at:bar.at,
+          latency_ms:bar.at-input.committed_at}] : [];
+      });
+      if(secondFrame) {
+        report.cost.second_callbacks=await secondFrame.evaluate(()=>window.__nativeBars);
+        for (const input of report.cost.inputs) assert.ok(report.cost.second_callbacks.some(bar=>
+          bar.close===Number(input.close) && bar.at>=input.committed_at),
+          'Second API connection must actually receive each scheduled input');
+        const shared=(await fixture('state')).tasks.filter(task=>task.kind==='bars' && task.indicator_count===0);
+        assert.equal(shared.length,1,'Cost sharing retains one bar task across both API processes');
+        report.sharing.task_count=shared.length;
+        report.sharing.active_consumers=shared[0].active_consumers;
+      }
       report.requests=requests.filter(row=>row.at>=costStart);
       if (!polling) assert.ok(!report.requests.some(row=>['/api/charts/data','/api/market-data/quotes',
         '/api/charts/provider/latest'].includes(row.path)),'Cost window must not poll');
@@ -407,10 +435,11 @@ async function fixture(action, ...args) {
     if (!process.argv.includes('--long-outage')) assert.ok(!normal.some(item => item.path === '/api/charts/data'),
       'Ordinary updates and short replay must not poll/reload historical bars');
     else {
-      assert.ok(await page.evaluate(()=>window.__sseTrace.events.some(event=>event.type==='reset')) &&
-        normal.some(item=>item.path==='/api/charts/data'),
-        'Expired replay lease must restore through an explicit reset');
-      checks.push('real gateway outage beyond 120-second lease restores all three buckets through reset/history');
+      const restoredWithHistory=normal.some(item=>item.path==='/api/charts/data');
+      if (restoredWithHistory) assert.ok(await page.evaluate(()=>window.__sseTrace.events.some(event=>event.type==='reset')),
+        'Historical restoration must follow an explicit reset');
+      report.long_outage_recovery=restoredWithHistory ? 'reset-and-history' : 'durable-replay';
+      checks.push('real gateway outage beyond 120-second lease restores all three buckets through verified replay or explicit reset/history');
     }
     assert.deepEqual(errors, []);
     if (process.argv.includes('--visibility')) {
@@ -521,6 +550,10 @@ async function fixture(action, ...args) {
     throw error;
   } finally {
     if (costOnly && frame) await frame.evaluate(()=>{
+      for (const id of [...subscriptions.keys()]) feed.unsubscribeBars(id);
+      for (const id of [...quoteSubscriptions.keys()]) feed.unsubscribeQuotes(id);
+    }).catch(()=>{});
+    if (costOnly && secondFrame) await secondFrame.evaluate(()=>{
       for (const id of [...subscriptions.keys()]) feed.unsubscribeBars(id);
       for (const id of [...quoteSubscriptions.keys()]) feed.unsubscribeQuotes(id);
     }).catch(()=>{});

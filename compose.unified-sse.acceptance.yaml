@@ -72,6 +72,9 @@ services:
   native-history-worker:
     <<: *api
     command: ["python", "-m", "alerts.history_versions", "--without-composite-aggregates"]
+  provider-history-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.native_history_loads"]
   chart-aggregation-worker:
     <<: *api
     command: ["python", "-m", "alerts.chart_aggregation_worker"]

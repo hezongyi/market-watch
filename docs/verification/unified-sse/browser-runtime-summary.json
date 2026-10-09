@@ -3419,6 +3419,1184 @@
       "latency_scope": "12 sequential synthetic managed M1 updates; not the full load matrix",
       "private_evidence": "artifacts/unified-sse/browser-quotes-current-passed.json",
       "private_evidence_sha256": "19cefa7e3eac3860a29aa859693910e6461b30c336ad23a7439ef17605a35292"
+    },
+    {
+      "passed": true,
+      "synthetic": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "app": "http://127.0.0.1:15643",
+      "chart": "http://127.0.0.1:15644",
+      "samples": [],
+      "checks": [
+        "real composite first screen and four native periods M1/D1/W1/MN",
+        "fixed immutable history first screen and actual native older-page navigation",
+        "fixed EMA31 background completion recovers actual native history and matches authoritative values",
+        "native period switch releases old period; unchanged fixed history has no market polling",
+        "native workspace load switches to managed series and retires previous fixed/composite subscriptions"
+      ],
+      "errors": [],
+      "stage": "workspace-switch",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "074ced01dcc217ceb7a31c069b17d92d966f690776dd66be96145c5b4e66fbea",
+      "fixture_sha256": "0a31e717099060440af979a66fc59ba92eb432837500a8670cea3b76fa09b595",
+      "composite": "732366eb987038b8644a927287feeec29745c3c350f2f881c8b8d71548804b63",
+      "history_version": "8b67a891-ca1d-4c68-ad53-b4c9c64f4854",
+      "workspace_switch": {
+        "previous_epoch": 0,
+        "current_epoch": 1
+      },
+      "private_evidence": "artifacts/unified-sse/browser-lifecycle-95d501e-passed.json",
+      "private_evidence_sha256": "82bd6c0f5488a537aa04fa4f782acc24be7b413db04e23be53e3b08424355d9e"
+    },
+    {
+      "passed": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "app": "http://127.0.0.1:15643",
+      "chart": "http://127.0.0.1:15644",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "1e2867fcf40272dac7f50b85935075c2536b63cf15622ff4993ab9d5a3c72d2e",
+      "fixture_sha256": "2bc3113374c4ab499829c21ecfb4170f8232bfead0aeb185a8088f51c0cd5bbb",
+      "synthetic": true,
+      "checks": [
+        "native first screen and unified subscription",
+        "same-bar updates and authoritative high contraction",
+        "real EventSource reconnect after gateway outage across three appended buckets",
+        "real gateway outage beyond 120-second lease restores all three buckets through verified replay or explicit reset/history"
+      ],
+      "samples": [
+        {
+          "committed_at": 1791510497032,
+          "callback_at": 1791510497882,
+          "latency_ms": 850,
+          "close": 101.01,
+          "high": 140
+        },
+        {
+          "committed_at": 1791510499155,
+          "callback_at": 1791510499518,
+          "latency_ms": 363,
+          "close": 101.02,
+          "high": 110
+        },
+        {
+          "committed_at": 1791510500867,
+          "callback_at": 1791510501724,
+          "latency_ms": 857,
+          "close": 101.03,
+          "high": 140
+        },
+        {
+          "committed_at": 1791510503256,
+          "callback_at": 1791510503935,
+          "latency_ms": 679,
+          "close": 101.04,
+          "high": 110
+        },
+        {
+          "committed_at": 1791510505322,
+          "callback_at": 1791510506105,
+          "latency_ms": 783,
+          "close": 101.05,
+          "high": 140
+        },
+        {
+          "committed_at": 1791510507725,
+          "callback_at": 1791510508246,
+          "latency_ms": 521,
+          "close": 101.06,
+          "high": 110
+        },
+        {
+          "committed_at": 1791510509828,
+          "callback_at": 1791510510439,
+          "latency_ms": 611,
+          "close": 101.07,
+          "high": 140
+        },
+        {
+          "committed_at": 1791510511948,
+          "callback_at": 1791510512617,
+          "latency_ms": 669,
+          "close": 101.08,
+          "high": 110
+        },
+        {
+          "committed_at": 1791510513915,
+          "callback_at": 1791510514782,
+          "latency_ms": 867,
+          "close": 101.09,
+          "high": 140
+        },
+        {
+          "committed_at": 1791510516365,
+          "callback_at": 1791510516968,
+          "latency_ms": 603,
+          "close": 101.1,
+          "high": 110
+        },
+        {
+          "committed_at": 1791510518546,
+          "callback_at": 1791510519182,
+          "latency_ms": 636,
+          "close": 101.11,
+          "high": 140
+        },
+        {
+          "committed_at": 1791510520679,
+          "callback_at": 1791510521377,
+          "latency_ms": 698,
+          "close": 101.12,
+          "high": 110
+        }
+      ],
+      "errors": [],
+      "database_before": [
+        {
+          "relname": "candles",
+          "seq_scan": 1278,
+          "seq_tup_read": 389358,
+          "idx_scan": 236640,
+          "idx_tup_fetch": 1801352,
+          "n_tup_ins": 594,
+          "n_tup_upd": 137833,
+          "n_tup_del": 0,
+          "n_live_tup": 594
+        },
+        {
+          "relname": "chart_publications",
+          "seq_scan": 73788,
+          "seq_tup_read": 1085597,
+          "idx_scan": 585,
+          "idx_tup_fetch": 684,
+          "n_tup_ins": 18,
+          "n_tup_upd": 13353,
+          "n_tup_del": 0,
+          "n_live_tup": 18
+        },
+        {
+          "relname": "chart_published_bars",
+          "seq_scan": 165,
+          "seq_tup_read": 396665,
+          "idx_scan": 168914,
+          "idx_tup_fetch": 1807977,
+          "n_tup_ins": 10871,
+          "n_tup_upd": 140620,
+          "n_tup_del": 0,
+          "n_live_tup": 10872
+        },
+        {
+          "relname": "market_stream_results",
+          "seq_scan": 8413,
+          "seq_tup_read": 243249,
+          "idx_scan": 23932,
+          "idx_tup_fetch": 3290,
+          "n_tup_ins": 2168,
+          "n_tup_upd": 0,
+          "n_tup_del": 2115,
+          "n_live_tup": 53
+        },
+        {
+          "relname": "market_stream_subscriptions",
+          "seq_scan": 160267,
+          "seq_tup_read": 2628396,
+          "idx_scan": 117804,
+          "idx_tup_fetch": 75992,
+          "n_tup_ins": 869,
+          "n_tup_upd": 30991,
+          "n_tup_del": 856,
+          "n_live_tup": 13
+        },
+        {
+          "relname": "market_stream_tasks",
+          "seq_scan": 42863,
+          "seq_tup_read": 202272,
+          "idx_scan": 587996,
+          "idx_tup_fetch": 571141,
+          "n_tup_ins": 118,
+          "n_tup_upd": 136877,
+          "n_tup_del": 115,
+          "n_live_tup": 3
+        }
+      ],
+      "resources_before": [
+        "mw-unified-sse-20261008-api-1 12.19% 155.8MiB / 15.61GiB 39.5MB / 12MB 877kB / 0B",
+        "mw-unified-sse-20261008-api-second-1 1.47% 117.7MiB / 15.61GiB 6.56MB / 3.24MB 0B / 0B",
+        "mw-unified-sse-20261008-market-stream-worker-1 4.76% 181.6MiB / 15.61GiB 37.1MB / 26.3MB 0B / 0B",
+        "mw-unified-sse-20261008-postgres-1 8.88% 259.4MiB / 15.61GiB 2.57GB / 19.1GB 35.7MB / 11.2GB"
+      ],
+      "stage": "long-disconnect",
+      "long_outage_ms": 130027,
+      "long_outage_recovery": "reset-and-history",
+      "database_after": [
+        {
+          "relname": "candles",
+          "seq_scan": 1278,
+          "seq_tup_read": 389358,
+          "idx_scan": 238888,
+          "idx_tup_fetch": 1823214,
+          "n_tup_ins": 600,
+          "n_tup_upd": 138957,
+          "n_tup_del": 0,
+          "n_live_tup": 601
+        },
+        {
+          "relname": "chart_publications",
+          "seq_scan": 74496,
+          "seq_tup_read": 1098341,
+          "idx_scan": 585,
+          "idx_tup_fetch": 684,
+          "n_tup_ins": 18,
+          "n_tup_upd": 13475,
+          "n_tup_del": 0,
+          "n_live_tup": 18
+        },
+        {
+          "relname": "chart_published_bars",
+          "seq_scan": 165,
+          "seq_tup_read": 396665,
+          "idx_scan": 170467,
+          "idx_tup_fetch": 1841529,
+          "n_tup_ins": 10877,
+          "n_tup_upd": 141765,
+          "n_tup_del": 0,
+          "n_live_tup": 10877
+        },
+        {
+          "relname": "market_stream_results",
+          "seq_scan": 8464,
+          "seq_tup_read": 246199,
+          "idx_scan": 24114,
+          "idx_tup_fetch": 3330,
+          "n_tup_ins": 2210,
+          "n_tup_upd": 0,
+          "n_tup_del": 2207,
+          "n_live_tup": 3
+        },
+        {
+          "relname": "market_stream_subscriptions",
+          "seq_scan": 161962,
+          "seq_tup_read": 2640820,
+          "idx_scan": 118058,
+          "idx_tup_fetch": 76233,
+          "n_tup_ins": 873,
+          "n_tup_upd": 31169,
+          "n_tup_del": 869,
+          "n_live_tup": 4
+        },
+        {
+          "relname": "market_stream_tasks",
+          "seq_scan": 47321,
+          "seq_tup_read": 215319,
+          "idx_scan": 588058,
+          "idx_tup_fetch": 571189,
+          "n_tup_ins": 121,
+          "n_tup_upd": 138218,
+          "n_tup_del": 118,
+          "n_live_tup": 3
+        }
+      ],
+      "resources_after": [
+        "mw-unified-sse-20261008-api-1 5.49% 156.2MiB / 15.61GiB 44.1MB / 13.5MB 877kB / 0B",
+        "mw-unified-sse-20261008-api-second-1 1.82% 117.8MiB / 15.61GiB 8.37MB / 4.13MB 0B / 0B",
+        "mw-unified-sse-20261008-market-stream-worker-1 6.31% 181.6MiB / 15.61GiB 53.8MB / 33.9MB 0B / 0B",
+        "mw-unified-sse-20261008-postgres-1 2.99% 247.3MiB / 15.61GiB 2.58GB / 19.1GB 35.7MB / 11.3GB"
+      ],
+      "p95_ms": 867,
+      "latency_scope": "12 sequential synthetic managed M1 updates; not the full load matrix",
+      "private_evidence": "artifacts/unified-sse/browser-long-outage-passed.json",
+      "private_evidence_sha256": "25b70ca3f5b064f5c3464de9c763542401fb0bff59b915d8e192e9a4f4b6116d"
+    },
+    {
+      "passed": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "80c99bd36d1fcc8815248e26cd44d67cafd84f342d634d0e160c0c6d73d22ad8",
+      "fixture_sha256": "2bc3113374c4ab499829c21ecfb4170f8232bfead0aeb185a8088f51c0cd5bbb",
+      "synthetic": true,
+      "checks": [
+        "native first screen and unified subscription",
+        "same-bar updates and authoritative high contraction",
+        "eight native periods including W1/MN each receive authoritative published updates",
+        "real EventSource reconnect after gateway outage across three appended buckets",
+        "layout reduction releases hidden period consumers and restoration reloads missed data"
+      ],
+      "samples": [
+        {
+          "committed_at": 1791515582101,
+          "callback_at": 1791515582541,
+          "latency_ms": 440,
+          "close": 101.01,
+          "high": 140
+        },
+        {
+          "committed_at": 1791515583975,
+          "callback_at": 1791515584311,
+          "latency_ms": 336,
+          "close": 101.02,
+          "high": 110
+        },
+        {
+          "committed_at": 1791515586072,
+          "callback_at": 1791515587164,
+          "latency_ms": 1092,
+          "close": 101.03,
+          "high": 140
+        },
+        {
+          "committed_at": 1791515588576,
+          "callback_at": 1791515589060,
+          "latency_ms": 484,
+          "close": 101.04,
+          "high": 110
+        },
+        {
+          "committed_at": 1791515590880,
+          "callback_at": 1791515592117,
+          "latency_ms": 1237,
+          "close": 101.05,
+          "high": 140
+        },
+        {
+          "committed_at": 1791515593682,
+          "callback_at": 1791515593856,
+          "latency_ms": 174,
+          "close": 101.06,
+          "high": 110
+        },
+        {
+          "committed_at": 1791515595484,
+          "callback_at": 1791515596658,
+          "latency_ms": 1174,
+          "close": 101.07,
+          "high": 140
+        },
+        {
+          "committed_at": 1791515598315,
+          "callback_at": 1791515599174,
+          "latency_ms": 859,
+          "close": 101.08,
+          "high": 110
+        },
+        {
+          "committed_at": 1791515600641,
+          "callback_at": 1791515601523,
+          "latency_ms": 882,
+          "close": 101.09,
+          "high": 140
+        },
+        {
+          "committed_at": 1791515602873,
+          "callback_at": 1791515603846,
+          "latency_ms": 973,
+          "close": 101.1,
+          "high": 110
+        },
+        {
+          "committed_at": 1791515605524,
+          "callback_at": 1791515606116,
+          "latency_ms": 592,
+          "close": 101.11,
+          "high": 140
+        },
+        {
+          "committed_at": 1791515607792,
+          "callback_at": 1791515608446,
+          "latency_ms": 654,
+          "close": 101.12,
+          "high": 110
+        }
+      ],
+      "p95_ms": 1237,
+      "private_evidence": "artifacts/unified-sse/browser-matrix-visibility-95d501e-passed.json",
+      "private_evidence_sha256": "80416a7781a3a58b58e1dbae37d0e882823025ee0d15044026a13f189965bdce",
+      "matrix": {
+        "charts": 8,
+        "frames": [
+          "M1",
+          "M5",
+          "M15",
+          "M30",
+          "H1",
+          "H4",
+          "W1",
+          "MN"
+        ],
+        "samples": [
+          {
+            "frame": "M1",
+            "latency_ms": 916
+          },
+          {
+            "frame": "M5",
+            "latency_ms": 825
+          },
+          {
+            "frame": "M15",
+            "latency_ms": 952
+          },
+          {
+            "frame": "M30",
+            "latency_ms": 437
+          },
+          {
+            "frame": "H1",
+            "latency_ms": 965
+          },
+          {
+            "frame": "H4",
+            "latency_ms": 853
+          },
+          {
+            "frame": "W1",
+            "latency_ms": 842
+          },
+          {
+            "frame": "MN",
+            "latency_ms": 261
+          },
+          {
+            "frame": "M1",
+            "latency_ms": 719
+          },
+          {
+            "frame": "M5",
+            "latency_ms": 744
+          },
+          {
+            "frame": "M15",
+            "latency_ms": 648
+          },
+          {
+            "frame": "M30",
+            "latency_ms": 814
+          },
+          {
+            "frame": "H1",
+            "latency_ms": 945
+          },
+          {
+            "frame": "H4",
+            "latency_ms": 928
+          },
+          {
+            "frame": "W1",
+            "latency_ms": 811
+          },
+          {
+            "frame": "MN",
+            "latency_ms": 435
+          },
+          {
+            "frame": "M1",
+            "latency_ms": 792
+          },
+          {
+            "frame": "M5",
+            "latency_ms": 904
+          },
+          {
+            "frame": "M15",
+            "latency_ms": 398
+          },
+          {
+            "frame": "M30",
+            "latency_ms": 895
+          },
+          {
+            "frame": "H1",
+            "latency_ms": 546
+          },
+          {
+            "frame": "H4",
+            "latency_ms": 780
+          },
+          {
+            "frame": "W1",
+            "latency_ms": 203
+          },
+          {
+            "frame": "MN",
+            "latency_ms": 1050
+          }
+        ],
+        "p95_ms": 965
+      },
+      "visibility": {
+        "retained_resolution": "1",
+        "restored_close": 105.19
+      }
+    },
+    {
+      "passed": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "fd621e8ba040ea880aeb7c79e2567a93c107943085536529a480f93e03f170fa",
+      "fixture_sha256": "2bc3113374c4ab499829c21ecfb4170f8232bfead0aeb185a8088f51c0cd5bbb",
+      "synthetic": true,
+      "checks": [
+        "native first screen and unified subscription",
+        "same-bar updates and authoritative high contraction",
+        "Python EMA worker output reaches native study callbacks for every update",
+        "real EventSource reconnect after gateway outage across three appended buckets",
+        "actual worker process stop and successor takeover of the same task",
+        "API process restart reconnects and preserves native delivery"
+      ],
+      "samples": [
+        {
+          "committed_at": 1791516333315,
+          "callback_at": 1791516334218,
+          "latency_ms": 903,
+          "close": 101.01,
+          "high": 140
+        },
+        {
+          "committed_at": 1791516335495,
+          "callback_at": 1791516336353,
+          "latency_ms": 858,
+          "close": 101.02,
+          "high": 110
+        },
+        {
+          "committed_at": 1791516337933,
+          "callback_at": 1791516339172,
+          "latency_ms": 1239,
+          "close": 101.03,
+          "high": 140
+        },
+        {
+          "committed_at": 1791516340693,
+          "callback_at": 1791516341322,
+          "latency_ms": 629,
+          "close": 101.04,
+          "high": 110
+        },
+        {
+          "committed_at": 1791516342815,
+          "callback_at": 1791516343556,
+          "latency_ms": 741,
+          "close": 101.05,
+          "high": 140
+        },
+        {
+          "committed_at": 1791516345021,
+          "callback_at": 1791516345746,
+          "latency_ms": 725,
+          "close": 101.06,
+          "high": 110
+        },
+        {
+          "committed_at": 1791516347107,
+          "callback_at": 1791516348016,
+          "latency_ms": 909,
+          "close": 101.07,
+          "high": 140
+        },
+        {
+          "committed_at": 1791516349315,
+          "callback_at": 1791516350184,
+          "latency_ms": 869,
+          "close": 101.08,
+          "high": 110
+        },
+        {
+          "committed_at": 1791516351673,
+          "callback_at": 1791516351873,
+          "latency_ms": 200,
+          "close": 101.09,
+          "high": 140
+        },
+        {
+          "committed_at": 1791516354107,
+          "callback_at": 1791516354646,
+          "latency_ms": 539,
+          "close": 101.1,
+          "high": 110
+        },
+        {
+          "committed_at": 1791516357164,
+          "callback_at": 1791516358011,
+          "latency_ms": 847,
+          "close": 101.11,
+          "high": 140
+        },
+        {
+          "committed_at": 1791516359600,
+          "callback_at": 1791516360280,
+          "latency_ms": 680,
+          "close": 101.12,
+          "high": 110
+        }
+      ],
+      "p95_ms": 1239,
+      "private_evidence": "artifacts/unified-sse/browser-indicators-takeover-95d501e-passed.json",
+      "private_evidence_sha256": "b57ad90b75363889e84c3d2f887446621aa8d144743530db730e929e93baa93e",
+      "takeover": {
+        "task_id": "8f7efa39133057d2b95f3d54c7b0c1c3e008b6f24765b68a76f36164f05f1cf6",
+        "owner_changed": true,
+        "previous_sequence": 16,
+        "recovered_sequence": 17
+      },
+      "api_reconnect_ms": 18358,
+      "indicator": {
+        "name": "EMA",
+        "period": 31,
+        "ticker": "MWPY_eyJzeW1ib2wiOiJTU0VGSVhUVVJFIiwic3BlYyI6eyJuYW1lIjoiRU1BIiwicGFyYW1zIjp7InBlcmlvZCI6MzF9fSwia2V5IjoidmFsdWUifQ=="
+      }
+    },
+    {
+      "passed": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "f8d206681dcf982049e119ea11d3f713bf3ff47cd7fa4890bfed5de9c381a13f",
+      "fixture_sha256": "0a31e717099060440af979a66fc59ba92eb432837500a8670cea3b76fa09b595",
+      "synthetic": true,
+      "checks": [
+        "real composite first screen and four native periods M1/D1/W1/MN",
+        "48 fresh actual callbacks for 12 source quotes, authoritative OHLC/time labels, no market polling",
+        "composite EMA31 shared worker values reach each actual native study callback"
+      ],
+      "samples": [
+        {
+          "frame": "M1",
+          "committed_at": 1791514994900,
+          "callback_at": 1791514996370,
+          "latency_ms": 1470
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791514994900,
+          "callback_at": 1791514995676,
+          "latency_ms": 776
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791514994900,
+          "callback_at": 1791514996370,
+          "latency_ms": 1470
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791514994900,
+          "callback_at": 1791514995677,
+          "latency_ms": 777
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791514998485,
+          "callback_at": 1791514999408,
+          "latency_ms": 923
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791514998485,
+          "callback_at": 1791514999407,
+          "latency_ms": 922
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791514998485,
+          "callback_at": 1791514999406,
+          "latency_ms": 921
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791514998485,
+          "callback_at": 1791514999407,
+          "latency_ms": 922
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515002170,
+          "callback_at": 1791515003403,
+          "latency_ms": 1233
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515002170,
+          "callback_at": 1791515003402,
+          "latency_ms": 1232
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515002170,
+          "callback_at": 1791515002853,
+          "latency_ms": 683
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515002170,
+          "callback_at": 1791515002853,
+          "latency_ms": 683
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515005133,
+          "callback_at": 1791515006493,
+          "latency_ms": 1360
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515005133,
+          "callback_at": 1791515005664,
+          "latency_ms": 531
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515005133,
+          "callback_at": 1791515006446,
+          "latency_ms": 1313
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515005133,
+          "callback_at": 1791515006449,
+          "latency_ms": 1316
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515009138,
+          "callback_at": 1791515010849,
+          "latency_ms": 1711
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515009138,
+          "callback_at": 1791515009720,
+          "latency_ms": 582
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515009138,
+          "callback_at": 1791515010849,
+          "latency_ms": 1711
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515009138,
+          "callback_at": 1791515010268,
+          "latency_ms": 1130
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515012654,
+          "callback_at": 1791515014774,
+          "latency_ms": 2120
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515012654,
+          "callback_at": 1791515013007,
+          "latency_ms": 353
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515012654,
+          "callback_at": 1791515013574,
+          "latency_ms": 920
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515012654,
+          "callback_at": 1791515013600,
+          "latency_ms": 946
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515059927,
+          "callback_at": 1791515061171,
+          "latency_ms": 1244
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515059927,
+          "callback_at": 1791515061171,
+          "latency_ms": 1244
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515059927,
+          "callback_at": 1791515060345,
+          "latency_ms": 418
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515059927,
+          "callback_at": 1791515060347,
+          "latency_ms": 420
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515064313,
+          "callback_at": 1791515065938,
+          "latency_ms": 1625
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515064313,
+          "callback_at": 1791515065939,
+          "latency_ms": 1626
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515064313,
+          "callback_at": 1791515065404,
+          "latency_ms": 1091
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515064313,
+          "callback_at": 1791515065937,
+          "latency_ms": 1624
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515067858,
+          "callback_at": 1791515069532,
+          "latency_ms": 1674
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515067858,
+          "callback_at": 1791515068187,
+          "latency_ms": 329
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515067858,
+          "callback_at": 1791515069530,
+          "latency_ms": 1672
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515067858,
+          "callback_at": 1791515069531,
+          "latency_ms": 1673
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515071453,
+          "callback_at": 1791515072839,
+          "latency_ms": 1386
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515071453,
+          "callback_at": 1791515071741,
+          "latency_ms": 288
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515071453,
+          "callback_at": 1791515072838,
+          "latency_ms": 1385
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515071453,
+          "callback_at": 1791515072293,
+          "latency_ms": 840
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515074538,
+          "callback_at": 1791515075671,
+          "latency_ms": 1133
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515074538,
+          "callback_at": 1791515075672,
+          "latency_ms": 1134
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515074538,
+          "callback_at": 1791515075082,
+          "latency_ms": 544
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515074538,
+          "callback_at": 1791515076211,
+          "latency_ms": 1673
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791515078047,
+          "callback_at": 1791515079913,
+          "latency_ms": 1866
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791515078047,
+          "callback_at": 1791515079371,
+          "latency_ms": 1324
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791515078047,
+          "callback_at": 1791515078539,
+          "latency_ms": 492
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791515078047,
+          "callback_at": 1791515079370,
+          "latency_ms": 1323
+        }
+      ],
+      "p95_ms": 1711,
+      "private_evidence": "artifacts/unified-sse/browser-composite-ema-resources-passed.json",
+      "private_evidence_sha256": "28d74df000533608caa28927aaea851101f9146e7091c0d5fa59d48a75ae6928",
+      "indicator": {
+        "name": "EMA",
+        "period": 31
+      },
+      "measurement_windows": [
+        {
+          "start": 1791514992851,
+          "source_minute": 1791514980000,
+          "resources": {
+            "report": "/home/quant/repos/market-watch-unified-sse-20261008/artifacts/unified-sse/resources/composite-ema-stable-quotes-1791515009682140022.json",
+            "scenario": "composite-ema-stable-quotes",
+            "summary": {
+              "api": {
+                "elapsed_seconds": 16.061380624771118,
+                "cpu_seconds": 8.851132000000007,
+                "average_cpu_cores": 0.5510816415339226,
+                "working_set_average_bytes": 233494755.55555555,
+                "working_set_peak_bytes": 293675008,
+                "network_rx_bytes": 2570025,
+                "network_tx_bytes": 1512664
+              },
+              "api-second": {
+                "elapsed_seconds": 16.058170557022095,
+                "cpu_seconds": 0.2951759999999979,
+                "average_cpu_cores": 0.01838167049925373,
+                "working_set_average_bytes": 131442005.33333333,
+                "working_set_peak_bytes": 131448832,
+                "network_rx_bytes": 160919,
+                "network_tx_bytes": 74840
+              },
+              "market-stream-worker": {
+                "elapsed_seconds": 16.058411598205566,
+                "cpu_seconds": 5.065358999999997,
+                "average_cpu_cores": 0.3154333770200548,
+                "working_set_average_bytes": 226010908.44444445,
+                "working_set_peak_bytes": 226848768,
+                "network_rx_bytes": 20700016,
+                "network_tx_bytes": 19102629
+              },
+              "postgres": {
+                "elapsed_seconds": 16.06513500213623,
+                "cpu_seconds": 1.629500999999891,
+                "average_cpu_cores": 0.10143089365780066,
+                "working_set_average_bytes": 248498403.55555555,
+                "working_set_peak_bytes": 251965440,
+                "network_rx_bytes": 19920052,
+                "network_tx_bytes": 24872311
+              },
+              "web": {
+                "elapsed_seconds": 16.059504508972168,
+                "cpu_seconds": 0.008469000000000004,
+                "average_cpu_cores": 0.0005273512638742073,
+                "working_set_average_bytes": 5530055.111111111,
+                "working_set_peak_bytes": 5537792,
+                "network_rx_bytes": 1137203,
+                "network_tx_bytes": 1142375
+              },
+              "web-second": {
+                "elapsed_seconds": 16.058964014053345,
+                "cpu_seconds": 0.00016800000000000148,
+                "average_cpu_cores": 1.0461446943463051e-05,
+                "working_set_average_bytes": 5058560,
+                "working_set_peak_bytes": 5058560,
+                "network_rx_bytes": 0,
+                "network_tx_bytes": 0
+              },
+              "chart-origin": {
+                "elapsed_seconds": 16.076713800430298,
+                "cpu_seconds": 0.0004450000000000287,
+                "average_cpu_cores": 2.7679786150582475e-05,
+                "working_set_average_bytes": 5972423.111111111,
+                "working_set_peak_bytes": 5976064,
+                "network_rx_bytes": 1188,
+                "network_tx_bytes": 1188
+              },
+              "composite-aggregate-worker": {
+                "elapsed_seconds": 16.079978704452515,
+                "cpu_seconds": 0.07102199999999925,
+                "average_cpu_cores": 0.004416796894160899,
+                "working_set_average_bytes": 113482410.66666667,
+                "working_set_peak_bytes": 113483776,
+                "network_rx_bytes": 24032,
+                "network_tx_bytes": 19904
+              },
+              "history-worker": {
+                "elapsed_seconds": 16.089272499084473,
+                "cpu_seconds": 0.15365100000000353,
+                "average_cpu_cores": 0.009549903515447745,
+                "working_set_average_bytes": 109395968,
+                "working_set_peak_bytes": 109395968,
+                "network_rx_bytes": 57840,
+                "network_tx_bytes": 44304
+              },
+              "native-history-worker": {
+                "elapsed_seconds": 16.094308853149414,
+                "cpu_seconds": 0.04042800000000035,
+                "average_cpu_cores": 0.002511943841073312,
+                "working_set_average_bytes": 101568967.1111111,
+                "working_set_peak_bytes": 101572608,
+                "network_rx_bytes": 19412,
+                "network_tx_bytes": 12988
+              },
+              "chart-aggregation-worker": {
+                "elapsed_seconds": 16.09849977493286,
+                "cpu_seconds": 0.6428610000000106,
+                "average_cpu_cores": 0.0399329756801945,
+                "working_set_average_bytes": 104898560,
+                "working_set_peak_bytes": 104964096,
+                "network_rx_bytes": 1185042,
+                "network_tx_bytes": 188151
+              },
+              "realtime-worker": {
+                "elapsed_seconds": 16.10003161430359,
+                "cpu_seconds": 0.48573200000001293,
+                "average_cpu_cores": 0.030169630199264885,
+                "working_set_average_bytes": 139987171.55555555,
+                "working_set_peak_bytes": 146018304,
+                "network_rx_bytes": 181680,
+                "network_tx_bytes": 91713
+              }
+            }
+          },
+          "end": 1791515014917
+        },
+        {
+          "start": 1791515058377,
+          "source_minute": 1791515040000,
+          "resources": {
+            "report": "/home/quant/repos/market-watch-unified-sse-20261008/artifacts/unified-sse/resources/composite-ema-stable-quotes-1791515075188370928.json",
+            "scenario": "composite-ema-stable-quotes",
+            "summary": {
+              "api": {
+                "elapsed_seconds": 16.061295986175537,
+                "cpu_seconds": 8.741014000000007,
+                "average_cpu_cores": 0.5442284363306469,
+                "working_set_average_bytes": 218117916.44444445,
+                "working_set_peak_bytes": 284200960,
+                "network_rx_bytes": 2566015,
+                "network_tx_bytes": 1513542
+              },
+              "api-second": {
+                "elapsed_seconds": 16.061989545822144,
+                "cpu_seconds": 0.33631800000000567,
+                "average_cpu_cores": 0.020938751020883634,
+                "working_set_average_bytes": 131440184.8888889,
+                "working_set_peak_bytes": 131448832,
+                "network_rx_bytes": 169351,
+                "network_tx_bytes": 84344
+              },
+              "market-stream-worker": {
+                "elapsed_seconds": 16.06231427192688,
+                "cpu_seconds": 5.014915000000002,
+                "average_cpu_cores": 0.3122162171091924,
+                "working_set_average_bytes": 226912938.66666666,
+                "working_set_peak_bytes": 227909632,
+                "network_rx_bytes": 20709770,
+                "network_tx_bytes": 19086998
+              },
+              "postgres": {
+                "elapsed_seconds": 16.058554649353027,
+                "cpu_seconds": 1.478605000000016,
+                "average_cpu_cores": 0.09207584569633646,
+                "working_set_average_bytes": 253264327.1111111,
+                "working_set_peak_bytes": 254803968,
+                "network_rx_bytes": 19646679,
+                "network_tx_bytes": 23552134
+              },
+              "web": {
+                "elapsed_seconds": 16.06198263168335,
+                "cpu_seconds": 0.009279000000000037,
+                "average_cpu_cores": 0.0005776995413814345,
+                "working_set_average_bytes": 5584668.444444444,
+                "working_set_peak_bytes": 5857280,
+                "network_rx_bytes": 1138489,
+                "network_tx_bytes": 1144531
+              },
+              "web-second": {
+                "elapsed_seconds": 16.063961505889893,
+                "cpu_seconds": 0.00016599999999999948,
+                "average_cpu_cores": 1.0333690101232823e-05,
+                "working_set_average_bytes": 5058560,
+                "working_set_peak_bytes": 5058560,
+                "network_rx_bytes": 0,
+                "network_tx_bytes": 0
+              },
+              "chart-origin": {
+                "elapsed_seconds": 16.070639610290527,
+                "cpu_seconds": 0,
+                "average_cpu_cores": 0,
+                "working_set_average_bytes": 5967872,
+                "working_set_peak_bytes": 5967872,
+                "network_rx_bytes": 0,
+                "network_tx_bytes": 0
+              },
+              "composite-aggregate-worker": {
+                "elapsed_seconds": 16.073126316070557,
+                "cpu_seconds": 0.07158500000000245,
+                "average_cpu_cores": 0.004453707299520747,
+                "working_set_average_bytes": 113538389.33333333,
+                "working_set_peak_bytes": 113541120,
+                "network_rx_bytes": 24032,
+                "network_tx_bytes": 19904
+              },
+              "history-worker": {
+                "elapsed_seconds": 16.083211660385132,
+                "cpu_seconds": 0.15284099999999512,
+                "average_cpu_cores": 0.009503139250256884,
+                "working_set_average_bytes": 109400519.1111111,
+                "working_set_peak_bytes": 109404160,
+                "network_rx_bytes": 57840,
+                "network_tx_bytes": 44304
+              },
+              "native-history-worker": {
+                "elapsed_seconds": 16.07879948616028,
+                "cpu_seconds": 0.04234199999999966,
+                "average_cpu_cores": 0.0026334055621780256,
+                "working_set_average_bytes": 101568967.1111111,
+                "working_set_peak_bytes": 101572608,
+                "network_rx_bytes": 19412,
+                "network_tx_bytes": 12988
+              },
+              "chart-aggregation-worker": {
+                "elapsed_seconds": 16.077685594558716,
+                "cpu_seconds": 0.15224600000001942,
+                "average_cpu_cores": 0.009469397762793987,
+                "working_set_average_bytes": 104890368,
+                "working_set_peak_bytes": 104890368,
+                "network_rx_bytes": 16264,
+                "network_tx_bytes": 8576
+              },
+              "realtime-worker": {
+                "elapsed_seconds": 16.07683277130127,
+                "cpu_seconds": 0.3561990000000037,
+                "average_cpu_cores": 0.022156043112910525,
+                "working_set_average_bytes": 144513706.66666666,
+                "working_set_peak_bytes": 147529728,
+                "network_rx_bytes": 1382,
+                "network_tx_bytes": 1507
+              }
+            }
+          },
+          "end": 1791515080092
+        }
+      ]
     }
   ],
   "scope": "Synthetic input runs on Ubuntu local Docker; each run states runtime image. Final delivery still pending remaining audit."

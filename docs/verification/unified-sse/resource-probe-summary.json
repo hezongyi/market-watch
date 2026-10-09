@@ -1,6 +1,1804 @@
 {
-  "status": "probe verified; matched baseline comparison pending",
+  "status": "measured current-image fallback comparisons, idle and composite EMA windows; supplier verification incomplete",
+  "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+  "baseline": "explicit polling fallback of same new image; not old release",
+  "host": {
+    "environment": "Ubuntu VM",
+    "vcpus": 4,
+    "memory_gib_approx": 16,
+    "other_tasks_present": true
+  },
   "reports": [
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "sse-single-period",
+      "requested_seconds": 60,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 60.040523290634155,
+          "cpu_seconds": 17.918071999999995,
+          "average_cpu_cores": 0.29843297523016543,
+          "working_set_average_bytes": 189848654.76923078,
+          "working_set_peak_bytes": 217538560,
+          "network_rx_bytes": 2446907,
+          "network_tx_bytes": 1012232
+        },
+        "api-second": {
+          "elapsed_seconds": 60.041868448257446,
+          "cpu_seconds": 1.129137,
+          "average_cpu_cores": 0.018805827153314882,
+          "working_set_average_bytes": 123731652.92307693,
+          "working_set_peak_bytes": 123752448,
+          "network_rx_bytes": 617797,
+          "network_tx_bytes": 298219
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 60.04649257659912,
+          "cpu_seconds": 4.145519,
+          "average_cpu_cores": 0.06903848704754424,
+          "working_set_average_bytes": 190423040.0,
+          "working_set_peak_bytes": 190423040,
+          "network_rx_bytes": 9175107,
+          "network_tx_bytes": 3876941
+        },
+        "postgres": {
+          "elapsed_seconds": 60.04757332801819,
+          "cpu_seconds": 3.529649999999947,
+          "average_cpu_cores": 0.05878089328803921,
+          "working_set_average_bytes": 259421735.3846154,
+          "working_set_peak_bytes": 259784704,
+          "network_rx_bytes": 6313951,
+          "network_tx_bytes": 17495932
+        },
+        "web": {
+          "elapsed_seconds": 60.04698634147644,
+          "cpu_seconds": 0.02500200000000001,
+          "average_cpu_cores": 0.0004163739352016456,
+          "working_set_average_bytes": 5541572.923076923,
+          "working_set_peak_bytes": 5545984,
+          "network_rx_bytes": 75206,
+          "network_tx_bytes": 78119
+        },
+        "web-second": {
+          "elapsed_seconds": 60.04627799987793,
+          "cpu_seconds": 0.0008249999999999993,
+          "average_cpu_cores": 1.3739402798649344e-05,
+          "working_set_average_bytes": 4800512.0,
+          "working_set_peak_bytes": 4800512,
+          "network_rx_bytes": 70,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.04572820663452,
+          "cpu_seconds": 0.0003429999999999822,
+          "average_cpu_cores": 5.712313102767629e-06,
+          "working_set_average_bytes": 5950857.846153846,
+          "working_set_peak_bytes": 5951488,
+          "network_rx_bytes": 2460,
+          "network_tx_bytes": 2460
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.045616149902344,
+          "cpu_seconds": 0.25426200000000065,
+          "average_cpu_cores": 0.004234480654928115,
+          "working_set_average_bytes": 108867584.0,
+          "working_set_peak_bytes": 108867584,
+          "network_rx_bytes": 89369,
+          "network_tx_bytes": 74018
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.04681062698364,
+          "cpu_seconds": 0.571022000000001,
+          "average_cpu_cores": 0.009509614149987793,
+          "working_set_average_bytes": 109211963.07692307,
+          "working_set_peak_bytes": 109215744,
+          "network_rx_bytes": 216900,
+          "network_tx_bytes": 166140
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.046470165252686,
+          "cpu_seconds": 0.12608700000000006,
+          "average_cpu_cores": 0.0020998236807758816,
+          "working_set_average_bytes": 99540361.84615384,
+          "working_set_peak_bytes": 99553280,
+          "network_rx_bytes": 58236,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.045170068740845,
+          "cpu_seconds": 2.5145040000000023,
+          "average_cpu_cores": 0.04187687364564628,
+          "working_set_average_bytes": 104637361.23076923,
+          "working_set_peak_bytes": 104697856,
+          "network_rx_bytes": 4531037,
+          "network_tx_bytes": 678139
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.05297255516052,
+          "cpu_seconds": 1.839492,
+          "average_cpu_cores": 0.030631156489553772,
+          "working_set_average_bytes": 138161230.76923078,
+          "working_set_peak_bytes": 143851520,
+          "network_rx_bytes": 438264,
+          "network_tx_bytes": 224664
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/sse-single-period-1791511053811991499.json",
+      "private_evidence_sha256": "6f9b39d8528c74f3a1b46d09087892ccdd50a667745980306e455bac38ae2465",
+      "scope": "60s scheduled managed input; first history excluded; new worker present in SSE and polling",
+      "database_delta": {
+        "xact_commit": 6974,
+        "blks_read": 9,
+        "blks_hit": 80960,
+        "tup_returned": 151737,
+        "tup_fetched": 40942,
+        "tup_inserted": 534,
+        "tup_updated": 2264,
+        "tup_deleted": 668
+      },
+      "wal_bytes_delta": 1282894.0,
+      "stream_queue_before": {
+        "tasks": 3,
+        "active_subscriptions": 2,
+        "retained_results": 3
+      },
+      "stream_queue_after": {
+        "tasks": 3,
+        "active_subscriptions": 2,
+        "retained_results": 23
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 483328,
+        "market_stream_subscriptions": 122880,
+        "market_stream_tasks": 606208
+      },
+      "database_bytes_delta": -122880,
+      "total_average_cpu_cores": 0.5338459569910586,
+      "total_average_working_set_bytes": 1340136526.7692308,
+      "browser_evidence": "artifacts/unified-sse/cost-sse-single-95d501e-passed.json",
+      "browser_sha256": "8ba8cbaafe5cbd027436a3da17a58ecbc0dec91eb67ef7f3ab284e6463dd3eb3",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "d14e6aa9c828061b2c6b9d6bf70ba9602b16c2c88ceffe327e6089563aeb67ae",
+      "inputs": 10,
+      "callbacks": 0,
+      "ordinary_market_http_requests": 0
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "polling-single-period",
+      "requested_seconds": 60,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 60.05409812927246,
+          "cpu_seconds": 17.432056000000017,
+          "average_cpu_cores": 0.29027254663746294,
+          "working_set_average_bytes": 203658476.30769232,
+          "working_set_peak_bytes": 243765248,
+          "network_rx_bytes": 787162,
+          "network_tx_bytes": 444848
+        },
+        "api-second": {
+          "elapsed_seconds": 60.05511784553528,
+          "cpu_seconds": 1.3579709999999992,
+          "average_cpu_cores": 0.02261207784976407,
+          "working_set_average_bytes": 123767571.6923077,
+          "working_set_peak_bytes": 123777024,
+          "network_rx_bytes": 628560,
+          "network_tx_bytes": 306431
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 60.0543372631073,
+          "cpu_seconds": 1.4360809999999944,
+          "average_cpu_cores": 0.023913027192495728,
+          "working_set_average_bytes": 190427136.0,
+          "working_set_peak_bytes": 190427136,
+          "network_rx_bytes": 423500,
+          "network_tx_bytes": 340906
+        },
+        "postgres": {
+          "elapsed_seconds": 60.05139207839966,
+          "cpu_seconds": 2.8364990000000034,
+          "average_cpu_cores": 0.04723452532618782,
+          "working_set_average_bytes": 259626850.46153846,
+          "working_set_peak_bytes": 262594560,
+          "network_rx_bytes": 2179527,
+          "network_tx_bytes": 6055070
+        },
+        "web": {
+          "elapsed_seconds": 60.05051136016846,
+          "cpu_seconds": 0.015862999999999988,
+          "average_cpu_cores": 0.00026416094785367515,
+          "working_set_average_bytes": 5469420.307692308,
+          "working_set_peak_bytes": 5488640,
+          "network_rx_bytes": 71903,
+          "network_tx_bytes": 76535
+        },
+        "web-second": {
+          "elapsed_seconds": 60.0495707988739,
+          "cpu_seconds": 0.0009929999999999939,
+          "average_cpu_cores": 1.6536338008574332e-05,
+          "working_set_average_bytes": 4800512.0,
+          "working_set_peak_bytes": 4800512,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.048216104507446,
+          "cpu_seconds": 0.00043199999999998795,
+          "average_cpu_cores": 7.194218713310959e-06,
+          "working_set_average_bytes": 5967241.846153846,
+          "working_set_peak_bytes": 5967872,
+          "network_rx_bytes": 2460,
+          "network_tx_bytes": 2460
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.045369148254395,
+          "cpu_seconds": 0.3153499999999987,
+          "average_cpu_cores": 0.005251862124810775,
+          "working_set_average_bytes": 108867584.0,
+          "working_set_peak_bytes": 108867584,
+          "network_rx_bytes": 89369,
+          "network_tx_bytes": 74018
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.04272222518921,
+          "cpu_seconds": 0.6635270000000002,
+          "average_cpu_cores": 0.011050914672247095,
+          "working_set_average_bytes": 109254183.38461539,
+          "working_set_peak_bytes": 109256704,
+          "network_rx_bytes": 213285,
+          "network_tx_bytes": 163305
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.05576252937317,
+          "cpu_seconds": 0.14120500000000025,
+          "average_cpu_cores": 0.0023512314897498323,
+          "working_set_average_bytes": 99605897.84615384,
+          "working_set_peak_bytes": 99614720,
+          "network_rx_bytes": 58236,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.065887689590454,
+          "cpu_seconds": 2.6308989999999994,
+          "average_cpu_cores": 0.043800218413419696,
+          "working_set_average_bytes": 104636416.0,
+          "working_set_peak_bytes": 104636416,
+          "network_rx_bytes": 3545993,
+          "network_tx_bytes": 618301
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.06947088241577,
+          "cpu_seconds": 2.2143020000000035,
+          "average_cpu_cores": 0.03686235233092755,
+          "working_set_average_bytes": 133790798.76923077,
+          "working_set_peak_bytes": 144281600,
+          "network_rx_bytes": 393624,
+          "network_tx_bytes": 247905
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/polling-single-period-1791511345526977337.json",
+      "private_evidence_sha256": "953f710a247eff05e21613cde962caa5e23d9bbe8ebb13a673fc9a5b923b6393",
+      "scope": "60s scheduled managed input; first history excluded; new worker present in SSE and polling",
+      "database_delta": {
+        "xact_commit": 4855,
+        "blks_read": 6,
+        "blks_hit": 44846,
+        "tup_returned": 99009,
+        "tup_fetched": 18463,
+        "tup_inserted": 535,
+        "tup_updated": 1317,
+        "tup_deleted": 497
+      },
+      "wal_bytes_delta": 432886.0,
+      "stream_queue_before": {
+        "tasks": 0,
+        "active_subscriptions": 0,
+        "retained_results": 0
+      },
+      "stream_queue_after": {
+        "tasks": 0,
+        "active_subscriptions": 0,
+        "retained_results": 0
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 294912,
+        "market_stream_subscriptions": 114688,
+        "market_stream_tasks": 581632
+      },
+      "database_bytes_delta": 0,
+      "total_average_cpu_cores": 0.48363664754164104,
+      "total_average_working_set_bytes": 1349872088.6153846,
+      "browser_evidence": "artifacts/unified-sse/cost-polling-single-95d501e-passed.json",
+      "browser_sha256": "4096b0732373c3374c4e66864d46f28bc17ee2ba86cc40ee64a87743c758777e",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "a9499049ada7317dbffb2f5f2019efd49af27581013e918cb9a8f7e27d4a3021",
+      "inputs": 10,
+      "callbacks": 0,
+      "ordinary_market_http_requests": 10
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "sse-eight-periods",
+      "requested_seconds": 60,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 60.03393006324768,
+          "cpu_seconds": 50.888859,
+          "average_cpu_cores": 0.8476682926869346,
+          "working_set_average_bytes": 438515239.38461536,
+          "working_set_peak_bytes": 899457024,
+          "network_rx_bytes": 5865186,
+          "network_tx_bytes": 1662759
+        },
+        "api-second": {
+          "elapsed_seconds": 60.03090810775757,
+          "cpu_seconds": 1.1798949999999948,
+          "average_cpu_cores": 0.019654791792955092,
+          "working_set_average_bytes": 123776708.92307693,
+          "working_set_peak_bytes": 123781120,
+          "network_rx_bytes": 635187,
+          "network_tx_bytes": 311548
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 60.03035545349121,
+          "cpu_seconds": 12.107152,
+          "average_cpu_cores": 0.20168382993134315,
+          "working_set_average_bytes": 189991384.6153846,
+          "working_set_peak_bytes": 190423040,
+          "network_rx_bytes": 25893135,
+          "network_tx_bytes": 9967971
+        },
+        "postgres": {
+          "elapsed_seconds": 60.03006625175476,
+          "cpu_seconds": 5.584283999999798,
+          "average_cpu_cores": 0.0930247848899644,
+          "working_set_average_bytes": 245385058.46153846,
+          "working_set_peak_bytes": 260472832,
+          "network_rx_bytes": 12741213,
+          "network_tx_bytes": 35502117
+        },
+        "web": {
+          "elapsed_seconds": 60.038368225097656,
+          "cpu_seconds": 0.022632999999999986,
+          "average_cpu_cores": 0.0003769756019208194,
+          "working_set_average_bytes": 5502818.461538462,
+          "working_set_peak_bytes": 5509120,
+          "network_rx_bytes": 94403,
+          "network_tx_bytes": 97833
+        },
+        "web-second": {
+          "elapsed_seconds": 60.03393006324768,
+          "cpu_seconds": 0.0008190000000000003,
+          "average_cpu_cores": 1.3642285273297241e-05,
+          "working_set_average_bytes": 4800512.0,
+          "working_set_peak_bytes": 4800512,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.034122943878174,
+          "cpu_seconds": 0.0004929999999999657,
+          "average_cpu_cores": 8.211996375142149e-06,
+          "working_set_average_bytes": 5978899.692307692,
+          "working_set_peak_bytes": 5980160,
+          "network_rx_bytes": 2460,
+          "network_tx_bytes": 2460
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.03429388999939,
+          "cpu_seconds": 0.2618639999999992,
+          "average_cpu_cores": 0.0043619068874169095,
+          "working_set_average_bytes": 108871049.84615384,
+          "working_set_peak_bytes": 108871680,
+          "network_rx_bytes": 90120,
+          "network_tx_bytes": 74640
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.03474831581116,
+          "cpu_seconds": 0.5723319999999994,
+          "average_cpu_cores": 0.009533345538308289,
+          "working_set_average_bytes": 109268992.0,
+          "working_set_peak_bytes": 109268992,
+          "network_rx_bytes": 213285,
+          "network_tx_bytes": 163371
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.03560018539429,
+          "cpu_seconds": 0.12801299999999927,
+          "average_cpu_cores": 0.0021322848377410375,
+          "working_set_average_bytes": 99703571.6923077,
+          "working_set_peak_bytes": 99708928,
+          "network_rx_bytes": 58236,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.03634858131409,
+          "cpu_seconds": 1.7601779999999962,
+          "average_cpu_cores": 0.02931853854529454,
+          "working_set_average_bytes": 104645868.3076923,
+          "working_set_peak_bytes": 104701952,
+          "network_rx_bytes": 2562678,
+          "network_tx_bytes": 437587
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.036725997924805,
+          "cpu_seconds": 1.877247000000004,
+          "average_cpu_cores": 0.03126831066812157,
+          "working_set_average_bytes": 139989937.23076922,
+          "working_set_peak_bytes": 148422656,
+          "network_rx_bytes": 250755,
+          "network_tx_bytes": 158152
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/sse-eight-periods-1791511663907283749.json",
+      "private_evidence_sha256": "0c384dfd2a5ba116f877bb487aad89a8141a1b3c1d2f0e17ed2b088929fb3d85",
+      "scope": "60s scheduled managed input; first history excluded; new worker present in SSE and polling",
+      "database_delta": {
+        "xact_commit": 11865,
+        "blks_read": 59,
+        "blks_hit": 223379,
+        "tup_returned": 320239,
+        "tup_fetched": 95274,
+        "tup_inserted": 940,
+        "tup_updated": 4619,
+        "tup_deleted": 758
+      },
+      "wal_bytes_delta": 3201265.0,
+      "stream_queue_before": {
+        "tasks": 10,
+        "active_subscriptions": 9,
+        "retained_results": 10
+      },
+      "stream_queue_after": {
+        "tasks": 10,
+        "active_subscriptions": 9,
+        "retained_results": 46
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 516096,
+        "market_stream_subscriptions": 131072,
+        "market_stream_tasks": 1048576
+      },
+      "database_bytes_delta": 434176,
+      "total_average_cpu_cores": 1.2390449156616488,
+      "total_average_working_set_bytes": 1576430040.6153846,
+      "browser_evidence": "artifacts/unified-sse/cost-sse-matrix-passed.json",
+      "browser_sha256": "e64ce1404e37d7c69afaaa5b2212867a189fec5faca4c61992460459e4719238",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "80c99bd36d1fcc8815248e26cd44d67cafd84f342d634d0e160c0c6d73d22ad8",
+      "inputs": 32,
+      "callbacks": 32,
+      "ordinary_market_http_requests": 0
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "polling-eight-periods",
+      "requested_seconds": 60,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 60.03014945983887,
+          "cpu_seconds": 46.02214699999996,
+          "average_cpu_cores": 0.7666505483347084,
+          "working_set_average_bytes": 293771421.53846157,
+          "working_set_peak_bytes": 791965696,
+          "network_rx_bytes": 991840,
+          "network_tx_bytes": 758834
+        },
+        "api-second": {
+          "elapsed_seconds": 60.03072714805603,
+          "cpu_seconds": 1.1681939999999997,
+          "average_cpu_cores": 0.01945993419534698,
+          "working_set_average_bytes": 123832162.46153846,
+          "working_set_peak_bytes": 123838464,
+          "network_rx_bytes": 630475,
+          "network_tx_bytes": 310786
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 60.0312294960022,
+          "cpu_seconds": 1.2327179999999913,
+          "average_cpu_cores": 0.020534611906992253,
+          "working_set_average_bytes": 189751296.0,
+          "working_set_peak_bytes": 189751296,
+          "network_rx_bytes": 426436,
+          "network_tx_bytes": 343261
+        },
+        "postgres": {
+          "elapsed_seconds": 60.03254175186157,
+          "cpu_seconds": 2.7521999999999025,
+          "average_cpu_cores": 0.04584513531637295,
+          "working_set_average_bytes": 235978436.92307693,
+          "working_set_peak_bytes": 238149632,
+          "network_rx_bytes": 2016879,
+          "network_tx_bytes": 4821106
+        },
+        "web": {
+          "elapsed_seconds": 60.033629417419434,
+          "cpu_seconds": 0.028030999999999973,
+          "average_cpu_cores": 0.0004669216282943317,
+          "working_set_average_bytes": 5473831.384615385,
+          "working_set_peak_bytes": 5484544,
+          "network_rx_bytes": 290678,
+          "network_tx_bytes": 303884
+        },
+        "web-second": {
+          "elapsed_seconds": 60.03426480293274,
+          "cpu_seconds": 0.000900999999999999,
+          "average_cpu_cores": 1.5008095842559301e-05,
+          "working_set_average_bytes": 4800512.0,
+          "working_set_peak_bytes": 4800512,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.03332829475403,
+          "cpu_seconds": 0.0002950000000000452,
+          "average_cpu_cores": 4.913937114258308e-06,
+          "working_set_average_bytes": 5975748.923076923,
+          "working_set_peak_bytes": 5976064,
+          "network_rx_bytes": 2502,
+          "network_tx_bytes": 2502
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.03666830062866,
+          "cpu_seconds": 0.25809899999999963,
+          "average_cpu_cores": 0.004299022702385652,
+          "working_set_average_bytes": 108867584.0,
+          "working_set_peak_bytes": 108867584,
+          "network_rx_bytes": 89439,
+          "network_tx_bytes": 74018
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.04108643531799,
+          "cpu_seconds": 0.5701890000000027,
+          "average_cpu_cores": 0.00949664694382679,
+          "working_set_average_bytes": 109294828.3076923,
+          "working_set_peak_bytes": 109297664,
+          "network_rx_bytes": 213285,
+          "network_tx_bytes": 163371
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.04228472709656,
+          "cpu_seconds": 0.1314339999999996,
+          "average_cpu_cores": 0.0021890239619859865,
+          "working_set_average_bytes": 99852288.0,
+          "working_set_peak_bytes": 99860480,
+          "network_rx_bytes": 58236,
+          "network_tx_bytes": 38898
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.04429912567139,
+          "cpu_seconds": 1.7031829999999957,
+          "average_cpu_cores": 0.028365440596371545,
+          "working_set_average_bytes": 104855079.38461539,
+          "working_set_peak_bytes": 104919040,
+          "network_rx_bytes": 2269331,
+          "network_tx_bytes": 413399
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.04385161399841,
+          "cpu_seconds": 1.7378510000000063,
+          "average_cpu_cores": 0.02894303002365774,
+          "working_set_average_bytes": 145594840.6153846,
+          "working_set_peak_bytes": 149143552,
+          "network_rx_bytes": 252296,
+          "network_tx_bytes": 155784
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/polling-eight-periods-1791512487587738687.json",
+      "private_evidence_sha256": "db07a4521c49b03c9e00b37c69720fc6dfa2ff884a3e890a05d882b5cfa1afc4",
+      "scope": "60s scheduled managed input; first history excluded; new worker present in SSE and polling",
+      "database_delta": {
+        "xact_commit": 4926,
+        "blks_read": 3,
+        "blks_hit": 57438,
+        "tup_returned": 84746,
+        "tup_fetched": 28188,
+        "tup_inserted": 531,
+        "tup_updated": 1137,
+        "tup_deleted": 333
+      },
+      "wal_bytes_delta": 484883.0,
+      "stream_queue_before": {
+        "tasks": 0,
+        "active_subscriptions": 0,
+        "retained_results": 0
+      },
+      "stream_queue_after": {
+        "tasks": 0,
+        "active_subscriptions": 0,
+        "retained_results": 0
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 188416,
+        "market_stream_subscriptions": 131072,
+        "market_stream_tasks": 319488
+      },
+      "database_bytes_delta": -32768,
+      "total_average_cpu_cores": 0.9262702376428994,
+      "total_average_working_set_bytes": 1428048029.5384617,
+      "browser_evidence": "artifacts/unified-sse/cost-polling-matrix-passed.json",
+      "browser_sha256": "ecba4b23dfa69957d8b5f78e7520c1740f6a765c0e6d0d6920c781d16e6fa5a9",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "80c99bd36d1fcc8815248e26cd44d67cafd84f342d634d0e160c0c6d73d22ad8",
+      "inputs": 32,
+      "callbacks": 25,
+      "ordinary_market_http_requests": 39
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "sse-four-charts-two-connections",
+      "requested_seconds": 60,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 60.05566906929016,
+          "cpu_seconds": 18.011612,
+          "average_cpu_cores": 0.2999152666040374,
+          "working_set_average_bytes": 165192940.30769232,
+          "working_set_peak_bytes": 208465920,
+          "network_rx_bytes": 2412084,
+          "network_tx_bytes": 1000124
+        },
+        "api-second": {
+          "elapsed_seconds": 60.05647301673889,
+          "cpu_seconds": 2.9320860000000266,
+          "average_cpu_cores": 0.048822147767199016,
+          "working_set_average_bytes": 132486695.38461539,
+          "working_set_peak_bytes": 132575232,
+          "network_rx_bytes": 2383472,
+          "network_tx_bytes": 951644
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 60.05270195007324,
+          "cpu_seconds": 4.141227000000001,
+          "average_cpu_cores": 0.0689598779992105,
+          "working_set_average_bytes": 120025403.07692307,
+          "working_set_peak_bytes": 120659968,
+          "network_rx_bytes": 9202498,
+          "network_tx_bytes": 3899567
+        },
+        "postgres": {
+          "elapsed_seconds": 60.050471782684326,
+          "cpu_seconds": 3.6711460000001352,
+          "average_cpu_cores": 0.06113434068071248,
+          "working_set_average_bytes": 228676214.15384614,
+          "working_set_peak_bytes": 229289984,
+          "network_rx_bytes": 6603933,
+          "network_tx_bytes": 17422513
+        },
+        "web": {
+          "elapsed_seconds": 60.054497957229614,
+          "cpu_seconds": 0.023609999999999992,
+          "average_cpu_cores": 0.0003931429085763878,
+          "working_set_average_bytes": 5054148.923076923,
+          "working_set_peak_bytes": 5058560,
+          "network_rx_bytes": 74888,
+          "network_tx_bytes": 78115
+        },
+        "web-second": {
+          "elapsed_seconds": 60.053685426712036,
+          "cpu_seconds": 0.02224899999999999,
+          "average_cpu_cores": 0.00037048517242379897,
+          "working_set_average_bytes": 5137014.153846154,
+          "working_set_peak_bytes": 5140480,
+          "network_rx_bytes": 75109,
+          "network_tx_bytes": 77688
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.05363368988037,
+          "cpu_seconds": 0.0005070000000000352,
+          "average_cpu_cores": 8.442453334600961e-06,
+          "working_set_average_bytes": 5974173.538461538,
+          "working_set_peak_bytes": 5976064,
+          "network_rx_bytes": 2106,
+          "network_tx_bytes": 2106
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.0467574596405,
+          "cpu_seconds": 0.26778600000000097,
+          "average_cpu_cores": 0.004459624654669974,
+          "working_set_average_bytes": 113540174.76923077,
+          "working_set_peak_bytes": 113541120,
+          "network_rx_bytes": 90120,
+          "network_tx_bytes": 74640
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.03687405586243,
+          "cpu_seconds": 0.5843069999999955,
+          "average_cpu_cores": 0.009732468740066582,
+          "working_set_average_bytes": 109498368.0,
+          "working_set_peak_bytes": 109498368,
+          "network_rx_bytes": 213285,
+          "network_tx_bytes": 163371
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.037230014801025,
+          "cpu_seconds": 0.12429799999999958,
+          "average_cpu_cores": 0.0020703486814657554,
+          "working_set_average_bytes": 101754722.46153846,
+          "working_set_peak_bytes": 101765120,
+          "network_rx_bytes": 58236,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.03680467605591,
+          "cpu_seconds": 1.8125129999999672,
+          "average_cpu_cores": 0.03019003109475678,
+          "working_set_average_bytes": 105216787.6923077,
+          "working_set_peak_bytes": 105250816,
+          "network_rx_bytes": 2873705,
+          "network_tx_bytes": 429048
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.04194211959839,
+          "cpu_seconds": 1.7432120000000282,
+          "average_cpu_cores": 0.029033238074273143,
+          "working_set_average_bytes": 142043923.69230768,
+          "working_set_peak_bytes": 154480640,
+          "network_rx_bytes": 292856,
+          "network_tx_bytes": 145954
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/sse-four-charts-two-connections-1791518700813486999.json",
+      "private_evidence_sha256": "c546d32c9f2f23fb11c3e7d9555ede96901e939788218b336672cab4c41000b6",
+      "scope": "60s scheduled managed input; first history excluded; new worker present in SSE and polling",
+      "database_delta": {
+        "xact_commit": 7452,
+        "blks_read": 22,
+        "blks_hit": 88246,
+        "tup_returned": 239604,
+        "tup_fetched": 44067,
+        "tup_inserted": 665,
+        "tup_updated": 2710,
+        "tup_deleted": 531
+      },
+      "wal_bytes_delta": 1694158.0,
+      "stream_queue_before": {
+        "tasks": 3,
+        "active_subscriptions": 4,
+        "retained_results": 3
+      },
+      "stream_queue_after": {
+        "tasks": 3,
+        "active_subscriptions": 4,
+        "retained_results": 23
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 344064,
+        "market_stream_subscriptions": 122880,
+        "market_stream_tasks": 483328
+      },
+      "database_bytes_delta": 98304,
+      "total_average_cpu_cores": 0.5550894148307264,
+      "total_average_working_set_bytes": 1234600566.1538463,
+      "browser_evidence": "artifacts/unified-sse/cost-sharing-passed.json",
+      "browser_sha256": "214dc21e0c5e8989fc44d93f32cbca1a97a5ec75bd52cfc1ce592c650f64b844",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "fd621e8ba040ea880aeb7c79e2567a93c107943085536529a480f93e03f170fa",
+      "inputs": 10,
+      "callbacks": 10,
+      "ordinary_market_http_requests": 0
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "idle-worker-running",
+      "requested_seconds": 60,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 60.03674840927124,
+          "cpu_seconds": 2.184775000000002,
+          "average_cpu_cores": 0.03639062837158276,
+          "working_set_average_bytes": 174520792.6153846,
+          "working_set_peak_bytes": 174526464,
+          "network_rx_bytes": 632436,
+          "network_tx_bytes": 313826
+        },
+        "api-second": {
+          "elapsed_seconds": 60.03577947616577,
+          "cpu_seconds": 1.1310320000000047,
+          "average_cpu_cores": 0.018839298995843384,
+          "working_set_average_bytes": 131422680.61538461,
+          "working_set_peak_bytes": 131436544,
+          "network_rx_bytes": 627729,
+          "network_tx_bytes": 307685
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 60.03329634666443,
+          "cpu_seconds": 1.1933530000000019,
+          "average_cpu_cores": 0.0198781854840844,
+          "working_set_average_bytes": 189751296.0,
+          "working_set_peak_bytes": 189751296,
+          "network_rx_bytes": 429372,
+          "network_tx_bytes": 345559
+        },
+        "postgres": {
+          "elapsed_seconds": 60.032923221588135,
+          "cpu_seconds": 2.177270000000135,
+          "average_cpu_cores": 0.03626793238043051,
+          "working_set_average_bytes": 237508450.46153846,
+          "working_set_peak_bytes": 237527040,
+          "network_rx_bytes": 1774439,
+          "network_tx_bytes": 4666449
+        },
+        "web": {
+          "elapsed_seconds": 60.03223896026611,
+          "cpu_seconds": 0.0008509999999999907,
+          "average_cpu_cores": 1.4175716493986622e-05,
+          "working_set_average_bytes": 5459968.0,
+          "working_set_peak_bytes": 5459968,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "web-second": {
+          "elapsed_seconds": 60.03126239776611,
+          "cpu_seconds": 0.0008620000000000017,
+          "average_cpu_cores": 1.4359184957471067e-05,
+          "working_set_average_bytes": 5058560.0,
+          "working_set_peak_bytes": 5058560,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.027981758117676,
+          "cpu_seconds": 0.0,
+          "average_cpu_cores": 0.0,
+          "working_set_average_bytes": 5967872.0,
+          "working_set_peak_bytes": 5967872,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.029353857040405,
+          "cpu_seconds": 0.25099300000000113,
+          "average_cpu_cores": 0.004181171108350419,
+          "working_set_average_bytes": 108867899.07692307,
+          "working_set_peak_bytes": 108871680,
+          "network_rx_bytes": 90120,
+          "network_tx_bytes": 74574
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.0284686088562,
+          "cpu_seconds": 0.45852800000000116,
+          "average_cpu_cores": 0.007638509037899277,
+          "working_set_average_bytes": 109356898.46153846,
+          "working_set_peak_bytes": 109367296,
+          "network_rx_bytes": 162787,
+          "network_tx_bytes": 124943
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.02885293960571,
+          "cpu_seconds": 0.12212800000000001,
+          "average_cpu_cores": 0.0020344883171909264,
+          "working_set_average_bytes": 100078828.3076923,
+          "working_set_peak_bytes": 100085760,
+          "network_rx_bytes": 58236,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.029136180877686,
+          "cpu_seconds": 1.7047729999999888,
+          "average_cpu_cores": 0.028399092648330414,
+          "working_set_average_bytes": 104871463.38461539,
+          "working_set_peak_bytes": 104890368,
+          "network_rx_bytes": 2426422,
+          "network_tx_bytes": 420352
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.02932906150818,
+          "cpu_seconds": 1.636728000000005,
+          "average_cpu_cores": 0.02726547215483544,
+          "working_set_average_bytes": 139885331.69230768,
+          "working_set_peak_bytes": 147038208,
+          "network_rx_bytes": 268910,
+          "network_tx_bytes": 157833
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/idle-worker-running-1791514318294704672.json",
+      "private_evidence_sha256": "2463460d995148b8cf237b08879442e060d664caf5593391430a1bfdff730390",
+      "scope": "60s no tasks/subscriptions/results; only this project unified worker stopped for second sample, restored afterward",
+      "database_delta": {
+        "xact_commit": 4550,
+        "blks_read": 9,
+        "blks_hit": 31323,
+        "tup_returned": 69873,
+        "tup_fetched": 10576,
+        "tup_inserted": 480,
+        "tup_updated": 1054,
+        "tup_deleted": 360
+      },
+      "wal_bytes_delta": 364263.0,
+      "stream_queue_before": {
+        "tasks": 0,
+        "active_subscriptions": 0,
+        "retained_results": 0
+      },
+      "stream_queue_after": {
+        "tasks": 0,
+        "active_subscriptions": 0,
+        "retained_results": 0
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 262144,
+        "market_stream_subscriptions": 131072,
+        "market_stream_tasks": 393216
+      },
+      "database_bytes_delta": -16384,
+      "total_average_cpu_cores": 0.18092331339999898,
+      "total_average_working_set_bytes": 1312750040.6153846
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "idle-worker-stopped",
+      "requested_seconds": 60,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 60.07362627983093,
+          "cpu_seconds": 2.2349230000000375,
+          "average_cpu_cores": 0.03720306461257174,
+          "working_set_average_bytes": 174529929.84615386,
+          "working_set_peak_bytes": 174538752,
+          "network_rx_bytes": 636259,
+          "network_tx_bytes": 314854
+        },
+        "api-second": {
+          "elapsed_seconds": 60.064244508743286,
+          "cpu_seconds": 1.1196779999999933,
+          "average_cpu_cores": 0.01864133993788945,
+          "working_set_average_bytes": 131421735.38461539,
+          "working_set_peak_bytes": 131432448,
+          "network_rx_bytes": 631033,
+          "network_tx_bytes": 311170
+        },
+        "postgres": {
+          "elapsed_seconds": 60.055070638656616,
+          "cpu_seconds": 2.1544369999999162,
+          "average_cpu_cores": 0.03587435627147752,
+          "working_set_average_bytes": 226451771.07692307,
+          "working_set_peak_bytes": 229707776,
+          "network_rx_bytes": 1728948,
+          "network_tx_bytes": 5576963
+        },
+        "web": {
+          "elapsed_seconds": 60.054330825805664,
+          "cpu_seconds": 0.0009580000000000144,
+          "average_cpu_cores": 1.5952221710350934e-05,
+          "working_set_average_bytes": 5459968.0,
+          "working_set_peak_bytes": 5459968,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "web-second": {
+          "elapsed_seconds": 60.03370523452759,
+          "cpu_seconds": 0.0008879999999999999,
+          "average_cpu_cores": 1.4791690709926039e-05,
+          "working_set_average_bytes": 5058560.0,
+          "working_set_peak_bytes": 5058560,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.033252477645874,
+          "cpu_seconds": 0.0,
+          "average_cpu_cores": 0.0,
+          "working_set_average_bytes": 5967872.0,
+          "working_set_peak_bytes": 5967872,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.03192639350891,
+          "cpu_seconds": 0.2549689999999991,
+          "average_cpu_cores": 0.004247223357929227,
+          "working_set_average_bytes": 108867584.0,
+          "working_set_peak_bytes": 108867584,
+          "network_rx_bytes": 89369,
+          "network_tx_bytes": 74018
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.03226375579834,
+          "cpu_seconds": 0.5297089999999969,
+          "average_cpu_cores": 0.008823738550902703,
+          "working_set_average_bytes": 109372967.38461539,
+          "working_set_peak_bytes": 109375488,
+          "network_rx_bytes": 213285,
+          "network_tx_bytes": 163371
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.032090187072754,
+          "cpu_seconds": 0.12027900000000002,
+          "average_cpu_cores": 0.0020035784132317416,
+          "working_set_average_bytes": 100117897.84615384,
+          "working_set_peak_bytes": 100139008,
+          "network_rx_bytes": 58236,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.02655816078186,
+          "cpu_seconds": 2.252143999999987,
+          "average_cpu_cores": 0.037519126016980556,
+          "working_set_average_bytes": 104890998.15384616,
+          "working_set_peak_bytes": 104894464,
+          "network_rx_bytes": 3641151,
+          "network_tx_bytes": 623740
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.024986028671265,
+          "cpu_seconds": 1.8059329999999818,
+          "average_cpu_cores": 0.030086354358122933,
+          "working_set_average_bytes": 141844795.07692307,
+          "working_set_peak_bytes": 150106112,
+          "network_rx_bytes": 350853,
+          "network_tx_bytes": 214263
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/idle-worker-stopped-1791514523431441379.json",
+      "private_evidence_sha256": "b866b38f15c6424cacc96413b31d45687896f9ae29833d36d360412423a3edec",
+      "scope": "60s no tasks/subscriptions/results; only this project unified worker stopped for second sample, restored afterward",
+      "database_delta": {
+        "xact_commit": 3510,
+        "blks_read": 5,
+        "blks_hit": 28153,
+        "tup_returned": 83482,
+        "tup_fetched": 11013,
+        "tup_inserted": 344,
+        "tup_updated": 1116,
+        "tup_deleted": 497
+      },
+      "wal_bytes_delta": 346994.0,
+      "stream_queue_before": {
+        "tasks": 0,
+        "active_subscriptions": 0,
+        "retained_results": 0
+      },
+      "stream_queue_after": {
+        "tasks": 0,
+        "active_subscriptions": 0,
+        "retained_results": 0
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 262144,
+        "market_stream_subscriptions": 131072,
+        "market_stream_tasks": 393216
+      },
+      "database_bytes_delta": 24576,
+      "total_average_cpu_cores": 0.17442952543152615,
+      "total_average_working_set_bytes": 1113984078.7692308
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "composite-ema-study-initialization",
+      "requested_seconds": 10,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 10.085095405578613,
+          "cpu_seconds": 5.454732999999976,
+          "average_cpu_cores": 0.5408707385140519,
+          "working_set_average_bytes": 218972160.0,
+          "working_set_peak_bytes": 277286912,
+          "network_rx_bytes": 10024066,
+          "network_tx_bytes": 2175323
+        },
+        "api-second": {
+          "elapsed_seconds": 10.082635402679443,
+          "cpu_seconds": 0.24696999999999036,
+          "average_cpu_cores": 0.02449458798583141,
+          "working_set_average_bytes": 131441322.66666667,
+          "working_set_peak_bytes": 131448832,
+          "network_rx_bytes": 113137,
+          "network_tx_bytes": 58188
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 10.079483032226562,
+          "cpu_seconds": 4.440814,
+          "average_cpu_cores": 0.44057954022062795,
+          "working_set_average_bytes": 201025536.0,
+          "working_set_peak_bytes": 223805440,
+          "network_rx_bytes": 17789681,
+          "network_tx_bytes": 17272412
+        },
+        "postgres": {
+          "elapsed_seconds": 10.075831413269043,
+          "cpu_seconds": 1.2462470000000394,
+          "average_cpu_cores": 0.12368676577486543,
+          "working_set_average_bytes": 239673344.0,
+          "working_set_peak_bytes": 243240960,
+          "network_rx_bytes": 17854074,
+          "network_tx_bytes": 28047786
+        },
+        "web": {
+          "elapsed_seconds": 10.07442593574524,
+          "cpu_seconds": 0.028047999999999962,
+          "average_cpu_cores": 0.0027840792298132228,
+          "working_set_average_bytes": 5545301.333333333,
+          "working_set_peak_bytes": 5574656,
+          "network_rx_bytes": 1788052,
+          "network_tx_bytes": 1799753
+        },
+        "web-second": {
+          "elapsed_seconds": 10.072670221328735,
+          "cpu_seconds": 0.00018699999999999273,
+          "average_cpu_cores": 1.856508710113659e-05,
+          "working_set_average_bytes": 5058560.0,
+          "working_set_peak_bytes": 5058560,
+          "network_rx_bytes": 42,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 10.044269561767578,
+          "cpu_seconds": 0.0,
+          "average_cpu_cores": 0.0,
+          "working_set_average_bytes": 5976064.0,
+          "working_set_peak_bytes": 5976064,
+          "network_rx_bytes": 42,
+          "network_tx_bytes": 0
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 10.042036533355713,
+          "cpu_seconds": 0.04358099999999965,
+          "average_cpu_cores": 0.004339856746710753,
+          "working_set_average_bytes": 113254400.0,
+          "working_set_peak_bytes": 113344512,
+          "network_rx_bytes": 15132,
+          "network_tx_bytes": 12440
+        },
+        "history-worker": {
+          "elapsed_seconds": 10.037647247314453,
+          "cpu_seconds": 0.0974470000000025,
+          "average_cpu_cores": 0.009708151482019275,
+          "working_set_average_bytes": 109395968.0,
+          "working_set_peak_bytes": 109395968,
+          "network_rx_bytes": 36192,
+          "network_tx_bytes": 27690
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 10.0529465675354,
+          "cpu_seconds": 0.058048999999998685,
+          "average_cpu_cores": 0.005774326920970603,
+          "working_set_average_bytes": 100882432.0,
+          "working_set_peak_bytes": 101564416,
+          "network_rx_bytes": 148764,
+          "network_tx_bytes": 19942
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 10.05457353591919,
+          "cpu_seconds": 0.10331299999998578,
+          "average_cpu_cores": 0.010275224466846658,
+          "working_set_average_bytes": 104890368.0,
+          "working_set_peak_bytes": 104890368,
+          "network_rx_bytes": 10207,
+          "network_tx_bytes": 5360
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 10.052274227142334,
+          "cpu_seconds": 0.354832000000016,
+          "average_cpu_cores": 0.0352986788842198,
+          "working_set_average_bytes": 147494229.33333334,
+          "working_set_peak_bytes": 150265856,
+          "network_rx_bytes": 1424,
+          "network_tx_bytes": 1359
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/composite-ema-study-initialization-1791514950549719234.json",
+      "private_evidence_sha256": "9773fa9606ee45bf8cf858784be6928bd68860db39bcea90f1fb5007a3d1d135",
+      "scope": "10s EMA study registration/preparation on existing four-period composite chart; not full cold deployment",
+      "database_delta": {
+        "xact_commit": 1762,
+        "blks_read": 66,
+        "blks_hit": 55221,
+        "tup_returned": 165367,
+        "tup_fetched": 23756,
+        "tup_inserted": 472,
+        "tup_updated": 732,
+        "tup_deleted": 160
+      },
+      "wal_bytes_delta": 1105711.0,
+      "stream_queue_before": {
+        "tasks": 5,
+        "active_subscriptions": 5,
+        "retained_results": 4
+      },
+      "stream_queue_after": {
+        "tasks": 7,
+        "active_subscriptions": 7,
+        "retained_results": 20
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 466944,
+        "market_stream_subscriptions": 131072,
+        "market_stream_tasks": 761856
+      },
+      "database_bytes_delta": 483328,
+      "total_average_cpu_cores": 1.1978305153130582,
+      "total_average_working_set_bytes": 1383609685.3333333,
+      "browser_evidence": "artifacts/unified-sse/browser-composite-ema-resources-passed.json",
+      "browser_sha256": "28d74df000533608caa28927aaea851101f9146e7091c0d5fa59d48a75ae6928",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "f8d206681dcf982049e119ea11d3f713bf3ff47cd7fa4890bfed5de9c381a13f"
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "composite-ema-stable-quotes",
+      "requested_seconds": 16,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 16.061380624771118,
+          "cpu_seconds": 8.851132000000007,
+          "average_cpu_cores": 0.5510816415339226,
+          "working_set_average_bytes": 233494755.55555555,
+          "working_set_peak_bytes": 293675008,
+          "network_rx_bytes": 2570025,
+          "network_tx_bytes": 1512664
+        },
+        "api-second": {
+          "elapsed_seconds": 16.058170557022095,
+          "cpu_seconds": 0.2951759999999979,
+          "average_cpu_cores": 0.01838167049925373,
+          "working_set_average_bytes": 131442005.33333333,
+          "working_set_peak_bytes": 131448832,
+          "network_rx_bytes": 160919,
+          "network_tx_bytes": 74840
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 16.058411598205566,
+          "cpu_seconds": 5.065358999999997,
+          "average_cpu_cores": 0.3154333770200548,
+          "working_set_average_bytes": 226010908.44444445,
+          "working_set_peak_bytes": 226848768,
+          "network_rx_bytes": 20700016,
+          "network_tx_bytes": 19102629
+        },
+        "postgres": {
+          "elapsed_seconds": 16.06513500213623,
+          "cpu_seconds": 1.629500999999891,
+          "average_cpu_cores": 0.10143089365780066,
+          "working_set_average_bytes": 248498403.55555555,
+          "working_set_peak_bytes": 251965440,
+          "network_rx_bytes": 19920052,
+          "network_tx_bytes": 24872311
+        },
+        "web": {
+          "elapsed_seconds": 16.059504508972168,
+          "cpu_seconds": 0.008469000000000004,
+          "average_cpu_cores": 0.0005273512638742073,
+          "working_set_average_bytes": 5530055.111111111,
+          "working_set_peak_bytes": 5537792,
+          "network_rx_bytes": 1137203,
+          "network_tx_bytes": 1142375
+        },
+        "web-second": {
+          "elapsed_seconds": 16.058964014053345,
+          "cpu_seconds": 0.00016800000000000148,
+          "average_cpu_cores": 1.0461446943463051e-05,
+          "working_set_average_bytes": 5058560.0,
+          "working_set_peak_bytes": 5058560,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 16.076713800430298,
+          "cpu_seconds": 0.0004450000000000287,
+          "average_cpu_cores": 2.7679786150582475e-05,
+          "working_set_average_bytes": 5972423.111111111,
+          "working_set_peak_bytes": 5976064,
+          "network_rx_bytes": 1188,
+          "network_tx_bytes": 1188
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 16.079978704452515,
+          "cpu_seconds": 0.07102199999999925,
+          "average_cpu_cores": 0.004416796894160899,
+          "working_set_average_bytes": 113482410.66666667,
+          "working_set_peak_bytes": 113483776,
+          "network_rx_bytes": 24032,
+          "network_tx_bytes": 19904
+        },
+        "history-worker": {
+          "elapsed_seconds": 16.089272499084473,
+          "cpu_seconds": 0.15365100000000353,
+          "average_cpu_cores": 0.009549903515447745,
+          "working_set_average_bytes": 109395968.0,
+          "working_set_peak_bytes": 109395968,
+          "network_rx_bytes": 57840,
+          "network_tx_bytes": 44304
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 16.094308853149414,
+          "cpu_seconds": 0.04042800000000035,
+          "average_cpu_cores": 0.002511943841073312,
+          "working_set_average_bytes": 101568967.1111111,
+          "working_set_peak_bytes": 101572608,
+          "network_rx_bytes": 19412,
+          "network_tx_bytes": 12988
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 16.09849977493286,
+          "cpu_seconds": 0.6428610000000106,
+          "average_cpu_cores": 0.0399329756801945,
+          "working_set_average_bytes": 104898560.0,
+          "working_set_peak_bytes": 104964096,
+          "network_rx_bytes": 1185042,
+          "network_tx_bytes": 188151
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 16.10003161430359,
+          "cpu_seconds": 0.48573200000001293,
+          "average_cpu_cores": 0.030169630199264885,
+          "working_set_average_bytes": 139987171.55555555,
+          "working_set_peak_bytes": 146018304,
+          "network_rx_bytes": 181680,
+          "network_tx_bytes": 91713
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/composite-ema-stable-quotes-1791515009682140022.json",
+      "private_evidence_sha256": "67c90d120be10c52af516c05bb0be2e839bbdef0067e85f11819905cf3a2196a",
+      "scope": "16s ordinary same-source-minute window 1; six quotes, four native bar periods plus EMA31; no history reload, boundary recovery excluded",
+      "database_delta": {
+        "xact_commit": 2430,
+        "blks_read": 57,
+        "blks_hit": 44303,
+        "tup_returned": 192546,
+        "tup_fetched": 14278,
+        "tup_inserted": 293,
+        "tup_updated": 933,
+        "tup_deleted": 410
+      },
+      "wal_bytes_delta": 1806340.0,
+      "stream_queue_before": {
+        "tasks": 7,
+        "active_subscriptions": 5,
+        "retained_results": 68
+      },
+      "stream_queue_after": {
+        "tasks": 7,
+        "active_subscriptions": 5,
+        "retained_results": 89
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 819200,
+        "market_stream_subscriptions": 139264,
+        "market_stream_tasks": 2564096
+      },
+      "database_bytes_delta": 450560,
+      "total_average_cpu_cores": 1.0734743253381414,
+      "total_average_working_set_bytes": 1425340188.4444444,
+      "browser_evidence": "artifacts/unified-sse/browser-composite-ema-resources-passed.json",
+      "browser_sha256": "28d74df000533608caa28927aaea851101f9146e7091c0d5fa59d48a75ae6928",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "f8d206681dcf982049e119ea11d3f713bf3ff47cd7fa4890bfed5de9c381a13f"
+    },
+    {
+      "project": "mw-unified-sse-20261008",
+      "environment": "Ubuntu local Docker",
+      "scenario": "composite-ema-stable-quotes",
+      "requested_seconds": 16,
+      "images": {
+        "sha256:099d1324a49041b330411e9e8d6d1290818aafa7db4f06279479b27630729166": {
+          "logical_bytes": 304280875,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872": {
+          "logical_bytes": 433027399,
+          "commit": null
+        },
+        "sha256:156f9ab6754b7efd37ce6937aab26e86575138775d521cf799c3fd24e2b2879a": {
+          "logical_bytes": 64091282,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        },
+        "sha256:85c5f2af9a7147d779e58b4042eb7f053a6e8236e70a60e5b481e337741baed0": {
+          "logical_bytes": 104753146,
+          "commit": "95d501e571a791400517214b3dd78ec2b6c10a66"
+        }
+      },
+      "limits": [
+        "Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
+        "Database counters include all activity in this isolated project, including fixture writes.",
+        "This probe does not run or simulate a workload; record the workload separately.",
+        "Container network totals count internal traffic at both ends; do not sum as external bandwidth.",
+        "Browser and host fixture processes are outside these container CPU/memory counters.",
+        "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."
+      ],
+      "summary": {
+        "api": {
+          "elapsed_seconds": 16.061295986175537,
+          "cpu_seconds": 8.741014000000007,
+          "average_cpu_cores": 0.5442284363306469,
+          "working_set_average_bytes": 218117916.44444445,
+          "working_set_peak_bytes": 284200960,
+          "network_rx_bytes": 2566015,
+          "network_tx_bytes": 1513542
+        },
+        "api-second": {
+          "elapsed_seconds": 16.061989545822144,
+          "cpu_seconds": 0.33631800000000567,
+          "average_cpu_cores": 0.020938751020883634,
+          "working_set_average_bytes": 131440184.8888889,
+          "working_set_peak_bytes": 131448832,
+          "network_rx_bytes": 169351,
+          "network_tx_bytes": 84344
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 16.06231427192688,
+          "cpu_seconds": 5.014915000000002,
+          "average_cpu_cores": 0.3122162171091924,
+          "working_set_average_bytes": 226912938.66666666,
+          "working_set_peak_bytes": 227909632,
+          "network_rx_bytes": 20709770,
+          "network_tx_bytes": 19086998
+        },
+        "postgres": {
+          "elapsed_seconds": 16.058554649353027,
+          "cpu_seconds": 1.478605000000016,
+          "average_cpu_cores": 0.09207584569633646,
+          "working_set_average_bytes": 253264327.1111111,
+          "working_set_peak_bytes": 254803968,
+          "network_rx_bytes": 19646679,
+          "network_tx_bytes": 23552134
+        },
+        "web": {
+          "elapsed_seconds": 16.06198263168335,
+          "cpu_seconds": 0.009279000000000037,
+          "average_cpu_cores": 0.0005776995413814345,
+          "working_set_average_bytes": 5584668.444444444,
+          "working_set_peak_bytes": 5857280,
+          "network_rx_bytes": 1138489,
+          "network_tx_bytes": 1144531
+        },
+        "web-second": {
+          "elapsed_seconds": 16.063961505889893,
+          "cpu_seconds": 0.00016599999999999948,
+          "average_cpu_cores": 1.0333690101232823e-05,
+          "working_set_average_bytes": 5058560.0,
+          "working_set_peak_bytes": 5058560,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "chart-origin": {
+          "elapsed_seconds": 16.070639610290527,
+          "cpu_seconds": 0.0,
+          "average_cpu_cores": 0.0,
+          "working_set_average_bytes": 5967872.0,
+          "working_set_peak_bytes": 5967872,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 16.073126316070557,
+          "cpu_seconds": 0.07158500000000245,
+          "average_cpu_cores": 0.004453707299520747,
+          "working_set_average_bytes": 113538389.33333333,
+          "working_set_peak_bytes": 113541120,
+          "network_rx_bytes": 24032,
+          "network_tx_bytes": 19904
+        },
+        "history-worker": {
+          "elapsed_seconds": 16.083211660385132,
+          "cpu_seconds": 0.15284099999999512,
+          "average_cpu_cores": 0.009503139250256884,
+          "working_set_average_bytes": 109400519.1111111,
+          "working_set_peak_bytes": 109404160,
+          "network_rx_bytes": 57840,
+          "network_tx_bytes": 44304
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 16.07879948616028,
+          "cpu_seconds": 0.04234199999999966,
+          "average_cpu_cores": 0.0026334055621780256,
+          "working_set_average_bytes": 101568967.1111111,
+          "working_set_peak_bytes": 101572608,
+          "network_rx_bytes": 19412,
+          "network_tx_bytes": 12988
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 16.077685594558716,
+          "cpu_seconds": 0.15224600000001942,
+          "average_cpu_cores": 0.009469397762793987,
+          "working_set_average_bytes": 104890368.0,
+          "working_set_peak_bytes": 104890368,
+          "network_rx_bytes": 16264,
+          "network_tx_bytes": 8576
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 16.07683277130127,
+          "cpu_seconds": 0.3561990000000037,
+          "average_cpu_cores": 0.022156043112910525,
+          "working_set_average_bytes": 144513706.66666666,
+          "working_set_peak_bytes": 147529728,
+          "network_rx_bytes": 1382,
+          "network_tx_bytes": 1507
+        }
+      },
+      "private_evidence": "artifacts/unified-sse/resources/composite-ema-stable-quotes-1791515075188370928.json",
+      "private_evidence_sha256": "73dc58be5d2a8f4e3f12bdcf1c8f6f4414afc00df6588b43829da8f40543c624",
+      "scope": "16s ordinary same-source-minute window 2; six quotes, four native bar periods plus EMA31; no history reload, boundary recovery excluded",
+      "database_delta": {
+        "xact_commit": 2368,
+        "blks_read": 13,
+        "blks_hit": 41220,
+        "tup_returned": 155020,
+        "tup_fetched": 13663,
+        "tup_inserted": 469,
+        "tup_updated": 896,
+        "tup_deleted": 259
+      },
+      "wal_bytes_delta": 1160481.0,
+      "stream_queue_before": {
+        "tasks": 7,
+        "active_subscriptions": 5,
+        "retained_results": 109
+      },
+      "stream_queue_after": {
+        "tasks": 7,
+        "active_subscriptions": 5,
+        "retained_results": 130
+      },
+      "stream_table_bytes_after": {
+        "market_stream_clients": 90112,
+        "market_stream_results": 966656,
+        "market_stream_subscriptions": 139264,
+        "market_stream_tasks": 1179648
+      },
+      "database_bytes_delta": -1351680,
+      "total_average_cpu_cores": 1.0182629763762021,
+      "total_average_working_set_bytes": 1420258417.7777777,
+      "browser_evidence": "artifacts/unified-sse/browser-composite-ema-resources-passed.json",
+      "browser_sha256": "28d74df000533608caa28927aaea851101f9146e7091c0d5fa59d48a75ae6928",
+      "runtime_image_commit": "95d501e571a791400517214b3dd78ec2b6c10a66",
+      "harness_sha256": "f8d206681dcf982049e119ea11d3f713bf3ff47cd7fa4890bfed5de9c381a13f"
+    }
+  ],
+  "legacy_exploratory_reports": [
     {
       "project": "mw-unified-sse-20261008",
       "environment": "Ubuntu local Docker",
@@ -427,5 +2225,6 @@
       "private_evidence_sha256": "a4fba12809a4381936329854962e7c258b1f3478194369f3506cd2324292da1c",
       "database_bytes_after": 56872283
     }
-  ]
+  ],
+  "legacy_limits": "Exploratory reports are not matched baselines. managed-quotes-browser includes a web counter reset and negative deltas; invalid for project totals."
 }

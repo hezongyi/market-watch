@@ -12,11 +12,13 @@ import socket
 import subprocess
 import time
 from pathlib import Path
+from urllib.parse import quote
 
 TASK = "mw-unified-sse-20261008"
 SERVICES = ("api", "api-second", "market-stream-worker", "postgres", "web",
             "web-second", "chart-origin", "composite-aggregate-worker",
             "history-worker", "native-history-worker", "chart-aggregation-worker", "realtime-worker")
+OPTIONAL_SERVICES = ("provider-history-worker", "pricing-worker")
 
 
 class LocalDocker(http.client.HTTPConnection):
@@ -91,7 +93,10 @@ def main():
     if os.getenv("DOCKER_HOST", "unix:///var/run/docker.sock") != "unix:///var/run/docker.sock":
         raise SystemExit("Local Docker socket required")
     containers = {}
-    for service in SERVICES:
+    filters = quote(json.dumps({"label": [f"com.docker.compose.project={TASK}"]}))
+    existing = docker_json(f"/containers/json?all=true&filters={filters}")
+    existing_services = {row["Labels"].get("com.docker.compose.service") for row in existing}
+    for service in (*SERVICES, *(name for name in OPTIONAL_SERVICES if name in existing_services)):
         item = docker_json(f"/containers/{TASK}-{service}-1/json")
         labels = item["Config"]["Labels"]
         if labels.get("com.docker.compose.project") != TASK or labels.get("com.docker.compose.service") != service:

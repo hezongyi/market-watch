@@ -25,6 +25,14 @@ const frames = ['M1','W1','MN','D1'];
 const resolutions = ['1','1W','1M','1D'];
 let keeper, keeping, bid = '1.12000', browser;
 const indicators = process.argv.includes('--indicators');
+const resources = process.argv.includes('--resources');
+assert.ok(!resources || !process.argv.includes('--lifecycle'), 'Resource windows require ordinary updates');
+
+function resourceProbe(scenario, seconds) {
+  return run('python',[path.join(root,'scripts/unified_sse_resources.py'),
+    '--scenario',scenario,'--seconds',String(seconds),'--interval','2'],
+    {cwd:root,timeout:(seconds+30)*1000,maxBuffer:1024*1024}).then(result=>JSON.parse(result.stdout));
+}
 
 async function fixture(action,...args) {
   const child = run('docker',[...compose,'exec','-T','api','python','-',action,...args],
@@ -131,13 +139,29 @@ function preflight() {
       feed.subscribeBars=(s,res,cb,id,reset)=>original(s,res,wrap(cb,res,s.ticker),id,reset);
     });
     let indicatorTicker;
+    let initializationProbe;
     if (indicators) {
+      if (resources) initializationProbe = resourceProbe('composite-ema-study-initialization',10);
       await frame.evaluate(()=>{widget.setActiveChart(0);});
       assert.ok(await frame.evaluate(()=>widget.activeChart().createStudy('守望 Python EMA',false,false,{period:31})));
       await frame.waitForFunction(()=>[...subscriptions.values()].some(sub=>
         decode(sub.symbol).spec?.name==='EMA' && sub.marketListener && sub.last),null,{timeout:120000});
       indicatorTicker = await frame.evaluate(()=>[...subscriptions.values()].find(sub=>decode(sub.symbol).spec?.name==='EMA').symbol);
       report.indicator = {name:'EMA',period:31};
+    }
+    if (initializationProbe) report.initialization_resources = await initializationProbe;
+    if (resources) {
+      // Measure chart demand alone; do not include the native default watchlist.
+      await frame.evaluate(()=>{
+        for (const id of [...quoteSubscriptions.keys()]) feed.unsubscribeQuotes(id);
+      });
+      const ownClient = await frame.evaluate(()=>clientId);
+      await expect.poll(async()=>{
+        const sql = "SELECT coalesce(json_agg(DISTINCT c.client),'[]'::json) FROM market_stream_subscriptions s JOIN market_stream_clients c ON c.id=s.client_id WHERE s.active AND s.expires>extract(epoch FROM clock_timestamp())*1000";
+        const result = await run('docker',['exec',task+'-postgres-1','psql','-U','alerts','-d','alerts',
+          '-X','-A','-t','-v','ON_ERROR_STOP=1','-c',sql],{cwd:root,timeout:20000});
+        return JSON.parse(result.stdout).every(client=>client===ownClient);
+      },{timeout:130000}).toBe(true);
     }
     report.checks.push('real composite first screen and four native periods M1/D1/W1/MN');
     if (!process.argv.includes('--lifecycle')) {
@@ -192,10 +216,15 @@ function preflight() {
         'Ordinary composite updates must not poll or reload history');
     }
     let measurement = await beginOrdinaryWindow();
+    let ordinaryProbe = resources ? resourceProbe(indicators ? 'composite-ema-stable-quotes' :
+      'composite-stable-quotes',16) : null;
     for (let index=1;index<=12;index++) {
       if (index===7) {
+        if (ordinaryProbe) measurement.resources = await ordinaryProbe;
         finishOrdinaryWindow(measurement);
         measurement = await beginOrdinaryWindow();
+        ordinaryProbe = resources ? resourceProbe(indicators ? 'composite-ema-stable-quotes' :
+          'composite-stable-quotes',16) : null;
       }
       await keeping;
       clearInterval(keeper);
@@ -225,6 +254,7 @@ function preflight() {
       }
     }
     await page.waitForTimeout(Math.max(0,16000-(Date.now()-measurement.start)));
+    if (ordinaryProbe) measurement.resources = await ordinaryProbe;
     finishOrdinaryWindow(measurement);
     report.measurement_end = Date.now();
     const expected = (await fixture('state')).expected;
