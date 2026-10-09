@@ -39,6 +39,10 @@ def _status(encoded_identity, encoded_profile, minute):
             c.start <= value and value + 1 <= c.end for c in session.weekly_closures)
 
     if not closed(moment):
+        # The excluded minute adjoining a fully closed interior is a boundary,
+        # not independently verified trading time. Collection stays conservative.
+        if closed(moment - timedelta(minutes=1)) or closed(moment + timedelta(minutes=1)):
+            return unknown
         return {'market_session': 'scheduled_open', 'next_session_at': None, 'calendar_verified': True}
     # Evaluate closure endpoints, including DST in the source timezone. Split
     # week-boundary closures do not fabricate a reopening at Monday midnight.

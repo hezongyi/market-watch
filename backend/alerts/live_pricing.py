@@ -16,7 +16,7 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from .calendar_profile import session_from
 from .config import settings
 from .live_session import effective_profile, session_status
-from .market_contracts import DatasetIdentity, QuoteEvent
+from .market_contracts import DatasetIdentity, MarketRequestError, QuoteEvent, RequestResult
 from .market_datasets import register_dataset
 from .storage import (
     Audit,
@@ -146,9 +146,9 @@ def startup_failed(ownership, account, result, *, now=None):
         raise ValueError('Startup ownership account mismatch')
     with transaction() as db:
         owner = lock_owner(db, ownership, now=stamp)
-        if owner.error == 'unauthorized':
-            from .market_contracts import RequestResult
-            result = RequestResult(status='unauthorized')
+        if owner.error == 'unauthorized' or (
+                owner.error == 'provider_maintenance' and result.status != 'unauthorized'):
+            result = RequestResult(status=owner.error)
         owner.failures = min(owner.failures + 1, 10)
         owner.error = result.status
         db.merge(Preference(key='oanda_probe_status:' + owner.id, value={}))
@@ -205,6 +205,8 @@ def park_closed(ownership, identities, seconds, *, now=None):
         owner = lock_owner(db, ownership, now=stamp)
         if owner.error == 'unauthorized':
             raise TimeoutError('Authentication hold cannot be released by closure')
+        if owner.error == 'provider_maintenance':
+            raise MarketRequestError(RequestResult(status='provider_maintenance'))
         owner.next_at = stamp + int(seconds * 1000)
         owner.expires, owner.token, owner.error, owner.failures = 0, None, None, 0
         for identity in identities.values():
@@ -266,6 +268,9 @@ def begin_connection(ownership, identities, *, now=None):
         owner = lock_owner(db, ownership, now=stamp)
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
+        if owner.error == 'provider_maintenance':
+            # Only a newly claimed connection epoch retires the prior pause.
+            owner.error = None
         owner.epoch += 1
         owner.connected_at = stamp
         scopes = {identity.account_scope for identity in identities.values()}
@@ -317,6 +322,8 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         owner = lock_owner(db, ownership, epoch, now=stamp)
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
+        if owner.error == 'provider_maintenance':
+            return 'rejected_provider_maintenance'
         owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
         if not isinstance(event, QuoteEvent):
             if event.get("type") != "heartbeat" or event.get("connection_epoch") != epoch:
@@ -396,11 +403,12 @@ def disconnected(ownership, epoch, identities, result, *, now=None, intentional=
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
-        owner.failures = 0 if intentional else min(owner.failures + 1, 10)
-        if owner.error == 'unauthorized':
-            from .market_contracts import RequestResult
-            result = RequestResult(status='unauthorized')
+        if owner.error == 'unauthorized' or (
+                owner.error == 'provider_maintenance' and result.status != 'unauthorized'):
+            result = RequestResult(status=owner.error)
+        if result.status in ('unauthorized', 'provider_maintenance'):
             intentional = False
+        owner.failures = 0 if intentional else min(owner.failures + 1, 10)
         owner.next_at = 0 if intentional else _retry_at(result, stamp, owner.failures)
         owner.error = None if intentional else result.status
         db.merge(Preference(key='oanda_probe_status:' + owner.id, value={}))
@@ -487,6 +495,8 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
         owner = lock_owner(db, ownership, epoch, now=stamp)
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
+        if owner.error == 'provider_maintenance' and batch.result.status != 'unauthorized':
+            raise MarketRequestError(RequestResult(status='provider_maintenance'))
         state = db.get(LiveState, batch.identity.key)
         if not state or state.epoch != epoch:
             raise TimeoutError("Confirmation generation is obsolete")
@@ -510,8 +520,10 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
             state.error = batch.result.status
             state.next_confirm_at = max(stamp + min(60000, 1000 * 2 ** min(state.attempts, 6)),
                                          batch.result.retry_at or 0)
-            if batch.result.status == "unauthorized":
-                owner.error = "unauthorized"
+            if batch.result.status in ('unauthorized', 'provider_maintenance'):
+                # Fence every symbol immediately, before the stream thread
+                # observes the confirmation thread's connection-stop event.
+                owner.error = batch.result.status
                 db.merge(Preference(key='oanda_probe_status:' + owner.id, value={}))
                 owner.next_at = _retry_at(batch.result, stamp, owner.failures)
                 state.ready = False

@@ -102,13 +102,21 @@ def confirm_pages(adapter, ownership, epoch, identities, cancelled):
                 window = confirmation_window(ownership, epoch, identity)
                 if window and session_states({identity.provider_symbol: identity})[identity.provider_symbol]['market_session'] != 'closed':
                     pending.append(pool.submit(fetch, identity, window))
+            failure = None
             for future in pending:
                 batch = future.result()
-                if cancelled():
-                    return None
+                # Both requests are already issued. Observe any second 401
+                # even after the first maintenance fault, without committing
+                # in-flight successes or submitting another pair.
+                if failure and (failure.status == 'unauthorized' or batch.result.status != 'unauthorized'):
+                    continue
+                if cancelled() and batch.result.status not in ('unauthorized', 'provider_maintenance'):
+                    continue
                 commit_confirmation(ownership, epoch, batch)
                 if batch.result.status in ('unauthorized', 'provider_maintenance'):
-                    return batch.result
+                    failure = batch.result
+            if failure:
+                return failure
     return None
 
 
@@ -210,11 +218,14 @@ def collect(adapter, ownership, identities, stopped):
         guardian.join(timeout=6)
         if not lost.is_set():
             try:
-                delay = closed_delay(identities) if closed_stop.is_set() else None
+                failure = (result if result.status == 'unauthorized' else
+                           maintenance_error[-1] if maintenance_error else result)
+                delay = (closed_delay(identities) if closed_stop.is_set() and failure.status not in (
+                    'unauthorized', 'provider_maintenance') else None)
                 if delay is not None:
                     park_closed(ownership, identities, delay)
                 else:
-                    disconnected(ownership, epoch, identities, maintenance_error[-1] if maintenance_error else result,
+                    disconnected(ownership, epoch, identities, failure,
                                  intentional=intentional_stop.is_set())
             except TimeoutError:
                 pass

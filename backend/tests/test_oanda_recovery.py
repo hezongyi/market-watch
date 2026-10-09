@@ -7,12 +7,138 @@ import pytest
 from alerts import live_pricing as live
 from alerts import oanda_worker
 from alerts.config import settings
-from alerts.market_contracts import DatasetIdentity, RequestResult, failed_request
+from alerts.market_contracts import (
+    DatasetIdentity,
+    MarketRequestError,
+    RequestResult,
+    failed_request,
+)
 from alerts.oanda_stream import OandaPractice
-from alerts.storage import Instrument, LiveState, MarketDataset, PricingOwner
+from alerts.storage import Instrument, LiveState, MarketDataset, PricingOwner, SignalRow
+from sqlalchemy import select
+from test_live_pricing import candles, quote
 from test_live_pricing import running as _running
 
 running = _running
+
+
+def assert_maintenance_fence(factory, ownership, epoch, identities, monkeypatch):
+    from alerts.service import create_watch
+
+    monkeypatch.setattr(settings, 'oanda_account_id', 'test-account')
+    first, other = identities['EUR_USD'], identities['XAU_USD']
+    for identity in identities.values():
+        live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
+    with factory.begin() as db:
+        inst = db.get(MarketDataset, first.key).instrument_id
+        create_watch(db, inst, 'Maintenance crossing', {'kind': 'price', 'timeframe': 'tick',
+            'direction': 'buy', 'level': '1.25'}, armed_at=0, use_history=False)
+    live.publish_event(ownership, epoch, quote(first, epoch, source=126000, bid='1.20'),
+                       identities, now=126000)
+    live.commit_confirmation(ownership, epoch, candles(first, rows=(), checkpoint=0,
+        result=RequestResult(status='provider_maintenance')), now=126001)
+    # Model the stream thread's fresh crossing before connection_stop is set.
+    assert live.publish_event(ownership, epoch, quote(first, epoch, seq=2, source=127000,
+        bid='1.30'), identities, now=127000) == 'rejected_provider_maintenance'
+    with pytest.raises(MarketRequestError):
+        live.commit_confirmation(ownership, epoch, candles(other), now=127000)
+    rows = live.snapshots(now=127000)
+    assert rows and all(row['connection_error'] == 'provider_maintenance' for row in rows)
+    assert all(not row['quote_ready'] and not row['candle_ready'] for row in rows)
+    with factory.begin() as db:
+        assert db.scalar(select(SignalRow)) is None
+        assert not db.get(LiveState, first.key).ready
+    live.disconnected(ownership, epoch, identities, RequestResult(status='unavailable'),
+                      now=127001, intentional=True)
+    assert live.claim('test-account', now=127002) is None
+    due = 127001 + settings.oanda_maintenance_probe_seconds * 1000
+    successor = live.claim('test-account', now=due)
+    assert successor
+    next_epoch = live.begin_connection(successor, identities, now=due)
+    assert next_epoch > epoch
+    with factory.begin() as db:
+        assert db.get(PricingOwner, ownership[0]).error is None
+        assert all(not db.get(LiveState, identity.key).ready for identity in identities.values())
+
+
+def test_maintenance_confirmation_fences_crossing_and_other_symbol_before_stream_stop(running, monkeypatch):
+    factory, ownership, epoch, identities = running
+    assert_maintenance_fence(factory, ownership, epoch, identities, monkeypatch)
+
+
+@pytest.mark.parametrize('stage', ['confirmation', 'startup', 'disconnect', 'intentional_disconnect'])
+def test_new_unauthorized_upgrades_maintenance_without_losing_auth_hold(running, stage):
+    factory, ownership, epoch, identities = running
+    identity = identities['EUR_USD']
+    live.commit_confirmation(ownership, epoch, candles(identity, rows=(), checkpoint=0,
+        result=RequestResult(status='provider_maintenance')), now=125001)
+    result = RequestResult(status='unauthorized')
+    if stage == 'confirmation':
+        live.commit_confirmation(ownership, epoch, candles(identity, rows=(), checkpoint=0,
+            result=result), now=125002)
+    elif stage == 'startup':
+        live.startup_failed(ownership, 'test-account', result, now=125002)
+    else:
+        live.disconnected(ownership, epoch, identities, result, now=125002,
+                          intentional=stage == 'intentional_disconnect')
+    with factory.begin() as db:
+        assert db.get(PricingOwner, ownership[0]).error == 'unauthorized'
+    assert live.claim('test-account', now=125003) is None
+
+
+def test_stream_unauthorized_wins_over_concurrent_rest_maintenance(running, monkeypatch):
+    import threading
+
+    factory, ownership, _, identities = running
+    confirmed = threading.Event()
+    original = oanda_worker.commit_confirmation
+
+    def commit(*args, **kwargs):
+        original(*args, **kwargs)
+        confirmed.set()
+
+    monkeypatch.setattr(oanda_worker, 'commit_confirmation', commit)
+
+    class Adapter:
+        account_id = 'test-account'
+
+        def page(self, identity, start, end):
+            return candles(identity, window_start=start, window_end=end, rows=(), checkpoint=start,
+                           result=RequestResult(status='provider_maintenance'))
+
+        def stream(self, *args, **kwargs):
+            assert confirmed.wait(5)
+            raise MarketRequestError(RequestResult(status='unauthorized'))
+            yield  # Keep the actual worker's generator contract.
+
+    oanda_worker.collect(Adapter(), ownership, identities, threading.Event())
+    with factory.begin() as db:
+        assert db.get(PricingOwner, ownership[0]).error == 'unauthorized'
+
+
+@pytest.mark.parametrize('statuses,expected', [
+    (('provider_maintenance', 'unauthorized'), 'unauthorized'),
+    (('unauthorized', 'provider_maintenance'), 'unauthorized'),
+    (('provider_maintenance', 'data'), 'provider_maintenance'),
+])
+def test_already_issued_confirmation_pair_preserves_strongest_fault(running, statuses, expected):
+    factory, ownership, epoch, identities = running
+    calls = []
+    results = dict(zip(identities, statuses))
+
+    class Adapter:
+        def page(self, identity, start, end):
+            calls.append(identity.provider_symbol)
+            status = results[identity.provider_symbol]
+            return candles(identity, window_start=start, window_end=end,
+                **({'rows': (), 'checkpoint': start} if status != 'data' else {}),
+                result=RequestResult(status=status))
+
+    failure = oanda_worker.confirm_pages(Adapter(), ownership, epoch, identities, lambda: False)
+    assert failure.status == expected and set(calls) == set(identities)
+    with factory.begin() as db:
+        assert db.get(PricingOwner, ownership[0]).error == expected
+        assert all(not db.get(LiveState, identity.key).ready for identity in identities.values())
 
 
 def client_for(*, summary_id="test-account", pricing_code=200, pricing_payload=None):

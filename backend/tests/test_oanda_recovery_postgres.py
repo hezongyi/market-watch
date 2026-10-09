@@ -11,7 +11,7 @@ from alerts.market_contracts import RequestResult
 from alerts.oanda_stream import OandaPractice
 from alerts.storage import LiveState, PricingOwner
 from sqlalchemy import select
-from test_oanda_recovery import client_for, profile
+from test_oanda_recovery import assert_maintenance_fence, client_for, profile
 from test_provider_postgres import provider_pg as _provider_pg
 
 provider_pg = _provider_pg
@@ -21,6 +21,15 @@ pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Isol
 def catalog(account='test-account'):
     live.ensure_catalog([{'name': 'EUR_USD', 'displayPrecision': 5}, {'name': 'XAU_USD', 'displayPrecision': 3}], account)
     return live.desired_datasets(account)
+
+
+def test_maintenance_fences_all_symbols_and_recovers_only_in_new_epoch(provider_pg, monkeypatch):
+    factory, _ = provider_pg
+    monkeypatch.setattr(live, 'now_ms', lambda: 125000)
+    identities = catalog()
+    ownership = live.claim('test-account', now=125000)
+    epoch = live.begin_connection(ownership, identities, now=125000)
+    assert_maintenance_fence(factory, ownership, epoch, identities, monkeypatch)
 
 
 def test_only_one_auth_probe_and_old_network_result_cannot_clear_successor(provider_pg, monkeypatch):
