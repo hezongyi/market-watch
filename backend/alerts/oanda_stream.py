@@ -166,6 +166,49 @@ class OandaPractice:
             trace.rest_failed("catalog", error, response)
             raise
 
+    def _account_json(self, endpoint, *, params=None):
+        with request_slot('oanda'):
+            response = self.rest.get(
+                'https://api-fxpractice.oanda.com/v3/accounts/' + self.account_id + '/' + endpoint,
+                headers=self.headers, params=params)
+        response.raise_for_status()
+        return response.json()
+
+    def validate_access(self, symbols):
+        """A closed-market snapshot proves auth only, never quote freshness."""
+        import hashlib
+
+        from .market_contracts import DatasetIdentity
+
+        symbols = sorted(set(symbols))
+        if not symbols or len(symbols) > 200:
+            raise ValueError('A bounded account pricing probe requires instruments')
+        summary = self._account_json('summary')
+        if summary.get('account', {}).get('id') != self.account_id:
+            raise ValueError('OANDA configured account summary mismatch')
+        catalog = self.catalog()
+        if not set(symbols) <= {row['name'] for row in catalog}:
+            raise ValueError('OANDA configured account instruments mismatch')
+        payload = self._account_json('pricing', params={'instruments': ','.join(symbols)})
+        prices = payload.get('prices')
+        if not isinstance(prices, list):
+            raise ValueError('Invalid OANDA pricing probe')
+        scope = 'sha256:' + hashlib.sha256(self.account_id.encode()).hexdigest()
+        identities = {symbol: DatasetIdentity(source='oanda', channel='v20', environment='practice',
+            account_scope=scope, provider_symbol=symbol, basis='bid', calendar_version='auth-probe')
+            for symbol in symbols}
+        seen = set()
+        for raw in prices:
+            if not isinstance(raw, dict) or raw.get('instrument') not in identities or raw['instrument'] in seen:
+                raise ValueError('OANDA pricing probe instrument mismatch')
+            event = price_event(raw, identities, epoch=1, sequence=1, received_at=self.clock())
+            if not isinstance(event, QuoteEvent):
+                raise ValueError('OANDA pricing probe requires prices')
+            seen.add(raw['instrument'])
+        if seen != set(symbols):
+            raise ValueError('OANDA pricing probe is incomplete')
+        return catalog
+
     def page(self, identity, start, end):
         if (identity.source, identity.environment, identity.channel, identity.basis) != (
                 "oanda", "practice", "v20", "bid"):

@@ -1,0 +1,37 @@
+[
+  {
+    "service": "api",
+    "running": true,
+    "health": "healthy",
+    "restarts": 0,
+    "image_id": "sha256:11b555f8e4e77a7d0cceeccf9f27f99ea089ac2010aa9fda6b3267e7e407d1a4"
+  },
+  {
+    "service": "web",
+    "running": true,
+    "health": null,
+    "restarts": 0,
+    "image_id": "sha256:79526553349c01cb530af21269041baf2337a01f74c27ef8b560e9b439bf36b8"
+  },
+  {
+    "service": "chart-origin",
+    "running": true,
+    "health": null,
+    "restarts": 0,
+    "image_id": "sha256:2c9a82fdad0d306f8434b38770cdfcb9710db0ced091f3e4a375dce6211c61d1"
+  },
+  {
+    "service": "market-stream-worker",
+    "running": true,
+    "health": null,
+    "restarts": 0,
+    "image_id": "sha256:11b555f8e4e77a7d0cceeccf9f27f99ea089ac2010aa9fda6b3267e7e407d1a4"
+  },
+  {
+    "service": "postgres",
+    "running": true,
+    "health": "healthy",
+    "restarts": 0,
+    "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872"
+  }
+]

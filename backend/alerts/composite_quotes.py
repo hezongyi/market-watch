@@ -6,12 +6,15 @@ from .composite_chart import chart_page
 from .config import settings
 from .history_catalog import account_scope
 from .live_pricing import account_key
+from .live_session import session_status
 from .storage import (
     CompositePreparation,
     CompositeRevision,
+    Instrument,
     LiveState,
     MarketComposite,
     MarketDataset,
+    Preference,
     PricingOwner,
     RealtimeMapping,
     now_ms,
@@ -33,6 +36,13 @@ def live_snapshot(db, revision, *, now=None):
     owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
     stamp = now_ms() if now is None else now
     current = target.identity["account_scope"] == account_scope()
+    session = session_status(target.identity, db.get(Instrument, target.instrument_id).calendar_profile, stamp)
+    held = bool(current and owner and owner.error == 'unauthorized' or state and state.error == 'unauthorized')
+    error = state.error if state else None
+    if current and owner and owner.error:
+        probe = db.get(Preference, 'oanda_probe_status:' + owner.id) if held else None
+        error = (probe.value.get('error') if probe else None) or owner.error
+    available = not held and error != 'provider_maintenance' and session['market_session'] != 'closed'
     quote = state.quote if state else {}
     age = stamp - quote["source_time"] if type(quote.get("source_time")) is int else None
     received_age = stamp - state.received_at if state else None
@@ -46,13 +56,15 @@ def live_snapshot(db, revision, *, now=None):
         valid = bid.is_finite() and ask.is_finite() and 0 < bid <= ask
     except (InvalidOperation, ValueError):
         pass
-    quote_ready = bool(owned and valid and quote.get("tradeable") is True
+    quote_ready = bool(available and owned and valid and quote.get("tradeable") is True
         and quote.get("connection_epoch") == state.epoch
         and age is not None and 0 <= age <= 15000
         and received_age is not None and 0 <= received_age <= 15000)
     return {"current_account": current, "owned": owned,
+        **session, 'authentication_hold': held, 'connection_error': error,
+        'next_probe_at': owner.next_at or None if current and owner else None,
         "connection": state.connection if state else "inactive",
-        "quote_ready": quote_ready, "confirmed_tail_ready": bool(owned and state.ready and not state.error),
+        "quote_ready": quote_ready, "confirmed_tail_ready": bool(available and owned and state.ready and not state.error),
         "quote_age_ms": age, "source_confirmed_end": state.confirmed_end if state else 0,
         "quote": dict(quote) if quote else {}, "received_at": state.received_at if state else None,
         "connection_epoch": state.epoch if state else None, "live_revision": state.revision if state else None}

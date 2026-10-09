@@ -1,0 +1,33 @@
+{
+  "environment": "Ubuntu isolated PostgreSQL, two synthetic live states",
+  "baseline_commit": "e933ed4",
+  "samples_per_revision": 60,
+  "profiles": "finite operational session proof, immutable history unchanged",
+  "snapshot": {
+    "baseline": {
+      "rows": 2,
+      "snapshot_bytes": 1733,
+      "median_ms": 6.822,
+      "sql_queries_per_snapshot": 8.0
+    },
+    "final": {
+      "rows": 2,
+      "snapshot_bytes": 2635,
+      "median_ms": 8.933,
+      "sql_queries_per_snapshot": 10.0
+    }
+  },
+  "provider_status_sql_queries": 2,
+  "additional_processes": 0,
+  "additional_database_migrations": 0,
+  "upstream_healthy_auth_requests_per_hour": 0,
+  "upstream_auth_hold_max_requests_per_hour": 36,
+  "upstream_verified_closed_failed_auth_probe_max_requests_per_hour": 12,
+  "limitations": "SQL/bytes measured on this controlled fixture; medians include local network/PG latency; no whole-system CPU percentage claim",
+  "data_center_refresh_seconds": 10,
+  "data_center_additional_http_requests_per_minute_per_tab": 6,
+  "data_center_status_sql_queries_per_request": 12,
+  "data_center_status_sql_queries_per_minute_per_tab": 72,
+  "authentication_audit_max_rows_per_day": 288,
+  "verified_closed_authentication_audit_max_rows_per_day": 96
+}

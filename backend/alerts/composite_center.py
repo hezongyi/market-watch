@@ -82,6 +82,9 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
     from .composite_aggregates import report
     status = "account_changed" if not current_account else "attention" if prep.error else (
         "preparing" if prep.status != "queried" else "inactive" if not active else
+        'provider_maintenance' if live['connection_error'] == 'provider_maintenance' else
+        'unauthorized' if live['authentication_hold'] else
+        'market_closed' if live['market_session'] == 'closed' else
         "receiving" if confirmed_ready else "recovering")
     return {"id": composite.id, "instrument_id": composite.instrument_id,
         "dataset_id": dataset.id, "logical_symbol": dataset.logical_symbol,
@@ -99,6 +102,8 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         "usage": {"charts": chart_count, "strategies": watch_count, "chart_alerts": alert_count,
                   "total": chart_count + watch_count + alert_count},
         "health": {"connection": connection, "quote_ready": quote_ready,
+            **{key: live[key] for key in ('market_session', 'next_session_at', 'calendar_verified',
+                'authentication_hold', 'connection_error', 'next_probe_at')},
             "confirmed_tail_ready": confirmed_ready, "quote_age_ms": quote_age,
             "source_confirmed_end": state.confirmed_end if state else 0,
             "strategy_readiness": "no_strategies" if watch_count + alert_count == 0 else
