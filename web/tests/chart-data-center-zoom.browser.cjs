@@ -17,7 +17,9 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
   });
   const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
   const page = context.pages()[0];
-  page.on('pageerror', error => report.errors.push(error.message));
+  const onError = error => report.errors.push(error.message);
+  let workspace;
+  const get = async route => { const r=await page.request.get(base+'/api'+route);expect(r.ok()).toBe(true);return r.json(); };
   if (process.env.LOCAL) await fixture.localNativeAssets(page);
   const { host, native } = fixture.frames(page);
   const center = () => native()?.locator('.dc-window');
@@ -56,6 +58,9 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
   try {
     await page.goto(base + '/market-data?query=EURUSD&status=available');
     await fixture.login(page);
+    const {csrf}=await get('/session'),created=await page.request.post(base+'/api/advanced-charts/workspaces',{data:{name:'数据中心详情实际200%缩放验收',symbol:'MWP:EURUSD'},headers:{'X-CSRF-Token':csrf}});
+    expect(created.ok()).toBe(true);workspace=await created.json();
+    await page.goto(base+'/market-data?query=EURUSD&status=available');
     await expect.poll(() => !!native(), { timeout: 30000 }).toBeTruthy();
     await expect(center()).toBeVisible({ timeout: 20000 });
     await native().getByRole('button', { name: '关闭数据中心' }).click();
@@ -73,8 +78,11 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       expect(await zoom(2)).toBe(2);
       await expect.poll(() => page.evaluate(() => innerWidth)).toBe(Math.floor(width / 2));
       expect(await page.evaluate(() => devicePixelRatio)).toBe(2);
+      page.off("pageerror", onError);
       await page.reload();
       await expect.poll(() => !!host() && !!native(), { timeout: 30000 }).toBeTruthy();
+      await host().waitForFunction(()=>ready && widget.activeChart().dataReady(),null,{timeout:60000});
+      page.on('pageerror',onError);
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeVisible({ timeout: 30000 });
       await native().getByRole('button', { name: '数据中心', exact: true }).click();
       await expect(center()).toBeVisible({ timeout: 20000 });
@@ -93,6 +101,15 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await expect(center().getByRole('navigation', { name: '列表分页' })).toHaveCount(0);
       await closeFilters();
       await screenshot(`browser-zoom200-${width}.png`);
+      const detail = center().locator('.dc-market-row').first().getByRole('button', {name:'查看详情', exact:true});
+      await detail.click();
+      await expect(center().locator('.dc-detail-panel').getByRole('button', {name:'关闭详情',exact:true})).toBeInViewport();
+      expect(await center().locator('.dc-detail-panel').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
+      await screenshot(`browser-zoom200-panel-${width}.png`);
+      await page.keyboard.press('Escape');
+      await expect(center().locator('.dc-detail-panel')).toHaveCount(0);
+      await expect(detail).toBeFocused();
+
       // Switching with the previous filter open must not leave an empty overlay.
       if (await filter.isVisible()) await filter.click();
       await center().getByRole('button', { name: '组合行情', exact: true }).click();
@@ -140,6 +157,8 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
     report.errors.push(error.message);
     throw error;
   } finally {
+    page.off('pageerror',onError);
+    if(workspace){const before=await get('/advanced-charts/workspaces'),owned=before.find(row=>row.id===workspace.id);if(owned){const {csrf}=await get('/session'),removed=await page.request.post(base+'/api/advanced-charts/workspaces/'+owned.id+'/delete',{data:{revision:owned.revision},headers:{'X-CSRF-Token':csrf}});expect(removed.ok()).toBe(true);const after=await get('/advanced-charts/workspaces');expect(after.map(row=>row.id).sort()).toEqual(before.filter(row=>row.id!==workspace.id).map(row=>row.id).sort());report.cleanup={onlyOwnedWorkspaceDeleted:true}}}
     if (!report.passed && center()) report.content = await center().innerText().catch(() => '');
     if (!report.passed) await page.screenshot({ path: path.join(art, 'browser-zoom-failed.png') }).catch(() => {});
     fs.writeFileSync(path.join(art, 'zoom-report.json'), JSON.stringify(report, null, 2));

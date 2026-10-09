@@ -335,8 +335,7 @@ export function DatasetCreate() {
           {selected && (
             <button onClick={() => setSelected(null)}>改为手工登记</button>
           )}
-          <details open={selected?.precision === null || !!fieldErrors["create-precision"] || undefined}>
-            <summary>高级登记：价格精度</summary>
+          <section className="dc-advanced-fields"><h3>高级登记：价格精度</h3>
             <label>
               小数位数
               <NativeInput {...fieldProps("create-precision")}
@@ -354,7 +353,7 @@ export function DatasetCreate() {
                 ? "精度来自当前账户目录，准确代码与类别已带入。"
                 : "目录不足或手工登记时需明确精度；真实下载时校验，不能据此认定来源已可用。"}
             </p>
-          </details>
+          </section>
           <p>
             原始 M1 · Bid。OANDA 使用后端配置的 Practice
             账户；凭据不会保存到公开数据集信息。

@@ -1,3 +1,4 @@
+import { DetailDisclosure } from "./DetailPanel";
 import { useContext } from "react";
 import { NativeUiContext } from "./NativeControls";
 import { useEffect, useRef, useState } from "react";
@@ -160,11 +161,11 @@ export function DatasetReferences({
           <p>管理此数据集的实时映射与组合；查看引用不会建立实时需求。</p>
           <Link to={`/market-data/datasets/${id}/mapping`}>配置与查看实时映射</Link>
           <Feedback error={mappings.error} loading={mappings.loading} empty={!mappings.data}/>
-          {mappings.data && <details><summary>已保存映射（{mappings.data.items.length}）</summary>
+          {mappings.data && <DetailDisclosure title={<>已保存映射（{mappings.data.items.length}）</>}>
             {mappings.data.items.length ? mappings.data.items.map(m => <p key={m.id}>
               OANDA · {m.target_display_symbol || m.target_identity.provider_symbol} · Bid · {m.target_identity.environment} · {m.current_account ? "当前账户" : "其他账户，需重新配置"}<br/>{m.match.rationale}
             </p>) : <p>尚未保存实时映射，查看此页不会建立组合。</p>}
-          </details>}
+          </DetailDisclosure>}
           <Feedback error={composites.error} loading={composites.loading} empty={!composites.data}/>
           {composites.data && <><h3>已建立组合</h3>
             {composites.data.items.length ? composites.data.items.map(c => <p key={c.id}>

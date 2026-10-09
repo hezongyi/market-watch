@@ -77,8 +77,8 @@ const report = { environment: 'Ubuntu isolated Docker; read-only existing datase
   });
   const enter = async () => {
     const row = center().locator(`#dataset-${id}`);
-    if (!(await row.locator('details').getAttribute('open')) && !await row.getByRole('link', { name: '删除历史数据', exact: true }).isVisible()) await row.getByText('详情', { exact: true }).click();
-    await center().locator(`#dataset-${id}`).getByRole('link', { name: '删除历史数据', exact: true }).click();
+    if (!await center().locator('.dc-detail-panel').isVisible()) await row.getByRole('button', { name: '查看详情', exact: true }).click();
+    await center().locator('.dc-detail-panel').getByRole('link', { name: '删除历史数据', exact: true }).click();
     await expect(center().getByRole('heading', { name: '删除历史数据', exact: true })).toBeVisible();
     await expect(center().getByRole('heading', { name: '删除影响清单', exact: true })).toBeVisible();
   };
@@ -94,9 +94,9 @@ const report = { environment: 'Ubuntu isolated Docker; read-only existing datase
     await expect(native().locator(".dc-window")).toBeVisible({timeout:30000});
     await expect(center().getByRole('heading', { name: '自建行情', exact: true })).toBeVisible();
     const first = center().locator('.dc-market-row').first();
-    await first.getByText('详情', { exact: true }).click();
+    await first.getByRole('button', { name: '查看详情', exact: true }).click();
     await expect(first).toBeVisible();
-    const link = first.getByRole('link', { name: '删除历史数据', exact: true });
+    const link = center().locator('.dc-detail-panel').getByRole('link', { name: '删除历史数据', exact: true });
     await expect(link).toBeVisible();
     const href = await link.getAttribute('href');
     id = href.match(/datasets\/([a-f0-9]{64})/)[1];

@@ -166,6 +166,13 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
   useEffect(() => {
     const unload = (event: BeforeUnloadEvent) => { if (dirty.current.size) { event.preventDefault(); event.returnValue = ""; } };
     const keyboard = (event: KeyboardEvent) => {
+      if (!guard && event.key === "Escape" && !event.defaultPrevented) {
+        const detailClose = content.current?.querySelector<HTMLButtonElement>("[data-dc-detail-close]");
+        const popup = document.querySelector('[role="listbox"]');
+        if (detailClose && !popup?.getClientRects().length) {
+          event.preventDefault(); event.stopImmediatePropagation(); detailClose.click(); return;
+        }
+      }
       if (hosted && !guard && event.key === "Escape" && !event.defaultPrevented) {
         const filters = content.current?.querySelector<HTMLButtonElement>('.dc-filter-toggle[aria-expanded="true"]');
         // A native Select/picker owns Escape while its separate popup is open.
@@ -173,6 +180,15 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
         if (filters?.getClientRects().length && (!ownPopup || ownPopup.contains(content.current))) {
           event.preventDefault(); event.stopImmediatePropagation(); filters.click(); filters.focus(); return;
         }
+      }
+      const fullPanel = content.current?.matches('[data-detail-mode="full"]') && content.current.querySelector<HTMLElement>(".dc-detail-panel");
+      if (fullPanel && event.key === "Tab" && !guard) {
+        const items = [...fullPanel.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],input:not(:disabled),[tabindex="0"]')].filter(item => item.getClientRects().length);
+        const first = items[0], last = items.at(-1), active = document.activeElement;
+        if (event.shiftKey && (active === first || !fullPanel.contains(active) || active === fullPanel)) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && (active === last || !fullPanel.contains(active) || active === fullPanel)) { event.preventDefault(); first?.focus(); }
+        if (event.defaultPrevented) event.stopImmediatePropagation();
+        return;
       }
       if (hosted && !guard) return;
       if (hosted && guard && event.key === "Escape") {event.preventDefault();event.stopImmediatePropagation();setGuard(null);guardFocus.current?.focus();return;}

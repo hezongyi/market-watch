@@ -1,3 +1,4 @@
+import { DetailDisclosure } from "./DetailPanel";
 import { NativeInput, NativeSelect } from "./NativeControls";
 import { centerReturn } from "./navigation";
 import { useEffect, useRef, useState } from "react";
@@ -376,19 +377,17 @@ export function DatasetDetail() {
                             </td>
                             <td>
                               {c.observed_minutes} 分钟
-                              <details>
-                                <summary>查看实际观测区间</summary>
+                              <DetailDisclosure title={<>查看实际观测区间</>}>
                                 {c.observed_intervals.map(([l, r]) => (
                                   <p key={l}>
                                     {time(l)} 至 {time(r)}
                                   </p>
                                 ))}
-                              </details>
+                              </DetailDisclosure>
                             </td>
                             <td>
                               {c.unknown_minutes} 分钟
-                              <details>
-                                <summary>查看未知区间</summary>
+                              <DetailDisclosure title={<>查看未知区间</>}>
                                 {c.unknown_intervals.length ? (
                                   c.unknown_intervals.map(([l, r]) => (
                                     <p key={l}>
@@ -398,12 +397,11 @@ export function DatasetDetail() {
                                 ) : (
                                   <p>无未知区间</p>
                                 )}
-                              </details>
+                              </DetailDisclosure>
                             </td>
                             <td>
                               {c.confirmed_closed_minutes} 分钟
-                              <details>
-                                <summary>查看闭市区间与依据</summary>
+                              <DetailDisclosure title={<>查看闭市区间与依据</>}>
                                 {c.confirmed_closed_intervals.length ? (
                                   c.confirmed_closed_intervals.map(([l, r]) => (
                                     <p key={l}>
@@ -427,12 +425,11 @@ export function DatasetDetail() {
                                       : ""}
                                   </p>
                                 ))}
-                              </details>
+                              </DetailDisclosure>
                             </td>
                             <td>
                               {c.conflict_minutes} 分钟
-                              <details>
-                                <summary>查看观测冲突</summary>
+                              <DetailDisclosure title={<>查看观测冲突</>}>
                                 {c.conflict_intervals.length ? (
                                   c.conflict_intervals.map(([l, r]) => (
                                     <p key={l}>
@@ -445,7 +442,7 @@ export function DatasetDetail() {
                                 <p>
                                   来源观测与闭市依据不一致时保留价格，不能据此认定完整覆盖。
                                 </p>
-                              </details>
+                              </DetailDisclosure>
                             </td>
                             <td>{time(c.observed_at)}</td>
                           </tr>

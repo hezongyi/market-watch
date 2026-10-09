@@ -1,3 +1,4 @@
+import { DetailPanel, useDetailPanel } from "./DetailPanel";
 import { Link } from "./router";
 import { NativeSelect } from "./NativeControls";
 import { OpenChart } from "./OpenChart";
@@ -134,14 +135,23 @@ function ManagedRow({
   dataset: Dataset;
   params: URLSearchParams;
 }) {
+  const detail = useDetailPanel();
   return (
     <article className="dc-market-row" id={`dataset-${d.id}`} tabIndex={-1}>
       <div className="dc-market-main">
-        <strong>{d.display_symbol || d.logical_symbol}</strong>
+        <button className="dc-symbol-button" onClick={detail.open}>
+          {d.display_symbol || d.logical_symbol}
+        </button>
         <span>
           {names[d.identity.source]} · {d.identity.basis} ·{" "}
           {phase(d.aggregation_calendar)}
         </span>
+        <small>
+          可用历史：
+          {d.available_end
+            ? `${time(d.available_start)} 至 ${time(d.available_end)}`
+            : "尚未发布"}
+        </small>
       </div>
       <span>
         {(
@@ -175,44 +185,63 @@ function ManagedRow({
             label="打开图表"
           />
         )}
-        <Link
-          to={centerLink(
-            `/market-data/datasets/${d.id}`,
-            params,
-            `dataset-${d.id}`,
-          )}
-        >
-          查看
-        </Link>
+        <button onClick={detail.open} aria-expanded={detail.opened}>
+          查看详情
+        </button>
       </div>
-      <details className="dc-market-row-details">
-        <summary>详情</summary>
-        <p>
-          可用历史：
-          {d.available_end
-            ? `${time(d.available_start)} 至 ${time(d.available_end)}`
-            : "尚未发布"}
-          {!!d.unknown_minutes && ` · 含未知区间 ${d.unknown_minutes} 分钟`}
-        </p>
-        <p>可用周期：{d.usable_timeframes.join(" · ") || "尚无可用周期"}</p>
-        {d.maintenance.frequency === "daily" &&
-          !d.maintenance.paused &&
-          d.maintenance.next_at != null && (
-            <p>下次维护：{time(d.maintenance.next_at)}</p>
-          )}
-        {d.maintenance.task_error && (
-          <p className="error">本次维护：{d.maintenance.task_error}</p>
-        )}
-        <Link
-          to={centerLink(
-            `/market-data/datasets/${d.id}?section=references&view=delete`,
-            params,
-            `dataset-${d.id}`,
-          )}
+      {detail.opened && (
+        <DetailPanel
+          title={`${d.display_symbol || d.logical_symbol} · 自建行情`}
+          close={detail.close}
         >
-          删除历史数据
-        </Link>
-      </details>
+          <p>
+            来源：{names[d.identity.source]} · {d.identity.basis} ·{" "}
+            {phase(d.aggregation_calendar)}
+          </p>
+          <p>状态：{names[d.availability] || d.availability}</p>
+          <p>
+            可用历史：
+            {d.available_end
+              ? `${time(d.available_start)} 至 ${time(d.available_end)}`
+              : "尚未发布"}
+            {!!d.unknown_minutes && ` · 含未知区间 ${d.unknown_minutes} 分钟`}
+          </p>
+          <p>可用周期：{d.usable_timeframes.join(" · ") || "尚无可用周期"}</p>
+          {d.maintenance.frequency === "daily" &&
+            !d.maintenance.paused &&
+            d.maintenance.next_at != null && (
+              <p>下次维护：{time(d.maintenance.next_at)}</p>
+            )}
+          {d.maintenance.task_error && (
+            <p className="error">本次维护：{d.maintenance.task_error}</p>
+          )}
+          <div className="dc-actions">
+            {d.latest_version_id && d.usable_timeframes.length > 0 && <OpenChart
+              ticker={`MWH:${d.periods.find(p => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`}
+              frame={d.usable_timeframes[0]} label="打开图表" />}
+
+            <Link
+              to={centerLink(
+                `/market-data/datasets/${d.id}`,
+                params,
+                `dataset-${d.id}`,
+              )}
+            >
+              管理行情
+            </Link>
+            <Link
+              className="dc-danger"
+              to={centerLink(
+                `/market-data/datasets/${d.id}?section=references&view=delete`,
+                params,
+                `dataset-${d.id}`,
+              )}
+            >
+              删除历史数据
+            </Link>
+          </div>
+        </DetailPanel>
+      )}
     </article>
   );
 }

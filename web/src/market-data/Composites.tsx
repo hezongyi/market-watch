@@ -1,3 +1,4 @@
+import { DetailDisclosure, DetailPanel, useDetailPanel } from "./DetailPanel";
 import { NativeCatalogPicker } from "./NativeCatalogPicker";
 import { NativeInput, NativeSelect } from "./NativeControls";
 import {
@@ -179,126 +180,25 @@ export function CompositeList() {
         </p>
       )}
       <div className="dc-market-list" ref={rows.list}>
-        {rows.items.map((item) => {
-          if ("dataset" in item) {
-            const d = item.dataset,
-              id = `candidate-${d.id}`;
-            return (
-              <article
-                className="dc-market-row"
-                key={d.id}
-                id={id}
-                tabIndex={-1}
-              >
-                <div className="dc-market-main">
-                  <strong>{d.display_symbol || d.logical_symbol}</strong>
-                  <span>{names[d.identity.source]} → OANDA Practice · Bid</span>
-                </div>
-                <span>{phase(d.aggregation_calendar)}</span>
-                <span>{statusNames[item.status] || item.status}</span>
-                <div className="dc-market-actions">
-                  {item.status === "ready_to_open" &&
-                    item.recommended_mapping_id && (
-                      <button
-                        aria-disabled={!!opening || busy}
-                        aria-busy={opening === d.id || undefined}
-                        onClick={() =>
-                          void open(d.id, item.recommended_mapping_id!)
-                        }
-                      >
-                        {opening === d.id ? "正在打开…" : "打开组合行情"}
-                      </button>
-                    )}
-                  <Link
-                    to={centerLink(
-                      item.status === "needs_maintenance"
-                        ? `/market-data/datasets/${d.id}`
-                        : `/market-data/datasets/${d.id}/mapping`,
-                      params,
-                      id,
-                    )}
-                  >
-                    {item.status === "needs_maintenance"
-                      ? "去维护"
-                      : "配置实时来源"}
-                  </Link>
-                </div>
-                <details className="dc-market-row-details">
-                  <summary>详情</summary>
-                  <p>
-                    自建历史：{time(d.available_start)} 至{" "}
-                    {time(d.available_end)}
-                  </p>
-                  {item.reason && <p>{item.reason}</p>}
-                  <p>
-                    准确来源代码：
-                    {d.provider_display_symbol || d.identity.provider_symbol} ·
-                    日界：{phase(d.aggregation_calendar)}
-                  </p>
-                </details>
-              </article>
-            );
-          }
-          const row = item,
-            id = `composite-${row.id}`;
-          return (
-            <article
-              className="dc-market-row"
-              key={row.id}
-              id={id}
-              tabIndex={-1}
-            >
-              <div className="dc-market-main">
-                <strong>{row.display_symbol || row.logical_symbol}</strong>
-                <span>
-                  {names[row.historical_source]} → OANDA Practice · Bid
-                </span>
-              </div>
-              <span>{phase(row.calendar)}</span>
-              <span>
-                {rows.error
-                  ? "健康未知"
-                  : statusNames[row.status] || row.status}
-                <small>{row.usage.total} 个需求</small>
-              </span>
-              <div className="dc-market-actions">
-                <OpenChart ticker={`MWC:${row.id}`} label="打开图表" />
-                <Link
-                  to={centerLink(
-                    `/market-data/composites/${row.id}`,
-                    params,
-                    id,
-                  )}
-                >
-                  查看详情
-                </Link>
-              </div>
-              <details className="dc-market-row-details">
-                <summary>接续信息</summary>
-                <p>
-                  历史基线：{time(row.revision.seam)} · 确认至：
-                  {row.preparation.confirmed_end
-                    ? time(row.preparation.confirmed_end)
-                    : "尚无确认M1"}
-                </p>
-                <p>
-                  实时来源代码：
-                  {row.mapping.target_display_symbol ||
-                    row.mapping.target_identity.provider_symbol}
-                </p>
-                <p>
-                  {rows.error
-                    ? "实时健康未知"
-                    : row.health.strategy_readiness === "no_strategies"
-                      ? "暂无策略"
-                      : row.health.strategy_readiness === "ready"
-                        ? "规则依赖就绪"
-                        : "策略依赖待检查"}
-                </p>
-              </details>
-            </article>
-          );
-        })}
+        {rows.items.map((item) =>
+          "dataset" in item ? (
+            <CandidateRow
+              key={item.dataset.id}
+              item={item}
+              params={params}
+              opening={opening}
+              busy={busy}
+              open={open}
+            />
+          ) : (
+            <CompositeRow
+              key={item.id}
+              row={item}
+              params={params}
+              rowsError={rows.error}
+            />
+          ),
+        )}
         <div ref={rows.sentinel}>
           <MarketListStatus
             loading={rows.loading}
@@ -313,6 +213,158 @@ export function CompositeList() {
         固定自建历史接续 OANDA Practice 确认M1及实时观察。浏览列表不会启动采集。
       </p>
     </section>
+  );
+}
+
+function CandidateRow({
+  item,
+  params,
+  opening,
+  busy,
+  open,
+}: {
+  item: Candidate;
+  params: URLSearchParams;
+  opening: string;
+  busy: boolean;
+  open: (dataset: string, mapping: string) => Promise<void>;
+}) {
+  const d = item.dataset,
+    id = `candidate-${d.id}`,
+    detail = useDetailPanel();
+  return (
+    <article className="dc-market-row" key={d.id} id={id} tabIndex={-1}>
+      <div className="dc-market-main">
+        <button className="dc-symbol-button" onClick={detail.open}>
+          {d.display_symbol || d.logical_symbol}
+        </button>
+        <span>{names[d.identity.source]} → OANDA Practice · Bid</span>
+      </div>
+      <span>{phase(d.aggregation_calendar)}</span>
+      <span>{statusNames[item.status] || item.status}</span>
+      <div className="dc-market-actions">
+        <button onClick={detail.open} aria-expanded={detail.opened}>
+          查看详情
+        </button>
+        {item.status === "ready_to_open" && item.recommended_mapping_id && (
+          <button
+            aria-disabled={!!opening || busy}
+            aria-busy={opening === d.id || undefined}
+            onClick={() => void open(d.id, item.recommended_mapping_id!)}
+          >
+            {opening === d.id ? "正在打开…" : "打开组合行情"}
+          </button>
+        )}
+        <Link
+          to={centerLink(
+            item.status === "needs_maintenance"
+              ? `/market-data/datasets/${d.id}`
+              : `/market-data/datasets/${d.id}/mapping`,
+            params,
+            id,
+          )}
+        >
+          {item.status === "needs_maintenance" ? "去维护" : "配置实时来源"}
+        </Link>
+      </div>
+      {detail.opened && (
+        <DetailPanel
+          title={`${d.display_symbol || d.logical_symbol} · 可建立候选`}
+          close={detail.close}
+        >
+          <p>建立条件：{statusNames[item.status] || item.status}</p>
+          <p>
+            自建历史：{time(d.available_start)} 至 {time(d.available_end)}
+          </p>
+          {item.reason && <p>{item.reason}</p>}
+          <p>
+            准确来源代码：
+            {d.provider_display_symbol || d.identity.provider_symbol} · 日界：
+            {phase(d.aggregation_calendar)}
+          </p>
+          <div className="dc-actions">
+            <Link to={centerLink(item.status === "needs_maintenance" ? `/market-data/datasets/${d.id}` : `/market-data/datasets/${d.id}/mapping`, params, id)}>{item.status === "needs_maintenance" ? "去维护" : "配置实时来源"}</Link>
+            {item.status === "ready_to_open" && item.recommended_mapping_id && <button aria-disabled={!!opening || busy} aria-busy={opening === d.id || undefined} onClick={() => void open(d.id, item.recommended_mapping_id!)}>{opening === d.id ? "正在打开…" : "打开组合行情"}</button>}
+          </div>
+        </DetailPanel>
+      )}
+    </article>
+  );
+}
+function CompositeRow({
+  row,
+  params,
+  rowsError,
+}: {
+  row: Composite;
+  params: URLSearchParams;
+  rowsError: string;
+}) {
+  const id = `composite-${row.id}`,
+    detail = useDetailPanel();
+  return (
+    <article className="dc-market-row" key={row.id} id={id} tabIndex={-1}>
+      <div className="dc-market-main">
+        <button className="dc-symbol-button" onClick={detail.open}>
+          {row.display_symbol || row.logical_symbol}
+        </button>
+        <span>{names[row.historical_source]} → OANDA Practice · Bid</span>
+      </div>
+      <span>{phase(row.calendar)}</span>
+      <span>
+        {rowsError ? "健康未知" : statusNames[row.status] || row.status}
+        <small>{row.usage.total} 个需求</small>
+      </span>
+      <div className="dc-market-actions">
+        <OpenChart ticker={`MWC:${row.id}`} label="打开图表" />
+        <button onClick={detail.open} aria-expanded={detail.opened}>
+          查看详情
+        </button>
+      </div>
+      {detail.opened && (
+        <DetailPanel
+          title={`${row.display_symbol || row.logical_symbol} · 组合行情`}
+          close={detail.close}
+        >
+          <p>
+            来源：{names[row.historical_source]} → OANDA Practice · Bid ·{" "}
+            {phase(row.calendar)}
+          </p>
+          <p>
+            接续状态：
+            {rowsError ? "健康未知" : statusNames[row.status] || row.status}
+          </p>
+          <p>
+            历史基线：{time(row.revision.seam)} · 确认至：
+            {row.preparation.confirmed_end
+              ? time(row.preparation.confirmed_end)
+              : "尚无确认M1"}
+          </p>
+          <p>
+            实时来源代码：
+            {row.mapping.target_display_symbol ||
+              row.mapping.target_identity.provider_symbol}
+          </p>
+          <p>
+            {rowsError
+              ? "实时健康未知"
+              : row.health.strategy_readiness === "no_strategies"
+                ? "暂无策略"
+                : row.health.strategy_readiness === "ready"
+                  ? "规则依赖就绪"
+                  : "策略依赖待检查"}
+          </p>
+          <div className="dc-actions">
+          <OpenChart ticker={`MWC:${row.id}`} label="打开图表" />
+          <Link
+            to={centerLink(`/market-data/composites/${row.id}`, params, id)}
+          >
+            管理组合行情
+          </Link>
+          </div>
+        </DetailPanel>
+      )}
+    </article>
   );
 }
 
@@ -744,8 +796,7 @@ export function CompositeDetail() {
               <p>
                 价格不平均、不平移；跨源量不相加。最新确认结束时间不能证明中间无缺口。
               </p>
-              <details>
-                <summary>映射复核依据</summary>
+              <DetailDisclosure title="映射复核依据">
                 <p>{row.mapping.match.rationale}</p>
                 <a
                   href={row.mapping.match.historical_evidence}
@@ -762,7 +813,7 @@ export function CompositeDetail() {
                 >
                   实时产品依据
                 </a>
-              </details>
+              </DetailDisclosure>
               <h2>补数请求记录</h2>
               <Feedback
                 error={requests.error}

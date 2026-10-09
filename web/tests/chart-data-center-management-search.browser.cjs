@@ -21,10 +21,11 @@ fs.mkdirSync(out, { recursive: true });
     checks: [],
     errors: [],
   };
-  p.on("pageerror", (e) => {
+  const onError = (e) => {
     report.errors.push(e.message);
     console.log("PAGEERROR", e.message);
-  });
+  };
+  let workspace;
   const record = (name) => {
     report.checks.push({ name });
     console.log("PASS", name);
@@ -48,10 +49,16 @@ fs.mkdirSync(out, { recursive: true });
     if (process.env.LOCAL) await f.localNativeAssets(p);
     await p.goto(f.base + "/advanced-charts");
     await f.login(p);
+    const { csrf } = await get("/session");
+    const created = await p.request.post(f.base + "/api/advanced-charts/workspaces", {data:{name:"自建组合详情面板回归",symbol:"MWP:EURUSD"},headers:{"X-CSRF-Token":csrf}});
+    expect(created.ok()).toBe(true); workspace = await created.json();
+    await p.goto(f.base + "/advanced-charts");
     await expect.poll(() => !!native(), { timeout: 30000 }).toBe(true);
     await host().waitForFunction(() => ready && dataCenter, null, {
       timeout: 60000,
     });
+    await host().waitForFunction(()=>widget.activeChart().dataReady(),null,{timeout:60000});
+    p.on("pageerror", onError);
     const original = await host().evaluate(() => widget.activeChart().symbol());
     const data = await get("/market-data/center/datasets?page_size=100"),
       existing = await get("/market-data/center/composites"),
@@ -83,14 +90,14 @@ fs.mkdirSync(out, { recursive: true });
     record(
       "real managed rows; visible title, full-width actual native search, native source/type/calendar controls, creation and no pagination",
     );
-    await rows().first().getByText("详情", { exact: true }).click();
+    await rows().first().getByRole("button", { name: "查看详情", exact: true }).click();
     await expect(
-      rows().first().getByRole("link", { name: "删除历史数据", exact: true }),
+      dc().locator(".dc-detail-panel").getByRole("link", { name: "删除历史数据", exact: true }),
     ).toBeVisible();
     await expect(rows().first()).toContainText("可用历史");
-    await rows()
-      .first()
-      .getByRole("link", { name: "查看", exact: true })
+    await dc()
+      .locator(".dc-detail-panel")
+      .getByRole("link", { name: "管理行情", exact: true })
       .click();
     await expect(dc().locator(".dc-form,.dc-detail").first())
       .toBeVisible()
@@ -109,8 +116,9 @@ fs.mkdirSync(out, { recursive: true });
     await expect(rows()).toHaveCount(Math.min(25, existing.items.length));
     await rows()
       .first()
-      .getByRole("link", { name: "查看详情", exact: true })
+      .getByRole("button", { name: "查看详情", exact: true })
       .click();
+    await dc().getByRole("link", { name: "管理组合行情", exact: true }).click();
     await expect(
       dc().getByRole("button", { name: "使用与健康", exact: true }),
     ).toBeVisible();
@@ -514,6 +522,8 @@ fs.mkdirSync(out, { recursive: true });
     await p.screenshot({ path: path.join(out, "failed.png") });
     throw e;
   } finally {
+    p.off("pageerror",onError);
+    if(workspace){const before=await get('/advanced-charts/workspaces'),owned=before.find(row=>row.id===workspace.id);if(owned){const {csrf}=await get('/session'),removed=await p.request.post(f.base+'/api/advanced-charts/workspaces/'+owned.id+'/delete',{data:{revision:owned.revision},headers:{'X-CSRF-Token':csrf}});expect(removed.ok()).toBe(true);const after=await get('/advanced-charts/workspaces');expect(after.map(row=>row.id).sort()).toEqual(before.filter(row=>row.id!==workspace.id).map(row=>row.id).sort());report.cleanup={onlyOwnedWorkspaceDeleted:true}}}
     fs.writeFileSync(
       path.join(out, "report.json"),
       JSON.stringify(report, null, 2),

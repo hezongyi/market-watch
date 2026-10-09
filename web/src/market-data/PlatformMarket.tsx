@@ -1,3 +1,4 @@
+import { DetailPanel, useDetailPanel } from "./DetailPanel";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { NativeInput, NativeSelect, NativeSlot, NativeUiContext } from "./NativeControls";
 import { api } from "./api";
@@ -28,7 +29,7 @@ export function PlatformMarket() {
   const [detail, setDetail] = useState<Instrument | null>(null), [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
   const [revision, setRevision] = useState(0);
-  const detailFocus = useRef<HTMLElement | null>(null);
+  const panel = useDetailPanel();
   const known = useRef(new Map<string, Instrument>()), active = useRef("");
   const latest = useRef({ params, setParams }); latest.current = { params, setParams };
   const query = params.get("query") || "", source = params.get("source") || "", asset = params.get("asset_class") || "";
@@ -76,9 +77,8 @@ export function PlatformMarket() {
     try { await apply(ticker, frame); }
     catch (error) { if (mounted.current) setError(String(error)); throw error; }
   }, [apply, busy, mounted]);
-  const selectDetail = useCallback((ticker: string) => { detailFocus.current = document.activeElement as HTMLElement; setDetail(known.current.get(ticker) || null); }, []);
+  const selectDetail = useCallback((ticker: string) => { panel.open(); setDetail(known.current.get(ticker) || null); }, [panel.open]);
   useCenterRowRestore(revision);
-  useEffect(() => { if (detail) document.getElementById("platform-detail")?.focus(); }, [detail]);
   return <section className="data-center dc-platform">
     <h1 className="dc-platform-title">平台行情</h1>
     {error && <p role="alert" className="error">{error}</p>}
@@ -86,10 +86,8 @@ export function PlatformMarket() {
       query, source, asset: Object.entries(assetTypes).find(([, value]) => value === asset)?.[0] || asset,
       symbolTypes, getPage, onOpen: open, onDetails: selectDetail, busy,
     }} /> : <PlatformFallback key={refresh} query={query} source={source} asset={asset}
-      filter={(key, value) => { const next = new URLSearchParams(params); next.set(key, value); next.delete("page"); setDetail(null); setParams(next); }} onDetails={setDetail} />}
-    {detail && <aside className="dc-platform-detail" aria-label="行情详情" id="platform-detail" tabIndex={-1}>
-      <div className="dc-heading"><h2>{detail.display_symbol || detail.provider_symbol} · {detail.label}</h2>
-        <button onClick={() => { setDetail(null); detailFocus.current?.focus(); }} aria-label="关闭行情详情">关闭</button></div>
+      filter={(key, value) => { const next = new URLSearchParams(params); next.set(key, value); next.delete("page"); setDetail(null); setParams(next); }} onDetails={row => { setDetail(row); panel.open(); }} />}
+    {detail && panel.opened && <DetailPanel title={`${detail.display_symbol || detail.provider_symbol} · ${detail.label}`} close={() => { setDetail(null); panel.close(); }}>
       <p>来源：{names[detail.source] || detail.source} · 原生周期：{detail.capabilities.native_periods.join(" · ") || "尚未接入"}</p>
       <p>M1 历史：{detail.capabilities.history_m1 ? "支持" : "未开放"} · 目录更新时间：{time(detail.updated_at)}</p>
       {detail.capabilities.native_confirmation === "not_supplied" && <p>来源未提供确认标记；按周期结束时间显示。</p>}
@@ -97,9 +95,9 @@ export function PlatformMarket() {
         {detail.available && detail.source === "oanda" && <Link to={centerLink(`/market-data/platform/configure?instrument=${encodeURIComponent(detail.id)}`, params, rowId(detail.id))}>配置原生参数</Link>}
         {detail.capabilities.history_m1 && (!detail.logical_symbol || detail.logical_symbol.length <= 10) &&
           <Link to={centerLink(`/market-data/datasets/new?source=${detail.source}&symbol=${encodeURIComponent(detail.provider_symbol)}${detail.history_precision == null ? "" : `&precision=${detail.history_precision}`}`, params, rowId(detail.id))}>添加为自建行情</Link>}
-        <button onClick={() => { setDetail(null); setRefresh(value => value + 1); }}>刷新目录</button>
+        <button onClick={() => { setDetail(null); panel.close(); setRefresh(value => value + 1); }}>刷新目录</button>
       </div>
-    </aside>}
+    </DetailPanel>}
   </section>;
 }
 

@@ -1,3 +1,4 @@
+import { DetailDisclosure } from "./DetailPanel";
 import { NativeInput, NativeSelect } from "./NativeControls";
 import { useRef, useState } from "react";
 import { Link, useDirtyForm, useActionLock } from "./router";
@@ -107,8 +108,8 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
       {row.preparation.indicators.map((item,index)=><p key={index}>{item.timeframe} {item.spec.name}：{item.status==="complete"?"初始化完成":"后台初始化中"}</p>)}
       {row.change&&<p>创建时已有 {row.change.affected_rules.length} 条规则，保持原修订。
         {row.change.affected_rules.map(item=><span key={item.id}> {item.name}；</span>)}</p>}
-      <details><summary>查看固定输入依据</summary><p>修订 {row.id} · 历史 {row.history_version_id}</p>
-        <p>准备截止 {time(row.preparation.cutoff)} · 固定输入 {row.preparation.input_revision??"等待M1查询"}</p></details>
+      <DetailDisclosure title={<>查看固定输入依据</>}><p>修订 {row.id} · 历史 {row.history_version_id}</p>
+        <p>准备截止 {time(row.preparation.cutoff)} · 固定输入 {row.preparation.input_revision??"等待M1查询"}</p></DetailDisclosure>
       {row.change&&!row.activated_at&&row.id!==active&&<button type="button"
         disabled={busy||!row.preparation.ready||!!revisions.error||row.parent_revision_id!==active}
         onClick={()=>void activate(row)}>启用此修订</button>}

@@ -161,8 +161,7 @@ export function MaintenanceSettings({
           </label>
         </div>
       )}
-      <details>
-        <summary>高级维护设置</summary>
+      <section className="dc-advanced-fields"><h3>高级维护设置</h3>
         <label>
           重叠复查窗口（分钟）
           <NativeInput
@@ -174,7 +173,7 @@ export function MaintenanceSettings({
           />
         </label>
         <p>有限窗口用于检查近期修订；更早区间可单独提交补数或复查。</p>
-      </details>
+      </section>
       {error && (
         <p role="alert" className="error">
           {error}

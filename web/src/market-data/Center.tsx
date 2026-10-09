@@ -1,3 +1,4 @@
+import { DetailDisclosure } from "./DetailPanel";
 import { NativeInput, NativeSelect } from "./NativeControls";
 import { useState } from "react";
 import { Link, useLocation, useSearchParams, useActionLock } from "./router";
@@ -243,13 +244,12 @@ export function CenterList() {
                     {t.error ? (
                       <>
                         {taskError(t.error, t.status)}
-                        <details>
-                          <summary>技术错误详情</summary>
+                        <DetailDisclosure title={<>技术错误详情</>}>
                           <code>{t.error}</code>
                           <p>
                             仅显示安全错误类型，不显示凭据或供应商响应内容。
                           </p>
-                        </details>
+                        </DetailDisclosure>
                         {t.status === "configuration_error" && (
                           <Link to="/market-data?tab=sources&connection=oanda">
                             查看连接配置说明
