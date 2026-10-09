@@ -44,9 +44,13 @@ def _client(db, session_hash, client):
     if not session or session.expires <= now_ms():
         raise PermissionError("会话已结束")
     ident = client_key(session_hash, client)
-    db.execute(_insert(db)(MarketStreamClient).values(id=ident, session_hash=session_hash,
-        client=client, expires=now_ms() + LEASE_MS).on_conflict_do_nothing(index_elements=["id"]))
-    return db.scalar(select(MarketStreamClient).where(MarketStreamClient.id == ident).with_for_update())
+    locked = select(MarketStreamClient).where(MarketStreamClient.id == ident).with_for_update()
+    owner = db.scalar(locked)
+    while owner is None:
+        db.execute(_insert(db)(MarketStreamClient).values(id=ident, session_hash=session_hash,
+            client=client, expires=now_ms() + LEASE_MS).on_conflict_do_nothing(index_elements=["id"]))
+        owner = db.scalar(locked)
+    return owner
 
 
 def _existing_client(db, session_hash, client):
@@ -83,16 +87,24 @@ def register(session_hash, client, listener, generation, identity, query, state)
         if (not old or not old.active) and count >= SUBSCRIPTION_LIMIT:
             raise ValueError("行情订阅数量超过预算")
         stamp = now_ms()
-        db.execute(_insert(db)(MarketStreamTask).values(id=key, identity=identity, query=query,
-            sequence=0, payload={}, fingerprint="", lease_until=0, next_at=0,
-            updated_at=stamp, expires=stamp + LEASE_MS).on_conflict_do_nothing(index_elements=["id"]))
         previous_task = old.task_id if old else None
         # Replacement and last-consumer cancellation share task-row fencing
         # with publication. Consistent ordering also covers two clients that
         # concurrently exchange their old and new calculation identities.
-        tasks = {task.id: task for task in db.scalars(select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(
-            MarketStreamTask.id.in_(sorted({key, previous_task} - {None})))
-            .order_by(MarketStreamTask.id).with_for_update())}
+        tasks = {}
+        for task_id in sorted({key, previous_task} - {None}):
+            locked = select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(
+                MarketStreamTask.id == task_id).with_for_update()
+            task = db.scalar(locked)
+            # An expired orphan can disappear before the lock is acquired.
+            # Acquire insertion locks in the same key order as existing rows;
+            # ON CONFLICT DO NOTHING alone does not protect an existing Task.
+            while task is None and task_id == key:
+                db.execute(_insert(db)(MarketStreamTask).values(id=key, identity=identity, query=query,
+                    sequence=0, payload={}, fingerprint="", lease_until=0, next_at=0,
+                    updated_at=stamp, expires=stamp + LEASE_MS).on_conflict_do_nothing(index_elements=["id"]))
+                task = db.scalar(locked)
+            tasks[task_id] = task
         task = tasks[key]
         if not old:
             old = MarketStreamSubscription(id=ident, client_id=owner.id, listener=listener)
@@ -187,15 +199,27 @@ def renew(session_hash, client):
             return
         # Serialize the infrequent write phase with registration/cancellation;
         # idle delivery reads never acquire this write lock.
-        db.refresh(owner, with_for_update=True)
-        db.execute(update(MarketStreamClient).where(
-            MarketStreamClient.id == owner.id,
-            MarketStreamClient.expires <= renew_before).values(expires=deadline))
-        task_ids = list(db.scalars(update(MarketStreamSubscription).where(
+        owner = db.scalar(select(MarketStreamClient).where(
+            MarketStreamClient.id == owner.id).with_for_update()
+            .execution_options(populate_existing=True))
+        if not owner or owner.expires <= stamp:
+            raise PermissionError("行情连接租约已结束")
+        due_tasks = select(MarketStreamSubscription.task_id).where(
             MarketStreamSubscription.client_id == owner.id,
             MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp,
             MarketStreamSubscription.expires <= renew_before)
-            .values(expires=deadline).returning(MarketStreamSubscription.task_id)))
+        # Every lifecycle writer locks Client -> sorted Tasks -> Subscriptions.
+        # A bulk UPDATE's physical scan order cannot provide this guarantee.
+        task_ids = list(db.scalars(select(MarketStreamTask.id).where(
+            MarketStreamTask.id.in_(due_tasks)).order_by(MarketStreamTask.id).with_for_update()))
+        db.execute(update(MarketStreamClient).where(
+            MarketStreamClient.id == owner.id,
+            MarketStreamClient.expires <= renew_before).values(expires=deadline))
+        db.execute(update(MarketStreamSubscription).where(
+            MarketStreamSubscription.client_id == owner.id,
+            MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp,
+            MarketStreamSubscription.expires <= renew_before)
+            .values(expires=deadline))
         if task_ids:
             db.execute(update(MarketStreamTask).where(
                 MarketStreamTask.id.in_(task_ids), MarketStreamTask.expires < deadline).values(
@@ -405,8 +429,10 @@ def delivery(db, task, sub, payload, cursors):
             if query.series_kind == "composite" and state.get("initial_input_revision") is not None:
                 from .composite_series import period
                 from .storage import CompositeMinuteInput
-                cutoff = period(before, query.timeframe, page["calendar"])[0]
-                floor = page["origin"] if query.indicators else (after or 0)
+                cutoff = period(before, query.timeframe, page["calendar"])[
+                    1 if state.get("historical") else 0]
+                floor = (page["origin"] if query.indicators else
+                         period(after, query.timeframe, page["calendar"])[0] if after is not None else 0)
                 changed = db.scalar(select(CompositeMinuteInput.start).where(
                     CompositeMinuteInput.revision_id == page["revision_id"],
                     CompositeMinuteInput.input_revision > state["initial_input_revision"],
@@ -428,17 +454,29 @@ def delivery(db, task, sub, payload, cursors):
                 check = managed_check(db, inst, source, check_page["bars"], query)
         elif query.series_kind == "provider":
             dataset = db.get(ProviderDataset, task.identity["dataset_id"])
+            # Recursive provider studies read the fixed prefix preceding the
+            # visible window. Match Calculator's per-study input boundaries.
+            floor = min(spec.get("calculation_origin") or 0 for spec in query.indicators) if query.indicators else (after or 0)
             changed = db.scalar(select(ProviderBar.start).where(ProviderBar.dataset_id == dataset.id,
-                ProviderBar.chart_time >= (after or 0), ProviderBar.chart_time < before,
+                ProviderBar.start >= floor,
+                (ProviderBar.start <= before if state.get("historical") else ProviderBar.start < before),
                 ProviderBar.revision > 1, ProviderBar.changed_at > state.get("observed_at", 0)).limit(1))
             if changed is not None or dataset.metadata_json.get("invalidated_at", 0) > state.get("observed_at", 0):
                 return {"type": "reset", "reason": "history_changed"}
     if check:
+        # Historical pages do not receive tail-bar callbacks. Preserve the HTTP
+        # prefix credential and separately validate its excluded, accepted bar.
+        if state.get("historical") and state.get("history_tail_revision") and (
+                state["history_tail_revision"] != check.get("tail_revision")):
+            return {"type": "reset", "reason": "history_changed"}
         previous = state.get("history_revision")
         # The next comparison follows the loaded tail after this delivery.
         # Advancing that boundary must not mistake normal appends for repairs.
         state["history_revision"] = (check["revision"] if state.get("historical") else
                                      check.get("next_revision", check["revision"]))
+        if check.get("next_tail_revision"):
+            state["history_tail_revision"] = (check["tail_revision"] if state.get("historical") else
+                                             check["next_tail_revision"])
         if previous and previous != check["revision"]:
             return {"type": "reset", "reason": "history_changed"}
     progress = [(item.get("id"), min(item.get("cursor", 0), before or item.get("cursor", 0)),
@@ -463,7 +501,7 @@ def delivery(db, task, sub, payload, cursors):
     if page["bars"]:
         state["cursor"] = page["bars"][-1].get("chart_time", page["bars"][-1]["start"])
         state["loaded_before"] = page["bars"][-1]["start"]
-    for name in ("loaded_before", "history_revision", "initial_input_revision"):
+    for name in ("loaded_before", "history_revision", "history_tail_revision", "initial_input_revision"):
         if name in state:
             page[name] = state[name]
     page.pop("latest_bar", None)
@@ -473,12 +511,35 @@ def delivery(db, task, sub, payload, cursors):
 def cleanup():
     with transaction() as db:
         stamp = now_ms()
-        db.execute(delete(MarketStreamSubscription).where(MarketStreamSubscription.expires <= stamp))
-        referenced = select(MarketStreamSubscription.task_id).where(MarketStreamSubscription.active.is_(True))
-        retired = select(MarketStreamTask.id).where(MarketStreamTask.expires <= stamp,
-            MarketStreamTask.lease_until <= stamp, MarketStreamTask.id.not_in(referenced))
+        expired_sub = select(MarketStreamSubscription.id).where(
+            MarketStreamSubscription.client_id == MarketStreamClient.id,
+            MarketStreamSubscription.expires <= stamp).exists()
+        clients = list(db.scalars(select(MarketStreamClient.id).where(
+            or_(MarketStreamClient.expires <= stamp, expired_sub))
+            .order_by(MarketStreamClient.id).with_for_update(skip_locked=True).limit(256)))
+        expired_tasks = select(MarketStreamSubscription.task_id).where(
+            MarketStreamSubscription.client_id.in_(clients),
+            MarketStreamSubscription.expires <= stamp)
+        # Include all references, including inactive bindings. NOT IN would also
+        # let one NULL tombstone prevent every orphan task from being reclaimed.
+        referenced = select(MarketStreamSubscription.id).where(
+            MarketStreamSubscription.task_id == MarketStreamTask.id).exists()
+        tasks = list(db.scalars(select(MarketStreamTask.id).where(or_(
+            MarketStreamTask.id.in_(expired_tasks),
+            (MarketStreamTask.expires <= stamp) & (MarketStreamTask.lease_until <= stamp) & ~referenced))
+            .order_by(MarketStreamTask.id).with_for_update(skip_locked=True).limit(1024)))
+        # Never hold a Subscription while waiting for a Task or a busy Client.
+        # Recheck expiry after acquiring locks; another page may have renewed a
+        # shared calculation while this cleanup was selecting candidates.
+        db.execute(delete(MarketStreamSubscription).where(
+            MarketStreamSubscription.client_id.in_(clients),
+            MarketStreamSubscription.expires <= stamp,
+            or_(MarketStreamSubscription.task_id.in_(tasks), MarketStreamSubscription.task_id.is_(None))))
+        retired = select(MarketStreamTask.id).where(MarketStreamTask.id.in_(tasks),
+            MarketStreamTask.expires <= stamp, MarketStreamTask.lease_until <= stamp, ~referenced)
         db.execute(delete(MarketStreamResult).where(MarketStreamResult.task_id.in_(retired)))
         db.execute(delete(MarketStreamTask).where(MarketStreamTask.id.in_(retired)))
-        clients = select(MarketStreamSubscription.client_id)
-        db.execute(delete(MarketStreamClient).where(MarketStreamClient.expires <= stamp,
-            MarketStreamClient.id.not_in(clients)))
+        subscribed = select(MarketStreamSubscription.id).where(
+            MarketStreamSubscription.client_id == MarketStreamClient.id).exists()
+        db.execute(delete(MarketStreamClient).where(MarketStreamClient.id.in_(clients),
+            MarketStreamClient.expires <= stamp, ~subscribed))

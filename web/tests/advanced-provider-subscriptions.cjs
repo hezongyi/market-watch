@@ -29,20 +29,23 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   assert.deepEqual(calls.map(c=>c.path),['/charts/provider/subscribe','/charts/provider/unsubscribe']);
   assert.equal(streams.length,0,'late registration never starts an abandoned stream');
   await transport.subscribe({client:'c',listener:'two'});
-  await transport.subscribe({client:'c',listener:'three'});
+  await transport.subscribe({client:'c',listener:'three',history_tail_revision:'http-tail'});
   assert.equal(streams.length,1,'same client shares one event stream');
   streams[0].onmessage({data:JSON.stringify({listener:'two',type:'bars'})});
   assert.equal(received.length,1);
   await transport.unsubscribe({client:'c',listener:'two'});
   assert.equal(streams[0].closed,false,'another listener remains active');
   streams[0].onmessage({data:JSON.stringify({listener:'three',type:'bars',cursor:12000,revision:3,as_of:1000,
-    loaded_before:12000,history_revision:'loaded-prefix',initial_input_revision:4})});
+    loaded_before:12000,history_revision:'loaded-prefix',history_tail_revision:'delivered-tail',
+    initial_input_revision:4})});
   streams[0].onopen({});await flush();await flush();
   const resumed=calls.filter(c=>c.path.endsWith('/subscribe')&&c.args.listener==='three').at(-1);
   assert.equal(resumed.args.cursor,12000,'reconnect restores the last delivered cursor');
   assert.equal(resumed.args.revision,3);
   assert.equal(resumed.args.loaded_before,12000,'reconnect retains the expanded loaded range');
   assert.equal(resumed.args.history_revision,'loaded-prefix');
+  assert.equal(resumed.args.history_tail_revision,'delivered-tail',
+    'reconnect retains the tail credential accepted from realtime delivery');
   assert.equal(resumed.args.initial_input_revision,4);
   streams[0].readyState=2;
   streams[0].onerror({});
@@ -50,7 +53,10 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   for(const [id,callback] of timers){timers.delete(id);callback()}
   assert.equal(streams.length,2,'terminal native stream is replaced while listeners remain');
   streams[1].onopen({});await flush();await flush();
-  assert.equal(calls.filter(c=>c.path.endsWith('/subscribe')&&c.args.listener==='three').at(-1).args.cursor,12000);
+  const replaced=calls.filter(c=>c.path.endsWith('/subscribe')&&c.args.listener==='three').at(-1);
+  assert.equal(replaced.args.cursor,12000);
+  assert.equal(replaced.args.history_tail_revision,'delivered-tail',
+    'terminal transport replacement must preserve the same accepted tail credential');
   streams[0].onmessage({data:JSON.stringify({listener:'two',type:'bars'})});
   assert.equal(received.length,2,'delayed events for canceled listeners are ignored');
   streams[1].readyState=2;streams[1].onerror({});

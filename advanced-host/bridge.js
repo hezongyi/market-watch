@@ -88,7 +88,8 @@ function registerMarketBar(sub) {
     cursor:sub.last || 0,sequence:0,
     loaded_after:state.first ?? firstHistory.get(sub.symbol+'|'+sub.res) ?? null,
     loaded_before:state.last ?? sub.last ?? null,
-    history_revision:state.history_revision ?? null,observed_at:state.observed_at || 0,
+    history_revision:state.history_revision ?? null,history_tail_revision:state.history_tail_revision ?? null,
+    observed_at:state.observed_at || 0,
     binding:state.binding || null,initial_input_revision:state.input_revision ?? null,initial_indicator_pending:!!sub.initialIndicatorPending,historical:!!sub.historical}});
 }
 function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
@@ -102,7 +103,8 @@ function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
     accepted:true,empty:!bars.length,
     last:bars.length ? Math.max(old.last || 0,bars.at(-1).start) : null,observed_at:page.as_of || Date.now(),
     input_revision:page.input_revision ?? null,
-    binding:page.revision_id || null,history_revision:page.history_check?.next_revision || null});
+    binding:page.revision_id || null,history_revision:page.history_check?.next_revision || null,
+    history_tail_revision:page.history_check?.next_tail_revision || null});
   for(const sub of subscriptions.values()) if(sub.symbol===ticker && sub.res===res && (sub.window || '')===(window || '')) {
     const historyKey=ticker+'|'+res+(decode(ticker).series_kind==='provider' ? '|'+(window || '') : '');
     sub.last=Math.max(sub.last || 0,lastHistory.get(historyKey) || 0);
@@ -2013,6 +2015,7 @@ addEventListener("message", async (e) => {
       if(state) {
         if(event.loaded_before != null) state.last=event.loaded_before;
         if(event.history_revision != null) state.history_revision=event.history_revision;
+        if(event.history_tail_revision != null) state.history_tail_revision=event.history_tail_revision;
         if(event.initial_input_revision != null) state.input_revision=event.initial_input_revision;
       }
       if(event.pending?.length) send({type:'status',text:event.pending.join('；')});

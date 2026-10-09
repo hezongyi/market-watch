@@ -89,7 +89,7 @@ export function providerSubscriptions(
             else if(value.bars?.length) current.cursor=value.bars.at(-1).chart_time ?? value.bars.at(-1).start;
             if(value.revision != null) current.revision=value.revision;
             if(value.as_of != null) current.observed_at=value.as_of;
-            for (const name of ['loaded_before', 'history_revision', 'initial_input_revision'])
+            for (const name of ['loaded_before', 'history_revision', 'history_tail_revision', 'initial_input_revision'])
               if (value[name] != null) current[name] = value[name];
           }
           if (value.type === 'quotes') {

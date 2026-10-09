@@ -88,7 +88,8 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
   await evaluate(`(async()=>{
     reloadHistory=async()=>{
       request=async query=>query.op==='dataset' ? {ready:true,start:60000,revision:2} :
-        {bars:[{start:60000,end:120000,open:1,high:2,low:1,close:2}],indicators:[],has_more:false};
+        {bars:[{start:60000,end:120000,open:1,high:2,low:1,close:2}],indicators:[],has_more:false,
+          history_check:{next_revision:'accepted-prefix',next_tail_revision:'accepted-tail'}};
       await feed.getBars({ticker:'EURUSD'},'1',{to:1000,countBack:160,firstDataRequest:true},
         ()=>{},error=>{throw Error(error)});
       return true;
@@ -100,15 +101,23 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
   assert.equal(restoredRegistration.history_accepted,true);
   assert.equal(restoredRegistration.query.dataset_start,60000);
   assert.equal(restoredRegistration.cursor,60000);
+  assert.equal(restoredRegistration.history_revision,'accepted-prefix');
+  assert.equal(restoredRegistration.history_tail_revision,'accepted-tail',
+    'accepted HTTP tail credential must accompany the restored subscription');
   assert.equal(sent.filter(row=>row.type==='market-subscribe').length,beforeRecovery+1,
     'history recovery must publish one accepted generation after the reload completes');
+  await deliver({listener:restoredRegistration.listener,generation:restoredRegistration.generation,
+    sequence:1,type:'bars',bars:[{start:60000,end:120000,open:1,high:2,low:1,close:2}],
+    history_revision:'delivered-prefix',history_tail_revision:'delivered-tail'});
+  assert.equal(evaluate("marketHistoryState.get('EURUSD|1|').history_tail_revision"),'delivered-tail',
+    'accepted realtime delivery must retain its latest tail credential for re-registration');
   await evaluate(`reloadHistory=async()=>{
     lastHistory.set('EURUSD|1',30000);
     acceptMarketHistory('EURUSD','1',{bars:[{start:30000,end:90000}],as_of:Date.now()});
     return true;
   };`);
   await deliver({listener:restoredRegistration.listener,generation:restoredRegistration.generation,
-    sequence:1,type:'reset',reason:'tail_retracted'});
+    sequence:2,type:'reset',reason:'tail_retracted'});
   const retractedRegistration=sent.filter(row=>row.type==='market-subscribe').at(-1).args;
   assert.equal(retractedRegistration.cursor,30000,
     'recovery must accept an authoritative shorter tail without restoring the old cursor');

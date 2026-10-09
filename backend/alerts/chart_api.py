@@ -199,20 +199,40 @@ def history_check(db, inst, source, visible, body):
                 Bar.instrument_id == inst.id,
                 Bar.timeframe == source,
                 Bar.start < boundary,
-                Bar.start >= (body.revision_after or 0),
+                Bar.start >= (0 if body.indicators else body.revision_after or 0),
             )
         ).one()
         return hashlib.sha256(
             json.dumps([list(stamp), inst.calendar_profile], sort_keys=True).encode()
         ).hexdigest()
 
+    def tail_fingerprint(boundary):
+        # The realtime prefix deliberately excludes this target bucket. A
+        # historical consumer also retains it, including every M15/D1 member.
+        if body.timeframe in ("M30", "W1", "MN"):
+            from .chart_data import bounds
+            from .domain import calendar_for
+            from .storage import instant, ms
+
+            end = ms(bounds(instant(boundary), body.timeframe, calendar_for(inst))[1])
+        else:
+            end = boundary + 1
+        stamp = db.execute(select(
+            func.count(Bar.id), func.sum(Bar.revision + Bar.volume_revision), func.max(Bar.received_at)
+        ).where(Bar.instrument_id == inst.id, Bar.timeframe == source,
+                Bar.start >= boundary, Bar.start < end)).one()
+        return hashlib.sha256(json.dumps([list(stamp), inst.calendar_profile], sort_keys=True).encode()).hexdigest()
+
     revision = fingerprint(before)
+    tail_revision = tail_fingerprint(before)
     return {
         "before": before,
         "after": body.revision_after,
         "revision": revision,
         "next_before": next_before,
         "next_revision": revision if next_before == before else fingerprint(next_before),
+        "tail_revision": tail_revision,
+        "next_tail_revision": tail_revision if next_before == before else tail_fingerprint(next_before),
     }
 
 

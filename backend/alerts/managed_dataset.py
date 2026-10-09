@@ -611,8 +611,8 @@ def published_history_check(db, inst, pub, visible, body):
     next_before = visible[-1]["start"]
     before = body.revision_before or next_before
     after = body.revision_after
-    lower = after or 0
-    if after is not None and body.timeframe in ("D1", "W1", "MN"):
+    lower = 0 if body.indicators else after or 0
+    if not body.indicators and after is not None and body.timeframe in ("D1", "W1", "MN"):
         # The datafeed reports UTC trading-date labels; published keys are session opens.
         lower = date_start(inst, instant(after).date().isoformat())
     lower = max(pub.start, body.dataset_start or pub.start, lower)
@@ -629,8 +629,18 @@ def published_history_check(db, inst, pub, visible, body):
         return hashlib.sha256(json.dumps(list(stamp)).encode()).hexdigest()
 
     revision = fingerprint(before)
+    def tail_fingerprint(boundary):
+        revision = db.scalar(select(ChartPublishedBar.revision).where(
+            ChartPublishedBar.instrument_id == inst.id,
+            ChartPublishedBar.timeframe == body.timeframe,
+            ChartPublishedBar.start == boundary))
+        return hashlib.sha256(json.dumps(revision).encode()).hexdigest()
+
+    tail_revision = tail_fingerprint(before)
     return dict(before=before, after=after, revision=revision, next_before=next_before,
-                next_revision=revision if before == next_before else fingerprint(next_before))
+                next_revision=revision if before == next_before else fingerprint(next_before),
+                tail_revision=tail_revision,
+                next_tail_revision=tail_revision if before == next_before else tail_fingerprint(next_before))
 
 
 def data(body):
