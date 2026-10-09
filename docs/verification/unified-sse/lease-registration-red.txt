@@ -1,0 +1,35 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_registering_new_listeners_does_not_starve_existing_lease _________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fd170e95a70>
+
+    def test_registering_new_listeners_does_not_starve_existing_lease(database, monkeypatch):
+        owner = session(database)
+        stamp = stream.now_ms()
+        monkeypatch.setattr(stream, "now_ms", lambda: stamp)
+        register(owner, listener="first")
+        for offset in (30000, 60000, 90000):
+            monkeypatch.setattr(stream, "now_ms", lambda: stamp + offset)
+            register(owner, listener=f"later-{offset}")
+            stream.renew(owner, "page")
+        monkeypatch.setattr(stream, "now_ms", lambda: stamp + 125000)
+        stream.renew(owner, "page")
+        with database.begin() as db:
+            first = db.scalar(select(MarketStreamSubscription).where(
+                MarketStreamSubscription.listener == "first"))
+>           assert first.active and first.expires > stream.now_ms(), (
+                "New registrations must not postpone renewal of an older active listener"
+            )
+E           AssertionError: New registrations must not postpone renewal of an older active listener
+E           assert (True and 1791550605748 > 1791550610748)
+E            +  where True = <alerts.storage.MarketStreamSubscription object at 0x7fd170ab7d90>.active
+E            +  and   1791550605748 = <alerts.storage.MarketStreamSubscription object at 0x7fd170ab7d90>.expires
+E            +  and   1791550610748 = <function test_registering_new_listeners_does_not_starve_existing_lease.<locals>.<lambda> at 0x7fd170adba60>()
+E            +    where <function test_registering_new_listeners_does_not_starve_existing_lease.<locals>.<lambda> at 0x7fd170adba60> = stream.now_ms
+
+backend/tests/test_market_stream_io_budget.py:58: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_stream_io_budget.py::test_registering_new_listeners_does_not_starve_existing_lease
+1 failed, 1 passed in 0.41s

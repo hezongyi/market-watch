@@ -1,5 +1,10 @@
 # 统一行情订阅资源开销（Ubuntu 实测，2026-10-09）
 
+补充：旧版本 `6fd9273` 与租约优化版 `32bc00b` 的真实隔离对照已完成，
+见 [old-release-cost-report.md](old-release-cost-report.md)。原方案净增量为单周期约
++0.110 CPU 核/+101.8 MiB、八周期约 +0.264 CPU 核/+128.5 MiB；
+八周期 WAL 为旧版 2.37×。下面保留较早的新版本内 fallback 对照及其限制。
+
 早期对照源码 `95d501e571a791400517214b3dd78ec2b6c10a66`；真实双组合新增采样运行 `0eb7f6c`。project/task
 `mw-unified-sse-20261008`。Ubuntu VM 为 4 vCPU、约 16 GiB RAM，主机有其他任务。
 所有数据来自本任务准确归属容器；不包含宿主 Chromium 和 fixture 进程。

@@ -1,5 +1,12 @@
 # 统一行情订阅：开发验证记录
 
+2026-10-09追加：统一租约写入优化及原方案 `6fd9273` 独立基线已完成，
+最终业务镜像为 `32bc00b`（dirty=false）。本地140项、宿主PG53项、
+最终镜像PG62项及Node三组通过；新增Practice复验见 completion-audit。
+净成本和同口径输入/窗口见 [old-release-cost-report.md](old-release-cost-report.md)。
+单周期增加约0.110 CPU核/101.8 MiB，八周期增加0.264 CPU核/128.5 MiB；
+WAL分别为旧方案1.22×/2.37×。下面087b135等记录为历史验收快照。
+
 技术验收与交付记录已完成；Ubuntu 实例保留供用户验收，未生产发布、未退役。实施范围以 `../../market-data-unified-subscriptions-plan.md` 为准。
 
 ## 当前环境与实现

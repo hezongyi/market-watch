@@ -1,5 +1,10 @@
 # 统一行情订阅完成审计
 
+追加验收（2026-10-09）：业务镜像已升级到 `32bc00b`，原 `087b135` 记录保留为历史证据。
+租约优化、本地140项/宿主PG53项/最终镜像PG62项及旧版本隔离成本矩阵均通过；
+新增Practice首屏/owner恢复/双账户切换全部通过；成本实例按恢复核验后退役。
+详情见追加记录，历史表格不作为最新运行版本声明。
+
 实施依据：`../../market-data-unified-subscriptions-plan.md`；开发起点 `6fd9273`。
 Ubuntu 技术验收与交付记录已完成；087b135 的闲置组合首屏、owner 恢复、账户切换复验通过。实例保留供用户验收；用户验收及退役尚未结束。未执行生产发布。
 
@@ -63,6 +68,49 @@ MWSeries.same规范化身份比较，而不是将相同系列的大写展示误�
 资源报告沿用已记录的实际版本和测量窗口，不能声称此次文档版本重新测得生产净增量。
 工程交付与技术验收完成；用户验收仍进行中，实例及数据库保留，未标记 Docker task 结束。
 用户验收结束后须按 mw-docker retire 预览、备份/恢复核验及精确退役流程收尾。
+
+## 租约优化与旧方案成本收口（2026-10-09）
+
+用户授权执行旧版本基线及数据库开销优化，通过后提交PR。
+最终业务镜像 commit 为 `32bc00bffb547015e6a3c5b04c3a3efa0803da81`，
+API/web/chart/pricing及其他所有13个运行应用容器核对同一commit、dirty=false。
+Ubuntu Practice主API healthy；网页 http://127.0.0.1:15643，
+API http://127.0.0.1:15641，chart http://127.0.0.1:15644，启停命令沿用README。
+未访问或修改unraid生产。文档提交晚于业务镜像，不冒称业务镜像包含后续审计文字。
+
+半秒delivery循环的client创建/锁与租约重写已移除，现有client读取仍检查会话和有效期；
+页面或任一活跃listener需要续期时才进行有条件批量续租。
+先红后绿锁定两种问题：闲置六轮transport不能写租约；新增listener不能推迟旧listener续期。
+SQLite与真实PG均通过，保留session/认证、世代取消、归属/接管与有界回放契约。
+
+最终验证结果：
+
+- 本地选定统一stream、组合/固定历史及fixture回归140项通过，证据 lease-local-32bc00b.txt。
+- 新增租约边界与已有真实PG/quote/live检查53项通过，证据 lease-host-postgres-32bc00b.txt。
+- 最终API镜像内PostgreSQL gates62项通过，无skip，证据 lease-image-postgres-32bc00b.txt。
+- Node真实bridge回调、固定系列、订阅传输三组通过；Ruff/py_compile/node语法/diff check通过。
+- 最终镜像真实Practice组合闲置首屏、pricing owner停止/恢复、双账户切换三组通过。
+  后两组同时验证最后browser取消后独立watch继续接数/判断，以及watch暂停后来源需求释放。
+  原账户已恢复，无待恢复配置；10份OANDA历史和新增原始报告哈希全部核对一致，
+  最新三份运行32bc00b，摘要见 oanda-runtime-summary.json。
+
+成本对照为原方案6fd9273与32bc00b的两套独立Ubuntu实例，每侧每场景一个60秒窗口，
+seed/OHLC/起价/更新频率一致，真实旧web/API轮询对比新web/API/SSE；
+不再以新版本fallback作为旧版本。单周期增量约0.110 CPU核/101.8 MiB、
+八周期约0.264 CPU核/128.5 MiB；WAL分别旧版1.22×/2.37×。
+单周期10次输入逐值SSE回调、八周期32次逐值SSE回调全部通过；
+窗口内新侧行情HTTP为0，旧侧分别8/36次。数据库、网络、队列和测量限制见
+old-release-cost-report.md及old-release-cost-summary.json。
+内部PG网络、事务和持久task开销仍增加，未宣称生产容量、物理磁盘净增量或长期稳定性已测定。
+
+两套成本task/project `mw-unified-sse-baseline-20261009`、
+`mw-unified-sse-lease-optimization`已分别执行mw-docker retire预览、归档、
+实际恢复逐表行数核对及来源稳定核对，然后精确删除容器/网络/数据卷和无引用任务镜像。
+两个非template数据库dump的哈希及实际恢复证据均核对；归属资源残留0。
+完整私有归档保留，提交摘要 cost-retirement-summary.json。
+Practice task `mw-unified-sse-20261008`继续运行供用户验收，未结束/未退役，生产发布未执行。
+代码可与当前origin/main自动合并；本轮没有将main后续OANDA生产补丁混入6fd9273成本基线，
+合并/生产发布前仍需针对最终合并版本按既有发布流程核验。
 
 ## 原始目标最终核验（2026-10-09）
 

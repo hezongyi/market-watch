@@ -149,6 +149,72 @@
       "alternate_account_real_prices": true,
       "old_account_fenced": true,
       "original_account_restored": true
+    },
+    {
+      "passed": true,
+      "synthetic": false,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "32bc00bffb547015e6a3c5b04c3a3efa0803da81",
+      "harness_sha256": "5fb9140201190e6d76b8ec7be520503950a2bfc45462d1e3eb147902e71ef948",
+      "fixture_sha256": "69642b72731dac41b8003f29bcb58cd8f704fcda4ab74919178ba345d770f5a7",
+      "checks": [
+        "real Practice fixed M1 history and stream-backed composite update licensed chart through SSE",
+        "real composite first screen receives bars after idle without a period switch"
+      ],
+      "private_evidence": "artifacts/unified-sse/oanda-first-screen-32bc00b-passed.json",
+      "private_evidence_sha256": "a2a16f110700d8b5de7167517f86fdbbd623348ba2ef3225813218af6b6ec1b7",
+      "series_kind": "composite",
+      "native_bar_callbacks": 2,
+      "quote_only_callbacks": 0,
+      "owner_failure_status_rows": 0,
+      "owner_recovery_status_rows": 0,
+      "watch_evaluation_advanced": false
+    },
+    {
+      "passed": true,
+      "synthetic": false,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "32bc00bffb547015e6a3c5b04c3a3efa0803da81",
+      "harness_sha256": "5fb9140201190e6d76b8ec7be520503950a2bfc45462d1e3eb147902e71ef948",
+      "fixture_sha256": "69642b72731dac41b8003f29bcb58cd8f704fcda4ab74919178ba345d770f5a7",
+      "checks": [
+        "real Practice fixed M1 history and stream-backed composite update licensed chart through SSE",
+        "real supplier demand with all bars closed keeps native quote callback delivery",
+        "real pricing worker stop retracts sampled-BID readiness; restart restores actual source prices",
+        "after final browser cancellation real OANDA prices and tick rule evaluation continue for independent active watch",
+        "last independent demand release removes real source from desired acquisition"
+      ],
+      "private_evidence": "artifacts/unified-sse/oanda-owner-32bc00b-passed.json",
+      "private_evidence_sha256": "c0d43692e857fc43f210c0638287a4afd50dc89da9c8d4e611ef68bcfb7d0857",
+      "series_kind": "composite",
+      "native_bar_callbacks": 2,
+      "quote_only_callbacks": 77,
+      "owner_failure_status_rows": 2,
+      "owner_recovery_status_rows": 3,
+      "watch_evaluation_advanced": true
+    },
+    {
+      "passed": true,
+      "synthetic": false,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "runtime_image_commit": "32bc00bffb547015e6a3c5b04c3a3efa0803da81",
+      "harness_sha256": "5fb9140201190e6d76b8ec7be520503950a2bfc45462d1e3eb147902e71ef948",
+      "fixture_sha256": "69642b72731dac41b8003f29bcb58cd8f704fcda4ab74919178ba345d770f5a7",
+      "checks": [
+        "real supplier demand with all bars closed keeps native quote callback delivery",
+        "real alternate Practice account delivers separately; original history/identity preserved, old account sampled prices fenced, original account restored",
+        "after final browser cancellation real OANDA prices and tick rule evaluation continue for independent active watch",
+        "last independent demand release removes real source from desired acquisition"
+      ],
+      "private_evidence": "artifacts/unified-sse/oanda-account-switch-32bc00b-passed.json",
+      "private_evidence_sha256": "81bc5dcc9344de04ffe8fe5b484cd74e77387b9bd92e503c6abb51acf714a85c",
+      "immutable_identity_preserved": true,
+      "alternate_account_real_prices": true,
+      "old_account_fenced": true,
+      "original_account_restored": true
     }
   ],
   "scope": "Real Practice upstream in isolated Ubuntu containers: provider native M1, managed/composite quote-only, real fixed M1 composite, owner stop/recovery, alternate-account fencing and independent watch demand. No trades/notification delivery.",
