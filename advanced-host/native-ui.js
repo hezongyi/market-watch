@@ -296,7 +296,17 @@ function chartNativeUi(widget, doc, searchSymbols) {
           dispose() { root?.unmount(); root = null; delete node.dataset.nativeComponent; } };
       }
       const popupCancels=new Set();
-      return { mount, components, react: R, createRoot,
+      let nativeIndicators;
+      const ui = { mount, components, react: R, createRoot,
+        async openIndicators(options) {
+          if (!String(TradingView.version()).includes(expected)) throw Error("原生指标版本尚未适配");
+          if (!nativeIndicators) {
+            await req.e(46439);
+            nativeIndicators = chartNativeIndicators(widget,doc,req,ui);
+          }
+          nativeIndicators.open(options);
+          return nativeIndicators;
+        },
         cancelPopups() {if(!popupCancels.size)return;widget.closePopupsAndDialogs();for(const cancel of [...popupCancels]) cancel();popupCancels.clear();},
         sidebarClasses: req(40806),
         pick(options) {
@@ -325,6 +335,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
           catch(error) {cancel();}
         }),
       };
+      return ui;
     })().catch(error => { loading = undefined; throw error; });
     return loading;
   }

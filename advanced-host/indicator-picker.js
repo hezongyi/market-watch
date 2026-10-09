@@ -125,6 +125,7 @@ function chartIndicatorPicker(chartWidget, catalog, report, getNativeUi) {
     opening = false,
     generation = 0,
     ui,
+    nativeExtension,
     nativeRoot,
     nativeMount,
     searchControl,
@@ -183,6 +184,7 @@ function chartIndicatorPicker(chartWidget, catalog, report, getNativeUi) {
   };
   doc.addEventListener("pointerdown", rememberPointer, true);
   function close(restore = true) {
+    nativeExtension?.close();
     ++generation;
     opening = false;
     dialog.open = false;
@@ -241,6 +243,11 @@ function chartIndicatorPicker(chartWidget, catalog, report, getNativeUi) {
       if (!adapter) throw Error("原生界面加载器不可用");
       ui = await adapter.load();
       if (disposed || activeGeneration !== generation) return;
+      if (ui.openIndicators) {
+        nativeExtension = await ui.openIndicators({entries,icon,report,isCurrent:()=>!disposed && activeGeneration === generation});
+        opening = false;
+        return;
+      }
       if (!searchControl) {
         fallbackInput.remove();
         searchControl = ui.mount("search", search, searchProps());
@@ -733,6 +740,7 @@ function chartIndicatorPicker(chartWidget, catalog, report, getNativeUi) {
       toolbarObserver.disconnect();
       resize.disconnect();
       searchControl?.dispose();
+      nativeExtension?.dispose();
       toolbarStyle.remove();
       dialog.remove();
       doc.removeEventListener("keydown", keyboard, true);

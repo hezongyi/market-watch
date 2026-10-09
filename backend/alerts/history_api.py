@@ -135,6 +135,19 @@ def router(authenticated):
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
+    @routes.get("/center/task-feed")
+    def center_task_feed(dataset_id: str | None = None, query: str = "", source: str | None = None,
+                         status: str = "all", page_size: int = 25, snapshot: int | None = None,
+                         before: str | None = None, ids: str | None = None):
+        from .data_center import task_feed
+
+        try:
+            with transaction() as db:
+                return task_feed(db, dataset_id=dataset_id, query=query, source=source,
+                    status=status, page_size=page_size, snapshot=snapshot, before=before, ids=ids)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
     @routes.get("/center/platform")
     def center_platform(query: str = "", source: str | None = None, page: int = 1, page_size: int = 25, asset_class: str | None = None):
         from .platform_catalog import catalog

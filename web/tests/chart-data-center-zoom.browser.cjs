@@ -150,13 +150,13 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await native().getByRole('button', { name: '关闭数据中心' }).click();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
       await host().evaluate(()=>indicatorPicker.open());
-      const indicators=native().locator('[data-name="mw-indicator-dialog"]');
+      const indicators=native().locator('[data-name="indicators-dialog"]');
       await expect(indicators).toBeVisible();
-      await indicators.getByRole('searchbox',{name:'搜索指标',exact:true}).fill('SMA');
+      await indicators.getByLabel('搜索指标',{exact:true}).fill('SMA');
       await indicators.locator('[data-study-name="守望 Python SMA"]').getByRole('button',{name:/查看.*详情/}).click();
-      const indicatorPanel=indicators.locator('.mw-indicator-detail');
+      const indicatorPanel=indicators.locator('.mw-native-indicator-detail');
       await expect(indicatorPanel.getByRole('button',{name:'关闭指标详情',exact:true})).toBeInViewport();
-      expect(await indicators.locator('.mw-indicator-picker').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
+      expect(await indicators.locator('.mw-native-indicator-content').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
       expect(await indicatorPanel.evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
       await screenshot(`browser-zoom200-indicators-${width}.png`);
       await page.keyboard.press('Escape');

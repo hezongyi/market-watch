@@ -4,7 +4,7 @@ COPY index.html build-assets.mjs patch-native-reserve.mjs native-reserve.js nati
 COPY charting_library/ ./charting_library/
 COPY chart-maximize.js data-center.js price-format.js ./
 COPY chart-theme.js ./
-COPY native-ui.js ./
+COPY native-ui.js native-indicator-dialog.js ./
 ARG NATIVE_RESERVE_ENABLED=true
 ENV NATIVE_RESERVE_ENABLED=${NATIVE_RESERVE_ENABLED}
 RUN if [ "$NATIVE_RESERVE_ENABLED" = "true" ]; then node patch-native-reserve.mjs; \

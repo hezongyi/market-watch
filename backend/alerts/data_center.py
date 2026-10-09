@@ -2,8 +2,8 @@
 
 from sqlalchemy import case, func, or_, select
 
-from .market_names import code_search
 from .history_maintenance import plan_report
+from .market_names import code_search
 from .storage import (
     DatasetMaintenance,
     HistoryArtifact,
@@ -101,12 +101,7 @@ def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, 
             "page": page, "page_size": page_size}
 
 
-def task_list(db, *, dataset_id=None, query="", source=None, status="all", page=1, page_size=25):
-    from .history_api import dataset_report
-    from .history_versions import version_report
-
-    if page < 1 or not 1 <= page_size <= 100:
-        raise ValueError("无效的任务分页")
+def _task_query(*, dataset_id=None, query="", source=None, status="all"):
     if status not in ("all", "active", "attention", "history", "paused"):
         raise ValueError("无效的任务状态筛选")
     base = select(HistoryVersion.id).join(MarketDataset).join(Instrument).outerjoin(HistoryRun,
@@ -129,18 +124,82 @@ def task_list(db, *, dataset_id=None, query="", source=None, status="all", page=
               "history": ("published", "cancelled"), "paused": ("paused",)}
     if status != "all":
         base = base.where(state.in_(groups[status]))
+    return base
+
+
+
+def _task_report(db, ident):
+    from .history_api import dataset_report
+    from .history_versions import version_report
+
+    report = version_report(db, ident)
+    dataset = db.get(MarketDataset, report["dataset_id"])
+    report["dataset"] = dataset_report(dataset, db.get(Instrument, dataset.instrument_id))
+    report["version_status"] = report["status"]
+    report["status"] = report["task_status"]
+    report["controllable"] = db.get(HistoryRun, ident) is not None and report["status"] not in ("published", "cancelled")
+    return report
+
+
+
+def task_list(db, *, dataset_id=None, query="", source=None, status="all", page=1, page_size=25):
+    if page < 1 or not 1 <= page_size <= 100:
+        raise ValueError("无效的任务分页")
+    base = _task_query(dataset_id=dataset_id, query=query, source=source, status=status)
     total = db.scalar(select(func.count()).select_from(base.subquery()))
-    items = []
-    for ident in db.scalars(base.order_by(HistoryVersion.created_at.desc(), HistoryVersion.id)
-                           .offset((page - 1) * page_size).limit(page_size)):
-        report = version_report(db, ident)
-        dataset = db.get(MarketDataset, report["dataset_id"])
-        report["dataset"] = dataset_report(dataset, db.get(Instrument, dataset.instrument_id))
-        report["version_status"] = report["status"]
-        report["status"] = report["task_status"]
-        report["controllable"] = db.get(HistoryRun, ident) is not None and report["status"] not in ("published", "cancelled")
-        items.append(report)
-    return {"items": items, "total": total, "page": page, "page_size": page_size}
+    ids = db.scalars(base.order_by(HistoryVersion.created_at.desc(), HistoryVersion.id)
+        .offset((page - 1) * page_size).limit(page_size))
+    return {"items": [_task_report(db, ident) for ident in ids], "total": total,
+            "page": page, "page_size": page_size}
+
+
+def task_feed(db, *, dataset_id=None, query="", source=None, status="all", page_size=25,
+              snapshot=None, before=None, ids=None):
+    """Read-only keyset browsing; state polling never reorders already loaded rows."""
+    from uuid import UUID
+
+    from .storage import now_ms
+
+    if not 1 <= page_size <= 100:
+        raise ValueError("无效的任务分页")
+    base = _task_query(dataset_id=dataset_id, query=query, source=source, status=status)
+    if ids is not None:
+        requested = list(dict.fromkeys(ids.split(",")))
+        try:
+            if not 1 <= len(requested) <= 100 or any(str(UUID(ident)) != ident for ident in requested):
+                raise ValueError()
+        except (ValueError, TypeError):
+            raise ValueError("无效的任务身份") from None
+        existing = set(db.scalars(select(HistoryVersion.id).where(HistoryVersion.id.in_(requested))))
+        return {"items": [_task_report(db, ident) for ident in requested if ident in existing]}
+    stamp = now_ms()
+    if snapshot is None:
+        # A closed millisecond boundary also puts same-millisecond insertions
+        # into the new-record notice instead of ambiguously joining this feed.
+        snapshot = max(0, stamp - 1)
+    if not 0 <= snapshot <= stamp:
+        raise ValueError("无效的任务快照")
+    new_count = db.scalar(select(func.count()).select_from(
+        base.where(HistoryVersion.created_at > snapshot).subquery()))
+    base = base.where(HistoryVersion.created_at <= snapshot)
+    total = db.scalar(select(func.count()).select_from(base.subquery()))
+    if before:
+        try:
+            created, ident = before.split(":")
+            created = int(created)
+            if not 0 <= created <= snapshot or str(UUID(ident)) != ident:
+                raise ValueError()
+        except (ValueError, TypeError):
+            raise ValueError("无效的任务游标") from None
+        base = base.where(or_(HistoryVersion.created_at < created,
+            (HistoryVersion.created_at == created) & (HistoryVersion.id > ident)))
+    selected = list(db.scalars(base.order_by(HistoryVersion.created_at.desc(), HistoryVersion.id)
+        .limit(page_size + 1)))
+    items = selected[:page_size]
+    last = db.get(HistoryVersion, items[-1]) if len(selected) > page_size else None
+    return {"items": [_task_report(db, ident) for ident in items], "total": total,
+        "snapshot": snapshot, "new_count": new_count,
+        "next_cursor": f"{last.created_at}:{last.id}" if last else None}
 
 
 def coverage_report(db, version_id, *, page=1, page_size=25):

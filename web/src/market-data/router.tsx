@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useCallback, typ
 import { centerLocation } from "./location";
 
 export type CenterNavigation = {
+  workspace?: string;
   location: string;
   navigate: (to: string, options?: { replace?: boolean; saved?: boolean }) => void;
   apply: (ticker: string, frame: string) => Promise<void>;
