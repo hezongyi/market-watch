@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "environment": "Ubuntu isolated Docker",
+  "synthetic": true,
+  "phases": [
+    {
+      "phase": "startup-auth",
+      "rows": 2,
+      "false_readiness": false,
+      "status_visible": true
+    },
+    {
+      "phase": "auth",
+      "rows": 2,
+      "false_readiness": false,
+      "status_visible": true
+    },
+    {
+      "phase": "maintenance",
+      "rows": 2,
+      "false_readiness": false,
+      "status_visible": true
+    },
+    {
+      "phase": "closed",
+      "rows": 2,
+      "false_readiness": false,
+      "status_visible": true
+    },
+    {
+      "phase": "recovering",
+      "rows": 2,
+      "false_readiness": false,
+      "status_visible": true
+    }
+  ],
+  "exceptions": [],
+  "native": {
+    "initial_charts": 4,
+    "restored_charts": 4,
+    "restore_cycles": 3,
+    "symbols": [
+      "SSEFIXTURE",
+      "SSEFIXTURE",
+      "SSEFIXTURE",
+      "SSEFIXTURE"
+    ]
+  },
+  "mobile_status": true
+}
