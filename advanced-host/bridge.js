@@ -400,26 +400,27 @@ function seriesPresentationRows(symbols) {
 const nativeSearchPages = new Map();
 async function searchNativeSymbols(options) {
   const epoch = workspaceEpoch;
-  const key = JSON.stringify([options.userInput,options.exchange,options.symbolType,epoch]);
+  const kind = options.kind || "all";
+  const key = JSON.stringify([kind,options.userInput,options.exchange,options.symbolType,epoch]);
   const start = options.start || 0;
   let pages = nativeSearchPages.get(key);
   if (!pages || start === 0) {pages=new Map([[0,null]]);nativeSearchPages.set(key,pages);}
   while(nativeSearchPages.size>20) nativeSearchPages.delete(nativeSearchPages.keys().next().value);
   if (!pages.has(start)) throw Error("搜索分页已失效，请重新搜索");
-  let cursor=pages.get(start),page;
+  let position=pages.get(start),page;
   for(let scan=0;scan<5;scan++) {
-    page=await request({op:"searchPage",args:{kind:"all",query:options.userInput || "",page_size:50,
+    page=await request({op:"searchPage",args:{kind,query:options.userInput || "",page_size:50,
       source:options.exchange ? options.exchange.toLowerCase() : undefined,
-      symbol_type:options.symbolType || "",cursor:cursor || undefined}},"market",()=>epoch===workspaceEpoch);
-    cursor=page.next_cursor;
-    if(page.items.length || !cursor) break;
+      symbol_type:options.symbolType || "",...(kind === "all" ? {cursor:position || undefined} : {offset:position || 0})}},"market",()=>epoch===workspaceEpoch && !options.signal?.aborted);
+    position=kind === "all" ? page.next_cursor : page.next_offset;
+    if(page.items.length || position == null) break;
   }
   if(epoch!==workspaceEpoch) throw Error("工作区已切换");
-  if(cursor) pages.set(start+page.items.length,cursor);
+  if(position != null) pages.set(start+page.items.length,position);
   while(pages.size>256) pages.delete(pages.keys().next().value);
   return {items:page.items.map(s=>({symbol:s.display_symbol || s.symbol,ticker:s.ticker,
     description:s.label+" · "+s.description,exchange:s.source === "composite" ? (s.historical_source || "").toUpperCase() : s.source.toUpperCase(),
-    type:s.type || "other"})),remaining:cursor ? 1 : 0};
+    type:s.type || "other"})),remaining:position != null ? 1 : 0};
 }
 
 const feed = {
@@ -1631,7 +1632,7 @@ function boot(
         send({type: "error", error: String(e)}));
       // Public left-aligned buttons retain their creation order in the header.
       if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
-        workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send,
+        workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,
         suspendIndicators: () => indicatorPicker?.close(),
         managementRequest: (args, signal) => request(args, "data-center-api", () => !signal.aborted),
         resolve: args => request({op:"resolve",args},"market")});

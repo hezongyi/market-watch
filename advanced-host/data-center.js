@@ -1,12 +1,12 @@
 /* Native dialog host. Authenticated operations remain in the trusted app. */
-function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest }) {
+function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols }) {
   const probe = widget.createButton({ align: "left", useTradingViewStyle: false });
   const doc = probe.ownerDocument;
   widget.removeButton(probe);
   const session = crypto.randomUUID(), channel = "mw-data-center-v1";
   const resolutions = {M1:"1",M5:"5",M15:"15",M30:"30",H1:"60",H4:"240",D1:"1D",W1:"1W",MN:"1M"};
   const dialog = { open: false };
-  const nativeUi = chartNativeUi(widget, doc);
+  const nativeUi = chartNativeUi(widget, doc, searchSymbols);
   const listeners = new Set();
   let nativeRoot, businessRoot, fallback, fallbackFrame, ui, opening = false, openGeneration = 0, assetPromise;
   const readControllers = new Set();

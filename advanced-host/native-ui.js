@@ -1,11 +1,44 @@
 /* The only adapter to the installed, version-pinned native UI implementation.
  * No chart-properties renderer, model or undo checkpoint is used here.
  */
-function chartNativeUi(widget, doc) {
+function chartNativeUi(widget, doc, searchSymbols) {
   const expected = "6b804c486857f27920cf761aa7eb6e29d9bb6362";
   const win = doc.defaultView;
-  let loading;
+  let loading, enhanceSymbolSearch;
+  // Adapt the dialog-opening boundary before the lazy search module executes.
+  // Keep the licensed factory and all native selection/close callbacks intact.
+  function searchFactory(original) {
+    if (original.mwSearchAdapter) return original;
+    function adapted(module, exports, req) {
+      original(module, exports, req);
+      const native = module.exports;
+      module.exports = {...native, showSymbolSearchItemsDialog(options) {
+        if(enhanceSymbolSearch) return native.showSymbolSearchItemsDialog(enhanceSymbolSearch(options));
+        let dialog,closed=false;
+        void load().then(()=>{if(!closed) dialog=native.showSymbolSearchItemsDialog(enhanceSymbolSearch?.(options) || options);})
+          .catch(()=>{if(!closed) dialog=native.showSymbolSearchItemsDialog(options);});
+        return {close(){closed=true;dialog?.close();}};
+      }};
+    }
+    adapted.mwSearchAdapter = true;
+    return adapted;
+  }
+  function prepareSearch() {
+    if(!searchSymbols || !String(TradingView.version()).includes(expected)) return;
+    let req;
+    win.webpackChunktradingview.push([[`mw-symbol-search-${crypto.randomUUID()}`],{},value=>{req=value;}]);
+    if (!req?.m || win.mwSymbolSearchFactoryInstalled) return;
+    win.mwSymbolSearchFactoryInstalled = true;
+    if(req.m[457185]) req.m[457185] = searchFactory(req.m[457185]);
+    const chunkPush = win.webpackChunktradingview.push;
+    win.webpackChunktradingview.push = function(chunk) {
+      if(chunk[1]?.[457185]) chunk[1][457185] = searchFactory(chunk[1][457185]);
+      return chunkPush.call(this,chunk);
+    };
+  }
+  prepareSearch();
   async function load() {
+    if (!String(TradingView.version()).includes(expected)) throw Error("原生界面版本尚未适配");
     if (loading) return loading;
     loading = (async () => {
       if (!String(TradingView.version()).includes(expected)) throw Error("原生界面版本尚未适配");
@@ -24,7 +57,7 @@ function chartNativeUi(widget, doc) {
       if(!Search || !SearchContext || !BodyContext || !SearchRow) throw Error("原生平台行情搜索不可用");
       const PlatformContext = R.createContext(null);
       const listClasses = req(198629), rowClasses = req(910890), headerClasses = req(86731);
-      const Select = req(221339).Select, createPortal = req(129365).createPortal;
+      const Select = req(221339).Select, createPortal = req(129365).createPortal, searchClasses=req(176871);
       const platformStyle = doc.createElement("style");
       platformStyle.textContent = `
         .mw-platform-search,.mw-platform-inline{height:100%;min-height:0;display:flex;flex-direction:column;width:100%}
@@ -142,6 +175,102 @@ function chartNativeUi(widget, doc) {
           symbolTypes:props.symbolTypes,selectedSymbolSettingsKey:"mw.data-center.platform.category",filterValuesSettingsKey:"mw.data-center.platform.filters",
           customSearchSymbols:search,onClose:()=>{},onSearchComplete:()=>{},
         }));
+      }
+      // Main symbol search keeps its actual native dialog, search, category
+      // tabs and rows. Only the two table-header controls are supplied here.
+      function SymbolFiltersBody({render,controls}) {
+        const node=R.useRef(null),[header,setHeader]=R.useState(null);
+        R.useLayoutEffect(()=>{
+          setHeader(node.current?.querySelector(`.${headerClasses.wrap} > .${headerClasses.item}:last-child`) || null);
+        });
+        return R.createElement("div",{ref:node,className:"mw-symbol-search-body"},render(),header && createPortal(controls,header));
+      }
+      function SymbolFiltersDialog({scope,...props}) {
+        const ctx=R.useContext(SearchContext);
+        const [kind,setKind]=R.useState("all"),[source,setSource]=R.useState("");
+        scope.kind=kind;
+        const selected=R.useMemo(()=>{
+          const item=ctx.searchSources.find(item=>item.value().toLowerCase()===source) || ctx.searchSources.find(item=>item.value()==="");
+          // A type change also invalidates the native feed and its old request,
+          // even when the source value is unchanged.
+          return item ? Object.create(item) : item;
+        },[source,kind]);
+        const scoped={...ctx,selectedSearchSource:selected,setSelectedSearchSource:item=>setSource(item.value().toLowerCase()),
+          symbolSearchContent:{...ctx.symbolSearchContent,currentSelectedSearchSource:selected,canChangeExchange:false}};
+        const sources=ctx.searchSources.map(item=>({value:item.value().toLowerCase(),content:item.value()?item.name():"全部来源"}));
+        const kinds=[{value:"all",content:"全部行情"},{value:"provider",content:"平台行情"},
+          {value:"history",content:"自建行情"},{value:"composite",content:"组合行情"}];
+        const control=(label,value,items,onChange)=>R.createElement("div",{className:"dc-select-control mw-symbol-search-select","data-native-component":"select"},
+          R.createElement(Select,{"aria-label":label,value,items,onChange:next=>{
+            if(next===value) return;
+            ctx.setSelectedIndex(-1);
+            ctx.setSymbolSearchContent(previous=>({...previous,renderSymbolSearchList:[],symbolsRemaining:0,symbolStartIndex:0}));
+            ctx.setSymbolSearchState("loading");onChange(next);
+          },size:"small",className:"dc-native-select"}));
+        const controls=R.createElement("div",{className:"mw-symbol-search-filters"},
+          control("行情类型",kind,kinds,setKind),control("来源",source,sources,setSource));
+        const dialogClasses=req(973134);
+        function keyboard(event) {
+          if(event.defaultPrevented) return;
+          if(event.key === "Tab") {
+            const root=doc.querySelector('[data-name="symbol-search-items-dialog"]');
+            const targets=[...(root?.querySelectorAll('button,input,[tabindex="0"]') || [])]
+              .filter(node=>!node.disabled && node.tabIndex>=0 && node.getClientRects().length);
+            const index=targets.indexOf(doc.activeElement),next=index+(event.shiftKey?-1:1);
+            if(targets.length && (index<0 || next<0 || next>=targets.length)) {
+              event.preventDefault();targets[event.shiftKey?targets.length-1:0].focus();
+            }
+            return;
+          }
+          if(event.target !== ctx.searchRef.current) return;
+          if(event.key === "Escape") {event.preventDefault();ctx.onClose();}
+          else if(event.key === "Enter" && !event.isComposing) {event.preventDefault();ctx.onSubmit(true);}
+          else if(["ArrowDown","ArrowUp"].includes(event.key)) {
+            event.preventDefault();
+            ctx.setSelectedIndex(Math.max(0,Math.min(ctx.feedItems.length-1,ctx.selectedIndex+(event.key==="ArrowDown"?1:-1))));
+          }
+        }
+        return R.createElement(SearchContext.Provider,{value:scoped},R.createElement(req(450259).AdaptivePopupDialog,{
+          ...props,className:[dialogClasses.dialog,!ctx.isMobile && (ctx.isTablet?dialogClasses.tabletDialog:dialogClasses.desktopDialog)].filter(Boolean).join(" "),
+          backdrop:true,draggable:false,onKeyDown:keyboard,closeAriaLabel:"关闭商品代码搜索",
+          render:()=>R.createElement(SymbolFiltersBody,{render:props.render,controls})}));
+      }
+      if(searchSymbols) {
+        const searchStyle=doc.createElement("style");
+        searchStyle.textContent=`.mw-symbol-search-body{display:flex;flex-direction:column;min-height:0;flex:1}
+          .mw-symbol-search-body>.${listClasses.wrap}{min-height:0;flex:1}
+          .mw-symbol-search-body .${headerClasses.wrap}{min-height:48px}
+          .mw-symbol-search-body>.${listClasses.wrap}.${listClasses.noFeed}{max-height:50px;flex:0 0 50px}
+          .mw-symbol-search-body .${listClasses.noFeed} [data-symbol-name]{display:none}
+          .mw-symbol-search-body .${searchClasses.spinnerWrap}{pointer-events:none}
+          .mw-symbol-search-filters{display:flex;gap:8px;margin-left:auto;flex-shrink:0}
+          .mw-symbol-search-select{width:128px;min-width:0}
+          .mw-symbol-search-select>[data-role=listbox]{width:100%;box-sizing:border-box}
+          @media(max-width:600px){.mw-symbol-search-body .${headerClasses.wrap}{flex-wrap:wrap;row-gap:8px}
+            .mw-symbol-search-body>.${listClasses.wrap}.${listClasses.noFeed}{max-height:88px;flex-basis:88px}
+            .mw-symbol-search-body .${headerClasses.wrap}>.${headerClasses.item}:last-child{flex:1;min-width:272px}}
+          @media(max-width:360px){.mw-symbol-search-select{width:116px}
+            .mw-symbol-search-body .${headerClasses.wrap}>.${headerClasses.item}:last-child{min-width:248px}}`;
+        doc.head.append(searchStyle);
+        enhanceSymbolSearch=options=>{
+          // Account-scoped catalog pickers and native watchlist/compare dialog
+          // renderers retain their own filters and action semantics.
+          if(options.customSearchSymbols || options.dialog) return options;
+          const scope={kind:"all"};
+          const Dialog=props=>R.createElement(SymbolFiltersDialog,{...props,scope});
+          return {...options,dialog:Dialog,disableRecents:true,showRecents:false,
+            customSearchSymbols:async request=>{
+              try {
+                const page=await searchSymbols({kind:scope.kind,userInput:request.text,exchange:request.exchange,
+                  symbolType:request.type,start:request.start,signal:request.signal});
+                if(request.signal?.aborted) throw new win.DOMException("查询已取消","AbortError");
+                return {symbols:page.items,symbols_remaining:page.remaining};
+              } catch(error) {
+                if(request.signal?.aborted) throw new win.DOMException("查询已取消","AbortError");
+                throw error;
+              }
+            }};
+        };
       }
       const components = {
         dialog: req(450259).AdaptivePopupDialog,

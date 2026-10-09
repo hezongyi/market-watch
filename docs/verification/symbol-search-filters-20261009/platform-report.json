@@ -1,0 +1,84 @@
+{
+  "environment": "Ubuntu local Docker",
+  "project": "mw-data-center-review-20261008",
+  "local": false,
+  "passed": true,
+  "checks": [
+    {
+      "name": "platform name, full-width native search, actual round category tabs, native source in table heading and no pagination"
+    },
+    {
+      "name": "real Yahoo MSFT and Binance BTC/USDT; source/type combined filtering does not mutate main-search settings or chart"
+    },
+    {
+      "name": "details preserve capability/maintenance actions; close restores focus; source Select Escape and keyboard focus stay inside data center"
+    },
+    {
+      "name": "real Dukascopy list loads beyond 50 with stable order and unique identities"
+    },
+    {
+      "name": "165-row continuous loading, failed continuation keeps 50 rows, retry requests same offset, stops at end without duplicates",
+      "requests": [
+        {
+          "query": "LONG",
+          "page": 1
+        },
+        {
+          "query": "LONG",
+          "page": 2
+        },
+        {
+          "query": "LONG",
+          "page": 2
+        },
+        {
+          "query": "LONG",
+          "page": 3
+        },
+        {
+          "query": "LONG",
+          "page": 4
+        },
+        {
+          "query": "LONG",
+          "page": 1
+        },
+        {
+          "query": "LONG",
+          "page": 2
+        },
+        {
+          "query": "LONG",
+          "page": 3
+        },
+        {
+          "query": "LONG",
+          "page": 4
+        },
+        {
+          "query": "EMPTY",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "name": "switching away and back restores filters, loaded prefix and scroll position"
+    },
+    {
+      "name": "new search resets list/offset; empty results are explicit"
+    },
+    {
+      "name": "closing cancels held catalog read; late old result cannot overwrite reopened source/query"
+    },
+    {
+      "name": "dark/light and desktop/tablet/375px layouts keep search, source and row actions reachable without horizontal overflow"
+    },
+    {
+      "name": "only chosen row loads; duplicate applies are ignored; rejected apply restores controls"
+    },
+    {
+      "name": "accepted open closes immediately while load/error continues on chart"
+    }
+  ],
+  "errors": []
+}
