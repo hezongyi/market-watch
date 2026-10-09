@@ -20,11 +20,35 @@
   "worker_claim_block": "alerts.live_pricing.claim returns None while owner.error == unauthorized",
   "owner_state_unchanged": true,
   "historical_fault_root_cause_proven": false,
-  "service_unavailable_root_cause_proven": false,
+  "service_unavailable_root_cause_proven": true,
   "operator_retry_performed": false,
   "stream_auth_and_fresh_pricing_not_verified": true,
   "private_evidence_sha256": {
     "oanda-auth-current.json": "db2cca1cd0813cf5028a1f8c0e55132997f6d1526f75ea94457c09c53ad7992d",
     "oanda-auth-current-runtime-route.json": "04e6cf7f503a75ef50ddced96fa8f9489c73b9268eba61b05351b2958734a60c"
+  },
+  "service_unavailable_explanation": "OANDA instruments and pricing REST error responses explicitly mention maintenance; this does not establish the daily schedule or original unauthorized cause",
+  "recovery_recheck": {
+    "checked_utc": "2026-10-09T22:07:43.942513+00:00",
+    "checked_singapore": "2026-10-10T06:07:43+08:00",
+    "accounts_http": 200,
+    "configured_account_visible": true,
+    "account_summary_http": 503,
+    "instruments_http": 503,
+    "pricing_snapshot_http": 503,
+    "pricing_stream_http": 503,
+    "instruments_and_pricing_response_mention_maintenance": true,
+    "upstream_pricing_recovered": false,
+    "worker_recovered": false,
+    "persisted_owner_error": "unauthorized",
+    "owner_state_unchanged": true,
+    "owner_state_changed": false,
+    "operator_retry_performed": false,
+    "ny17_daily_schedule_independently_verified": false,
+    "evidence_sha256": {
+      "oanda-auth-recovery-current.json": "c98488a36e23271c0a9c2e4617699031c3ce7fa60ca03e1b206736b2b00b299c",
+      "oanda-service-recovery-current.json": "4296a9c505cd24c01b4df4cc82dc05293e3175cb079be84dffffff29aaca4c5c",
+      "production-state-recovery-current.json": "69544420b3dd43a84c9eb67020d8f3b68c5790c96aa488e3d37296bb54e01b04"
+    }
   }
 }
