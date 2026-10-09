@@ -103,9 +103,21 @@ def chart_data(db, body, *, realtime=None):
     from .market_data import renew_demand
 
     meta = metadata(db, body.instrument, body.series_kind)
-    # Capture the evaluation clock after metadata/source state is read. A
-    # quote can arrive while metadata is being resolved; using an earlier
-    # clock would incorrectly classify that fresh temporary minute as future.
+    if body.series_kind == "composite":
+        from .config import settings
+        from .live_pricing import account_key
+        from .storage import LiveState, PricingOwner
+
+        composite = db.get(MarketComposite, body.instrument)
+        if composite:
+            selected = db.get(CompositeRevision, body.composite_revision_id or composite.active_revision_id)
+            mapping = db.get(RealtimeMapping, selected.mapping_id)
+            # Strong references keep SQLAlchemy's weak identity map on this
+            # source observation throughout the history/aggregation read.
+            _live_observation = (db.get(LiveState, mapping.target_dataset_id),
+                                 db.get(PricingOwner, account_key(settings.oanda_account_id)))
+    # Evaluate freshness after the source snapshot, never before IO that can
+    # read a newly received quote and mistake it for future data.
     stamp = now_ms()
     if body.series_kind == "history":
         parent = db.get(HistoryVersion, body.instrument)

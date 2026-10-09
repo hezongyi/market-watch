@@ -156,6 +156,24 @@ def test_live_quote_arriving_during_chart_resolution_is_not_retracted(database, 
             assert not page["bars"][-1]["source_confirmed"], \
                 "fresh quote read after metadata must use an observation clock captured after the source read"
     monkeypatch.setattr(series_access, "metadata", original)
+    from alerts.storage import LiveState
+
+    for cache in (None, CurrentBuckets()):
+        clock[0] = 200010000
+        with database.begin() as db:
+            original_get = db.get
+
+            def received(model, *args, **kwargs):
+                row = original_get(model, *args, **kwargs)
+                if model is LiveState:
+                    clock[0] = 200012000
+                return row
+
+            monkeypatch.setattr(db, "get", received)
+            page = series_access.chart_data(db, DataQuery(instrument=composite,
+                series_kind="composite", timeframe="M1"), realtime=cache)
+            assert page["bars"][-1]["start"] == 200011000 // 60000 * 60000, \
+                "a receipt during the actual LiveState read must also precede the evaluation clock"
     clock[0] = 200010000
     with database.begin() as db:
         earlier = series_access.chart_data(db, DataQuery(instrument=composite,
