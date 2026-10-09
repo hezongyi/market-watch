@@ -1,0 +1,33 @@
+{
+  "version": "1.15.0",
+  "release_tag": "v1.15.0",
+  "previous_source_tag": "v1.14.2",
+  "source_commit_resolution": "Resolve annotated v1.15.0^{commit}; tag the PR25 main merge including version metadata.",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/25",
+  "accepted_business_commit": "0ba1d2856950b26b93d94836ac290ba84e11d6a8",
+  "schema_before": "aq44_aggregation_service_order",
+  "schema_after": "ar45_market_stream",
+  "new_migrations": ["ar45_market_stream"],
+  "new_production_services": ["market-stream-worker"],
+  "application_dependencies_changed": false,
+  "build_environment": "Ubuntu local Docker; mw-docker; market-watch-ubuntu BuildKit",
+  "production_environment": "unraid existing formal market-watch project",
+  "verification": {
+    "review_record": "docs/verification/unified-sse/pr25-review-fixes-20261009.md",
+    "practice_record": "docs/verification/unified-sse/pr25-final-runtime-summary.json",
+    "accepted_image_postgres_passed": 109,
+    "accepted_latest_local_passed": 106,
+    "review_axes": ["Standards", "Spec", "Integration"],
+    "remaining_review_blockers": 0,
+    "tagged_image_verification": "Record actual tagged build and production results separately; do not relabel prior acceptance images."
+  },
+  "production_status_at_source_record": "authorized_not_yet_deployed",
+  "rollback": {
+    "application_source_tag": "v1.14.2",
+    "web_chart_source_tag": "v1.14.1",
+    "schema_downgrade": false,
+    "data_restore": "Not part of application rollback; preserve new data and auth fencing.",
+    "new_worker": "Stop and remove only the newly added market-stream-worker before restoring old Compose."
+  },
+  "cost_boundary": "Historical 6fd9273 versus 32bc00b measurements; final repair/tagged build net cost was not remeasured."
+}
