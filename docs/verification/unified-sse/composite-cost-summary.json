@@ -579,5 +579,36 @@
       "scope": "real PostgreSQL Calculator/SQL cost with a frozen source clock; not browser or supplier SLA"
     }
   ],
-  "scope": "Task-local real PostgreSQL; frozen synthetic source clock; not a browser or supplier SLA."
+  "scope": "Task-local real PostgreSQL; frozen synthetic source clock; not a browser or supplier SLA.",
+  "multi_composite": {
+    "synthetic": true,
+    "composites": 2,
+    "periods": [
+      "W1",
+      "MN"
+    ],
+    "connections": 4,
+    "shared_tasks": 4,
+    "bucket_builds": 4,
+    "computations": 16,
+    "calculation_ms": [
+      164.896,
+      177.761,
+      406.684,
+      263.153,
+      38.998,
+      39.627,
+      70.554,
+      50.621,
+      44.546,
+      42.771,
+      39.95,
+      57.136,
+      56.863,
+      37.326,
+      45.941,
+      50.006
+    ]
+  },
+  "multi_composite_evidence_sha256": "023fd46cffd1679a7fd6db4a0bea749e23bb796d924802ae60488bfa061f6e9b"
 }

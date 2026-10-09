@@ -1502,7 +1502,7 @@ function boot(
     // Symbol change events also fire for the library's cached resolutions.
     // resolveSymbol alone cannot correct a return to a previously seen symbol.
     for(const [chart,changed] of symbolResolutionBindings)
-      chart.onSymbolChanged().unsubscribe(null,changed);
+      {chart.onSymbolChanged().unsubscribe(null,changed);chart.onIntervalChanged().unsubscribe(null,changed);}
     symbolResolutionBindings.clear();
     for(let index=0; index<widget.chartsCount(); index++) {
       const chart=widget.chart(index);
@@ -1510,8 +1510,10 @@ function boot(
         if(info.ticker && decode(info.ticker).symbol.startsWith("YAHOO:") &&
            info.supported_resolutions && !info.supported_resolutions.includes(chart.resolution()))
           chart.setResolution("60",{doNotActivateChart:true});
+        synchronizeMarketVisibility();
       };
       chart.onSymbolChanged().subscribe(null,changed);
+      chart.onIntervalChanged().subscribe(null,changed);
       symbolResolutionBindings.set(chart,changed);
     }
     for (const [chart, changed] of viewportBindings)
@@ -1886,6 +1888,7 @@ function boot(
       workspaceLoadPause = undefined;
       loading = false;
       barRangeMapping.configure(pendingBarRange || {version:1,enabled:false,style:"background"}, true);
+      synchronizeMarketVisibility();
       barRangeMapping.refreshCharts();
       rangeGuard?.dispose();
       rangeGuard = rangeSyncLoadingGuard(widget);
@@ -1977,6 +1980,10 @@ addEventListener("message", async (e) => {
     }
     const sub=[...subscriptions.values()].find(item=>item.marketListener===event?.listener);
     if(!sub || event.generation!==sub.marketGeneration) return;
+    // Native caches can retain the old source after a symbol/period switch.
+    // Its late reset must not re-register demand or mutate the new viewport.
+    if(ready && !loading) synchronizeMarketVisibility();
+    if(sub.marketPaused) return;
     if(sub.marketResultEpoch && event.result_epoch && sub.marketResultEpoch!==event.result_epoch) {
       sub.marketSequence=0;
       event.type='reset';event.reason='result_epoch_changed';

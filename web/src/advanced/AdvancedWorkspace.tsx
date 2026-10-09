@@ -571,7 +571,7 @@ export default function AdvancedWorkspace() {
           setChartTheme(m.theme.toLowerCase());
       } else if (m.type === "ready") {
         setNativeReady(true);
-        setStatus("已加载 · 行情每15秒检查");
+        setStatus("已加载 · 行情按需更新");
       } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
         setSyncNotices((previous) => {

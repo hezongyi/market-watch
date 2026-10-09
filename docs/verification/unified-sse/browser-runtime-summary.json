@@ -2517,6 +2517,908 @@
       },
       "evidence_file": "browser-takeover-rebuilt-passed.json",
       "evidence_sha256": "9b3db81e747f4e7bdb987befaac11da93680a70ae213e868fbe6c957bb22f1bd"
+    },
+    {
+      "passed": true,
+      "synthetic": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "app": "http://127.0.0.1:15643",
+      "chart": "http://127.0.0.1:15644",
+      "samples": [
+        {
+          "frame": "M1",
+          "committed_at": 1791506539759,
+          "callback_at": 1791506540923,
+          "latency_ms": 1164
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506539759,
+          "callback_at": 1791506540388,
+          "latency_ms": 629
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506539759,
+          "callback_at": 1791506540388,
+          "latency_ms": 629
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506539759,
+          "callback_at": 1791506540392,
+          "latency_ms": 633
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506542419,
+          "callback_at": 1791506543149,
+          "latency_ms": 730
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506542419,
+          "callback_at": 1791506543148,
+          "latency_ms": 729
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506542419,
+          "callback_at": 1791506543148,
+          "latency_ms": 729
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506542419,
+          "callback_at": 1791506542606,
+          "latency_ms": 187
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506544661,
+          "callback_at": 1791506545379,
+          "latency_ms": 718
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506544661,
+          "callback_at": 1791506545377,
+          "latency_ms": 716
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506544661,
+          "callback_at": 1791506545378,
+          "latency_ms": 717
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506544661,
+          "callback_at": 1791506545384,
+          "latency_ms": 723
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506547121,
+          "callback_at": 1791506548471,
+          "latency_ms": 1350
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506547121,
+          "callback_at": 1791506547873,
+          "latency_ms": 752
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506547121,
+          "callback_at": 1791506547874,
+          "latency_ms": 753
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506547121,
+          "callback_at": 1791506547898,
+          "latency_ms": 777
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506551400,
+          "callback_at": 1791506553224,
+          "latency_ms": 1824
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506551400,
+          "callback_at": 1791506552159,
+          "latency_ms": 759
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506551400,
+          "callback_at": 1791506553221,
+          "latency_ms": 1821
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506551400,
+          "callback_at": 1791506553231,
+          "latency_ms": 1831
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506556891,
+          "callback_at": 1791506558144,
+          "latency_ms": 1253
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506556891,
+          "callback_at": 1791506557575,
+          "latency_ms": 684
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506556891,
+          "callback_at": 1791506557578,
+          "latency_ms": 687
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506556891,
+          "callback_at": 1791506558144,
+          "latency_ms": 1253
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506560643,
+          "callback_at": 1791506561760,
+          "latency_ms": 1117
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506560643,
+          "callback_at": 1791506561760,
+          "latency_ms": 1117
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506560643,
+          "callback_at": 1791506561221,
+          "latency_ms": 578
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506560643,
+          "callback_at": 1791506561761,
+          "latency_ms": 1118
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506563939,
+          "callback_at": 1791506565231,
+          "latency_ms": 1292
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506563939,
+          "callback_at": 1791506564674,
+          "latency_ms": 735
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506563939,
+          "callback_at": 1791506564676,
+          "latency_ms": 737
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506563939,
+          "callback_at": 1791506564683,
+          "latency_ms": 744
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506567049,
+          "callback_at": 1791506568199,
+          "latency_ms": 1150
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506567049,
+          "callback_at": 1791506568196,
+          "latency_ms": 1147
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506567049,
+          "callback_at": 1791506567479,
+          "latency_ms": 430
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506567049,
+          "callback_at": 1791506568199,
+          "latency_ms": 1150
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506569826,
+          "callback_at": 1791506571112,
+          "latency_ms": 1286
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506569826,
+          "callback_at": 1791506570457,
+          "latency_ms": 631
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506569826,
+          "callback_at": 1791506571111,
+          "latency_ms": 1285
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506569826,
+          "callback_at": 1791506570466,
+          "latency_ms": 640
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506573532,
+          "callback_at": 1791506574498,
+          "latency_ms": 966
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506573532,
+          "callback_at": 1791506574463,
+          "latency_ms": 931
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506573532,
+          "callback_at": 1791506574498,
+          "latency_ms": 966
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506573532,
+          "callback_at": 1791506574499,
+          "latency_ms": 967
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791506577593,
+          "callback_at": 1791506579050,
+          "latency_ms": 1457
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791506577593,
+          "callback_at": 1791506578238,
+          "latency_ms": 645
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791506577593,
+          "callback_at": 1791506579037,
+          "latency_ms": 1444
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791506577593,
+          "callback_at": 1791506578239,
+          "latency_ms": 646
+        }
+      ],
+      "checks": [
+        "real composite first screen and four native periods M1/D1/W1/MN",
+        "48 fresh actual callbacks for 12 source quotes, authoritative OHLC/time labels, no market polling"
+      ],
+      "errors": [],
+      "stage": "updates",
+      "runtime_image_commit": "2b6c5e54ef57ea2880d20a78324536631d48805d",
+      "harness_sha256": "1a26da66fd72f2b7f4d009664dc3dd3d706f77a61e49655c47371b6bfcf72c48",
+      "composite": "732366eb987038b8644a927287feeec29745c3c350f2f881c8b8d71548804b63",
+      "measurement_start": 1791506538056,
+      "p95_ms": 1821,
+      "private_evidence": "artifacts/unified-sse/browser-composite-passed.json",
+      "private_evidence_sha256": "1216ee116dd22069d1a1307a9e7c987f58610e0d3c7029a7edf71fa4d8edc2e0"
+    },
+    {
+      "passed": true,
+      "synthetic": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "app": "http://127.0.0.1:15643",
+      "chart": "http://127.0.0.1:15644",
+      "samples": [
+        {
+          "frame": "M1",
+          "committed_at": 1791507794899,
+          "callback_at": 1791507796143,
+          "latency_ms": 1244
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507794899,
+          "callback_at": 1791507796142,
+          "latency_ms": 1243
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507794899,
+          "callback_at": 1791507795463,
+          "latency_ms": 564
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507794899,
+          "callback_at": 1791507796140,
+          "latency_ms": 1241
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507799340,
+          "callback_at": 1791507801836,
+          "latency_ms": 2496
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507799340,
+          "callback_at": 1791507800531,
+          "latency_ms": 1191
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507799340,
+          "callback_at": 1791507800522,
+          "latency_ms": 1182
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507799340,
+          "callback_at": 1791507800531,
+          "latency_ms": 1191
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507804759,
+          "callback_at": 1791507806392,
+          "latency_ms": 1633
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507804759,
+          "callback_at": 1791507805591,
+          "latency_ms": 832
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507804759,
+          "callback_at": 1791507805568,
+          "latency_ms": 809
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507804759,
+          "callback_at": 1791507805567,
+          "latency_ms": 808
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507808377,
+          "callback_at": 1791507809272,
+          "latency_ms": 895
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507808377,
+          "callback_at": 1791507809272,
+          "latency_ms": 895
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507808377,
+          "callback_at": 1791507809833,
+          "latency_ms": 1456
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507808377,
+          "callback_at": 1791507809270,
+          "latency_ms": 893
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507811859,
+          "callback_at": 1791507812752,
+          "latency_ms": 893
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507811859,
+          "callback_at": 1791507812191,
+          "latency_ms": 332
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507811859,
+          "callback_at": 1791507812752,
+          "latency_ms": 893
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507811859,
+          "callback_at": 1791507812752,
+          "latency_ms": 893
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507815793,
+          "callback_at": 1791507817551,
+          "latency_ms": 1758
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507815793,
+          "callback_at": 1791507816240,
+          "latency_ms": 447
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507815793,
+          "callback_at": 1791507816955,
+          "latency_ms": 1162
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507815793,
+          "callback_at": 1791507817550,
+          "latency_ms": 1757
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507856383,
+          "callback_at": 1791507857436,
+          "latency_ms": 1053
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507856383,
+          "callback_at": 1791507857445,
+          "latency_ms": 1062
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507856383,
+          "callback_at": 1791507856805,
+          "latency_ms": 422
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507856383,
+          "callback_at": 1791507856805,
+          "latency_ms": 422
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507860361,
+          "callback_at": 1791507860970,
+          "latency_ms": 609
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507860361,
+          "callback_at": 1791507860973,
+          "latency_ms": 612
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507860361,
+          "callback_at": 1791507861633,
+          "latency_ms": 1272
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507860361,
+          "callback_at": 1791507861618,
+          "latency_ms": 1257
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507863473,
+          "callback_at": 1791507865282,
+          "latency_ms": 1809
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507863473,
+          "callback_at": 1791507863907,
+          "latency_ms": 434
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507863473,
+          "callback_at": 1791507864731,
+          "latency_ms": 1258
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507863473,
+          "callback_at": 1791507863892,
+          "latency_ms": 419
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507867247,
+          "callback_at": 1791507868818,
+          "latency_ms": 1571
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507867247,
+          "callback_at": 1791507867642,
+          "latency_ms": 395
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507867247,
+          "callback_at": 1791507867641,
+          "latency_ms": 394
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507867247,
+          "callback_at": 1791507867641,
+          "latency_ms": 394
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507870552,
+          "callback_at": 1791507871609,
+          "latency_ms": 1057
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507870552,
+          "callback_at": 1791507872152,
+          "latency_ms": 1600
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507870552,
+          "callback_at": 1791507871027,
+          "latency_ms": 475
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507870552,
+          "callback_at": 1791507872151,
+          "latency_ms": 1599
+        },
+        {
+          "frame": "M1",
+          "committed_at": 1791507874001,
+          "callback_at": 1791507875654,
+          "latency_ms": 1653
+        },
+        {
+          "frame": "W1",
+          "committed_at": 1791507874001,
+          "callback_at": 1791507875655,
+          "latency_ms": 1654
+        },
+        {
+          "frame": "MN",
+          "committed_at": 1791507874001,
+          "callback_at": 1791507875655,
+          "latency_ms": 1654
+        },
+        {
+          "frame": "D1",
+          "committed_at": 1791507874001,
+          "callback_at": 1791507875653,
+          "latency_ms": 1652
+        }
+      ],
+      "checks": [
+        "real composite first screen and four native periods M1/D1/W1/MN",
+        "48 fresh actual callbacks for 12 source quotes, authoritative OHLC/time labels, no market polling",
+        "composite EMA31 shared worker values reach each actual native study callback"
+      ],
+      "errors": [],
+      "stage": "updates",
+      "runtime_image_commit": "2b6c5e54ef57ea2880d20a78324536631d48805d",
+      "harness_sha256": "81e71d587d9690994d206e76c9e1b819bd6fcbf1f40d050c63d85c51dc3d0295",
+      "composite": "732366eb987038b8644a927287feeec29745c3c350f2f881c8b8d71548804b63",
+      "indicator": {
+        "name": "EMA",
+        "period": 31
+      },
+      "measurement_windows": [
+        {
+          "start": 1791507793199,
+          "source_minute": 1791507780000,
+          "end": 1791507817709
+        },
+        {
+          "start": 1791507854824,
+          "source_minute": 1791507840000,
+          "end": 1791507875811
+        }
+      ],
+      "boundary_confirmation": 1791507847533,
+      "measurement_start": 1791507793199,
+      "measurement_end": 1791507875811,
+      "p95_ms": 1758,
+      "private_evidence": "artifacts/unified-sse/browser-composite-ema-passed.json",
+      "private_evidence_sha256": "f5e9ffd34f364a799a13df8bfa1205f07f19534bac80741875923267ca3f73ac"
+    },
+    {
+      "passed": true,
+      "environment": "Ubuntu local Docker",
+      "task": "mw-unified-sse-20261008",
+      "app": "http://127.0.0.1:15643",
+      "chart": "http://127.0.0.1:15644",
+      "runtime_image_commit": "2b6c5e54ef57ea2880d20a78324536631d48805d",
+      "harness_sha256": "ce5ad6bf9e5a7c5ddff9a8e2649131d046219b3da79fe2d498aa307bd8034ae5",
+      "fixture_sha256": "f2880918f9f60cb32d28576c837e9d015d1d0891c75408d842914b042d6592c5",
+      "synthetic": true,
+      "checks": [
+        "native first screen and unified subscription",
+        "same-bar updates and authoritative high contraction",
+        "real EventSource reconnect after gateway outage across three appended buckets",
+        "native quote callbacks continue after all bar subscriptions are released and last quote cancellation releases consumers"
+      ],
+      "samples": [
+        {
+          "committed_at": 1791507913769,
+          "callback_at": 1791507914331,
+          "latency_ms": 562,
+          "close": 101.01,
+          "high": 140
+        },
+        {
+          "committed_at": 1791507916062,
+          "callback_at": 1791507917097,
+          "latency_ms": 1035,
+          "close": 101.02,
+          "high": 110
+        },
+        {
+          "committed_at": 1791507918616,
+          "callback_at": 1791507919279,
+          "latency_ms": 663,
+          "close": 101.03,
+          "high": 140
+        },
+        {
+          "committed_at": 1791507921109,
+          "callback_at": 1791507922031,
+          "latency_ms": 922,
+          "close": 101.04,
+          "high": 110
+        },
+        {
+          "committed_at": 1791507923411,
+          "callback_at": 1791507924229,
+          "latency_ms": 818,
+          "close": 101.05,
+          "high": 140
+        },
+        {
+          "committed_at": 1791507925559,
+          "callback_at": 1791507926404,
+          "latency_ms": 845,
+          "close": 101.06,
+          "high": 110
+        },
+        {
+          "committed_at": 1791507928061,
+          "callback_at": 1791507928551,
+          "latency_ms": 490,
+          "close": 101.07,
+          "high": 140
+        },
+        {
+          "committed_at": 1791507930165,
+          "callback_at": 1791507930782,
+          "latency_ms": 617,
+          "close": 101.08,
+          "high": 110
+        },
+        {
+          "committed_at": 1791507932641,
+          "callback_at": 1791507933527,
+          "latency_ms": 886,
+          "close": 101.09,
+          "high": 140
+        },
+        {
+          "committed_at": 1791507935109,
+          "callback_at": 1791507935786,
+          "latency_ms": 677,
+          "close": 101.1,
+          "high": 110
+        },
+        {
+          "committed_at": 1791507937402,
+          "callback_at": 1791507938431,
+          "latency_ms": 1029,
+          "close": 101.11,
+          "high": 140
+        },
+        {
+          "committed_at": 1791507939974,
+          "callback_at": 1791507940640,
+          "latency_ms": 666,
+          "close": 101.12,
+          "high": 110
+        }
+      ],
+      "errors": [],
+      "database_before": [
+        {
+          "relname": "candles",
+          "seq_scan": 1230,
+          "seq_tup_read": 362845,
+          "idx_scan": 205339,
+          "idx_tup_fetch": 1541013,
+          "n_tup_ins": 533,
+          "n_tup_upd": 120462,
+          "n_tup_del": 0,
+          "n_live_tup": 533
+        },
+        {
+          "relname": "chart_publications",
+          "seq_scan": 66370,
+          "seq_tup_read": 952073,
+          "idx_scan": 585,
+          "idx_tup_fetch": 684,
+          "n_tup_ins": 18,
+          "n_tup_upd": 11602,
+          "n_tup_del": 0,
+          "n_live_tup": 18
+        },
+        {
+          "relname": "chart_published_bars",
+          "seq_scan": 165,
+          "seq_tup_read": 396665,
+          "idx_scan": 145379,
+          "idx_tup_fetch": 1634501,
+          "n_tup_ins": 10809,
+          "n_tup_upd": 122932,
+          "n_tup_del": 0,
+          "n_live_tup": 10809
+        },
+        {
+          "relname": "market_stream_results",
+          "seq_scan": 7719,
+          "seq_tup_read": 223215,
+          "idx_scan": 17648,
+          "idx_tup_fetch": 2142,
+          "n_tup_ins": 1686,
+          "n_tup_upd": 0,
+          "n_tup_del": 1329,
+          "n_live_tup": 357
+        },
+        {
+          "relname": "market_stream_subscriptions",
+          "seq_scan": 120817,
+          "seq_tup_read": 1784573,
+          "idx_scan": 54855,
+          "idx_tup_fetch": 54485,
+          "n_tup_ins": 532,
+          "n_tup_upd": 23862,
+          "n_tup_del": 502,
+          "n_live_tup": 30
+        },
+        {
+          "relname": "market_stream_tasks",
+          "seq_scan": 40405,
+          "seq_tup_read": 194910,
+          "idx_scan": 490244,
+          "idx_tup_fetch": 421716,
+          "n_tup_ins": 77,
+          "n_tup_upd": 108679,
+          "n_tup_del": 68,
+          "n_live_tup": 9
+        }
+      ],
+      "resources_before": [
+        "mw-unified-sse-20261008-api-1 5.83% 216.1MiB / 15.61GiB 463MB / 79.6MB 61.3MB / 0B",
+        "mw-unified-sse-20261008-api-second-1 1.42% 117.9MiB / 15.61GiB 16.9MB / 8.27MB 0B / 0B",
+        "mw-unified-sse-20261008-market-stream-worker-1 21.86% 217.2MiB / 15.61GiB 920MB / 651MB 8.19kB / 0B",
+        "mw-unified-sse-20261008-postgres-1 12.23% 234.9MiB / 15.61GiB 2.01GB / 16.8GB 35MB / 8.52GB"
+      ],
+      "stage": "quote-only",
+      "quote_only": {
+        "last_close": 106.03,
+        "committed_at": 1791507966737
+      },
+      "database_after": [
+        {
+          "relname": "candles",
+          "seq_scan": 1230,
+          "seq_tup_read": 362845,
+          "idx_scan": 206374,
+          "idx_tup_fetch": 1549206,
+          "n_tup_ins": 539,
+          "n_tup_upd": 120952,
+          "n_tup_del": 0,
+          "n_live_tup": 539
+        },
+        {
+          "relname": "chart_publications",
+          "seq_scan": 66669,
+          "seq_tup_read": 957455,
+          "idx_scan": 585,
+          "idx_tup_fetch": 684,
+          "n_tup_ins": 18,
+          "n_tup_upd": 11672,
+          "n_tup_del": 0,
+          "n_live_tup": 18
+        },
+        {
+          "relname": "chart_published_bars",
+          "seq_scan": 165,
+          "seq_tup_read": 396665,
+          "idx_scan": 146101,
+          "idx_tup_fetch": 1663508,
+          "n_tup_ins": 10815,
+          "n_tup_upd": 123431,
+          "n_tup_del": 0,
+          "n_live_tup": 10815
+        },
+        {
+          "relname": "market_stream_results",
+          "seq_scan": 7721,
+          "seq_tup_read": 223217,
+          "idx_scan": 17901,
+          "idx_tup_fetch": 2195,
+          "n_tup_ins": 1723,
+          "n_tup_upd": 0,
+          "n_tup_del": 1329,
+          "n_live_tup": 394
+        },
+        {
+          "relname": "market_stream_subscriptions",
+          "seq_scan": 122472,
+          "seq_tup_read": 1817322,
+          "idx_scan": 56348,
+          "idx_tup_fetch": 55668,
+          "n_tup_ins": 532,
+          "n_tup_upd": 24087,
+          "n_tup_del": 512,
+          "n_live_tup": 20
+        },
+        {
+          "relname": "market_stream_tasks",
+          "seq_scan": 40405,
+          "seq_tup_read": 194910,
+          "idx_scan": 494574,
+          "idx_tup_fetch": 427350,
+          "n_tup_ins": 77,
+          "n_tup_upd": 110529,
+          "n_tup_del": 68,
+          "n_live_tup": 9
+        }
+      ],
+      "resources_after": [
+        "mw-unified-sse-20261008-api-1 5.70% 220.4MiB / 15.61GiB 479MB / 80.7MB 61.3MB / 0B",
+        "mw-unified-sse-20261008-api-second-1 3.67% 117.9MiB / 15.61GiB 17.5MB / 8.59MB 0B / 0B",
+        "mw-unified-sse-20261008-market-stream-worker-1 17.00% 217.2MiB / 15.61GiB 944MB / 659MB 8.19kB / 0B",
+        "mw-unified-sse-20261008-postgres-1 10.20% 235.2MiB / 15.61GiB 2.02GB / 16.9GB 35MB / 8.56GB"
+      ],
+      "p95_ms": 1035,
+      "latency_scope": "12 sequential synthetic managed M1 updates; not the full load matrix",
+      "private_evidence": "artifacts/unified-sse/browser-quotes-current-passed.json",
+      "private_evidence_sha256": "19cefa7e3eac3860a29aa859693910e6461b30c336ad23a7439ef17605a35292"
     }
   ],
   "scope": "Synthetic input runs on Ubuntu local Docker; each run states runtime image. Final delivery still pending remaining audit."

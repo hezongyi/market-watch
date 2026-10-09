@@ -22,6 +22,7 @@ from alerts.source_history_store import store_blob
 from alerts.source_registry import collection_identity
 from alerts.storage import (
     AdvancedWorkspace,
+    CompositeMinute,
     CompositePreparation,
     CompositeRevision,
     HistoryArtifact,
@@ -123,12 +124,18 @@ def main():
             workspace = db.get(AdvancedWorkspace,WORKSPACE)
             if workspace is not None:
                 workspace.updated_at = now_ms()
+                if args.action == "seed":
+                    workspace.document = {"engine":"tv31","schemaVersion":1,
+                        "symbol":encode(value["composite"],"composite"),"series_kind":"composite","interval":"1"}
+                    workspace.revision += 1
         if args.action == "expire":
             owner = db.get(PricingOwner,live_pricing.account_key(settings.oanda_account_id))
             if owner and owner.token == value.get("owner_token"):
                 owner.expires = 0
         artifacts_ready = all(status == "published" for status in db.scalars(select(HistoryArtifact.status).where(
             HistoryArtifact.version_id == value["version"])))
+        version = db.get(HistoryVersion,value["version"])
+        history_bounds = {"start":version.start,"end":version.end}
         expected = {}
         if args.action == "state" and value.get("composite"):
             from alerts.chart_api import DataQuery
@@ -149,15 +156,25 @@ def main():
             ownership = (owner.id,owner.token) if owner and owner.token == value.get("owner_token") and owner.expires > now_ms() else None
             state = db.get(LiveState,target.key)
             forming = state.forming or {}
-            if forming and forming["end"] <= now_ms():
+            confirmed_start = value.get("confirmed_cursor",value["seam"])
+            confirmed_end = (now_ms()-5000) // WIDTH * WIDTH
+            if confirmed_start < confirmed_end:
                 # Synthetic source confirmation on a minute boundary, through
                 # the same immutable writer used by actual REST confirmations.
-                apply_minutes(db,record(db,CandleBatch(identity=target,
-                    window_start=forming["start"],window_end=forming["end"],checkpoint=forming["end"],
+                existing = set(db.scalars(select(CompositeMinute.start).where(
+                    CompositeMinute.revision_id == value["revision"],
+                    CompositeMinute.start >= confirmed_start,CompositeMinute.start < confirmed_end)))
+                confirmed = tuple(MinuteRow(timestamp=at,complete=True,volume=None,
+                    **{field:forming[field] for field in ("open","high","low","close")})
+                    if forming.get("start") == at else minute(at)
+                    for at in range(confirmed_start,confirmed_end,WIDTH) if at not in existing)
+                if confirmed:
+                    apply_minutes(db,record(db,CandleBatch(identity=target,
+                    window_start=confirmed_start,window_end=confirmed_end,checkpoint=confirmed_end,
                     observed_at=now_ms(),result={"status":"data"},
-                    rows=(MinuteRow(timestamp=forming["start"],complete=True,volume=None,
-                        **{field:forming[field] for field in ("open","high","low","close")}),),
+                    rows=confirmed,
                     volume_kind="price_count",volume_unit="quotes")),revision_id=value["revision"])
+                value["confirmed_cursor"] = confirmed_end
         if ownership is None:
             ownership = live_pricing.claim(settings.oanda_account_id)
             if ownership is None:
@@ -176,6 +193,7 @@ def main():
     print(json.dumps({"action":args.action,"synthetic":True,"workspace":WORKSPACE,
         "composite":value.get("composite"),"revision":value.get("revision"),
         "version":value["version"],"bid":str(args.bid),"committed_at":now_ms(),
+        "history_bounds":history_bounds,
         "artifacts_ready":artifacts_ready,"expected":expected}))
 
 

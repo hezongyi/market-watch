@@ -19,14 +19,19 @@ const compose = ['compose', '--env-file', path.join(directory, 'compose.env'),
   '-p', task, '-f', path.join(root, 'compose.unified-sse.acceptance.yaml')];
 const fixtureSource = fs.readFileSync(path.join(root, 'scripts/unified_sse_acceptance_fixture.py'), 'utf8');
 const samples = [], checks = [], errors = [], requests = [];
+let persistReport = ()=>{};
 const sharing = process.argv.includes('--sharing');
 const matrix = process.argv.includes('--matrix');
+const costOnly = process.argv.includes('--cost-only');
+const polling = process.argv.includes('--polling');
+assert.ok(!polling || costOnly, 'Legacy polling is only used for the matched cost comparison');
 const matrixResolutions = ['1','5','15','30','60','240','1W','1M'];
 const matrixFrames = ['M1','M5','M15','M30','H1','H4','W1','MN'];
 
 async function instrumentCallbacks(frame) {
   await frame.evaluate(() => {
     window.__nativeBars = [];
+    window.__nativeHistory = [];
     const wrap = (cb, ticker, res) => bar => {
       cb(bar); // Observe after the actual library callback returns.
       window.__nativeBars.push({at:Date.now(), ticker, res, ...bar});
@@ -34,6 +39,12 @@ async function instrumentCallbacks(frame) {
     for (const sub of subscriptions.values()) sub.cb = wrap(sub.cb, sub.symbol, sub.res);
     const original = feed.subscribeBars;
     feed.subscribeBars = (s, res, cb, id, reset) => original(s, res, wrap(cb, s.ticker, res), id, reset);
+    const getBars=feed.getBars;
+    feed.getBars=(s,res,period,cb,error)=>getBars(s,res,period,(bars,meta)=>{
+      const accepted=cb(bars,meta);
+      window.__nativeHistory.push({at:Date.now(),ticker:s.ticker,res,bars});
+      return accepted;
+    },error);
   });
 }
 let gatewayStopped = false;
@@ -113,6 +124,8 @@ async function fixture(action, ...args) {
     harness_sha256:createHash('sha256').update(fs.readFileSync(__filename)).digest('hex'),
     fixture_sha256:createHash('sha256').update(fixtureSource).digest('hex'),
     synthetic:true, checks, samples, errors};
+  persistReport=()=>fs.writeFileSync(path.join(directory,'unified-sse-browser.json'),
+    JSON.stringify(report,null,2),{mode:0o600});
   page.on('pageerror', error => errors.push(error.message));
   const initialRequests = new Set();
   const initialPath = url => ['/api/charts/data', '/api/market-data/quotes'].includes(new URL(url).pathname);
@@ -149,15 +162,15 @@ async function fixture(action, ...args) {
     const login = page.waitForResponse(response => response.url().endsWith('/api/login'));
     await page.getByRole('button', {name:'登录工作台'}).click();
     assert.equal((await login).status(), 200);
-    await page.goto(app + '/advanced-charts');
+    await page.goto(app + '/advanced-charts' + (polling ? '?marketPolling=1' : ''));
     await page.locator('iframe[title="专业图表工作区"]').waitFor();
     await expect.poll(() => page.frames().some(item => item.url().startsWith(chart + '/'))).toBe(true);
     frame = page.frames().find(item => item.url().startsWith(chart + '/'));
-    await frame.waitForFunction(expected => typeof ready !== 'undefined' && ready && !loading &&
+    await frame.waitForFunction(({expected,legacy}) => typeof ready !== 'undefined' && ready && !loading &&
       widget.activeChart().dataReady() && widget.activeChart().symbol() === expected &&
       widget.activeChart().resolution() === '1' &&
-      [...subscriptions.values()].some(sub => sub.symbol === expected && sub.marketListener),
-      symbol, {timeout:60000});
+      [...subscriptions.values()].some(sub => sub.symbol === expected && (sub.marketListener || legacy)),
+      {expected:symbol,legacy:polling}, {timeout:60000});
     if (sharing) {
       await frame.evaluate(() => widget.setLayout('4'));
       await frame.waitForFunction(expected => widget.chartsCount() === 4 &&
@@ -200,7 +213,7 @@ async function fixture(action, ...args) {
     await instrumentCallbacks(frame);
     assert.ok(requests.some(item => item.path === '/api/charts/data' &&
       item.body?.instrument === symbol), 'First screen must use real HTTP history');
-    checks.push('native first screen and unified subscription');
+    checks.push('native first screen and '+(polling ? 'explicit polling fallback' : 'unified subscription'));
     let indicatorTicker;
     if (process.argv.includes('--indicators')) {
       const study = await frame.evaluate(() => widget.activeChart().createStudy(
@@ -224,6 +237,44 @@ async function fixture(action, ...args) {
       '{{.Name}} {{.CPUPerc}} {{.MemUsage}} {{.NetIO}} {{.BlockIO}}',
       ...['api','api-second','market-stream-worker','postgres'].map(name=>`${task}-${name}-1`)],
       {cwd:root,timeout:10000})).stdout.trim().split('\n');
+    if (costOnly) {
+      report.stage='cost-consumer-drain'; persistReport();
+      const ownClient=await frame.evaluate(()=>clientId);
+      await expect.poll(async()=> (await fixture('state')).all_consumers.every(consumer=>
+        consumer.client===ownClient),{timeout:130000}).toBe(true);
+      const scenario = (polling ? 'polling' : 'sse') + (matrix ? '-eight-periods' : '-single-period');
+      const probe = run('python',[path.join(root,'scripts/unified_sse_resources.py'),
+        '--scenario',scenario,'--seconds','60','--interval','5'],{cwd:root,timeout:90000,maxBuffer:1024*1024});
+      const costStart = Date.now();
+      const inputInterval = matrix ? 12000 : 5000;
+      const inputCount = matrix ? 4 : 10;
+      report.cost = {scenario,input_interval_ms:inputInterval,inputs:[],duration_ms:60000,
+        limits:'Same new-image fallback comparison; includes idle unified worker in both modes. Not an old-release baseline.'};
+      report.stage='cost-measurement'; persistReport();
+      for (let index=1;index<=inputCount;index++) {
+        await page.waitForTimeout(Math.max(0,costStart+index*inputInterval-Date.now()));
+        for (const period of matrix ? matrixFrames : ['M1']) {
+          const close=(107+index/100).toFixed(2);
+          const committed=await fixture('update','--timeframe',period,'--close',close);
+          report.cost.inputs.push({period,close,committed_at:committed.committed_at});
+        }
+      }
+      assert.ok(Date.now()-costStart<=60000,'Scheduled inputs exceeded resource measurement window');
+      await page.waitForTimeout(Math.max(0,costStart+60000-Date.now()));
+      report.cost.resources=JSON.parse((await probe).stdout);
+      persistReport();
+      const latest=report.cost.inputs.at(-1);
+      await frame.waitForFunction(price=>window.__nativeBars.some(bar=>bar.close===price),Number(latest.close),{timeout:20000});
+      report.nativeBars=await frame.evaluate(()=>window.__nativeBars);
+      report.requests=requests.filter(row=>row.at>=costStart);
+      if (!polling) assert.ok(!report.requests.some(row=>['/api/charts/data','/api/market-data/quotes',
+        '/api/charts/provider/latest'].includes(row.path)),'Cost window must not poll');
+      else assert.ok(report.requests.some(row=>row.path==='/api/charts/data'),'Fallback must actually poll');
+      assert.deepEqual(errors,[]);
+      checks.push('same scheduled inputs for 60-second resource comparison with actual native delivery');
+      report.passed=true;
+      return;
+    }
     for (let index = 1; index <= 12; index++) {
       const close = (101 + index / 100).toFixed(2), high = index % 2 ? '140' : '110';
       const callbackCount = await frame.evaluate(() => window.__nativeBars.length);
@@ -297,15 +348,24 @@ async function fixture(action, ...args) {
     let latest;
     for (const close of ['102.01', '102.02', '102.03']) latest = await fixture('append', '--close', close);
     await page.waitForTimeout(1000);
+    if (process.argv.includes('--long-outage')) {
+      report.stage='long-disconnect'; persistReport();
+      const outageStart=Date.now();
+      for (let interval=0;interval<13;interval++) await page.waitForTimeout(10000);
+      report.long_outage_ms=Date.now()-outageStart;
+    }
     assert.equal(await frame.evaluate(() => window.__nativeBars.length), offlineCount,
       'Disconnected browser must not receive fixture updates');
     await gateway(true);
     await page.waitForFunction(previous => window.__sseTrace.opens > previous, opens, {timeout:30000});
-    await frame.waitForFunction(({time,close}) => window.__nativeBars.some(bar =>
+    await frame.waitForFunction(({time,close,longOutage}) => [...window.__nativeBars,
+      ...(longOutage ? window.__nativeHistory.flatMap(row=>row.bars) : [])].some(bar =>
       bar.time === time && bar.close === close),
-      {time:latest.bar.start, close:Number(latest.bar.close)}, {timeout:30000});
+      {time:latest.bar.start, close:Number(latest.bar.close),longOutage:process.argv.includes('--long-outage')},
+      {timeout:30000});
     const recovered = await frame.evaluate(() => window.__nativeBars.slice());
-    for (let offset = 1; offset <= 3; offset++) assert.ok(recovered.some(bar =>
+    const recoveredHistory=await frame.evaluate(()=>window.__nativeHistory.flatMap(row=>row.bars));
+    for (let offset = 1; offset <= 3; offset++) assert.ok([...recovered,...recoveredHistory].some(bar =>
       bar.time === initial.bar.start + offset * 60000), 'Recover every disconnected bucket');
     checks.push('real EventSource reconnect after gateway outage across three appended buckets');
     if (process.argv.includes('--takeover')) {
@@ -344,8 +404,14 @@ async function fixture(action, ...args) {
     const normal = requests.filter(item => item.at >= measurementStart);
     assert.ok(!normal.some(item => ['/api/market-data/quotes', '/api/charts/provider/latest'].includes(item.path)),
       'Default mode must not poll bars or quotes');
-    assert.ok(!normal.some(item => item.path === '/api/charts/data'),
+    if (!process.argv.includes('--long-outage')) assert.ok(!normal.some(item => item.path === '/api/charts/data'),
       'Ordinary updates and short replay must not poll/reload historical bars');
+    else {
+      assert.ok(await page.evaluate(()=>window.__sseTrace.events.some(event=>event.type==='reset')) &&
+        normal.some(item=>item.path==='/api/charts/data'),
+        'Expired replay lease must restore through an explicit reset');
+      checks.push('real gateway outage beyond 120-second lease restores all three buckets through reset/history');
+    }
     assert.deepEqual(errors, []);
     if (process.argv.includes('--visibility')) {
       report.stage = 'visibility-release';
@@ -454,6 +520,10 @@ async function fixture(action, ...args) {
     await page.screenshot({path:path.join(directory, 'unified-sse-browser-failed.png'), fullPage:true}).catch(() => {});
     throw error;
   } finally {
+    if (costOnly && frame) await frame.evaluate(()=>{
+      for (const id of [...subscriptions.keys()]) feed.unsubscribeBars(id);
+      for (const id of [...quoteSubscriptions.keys()]) feed.unsubscribeQuotes(id);
+    }).catch(()=>{});
     fs.writeFileSync(path.join(directory, 'unified-sse-browser.json'), JSON.stringify(report, null, 2), {mode:0o600});
     if (gatewayStopped) await gateway(true);
     if (primaryStopped) await service('start', 'market-stream-worker');

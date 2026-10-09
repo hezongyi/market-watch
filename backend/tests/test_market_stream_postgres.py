@@ -103,6 +103,10 @@ def test_managed_and_http_contract_postgres(provider_pg, contract):
     contract(provider_pg[0])
 
 
+def test_binding_retirement_postgres(provider_pg,monkeypatch):
+    contracts.test_repeated_binding_retirement_cleans_only_expired_task_resources(provider_pg[0],monkeypatch)
+
+
 def process_operation(args):
     """Spawned processes have independent engines and no inherited pool state."""
     from alerts import storage

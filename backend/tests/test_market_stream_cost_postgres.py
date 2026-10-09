@@ -189,3 +189,80 @@ def test_shared_composite_quote_cost(provider_pg, monkeypatch, frame, with_indic
         directory = Path(output)
         directory.mkdir(parents=True,exist_ok=True)
         (directory / f"{frame}-{consumers}.json").write_text(json.dumps(report,indent=2)+"\n")
+
+
+def test_multiple_composites_periods_and_connections_keep_independent_shared_work(provider_pg,monkeypatch):
+    from alerts.storage import CompositePreparation, Instrument, MarketComposite
+
+    factory,_ = provider_pg
+    first,revision_id,seam = populated(factory,monkeypatch)
+    second = stream.digest([first,"synthetic-second-composite"])
+    with factory.begin() as db:
+        original = db.get(MarketComposite,first)
+        revision = db.get(CompositeRevision,revision_id)
+        db.add(Instrument(id="SSECOST2",symbol="EURUSD",label="Synthetic second composite",
+            source="composite",calendar="ny17",basis="bid",precision=5,enabled=False,calendar_profile={}))
+        db.flush()
+        clone = MarketComposite(id=second,instrument_id="SSECOST2",dataset_id=original.dataset_id,
+            mapping_id=original.mapping_id,permission_scope=original.permission_scope,rules=original.rules)
+        db.add(clone)
+        db.flush()
+        second_revision = CompositeRevision(composite_id=second,history_version_id=revision.history_version_id,
+            mapping_id=revision.mapping_id,seam=seam,rules=revision.rules,request_id="synthetic-cost")
+        db.add(second_revision)
+        db.flush()
+        clone.active_revision_id = second_revision.id
+        db.add(CompositePreparation(revision_id=second_revision.id,cursor=seam,
+            cutoff=seam+100*60000,state={}))
+        db.flush()
+        target = db.get(MarketDataset,db.get(RealtimeMapping,revision.mapping_id).target_dataset_id)
+        identity = DatasetIdentity.model_validate(target.identity)
+        apply_minutes(db,record(db,batch(identity=identity,window_start=seam,
+            window_end=seam+100*60000,checkpoint=seam+100*60000,observed_at=seam+100*60000,
+            rows=tuple(minute(seam+offset*60000,volume="3") for offset in range(100)),
+            volume_kind="price_count",volume_unit="quotes")))
+    clock = seam+100*60000+10000
+    for name in ("market_stream","market_stream_worker","series_access","composite_series",
+                 "composite_chart","composite_quotes","market_data"):
+        module = importlib.import_module("alerts."+name)
+        if hasattr(module,"now_ms"):
+            monkeypatch.setattr(module,"now_ms",lambda:clock)
+    owner = live.claim(live.settings.oanda_account_id,now=clock)
+    epoch = live.begin_connection(owner,{identity.provider_symbol:identity},now=clock)
+    auth = session(factory)
+    task_ids = set()
+    for composite in (first,second):
+        for frame in ("W1","MN"):
+            query = DataQuery(instrument=composite,series_kind="composite",timeframe=frame,provisional=True)
+            shared,serialized = resolve(Subscription(client="matrix",listener="chart",generation=1,
+                kind="bars",query=query))
+            for index in range(4):
+                task_ids.add(stream.register(auth,f"matrix-{index}",composite+frame,1,shared,serialized,{})["task_id"])
+    assert len(task_ids)==4
+    calculator = Calculator()
+    cursors = [{} for _ in range(4)]
+    elapsed = []
+    for sequence in range(1,5):
+        live.publish_event(owner,epoch,QuoteEvent(identity=identity,bid=f"{1.12+sequence/10000:.4f}",ask="1.13",
+            source_time=clock-5000+sequence,received_at=clock-4000+sequence,tradeable=True,
+            connection_epoch=epoch,sequence=sequence),{identity.provider_symbol:identity},now=clock)
+        completed = set()
+        for _ in range(4):
+            work = stream.claim(exclude=completed)
+            assert work and work["id"] in task_ids
+            completed.add(work["id"])
+            started = time.perf_counter()
+            payload,_ = calculator.build(work)
+            elapsed.append(round((time.perf_counter()-started)*1000,3))
+            assert payload["composite_id"] == work["identity"]["instrument"]
+            stream.commit(work,payload,delay_ms=0)
+        for index in range(4):
+            delivered = stream.events(auth,f"matrix-{index}",cursors[index])
+            assert len(delivered)==4 and all(row["type"]=="bars" for row in delivered)
+            assert {row["identity"]["instrument"] for row in delivered}=={first,second}
+        assert calculator.buckets.builds==4, "Only each distinct composite/period initializes a bucket"
+    assert calculator.computations==16
+    report={"synthetic":True,"composites":2,"periods":["W1","MN"],"connections":4,
+        "shared_tasks":4,"bucket_builds":4,"computations":16,"calculation_ms":elapsed}
+    if output := os.getenv("MARKET_STREAM_COST_REPORT"):
+        (Path(output)/"multi-composite.json").write_text(json.dumps(report,indent=2)+"\n")

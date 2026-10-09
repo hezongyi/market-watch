@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from alerts import live_pricing
 from alerts import market_stream as stream
 from alerts.chart_api import DataQuery
 from alerts.history_artifacts import artifact_tick
@@ -13,6 +14,7 @@ from alerts.market_stream_api import Subscription, resolve
 from alerts.market_stream_worker import Calculator
 from alerts.series_access import chart_data
 from alerts.storage import transaction
+from sqlalchemy import select
 from test_market_stream import session
 
 directory = Path(__file__).resolve().parents[2] / "scripts"
@@ -68,3 +70,31 @@ def test_synthetic_composite_refuses_supplier_credentials_before_database(monkey
     monkeypatch.setattr(fixture,"transaction",lambda:pytest.fail("must refuse before DB"))
     with pytest.raises(SystemExit,match="credential-free"):
         fixture.main()
+
+
+def test_repeated_fixture_runs_fill_confirmation_gaps_without_rewriting_existing_inputs(database,monkeypatch,capsys):
+    monkeypatch.setattr(fixture,"guard",lambda:None)
+    monkeypatch.setattr(fixture.settings,"oanda_account_id","")
+    monkeypatch.setattr(fixture.settings,"oanda_token","")
+    clock = [fixture.now_ms()]
+    monkeypatch.setattr(fixture,"now_ms",lambda:clock[0])
+    monkeypatch.setattr(live_pricing,"now_ms",lambda:clock[0])
+    seeded = invoke(monkeypatch,capsys,"seed")
+    while artifact_tick(seeded["version"]):
+        pass
+    active = invoke(monkeypatch,capsys,"activate")
+    invoke(monkeypatch,capsys,"quote","--bid","1.121")
+    with transaction() as db:
+        before = {row.start:row.source_revision_id for row in db.scalars(select(fixture.CompositeMinute).where(
+            fixture.CompositeMinute.revision_id == active["revision"]))}
+    # A stopped synthetic source leaves multiple missing confirmation minutes.
+    clock[0] += 3 * fixture.WIDTH
+    invoke(monkeypatch,capsys,"quote","--bid","1.122")
+    with transaction() as db:
+        after = {row.start:row.source_revision_id for row in db.scalars(select(fixture.CompositeMinute).where(
+            fixture.CompositeMinute.revision_id == active["revision"]))}
+        value = db.get(fixture.Preference,fixture.MARKER).value
+        assert set(after) == set(range(value["seam"],value["confirmed_cursor"],fixture.WIDTH))
+        assert {at:after[at] for at in before} == before
+        assert len(after) > len(before)
+    invoke(monkeypatch,capsys,"expire")

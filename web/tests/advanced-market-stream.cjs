@@ -134,5 +134,20 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
   assert.equal(sent.filter(row=>row.type==='market-subscribe').at(-1).args.history_accepted,false,
     'bars excluded from the native history window must not mark an empty callback as loaded');
   evaluate("feed.unsubscribeBars('filtered')");
+  evaluate(`ready=true; loading=false;
+    widget={chartsCount:()=>1,chart:()=>({symbol:()=> 'EURUSD',resolution:()=> '5',getAllStudies:()=>[]})};
+    lastHistory.set('EURUSD|1',60000);
+    feed.subscribeBars({ticker:'EURUSD'},'1',()=>{throw Error('Invisible old-period callback')},'cached-period',()=>{});
+    globalThis.invisibleRecovery=0;
+    reloadHistory=async()=>{invisibleRecovery++;return true;};`);
+  const cached=sent.filter(row=>row.type==='market-subscribe').at(-1).args;
+  const beforeInvisible=sent.filter(row=>row.type==='market-subscribe').length;
+  await deliver({listener:cached.listener,generation:cached.generation,sequence:1,
+    type:'reset',reason:'initial_history_ready'});
+  assert.equal(context.invisibleRecovery,0,'A cached old native period must not trigger recovery after the visible period changes');
+  assert.equal(sent.filter(row=>row.type==='market-subscribe').length,beforeInvisible,
+    'An invisible native cache must not re-register its retired demand');
+  assert.ok(sent.some(row=>row.type==='market-unsubscribe' && row.args.listener===cached.listener));
+  evaluate("feed.unsubscribeBars('cached-period')");
   console.log('Unified native callbacks: generation/order fences, authoritative extremes, quote delivery and no polling passed');
 })().catch(error=>{console.error(error);process.exitCode=1});

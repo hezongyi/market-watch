@@ -2,7 +2,7 @@
 
 日期：2026-10-08。
 
-状态：用户已认可架构方向；本文形成实施方案，尚未实现、性能验收或发布。编写依据为交接文档 `/tmp/market-watch-composite-realtime-handoff-20261008.md`、本轮讨论及本地源码 `6fd9273`。交接记录中的生产后端版本与本地不同，实施前须核对相关源码差异。
+状态：实现及Ubuntu隔离真实验收进行中，未完整交付或生产发布。核心统一订阅与共享计算已落地；已完成部分PostgreSQL/许可浏览器及性能检查，剩余门槛见 `verification/unified-sse/completion-audit.md`。方案编写依据为交接文档 `/tmp/market-watch-composite-realtime-handoff-20261008.md`、本轮讨论及本地源码 `6fd9273`；运行版本前置核对见 `unified-sse-implementation-preflight.md`，正式发布前仍需重核目标基线。
 
 复核：2026-10-08 完成文档与本地关键路径静态复核。架构方向保留，补充历史范围、同柱消息顺序、后台独立需求和缓存失效约束。此复核不替代运行测试；跨进程计算归属与容量仍是实施前置检查。
 

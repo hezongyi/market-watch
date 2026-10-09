@@ -4,6 +4,42 @@
 
 ## 当前环境与实现
 
+用户要求收口时统计本套实现新增开销。使用 `scripts/unified_sse_resources.py`
+对本项目准确归属容器进行只读采样，记录累计 CPU 时间差、工作集平均/峰值、
+网络字节差、块 I/O、PostgreSQL 扫描/读写/WAL 和表/数据库大小。
+私有原始报告保存在 `artifacts/unified-sse/resources/`。须分别记录无订阅空闲、
+单周期、八周期、EMA、多连接及多组合，并以相同输入速率/时长比较可用基线。
+运行新实现一次不等于已测得相对旧实现增量；镜像逻辑大小也不等于物理磁盘新增占用。
+首次历史加载与稳定报价窗口分开，fixture 写入和本项目其他 worker 成本需说明。
+收口报告给出实测值、测量规模及未完成比较，不承诺零负荷或生产容量。
+
+```bash
+sg docker -c 'python scripts/unified_sse_resources.py --scenario idle --seconds 60 --interval 5'
+```
+
+场景标签必须与实际负载一致；上例只有在没有消费者/验收进程时才可记为空闲。
+当前已完成10秒与60秒真实采样探针检查，原始结果覆盖组合EMA初始化/边界恢复，
+还不构成相同负载下相对旧轮询的新增开销结论。
+
+最新镜像检查点为 `2b6c5e5`，Ubuntu API/chart/web实际运行；
+`postgres-container-tests.txt` 已更新为该镜像的56项通过结果（37统一订阅、
+6组合成本、13固定指标）。其后新增清理及多组合检查在本机PG通过，
+对应未提交测试还没有进入该镜像，不混称已完成最终镜像复核。
+
+组合原生M1/D1/W1/MN浏览器通过，P95 1821ms。组合EMA31也已实际通过，
+12次报价共48个新原生bar回调，P95 1758ms；指标值由真实共享worker交付，
+四周期OHLC/时间与权威读取一致。普通报价检查分为两个真实分钟内窗口，
+每个窗口先等确认边界、指标完成及native恢复，窗口内不得行情轮询/历史重读。
+两窗口之间的确认修订恢复不计入普通报价P95，也不宣称无需HTTP。
+最初连续12报价跨分钟导致tail_retracted/history_changed；红记录保留，
+没有放宽普通报价断言。此证据仅合成输入，不是OANDA来源验收。
+新增fixture补缺口且不重写既有确认输入检查通过，fixture共3项通过。
+同镜像仅报价场景已重跑并归档，普通bar更新P95 1035ms；网关断线跨三柱恢复、
+释放全部bar后原生报价继续交付、最后报价取消精确释放消费者通过。
+本轮选定组合/订阅套件138 passed、45 PG skipped；fixture新增项另行3 passed。
+跳过项不当通过，最新测试尚需最终镜像gates复核。资源探针摘要见
+`resource-probe-summary.json`，明确标记尚缺同负载基线比较。
+
 Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `feat/unified-market-sse-20261008`，基线 `6fd9273`。前置核对见 `../../unified-sse-implementation-preflight.md`。本地 `.venv` 按 requirements.lock 安装；web 按 package-lock 安装。许可图表复制到忽略目录，未进入 git。
 
 已有实现：组合单 bucket 替换聚合及确认 delta 更新；数据库共享任务、结果序号、有界回放和世代取消；会话认证及 CSRF；统一 worker 的有界并发、归属租约/接管与持久输入凭据；前端复用订阅生命周期、统一 bar/quote 回调和按需 reset；默认停用行情 tick，`?marketPolling=1` 保留迁移回退。
@@ -83,13 +119,26 @@ fixture 仅创建本任务的 `SSEFIXTURE`/`unified-sse-synthetic`，九周期�
 - 已有真实PostgreSQL迁移、独立进程竞争、双API运行、worker接管及API重启证据；双浏览器实际经15643/15646连接两API，同周期四图保持一共享bar任务；最新代码容器gates待重建复核。
 - 原生首屏、同柱更新、三bucket断线、worker/API重启及managed EMA已实测；八周期及隐藏布局释放/恢复已实测；分页范围更新、切周期/工作区和更长断线仍待扩展。
 - 所有供应商仅自选表需求及身份切换、固定组合报价绑定、预警独立需求保持，需真实路径检查。
-- managed EMA逐次回调已实测；固定/组合指标初始化、修订、临时递归更新及同规格跨连接共享仍需实际worker/数据库验证。
-- 已记录managed同周期多图、八周期、双连接双API、EMA的原生P95（均≤3秒）；组合W1/MN在1/8消费者的真实PG成本见 composite-cost-summary.json。仍缺组合浏览器、多组合/指标完整矩阵、长期队列/发送成本。
+- managed/组合EMA逐次回调已实测；固定历史指标许可浏览器正在补验收。固定/组合指标初始化和确认修订已在真实PG验证。
+- 已记录managed同周期多图、八周期、双连接双API、EMA及组合四周期/EMA的原生P95（均≤3秒）；两组合×W1/MN×四连接真实PG检查通过。成本见 composite-cost-summary.json；完整容器开销对照及持续队列/发送成本仍需汇总。
 - worker 检查节奏、负载预算、发送合并窗口及流队列预算需由测量确认；目前500ms是待验收的实现参数，不是性能承诺。
 - 历史准备职责、reset 时首屏接受与新游标的实际协调、长期有界任务/缓存回收，仍需进一步核查。
 - 继续通过sg docker及mw-docker入口构建，标签commit与运行服务核对；不直接构建绕过。
 
 任务继续开发；上述全部证据齐备后再修改方案状态和交付结论。
+逐项证据及余项统一记录于 `completion-audit.md`。
+
+最新本机PG完整gates58 passed（38统一订阅、7组合成本、13固定指标），
+见 `postgres-latest-host.txt`；使用本项目15645端口，每项随机schema精确清理。
+这是当前未提交测试的本机结果，不替代最终镜像检查。
+
+生命周期复跑发现原生缓存保留不可见的旧组合M1订阅，收到reset后重复恢复并重新注册。
+仅layout_changed同步可见性不足以覆盖切品种/周期；旧来源失去viewer后的迟到reset
+仍可能留下有效需求。Node真实message回调回归先失败（恢复次数1，应为0），
+修复后通过：符号/周期变化及workspace加载完成同步可见性，处理bar/reset前复核
+viewer并拒收已暂停旧来源。见 `invisible-period-red.txt` / `invisible-period-green.txt`。
+此修复尚待新chart镜像真实浏览器验证。固定首屏/分页/EMA/M5回调曾实际通过，
+但整组生命周期不得以此前末尾断言失败的记录当成功。
 
 ## 2026-10-09 恢复与取消竞争修复
 

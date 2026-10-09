@@ -4,6 +4,7 @@ import pytest
 from alerts import market_stream as stream
 from alerts.storage import (
     LoginSession,
+    MarketStreamClient,
     MarketStreamResult,
     MarketStreamSubscription,
     MarketStreamTask,
@@ -141,6 +142,31 @@ def test_slow_consumer_does_not_block_fast_delivery_and_replay_is_bounded(databa
         {"start":(offset+1) * 60000,"close":"1.1"}
         for offset in range(stream.RESULT_LIMIT+6)]}, delay_ms=0)
     assert stream.events(owner, "fast", fast)[0]["type"] == "bars"
+
+
+def test_repeated_binding_retirement_cleans_only_expired_task_resources(database,monkeypatch):
+    stamp = [stream.now_ms()]
+    monkeypatch.setattr(stream,"now_ms",lambda:stamp[0])
+    owner = session(database)
+    live = register(owner,client="retained")
+    for index in range(20):
+        generation = index+1
+        stream.register(owner,"switching","chart",generation,
+            {"kind":"bars","dataset":str(index)},
+            {"instrument":"EURUSD","timeframe":"M1"},{})
+        work = stream.claim()
+        assert work
+        stream.commit(work,{"type":"status","status":str(index)},delay_ms=1000000)
+    stream.cancel(owner,"switching","chart",20)
+    stamp[0] += stream.LEASE_MS-1000
+    stream.renew(owner,"retained")
+    stamp[0] += 2000
+    stream.cleanup()
+    with database.begin() as db:
+        assert list(db.scalars(select(MarketStreamTask.id))) == [live["task_id"]]
+        assert db.scalar(select(func.count()).select_from(MarketStreamSubscription)) == 1
+        assert db.scalar(select(func.count()).select_from(MarketStreamClient)) == 1
+        assert not db.scalar(select(MarketStreamResult.task_id).where(MarketStreamResult.task_id!=live["task_id"]))
 
 
 def test_session_end_disables_work_and_output(database):

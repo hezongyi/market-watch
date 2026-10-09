@@ -183,6 +183,12 @@ def main():
                   "action": args.action, "timeframe": args.timeframe,
                   "bar": row.payload, "publication_revision": pub.revision}
         if args.action == "state":
+            result["all_consumers"] = [{"client":client,"instrument":instrument}
+                for client,instrument in db.execute(select(MarketStreamClient.client,
+                    MarketStreamTask.query["instrument"].as_string()).select_from(MarketStreamSubscription)
+                    .join(MarketStreamClient,MarketStreamClient.id == MarketStreamSubscription.client_id)
+                    .join(MarketStreamTask,MarketStreamTask.id == MarketStreamSubscription.task_id).where(
+                        MarketStreamSubscription.active.is_(True),MarketStreamSubscription.expires > now_ms()))]
             result["tasks"] = [{"id": task.id, "kind": task.identity.get("kind"),
                 "indicator_count": len(task.query.get("indicators", [])),
                 "timeframe": task.query.get("timeframe"),
