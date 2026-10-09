@@ -68,3 +68,9 @@ Authentication probing adds no requests while healthy. During an auth hold, defa
 `ALERTS_OANDA_LIVE_SESSION_PROFILES` controls status/scheduling only. It does not change immutable dataset calendar identity, history coverage, gap evidence, or published versions. It is separate from `ALERTS_OANDA_CALENDAR_PROFILES`. Default unknown sessions remain unknown.
 
 Remaining external verification: next market opening, observe actual OANDA pricing stream/heartbeat, fresh Bid/Ask, confirmed-M1 recovery and browser propagation. Weekend closure cannot prove new-price advancement. This opening check was item 4 and is outside the authorized implementation items 1–3. No production auto-recovery has been claimed before this patch is released.
+
+## Subsequent formal release
+
+PR26 review repairs, merge/tag and the authorized v1.15.1 production deployment are recorded in [production acceptance](v1.15.1-production.md). The original acceptance above is a pre-review snapshot; it does not claim real reopening.
+
+The Ubuntu acceptance project above was subsequently retired after verified backup/restore and content checks. Its localhost URLs and images are no longer active; use the formal production URLs in the release record.
