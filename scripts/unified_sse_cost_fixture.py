@@ -98,7 +98,14 @@ def main():
                 ChartPublishedBar.timeframe == frame).order_by(ChartPublishedBar.start.desc()).limit(1))
             if not pub or not row:
                 raise SystemExit("Missing cost publication")
-            if args.action == "update":
+            if args.action == "seed":
+                # Repeated benchmark runs must start from the same tail price,
+                # rather than retaining the previous arm's final update.
+                row.revision += 1
+                row.payload = {**row.payload, "close": "107.00", "revision": row.revision}
+                pub.revision += 1
+                pub.updated_at = now_ms()
+            else:
                 if args.close is None or not args.close.is_finite() or not 90 <= args.close <= 110:
                     raise SystemExit("A finite close within OHLC bounds is required")
                 row.revision += 1
