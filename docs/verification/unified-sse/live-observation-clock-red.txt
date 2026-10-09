@@ -1,0 +1,9 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_live_quote_arriving_during_chart_resolution_is_not_retracted _______
+backend/tests/test_market_stream_worker.py:154: in test_live_quote_arriving_during_chart_resolution_is_not_retracted
+    assert page["bars"][-1]["start"] == 200011000 // 60000 * 60000
+E   assert 166140000 == ((200011000 // 60000) * 60000)
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_stream_worker.py::test_live_quote_arriving_during_chart_resolution_is_not_retracted
+1 failed, 10 deselected in 0.72s

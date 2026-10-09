@@ -120,6 +120,50 @@ def test_shared_page_cache_matches_authoritative_high_period_overlay(database, m
             assert cached["bars"] == plain["bars"]
 
 
+def test_live_quote_arriving_during_chart_resolution_is_not_retracted(database, monkeypatch):
+    from alerts import live_pricing as live
+    from alerts import series_access
+    from alerts.composite_realtime import CurrentBuckets
+    from alerts.market_contracts import DatasetIdentity, QuoteEvent
+    from alerts.storage import CompositeRevision, MarketDataset, RealtimeMapping
+
+    composite, revision_id, _ = populated(database, monkeypatch)
+    with database.begin() as db:
+        revision = db.get(CompositeRevision, revision_id)
+        target = db.get(MarketDataset, db.get(RealtimeMapping, revision.mapping_id).target_dataset_id)
+        ident = DatasetIdentity.model_validate(target.identity)
+    ownership = live.claim(live.settings.oanda_account_id, now=200010000)
+    epoch = live.begin_connection(ownership, {"EUR_USD": ident}, now=200010000)
+    live.publish_event(ownership, epoch, QuoteEvent(identity=ident, bid="1.10", ask="1.11",
+        source_time=200011000, received_at=200011000, tradeable=True, connection_epoch=epoch, sequence=1),
+        {"EUR_USD": ident}, now=200012000)
+    clock = [200010000]
+    monkeypatch.setattr(series_access, "now_ms", lambda: clock[0])
+    original = series_access.metadata
+
+    def resolved(*args, **kwargs):
+        result = original(*args, **kwargs)
+        clock[0] = 200012000
+        return result
+
+    monkeypatch.setattr(series_access, "metadata", resolved)
+    for cache in (None, CurrentBuckets()):
+        clock[0] = 200010000
+        with database.begin() as db:
+            page = series_access.chart_data(db, DataQuery(instrument=composite,
+                series_kind="composite", timeframe="M1"), realtime=cache)
+            assert page["bars"][-1]["start"] == 200011000 // 60000 * 60000
+            assert not page["bars"][-1]["source_confirmed"], \
+                "fresh quote read after metadata must use an observation clock captured after the source read"
+    monkeypatch.setattr(series_access, "metadata", original)
+    clock[0] = 200010000
+    with database.begin() as db:
+        earlier = series_access.chart_data(db, DataQuery(instrument=composite,
+            series_kind="composite", timeframe="M1"))
+        assert all(bar["source_confirmed"] for bar in earlier["bars"]), \
+            "a quote that is still in the future at the observation clock remains unavailable"
+
+
 def test_canceling_last_browser_demand_preserves_other_internal_owners(database, monkeypatch):
     from alerts.storage import MarketDemand
     from sqlalchemy import select

@@ -1,2 +1,6 @@
-..........................................................               [100%]
-58 passed in 222.30s (0:03:42)
+Ubuntu isolated project mw-unified-sse-20261008; API image commit 0eb7f6cdb2eb1ec65fa4bcc4e466b8fdd978b95a, dirty=false.
+59 passed in 245.30s (0:04:05): 39 unified subscription contracts, 7 composite cost contracts, 13 fixed indicator contracts.
+Container command: compose --profile verification run --rm --no-deps postgres-gates.
+Added managed quote with existing ChartHistoryPlan, confirmed update delivery and idle no-recompute regression.
+Post-run actual provider_% schema count: 0.
+Private original: artifacts/unified-sse/postgres-container-0eb7f6c.log

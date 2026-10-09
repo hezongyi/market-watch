@@ -1,4 +1,4 @@
-# 统一行情订阅：开发验证记录（进行中）
+# 统一行情订阅：开发验证记录
 
 本记录不构成验收交付。实施范围及完成门槛仍以 `../../market-data-unified-subscriptions-plan.md` 为准。
 
@@ -11,7 +11,7 @@
 单周期、八周期、EMA、多连接及多组合，并以相同输入速率/时长比较可用基线。
 运行新实现一次不等于已测得相对旧实现增量；镜像逻辑大小也不等于物理磁盘新增占用。
 首次历史加载与稳定报价窗口分开，fixture 写入和本项目其他 worker 成本需说明。
-收口报告给出实测值、测量规模及未完成比较，不承诺零负荷或生产容量。
+收口报告给出实测值、测量规模及比较边界，不承诺零负荷或生产容量。
 
 ```bash
 sg docker -c 'python scripts/unified_sse_resources.py --scenario idle --seconds 60 --interval 5'
@@ -36,7 +36,7 @@ fixture10项通过，web构建及Node桥接检查通过。
 2026-10-09按用户授权从原market-watch本机.env获取Practice配置，私有保存，未输出凭据。
 本机直连失败，已有代理实测REST127品种、EURUSD/XAUUSD各5根确认M1；
 20秒单价格流有两品种报价与心跳。已配置本任务隔离API及pricing-worker，
-通知关闭、默认resident为空，供应商浏览器验收进行中。
+通知关闭、默认 resident 为空，供应商浏览器验收已完成。
 
 Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `feat/unified-market-sse-20261008`，基线 `6fd9273`。前置核对见 `../../unified-sse-implementation-preflight.md`。本地 `.venv` 按 requirements.lock 安装；web 按 package-lock 安装。许可图表复制到忽略目录，未进入 git。
 
@@ -54,7 +54,7 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 - `test_market_stream_postgres.py`：Ubuntu隔离PostgreSQL上34 passed，见 `postgres-tests.txt`。包含独立进程注册/领取、worker、报价与HTTP契约；这次使用本机.venv连接本项目15645端口。初次容器运行31 passed、3 failed，原因是测试schema缺少基础品种；补齐fixture后重跑通过，`c251b9d` 容器内34项复核通过（postgres-container-tests.txt）；最新快照成本和慢消费者检查加入下次镜像 gates。
 - 新模块 Ruff、`node --check advanced-host/bridge.js`、`git diff --check` 通过；Alembic 单 head 为 `ar45_market_stream`。
 
-## Ubuntu Docker 验收实例（已运行，整体验收进行中）
+## Ubuntu Docker 验收实例（主验收通过，首屏闲置复核进行中）
 
 2026-10-09 用户授权并配置Ubuntu Docker权限，docker组已包含quant；旧进程附加组未刷新，使用 `sg docker -c 'COMMAND'` 成功访问本机Docker29.1.3。API/web/chart均通过mw-docker及market-watch-ubuntu构建。已创建本项目独立network和postgres-data volume并启动服务，主API健康检查通过；查询数据库alembic_version确认 `ar45_market_stream`。没有访问或修改unraid。
 
@@ -117,11 +117,9 @@ fixture 仅创建本任务的 `SSEFIXTURE`/`unified-sse-synthetic`，九周期�
 
 ## 完成审计
 
-逐项证据及余项统一记录于 [completion-audit.md](completion-audit.md)。
-当前尚缺真实供应商的原生回调、仅报价/独立预警、来源或账户切换和过期恢复直接证据；
-正在使用找到的Practice配置补验收。连通性探针不能代替这些行为通过。
-多组合共享计算有真实PG成本证据，独立稳定容器CPU/内存对照尚未测量。
-资源与证据已整理，整体目标仍active，未发布生产，不finish/retire。
+逐项证据及测量边界统一记录于 [completion-audit.md](completion-audit.md)。
+真实供应商的原生回调、仅报价/独立预警、账户切换、owner恢复和多组合稳定容器开销均已通过；
+逐项证据见 [completion-audit.md](completion-audit.md)。任务未发布生产，未执行 retire。
 
 可见性修复先红后绿见 `invisible-period-red.txt` / `invisible-period-green.txt`：
 原生缓存保留旧组合M1，切品种/周期后迟到reset反复恢复。95d501e同步symbol/interval
@@ -143,5 +141,23 @@ sg docker -c 'env LD_LIBRARY_PATH=/home/quant/.local/share/playwright-deps-jammy
 该品种已形成历史计划后Calculator直接抛AttributeError，不交付managed报价。
 已加入先红后绿回归（managed-history-plan-red.txt/green.txt），20项quote/worker检查通过；
 3956df2改为读取模型实际存在的status/cursor/边界/realtime字段。
-新API镜像重建和真实supplier复跑尚待完成，不能以此unit结果宣称真实验收通过。
-真实OANDA三天M1固定历史已下载并发布，独立专属composite已建立；实际stream组合回调待验。
+新 API 镜像已重建，真实 supplier 复跑通过；真实 OANDA 三天 M1 固定历史已下载并发布。
+
+0eb7f6c API/chart/web全部经mw-docker重建并启动，dirty=false，API healthy。
+镜像内PG59项通过，provider schema残留0；新增fixture/quote/worker选定检查30项通过，
+Node桥接/固定身份/传输/指标检查通过（需要在web cwd运行相应入口）。
+真实OANDA平台native M1、关闭全部bar后的managed报价、浏览器全部取消后独立active
+watch继续接收真实报价并推进规则状态、最后watch暂停释放wanted来源，整组通过。
+见 [oanda-runtime-summary.json](oanda-runtime-summary.json)，含私有原始证据哈希。
+真实固定历史组合及 pricing-owner 停止/恢复已通过，未混称合成数据为供应商证据。
+
+真实Practice组合/只报价/pricing-owner停止恢复/独立watch整组通过，运行0eb7f6c。
+停止owner后sampled_bid/quote_ready=true实际变为confirmed_m1_close/false，
+重启后真实sampled_bid恢复；所有bar取消后quote回调继续。
+最后browser退出后独立watch状态与真实source received_at推进，最后watch暂停、
+HTTP首次读取120秒需求租约退尽后EUR_USD退出desired_datasets。
+完整报告oanda-composite-owner-0eb7f6c-passed.json留私有，摘要/哈希在oanda-runtime-summary.json。
+真实组合冷恢复产生tail_retracted/history_changed与native重读，单独记录；
+source探针对应owner未就绪/报价过期及确认修订，稳定普通窗口不允许市场HTTP。
+账户切换、资源范围已完成；闲置后组合首屏无 bar 订阅仍在复现，最终审计保持未收口。
+物理磁盘净增量及长期生产容量明确列为测量限制。

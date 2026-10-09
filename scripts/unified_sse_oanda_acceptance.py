@@ -28,14 +28,51 @@ WATCH = "unified-sse-oanda-independent-watch"
 MARKER = "acceptance.unified-sse.oanda-real"
 
 
+def account_probe():
+    """Inspect both real account identities without rebinding the original fixture."""
+    from alerts.composite_definitions import key
+    from alerts.composite_quotes import live_snapshot, snapshot
+    from alerts.storage import CompositeRevision, HistoryVersion, MarketComposite, RealtimeMapping
+
+    with transaction() as db:
+        marker = db.get(Preference, MARKER + ".composite")
+        if not marker or marker.value.get("task") != TASK or marker.value.get("synthetic") is not False:
+            raise SystemExit("Missing task-owned real composite")
+        composite = db.get(MarketComposite, marker.value["composite"])
+        revision = db.get(CompositeRevision, composite.active_revision_id)
+        old = db.get(MarketDataset, db.get(RealtimeMapping, revision.mapping_id).target_dataset_id)
+        current = next((row for row in db.scalars(select(MarketDataset)) if
+            row.identity.get("account_scope") == account_scope()
+            and row.identity.get("provider_symbol") == "EUR_USD"
+            and row.identity.get("calendar_version") == settings.oanda_calendar_version), None)
+        old_state = db.get(LiveState, old.id)
+        current_state = db.get(LiveState, current.id) if current else None
+        history = db.get(HistoryVersion, revision.history_version_id)
+        live = live_snapshot(db, revision)
+        return {"synthetic": False, "current_instrument": current.instrument_id if current else None,
+            "different_account": bool(current and current.id != old.id),
+            "immutable_fingerprint": key({"dataset": old.identity, "composite": composite.id,
+                "revision": revision.id, "mapping": revision.mapping_id, "history": history.id,
+                "manifest": history.manifest, "seam": revision.seam}),
+            "old_received_at": old_state.received_at,
+            "current_received_at": current_state.received_at if current_state else None,
+            "current_ready": current_state.ready if current_state else False,
+            "old_live": {k: live[k] for k in ("current_account", "owned", "quote_ready")},
+            "old_snapshot": {k: v for k, v in snapshot(db, composite).items()
+                if k in ("quality", "price_type", "quote_ready", "history_version_id", "revision_id")}}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("seed", "state", "watch-on", "watch-off",
-        "composite-seed", "composite-activate"))
+        "composite-seed", "composite-activate", "account-state", "resources-seed"))
     args = parser.parse_args()
     guard()
     if not settings.oanda_token or not settings.oanda_account_id or not settings.oanda_stream_enabled:
         raise SystemExit("Real Practice configuration required")
+    if args.action == "account-state":
+        print(json.dumps(account_probe()))
+        return
     scope = account_scope()
     if args.action in ("seed", "composite-seed"):
         from alerts.market_data import refresh_catalog
@@ -61,6 +98,29 @@ def main():
         if marker.value != {"task": TASK, "supplier": "oanda-practice", "instrument": dataset.instrument_id}:
             raise SystemExit("Incompatible real supplier acceptance ownership")
         composite_marker = db.get(Preference, MARKER + ".composite")
+        resources_composite = None
+        if args.action == "resources-seed":
+            from alerts.composite_definitions import first_use, save_mapping
+            from alerts.storage import (
+                CompositeRevision,
+                MarketCatalog,
+                MarketComposite,
+                RealtimeMapping,
+            )
+
+            if not composite_marker or composite_marker.value.get("task") != TASK:
+                raise SystemExit("Missing task-owned real composite")
+            original = db.get(MarketComposite, composite_marker.value["composite"])
+            revision = db.get(CompositeRevision, original.active_revision_id)
+            old_mapping = db.get(RealtimeMapping, revision.mapping_id)
+            entry = next(row for row in db.scalars(select(MarketCatalog)) if
+                row.symbol == "EUR_USD" and row.metadata_json.get("history_account_scope") == scope)
+            fields = ("underlying", "quote_currency", "historical_product", "live_product",
+                "relationship", "historical_evidence", "live_evidence", "rationale", "reviewed")
+            proof = {key: old_mapping.match[key] for key in fields}
+            proof["rationale"] = "Separate accepted composite for two-identity resource measurement, same actual EUR/USD BID sources"
+            mapping = save_mapping(db, old_mapping.dataset_id, entry.id, proof)
+            resources_composite = first_use(db, old_mapping.dataset_id, mapping.id).id
         if args.action == "composite-seed" and not composite_marker:
             from alerts.history_versions import create_version
 
@@ -138,6 +198,8 @@ def main():
             "watch_status": watch.status if watch else None}
         if args.action == "composite-activate":
             result["workspace"] = WORKSPACE + "-composite"
+        if resources_composite:
+            result["resources_composite"] = resources_composite
         if composite_marker:
             from alerts.storage import HistoryArtifact, HistoryVersion
 
@@ -145,6 +207,22 @@ def main():
             result["real_history"] = {**value, "status": db.get(HistoryVersion,value["version"]).status,
                 "artifacts": [{"frame": a.timeframe, "status": a.status} for a in db.scalars(
                     select(HistoryArtifact).where(HistoryArtifact.version_id == value["version"]))]}
+            if value.get("composite"):
+                from alerts.composite_quotes import live_snapshot
+                from alerts.storage import CompositeRevision, MarketComposite
+
+                composite = db.get(MarketComposite,value["composite"])
+                live = live_snapshot(db,db.get(CompositeRevision,composite.active_revision_id))
+                result["composite_live"] = {key:live[key] for key in ("owned","quote_ready",
+                    "confirmed_tail_ready","quote_age_ms","connection","received_at",
+                    "source_confirmed_end","live_revision","connection_epoch")}
+                result["composite_live"]["bar_snapshots"] = [{"task": task.id,
+                    "sequence": task.sequence, "starts": [bar["start"] for bar in task.payload.get("bars", [])],
+                    "input_revision": task.payload.get("input_revision")}
+                    for task in db.scalars(select(MarketStreamTask).where(
+                        MarketStreamTask.identity["instrument"].as_string() == composite.id,
+                        MarketStreamTask.identity["kind"].as_string() == "bars",
+                        MarketStreamTask.query["timeframe"].as_string() == "M1"))]
     result["desired_symbols"] = list(desired_datasets(settings.oanda_account_id))
     print(json.dumps(result))
 

@@ -102,8 +102,11 @@ def chart_data(db, body, *, realtime=None):
     from .history_artifacts import chart_page as history_page
     from .market_data import renew_demand
 
-    stamp = now_ms()
     meta = metadata(db, body.instrument, body.series_kind)
+    # Capture the evaluation clock after metadata/source state is read. A
+    # quote can arrive while metadata is being resolved; using an earlier
+    # clock would incorrectly classify that fresh temporary minute as future.
+    stamp = now_ms()
     if body.series_kind == "history":
         parent = db.get(HistoryVersion, body.instrument)
         page = history_page(db, parent.id, body.timeframe, before=body.before, count=body.limit)

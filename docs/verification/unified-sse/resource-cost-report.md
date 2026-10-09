@@ -1,10 +1,10 @@
 # 统一行情订阅资源开销（Ubuntu 实测，2026-10-09）
 
-运行源码 `95d501e571a791400517214b3dd78ec2b6c10a66`，project/task
+早期对照源码 `95d501e571a791400517214b3dd78ec2b6c10a66`；真实双组合新增采样运行 `0eb7f6c`。project/task
 `mw-unified-sse-20261008`。Ubuntu VM 为 4 vCPU、约 16 GiB RAM，主机有其他任务。
 所有数据来自本任务准确归属容器；不包含宿主 Chromium 和 fixture 进程。
 原始报告在私有 `artifacts/unified-sse/resources/`，可提交摘要、文件哈希及计数见
-[resource-probe-summary.json](resource-probe-summary.json)。以下采样在接入真实供应商前完成。
+[resource-probe-summary.json](resource-probe-summary.json)。早期对照在接入真实供应商前完成；真实供应商双组合稳定窗口另有私有原始报告。
 
 目前可验证的结论：新 worker 是一个额外进程，空闲预热工作集约 181 MiB，
 空闲平均约 0.020 CPU 核。相同输入的本版本轮询回退/SSE 比较，单周期全项目
@@ -80,7 +80,13 @@ PG TX 是内部数据库传输；内部网络两端不得相加当外网流量�
 约 0.03–0.08 秒，warm 不 yield 历史 M1；确认 delta 只 yield 1 根。
 EMA31 冷计算约 6–8 秒、warm 约 0.16–0.32 秒。
 1→8 消费者仍为一个 task/一次 bucket build；两组合×W1/MN×四连接为
-4 个 task、4 次 build。多组合 CPU/内存尚无独立稳定容器对照，不能推断生产容量。
+4 个 task、4 次 build。真实 OANDA 双组合各 W1/MN 稳定窗口（16 秒、每 4 秒采样）全项目平均 CPU 为
+0.636–0.677 核、工作集 1461.0–1470.2 MiB；共享行情 worker 为 0.202–0.233 核、
+184.9–185.0 MiB。四个系列均收到真实 native 回调，窗口内无 charts/data、quotes 或
+provider/latest 重读。每窗口 WAL 增量 0.92–0.99 MiB、数据库增长约 0.16–0.19 MiB、
+web 网关 TX 约 191–315 KiB；9 个活跃订阅包含四个 bar 及原生自选表报价，未隔离为纯 bar 负载。
+任务保留结果由 86→141、298→390。这些是运行总量，
+不是相对旧版本净增量。
 
 ## 磁盘
 
@@ -98,4 +104,4 @@ WAL 为上表的实际窗口生成量，包含其他 worker 和 fixture，不能
 这组数据是小规模、短时、合成输入的工程成本证据；首次成本试跑残留旧 lease，
 以及跨网关重启出现负累计计数的探针，只保留为探索记录，不用于上述结论。
 稀疏内存采样可能漏过瞬时峰值，block IO 字段在本机可能不可用。
-真实供应商验收、长期生产容量和旧发布版本完全新增成本不能由本报告代替。
+真实供应商验收已完成；长期生产容量和旧发布版本完全新增成本不能由本报告代替。

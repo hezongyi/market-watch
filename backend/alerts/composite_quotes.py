@@ -27,11 +27,11 @@ def get_snapshot(db, composite_id):
 
 def live_snapshot(db, revision, *, now=None):
     """Quote and candle readiness are independent, both fenced by the live owner."""
-    stamp = now_ms() if now is None else now
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     target = db.get(MarketDataset, mapping.target_dataset_id)
     state = db.get(LiveState, target.id)
     owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
+    stamp = now_ms() if now is None else now
     current = target.identity["account_scope"] == account_scope()
     quote = state.quote if state else {}
     age = stamp - quote["source_time"] if type(quote.get("source_time")) is int else None
