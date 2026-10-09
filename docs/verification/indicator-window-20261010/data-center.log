@@ -1,0 +1,8 @@
+PASS desktop side panel preserves compact row height, keeps list/actions accessible, switches rows and restores focus with Escape
+PASS deep continuous list keeps search and exact scroll position across detail close
+PASS existing composites/candidates and mapping/revision evidence retain information and full management entry
+PASS all four coverage evidence controls open the same panel; intervals, citations and empty conflict state remain complete
+PASS saved mappings use detail panel; advanced editable fields are directly visible and keep native form controls
+PASS technical task errors use the same panel without exposing supplier payloads
+PASS dark/light at desktop, tablet, 375px: visible close, no overflow, full panel keyboard containment and return focus
+PASS version-mismatch compatibility window keeps the same details, management links, Escape and return focus

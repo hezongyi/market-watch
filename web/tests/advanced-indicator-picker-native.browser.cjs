@@ -38,7 +38,7 @@ const OUT =
     },
   };
   const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0"><div id="chart" style="height:100vh"></div>
-    <script src="/charting_library/charting_library.js"></script><script src="/indicators.js"></script><script src="/indicator-picker.js"></script><script>
+    <script src="/charting_library/charting_library.js"></script><script src="/indicators.js"></script><script src="/native-ui.js"></script><script src="/indicator-picker.js"></script><script>
     const catalog=${JSON.stringify(catalog)};
     const feed={onReady:cb=>setTimeout(()=>cb({supported_resolutions:['5','60','1D']}),0),
       resolveSymbol:(name,cb)=>setTimeout(()=>cb({name,ticker:name,description:name,type:'crypto',session:'24x7',timezone:'Etc/UTC',minmov:1,pricescale:100,has_intraday:true,supported_resolutions:['5','60','1D'],volume_precision:0}),0),
@@ -198,9 +198,7 @@ const OUT =
       width: n.clientWidth,
     }));
     assert.equal(dimensions.scroll, dimensions.width, "no horizontal overflow");
-    await dialog
-      .getByRole("combobox", { name: "指标分类", exact: true })
-      .selectOption("python");
+    await dialog.getByRole("button", { name: "我的 Python", exact: true }).click();
     assert.equal(await dialog.locator("[data-study-name]").count(), 1);
     await query.focus();
     for (let i = 0; i < 16; i++) {
@@ -344,7 +342,7 @@ const OUT =
             "direct settings after addition",
             "category empty results",
             "Light/Dark",
-            "375px category select and no overflow",
+            "375px category tabs and no overflow",
             "Tab loop/Escape/focus return",
             "active chart instances",
             "pending addition captured chart",

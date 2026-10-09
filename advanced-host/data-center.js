@@ -278,5 +278,5 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
   const invalidate = () => { if (dialog.open && target) target.invalid = true; clearOperation(); };
   const events = ["layout_changed", "chart_load_requested", "activeChartChanged"];
   for (const name of events) widget.subscribe(name, invalidate);
-  return { open, dispose() { disposed = true; close(); clearOperation(); observer.disconnect();removeEventListener("message",fallbackMessage);doc.removeEventListener("keydown",modalKeys,true); style.remove(); noticeStyle.remove(); widget.removeButton(buttonId); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };
+  return { open, nativeUi, dispose() { disposed = true; close(); clearOperation(); observer.disconnect();removeEventListener("message",fallbackMessage);doc.removeEventListener("keydown",modalKeys,true); style.remove(); noticeStyle.remove(); widget.removeButton(buttonId); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };
 }

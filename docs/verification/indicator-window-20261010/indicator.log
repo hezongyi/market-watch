@@ -1,0 +1,10 @@
+PASS cold first open uses native dialog/search; round categories, Chinese/English search, empty state and clear preserve identities
+PASS indicator detail replaces triangles with panel; descriptions, calculation, input defaults and version remain readable; Escape only returns list
+PASS native/Python additions and intentional duplicates retain distinct IDs; native properties close returns to query
+PASS current chart list preserves per-instance settings, visibility/removal and focus after row replacement
+PASS favorites retain native shared storage and native dialog; closing resumes the same category
+PASS pending add disables duplicates and stays on captured chart; active chart list follows multi-chart selection
+PASS native save/load retains study names and changed period; UI creates no alternate indicator identity
+PASS dark/light desktop/tablet/375px, native close, no overflow, detail keyboard containment and Escape focus pass
+PASS shared native loader preserves data center and main symbol-search filters after indicators cold-load first
+PASS version mismatch retains complete compatibility picker; corrected version restores native path

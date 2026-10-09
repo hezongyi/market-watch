@@ -149,7 +149,21 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await screenshot(`browser-zoom200-platform-${width}.png`);
       await native().getByRole('button', { name: '关闭数据中心' }).click();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
-      record('real 200% browser zoom retains native entry, both composite lists and continuous platform search at ' + width, { physicalWidth: width, cssWidth: await page.evaluate(() => innerWidth), dpr: await page.evaluate(() => devicePixelRatio) });
+      await host().evaluate(()=>indicatorPicker.open());
+      const indicators=native().locator('[data-name="mw-indicator-dialog"]');
+      await expect(indicators).toBeVisible();
+      await indicators.getByRole('searchbox',{name:'搜索指标',exact:true}).fill('SMA');
+      await indicators.locator('[data-study-name="守望 Python SMA"]').getByRole('button',{name:/查看.*详情/}).click();
+      const indicatorPanel=indicators.locator('.mw-indicator-detail');
+      await expect(indicatorPanel.getByRole('button',{name:'关闭指标详情',exact:true})).toBeInViewport();
+      expect(await indicators.locator('.mw-indicator-picker').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
+      expect(await indicatorPanel.evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
+      await screenshot(`browser-zoom200-indicators-${width}.png`);
+      await page.keyboard.press('Escape');
+      await expect(indicatorPanel).toBeHidden();
+      await indicators.getByRole('button',{name:'关闭指标窗口',exact:true}).click();
+      await expect(indicators).toHaveCount(0);
+      record('real 200% browser zoom retains native entry, data center lists and indicator detail panel at ' + width, { physicalWidth: width, cssWidth: await page.evaluate(() => innerWidth), dpr: await page.evaluate(() => devicePixelRatio) });
     }
     expect(report.errors).toEqual([]);
     report.passed = true;

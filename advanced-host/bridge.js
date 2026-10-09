@@ -1629,7 +1629,7 @@ function boot(
     .headerReady()
     .then(async () => {
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
-        send({type: "error", error: String(e)}));
+        send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
       if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
         workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,

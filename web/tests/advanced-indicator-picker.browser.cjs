@@ -266,15 +266,15 @@ const record = (name) => {
     );
     record("内置 SMA 经新窗口添加与移除");
     const py = dialog.locator('[data-study-name="守望 Python SMA"]');
-    await py.locator("summary").click();
-    await py.getByText("用途：平滑价格，观察趋势。", { exact: true }).waitFor();
-    await py
+    await py.getByRole("button", { name: /查看.*详情/ }).click();
+    await dialog.locator(".mw-indicator-detail").getByText("用途：平滑价格，观察趋势。", { exact: true }).waitFor();
+    await dialog.locator(".mw-indicator-detail")
       .getByText("计算：取最近 period 根收盘价的算术平均值。", { exact: true })
       .waitFor();
-    await py.getByText(/^输入：/).waitFor();
-    await py.getByText(/^版本 1/).waitFor();
+    await dialog.locator(".mw-indicator-detail").getByRole("heading", {name:"默认输入"}).waitFor();
+    await dialog.locator(".mw-indicator-detail").getByText(/^版本 1/).waitFor();
     record("Python 指标详情含用途、计算、输入及版本");
-    await py.locator("summary").click();
+    await dialog.getByRole("button", { name:"关闭指标详情", exact:true }).click();
     await py.getByRole("button", { name: /添加/ }).click();
     await py.getByRole("button", { name: /添加/ }).click();
     await dialog
