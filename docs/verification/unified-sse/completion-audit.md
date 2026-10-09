@@ -51,7 +51,7 @@ MWSeries.same规范化身份比较，而不是将相同系列的大写展示误�
 ## 最终修复验收
 
 运行版本 `087b1356be1d8aa0845fb0d2989d9a7a286cf511`；API healthy，Ubuntu project
-`mw-unified-sse-20261008`，未访问/修改 unraid。132 本地回归及 60 镜像内 PostgreSQL gates
+`mw-unified-sse-20261008`，未在 unraid 部署/修改实例；前置阶段仅只读核对生产版本。132 本地回归及 60 镜像内 PostgreSQL gates
 均通过，新增 LiveState 读取竞争测试也通过并继续拒收真正未来报价。Node 三组桥接检查、Ruff 通过。
 
 真实供应商三个修复后原始报告及 SHA-256 已加入 oanda-runtime-summary.json：
@@ -63,3 +63,17 @@ MWSeries.same规范化身份比较，而不是将相同系列的大写展示误�
 资源报告沿用已记录的实际版本和测量窗口，不能声称此次文档版本重新测得生产净增量。
 工程交付与技术验收完成；用户验收仍进行中，实例及数据库保留，未标记 Docker task 结束。
 用户验收结束后须按 mw-docker retire 预览、备份/恢复核验及精确退役流程收尾。
+
+## 原始目标最终核验（2026-10-09）
+
+重新读取 /tmp/market-watch-unified-sse-development-handoff-20261008.md 及原方案后，
+逐项检查上述正确性、性能和交付要求。隔离 worktree/branch、前置进程布局/共享归属/变化触发源
+记录、实现与默认前端 SSE 出口、真实 Ubuntu/Practice 验收、启停/地址/限制及开销交付均有直接证据。
+19 份许可浏览器原始报告、15 份资源报告、8 份 OANDA/连通性报告的登记文件哈希核对通过；
+7 份组合 SQL/扫描成本原始报告与摘要逐字段相等，并补充文件路径及 SHA-256。
+历史负载矩阵保留各自运行 commit，不冒称为087b135重新跑过的全部矩阵；95d501e之后的
+业务修改仅涉及组合报价标签、managed历史计划读取、LiveState快照时间，最终132项本地、
+60项镜像内PG及三组修复后Practice复验覆盖这些影响路径，bridge与传输/聚合主体无后续修改。
+7个核心服务核对实际镜像commit/task/project/acceptance标签，均为087b135且运行；
+主API /healthz正常，测试schema（provider_/unified_/test_）残留0，工作树只有审计文档更新。
+未新增提交env/token/许可材料。原始开发目标已达到；生产发布及用户验收后的资源退役不作为已完成行为。

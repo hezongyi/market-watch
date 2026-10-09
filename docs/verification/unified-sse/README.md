@@ -52,7 +52,7 @@ Ubuntu worktree `/home/quant/repos/market-watch-unified-sse-20261008`，分支 `
 
 ## Ubuntu Docker 验收实例（技术验收通过，保留供用户查看）
 
-2026-10-09 用户授权并配置Ubuntu Docker权限，docker组已包含quant；旧进程附加组未刷新，使用 `sg docker -c 'COMMAND'` 成功访问本机Docker29.1.3。API/web/chart均通过mw-docker及market-watch-ubuntu构建。已创建本项目独立network和postgres-data volume并启动服务，主API健康检查通过；查询数据库alembic_version确认 `ar45_market_stream`。没有访问或修改unraid。
+2026-10-09 用户授权并配置Ubuntu Docker权限，docker组已包含quant；旧进程附加组未刷新，使用 `sg docker -c 'COMMAND'` 成功访问本机Docker29.1.3。API/web/chart均通过mw-docker及market-watch-ubuntu构建。已创建本项目独立network和postgres-data volume并启动服务，主API健康检查通过；查询数据库alembic_version确认 `ar45_market_stream`。此开发验收阶段未部署或修改 unraid；前置阶段曾只读核对生产版本，见实施前置记录。
 
 Compose：`compose.unified-sse.acceptance.yaml`，task/project `mw-unified-sse-20261008`。provider-history-worker（alerts.native_history_loads）已补齐：平台首次历史分页任务需要此进程；
 原native-history-worker只运行固定历史/指标版本处理，两者职责不同。
@@ -109,7 +109,7 @@ fixture 仅创建本任务的 `SSEFIXTURE`/`unified-sse-synthetic`，九周期�
 
 早期2026-10-09首次运行该命令：在 `compose ps -q api` 阶段遇到 Ubuntu Docker socket permission denied，浏览器未启动、fixture 未写入。`test_unified_sse_acceptance_fixture.py` 的6项SQLite检查通过，仅证明保护和fixture→真实Calculator/持久事件的输入契约。该早期权限失败已被后续Ubuntu实测取代；fixture现有7项检查通过。
 
-完整统一Python套件本地142 passed、37 skipped，随后在实际隔离PostgreSQL上补跑34项全部通过；两个结果证据分开保存。Node脚本语法、新增Python文件Ruff及diff check通过。Docker权限阻塞已解除。后续已从本机 market-watch .env 获取 Practice 配置并完成真实供应商验收；未访问 unraid。
+完整统一Python套件本地142 passed、37 skipped，随后在实际隔离PostgreSQL上补跑34项全部通过；两个结果证据分开保存。Node脚本语法、新增Python文件Ruff及diff check通过。Docker权限阻塞已解除。后续已从本机 market-watch .env 获取 Practice 配置并完成真实供应商验收；凭据查找无需访问 unraid。
 
 ## 完成审计
 
