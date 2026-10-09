@@ -609,7 +609,7 @@ def read_rows(db, inst, frame, before, limit, *, dataset_start=None):
 
 def published_history_check(db, inst, pub, visible, body):
     """Fingerprint a stable session prefix, excluding appends and the streamed last bar."""
-    if not body.track_history or not visible or pub is None:
+    if not visible or pub is None:
         return None
     next_before = visible[-1]["start"]
     before = body.revision_before or next_before
@@ -631,7 +631,6 @@ def published_history_check(db, inst, pub, visible, body):
         )).one()
         return hashlib.sha256(json.dumps(list(stamp)).encode()).hexdigest()
 
-    revision = fingerprint(before)
     def tail_fingerprint(boundary):
         revision = db.scalar(select(ChartPublishedBar.revision).where(
             ChartPublishedBar.instrument_id == inst.id,
@@ -639,6 +638,12 @@ def published_history_check(db, inst, pub, visible, body):
             ChartPublishedBar.start == boundary))
         return hashlib.sha256(json.dumps(revision).encode()).hexdigest()
 
+    if not body.track_history:
+        tail_revision = tail_fingerprint(next_before)
+        return dict(before=next_before, after=after, tail_revision=tail_revision,
+                    next_tail_revision=tail_revision)
+
+    revision = fingerprint(before)
     tail_revision = tail_fingerprint(before)
     return dict(before=before, after=after, revision=revision, next_before=next_before,
                 next_revision=revision if before == next_before else fingerprint(next_before),

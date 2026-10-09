@@ -27,6 +27,7 @@ CASES = [
         contracts.test_managed_historical_last_bar_correction_resets_from_http_observation,
         contracts.test_managed_historical_window_ignores_tail_append,
         contracts.test_managed_historical_indicator_keeps_recursive_prefix_dependency,
+        contracts.test_managed_last_bar_correction_between_native_history_and_first_delivery_resets,
     ) for published in (False, True)
 ] + [
     (contracts.test_provider_historical_indicator_keeps_recursive_prefix_dependency,

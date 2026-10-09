@@ -188,7 +188,7 @@ class ProviderUnsubscribe(BaseModel):
 
 def history_check(db, inst, source, visible, body):
     """Compare a stable prefix, excluding the last streamed candle and new appends."""
-    if not body.track_history or not visible:
+    if not visible:
         return None
     next_before = visible[-1]["start"]
     before = body.revision_before or next_before
@@ -222,6 +222,11 @@ def history_check(db, inst, source, visible, body):
         ).where(Bar.instrument_id == inst.id, Bar.timeframe == source,
                 Bar.start >= boundary, Bar.start < end)).one()
         return hashlib.sha256(json.dumps([list(stamp), inst.calendar_profile], sort_keys=True).encode()).hexdigest()
+
+    if not body.track_history:
+        tail_revision = tail_fingerprint(next_before)
+        return {"before": next_before, "after": body.revision_after,
+                "tail_revision": tail_revision, "next_tail_revision": tail_revision}
 
     revision = fingerprint(before)
     tail_revision = tail_fingerprint(before)

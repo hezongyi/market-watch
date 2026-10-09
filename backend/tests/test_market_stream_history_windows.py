@@ -28,10 +28,10 @@ def history_client(database):
         yield client, owner
 
 
-def history(client, query, *, before=None, limit=3):
+def history(client, query, *, before=None, limit=3, track_history=False):
     response = client.post("/api/charts/data", json={
         **query.model_dump(by_alias=True), "before": before,
-        "limit": limit, "track_history": True})
+        "limit": limit, "track_history": track_history})
     assert response.status_code == 200, response.text
     page = response.json()
     assert page["bars"]
@@ -167,7 +167,7 @@ def test_managed_historical_last_bar_correction_resets_from_http_observation(
     query = DataQuery(instrument="BTCUSDT", timeframe="M1", published=published,
                       dataset_start=START if published else None, revision_after=START + 2 * MINUTE)
     page = history(client, query, before=START + 5 * MINUTE)
-    assert page["history_check"]["next_revision"]
+    assert page["history_check"]["next_tail_revision"]
     calculator, cursors = subscribe(client, query, page)
     initial = publish(calculator, owner, cursors)[0]
     assert initial["type"] == "status", initial.get("reason")
@@ -246,3 +246,23 @@ def test_managed_historical_indicator_keeps_recursive_prefix_dependency(
     event = publish(calculator, owner, cursors)[0]
     assert event["type"] == "reset" and event["reason"] == "history_changed", (
         "Recursive managed study repairs include input preceding the loaded OHLC window")
+
+
+@pytest.mark.parametrize("published", [False, True])
+def test_managed_last_bar_correction_between_native_history_and_first_delivery_resets(
+        database, history_client, published):
+    end = START + 10 * MINUTE
+    write_managed(database, START, 10, 10, end + 5000, published)
+    client, owner = history_client
+    query = DataQuery(instrument="BTCUSDT", timeframe="M1", published=published,
+                      dataset_start=START if published else None)
+    page = history(client, query, before=START + 5 * MINUTE)
+    assert page["history_check"]["next_tail_revision"]
+    assert "next_revision" not in page["history_check"], (
+        "Native first reads use no prefix tracking; their tail credential is independent")
+    # The chart has accepted this HTTP snapshot, but no stream result has reached it yet.
+    write_managed(database, page["bars"][-1]["start"], 1, 20, end + 6000, published)
+    calculator, cursors = subscribe(client, query, page)
+    event = publish(calculator, owner, cursors)[0]
+    assert event["type"] == "reset" and event["reason"] == "history_changed", (
+        "A last-bar correction during the native history/subscription handshake must reload")
