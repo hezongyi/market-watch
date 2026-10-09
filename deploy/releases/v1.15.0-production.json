@@ -288,10 +288,26 @@
   },
   "browser_acceptance": {
     "passed": false,
-    "login_http": 401,
-    "attempts": 1,
-    "reason": "Saved password does not match persisted auth.admin credential; request current private credential",
-    "sse_or_native_callbacks_verified": false,
+    "initial_login_http": 401,
+    "current_login_http": 200,
+    "login_credential_block_resolved": true,
+    "secure_cookie_verified": true,
+    "logout_http": 200,
+    "sse_connection_verified": true,
+    "sse_event_types": [
+      "bars",
+      "quotes"
+    ],
+    "sse_events": 81,
+    "sse_errors": 0,
+    "native_initial_snapshot_callbacks": 2,
+    "normal_stable_market_http_requests": 0,
+    "fresh_oanda_price_progression_verified": false,
+    "remaining_blockers": [
+      "Inherited OANDA unauthorized hold",
+      "Value is null on chart startup in both SSE and polling mode"
+    ],
+    "record": "docs/verification/unified-sse/v1.15.0-production-browser-followup.json",
     "auth_reset_or_session_forgery": false
   },
   "switch_incident": {
@@ -353,8 +369,13 @@
     "production-state.jsonl": "796cc49a35d2c973d0a4ebb4da785556b4721980350b03b20d37e2857e3f9a48",
     "production-runtime-samples.txt": "099ef70f1af36c69f56b220be11e76a93b95bcde619d09534c939426f5421654",
     "production-services.private.log": "18d5bbfa7643f0db5bd2a29838a07d2ffa5be7027fe087918beef7f45105a363",
-    "production-browser.json": "a88efdffa5c27d9a25e17085936fe5c42e8cb078b3379465af0cca6445157622",
-    "production-switch.checked.txt": "aeae514469939186c78c7f80f8ecb4eb841066a2da7f6675d7d1e6bdf3e45385"
+    "production-switch.checked.txt": "aeae514469939186c78c7f80f8ecb4eb841066a2da7f6675d7d1e6bdf3e45385",
+    "production-browser-login401.json": "a88efdffa5c27d9a25e17085936fe5c42e8cb078b3379465af0cca6445157622",
+    "production-browser.json": "0ad7d82791575d97d0f8d9c1daa1f85e01e5ed059799de976eb3296bc2effc5f",
+    "production-startup-probe.json": "1afbb32dc529ca2922d4f02de1cdc6cd2ac74e4190a1f79b8fd259984d72f372",
+    "production-startup-polling-probe.json": "49af71bb97be92b1488c369b5471ec2de7fa97a590834846ff1591cbb9f45bba",
+    "production-state-auth-sse.json": "08416443373e8bde665a15c0a98fc95acae4c04eff4697a2805389467344883f",
+    "production-state-auth-final.json": "a39b059abd2f71e4933a5d50ccc9156673d6d02b1cf4e48fac05420472e45b3f"
   },
   "cost_reference": "docs/verification/unified-sse/old-release-cost-report.md",
   "cost_boundary": "Old 6fd9273 versus 32bc00b isolated Ubuntu windows; no measured net cost versus current v1.14.2 production under active consumers"

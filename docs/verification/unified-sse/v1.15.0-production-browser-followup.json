@@ -1,0 +1,79 @@
+{
+  "passed": false,
+  "environment": "unraid formal production; browser on Ubuntu",
+  "synthetic": false,
+  "started": "2026-10-09T21:50:37.677Z",
+  "finished": "2026-10-09T21:53:48.255Z",
+  "login_http": 200,
+  "secure_http_only_session_cookie": true,
+  "logout_http": 200,
+  "chart": {
+    "symbol": "MWP:EURUSD",
+    "resolution": "5",
+    "charts": 4,
+    "subscriptions": 4
+  },
+  "samples": 6,
+  "observation_seconds": 180.053,
+  "sse_opens": 1,
+  "sse_errors": 0,
+  "sse_events": 81,
+  "sse_event_types": [
+    "bars",
+    "quotes"
+  ],
+  "native_initial_snapshot_callbacks": 2,
+  "fresh_supplier_price_progression_verified": false,
+  "stable_window_market_http_requests": 0,
+  "normal_stable_bar_listeners": [
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "1W",
+      "listener": true,
+      "recovering": false
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "1D",
+      "listener": true,
+      "recovering": false
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "240",
+      "listener": true,
+      "recovering": false
+    },
+    {
+      "symbol": "MWP:EURUSD",
+      "res": "5",
+      "listener": true,
+      "recovering": false
+    }
+  ],
+  "uncaught_startup_exception": {
+    "message": "Value is null",
+    "location": "Licensed chart library restricted-toolset componentWillUnmount -> model()",
+    "sse_startup_reproduced": true,
+    "polling_startup_reproduced": true,
+    "sse_specific_cause_supported": false,
+    "cause_fully_diagnosed": false,
+    "fixed": false
+  },
+  "oanda_owner": {
+    "epoch": 360,
+    "expires": 0,
+    "failures": 1,
+    "error": "unauthorized"
+  },
+  "operator_oanda_retry_performed": false,
+  "production_deadlock_counter": 715,
+  "long_transactions_over_30_seconds": 0,
+  "private_evidence_sha256": {
+    "production-browser.json": "0ad7d82791575d97d0f8d9c1daa1f85e01e5ed059799de976eb3296bc2effc5f",
+    "production-startup-probe.json": "1afbb32dc529ca2922d4f02de1cdc6cd2ac74e4190a1f79b8fd259984d72f372",
+    "production-startup-polling-probe.json": "49af71bb97be92b1488c369b5471ec2de7fa97a590834846ff1591cbb9f45bba",
+    "production-state-auth-sse.json": "08416443373e8bde665a15c0a98fc95acae4c04eff4697a2805389467344883f",
+    "production-state-auth-final.json": "a39b059abd2f71e4933a5d50ccc9156673d6d02b1cf4e48fac05420472e45b3f"
+  }
+}

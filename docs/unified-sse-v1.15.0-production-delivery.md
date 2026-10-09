@@ -21,9 +21,11 @@ Ubuntu 与 unraid Docker 使用不同形式的镜像 ID；导入后核对配置 
 网站、图表域名及 `/readyz` HTTPS 均返回 200，API healthy。启动时核对 12 个正式服务运行状态、镜像、零重启；原 Compose 各服务除镜像以外的配置字段保持一致，新增一个 `market-stream-worker`，数据库池 2、overflow 0。
 连接池、数据库死锁增量、长事务、重启次数和 stream 任务状态在生产只读采样：21 次、684.3 秒；死锁增量 0，未见超过 30 秒的长事务，12 个服务均零重启。数据库后端连接数 13–13。这是运行检查，不代替实际浏览器行情回调验收。
 
-- 保存于 Ubuntu 的管理员密码与生产环境变量中的 hash 匹配，但生产数据库 `auth.admin` 的当前 hash 已覆盖环境变量值。正式 HTTPS 登录一次返回 401；没有重置密码、伪造会话或关闭认证。已请求将当前密码写入本地私密凭据文件，浏览器 SSE/原生回调验收等待正确凭据。
+- 最初保存的密码登录返回 401。用户补充当前凭据后，正式 HTTPS 登录和退出均返回 200，Secure/HttpOnly 会话 Cookie 核验通过。凭据仅存于 Ubuntu 0700 目录中的 0600 私密文件，没有重置认证或伪造会话。
 - 生产 `market_pricing_owners` 为 `error=unauthorized`、epoch=360。停写前 dump 中已有相同状态，确认不是 v1.15.0 引入。此授权隔离状态被保留，未擅自重试、改 token 或切换账号；当前没有活跃的真实 OANDA 行情数据。因此不能声称正式生产真实 OANDA 端到端已经通过。
-- 本地真实 Practice 的功能验收记录仍见 [PR 最终验收](verification/unified-sse/pr25-review-fixes-20261009.md)，其结果不替代生产账号验证。待凭据及生产 OANDA 授权恢复后，应补验原工作区中的真实 SSE、许可图表回调、稳定期间无行情 HTTP 轮询、确认水位推进和自动恢复。
+- 当前四图工作区已在正式 HTTPS 页面加载。约 180 秒观察内，统一 SSE 打开一次、无连接错误，接收 81 个 bars/quotes 事件，真实许可图表收到 2 次首屏快照回调；稳定窗口没有 charts/data、market-data/quotes 或 provider/latest 行情 HTTP 请求。这不证明实时 OANDA 新价格推进。
+- 浏览器首屏有一次未捕获的 `Value is null`，堆栈指向许可图表库 restricted-toolset 的 `componentWillUnmount -> model()`。约 8 秒的只读首屏探针在 SSE 和轮询模式均复现该异常，不能把它归因于 SSE；工作区恢复/库生命周期的完整根因尚未定位，也未修复。没有为此修改生产程序或保存用户图表配置。完整浏览器验收保持未通过，证据见 [补验记录](verification/unified-sse/v1.15.0-production-browser-followup.json)。
+- 本地真实 Practice 的功能验收记录仍见 [PR 最终验收](verification/unified-sse/pr25-review-fixes-20261009.md)，其结果不替代生产账号验证。待生产 OANDA 授权恢复及图表首屏异常修复后，应补验新价格回调、确认水位推进和自动恢复。
 
 ## 启停、回退和保留资源
 
