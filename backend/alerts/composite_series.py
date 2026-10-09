@@ -169,11 +169,14 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
         from .config import settings
         from .history_catalog import account_scope
         from .live_pricing import account_key
+        from .live_session import session_status
 
         live = db.get(LiveState, target.id)
         owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
         forming = live.forming if live else {}
-        if (owner and owner.token and owner.expires > stamp and live and owner.epoch == live.epoch
+        if (owner and owner.error not in ('unauthorized', 'provider_maintenance')
+                and session_status(target.identity, target_meta['profile'], stamp)['market_session'] != 'closed'
+                and owner.token and owner.expires > stamp and live and owner.epoch == live.epoch
                 and target.identity["account_scope"] == account_scope()
                 and live.connection in ("connected", "recovering") and forming and live.quote.get("tradeable")
                 and live.quote.get("bid") is not None and live.quote.get("ask") is not None

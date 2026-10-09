@@ -9,7 +9,8 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 
-from .live_pricing import measurements, snapshots
+from .config import settings
+from .live_pricing import account_key, measurements, provider_status, snapshots
 from .storage import MarketDataset, MarketDemand, PricingOwner, now_ms, transaction
 
 
@@ -20,7 +21,9 @@ class Demand(BaseModel):
 
 def snapshot_signature(snapshot):
     # Shared cooldowns can change without a quote or LiveState revision.
-    return tuple((row["dataset_id"], row["revision"], row["quality"], row["cooldown_until"])
+    return tuple((row["dataset_id"], row["revision"], row["quality"], row["cooldown_until"],
+                  row.get('market_session'), row.get('connection_error'), row.get('authentication_hold'),
+                  row.get('next_probe_at'))
                  for row in snapshot)
 
 
@@ -30,6 +33,15 @@ def router(authenticated):
     @routes.get("")
     def live():
         return snapshots()
+
+    @routes.get('/provider-status')
+    def source_status():
+        return provider_status()
+
+    @routes.get('/status')
+    def status():
+        # Low-frequency data-center view; does not create collection demand.
+        return {'provider': provider_status(), 'datasets': snapshots()}
 
     @routes.post("/demand")
     def demand(body: Demand):
@@ -55,20 +67,23 @@ def router(authenticated):
     @routes.post("/retry")
     def retry():
         with transaction() as db:
-            cleared = 0
-            for owner in db.scalars(select(PricingOwner).where(PricingOwner.error == "unauthorized")
+            scheduled = 0
+            for owner in db.scalars(select(PricingOwner).where(PricingOwner.error == "unauthorized",
+                                    PricingOwner.id == account_key(settings.oanda_account_id))
                                     .with_for_update()):
                 if owner.expires > now_ms():
                     continue
-                owner.error = None
-                owner.next_at = 0
-                cleared += 1
-            return {"reset_configuration_faults": cleared}
+                # Retry schedules validation; it never bypasses the auth hold.
+                if owner.next_at <= now_ms():
+                    scheduled += 1
+            return {"scheduled_authentication_checks": scheduled}
 
     @routes.get("/events")
     async def events(request: Request):
         async def stream():
             cursor = None
+            provider_cursor = None
+            cycles = 0
             while not await request.is_disconnected():
                 snapshot = await asyncio.to_thread(snapshots)
                 signature = snapshot_signature(snapshot)
@@ -76,6 +91,12 @@ def router(authenticated):
                     # Every browser reconnect starts with a full current snapshot.
                     yield "event: snapshot\ndata: " + json.dumps(snapshot) + "\n\n"
                     cursor = signature
+                if cycles % 5 == 0:
+                    status = await asyncio.to_thread(provider_status)
+                    if provider_cursor != status:
+                        yield 'event: provider-status\ndata: ' + json.dumps(status) + '\n\n'
+                        provider_cursor = status
+                cycles += 1
                 yield "event: heartbeat\ndata: {}\n\n"
                 await asyncio.sleep(1)
         return StreamingResponse(stream(), media_type="text/event-stream",

@@ -79,6 +79,9 @@ def test_live_quote_is_independent_of_recovery_and_exact_input_is_auditable(data
         "nonfinite",
         "untradeable",
         "account",
+        'auth_hold',
+        'maintenance',
+        'operational_closure',
     ],
 )
 def test_invalid_or_expired_owner_never_promotes_stream_price(database, monkeypatch, change):
@@ -90,6 +93,26 @@ def test_invalid_or_expired_owner_never_promotes_stream_price(database, monkeypa
         mapping = db.get(RealtimeMapping, revision.mapping_id)
         live = db.get(LiveState, mapping.target_dataset_id)
         owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
+        if change == 'auth_hold':
+            owner.error = 'unauthorized'
+        if change == 'maintenance':
+            owner.error = 'provider_maintenance'
+        if change == 'operational_closure':
+            from datetime import UTC, datetime
+            from zoneinfo import ZoneInfo
+
+            from alerts.storage import MarketDataset
+
+            target = db.get(MarketDataset, mapping.target_dataset_id)
+            at = datetime.fromtimestamp(stamp/1000, UTC)
+            day = at.astimezone(ZoneInfo('America/New_York')).weekday()
+            monkeypatch.setattr(settings, 'oanda_live_session_profiles', {target.identity['provider_symbol']: {
+                'revision': 'test-operational', 'source_session': {
+                    **{key: target.identity[key] for key in ('source', 'channel', 'environment', 'account_scope', 'provider_symbol')},
+                    'timezone': 'America/New_York', 'reviewed_start': '1970-01-01T00:00:00Z',
+                    'reviewed_end': '1970-01-07T00:00:00Z', 'evidence_url': 'https://example.test/reviewed-fixture',
+                    'applicability': 'Controlled status fixture; not coverage',
+                    'weekly_closures': [{'start': day*1440, 'end': (day+1)*1440}]}}})
         if change == "epoch":
             owner.epoch += 1
         if change == "quote_epoch":

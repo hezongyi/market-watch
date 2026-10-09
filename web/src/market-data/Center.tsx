@@ -17,6 +17,7 @@ import {
 import { useSnapshot } from "./useSnapshot";
 import { NativeConfigure } from "./NativeConfigure";
 import { centerLink, useCenterRowRestore } from "./navigation";
+import { LiveProviderStatus } from "./LiveProviderStatus";
 
 export function Feedback({
   error,
@@ -485,13 +486,16 @@ export function TaskActions({
 }
 export default function Center() {
   return (
-    <Routes>
-      <Route index element={<CenterList />} />
-      <Route path="platform/configure" element={<NativeConfigure />} />
-      <Route path="datasets/new" element={<DatasetCreate />} />
-      <Route path="datasets/:id" element={<DatasetDetail />} />
-      <Route path="datasets/:id/mapping" element={<MappingForm />} />
-      <Route path="composites/:id" element={<CompositeDetail />} />
-    </Routes>
+    <>
+      <LiveProviderStatus />
+      <Routes>
+        <Route index element={<CenterList />} />
+        <Route path="platform/configure" element={<NativeConfigure />} />
+        <Route path="datasets/new" element={<DatasetCreate />} />
+        <Route path="datasets/:id" element={<DatasetDetail />} />
+        <Route path="datasets/:id/mapping" element={<MappingForm />} />
+        <Route path="composites/:id" element={<CompositeDetail />} />
+      </Routes>
+    </>
   );
 }

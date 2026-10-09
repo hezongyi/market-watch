@@ -37,6 +37,7 @@ class RequestStatus(StrEnum):
     UNAUTHORIZED = "unauthorized"
     TIMEOUT = "timeout"
     UNAVAILABLE = "unavailable"
+    PROVIDER_MAINTENANCE = "provider_maintenance"
     INVALID_PAYLOAD = "invalid_payload"
 
 
@@ -111,6 +112,8 @@ class MarketRequestError(RuntimeError):
 
 
 def failed_request(error, *, observed_at):
+    if isinstance(error, MarketRequestError):
+        return error.result
     status = RequestStatus.UNAVAILABLE
     retry_at = None
     if isinstance(error, httpx.HTTPStatusError):
@@ -131,6 +134,18 @@ def failed_request(error, *, observed_at):
                     pass
         elif code in (401, 403):
             status = RequestStatus.UNAUTHORIZED
+        elif code == 503 and error.response.is_stream_consumed:
+            # Classify only a bounded, explicit provider assertion. Do not read
+            # a streaming error body here or expose response text in status/logs.
+            content = error.response.content
+            if len(content) <= 8192:
+                try:
+                    payload = error.response.json()
+                    message = payload.get('errorMessage') if isinstance(payload, dict) else None
+                    if isinstance(message, str) and 'maintenance' in message.lower():
+                        status = RequestStatus.PROVIDER_MAINTENANCE
+                except ValueError:
+                    pass
     elif isinstance(error, (httpx.TimeoutException, TimeoutError)):
         status = RequestStatus.TIMEOUT
     elif isinstance(error, (ValueError, KeyError, TypeError)):

@@ -313,7 +313,7 @@ def test_unauthorized_holds_configuration_fault_without_reconnect_storm(running)
     assert live.claim("test-account", now=999999) is None
     with db_factory.begin() as db:
         assert db.get(PricingOwner, ownership[0]).error == "unauthorized"
-    assert all(row["quality"] == "unavailable" and not row["fallback_ready"]
+    assert all(row["quality"] == "unauthorized" and not row["fallback_ready"]
                for row in live.snapshots(now=125000))
 
 

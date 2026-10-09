@@ -109,11 +109,15 @@ try {
     assets,
     "charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js",
   );
+  const toolset = fs.readFileSync(path.join(host,
+    'charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js'));
+  fs.writeFileSync(path.join(assets,
+    'charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js'), toolset);
   for (const source of [original, installed]) {
     fs.writeFileSync(assetBundle, source);
     execFileSync(process.execPath, [path.join(assets, "build-assets.mjs")]);
     const html = fs.readFileSync(path.join(assets, "index.html"), "utf8");
-    const version = digest(source).slice(0, 16);
+    const version = crypto.createHash('sha256').update(source).update(toolset).digest('hex').slice(0, 16);
     assert.ok(
       html.includes(`/charting_library_${version}/charting_library.js`),
     );
@@ -125,6 +129,12 @@ try {
     );
     assert.equal((html.match(/src="\/host\./g) || []).length, 1);
   }
+  const previousHtml = fs.readFileSync(path.join(assets, 'index.html'), 'utf8');
+  fs.appendFileSync(path.join(assets,
+    'charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js'), '\n/* cache test */');
+  execFileSync(process.execPath, [path.join(assets, 'build-assets.mjs')]);
+  assert.notEqual(fs.readFileSync(path.join(assets, 'index.html'), 'utf8'), previousHtml,
+    'toolset-only change must invalidate the private library URL');
   console.log(
     "Original, legacy, idempotent, partial/tampered, disable and distinct cache URL contracts passed",
   );

@@ -15,6 +15,7 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from .calendar_profile import session_from
 from .config import settings
+from .live_session import effective_profile, session_status
 from .market_contracts import DatasetIdentity, QuoteEvent
 from .market_datasets import register_dataset
 from .storage import (
@@ -36,13 +37,17 @@ def account_key(account):
     return hashlib.sha256(("oanda:practice:" + account).encode()).hexdigest()
 
 
-def ensure_catalog(items, account):
+def ensure_catalog(items, account, *, ownership=None):
     scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
     by_symbol = {row["name"]: row for row in items}
     resident = tuple(symbol.strip() for symbol in settings.oanda_resident_symbols.split(",") if symbol.strip())
     if any(symbol not in by_symbol for symbol in resident):
         raise ValueError("Resident instruments are unavailable in this practice account")
     with transaction() as db:
+        if ownership is not None:
+            if ownership[0] != account_key(account):
+                raise ValueError('Catalog ownership account mismatch')
+            lock_owner(db, ownership)
         for symbol, meta in by_symbol.items():
             logical = symbol.replace("_", "")
             if len(logical) > 10:
@@ -82,7 +87,7 @@ def desired_datasets(account):
         return result
 
 
-def claim(account, *, now=None):
+def claim(account, *, now=None, startup=False):
     stamp = now_ms() if now is None else now
     key = account_key(account)
     with transaction() as db:
@@ -93,8 +98,119 @@ def claim(account, *, now=None):
         if owner.expires > stamp or owner.next_at > stamp or owner.error == "unauthorized":
             return None
         owner.token = uid()
-        owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
+        owner.expires = stamp + (120 if startup else settings.oanda_stream_lease_seconds) * 1000
         return (key, owner.token)
+
+
+def claim_auth_probe(account, *, now=None):
+    """Reserve the next probe before I/O, including after a worker crash."""
+    stamp = now_ms() if now is None else now
+    key = account_key(account)
+    with transaction() as db:
+        owner = db.scalar(select(PricingOwner).where(PricingOwner.id == key).with_for_update())
+        if not owner or owner.error != 'unauthorized' or owner.expires > stamp or owner.next_at > stamp:
+            return None
+        owner.token = uid()
+        # Three bounded HTTP requests plus their independent slot waits.
+        owner.expires = stamp + 120000
+        owner.next_at = stamp + settings.oanda_auth_probe_seconds * 1000
+        return key, owner.token
+
+
+def wait_delay(account, *, now=None):
+    stamp = now_ms() if now is None else now
+    with transaction() as db:
+        owner = db.get(PricingOwner, account_key(account))
+        deadlines = [value for value in (owner.expires, owner.next_at) if value > stamp] if owner else []
+        return min(10, max(1, (min(deadlines) - stamp) / 1000)) if deadlines else 1
+
+
+def _account_states(db, account):
+    scope = 'sha256:' + hashlib.sha256(account.encode()).hexdigest()
+    return [(state, dataset) for state, dataset in db.execute(select(LiveState, MarketDataset).join(
+        MarketDataset, MarketDataset.id == LiveState.dataset_id)) if all(dataset.identity.get(key) == value
+        for key, value in {'source': 'oanda', 'channel': 'v20', 'environment': 'practice', 'account_scope': scope}.items())]
+
+
+def _retry_at(result, stamp, failures):
+    delay = (settings.oanda_auth_probe_seconds * 1000 if result.status == 'unauthorized' else
+             settings.oanda_maintenance_probe_seconds * 1000 if result.status == 'provider_maintenance' else
+             int(min(60000, 1000 * 2 ** max(0, failures - 1)) * random.uniform(0.8, 1.2)))
+    return max(stamp + delay, result.retry_at or 0)
+
+
+def startup_failed(ownership, account, result, *, now=None):
+    """Persist startup faults under the same account lease as collection."""
+    stamp = now_ms() if now is None else now
+    if ownership[0] != account_key(account):
+        raise ValueError('Startup ownership account mismatch')
+    with transaction() as db:
+        owner = lock_owner(db, ownership, now=stamp)
+        if owner.error == 'unauthorized':
+            from .market_contracts import RequestResult
+            result = RequestResult(status='unauthorized')
+        owner.failures = min(owner.failures + 1, 10)
+        owner.error = result.status
+        db.merge(Preference(key='oanda_probe_status:' + owner.id, value={}))
+        owner.next_at = _retry_at(result, stamp, owner.failures)
+        owner.expires, owner.token = 0, None
+        for state, _ in _account_states(db, account):
+            state.connection, state.error, state.ready = 'disconnected', result.status, False
+            state.revision += 1
+
+
+def finish_auth_probe(ownership, result, *, now=None, retry_seconds=None):
+    stamp = now_ms() if now is None else now
+    with transaction() as db:
+        owner = lock_owner(db, ownership, now=stamp)
+        if owner.error != 'unauthorized':
+            raise TimeoutError('Authentication probe was superseded')
+        owner.expires, owner.token = 0, None
+        if result.successful:
+            owner.error, owner.failures, owner.next_at = None, 0, 0
+        else:
+            # Maintenance/timeout must not clear a persisted auth hold.
+            delay = max(settings.oanda_auth_probe_seconds, retry_seconds or 0)
+            owner.next_at = max(stamp + int(delay * 1000), result.retry_at or 0)
+        db.merge(Preference(key='oanda_probe_status:' + ownership[0],
+            value={'error': None if result.successful else result.status, 'observed_at': stamp}))
+        db.add(Audit(kind='pricing_auth_probe', details={'account_key': ownership[0],
+            'effective_at': stamp, 'result': result.status, 'hold_released': result.successful}))
+
+
+def provider_status(*, now=None):
+    with transaction() as db:
+        owner = db.get(PricingOwner, account_key(settings.oanda_account_id)) if settings.oanda_account_id else None
+        probe = db.get(Preference, 'oanda_probe_status:' + owner.id) if owner else None
+        held = bool(owner and owner.error == 'unauthorized')
+        return {'source': 'oanda', 'environment': 'practice', 'authentication_hold': held,
+            'error': ((probe.value.get('error') if probe and held else None) or owner.error) if owner else None,
+            'next_probe_at': owner.next_at or None if owner else None}
+
+
+def session_states(identities, *, now=None):
+    stamp = now_ms() if now is None else now
+    with transaction() as db:
+        result = {}
+        for symbol, identity in identities.items():
+            dataset = db.get(MarketDataset, identity.key)
+            inst = db.get(Instrument, dataset.instrument_id) if dataset else None
+            result[symbol] = session_status(identity.model_dump(), inst.calendar_profile if inst else {}, stamp)
+        return result
+
+
+def park_closed(ownership, identities, seconds, *, now=None):
+    stamp = now_ms() if now is None else now
+    with transaction() as db:
+        owner = lock_owner(db, ownership, now=stamp)
+        if owner.error == 'unauthorized':
+            raise TimeoutError('Authentication hold cannot be released by closure')
+        owner.next_at = stamp + int(seconds * 1000)
+        owner.expires, owner.token, owner.error, owner.failures = 0, None, None, 0
+        for identity in identities.values():
+            state = db.get(LiveState, identity.key)
+            state.connection, state.ready, state.error = 'closed', False, None
+            state.revision += 1
 
 
 def lock_owner(db, ownership, epoch=None, *, now=None):
@@ -148,6 +264,8 @@ def begin_connection(ownership, identities, *, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, now=stamp)
+        if owner.error == 'unauthorized':
+            raise TimeoutError('Account authentication hold')
         owner.epoch += 1
         owner.connected_at = stamp
         scopes = {identity.account_scope for identity in identities.values()}
@@ -197,6 +315,8 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
+        if owner.error == 'unauthorized':
+            raise TimeoutError('Account authentication hold')
         owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
         if not isinstance(event, QuoteEvent):
             if event.get("type") != "heartbeat" or event.get("connection_epoch") != epoch:
@@ -262,7 +382,8 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
                 if watch.rule["timeframe"] == "tick":
                     watch.state = {}
                     watch.paused_reason = "报价期间缺少连续观测，重新建立同源判断前态"
-        if (state.ready and event.tradeable and event.bid is not None and event.ask is not None
+        if (state.ready and session_status(event.identity.model_dump(), inst.calendar_profile, stamp)['market_session'] != 'closed'
+                and event.tradeable and event.bid is not None and event.ask is not None
                 and Decimal(event.ask) >= Decimal(event.bid)
                 and 0 <= stamp - event.source_time <= 15000):
             from .service import evaluate_quote
@@ -276,9 +397,13 @@ def disconnected(ownership, epoch, identities, result, *, now=None, intentional=
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
         owner.failures = 0 if intentional else min(owner.failures + 1, 10)
-        delay = min(60000, 1000 * 2 ** (owner.failures - 1))
-        owner.next_at = 0 if intentional else max(stamp + int(delay * random.uniform(0.8, 1.2)), result.retry_at or 0)
+        if owner.error == 'unauthorized':
+            from .market_contracts import RequestResult
+            result = RequestResult(status='unauthorized')
+            intentional = False
+        owner.next_at = 0 if intentional else _retry_at(result, stamp, owner.failures)
         owner.error = None if intentional else result.status
+        db.merge(Preference(key='oanda_probe_status:' + owner.id, value={}))
         owner.expires = 0
         owner.token = None
         for identity in identities.values():
@@ -360,6 +485,8 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
+        if owner.error == 'unauthorized':
+            raise TimeoutError('Account authentication hold')
         state = db.get(LiveState, batch.identity.key)
         if not state or state.epoch != epoch:
             raise TimeoutError("Confirmation generation is obsolete")
@@ -385,6 +512,8 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
                                          batch.result.retry_at or 0)
             if batch.result.status == "unauthorized":
                 owner.error = "unauthorized"
+                db.merge(Preference(key='oanda_probe_status:' + owner.id, value={}))
+                owner.next_at = _retry_at(batch.result, stamp, owner.failures)
                 state.ready = False
             return
         dataset = db.get(MarketDataset, batch.identity.key)
@@ -452,7 +581,7 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
                 db.add(Audit(kind="pricing_recovered", details={"dataset": batch.identity.key,
                     "epoch": epoch, "confirmed_end": state.confirmed_end,
                     "effective_at": stamp, "historical_notifications": "suppressed"}))
-        if state.ready and current_confirmed:
+        if state.ready and current_confirmed and session_status(batch.identity.model_dump(), inst.calendar_profile, stamp)['market_session'] != 'closed':
             from .service import evaluate_watch, rewarm_watch
 
             emit_after = max(state.recovery_started, stamp - 30000)
@@ -494,8 +623,11 @@ def snapshots(*, now=None):
     with transaction() as db:
         result = []
         source_cooldowns = {}
+        configured_scope = 'sha256:' + hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
+        owner = db.get(PricingOwner, account_key(settings.oanda_account_id)) if settings.oanda_account_id else None
+        probe = db.get(Preference, 'oanda_probe_status:' + owner.id) if owner else None
         for state in db.scalars(select(LiveState)):
-            if state.epoch == 0 or state.connection == "inactive":
+            if (state.epoch == 0 and not state.error and state.connection != 'closed') or state.connection == "inactive":
                 continue
             dataset = db.get(MarketDataset, state.dataset_id)
             source = dataset.identity["source"]
@@ -506,14 +638,27 @@ def snapshots(*, now=None):
                 # Report only active shared REST cooldowns, rounded outward.
                 source_cooldowns[source] = math.ceil(deadline) if deadline > stamp else None
             inst = db.get(Instrument, dataset.instrument_id)
-            session = session_from(inst.calendar_profile)
+            if state.epoch == 0 and not inst.enabled and state.connection != 'closed':
+                continue
+            session = session_from(effective_profile(dataset.identity, inst.calendar_profile))
+            session_view = session_status(dataset.identity, inst.calendar_profile, stamp)
+            scoped_owner = owner if dataset.identity.get('account_scope') == configured_scope and all(
+                dataset.identity.get(key) == value for key, value in
+                {'source': 'oanda', 'environment': 'practice', 'channel': 'v20'}.items()) else None
+            authentication_hold = bool(scoped_owner and scoped_owner.error == 'unauthorized' or state.error == 'unauthorized')
+            connection_error = state.error
+            if scoped_owner and scoped_owner.error:
+                connection_error = (probe.value.get('error') if probe and authentication_hold else None) or scoped_owner.error
             quote = state.quote
             age = stamp - quote["source_time"] if quote else None
             connected = state.connection != "disconnected" and (
                 max(state.heartbeat_at, state.received_at) >= stamp - 15000)
             valid_quote = bool(quote and quote.get("bid") and quote.get("ask")
                 and Decimal(quote["ask"]) >= Decimal(quote["bid"]))
-            quality = ("unavailable" if not connected else "recovering" if not state.ready else
+            quality = ('provider_maintenance' if connection_error == 'provider_maintenance' else
+                       'unauthorized' if authentication_hold else
+                       'market_closed' if session_view['market_session'] == 'closed' else
+                       "unavailable" if not connected else "recovering" if not state.ready else
                        "not_tradeable" if quote and not quote["tradeable"] else
                        "stale" if age is None or age > 15000 or age < 0 else
                        "degraded" if state.error or not valid_quote else "healthy")
@@ -524,17 +669,19 @@ def snapshots(*, now=None):
                 "heartbeat_at": state.heartbeat_at, "last_confirmed_m1": state.confirmed_end,
                 "cooldown_until": source_cooldowns[source],
                 "recovery_ready": state.ready, "error": state.error,
-                "calendar_verified": bool(session and int(session.reviewed_start.timestamp() * 1000) <= stamp
-                    < int(session.reviewed_end.timestamp() * 1000)),
+                **session_view, 'authentication_hold': authentication_hold,
+                'connection_error': connection_error,
+                'next_probe_at': scoped_owner.next_at or None if scoped_owner else None,
                 "calendar_revision": inst.calendar_profile.get("revision", dataset.identity["calendar_version"]),
                 "session_evidence": ({"url": session.evidence_url, "applicability": session.applicability,
                     "reviewed_start": session.reviewed_start.isoformat(), "reviewed_end": session.reviewed_end.isoformat()}
                     if session else None),
                 "fallback_ready": False, "selection_epoch": state.epoch,
                 "received_at": state.received_at, "quote_age_ms": age})
-            result[-1]["quote_ready"] = bool(connected and valid_quote and quote["tradeable"]
+            available = not authentication_hold and connection_error != 'provider_maintenance' and session_view['market_session'] != 'closed'
+            result[-1]["quote_ready"] = bool(available and connected and valid_quote and quote["tradeable"]
                 and age is not None and 0 <= age <= 15000)
-            result[-1]["candle_ready"] = bool(connected and state.ready and not state.error)
+            result[-1]["candle_ready"] = bool(available and connected and state.ready and not state.error)
             result[-1]["precision"] = inst.precision
             result[-1]["alert_readiness"] = [{"watch_id": watch.id, "reason": watch.paused_reason,
                 "status": watch.status} for watch in db.scalars(select(Watch).where(
