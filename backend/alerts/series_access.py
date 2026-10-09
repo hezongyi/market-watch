@@ -111,6 +111,8 @@ def chart_data(db, body, *, realtime=None):
         composite = db.get(MarketComposite, body.instrument)
         if composite:
             selected = db.get(CompositeRevision, body.composite_revision_id or composite.active_revision_id)
+            if not selected or selected.composite_id != composite.id:
+                raise ValueError("组合修订不属于当前组合")
             mapping = db.get(RealtimeMapping, selected.mapping_id)
             # Strong references keep SQLAlchemy's weak identity map on this
             # source observation throughout the history/aggregation read.
