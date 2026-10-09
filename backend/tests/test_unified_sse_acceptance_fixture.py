@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 from alerts import market_stream as stream
 from alerts.chart_api import DataQuery
+from alerts.chart_data import FRAMES
 from alerts.market_stream_api import Subscription, resolve
 from alerts.market_stream_worker import Calculator
 from alerts.storage import ChartPublication, ChartPublishedBar, Instrument, now_ms
@@ -99,3 +100,19 @@ def test_invalid_fixture_update_rolls_back_publication(database, monkeypatch, ca
         assert pub.end == initial["bar"]["end"]
         assert pub.revision == initial["publication_revision"]
         assert db.get(ChartPublishedBar, (fixture.SYMBOL, "M1", pub.end)) is None
+
+
+def test_all_synthetic_periods_use_real_calendar_bounds_and_update_independently(database, monkeypatch, capsys):
+    monkeypatch.setattr(fixture, "guard", lambda: None)
+    invoke(monkeypatch, capsys, "seed")
+    for frame in FRAMES:
+        tail = invoke(monkeypatch, capsys, "tail", "--timeframe", frame)
+        with database() as db:
+            pub = db.get(ChartPublication, (fixture.SYMBOL, frame))
+            assert pub and pub.initialized and pub.complete_count > 0
+        assert tail["bar"]["end"] <= now_ms()
+        before = tail["publication_revision"]
+        updated = invoke(monkeypatch, capsys, "update", "--timeframe", frame, "--close", "104.001")
+        assert updated["publication_revision"] == before + 1
+        assert updated["bar"]["start"] == tail["bar"]["start"]
+        assert updated["bar"]["close"] == "104.001"

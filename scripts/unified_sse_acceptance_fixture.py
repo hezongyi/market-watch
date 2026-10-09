@@ -8,18 +8,23 @@ import argparse
 import json
 from decimal import Decimal
 
+from alerts.chart_data import FRAMES, bounds
 from alerts.config import settings
+from alerts.domain import Calendar, bucket_bounds
 from alerts.storage import (
     AdvancedWorkspace,
     ChartPublication,
     ChartPublishedBar,
     Instrument,
+    MarketStreamSubscription,
     MarketStreamTask,
     Preference,
+    instant,
+    ms,
     now_ms,
     transaction,
 )
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.engine import make_url
 
 TASK = "mw-unified-sse-20261008"
@@ -42,13 +47,30 @@ def guard():
         raise SystemExit("Refusing any database outside the isolated unified-SSE task")
 
 
-def payload(start, value):
+def payload(start, value, end=None):
     return {
-        "start": start, "end": start + WIDTH,
+        "start": start, "end": end or start + WIDTH,
         "open": str(value), "high": str(value + 2), "low": str(value - 2),
         "close": str(value + 1), "complete": True, "revision": 1,
         "volume": None, "volume_complete": False,
     }
+
+
+def seed_period(db, frame):
+    if db.get(ChartPublication, (SYMBOL, frame)):
+        return
+    boundary = bounds if frame in ("M30", "W1", "MN") else bucket_bounds
+    right = ms(boundary(instant(now_ms()), frame, Calendar.UTC0)[0])
+    end = right
+    count = 120 if frame == "MN" else 300 if frame == "W1" else 1400
+    for index in range(count):
+        left = ms(boundary(instant(right - 1), frame, Calendar.UTC0)[0])
+        db.add(ChartPublishedBar(instrument_id=SYMBOL, timeframe=frame,
+            start=left, end=right, complete=True, revision=1,
+            payload=payload(left, Decimal("100") + Decimal(index % 40) / 10, right)))
+        right = left
+    db.add(ChartPublication(instrument_id=SYMBOL, timeframe=frame, start=right,
+        end=end, complete_count=count, initialized=True, revision=1))
 
 
 def main():
@@ -57,6 +79,7 @@ def main():
     parser.add_argument("--close", type=Decimal)
     parser.add_argument("--high", type=Decimal, default=Decimal("110"))
     parser.add_argument("--low", type=Decimal, default=Decimal("90"))
+    parser.add_argument("--timeframe", choices=tuple(FRAMES), default="M1")
     args = parser.parse_args()
     guard()
     # Migrations must already have succeeded; deliberately no create_all/bootstrap.
@@ -87,18 +110,26 @@ def main():
             db.flush()
         if marker is None or marker.value != {"task": TASK, "synthetic": True}:
             raise SystemExit("Missing or incompatible synthetic fixture ownership")
+        if args.action == "seed":
+            for frame in FRAMES:
+                seed_period(db, frame)
+            db.flush()
         pub = db.scalar(select(ChartPublication).where(
             ChartPublication.instrument_id == SYMBOL,
-            ChartPublication.timeframe == "M1").with_for_update())
+            ChartPublication.timeframe == args.timeframe).with_for_update())
         if pub is None or not pub.initialized:
             raise SystemExit("Missing initialized synthetic publication")
-        row = db.get(ChartPublishedBar, (SYMBOL, "M1", pub.end - WIDTH))
+        row = db.scalar(select(ChartPublishedBar).where(
+            ChartPublishedBar.instrument_id == SYMBOL,
+            ChartPublishedBar.timeframe == args.timeframe).order_by(ChartPublishedBar.start.desc()).limit(1))
         if row is None:
             raise SystemExit("Missing synthetic tail")
         if args.action in ("update", "append"):
             if args.close is None or not all(v.is_finite() for v in (args.close, args.high, args.low)):
                 raise SystemExit("A finite close/high/low is required")
             if args.action == "append":
+                if args.timeframe != "M1":
+                    raise SystemExit("Append fixture supports only M1")
                 start = pub.end
                 if start + WIDTH > now_ms():
                     raise SystemExit("Refusing future completed synthetic bars")
@@ -123,15 +154,29 @@ def main():
                 raise SystemExit("Missing owned fixture workspace")
             workspace.updated_at = now_ms()
         result = {"synthetic": True, "instrument": SYMBOL, "workspace": WORKSPACE,
-                  "action": args.action, "bar": row.payload, "publication_revision": pub.revision}
+                  "action": args.action, "timeframe": args.timeframe,
+                  "bar": row.payload, "publication_revision": pub.revision}
         if args.action == "state":
             result["tasks"] = [{"id": task.id, "kind": task.identity.get("kind"),
                 "indicator_count": len(task.query.get("indicators", [])),
+                "timeframe": task.query.get("timeframe"),
                 "owner": task.owner_token, "owner_until": task.owner_until,
-                "sequence": task.sequence, "expires": task.expires}
+                "sequence": task.sequence, "expires": task.expires,
+                "active_consumers": len(list(db.scalars(select(MarketStreamSubscription.id).where(
+                    MarketStreamSubscription.task_id == task.id,
+                    MarketStreamSubscription.active.is_(True),
+                    MarketStreamSubscription.expires > now_ms()))))}
                 for task in db.scalars(select(MarketStreamTask).where(
                     MarketStreamTask.expires > now_ms()))
                 if task.query.get("instrument") == SYMBOL]
+            if db.get_bind().dialect.name == "postgresql":
+                result["database_stats"] = [dict(row._mapping) for row in db.execute(text(
+                    "SELECT relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, "
+                    "n_tup_ins, n_tup_upd, n_tup_del, n_live_tup "
+                    "FROM pg_stat_user_tables WHERE schemaname = 'public' "
+                    "AND relname IN ('candles','chart_publications','chart_published_bars', "
+                    "'market_stream_tasks','market_stream_results','market_stream_subscriptions') "
+                    "ORDER BY relname"))]
     # This timestamp follows the transaction's commit, excluding Docker exec startup.
     result["committed_at"] = now_ms()
     print(json.dumps(result))

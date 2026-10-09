@@ -2,8 +2,13 @@
 
 import pytest
 from alerts import market_stream as stream
-from alerts.storage import LoginSession, MarketStreamSubscription, MarketStreamTask
-from sqlalchemy import func, select
+from alerts.storage import (
+    LoginSession,
+    MarketStreamResult,
+    MarketStreamSubscription,
+    MarketStreamTask,
+)
+from sqlalchemy import event, func, select
 
 
 def session(database, key="session"):
@@ -33,6 +38,34 @@ def test_multiple_pages_share_one_calculation_and_session_scopes_listeners(datab
     stream.commit(ownership, {"type": "bars", "bars": [{"start": 60000, "close": "1.1"}]})
     assert len(stream.events(owner, "page", {})) == 1
     assert len(stream.events(other, "page", {})) == 1
+
+
+def test_idle_lease_and_delivery_do_not_read_retained_history_snapshot(database):
+    owner = session(database)
+    register(owner)
+    stream.commit(stream.claim(), {"type":"bars", "bars":[
+        {"start":index * 60000,"close":"1.1"} for index in range(2000)]}, delay_ms=0)
+    cursor = {}
+    assert stream.events(owner, "page", cursor)
+    statements = []
+    engine = database.kw["bind"]
+
+    def observe(conn, db_cursor, statement, parameters, context, executemany):
+        if statement.lstrip().upper().startswith("SELECT"):
+            statements.append(statement)
+
+    event.listen(engine, "before_cursor_execute", observe)
+    try:
+        for _ in range(3):
+            stream.renew(owner, "page")
+            work = stream.claim()
+            assert work
+            stream.commit(work, None, delay_ms=0)
+            assert stream.events(owner, "page", cursor) == []
+    finally:
+        event.remove(engine, "before_cursor_execute", observe)
+    assert not any("market_stream_tasks.payload" in statement for statement in statements), (
+        "Idle delivery/lease checks must not transfer the full 2000-bar snapshot")
 
 
 def test_old_cancel_duplicate_register_and_late_register_do_not_remove_new_generation(database):
@@ -74,6 +107,28 @@ def test_result_sequence_rejects_stale_same_bar_and_recovers_or_resets(database)
     stream.commit(work, {"type": "bars", "bars": [{"start": 60000, "close": "latest"}]}, delay_ms=0)
     rows = stream.events(owner, "page", cursor)
     assert len(rows) == 1 and rows[0]["sequence"] == stream.RESULT_LIMIT + 3
+
+
+def test_slow_consumer_does_not_block_fast_delivery_and_replay_is_bounded(database):
+    owner = session(database)
+    register(owner, "fast")
+    register(owner, "slow")
+    fast, slow = {}, {}
+    for index in range(stream.RESULT_LIMIT + 5):
+        stream.commit(stream.claim(), {"type":"bars", "bars":[
+            {"start":(offset+1) * 60000,"close":"1.1"} for offset in range(index+1)]}, delay_ms=0)
+        rows = stream.events(owner, "fast", fast)
+        assert len(rows) == 1 and rows[0]["type"] == "bars"
+        assert rows[0]["bars"][-1]["start"] == (index+1) * 60000
+    with database.begin() as db:
+        assert db.scalar(select(func.count()).select_from(MarketStreamResult)) == stream.RESULT_LIMIT
+    rows = stream.events(owner, "slow", slow)
+    assert len(rows) == 1 and rows[0]["type"] == "reset"
+    assert rows[0]["reason"] == "recovery_budget"
+    stream.commit(stream.claim(), {"type":"bars", "bars":[
+        {"start":(offset+1) * 60000,"close":"1.1"}
+        for offset in range(stream.RESULT_LIMIT+6)]}, delay_ms=0)
+    assert stream.events(owner, "fast", fast)[0]["type"] == "bars"
 
 
 def test_session_end_disables_work_and_output(database):

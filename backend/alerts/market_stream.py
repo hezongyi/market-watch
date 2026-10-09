@@ -8,6 +8,7 @@ import hashlib
 import json
 
 from sqlalchemy import delete, func, or_, select
+from sqlalchemy.orm import defer
 
 from .source_history_store import _insert
 from .storage import (
@@ -76,7 +77,7 @@ def register(session_hash, client, listener, generation, identity, query, state)
         # Replacement and last-consumer cancellation share task-row fencing
         # with publication. Consistent ordering also covers two clients that
         # concurrently exchange their old and new calculation identities.
-        tasks = {task.id: task for task in db.scalars(select(MarketStreamTask).where(
+        tasks = {task.id: task for task in db.scalars(select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(
             MarketStreamTask.id.in_(sorted({key, previous_task} - {None})))
             .order_by(MarketStreamTask.id).with_for_update())}
         task = tasks[key]
@@ -120,7 +121,7 @@ def cancel(session_hash, client, listener, generation):
                                            state={}, expires=now_ms() + LEASE_MS)
             db.add(sub)
         task_id = sub.task_id
-        task = db.scalar(select(MarketStreamTask).where(MarketStreamTask.id == task_id)
+        task = db.scalar(select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(MarketStreamTask.id == task_id)
                          .with_for_update()) if task_id else None
         sub.generation, sub.active = generation, False
         sub.task_id = None
@@ -167,7 +168,7 @@ def renew(session_hash, client):
                 MarketStreamSubscription.client_id == owner.id,
                 MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp)):
             sub.expires = stamp + LEASE_MS
-            task = db.get(MarketStreamTask, sub.task_id)
+            task = db.get(MarketStreamTask, sub.task_id, options=[defer(MarketStreamTask.payload)])
             task.expires = max(task.expires, sub.expires)
 
 
@@ -179,7 +180,7 @@ def claim(exclude=(), owner=None):
             MarketStreamClient.session_hash == LoginSession.token_hash).where(
                 MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp,
                 LoginSession.expires > stamp)
-        task = db.scalar(select(MarketStreamTask).where(MarketStreamTask.id.in_(active),
+        task = db.scalar(select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(MarketStreamTask.id.in_(active),
             MarketStreamTask.id.not_in(exclude),
             or_(MarketStreamTask.owner_until <= stamp, MarketStreamTask.owner_token == owner),
             MarketStreamTask.next_at <= stamp, MarketStreamTask.lease_until <= stamp)
@@ -199,7 +200,7 @@ def commit(ownership, payload, *, delay_ms=500):
     if payload is not None and len(json.dumps(payload).encode()) > PAYLOAD_BYTES:
         payload = {"type": "reset", "reason": "result_budget"}
     with transaction() as db:
-        task = db.scalar(select(MarketStreamTask).where(MarketStreamTask.id == ownership["id"])
+        task = db.scalar(select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(MarketStreamTask.id == ownership["id"])
                          .with_for_update())
         stamp = now_ms()
         if not task or task.lease_token != ownership["token"] or task.lease_until <= stamp:
@@ -275,7 +276,9 @@ def events(session_hash, client, cursors):
         for sub in db.scalars(select(MarketStreamSubscription).where(
                 MarketStreamSubscription.client_id == owner.id,
                 MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > now_ms())):
-            task = db.get(MarketStreamTask, sub.task_id)
+            # The retained full snapshot is needed only for a fresh binding.
+            # Idle checks and ordinary deltas read metadata/results instead.
+            task = db.get(MarketStreamTask, sub.task_id, options=[defer(MarketStreamTask.payload)])
             key = (sub.listener, sub.generation)
             sequence = cursors.get(key, sub.state.get("sequence", 0))
             rows = list(db.scalars(select(MarketStreamResult).where(

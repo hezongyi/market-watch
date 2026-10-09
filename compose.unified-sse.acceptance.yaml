@@ -57,7 +57,9 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       PYTHONPATH: /app/backend
     command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "--tb=short",
-      "backend/tests/test_market_stream_postgres.py"]
+      "backend/tests/test_market_stream_postgres.py",
+      "backend/tests/test_market_stream_cost_postgres.py",
+      "backend/tests/test_fixed_indicators_postgres.py"]
   composite-aggregate-worker:
     <<: *api
     command: ["python", "-m", "alerts.composite_aggregate_worker"]
@@ -86,6 +88,14 @@ services:
   chart-origin:
     image: ${MW_CHART_IMAGE:?Build licensed chart locally with mw-docker}
     ports: ["127.0.0.1:15644:80"]
+    restart: "no"
+  web-second:
+    image: ${MW_WEB_IMAGE:?Build the task-owned web image with mw-docker}
+    ports: ["127.0.0.1:15646:80"]
+    # Reuse the same task image while exercising a distinct API process.
+    command: ["/bin/sh", "-c", "sed -i 's/server api:8000/server api-second:8000/' /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
+    depends_on:
+      api-second: {condition: service_started}
     restart: "no"
 volumes:
   postgres-data:
