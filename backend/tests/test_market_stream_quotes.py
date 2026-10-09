@@ -147,6 +147,33 @@ def test_managed_quote_cancellation_releases_only_task_demand(database):
         assert [row.id for row in db.scalars(select(MarketDemand))] == ["managed-alert"]
 
 
+def test_managed_quotes_with_history_plan_deliver_confirmed_updates(database):
+    from decimal import Decimal
+
+    from alerts.storage import Bar, ChartHistoryPlan, now_ms
+
+    owner = session(database)
+    start = now_ms() // 60000 * 60000 - 60000
+    with database.begin() as db:
+        db.add(ChartHistoryPlan(instrument_id="BTCUSDT", target_start=start,
+            target_end=start+60000, cursor=start, status="ready"))
+        db.add(Bar(instrument_id="BTCUSDT",timeframe="M1",start=start,end=start+60000,
+            open=100,high=110,low=90,close=101,complete=True,revision=1))
+    query = DataQuery(instrument="BTCUSDT",timeframe="M1",published=True)
+    identity, serialized = resolve(Subscription(client="page",listener="watchlist",generation=1,
+        kind="quotes",query=query))
+    stream.register(owner,"page","watchlist",1,identity,serialized,{})
+    calculator, cursor = Calculator(), {}
+    publish(calculator)
+    assert stream.events(owner,"page",cursor)[0]["quotes"][0]["v"]["lp"] == 101
+    with database.begin() as db:
+        row = db.scalar(select(Bar).where(Bar.instrument_id == "BTCUSDT",Bar.start == start))
+        row.close, row.revision = Decimal("102"), 2
+    publish(calculator)
+    assert stream.events(owner,"page",cursor)[0]["quotes"][0]["v"]["lp"] == 102
+    assert publish(calculator) is None, "unchanged confirmed input is not repeatedly calculated"
+
+
 def test_quote_only_provider_task_keeps_supplier_cadence_without_history_interest(database, monkeypatch):
     from alerts import provider_chart
     from alerts.provider_capabilities import poll_seconds

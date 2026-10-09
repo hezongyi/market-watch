@@ -94,7 +94,8 @@ class Calculator:
         inst = db.get(Instrument, ident)
         from .storage import ChartHistoryPlan, ChartPublication
         plan = db.get(ChartHistoryPlan, ident)
-        preparation = [plan.status, plan.cursor, plan.error] if plan else None
+        preparation = [plan.status, plan.cursor, plan.target_start, plan.target_end,
+                       plan.realtime_enabled, plan.realtime_end] if plan else None
         if query.published and work["identity"]["kind"] == "bars":
             # Published native data depends on its atomic publication, not on
             # every staging candle. This primary-key read is independent of

@@ -95,6 +95,7 @@ def test_quote_contract_postgres(provider_pg, monkeypatch, contract):
     worker_contracts.test_managed_preparation_waits_for_native_dataset_readiness,
     worker_contracts.test_published_stream_signal_uses_publication_evidence_without_scanning_staging_history,
     quote_contracts.test_managed_quote_cancellation_releases_only_task_demand,
+    quote_contracts.test_managed_quotes_with_history_plan_deliver_confirmed_updates,
 ])
 def test_managed_and_http_contract_postgres(provider_pg, contract):
     from alerts import storage
