@@ -1,0 +1,12 @@
+AssertionError [ERR_ASSERTION]: A cached old native period must not trigger recovery after the visible period changes
+
+1 !== 0
+
+    at /home/quant/repos/market-watch-unified-sse-20261008/web/tests/advanced-market-stream.cjs:147:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

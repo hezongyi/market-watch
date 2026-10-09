@@ -1,0 +1,75 @@
+........FFF.......................                                       [100%]
+=================================== FAILURES ===================================
+_ test_durable_contract[test_replay_checks_each_committed_result_without_looking_ahead] _
+backend/tests/test_market_stream_postgres.py:36: in test_durable_contract
+    contract(provider_pg[0])
+backend/tests/test_market_stream.py:149: in test_replay_checks_each_committed_result_without_looking_ahead
+    rows = stream.events(owner, "page", cursor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_stream.py:301: in events
+    payload = delivery(db, task, sub, payload, cursors)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_stream.py:395: in delivery
+    check = managed_check(db, inst, source, check_page["bars"], query)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/chart_api.py:209: in history_check
+    revision = fingerprint(before)
+               ^^^^^^^^^^^^^^^^^^^
+backend/alerts/chart_api.py:199: in fingerprint
+    Bar.instrument_id == inst.id,
+                         ^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'id'
+_ test_durable_contract[test_disconnect_beyond_retained_bar_window_requires_reset] _
+backend/tests/test_market_stream_postgres.py:36: in test_durable_contract
+    contract(provider_pg[0])
+backend/tests/test_market_stream.py:161: in test_disconnect_beyond_retained_bar_window_requires_reset
+    event = stream.events(owner, "page", cursor)[0]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_stream.py:301: in events
+    payload = delivery(db, task, sub, payload, cursors)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_stream.py:395: in delivery
+    check = managed_check(db, inst, source, check_page["bars"], query)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/chart_api.py:209: in history_check
+    revision = fingerprint(before)
+               ^^^^^^^^^^^^^^^^^^^
+backend/alerts/chart_api.py:199: in fingerprint
+    Bar.instrument_id == inst.id,
+                         ^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'id'
+_ test_durable_contract[test_indicator_only_change_delivers_native_bar_at_its_own_time] _
+backend/tests/test_market_stream_postgres.py:36: in test_durable_contract
+    contract(provider_pg[0])
+backend/tests/test_market_stream.py:179: in test_indicator_only_change_delivers_native_bar_at_its_own_time
+    event = stream.events(owner, "page", cursors)[0]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_stream.py:301: in events
+    payload = delivery(db, task, sub, payload, cursors)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_stream.py:395: in delivery
+    check = managed_check(db, inst, source, check_page["bars"], query)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/chart_api.py:209: in history_check
+    revision = fingerprint(before)
+               ^^^^^^^^^^^^^^^^^^^
+backend/alerts/chart_api.py:199: in fingerprint
+    Bar.instrument_id == inst.id,
+                         ^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'id'
+=============================== warnings summary ===============================
+../usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:469
+  /usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:469: PytestCacheWarning: could not create cache path /app/.pytest_cache/v/cache/nodeids: [Errno 13] Permission denied: '/app/pytest-cache-files-lv0gdoix'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+../usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:423
+  /usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:423: PytestCacheWarning: could not create cache path /app/.pytest_cache/v/cache/lastfailed: [Errno 13] Permission denied: '/app/pytest-cache-files-_fhv1j1m'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_stream_postgres.py::test_durable_contract[test_replay_checks_each_committed_result_without_looking_ahead]
+FAILED backend/tests/test_market_stream_postgres.py::test_durable_contract[test_disconnect_beyond_retained_bar_window_requires_reset]
+FAILED backend/tests/test_market_stream_postgres.py::test_durable_contract[test_indicator_only_change_delivers_native_bar_at_its_own_time]
+3 failed, 31 passed, 2 warnings in 69.46s (0:01:09)
+

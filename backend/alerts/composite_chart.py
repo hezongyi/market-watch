@@ -28,7 +28,7 @@ SPAN = {"M1": 60000, "M5": 300000, "M15": 900000, "M30": 1800000,
 
 
 def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=None,
-               input_revision=None, provisional=False, now=None, permission_scope="workspace:default"):
+               input_revision=None, provisional=False, now=None, permission_scope="workspace:default", realtime=None):
     stamp = now_ms() if now is None else now
     if frame not in SPAN or not 1 <= count <= 2000 or before is not None and before < 0:
         raise ValueError("无效组合图表分页")
@@ -45,6 +45,8 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
     if provisional and input_revision is not None:
         raise ValueError("固定确认输入版本不能包含实时临时观察")
     version = db.get(HistoryVersion, revision.history_version_id)
+    if realtime and before is None and provisional:
+        return realtime.page(db, composite, revision, prep, version, frame, count, stamp, permission_scope)
     phase, seam = revision.rules["aggregation_calendar"], revision.seam
     seam_bucket = period(seam, frame, phase)[0]
     cutoff = stamp + 1 if before is None else before
@@ -76,7 +78,7 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
             else:
                 left, right = period(forming["start"], frame, phase)
                 sampled = read_window(db, composite.id, frame, left, right, revision_id=revision.id,
-                    provisional=True, now=stamp, permission_scope=permission_scope)["bars"]
+                    provisional=True, now=stamp, permission_scope=permission_scope, realtime=realtime)["bars"]
                 if sampled:
                     output = sorted([bar for bar in output if bar["start"] != left] + sampled,
                                     key=lambda bar: bar["start"])

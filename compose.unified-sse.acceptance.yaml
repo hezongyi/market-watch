@@ -1,0 +1,104 @@
+# Ubuntu only. Dedicated database, volume, network and task-owned images.
+name: mw-unified-sse-20261008
+x-api: &api
+  image: ${MW_API_IMAGE:?Build the task-owned API image with mw-docker}
+  env_file: ${MW_ACCEPTANCE_ENV:?Use a private Ubuntu development env file}
+  environment:
+    ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD:?Set development-only password}@postgres/alerts
+    ALERTS_COOKIE_SECURE: "false"
+    ALERTS_DELIVERY_ENABLED: "false"
+  restart: "no"
+  depends_on:
+    migrate: {condition: service_completed_successfully}
+services:
+  postgres:
+    image: postgres:14-bookworm
+    environment:
+      POSTGRES_DB: alerts
+      POSTGRES_USER: alerts
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    ports: ["127.0.0.1:15645:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alerts -d alerts"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: "no"
+  migrate:
+    <<: *api
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    <<: *api
+    ports: ["127.0.0.1:15641:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+  api-second:
+    <<: *api
+    ports: ["127.0.0.1:15642:8000"]
+  market-stream-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.market_stream_worker"]
+  market-stream-successor:
+    <<: *api
+    command: ["python", "-m", "alerts.market_stream_worker"]
+    profiles: ["takeover"]
+  postgres-gates:
+    <<: *api
+    profiles: ["verification"]
+    environment:
+      TEST_POSTGRES_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DELIVERY_ENABLED: "false"
+      PYTHONPATH: /app/backend
+    command: ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "--tb=short",
+      "backend/tests/test_market_stream_postgres.py",
+      "backend/tests/test_market_stream_cost_postgres.py",
+      "backend/tests/test_fixed_indicators_postgres.py"]
+  composite-aggregate-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.composite_aggregate_worker"]
+  realtime-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.realtime_worker"]
+  history-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.chart_history_worker"]
+  native-history-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.history_versions", "--without-composite-aggregates"]
+  provider-history-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.native_history_loads"]
+  chart-aggregation-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.chart_aggregation_worker"]
+  pricing-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.oanda_worker"]
+    profiles: ["upstream"]
+  web:
+    image: ${MW_WEB_IMAGE:?Build the task-owned web image with mw-docker}
+    ports: ["127.0.0.1:15643:80"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: "no"
+  chart-origin:
+    image: ${MW_CHART_IMAGE:?Build licensed chart locally with mw-docker}
+    ports: ["127.0.0.1:15644:80"]
+    restart: "no"
+  web-second:
+    image: ${MW_WEB_IMAGE:?Build the task-owned web image with mw-docker}
+    ports: ["127.0.0.1:15646:80"]
+    # Reuse the same task image while exercising a distinct API process.
+    command: ["/bin/sh", "-c", "sed -i 's/server api:8000/server api-second:8000/' /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
+    depends_on:
+      api-second: {condition: service_started}
+    restart: "no"
+volumes:
+  postgres-data:

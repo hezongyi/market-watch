@@ -1,0 +1,73 @@
+# Matched old/new Ubuntu cost instances; each project owns its data and ports.
+x-api: &api
+  image: ${MW_API_IMAGE:?Use a task-owned mw-docker image}
+  env_file: ${MW_ACCEPTANCE_ENV:?Use task-private credentials}
+  environment:
+    ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+    ALERTS_COOKIE_SECURE: "false"
+    ALERTS_DELIVERY_ENABLED: "false"
+  restart: "no"
+  depends_on:
+    migrate: {condition: service_completed_successfully}
+services:
+  postgres:
+    image: postgres:14-bookworm
+    environment:
+      POSTGRES_DB: alerts
+      POSTGRES_USER: alerts
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    ports: ["127.0.0.1:${MW_PG_PORT}:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alerts -d alerts"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: "no"
+  migrate:
+    <<: *api
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    <<: *api
+    ports: ["127.0.0.1:${MW_API_PORT}:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+  market-stream-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.market_stream_worker"]
+    profiles: ["unified"]
+  composite-aggregate-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.composite_aggregate_worker"]
+  realtime-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.realtime_worker"]
+  history-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.chart_history_worker"]
+  native-history-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.history_versions", "--without-composite-aggregates"]
+  provider-history-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.native_history_loads"]
+  chart-aggregation-worker:
+    <<: *api
+    command: ["python", "-m", "alerts.chart_aggregation_worker"]
+  web:
+    image: ${MW_WEB_IMAGE:?Use a task-owned mw-docker image}
+    ports: ["127.0.0.1:${MW_WEB_PORT}:80"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: "no"
+  chart-origin:
+    image: ${MW_CHART_IMAGE:?Use a task-owned licensed chart image}
+    ports: ["127.0.0.1:${MW_CHART_PORT}:80"]
+    restart: "no"
+volumes:
+  postgres-data:

@@ -1015,6 +1015,10 @@ from .chart_api import router as chart_router  # noqa: E402
 
 app.include_router(chart_router(authenticated))
 
+from .market_stream_api import router as market_stream_router
+
+app.include_router(market_stream_router(authenticated))
+
 from .advanced_api import router as advanced_router  # noqa: E402
 
 app.include_router(advanced_router(authenticated))
