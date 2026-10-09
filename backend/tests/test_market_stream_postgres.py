@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 import test_market_stream as contracts
 import test_market_stream_api as http_contracts
+import test_market_stream_io_budget as io_contracts
 import test_market_stream_quotes as quote_contracts
 import test_market_stream_worker as worker_contracts
 from alerts import market_stream as stream
@@ -107,6 +108,20 @@ def test_managed_and_http_contract_postgres(provider_pg, contract):
 
 def test_binding_retirement_postgres(provider_pg,monkeypatch):
     contracts.test_repeated_binding_retirement_cleans_only_expired_task_resources(provider_pg[0],monkeypatch)
+
+
+def test_idle_delivery_io_postgres(provider_pg):
+    from alerts import storage
+
+    storage.bootstrap(provider_pg[1])
+    io_contracts.test_idle_connection_does_not_rewrite_all_leases_each_delivery_poll(provider_pg[0])
+
+
+def test_new_registration_keeps_old_lease_postgres(provider_pg, monkeypatch):
+    from alerts import storage
+
+    storage.bootstrap(provider_pg[1])
+    io_contracts.test_registering_new_listeners_does_not_starve_existing_lease(provider_pg[0], monkeypatch)
 
 
 def process_operation(args):

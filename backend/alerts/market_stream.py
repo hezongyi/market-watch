@@ -7,7 +7,7 @@ the worker, never the number of consumers or API processes.
 import hashlib
 import json
 
-from sqlalchemy import delete, func, or_, select
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.orm import defer
 
 from .source_history_store import _insert
@@ -47,6 +47,17 @@ def _client(db, session_hash, client):
     db.execute(_insert(db)(MarketStreamClient).values(id=ident, session_hash=session_hash,
         client=client, expires=now_ms() + LEASE_MS).on_conflict_do_nothing(index_elements=["id"]))
     return db.scalar(select(MarketStreamClient).where(MarketStreamClient.id == ident).with_for_update())
+
+
+def _existing_client(db, session_hash, client):
+    session = db.get(LoginSession, session_hash)
+    if not session or session.expires <= now_ms():
+        raise PermissionError("会话已结束")
+    ident = client_key(session_hash, client)
+    owner = db.get(MarketStreamClient, ident)
+    if not owner or owner.session_hash != session_hash or owner.expires <= now_ms():
+        raise PermissionError("行情连接租约已结束")
+    return owner
 
 
 def register(session_hash, client, listener, generation, identity, query, state):
@@ -163,15 +174,32 @@ def _release_demand(db, task, *, keep_revision=None):
 
 def renew(session_hash, client):
     with transaction() as db:
-        owner = _client(db, session_hash, client)
         stamp = now_ms()
-        owner.expires = stamp + LEASE_MS
-        for sub in db.scalars(select(MarketStreamSubscription).where(
-                MarketStreamSubscription.client_id == owner.id,
-                MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp)):
-            sub.expires = stamp + LEASE_MS
-            task = db.get(MarketStreamTask, sub.task_id, options=[defer(MarketStreamTask.payload)])
-            task.expires = max(task.expires, sub.expires)
+        owner = _existing_client(db, session_hash, client)
+        deadline, renew_before = stamp + LEASE_MS, stamp + LEASE_MS * 2 // 3
+        due = select(MarketStreamSubscription.id).where(
+            MarketStreamSubscription.client_id == owner.id,
+            MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp,
+            MarketStreamSubscription.expires <= renew_before).exists()
+        # Registration extends the page lease independently of its older
+        # listeners. Neither clock may starve the other's renewal.
+        if owner.expires > renew_before and not db.scalar(select(due)):
+            return
+        # Serialize the infrequent write phase with registration/cancellation;
+        # idle delivery reads never acquire this write lock.
+        db.refresh(owner, with_for_update=True)
+        db.execute(update(MarketStreamClient).where(
+            MarketStreamClient.id == owner.id,
+            MarketStreamClient.expires <= renew_before).values(expires=deadline))
+        task_ids = list(db.scalars(update(MarketStreamSubscription).where(
+            MarketStreamSubscription.client_id == owner.id,
+            MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp,
+            MarketStreamSubscription.expires <= renew_before)
+            .values(expires=deadline).returning(MarketStreamSubscription.task_id)))
+        if task_ids:
+            db.execute(update(MarketStreamTask).where(
+                MarketStreamTask.id.in_(task_ids), MarketStreamTask.expires < deadline).values(
+                    expires=deadline))
 
 
 def claim(exclude=(), owner=None):
@@ -272,7 +300,7 @@ def commit(ownership, payload, *, delay_ms=500):
 def events(session_hash, client, cursors):
     """Bounded replay or explicit reset; never assume SSE IDs prove continuity."""
     with transaction() as db:
-        owner = _client(db, session_hash, client)
+        owner = _existing_client(db, session_hash, client)
         output = []
         size = 0
         for sub in db.scalars(select(MarketStreamSubscription).where(

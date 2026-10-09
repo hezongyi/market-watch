@@ -40,15 +40,17 @@ def docker_json(endpoint):
         connection.close()
 
 
-def database(container):
-    sql = """SELECT json_build_object(
-      'at',clock_timestamp(), 'database_bytes',pg_database_size(current_database()),
-      'wal',(SELECT row_to_json(w) FROM pg_stat_wal w),
+def database(container, *, include_stream):
+    stream = """
       'stream_queue',json_build_object(
         'tasks',(SELECT count(*) FROM market_stream_tasks),
         'active_subscriptions',(SELECT count(*) FROM market_stream_subscriptions
           WHERE active AND expires>extract(epoch FROM clock_timestamp())*1000),
-        'retained_results',(SELECT count(*) FROM market_stream_results)),
+        'retained_results',(SELECT count(*) FROM market_stream_results)),""" if include_stream else ""
+    sql = f"""SELECT json_build_object(
+      'at',clock_timestamp(), 'database_bytes',pg_database_size(current_database()),
+      'wal',(SELECT row_to_json(w) FROM pg_stat_wal w),
+      {stream}
       'activity',(SELECT row_to_json(d) FROM pg_stat_database d WHERE datname=current_database()),
       'tables',(SELECT json_agg(t) FROM (SELECT relname,seq_scan,seq_tup_read,idx_scan,
         idx_tup_fetch,n_tup_ins,n_tup_upd,n_tup_del,n_live_tup,n_dead_tup,
@@ -83,23 +85,29 @@ def main():
     parser.add_argument("--scenario", required=True)
     parser.add_argument("--seconds", type=int, default=60)
     parser.add_argument("--interval", type=int, default=5)
+    parser.add_argument("--project", default=TASK)
+    parser.add_argument("--include-stream", action="store_true")
+    parser.add_argument("--ready-file", type=Path)
     args = parser.parse_args()
     if not 10 <= args.seconds <= 600 or not 1 <= args.interval <= 60:
         parser.error("seconds must be 10..600; interval must be 1..60")
-    if not args.scenario or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-_" for c in args.scenario):
-        parser.error("scenario must contain only lowercase letters, numbers, - or _")
+    if any(not value or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-_" for c in value)
+           for value in (args.scenario, args.project)):
+        parser.error("scenario and project must contain only lowercase letters, numbers, - or _")
     if "ID=ubuntu" not in Path("/etc/os-release").read_text().splitlines():
         raise SystemExit("Ubuntu required")
     if os.getenv("DOCKER_HOST", "unix:///var/run/docker.sock") != "unix:///var/run/docker.sock":
         raise SystemExit("Local Docker socket required")
     containers = {}
-    filters = quote(json.dumps({"label": [f"com.docker.compose.project={TASK}"]}))
+    filters = quote(json.dumps({"label": [f"com.docker.compose.project={args.project}"]}))
     existing = docker_json(f"/containers/json?all=true&filters={filters}")
     existing_services = {row["Labels"].get("com.docker.compose.service") for row in existing}
     for service in (*SERVICES, *(name for name in OPTIONAL_SERVICES if name in existing_services)):
-        item = docker_json(f"/containers/{TASK}-{service}-1/json")
+        if service not in existing_services:
+            continue
+        item = docker_json(f"/containers/{args.project}-{service}-1/json")
         labels = item["Config"]["Labels"]
-        if labels.get("com.docker.compose.project") != TASK or labels.get("com.docker.compose.service") != service:
+        if labels.get("com.docker.compose.project") != args.project or labels.get("com.docker.compose.service") != service:
             raise SystemExit("Container ownership mismatch")
         if item["State"]["Running"]:
             containers[service] = {"Id": item["Id"], "Image": item["Image"]}
@@ -112,9 +120,10 @@ def main():
             item = docker_json(f"/images/{image_id}/json")
             images[image_id] = {"logical_bytes": item["Size"],
                 "commit": item["Config"].get("Labels", {}).get("io.market-watch.commit")}
-    report = {"project": TASK, "environment": "Ubuntu local Docker", "scenario": args.scenario,
-        "requested_seconds": args.seconds, "containers": containers, "images": images,
-        "database_before": database(containers["postgres"]["Id"]), "samples": [],
+    report = {"project": args.project, "environment": "Ubuntu local Docker", "scenario": args.scenario,
+        "requested_seconds": args.seconds, "include_stream": args.include_stream,
+        "containers": containers, "images": images,
+        "database_before": database(containers["postgres"]["Id"], include_stream=args.include_stream), "samples": [],
         "limits": ["Image sizes are logical sizes; shared layers cannot be summed as physical disk use.",
                    "Database counters include all activity in this isolated project, including fixture writes.",
                    "This probe does not run or simulate a workload; record the workload separately.",
@@ -123,10 +132,13 @@ def main():
                    "Sparse memory samples may miss brief peaks; block I/O may be unavailable on this host."]}
     report["samples"].append(snapshot(containers))
     started = time.monotonic()
+    if args.ready_file:
+        with args.ready_file.open("x") as file:
+            file.write(str(time.time()))
     while time.monotonic() - started < args.seconds:
         time.sleep(min(args.interval, max(0, args.seconds - (time.monotonic() - started))))
         report["samples"].append(snapshot(containers))
-    report["database_after"] = database(containers["postgres"]["Id"])
+    report["database_after"] = database(containers["postgres"]["Id"], include_stream=args.include_stream)
     report["summary"] = {}
     for service in containers:
         rows = [sample[service] for sample in report["samples"]]
@@ -141,7 +153,7 @@ def main():
             "network_rx_bytes": last["network_rx_bytes"] - first["network_rx_bytes"],
             "network_tx_bytes": last["network_tx_bytes"] - first["network_tx_bytes"],
         }
-    directory = Path(__file__).resolve().parents[1] / "artifacts/unified-sse/resources"
+    directory = Path(__file__).resolve().parents[1] / "artifacts/unified-sse/resources" / args.project
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     target = directory / f"{args.scenario}-{time.time_ns()}.json"
     target.write_text(json.dumps(report, indent=2) + "\n")
