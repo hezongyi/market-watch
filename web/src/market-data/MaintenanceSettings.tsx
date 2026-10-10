@@ -97,7 +97,9 @@ export function MaintenanceSettings({
     }
   }
   return (
-    <form className="dc-fields" onSubmit={save} inert={busy}>
+    <form className="dc-fields dc-maintenance-form" onSubmit={save} aria-busy={busy}>
+      <fieldset disabled={busy} className="dc-maintenance-controls">
+      <legend>维护计划</legend>
       <label>
         目标起始交易日期
         <NativeInput
@@ -161,7 +163,7 @@ export function MaintenanceSettings({
           </label>
         </div>
       )}
-      <section className="dc-advanced-fields"><h3>高级维护设置</h3>
+      <details className="dc-advanced-fields"><summary>高级维护设置</summary>
         <label>
           重叠复查窗口（分钟）
           <NativeInput
@@ -173,7 +175,8 @@ export function MaintenanceSettings({
           />
         </label>
         <p>有限窗口用于检查近期修订；更早区间可单独提交补数或复查。</p>
-      </section>
+      </details>
+      </fieldset>
       {error && (
         <p role="alert" className="error">
           {error}

@@ -1,0 +1,89 @@
+{
+  "environment": "Ubuntu isolated Docker mw-dataset-management-20261010; actual authenticated API/PostgreSQL/native and compatibility UI; synthetic candle adapter and browser chart feed",
+  "passed": true,
+  "checks": [
+    {
+      "name": "Actual list → detail → management entry and nine real published artifacts in minute/hour/day groups"
+    },
+    {
+      "name": "Read-only period detail names actual artifact/version and restores trigger focus"
+    },
+    {
+      "name": "Task entry prefills authoritative code, source/calendar, all states and exact dataset; same code other identities excluded"
+    },
+    {
+      "name": "Task detail → management → task row → original management → filtered list restores context and focus without nested URLs"
+    },
+    {
+      "name": "Editing query releases exact dataset/source; view-all clears entry filters but retains state; direct sidebar tasks has no false origin"
+    },
+    {
+      "name": "Actual coverage/read evidence stay distinct, carry selected version and retain outcome semantics"
+    },
+    {
+      "name": "Changing fixed version resets both paginations, aborts obsolete read and ignores its late payload"
+    },
+    {
+      "name": "Version details/replay/comparison use the selected fixed version, not latest"
+    },
+    {
+      "name": "Actually reclaimed version keeps its manifest and legal comparison; unavailable price cannot be opened"
+    },
+    {
+      "name": "NY17 date uses authoritative trading boundary; advanced fields folded; dirty guard preserves input on continue"
+    },
+    {
+      "name": "Completely empty task feed retains exact dataset/source/calendar and original management return (browser fixture)"
+    },
+    {
+      "name": "Browsing, filtering and detail navigation send no maintenance/collection/control writes"
+    },
+    {
+      "name": "Real stale revision POST409 retains fields; explicit load permits save against winning revision"
+    },
+    {
+      "name": "Real pause/resume/archive/unarchive target only current fixture and preserve published prices"
+    },
+    {
+      "name": "Real bounded backfill submission uses current identity and excluded end date; fixture task cancelled without worker fetch"
+    },
+    {
+      "name": "Recheck failure preserves input; rapid duplicate click issues one retry with same idempotency key; real backend deduplicates and leaves published versions fixed"
+    },
+    {
+      "name": "Real deletion review shows actual range and requires existing archive/reference protection"
+    },
+    {
+      "name": "Leaving a category aborts its pending read; closing stops management polling beyond its 10-second interval"
+    },
+    {
+      "name": "Missing artifact omitted; pending artifact counts and separate previous usable version remain explicit (browser fixture)"
+    },
+    {
+      "name": "Native five sections/dark/light 1440/768/375px, single body scroller, full detail focus and no horizontal overflow"
+    },
+    {
+      "name": "Close/reopen restores body scroll and task-entry focus; category round-trip preserves fixed version; More opens/closes by keyboard and restores focus"
+    },
+    {
+      "name": "Every classification survives window close/reopen with the same category, body scroll and keyboard focus"
+    },
+    {
+      "name": "Actual Chrome 200% zoom leaves summary/nav/body/controls accessible"
+    },
+    {
+      "name": "Compatibility five sections/dark/light/three widths and real 200% zoom support same business reads and details"
+    },
+    {
+      "name": "Compatibility keyboard detail dismissal/trap, advanced form save and actual pause/resume use the same business contracts"
+    },
+    {
+      "name": "Actual chart receives the selected earlier fixed-version ticker from compatibility management"
+    },
+    {
+      "name": "Actually loading another stored workspace isolates old return token and task filters; original workspace restored and only own temporary workspace deleted"
+    }
+  ],
+  "errors": [],
+  "fixtureCleanup": "Own initial plan restored; submitted fixture task cancelled; no upstream workers"
+}

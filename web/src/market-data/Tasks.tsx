@@ -3,10 +3,11 @@ import { Link, useActionLock, useSearchParams } from "./router";
 import { NativeSelect } from "./NativeControls";
 import { DetailPanel, useDetailPanel } from "./DetailPanel";
 import { MarketListHeader, MarketTabs } from "./MarketList";
-import { centerLink } from "./navigation";
+import { useReturnNavigation } from "./navigation";
+import { useSnapshot } from "./useSnapshot";
 import { useTaskRows } from "./useTaskRows";
 import { api } from "./api";
-import { names, phase, time, taskKind, taskError, type Task } from "./types";
+import { names, phase, time, taskKind, taskError, type Task, type Dataset } from "./types";
 
 const states = [
   ["active", "当前任务"],
@@ -24,6 +25,8 @@ export function Tasks() {
   const filters = new URLSearchParams({ status, query, source });
   if (dataset) filters.set("dataset_id", dataset);
   const rows = useTaskRows(filters);
+  const navigation = useReturnNavigation();
+  const context = useSnapshot<Dataset>(dataset ? `/market-data/center/datasets/${dataset}` : null);
   const detail = useDetailPanel(),
     [selected, select] = useState<string | null>(null);
   const task = rows.items.find((row) => row.id === selected);
@@ -31,6 +34,10 @@ export function Tasks() {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value);
     else next.delete(key);
+    if ((key === "query" || key === "source") && dataset) {
+      next.delete("dataset_id");
+      if (key === "query") next.delete("source");
+    }
     next.delete("page");
     detail.close();
     select(null);
@@ -42,6 +49,7 @@ export function Tasks() {
   };
   return (
     <section className="data-center dc-market-page dc-task-page">
+      {navigation.back && <Link className="dc-task-return" to={navigation.back.location}>← 返回 {navigation.back.label}</Link>}
       <MarketListHeader
         title="任务与记录"
         query={query}
@@ -61,10 +69,16 @@ export function Tasks() {
       />
       {dataset && (
         <div className="dc-task-context">
-          当前仅查看此行情的任务{" "}
-          <button onClick={() => change("dataset_id", "")}>查看全部对象</button>
+          <p>精确限定行情：{context.data ? `${context.data.display_symbol || context.data.logical_symbol} · ${names[context.data.identity.source]} · ${phase(context.data.aggregation_calendar)}` : context.error ? "行情信息暂时无法读取；精确数据集限定仍生效" : "正在读取行情信息…"}</p>
+          <small>数据集身份：{dataset}</small>
+          <button onClick={() => {
+            const next = new URLSearchParams(params);
+            for (const key of ["dataset_id", "query", "source", "page"]) next.delete(key);
+            detail.close(); select(null); setParams(next, {replace: true});
+          }}>查看全部对象</button>
         </div>
       )}
+      {!dataset && (query || source) && <p className="dc-task-context">当前筛选：{query || "全部品种"} · {names[source] || "全部来源"}</p>}
       <div className="dc-task-table-head">
         <span>品种与任务</span>
         <span>状态与进度</span>
@@ -127,7 +141,7 @@ export function Tasks() {
           ) : rows.loading ? (
             "正在加载…"
           ) : !rows.items.length ? (
-            status === "active" ? (
+            dataset && status === "all" ? "该行情暂无维护任务与记录。" : dataset ? "当前筛选下没有任务记录。" : status === "active" ? (
               "暂无当前任务。已完成及已取消任务可在历史记录中查看。"
             ) : (
               "没有符合筛选的任务记录。"
@@ -153,7 +167,6 @@ export function Tasks() {
           <TaskDetails
             key={task.id}
             task={task}
-            params={params}
             refresh={rows.refreshStates}
           />
         </DetailPanel>
@@ -222,14 +235,13 @@ function stopping(task: Task) {
 }
 function TaskDetails({
   task,
-  params,
   refresh,
 }: {
   task: Task;
-  params: URLSearchParams;
   refresh: () => void;
 }) {
   const [technical, setTechnical] = useState(false);
+  const navigation = useReturnNavigation();
   return (
     <>
       <p>
@@ -292,15 +304,9 @@ function TaskDetails({
       <h3>任务操作</h3>
       <TaskActions task={task} onDone={refresh} />
       <p>
-        <Link
-          to={centerLink(
-            `/market-data/datasets/${task.dataset_id}`,
-            params,
-            `task-${task.id}`,
-          )}
-        >
+        <button onClick={() => navigation.go(`/market-data/datasets/${task.dataset_id}`, "任务与记录", `task-${task.id}`)}>
           查看行情管理
-        </Link>
+        </button>
       </p>
       <p className="dc-subtle">任务身份：{task.id}</p>
     </>

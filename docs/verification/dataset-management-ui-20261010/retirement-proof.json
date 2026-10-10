@@ -1,0 +1,34 @@
+{
+  "project": "mw-dataset-management-20261010",
+  "task": "mw-dataset-management-20261010",
+  "retired_at": "2026-10-10T12:59:25.512730+00:00",
+  "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-dataset-management-20261010-20261010T125746-f7d49d8e",
+  "actual_restore_verified": true,
+  "backups": [
+    {
+      "database": "dataset_management",
+      "sha256": "e1f4b6c34ab87565b901652a2e948a2527b6b347791d3990bc21215bc8c76686",
+      "tables": 87,
+      "fingerprinted_tables": 87,
+      "actual_restore_verified": true
+    },
+    {
+      "database": "postgres",
+      "sha256": "9ae59d6c1e2b42cb78647238d278d507b1ba748f6f35a9c435627d0e155065d0",
+      "tables": 0,
+      "fingerprinted_tables": 0,
+      "actual_restore_verified": true
+    }
+  ],
+  "removed": {
+    "containers": 6,
+    "volumes": 1,
+    "networks": 1
+  },
+  "remaining_project_resources": {
+    "containers": 0,
+    "volumes": 0,
+    "networks": 0,
+    "task_images": 0
+  }
+}

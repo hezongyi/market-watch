@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { useLocation } from "./router";
+import { useCenter, useLocation, useNavigate, useSearchParams } from "./router";
+import type { Dataset } from "./types";
 
 /** Preserve the originating center filter/page and a stable row on return. */
 export function centerLink(path: string, params: URLSearchParams, row?: string) {
@@ -14,6 +15,30 @@ export function centerLink(path: string, params: URLSearchParams, row?: string) 
 export function centerReturn(params: URLSearchParams, fallback = "/market-data") {
   const value = params.get("return_to") || "";
   return /^\/market-data(?:\?[^#]*)?(?:#[^?]*)?$/.test(value) ? value : fallback;
+}
+
+export function useReturnNavigation() {
+  const center = useCenter(), navigate = useNavigate(), [params] = useSearchParams();
+  const back = center.returns?.get(params.get("return_key") || "");
+  return {
+    back,
+    go(to: string, label: string, row?: string) {
+      const source = new URL(center.location, "https://center.invalid");
+      if (row) source.hash = row;
+      const target = new URL(to, "https://center.invalid");
+      const key = center.returns?.remember(source.pathname + source.search + source.hash, label);
+      if (key) target.searchParams.set("return_key", key);
+      navigate(target.pathname + target.search + target.hash);
+    },
+  };
+}
+
+export function datasetTaskLocation(dataset: Dataset) {
+  // logical_symbol is an authoritative field queried by the task endpoint.
+  // Display labels such as EUR/USD are not substituted for query identities.
+  const query = new URLSearchParams({ tab: "tasks", status: "all", dataset_id: dataset.id,
+    query: dataset.logical_symbol, source: dataset.identity.source });
+  return `/market-data?${query}`;
 }
 
 export function useCenterRowRestore(snapshot: unknown) {

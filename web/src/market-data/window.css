@@ -469,3 +469,100 @@
   .dc-window-native .dc-window-nav .dc-native-slot[data-native-component=sidebarItem] {flex:1 1 25%;min-width:0;}
   .dc-window-native .dc-window-nav [data-native-component=sidebarItem] button {padding:4px 2px;min-height:32px;font-size:12px;gap:4px;}
 }
+
+/* Management has one body scroller below the summary and category navigation. */
+.dc-window-content:has(.dc-dataset-detail) {display:flex;flex-direction:column;overflow:hidden;}
+.dc-window-content:has(.dc-dataset-detail) > .dc-live-provider-status {flex-shrink:0;}
+.dc-window .data-center.dc-dataset-detail {display:flex;flex-direction:column;flex:1;min-height:0;padding:0;gap:0;height:100%;overflow:hidden;}
+.dc-dataset-top {flex-shrink:0;min-width:0;padding:12px 20px 0;background:var(--surface);}
+.dc-dataset-hero {border:0;border-radius:0;padding:8px 0;gap:8px 16px;flex-wrap:wrap;}
+.dc-dataset-hero > div {min-width:0;}
+.dc-dataset-hero p,.dc-dataset-hero h1 {overflow-wrap:anywhere;}
+.dc-dataset-hero-actions {justify-content:flex-start;}
+.dc-dataset-statusbar {border:0;padding:4px 0;min-height:0;gap:4px 10px;font-size:12px;}
+.dc-dataset-nav {position:static;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;padding:0;border-bottom:1px solid var(--line);}
+.dc-window .dc-dataset-nav button {font-size:13px;min-width:0;min-height:36px;white-space:normal;padding:6px 8px;}
+.dc-dataset-nav [aria-current=page] {color:var(--ink);box-shadow:inset 0 -2px var(--ink);}
+.dc-dataset-body {flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scroll-padding:44px 16px 16px;padding:16px 20px;container-type:inline-size;container-name:dataset-body;}
+.dc-dataset-body > * + * {margin-top:12px;}
+.dc-more {position:relative;}
+.dc-more summary {cursor:pointer;min-height:36px;padding:6px 10px;border:1px solid var(--control-line);border-radius:6px;list-style:none;}
+.dc-more summary::after {content:"";display:inline-block;width:6px;height:6px;margin:0 2px 3px 10px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg);}
+.dc-more summary::-webkit-details-marker {display:none;}
+.dc-more-actions {position:absolute;right:0;top:calc(100% + 4px);z-index:4;min-width:170px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 12px rgb(0 0 0 / 15%);}
+.dc-more-actions > a,.dc-window .dc-more-actions button {display:flex;width:100%;justify-content:flex-start;padding:8px 10px;border:0;background:transparent;text-align:left;min-height:36px;}
+.dc-more-actions > a:hover {background:var(--card);}
+.dc-more-danger {border-top:1px solid var(--line);margin-top:4px;padding-top:4px;}
+.dc-window .dc-text-link {border:0;background:transparent;color:var(--green);padding:4px 0;justify-content:flex-start;width:fit-content;max-width:100%;text-align:left;}
+.dc-period-columns,.dc-period-row {display:grid;grid-template-columns:80px minmax(120px,1fr) 100px 120px;gap:8px 12px;align-items:start;}
+.dc-period-columns {position:sticky;top:-16px;z-index:1;padding:8px 0;background:var(--surface);border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);}
+.dc-period-columns > :nth-child(n+3),.dc-period-count {text-align:right;font-variant-numeric:tabular-nums;}
+.dc-period-row {padding:10px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;}
+.dc-period-group {padding:12px 0 4px;font-size:12px;color:var(--muted);}
+.dc-period-row small,.dc-business-row small,.dc-reference-row small {display:block;margin-top:4px;font-size:12px;color:var(--muted);}
+.dc-period-row > * {min-width:0;overflow-wrap:anywhere;}
+.dc-window .dc-period-row .dc-detail-trigger {font-size:12px;margin:2px 0 0;min-height:24px;}
+.dc-mobile-label {display:none;}
+.dc-evidence-tools {display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;}
+.dc-evidence-tools label {display:grid;gap:6px;width:min(300px,100%);}
+.dc-evidence-tools p {font-size:12px;color:var(--muted);}
+.dc-evidence-list {container-type:inline-size;}
+.dc-business-head {position:sticky;top:-16px;z-index:1;background:var(--surface);color:var(--muted);font-size:12px;border-bottom:1px solid var(--line);padding:8px 0;}
+.dc-business-row {border-bottom:1px solid var(--line);padding:12px 0;font-variant-numeric:tabular-nums;}
+.dc-business-row > * {min-width:0;overflow-wrap:anywhere;}
+.dc-coverage-columns {display:grid;grid-template-columns:minmax(160px,2fr) repeat(4,minmax(70px,1fr)) 72px;gap:12px;}
+.dc-request-columns {display:grid;grid-template-columns:minmax(150px,1.5fr) minmax(90px,1fr) minmax(80px,1fr) minmax(90px,1fr) minmax(130px,1.2fr);gap:12px;}
+.dc-version-columns {display:grid;grid-template-columns:minmax(130px,1fr) minmax(170px,1.5fr) minmax(110px,1fr) minmax(110px,1fr) 60px;gap:12px;}
+.dc-window .dc-maintenance-form {max-width:720px;gap:12px;}
+.dc-maintenance-controls,.dc-range-maintenance {padding:16px;border:1px solid var(--line);display:grid;gap:16px;max-width:720px;min-width:0;}
+.dc-maintenance-controls > label,.dc-range-maintenance > label {display:grid;gap:6px;width:min(320px,100%);min-width:0;}
+.dc-maintenance-controls input:not([type=checkbox]),.dc-range-maintenance input {min-width:0;max-width:100%;}
+.dc-maintenance-controls .dc-filters label {min-width:0;}
+.dc-maintenance-controls .dc-filters {align-items:flex-start;}
+.dc-maintenance-form > button,.dc-range-maintenance > button {width:fit-content;}
+.dc-advanced-fields summary {cursor:pointer;min-height:36px;font-weight:600;}
+.dc-advanced-fields label {max-width:320px;}
+.dc-maintenance-state {border-top:1px solid var(--line);padding-top:16px;display:grid;gap:12px;}
+.dc-reference-row {display:flex;flex-wrap:wrap;align-items:start;gap:8px 20px;padding:12px 0;border-bottom:1px solid var(--line);}
+.dc-reference-row > div {flex:1;min-width:0;overflow-wrap:anywhere;}
+.dc-task-return {padding:8px 20px 0;font-size:13px;flex-shrink:0;}
+.dc-task-context small {display:block;overflow-wrap:anywhere;font-size:11px;color:var(--muted);}
+/* The fixed chart build uses a 5px thumb and transparent track with 3px radius.
+   These styles apply only to app surfaces; licensed resources are untouched. */
+.dc-dataset-body,.dc-detail-body,.dc-market-list {--dc-scroll-thumb:var(--tv-color-scrollbar-thumb-background,#dbdbdb);scrollbar-color:var(--dc-scroll-thumb) transparent;}
+.dc-window[data-theme=dark] .dc-dataset-body,.dc-window[data-theme=dark] .dc-detail-body,.dc-window[data-theme=dark] .dc-market-list {--dc-scroll-thumb:var(--tv-color-scrollbar-thumb-background,#4a4a4a);}
+@media(pointer:fine) {
+ .dc-dataset-body::-webkit-scrollbar,.dc-detail-body::-webkit-scrollbar,.dc-market-list::-webkit-scrollbar {width:5px;height:5px;}
+ .dc-dataset-body::-webkit-scrollbar-thumb,.dc-detail-body::-webkit-scrollbar-thumb,.dc-market-list::-webkit-scrollbar-thumb {background:var(--dc-scroll-thumb);border:1px solid transparent;background-clip:content-box;border-radius:3px;}
+ .dc-dataset-body::-webkit-scrollbar-thumb:hover,.dc-detail-body::-webkit-scrollbar-thumb:hover,.dc-market-list::-webkit-scrollbar-thumb:hover {background-color:var(--muted);}
+ .dc-dataset-body::-webkit-scrollbar-track,.dc-detail-body::-webkit-scrollbar-track,.dc-market-list::-webkit-scrollbar-track {background:transparent;}
+}
+@container dataset-body (max-width:760px) {
+ .dc-business-head {display:none;}
+ .dc-coverage-columns,.dc-request-columns,.dc-version-columns {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .dc-business-row > :first-child {grid-column:1/-1;}
+ .dc-business-row .dc-mobile-label {display:block;font-size:12px;color:var(--muted);margin-bottom:4px;}
+}
+@container dataset-body (max-width:570px) {
+ .dc-period-columns {display:none;}
+ .dc-period-row {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .dc-period-count {text-align:left;}
+ .dc-period-count .dc-mobile-label {display:block;font-size:12px;color:var(--muted);margin-bottom:4px;}
+ .dc-period-row > :first-child small {display:inline;margin-left:8px;}
+}
+@container(max-width:600px) {
+ .dc-dataset-top {padding:8px 12px 0;}
+ .dc-dataset-body {padding:12px;}
+ .dc-dataset-hero {flex-direction:row;}
+ .dc-dataset-hero-actions {width:auto;flex-wrap:nowrap;}
+ .dc-dataset-hero-actions > * {flex:0 0 auto;}
+ .dc-window .dc-dataset-nav button {padding:6px 2px;font-size:12px;}
+ .dc-dataset-statusbar {gap:4px 8px;}
+ .dc-task-return {padding-inline:12px;}
+}
+@media(max-height:650px) {
+ .dc-dataset-top {padding-top:4px;}
+ .dc-dataset-hero {padding-block:4px;}
+ .dc-dataset-statusbar {font-size:11px;}
+ .dc-window .dc-dataset-nav button {min-height:32px;}
+}
