@@ -1,0 +1,457 @@
+{
+  "version": "1.17.0",
+  "release_tag": "v1.17.0",
+  "source_commit": "6c3bdc172ae058c3fc053c74fae365fbacd1ad83",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/31",
+  "schema": "ar45_market_stream",
+  "schema_migration": false,
+  "build_environment": "Ubuntu local Docker; mw-docker; market-watch-ubuntu BuildKit",
+  "build_task": "mw-dataset-management-v1170-release-20261010",
+  "build_project": "mw-v1170-release-build",
+  "build_purpose": "release",
+  "images": {
+    "market-watch-api:v1.17.0-6c3bdc1": {
+      "production_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:89047aefac50e42ccc51776fd372fc88484a3a1a3626a9ce82df18351ad02e4b",
+        "sha256:2b8e3131615a35ea92ec259a9a41e6b877f265c6ce7c663e46681dc20384dcb1",
+        "sha256:793737ac8ddf04f11e4eb53e620d200a482423a938a1c5dc77b58f02f21fcdd3",
+        "sha256:b58f860ed232cf1c4744d03dcc319e7e46becb574354e748a2ea1f5bd8a2ce10",
+        "sha256:6d0caf97a7659bebc860b3ec46e1e7f0b09fdc07cf2abddf7c6bff0a923a8a27",
+        "sha256:103833f090b25f6071c098d220c3b7ff51b2a9b4fb35bd32e1d4bfc5c8ed1937",
+        "sha256:97bb768528b701936357f63e1ffc25465f1825e29551ea79d872f683e088be71",
+        "sha256:4903e7eb6f03db0a8392f832e2276cf7688360dd85583c874f0832c1e22f27f4",
+        "sha256:190da20a0c1aed4e4011189274e3507921fcd65fbbaa7f200f4b97455ecc7aff",
+        "sha256:472a6ba25cdb93e412b7f43246925f7439394e402417add696213d5ce3133ebf",
+        "sha256:b3dee7e37c1522fd47003dc85a987687d0c4649176622c9363fab21dc91b2a81"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-10T13:23:31.064145+00:00",
+        "io.market-watch.commit": "6c3bdc172ae058c3fc053c74fae365fbacd1ad83",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1170-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-dataset-management-v1170-release-20261010"
+      }
+    },
+    "market-watch-web:v1.17.0-6c3bdc1": {
+      "production_id": "sha256:12731e6d5bf4d989eeeaf52ae5ce93f5265db08ff550f24c2277091b04e260ed",
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:e6d2ae77510a77ad74e88d1ed9ba6031facb22aed9e48aebcd6094c4a50ad201",
+        "sha256:d5d4c2b8eed3b490a9ce2153c279962469d8f5c17bb037577956838629763575"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-10T13:26:01.758507+00:00",
+        "io.market-watch.commit": "6c3bdc172ae058c3fc053c74fae365fbacd1ad83",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1170-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-dataset-management-v1170-release-20261010",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-chart-origin:v1.17.0-6c3bdc1": {
+      "production_id": "sha256:4db7307965f6b84d07e670a477dbeb782c3441561c5a062dc3852a8d9ea18c35",
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:fd01f5d3519ff5fbfb6c830116d3b1380a60efd5bb76f8e933998a9b46dec0eb",
+        "sha256:566f67cf92e17faec8743d01552d97fb266d319e2edea5c7f7c890239601bd3c",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-10T13:26:40.329022+00:00",
+        "io.market-watch.commit": "6c3bdc172ae058c3fc053c74fae365fbacd1ad83",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1170-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-dataset-management-v1170-release-20261010",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-backup:v1.17.0-6c3bdc1": {
+      "production_id": "sha256:6dabf06edbeeaf53f352bbce1341a3cd4bd708449a38a0bcfc6d5b831efb526a",
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:89047aefac50e42ccc51776fd372fc88484a3a1a3626a9ce82df18351ad02e4b",
+        "sha256:2b8e3131615a35ea92ec259a9a41e6b877f265c6ce7c663e46681dc20384dcb1",
+        "sha256:793737ac8ddf04f11e4eb53e620d200a482423a938a1c5dc77b58f02f21fcdd3",
+        "sha256:b58f860ed232cf1c4744d03dcc319e7e46becb574354e748a2ea1f5bd8a2ce10",
+        "sha256:6d0caf97a7659bebc860b3ec46e1e7f0b09fdc07cf2abddf7c6bff0a923a8a27",
+        "sha256:103833f090b25f6071c098d220c3b7ff51b2a9b4fb35bd32e1d4bfc5c8ed1937",
+        "sha256:97bb768528b701936357f63e1ffc25465f1825e29551ea79d872f683e088be71",
+        "sha256:4903e7eb6f03db0a8392f832e2276cf7688360dd85583c874f0832c1e22f27f4",
+        "sha256:190da20a0c1aed4e4011189274e3507921fcd65fbbaa7f200f4b97455ecc7aff",
+        "sha256:472a6ba25cdb93e412b7f43246925f7439394e402417add696213d5ce3133ebf",
+        "sha256:b3dee7e37c1522fd47003dc85a987687d0c4649176622c9363fab21dc91b2a81",
+        "sha256:3491241aa3ae1f8cdd9821453d5fe556a4bbd7f53a4a821363aa6c1ed31870c2",
+        "sha256:9e3631541d2804bea518ba550bac4c1fe40d2e2c4cbd15416d84d866646c0d9e",
+        "sha256:86b4091b378b1a51d4cbe6851a3dee78c07d6d9f27784fa5ed28019208c9d9d4"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-10T13:27:33.756735+00:00",
+        "io.market-watch.commit": "6c3bdc172ae058c3fc053c74fae365fbacd1ad83",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1170-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-dataset-management-v1170-release-20261010"
+      }
+    }
+  },
+  "all_four_archive_configs_rootfs_and_production_labels_verified": true,
+  "rollback_version": "v1.16.0",
+  "private_package_manifest": {
+    "version": "1.17.0",
+    "source_commit": "6c3bdc172ae058c3fc053c74fae365fbacd1ad83",
+    "private_package": true,
+    "includes_licensed_library": true,
+    "files": {
+      "source.release.tar.gz": {
+        "sha256": "c7398d1bd24f150d3f45cd1b850f5861f3f6c2b9508ccf51ea32540903c95e92",
+        "bytes": 107660082
+      },
+      "images.release.tar.gz": {
+        "sha256": "8f1e8bf3121e6bb89b9b36621cdde0445cf6fd144d47db7be8b709807b34311d",
+        "bytes": 284069261
+      }
+    }
+  },
+  "production_deployed": true,
+  "production_environment": "unraid existing formal market-watch project",
+  "production_root": "/mnt/user/appdata/market-watch",
+  "production_project": "market-watch",
+  "public_url": "https://trade.kookvv.com:8443",
+  "chart_origin": "https://charts.kookvv.com:8443",
+  "active_release": "releases/v1.17.0-6c3bdc1",
+  "runtime": {
+    "services": {
+      "web": {
+        "image_ref": "market-watch-web:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:12731e6d5bf4d989eeeaf52ae5ce93f5265db08ff550f24c2277091b04e260ed",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "market-stream-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "chart-aggregation-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "history-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "native-history-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "notify-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "realtime-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "composite-aggregate-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "chart-history-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "pricing-worker": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "api": {
+        "image_ref": "market-watch-api:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:8b07a40adf87523d46d58605d751179af9d979a80cdfabbb736578f449441464",
+        "status": "running",
+        "restarts": 0,
+        "health": "healthy"
+      },
+      "chart-origin": {
+        "image_ref": "market-watch-chart-origin:v1.17.0-6c3bdc1",
+        "production_image_id": "sha256:4db7307965f6b84d07e670a477dbeb782c3441561c5a062dc3852a8d9ea18c35",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      }
+    },
+    "all_running": true,
+    "all_restarts_zero": true,
+    "env_commands_ports_mounts_preserved": true
+  },
+  "browser": {
+    "passed": true,
+    "environment": "unraid formal production; browser on Ubuntu; existing workspace and read-only operations",
+    "checks": [
+      "HTTPS login and secure session cookie",
+      "three existing-workspace reloads; chart data ready and authenticated SSE open",
+      "production data center 自建行情",
+      "production data center 平台行情",
+      "production data center 组合行情",
+      "production data center 任务与记录",
+      "Actual production dataset supports all five classifications without overflow",
+      "Production task entry uses authoritative symbol, exact dataset, all states and returns to management",
+      "Production category round-trip preserves overview scroll at 375px",
+      "Production version detail retains fixed replay identity and restores trigger focus",
+      "native indicator category/detail shell opens and closes",
+      "data center and indicator reads preserve chart symbols and study instances",
+      "real Binance snapshot over SSE native callback retains raw price and native tick scale 100",
+      "Actual production source status API and responsive display remain accessible",
+      "390px source-status layout",
+      "Production review performs no maintenance, collection or control writes"
+    ],
+    "errors": [],
+    "reloads": [
+      {
+        "native": {
+          "charts": 5,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD"
+          ],
+          "data_ready": true
+        },
+        "sse": {
+          "opens": 1,
+          "errors": 0,
+          "types": [
+            "bars",
+            "quotes"
+          ]
+        }
+      },
+      {
+        "native": {
+          "charts": 5,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD"
+          ],
+          "data_ready": true
+        },
+        "sse": {
+          "opens": 1,
+          "errors": 0,
+          "types": [
+            "bars",
+            "reset",
+            "quotes"
+          ]
+        }
+      },
+      {
+        "native": {
+          "charts": 5,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD",
+            "MWP:XAUUSD"
+          ],
+          "data_ready": true
+        },
+        "sse": {
+          "opens": 2,
+          "errors": 1,
+          "types": [
+            "bars",
+            "reset",
+            "quotes"
+          ]
+        }
+      }
+    ],
+    "business_writes": [],
+    "login_http": 200,
+    "managed_dataset": {
+      "id": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+      "symbol": "EURUSD"
+    },
+    "scroll_restore": {
+      "before": 150,
+      "after": 150
+    },
+    "sse_precision": {
+      "source": "binance",
+      "price": 82840.58,
+      "scale": 100,
+      "native_tick_rule_preserved": true
+    },
+    "live_status": {
+      "provider": {
+        "error": "unavailable",
+        "authentication_hold": false
+      },
+      "datasets": [
+        {
+          "symbol": "XAUUSD",
+          "market_session": "unknown",
+          "quote_ready": false,
+          "candle_ready": false,
+          "error": "m1_late"
+        },
+        {
+          "symbol": "EURUSD",
+          "market_session": "unknown",
+          "quote_ready": false,
+          "candle_ready": false,
+          "error": "m1_late"
+        }
+      ]
+    },
+    "logout_http": 200,
+    "finished": "2026-10-10T13:38:00.996Z"
+  },
+  "backups_actual_ubuntu_restores": [
+    {
+      "verified": true,
+      "environment": "Ubuntu isolated Docker mw-v1170-restore-20261010",
+      "sha256": "205939574508d84e206987c168b7c844707b794a3c138b37ee50eda1e3fa834b",
+      "bytes": 334340668,
+      "tables": 86,
+      "cleaned": true,
+      "schema": "ar45_market_stream"
+    }
+  ],
+  "config_restore": [
+    {
+      "file": "config-20261010T133222Z-VRag0o.tar.gz",
+      "sha256": "93a612ac5fffadbeeff68af9085fc0c017ec831e8854aeb3e0e1763451ef6531",
+      "actual_ubuntu_extraction": true,
+      "env_hash_matches_production": true,
+      "env_permissions_private": true,
+      "compose_config_valid": true,
+      "active_release": "releases/v1.16.0-0bd9df8",
+      "extracted_directory_removed": true
+    }
+  ],
+  "switch": {
+    "writers_stopped": "2026-10-10T13:31:25Z",
+    "switched": "2026-10-10T13:36:49Z",
+    "writer_pause_seconds": 324.0
+  },
+  "release_image_regression": {
+    "passed": 32,
+    "failed": 0
+  },
+  "rollback": {
+    "version": "v1.16.0",
+    "script": "deploy/dataset-management-v1.17.0-switch-20261010/rollback.sh",
+    "schema_downgrade": false,
+    "preserve_current_data": true,
+    "actual_production_rollback_not_executed": true
+  },
+  "verification_boundaries": [
+    "Original 27 native/compat Docker cases are from e2129b9 acceptance; final fix reruns 3 actual React UI fixture cases.",
+    "Production browser performed 16 read-only checks using real APIs and existing workspace, including 375px overview scroll 150→150. No maintenance/collection/control writes.",
+    "OANDA unavailable/unknown m1_late remains visible with no readiness claims; weekend reopening/live readiness and Yahoo supplier network not reverified.",
+    "Production browser initially ran during service startup and login returned 502; after API health and web startup, full 16 checks passed."
+  ],
+  "cleanup": {
+    "ubuntu_restore_project_retired": true,
+    "ubuntu_restore_proof": {
+      "restore_verified": true,
+      "archive_directory": "/home/quant/.local/share/market-watch-docker/archives/mw-v1170-restore-20261010-20261010T133732-9e207a07",
+      "project": "mw-v1170-restore-20261010",
+      "task": "mw-v1170-restore-20261010",
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0,
+      "completed_at": "2026-10-10T13:38:06.829647+00:00",
+      "database_restore_checks": [
+        {
+          "database": "postgres",
+          "sha256": "fbc83c23cc394a8150872ef14b82b9a38d72c20665cf6661d0728fe4a3c600ef",
+          "table_count": 0,
+          "content_fingerprint_count": 0,
+          "actual_restore_verified": true
+        },
+        {
+          "database": "restore_admin",
+          "sha256": "d6a09b7b0061426db5c5662f3ee04a8cfb2e0a0e71a89fb7b5f7707c137ffd06",
+          "table_count": 0,
+          "content_fingerprint_count": 0,
+          "actual_restore_verified": true
+        }
+      ]
+    },
+    "no_unraid_test_or_validation_instance_created": true,
+    "previous_release_and_backups_retained": true,
+    "production_temporary_image_and_source_archives_removed": true
+  },
+  "release_build_task_completed": {
+    "task": "mw-dataset-management-v1170-release-20261010",
+    "completed_at": "2026-10-10T13:38:39.482867+00:00"
+  }
+}
