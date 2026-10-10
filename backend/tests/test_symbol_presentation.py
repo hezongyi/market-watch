@@ -10,20 +10,20 @@ from alerts.storage import MarketCatalog
 
 
 @pytest.mark.parametrize("source,code,kind,expected", [
-    ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
-    ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
-    ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
-    ("oanda", "XAU_USD", "METAL", "XAU/USD"),
-    ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
-    ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
-    ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
-    ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
-    ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+    ("oanda", "EUR_USD", "CURRENCY", "EURUSD"),
+    ("dukascopy", "eurusd", "CURRENCY", "EURUSD"),
+    ("dukascopy", "EUR/USD", "CURRENCY", "EURUSD"),
+    ("oanda", "XAU_USD", "METAL", "XAUUSD"),
+    ("binance", "BTCUSDT", "CRYPTO", "BTCUSDT"),
+    ("binance", "DOGEUSDC", "CRYPTO", "DOGEUSDC"),
+    ("yahoo", "EURUSD=X", "CURRENCY", "EURUSD"),
+    ("yahoo", "JPY=X", "CURRENCY", "USDJPY"),
+    ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTCUSD"),
     ("yahoo", "MSFT", "EQUITY", "MSFT"),
     ("yahoo", "^GSPC", "INDEX", "^GSPC"),
     ("yahoo", "CL=F", "FUTURE", "CL=F"),
     ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
-    ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+    ("oanda", "NAS100_USD", "INDEX", "NAS100USD"),
     ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
     (None, "UNKNOWN", None, "UNKNOWN"),
 ])
@@ -41,16 +41,16 @@ def test_platform_and_chart_search_share_display_and_preserve_ticker(database, m
         db.flush()
         for query in ("EUR/USD", "eurusd", "EUR_USD"):
             row = catalog(db, source="oanda", query=query)["items"][0]
-            assert row["display_symbol"] == "EUR/USD"
+            assert row["display_symbol"] == "EURUSD"
             assert row["provider_symbol"] == "EUR_USD"
     for query in ("EUR/USD", "eurusd", "EUR_USD"):
         rows = market_data.search_series(query, kind="provider", source="oanda")
         row = next(row for row in rows if row["id"] == "OANDA:EUR_USD")
-        assert row["display_symbol"] == "EUR/USD"
+        assert row["display_symbol"] == "EURUSD"
         assert row["symbol"] == "EUR_USD"
         assert row["ticker"] == "MWP:OANDA:EUR_USD"
     meta = metadata("OANDA:EUR_USD")
-    assert meta["symbol"] == "EUR_USD" and meta["display_symbol"] == "EUR/USD"
+    assert meta["symbol"] == "EUR_USD" and meta["display_symbol"] == "EURUSD"
 
 
 def test_slash_search_reaches_history_tasks_and_composite_without_first_use(database, monkeypatch):
@@ -68,9 +68,9 @@ def test_slash_search_reaches_history_tasks_and_composite_without_first_use(data
         for query in ("EUR/USD", "eurusd", "EUR_USD"):
             for kind in ("history", "composite"):
                 row = search_page(db, query, kind=kind)["items"][0]
-                assert row["display_symbol"] == "EUR/USD" and row["symbol"] == "EURUSD"
-            assert dataset_list(db, query=query)["items"][0]["display_symbol"] == "EUR/USD"
-            assert task_list(db, query=query)["items"][0]["dataset"]["display_symbol"] == "EUR/USD"
+                assert row["display_symbol"] == "EURUSD" and row["symbol"] == "EURUSD"
+            assert dataset_list(db, query=query)["items"][0]["display_symbol"] == "EURUSD"
+            assert task_list(db, query=query)["items"][0]["dataset"]["display_symbol"] == "EURUSD"
         assert search_page(db, "_")["items"] == []
         assert search_page(db, "%")["items"] == []
         assert db.scalar(select(MarketComposite)) is None

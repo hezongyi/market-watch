@@ -388,8 +388,9 @@ function seriesPresentationRows(symbols) {
   return symbols.flatMap(ticker => {
     const identity = decode(ticker);
     const meta = symbolPresentations.get(identity.symbol);
-    return meta ? [{s:"ok",n:ticker,v:{short_name:meta.display_symbol || meta.symbol,
-      description:meta.name + (meta.source === 'yahoo' ? " · Yahoo 市场报价" :
+    const shown = meta?.display_symbol || meta?.symbol || MWSeries.display(identity.symbol);
+    return meta ? [{s:"ok",n:ticker,v:{short_name:shown,
+      description:meta.source === 'yahoo' ? meta.name + " · " + shown + " · Yahoo 市场报价" : shown + (
         identity.series_kind === 'provider' ? " · 平台原生行情" :
         identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情"),
       exchange:meta.exchange || meta.source?.toUpperCase()}}] : [];
@@ -1568,9 +1569,9 @@ function boot(
       },
     },
     compare_symbols: [
-      { symbol: "MWP:EURUSD", title: "EUR/USD · 平台行情" },
-      { symbol: "MWP:XAUUSD", title: "黄金 / 美元 · 平台行情" },
-      { symbol: "MWP:BTCUSDT", title: "BTC/USDT · 平台行情" },
+      { symbol: "MWP:EURUSD", title: "EURUSD · 平台行情" },
+      { symbol: "MWP:XAUUSD", title: "XAUUSD · 平台行情" },
+      { symbol: "MWP:BTCUSDT", title: "BTCUSDT · 平台行情" },
     ],
     // A constructor symbol overrides the first MainSeries in saved_data.
     // Existing layouts may have stale/display-only top-level metadata; the

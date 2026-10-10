@@ -21,7 +21,7 @@ const credentials = JSON.parse(fs.readFileSync(path.join(artifacts, 'three-layer
     await expect(page.getByRole('heading', { name: '数据中心', exact: true })).toBeVisible();
     await page.getByRole('link', { name: '添加自建行情', exact: true }).click();
     await page.getByLabel('搜索来源目录').fill('EURUSD');
-    await page.getByRole('button', { name: '选择 EUR/USD', exact: true }).click();
+    await page.getByRole('button', { name: '选择 EURUSD', exact: true }).click();
     await expect(page.getByLabel('准确来源代码')).toHaveValue('EUR/USD');
     await expect(page.getByLabel('逻辑品种')).toHaveValue('EURUSD');
     await expect(page.getByLabel('小数位数')).toHaveValue('');

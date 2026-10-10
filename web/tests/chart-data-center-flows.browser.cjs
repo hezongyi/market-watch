@@ -17,7 +17,7 @@ const report={environment:'Ubuntu isolated Docker, real supplier and licensed na
  try {
   await p.goto(base+`/market-data/datasets/${dataset}?section=versions&version=${version}&frame=M1`);
   await fixture.login(p);
-  await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().getByRole('heading',{name:'EUR/USD',exact:true})).toBeVisible();
+  await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().getByRole('heading',{name:'EURUSD',exact:true})).toBeVisible();
   await expect(dc().getByRole('button',{name:'打开此版本',exact:true}).first()).toBeVisible();
   record('old fixed-version link opens exact dataset, version and section in dialog');
   await close();
@@ -37,7 +37,7 @@ const report={environment:'Ubuntu isolated Docker, real supplier and licensed na
   await host().evaluate(()=>widget.setLayout('1'));
   await dc().getByRole('button',{name:'打开此版本',exact:true}).first().click();
   await expect(dc().locator('.dc-window-content > [role=alert]')).toContainText('目标图格');
-  await expect(dc().getByRole('heading',{name:'EUR/USD',exact:true})).toBeVisible();
+  await expect(dc().getByRole('heading',{name:'EURUSD',exact:true})).toBeVisible();
   record('stale target refuses application and retains selected object');await close();
   await open();await choose('平台品种');
   await dc().getByLabel('搜索品种',{exact:true}).fill('EUR_USD');await dc().getByLabel('来源',{exact:true}).selectOption('oanda');

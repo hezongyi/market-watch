@@ -32,51 +32,70 @@ _FX_CODES = set(_CURRENCIES) | {
 _CRYPTO_QUOTES = ("USDT", "USDC", "FDUSD", "TUSD", "BUSD", "USD", "BTC", "ETH", "BNB", "EUR", "TRY")
 
 
-def display_code(symbol, source=None, asset_type=None):
-    """Recognise pairs without cutting stock, index or futures tickers arbitrarily."""
+def _compact_pair(symbol, source=None, asset_type=None):
+    """Return a compact pair code, or ``None`` when the code is not a pair."""
     code = symbol.strip().upper()
     kind = (asset_type or "").upper()
-    if kind in ("EQUITY", "ETF", "STOCK", "FUTURE"):
-        return code
+
+    # Yahoo uses ``JPY=X`` for USD/JPY, while a complete Yahoo FX ticker such
+    # as EURUSD=X already contains both legs. Keep that meaning but remove the
+    # provider suffix from the presentation code.
     if source == "yahoo" and code.endswith("=X"):
         code = code[:-2]
         if code in _FX_CODES:
-            return "USD/" + code
+            return "USD" + code
+
+    if kind in ("EQUITY", "ETF", "STOCK", "FUTURE"):
+        return None
+
     parts = re.split(r"[/_-]", code)
     if len(parts) == 2 and all(part.isalnum() for part in parts):
         base, quote = parts
-        if (base in _FX_CODES and quote in _FX_CODES or
-                quote in _CRYPTO_QUOTES and (source in ("binance", "oanda") or
-                    base in _CRYPTO or kind in ("CRYPTO", "CRYPTOCURRENCY"))):
-            return base + "/" + quote
-    if kind != "INDEX" and len(code) == 6 and code[:3] in _FX_CODES and code[3:] in _FX_CODES:
-        return code[:3] + "/" + code[3:]
-    if source == "binance" or kind in ("CRYPTO", "CRYPTOCURRENCY") or source is None:
+        is_currency_pair = base in _FX_CODES and quote in _FX_CODES
+        is_provider_pair = quote in _FX_CODES and source in ("oanda", "dukascopy")
+        is_crypto_pair = quote in _CRYPTO_QUOTES and (
+            source in ("binance", "oanda") or
+            base in _CRYPTO or
+            kind in ("CRYPTO", "CRYPTOCURRENCY")
+        )
+        if is_currency_pair or is_provider_pair or is_crypto_pair:
+            return base + quote
+
+    # A bare six-character FX code is safe to compact only when both legs are
+    # known currencies. This prevents an equity ticker such as EURUSD from
+    # being interpreted as a currency pair when its asset type is explicit.
+    if len(code) == 6 and code[:3] in _FX_CODES and code[3:] in _FX_CODES:
+        return code
+
+    if source == "binance" or kind in ("CRYPTO", "CRYPTOCURRENCY") or any(
+            code.endswith(quote) and code.removesuffix(quote) in _CRYPTO
+            for quote in _CRYPTO_QUOTES):
         for quote in _CRYPTO_QUOTES:
             base = code.removesuffix(quote)
-            if base != code and base and base.isalnum() and (source == "binance" or
-                    kind in ("CRYPTO", "CRYPTOCURRENCY") or base in _CRYPTO):
-                return base + "/" + quote
-    return symbol.strip().upper()
+            if base != code and base and base.isalnum() and (
+                    source == "binance" or kind in ("CRYPTO", "CRYPTOCURRENCY") or base in _CRYPTO):
+                return base + quote
+    return None
+
+
+def display_code(symbol, source=None, asset_type=None):
+    """Return a compact UI code while preserving non-pair tickers verbatim."""
+    raw = symbol.strip().upper()
+    return _compact_pair(raw, source, asset_type) or raw
 
 
 def pair_query(query):
-    """Only recognised pairs get separator-insensitive aliases; other text stays literal."""
-    term = query[:100].strip()
-    shown = display_code(term)
-    parts = shown.split("/")
-    if len(parts) == 2 and all(part in _FX_CODES or part in _CRYPTO or
-            part in _CRYPTO_QUOTES for part in parts):
-        return "".join(parts)
-    return None
+    """Return the compact alias for a recognised pair query."""
+    return _compact_pair(query[:100].strip())
 
 
 def matches_code(query, symbol, source=None, asset_type=None, *labels):
     term = query[:100].strip().casefold()
     shown = display_code(symbol, source, asset_type)
     compact = pair_query(query)
-    return term in " ".join((symbol, shown, shown.replace("/", ""), *labels)).casefold() or (
-        compact is not None and compact == shown.replace("/", "").upper())
+    normalized = re.sub(r"[/_-]", "", shown).casefold()
+    return term in " ".join((symbol, shown, normalized, *labels)).casefold() or (
+        compact is not None and compact.casefold() == normalized)
 
 
 def code_search(query, *columns):
@@ -89,8 +108,11 @@ def code_search(query, *columns):
     terms = [column.ilike(pattern(query[:100].strip()), escape="\\") for column in columns]
     compact = pair_query(query)
     if compact:
-        terms.extend(func.replace(func.replace(column, "_", ""), "/", "").ilike(
-            pattern(compact), escape="\\") for column in columns)
+        terms.extend(
+            func.replace(func.replace(func.replace(column, "_", ""), "/", ""), "-", "").ilike(
+                pattern(compact), escape="\\")
+            for column in columns
+        )
     return or_(*terms)
 
 

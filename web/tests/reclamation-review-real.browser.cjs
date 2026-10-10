@@ -17,7 +17,7 @@ const artifacts=path.resolve(__dirname,'../../artifacts/data-integration'),base=
   expect(dataset.maintenance.paused).toBe(true);expect(dataset.maintenance.archived).toBe(true);
   expect((await get('market-data/versions/'+version)).payload_available).toBe(true);
   await page.goto(base+'/market-data/datasets/'+id+'?section=references');await page.getByRole('button',{name:'查看回收影响',exact:true}).click();
-  let review=page.getByRole('region',{name:'确认历史回收'});await expect(review).toBeVisible();await expect(review).toContainText(version);await expect(review).toContainText('EUR/USD');await expect(review).toContainText('UTC0');
+  let review=page.getByRole('region',{name:'确认历史回收'});await expect(review).toBeVisible();await expect(review).toContainText(version);await expect(review).toContainText('EURUSD');await expect(review).toContainText('UTC0');
   await expect(review).toContainText('保留');await expect(review.getByRole('button',{name:'删除所列数据'})).toBeEnabled();
   const initial=await get('market-data/datasets/'+id+'/references');expect(initial.impact.payload_totals.retained_shared_source_blobs).toBeGreaterThan(0);
   for(const width of [1024,1440,1920]){await page.setViewportSize({width,height:1000});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true)}

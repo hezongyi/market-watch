@@ -85,9 +85,9 @@ fs.mkdirSync(out, { recursive: true });
     await expect(
       dc().getByRole("heading", { name: "添加自建行情" }),
     ).toBeVisible();
-    await expect(dc().locator(".dc-create-selection")).toContainText("EUR/USD");
+    await expect(dc().locator(".dc-create-selection")).toContainText("EURUSD");
     await expect(dc().locator(".dc-create-facts").first()).toContainText(
-      "EUR/USD",
+      "EURUSD",
     );
     await dc().getByRole("link", { name: "取消", exact: true }).click();
     if (await dc().getByRole("button", { name: "放弃修改" }).count())

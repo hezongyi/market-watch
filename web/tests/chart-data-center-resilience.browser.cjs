@@ -17,7 +17,7 @@ const report={environment:'Ubuntu isolated Docker, real engine/APIs; controlled 
   await p.goto(base+'/market-data');await fixture.login(p);await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();await expect(dc().getByRole('heading',{name:'自建行情',exact:true})).toBeVisible();
   const originalHost=host(),originalNative=native();
   await dc().getByLabel('搜索品种',{exact:true}).fill('EURUSD');await dc().getByRole('button',{name:'可用',exact:true}).click();
-  await dc().locator('#dataset-'+dataset).getByRole('link',{name:'查看',exact:true}).click();await expect(dc().getByRole('heading',{name:'EUR/USD',exact:true})).toBeVisible();await dc().getByRole('link',{name:'返回数据中心列表'}).click();
+  await dc().locator('#dataset-'+dataset).getByRole('link',{name:'查看',exact:true}).click();await expect(dc().getByRole('heading',{name:'EURUSD',exact:true})).toBeVisible();await dc().getByRole('link',{name:'返回数据中心列表'}).click();
   await expect(dc().getByLabel('搜索品种',{exact:true})).toHaveValue('EURUSD');await expect(dc().getByRole('button',{name:'可用',exact:true})).toHaveAttribute('aria-pressed','true');await expect(dc().locator('#dataset-'+dataset)).toBeFocused();
   await choose('平台品种');await dc().getByLabel('来源',{exact:true}).selectOption('oanda');await dc().getByRole('button',{name:'下一页',exact:true}).click();await expect(dc().getByText(/第 2 页/)).toBeVisible();
   await choose('自建行情');await expect(dc().getByLabel('搜索品种',{exact:true})).toHaveValue('EURUSD');await choose('平台品种');await expect(dc().getByText(/第 2 页/)).toBeVisible();await close();await open();await expect(dc().getByText(/第 2 页/)).toBeVisible();

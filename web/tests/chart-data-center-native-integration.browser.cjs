@@ -63,12 +63,12 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   await select('来源','Yahoo');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('MSFT');
   await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1,{timeout:15000});await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toContainText('微软');
   await p.screenshot({path:path.join(out,'native-yahoo.png')});
-  await select('来源','Binance');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('BTC/USDT');await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1,{timeout:15000});await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toContainText('BTC/USDT');
-  record('Yahoo MSFT and Binance BTC/USDT directory and native filters');
+  await select('来源','Binance');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('BTC/USDT');await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1,{timeout:15000});await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toContainText('BTCUSDT');
+  record('Yahoo MSFT and Binance BTCUSDT directory and native filters');
   await dc().getByRole('button',{name:'自建行情',exact:true}).click();await dc().getByRole('link',{name:'添加行情',exact:true}).click();
   const beforePick=await host().evaluate(()=>widget.activeChart().symbol());await dc().getByRole('button',{name:'选择品种',exact:true}).click();
   const picker=native().locator('[data-dialog-name="选择来源品种"]');await expect(picker).toBeVisible({timeout:10000});
-  await picker.getByRole('searchbox').fill('eurusd');await expect(picker.getByText('EUR/USD',{exact:true}).first()).toBeVisible({timeout:15000});await picker.getByText('EUR/USD',{exact:true}).first().click();
+  await picker.getByRole('searchbox').fill('eurusd');await expect(picker.getByText('EURUSD',{exact:true}).first()).toBeVisible({timeout:15000});await picker.getByText('EURUSD',{exact:true}).first().click();
   await expect(picker).toHaveCount(0);await expect(dc().getByLabel('逻辑品种',{exact:true})).toHaveValue('EURUSD');expect(await host().evaluate(()=>widget.activeChart().symbol())).toBe(beforePick);
   record('actual native symbol picker fills a draft and keeps chart unchanged');
   await dc().getByRole('button',{name:'平台行情',exact:true}).click();await dc().getByRole('button',{name:'放弃修改'}).click();

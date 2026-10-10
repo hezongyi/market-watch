@@ -1094,12 +1094,12 @@ def _rank_catalog(rows, query):
     """Prefer code matches; interleave equal-ranked sources to avoid starvation."""
     from collections import defaultdict
 
-    term = query.strip().casefold()
+    term = (pair_query(query) or query.strip()).casefold()
     groups = defaultdict(lambda: defaultdict(list))
     for row in rows:
         row["display_symbol"] = display_code(row["symbol"], row["source"], row.get("asset_type"))
         codes = [row["display_symbol"].casefold(), row["display_symbol"].replace("/", "").casefold(), row.get("symbol", "").casefold(), row.get("logical_symbol", "").casefold(),
-                 row.get("symbol", "").replace("_", "").replace("/", "").casefold()]
+                 row.get("symbol", "").replace("_", "").replace("/", "").replace("-", "").casefold()]
         rank = 0 if term and term in codes else 1 if term and any(c.startswith(term) for c in codes) else 2
         groups[rank][row["source"]].append(row)
     result = []

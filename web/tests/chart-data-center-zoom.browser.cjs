@@ -152,7 +152,7 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await native().getByRole('button', { name: '关闭数据中心' }).click();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
       await host().evaluate(() => dataCenter.open('/market-data/datasets/new?source=dukascopy&symbol=EUR%2FUSD'));
-      await expect(center().locator('.dc-create-selection')).toContainText('EUR/USD');
+      await expect(center().locator('.dc-create-selection')).toContainText('EURUSD');
       await expect(center().getByRole('button', {name:'创建并开始准备历史',exact:true})).toBeInViewport();
       expect(await center().locator('.dc-create-page').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
       await screenshot(`browser-zoom200-create-config-${width}.png`);
