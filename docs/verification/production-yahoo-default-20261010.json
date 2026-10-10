@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "environment": "Ubuntu local Docker Compose config; synthetic env; no runtime or production mutation",
+  "backend_services": [
+    "api",
+    "chart-aggregation-worker",
+    "chart-history-worker",
+    "composite-aggregate-worker",
+    "history-worker",
+    "market-stream-worker",
+    "migrate",
+    "native-history-worker",
+    "notify-worker",
+    "pricing-worker",
+    "realtime-worker"
+  ],
+  "yahoo_true_overrides_private_env_false": true,
+  "other_configuration_matches_v1170": true,
+  "actual_upstream_verified": false
+}
