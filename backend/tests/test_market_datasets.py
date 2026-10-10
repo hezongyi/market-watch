@@ -1,5 +1,5 @@
 import importlib.util
-from decimal import Decimal
+from decimal import Decimal, Inexact, Rounded, localcontext
 from pathlib import Path
 
 import pytest
@@ -212,3 +212,33 @@ def test_additive_migration_roundtrip_and_populated_rollback_guard():
             assert not inspect(connection).has_table("market_datasets")
             assert connection.execute(text("SELECT * FROM candles")).one() == ("EURUSD", "1.12345")
     engine.dispose()
+
+
+@pytest.mark.parametrize("ambient_precision", [2, 5, 28])
+def test_price_processing_is_independent_of_ambient_context(ambient_precision):
+    raw = {field: "1.093887" for field in ("open", "high", "low", "close")}
+    with localcontext() as context:
+        context.prec = ambient_precision
+        context.traps[Inexact] = context.traps[Rounded] = True
+        assert process_price_row(raw, 5)["close"] == "1.09389"
+        zeros = {field: "1.093880" for field in raw}
+        assert process_price_row(zeros, 5) == zeros
+    assert raw["close"] == "1.093887"
+
+
+def test_price_processing_rejects_invalid_ohlc_even_if_rounding_would_hide_it():
+    with pytest.raises(ValueError, match="OHLC"):
+        process_price_row({"open": "1.000004", "high": "1.000003",
+                           "low": "1.000002", "close": "1.000004"}, 5)
+
+
+@pytest.mark.parametrize("manifest", [
+    {"price_precision": 5}, {"price_rule_version": "unknown", "price_precision": 5},
+    {"price_rule_version": "dataset-precision-half-up-v1"},
+    {"price_rule_version": "dataset-precision-half-up-v1", "price_precision": True},
+])
+def test_unknown_or_incomplete_version_price_rule_is_rejected(manifest):
+    from alerts.market_datasets import version_price_rows
+
+    with pytest.raises(ValueError):
+        version_price_rows([], manifest)

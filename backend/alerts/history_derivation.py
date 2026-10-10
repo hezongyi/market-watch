@@ -67,7 +67,7 @@ def derive_version(db, original_id, destination_dataset, *, quarantine_reason=No
     version.manifest = {**(version.manifest or {}), "provenance": {"derived_from_version": parent.id,
         "original_identity": original.identity, "original_cursor": parent.cursor,
         "copied_minutes": 0, "copied_chunks": 0, "original_prefix_checksum": hashlib.sha256(b"").hexdigest(),
-        "method": "verified immutable original chunks; no price rounding or source substitution"}}
+        "method": "verified immutable original chunks; target version price rule; no source substitution"}}
     return ident
 
 
@@ -105,11 +105,11 @@ def derive_page(ident):
             window_start=source.start, window_end=source.end, observed_at=source.observed_at,
             result=RequestResult(status=source.result), rows=tuple(json.loads(raw)),
             checkpoint=source.end, volume_kind=dataset.volume_kind, volume_unit=dataset.volume_unit).ingestion_payload()
-        payload = {**payload, "rows": [row.model_dump() for row in validate_ingestion(db, inst, payload).rows]}
+        payload = {**payload, "rows": [row.model_dump() for row in validate_ingestion(db, inst, payload, price_manifest=version.manifest or {}).rows]}
         if len(payload["rows"]) != source.count:
             raise ValueError("Original row count mismatch")
-        # Destination series is new. Copy exact original JSON, never a newer
-        # staging revision, and use bounded ordinary inserts in this transaction.
+        # Reconstruct destination business prices from original source JSON,
+        # never from a newer staging revision or already rounded parent rows.
         values = [{"instrument_id": inst.id, "timeframe": "M1", "start": row["timestamp"],
             "end": row["timestamp"] + 60000,
             **{key: Decimal(row[key]) for key in ("open", "high", "low", "close")},

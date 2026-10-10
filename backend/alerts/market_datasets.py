@@ -1,6 +1,6 @@
 """Explicit managed dataset registration. Legacy histories are never rebound."""
 
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP, localcontext
+from decimal import Context, Decimal, InvalidOperation, ROUND_HALF_UP, localcontext
 
 from sqlalchemy import func, select
 
@@ -14,17 +14,39 @@ PRICE_RULE_VERSION = "dataset-precision-half-up-v1"
 _STORAGE_LIMIT = Decimal("1e14")
 
 
-def process_price_row(row, precision):
+class PricePrecisionError(ValueError):
+    """Legacy imports require explicit rule activation before rounding."""
+
+
+def price_rule(manifest):
+    """Resolve a frozen version rule, rejecting incomplete/unknown policies."""
+    manifest = manifest or {}
+    if "price_rule_version" not in manifest and "price_precision" not in manifest:
+        return None
+    if manifest.get("price_rule_version") != PRICE_RULE_VERSION:
+        raise ValueError("Unsupported historical price rule")
+    precision = manifest.get("price_precision")
+    if type(precision) is not int or not 0 <= precision <= 10:
+        raise ValueError("Unsupported historical price precision")
+    return PRICE_RULE_VERSION, precision
+
+
+def version_price_rows(rows, manifest):
+    rule = price_rule(manifest)
+    return process_rows(rows, rule[1]) if rule else list(rows)
+
+
+def process_price_row(row, precision, *, allow_rounding=True):
     """Validate and normalize one source row for the dataset's business view.
 
     Raw source strings are returned byte-for-byte when their effective scale is
     already within the registered precision.  Only excess scale is rounded,
     using a local Decimal context so no ambient context can alter the result.
     """
-    if not isinstance(precision, int) or not 0 <= precision <= 10:
+    if type(precision) is not int or not 0 <= precision <= 10:
         raise ValueError("Unsupported price precision")
     result = dict(row)
-    prices = {}
+    prices, original = {}, {}
     for field in ("open", "high", "low", "close"):
         raw = row.get(field)
         if not isinstance(raw, str):
@@ -35,23 +57,31 @@ def process_price_row(row, precision):
             raise ValueError("Invalid Decimal price") from error
         if not value.is_finite() or value <= 0 or value >= _STORAGE_LIMIT:
             raise ValueError("Price must be positive and within storage range")
-        effective_scale = max(0, -value.normalize().as_tuple().exponent)
+        original[field] = value
+        digits = value.as_tuple().digits
+        trailing = 0
+        for digit in reversed(digits):
+            if digit:
+                break
+            trailing += 1
+        effective_scale = max(0, -value.as_tuple().exponent - trailing)
         if effective_scale <= precision:
             output = raw
         else:
-            quantum = Decimal(1).scaleb(-precision)
-            with localcontext() as context:
-                context.prec = max(80, len(value.as_tuple().digits) + abs(value.as_tuple().exponent) + precision + 10)
+            if not allow_rounding:
+                raise PricePrecisionError("Price exceeds legacy dataset precision")
+            quantum = Decimal((0, (1,), -precision))
+            with localcontext(Context(prec=max(80, len(digits) + precision + 24))):
                 output = str(value.quantize(quantum, rounding=ROUND_HALF_UP))
             rounded = Decimal(output)
             if not rounded.is_finite() or rounded <= 0 or rounded >= _STORAGE_LIMIT:
                 raise ValueError("Rounded price is outside storage range")
         prices[field] = Decimal(output)
         result[field] = output
-    if prices["low"] > min(prices["open"], prices["close"]):
-        raise ValueError("Invalid OHLC extremes")
-    if prices["high"] < max(prices["open"], prices["close"]):
-        raise ValueError("Invalid OHLC extremes")
+    for values in (original, prices):
+        if (values["low"] > min(values["open"], values["close"])
+                or values["high"] < max(values["open"], values["close"])):
+            raise ValueError("Invalid OHLC extremes")
     return result
 
 
@@ -126,7 +156,7 @@ def assert_binding(inst, row, identity):
         raise ValueError("数据集身份不匹配，拒绝重新解释或混合数据")
 
 
-def validate_ingestion(db, inst, payload):
+def validate_ingestion(db, inst, payload, *, price_manifest=None):
     result = payload.get("request_result")
     if result is not None:
         result = RequestResult.model_validate(result)
@@ -146,7 +176,13 @@ def validate_ingestion(db, inst, payload):
     assert_binding(inst, row, batch.identity)
     if (batch.volume_kind, batch.volume_unit) != (row.volume_kind, row.volume_unit):
         raise ValueError("Volume semantics do not match the registered dataset")
-    rows = process_rows((candle.model_dump() for candle in batch.rows), inst.precision)
+    raw_rows = [candle.model_dump() for candle in batch.rows]
+    if price_manifest is None:
+        rows = process_rows(raw_rows, inst.precision)
+    elif price_rule(price_manifest) is None:
+        rows = [process_price_row(row, inst.precision, allow_rounding=False) for row in raw_rows]
+    else:
+        rows = version_price_rows(raw_rows, price_manifest)
     from .market_contracts import MinuteRow
 
     return batch.model_copy(update={"rows": tuple(MinuteRow.model_validate(row) for row in rows)})

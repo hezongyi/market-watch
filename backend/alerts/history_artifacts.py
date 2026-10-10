@@ -16,7 +16,7 @@ from .chart_data import FRAMES, bounds
 from .chart_series import is_gold
 from .domain import bucket_bounds, calendar_for, scheduled_open
 from .source_history_store import raw_chunk
-from .market_datasets import process_rows
+from .market_datasets import price_rule, version_price_rows
 from .storage import (
     HistoryArtifact,
     HistoryArtifactBlock,
@@ -109,6 +109,8 @@ def _reuse_period_block(db, artifact, version):
     if not run or not run.parent_version_id:
         return None
     parent = db.get(HistoryVersion, run.parent_version_id)
+    if price_rule(parent.manifest) != price_rule(version.manifest):
+        return None
     if not parent.start <= artifact.cursor < parent.end:
         return None
     previous = db.scalar(select(HistoryArtifact).where(HistoryArtifact.version_id == parent.id,
@@ -154,10 +156,7 @@ def artifact_tick(version_id=None):
         elif chunk:
             if chunk.start > artifact.cursor:
                 raise ValueError("Artifact parent query partition is discontinuous")
-            source_rows = json.loads(raw_chunk(db, chunk))
-            manifest = version.manifest or {}
-            if manifest.get("price_rule_version"):
-                source_rows = process_rows(source_rows, manifest["price_precision"])
+            source_rows = version_price_rows(json.loads(raw_chunk(db, chunk)), version.manifest)
             rows = [r for r in source_rows
                     if r["timestamp"] >= artifact.cursor]
             page = rows[:5000]

@@ -331,3 +331,40 @@ def test_scheduler_recovers_completion_after_artifact_publish_crash(database, mo
     with database.begin() as db:
         assert plan_report(db, identity().key)["active_version_id"] is None
         assert plan_report(db, identity().key)["last_success"] is not None
+
+
+@pytest.mark.parametrize("action", ["resume", "retry"])
+def test_legacy_resume_and_unrelated_retry_cannot_enable_rounding(database, action):
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
+        version = create_run(db, identity().key, end=120000, request_id="legacy-control")
+        ident = version.id
+        version.manifest = {}
+        version.status = "paused" if action == "resume" else "retrying"
+        version.error = None if action == "resume" else "timeout"
+        task_control(db, ident, action)
+    import_page(Adapter(close="1.111111"), version_id=ident)
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        assert version.status == "configuration_error"
+        assert version.error == "price_precision_overflow"
+        assert version.cursor == 0 and version.manifest == {}
+        with pytest.raises(ValueError, match="显式重试"):
+            task_control(db, ident, "resume")
+        task_control(db, ident, "retry")
+        audit = dict(version.manifest["price_rule_activation"])
+    import_page(Adapter(close="1.111111"), version_id=ident)
+    while artifact_tick(ident):
+        pass
+    with database.begin() as db:
+        from decimal import Decimal
+        from alerts.history_artifacts import read_artifact
+        from alerts.storage import Bar
+
+        version = db.get(HistoryVersion, ident)
+        assert version.manifest["price_rule_activation"] == audit
+        assert version.status == "published"
+        assert db.scalar(select(Bar)).close == Decimal("1.11111")
+        assert list(snapshot_rows(db, ident))[0]["close"] == "1.11111"
+        assert read_artifact(db, ident, "M1")[0]["close"] == "1.11111"

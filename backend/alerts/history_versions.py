@@ -16,7 +16,7 @@ from .history_request_evidence import snapshot as read_snapshot
 from .history_request_evidence import start as start_read
 from .history_sources import HistoryConfigurationError, HistorySources, history_identity, page_end
 from .market_contracts import DatasetIdentity, failed_request
-from .market_datasets import PRICE_RULE_VERSION, process_rows, register_dataset
+from .market_datasets import PRICE_RULE_VERSION, PricePrecisionError, version_price_rows, register_dataset
 from .market_resources import cooldown, lane
 from .source_history_store import AcquisitionBusy, raw_chunk, shared_page, store_blob
 from .source_registry import collection_identity
@@ -249,7 +249,7 @@ def import_page(adapter, *, version_id=None):
             from .market import ingest
 
             ingest(db, db.get(Instrument, dataset.instrument_id), batch.ingestion_payload(),
-                   defer_aggregation=True)
+                   defer_aggregation=True, price_manifest=version.manifest or {})
             content_id, checksum = store_blob(db, collection_identity(raw_identity).key, content)
             db.add(HistoryChunk(version_id=ident, start=start, end=checkpoint,
                 observed_at=batch.observed_at, count=len(batch.rows),
@@ -290,14 +290,16 @@ def import_page(adapter, *, version_id=None):
                 return True
             version.attempts += 1
             result = batch.result if batch and not batch.result.successful else failed_request(error, observed_at=now_ms())
+            metadata_failure = isinstance(error, PricePrecisionError)
             configuration_failure = isinstance(error, HistoryConfigurationError)
-            version.error = ("history_source_configuration" if configuration_failure else
+            version.error = ("price_precision_overflow" if metadata_failure else
+                             "history_source_configuration" if configuration_failure else
                              result.status if result else "invalid_payload")
             finish_read(db.get(HistoryReadAttempt, read_id), version.error, batch=batch,
                         read_kind=evidence.get("read_kind"))
             version.next_at = (result.retry_at if result and result.retry_at else
                                now_ms() + min(900000, 1000 * 2 ** min(version.attempts, 10)))
-            version.status = "configuration_error" if configuration_failure or (
+            version.status = "configuration_error" if metadata_failure or configuration_failure or (
                 result and result.status == "unauthorized") else "retrying"
             version.lease_token = None
             version.lease_until = 0
@@ -359,10 +361,7 @@ def snapshot_rows(db, ident, *, start=None, end=None):
         HistoryChunk.start < right, HistoryChunk.end > left).order_by(HistoryChunk.start)
     for chunk in db.scalars(query.execution_options(yield_per=1)):
         raw = raw_chunk(db, chunk)
-        rows = json.loads(raw)
-        manifest = version.manifest or {}
-        if manifest.get("price_rule_version"):
-            rows = process_rows(rows, manifest["price_precision"])
+        rows = version_price_rows(json.loads(raw), version.manifest)
         for row in rows:
             if left <= row["timestamp"] < right:
                 yield row

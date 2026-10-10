@@ -115,14 +115,14 @@ class Ingestion:
     price_changed: bool
 
 
-def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False, report_changes=False):
+def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False, report_changes=False, price_manifest=None):
     # Serialize bounded writes for one instrument across live and history workers.
     from .storage import MarketDataset
 
     if instrument.id.startswith("MD:"):
         db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == instrument.id).with_for_update())
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
-    batch = validate_ingestion(db, instrument, payload)
+    batch = validate_ingestion(db, instrument, payload, price_manifest=price_manifest)
     if batch is not None:
         # Keep the source payload immutable, but pass the validated business
         # rows to every Bar and aggregation writer.

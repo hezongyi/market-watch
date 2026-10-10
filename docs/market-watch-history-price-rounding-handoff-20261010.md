@@ -51,14 +51,14 @@
 
 ## 4. 关键代码地图与风险
 
-- `backend/alerts/market_datasets.py`：`validate_ingestion` 在统一边界处理超精度价格，仍拒绝非法值和无效 OHLC。
+- `backend/alerts/market_datasets.py`：`price_rule` 解析冻结规则，`version_price_rows` 统一生成版本业务价格；`validate_ingestion` 根据显式版本 manifest 保持 legacy 严格校验或使用冻结精度，仍拒绝非法值和无效 OHLC。
 - `backend/alerts/history_versions.py`：历史导入和 `snapshot_rows` 均通过统一价格处理边界；旧任务错误字段和前端提示保留兼容读取。
 - `backend/alerts/source_history_store.py:38`：`raw_chunk` 返回经过 checksum 校验的原始来源内容；不要在这里把共享原始内容改写成某个数据集的精度。
-- `backend/alerts/history_artifacts.py:156`：周期产物直接消费 `raw_chunk`。
+- `backend/alerts/history_artifacts.py`：周期产物通过统一接口处理原始块；父子版本价格规则不兼容时从原始块重建。
 - `backend/alerts/history_derivation.py`：派生版本读取原始块，按目标数据集精度处理后写入 `Bar`，来源内容与 checksum 保持不变。
 - `backend/alerts/history_maintenance.py:159`：父版本复用/增量维护直接读取原始块。
-- `backend/alerts/data_center.py:225`：覆盖详情直接解析原始块。
-- `web/src/market-data/DatasetViews.tsx:51`：`price_precision_overflow` 现在说明会按数据集精度进行四舍五入。
+- `backend/alerts/data_center.py`：覆盖详情使用版本冻结规则处理原始块。
+- `web/src/market-data/DatasetViews.tsx`：精度错误提示明确要求显式重试；版本详情区分新冻结规则与旧版本行为，创建页解释舍入条件。
 - `backend/alerts/storage.py`：`HistoryVersion.manifest` 可记录精度与规则版本；`HistoryChunk` 保持引用 `SourceBlob` 的现有归属。
 
 关键风险是只放宽 `validate_ingestion`：图表、聚合、回测、组合历史和派生仍可能读取未处理的超精度值，造成同一版本结果不一致。必须提供一个统一的版本价格读取/处理接口，并让所有下游使用它。
@@ -117,4 +117,53 @@ rg -n "validate_ingestion|raw_chunk|snapshot_rows|price_precision_overflow" back
 - `python -m compileall` 与 `git diff --check` 已通过。使用含完整供应商依赖的 `/home/quant/repos/market-watch-data-integration/.venv`：受影响模块回归最终为 `348 passed, 149 skipped`；精度/历史/派生/共享来源/复合输入聚焦回归为 `56 passed`。完整 backend 测试和 SQLite-only 全集在 5 分钟上限前分别停在 PostgreSQL 合约区段和约 63% 处，未产生失败断言。API 与 web 镜像通过 `mw-docker build` 使用 `market-watch-ubuntu` 构建；chart 镜像使用本机已有 licensed 资源临时构建，并在验收后删除资源副本。API-only Ubuntu Compose 在 `127.0.0.1:18011` 验收：`/readyz` 返回 `status=ready`，容器内精度/历史/派生/共享来源/复合回归 `69 passed, 1 deselected`，schema 检查、运行时精度检查和 SQLite `backup-restore-ok` 均通过。chart-only smoke Compose 在 `127.0.0.1:18012` 验收：首页 623 字节、`charting_library.js` 60,521 字节、`range-sync.js` 2,282 字节，CSP/Referrer-Policy/nosniff/no-store 响应头存在，未知资源返回 404。两个验收项目的容器、网络、volume 和登记镜像均已按精确归属清理；SQLite 项目因 `mw-docker retire` 不自动处理非 PG volume，先完成备份恢复检查后按明确 project 名手工 `compose down --volumes`，再清理镜像。未执行生产操作。
 - 收尾复核从 `backend` 目录以完整依赖和 `PYTHONPATH=.` 重跑受影响测试，结果为 `92 passed in 18.97s`；两个 acceptance task 的清理预览无容器、网络、volume 或 task 镜像残留。
 
-实现与验收已经完成；后续由用户决定是否提交 PR、合并、打 tag 或授权生产恢复。生产恢复前仍需重新确认目标任务状态、备份和发布窗口。
+上述记录为初次实现证据；PR #36 复审发现的规则绕过、Decimal 上下文和正常页面说明问题，以以下修复与验收记录为准。PR 合并、打 tag 和生产恢复仍由用户授权；生产恢复前须重新确认目标任务状态、备份和发布窗口。
+
+## 9. PR #36 修复复审与可复现验收（2026-10-11）
+
+- legacy pending/retrying 任务、resume 和无关错误 retry 不能自动启用舍入；精度错误只通过无写入租约的显式 retry 冻结并审计规则。导入与派生将 manifest 明确传入工作表写入边界，避免 Bar、快照和产物价格不一致。
+- 有效小数位从 Decimal tuple 计算；量化使用独立 Context，低全局精度和 Inexact/Rounded traps 不改变结果。处理前后都校验 OHLC。
+- 统一解析规则；未知、不完整或非法规则拒绝消费。父子产物规则不兼容时重建，避免复用不同精度或旧规则价格。
+- 宿主受影响模块回归：`206 passed in 59.48s`。Ubuntu API 容器内真实 PostgreSQL 回归：`34 passed in 79.80s`，覆盖精度规则、maintenance、artifacts 和 source store；唯一 warning 是非 root 容器无法写 pytest cache，与断言无关。测试使用独立 schema，未接触生产数据库。
+- API/web 均经 `mw-docker` 与 `market-watch-ubuntu` 构建，web 的 TypeScript/Vite 构建通过。API 与 Web 代理的 `/readyz` 均返回 ready，编译后的 native JS 返回 HTTP 200。
+- Chromium 实际加载 Ubuntu Web 容器编译产物，以受控 API fixture 检查创建页、冻结精度 5 版本与 legacy 版本的说明。1280px 和 390px 均通过，无页面级横向溢出或 pageerror；这不是供应商或完整图表端到端验收。
+
+实际运行环境为 Ubuntu 本机 Docker，task/project 为 `mw-price-rounding-review-20261011`；API `http://127.0.0.1:18011`，Web `http://127.0.0.1:18013`。本轮使用独立 PostgreSQL 14 数据卷和网络，未启用供应商采集或通知。Compose 清单：[`deploy/ubuntu/history-price-rounding.acceptance.yaml`](../deploy/ubuntu/history-price-rounding.acceptance.yaml)。测试结束后退役，以上地址不再提供服务。
+
+真实 PG 用例运行方式（先启动隔离实例；`TEST_POSTGRES_URL` 仅从容器现有配置读取，测试自动创建/删除各自 schema）：
+
+```bash
+sg docker -c '/usr/bin/docker exec -w /app/backend mw-price-rounding-review-20261011-api-1 python -c '\''import os,pytest; os.environ["TEST_POSTGRES_URL"]=os.environ["ALERTS_DATABASE_URL"]; raise SystemExit(pytest.main(["-q", "-p", "no:cacheprovider", "tests/test_history_price_rules_postgres.py", "tests/test_history_maintenance_postgres.py", "tests/test_history_artifacts_postgres.py", "tests/test_source_history_store_postgres.py"]))'\'''
+```
+
+初次构建后新增的 `test_history_price_rules_postgres.py` 已单独复制进本轮 API 容器执行；重建最终分支镜像会直接包含该文件。其余应用与测试代码均来自构建时工作区。上面的复现命令关闭 cache 插件，避免已记录的非 root cache warning。
+
+复现时选取新的 task/project；创建仓库外权限 0600 的 env 文件，包含 `MW_ACCEPTANCE_DB_PASSWORD`（开发专用随机密码）、`MW_API_IMAGE`、`MW_WEB_IMAGE`，不要提交凭据。构建、启动、停止和退役方式：
+
+```bash
+cd /home/quant/repos/market-watch-history-price-rounding-plan-20261010
+task=mw-price-rounding-review-20261011  # 重跑时必须换新 task
+project=$task
+mw-docker build --repo . --component api --tag market-watch-api:$task \
+  --task "$task" --project "$project" --purpose acceptance
+mw-docker build --repo . --component web --tag market-watch-web:$task \
+  --task "$task" --project "$project" --purpose acceptance \
+  --build-arg VITE_ADVANCED_CHART_ORIGIN=http://127.0.0.1:18012
+env_file=/tmp/$task/acceptance.env
+# 本会话用 sg docker 获得已授权的本机 docker 组权限。
+sg docker -c "/usr/bin/docker compose --env-file '$env_file' -p '$project' \
+  -f deploy/ubuntu/history-price-rounding.acceptance.yaml up -d --no-build"
+curl -fsS http://127.0.0.1:18011/readyz
+curl -fsS http://127.0.0.1:18013/readyz
+# 停止应用写入，保留 PG 供归档与实际恢复校验。
+sg docker -c "/usr/bin/docker compose --env-file '$env_file' -p '$project' \
+  -f deploy/ubuntu/history-price-rounding.acceptance.yaml stop api web"
+mw-docker retire --task "$task" --project "$project"
+mw-docker retire --task "$task" --project "$project" --apply
+```
+
+本轮 chart 未改动；18012 仅是编译配置，不代表本轮运行 chart 服务。真实生产失败页断点续传与最终发布、完整 backend 全集仍未验证；生产恢复需后续明确授权。
+
+复审还校正了方案中的输入边界表述：已有契约校验 Decimal 可解析性、有限正价格、OHLC 和数值存储范围，没有单独限制价格字符串长度、有效数字数量或指数绝对值。本次不声称实现了这些基线不存在的限制；额外边界须另行确定供应商与历史兼容范围。
+
+本轮 `mw-docker retire` 已完成：`postgres` 和 `price_rounding` 均实际恢复成功，后者 87 张表的行数与内容指纹一致，并重新核对来源未变。按精确 project 删除 4 个容器、1 个独立数据卷、1 个网络和 2 个任务镜像引用，task 已登记完成。私有归档留在 `~/.local/share/market-watch-docker/archives/mw-price-rounding-review-20261011-20261010T205849-c2824dda`，不提交其凭据与配置。公开验证摘要见[本轮证据](verification/history-price-rounding-review-20261011.json)。规范/需求独立复审均无合并阻断；没有执行合并或生产操作。
