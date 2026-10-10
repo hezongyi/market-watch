@@ -34,3 +34,25 @@
 ## 已知生产问题
 
 真实登录检查仍发现 Dukascopy 精度溢出、OANDA `m1_late`、Yahoo 关闭，以及许可图表 console 的 `Value is null`。这些是实际缺陷／配置状态，没有已验收修复提交可补合；本次仅补漏合改动，未声称修复这些生产故障。
+
+## 本次集成验收
+
+- 环境：Ubuntu 本机 Docker，独立 task/project `mw-source-status-delivery-20261010`，独立 PG14、volume、network 和端口；没有采集／通知 worker，没有 unraid 测试实例。
+- 验收运行地址：`https://192.168.7.232:19983/advanced-charts`；图表 origin `https://192.168.7.232:19984`。验收完成后精确退役，地址关闭；需重新验收时登记新 task/project。
+- API/web/chart-origin 三个候选镜像均使用 `mw-docker build --purpose acceptance --task mw-source-status-delivery-20261010 --project mw-source-status-delivery-20261010` 和 `market-watch-ubuntu`；TypeScript/Vite/native UI bundle 实际 Docker 构建通过。
+- [19 组浏览器验收](browser.json)通过，页面异常 0；原四分类无全局状态及轮询，来源页异常／旧快照／状态口径、键盘、明暗、1440/768/375px、真实 200% 缩放、请求取消和关闭重开通过。真实应用认证/API/许可 UI；供应商状态和图表 feed 在浏览器中使用明确受控 fixture，不声称真实上游连通。
+- [55 项后端回归](backend-tests.txt)通过；[实际 PG14 账户过滤与只读性](pg-status.json)通过，5 次读取隐藏另一账户 2 行，状态与需求指纹保持一致。
+- [7 项实际 React 位置回归](position.json)通过，概览 200 → 200、覆盖页 350 → 350、旧位置迁移及焦点恢复、延迟来源快照的分类往返／实际关闭重开滚动和焦点恢复、读取中用户交互优先；来源页／任务路由和有界工作区返回上下文检查通过。
+- [Yahoo overlay](yahoo-overlay.json)使用合成私有 env 经 Ubuntu Compose 实际配置合并，11 个后端服务均启用，既有 proxy 值保留；没有部署此 overlay，没有连接真实 Yahoo。
+- Ruff 和 `git diff --check` 通过。暗色桌面与亮色 375px 截图实际目视检查通过；私有原始材料在 ignored `artifacts/source-status/`。
+
+验收时启停（当前工作目录，已经结束的 project 不复用）：
+
+```bash
+sg docker -c 'docker compose --env-file artifacts/source-status/compose.env -p mw-source-status-delivery-20261010 -f artifacts/source-status/compose.yaml up -d --no-build'
+sg docker -c 'docker compose --env-file artifacts/source-status/compose.env -p mw-source-status-delivery-20261010 -f artifacts/source-status/compose.yaml stop'
+```
+
+复审发现来源页首次异步快照会使旧位置提前恢复到空页（实跑 350 → 0）。修复为等待首次读取结束再恢复，用户操作仍取消迟到恢复；新增回归已通过。19 组 Docker 来源页检查在此局部修复前完成；修复后新增实际 React 浏览器回归及最终 Docker web 构建，不冒称原 19 组全部重新运行。
+
+[退役证据](retirement.json)：`mw-docker retire` 先 preview 再 apply；两个数据库均实际恢复并核对内容，剩余本 task 容器、volume、网络均为 0，三个无引用候选镜像精确删除。私有备份／配置保存在本机生命周期归档，不提交。

@@ -54,7 +54,7 @@ export function LiveProviderStatus() {
   const provider = snapshot.data?.provider, rows = snapshot.data?.datasets ?? [];
   const held = provider?.authentication_hold || rows.some(row => row.authentication_hold);
   return <section className="data-center dc-sources" aria-label="来源状态">
-    <header className="dc-heading">
+    <header className="dc-heading" data-source-loading={snapshot.loading}>
       <div><h1 id="dc-sources-title" tabIndex={-1}>来源状态</h1><p className="dc-source-read-time">最近成功读取：<time>{snapshot.at ? statusTime(snapshot.at) : "尚未成功读取"}</time></p></div>
       <button id="dc-source-refresh" disabled={snapshot.loading} onClick={() => setRefresh(value => value + 1)}>刷新状态</button>
     </header>

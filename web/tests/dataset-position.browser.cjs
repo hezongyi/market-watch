@@ -24,7 +24,12 @@ const script = buildSync({
       usable_timeframes:[],availability:'available',latest_version_id:version};
     setCenterTransport(async path => {
       if(path.includes('/center/datasets/')) return dataset;
-      if(path.includes('/live/status')) return {provider:{error:null},datasets:[]};
+      if(path.includes('/live/status')) {
+        await new Promise(resolve=>setTimeout(resolve,300));
+        return {provider:{configured:true,error:null},datasets:Array.from({length:12},(_,i)=>
+          ({dataset_id:String(i),logical_symbol:'EURUSD'+i,quote_ready:false,candle_ready:false,
+            market_session:'unknown',quote:null,last_confirmed_m1:null}))};
+      }
       if(path.startsWith('/market-data/versions?')) return [{id:version,status:'published',start:0,end:60000,published_at:60000}];
       if(path.includes('/requests?')) return {items:Array.from({length:25},(_,i)=>
         ({id:String(i),start:i*60000,end:(i+1)*60000,started_at:60000,finished_at:60000,
@@ -37,7 +42,7 @@ const script = buildSync({
       root=createRoot(document.getElementById('root'));
       root.render(<Window hosted={{context:{workspace:'position-test',target:'t',theme:'light',
         symbolSync:false,intervalSync:false,location},
-        post:m=>{if(m.type==='location') window.currentRoute=m.location;},subscribe:()=>()=>{}}}/>);
+        post:m=>{if(m.type==='location') window.currentRoute=m.location; if(m.type==='close') queueMicrotask(()=>root.unmount());},subscribe:listener=>{window.centerMessage=listener;return ()=>{window.centerMessage=null;};}}}/>);
     };
     window.unmountCenter = () => root.unmount();
   `},
@@ -93,6 +98,36 @@ const script = buildSync({
     await expect.poll(()=>body.evaluate(node=>node.scrollTop)).toBe(180);
     await expect(page.locator('#dc-dataset-tasks')).toBeFocused();
     checks.push('Legacy stored URL migrates and restores both scroll and focus');
+    await page.evaluate(() => window.unmountCenter());
+    const sourceRoute='/market-data?tab=sources';
+    await page.evaluate(route => sessionStorage.setItem('mw-data-center:position-test:positions',
+      JSON.stringify({[route]:{top:350,tableTop:0,tableLeft:0,focus:'dc-source-diagnostics-toggle'}})),sourceRoute);
+    const scroller=page.locator('.dc-window-content');
+    await page.evaluate(route=>window.mountCenter(route),sourceRoute);
+    await expect(page.locator('.dc-source-table tbody tr')).toHaveCount(12);
+    await expect.poll(()=>scroller.evaluate(node=>node.scrollTop)).toBe(350);
+    await expect(page.locator('#dc-source-diagnostics-toggle')).toBeFocused();
+    checks.push('Delayed source snapshot restores saved scroll and diagnostic focus on reopen');
+    await page.getByRole('button',{name:'任务与记录',exact:true}).click();
+    await page.getByRole('button',{name:'来源状态',exact:true}).click();
+    await expect(page.locator('.dc-source-table tbody tr')).toHaveCount(12);
+    await expect.poll(()=>scroller.evaluate(node=>node.scrollTop)).toBe(350);
+    await expect(page.locator('#dc-source-diagnostics-toggle')).toBeFocused();
+    checks.push('Source category round-trip preserves scroll and diagnostic focus after delayed reload');
+    await page.evaluate(()=>window.centerMessage({type:'request-close'}));
+    await expect(page.locator('.dc-window')).toHaveCount(0);
+    await page.evaluate(route=>window.mountCenter(route),sourceRoute);
+    await expect(page.locator('.dc-source-table tbody tr')).toHaveCount(12);
+    await expect.poll(()=>scroller.evaluate(node=>node.scrollTop)).toBe(350);
+    await expect(page.locator('#dc-source-diagnostics-toggle')).toBeFocused();
+    checks.push('Actual close and reopen preserves source scroll and diagnostic focus');
+    await page.evaluate(() => window.unmountCenter());
+    await page.evaluate(route=>window.mountCenter(route),sourceRoute);
+    await page.locator('#dc-sources-title').click();
+    await expect(page.locator('.dc-source-table tbody tr')).toHaveCount(12);
+    await expect.poll(()=>scroller.evaluate(node=>node.scrollTop)).toBe(0);
+    await expect(page.locator('#dc-sources-title')).toBeFocused();
+    checks.push('User interaction during initial source read cancels late position restoration');
     assert.deepEqual(errors,[]);
     console.log(JSON.stringify({passed:true,environment:'Ubuntu Chromium; actual React UI and read-only browser API fixtures',checks,errors},null,2));
   } finally {await browser.close();}

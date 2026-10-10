@@ -174,6 +174,9 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
       // Evidence/version rows load after the dataset summary. Restoring before
       // those rows exist clamps a saved scroll offset to an empty body.
       if ([...content.current?.querySelectorAll<HTMLElement>('.dc-dataset-detail [role="status"]') || []].some(node => node.textContent === "正在读取数据…")) return;
+      // Source rows and diagnostic controls arrive with the first snapshot.
+      // Wait for that read to settle before restoring into the short loading page.
+      if (content.current?.querySelector('.dc-sources [data-source-loading="true"]')) return;
       const requestedFocus = parsedRoute.hash.slice(1) || saved?.focus;
       const target = requestedFocus ? document.getElementById(requestedFocus) : null;
       if (parsedRoute.hash && !target && !content.current?.querySelector('[role="alert"]')) return;
