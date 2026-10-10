@@ -182,16 +182,30 @@ function chartNativeUi(widget, doc, searchSymbols) {
           customSearchSymbols:search,onClose:()=>{},onSearchComplete:()=>{},
         }));
       }
-      // Main symbol search keeps its actual native dialog, search, category
-      // tabs and rows. Only the two table-header controls are supplied here.
+      // Symbol search and watchlist add keep their native dialogs, category
+      // tabs, rows and actions. Both use the same table-header controls.
       function SymbolFiltersBody({render,controls}) {
         const node=R.useRef(null),[header,setHeader]=R.useState(null);
         R.useLayoutEffect(()=>{
           setHeader(node.current?.querySelector(`.${headerClasses.wrap} > .${headerClasses.item}:last-child`) || null);
         });
+        R.useEffect(()=>{
+          const root=node.current?.closest('[data-name="symbol-search-items-dialog"],[data-name="watchlist-symbol-search-dialog"]');
+          function keyboard(event) {
+            if(event.defaultPrevented || event.key !== "Tab") return;
+            const targets=[...(root?.querySelectorAll('button,input,[tabindex="0"]') || [])]
+              .filter(node=>!node.disabled && node.tabIndex>=0 && node.getClientRects().length);
+            const index=targets.indexOf(doc.activeElement),next=index+(event.shiftKey?-1:1);
+            if(targets.length && (index<0 || next<0 || next>=targets.length)) {
+              event.preventDefault();event.stopPropagation();targets[event.shiftKey?targets.length-1:0].focus();
+            }
+          }
+          root?.addEventListener("keydown",keyboard,true);
+          return()=>root?.removeEventListener("keydown",keyboard,true);
+        },[]);
         return R.createElement("div",{ref:node,className:"mw-symbol-search-body"},render(),header && createPortal(controls,header));
       }
-      function SymbolFiltersDialog({scope,...props}) {
+      function SymbolFiltersDialog({scope,nativeDialog:NativeDialog,...props}) {
         const ctx=R.useContext(SearchContext);
         const [kind,setKind]=R.useState("all"),[source,setSource]=R.useState("");
         scope.kind=kind;
@@ -215,19 +229,15 @@ function chartNativeUi(widget, doc, searchSymbols) {
           },size:"small",className:"dc-native-select"}));
         const controls=R.createElement("div",{className:"mw-symbol-search-filters"},
           control("行情类型",kind,kinds,setKind),control("来源",source,sources,setSource));
+        if(NativeDialog) {
+          // Keep the connected watchlist dialog and its Enter/Shift+Enter,
+          // add/remove callbacks, footer and watchlist context intact.
+          return R.createElement(SearchContext.Provider,{value:scoped},R.createElement(NativeDialog,{
+            ...props,render:()=>R.createElement(SymbolFiltersBody,{render:props.render,controls})}));
+        }
         const dialogClasses=req(973134);
         function keyboard(event) {
           if(event.defaultPrevented) return;
-          if(event.key === "Tab") {
-            const root=doc.querySelector('[data-name="symbol-search-items-dialog"]');
-            const targets=[...(root?.querySelectorAll('button,input,[tabindex="0"]') || [])]
-              .filter(node=>!node.disabled && node.tabIndex>=0 && node.getClientRects().length);
-            const index=targets.indexOf(doc.activeElement),next=index+(event.shiftKey?-1:1);
-            if(targets.length && (index<0 || next<0 || next>=targets.length)) {
-              event.preventDefault();targets[event.shiftKey?targets.length-1:0].focus();
-            }
-            return;
-          }
           if(event.target !== ctx.searchRef.current) return;
           if(event.key === "Escape") {event.preventDefault();ctx.onClose();}
           else if(event.key === "Enter" && !event.isComposing) {event.preventDefault();ctx.onSubmit(true);}
@@ -259,11 +269,12 @@ function chartNativeUi(widget, doc, searchSymbols) {
             .mw-symbol-search-body .${headerClasses.wrap}>.${headerClasses.item}:last-child{min-width:248px}}`;
         doc.head.append(searchStyle);
         enhanceSymbolSearch=options=>{
-          // Account-scoped catalog pickers and native watchlist/compare dialog
-          // renderers retain their own filters and action semantics.
-          if(options.customSearchSymbols || options.dialog) return options;
+          // Account-scoped catalog pickers and compare dialogs retain their
+          // own filters. Only the pinned native watchlist picker shares ours.
+          const watchlist=options.searchInitiationPoint === "watchlist";
+          if(options.customSearchSymbols || (options.dialog && !watchlist)) return options;
           const scope={kind:"all"};
-          const Dialog=props=>R.createElement(SymbolFiltersDialog,{...props,scope});
+          const Dialog=props=>R.createElement(SymbolFiltersDialog,{...props,scope,nativeDialog:watchlist?options.dialog:undefined});
           return {...options,dialog:Dialog,disableRecents:true,showRecents:false,
             customSearchSymbols:async request=>{
               try {
