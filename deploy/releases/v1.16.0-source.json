@@ -1,0 +1,20 @@
+{
+  "version": "1.16.0",
+  "release_tag": "v1.16.0",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/27",
+  "implementation_merge": "54c37205245d271579227bcf63e38c5691470b8b",
+  "source_commit_resolution": "Resolve annotated v1.16.0^{commit}; tag the main merge of release metadata after successful production delivery.",
+  "schema_before": "ar45_market_stream",
+  "schema_after": "ar45_market_stream",
+  "new_migrations": [],
+  "new_production_services": [],
+  "dependencies_changed": false,
+  "verification_record": "docs/verification/chart-data-center/pr-integration-20261010.md",
+  "build_environment": "Ubuntu local Docker; mw-docker; market-watch-ubuntu BuildKit",
+  "production_environment": "unraid existing formal market-watch project",
+  "rollback": {
+    "application_version": "v1.15.1",
+    "schema_downgrade": false,
+    "data_restore": "Not part of application rollback; preserve existing data and authentication fencing."
+  }
+}
