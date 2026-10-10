@@ -56,3 +56,5 @@ sg docker -c 'docker compose --env-file artifacts/source-status/compose.env -p m
 复审发现来源页首次异步快照会使旧位置提前恢复到空页（实跑 350 → 0）。修复为等待首次读取结束再恢复，用户操作仍取消迟到恢复；新增回归已通过。19 组 Docker 来源页检查在此局部修复前完成；修复后新增实际 React 浏览器回归及最终 Docker web 构建，不冒称原 19 组全部重新运行。
 
 [退役证据](retirement.json)：`mw-docker retire` 先 preview 再 apply；两个数据库均实际恢复并核对内容，剩余本 task 容器、volume、网络均为 0，三个无引用候选镜像精确删除。私有备份／配置保存在本机生命周期归档，不提交。
+
+最终 `dcea7a4` 的 [Docker web 构建](final-build.json)通过；纯构建 task 已 finish，cleanup 先 preview 再 apply。两轴[复审](review.md)均无遗留发现。
