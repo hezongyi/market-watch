@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),vm=require('node:vm'),path=require('n
 const root=path.resolve(__dirname,'../..');
 function moduleFrom(file){const {text}=buildSync({entryPoints:[path.join(root,file)],bundle:true,write:false,platform:'node',format:'cjs',external:['react']}).outputFiles[0];const box={module:{exports:{}},exports:{},require,URL,URLSearchParams,crypto:require('node:crypto').webcrypto};vm.runInNewContext(text,box);return box.module.exports;}
 const {ReturnContexts}=moduleFrom('web/src/market-data/returnContext.ts');
-const {centerLocation}=moduleFrom('web/src/market-data/location.ts');
+const {centerLocation,centerPositionKey}=moduleFrom('web/src/market-data/location.ts');
 const {datasetTaskLocation}=moduleFrom('web/src/market-data/navigation.ts');
 const id='a'.repeat(64),version='11111111-1111-4111-8111-111111111111';
 const store=new ReturnContexts('workspace-A'),other=new ReturnContexts('workspace-B');
@@ -17,4 +17,11 @@ for(let i=0;i<32;i++)store.remember('/market-data?tab=tasks','任务与记录');
 const dataset={id,logical_symbol:'EURUSD',display_symbol:'显示名称与查询代码不同',identity:{source:'dukascopy'}};
 const target=new URL(datasetTaskLocation(dataset),'https://center.invalid');
 assert.equal(target.searchParams.get('query'),'EURUSD');assert.equal(target.searchParams.get('dataset_id'),id);assert.equal(target.searchParams.get('source'),'dukascopy');assert.equal(target.searchParams.get('status'),'all');
+const detail='/market-data/datasets/'+id;
+assert.equal(centerPositionKey(detail),centerPositionKey(detail+'?section=overview'));
+assert.equal(centerPositionKey(detail+'?section=coverage&version='+version+'&view=requests&coverage_page=2'),centerPositionKey(detail+'?view=requests&coverage_page=2&version='+version+'&section=coverage'));
+assert.notEqual(centerPositionKey(detail+'?section=coverage'),centerPositionKey(detail+'?section=maintenance'));
+assert.notEqual(centerPositionKey(detail+'?section=coverage&version='+version),centerPositionKey(detail+'?section=coverage&version=22222222-2222-4222-8222-222222222222'));
+assert.notEqual(centerPositionKey(detail+'?section=coverage&coverage_page=1'),centerPositionKey(detail+'?section=coverage&coverage_page=2'));
+assert.notEqual(centerPositionKey(detail+'#dataset-'+id),centerPositionKey(detail));
 console.log('PASS bounded per-window return contexts, workspace isolation, safe paths, preserved detail/list context and authoritative exact task query');

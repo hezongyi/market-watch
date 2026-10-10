@@ -42,3 +42,12 @@ export function centerTab(value: string) {
   const tab = url.searchParams.get("tab") || "managed";
   return ["managed", "platform", "composite", "tasks"].includes(tab) ? tab : "managed";
 }
+
+/** Equivalent addresses must share a saved scroll/focus position. */
+export function centerPositionKey(value: string) {
+  const url = new URL(centerLocation(value), "https://center.invalid");
+  if (new RegExp(`^/market-data/datasets/${objectId}$`).test(url.pathname))
+    url.searchParams.set("section", url.searchParams.get("section") || "overview");
+  url.searchParams.sort();
+  return url.pathname + url.search + url.hash;
+}

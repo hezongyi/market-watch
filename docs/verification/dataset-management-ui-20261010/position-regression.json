@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "environment": "Ubuntu Chromium; actual React UI and read-only browser API fixtures",
+  "checks": [
+    "Default overview survives category round-trip (200 → 200)",
+    "Coverage parameters reordered on return retain page/version and scroll (350 → 350)",
+    "Legacy stored URL migrates and restores both scroll and focus"
+  ],
+  "errors": []
+}

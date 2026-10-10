@@ -87,4 +87,10 @@ TypeScript/Vite 与原生 bundle 构建成功；已有大于 500 kB 的 bundle �
 
 [退役证明](dataset-management-ui-20261010/retirement-proof.json)包含恢复校验结果、备份 SHA256、表数量和精确资源数量。私有完整归档位于 `/home/quant/.local/share/market-watch-docker/archives/mw-dataset-management-20261010-20261010T125746-f7d49d8e`，包含数据库、角色和配置；不提交该归档或任何凭据。
 
-本任务仅提交独立实施分支，尚未合并、打 tag 或部署生产。
+原验收阶段仅提交独立实施分支。后续用户已授权 PR #31 修复、复审、合并、推 tag 及正式部署，执行结果以 v1.17.0 发布清单为准。
+
+## PR #31 位置恢复修复
+
+复审发现默认概览首次分类往返将滚动从 200 重置为 0：位置按完整 URL 存储，分类切换新增默认 section 或重排参数使键不匹配。现在位置键统一通过合法内部路径校验、补全默认概览分类并排序参数；读取旧位置记录时同样规范化。版本、页码和行锚点保持独立。
+
+Ubuntu Chromium 执行实际 Window／DatasetDetail 代码及只读 API fixture，新增 [3 项浏览器回归](dataset-management-ui-20261010/position-regression.json)全部通过：默认概览 200 → 200、覆盖页参数重排 350 → 350 且版本／页码保持、旧存储记录滚动和焦点恢复。脚本为 `web/tests/dataset-position.browser.cjs`；不启动数据库或供源。导航 helper 同时验证等价位置键与不同版本／页码／锚点隔离。原 27 项 Docker 验收未因该局部修复重新全量执行。

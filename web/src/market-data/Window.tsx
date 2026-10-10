@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Database, Layers, ListChecks, Radio } from "lucide-react";
 import Center from "./Center";
 import { CenterContext, type CenterNavigation } from "./router";
-import { centerLocation, centerTab } from "./location";
+import { centerLocation, centerPositionKey, centerTab } from "./location";
 import { ReturnContexts } from "./returnContext";
 import "./window.css";
 import { NativeSlot, NativeSidebar, NativeUiContext } from "./NativeControls";
@@ -20,6 +20,10 @@ export type HostedCenter = {
 function readMemory<T>(key: string, fallback: T): T {
   try { return JSON.parse(sessionStorage.getItem(key) || "null") || fallback; } catch { return fallback; }
 }
+function readPositions(key: string): Record<string, Position> {
+  return Object.fromEntries(Object.entries(readMemory<Record<string, Position>>(key, {}))
+    .map(([route, position]) => [centerPositionKey(route), position]).slice(-50));
+}
 
 /** React owns business state; the public chart host owns the fullscreen dialog. */
 export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } = {}) {
@@ -35,12 +39,12 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
   const request = useRef<{ id: string; resolve: () => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> } | null>(null);
   const content = useRef<HTMLDivElement>(null), closeButton = useRef<HTMLButtonElement>(null), guardBox = useRef<HTMLDivElement>(null);
   const memoryScope = `mw-data-center:${context?.workspace || session}`;
-  const positions = useRef<Record<string, Position>>(readMemory(memoryScope + ":positions", {}));
+  const positions = useRef<Record<string, Position>>(readPositions(memoryScope + ":positions"));
   const tabLocations = useRef<Record<string, string>>(readMemory(memoryScope + ":tabs", {}));
   const returns = useRef(new ReturnContexts(context?.workspace || session));
   if (returns.current.workspace !== (context?.workspace || session)) {
     returns.current = new ReturnContexts(context?.workspace || session);
-    positions.current = readMemory(memoryScope + ":positions", {});
+    positions.current = readPositions(memoryScope + ":positions");
     tabLocations.current = readMemory(memoryScope + ":tabs", {});
   }
   const restoreScope = useRef<string | null>(null);
@@ -60,7 +64,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
   const rememberPosition = useCallback(() => {
     const active = document.activeElement as HTMLElement;
     const table = content.current?.querySelector<HTMLElement>(".dc-table,.dc-platform-scroll,.dc-market-list");
-    positions.current[routeRef.current] = { top: (content.current?.querySelector<HTMLElement>(".dc-dataset-body") || content.current)?.scrollTop || 0,
+    positions.current[centerPositionKey(routeRef.current)] = { top: (content.current?.querySelector<HTMLElement>(".dc-dataset-body") || content.current)?.scrollTop || 0,
       tableTop: table?.scrollTop || 0, tableLeft: table?.scrollLeft || 0,
       focus: content.current?.contains(active) ? active.id || active.closest("tr[id],.dc-task-row[id],.dc-market-row[id],.dc-business-row[id]")?.id || null : lastContentFocus.current };
     const recent = Object.entries(positions.current).slice(-50);
@@ -153,7 +157,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
     document.addEventListener("keydown", interacted, true);
     content.current?.addEventListener("wheel", interacted, {capture: true, passive: true});
     let platformSettled = false, platformFrame = 0;
-    const saved = positions.current[route];
+    const saved = positions.current[centerPositionKey(route)];
     const restore = () => {
       if (restored) return;
       const table = content.current?.querySelector<HTMLElement>(".dc-table,.dc-platform-scroll,.dc-market-list");
