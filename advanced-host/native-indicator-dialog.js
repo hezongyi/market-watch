@@ -18,6 +18,8 @@ function chartNativeIndicators(widget, doc, req, ui) {
   };
   const Context = R.createContext(null);
   const propertyObservers = new Set();
+  const pythonDisplayName = (entry) =>
+    entry?.source === "Python" ? `Python ${entry.id}` : null;
   const categories = [
     ["all", "全部指标"],
     ["favorites", "收藏"],
@@ -35,8 +37,10 @@ function chartNativeIndicators(widget, doc, req, ui) {
           entry.label === name ||
           entry.name === row.title ||
           entry.label === row.title ||
-          (row.title.startsWith("守望 Python ") &&
-            entry.id === row.title.slice("守望 Python ".length)),
+          ((row.title.startsWith("守望 Python ") &&
+            entry.id === row.title.slice("守望 Python ".length)) ||
+            (row.title.startsWith("Python ") &&
+              entry.id === row.title.slice("Python ".length))),
       ) || null
     );
   }
@@ -54,6 +58,15 @@ function chartNativeIndicators(widget, doc, req, ui) {
     const ctx = R.useContext(Context),
       entry = entryFor(props.item),
       pending = state.pending.has(props.item.id);
+    const displayName = pythonDisplayName(entry);
+    const item = displayName
+      ? {
+          ...props.item,
+          title: displayName,
+          shortTitle: displayName,
+          description: displayName,
+        }
+      : props.item;
     return R.createElement(
       "div",
       {
@@ -68,6 +81,7 @@ function chartNativeIndicators(widget, doc, req, ui) {
         { className: "mw-native-study-main" },
         R.createElement(Native, {
           ...props,
+          item,
           onClick: pending ? () => {} : props.onClick,
         }),
       ),
