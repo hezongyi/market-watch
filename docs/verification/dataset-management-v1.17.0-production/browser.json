@@ -1,0 +1,130 @@
+{
+  "passed": true,
+  "environment": "unraid formal production; browser on Ubuntu; existing workspace and read-only operations",
+  "checks": [
+    "HTTPS login and secure session cookie",
+    "three existing-workspace reloads; chart data ready and authenticated SSE open",
+    "production data center 自建行情",
+    "production data center 平台行情",
+    "production data center 组合行情",
+    "production data center 任务与记录",
+    "Actual production dataset supports all five classifications without overflow",
+    "Production task entry uses authoritative symbol, exact dataset, all states and returns to management",
+    "Production category round-trip preserves overview scroll at 375px",
+    "Production version detail retains fixed replay identity and restores trigger focus",
+    "native indicator category/detail shell opens and closes",
+    "data center and indicator reads preserve chart symbols and study instances",
+    "real Binance snapshot over SSE native callback retains raw price and native tick scale 100",
+    "Actual production source status API and responsive display remain accessible",
+    "390px source-status layout",
+    "Production review performs no maintenance, collection or control writes"
+  ],
+  "errors": [],
+  "reloads": [
+    {
+      "native": {
+        "charts": 5,
+        "symbols": [
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD"
+        ],
+        "data_ready": true
+      },
+      "sse": {
+        "opens": 1,
+        "errors": 0,
+        "types": [
+          "bars",
+          "quotes"
+        ]
+      }
+    },
+    {
+      "native": {
+        "charts": 5,
+        "symbols": [
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD"
+        ],
+        "data_ready": true
+      },
+      "sse": {
+        "opens": 1,
+        "errors": 0,
+        "types": [
+          "bars",
+          "reset",
+          "quotes"
+        ]
+      }
+    },
+    {
+      "native": {
+        "charts": 5,
+        "symbols": [
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD",
+          "MWP:XAUUSD"
+        ],
+        "data_ready": true
+      },
+      "sse": {
+        "opens": 2,
+        "errors": 1,
+        "types": [
+          "bars",
+          "reset",
+          "quotes"
+        ]
+      }
+    }
+  ],
+  "business_writes": [],
+  "login_http": 200,
+  "managed_dataset": {
+    "id": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+    "symbol": "EURUSD"
+  },
+  "scroll_restore": {
+    "before": 150,
+    "after": 150
+  },
+  "sse_precision": {
+    "source": "binance",
+    "price": 82840.58,
+    "scale": 100,
+    "native_tick_rule_preserved": true
+  },
+  "live_status": {
+    "provider": {
+      "error": "unavailable",
+      "authentication_hold": false
+    },
+    "datasets": [
+      {
+        "symbol": "XAUUSD",
+        "market_session": "unknown",
+        "quote_ready": false,
+        "candle_ready": false,
+        "error": "m1_late"
+      },
+      {
+        "symbol": "EURUSD",
+        "market_session": "unknown",
+        "quote_ready": false,
+        "candle_ready": false,
+        "error": "m1_late"
+      }
+    ]
+  },
+  "logout_http": 200,
+  "finished": "2026-10-10T13:38:00.996Z"
+}

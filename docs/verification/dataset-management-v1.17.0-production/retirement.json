@@ -1,0 +1,26 @@
+{
+  "restore_verified": true,
+  "archive_directory": "/home/quant/.local/share/market-watch-docker/archives/mw-v1170-restore-20261010-20261010T133732-9e207a07",
+  "project": "mw-v1170-restore-20261010",
+  "task": "mw-v1170-restore-20261010",
+  "containers": 0,
+  "volumes": 0,
+  "networks": 0,
+  "completed_at": "2026-10-10T13:38:06.829647+00:00",
+  "database_restore_checks": [
+    {
+      "database": "postgres",
+      "sha256": "fbc83c23cc394a8150872ef14b82b9a38d72c20665cf6661d0728fe4a3c600ef",
+      "table_count": 0,
+      "content_fingerprint_count": 0,
+      "actual_restore_verified": true
+    },
+    {
+      "database": "restore_admin",
+      "sha256": "d6a09b7b0061426db5c5662f3ee04a8cfb2e0a0e71a89fb7b5f7707c137ffd06",
+      "table_count": 0,
+      "content_fingerprint_count": 0,
+      "actual_restore_verified": true
+    }
+  ]
+}
