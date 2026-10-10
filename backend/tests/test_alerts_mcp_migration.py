@@ -11,7 +11,7 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "aq44_aggregation_service_order"
+HEAD = "ar45_market_stream"
 
 
 def configuration():
@@ -53,7 +53,8 @@ def verify_upgrade_paths(engine, monkeypatch, initial):
         assert connection.execute(text("SELECT version_num FROM alembic_version")).scalars().all() == [HEAD]
         tables = inspect(connection).get_table_names()
         assert {"chart_alerts", "chart_alert_versions", "agent_credentials", "agent_operations",
-                "market_datasets", "market_history_versions", "market_live_states"} <= set(tables)
+                "market_datasets", "market_history_versions", "market_live_states",
+                "market_stream_tasks", "market_stream_clients", "market_stream_subscriptions"} <= set(tables)
         assert {"event_key", "chart_alert_id"} <= {c["name"] for c in inspect(connection).get_columns("signals")}
         if initial == "s20_agent_capabilities":
             assert connection.execute(text("SELECT agent_id, quota_count FROM agent_credentials WHERE token_hash='kept-hash'")).one() == ("migration-fixture", 3)
