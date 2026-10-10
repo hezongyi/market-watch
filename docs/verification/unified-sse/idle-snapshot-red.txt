@@ -1,0 +1,11 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_idle_lease_and_delivery_do_not_read_retained_history_snapshot ______
+backend/tests/test_market_stream.py:62: in test_idle_lease_and_delivery_do_not_read_retained_history_snapshot
+    assert not any("market_stream_tasks.payload" in statement for statement in statements), (
+E   AssertionError: Idle delivery/lease checks must not transfer the full 2000-bar snapshot
+E   assert not True
+E    +  where True = any(<generator object test_idle_lease_and_delivery_do_not_read_retained_history_snapshot.<locals>.<genexpr> at 0x7fa14de6bb90>)
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_stream.py::test_idle_lease_and_delivery_do_not_read_retained_history_snapshot
+1 failed, 12 deselected in 0.32s

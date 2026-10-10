@@ -5,12 +5,13 @@ COPY charting_library/ ./charting_library/
 COPY chart-maximize.js data-center.js price-format.js ./
 COPY chart-theme.js ./
 COPY native-ui.js native-indicator-dialog.js ./
+COPY patch-native-toolset.mjs ./
 ARG NATIVE_RESERVE_ENABLED=true
 ENV NATIVE_RESERVE_ENABLED=${NATIVE_RESERVE_ENABLED}
 RUN if [ "$NATIVE_RESERVE_ENABLED" = "true" ]; then node patch-native-reserve.mjs; \
     elif [ "$NATIVE_RESERVE_ENABLED" = "false" ]; then node patch-native-reserve.mjs --disable; \
     else exit 1; fi
-RUN node build-assets.mjs
+RUN node patch-native-toolset.mjs && node build-assets.mjs
 
 FROM nginx:1.28-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf

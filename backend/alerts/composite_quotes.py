@@ -6,12 +6,15 @@ from .composite_chart import chart_page
 from .config import settings
 from .history_catalog import account_scope
 from .live_pricing import account_key
+from .live_session import session_status
 from .storage import (
     CompositePreparation,
     CompositeRevision,
+    Instrument,
     LiveState,
     MarketComposite,
     MarketDataset,
+    Preference,
     PricingOwner,
     RealtimeMapping,
     now_ms,
@@ -27,12 +30,19 @@ def get_snapshot(db, composite_id):
 
 def live_snapshot(db, revision, *, now=None):
     """Quote and candle readiness are independent, both fenced by the live owner."""
-    stamp = now_ms() if now is None else now
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     target = db.get(MarketDataset, mapping.target_dataset_id)
     state = db.get(LiveState, target.id)
     owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
+    stamp = now_ms() if now is None else now
     current = target.identity["account_scope"] == account_scope()
+    session = session_status(target.identity, db.get(Instrument, target.instrument_id).calendar_profile, stamp)
+    held = bool(current and owner and owner.error == 'unauthorized' or state and state.error == 'unauthorized')
+    error = state.error if state else None
+    if current and owner and owner.error:
+        probe = db.get(Preference, 'oanda_probe_status:' + owner.id) if held else None
+        error = (probe.value.get('error') if probe else None) or owner.error
+    available = not held and error != 'provider_maintenance' and session['market_session'] != 'closed'
     quote = state.quote if state else {}
     age = stamp - quote["source_time"] if type(quote.get("source_time")) is int else None
     received_age = stamp - state.received_at if state else None
@@ -46,30 +56,34 @@ def live_snapshot(db, revision, *, now=None):
         valid = bid.is_finite() and ask.is_finite() and 0 < bid <= ask
     except (InvalidOperation, ValueError):
         pass
-    quote_ready = bool(owned and valid and quote.get("tradeable") is True
+    quote_ready = bool(available and owned and valid and quote.get("tradeable") is True
         and quote.get("connection_epoch") == state.epoch
         and age is not None and 0 <= age <= 15000
         and received_age is not None and 0 <= received_age <= 15000)
     return {"current_account": current, "owned": owned,
+        **session, 'authentication_hold': held, 'connection_error': error,
+        'next_probe_at': owner.next_at or None if current and owner else None,
         "connection": state.connection if state else "inactive",
-        "quote_ready": quote_ready, "confirmed_tail_ready": bool(owned and state.ready and not state.error),
+        "quote_ready": quote_ready, "confirmed_tail_ready": bool(available and owned and state.ready and not state.error),
         "quote_age_ms": age, "source_confirmed_end": state.confirmed_end if state else 0,
         "quote": dict(quote) if quote else {}, "received_at": state.received_at if state else None,
         "connection_epoch": state.epoch if state else None, "live_revision": state.revision if state else None}
 
 
-def snapshot(db, composite, *, now=None):
+def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
     stamp = now_ms() if now is None else now
-    revision = db.get(CompositeRevision, composite.active_revision_id)
+    revision = db.get(CompositeRevision, revision_id or composite.active_revision_id)
+    if not revision or revision.composite_id != composite.id:
+        raise ValueError("组合修订不属于所选系列")
     prep = db.get(CompositePreparation, revision.id)
     live = live_snapshot(db, revision, now=stamp)
     result = {"composite_id": composite.id, "revision_id": revision.id,
-        "input_revision": prep.input_revision, "history_version_id": revision.history_version_id,
+        "input_revision": prep.input_revision if input_revision is None else input_revision, "history_version_id": revision.history_version_id,
         "seam": revision.seam, "queried_at": stamp,
         "quote_ready": live["quote_ready"], "confirmed_tail_ready": live["confirmed_tail_ready"],
         "connection": live["connection"], "price": None, "observed_at": None,
         "quality": "pending", "price_type": None, "provenance": None}
-    if live["quote_ready"] and live["quote"]["source_time"] >= revision.seam:
+    if input_revision is None and live["quote_ready"] and live["quote"]["source_time"] >= revision.seam:
         result.update(price=str(live["quote"]["bid"]), observed_at=live["quote"]["source_time"],
             quality="sampled", price_type="sampled_bid", provenance={
                 "target_dataset_id": db.get(RealtimeMapping, revision.mapping_id).target_dataset_id,
@@ -78,7 +92,8 @@ def snapshot(db, composite, *, now=None):
         return result
     # Uses the same pinned M1 input as the chart; never raw target history that
     # has not been accepted by this composite revision. Historical side is <T.
-    page = chart_page(db, composite.id, "M1", before=stamp//60000*60000, count=1, provisional=False, now=stamp)
+    page = chart_page(db, composite.id, "M1", before=stamp//60000*60000, count=1, provisional=False, now=stamp,
+                      revision_id=revision.id, input_revision=input_revision)
     bars = [bar for bar in page["bars"] if bar["source_confirmed"] and bar["end"] <= stamp]
     if bars:
         bar = bars[-1]

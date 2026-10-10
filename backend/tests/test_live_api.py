@@ -14,6 +14,8 @@ running = _running
 def test_live_reads_require_authentication(database):
     with TestClient(api_module.app) as client:
         assert client.get("/api/market-data/live").status_code == 401
+        assert client.get('/api/market-data/live/provider-status').status_code == 401
+        assert client.get('/api/market-data/live/status').status_code == 401
         assert client.get("/api/market-data/live/metrics/unknown").status_code == 401
         assert client.post("/api/market-data/live/demand", json={}).status_code == 401
 
@@ -86,6 +88,32 @@ def test_snapshot_signature_detects_cooldown_change_without_new_quote_or_epoch()
     row = {"dataset_id": "dataset", "revision": 2, "quality": "healthy", "cooldown_until": None}
     assert snapshot_signature([row]) != snapshot_signature([row | {"cooldown_until": 200000}])
     assert snapshot_signature([row]) == snapshot_signature([dict(row)])
+    assert snapshot_signature([row | {'authentication_hold': True}]) != snapshot_signature([row])
+    assert snapshot_signature([row | {'market_session': 'closed'}]) != snapshot_signature([row])
+
+
+def test_retry_never_clears_auth_fault_or_accelerates_probes(running, monkeypatch):
+    from alerts.config import settings
+    from alerts.market_contracts import RequestResult
+    from alerts.storage import PricingOwner
+
+    factory, ownership, epoch, identities = running
+    monkeypatch.setattr(settings, 'oanda_account_id', 'test-account')
+    live.disconnected(ownership, epoch, identities, RequestResult(status='unauthorized'), now=125000)
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+    try:
+        with TestClient(api_module.app) as client:
+            status = client.get('/api/market-data/live/provider-status').json()
+            assert status['authentication_hold']
+            assert client.get('/api/market-data/live/status').json()['provider']['authentication_hold']
+            for _ in range(3):
+                assert client.post('/api/market-data/live/retry').status_code == 200
+        with factory.begin() as db:
+            owner = db.get(PricingOwner, ownership[0])
+            assert owner.error == 'unauthorized'
+            assert owner.next_at == 125000 + settings.oanda_auth_probe_seconds * 1000
+    finally:
+        api_module.app.dependency_overrides.clear()
 
 
 @pytest.mark.asyncio

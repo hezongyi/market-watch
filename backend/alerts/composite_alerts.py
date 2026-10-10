@@ -206,10 +206,14 @@ def evaluate(db, alert, version, config, now):
     profiles = [(identity["history_start"], revision.seam,
                  db.get(HistoryVersion, revision.history_version_id).manifest.get("calendar_profile", {})),
                 (revision.seam, now + 1, profile)]
-    is_open = scheduled_open(instant(now), calendar_from(phase, profile, explicit=True), closures=closures_from(profile))
+    from .live_session import session_status
+
+    is_open = session_status(target.identity, profile, now)['market_session'] != 'closed' and scheduled_open(
+        instant(now), calendar_from(phase, profile, explicit=True), closures=closures_from(profile))
     live = db.get(LiveState, target.id)
     owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
-    owned = bool(owner and owner.token and owner.expires > now and live and live.epoch == owner.epoch
+    owned = bool(owner and owner.error not in ('unauthorized', 'provider_maintenance')
+        and owner.token and owner.expires > now and live and live.epoch == owner.epoch
         and live.connection in ("connected", "recovering") and 0 <= now - max(live.heartbeat_at, live.received_at) <= 15000)
     if is_open and (not owned or not live.ready or live.error):
         return wait(alert, runtime, "stale", "确认来源断线、拥有者过期或恢复未就绪；等待补齐后建立新基准")

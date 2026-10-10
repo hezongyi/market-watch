@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_managed_quotes_with_history_plan_deliver_confirmed_updates ________
+tests/test_market_stream_quotes.py:167: in test_managed_quotes_with_history_plan_deliver_confirmed_updates
+    publish(calculator)
+tests/test_market_stream_quotes.py:27: in publish
+    payload, _ = calculator.build(work)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+alerts/market_stream_worker.py:133: in build
+    signal_value = stream.digest(self._signal(db, work, query))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+alerts/market_stream_worker.py:97: in _signal
+    preparation = [plan.status, plan.cursor, plan.error] if plan else None
+                                             ^^^^^^^^^^
+E   AttributeError: 'ChartHistoryPlan' object has no attribute 'error'
+=========================== short test summary info ============================
+FAILED tests/test_market_stream_quotes.py::test_managed_quotes_with_history_plan_deliver_confirmed_updates
+1 failed in 0.46s

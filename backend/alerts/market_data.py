@@ -228,6 +228,17 @@ class Activity(BaseModel):
 class QuoteQuery(BaseModel):
     symbols: list[str] = Field(min_length=1, max_length=100)
     client: str | None = Field(default=None, min_length=1, max_length=40)
+    composite_revision_id: str | None = Field(default=None, max_length=36)
+    input_revision: int | None = Field(default=None, ge=0)
+
+
+def demand_id(client, instrument_id, *, composite_revision_id=None):
+    import hashlib
+
+    lease_key = client + "|" + instrument_id
+    if composite_revision_id is not None:
+        lease_key += "|" + composite_revision_id
+    return hashlib.sha256(lease_key.encode()).hexdigest()[:40]
 
 
 def renew_demand(db, client, inst, *, composite_revision_id=None):
@@ -244,12 +255,7 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
     live_source = dataset and dataset.identity["source"] == "oanda"
     if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
         return
-    import hashlib
-
-    lease_key = client + "|" + inst.id
-    if composite_revision_id is not None:
-        lease_key += "|" + composite_revision_id
-    ident = hashlib.sha256(lease_key.encode()).hexdigest()[:40]
+    ident = demand_id(client, inst.id, composite_revision_id=composite_revision_id)
     demand = db.get(MarketDemand, ident)
     if not demand:
         demand = MarketDemand(id=ident, instrument_id=inst.id, composite_revision_id=composite_revision_id)
@@ -522,207 +528,7 @@ def router(authenticated):
 
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
-        result = []
-        # Fetch platform quotes before opening the managed read transaction.
-        # Platform watchlists never renew managed M1 demand.
-        managed = []
-        for ticker in dict.fromkeys(body.symbols):
-            try:
-                ident, kind = decode(ticker)
-            except ValueError as error:
-                raise HTTPException(422, str(error)) from error
-            if kind == "managed":
-                managed.append(ident)
-                continue
-            if kind in ("history", "composite"):
-                from .series_access import metadata
-                with transaction() as db:
-                    try:
-                        meta = metadata(db, ident, kind)
-                        values = {"short_name": meta["display_symbol"], "description": meta["name"] + (
-                            " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
-                        facts = None
-                        if kind == "composite":
-                            from .composite_quotes import snapshot
-                            from .series_access import composite_definition
-
-                            _, _, composite = composite_definition(db, ident)
-                            if composite:
-                                facts = snapshot(db, composite)
-                                if facts["price"] is not None:
-                                    values["lp"] = float(facts["price"])
-                                    if facts["price_type"] == "sampled_bid":
-                                        values["bid"] = values["lp"]
-                                values.update(quote_time=facts["observed_at"], price_type=facts["price_type"],
-                                    quote_ready=facts["quote_ready"], confirmed_tail_ready=facts["confirmed_tail_ready"],
-                                    quality=facts["quality"])
-                                values["description"] += " · " + ("抽样Bid" if facts["price_type"] == "sampled_bid" else
-                                    "保存的确认M1收盘" if facts["price"] is not None else "等待报价")
-                                if facts["observed_at"] is not None:
-                                    values["description"] += " · " + instant(facts["observed_at"]).strftime("%Y-%m-%d %H:%M UTC")
-                        # Watchlist metadata is pure, never a first-use command.
-                        result.append({"s": "ok", "n": ticker, "v": values,
-                                       **({"snapshot": facts} if facts else {})})
-                    except ValueError:
-                        result.append({"s": "error", "n": ticker, "v": {"description": "行情不可用，请查看数据中心"}})
-                continue
-            from .provider_chart import metadata, quote_page, quote_previous_close
-
-            try:
-                from .config import settings
-                deadline = time.monotonic() + settings.provider_request_seconds
-                meta = metadata(ident, deadline=deadline) if ident.startswith("YAHOO:") else metadata(ident)
-                if meta["source"] == "yahoo":
-                    from .provider_service import yahoo_quote
-                    snapshot = yahoo_quote(meta, deadline=deadline)
-                    stamp = snapshot["quote_time"]
-                    delay = snapshot["delay_seconds"]
-                    description = meta["name"] + " · Yahoo 市场报价"
-                    if stamp is not None:
-                        description += " · " + instant(stamp).strftime("%Y-%m-%d %H:%M UTC")
-                    description += " · 延迟 " + str(delay//60) + " 分钟" if delay is not None and delay>0 else " · 延迟未知" if delay is None else " · 实时"
-                    if snapshot["status"] != "ok":
-                        description += " · 抓取失败，保留上次报价"
-                    values = {"short_name":meta["display_symbol"], "description":description,
-                              "exchange":meta["exchange"], "lp":float(snapshot["price"]),
-                              "quote_time":stamp, "fetched_at":snapshot["fetched_at"],
-                              "delay_seconds":delay, "fetch_status":snapshot["status"]}
-                    previous = snapshot["previous_close"]
-                    if previous is not None and Decimal(previous) != 0:
-                        delta = Decimal(snapshot["price"])-Decimal(previous)
-                        values.update(ch=float(delta), chp=float(delta/Decimal(previous)*100),
-                                      prev_close_price=float(previous))
-                    result.append({"s":"ok", "n":ticker, "v":values,
-                                   **{k:snapshot[k] for k in ("quote_time","fetched_at","delay_seconds","status")}})
-                    continue
-                page = quote_page(meta)
-                latest = page["bars"][-1] if page["bars"] else None
-                values = {"short_name": meta["display_symbol"], "description": meta["display_symbol"] + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
-                          "exchange": meta["source"].upper()}
-                if latest:
-                    values["lp"] = float(latest["close"])
-                    if meta["basis"] == "bid":
-                        values["bid"] = values["lp"]
-                    elif meta["basis"] == "ask":
-                        values["ask"] = values["lp"]
-                    # Missing prior-session data must not hide a valid last price.
-                    try:
-                        previous = quote_previous_close(meta, latest)
-                        if previous is not None and previous > 0:
-                            delta = Decimal(latest["close"]) - previous
-                            values.update(ch=float(delta), chp=float(delta / previous * 100),
-                                          prev_close_price=float(previous))
-                    except Exception:
-                        pass
-                result.append({"s": "ok", "n": ticker, "v": values})
-            except Exception:
-                result.append({"s": "error", "n": ticker,
-                               "v": {"description": "平台报价暂不可用，请重试"}})
-        with transaction() as db:
-            for ident in managed:
-                if len(ident) > 80:
-                    raise HTTPException(422, "无效品种")
-                inst = db.get(Instrument, ident)
-                if body.client:
-                    try:
-                        inst = resolve(db, ident)
-                    except HTTPException:
-                        result.append(
-                            {"s": "error", "n": ident, "v": {"description": "品种暂不可用"}}
-                        )
-                        continue
-                    renew_demand(db, body.client, inst)
-                bar = (
-                    db.scalar(
-                        select(Bar)
-                        .where(Bar.instrument_id == ident, Bar.timeframe == "M1")
-                        .order_by(Bar.start.desc())
-                        .limit(1)
-                    )
-                    if inst
-                    else None
-                )
-                if not bar:
-                    if inst:
-                        result.append({"s": "ok", "n": ident, "quality": "pending", "v": {
-                            "short_name": display_code(inst.symbol, inst.source),
-                            "description": display_code(inst.symbol, inst.source) + " · 报价准备中",
-                            "exchange": inst.source.upper(),
-                        }})
-                    else:
-                        result.append({"s": "error", "n": ident,
-                                       "v": {"description": "未知品种"}})
-                    continue
-                values = {
-                    "lp": float(bar.close),
-                    "short_name": display_code(inst.symbol, inst.source),
-                    "description": display_code(inst.symbol, inst.source) + " · " + inst.basis + " · M1",
-                    "exchange": inst.source.upper(),
-                }
-                if inst.basis == "bid":
-                    values["bid"] = float(bar.close)
-                observed_now = now_ms()
-                age = max(0, observed_now - bar.end)
-                is_open = scheduled_open(
-                    instant(observed_now),
-                    calendar_for(inst),
-                    gold=is_gold(inst.id),
-                    closures=closures_from(inst.calendar_profile),
-                )
-                quality = "fresh" if age <= 180000 else "stale" if is_open else "closed"
-                label = {
-                    "fresh": "最近更新",
-                    "stale": "报价待更新",
-                    "closed": "按日历休市，最后报价",
-                }[quality]
-                values["description"] += (
-                    " · " + label + " · " + instant(bar.end).strftime("%Y-%m-%d %H:%M UTC")
-                )
-                session_start = ms(session_bounds(instant(bar.start), calendar_for(inst))[0])
-                previous = db.scalar(
-                    select(Bar)
-                    .where(
-                        Bar.instrument_id == ident,
-                        Bar.timeframe == "D1",
-                        Bar.complete.is_(True),
-                        Bar.end <= session_start,
-                    )
-                    .order_by(Bar.end.desc())
-                    .limit(1)
-                )
-                # Bound calendar scanning for old caches; a missing trading minute
-                # invalidates the previous-close reference, a scheduled closure does not.
-                if (
-                    previous
-                    and previous.close != 0
-                    and session_start - previous.end <= 14 * DAY
-                    and not has_trading_gap(
-                        instant(previous.end),
-                        instant(session_start),
-                        calendar_for(inst),
-                        gold=is_gold(inst.id),
-                        closures=closures_from(inst.calendar_profile),
-                    )
-                ):
-                    delta = bar.close - previous.close
-                    values.update(
-                        ch=float(delta),
-                        chp=float(delta / previous.close * 100),
-                        prev_close_price=float(previous.close),
-                    )
-                result.append(
-                    {
-                        "s": "ok",
-                        "n": ident,
-                        "v": values,
-                        "as_of": bar.end,
-                        "basis": inst.basis,
-                        "resolution": "M1",
-                        "quality": quality,
-                        "age_ms": age,
-                    }
-                )
-        return result
+        return quote_snapshot(body)
 
     @r.get("/catalog")
     def catalog(query: str = ""):
@@ -1198,3 +1004,210 @@ def instrument_catalog(query: str = "", *, limit=250):
     for row in dukascopy:
         row["search_status"] = search_status
     return _rank_catalog(result + dukascopy, query)[:limit]
+
+
+def quote_snapshot(body: QuoteQuery):
+    result = []
+    # Fetch platform quotes before opening the managed read transaction.
+    # Platform watchlists never renew managed M1 demand.
+    managed = []
+    for ticker in dict.fromkeys(body.symbols):
+        try:
+            ident, kind = decode(ticker)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        if kind == "managed":
+            managed.append(ident)
+            continue
+        if kind in ("history", "composite"):
+            from .series_access import metadata
+            with transaction() as db:
+                try:
+                    meta = metadata(db, ident, kind)
+                    shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
+                    values = {"short_name": shown, "description": meta["name"] + (
+                        " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
+                    facts = None
+                    if kind == "composite":
+                        from .composite_quotes import snapshot
+                        from .series_access import composite_definition
+
+                        _, _, composite = composite_definition(db, ident)
+                        if composite:
+                            facts = snapshot(db, composite, revision_id=body.composite_revision_id,
+                                             input_revision=body.input_revision)
+                            if facts["price"] is not None:
+                                values["lp"] = float(facts["price"])
+                                if facts["price_type"] == "sampled_bid":
+                                    values["bid"] = values["lp"]
+                            values.update(quote_time=facts["observed_at"], price_type=facts["price_type"],
+                                quote_ready=facts["quote_ready"], confirmed_tail_ready=facts["confirmed_tail_ready"],
+                                quality=facts["quality"])
+                            values["description"] += " · " + ("抽样Bid" if facts["price_type"] == "sampled_bid" else
+                                "保存的确认M1收盘" if facts["price"] is not None else "等待报价")
+                            if facts["observed_at"] is not None:
+                                values["description"] += " · " + instant(facts["observed_at"]).strftime("%Y-%m-%d %H:%M UTC")
+                    # Watchlist metadata is pure, never a first-use command.
+                    result.append({"s": "ok", "n": ticker, "v": values,
+                                   **({"snapshot": facts} if facts else {})})
+                except ValueError:
+                    result.append({"s": "error", "n": ticker, "v": {"description": "行情不可用，请查看数据中心"}})
+            continue
+        from .provider_chart import metadata, quote_page, quote_previous_close
+
+        try:
+            from .config import settings
+            deadline = time.monotonic() + settings.provider_request_seconds
+            meta = metadata(ident, deadline=deadline) if ident.startswith("YAHOO:") else metadata(ident)
+            shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
+            if meta["source"] == "yahoo":
+                from .provider_service import yahoo_quote
+                snapshot = yahoo_quote(meta, deadline=deadline)
+                stamp = snapshot["quote_time"]
+                delay = snapshot["delay_seconds"]
+                description = meta["name"] + " · Yahoo 市场报价"
+                if stamp is not None:
+                    description += " · " + instant(stamp).strftime("%Y-%m-%d %H:%M UTC")
+                description += " · 延迟 " + str(delay//60) + " 分钟" if delay is not None and delay>0 else " · 延迟未知" if delay is None else " · 实时"
+                if snapshot["status"] != "ok":
+                    description += " · 抓取失败，保留上次报价"
+                values = {"short_name":shown, "description":description,
+                          "exchange":meta["exchange"], "lp":float(snapshot["price"]),
+                          "quote_time":stamp, "fetched_at":snapshot["fetched_at"],
+                          "delay_seconds":delay, "fetch_status":snapshot["status"]}
+                previous = snapshot["previous_close"]
+                if previous is not None and Decimal(previous) != 0:
+                    delta = Decimal(snapshot["price"])-Decimal(previous)
+                    values.update(ch=float(delta), chp=float(delta/Decimal(previous)*100),
+                                  prev_close_price=float(previous))
+                result.append({"s":"ok", "n":ticker, "v":values,
+                               **{k:snapshot[k] for k in ("quote_time","fetched_at","delay_seconds","status")}})
+                continue
+            page = quote_page(meta)
+            latest = page["bars"][-1] if page["bars"] else None
+            values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
+                      "exchange": meta["source"].upper()}
+            if latest:
+                values["lp"] = float(latest["close"])
+                if meta["basis"] == "bid":
+                    values["bid"] = values["lp"]
+                elif meta["basis"] == "ask":
+                    values["ask"] = values["lp"]
+                # Missing prior-session data must not hide a valid last price.
+                try:
+                    previous = quote_previous_close(meta, latest)
+                    if previous is not None and previous > 0:
+                        delta = Decimal(latest["close"]) - previous
+                        values.update(ch=float(delta), chp=float(delta / previous * 100),
+                                      prev_close_price=float(previous))
+                except Exception:
+                    pass
+            result.append({"s": "ok", "n": ticker, "v": values})
+        except Exception:
+            result.append({"s": "error", "n": ticker,
+                           "v": {"description": "平台报价暂不可用，请重试"}})
+    with transaction() as db:
+        for ident in managed:
+            if len(ident) > 80:
+                raise HTTPException(422, "无效品种")
+            inst = db.get(Instrument, ident)
+            if body.client:
+                try:
+                    inst = resolve(db, ident)
+                except HTTPException:
+                    result.append(
+                        {"s": "error", "n": ident, "v": {"description": "品种暂不可用"}}
+                    )
+                    continue
+                renew_demand(db, body.client, inst)
+            bar = (
+                db.scalar(
+                    select(Bar)
+                    .where(Bar.instrument_id == ident, Bar.timeframe == "M1")
+                    .order_by(Bar.start.desc())
+                    .limit(1)
+                )
+                if inst
+                else None
+            )
+            if not bar:
+                if inst:
+                    result.append({"s": "ok", "n": ident, "quality": "pending", "v": {
+                        "short_name": display_code(inst.symbol, inst.source),
+                        "description": display_code(inst.symbol, inst.source) + " · 报价准备中",
+                        "exchange": inst.source.upper(),
+                    }})
+                else:
+                    result.append({"s": "error", "n": ident,
+                                   "v": {"description": "未知品种"}})
+                continue
+            values = {
+                "lp": float(bar.close),
+                "short_name": display_code(inst.symbol, inst.source),
+                "description": display_code(inst.symbol, inst.source) + " · " + inst.basis + " · M1",
+                "exchange": inst.source.upper(),
+            }
+            if inst.basis == "bid":
+                values["bid"] = float(bar.close)
+            observed_now = now_ms()
+            age = max(0, observed_now - bar.end)
+            is_open = scheduled_open(
+                instant(observed_now),
+                calendar_for(inst),
+                gold=is_gold(inst.id),
+                closures=closures_from(inst.calendar_profile),
+            )
+            quality = "fresh" if age <= 180000 else "stale" if is_open else "closed"
+            label = {
+                "fresh": "最近更新",
+                "stale": "报价待更新",
+                "closed": "按日历休市，最后报价",
+            }[quality]
+            values["description"] += (
+                " · " + label + " · " + instant(bar.end).strftime("%Y-%m-%d %H:%M UTC")
+            )
+            session_start = ms(session_bounds(instant(bar.start), calendar_for(inst))[0])
+            previous = db.scalar(
+                select(Bar)
+                .where(
+                    Bar.instrument_id == ident,
+                    Bar.timeframe == "D1",
+                    Bar.complete.is_(True),
+                    Bar.end <= session_start,
+                )
+                .order_by(Bar.end.desc())
+                .limit(1)
+            )
+            # Bound calendar scanning for old caches; a missing trading minute
+            # invalidates the previous-close reference, a scheduled closure does not.
+            if (
+                previous
+                and previous.close != 0
+                and session_start - previous.end <= 14 * DAY
+                and not has_trading_gap(
+                    instant(previous.end),
+                    instant(session_start),
+                    calendar_for(inst),
+                    gold=is_gold(inst.id),
+                    closures=closures_from(inst.calendar_profile),
+                )
+            ):
+                delta = bar.close - previous.close
+                values.update(
+                    ch=float(delta),
+                    chp=float(delta / previous.close * 100),
+                    prev_close_price=float(previous.close),
+                )
+            result.append(
+                {
+                    "s": "ok",
+                    "n": ident,
+                    "v": values,
+                    "as_of": bar.end,
+                    "basis": inst.basis,
+                    "resolution": "M1",
+                    "quality": quality,
+                    "age_ms": age,
+                }
+            )
+    return result

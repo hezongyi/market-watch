@@ -69,6 +69,10 @@ type Composite = {
   health: {
     connection: string;
     quote_ready: boolean;
+    market_session: string;
+    next_session_at: number | null;
+    authentication_hold: boolean;
+    connection_error: string | null;
     confirmed_tail_ready: boolean;
     quote_age_ms: number | null;
     strategy_readiness: string;
@@ -97,6 +101,9 @@ const statusNames: Record<string, string> = {
   inactive: "未在采集",
   receiving: "确认尾部正常",
   recovering: "确认尾部恢复中",
+  market_closed: "市场已闭市，历史仍可查看",
+  provider_maintenance: "OANDA 上游维护中",
+  unauthorized: "OANDA 鉴权失败，等待账户与报价校验",
   attention: "需处理",
   account_changed: "实时账户已改变",
   queried: "固定区间已查询",

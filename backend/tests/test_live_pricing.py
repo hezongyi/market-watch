@@ -84,6 +84,28 @@ def test_quotes_are_source_isolated_forming_has_no_fake_volume_and_duplicate_ord
     assert report["quotes"]["max_interarrival_ms"] == 1000
 
 
+def test_publish_reports_committed_outcomes_without_refreshing_rejected_quotes(running):
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+
+    def publish(event):
+        return live.publish_event(ownership, epoch, event, identities, now=125000)
+
+    assert publish(quote(identity, epoch, seq=5)) == "accepted"
+    # Old source takes precedence when both source time and sequence are old.
+    assert publish(quote(identity, epoch, seq=4, source=120000)) == "rejected_old_source"
+    assert publish(quote(identity, epoch, seq=5, source=122000)) == "rejected_sequence"
+    assert publish(quote(identity, epoch, seq=6, received_at=124000)) == "rejected_duplicate"
+    with factory.begin() as db:
+        state = db.get(LiveState, identity.key)
+        assert state.quote["source_time"] == 121000 and state.received_at == 122000
+    # An unchanged price with a newer source timestamp is an accepted update.
+    assert publish(quote(identity, epoch, seq=7, source=122000)) == "accepted"
+    assert publish({"type": "heartbeat", "received_at": 124000,
+                    "connection_epoch": epoch}) == "heartbeat"
+    assert live.measurements(identity.key)["quotes"]["samples"] == 2
+
+
 def test_old_connection_epoch_messages_are_rejected_even_when_token_is_same(running):
     _, ownership, epoch, identities = running
     next_epoch = live.begin_connection(ownership, identities, now=126000)
@@ -291,7 +313,7 @@ def test_unauthorized_holds_configuration_fault_without_reconnect_storm(running)
     assert live.claim("test-account", now=999999) is None
     with db_factory.begin() as db:
         assert db.get(PricingOwner, ownership[0]).error == "unauthorized"
-    assert all(row["quality"] == "unavailable" and not row["fallback_ready"]
+    assert all(row["quality"] == "unauthorized" and not row["fallback_ready"]
                for row in live.snapshots(now=125000))
 
 

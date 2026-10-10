@@ -99,13 +99,30 @@ def _metadata(db, ident, kind, *, composite_context=None):
         "volume_unit": volume_unit, **binding}
 
 
-def chart_data(db, body):
+def chart_data(db, body, *, realtime=None):
     from .composite_chart import chart_page as composite_page
     from .history_artifacts import chart_page as history_page
     from .market_data import renew_demand
 
-    stamp = now_ms()
     meta = metadata(db, body.instrument, body.series_kind)
+    if body.series_kind == "composite":
+        from .config import settings
+        from .live_pricing import account_key
+        from .storage import LiveState, PricingOwner
+
+        composite = db.get(MarketComposite, body.instrument)
+        if composite:
+            selected = db.get(CompositeRevision, body.composite_revision_id or composite.active_revision_id)
+            if not selected or selected.composite_id != composite.id:
+                raise ValueError("组合修订不属于当前组合")
+            mapping = db.get(RealtimeMapping, selected.mapping_id)
+            # Strong references keep SQLAlchemy's weak identity map on this
+            # source observation throughout the history/aggregation read.
+            _live_observation = (db.get(LiveState, mapping.target_dataset_id),
+                                 db.get(PricingOwner, account_key(settings.oanda_account_id)))
+    # Evaluate freshness after the source snapshot, never before IO that can
+    # read a newly received quote and mistake it for future data.
+    stamp = now_ms()
     if body.series_kind == "history":
         parent = db.get(HistoryVersion, body.instrument)
         page = history_page(db, parent.id, body.timeframe, before=body.before, count=body.limit)
@@ -123,7 +140,7 @@ def chart_data(db, body):
             raise ValueError("组合尚未建立；请从图表实际使用入口打开")
         page = composite_page(db, composite.id, body.timeframe, before=body.before, count=body.limit,
             revision_id=body.composite_revision_id, input_revision=body.input_revision,
-            provisional=body.provisional and body.input_revision is None, now=stamp)
+            provisional=body.provisional and body.input_revision is None, now=stamp, realtime=realtime)
         selected = db.get(CompositeRevision, page["revision_id"])
         parent = db.get(HistoryVersion, selected.history_version_id)
         meta["calendar"] = selected.rules["aggregation_calendar"]

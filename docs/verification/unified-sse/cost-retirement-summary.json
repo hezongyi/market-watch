@@ -1,0 +1,60 @@
+[
+  {
+    "project": "mw-unified-sse-baseline-20261009",
+    "task": "mw-unified-sse-baseline-20261009",
+    "archive_directory": "/home/quant/.local/share/market-watch-docker/archives/mw-unified-sse-baseline-20261009-20261009T133746-e2e9ee73",
+    "restore_verified": true,
+    "removed_container_count": 11,
+    "removed_volumes": [
+      "mw-unified-sse-baseline-20261009_postgres-data"
+    ],
+    "removed_networks": [
+      "e91f669e16aa"
+    ],
+    "archive_dump_hashes_match": true,
+    "remaining_project_containers_volumes_networks": 0,
+    "databases": [
+      {
+        "database": "alerts",
+        "sha256": "12b38cdd861e26d5eeb709bf4c42396139eb9d5b77fa89e29c0b92168b47c46a",
+        "public_table_count": 83,
+        "actual_restore_verified": true
+      },
+      {
+        "database": "postgres",
+        "sha256": "cc993005939dcb280443847163912dd08ee4557d2928e30158f96db6f340056a",
+        "public_table_count": 0,
+        "actual_restore_verified": true
+      }
+    ]
+  },
+  {
+    "project": "mw-unified-sse-lease-optimization",
+    "task": "mw-unified-sse-lease-optimization",
+    "archive_directory": "/home/quant/.local/share/market-watch-docker/archives/mw-unified-sse-lease-optimization-20261009T134050-f06cdc6b",
+    "restore_verified": true,
+    "removed_container_count": 12,
+    "removed_volumes": [
+      "mw-unified-sse-lease-optimization_postgres-data"
+    ],
+    "removed_networks": [
+      "077a26ebe2f5"
+    ],
+    "archive_dump_hashes_match": true,
+    "remaining_project_containers_volumes_networks": 0,
+    "databases": [
+      {
+        "database": "alerts",
+        "sha256": "f2219a27e46c2da04dab2d16fb4c1d4a223d68e42b7648f1083a8038e11e4014",
+        "public_table_count": 87,
+        "actual_restore_verified": true
+      },
+      {
+        "database": "postgres",
+        "sha256": "b77d80a1d93cb8c14f958ed2e389b363d9a3307f815c1e41beab981f5a3aeb9a",
+        "public_table_count": 0,
+        "actual_restore_verified": true
+      }
+    ]
+  }
+]

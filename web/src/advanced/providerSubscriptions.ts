@@ -14,6 +14,7 @@ export function providerSubscriptions(
   connect: (client: string) => Stream,
   receive: (event: any) => void,
   failure: (error: unknown) => void,
+  paths = {subscribe: '/charts/provider/subscribe', unsubscribe: '/charts/provider/unsubscribe'},
 ) {
   let disposed = false;
   const desired = new Map<string, Subscription>();
@@ -38,10 +39,14 @@ export function providerSubscriptions(
     return next;
   }
   function unsubscribe(args: Subscription) {
+    const current = desired.get(keyOf(args));
+    if (current?.generation != null && args.generation != null &&
+        Number(args.generation) < Number(current.generation)) return Promise.resolve();
     desired.delete(keyOf(args));
     closeUnused(args.client);
     return enqueue(args, async () => {
-      await request('/charts/provider/unsubscribe', {client: args.client, listener: args.listener});
+      await request(paths.unsubscribe, {client: args.client, listener: args.listener,
+        ...(args.generation != null ? {generation: args.generation} : {})});
     });
   }
   function open(client: string) {
@@ -53,7 +58,7 @@ export function providerSubscriptions(
       for (const current of desired.values()) if (current.client === client)
         void enqueue(current, async () => {
           if (!disposed && desired.get(keyOf(current)) === current)
-            await request('/charts/provider/subscribe', current);
+            await request(paths.subscribe, current);
         });
     };
     stream.onerror = () => {
@@ -72,13 +77,26 @@ export function providerSubscriptions(
       try {
         const value = JSON.parse(event.data);
         const current = desired.get(client + '|' + value.listener);
-        if (current) {
+        const epochChanged = current?.result_epoch != null && value.result_epoch != null &&
+          value.result_epoch !== current.result_epoch;
+        if (current && (current.generation == null || value.generation === current.generation) &&
+            (epochChanged || current.sequence == null || value.sequence > Number(current.sequence))) {
+          if (epochChanged) current.sequence = 0;
+          if (value.result_epoch != null) current.result_epoch = value.result_epoch;
           receive(value);
           if(value.type === 'bars') {
-            current.cursor=value.cursor;
-            current.revision=value.revision;
-            current.observed_at=value.as_of;
+            if(value.cursor != null) current.cursor=value.cursor;
+            else if(value.bars?.length) current.cursor=value.bars.at(-1).chart_time ?? value.bars.at(-1).start;
+            if(value.revision != null) current.revision=value.revision;
+            if(value.as_of != null) current.observed_at=value.as_of;
+            for (const name of ['loaded_before', 'history_revision', 'history_tail_revision', 'initial_input_revision'])
+              if (value[name] != null) current[name] = value[name];
           }
+          if (value.type === 'quotes') {
+            const binding = value.quotes?.find((quote: any) => quote.snapshot)?.snapshot?.revision_id;
+            if (binding != null) current.binding = binding;
+          }
+          if (value.sequence != null) current.sequence = value.sequence;
         }
       } catch (error) { failure(error); }
     };
@@ -89,7 +107,7 @@ export function providerSubscriptions(
       desired.set(keyOf(args), args);
       return enqueue(args, async () => {
         if (disposed || desired.get(keyOf(args)) !== args) return;
-        await request('/charts/provider/subscribe', args);
+        await request(paths.subscribe, args);
         if (disposed || desired.get(keyOf(args)) !== args) return;
         if (!retries.has(args.client)) open(args.client);
       });

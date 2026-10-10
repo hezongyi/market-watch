@@ -1,0 +1,19 @@
+{
+  "passed": false,
+  "environment": "Ubuntu isolated Docker",
+  "synthetic": true,
+  "errors": [
+    {
+      "message": "Value is null",
+      "stack": "Error: Value is null\n    at r (http://127.0.0.1:15674/charting_library_BASE/bundles/41890.26660955cd3bff3b75c4.js:1:243)\n    at Vg.model (http://127.0.0.1:15674/charting_library_BASE/bundles/library.e2f8b3a016c9e1a0b7a5.js:712:2191)\n    at oa.componentWillUnmount (http://127.0.0.1:15674/charting_library_BASE/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js:28:2707)\n    at mi (http://127.0.0.1:15674/charting_library_BASE/bundles/29365.5b7877a63c3aafa14f69.js:32:1197)\n    at pi (http://127.0.0.1:15674/charting_library_BASE/bundles/29365.5b7877a63c3aafa14f69.js:32:298)\n    at mi (http://127.0.0.1:15674/charting_library_BASE/bundles/29365.5b7877a63c3aafa14f69.js:32:495)\n    at pi (http://127.0.0.1:15674/charting_library_BASE/bundles/29365.5b7877a63c3aafa14f69.js:32:298)\n    at mi (http://127.0.0.1:15674/charting_library_BASE/bundles/29365.5b7877a63c3aafa14f69.js:32:1047)\n    at pi (http://127.0.0.1:15674/charting_library_BASE/bundles/29365.5b7877a63c3aafa14f69.js:32:298)\n    at mi (http://127.0.0.1:15674/charting_library_BASE/bundles/29365.5b7877a63c3aafa14f69.js:32:1047)"
+    }
+  ],
+  "charts": {
+    "count": 1,
+    "symbols": [
+      "SSEFIXTURE"
+    ],
+    "ready": true
+  },
+  "failure": "No startup page exceptions\n\n1 !== 0\n"
+}

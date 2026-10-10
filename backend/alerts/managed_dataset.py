@@ -47,11 +47,13 @@ def date_start(inst, value):
 
 
 def join(db, inst, start, now):
+    from .chart_history_plan import lock_plan_instrument
+
     end = (now - 5000) // 60000 * 60000
     if start < 0 or start % 60000 or start >= end:
         raise ValueError("历史起点必须早于最新已完成分钟")
-    db.scalar(select(Instrument).where(Instrument.id == inst.id).with_for_update())
-    plan = db.get(ChartHistoryPlan, inst.id)
+    lock_plan_instrument(db, inst.id)
+    plan = db.get(ChartHistoryPlan, inst.id, populate_existing=True)
     if plan is None:
         plan = ChartHistoryPlan(
             instrument_id=inst.id,
@@ -483,6 +485,7 @@ def adopt_legacy_once(*, limit=None):
     maintenance setting. A disabled catalog entry with no stored coverage is
     never adopted merely because somebody searched or opened its chart.
     """
+    from .chart_history_plan import lock_plan_instrument
     from .market import stored_coverage
     from .storage import MarketCoverage
 
@@ -494,7 +497,7 @@ def adopt_legacy_once(*, limit=None):
         ids = list(db.scalars(query.limit(limit) if limit is not None else query))
     for ident in ids:
         with transaction() as db:
-            inst = db.scalar(select(Instrument).where(Instrument.id == ident).with_for_update(skip_locked=True))
+            inst = lock_plan_instrument(db, ident, skip_locked=True)
             if inst is None:
                 continue
             if db.get(ChartHistoryPlan, ident):
@@ -606,13 +609,13 @@ def read_rows(db, inst, frame, before, limit, *, dataset_start=None):
 
 def published_history_check(db, inst, pub, visible, body):
     """Fingerprint a stable session prefix, excluding appends and the streamed last bar."""
-    if not body.track_history or not visible or pub is None:
+    if not visible or pub is None:
         return None
     next_before = visible[-1]["start"]
     before = body.revision_before or next_before
     after = body.revision_after
-    lower = after or 0
-    if after is not None and body.timeframe in ("D1", "W1", "MN"):
+    lower = 0 if body.indicators else after or 0
+    if not body.indicators and after is not None and body.timeframe in ("D1", "W1", "MN"):
         # The datafeed reports UTC trading-date labels; published keys are session opens.
         lower = date_start(inst, instant(after).date().isoformat())
     lower = max(pub.start, body.dataset_start or pub.start, lower)
@@ -628,9 +631,24 @@ def published_history_check(db, inst, pub, visible, body):
         )).one()
         return hashlib.sha256(json.dumps(list(stamp)).encode()).hexdigest()
 
+    def tail_fingerprint(boundary):
+        revision = db.scalar(select(ChartPublishedBar.revision).where(
+            ChartPublishedBar.instrument_id == inst.id,
+            ChartPublishedBar.timeframe == body.timeframe,
+            ChartPublishedBar.start == boundary))
+        return hashlib.sha256(json.dumps(revision).encode()).hexdigest()
+
+    if not body.track_history:
+        tail_revision = tail_fingerprint(next_before)
+        return dict(before=next_before, after=after, tail_revision=tail_revision,
+                    next_tail_revision=tail_revision)
+
     revision = fingerprint(before)
+    tail_revision = tail_fingerprint(before)
     return dict(before=before, after=after, revision=revision, next_before=next_before,
-                next_revision=revision if before == next_before else fingerprint(next_before))
+                next_revision=revision if before == next_before else fingerprint(next_before),
+                tail_revision=tail_revision,
+                next_tail_revision=tail_revision if before == next_before else tail_fingerprint(next_before))
 
 
 def data(body):

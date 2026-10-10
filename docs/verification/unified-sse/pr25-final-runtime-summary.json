@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "environment": "Ubuntu local Docker / real OANDA Practice",
+  "business_commit": "0ba1d2856950b26b93d94836ac290ba84e11d6a8",
+  "task": "mw-unified-sse-20261008",
+  "first_screen": {
+    "passed": true,
+    "checks": [
+      "real Practice fixed M1 history and stream-backed composite update licensed chart through SSE",
+      "real composite first screen receives bars after idle without a period switch"
+    ],
+    "runtime_image_commit": "0ba1d2856950b26b93d94836ac290ba84e11d6a8"
+  },
+  "owner_restart_and_account_switch": {
+    "passed": true,
+    "checks": [
+      "real supplier demand with all bars closed keeps native quote callback delivery",
+      "real pricing worker stop retracts sampled-BID readiness; restart restores actual source prices",
+      "real alternate Practice account delivers separately; original history/identity preserved, old account sampled prices fenced, original account restored",
+      "after final browser cancellation real OANDA prices and tick rule evaluation continue for independent active watch",
+      "last independent demand release removes real source from desired acquisition"
+    ],
+    "runtime_image_commit": "0ba1d2856950b26b93d94836ac290ba84e11d6a8"
+  },
+  "harness_sha256": "5fb9140201190e6d76b8ec7be520503950a2bfc45462d1e3eb147902e71ef948",
+  "fixture_sha256": "69642b72731dac41b8003f29bcb58cd8f704fcda4ab74919178ba345d770f5a7",
+  "checks": [
+    "real composite first screen receives bars after idle without a period switch",
+    "real pricing worker stop retracts sampled-BID readiness and restart restores source prices",
+    "real alternate Practice account receives separately; original account restored and old account fenced",
+    "independent active watch continues source updates and evaluation after browser cancellation",
+    "final test-owned demand release removes its source from desired acquisition"
+  ],
+  "errors": []
+}

@@ -108,7 +108,7 @@ def aggregate(minutes, frame, *, phase, seam, segments, revision_id, input_revis
 
 
 def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_revision=None,
-                provisional=False, now=None, permission_scope="workspace:default"):
+                provisional=False, now=None, permission_scope="workspace:default", realtime=None):
     """Read a bounded minute partition; outer pagination/materialization owns long history."""
     stamp = now_ms() if now is None else now
     composite = db.get(MarketComposite, composite_id)
@@ -133,6 +133,10 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
         raise ValueError("Invalid fixed composite input revision")
     phase = revision.rules["aggregation_calendar"]
     left, right = period(start, frame, phase)[0], period(end - 1, frame, phase)[1]
+    if realtime and period(left, frame, phase)[1] != right:
+        # This optimization applies only to one bucket; ordinary bounded
+        # multi-bucket partitions remain on the authoritative reader.
+        realtime = None
     history_meta = {"source_id": collection_identity(version.manifest["identity"]).key,
         "profile": version.manifest.get("calendar_profile", {}),
         "volume_kind": version.manifest["volume_kind"], "volume_unit": version.manifest["volume_unit"],
@@ -140,25 +144,39 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
     target_meta = {"source_id": collection_identity(target.identity).key, "profile": target_inst.calendar_profile,
         "volume_kind": target.volume_kind, "volume_unit": target.volume_unit,
         "input": {"composite_revision_id": revision.id, "input_revision": value}}
+    segments = {"history": history_meta, "target": target_meta}
+    # Only the shared worker supplies this cache. Public historical reads keep
+    # their fixed-input behavior and never depend on mutable worker state.
+    state = realtime.state(db, revision, frame, left, right, value, version, segments) if realtime else None
     minutes = []
     history_left, history_right = max(left, version.start), min(right, revision.seam, version.end)
-    if history_left < history_right:
+    if state is None and history_left < history_right:
         minutes.extend({**row, "segment": "history", "source_id": history_meta["source_id"],
             "volume_kind": history_meta["volume_kind"], "volume_unit": history_meta["volume_unit"]}
             for row in snapshot_rows(db, version.id, start=history_left, end=history_right))
     tail_left = max(left, revision.seam)
-    if tail_left < right:
+    if state is None and tail_left < right:
         minutes.extend({**row, "segment": "target"} for row in tail_rows(db, revision.id, tail_left, right,
                                                                          input_revision=value))
+    if realtime and state is None:
+        state = realtime.initialize(revision, frame, left, version, segments, value, minutes)
+    if state:
+        # The old temporary minute is removed even when no new quote arrives,
+        # owner validity changes, or the next minute is not yet REST-confirmed.
+        for at in list(state.stats["target"]["provisional"]):
+            state.remove(at)
     if provisional:
         from .config import settings
         from .history_catalog import account_scope
         from .live_pricing import account_key
+        from .live_session import session_status
 
         live = db.get(LiveState, target.id)
         owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
         forming = live.forming if live else {}
-        if (owner and owner.token and owner.expires > stamp and live and owner.epoch == live.epoch
+        if (owner and owner.error not in ('unauthorized', 'provider_maintenance')
+                and session_status(target.identity, target_meta['profile'], stamp)['market_session'] != 'closed'
+                and owner.token and owner.expires > stamp and live and owner.epoch == live.epoch
                 and target.identity["account_scope"] == account_scope()
                 and live.connection in ("connected", "recovering") and forming and live.quote.get("tradeable")
                 and live.quote.get("bid") is not None and live.quote.get("ask") is not None
@@ -167,15 +185,22 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
                 and 0 <= stamp - live.received_at <= 15000
                 and forming.get("connection_epoch") == live.epoch
                 and tail_left <= forming["start"] < right
-                and not any(row["timestamp"] == forming["start"] for row in minutes)):
+                and not (forming["start"] in state.rows if state else
+                         any(row["timestamp"] == forming["start"] for row in minutes))):
             minutes.append({**forming, "timestamp": forming["start"], "segment": "target",
                 "source_id": target_meta["source_id"], "volume_kind": "unavailable", "volume_unit": None,
                 "provisional_input": {"epoch": live.epoch, "live_revision": live.revision,
                     "observed_at": live.received_at, "minute": dict(forming)}})
             minutes.sort(key=lambda row: row["timestamp"])
-    bars = aggregate(minutes, frame, phase=phase, seam=revision.seam,
-        segments={"history": history_meta, "target": target_meta}, revision_id=revision.id,
-        input_revision=value, now=stamp, history_start=version.start)
+    if state:
+        for row in minutes:
+            state.replace(row)
+        result = state.result(input_revision=value, now=stamp, segments=segments)
+        bars = [result] if result else []
+    else:
+        bars = aggregate(minutes, frame, phase=phase, seam=revision.seam,
+            segments=segments, revision_id=revision.id,
+            input_revision=value, now=stamp, history_start=version.start)
     return {"composite_id": composite.id, "revision_id": revision.id, "input_revision": value,
         "history_version_id": version.id, "seam": revision.seam, "timeframe": frame,
         "bars": [row for row in bars if start <= row["start"] < end],

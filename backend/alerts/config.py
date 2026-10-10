@@ -46,9 +46,15 @@ class Settings(BaseSettings):
     oanda_calendar_version: str = "ny17-candidate-v1"
     oanda_calendar_verified: bool = False
     oanda_calendar_profiles: dict[str, dict] = Field(default_factory=dict)
+    # Status/scheduling evidence may be reviewed without reinterpreting an
+    # immutable history calendar. Identity and finite applicability still apply.
+    oanda_live_session_profiles: dict[str, dict] = Field(default_factory=dict)
     oanda_recovery_minutes: int = Field(default=1500, ge=120, le=20000)
     oanda_stream_lease_seconds: int = Field(default=30, ge=20, le=90)
     oanda_idle_grace_seconds: int = Field(default=60, ge=0, le=900)
+    oanda_auth_probe_seconds: int = Field(default=300, ge=300, le=86400)
+    oanda_maintenance_probe_seconds: int = Field(default=300, ge=60, le=3600)
+    oanda_closed_probe_seconds: int = Field(default=900, ge=300, le=3600)
     session_hours: int = 24
     market_poll_seconds: int = 15
     coverage_projection_enabled: bool = True

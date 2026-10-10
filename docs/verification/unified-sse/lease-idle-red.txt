@@ -1,0 +1,10 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_idle_connection_does_not_rewrite_all_leases_each_delivery_poll ______
+backend/tests/test_market_stream_io_budget.py:31: in test_idle_connection_does_not_rewrite_all_leases_each_delivery_poll
+    assert not statements, (
+E   AssertionError: Six idle delivery polls rewrote leases 36 times; the 120-second lease must be renewed at a bounded cadence
+E   assert not ['INSERT INTO market_stream_clients (id, session_hash, client, expires) VALUES (?, ?, ?, ?) ON CONFLICT (id) DO NOTHIN...T INTO market_stream_clients (id, session_hash, client, expires) VALUES (?, ?, ?, ?) ON CONFLICT (id) DO NOTHING', ...]
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_stream_io_budget.py::test_idle_connection_does_not_rewrite_all_leases_each_delivery_poll
+1 failed in 0.28s

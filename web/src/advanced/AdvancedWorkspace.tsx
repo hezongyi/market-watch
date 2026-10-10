@@ -235,15 +235,20 @@ export default function AdvancedWorkspace() {
       api,
       (client) =>
         new EventSource(
-          "/api/charts/provider/events?client=" + encodeURIComponent(client),
+          "/api/charts/stream/events?client=" + encodeURIComponent(client),
         ),
       (event) =>
         frame.current?.contentWindow?.postMessage(
-          { channel, type: "provider-event", event },
+          { channel, type: "market-event", event },
           origin,
         ),
       (error) => setError(String(error)),
+      {subscribe: '/charts/stream/subscribe', unsubscribe: '/charts/stream/unsubscribe'},
     );
+    const legacyProvider = providerSubscriptions(api,
+      client => new EventSource('/api/charts/provider/events?client=' + encodeURIComponent(client)),
+      event => frame.current?.contentWindow?.postMessage({channel, type:'provider-event', event}, origin),
+      error => setError(String(error)));
     const listener = async (e: MessageEvent) => {
       if (
         e.source !== frame.current?.contentWindow ||
@@ -266,7 +271,7 @@ export default function AdvancedWorkspace() {
       if (m.type === "data-center-api") {
         const q = m.query;
         if (mobile || !Number.isSafeInteger(m.id) || m.id <= 0 || !q || q.session !== centerSession.current || typeof q.path !== "string" || q.path.length > 4000 ||
-          JSON.stringify(q).length > 100000 || !/^\/market-data\/(?:center|datasets|history-catalog|date-boundary|composites|tasks|versions|series|resolve|capabilities|sources)(?:\/[A-Za-z0-9_-]+)*(?:\?[^#]*)?$/.test(q.path) && q.path !== "/charts/provider/configure") {
+          JSON.stringify(q).length > 100000 || !/^\/market-data\/(?:center|datasets|history-catalog|date-boundary|composites|tasks|versions|series|resolve|capabilities|sources|live)(?:\/[A-Za-z0-9_-]+)*(?:\?[^#]*)?$/.test(q.path) && q.path !== "/charts/provider/configure") {
           reply({type:"result",id:m.id,error:"数据中心请求不允许",errorDetails:{status:403,code:"FORBIDDEN"}});return;
         }
         const controller = new AbortController();
@@ -318,8 +323,9 @@ export default function AdvancedWorkspace() {
         return;
       }
       if (
-        m.type === "provider-subscribe" ||
-        m.type === "provider-unsubscribe"
+        m.type === "market-subscribe" ||
+        m.type === "market-unsubscribe" ||
+        m.type === "provider-subscribe" || m.type === "provider-unsubscribe"
       ) {
         const args = m.args;
         if (
@@ -330,10 +336,11 @@ export default function AdvancedWorkspace() {
         )
           return;
         try {
-          if (m.type === "provider-subscribe") {
-            await provider.subscribe(args);
+          const transport = m.type.startsWith('provider-') ? legacyProvider : provider;
+          if (m.type.endsWith('-subscribe')) {
+            await transport.subscribe(args);
           } else {
-            await provider.unsubscribe(args);
+            await transport.unsubscribe(args);
           }
         } catch (error) {
           setError(String(error));
@@ -547,6 +554,7 @@ export default function AdvancedWorkspace() {
       }
       if (m.type === "loaded") {
         await provider.clear();
+        await legacyProvider.clear();
         try {
           if (!mobile) await api("/advanced-charts/preferences/migrate", {});
           const [catalog, preferences, capabilities] = await Promise.all([
@@ -603,7 +611,7 @@ export default function AdvancedWorkspace() {
           deepCenter.current = null;
           const url = new URL(location.href); url.searchParams.delete("data_center"); history.replaceState(null, "", url.pathname + url.search);
         }
-        setStatus("已加载 · 行情每15秒检查");
+        setStatus("已加载 · 行情按需更新");
       } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
         setSyncNotices((previous) => {
@@ -1182,6 +1190,7 @@ export default function AdvancedWorkspace() {
     return () => {
       removeEventListener("message", listener);
       void provider.dispose();
+      void legacyProvider.dispose();
       for (const requests of marketRequests.values())
         for (const controller of requests.values()) controller.abort();
     };
@@ -1300,7 +1309,7 @@ export default function AdvancedWorkspace() {
           ref={frame}
           title="专业图表工作区"
           data-workspace-id={active.id}
-          src={`${origin}/?parent=${encodeURIComponent(location.origin)}`}
+          src={`${origin}/?parent=${encodeURIComponent(location.origin)}${new URLSearchParams(location.search).get('marketPolling') === '1' ? '&marketPolling=1' : ''}`}
           sandbox="allow-scripts allow-same-origin allow-downloads allow-forms"
           allowFullScreen
           referrerPolicy="no-referrer"

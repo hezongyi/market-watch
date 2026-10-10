@@ -1,0 +1,733 @@
+{
+  "environment": "Ubuntu local Docker, 4 vCPU / approximately 16 GiB, other existing tasks remained running",
+  "runs": [
+    {
+      "scenario": "single-period",
+      "arm": "baseline",
+      "project": "mw-unified-sse-baseline-20261009",
+      "runtime_image_commit": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "seed_at": 1791548400000,
+      "duration_ms": 60004,
+      "input_count": 10,
+      "input_interval_ms": 5000,
+      "native_callbacks": 4,
+      "window_request_counts": {
+        "/api/market-data/quotes": 4,
+        "/api/charts/data": 4
+      },
+      "cpu_average_cores": 0.3858606407829048,
+      "working_set_average_bytes": 931073417.8461539,
+      "wal_bytes": 755874,
+      "db_activity_delta": {
+        "xact_commit": 2641,
+        "xact_rollback": 10,
+        "blks_read": 10,
+        "blks_hit": 33255,
+        "tup_returned": 53117,
+        "tup_fetched": 16398,
+        "tup_inserted": 535,
+        "tup_updated": 1091,
+        "tup_deleted": 337
+      },
+      "database_size_delta_bytes": 0,
+      "pg_tx_bytes": 2590653,
+      "web_tx_bytes": 76647,
+      "service_resources": {
+        "api": {
+          "elapsed_seconds": 60.0257887840271,
+          "cpu_seconds": 16.334795000000014,
+          "average_cpu_cores": 0.2721296184673664,
+          "working_set_average_bytes": 181882564.92307693,
+          "working_set_peak_bytes": 267235328,
+          "network_rx_bytes": 797324,
+          "network_tx_bytes": 452501
+        },
+        "postgres": {
+          "elapsed_seconds": 60.02336859703064,
+          "cpu_seconds": 2.0455789999999894,
+          "average_cpu_cores": 0.034079710083135595,
+          "working_set_average_bytes": 69248236.3076923,
+          "working_set_peak_bytes": 70955008,
+          "network_rx_bytes": 1322194,
+          "network_tx_bytes": 2590653
+        },
+        "web": {
+          "elapsed_seconds": 60.022785902023315,
+          "cpu_seconds": 0.014411000000000007,
+          "average_cpu_cores": 0.00024009215472809675,
+          "working_set_average_bytes": 5812224.0,
+          "working_set_peak_bytes": 5812224,
+          "network_rx_bytes": 71025,
+          "network_tx_bytes": 76647
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.022228956222534,
+          "cpu_seconds": 0.0,
+          "average_cpu_cores": 0.0,
+          "working_set_average_bytes": 10326016.0,
+          "working_set_peak_bytes": 10326016,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.02129769325256,
+          "cpu_seconds": 0.25497899999999873,
+          "average_cpu_cores": 0.004248142072887285,
+          "working_set_average_bytes": 98167886.76923077,
+          "working_set_peak_bytes": 98168832,
+          "network_rx_bytes": 89439,
+          "network_tx_bytes": 74018
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.02043128013611,
+          "cpu_seconds": 0.6613630000000015,
+          "average_cpu_cores": 0.011018964474167,
+          "working_set_average_bytes": 108980381.53846154,
+          "working_set_peak_bytes": 108982272,
+          "network_rx_bytes": 213285,
+          "network_tx_bytes": 163503
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.01957440376282,
+          "cpu_seconds": 0.1402479999999997,
+          "average_cpu_cores": 0.0023367043400962057,
+          "working_set_average_bytes": 99724051.6923077,
+          "working_set_peak_bytes": 99737600,
+          "network_rx_bytes": 58306,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.01903438568115,
+          "cpu_seconds": 1.7864339999999999,
+          "average_cpu_cores": 0.029764457530596203,
+          "working_set_average_bytes": 103653376.0,
+          "working_set_peak_bytes": 103653376,
+          "network_rx_bytes": 1235434,
+          "network_tx_bytes": 426402
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.02180600166321,
+          "cpu_seconds": 1.743867999999992,
+          "average_cpu_cores": 0.02905390750740938,
+          "working_set_average_bytes": 144705693.53846154,
+          "working_set_peak_bytes": 152305664,
+          "network_rx_bytes": 213572,
+          "network_tx_bytes": 158819
+        },
+        "provider-history-worker": {
+          "elapsed_seconds": 60.02186346054077,
+          "cpu_seconds": 0.17940799999999957,
+          "average_cpu_cores": 0.002989044152518606,
+          "working_set_average_bytes": 108572987.07692307,
+          "working_set_peak_bytes": 108576768,
+          "network_rx_bytes": 53220,
+          "network_tx_bytes": 59820
+        }
+      },
+      "stream_tables_after": null,
+      "stream_queue_before": null,
+      "stream_queue_after": null,
+      "private_browser_report": "artifacts/unified-sse/cost-old-new-baseline-single-period.json",
+      "private_browser_report_sha256": "05e8776c310e0f9cfa5b5fa0f36ce5a56b0bd25f579619bbffd54e7ecc077771",
+      "private_resource_report": "artifacts/unified-sse/resources/mw-unified-sse-baseline-20261009/baseline-single-period-1791551910622748736.json",
+      "private_resource_report_sha256": "89a0d0862a74a312f52b42674d9ed6be5468591e1b0d8b876d5569162ffd2c22",
+      "harness_sha256": "c61cbad031bf6e6ec76959a0c06222a52729004199496e9ce401cbfe17615cd1",
+      "fixture_sha256": "c661561338ffeb4f1cc4291c92b5d0ab279cf1771eed8376f588fa8e125ae577",
+      "observed_callback_p95_ms": 12421
+    },
+    {
+      "scenario": "single-period",
+      "arm": "optimized",
+      "project": "mw-unified-sse-lease-optimization",
+      "runtime_image_commit": "32bc00bffb547015e6a3c5b04c3a3efa0803da81",
+      "seed_at": 1791548400000,
+      "duration_ms": 60002,
+      "input_count": 10,
+      "input_interval_ms": 5000,
+      "native_callbacks": 10,
+      "window_request_counts": {},
+      "cpu_average_cores": 0.4959512749656179,
+      "working_set_average_bytes": 1037834712.6153846,
+      "wal_bytes": 921961,
+      "db_activity_delta": {
+        "xact_commit": 5561,
+        "xact_rollback": 10,
+        "blks_read": 60,
+        "blks_hit": 54511,
+        "tup_returned": 82796,
+        "tup_fetched": 35941,
+        "tup_inserted": 623,
+        "tup_updated": 1478,
+        "tup_deleted": 455
+      },
+      "database_size_delta_bytes": 270336,
+      "pg_tx_bytes": 12341440,
+      "web_tx_bytes": 79336,
+      "service_resources": {
+        "api": {
+          "elapsed_seconds": 60.052852630615234,
+          "cpu_seconds": 17.979346,
+          "average_cpu_cores": 0.2993920390525136,
+          "working_set_average_bytes": 135974281.84615386,
+          "working_set_peak_bytes": 149372928,
+          "network_rx_bytes": 2139140,
+          "network_tx_bytes": 813544
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 60.067460775375366,
+          "cpu_seconds": 3.864658000000002,
+          "average_cpu_cores": 0.06433862777139927,
+          "working_set_average_bytes": 116657545.84615384,
+          "working_set_peak_bytes": 117039104,
+          "network_rx_bytes": 8459243,
+          "network_tx_bytes": 3605973
+        },
+        "postgres": {
+          "elapsed_seconds": 60.0776801109314,
+          "cpu_seconds": 3.046156999999994,
+          "average_cpu_cores": 0.05070363892839018,
+          "working_set_average_bytes": 113082368.0,
+          "working_set_peak_bytes": 113627136,
+          "network_rx_bytes": 5284626,
+          "network_tx_bytes": 12341440
+        },
+        "web": {
+          "elapsed_seconds": 60.094807863235474,
+          "cpu_seconds": 0.02471899999999999,
+          "average_cpu_cores": 0.00041133337269761816,
+          "working_set_average_bytes": 5142370.461538462,
+          "working_set_peak_bytes": 5144576,
+          "network_rx_bytes": 76408,
+          "network_tx_bytes": 79336
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.10332202911377,
+          "cpu_seconds": 0.0,
+          "average_cpu_cores": 0.0,
+          "working_set_average_bytes": 10482609.23076923,
+          "working_set_peak_bytes": 11358208,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.108726501464844,
+          "cpu_seconds": 0.266559,
+          "average_cpu_cores": 0.004434613998909193,
+          "working_set_average_bytes": 98003731.6923077,
+          "working_set_peak_bytes": 98025472,
+          "network_rx_bytes": 90036,
+          "network_tx_bytes": 74496
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.11714267730713,
+          "cpu_seconds": 0.6510500000000006,
+          "average_cpu_cores": 0.010829689685929756,
+          "working_set_average_bytes": 108996450.46153846,
+          "working_set_peak_bytes": 108998656,
+          "network_rx_bytes": 209670,
+          "network_tx_bytes": 160602
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.11973524093628,
+          "cpu_seconds": 0.14843399999999995,
+          "average_cpu_cores": 0.002468972948818467,
+          "working_set_average_bytes": 99359822.76923077,
+          "working_set_peak_bytes": 99364864,
+          "network_rx_bytes": 58236,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.12645411491394,
+          "cpu_seconds": 1.8218010000000007,
+          "average_cpu_cores": 0.03029949174315463,
+          "working_set_average_bytes": 103086552.61538461,
+          "working_set_peak_bytes": 103153664,
+          "network_rx_bytes": 1187334,
+          "network_tx_bytes": 426318
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.13191866874695,
+          "cpu_seconds": 1.7975150000000006,
+          "average_cpu_cores": 0.02989285956269085,
+          "working_set_average_bytes": 138369811.69230768,
+          "working_set_peak_bytes": 143691776,
+          "network_rx_bytes": 212400,
+          "network_tx_bytes": 162178
+        },
+        "provider-history-worker": {
+          "elapsed_seconds": 60.147963762283325,
+          "cpu_seconds": 0.19127099999999997,
+          "average_cpu_cores": 0.0031800079011143397,
+          "working_set_average_bytes": 108679168.0,
+          "working_set_peak_bytes": 108695552,
+          "network_rx_bytes": 52333,
+          "network_tx_bytes": 58823
+        }
+      },
+      "stream_tables_after": [
+        {
+          "relname": "market_stream_clients",
+          "seq_scan": 62,
+          "seq_tup_read": 7,
+          "idx_scan": 2232,
+          "idx_tup_fetch": 2231,
+          "n_tup_ins": 1,
+          "n_tup_upd": 15,
+          "n_tup_del": 0,
+          "n_live_tup": 1,
+          "n_dead_tup": 15,
+          "bytes": 57344
+        },
+        {
+          "relname": "market_stream_results",
+          "seq_scan": 56,
+          "seq_tup_read": 12,
+          "idx_scan": 1097,
+          "idx_tup_fetch": 34,
+          "n_tup_ins": 33,
+          "n_tup_upd": 0,
+          "n_tup_del": 0,
+          "n_live_tup": 33,
+          "n_dead_tup": 0,
+          "bytes": 131072
+        },
+        {
+          "relname": "market_stream_subscriptions",
+          "seq_scan": 64,
+          "seq_tup_read": 54,
+          "idx_scan": 2563,
+          "idx_tup_fetch": 9045,
+          "n_tup_ins": 9,
+          "n_tup_upd": 20,
+          "n_tup_del": 6,
+          "n_live_tup": 3,
+          "n_dead_tup": 26,
+          "bytes": 114688
+        },
+        {
+          "relname": "market_stream_tasks",
+          "seq_scan": 19202,
+          "seq_tup_read": 13744,
+          "idx_scan": 837,
+          "idx_tup_fetch": 833,
+          "n_tup_ins": 3,
+          "n_tup_upd": 1366,
+          "n_tup_del": 0,
+          "n_live_tup": 3,
+          "n_dead_tup": 80,
+          "bytes": 344064
+        }
+      ],
+      "stream_queue_before": {
+        "tasks": 3,
+        "active_subscriptions": 3,
+        "retained_results": 10
+      },
+      "stream_queue_after": {
+        "tasks": 3,
+        "active_subscriptions": 3,
+        "retained_results": 33
+      },
+      "private_browser_report": "artifacts/unified-sse/cost-old-new-optimized-single-period.json",
+      "private_browser_report_sha256": "9d63b990d0b4263a8b7410c9f792fdd0e9207e3c14061694b589a9e4018299c8",
+      "private_resource_report": "artifacts/unified-sse/resources/mw-unified-sse-lease-optimization/optimized-single-period-1791552116715668488.json",
+      "private_resource_report_sha256": "dc42fbddde7972fb01fc10f0d72b8070cb1a74bf91fec64b67142568137af5c3",
+      "harness_sha256": "c61cbad031bf6e6ec76959a0c06222a52729004199496e9ce401cbfe17615cd1",
+      "fixture_sha256": "c661561338ffeb4f1cc4291c92b5d0ab279cf1771eed8376f588fa8e125ae577",
+      "observed_callback_p95_ms": 2254
+    },
+    {
+      "scenario": "eight-periods",
+      "arm": "baseline",
+      "project": "mw-unified-sse-baseline-20261009",
+      "runtime_image_commit": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "seed_at": 1791548400000,
+      "duration_ms": 60001,
+      "input_count": 32,
+      "input_interval_ms": 12000,
+      "native_callbacks": 24,
+      "window_request_counts": {
+        "/api/market-data/quotes": 4,
+        "/api/charts/data": 32
+      },
+      "cpu_average_cores": 0.2852962179232109,
+      "working_set_average_bytes": 924848758.1538461,
+      "wal_bytes": 955270,
+      "db_activity_delta": {
+        "xact_commit": 2863,
+        "xact_rollback": 4,
+        "blks_read": 10,
+        "blks_hit": 41148,
+        "tup_returned": 84263,
+        "tup_fetched": 20554,
+        "tup_inserted": 700,
+        "tup_updated": 1805,
+        "tup_deleted": 672
+      },
+      "database_size_delta_bytes": 8192,
+      "pg_tx_bytes": 4183863,
+      "web_tx_bytes": 302680,
+      "service_resources": {
+        "api": {
+          "elapsed_seconds": 60.02793765068054,
+          "cpu_seconds": 8.069377000000003,
+          "average_cpu_cores": 0.13442702374614263,
+          "working_set_average_bytes": 184798286.76923078,
+          "working_set_peak_bytes": 270938112,
+          "network_rx_bytes": 932519,
+          "network_tx_bytes": 688214
+        },
+        "postgres": {
+          "elapsed_seconds": 60.02760338783264,
+          "cpu_seconds": 2.2147740000000056,
+          "average_cpu_cores": 0.03689592579084927,
+          "working_set_average_bytes": 69580012.3076923,
+          "working_set_peak_bytes": 71323648,
+          "network_rx_bytes": 1927498,
+          "network_tx_bytes": 4183863
+        },
+        "web": {
+          "elapsed_seconds": 60.02697038650513,
+          "cpu_seconds": 0.028205000000000036,
+          "average_cpu_cores": 0.00046987212278734125,
+          "working_set_average_bytes": 5815059.692307692,
+          "working_set_peak_bytes": 5816320,
+          "network_rx_bytes": 290002,
+          "network_tx_bytes": 302680
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.02719712257385,
+          "cpu_seconds": 0.0,
+          "average_cpu_cores": 0.0,
+          "working_set_average_bytes": 12091392.0,
+          "working_set_peak_bytes": 12115968,
+          "network_rx_bytes": 0,
+          "network_tx_bytes": 0
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.02735948562622,
+          "cpu_seconds": 0.24832199999999993,
+          "average_cpu_cores": 0.004136813648440784,
+          "working_set_average_bytes": 97847138.46153846,
+          "working_set_peak_bytes": 97853440,
+          "network_rx_bytes": 90120,
+          "network_tx_bytes": 74640
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.027230739593506,
+          "cpu_seconds": 0.58108,
+          "average_cpu_cores": 0.009680273316635346,
+          "working_set_average_bytes": 108996135.38461539,
+          "working_set_peak_bytes": 108998656,
+          "network_rx_bytes": 213285,
+          "network_tx_bytes": 163371
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.03020715713501,
+          "cpu_seconds": 0.11229000000000067,
+          "average_cpu_cores": 0.0018705582625438968,
+          "working_set_average_bytes": 99563047.38461539,
+          "working_set_peak_bytes": 99565568,
+          "network_rx_bytes": 53383,
+          "network_tx_bytes": 35717
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.031927824020386,
+          "cpu_seconds": 2.8975030000000004,
+          "average_cpu_cores": 0.04826603284328696,
+          "working_set_average_bytes": 103670705.23076923,
+          "working_set_peak_bytes": 103714816,
+          "network_rx_bytes": 2605312,
+          "network_tx_bytes": 867737
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.0328049659729,
+          "cpu_seconds": 2.7919489999999882,
+          "average_cpu_cores": 0.046507055627044054,
+          "working_set_average_bytes": 134168260.92307693,
+          "working_set_peak_bytes": 154075136,
+          "network_rx_bytes": 405493,
+          "network_tx_bytes": 298862
+        },
+        "provider-history-worker": {
+          "elapsed_seconds": 60.032946825027466,
+          "cpu_seconds": 0.18266000000000027,
+          "average_cpu_cores": 0.003042662565480629,
+          "working_set_average_bytes": 108318720.0,
+          "working_set_peak_bytes": 108318720,
+          "network_rx_bytes": 53220,
+          "network_tx_bytes": 59820
+        }
+      },
+      "stream_tables_after": null,
+      "stream_queue_before": null,
+      "stream_queue_after": null,
+      "private_browser_report": "artifacts/unified-sse/cost-old-new-baseline-eight-periods.json",
+      "private_browser_report_sha256": "0cbe83d7488901b45141e4018c448e9449212769a2398651f935eecbbb080c03",
+      "private_resource_report": "artifacts/unified-sse/resources/mw-unified-sse-baseline-20261009/baseline-eight-periods-1791552513169704843.json",
+      "private_resource_report_sha256": "6268974e3956eabfafdd8c48285f5a3cedaab9506e8d744adc6876b72d0380d1",
+      "harness_sha256": "c61cbad031bf6e6ec76959a0c06222a52729004199496e9ce401cbfe17615cd1",
+      "fixture_sha256": "c661561338ffeb4f1cc4291c92b5d0ab279cf1771eed8376f588fa8e125ae577",
+      "observed_callback_p95_ms": 11189
+    },
+    {
+      "scenario": "eight-periods",
+      "arm": "optimized",
+      "project": "mw-unified-sse-lease-optimization",
+      "runtime_image_commit": "32bc00bffb547015e6a3c5b04c3a3efa0803da81",
+      "seed_at": 1791548400000,
+      "duration_ms": 60001,
+      "input_count": 32,
+      "input_interval_ms": 12000,
+      "native_callbacks": 32,
+      "window_request_counts": {},
+      "cpu_average_cores": 0.549158109672214,
+      "working_set_average_bytes": 1059608103.3846154,
+      "wal_bytes": 2267487,
+      "db_activity_delta": {
+        "xact_commit": 10820,
+        "xact_rollback": 4,
+        "blks_read": 60,
+        "blks_hit": 103694,
+        "tup_returned": 210671,
+        "tup_fetched": 73513,
+        "tup_inserted": 906,
+        "tup_updated": 3212,
+        "tup_deleted": 850
+      },
+      "database_size_delta_bytes": 442368,
+      "pg_tx_bytes": 31999218,
+      "web_tx_bytes": 98348,
+      "service_resources": {
+        "api": {
+          "elapsed_seconds": 60.053035259246826,
+          "cpu_seconds": 10.229230000000001,
+          "average_cpu_cores": 0.17033660256872576,
+          "working_set_average_bytes": 151773184.0,
+          "working_set_peak_bytes": 228384768,
+          "network_rx_bytes": 4211797,
+          "network_tx_bytes": 1120771
+        },
+        "market-stream-worker": {
+          "elapsed_seconds": 60.05315661430359,
+          "cpu_seconds": 11.956211000000003,
+          "average_cpu_cores": 0.19909379746330017,
+          "working_set_average_bytes": 125622429.53846154,
+          "working_set_peak_bytes": 127672320,
+          "network_rx_bytes": 25230976,
+          "network_tx_bytes": 9712759
+        },
+        "postgres": {
+          "elapsed_seconds": 60.052456855773926,
+          "cpu_seconds": 4.836345999999992,
+          "average_cpu_cores": 0.080535356140637,
+          "working_set_average_bytes": 115381169.23076923,
+          "working_set_peak_bytes": 117239808,
+          "network_rx_bytes": 11974591,
+          "network_tx_bytes": 31999218
+        },
+        "web": {
+          "elapsed_seconds": 60.05180835723877,
+          "cpu_seconds": 0.02365499999999998,
+          "average_cpu_cores": 0.0003939098696125869,
+          "working_set_average_bytes": 5760866.461538462,
+          "working_set_peak_bytes": 5763072,
+          "network_rx_bytes": 95230,
+          "network_tx_bytes": 98348
+        },
+        "chart-origin": {
+          "elapsed_seconds": 60.04770469665527,
+          "cpu_seconds": 0.0,
+          "average_cpu_cores": 0.0,
+          "working_set_average_bytes": 11752054.153846154,
+          "working_set_peak_bytes": 11816960,
+          "network_rx_bytes": 84,
+          "network_tx_bytes": 0
+        },
+        "composite-aggregate-worker": {
+          "elapsed_seconds": 60.048726320266724,
+          "cpu_seconds": 0.2563500000000003,
+          "average_cpu_cores": 0.004269033095436047,
+          "working_set_average_bytes": 98120940.3076923,
+          "working_set_peak_bytes": 98140160,
+          "network_rx_bytes": 89453,
+          "network_tx_bytes": 74018
+        },
+        "history-worker": {
+          "elapsed_seconds": 60.05638289451599,
+          "cpu_seconds": 0.6196470000000005,
+          "average_cpu_cores": 0.010317754252505659,
+          "working_set_average_bytes": 109032999.38461539,
+          "working_set_peak_bytes": 109039616,
+          "network_rx_bytes": 213369,
+          "network_tx_bytes": 163371
+        },
+        "native-history-worker": {
+          "elapsed_seconds": 60.05858540534973,
+          "cpu_seconds": 0.14129999999999976,
+          "average_cpu_cores": 0.0023527027659131883,
+          "working_set_average_bytes": 99382193.23076923,
+          "working_set_peak_bytes": 99393536,
+          "network_rx_bytes": 58320,
+          "network_tx_bytes": 38964
+        },
+        "chart-aggregation-worker": {
+          "elapsed_seconds": 60.05831837654114,
+          "cpu_seconds": 2.3774440000000006,
+          "average_cpu_cores": 0.03958559054375111,
+          "working_set_average_bytes": 103129403.07692307,
+          "working_set_peak_bytes": 103170048,
+          "network_rx_bytes": 1867853,
+          "network_tx_bytes": 630022
+        },
+        "realtime-worker": {
+          "elapsed_seconds": 60.058074951171875,
+          "cpu_seconds": 2.3439729999999983,
+          "average_cpu_cores": 0.039028440420471086,
+          "working_set_average_bytes": 130894926.76923077,
+          "working_set_peak_bytes": 144068608,
+          "network_rx_bytes": 374604,
+          "network_tx_bytes": 260361
+        },
+        "provider-history-worker": {
+          "elapsed_seconds": 60.05751967430115,
+          "cpu_seconds": 0.19488199999999978,
+          "average_cpu_cores": 0.003244922551861404,
+          "working_set_average_bytes": 108757937.23076923,
+          "working_set_peak_bytes": 108769280,
+          "network_rx_bytes": 53304,
+          "network_tx_bytes": 59820
+        }
+      },
+      "stream_tables_after": [
+        {
+          "relname": "market_stream_clients",
+          "seq_scan": 69,
+          "seq_tup_read": 19,
+          "idx_scan": 11567,
+          "idx_tup_fetch": 11564,
+          "n_tup_ins": 2,
+          "n_tup_upd": 45,
+          "n_tup_del": 1,
+          "n_live_tup": 1,
+          "n_dead_tup": 46,
+          "bytes": 57344
+        },
+        {
+          "relname": "market_stream_results",
+          "seq_scan": 752,
+          "seq_tup_read": 36309,
+          "idx_scan": 3517,
+          "idx_tup_fetch": 67,
+          "n_tup_ins": 79,
+          "n_tup_upd": 0,
+          "n_tup_del": 12,
+          "n_live_tup": 67,
+          "n_dead_tup": 12,
+          "bytes": 319488
+        },
+        {
+          "relname": "market_stream_subscriptions",
+          "seq_scan": 3439,
+          "seq_tup_read": 39018,
+          "idx_scan": 11683,
+          "idx_tup_fetch": 17577,
+          "n_tup_ins": 26,
+          "n_tup_upd": 76,
+          "n_tup_del": 17,
+          "n_live_tup": 9,
+          "n_dead_tup": 29,
+          "bytes": 131072
+        },
+        {
+          "relname": "market_stream_tasks",
+          "seq_scan": 28425,
+          "seq_tup_read": 103169,
+          "idx_scan": 7477,
+          "idx_tup_fetch": 7430,
+          "n_tup_ins": 10,
+          "n_tup_upd": 7093,
+          "n_tup_del": 1,
+          "n_live_tup": 9,
+          "n_dead_tup": 642,
+          "bytes": 876544
+        }
+      ],
+      "stream_queue_before": {
+        "tasks": 10,
+        "active_subscriptions": 9,
+        "retained_results": 43
+      },
+      "stream_queue_after": {
+        "tasks": 9,
+        "active_subscriptions": 9,
+        "retained_results": 67
+      },
+      "private_browser_report": "artifacts/unified-sse/cost-old-new-optimized-eight-periods.json",
+      "private_browser_report_sha256": "aba18e2d84bd15a9f6d613d03d1d33683afdb0604d6f1aeabfc4d26796e23e06",
+      "private_resource_report": "artifacts/unified-sse/resources/mw-unified-sse-lease-optimization/optimized-eight-periods-1791552316646897069.json",
+      "private_resource_report_sha256": "1745caa826fcadbf350c5cd90a9e00fefce28b7fce3d136fffa46d7e16391f60",
+      "harness_sha256": "c61cbad031bf6e6ec76959a0c06222a52729004199496e9ce401cbfe17615cd1",
+      "fixture_sha256": "c661561338ffeb4f1cc4291c92b5d0ab279cf1771eed8376f588fa8e125ae577",
+      "observed_callback_p95_ms": 1813
+    }
+  ],
+  "comparisons": [
+    {
+      "scenario": "single-period",
+      "optimized_minus_baseline": {
+        "cpu_average_cores": 0.11009063418271314,
+        "working_set_average_bytes": 106761294.76923072,
+        "wal_bytes": 166087,
+        "pg_tx_bytes": 9750787,
+        "web_tx_bytes": 2689
+      },
+      "wal_ratio": 1.21972842034519,
+      "db_activity_delta_difference": {
+        "xact_commit": 2920,
+        "xact_rollback": 0,
+        "blks_read": 50,
+        "blks_hit": 21256,
+        "tup_returned": 29679,
+        "tup_fetched": 19543,
+        "tup_inserted": 88,
+        "tup_updated": 387,
+        "tup_deleted": 118
+      }
+    },
+    {
+      "scenario": "eight-periods",
+      "optimized_minus_baseline": {
+        "cpu_average_cores": 0.2638618917490031,
+        "working_set_average_bytes": 134759345.23076928,
+        "wal_bytes": 1312217,
+        "pg_tx_bytes": 27815355,
+        "web_tx_bytes": -204332
+      },
+      "wal_ratio": 2.373660849812095,
+      "db_activity_delta_difference": {
+        "xact_commit": 7957,
+        "xact_rollback": 0,
+        "blks_read": 50,
+        "blks_hit": 62546,
+        "tup_returned": 126408,
+        "tup_fetched": 52959,
+        "tup_inserted": 206,
+        "tup_updated": 1407,
+        "tup_deleted": 178
+      }
+    }
+  ],
+  "limits": [
+    "Baseline is original implementation 6fd9273, not current main production release.",
+    "One sequential 60-second window per arm/scenario; short synthetic managed inputs, not production capacity.",
+    "125-second warmup per arm; exact same seed time, 107.00 start price, updates and input frequency.",
+    "All four final windows were run after final builds and startup finished; exploratory earlier runs excluded.",
+    "Browser and fixture host processes excluded; all isolated project containers included, including fixture SQL writes.",
+    "Memory is sparse sampled working set, affected by cache/allocator/sequence; no confidence interval.",
+    "Polling coalesces intermediate inputs; SSE checks every input; both verify final value.",
+    "PG TX is internal traffic; web TX includes protocol and all page traffic.",
+    "WAL is generated bytes per window, not retained storage or a daily disk-growth forecast.",
+    "Image logical bytes and stream table sizes do not establish physical disk net overhead."
+  ]
+}

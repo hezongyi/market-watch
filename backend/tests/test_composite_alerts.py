@@ -121,6 +121,16 @@ def test_fixed_binding_persistent_demand_and_one_transactional_event(database, m
     assert not desired_datasets(settings.oanda_account_id)
 
 
+@pytest.mark.parametrize('error', ['unauthorized', 'provider_maintenance'])
+def test_account_fault_blocks_alert_even_if_another_instrument_still_has_ready_state(database, monkeypatch, error):
+    ident, _, _, _, stamp = armed(database, monkeypatch)
+    with database.begin() as db:
+        db.get(PricingOwner, account_key(settings.oanda_account_id)).error = error
+        assert evaluate(db, ident, now=stamp) == []
+        assert db.get(ChartAlert, ident).health == 'stale'
+        assert db.scalar(select(SignalRow)) is None
+
+
 def test_disconnect_recovery_baselines_old_cross_and_later_new_event_triggers(database, monkeypatch):
     ident, _, revision, seam, stamp = armed(database, monkeypatch)
     with database.begin() as db:

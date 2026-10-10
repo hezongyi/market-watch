@@ -6,6 +6,7 @@ import { CompositeDetail, CompositeList, MappingForm } from "./Composites";
 import { NativeConfigure } from "./NativeConfigure";
 import { PlatformMarket } from "./PlatformMarket";
 import { ManagedMarket } from "./ManagedMarket";
+import { LiveProviderStatus } from "./LiveProviderStatus";
 
 export function Feedback({
   error,
@@ -51,7 +52,7 @@ export function Pager({
   );
 }
 export { TaskActions } from "./Tasks";
-export default function Center() {
+function CenterPage() {
   const { pathname } = useLocation(),
     [params] = useSearchParams();
   if (pathname === "/market-data/platform/configure")
@@ -66,4 +67,8 @@ export default function Center() {
   if ((params.get("tab") || "managed") === "managed") return <ManagedMarket />;
   if (params.get("tab") === "composite") return <CompositeList />;
   return <Tasks />;
+}
+
+export default function Center() {
+  return <><LiveProviderStatus /><CenterPage /></>;
 }

@@ -3,7 +3,8 @@ import {readFileSync, writeFileSync, cpSync, readdirSync, rmSync} from 'node:fs'
 
 // Give all private library assets a URL derived from the patched bytes.
 const bundle = readFileSync(new URL('charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js', import.meta.url));
-const libraryVersion = createHash('sha256').update(bundle).digest('hex').slice(0,16);
+const toolset = readFileSync(new URL('charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js', import.meta.url));
+const libraryVersion = createHash('sha256').update(bundle).update(toolset).digest('hex').slice(0,16);
 const libraryDirectory = `charting_library_${libraryVersion}`;
 for (const name of readdirSync(new URL('.',import.meta.url)))
   if (/^charting_library_[a-f0-9]{16}$/.test(name) && name !== libraryDirectory)

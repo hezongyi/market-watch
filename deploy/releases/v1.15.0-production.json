@@ -1,0 +1,414 @@
+{
+  "version": "1.15.0",
+  "release_tag": "v1.15.0",
+  "source_commit": "9f182c28ac8f161ed292a53f743b9cb5041d4ccb",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/25",
+  "merged": true,
+  "annotated_tag_pushed": true,
+  "production_deployed": true,
+  "production_end_to_end_accepted": false,
+  "production_environment": "unraid existing formal production",
+  "production_root": "/mnt/user/appdata/market-watch",
+  "production_project": "market-watch",
+  "public_url": "https://trade.kookvv.com:8443",
+  "chart_origin": "https://charts.kookvv.com:8443",
+  "active_release": "releases/v1.15.0-9f182c2",
+  "writers_stopped_utc": "2026-10-09T20:22:48Z",
+  "deployed_utc": "2026-10-09T20:26:28Z",
+  "writer_pause_seconds": 220,
+  "build_environment": "Ubuntu local Docker; mw-docker; market-watch-ubuntu BuildKit",
+  "build_task": "mw-unified-sse-v1.15.0-release-20261010",
+  "build_project": "mw-unified-sse-v1.15.0-release-20261010",
+  "build_purpose": "release",
+  "installed_module_count": 130,
+  "installed_modules_match_tag": true,
+  "third_party_dependencies_equal_acceptance": true,
+  "tagged_image_postgres_tests": {
+    "passed": 109,
+    "skipped": 0,
+    "seconds": 270.26
+  },
+  "all_four_archive_config_and_rootfs_verified": true,
+  "images": {
+    "market-watch-api:v1.15.0-9f182c2": {
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b"
+    },
+    "market-watch-web:v1.15.0-9f182c2": {
+      "production_image_id": "sha256:a284c14041971b8c27e7cea5b44e871ecbed651bf24df2e13a1c9f8160f53676"
+    },
+    "market-watch-chart-origin:v1.15.0-9f182c2": {
+      "production_image_id": "sha256:e33747b80ad95ad651b58ab10ff290cf3ddbc1fc4abd9fd3636045cd8437f54f"
+    },
+    "market-watch-backup:v1.15.0-9f182c2": {
+      "production_image_id": "sha256:f98850653b3c5239bf178a52dcb1962f44e587ecf76ac72b6c59dae719ae7786"
+    }
+  },
+  "services": {
+    "chart-aggregation-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "realtime-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "pricing-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "market-stream-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "composite-aggregate-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "web": {
+      "image_ref": "market-watch-web:v1.15.0-9f182c2",
+      "production_image_id": "sha256:a284c14041971b8c27e7cea5b44e871ecbed651bf24df2e13a1c9f8160f53676",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "native-history-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "notify-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "chart-history-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "history-worker": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    },
+    "api": {
+      "image_ref": "market-watch-api:v1.15.0-9f182c2",
+      "production_image_id": "sha256:6ecb3f40fb432a9902b6a6978ed79a20dc84ece0a75035c25e43f8d7cb099a7b",
+      "status": "running",
+      "restart_count": 0,
+      "health": "healthy"
+    },
+    "chart-origin": {
+      "image_ref": "market-watch-chart-origin:v1.15.0-9f182c2",
+      "production_image_id": "sha256:e33747b80ad95ad651b58ab10ff290cf3ddbc1fc4abd9fd3636045cd8437f54f",
+      "status": "running",
+      "restart_count": 0,
+      "health": null
+    }
+  },
+  "raw_existing_compose_non_image_fields_preserved": true,
+  "original_production_env_hash_preserved": true,
+  "actual_existing_container_env_commands_mounts_ports_compared": [
+    "api",
+    "web",
+    "chart-origin"
+  ],
+  "schema_before": "aq44_aggregation_service_order",
+  "schema_after": "ar45_market_stream",
+  "existing_tables_unchanged_at_migration": 82,
+  "expected_backup_audit_insert": 1,
+  "new_empty_tables_at_migration": [
+    "market_stream_clients",
+    "market_stream_results",
+    "market_stream_subscriptions",
+    "market_stream_tasks"
+  ],
+  "backups": {
+    "preflight": {
+      "file": "alerts-20261009T201438621473Z.dump",
+      "sha256": "c853be0f561726e3db5b660182c59c5f19c0bd44c241088d3696ec8677c7fa0b",
+      "bytes": 99306789,
+      "snapshot_tables": 82,
+      "actual_ubuntu_pg14_restore": {
+        "verified": true,
+        "environment": "Ubuntu isolated PostgreSQL14",
+        "backup_sha256": "c853be0f561726e3db5b660182c59c5f19c0bd44c241088d3696ec8677c7fa0b",
+        "backup_bytes": 99306789,
+        "snapshot_tables": 82,
+        "restore_database": "mw_release_restore_16efe182bddd40b5bff8d7647242464c",
+        "migration_verified": true,
+        "cleaned": true,
+        "schema_before": "aq44_aggregation_service_order",
+        "schema_after": "ar45_market_stream",
+        "new_empty_tables": [
+          "market_stream_clients",
+          "market_stream_results",
+          "market_stream_subscriptions",
+          "market_stream_tasks"
+        ]
+      }
+    },
+    "final_before": {
+      "file": "alerts-20261009T202250413546Z.dump",
+      "sha256": "b45d747deb7b78359d5fb2f560dacd8aa3c4f7f1f163cf513c5908611c018299",
+      "bytes": 99307106,
+      "snapshot_tables": 82,
+      "actual_ubuntu_pg14_restore": {
+        "verified": true,
+        "environment": "Ubuntu isolated PostgreSQL14",
+        "backup_sha256": "b45d747deb7b78359d5fb2f560dacd8aa3c4f7f1f163cf513c5908611c018299",
+        "backup_bytes": 99307106,
+        "snapshot_tables": 82,
+        "restore_database": "mw_release_restore_c044e367d5eb42eaa4df6bb08bfca9c3",
+        "migration_verified": true,
+        "cleaned": true,
+        "schema_before": "aq44_aggregation_service_order",
+        "schema_after": "ar45_market_stream",
+        "new_empty_tables": [
+          "market_stream_clients",
+          "market_stream_results",
+          "market_stream_subscriptions",
+          "market_stream_tasks"
+        ]
+      }
+    },
+    "after": {
+      "file": "alerts-20261009T202653191292Z.dump",
+      "sha256": "789a9c9a36dbaa451422b0f4c951e889b1a27f23ca6196a79bdd6ae07be5438f",
+      "bytes": 99328821,
+      "snapshot_tables": 86,
+      "actual_ubuntu_pg14_restore": {
+        "verified": true,
+        "environment": "Ubuntu isolated PostgreSQL14",
+        "backup_sha256": "789a9c9a36dbaa451422b0f4c951e889b1a27f23ca6196a79bdd6ae07be5438f",
+        "backup_bytes": 99328821,
+        "snapshot_tables": 86,
+        "restore_database": "mw_release_restore_007844a04bf94407b6e5f6c1c911b53a",
+        "migration_verified": true,
+        "cleaned": true,
+        "schema_before": "ar45_market_stream",
+        "schema_after": "ar45_market_stream",
+        "new_empty_tables": [
+          "market_stream_clients",
+          "market_stream_results",
+          "market_stream_subscriptions",
+          "market_stream_tasks"
+        ]
+      }
+    }
+  },
+  "config_backups": [
+    {
+      "file": "config-20261009T202308Z-3bmvdc.tar.gz",
+      "sha256": "bf7dc01547f199fa139f5744b73b80416b865d48d4d692afd58a847a205a6b1b",
+      "actual_ubuntu_extraction": true,
+      "env_hash_matches_production": true,
+      "env_permissions_private": true,
+      "compose_config_valid": true,
+      "active_release": "releases/v1.14.2-ccc7e0a",
+      "extracted_directory_removed": true
+    },
+    {
+      "file": "config-20261009T202711Z-Dsa0uf.tar.gz",
+      "sha256": "ccb59f9992b26849c2768142104eedfea0b16d758fdbf7cee0bba7f6ef2f710d",
+      "actual_ubuntu_extraction": true,
+      "env_hash_matches_production": true,
+      "env_permissions_private": true,
+      "compose_config_valid": true,
+      "active_release": "releases/v1.15.0-9f182c2",
+      "extracted_directory_removed": true
+    }
+  ],
+  "website_https": 200,
+  "chart_https": 200,
+  "readyz_https": 200,
+  "production_observation": {
+    "samples": 21,
+    "seconds": 684.317,
+    "deadlock_counter_before": 715,
+    "deadlock_counter_after": 715,
+    "deadlock_delta": 0,
+    "long_transactions_over_30_seconds": 0,
+    "all_service_restarts_zero": true,
+    "active_stream_subscriptions_max": 0,
+    "fresh_oanda_states_max": 0,
+    "db_backends_min": 13,
+    "db_backends_max": 13,
+    "idle_new_worker": {
+      "samples": 21,
+      "mean_cpu_cores": 0.015966666666666667,
+      "mean_memory_mib": 117.39047619047619,
+      "minimum_memory_mib": 115.5,
+      "maximum_memory_mib": 123.2,
+      "net_old_vs_new_production_cost_measured": false
+    }
+  },
+  "inherited_oanda_block": {
+    "before": {
+      "epoch": "360",
+      "expires": "0",
+      "connected_at": "1791475092833",
+      "next_at": "1791486013424",
+      "failures": "1",
+      "error": "unauthorized"
+    },
+    "after": {
+      "epoch": 360,
+      "expires": 0,
+      "connected_at": 1791475092833,
+      "next_at": 1791486013424,
+      "failures": 1,
+      "error": "unauthorized"
+    },
+    "operator_retry_performed": false,
+    "credentials_or_account_changed": false,
+    "current_credential_probe": {
+      "accounts_http": 200,
+      "configured_account_visible": true,
+      "account_summary_http": 503,
+      "current_token_accepted_for_accounts_endpoint": true,
+      "owner_unauthorized_hold_unchanged": true,
+      "operator_retry_performed": false,
+      "record": "docs/verification/unified-sse/v1.15.0-production-oanda-auth.json"
+    },
+    "recovery_recheck": {
+      "checked_utc": "2026-10-09T22:07:43.942513+00:00",
+      "checked_singapore": "2026-10-10T06:07:43+08:00",
+      "accounts_http": 200,
+      "configured_account_visible": true,
+      "account_summary_http": 503,
+      "instruments_http": 503,
+      "pricing_snapshot_http": 503,
+      "pricing_stream_http": 503,
+      "instruments_and_pricing_response_mention_maintenance": true,
+      "upstream_pricing_recovered": false,
+      "worker_recovered": false,
+      "persisted_owner_error": "unauthorized",
+      "owner_state_unchanged": true,
+      "owner_state_changed": false,
+      "operator_retry_performed": false,
+      "ny17_daily_schedule_independently_verified": false,
+      "evidence_sha256": {
+        "oanda-auth-recovery-current.json": "c98488a36e23271c0a9c2e4617699031c3ce7fa60ca03e1b206736b2b00b299c",
+        "oanda-service-recovery-current.json": "4296a9c505cd24c01b4df4cc82dc05293e3175cb079be84dffffff29aaca4c5c",
+        "production-state-recovery-current.json": "69544420b3dd43a84c9eb67020d8f3b68c5790c96aa488e3d37296bb54e01b04"
+      }
+    }
+  },
+  "browser_acceptance": {
+    "passed": false,
+    "initial_login_http": 401,
+    "current_login_http": 200,
+    "login_credential_block_resolved": true,
+    "secure_cookie_verified": true,
+    "logout_http": 200,
+    "sse_connection_verified": true,
+    "sse_event_types": [
+      "bars",
+      "quotes"
+    ],
+    "sse_events": 81,
+    "sse_errors": 0,
+    "native_initial_snapshot_callbacks": 2,
+    "normal_stable_market_http_requests": 0,
+    "fresh_oanda_price_progression_verified": false,
+    "remaining_blockers": [
+      "Inherited OANDA unauthorized hold",
+      "Value is null on chart startup in both SSE and polling mode"
+    ],
+    "record": "docs/verification/unified-sse/v1.15.0-production-browser-followup.json",
+    "auth_reset_or_session_forgery": false
+  },
+  "switch_incident": {
+    "initial_post_migration_count_check": "permission denied reading root-owned mounted verification script",
+    "old_application_restart": "blocked by old migration image unable to resolve ar45",
+    "recovery": "Read-only verification script supplied through stdin; all 82 old counts and four empty new tables verified; new migration image exited zero; new services started",
+    "included_in_220_second_pause": true
+  },
+  "rollback": {
+    "script": "deploy/unified-sse-v1.15.0-switch-20261010/rollback.sh",
+    "syntax_checked": true,
+    "executed_final_script": false,
+    "application_api": "v1.14.2",
+    "web_chart": "v1.14.1",
+    "maintenance_migrate_backup": "v1.15.0",
+    "schema_downgrade": false,
+    "preserve_new_data": true,
+    "old_images_and_raw_configuration_retained": true
+  },
+  "cleanup": {
+    "production_transfer_archives_removed": [
+      "deploy/unified-sse-v1.15.0-switch-20261010/images.tag.tar",
+      "deploy/unified-sse-v1.15.0-switch-20261010/source.tag.tar.gz"
+    ],
+    "completed_migration_container_removed": "market-watch-migrate-1",
+    "production_backups_retained": true,
+    "ubuntu_restore_project": {
+      "project": "mw-unified-sse-v1150-restore-20261010",
+      "backup_and_actual_restore_verified": true,
+      "container_removed": "mw-unified-sse-v1150-restore-20261010-postgres-1",
+      "volume_removed": "mw-unified-sse-v1150-restore-20261010_postgres-data",
+      "network_removed": "mw-unified-sse-v1150-restore-20261010_default",
+      "other_resources_touched": false,
+      "retire_tool_not_applicable": "restore-only PG project has no registered acceptance builds"
+    },
+    "ubuntu_volume_archive_verification": {
+      "source_project": "mw-unified-sse-v1150-restore-20261010",
+      "non_template_databases": [
+        "alerts",
+        "postgres"
+      ],
+      "alerts_backup_sha256": "25cdabdadb0f726503c6fdb7f138fef4daf8162d1f1f408b06c9b9f9ca45ed75",
+      "alerts_backup_bytes": 850,
+      "public_tables": 0,
+      "actual_restore_counts_match": true,
+      "random_database_removed": true,
+      "roles_archived": true
+    },
+    "release_images_retained": true,
+    "original_ongoing_practice_acceptance_project_untouched": true,
+    "global_prune": false
+  },
+  "archive_sha256": {
+    "images.tag.tar": "488738c996d93abd557e801b7136716a7fd2c906e4e3e2b5f45418a3887b624d",
+    "source.tag.tar.gz": "cbc138b18f605ce85b76006054eb2130cbfbaba97346952eb2087a52a64ed673"
+  },
+  "private_evidence_sha256": {
+    "tagged-image-postgres.txt": "f9eec676cfc11041f24382d11366479554adfdd91272c10dc9b405bae9153805",
+    "production-state.jsonl": "796cc49a35d2c973d0a4ebb4da785556b4721980350b03b20d37e2857e3f9a48",
+    "production-runtime-samples.txt": "099ef70f1af36c69f56b220be11e76a93b95bcde619d09534c939426f5421654",
+    "production-services.private.log": "18d5bbfa7643f0db5bd2a29838a07d2ffa5be7027fe087918beef7f45105a363",
+    "production-switch.checked.txt": "aeae514469939186c78c7f80f8ecb4eb841066a2da7f6675d7d1e6bdf3e45385",
+    "production-browser-login401.json": "a88efdffa5c27d9a25e17085936fe5c42e8cb078b3379465af0cca6445157622",
+    "production-browser.json": "0ad7d82791575d97d0f8d9c1daa1f85e01e5ed059799de976eb3296bc2effc5f",
+    "production-startup-probe.json": "1afbb32dc529ca2922d4f02de1cdc6cd2ac74e4190a1f79b8fd259984d72f372",
+    "production-startup-polling-probe.json": "49af71bb97be92b1488c369b5471ec2de7fa97a590834846ff1591cbb9f45bba",
+    "production-state-auth-sse.json": "08416443373e8bde665a15c0a98fc95acae4c04eff4697a2805389467344883f",
+    "production-state-auth-final.json": "a39b059abd2f71e4933a5d50ccc9156673d6d02b1cf4e48fac05420472e45b3f"
+  },
+  "cost_reference": "docs/verification/unified-sse/old-release-cost-report.md",
+  "cost_boundary": "Old 6fd9273 versus 32bc00b isolated Ubuntu windows; no measured net cost versus current v1.14.2 production under active consumers"
+}

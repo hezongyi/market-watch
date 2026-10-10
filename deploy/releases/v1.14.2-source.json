@@ -1,0 +1,36 @@
+{
+  "version": "1.14.2",
+  "release_tag": "v1.14.2",
+  "previous_source_tag": "v1.14.1",
+  "source_commit_resolution": "Resolve annotated v1.14.2^{commit}; tag the reviewed PR main merge after approval.",
+  "runtime_product_source": "b7376b9a067384789fe7b19344ae1f193502d1d4",
+  "source_input_manifest": "deploy/releases/v1.14.2-source-inputs.json",
+  "source_input_count": 717,
+  "schema": "aq44_aggregation_service_order",
+  "new_migrations": [],
+  "application_dependencies_changed": false,
+  "release_scope": "Local deadlock/owned stream-pool recovery repairs and bounded diagnostics. Remaining external transport failures and EURUSD freshness are retained.",
+  "verification": {
+    "deadlock_record": "docs/investigations/oanda-stream-reconnect-fix.md",
+    "layered_record": "docs/investigations/oanda-timeout-follow-up.md",
+    "installed_layer_selection_passed": 72,
+    "subsequent_extended_pipeline_selection_passed": 10,
+    "counts_are_not_additive": true,
+    "latest_real_window_seconds": 600.025,
+    "latest_real_window_strict_passed": false,
+    "strict_failure": "EURUSD freshness",
+    "production_four_layer_wrappers_enabled": false
+  },
+  "production": {
+    "authorization": "User authorized formal switch, one controlled retry, observation; PR review/merge and tag must precede switch.",
+    "status": "not_deployed",
+    "proposal": "docs/investigations/oanda-release-review.md",
+    "final_tagged_image_ids": "Record separately after tagged build and actual deployment; do not relabel historical acceptance artifacts."
+  },
+  "rollback": {
+    "source_tag": "v1.14.1",
+    "schema_downgrade": false,
+    "data_restore": "Not part of application rollback; preserve new data.",
+    "auth_hold": "Preserve fencing; use existing authenticated retry once only when authorized."
+  }
+}

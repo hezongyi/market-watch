@@ -1,0 +1,446 @@
+{
+  "version": "1.15.1",
+  "release_tag": "v1.15.1",
+  "source_commit": "83d939beacc84b7ac587257483fd9b3168623b68",
+  "implementation_pr": "https://github.com/hezongyi/market-watch/pull/26",
+  "merged": true,
+  "annotated_tag_pushed": true,
+  "production_deployed": true,
+  "production_environment": "unraid existing formal production",
+  "production_root": "/mnt/user/appdata/market-watch",
+  "production_project": "market-watch",
+  "public_url": "https://trade.kookvv.com:8443",
+  "chart_origin": "https://charts.kookvv.com:8443",
+  "active_release": "releases/v1.15.1-83d939b",
+  "build_environment": "Ubuntu local Docker; mw-docker; market-watch-ubuntu BuildKit",
+  "build_task": "mw-weekend-v1.15.1-release-20261010",
+  "build_purpose": "release",
+  "tagged_image_regression_passed": 165,
+  "installed_modules_match_tag": true,
+  "third_party_dependencies_equal_acceptance": true,
+  "all_four_archive_config_and_rootfs_verified": true,
+  "images": {
+    "market-watch-web:v1.15.1-83d939b": {
+      "production_image_id": "sha256:832bd98154ae06678f33432dd1a28f7b0abd1936670d1135349f301f2f23596a"
+    },
+    "market-watch-chart-origin:v1.15.1-83d939b": {
+      "production_image_id": "sha256:c64cb9f45e0c70b347e92fddb9bcc65150ec7d5e489aa726f5662baf3a609153"
+    },
+    "market-watch-backup:v1.15.1-83d939b": {
+      "production_image_id": "sha256:7772c9f4300bb823ee83facbf6d40ca704e8b980dc19fd31995b031a33998e00"
+    },
+    "market-watch-api:v1.15.1-83d939b": {
+      "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc"
+    }
+  },
+  "runtime": {
+    "services": {
+      "chart-history-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "market-stream-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "realtime-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "native-history-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "pricing-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "notify-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "web": {
+        "image_ref": "market-watch-web:v1.15.1-83d939b",
+        "production_image_id": "sha256:832bd98154ae06678f33432dd1a28f7b0abd1936670d1135349f301f2f23596a",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "composite-aggregate-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "chart-aggregation-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "history-worker": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      },
+      "api": {
+        "image_ref": "market-watch-api:v1.15.1-83d939b",
+        "production_image_id": "sha256:45bd986bf57fddb6284ba5d6a906309670c89b51a48f2486183976f1af73e9dc",
+        "status": "running",
+        "restarts": 0,
+        "health": "healthy"
+      },
+      "chart-origin": {
+        "image_ref": "market-watch-chart-origin:v1.15.1-83d939b",
+        "production_image_id": "sha256:c64cb9f45e0c70b347e92fddb9bcc65150ec7d5e489aa726f5662baf3a609153",
+        "status": "running",
+        "restarts": 0,
+        "health": null
+      }
+    },
+    "all_running": true,
+    "all_restarts_zero": true,
+    "env_commands_ports_mounts_preserved": true
+  },
+  "switch": {
+    "writers-stopped": "2026-10-09T23:48:59Z",
+    "switched": "2026-10-09T23:51:36Z",
+    "writer_pause_seconds": 157.0,
+    "first_attempt_rolled_back": true,
+    "first_attempt_reason": "Container user could not read root-only bind-mounted verification script; no schema migration; automatic application rollback succeeded.",
+    "retry_fix": "Run migration and inject count-check code through stdin, preserving directory permissions."
+  },
+  "backups_actual_ubuntu_restores": [
+    {
+      "verified": true,
+      "environment": "Ubuntu isolated PG14 in mw-weekend-recovery-20261010",
+      "backup_sha256": "ef3dc594333a4c833fcf4233e515a1e1f8b02e1ff8a6df845578696da43f5c58",
+      "bytes": 98212942,
+      "tables": 86,
+      "cleaned": true,
+      "schema": "ar45_market_stream"
+    },
+    {
+      "verified": true,
+      "environment": "Ubuntu isolated PG14 in mw-weekend-recovery-20261010",
+      "backup_sha256": "e5d37d7cd3b644db91bd753b9946001bd3097991fee0ab2fc07daf64849006eb",
+      "bytes": 98214541,
+      "tables": 86,
+      "cleaned": true,
+      "schema": "ar45_market_stream"
+    },
+    {
+      "verified": true,
+      "environment": "Ubuntu isolated PG14 in mw-weekend-recovery-20261010",
+      "backup_sha256": "5ba96b5d74d2bf588703db0378293a91b32581c74814591bbf117ee67acb434b",
+      "bytes": 99068830,
+      "tables": 86,
+      "cleaned": true,
+      "schema": "ar45_market_stream"
+    }
+  ],
+  "config_backup_restore": {
+    "file": "config-20261009T234920Z-PoZVTJ.tar.gz",
+    "sha256": "df35589f1ce066ec6fe8a3f7eb025dd75d601def3e447a04fc0136e03f1d3dac",
+    "actual_ubuntu_extraction": true,
+    "env_hash_matches_production": true,
+    "private_env": true,
+    "compose_config_valid": true,
+    "active_release": "releases/v1.15.0-9f182c2",
+    "extraction_removed": true
+  },
+  "schema_before": "ar45_market_stream",
+  "schema_after": "ar45_market_stream",
+  "schema_migration": false,
+  "production_env_preserved": true,
+  "operational_session_profile_enabled": false,
+  "browser": {
+    "passed": true,
+    "environment": "unraid formal production; browser on Ubuntu",
+    "started": "2026-10-09T23:51:50.289Z",
+    "errors": [],
+    "reloads": [
+      {
+        "native": {
+          "charts": 4,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:EURUSD",
+            "MWP:EURUSD",
+            "MWP:EURUSD"
+          ],
+          "data_ready": true
+        },
+        "sse": {
+          "opens": 1,
+          "errors": 0,
+          "types": [
+            "bars",
+            "reset",
+            "quotes"
+          ]
+        }
+      },
+      {
+        "native": {
+          "charts": 4,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:EURUSD",
+            "MWP:EURUSD",
+            "MWP:EURUSD"
+          ],
+          "data_ready": true
+        },
+        "sse": {
+          "opens": 1,
+          "errors": 0,
+          "types": [
+            "bars",
+            "quotes"
+          ]
+        }
+      },
+      {
+        "native": {
+          "charts": 4,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:EURUSD",
+            "MWP:EURUSD",
+            "MWP:EURUSD"
+          ],
+          "data_ready": true
+        },
+        "sse": {
+          "opens": 1,
+          "errors": 0,
+          "types": [
+            "bars",
+            "reset",
+            "quotes"
+          ]
+        }
+      }
+    ],
+    "login_http": 200,
+    "secure_cookie": true,
+    "status_text": "OANDA Practice 实时状态\n\nOANDA 连接暂不可用。下次检查：2026/10/09 23:52 UTC。\n\nEURUSD · 行情连接暂不可用。当前来源时段尚未核实。\n\nXAUUSD · 行情连接暂不可用。当前来源时段尚未核实。",
+    "live_status": {
+      "provider": {
+        "source": "oanda",
+        "environment": "practice",
+        "authentication_hold": false,
+        "error": "timeout",
+        "next_probe_at": 1791589923532
+      },
+      "datasets": [
+        {
+          "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+          "instrument_id": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+          "logical_symbol": "EURUSD",
+          "identity": {
+            "source": "oanda",
+            "channel": "v20",
+            "environment": "practice",
+            "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+            "provider_symbol": "EUR_USD",
+            "basis": "bid",
+            "calendar_version": "ny17-candidate-v1"
+          },
+          "revision": 48224,
+          "quote": {
+            "identity": {
+              "source": "oanda",
+              "channel": "v20",
+              "environment": "practice",
+              "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+              "provider_symbol": "EUR_USD",
+              "basis": "bid",
+              "calendar_version": "ny17-candidate-v1"
+            },
+            "bid": "1.12095",
+            "ask": "1.12105",
+            "source_time": 1791486011886,
+            "received_at": 1791486012121,
+            "tradeable": true,
+            "connection_epoch": 360,
+            "sequence": 42922
+          },
+          "forming": {},
+          "quality": "unavailable",
+          "connection": "connecting",
+          "connection_epoch": 362,
+          "heartbeat_at": 1791486009456,
+          "last_confirmed_m1": 1791557460000,
+          "cooldown_until": null,
+          "recovery_ready": false,
+          "error": null,
+          "market_session": "unknown",
+          "next_session_at": null,
+          "calendar_verified": false,
+          "authentication_hold": false,
+          "connection_error": "timeout",
+          "next_probe_at": 1791589923532,
+          "calendar_revision": "ny17-candidate-v1",
+          "session_evidence": null,
+          "fallback_ready": false,
+          "selection_epoch": 362,
+          "received_at": 1791486012121,
+          "quote_age_ms": 103924463,
+          "quote_ready": false,
+          "candle_ready": false,
+          "precision": 5,
+          "alert_readiness": []
+        },
+        {
+          "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+          "instrument_id": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+          "logical_symbol": "XAUUSD",
+          "identity": {
+            "source": "oanda",
+            "channel": "v20",
+            "environment": "practice",
+            "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+            "provider_symbol": "XAU_USD",
+            "basis": "bid",
+            "calendar_version": "ny17-candidate-v1"
+          },
+          "revision": 102422,
+          "quote": {
+            "identity": {
+              "source": "oanda",
+              "channel": "v20",
+              "environment": "practice",
+              "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+              "provider_symbol": "XAU_USD",
+              "basis": "bid",
+              "calendar_version": "ny17-candidate-v1"
+            },
+            "bid": "4127.925",
+            "ask": "4128.395",
+            "source_time": 1791486011849,
+            "received_at": 1791486012135,
+            "tradeable": true,
+            "connection_epoch": 360,
+            "sequence": 42923
+          },
+          "forming": {},
+          "quality": "unavailable",
+          "connection": "connecting",
+          "connection_epoch": 362,
+          "heartbeat_at": 1791486009456,
+          "last_confirmed_m1": 1791557460000,
+          "cooldown_until": null,
+          "recovery_ready": false,
+          "error": null,
+          "market_session": "unknown",
+          "next_session_at": null,
+          "calendar_verified": false,
+          "authentication_hold": false,
+          "connection_error": "timeout",
+          "next_probe_at": 1791589923532,
+          "calendar_revision": "ny17-candidate-v1",
+          "session_evidence": null,
+          "fallback_ready": false,
+          "selection_epoch": 362,
+          "received_at": 1791486012135,
+          "quote_age_ms": 103924500,
+          "quote_ready": false,
+          "candle_ready": false,
+          "precision": 3,
+          "alert_readiness": []
+        }
+      ]
+    },
+    "mobile_status": true,
+    "logout_http": 200,
+    "finished": "2026-10-09T23:52:17.083Z"
+  },
+  "production_observation": {
+    "samples": 7,
+    "deadlocks_before": 715,
+    "deadlocks_after": 715,
+    "long_transactions_final": [],
+    "owners_first": [
+      {
+        "epoch": 361,
+        "expires": 1791589940569,
+        "connected_at": 1791589905373,
+        "next_at": 0,
+        "failures": 0,
+        "error": null
+      }
+    ],
+    "owners_final": [
+      {
+        "epoch": 364,
+        "expires": 1791590072134,
+        "connected_at": 1791589962697,
+        "next_at": 1791589962586,
+        "failures": 3,
+        "error": "timeout"
+      }
+    ],
+    "deadlock_delta": 0
+  },
+  "source_acceptance": "docs/verification/weekend-recovery/README.md",
+  "review": "docs/verification/weekend-recovery/pr26-review.md",
+  "real_opening_price_progression_verified": false,
+  "release_runtime_acceptance_passed": true,
+  "external_verification_remaining": "Weekend closure/maintenance cannot prove real OANDA reopening, fresh Bid/Ask advancement or confirmed-M1 browser propagation.",
+  "rollback": {
+    "retained_source": "v1.15.0",
+    "retained_images": true,
+    "schema_downgrade": false
+  },
+  "production_authentication_recovery": {
+    "automatic": true,
+    "probe_result": "data",
+    "hold_released": true,
+    "effective_at": 1791589904337,
+    "manual_retry_or_credential_change": false,
+    "latest_stream_failure": {
+      "status": "timeout",
+      "phase": "receive_headers",
+      "route": "upstream",
+      "records": 0
+    },
+    "market_session": "unknown"
+  },
+  "https": {
+    "website": 200,
+    "chart_origin": 200,
+    "readyz": 200
+  },
+  "ubuntu_acceptance_retirement": {
+    "task": "mw-weekend-recovery-20261010",
+    "project": "mw-weekend-recovery-20261010",
+    "actual_backup_restore_and_content_verification": true,
+    "task_containers_volume_network_removed": true,
+    "other_tasks_preserved": true,
+    "private_archive": "mw-weekend-recovery-20261010-20261009T235519-3853c558"
+  }
+}

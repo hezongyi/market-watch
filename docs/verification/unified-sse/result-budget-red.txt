@@ -1,0 +1,13 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_composite_history_snapshot_budget_allows_windowed_native_delivery ____
+backend/tests/test_market_stream.py:79: in test_composite_history_snapshot_budget_allows_windowed_native_delivery
+    assert len(rows) == 1 and rows[0]["type"] == "bars"
+E   AssertionError: assert (1 == 1 and 'reset' == 'bars'
+E    +  where 1 = len([{'listener': 'chart', 'generation': 1, 'identity': {'kind': 'bars', 'dataset': 'independent'}, 'result_epoch': '1fc914d6-a101-4d23-ab3e-a6eee2ce9303', ...}])
+E     
+E     - bars
+E     + reset)
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_stream.py::test_composite_history_snapshot_budget_allows_windowed_native_delivery
+1 failed, 14 deselected in 0.32s
