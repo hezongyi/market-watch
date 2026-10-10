@@ -15,9 +15,9 @@
 
 Ubuntu quant-server 本机 Docker；task / Compose project：`mw-pr27-review-20261010`。独立网络、volume `mw-pr27-review-20261010_pr27-pg`、数据库及端口。没有在 unraid 创建实例。
 
-验收运行地址：`https://192.168.7.232:19973/advanced-charts`；图表来源：`https://192.168.7.232:19974`；PostgreSQL 仅绑定 `127.0.0.1:19975`。
+验收期间运行地址（2026-10-10 已退役，当前不可访问）：`https://192.168.7.232:19973/advanced-charts`；图表来源：`https://192.168.7.232:19974`；PostgreSQL 仅绑定 `127.0.0.1:19975`。
 
-13 个服务实际运行，API/PG 健康，`/readyz` HTTP 200。数据库从 Ubuntu 原验收项目一致性快照实际恢复，最终包含 17 个历史版本、5 个维护计划、1 个组合；未修改源实例。
+验收期间 13 个服务实际运行，API/PG 健康，`/readyz` HTTP 200。数据库从 Ubuntu 原验收项目一致性快照实际恢复，最终包含 17 个历史版本、5 个维护计划、1 个组合；未修改源实例。
 
 全部候选镜像通过 `mw-docker build --task mw-pr27-review-20261010 --project mw-pr27-review-20261010 --purpose acceptance` 和 Ubuntu 专用 builder 构建，dirty 标签为 false：
 
@@ -72,4 +72,11 @@ sg docker -c 'docker compose --env-file artifacts/pr27-review/compose.env -p mw-
 sg docker -c 'docker compose --env-file artifacts/pr27-review/compose.env -p mw-pr27-review-20261010 -f artifacts/pr27-review/compose.yaml stop'
 ```
 
-退役必须先预览 `mw-docker retire --task mw-pr27-review-20261010 --project mw-pr27-review-20261010`，然后执行 `--apply`，真实备份/恢复验证通过后再删除该任务容器、卷、网络与无引用候选镜像。其他 Ubuntu 项目及生产实例不在本次清理范围。
+## 已完成退役
+
+2026-10-10 17:36（Asia/Singapore）完成精确退役。先预览 `mw-docker retire --task mw-pr27-review-20261010 --project mw-pr27-review-20261010` 清单，再执行 `--apply`。
+
+- 备份 `data_center` 和 `postgres` 两个数据库及全局角色；在本任务 PostgreSQL 中创建临时数据库实际恢复，87 张表的行数和逐行内容指纹一致，源库复核一致。恢复校验成功后删除临时数据库。
+- 删除本任务 14 个容器、`mw-pr27-review-20261010_pr27-pg` 卷和独立网络；通过工具清理本任务无引用候选镜像，任务已登记结束。其他 Ubuntu 项目及生产实例不在清理范围。
+- 私有归档保留于 `~/.local/share/market-watch-docker/archives/mw-pr27-review-20261010-20261010T093220-2b0ecd57/`，包含备份、恢复校验记录及私有配置，不入库。原始退役预览/执行结果在 ignored 的 `artifacts/pr27-review/retire-*.json`。
+- 上述地址已停用，启停命令仅记录验收运行期间的操作。重新验收需使用新 task 和独立 project，通过 `mw-docker` 重新构建并恢复到新的隔离卷；不得复用已结束任务。
