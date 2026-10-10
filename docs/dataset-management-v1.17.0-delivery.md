@@ -25,6 +25,7 @@ PR #31 已修复并通过 Standards／Spec 复审，合并提交 `6c3bdc172ae058
 - 最终正式 API 镜像：32 项回归通过（SQLite 和实际 Ubuntu PG 用例）；133 个安装后端模块与标签源码一致，第三方依赖与 v1.16.0 一致。
 - 正式生产：16 项浏览器检查通过，实际五分类、精确任务入口和返回、375px 滚动 150 → 150、固定版本详情焦点、既有图表与 SSE；没有维护／采集／控制写入。登录检查首次在服务启动中返回 502，健康后完整复跑通过。
 - OANDA 状态仍为 unavailable／unknown 和 m1_late，页面没有宣称供源就绪；周末开市与 Yahoo 网络未重新验证。
+- 补充核对：上述生产“source status”检查实际操作 `details.dc-live-provider-status` 旧顶部区，验证其读取和 390px 布局；未验证独立「来源状态」页。该功能提交 `3631909` 没有包含在 v1.17.0；本 session 的页面迁移交付存在遗漏。Yahoo 实现虽已入 main，生产开关仍为关闭。详见[漏合核对](verification/session-unmerged-audit-20261010/README.md)。
 
 ## 备份与回滚
 

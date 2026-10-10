@@ -6,15 +6,16 @@ No workers, upstream connections, notifications or production databases are used
 import hashlib
 import json
 
-from sqlalchemy import select
-
 from alerts import live_api, live_pricing
 from alerts.config import settings
 from alerts.storage import LiveState, MarketDemand, Preference, PricingOwner, now_ms, transaction
+from sqlalchemy import select
 
 
 def main():
-    assert settings.database_application_name == 'mw-source-status-20261010'
+    assert settings.database_application_name in {
+        'mw-source-status-20261010', 'mw-source-status-delivery-20261010'
+    }
     assert settings.database_url.split('@')[-1] == 'pg/source_status'
     assert settings.oanda_account_id == 'source-status-acceptance-account'
     assert not settings.delivery_enabled and not settings.oanda_stream_enabled

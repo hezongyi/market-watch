@@ -16,7 +16,7 @@ const healthy=()=>({provider:{...provider},datasets:[{...row}]});
 (async()=>{
  const context=await chromium.launchPersistentContext('',{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',ignoreHTTPSErrors:true,viewport:null,args:['--no-sandbox','--window-size=1440,1000','--disable-extensions-except='+extension,'--load-extension='+extension]});
  const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker'),p=context.pages()[0];
- const report={environment:'Ubuntu isolated Docker mw-source-status-20261010; actual authenticated native/compatibility windows; controlled status/feed fixtures',passed:false,checks:[],errors:[]};
+ const report={environment:'Ubuntu isolated Docker mw-source-status-delivery-20261010; actual authenticated native/compatibility windows; controlled status/feed fixtures',passed:false,checks:[],errors:[]};
  p.on('pageerror',e=>report.errors.push(e.message));const record=(name,data={})=>{report.checks.push({name,...data});console.log('PASS',name,JSON.stringify(data));};
  const host=()=>p.frames().find(f=>f.url().startsWith(chart+'/?'));
  const native=()=>p.frames().find(f=>f.url().startsWith('blob:'));
