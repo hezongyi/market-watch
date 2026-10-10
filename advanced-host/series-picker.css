@@ -10,6 +10,7 @@
 .mw-series-picker button { cursor: pointer; }
 .mw-series-picker button:disabled { cursor: default; opacity: .5; }
 .mw-series-picker :focus-visible { outline: 2px solid #8cbdff; outline-offset: 3px; }
+.mw-series-picker input[type="search"]:focus,.mw-series-picker input[type="search"]:focus-visible { outline:none; box-shadow:none; }
 .mw-series-picker a { color: var(--series-link); }
 .mw-series-results { display: grid; gap: 8px; }
 .mw-series-result { text-align: left; display: grid; gap: 4px; overflow-wrap: anywhere; }

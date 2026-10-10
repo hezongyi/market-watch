@@ -33,6 +33,10 @@
 .dc-steps li { padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; }
 .dc-steps [aria-current] { color: var(--green); border-color: var(--green); }
 .data-center button:not([data-native-component] *), .data-center input:not([data-native-component] *), .data-center select:not([data-native-component] *) { font-size: 14px; min-height: 36px; }
+.data-center input[type="search"]:focus, .data-center input[type="search"]:focus-visible,
+.data-center [data-native-component="search"] input:focus, .data-center [data-native-component="search"] input:focus-visible {
+  outline: none !important; box-shadow: none !important; border-color: var(--control-line, var(--line)) !important;
+}
 .data-center tr:focus, .data-center [role="alert"]:focus { outline: 2px solid var(--green); outline-offset: 4px; }
 .data-center .dc-fields small { font-size: 14px; }
 .data-center .error { color: var(--danger); overflow-wrap: anywhere; }

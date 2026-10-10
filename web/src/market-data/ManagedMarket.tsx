@@ -136,6 +136,18 @@ function ManagedRow({
   params: URLSearchParams;
 }) {
   const detail = useDetailPanel();
+  const lifecycleStatus = d.maintenance.archived
+    ? "已归档"
+    : d.maintenance.paused
+      ? "维护已暂停"
+      : names[d.availability] || d.availability;
+  const maintenanceStatus = d.maintenance.configured
+    ? d.maintenance.paused
+      ? "暂停定时维护"
+      : d.maintenance.frequency === "daily"
+        ? "每日维护"
+        : "一次性维护"
+    : "未配置维护";
   return (
     <article className="dc-market-row" id={`dataset-${d.id}`} tabIndex={-1}>
       <div className="dc-market-main">
@@ -194,51 +206,36 @@ function ManagedRow({
           title={`${d.display_symbol || d.logical_symbol} · 自建行情`}
           close={detail.close}
         >
-          <p>
-            来源：{names[d.identity.source]} · {d.identity.basis} ·{" "}
-            {phase(d.aggregation_calendar)}
-          </p>
-          <p>状态：{names[d.availability] || d.availability}</p>
-          <p>
-            可用历史：
-            {d.available_end
-              ? `${time(d.available_start)} 至 ${time(d.available_end)}`
-              : "尚未发布"}
-            {!!d.unknown_minutes && ` · 含未知区间 ${d.unknown_minutes} 分钟`}
-          </p>
-          <p>可用周期：{d.usable_timeframes.join(" · ") || "尚无可用周期"}</p>
-          {d.maintenance.frequency === "daily" &&
-            !d.maintenance.paused &&
-            d.maintenance.next_at != null && (
-              <p>下次维护：{time(d.maintenance.next_at)}</p>
-            )}
-          {d.maintenance.task_error && (
-            <p className="error">本次维护：{d.maintenance.task_error}</p>
-          )}
-          <div className="dc-actions">
+          <div className="dc-detail-summary">
+            <div className="dc-detail-status-line">
+              <span className={`dc-status-pill state-${d.maintenance.archived ? "archived" : d.maintenance.paused ? "paused" : d.availability}`}>
+                {lifecycleStatus}
+              </span>
+              <span className="dc-detail-muted">{maintenanceStatus}</span>
+            </div>
+            <dl className="dc-detail-facts">
+              <div><dt>来源</dt><dd>{names[d.identity.source]} · {d.identity.basis.toUpperCase()}</dd></div>
+              <div><dt>聚合日界</dt><dd>{phase(d.aggregation_calendar)}</dd></div>
+              <div><dt>可用历史</dt><dd>{d.available_end ? `${time(d.available_start)} 至 ${time(d.available_end)}` : "尚未发布"}</dd></div>
+              <div><dt>可用周期</dt><dd>{d.usable_timeframes.join(" · ") || "尚无可用周期"}</dd></div>
+              <div><dt>准确来源代码</dt><dd>{d.provider_display_symbol || d.identity.provider_symbol}</dd></div>
+              {d.maintenance.frequency === "daily" && !d.maintenance.paused && d.maintenance.next_at != null && (
+                <div><dt>下次维护</dt><dd>{time(d.maintenance.next_at)}</dd></div>
+              )}
+            </dl>
+            {!!d.unknown_minutes && <p className="dc-detail-muted">未观测区间：{d.unknown_minutes} 分钟</p>}
+            {d.maintenance.task_error && <p className="error">本次维护：{d.maintenance.task_error}</p>}
+          </div>
+          <div className="dc-detail-actions" aria-label="行情操作">
             {d.latest_version_id && d.usable_timeframes.length > 0 && <OpenChart
               ticker={`MWH:${d.periods.find(p => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`}
               frame={d.usable_timeframes[0]} label="打开图表" />}
-
-            <Link
-              to={centerLink(
-                `/market-data/datasets/${d.id}`,
-                params,
-                `dataset-${d.id}`,
-              )}
-            >
-              管理行情
-            </Link>
-            <Link
-              className="dc-danger"
-              to={centerLink(
-                `/market-data/datasets/${d.id}?section=references&view=delete`,
-                params,
-                `dataset-${d.id}`,
-              )}
-            >
-              删除历史数据
-            </Link>
+            <Link className="primary" to={centerLink(`/market-data/datasets/${d.id}`, params, `dataset-${d.id}`)}>管理行情</Link>
+          </div>
+          <div className="dc-detail-lifecycle">
+            <h3>生命周期</h3>
+            <p>暂停维护会保留已发布历史；归档会从默认列表隐藏；删除历史数据会回收价格内容，且不可逆。</p>
+            <Link className="dc-danger-link" to={centerLink(`/market-data/datasets/${d.id}?section=references&view=delete`, params, `dataset-${d.id}`)}>删除历史数据</Link>
           </div>
         </DetailPanel>
       )}

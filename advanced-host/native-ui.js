@@ -70,6 +70,8 @@ function chartNativeUi(widget, doc, searchSymbols) {
         .mw-platform-inline .mw-platform-action:hover{background:var(--card)}
         .mw-platform-inline .mw-platform-action:disabled{opacity:.5;cursor:default}
         .mw-platform-inline .mw-platform-action:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+        .mw-platform-inline input[role="searchbox"]:focus,.mw-platform-inline input[role="searchbox"]:focus-visible{outline:none!important;box-shadow:none!important;border-color:var(--control-line,#d9d9d9)!important}
+        [data-dialog-name^="选择 "] input[role="searchbox"]:focus,[data-dialog-name^="选择 "] input[role="searchbox"]:focus-visible{outline:none!important;box-shadow:none!important}
         .mw-platform-source{margin-left:auto;min-width:120px;max-width:180px}
         .mw-platform-status{font-size:12px;color:var(--muted);padding:8px 20px;flex-shrink:0}
         .mw-platform-status[role=alert]{color:var(--danger)}

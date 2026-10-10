@@ -67,6 +67,20 @@ export function DatasetDetail() {
   const frameReady = selectedPeriods.data?.some(
     (p) => p.timeframe === frame && p.status === "published" && p.rows > 0,
   );
+  const lifecycleStatus = dataset?.maintenance.archived
+    ? "已归档"
+    : dataset?.maintenance.paused
+      ? "维护已暂停"
+      : dataset?.availability
+        ? names[dataset.availability] || dataset.availability
+        : "读取中";
+  const maintenanceSummary = dataset?.maintenance.configured
+    ? dataset.maintenance.paused
+      ? "暂停定时维护"
+      : dataset.maintenance.frequency === "daily"
+        ? "每日维护"
+        : "一次性维护"
+    : "未配置维护";
   const coveragePage = Math.max(1, Number(params.get("coverage_page")) || 1);
   const requestPage = Math.max(1, Number(params.get("request_page")) || 1);
   const requests = useSnapshot<{
@@ -193,8 +207,8 @@ export function DatasetDetail() {
     }
   }
   return (
-    <section className="data-center">
-      <Link to={centerReturn(params)}>返回数据中心列表</Link>
+    <section className="data-center dc-dataset-detail">
+      <Link className="dc-breadcrumb" to={centerReturn(params)}>返回数据中心列表</Link>
       <Feedback
         error={result.error}
         loading={result.loading}
@@ -202,7 +216,7 @@ export function DatasetDetail() {
       />
       {dataset && (
         <>
-          <div className="dc-heading">
+          <div className="dc-dataset-hero">
             <div>
               <h1>{dataset.display_symbol || dataset.logical_symbol}</h1>
               <p>
@@ -211,34 +225,26 @@ export function DatasetDetail() {
                 {dataset.provider_display_symbol || dataset.identity.provider_symbol}
               </p>
             </div>
-            <div className="dc-actions">
-              <button onClick={() => {
-                const next = new URLSearchParams(params);
-                next.set("section", "references"); next.set("view", "delete");
-                setParams(next);
-              }}>删除历史数据</button>
+            <div className="dc-dataset-hero-actions" aria-label="行情快捷操作">
               {dataset.usable_timeframes.length > 0 && (
                 <OpenChart ticker={`MWH:${dataset.periods.find(p => p.timeframe === "M1")?.available_version_id || dataset.latest_version_id}`} />
               )}
               {dataset.latest_version_id && (
-                <Link
-                  to={`/replay?dataset_version=${dataset.latest_version_id}`}
-                >
-                  用于回测
-                </Link>
+                <Link to={`/replay?dataset_version=${dataset.latest_version_id}`}>用于回测</Link>
               )}
               {dataset.maintenance.configured && (
                 <button
                   disabled={busy}
-                  onClick={() =>
-                    void act(`/market-data/datasets/${id}/tasks`, {
-                      request_id: crypto.randomUUID(),
-                    })
-                  }
+                  onClick={() => void act(`/market-data/datasets/${id}/tasks`, { request_id: crypto.randomUUID() })}
                 >
                   立即更新
                 </button>
               )}
+              <button className="dc-danger-action" onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set("section", "references"); next.set("view", "delete");
+                setParams(next);
+              }}>删除历史数据</button>
             </div>
           </div>
           {error && (
@@ -247,13 +253,13 @@ export function DatasetDetail() {
             </p>
           )}
           {notice && <p role="status">{notice}</p>}
-          <p>
-            可用到 {time(dataset.available_end)}
-            {dataset.maintenance.task_error
-              ? " · 本次更新失败，旧版本仍可使用"
-              : ""}
-          </p>
-          <nav className="dc-tabs" aria-label="自建行情详情">
+          <div className="dc-dataset-statusbar">
+            <span className={`dc-status-pill state-${dataset.maintenance.archived ? "archived" : dataset.maintenance.paused ? "paused" : dataset.availability}`}>{lifecycleStatus}</span>
+            <span>{maintenanceSummary}</span>
+            <span>可用到 {time(dataset.available_end)}</span>
+            {dataset.maintenance.task_error && <span className="error">本次更新失败，旧版本仍可使用</span>}
+          </div>
+          <nav className="dc-tabs dc-dataset-nav" aria-label="自建行情管理">
             {[
               ["overview", "概览"],
               ["coverage", "覆盖与质量"],
@@ -600,8 +606,9 @@ export function DatasetDetail() {
             </>
           )}
           {section === "maintenance" && (
-            <div className="dc-fields">
+            <div className="dc-fields dc-management-section dc-maintenance-section">
               <h2>维护计划</h2>
+              <p className="dc-section-lead">维护计划控制后续数据更新；暂停和归档不会删除已发布历史。</p>
               <MaintenanceSettings
                 key={dataset.id}
                 dataset={dataset}
@@ -613,8 +620,9 @@ export function DatasetDetail() {
                   : "未配置维护"}
               </p>
               {dataset.maintenance.configured && (
-                <div className="dc-actions">
+                <div className="dc-lifecycle-actions" aria-label="维护生命周期操作">
                   <button
+                    className={!dataset.maintenance.archived ? "dc-danger-action" : undefined}
                     disabled={busy}
                     onClick={() =>
                       void act(
