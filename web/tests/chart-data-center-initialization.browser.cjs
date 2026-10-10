@@ -28,7 +28,7 @@ const report = { environment: 'Ubuntu Docker; injected first native save conflic
         await route.fulfill({ status: 409, json: { detail: '验收注入：工作区版本已改变' } });
       } else await route.continue();
     });
-    await page.goto(base + '/market-data?tab=sources');
+    await page.goto(base + '/market-data?tab=invalid-section');
     await expect.poll(() => failed, { timeout: 30000 }).toBeTruthy();
     await expect.poll(() => !!native()).toBeTruthy();
     await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeVisible({ timeout: 5000 });

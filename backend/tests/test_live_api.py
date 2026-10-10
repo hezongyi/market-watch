@@ -185,3 +185,100 @@ def test_shared_chart_query_renews_source_demand(running):
                 MarketDemand.instrument_id == instrument)) is not None
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_source_status_reports_configuration_without_exposing_credentials(database, monkeypatch):
+    from alerts.config import settings
+
+    monkeypatch.setattr(settings, 'oanda_account_id', '')
+    monkeypatch.setattr(settings, 'oanda_token', '')
+    empty = live.provider_status()
+    assert empty['configured'] is False
+    assert empty['collection_recorded'] is False
+    assert empty['error_observed_at'] is None
+    assert empty['connection_started_at'] is None
+    monkeypatch.setattr(settings, 'oanda_account_id', 'status-test-account')
+    assert live.provider_status()['configured'] is False
+    monkeypatch.setattr(settings, 'oanda_token', 'status-test-secret-token')
+    configured = live.provider_status()
+    assert configured['configured'] is True
+    assert configured['collection_recorded'] is False
+    assert configured['error'] is None
+    assert 'status-test-account' not in str(configured)
+    assert 'status-test-secret-token' not in str(configured)
+
+
+def test_source_status_never_borrows_probe_time_for_stream_error(running, monkeypatch):
+    from alerts.config import settings
+    from alerts.market_contracts import RequestResult
+
+    factory, ownership, epoch, identities = running
+    monkeypatch.setattr(settings, 'oanda_account_id', 'test-account')
+    live.disconnected(ownership, epoch, identities, RequestResult(status='timeout'), now=125000)
+    with factory.begin() as db:
+        db.merge(Preference(key='oanda_probe_status:' + ownership[0],
+                            value={'error': 'timeout', 'observed_at': 120000}))
+    status = live.provider_status(now=130000)
+    assert status['error'] == 'timeout'
+    assert status['error_observed_at'] is None
+    assert status['authentication_probe_at'] == 120000
+    assert status['collection_recorded'] is True
+
+
+def test_source_status_auth_probe_observation_belongs_to_its_actual_error(running, monkeypatch):
+    from alerts.config import settings
+    from alerts.market_contracts import RequestResult
+    from alerts.storage import PricingOwner
+
+    factory, ownership, epoch, identities = running
+    monkeypatch.setattr(settings, 'oanda_account_id', 'test-account')
+    live.disconnected(ownership, epoch, identities, RequestResult(status='unauthorized'), now=125000)
+    assert live.provider_status()['error_observed_at'] is None
+    with factory.begin() as db:
+        due = db.get(PricingOwner, ownership[0]).next_at
+    probe = live.claim_auth_probe('test-account', now=due)
+    live.finish_auth_probe(probe, RequestResult(status='timeout'), now=due + 1)
+    status = live.provider_status(now=due + 2)
+    assert status['authentication_hold'] is True
+    assert status['error'] == 'timeout'
+    assert status['error_observed_at'] == due + 1
+    assert status['authentication_probe_at'] == due + 1
+    # A missing observation stays missing; the read clock does not fill it.
+    with factory.begin() as db:
+        db.merge(Preference(key='oanda_probe_status:' + ownership[0], value={'error': 'timeout'}))
+    assert live.provider_status(now=due + 999)['error_observed_at'] is None
+
+
+def test_source_status_only_shows_configured_account_and_reads_do_not_write(running, monkeypatch):
+    from alerts.config import settings
+    from alerts.storage import LiveState, PricingOwner
+
+    factory, _, _, _ = running
+    monkeypatch.setattr(settings, 'oanda_account_id', 'other-account')
+    monkeypatch.setattr(settings, 'oanda_token', 'test-token')
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+
+    def stored():
+        with factory.begin() as db:
+            return {
+                'owners': [(row.id, row.token, row.expires, row.next_at, row.error) for row in db.scalars(select(PricingOwner))],
+                'states': [(row.dataset_id, row.revision, row.connection, row.quote, row.ready) for row in db.scalars(select(LiveState))],
+                'demand': [(row.id, row.expires) for row in db.scalars(select(MarketDemand))],
+                'preferences': [(row.key, row.value) for row in db.scalars(select(Preference))],
+            }
+
+    before = stored()
+    try:
+        with TestClient(api_module.app) as client:
+            assert client.get('/api/market-data/live/status').json()['datasets'] == []
+            monkeypatch.setattr(settings, 'oanda_account_id', 'test-account')
+            for _ in range(3):
+                response = client.get('/api/market-data/live/status')
+                assert response.status_code == 200
+                body = response.json()
+                assert {row['logical_symbol'] for row in body['datasets']} == {'EURUSD', 'XAUUSD'}
+                assert all('quote_ready' in row and 'candle_ready' in row for row in body['datasets'])
+                assert body['provider']['collection_recorded'] is True
+        assert stored() == before
+    finally:
+        api_module.app.dependency_overrides.clear()
