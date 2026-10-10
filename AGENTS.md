@@ -26,3 +26,9 @@
 - 构建使用Ubuntu专用 `market-watch-ubuntu` BuildKit，缓存回收目标8 GiB。正式与回滚镜像用途必须明确，不参与自动删除。
 - 验收结束后先查看 `mw-docker retire --task TASK --project PROJECT` 清单，再对该已结束任务执行 `--apply`；数据库必须归档且实际恢复校验。进行中任务不标记完成。
 - 自动清理仅针对已完成、过期、无任何容器引用的本工具标签镜像；既有不明归属资源和其他任务不自动删除。
+
+## 生产供源默认配置
+
+- 用户已明确要求 Yahoo 在此后的每次生产部署保持启用。新版本使用根目录 `compose.production.yaml` 生成／核对 standalone `compose.release.yaml`，全部后端服务有效配置必须为 `ALERTS_YAHOO_ENABLED=true`；不可仅凭镜像更新或可选 overlay 宣称持久启用。
+- 发布镜像引用必须固定；保留生产私有代理、数据库及其他配置。Yahoo 代理使用 `ALERTS_YAHOO_PROXY` 或既有 `ALERTS_MARKET_PROXY`。验收与开发实例仍显式决定是否启用。
+- 生成部署包及切换前核对 Compose 展开配置中全部后端服务的 Yahoo 开关；部署后核对实际 Settings 和 Yahoo 读取。除非用户要求关闭，不随版本升级恢复为 false。历史 release 清单不可改写。

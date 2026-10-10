@@ -1,15 +1,16 @@
-# Yahoo 显式启用交付
+# Yahoo 生产默认启用
 
-本 session 曾要求启用 Yahoo。功能代码已合入 main，但 2026-10-10 的生产读取确认 `yahoo_enabled=False`，AAPL 目录为空；不能称启用完成。
+用户明确要求首次生产启用后，每次生产部署、重建都保持启用。PR #33 的可选 `compose.yahoo.yaml` 不能单独保证这一点。
 
-本 PR 增加 [compose.yahoo.yaml](../compose.yahoo.yaml)，对当前正式 Compose 的全部后端服务显式启用 Yahoo，使 API、目录刷新、历史和报价 worker 使用一致配置。它是选择性 overlay；Python 默认开关仍由部署选择。私有 `.env` 必须配置 `ALERTS_YAHOO_PROXY` 或已有 `ALERTS_MARKET_PROXY`；不在 Git 保存代理地址／凭据。代理缺失继续返回原有 configuration 错误。
+后续正式发布使用根目录 [compose.production.yaml](../compose.production.yaml) 作为 standalone 模板。全部 11 个后端服务明确固定 `ALERTS_YAHOO_ENABLED=true`，升级只更换发布镜像，不依赖额外 Yahoo overlay；生产私有 `.env` 中的旧 false 不会覆盖 Compose 的明确 true。Python 默认值以及开发／验收配置不变。
 
-当前正式部署的配置预览方式（尚未执行生产变更）：
+为发布设置 `MW_API_IMAGE`、`MW_WEB_IMAGE`、`MW_CHART_IMAGE`、`MW_BACKUP_IMAGE` 四个不可变镜像引用，保留现有生产私有代理、数据库及其他配置。生成 standalone `compose.release.yaml` 后，核对所有后端服务开关为 true，再使用既有命令启动：
 
 ```bash
-./tools/docker-compose -p market-watch -f compose.release.yaml -f compose.yahoo.yaml config --quiet
+./tools/docker-compose -p market-watch -f compose.release.yaml config --quiet
+./tools/docker-compose -p market-watch -f compose.release.yaml up -d --no-build
 ```
 
-正式应用需将 overlay 随部署包放入生产根目录，先备份配置，再以相同组合执行 `up -d --no-build`。后续启停和重建均使用两个 `-f`，否则会恢复原 `.env` 的关闭值。通过 API 搜索 AAPL、真实解析／历史／报价与实际代理读取验收后，才能记录启用完成。不开新采集 worker、不迁移 schema、不改变历史业务。
+私有代理必须配置 `ALERTS_YAHOO_PROXY` 或 `ALERTS_MARKET_PROXY`，凭据不提交。每次发布都核对展开配置和实际 Settings，并验证 Yahoo 搜索／解析／历史／报价；开关启用不代表上游每次请求都成功。关闭需用户明确要求后调整生产配置，保留缓存与工作区。
 
-关闭时回到原 Compose 和私有 env 的原值并重建相关服务；保留 Yahoo 缓存与工作区。此 PR 仅交付可审查的配置，不变更 unraid，不声明真实 Yahoo 上游验证通过。
+当前生产仍是 v1.17.0，真实检查为 `yahoo_enabled=False`；本次模板改动尚未应用生产，不改写历史发布证据。

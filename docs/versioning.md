@@ -1,5 +1,9 @@
 # Git与版本维护
 
+## v1.18.0 来源状态页面与生产 Yahoo 默认启用
+
+PR #33 补交来源状态分类，PR #34 将 Yahoo 固定为后续生产默认启用，采用兼容功能次版本 1.18.0。Python/web/锁文件根版本与 CHANGELOG 同步；按用户授权在最终 main 合并提交推送不可移动附注 tag v1.18.0，Ubuntu mw-docker purpose=release 构建四类正式镜像，再部署 unraid。无新增 schema/第三方依赖；生产开关与网络验收依据实际部署记录，不以源码 tag 推断已启用。
+
 ## v1.17.0 自建行情管理 UI 与任务导航
 
 PR #31 新增兼容的管理布局与任务返回导航，采用次版本 1.17.0。同步 Python/web 及锁文件根版本和 CHANGELOG；合并后在最终 main 提交创建不可移动的附注标签 v1.17.0。正式镜像通过 Ubuntu `mw-docker`、`purpose=release` 构建，逐服务提交和镜像 ID 由发布清单记录；用户已授权 unraid 正式生产切换，数据库保持 `ar45_market_stream`。原验收与新增位置恢复回归边界见 `docs/verification/dataset-management-ui-20261010.md`。

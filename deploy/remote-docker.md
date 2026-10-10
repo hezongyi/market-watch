@@ -1,6 +1,10 @@
 # Unraid 生产部署与升级
 
-## 当前 v1.8.0（2026-10-06）
+## 后续正式发布：Yahoo 默认开启
+
+用户要求后续每次生产部署保持 Yahoo 启用。新发布使用根目录 `compose.production.yaml` 作为 standalone 模板，固定四类发布镜像，保留私有代理和数据库配置，生成生产 `compose.release.yaml`。全部 11 个后端服务展开后必须为 `ALERTS_YAHOO_ENABLED=true`，部署后再次核对实际 Settings 与 Yahoo 读取；无需附加 Yahoo overlay。详见 [Yahoo 部署规则](../docs/yahoo-enable-delivery-20261010.md)。历史 release 文件是当时证据，不能直接拿其 Yahoo 关闭状态作为新版本默认值。
+
+## 历史 v1.8.0（2026-10-06）
 
 生产为 v1.8.0，schema `r19_native_history_loads`，发布源码及固定附注标签为 `b700911` / `v1.8.0`。实际四类镜像 ID、八个常驻服务、迁移和备份恢复证据见 [生产清单](releases/v1.8.0-production.json)，固定 standalone 配置见 [Compose](releases/v1.8.0-production.yaml)。新增 `native-history-worker` 执行 `python -m alerts.native_history_loads`，通知投递关闭；其他服务、pool size=2 / overflow=0 和既有 Yahoo 关闭配置保留。
 
