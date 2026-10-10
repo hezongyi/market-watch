@@ -1,0 +1,26 @@
+{
+  "environment": "Ubuntu isolated Docker; native multi-chart API, delayed/failed source fixtures",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "stale layout is rejected before closing the dialog; selected action resets"
+    },
+    {
+      "name": "source failure is shown on the chart; retry succeeds without reopening the dialog"
+    },
+    {
+      "name": "changing active chart cancels delayed validation without replacing the newer target"
+    },
+    {
+      "name": "symbol/period command affects only captured chart with both sync locks initially enabled"
+    },
+    {
+      "name": "late native callback cannot re-open a dialog or advance an older workspace command"
+    },
+    {
+      "name": "a newer user period survives the late symbol callback without reverting to requested H1"
+    }
+  ],
+  "errors": []
+}

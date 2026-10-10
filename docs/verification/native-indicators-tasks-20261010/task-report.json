@@ -1,0 +1,40 @@
+{
+  "environment": "Ubuntu isolated Docker; deployed native UI; real task feed read and scoped task control/pagination fixtures",
+  "passed": true,
+  "checks": [
+    {
+      "name": "real deployed task feed and native title/search/status tabs/source Select replace old filter and pager"
+    },
+    {
+      "name": "compact rows open complete task detail in one panel; Escape preserves list and trigger focus"
+    },
+    {
+      "name": "keyset scrolling loads 70 unique tasks; continuation failure retains rows and retry completes without pager"
+    },
+    {
+      "name": "ID polling updates completed state in place; new records prompt refresh without reorder or scroll jumps"
+    },
+    {
+      "name": "held task mutation shares busy state between row/detail, prevents duplicates and leaves other rows enabled"
+    },
+    {
+      "name": "resume/pause follow server state; cancellation is detail-only with keep/cancel confirmation and ended record retained"
+    },
+    {
+      "name": "retry failure remains local and can retry; configuration errors expose safe reason and correct provider configuration entry"
+    },
+    {
+      "name": "search and source reset feed; held stale response cannot overwrite later query and empty state remains clear"
+    },
+    {
+      "name": "full management round trip restores loaded task prefix, exact task row and browsing context"
+    },
+    {
+      "name": "dark/light desktop/tablet/375px keep source, rows and details reachable; no overflow and detail Tab/Escape restore focus"
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "onlyOwnedWorkspaceDeleted": true
+  }
+}

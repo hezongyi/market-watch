@@ -160,9 +160,17 @@ replacements.push([
   '_syncChartsDateRangesWithActiveChartRange(e){const t=this.activeChartWidget.value(),',
   '_syncChartsDateRangesWithActiveChartRange(e){if(globalThis.parent?.MWChartMaximize?.resizing())return;const t=this.activeChartWidget.value(),',
 ]);
+const maximizedHooks = replacements.map(pair => [...pair]);
+// Native quotes overwrite every returned scale with the storage symbol scale.
+// Permit a host display scale only in quote presentation, retaining the source
+// symbol scale for candles, calculations, drawing ticks and manual settings.
+replacements.push([
+  'pricescale:i.pricescale,minmov:i.minmov,minmove2:i.minmove2||0,fractional:i.fractional||!1',
+  'pricescale:globalThis.parent?.chartQuoteScale?.(t,i)??i.pricescale,minmov:i.minmov,minmove2:i.minmove2||0,fractional:i.fractional||!1',
+]);
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [replacements, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
+  const installed = [replacements, maximizedHooks, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;

@@ -1,0 +1,189 @@
+{
+  "checked_at": "2026-10-08T15:25:20.600881+00:00",
+  "host": "quant-server",
+  "environment": "Ubuntu local isolated Docker",
+  "project": "mw-data-center-review-20261008",
+  "task": "mw-data-center-review-20261008",
+  "app_url": "https://192.168.7.232:19943/advanced-charts",
+  "chart_origin": "https://192.168.7.232:19944",
+  "retained_for_user_review": true,
+  "lifecycle_task_state": "in_progress",
+  "services": [
+    {
+      "name": "mw-data-center-review-20261008-api-1",
+      "image": "sha256:c20aad1205a9d0958426a687e062453957bb88f127bbb28bc9c9812f3d38b811",
+      "state": "running",
+      "health": "healthy",
+      "project": "mw-data-center-review-20261008",
+      "purpose": "acceptance",
+      "task": "mw-data-center-review-20261008",
+      "commit": "4996af5e63b85d69ea868168b49cb364f8b1d70e",
+      "dirty": "true",
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      },
+      "volumes": []
+    },
+    {
+      "name": "mw-data-center-review-20261008-web-1",
+      "image": "sha256:cfba691408ae618b4725e5fcb449ddc1a5e4a514777e87c16eba8362b0ab737d",
+      "state": "running",
+      "health": null,
+      "project": "mw-data-center-review-20261008",
+      "purpose": "acceptance",
+      "task": "mw-data-center-review-20261008",
+      "commit": "4996af5e63b85d69ea868168b49cb364f8b1d70e",
+      "dirty": "true",
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "80/tcp": null
+      },
+      "volumes": []
+    },
+    {
+      "name": "mw-data-center-review-20261008-chart-origin-1",
+      "image": "sha256:64bae3688f2dc88b42a775ab39ee19822f05ee0318b9cd78546414d74f111d1b",
+      "state": "running",
+      "health": null,
+      "project": "mw-data-center-review-20261008",
+      "purpose": "acceptance",
+      "task": "mw-data-center-review-20261008",
+      "commit": "4996af5e63b85d69ea868168b49cb364f8b1d70e",
+      "dirty": "true",
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "80/tcp": null
+      },
+      "volumes": []
+    },
+    {
+      "name": "mw-data-center-review-20261008-pg-1",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": "running",
+      "health": "healthy",
+      "project": "mw-data-center-review-20261008",
+      "purpose": null,
+      "task": null,
+      "commit": null,
+      "dirty": null,
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "5432/tcp": null
+      },
+      "volumes": [
+        "mw-data-center-review-20261008_data-center-pg"
+      ]
+    },
+    {
+      "name": "mw-data-center-review-20261008-tls-1",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "health": null,
+      "project": "mw-data-center-review-20261008",
+      "purpose": null,
+      "task": null,
+      "commit": null,
+      "dirty": null,
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "443/tcp": [
+          {
+            "HostIp": "192.168.7.232",
+            "HostPort": "19943"
+          }
+        ],
+        "444/tcp": [
+          {
+            "HostIp": "192.168.7.232",
+            "HostPort": "19944"
+          }
+        ],
+        "80/tcp": null
+      },
+      "volumes": []
+    },
+    {
+      "name": "mw-data-center-review-20261008-history-worker-1",
+      "image": "sha256:c20aad1205a9d0958426a687e062453957bb88f127bbb28bc9c9812f3d38b811",
+      "state": "running",
+      "health": null,
+      "project": "mw-data-center-review-20261008",
+      "purpose": "acceptance",
+      "task": "mw-data-center-review-20261008",
+      "commit": "4996af5e63b85d69ea868168b49cb364f8b1d70e",
+      "dirty": "true",
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      },
+      "volumes": []
+    },
+    {
+      "name": "mw-data-center-review-20261008-native-history-worker-1",
+      "image": "sha256:c20aad1205a9d0958426a687e062453957bb88f127bbb28bc9c9812f3d38b811",
+      "state": "running",
+      "health": null,
+      "project": "mw-data-center-review-20261008",
+      "purpose": "acceptance",
+      "task": "mw-data-center-review-20261008",
+      "commit": "4996af5e63b85d69ea868168b49cb364f8b1d70e",
+      "dirty": "true",
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      },
+      "volumes": []
+    },
+    {
+      "name": "mw-data-center-review-20261008-composite-aggregate-worker-1",
+      "image": "sha256:c20aad1205a9d0958426a687e062453957bb88f127bbb28bc9c9812f3d38b811",
+      "state": "running",
+      "health": null,
+      "project": "mw-data-center-review-20261008",
+      "purpose": "acceptance",
+      "task": "mw-data-center-review-20261008",
+      "commit": "4996af5e63b85d69ea868168b49cb364f8b1d70e",
+      "dirty": "true",
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      },
+      "volumes": []
+    },
+    {
+      "name": "mw-data-center-review-20261008-pricing-worker-1",
+      "image": "sha256:c20aad1205a9d0958426a687e062453957bb88f127bbb28bc9c9812f3d38b811",
+      "state": "running",
+      "health": null,
+      "project": "mw-data-center-review-20261008",
+      "purpose": "acceptance",
+      "task": "mw-data-center-review-20261008",
+      "commit": "4996af5e63b85d69ea868168b49cb364f8b1d70e",
+      "dirty": "true",
+      "networks": [
+        "mw-data-center-review-20261008_default"
+      ],
+      "ports": {
+        "8000/tcp": null
+      },
+      "volumes": []
+    }
+  ]
+}

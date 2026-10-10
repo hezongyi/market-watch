@@ -1,0 +1,5 @@
+PASS only selected row changes; other labels/style remain and rapid duplicate clicks are ignored { originalCount: 25 }
+PASS dialog closes before the held source responds { closeMs: 300, blocked: false }
+PASS loading feedback stays on the chart and clears after the native callback {}
+PASS slow candles load behind the closed dialog with visible chart feedback { closeMs: 139 }
+PASS long load explains the wait and retry stays on the chart without reopening data center {}

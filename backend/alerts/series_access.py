@@ -16,6 +16,7 @@ from sqlalchemy import func, or_, select
 from .chart_data import FRAMES, future_grid
 from .chart_series import encode
 from .composite_definitions import baseline, definition, first_use
+from .market_names import code_search, display_code, pair_query
 from .storage import (
     CompositeMinuteInput,
     CompositeRevision,
@@ -89,6 +90,7 @@ def _metadata(db, ident, kind, *, composite_context=None):
     else:
         raise ValueError("需要明确的固定历史或组合行情类型")
     return {"id": ident, "symbol": dataset.logical_symbol, "name": inst.label,
+        "display_symbol": display_code(dataset.logical_symbol, asset_type=dataset.asset_class),
         "series_kind": kind, "source": dataset.identity["source"] if kind == "history" else "composite",
         "historical_source": dataset.identity["source"], "basis": inst.basis,
         "calendar": revision.rules["aggregation_calendar"] if kind == "composite" and composite else inst.calendar,
@@ -261,17 +263,17 @@ def export_page(db, body):
     raise HTTPException(413, "单次导出分页过多，请缩小日期范围")
 
 
-def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None):
+def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None, symbol_type=""):
     """Bounded SQL qualification then exact metadata; never scan every snapshot.
 
     Offset advances through candidates, including invalid seam/account entries.
     At most 500 are inspected per request. Unknown qualification totals are not
     presented as counts of usable series; an empty page can still continue.
     """
-    if (kind not in ("history", "composite") or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
+    from .search_types import TYPES
+    if (symbol_type not in TYPES or kind not in ("history", "composite") or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
             or source not in (None, "dukascopy", "oanda", "binance") or calendar not in (None, "ny17", "utc0")):
         raise ValueError("无效行情搜索范围或筛选")
-    pattern = "%" + query[:100].strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
     eligible_period = select(HistoryArtifact.id).where(HistoryArtifact.version_id == HistoryVersion.id,
         HistoryArtifact.status == "published", HistoryArtifact.count > 0)
     if kind == "composite":
@@ -286,8 +288,10 @@ def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=
     query_ids = query_ids.select_from(MarketDataset).join(Instrument).join(versions, (versions.c.dataset_id == MarketDataset.id) & (versions.c.position == 1))
     query_ids = query_ids.where(~select(DatasetMaintenance.dataset_id).where(
         DatasetMaintenance.dataset_id == MarketDataset.id, DatasetMaintenance.archived.is_(True)).exists(),
-        or_(MarketDataset.logical_symbol.ilike(pattern, escape="\\"), Instrument.label.ilike(pattern, escape="\\"),
-            Instrument.symbol.ilike(pattern, escape="\\"), MarketDataset.identity["provider_symbol"].as_string().ilike(pattern, escape="\\")))
+        code_search(query, MarketDataset.logical_symbol, Instrument.label, Instrument.symbol,
+            MarketDataset.identity["provider_symbol"].as_string()))
+    if symbol_type:
+        query_ids = query_ids.where(MarketDataset.asset_class == {"commodity": "metal", "stock": "equity", "fund": "etf", "futures": "future"}.get(symbol_type, symbol_type))
     if source:
         query_ids = query_ids.where(Instrument.source == source)
     if calendar and kind == "history":
@@ -305,7 +309,7 @@ def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=
         from sqlalchemy import literal
         query_ids = query_ids.add_columns(literal("").label("mapping_id"))
     from sqlalchemy import case
-    term = query[:100].strip().upper()
+    term = pair_query(query) or query[:100].strip().upper()
     code = func.upper(Instrument.symbol)
     logical = func.upper(MarketDataset.logical_symbol)
     exact = or_(code == term, logical == term, func.replace(func.replace(code, "_", ""), "/", "") == term)
@@ -319,7 +323,7 @@ def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=
     candidates_query = select(ranked).order_by(ranked.c.match_rank, ranked.c.source_position, ranked.c.source,
         ranked.c.symbol, ranked.c.dataset_id, ranked.c.mapping_id).offset(offset).limit(501)
     records = list(db.execute(candidates_query).mappings())
-    items, examined = [], 0
+    items, item_offsets, examined = [], [], 0
     for record in records[:500]:
         examined += 1
         try:
@@ -332,13 +336,15 @@ def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=
             continue
         dataset = db.get(MarketDataset, record["dataset_id"])
         inst = db.get(Instrument, dataset.instrument_id)
-        items.append({**meta, "ticker": encode(ident, kind), "label": inst.label,
+        from .search_types import symbol_type as asset_type
+        items.append({**meta, "type": asset_type(dataset.asset_class), "ticker": encode(ident, kind), "label": inst.label,
             "description": f"{'自建' if kind == 'history' else '组合'} · {dataset.identity['source']}"
                 f"{'→OANDA Practice' if kind == 'composite' else ''} · {inst.basis} · {meta['calendar']}", "available": True})
+        item_offsets.append(offset + examined)
         if len(items) == page_size:
             break
     has_more = examined < len(records)
-    return {"items": items, "offset": offset, "page_size": page_size, "examined": examined,
+    return {"items": items, "item_offsets": item_offsets, "offset": offset, "page_size": page_size, "examined": examined,
         "has_more": has_more, "next_offset": offset + examined if has_more else None}
 
 

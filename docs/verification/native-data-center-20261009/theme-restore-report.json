@@ -1,0 +1,35 @@
+{
+  "environment": "Ubuntu isolated Docker; native widget with in-memory workspace/preference storage",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "legacy white layout + remembered Dark restores canvas, axes, toolbar, host and data center together"
+    },
+    {
+      "name": "Light: menu choice persists with layout autosave off"
+    },
+    {
+      "name": "Dark: menu choice persists with layout autosave off"
+    },
+    {
+      "name": "same-theme custom canvas, candle color and axis font survive native save/reload"
+    },
+    {
+      "name": "unmarked custom canvas is preserved during legacy repair"
+    },
+    {
+      "name": "in-place native layout load restores current theme with no iframe recreation"
+    },
+    {
+      "name": "legacy dark two-chart layout restores Light across both panes"
+    },
+    {
+      "name": "marked older layout restores the newer remembered theme across both panes"
+    },
+    {
+      "name": "old native theme preference remains usable when mw.theme is absent"
+    }
+  ],
+  "errors": []
+}

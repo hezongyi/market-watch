@@ -1,0 +1,8 @@
+PASS cold main search uses native shell/search/tabs/rows and two right-hand native Select controls; default all types and all sources
+PASS real provider/history/composite and source combination match server filtering; browsing does not change chart
+PASS native asset tabs combine with type/source/query; history plus Yahoo shows explicit empty state
+PASS Enter opens filters, Escape closes only popup and restores trigger; Tab and Shift+Tab stay in main search
+PASS reopen defaults remain clear; ArrowDown plus Enter opens exact fixed-history ticker through native submit
+PASS 125-row provider mode passes qualified offsets; switching to all resets pagination and uses a separate cursor
+PASS changing type/query invalidates held previous request; late result cannot replace current composite rows
+PASS dark/light at 1440, 768, 375 px keep both filters and results reachable without horizontal overflow

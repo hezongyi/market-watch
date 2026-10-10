@@ -1,10 +1,12 @@
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { useEffect, useState } from "react";
-import { api } from "../api";
+import { api } from "./api";
 
 export type QualifiedSeries = {
   id: string;
   ticker: string;
   symbol: string;
+  display_symbol?: string;
   series_kind: "history" | "composite";
   dataset_id: string;
   historical_source: string;
@@ -17,7 +19,7 @@ export type QualifiedSeries = {
 export function seriesLabel(row: QualifiedSeries) {
   const source = row.historical_source === "dukascopy" ? "Dukascopy" : row.historical_source === "oanda" ? "OANDA" : row.historical_source;
   const phase = row.calendar === "ny17" ? "NY17" : row.calendar === "utc0" ? "UTC 00:00" : row.calendar;
-  return `${row.symbol} · ${source}${row.series_kind === "composite" ? " → OANDA Practice" : ""} · ${row.basis === "bid" ? "Bid" : row.basis} · ${phase}`;
+  return `${row.display_symbol || row.symbol} · ${source}${row.series_kind === "composite" ? " → OANDA Practice" : ""} · ${row.basis === "bid" ? "Bid" : row.basis} · ${phase}`;
 }
 
 /** Pure search; only its caller's explicit submit/open may create live demand. */
@@ -65,32 +67,32 @@ export default function SeriesPicker({ kind, selected, onSelect }: {
   const options = selected ? [selected, ...rows.filter(row => kind === "history"
     ? row.dataset_id !== selected.dataset_id : row.id !== selected.id)] : rows;
   return <div className="qualified-series-picker">
-    <label>查找{title}<input type="search" value={query} maxLength={100}
+    <label>查找{title}<NativeInput type="search" value={query} maxLength={100}
       onChange={e => { setQuery(e.target.value); resetPages(); }} placeholder="品种或准确来源代码" /></label>
-    <label>历史来源<select aria-label="历史来源" value={source} onChange={e => { setSource(e.target.value); resetPages(); }}>
+    <label>历史来源<NativeSelect aria-label="历史来源" value={source} onChange={e => { setSource(e.target.value); resetPages(); }}>
       <option value="">全部来源</option><option value="dukascopy">Dukascopy</option><option value="oanda">OANDA</option><option value="binance">Binance</option>
-    </select></label>
-    <label>聚合日界<select aria-label="聚合日界" value={calendar} onChange={e => { setCalendar(e.target.value); resetPages(); }}>
+    </NativeSelect></label>
+    <label>聚合日界<NativeSelect aria-label="聚合日界" value={calendar} onChange={e => { setCalendar(e.target.value); resetPages(); }}>
       <option value="">全部日界</option><option value="ny17">NY17</option><option value="utc0">UTC 00:00</option>
-    </select></label>
-    <label>品种<select disabled={loading} value={selected?.id ?? ""} onChange={e => onSelect(options.find(row => row.id === e.target.value) ?? null)}>
+    </NativeSelect></label>
+    <label>品种<NativeSelect disabled={loading} value={selected?.id ?? ""} onChange={e => onSelect(options.find(row => row.id === e.target.value) ?? null)}>
       <option value="">选择{title}</option>
       {options.map(row => <option key={row.id} value={row.id}>{seriesLabel(row)} · {kind === "history" ? "已发布" : row.created ? "已建立" : "首次使用时准备"}</option>)}
-    </select></label>
+    </NativeSelect></label>
     <div role="status">{loading ? "正在查找…" : error ? "查找失败，所选行情保留。" : !rows.length ? "没有符合条件的可用行情。" : `本页 ${rows.length} 条${title}。`}</div>
     <nav className="dc-actions" aria-label={`${title}搜索分页`}>
       <button type="button" disabled={loading || offsets.length === 1} onClick={() => setOffsets(current => current.slice(0,-1))}>上一页行情</button>
       <span>第 {offsets.length} 页</span>
       <button type="button" disabled={loading || error !== "" || nextOffset === null} onClick={() => setOffsets(current => [...current,nextOffset!])}>下一页行情</button>
     </nav>
-    {!loading&&!error&&!rows.length&&<p>可以缩小或更换品种关键词，或<a href="/market-data">去数据中心维护与配置</a>。</p>}
+    {!loading&&!error&&!rows.length&&<p>可以缩小或更换品种关键词，请从图表顶部的数据中心维护与配置。</p>}
     {error && <p role="alert">{error} <button type="button" className="secondary" onClick={() => setRetry(n => n + 1)}>重试搜索</button></p>}
     {selected && <p>{seriesLabel(selected)} · {kind === "history" ? "下一步选择固定发布版本及区间" : "提交规则后维护实时需求；搜索不会启动采集"}</p>}
     {pendingTotal > 0 && <details><summary>查看{title}准备与配置（本页待处理 {pending.length} 条）</summary>
       <ul>{pending.map(row => {
         const dataset = kind === "history" ? row : row.dataset;
-        return <li key={dataset.id}>{dataset.logical_symbol} · {dataset.identity.source} · {dataset.aggregation_calendar === "ny17" ? "NY17" : "UTC 00:00"} · {kind === "history" ? "尚无可用发布" : row.reason || (row.status === "needs_mapping" ? "缺少实时映射" : "历史待维护")}
-          {" "}<a href={`/market-data/datasets/${dataset.id}${kind === "composite" && row.status === "needs_mapping" ? "/mapping" : ""}`}>{kind === "composite" && row.status === "needs_mapping" ? "配置映射" : "查看进度与维护"}</a></li>;
+        return <li key={dataset.id}>{dataset.display_symbol || dataset.logical_symbol} · {dataset.identity.source} · {dataset.aggregation_calendar === "ny17" ? "NY17" : "UTC 00:00"} · {kind === "history" ? "尚无可用发布" : row.reason || (row.status === "needs_mapping" ? "缺少实时映射" : "历史待维护")}
+          。请从图表顶部的数据中心维护与配置。</li>;
       })}</ul>
       {pending.length === 0 && <p>本页没有待准备或配置项，可继续翻页查看其他自建行情。</p>}
       <nav className="dc-actions" aria-label="准备与配置分页">

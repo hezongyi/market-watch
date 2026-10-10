@@ -1,0 +1,19 @@
+{
+  "environment": "Ubuntu isolated Docker, real submissions with controlled response faults",
+  "passed": true,
+  "checks": [
+    {
+      "name": "duplicate creation click posts once; late submitted result never navigates or clears next form",
+      "dataset": "aa2042bacb8621007b1555892202a4b826dd4d1c92236c0cacf2c1cc6a08f3a5"
+    },
+    {
+      "name": "lost creation response reconciles actual committed task by request id without duplicate POST",
+      "dataset": "4bdb14a00dd6d8b5ac95be49e2794a77a86dc9271d120a8406d0deda5ebfc2c4",
+      "task": "d818955a-e205-481d-9dec-63065b905fe5"
+    },
+    {
+      "name": "hung save times out, preserves fields and releases submit control"
+    }
+  ],
+  "errors": []
+}

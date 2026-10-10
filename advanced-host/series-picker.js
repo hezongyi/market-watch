@@ -16,7 +16,7 @@ globalThis.MWSeriesPicker = (() => {
         </div><p role="status"></p><p role="alert" hidden></p><div class="mw-series-results"></div>
         <nav aria-label="行情搜索分页"><button type="button" data-action="previous">上一页行情</button><span></span><button type="button" data-action="next">下一页行情</button></nav>
         <p>平台返回原生周期；自建固定发布版本；组合在打开后准备实时接续。</p>
-        <p><a href="#" data-action="center">未就绪行情：去数据中心维护或配置映射</a></p>`;
+        <p>未就绪行情：请从图表顶部的数据中心维护或配置映射。</p>`;
       document.body.append(dialog);
       const kind=dialog.querySelector('[name=kind]'),query=dialog.querySelector('[name=query]'),source=dialog.querySelector('[name=source]'),calendar=dialog.querySelector('[name=calendar]');
       kind.value=current.series_kind==='managed'?'provider':current.series_kind;
@@ -38,9 +38,9 @@ globalThis.MWSeriesPicker = (() => {
           results.replaceChildren();nextOffset=page.next_offset;
           for(const row of page.items){
             const item=document.createElement('button');item.type='button';item.className='mw-series-result';
-            const title=document.createElement('strong');title.textContent=row.symbol;
+            const title=document.createElement('strong');title.textContent=row.display_symbol || row.symbol;
             const detail=document.createElement('span');detail.textContent=row.description;
-            item.append(title,detail);item.setAttribute('aria-label',row.symbol+' · '+row.description);
+            item.append(title,detail);item.setAttribute('aria-label',(row.display_symbol || row.symbol)+' · '+row.description);
             item.addEventListener('click',async()=>{
               item.disabled=true;
               dialog.close();
@@ -60,7 +60,6 @@ globalThis.MWSeriesPicker = (() => {
       previous.onclick=()=>{offsets.pop();load()};next.onclick=()=>{offsets.push(nextOffset);load()};
       // The host iframe deliberately disallows form submission, including method=dialog.
       dialog.querySelector('.mw-series-close').onclick=()=>dialog.close();
-      dialog.querySelector('[data-action=center]').onclick=e=>{e.preventDefault();openCenter();dialog.close()};
       dialog.addEventListener('close',()=>{closed=true;++generation;clearTimeout(timer);dialog.remove();button.focus()},{once:true});
       dialog.showModal();query.focus();load();
     });

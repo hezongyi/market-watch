@@ -115,8 +115,10 @@ def metadata(ident, *, deadline=None, cached_only=False):
             raise HTTPException(404, "未知品种，请刷新品种目录")
     if source not in ("oanda", "binance") or calendar not in ("ny17", "utc0"):
         raise HTTPException(422, "该品种的平台周期或交易日历尚未接入")
+    from .market_names import display_code
     result = {
         "id": ident,
+        "display_symbol": display_code(symbol, source),
         "symbol": symbol,
         "name": label,
         "source": source,

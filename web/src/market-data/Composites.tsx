@@ -1,13 +1,18 @@
-import { centerLink, centerReturn, useCenterRowRestore } from "./navigation";
-import { useEffect, useRef, useState } from "react";
+import { DetailDisclosure, DetailPanel, useDetailPanel } from "./DetailPanel";
+import { NativeCatalogPicker } from "./NativeCatalogPicker";
+import { NativeInput, NativeSelect } from "./NativeControls";
 import {
-  Link,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
-import { api, type Bar } from "../api";
-import Chart from "../Chart";
+  MarketListHeader,
+  MarketListStatus,
+  MarketTabs,
+  useMarketRows,
+} from "./MarketList";
+import { centerLink, centerReturn } from "./navigation";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useParams, useSearchParams } from "./router";
+import { api } from "./api";
+import { OpenChart } from "./OpenChart";
+import { useCenter, useDirtyForm, useMounted, useActionLock } from "./router";
 import { Feedback, Pager } from "./Center";
 import { CompositeRevisions } from "./CompositeRevisions";
 import { useSnapshot } from "./useSnapshot";
@@ -16,6 +21,7 @@ import { frames, names, phase, time, type Dataset, type Page } from "./types";
 type Mapping = {
   id: string;
   current_account: boolean;
+  target_display_symbol?: string;
   target_identity: { provider_symbol: string; environment: string };
   match: any;
 };
@@ -24,6 +30,7 @@ type Composite = {
   instrument_id: string;
   dataset_id: string;
   logical_symbol: string;
+  display_symbol?: string;
   precision: number;
   calendar: string;
   historical_source: string;
@@ -44,8 +51,15 @@ type Composite = {
     input_revision: number;
     error: string | null;
   };
-  periods: {timeframe:string;status:string;applied_input_revision:number;input_revision:number;
-    updated_at:number|null;error:string|null;next_at:number}[];
+  periods: {
+    timeframe: string;
+    status: string;
+    applied_input_revision: number;
+    input_revision: number;
+    updated_at: number | null;
+    error: string | null;
+    next_at: number;
+  }[];
   usage: {
     charts: number;
     strategies: number;
@@ -62,7 +76,14 @@ type Composite = {
     confirmed_tail_ready: boolean;
     quote_age_ms: number | null;
     strategy_readiness: string;
-    rules?: {id:string;name:string;health:string;reason:string|null;revision_id:string;seam_policy:string}[];
+    rules?: {
+      id: string;
+      name: string;
+      health: string;
+      reason: string | null;
+      revision_id: string;
+      seam_policy: string;
+    }[];
   };
 };
 type Candidate = {
@@ -100,26 +121,28 @@ const clientId = () => {
 export function CompositeList() {
   const [params, setParams] = useSearchParams();
   const [refresh, setRefresh] = useState(0),
-    [busy, setBusy] = useState(false),
+    [opening, setOpening] = useState(""),
     [error, setError] = useState("");
-  const navigate = useNavigate(),
-    client = useRef(clientId());
+  const { apply, busy } = useCenter(),
+    mounted = useMounted(),
+    actionLock = useActionLock();
+  const client = useRef(clientId());
   const mode = params.get("view") === "candidates" ? "candidates" : "existing",
-    query = params.get("query") || "",
-    page = Math.max(1, Number(params.get("page")) || 1);
-  const result = useSnapshot<Page<Composite | Candidate>>(
-    `/market-data/center/${mode === "candidates" ? "composite-candidates" : "composites"}?query=${encodeURIComponent(query)}&page=${page}`,
+    query = params.get("query") || "";
+  const rows = useMarketRows<Composite | Candidate>(
+    `/market-data/center/${mode === "candidates" ? "composite-candidates" : "composites"}`,
+    new URLSearchParams({ query }),
     refresh,
   );
-  useCenterRowRestore(result.data);
   function filter(key: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(key, value);
-    if (key !== "page") next.delete("page");
-    setParams(next);
+    next.delete("page");
+    setParams(next, { replace: true });
   }
   async function open(dataset: string, mapping: string) {
-    setBusy(true);
+    if (busy || !actionLock.acquire()) return;
+    setOpening(dataset);
     setError("");
     try {
       const row = await api<Composite>("/market-data/composites/use", {
@@ -127,177 +150,235 @@ export function CompositeList() {
         mapping_id: mapping,
         client: client.current,
       });
-      navigate(centerLink(`/market-data/composites/${row.id}?section=chart`, params));
+      if (mounted.current) await apply(`MWC:${row.id}`, "M1");
     } catch (e) {
-      setError(String(e));
+      if (mounted.current) setError(String(e));
     } finally {
-      setBusy(false);
+      actionLock.release();
+      if (mounted.current) setOpening("");
     }
   }
   return (
-    <>
-      <div className="dc-filters">
-        <button
-          aria-pressed={mode === "existing"}
-          onClick={() => filter("view", "existing")}
-        >
-          已建立组合
-        </button>
-        <button
-          aria-pressed={mode === "candidates"}
-          onClick={() => filter("view", "candidates")}
-        >
-          可建立候选
-        </button>
-        <label>
-          搜索品种
-          <input
-            value={query}
-            onChange={(e) => filter("query", e.target.value)}
-          />
-        </label>
-        <button onClick={() => setRefresh((v) => v + 1)}>刷新</button>
-      </div>
-      <p>
-        固定自建历史接续 OANDA Practice
-        确认M1及实时观察，供策略与人工交易辅助使用。浏览此列表不会启动采集。
-      </p>
-      <Feedback
-        error={result.error || error}
-        loading={result.loading}
-        empty={!result.data}
+    <section className="data-center dc-market-page">
+      <MarketListHeader
+        title="组合行情"
+        query={query}
+        onQuery={(value) => filter("query", value)}
+        refresh={() => setRefresh((value) => value + 1)}
       />
-      {result.data && (
-        <>
-          <p className="dc-subtle">
-            快照：{time(result.at)}
-            {result.error ? " · 刷新失败，实时健康未知" : ""}
-          </p>
-          {!result.data.items.length ? (
-            <p>
-              暂无符合筛选的条目。可切换到“可建立候选”配置已有自建历史的实时映射。
-            </p>
-          ) : (
-            <div className="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th>品种与来源</th>
-                    <th>日界</th>
-                    <th>历史基线 / 确认尾部（UTC）</th>
-                    <th>需求与状态</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.data.items.map((item) => {
-                    if ("dataset" in item) {
-                      const row = item as Candidate,
-                        d = row.dataset;
-                      return (
-                        <tr key={d.id}>
-                          <td>
-                            {d.logical_symbol}
-                            <small>
-                              {names[d.identity.source]} ·{" "}
-                              {d.identity.provider_symbol} → OANDA Practice ·
-                              Bid
-                            </small>
-                          </td>
-                          <td>{phase(d.aggregation_calendar)}</td>
-                          <td>
-                            {time(d.available_start)} — {time(d.available_end)}
-                          </td>
-                          <td>
-                            {statusNames[row.status]}
-                            {row.reason && <small>{row.reason}</small>}
-                          </td>
-                          <td>
-                            <div className="dc-actions">
-                              {row.status === "needs_maintenance" ? (
-                                <Link to={`/market-data/datasets/${d.id}`}>
-                                  去维护
-                                </Link>
-                              ) : (
-                                <Link
-                                  to={`/market-data/datasets/${d.id}/mapping`}
-                                >
-                                  配置实时来源
-                                </Link>
-                              )}
-                              {row.status === "ready_to_open" &&
-                                row.recommended_mapping_id && (
-                                  <button
-                                    disabled={busy}
-                                    onClick={() =>
-                                      open(d.id, row.recommended_mapping_id!)
-                                    }
-                                  >
-                                    打开组合行情
-                                  </button>
-                                )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    }
-                    const row = item as Composite;
-                    return (
-                      <tr key={row.id} id={`composite-${row.id}`} tabIndex={-1}>
-                        <td>
-                          {row.logical_symbol}
-                          <small>
-                            {names[row.historical_source]} → OANDA Practice ·{" "}
-                            {row.mapping.target_identity.provider_symbol} · Bid
-                          </small>
-                        </td>
-                        <td>{phase(row.calendar)}</td>
-                        <td>
-                          基线 {time(row.revision.seam)}
-                          <small>
-                            确认至{" "}
-                            {row.preparation.confirmed_end
-                              ? time(row.preparation.confirmed_end)
-                              : "尚无确认M1"}
-                          </small>
-                        </td>
-                        <td>
-                          {row.usage.total} 个需求 ·{" "}
-                          {result.error ? "健康未知" : statusNames[row.status]}
-                          <small>
-                            {row.health.strategy_readiness === "no_strategies"
-                              ? "暂无策略"
-                              : row.health.strategy_readiness === "ready" ? "规则依赖就绪"
-                              : "策略依赖待检查"}
-                          </small>
-                        </td>
-                        <td>
-                          <Link to={centerLink(`/market-data/composites/${row.id}`, params, `composite-${row.id}`)}>
-                            查看详情
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <Pager
-            total={result.data.total}
-            page={page}
-            size={25}
-            change={(value) => filter("page", String(value))}
-          />
-        </>
+      <MarketTabs
+        label="组合列表"
+        value={mode}
+        items={[
+          ["existing", "已建立组合"],
+          ["candidates", "可建立候选"],
+        ]}
+        change={(value) => filter("view", value)}
+      />
+      <div className="dc-market-table-head dc-composite-head">
+        <span>品种与来源</span>
+        <span>日界</span>
+        <span>{mode === "existing" ? "接续状态" : "建立条件"}</span>
+        <span>操作</span>
+      </div>
+      {error && (
+        <p role="alert" className="error">
+          {error}
+        </p>
       )}
-    </>
+      <div className="dc-market-list" ref={rows.list}>
+        {rows.items.map((item) =>
+          "dataset" in item ? (
+            <CandidateRow
+              key={item.dataset.id}
+              item={item}
+              params={params}
+              opening={opening}
+              busy={busy}
+              open={open}
+            />
+          ) : (
+            <CompositeRow
+              key={item.id}
+              row={item}
+              params={params}
+              rowsError={rows.error}
+            />
+          ),
+        )}
+        <div ref={rows.sentinel}>
+          <MarketListStatus
+            loading={rows.loading}
+            error={rows.error}
+            count={rows.items.length}
+            total={rows.total}
+            retry={rows.retry}
+          />
+        </div>
+      </div>
+      <p className="dc-market-note">
+        固定自建历史接续 OANDA Practice 确认M1及实时观察。浏览列表不会启动采集。
+      </p>
+    </section>
+  );
+}
+
+function CandidateRow({
+  item,
+  params,
+  opening,
+  busy,
+  open,
+}: {
+  item: Candidate;
+  params: URLSearchParams;
+  opening: string;
+  busy: boolean;
+  open: (dataset: string, mapping: string) => Promise<void>;
+}) {
+  const d = item.dataset,
+    id = `candidate-${d.id}`,
+    detail = useDetailPanel();
+  return (
+    <article className="dc-market-row" key={d.id} id={id} tabIndex={-1}>
+      <div className="dc-market-main">
+        <button className="dc-symbol-button" onClick={detail.open}>
+          {d.display_symbol || d.logical_symbol}
+        </button>
+        <span>{names[d.identity.source]} → OANDA Practice · Bid</span>
+      </div>
+      <span>{phase(d.aggregation_calendar)}</span>
+      <span>{statusNames[item.status] || item.status}</span>
+      <div className="dc-market-actions">
+        <button onClick={detail.open} aria-expanded={detail.opened}>
+          查看详情
+        </button>
+        {item.status === "ready_to_open" && item.recommended_mapping_id && (
+          <button
+            aria-disabled={!!opening || busy}
+            aria-busy={opening === d.id || undefined}
+            onClick={() => void open(d.id, item.recommended_mapping_id!)}
+          >
+            {opening === d.id ? "正在打开…" : "打开组合行情"}
+          </button>
+        )}
+        <Link
+          to={centerLink(
+            item.status === "needs_maintenance"
+              ? `/market-data/datasets/${d.id}`
+              : `/market-data/datasets/${d.id}/mapping`,
+            params,
+            id,
+          )}
+        >
+          {item.status === "needs_maintenance" ? "去维护" : "配置实时来源"}
+        </Link>
+      </div>
+      {detail.opened && (
+        <DetailPanel
+          title={`${d.display_symbol || d.logical_symbol} · 可建立候选`}
+          close={detail.close}
+        >
+          <p>建立条件：{statusNames[item.status] || item.status}</p>
+          <p>
+            自建历史：{time(d.available_start)} 至 {time(d.available_end)}
+          </p>
+          {item.reason && <p>{item.reason}</p>}
+          <p>
+            准确来源代码：
+            {d.provider_display_symbol || d.identity.provider_symbol} · 日界：
+            {phase(d.aggregation_calendar)}
+          </p>
+          <div className="dc-actions">
+            <Link to={centerLink(item.status === "needs_maintenance" ? `/market-data/datasets/${d.id}` : `/market-data/datasets/${d.id}/mapping`, params, id)}>{item.status === "needs_maintenance" ? "去维护" : "配置实时来源"}</Link>
+            {item.status === "ready_to_open" && item.recommended_mapping_id && <button aria-disabled={!!opening || busy} aria-busy={opening === d.id || undefined} onClick={() => void open(d.id, item.recommended_mapping_id!)}>{opening === d.id ? "正在打开…" : "打开组合行情"}</button>}
+          </div>
+        </DetailPanel>
+      )}
+    </article>
+  );
+}
+function CompositeRow({
+  row,
+  params,
+  rowsError,
+}: {
+  row: Composite;
+  params: URLSearchParams;
+  rowsError: string;
+}) {
+  const id = `composite-${row.id}`,
+    detail = useDetailPanel();
+  return (
+    <article className="dc-market-row" key={row.id} id={id} tabIndex={-1}>
+      <div className="dc-market-main">
+        <button className="dc-symbol-button" onClick={detail.open}>
+          {row.display_symbol || row.logical_symbol}
+        </button>
+        <span>{names[row.historical_source]} → OANDA Practice · Bid</span>
+      </div>
+      <span>{phase(row.calendar)}</span>
+      <span>
+        {rowsError ? "健康未知" : statusNames[row.status] || row.status}
+        <small>{row.usage.total} 个需求</small>
+      </span>
+      <div className="dc-market-actions">
+        <OpenChart ticker={`MWC:${row.id}`} label="打开图表" />
+        <button onClick={detail.open} aria-expanded={detail.opened}>
+          查看详情
+        </button>
+      </div>
+      {detail.opened && (
+        <DetailPanel
+          title={`${row.display_symbol || row.logical_symbol} · 组合行情`}
+          close={detail.close}
+        >
+          <p>
+            来源：{names[row.historical_source]} → OANDA Practice · Bid ·{" "}
+            {phase(row.calendar)}
+          </p>
+          <p>
+            接续状态：
+            {rowsError ? "健康未知" : statusNames[row.status] || row.status}
+          </p>
+          <p>
+            历史基线：{time(row.revision.seam)} · 确认至：
+            {row.preparation.confirmed_end
+              ? time(row.preparation.confirmed_end)
+              : "尚无确认M1"}
+          </p>
+          <p>
+            实时来源代码：
+            {row.mapping.target_display_symbol ||
+              row.mapping.target_identity.provider_symbol}
+          </p>
+          <p>
+            {rowsError
+              ? "实时健康未知"
+              : row.health.strategy_readiness === "no_strategies"
+                ? "暂无策略"
+                : row.health.strategy_readiness === "ready"
+                  ? "规则依赖就绪"
+                  : "策略依赖待检查"}
+          </p>
+          <div className="dc-actions">
+          <OpenChart ticker={`MWC:${row.id}`} label="打开图表" />
+          <Link
+            to={centerLink(`/market-data/composites/${row.id}`, params, id)}
+          >
+            管理组合行情
+          </Link>
+          </div>
+        </DetailPanel>
+      )}
+    </article>
   );
 }
 
 export function MappingForm() {
   const { id } = useParams(),
     navigate = useNavigate();
+  const [params] = useSearchParams();
   const [targetQuery, setTargetQuery] = useState(""),
     [catalogPage, setCatalogPage] = useState(1),
     [catalogRefresh, setCatalogRefresh] = useState(0);
@@ -320,11 +401,14 @@ export function MappingForm() {
     [reviewed, setReviewed] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  useDirtyForm("mapping", [code, underlying, currency, historicalProduct, liveProduct, relationship, historicalEvidence, liveEvidence, rationale, reviewed]);
   const errorRef = useRef<HTMLParagraphElement>(null);
+  const actionLock = useActionLock();
   useEffect(() => {
     if (error) errorRef.current?.focus();
   }, [error]);
-  const selected = catalog.data?.items.find((row) => row.catalog_id === code);
+  const [picked,setPicked]=useState<any>(null);
+  const selected = picked?.catalog_id === code ? picked : catalog.data?.items.find((row) => row.catalog_id === code);
   const products = [
     ["spot_fx", "现货外汇"],
     ["spot_metal", "现货金属"],
@@ -336,6 +420,7 @@ export function MappingForm() {
   ];
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (!actionLock.acquire()) return;
     setBusy(true);
     setError("");
     try {
@@ -354,17 +439,18 @@ export function MappingForm() {
         },
       });
       navigate(
-        `/market-data?tab=composite&view=candidates&query=${encodeURIComponent(dataset.data?.logical_symbol || "")}`,
+        `/market-data?tab=composite&view=candidates&query=${encodeURIComponent(dataset.data?.logical_symbol || "")}`, {saved: true},
       );
     } catch (e) {
       setError(String(e));
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
   return (
     <section className="data-center">
-      <Link to="/market-data?tab=composite&view=candidates">返回组合候选</Link>
+      <Link to={centerReturn(params, "/market-data?tab=composite&view=candidates")}>返回组合候选</Link>
       <h1>配置实时来源</h1>
       <Feedback
         error={dataset.error || catalog.error}
@@ -374,9 +460,9 @@ export function MappingForm() {
       {dataset.data && (
         <>
           <p>
-            {dataset.data.logical_symbol} ·{" "}
+            {dataset.data.display_symbol || dataset.data.logical_symbol} ·{" "}
             {names[dataset.data.identity.source]} ·{" "}
-            {dataset.data.identity.provider_symbol} · Bid ·{" "}
+            {dataset.data.provider_display_symbol || dataset.data.identity.provider_symbol} · Bid ·{" "}
             {phase(dataset.data.aggregation_calendar)}
           </p>
           <p>
@@ -388,7 +474,7 @@ export function MappingForm() {
           <div className="dc-filters">
             <label>
               查找目标准确品种
-              <input
+              <NativeInput
                 value={targetQuery}
                 onChange={(e) => {
                   setTargetQuery(e.target.value);
@@ -422,36 +508,37 @@ export function MappingForm() {
               change={setCatalogPage}
             />
           )}
-          <form onSubmit={save} className="dc-form">
+          <form onSubmit={save} className="dc-form" inert={busy}>
             {error && (
               <p ref={errorRef} tabIndex={-1} role="alert" className="error">
                 {error}
               </p>
             )}
+            <NativeCatalogPicker source="oanda" disabled={busy} onSelect={row=>{setPicked(row);setCode(row.catalog_id);}} />
             <label>
               目标准确品种（OANDA Practice）
-              <select
+              <NativeSelect
                 required
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
               >
                 <option value="">请选择当前账户品种</option>
-                {catalog.data?.items.map((row) => (
+                {[...(picked && !catalog.data?.items.some(row=>row.catalog_id===picked.catalog_id) ? [picked] : []),...(catalog.data?.items || [])].map((row) => (
                   <option key={row.catalog_id} value={row.catalog_id}>
-                    {row.provider_symbol} · {row.label} · {row.asset_class}
+                    {row.display_symbol || row.provider_symbol} · {row.label} · {row.asset_class}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
             {selected && (
               <p>
-                Practice · {selected.provider_symbol} · 来源精度{" "}
+                Practice · {selected.display_symbol || selected.provider_symbol} · 来源精度{" "}
                 {selected.precision} · Bid；未授权交易执行。
               </p>
             )}
             <label>
               标的代码
-              <input
+              <NativeInput
                 required
                 pattern="[A-Z0-9]{1,30}"
                 value={underlying}
@@ -460,7 +547,7 @@ export function MappingForm() {
             </label>
             <label>
               报价币种
-              <input
+              <NativeInput
                 required
                 pattern="[A-Z]{3,8}"
                 value={currency}
@@ -469,7 +556,7 @@ export function MappingForm() {
             </label>
             <label>
               历史产品类型
-              <select
+              <NativeSelect
                 value={historicalProduct}
                 onChange={(e) => setHistoricalProduct(e.target.value)}
               >
@@ -478,11 +565,11 @@ export function MappingForm() {
                     {l}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
             <label>
               实时产品类型
-              <select
+              <NativeSelect
                 value={liveProduct}
                 onChange={(e) => setLiveProduct(e.target.value)}
               >
@@ -491,11 +578,11 @@ export function MappingForm() {
                     {l}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
             <label>
               产品关系
-              <select
+              <NativeSelect
                 value={relationship}
                 onChange={(e) => setRelationship(e.target.value)}
               >
@@ -503,11 +590,11 @@ export function MappingForm() {
                 <option value="same_underlying_different_product">
                   相同标的、不同产品
                 </option>
-              </select>
+              </NativeSelect>
             </label>
             <label>
               历史产品官方依据
-              <input
+              <NativeInput
                 required
                 type="url"
                 value={historicalEvidence}
@@ -516,7 +603,7 @@ export function MappingForm() {
             </label>
             <label>
               实时产品官方依据
-              <input
+              <NativeInput
                 required
                 type="url"
                 value={liveEvidence}
@@ -534,7 +621,7 @@ export function MappingForm() {
               />
             </label>
             <label>
-              <input
+              <NativeInput
                 required
                 type="checkbox"
                 checked={reviewed}
@@ -546,7 +633,7 @@ export function MappingForm() {
               <button className="primary" disabled={busy || !catalog.data}>
                 保存映射版本
               </button>
-              <Link to="/market-data?tab=composite&view=candidates">取消</Link>
+              <Link to={centerReturn(params, "/market-data?tab=composite&view=candidates")}>取消</Link>
             </div>
           </form>
         </>
@@ -560,53 +647,16 @@ export function CompositeDetail() {
     [params, setParams] = useSearchParams();
   const [refresh, setRefresh] = useState(0),
     [error, setError] = useState("");
-  const client = useRef(clientId()),
-    section = params.get("section") || "overview",
-    frame = params.get("frame") || "M1",
-    before = params.get("before");
+  const section = params.get("section") || "overview", frame = params.get("frame") || "M1";
   const result = useSnapshot<Composite>(
       `/market-data/composites/${id}`,
       refresh,
     ),
     row = result.data;
-  const page = useSnapshot<{
-    bars: Bar[];
-    next_before: number | null;
-    revision_id: string;
-    input_revision: number;
-    pending: string[];
-  }>(
-    row && section === "chart"
-      ? `/market-data/composites/${id}/chart?timeframe=${frame}&count=300&provisional=true${before ? `&before=${before}` : ""}`
-      : null,
-    refresh,
-  );
   const requests = useSnapshot<Page<any>>(
     row && section === "seam" ? `/market-data/composites/${id}/requests` : null,
     refresh,
   );
-  useEffect(() => {
-    if (!row || section !== "chart") return;
-    const abort = new AbortController();
-    const renew = () =>
-      api(
-        "/market-data/composites/use",
-        {
-          dataset_id: row.dataset_id,
-          mapping_id: row.mapping.id,
-          client: client.current,
-        },
-        abort.signal,
-      ).catch((e) => {
-        if (!abort.signal.aborted) setError(String(e));
-      });
-    void renew();
-    const timer = setInterval(renew, 60000);
-    return () => {
-      abort.abort();
-      clearInterval(timer);
-    };
-  }, [row?.id, section]);
   function select(key: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(key, value);
@@ -625,18 +675,17 @@ export function CompositeDetail() {
         <>
           <div className="dc-heading">
             <div>
-              <h1>{row.logical_symbol} 组合行情</h1>
+              <h1>{row.display_symbol || row.logical_symbol} 组合行情</h1>
               <p>
                 {names[row.historical_source]} → OANDA Practice · Bid ·{" "}
                 {phase(row.calendar)}
               </p>
             </div>
-            <button onClick={() => setRefresh((v) => v + 1)}>刷新</button>
+            <div className="dc-actions"><OpenChart ticker={`MWC:${row.id}`} frame={frame} label="打开组合图表" /><button onClick={() => setRefresh((v) => v + 1)}>刷新</button></div>
           </div>
           <nav className="dc-tabs" aria-label="组合详情页签">
             {[
               ["overview", "概览"],
-              ["chart", "打开组合图表"],
               ["seam", "接续与修订"],
               ["usage", "使用与健康"],
             ].map(([key, label]) => (
@@ -712,113 +761,7 @@ export function CompositeDetail() {
               </Link>
             </>
           )}
-          {section === "chart" && (
-            <>
-              <div className="dc-filters">
-                <label>
-                  周期
-                  <select
-                    aria-label="周期"
-                    value={frame}
-                    onChange={(e) => select("frame", e.target.value)}
-                  >
-                    {frames.map((f) => (
-                      <option key={f}>{f}</option>
-                    ))}
-                  </select>
-                </label>
-                {before && (
-                  <button
-                    onClick={() => {
-                      const next = new URLSearchParams(params);
-                      next.delete("before");
-                      setParams(next);
-                    }}
-                  >
-                    返回最新
-                  </button>
-                )}
-                <button
-                  disabled={!page.data?.next_before}
-                  onClick={() =>
-                    select("before", String(page.data?.next_before))
-                  }
-                >
-                  更早历史
-                </button>
-              </div>
-              <p>
-                打开图表会维持临时行情需求，关闭后按租约和宽限释放。当前未确认分钟来自采样流。
-              </p>
-              <Feedback
-                error={page.error}
-                loading={page.loading}
-                empty={!page.data}
-              />
-              {page.data?.pending.map((reason) => (
-                <p key={reason} role="status">
-                  {reason}
-                </p>
-              ))}
-              {page.data && (
-                <>
-                  <details className="dc-source">
-                    <summary>查看输入版本依据</summary>
-                    <p>
-                      固定组合修订 {page.data.revision_id} · 输入修订{" "}
-                      {page.data.input_revision}
-                    </p>
-                  </details>
-                  <Chart
-                    key={`${id}-${frame}`}
-                    bars={page.data.bars}
-                    precision={row.precision}
-                  />
-                  <div className="table-scroll">
-                    <table>
-                      <caption>最近20根柱的确认、覆盖与接缝事实</caption>
-                      <thead>
-                        <tr>
-                          <th>UTC起点</th>
-                          <th>时间结束</th>
-                          <th>来源确认</th>
-                          <th>覆盖完整</th>
-                          <th>接缝</th>
-                          <th>量口径</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {page.data.bars.slice(-20).map((b: any) => (
-                          <tr key={b.start}>
-                            <td>{time(b.start)}</td>
-                            <td>{b.time_closed ? "是" : "否"}</td>
-                            <td>{b.source_confirmed ? "是" : "临时观察"}</td>
-                            <td>
-                              {b.coverage_complete
-                                ? "是"
-                                : `未知 ${b.unknown_minutes ?? "—"} 分钟`}
-                            </td>
-                            <td>
-                              {b.seam_crossing
-                                ? "跨接缝"
-                                : b.seam_at_start
-                                  ? "接续首柱"
-                                  : "—"}
-                            </td>
-                            <td>
-                              {b.mixed_source
-                                ? "跨源总量为空"
-                                : `${b.volume_kind} · ${b.volume_unit || "—"}`}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
-            </>
-          )}
+          {section === "chart" && <div className="dc-fields"><label>周期<NativeSelect value={frame} onChange={e => select("frame", e.target.value)}>{frames.map(f => <option key={f}>{f}</option>)}</NativeSelect></label><OpenChart ticker={`MWC:${row.id}`} frame={frame} /></div>}
           {section === "seam" && (
             <>
               <CompositeRevisions key={id} id={id!} active={row.active_revision_id} onChanged={()=>setRefresh(value=>value+1)}/>
@@ -845,7 +788,7 @@ export function CompositeDetail() {
                       <td>确认尾部</td>
                       <td>
                         OANDA Practice ·{" "}
-                        {row.mapping.target_identity.provider_symbol}
+                        {row.mapping.target_display_symbol || row.mapping.target_identity.provider_symbol}
                       </td>
                       <td>[{time(row.revision.seam)}, 最新确认观测)</td>
                     </tr>
@@ -860,8 +803,7 @@ export function CompositeDetail() {
               <p>
                 价格不平均、不平移；跨源量不相加。最新确认结束时间不能证明中间无缺口。
               </p>
-              <details>
-                <summary>映射复核依据</summary>
+              <DetailDisclosure title="映射复核依据">
                 <p>{row.mapping.match.rationale}</p>
                 <a
                   href={row.mapping.match.historical_evidence}
@@ -878,7 +820,7 @@ export function CompositeDetail() {
                 >
                   实时产品依据
                 </a>
-              </details>
+              </DetailDisclosure>
               <h2>补数请求记录</h2>
               <Feedback
                 error={requests.error}

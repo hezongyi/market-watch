@@ -1,0 +1,32 @@
+[
+  {
+    "suite": "symbol-filters",
+    "exit_code": 0,
+    "seconds": 30.1
+  },
+  {
+    "suite": "native-integration",
+    "exit_code": 0,
+    "seconds": 16.3
+  },
+  {
+    "suite": "platform-search",
+    "exit_code": 0,
+    "seconds": 19.8
+  },
+  {
+    "suite": "native-linked",
+    "exit_code": 0,
+    "seconds": 30.8
+  },
+  {
+    "suite": "native-compat",
+    "exit_code": 0,
+    "retry_after": "one transient resource fetch failure on reload; full suite rerun passed"
+  },
+  {
+    "suite": "native-lifecycle",
+    "exit_code": 0,
+    "validation": "4 scoped interaction checks; isolated workspace; wait for startup queue to drain; exact cleanup passed"
+  }
+]

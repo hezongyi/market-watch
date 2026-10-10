@@ -3,6 +3,7 @@
 import hashlib
 import json
 import logging
+import math
 import threading
 import time
 from contextlib import contextmanager
@@ -192,6 +193,18 @@ def allowed(info):
     return True
 
 
+def display_precision(details):
+    """Presentation only; never round observations or change data precision."""
+    hint = details.get("price_hint")
+    precision = hint if type(hint) is int and 0 <= hint <= 8 else (
+        5 if details.get("asset_type") == "CURRENCY" else 2)
+    price = details.get("regular_market_price")
+    if type(price) in (int, float) and math.isfinite(price) and 0 < abs(price) < 1:
+        # Keep small quoted prices readable instead of showing them as 0.00.
+        precision = max(precision, math.ceil(-math.log10(abs(price))) + 2)
+    return min(8, precision)
+
+
 def _metadata(info):
     if not allowed(info):
         raise YahooError("unsupported", "该品种不在 Yahoo 首期范围内")
@@ -234,6 +247,11 @@ def _metadata(info):
         "exchange": info.get("fullExchangeName") or exchange,
         "exchange_code": exchange,
         "currency": info.get("currency"),
+        "price_hint": info.get("priceHint") if type(info.get("priceHint")) is int
+            and 0 <= info["priceHint"] <= 8 else None,
+        "regular_market_price": info.get("regularMarketPrice")
+            if type(info.get("regularMarketPrice")) in (int, float)
+            and math.isfinite(info["regularMarketPrice"]) else None,
         "timezone": timezone,
         "session": session,
         "session_status": "configured" if session else "unknown",

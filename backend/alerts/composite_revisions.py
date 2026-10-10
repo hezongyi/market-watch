@@ -256,7 +256,9 @@ def options(db, composite_id):
                 RealtimeMapping.permission_scope == composite.permission_scope)):
             target = db.get(MarketDataset, mapping.target_dataset_id)
             if target.identity["account_scope"] == account_scope():
+                from .market_names import display_code
                 mappings.append({"id": mapping.id, "provider_symbol": target.identity["provider_symbol"],
+                    "display_symbol": display_code(target.identity["provider_symbol"], target.identity["source"], target.asset_class),
                     "environment": target.identity["environment"], "reviewed": mapping.match.get("reviewed", False)})
         output.append({"version_id": version.id, "dataset_id": dataset.id, "calendar": inst.calendar,
             "start": version.start, "end": version.end, "checksum": version.manifest["checksum"],

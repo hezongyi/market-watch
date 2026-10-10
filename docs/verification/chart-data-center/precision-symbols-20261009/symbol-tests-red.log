@@ -1,0 +1,505 @@
+FFFFFFFFFFFFFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_code_policy[oanda-EUR_USD-CURRENCY-EUR/USD] _______________
+
+source = 'oanda', code = 'EUR_USD', kind = 'CURRENCY', expected = 'EUR/USD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+_____________ test_code_policy[dukascopy-eurusd-CURRENCY-EUR/USD] ______________
+
+source = 'dukascopy', code = 'eurusd', kind = 'CURRENCY', expected = 'EUR/USD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+_____________ test_code_policy[dukascopy-EUR/USD-CURRENCY-EUR/USD] _____________
+
+source = 'dukascopy', code = 'EUR/USD', kind = 'CURRENCY', expected = 'EUR/USD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+________________ test_code_policy[oanda-XAU_USD-METAL-XAU/USD] _________________
+
+source = 'oanda', code = 'XAU_USD', kind = 'METAL', expected = 'XAU/USD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+______________ test_code_policy[binance-BTCUSDT-CRYPTO-BTC/USDT] _______________
+
+source = 'binance', code = 'BTCUSDT', kind = 'CRYPTO', expected = 'BTC/USDT'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+_____________ test_code_policy[binance-DOGEUSDC-CRYPTO-DOGE/USDC] ______________
+
+source = 'binance', code = 'DOGEUSDC', kind = 'CRYPTO', expected = 'DOGE/USDC'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+______________ test_code_policy[yahoo-EURUSD=X-CURRENCY-EUR/USD] _______________
+
+source = 'yahoo', code = 'EURUSD=X', kind = 'CURRENCY', expected = 'EUR/USD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+________________ test_code_policy[yahoo-JPY=X-CURRENCY-USD/JPY] ________________
+
+source = 'yahoo', code = 'JPY=X', kind = 'CURRENCY', expected = 'USD/JPY'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+____________ test_code_policy[yahoo-BTC-USD-CRYPTOCURRENCY-BTC/USD] ____________
+
+source = 'yahoo', code = 'BTC-USD', kind = 'CRYPTOCURRENCY'
+expected = 'BTC/USD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+___________________ test_code_policy[yahoo-MSFT-EQUITY-MSFT] ___________________
+
+source = 'yahoo', code = 'MSFT', kind = 'EQUITY', expected = 'MSFT'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+__________________ test_code_policy[yahoo-^GSPC-INDEX-^GSPC] ___________________
+
+source = 'yahoo', code = '^GSPC', kind = 'INDEX', expected = '^GSPC'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+___________________ test_code_policy[yahoo-CL=F-FUTURE-CL=F] ___________________
+
+source = 'yahoo', code = 'CL=F', kind = 'FUTURE', expected = 'CL=F'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+_________________ test_code_policy[yahoo-EURUSD-EQUITY-EURUSD] _________________
+
+source = 'yahoo', code = 'EURUSD', kind = 'EQUITY', expected = 'EURUSD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+_____________ test_code_policy[oanda-NAS100_USD-INDEX-NAS100/USD] ______________
+
+source = 'oanda', code = 'NAS100_USD', kind = 'INDEX', expected = 'NAS100/USD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+__________ test_code_policy[dukascopy-MSFT.US/USD-OTHER-MSFT.US/USD] ___________
+
+source = 'dukascopy', code = 'MSFT.US/USD', kind = 'OTHER'
+expected = 'MSFT.US/USD'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+_________________ test_code_policy[None-UNKNOWN-None-UNKNOWN] __________________
+
+source = None, code = 'UNKNOWN', kind = None, expected = 'UNKNOWN'
+
+    @pytest.mark.parametrize("source,code,kind,expected", [
+        ("oanda", "EUR_USD", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "eurusd", "CURRENCY", "EUR/USD"),
+        ("dukascopy", "EUR/USD", "CURRENCY", "EUR/USD"),
+        ("oanda", "XAU_USD", "METAL", "XAU/USD"),
+        ("binance", "BTCUSDT", "CRYPTO", "BTC/USDT"),
+        ("binance", "DOGEUSDC", "CRYPTO", "DOGE/USDC"),
+        ("yahoo", "EURUSD=X", "CURRENCY", "EUR/USD"),
+        ("yahoo", "JPY=X", "CURRENCY", "USD/JPY"),
+        ("yahoo", "BTC-USD", "CRYPTOCURRENCY", "BTC/USD"),
+        ("yahoo", "MSFT", "EQUITY", "MSFT"),
+        ("yahoo", "^GSPC", "INDEX", "^GSPC"),
+        ("yahoo", "CL=F", "FUTURE", "CL=F"),
+        ("yahoo", "EURUSD", "EQUITY", "EURUSD"),
+        ("oanda", "NAS100_USD", "INDEX", "NAS100/USD"),
+        ("dukascopy", "MSFT.US/USD", "OTHER", "MSFT.US/USD"),
+        (None, "UNKNOWN", None, "UNKNOWN"),
+    ])
+    def test_code_policy(source, code, kind, expected):
+>       from alerts.market_names import display_code
+E       ImportError: cannot import name 'display_code' from 'alerts.market_names' (/app/backend/alerts/market_names.py)
+
+tests/test_symbol_presentation.py:31: ImportError
+_______ test_platform_and_chart_search_share_display_and_preserve_ticker _______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb05e940cd0>
+
+    def test_platform_and_chart_search_share_display_and_preserve_ticker(database, monkeypatch):
+        monkeypatch.setattr(settings, "yahoo_enabled", False)
+        with database.begin() as db:
+            db.add(MarketCatalog(id="OANDA:EUR_USD", source="oanda", symbol="EUR_USD",
+                label="Euro vs US Dollar", asset_type="CURRENCY", precision=5, calendar="ny17", available=True))
+            db.flush()
+            for query in ("EUR/USD", "eurusd", "EUR_USD"):
+>               row = catalog(db, source="oanda", query=query)["items"][0]
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               IndexError: list index out of range
+
+tests/test_symbol_presentation.py:43: IndexError
+___ test_slash_search_reaches_history_tasks_and_composite_without_first_use ____
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb05e9532d0>
+
+    def test_slash_search_reaches_history_tasks_and_composite_without_first_use(database, monkeypatch):
+        from test_series_access import fixture
+        from alerts.data_center import dataset_list, task_list
+        from alerts.series_access import search_page
+        from alerts.storage import MarketComposite, MarketDemand
+        from sqlalchemy import select
+
+        fixture(database, monkeypatch)
+        with database.begin() as db:
+            for query in ("EUR/USD", "eurusd", "EUR_USD"):
+                for kind in ("history", "composite"):
+                    row = search_page(db, query, kind=kind)["items"][0]
+>                   assert row["display_symbol"] == "EUR/USD" and row["symbol"] == "EURUSD"
+                           ^^^^^^^^^^^^^^^^^^^^^
+E                   KeyError: 'display_symbol'
+
+tests/test_symbol_presentation.py:68: KeyError
+=============================== warnings summary ===============================
+../../usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:469
+  /usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:469: PytestCacheWarning: could not create cache path /app/.pytest_cache/v/cache/nodeids: [Errno 13] Permission denied: '/app/pytest-cache-files-nyrpcngi'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+../../usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:423
+  /usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:423: PytestCacheWarning: could not create cache path /app/.pytest_cache/v/cache/lastfailed: [Errno 13] Permission denied: '/app/pytest-cache-files-3emiju7p'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_symbol_presentation.py::test_code_policy[oanda-EUR_USD-CURRENCY-EUR/USD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[dukascopy-eurusd-CURRENCY-EUR/USD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[dukascopy-EUR/USD-CURRENCY-EUR/USD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[oanda-XAU_USD-METAL-XAU/USD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[binance-BTCUSDT-CRYPTO-BTC/USDT]
+FAILED tests/test_symbol_presentation.py::test_code_policy[binance-DOGEUSDC-CRYPTO-DOGE/USDC]
+FAILED tests/test_symbol_presentation.py::test_code_policy[yahoo-EURUSD=X-CURRENCY-EUR/USD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[yahoo-JPY=X-CURRENCY-USD/JPY]
+FAILED tests/test_symbol_presentation.py::test_code_policy[yahoo-BTC-USD-CRYPTOCURRENCY-BTC/USD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[yahoo-MSFT-EQUITY-MSFT]
+FAILED tests/test_symbol_presentation.py::test_code_policy[yahoo-^GSPC-INDEX-^GSPC]
+FAILED tests/test_symbol_presentation.py::test_code_policy[yahoo-CL=F-FUTURE-CL=F]
+FAILED tests/test_symbol_presentation.py::test_code_policy[yahoo-EURUSD-EQUITY-EURUSD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[oanda-NAS100_USD-INDEX-NAS100/USD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[dukascopy-MSFT.US/USD-OTHER-MSFT.US/USD]
+FAILED tests/test_symbol_presentation.py::test_code_policy[None-UNKNOWN-None-UNKNOWN]
+FAILED tests/test_symbol_presentation.py::test_platform_and_chart_search_share_display_and_preserve_ticker
+FAILED tests/test_symbol_presentation.py::test_slash_search_reaches_history_tasks_and_composite_without_first_use
+18 failed, 2 warnings in 0.78s

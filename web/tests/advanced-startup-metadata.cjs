@@ -1,12 +1,12 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const messages=[],handlers=[];
-const ctx=vm.createContext({URL,URLSearchParams,Map,Promise,Date,Intl,Error,
+const ctx=vm.createContext({document:{createElement:()=>({}),head:{append:()=>{}}},URL,URLSearchParams,Map,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
  crypto:{randomUUID:()=> 'startup'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout});
 for(const file of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
 messages.length=0;
 (async()=>{
- vm.runInContext(`initialSymbol={ticker:'MWP:BTCUSDT',metadata:{name:'BTC/USDT',basis:'last',
+ vm.runInContext(`initialSymbol={ticker:'MWP:BTCUSDT',metadata:{name:'BTCUSDT',basis:'last',
  source:'binance',precision:2,calendar:'utc0'}};globalThis.resolved=[];
  globalThis.first=feed.resolveSymbol('MWP:BTCUSDT',info=>resolved.push(info),error=>{throw error});`,ctx);
  assert.equal(messages.length,0,'startup metadata avoids another cross-origin resolve request');
@@ -17,7 +17,7 @@ messages.length=0;
  vm.runInContext(`globalThis.second=feed.resolveSymbol('MWP:BTCUSDT',info=>resolved.push(info),error=>{throw error});`,ctx);
  const sent=messages[0];assert.equal(sent.query.op,'resolve');assert.equal(sent.query.args.series_kind,'provider');
  await handlers[0]({source:ctx.parent,origin:'http://localhost',data:{channel:'mw-chart-v1',type:'result',id:sent.id,
-  result:{name:'BTC/USDT',basis:'last',source:'binance',precision:3,calendar:'utc0'}}});
+      result:{name:'BTCUSDT',basis:'last',source:'binance',precision:3,calendar:'utc0'}}});
  await ctx.second;assert.equal(ctx.resolved[1].pricescale,1000,'later resolves use current backend metadata');
  vm.runInContext(`initialSymbol={ticker:'MWP:BTCUSDT',metadata:{name:'wrong'}};
  globalThis.managed=feed.resolveSymbol('BTCUSDT',info=>resolved.push(info),error=>{throw error});`,ctx);

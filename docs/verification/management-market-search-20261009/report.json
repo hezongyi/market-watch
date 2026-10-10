@@ -1,0 +1,47 @@
+{
+  "environment": "Ubuntu isolated Docker; actual native input/select; scoped long-list and mutation fixtures",
+  "local": false,
+  "passed": true,
+  "checks": [
+    {
+      "name": "real managed rows and composite candidates only include configured historical maintenance"
+    },
+    {
+      "name": "real managed rows; visible title, full-width actual native search, native source/type/calendar controls, creation and no pagination"
+    },
+    {
+      "name": "managed history/period/maintenance details and protected delete entry preserved; full detail returns to original row"
+    },
+    {
+      "name": "real existing/candidate modes preserve mapping, maintenance, health and detail return; browsing never changes chart"
+    },
+    {
+      "name": "managed 65-row continuous results, failed continuation preserves prefix and retry, unique IDs and stationary heading"
+    },
+    {
+      "name": "section round trip restores managed loaded prefix and scrolling"
+    },
+    {
+      "name": "new filters reset pages; empty state and search typing focus preserved"
+    },
+    {
+      "name": "native source/category/calendar controls combine with status and query before server paging"
+    },
+    {
+      "name": "both composite modes continuously load all 65 rows without pagination"
+    },
+    {
+      "name": "managed/composite dark/light desktop/tablet/375px layouts keep title/search/actions in one continuous page"
+    },
+    {
+      "name": "closing aborts management reads; new query remains isolated and Tab/Shift+Tab stay inside the native dialog"
+    },
+    {
+      "name": "published managed history applies its exact fixed-version ticker; only chosen row loads and target rejection restores actions"
+    },
+    {
+      "name": "candidate explicit creation sends one exact mapping; duplicate/other-row clicks are suppressed, only chosen row loads, rejected target restores page"
+    }
+  ],
+  "errors": []
+}

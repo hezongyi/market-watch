@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
-from .chart_series import SeriesKind, decode, display_symbol, is_gold
+from .chart_series import SeriesKind, decode, is_gold
 from .coverage import covers_interval
 from .domain import (
     bucket_bounds,
@@ -19,7 +19,7 @@ from .domain import (
     session_bounds,
 )
 from .market import stored_coverage
-from .market_names import chinese_name
+from .market_names import chinese_name, display_code, matches_code, pair_query
 from .providers import fetch_oanda_catalog
 from .storage import (
     Bar,
@@ -521,9 +521,10 @@ def router(authenticated):
 
     @r.get("/series/page")
     def series_page(query: str = "", kind: str = "history", page_size: int = 25,
-                    offset: int = 0, source: str | None = None, calendar: str | None = None):
+                    offset: int = 0, source: str | None = None, calendar: str | None = None,
+                    symbol_type: str = "", cursor: str | None = None):
         return search_series_page(query, kind=kind, page_size=page_size, offset=offset,
-                                  source=source or None, calendar=calendar or None)
+                                  source=source or None, calendar=calendar or None, symbol_type=symbol_type, cursor=cursor)
 
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
@@ -555,6 +556,8 @@ def router(authenticated):
             return {
                 "id": inst.id,
                 "name": inst.label,
+                "symbol": inst.symbol,
+                "display_symbol": display_code(inst.symbol, inst.source),
                 "source": inst.source,
                 "basis": inst.basis,
                 "precision": inst.precision,
@@ -757,24 +760,94 @@ def router(authenticated):
     return r
 
 
-def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None):
+def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None, symbol_type="", cursor=None):
+    from .search_types import TYPES
+    if (kind not in ("all", "provider", "history", "composite") or symbol_type not in TYPES
+            or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
+            or source not in (None, "dukascopy", "oanda", "binance", "yahoo")
+            or calendar not in (None, "ny17", "utc0")):
+        raise HTTPException(422, "无效行情搜索分页或筛选")
+    if kind == "all":
+        if offset:
+            raise HTTPException(422, "全类别搜索请使用游标翻页")
+        return _all_series_page(query, page_size=page_size, source=source, calendar=calendar,
+                                symbol_type=symbol_type, cursor=cursor)
+    if cursor:
+        raise HTTPException(422, "此搜索范围不接受游标")
     if kind == "provider":
-        if not 1 <= page_size <= 250 or not 0 <= offset <= 1000000 or calendar:
-            raise HTTPException(422, "无效平台搜索分页或筛选")
-        rows = _provider_series(query, source=source)
+        if calendar:
+            raise HTTPException(422, "平台搜索不接受自建聚合日界")
+        rows = _provider_series(query, source=source, symbol_type=symbol_type)
         items = rows[offset:offset + page_size]
         has_more = offset + len(items) < len(rows)
         return {"items": items, "total": len(rows), "offset": offset, "page_size": page_size,
             "has_more": has_more, "next_offset": offset + len(items) if has_more else None}
     from .series_access import search_page
+    if source == "yahoo":
+        return {"items": [], "has_more": False, "next_offset": None}
     try:
         with transaction() as db:
-            return search_page(db, query, kind=kind, page_size=page_size, offset=offset, source=source, calendar=calendar)
+            return search_page(db, query, kind=kind, page_size=page_size, offset=offset,
+                               source=source, calendar=calendar, symbol_type=symbol_type)
     except ValueError as error:
         raise HTTPException(422, str(error)) from None
 
 
-def _provider_series(query, *, source=None):
+def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor):
+    """Fair merge of three pure searches. Cursor advances through candidates,
+    including invalid mappings, without losing the unconsumed part of a page.
+    Each managed branch retains its bounded qualification scan.
+    """
+    import base64
+    import binascii
+    import json
+    import hashlib
+    from .series_access import search_page
+
+    signature = hashlib.sha256(json.dumps([query, source, calendar, symbol_type]).encode()).hexdigest()[:16]
+    positions, turn = [0, 0, 0], 0
+    if cursor:
+        try:
+            if len(cursor) > 300:
+                raise ValueError()
+            state = json.loads(base64.urlsafe_b64decode(cursor + "=" * (-len(cursor) % 4)))
+            positions, turn = state["p"], state["t"]
+            if (state["s"] != signature or len(positions) != 3 or type(turn) is not int or not 0 <= turn < 3
+                    or any(p is not None and (type(p) is not int or not 0 <= p <= 1000000) for p in positions)):
+                raise ValueError()
+        except (ValueError, KeyError, TypeError, UnicodeError, binascii.Error):
+            raise HTTPException(422, "无效搜索游标") from None
+    providers = _provider_series(query, source=source, symbol_type=symbol_type) if positions[0] is not None and not calendar else []
+    p = positions[0] or 0
+    pages = [{"items": providers[p:p + page_size], "item_offsets": list(range(p + 1, min(p + page_size, len(providers)) + 1)),
+              "next_offset": p + page_size if p + page_size < len(providers) else None}]
+    with transaction() as db:
+        for i, kind in enumerate(("history", "composite"), 1):
+            pages.append(search_page(db, query, kind=kind, page_size=page_size, offset=positions[i],
+                         source=source, calendar=calendar, symbol_type=symbol_type)
+                         if positions[i] is not None and source != "yahoo" else {"items": [], "next_offset": None})
+    for i, page in enumerate(pages):
+        if not page["items"]:
+            positions[i] = page["next_offset"]
+    indices, items = [0, 0, 0], []
+    for _ in range(page_size * 3):
+        i = turn
+        turn = (turn + 1) % 3
+        page = pages[i]
+        if indices[i] < len(page["items"]):
+            items.append(page["items"][indices[i]])
+            positions[i] = page["item_offsets"][indices[i]]
+            indices[i] += 1
+        if indices[i] == len(page["items"]):
+            positions[i] = page["next_offset"]
+        if len(items) == page_size or all(indices[j] == len(pages[j]["items"]) for j in range(3)):
+            break
+    has_more = any(p is not None for p in positions)
+    next_cursor = base64.urlsafe_b64encode(json.dumps({"p": positions, "t": turn, "s": signature}, separators=(",", ":")).encode()).decode().rstrip("=") if has_more else None
+    return {"items": items, "has_more": has_more, "next_cursor": next_cursor}
+
+
+def _provider_series(query, *, source=None, symbol_type=""):
     from .chart_series import encode
     from .history_catalog import account_scope
 
@@ -788,17 +861,21 @@ def _provider_series(query, *, source=None):
                 MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True))):
             if row.metadata_json.get("history_account_scope") != account_scope():
                 continue
-            if query.strip().upper() not in (row.symbol + row.symbol.replace("_", "") + row.label).upper():
+            if not matches_code(query, row.symbol, row.source, row.asset_type, row.label):
                 continue
             ident = "OANDA:" + row.symbol
             if any(item["id"] == ident for item in result):
                 continue
             result.append({"id": ident, "symbol": row.symbol, "label": row.label,
+                "display_symbol": display_code(row.symbol, row.source, row.asset_type),
                 "series_kind": "provider", "ticker": encode(ident, "provider"),
                 "source": "oanda", "asset_type": row.asset_type, "available": True,
                 "supported": row.calendar in ("ny17", "utc0"), "precision": row.precision,
                 "description": "平台 · OANDA Practice · Bid · 原生周期"})
-    return _rank_catalog([row for row in result if not source or row["source"] == source], query)
+    from .search_types import symbol_type as asset_type
+    for row in result:
+        row["type"] = asset_type(row.get("asset_type", ""))
+    return _rank_catalog([row for row in result if (not source or row["source"] == source) and (not symbol_type or row["type"] == symbol_type)], query)
 
 
 def search_series(query="", *, kind="all", limit=100, source=None, calendar=None):
@@ -823,11 +900,12 @@ def _rank_catalog(rows, query):
     """Prefer code matches; interleave equal-ranked sources to avoid starvation."""
     from collections import defaultdict
 
-    term = query.strip().casefold()
+    term = (pair_query(query) or query.strip()).casefold()
     groups = defaultdict(lambda: defaultdict(list))
     for row in rows:
-        codes = [row.get("symbol", "").casefold(), row.get("logical_symbol", "").casefold(),
-                 row.get("symbol", "").replace("_", "").replace("/", "").casefold()]
+        row["display_symbol"] = display_code(row["symbol"], row["source"], row.get("asset_type"))
+        codes = [row["display_symbol"].casefold(), row["display_symbol"].replace("/", "").casefold(), row.get("symbol", "").casefold(), row.get("logical_symbol", "").casefold(),
+                 row.get("symbol", "").replace("_", "").replace("/", "").replace("-", "").casefold()]
         rank = 0 if term and term in codes else 1 if term and any(c.startswith(term) for c in codes) else 2
         groups[rank][row["source"]].append(row)
     result = []
@@ -850,12 +928,14 @@ def instrument_catalog(query: str = "", *, limit=250):
     if query.strip() and settings.yahoo_enabled:
         # Exact codes/names and known Chinese aliases remain local. A
         # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
-        term = query.strip().upper()
+        term = pair_query(query) or query.strip().upper()
         with transaction() as db:
             local = list(db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))) + list(db.scalars(select(Instrument)))
-            known = any(term in {row["symbol"].upper(), row["logical_symbol"]}
+            known = any(term in {row["symbol"].upper(), row["logical_symbol"], row["display_symbol"]}
                         for row in dukascopy) or any(
-                term in {x.symbol.upper(), x.label.upper(),
+                term in {x.symbol.upper(), x.label.upper(), display_code(x.symbol, x.source,
+                         getattr(x, "asset_type", None)),
+                         display_code(x.symbol, x.source, getattr(x, "asset_type", None)).replace("/", ""),
                          (getattr(x, "metadata_json", None) or {}).get("english_name", "").upper()}
                 or not term.isascii() and term in
                 (x.label + (chinese_name(x.source, x.symbol) or "")).upper()
@@ -918,7 +998,8 @@ def instrument_catalog(query: str = "", *, limit=250):
         result = [
             x
             for x in entries.values()
-            if x["available"] and query.upper() in (x["id"] + x["label"] + x["symbol"] + x.get("english_name", "")).upper()
+            if x["available"] and matches_code(query, x["symbol"], x["source"],
+                x["asset_type"], x["id"], x["label"], x.get("english_name", ""))
         ]
     for row in dukascopy:
         row["search_status"] = search_status
@@ -943,7 +1024,8 @@ def quote_snapshot(body: QuoteQuery):
             with transaction() as db:
                 try:
                     meta = metadata(db, ident, kind)
-                    values = {"short_name": meta["symbol"], "description": meta["name"] + (
+                    shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
+                    values = {"short_name": shown, "description": meta["name"] + (
                         " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
                     facts = None
                     if kind == "composite":
@@ -977,6 +1059,7 @@ def quote_snapshot(body: QuoteQuery):
             from .config import settings
             deadline = time.monotonic() + settings.provider_request_seconds
             meta = metadata(ident, deadline=deadline) if ident.startswith("YAHOO:") else metadata(ident)
+            shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
             if meta["source"] == "yahoo":
                 from .provider_service import yahoo_quote
                 snapshot = yahoo_quote(meta, deadline=deadline)
@@ -988,7 +1071,7 @@ def quote_snapshot(body: QuoteQuery):
                 description += " · 延迟 " + str(delay//60) + " 分钟" if delay is not None and delay>0 else " · 延迟未知" if delay is None else " · 实时"
                 if snapshot["status"] != "ok":
                     description += " · 抓取失败，保留上次报价"
-                values = {"short_name":meta["symbol"], "description":description,
+                values = {"short_name":shown, "description":description,
                           "exchange":meta["exchange"], "lp":float(snapshot["price"]),
                           "quote_time":stamp, "fetched_at":snapshot["fetched_at"],
                           "delay_seconds":delay, "fetch_status":snapshot["status"]}
@@ -1002,7 +1085,7 @@ def quote_snapshot(body: QuoteQuery):
                 continue
             page = quote_page(meta)
             latest = page["bars"][-1] if page["bars"] else None
-            values = {"short_name": display_symbol(meta["symbol"]), "description": display_symbol(meta["symbol"]) + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
+            values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
                       "exchange": meta["source"].upper()}
             if latest:
                 values["lp"] = float(latest["close"])
@@ -1050,8 +1133,8 @@ def quote_snapshot(body: QuoteQuery):
             if not bar:
                 if inst:
                     result.append({"s": "ok", "n": ident, "quality": "pending", "v": {
-                        "short_name": display_symbol(inst.symbol),
-                        "description": display_symbol(inst.symbol) + " · 报价准备中",
+                        "short_name": display_code(inst.symbol, inst.source),
+                        "description": display_code(inst.symbol, inst.source) + " · 报价准备中",
                         "exchange": inst.source.upper(),
                     }})
                 else:
@@ -1060,8 +1143,8 @@ def quote_snapshot(body: QuoteQuery):
                 continue
             values = {
                 "lp": float(bar.close),
-                "short_name": display_symbol(inst.symbol),
-                "description": display_symbol(inst.symbol) + " · " + inst.basis + " · M1",
+                "short_name": display_code(inst.symbol, inst.source),
+                "description": display_code(inst.symbol, inst.source) + " · " + inst.basis + " · M1",
                 "exchange": inst.source.upper(),
             }
             if inst.basis == "bid":

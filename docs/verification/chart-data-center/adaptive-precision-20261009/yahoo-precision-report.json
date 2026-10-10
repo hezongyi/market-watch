@@ -1,0 +1,33 @@
+{
+  "environment": "Ubuntu isolated Docker; real Yahoo symbols and native public price formatter",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "MSFT native price axis defaults to cents while symbol data precision remains eight",
+      "symbol": "MSFT",
+      "pricescale": 100000000,
+      "displayPrecision": 2,
+      "formatted": "530.82",
+      "smallChange": "0.01"
+    },
+    {
+      "name": "manual native precision overrides automatic default and can return to automatic"
+    },
+    {
+      "name": "EURUSD=X adapts by source/type rather than using stock precision",
+      "precision": 4
+    },
+    {
+      "name": "CL=F adapts by source/type rather than using stock precision",
+      "precision": 2
+    },
+    {
+      "name": "existing Binance datafeed price scale remains unchanged"
+    },
+    {
+      "name": "existing workspace reload retains automatic MSFT formatting"
+    }
+  ],
+  "errors": []
+}

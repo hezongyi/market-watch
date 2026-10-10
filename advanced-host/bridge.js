@@ -2,13 +2,19 @@
 const parentOrigin = new URLSearchParams(location.search).get("parent");
 if (!parentOrigin || new URL(parentOrigin).origin !== parentOrigin)
   throw Error("Missing parent origin");
+// Narrow the header's HTTP(S) frame allowance to this authenticated app before
+// creating any chart or management iframe. Blob documents inherit this policy.
+const framePolicy = document.createElement("meta");
+framePolicy.httpEquiv = "Content-Security-Policy";
+framePolicy.content = `frame-src 'self' blob: ${parentOrigin}`;
+document.head.append(framePolicy);
 const send = (value) =>
   parent.postMessage({ channel: "mw-chart-v1", ...value }, parentOrigin);
 const pending = new Map();
 // Use public native dialogs. The widget has no public non-modal toast API.
 // Keep acknowledged conditions deduplicated until the parent clears them.
 const acknowledgedNotices = new Set();
-let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge;
+let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, dataCenter;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
@@ -193,17 +199,21 @@ const clientId = crypto.randomUUID();
 const requests = [];
 let initialHistoryGate;
 function drain() {
-  while (pending.size < 4 && requests.length) {
+  while (requests.length) {
+    const managementBusy=[...pending.values()].filter(entry=>entry.management).length;
+    const management=requests.findIndex(entry=>entry.type === "data-center-api");
+    const managementSlot=management>=0 && managementBusy<2;
+    if(!managementSlot && pending.size-managementBusy>=4) break;
     // Pointer-driven viewport checks must not sit behind queued prewarming.
     // Keep the same four in-flight limit and leave ongoing reads untouched.
     const quoteBusy = [...pending.values()].some(entry => entry.quote);
     const reserveBusy = [...pending.values()].filter(entry => entry.reserve).length;
-    const eligible = entry => (entry.query.op !== 'quotes' || !quoteBusy) &&
+    const eligible = entry => entry.type !== 'data-center-api' && (entry.query.op !== 'quotes' || !quoteBusy) &&
       (!entry.query.native_reserve || reserveBusy < 2);
-    let interaction = requests.findIndex(entry => entry.query.op === "viewport");
+    let interaction = managementSlot ? management : requests.findIndex(entry => entry.query.op === "viewport");
     if (interaction < 0) interaction = requests.findIndex(entry =>
       entry.query.op === "historyCache" && !entry.query.background);
-    if (interaction < 0) interaction = requests.findIndex(entry => !entry.query.op && !entry.query.native_reserve);
+    if (interaction < 0) interaction = requests.findIndex(entry => eligible(entry) && !entry.query.op && !entry.query.native_reserve);
     if (interaction < 0) interaction = requests.findIndex(entry => entry.type === 'workspace');
     if (interaction < 0) interaction = requests.findIndex(eligible);
     if (interaction < 0) break;
@@ -223,7 +233,7 @@ function drain() {
       drain();
     }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
     const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
-      reserve: !!query.native_reserve };
+      reserve: !!query.native_reserve, management:type === "data-center-api" };
     pending.set(id, entry);
     if (isCurrent) {
       const check = () => {
@@ -457,13 +467,42 @@ function seriesPresentationRows(symbols) {
   return symbols.flatMap(ticker => {
     const identity = decode(ticker);
     const meta = symbolPresentations.get(identity.symbol);
-    return meta ? [{s:"ok",n:ticker,v:{short_name:meta.symbol,
-      description:meta.name + (meta.source === 'yahoo' ? " · Yahoo 市场报价" :
+    const shown = meta?.display_symbol || meta?.symbol || MWSeries.display(identity.symbol);
+    return meta ? [{s:"ok",n:ticker,v:{short_name:shown,
+      description:meta.source === 'yahoo' ? meta.name + " · " + shown + " · Yahoo 市场报价" : shown + (
         identity.series_kind === 'provider' ? " · 平台原生行情" :
         identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情"),
       exchange:meta.exchange || meta.source?.toUpperCase()}}] : [];
   });
 }
+// Vendor start counts returned rows; backend cursors count qualified candidates.
+// Keep that translation local to each immutable query, with bounded memory.
+const nativeSearchPages = new Map();
+async function searchNativeSymbols(options) {
+  const epoch = workspaceEpoch;
+  const kind = options.kind || "all";
+  const key = JSON.stringify([kind,options.userInput,options.exchange,options.symbolType,epoch]);
+  const start = options.start || 0;
+  let pages = nativeSearchPages.get(key);
+  if (!pages || start === 0) {pages=new Map([[0,null]]);nativeSearchPages.set(key,pages);}
+  while(nativeSearchPages.size>20) nativeSearchPages.delete(nativeSearchPages.keys().next().value);
+  if (!pages.has(start)) throw Error("搜索分页已失效，请重新搜索");
+  let position=pages.get(start),page;
+  for(let scan=0;scan<5;scan++) {
+    page=await request({op:"searchPage",args:{kind,query:options.userInput || "",page_size:50,
+      source:options.exchange ? options.exchange.toLowerCase() : undefined,
+      symbol_type:options.symbolType || "",...(kind === "all" ? {cursor:position || undefined} : {offset:position || 0})}},"market",()=>epoch===workspaceEpoch && !options.signal?.aborted);
+    position=kind === "all" ? page.next_cursor : page.next_offset;
+    if(page.items.length || position == null) break;
+  }
+  if(epoch!==workspaceEpoch) throw Error("工作区已切换");
+  if(position != null) pages.set(start+page.items.length,position);
+  while(pages.size>256) pages.delete(pages.keys().next().value);
+  return {items:page.items.map(s=>({symbol:s.display_symbol || s.symbol,ticker:s.ticker,
+    description:s.label+" · "+s.description,exchange:s.source === "composite" ? (s.historical_source || "").toUpperCase() : s.source.toUpperCase(),
+    type:s.type || "other"})),remaining:position != null ? 1 : 0};
+}
+
 const feed = {
   // The native price-axis countdown requires server time in UNIX seconds.
   // Authenticated/network access stays in the trusted parent origin.
@@ -480,7 +519,8 @@ const feed = {
     Promise.resolve(initialHistoryGate?.promise)
       .then(() => request({ op: "quotes", args: { symbols } }, "market",
         () => epoch === workspaceEpoch))
-      .then((rows) => cb(rows.map(({ s, n, v }) => ({ s, n, v }))))
+      .then((rows) => cb(rows.map(row => chartQuotePresentation(row,
+        symbolPresentations.get(decode(row.n).symbol)))))
       .catch((e) => err(String(e)));
   },
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
@@ -516,6 +556,11 @@ const feed = {
     setTimeout(
       () =>
         cb({
+          exchanges: [{value:"",name:"全部来源",desc:"全部行情来源"},
+            ...["Dukascopy","OANDA","Binance","Yahoo"].map(name=>({value:name.toUpperCase(),name,desc:name+" 行情来源"}))],
+          symbols_types: [{name:"全部",value:""},{name:"外汇",value:"forex"},{name:"股票",value:"stock"},
+            {name:"加密",value:"crypto"},{name:"指数",value:"index"},{name:"基金",value:"fund"},
+            {name:"期货",value:"futures"},{name:"金属",value:"commodity"},{name:"其他",value:"other"}],
           supported_resolutions: resolutions,
           supports_marks: false,
           supports_timescale_marks: false,
@@ -523,28 +568,13 @@ const feed = {
         }),
       0,
     ),
-  searchSymbols: async (input, exchange, type, cb) => {
-    try {
-      const currentKind = typeof widget !== 'undefined' && ready ? decode(widget.activeChart().symbol()).series_kind : 'provider';
-      const rows = await request(
-        { op: "search", args: { query: input, kind: currentKind === 'managed' ? 'provider' : currentKind,
-          source: ['DUKASCOPY','OANDA','BINANCE','YAHOO'].includes(exchange?.toUpperCase()) ? exchange.toLowerCase() : undefined } },
-        "market",
-      );
-      cb(
-        rows.map(s => ({
-          symbol: s.symbol,
-          ticker: s.ticker || MWSeries.encode(s.id, "provider"),
-          description: s.label + " · " + (s.description || "平台行情") +
-            (s.series_kind && s.series_kind !== 'provider' || s.supported ? "" : " · 日历待接入"),
-          exchange: s.exchange || s.source.toUpperCase(),
-          type: ({CRYPTO:"crypto", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures"})[s.asset_type] || "forex",
-        })),
-      );
-    } catch (e) {
-      cb([]);
-      send({ type: "error", error: String(e) });
-    }
+  searchSymbols: (input, exchange, type, cb) => {
+    searchNativeSymbols({userInput:input,exchange,symbolType:type,start:0})
+      .then(page=>cb(page.items)).catch(error=>{cb([]);send({type:"error",error:String(error)});});
+  },
+  searchSymbolsPaginated: (options, cb) => {
+    searchNativeSymbols(options).then(page=>cb(page.items,page.remaining))
+      .catch(error=>{cb([],0);send({type:"error",error:String(error)});});
   },
   resolveSymbol: async (ticker, cb, err) => {
     try {
@@ -569,14 +599,15 @@ const feed = {
         while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       }
       cb({
-        name: meta.symbol || MWSeries.display(symbol),
+        name: meta.display_symbol || meta.symbol || MWSeries.display(symbol),
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
         mw_historyPageBars: meta.native_page_capacity || (meta.source === "binance" ? 1000 : 4000),
-        description: (meta.source === "yahoo" ? meta.name + " · " + meta.symbol : meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
+        description: (meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
         mw_range_source: meta.source,
+        ...(meta.source === "yahoo" ? { mw_display_precision: meta.display_precision } : {}),
         type: ({CRYPTO:"crypto", METAL:"commodity", INDEX:"index", ETF:"fund", EQUITY:"stock", FUTURE:"futures", OTHER:"commodity"})[meta.asset_type] || (meta.calendar === "utc0" ? "crypto" : "forex"),
         session: meta.session || (meta.source === "yahoo" ? "0000-0000:23456" : meta.calendar === "utc0" ? "24x7" : "1700-1700:23456"),
         timezone: meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York"),
@@ -786,7 +817,7 @@ const feed = {
         if (!dataset.ready) {
           if (dataset.reason==='unmaintained' && !nativeReadonly && !maintenanceAsked.has(symbol)) {
             maintenanceAsked.add(symbol);
-            send({type:'maintenance-required',instrument:symbol,calendar:s.calendar});
+            send({type:'error',error:'历史尚未配置，请从图表顶部的数据中心维护。'});
           }
           if(cb([],{noData:true}) !== false) acceptMarketHistory(s.ticker,res,{bars:[]},s.mw_window);
           finishTerminal();
@@ -1137,7 +1168,8 @@ async function tick() {
           sub.cb(
             rows
               .filter((r) => sub.symbols.includes(r.n))
-              .map(({ s, n, v }) => ({ s, n, v })),
+              .map(row => chartQuotePresentation(row,
+                symbolPresentations.get(decode(row.n).symbol))),
           );
         send({ type: "feed-poll-state", key: "@quotes", error: "" });
       } catch (e) {
@@ -1313,7 +1345,7 @@ function snapshot(manual = true) {
         schemaVersion: 1,
         state: {...state, _mwBarRangeMapping:barRangeMapping.snapshot(),
           _mwDrawingProjection: captureDrawingProjection(widget)},
-        theme: savedDoc.theme || "Dark",
+        theme: chartThemeName(widget.getTheme()) || "Dark",
         templates: savedDoc.templates || {},
       },
     }),
@@ -1346,6 +1378,16 @@ function boot(
     }
   }
   let grid;
+  let selectedTheme = chartInitialTheme(preferences, doc, chartState);
+  let pendingThemeState = chartState || {}, themeRestoring = false;
+  const restoreTheme = async () => {
+    if (pendingThemeState === undefined) return;
+    const state = pendingThemeState;
+    pendingThemeState = undefined;
+    themeRestoring = true;
+    try { await restoreChartTheme(widget, state, selectedTheme); }
+    finally { themeRestoring = false; }
+  };
   const pendingGridStyle = chartState?._mwGridStyle;
   let pendingBarRange = doc.state?._mwBarRangeMapping || chartState?._mwBarRangeMapping;
   let pendingViewports = storedViewports || chartState?._mwViewports;
@@ -1379,6 +1421,7 @@ function boot(
     delete chartState._mwGridStyle;
     delete chartState._mwBarRangeMapping;
     delete chartState._mwDrawingProjection;
+    delete chartState._mwTheme;
   }
   let viewportRestoring = false, workspaceLoadPause;
   const restoreViewports = async () => {
@@ -1456,47 +1499,55 @@ function boot(
   const loadContent = layouts.getChartContent;
   const saveLayout = layouts.saveChart;
   let initialNativeSave = false;
+  let initialNativeSaveError;
   let busySaveNoticeShown = false;
   layouts.saveChart = async (data) => {
-    if (viewportRestoring || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
-      dirty = true;
-      if (!busySaveNoticeShown) {
-        busySaveNoticeShown = true;
-        widget.showNoticeDialog({
-          title: "等待图表就绪",
-          body: "图表正在切换，数据就绪后自动保存",
-          callback: () => {},
-        });
+    try {
+      if (viewportRestoring || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
+        dirty = true;
+        if (!busySaveNoticeShown) {
+          busySaveNoticeShown = true;
+          widget.showNoticeDialog({
+            title: "等待图表就绪",
+            body: "图表正在切换，数据就绪后自动保存",
+            callback: () => {},
+          });
+        }
+        // Native save callbacks serialize rejection values; Error becomes {}.
+        return Promise.reject("图表正在切换，数据就绪后自动保存");
       }
-      // Native save callbacks serialize rejection values; Error becomes {}.
-      return Promise.reject("图表正在切换，数据就绪后自动保存");
+      busySaveNoticeShown = false;
+      // An explicit initial native save binds its returned server ID without
+      // reloading the chart. Only this boot call may target the existing empty
+      // workspace when the native library has no ID; later Save As stays a copy.
+      if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
+      const revision = editRevision, epoch = workspaceEpoch;
+      const state = await captureChartLayout(widget);
+      alertBridge.persist(state);
+      state._mwGridStyle = grid.value;
+      state._mwTheme = chartThemeName(widget.getTheme());
+      state._mwBarRangeMapping = barRangeMapping.snapshot();
+      state._mwDrawingProjection = captureDrawingProjection(widget);
+      if (epoch !== workspaceEpoch || editRevision !== revision) {
+        dirty = true;
+        throw new Error("图表在保存期间已修改，请重试保存");
+      }
+      // Native save metadata uses the resolved display name, which omits MWP:
+      // and can belong to a different active pane. Pin it to the captured first
+      // chart's public identity so list/load metadata retains the series kind.
+      const primary = state._mwViewports[0];
+      const result = await saveLayout({ ...data, symbol: primary.symbol,
+        resolution: primary.resolution, content: JSON.stringify(state) });
+      if (epoch === workspaceEpoch && editRevision === revision) {
+        dirty = false;
+        send({type: "native-saved"});
+      }
+      return result;
+    } catch (error) {
+      // Native callbacks serialize Error and lose its non-enumerable message.
+      if (initialNativeSave) initialNativeSaveError = String(error);
+      throw error;
     }
-    busySaveNoticeShown = false;
-    // An explicit initial native save binds its returned server ID without
-    // reloading the chart. Only this boot call may target the existing empty
-    // workspace when the native library has no ID; later Save As stays a copy.
-    if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
-    const revision = editRevision, epoch = workspaceEpoch;
-    const state = await captureChartLayout(widget);
-    alertBridge.persist(state);
-    state._mwGridStyle = grid.value;
-    state._mwBarRangeMapping = barRangeMapping.snapshot();
-    state._mwDrawingProjection = captureDrawingProjection(widget);
-    if (epoch !== workspaceEpoch || editRevision !== revision) {
-      dirty = true;
-      throw new Error("图表在保存期间已修改，请重试保存");
-    }
-    // Native save metadata uses the resolved display name, which omits MWP:
-    // and can belong to a different active pane. Pin it to the captured first
-    // chart's public identity so list/load metadata retains the series kind.
-    const primary = state._mwViewports[0];
-    const result = await saveLayout({ ...data, symbol: primary.symbol,
-      resolution: primary.resolution, content: JSON.stringify(state) });
-    if (epoch === workspaceEpoch && editRevision === revision) {
-      dirty = false;
-      send({type: "native-saved"});
-    }
-    return result;
   };
   const viewportBindings = new Map();
   const symbolResolutionBindings = new Map();
@@ -1540,6 +1591,7 @@ function boot(
         throw Error("当前布局有未保存更改，请先保存布局再打开其他布局");
       }
       const state = JSON.parse(await loadContent(id));
+      pendingThemeState = state;
       alertBridge.reset(state);
       grid.restore(state._mwGridStyle);
       pendingBarRange = state._mwBarRangeMapping;
@@ -1551,6 +1603,9 @@ function boot(
       prepareLegacyViewports(state);
       delete state._mwViewports;
       delete state._mwSync;
+      // Keep the marker out of the native document but available for restore.
+      pendingThemeState = { _mwTheme: state._mwTheme };
+      delete state._mwTheme;
       return JSON.stringify(nativeLayoutContent(state, currentNativeWorkspace));
     } catch (e) {
       loading = false;
@@ -1579,6 +1634,7 @@ function boot(
   progressivePages = undefined;
   managedSessions.clear();
   maintenanceAsked.clear();
+  dataCenter?.dispose();
   indicatorPicker?.dispose();
   barRangeMapping?.dispose();
   barRangeMapping = chartBarRangeMapping({widget:()=>widget,initial:pendingBarRange,readonly,changed:()=>{
@@ -1617,9 +1673,9 @@ function boot(
       },
     },
     compare_symbols: [
-      { symbol: "MWP:EURUSD", title: "EUR/USD · 平台行情" },
-      { symbol: "MWP:XAUUSD", title: "黄金 / 美元 · 平台行情" },
-      { symbol: "MWP:BTCUSDT", title: "BTC/USDT · 平台行情" },
+      { symbol: "MWP:EURUSD", title: "EURUSD · 平台行情" },
+      { symbol: "MWP:XAUUSD", title: "XAUUSD · 平台行情" },
+      { symbol: "MWP:BTCUSDT", title: "BTCUSDT · 平台行情" },
     ],
     // A constructor symbol overrides the first MainSeries in saved_data.
     // Existing layouts may have stale/display-only top-level metadata; the
@@ -1630,17 +1686,14 @@ function boot(
       ? { timeframe: "3M" }
       : {}),
     locale: "zh",
+    custom_formatters: { priceFormatterFactory: chartPriceFormatter },
     custom_translate_function: (original, singular, translated) => {
       if ([original, singular, translated].some(text => /^object tree$/i.test(String(text)))) return "对象树";
       if (['No data here', 'No data', 'Loading', 'Loading...'].includes(original)) return '';
       return null;
     },
     autosize: true,
-    theme:
-      preferences.find((p) => p.kind === "setting" && p.name === "mw.theme")
-        ?.content.value ||
-      doc.theme ||
-      "Dark",
+    theme: selectedTheme,
     saved_data: chartState,
     saved_data_meta_info: workspace
       ? { uid: workspace.id, name: workspace.name, description: workspace.name }
@@ -1650,6 +1703,7 @@ function boot(
       "support_multicharts",
       "determine_first_data_request_size_using_visible_range",
       "header_layouttoggle",
+      "header_in_fullscreen_mode",
       "disable_resolution_rebuild",
       "prefer_quote_short_name",
       "use_symbol_name_for_header_toolbar",
@@ -1676,7 +1730,21 @@ function boot(
         : []),
     ],
   });
+  widget
+    .headerReady()
+    .then(async () => {
+      if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
+        send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
+      // Public left-aligned buttons retain their creation order in the header.
+      if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
+        workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,
+        suspendIndicators: () => indicatorPicker?.close(),
+        managementRequest: (args, signal) => request(args, "data-center-api", () => !signal.aborted),
+        resolve: args => request({op:"resolve",args},"market")});
+    })
+    .catch((e) => send({ type: "error", error: String(e) }));
   widget.onChartReady(async () => {
+    await restoreTheme();
     globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
     syncCoordinator.refreshCharts();
@@ -1703,25 +1771,16 @@ function boot(
           await new Promise((resolve, reject) => widget.saveChartToServer(resolve, reject,
             {chartName: workspace.name}));
         } catch (e) {
-          send({ type: "error", error: "工作区初始化失败：" + String(e) });
-          return;
+          send({ type: "error", error: "工作区初始化失败：" + (initialNativeSaveError || e?.message || String(e)) });
+          // Saving can fail while the chart is usable. Keep the toolbar and
+          // draft recovery available rather than abandoning initialization.
         } finally {
           initialNativeSave = false;
         }
       }
     }
-    widget
-      .headerReady()
-      .then(async () => {
-        if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
-          send({type: "error", error: String(e)}));
+    widget.headerReady().then(async()=>{
         alertBridge.attach();
-        if (!readonly) {
-          globalThis.MWSeriesPicker?.attach(widget, query => request({op:'searchPage',args:query},'market'),
-            error=>error ? send({type:'error',error:String(error)}) : send({type:'workspace-action',action:'market-data'}));
-          const button = widget.createButton(); button.textContent = "创建告警";
-          button.setAttribute("title","在当前图表创建告警"); button.addEventListener("click",()=>alertBridge.create());
-        }
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
           grid, [
@@ -1750,16 +1809,10 @@ function boot(
                 send({ type: "error", error: String(error) });
               }
             }}] : []),
-            ...(!readonly ? [{label: "维护历史", title: "填写历史起点，并持续维护最新行情", run: () => {
-              const identity = decode(widget.activeChart().symbol());
-              if (identity.series_kind === "managed") send({type: "maintenance-required", instrument: identity.symbol});
-              else send({type: "history-plans-open"});
-            }}] : []),
             {label: "刷新历史", title: "载入新发布历史，保留柱宽与查看位置", run: async () => {
               await refreshProviderHistoryCorrections();
               await refreshManagedHistory();
             }},
-            {label: "历史任务", run: () => send({type: "history-plans-open"})},
             {label: "修改密码", run: () => chartMenu.changePassword()},
             {label: "登出", run: () => send({type: "workspace-action", action: "logout"})},
             ...(!readonly ? [{label: "复制恢复草稿", recovery: true,
@@ -1789,8 +1842,11 @@ function boot(
           })
           .catch(e => send({type: "error", error: "网格线样式恢复失败：" + String(e)}));
       }
-      if (readonly || !standard || onlyActive) return;
+      if (themeRestoring || !standard || onlyActive) return;
       const theme = String(name).toLowerCase() === "light" ? "Light" : "Dark";
+      selectedTheme = theme;
+      savedDoc.theme = theme;
+      if (readonly) return;
       prefs
         .savePreference("setting", "mw.theme", theme)
         .catch((e) =>
@@ -1876,6 +1932,8 @@ function boot(
     });
     widget.subscribe("chart_loaded", async () => {
       const epoch = workspaceEpoch;
+      await restoreTheme();
+      if (epoch !== workspaceEpoch) return;
       await restoreViewports();
       if (epoch !== workspaceEpoch) return;
       // load() emits chart_loaded again for the rebuilt single chart. Only that
@@ -1946,6 +2004,7 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if (m.type === "data-center-open" && ready && !loading && typeof m.location === "string" && m.location.length <= 4000) { dataCenter?.open(m.location); return; }
   if (m.type === "chart-alert-create" && ready && !loading) {void alertBridge?.create(); return;}
   if (m.type === "chart-alert-drawing-action" && typeof m.alert_id === "string" && ["retry","restore"].includes(m.action) && ready && !loading) {void alertBridge?.drawingAction(m.alert_id,m.action); return;}
   if (m.type === "chart-alert-rows" && Array.isArray(m.rows)) {alertBridge?.setRows(m.rows); return;}
@@ -1972,7 +2031,8 @@ addEventListener("message", async (e) => {
       if(event.result_epoch) entry.result_epoch=event.result_epoch;
       if(event.sequence<=entry.sequence) return;
       entry.sequence=event.sequence;
-      if(event.type==='quotes') quote.cb(event.quotes.map(({s,v})=>({s,n:entry.ticker,v})));
+      if(event.type==='quotes') quote.cb(event.quotes.map(({s,v})=>chartQuotePresentation(
+        {s,n:entry.ticker,v},symbolPresentations.get(decode(entry.ticker).symbol))));
       if(event.type==='reset') {
         entry.generation=++marketGeneration;entry.sequence=0;
         send({type:'market-subscribe',args:{client:clientId,listener:entry.listener,generation:entry.generation,

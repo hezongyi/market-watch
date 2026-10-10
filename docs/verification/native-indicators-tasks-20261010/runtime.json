@@ -1,0 +1,69 @@
+{
+  "environment": "Ubuntu quant-server local isolated Docker",
+  "project": "mw-data-center-review-20261008",
+  "services": [
+    {
+      "Service": "api",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "healthy",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Service": "chart-origin",
+      "Image": "market-watch-chart-origin:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp"
+    },
+    {
+      "Service": "composite-aggregate-worker",
+      "Image": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Service": "history-worker",
+      "Image": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Service": "native-history-worker",
+      "Image": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Service": "pg",
+      "Image": "postgres:14-bookworm",
+      "State": "running",
+      "Health": "healthy",
+      "Ports": "5432/tcp"
+    },
+    {
+      "Service": "pricing-worker",
+      "Image": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "State": "running",
+      "Health": "",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Service": "tls",
+      "Image": "nginx:1.28-alpine",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp, 192.168.7.232:19943->443/tcp, 192.168.7.232:19944->444/tcp"
+    },
+    {
+      "Service": "web",
+      "Image": "market-watch-web:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Ports": "80/tcp"
+    }
+  ]
+}

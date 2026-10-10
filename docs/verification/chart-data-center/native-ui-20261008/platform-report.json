@@ -1,0 +1,20 @@
+{
+  "environment": "Ubuntu isolated Docker; enabled Yahoo and legacy Binance directory; real chart resolve",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "binance directory/filter and exact chart identity",
+      "total": 1,
+      "symbol": "BTCUSDT",
+      "id": "BTCUSDT"
+    },
+    {
+      "name": "yahoo directory/filter and exact chart identity",
+      "total": 17,
+      "symbol": "AAPL",
+      "id": "YAHOO:1eb44d625271a4eb75016f276d137836"
+    }
+  ],
+  "errors": []
+}

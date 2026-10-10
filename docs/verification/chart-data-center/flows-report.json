@@ -1,0 +1,52 @@
+{
+  "environment": "Ubuntu isolated Docker, real supplier and licensed native engine",
+  "passed": true,
+  "checks": [
+    {
+      "name": "old fixed-version link opens exact dataset, version and section in dialog"
+    },
+    {
+      "name": "fixed version applies only to captured chart with symbol/interval sync enabled",
+      "before": {
+        "symbols": [
+          "MWP:XAUUSD",
+          "MWP:XAUUSD"
+        ],
+        "res": [
+          "240",
+          "240"
+        ],
+        "active": 0
+      },
+      "after": {
+        "symbols": [
+          "MWH:0341A05C-0C7E-434D-980A-4E9550D0C1F5",
+          "MWP:XAUUSD"
+        ],
+        "res": [
+          "1",
+          "240"
+        ],
+        "active": 0,
+        "sync": [
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "name": "stale target refuses application and retains selected object"
+    },
+    {
+      "name": "native parameter form dirty guard, save and exact configured provider identity",
+      "ticker": "MWP:NATIVE:B046DF411F8E76683D7E2F33CFF6B13B"
+    },
+    {
+      "name": "maintenance edit guard, revision save and pause/resume real API"
+    },
+    {
+      "name": "light theme and real fullscreen dialog visibility"
+    }
+  ],
+  "errors": []
+}

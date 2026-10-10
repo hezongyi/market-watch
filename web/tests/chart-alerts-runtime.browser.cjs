@@ -138,8 +138,7 @@ assert.deepEqual(
       });
     }
     report.cases.push("actual HTTPS login and platform native chart load");
-    const nativeUI = frame.childFrames()[0];
-    await nativeUI.getByText("创建告警", { exact: true }).click();
+    await frame.evaluate(() => alertBridge.create());
     const dialog = page.getByRole("dialog");
     await dialog.waitFor();
     assert.equal(await dialog.getByLabel("触发次数").inputValue(), "1");

@@ -1,0 +1,16 @@
+{
+  "environment": "Ubuntu isolated Docker PostgreSQL and deployed API",
+  "passed": true,
+  "counts": {
+    "registered": 131,
+    "configured_active": 3,
+    "configured_archived": 1,
+    "registered_only": 127
+  },
+  "checks": [
+    "managed and candidate totals equal SQL configured active count",
+    "page size 1 returns every configured identity once in same order",
+    "real registered-only symbol omitted from both searches",
+    "configured archived records remain in archived filter"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "environment": "Ubuntu isolated real APIs/PG; exact created-task failure state injection",
+  "passed": true,
+  "checks": [
+    {
+      "name": "range maintenance submits real task; UI pause/resume/retry/cancel work against exact PG fixture",
+      "task": "b6ace001-483f-4a6c-9d0b-a8e604c69308"
+    },
+    {
+      "name": "real workspace/composite references protect history deletion"
+    },
+    {
+      "name": "archive, exact impact review, cancel focus and unreferenced history reclamation complete",
+      "dataset": "489e0c3a84431ea19d277256deb3a2b9810b13cfc8959400e0357b21cefc3675"
+    }
+  ],
+  "errors": []
+}

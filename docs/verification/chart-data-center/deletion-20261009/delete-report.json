@@ -1,0 +1,32 @@
+{
+  "environment": "Ubuntu isolated Docker; read-only existing dataset and intercepted destructive commands",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "real list exposes deletion; opening/cancelling only reads and restores originating row/page"
+    },
+    {
+      "name": "archive prerequisite pauses first, prevents repeated commands and never deletes prices"
+    },
+    {
+      "name": "explicit confirmation submits latest reviewed token once and displays completion"
+    },
+    {
+      "name": "durable references remain visible and block deletion"
+    },
+    {
+      "name": "empty or already reclaimed history cannot submit deletion"
+    },
+    {
+      "name": "review conflict resets confirmation and preserves prices"
+    },
+    {
+      "name": "partial archive failure is visible; idempotent retry never reclaims prices"
+    },
+    {
+      "name": "detail entry and maintenance guidance preserve return context"
+    }
+  ],
+  "errors": []
+}

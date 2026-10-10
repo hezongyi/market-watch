@@ -5,6 +5,7 @@ from sqlalchemy import func, or_, select
 from .composite_definitions import baseline
 from .history_catalog import account_scope
 from .market_usage import wanted_instruments
+from .market_names import code_search, display_code
 from .storage import (
     ChartAlert,
     ChartAlertVersion,
@@ -30,6 +31,7 @@ def mapping_report(db, row):
     identity = target.identity
     return {"id": row.id, "dataset_id": row.dataset_id, "created_at": row.created_at,
         "target_dataset_id": target.id, "target_identity": identity, "match": row.match,
+        "target_display_symbol": display_code(identity["provider_symbol"], identity["source"], target.asset_class),
         "current_account": identity["account_scope"] == account_scope()}
 
 
@@ -88,6 +90,7 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         "receiving" if confirmed_ready else "recovering")
     return {"id": composite.id, "instrument_id": composite.instrument_id,
         "dataset_id": dataset.id, "logical_symbol": dataset.logical_symbol,
+        "display_symbol": display_code(dataset.logical_symbol, asset_type=dataset.asset_class),
         "precision": inst.precision, "calendar": revision.rules["aggregation_calendar"],
         "historical_source": dataset.identity["source"], "live_source": "oanda",
         "basis": inst.basis, "status": status, "created_at": composite.created_at,
@@ -127,8 +130,7 @@ def list_composites(db, *, query="", page=1, page_size=25, permission_scope=SCOP
     if dataset_id:
         base = base.where(MarketComposite.dataset_id == dataset_id)
     if query:
-        value = "%" + query[:100].replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
-        base = base.where(MarketDataset.logical_symbol.ilike(value, escape="\\"))
+        base = base.where(code_search(query, MarketDataset.logical_symbol))
     total = db.scalar(select(func.count()).select_from(base.subquery()))
     rows = db.scalars(base.order_by(MarketDataset.logical_symbol, MarketComposite.id)
                       .offset((page - 1) * page_size).limit(page_size))

@@ -3,6 +3,7 @@ import {
   type HistoryCapabilities,
 } from "./nativeHistoryLoads";
 import { useEffect, useRef, useState } from "react";
+import { centerLocation } from "../market-data/location";
 import { api, apiErrorDetails } from "../api";
 import "./advanced.css";
 import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
@@ -78,10 +79,14 @@ export default function AdvancedWorkspace() {
   const frame = useRef<HTMLIFrameElement>(null),
     current = useRef<Workspace | null>(null);
   const unsaved = useRef(false);
+  const centerSession = useRef<string | null>(null);
+  const deepCenter = useRef(new URLSearchParams(location.search).get("data_center"));
   const flushWaiters = useRef<
     { resolve: () => void; reject: (e: Error) => void }[]
   >([]);
-  const mobile = matchMedia("(max-width:700px), (pointer:coarse)").matches;
+  // Browser zoom narrows CSS pixels on a desktop. It must not remove editing
+  // and management; coarse-pointer devices retain the existing read-only view.
+  const mobile = matchMedia("(pointer:coarse)").matches;
   const queue = useRef<Promise<void>>(Promise.resolve()),
     blocked = useRef(false),
     inflight = useRef(0);
@@ -208,7 +213,10 @@ export default function AdvancedWorkspace() {
           history.replaceState(null, "", location.pathname);
           return [row];
         })
-      : refresh(1);
+      : refresh(1).then(async list => {
+          if (!list.length && deepCenter.current) return [await api<Workspace>("/advanced-charts/workspaces", {name: "图表工作区"})];
+          return list;
+        });
     opening
       .then((list) => {
         if (!cancelled) {
@@ -252,6 +260,33 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
+        centerSession.current = m.open === true ? m.session : null;
+        if (m.open) { setAlertsOpen(false); setCapacityDialog(null); setExportSelection(null); }
+        return;
+      }
+      if (m.type === "data-center-replay" && m.session === centerSession.current && /^\/replay(?:\?dataset_version=[a-f0-9-]{36})?$/.test(m.path)) {
+        location.assign(m.path); return;
+      }
+      if (m.type === "data-center-api") {
+        const q = m.query;
+        if (mobile || !Number.isSafeInteger(m.id) || m.id <= 0 || !q || q.session !== centerSession.current || typeof q.path !== "string" || q.path.length > 4000 ||
+          JSON.stringify(q).length > 100000 || !/^\/market-data\/(?:center|datasets|history-catalog|date-boundary|composites|tasks|versions|series|resolve|capabilities|sources|live)(?:\/[A-Za-z0-9_-]+)*(?:\?[^#]*)?$/.test(q.path) && q.path !== "/charts/provider/configure") {
+          reply({type:"result",id:m.id,error:"数据中心请求不允许",errorDetails:{status:403,code:"FORBIDDEN"}});return;
+        }
+        const controller = new AbortController();
+        if (!marketRequests.has(source)) marketRequests.set(source, new Map());
+        marketRequests.get(source)!.set(m.id, controller);
+        try {
+          const result = await api(q.path, q.body, controller.signal);
+          reply({type:"result",id:m.id,result});
+        } catch (error: any) {
+          reply({type:"result",id:m.id,error:error.message || String(error),errorDetails:{...apiErrorDetails(error),status:error.status}});
+        } finally {
+          marketRequests.get(source)?.delete(m.id);
+        }
+        return;
+      }
       if (m.type === "chart-alert-context") {
         if (mobile || !validAlertContext(m.context, current.current?.id)) return;
         setAlertContext(m.context); setAlertsOpen(true);
@@ -555,7 +590,7 @@ export default function AdvancedWorkspace() {
           setExportSelection(value);
       } else if (m.type === "workspace-action") {
         if (m.action === "home") location.assign("/");
-        else if (m.action === "market-data") location.assign("/market-data");
+
         else if (m.action === "logout") {
           try {
             if (!mobile && unsaved.current) await flush();
@@ -571,6 +606,11 @@ export default function AdvancedWorkspace() {
           setChartTheme(m.theme.toLowerCase());
       } else if (m.type === "ready") {
         setNativeReady(true);
+        if (deepCenter.current) {
+          reply({type: "data-center-open", location: centerLocation(deepCenter.current)});
+          deepCenter.current = null;
+          const url = new URL(location.href); url.searchParams.delete("data_center"); history.replaceState(null, "", url.pathname + url.search);
+        }
         setStatus("已加载 · 行情按需更新");
       } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
@@ -881,9 +921,11 @@ export default function AdvancedWorkspace() {
               endpoints[q.op] +
                 (q.op === "searchPage"
                   ? "?" + new URLSearchParams({query:String(q.args?.query || ""),
-                    kind:["provider","history","composite"].includes(q.args?.kind) ? q.args.kind : "provider",
+                    kind:["provider","history","composite","all"].includes(q.args?.kind) ? q.args.kind : "provider",
                     source:String(q.args?.source || ""),calendar:String(q.args?.calendar || ""),
-                    page_size:"25",offset:String(Number.isSafeInteger(q.args?.offset) ? q.args.offset : 0)})
+                    symbol_type:String(q.args?.symbol_type || ""),cursor:String(q.args?.cursor || ""),
+                    page_size:String(Number.isSafeInteger(q.args?.page_size) ? Math.max(1,Math.min(100,q.args.page_size)) : 25),
+                    offset:String(Number.isSafeInteger(q.args?.offset) ? q.args.offset : 0)})
                   : q.op === "search"
                   ? "?query=" + encodeURIComponent(String(q.args?.query || "")) +
                     "&kind=" + encodeURIComponent(["provider", "history", "composite", "all"].includes(q.args?.kind) ? q.args.kind : "all") +
@@ -1268,7 +1310,7 @@ export default function AdvancedWorkspace() {
           title="专业图表工作区"
           data-workspace-id={active.id}
           src={`${origin}/?parent=${encodeURIComponent(location.origin)}${new URLSearchParams(location.search).get('marketPolling') === '1' ? '&marketPolling=1' : ''}`}
-          sandbox="allow-scripts allow-same-origin allow-downloads"
+          sandbox="allow-scripts allow-same-origin allow-downloads allow-forms"
           allowFullScreen
           referrerPolicy="no-referrer"
         />

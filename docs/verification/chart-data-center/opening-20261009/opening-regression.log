@@ -1,0 +1,52 @@
+RUN chart-data-center-opening.browser.cjs
+PASS only selected row changes; other labels/style remain and rapid duplicate clicks are ignored { originalCount: 25 }
+PASS dialog closes before the held source responds { closeMs: 343, blocked: false }
+PASS loading feedback stays on the chart and clears after the native callback {}
+PASS slow candles load behind the closed dialog with visible chart feedback { closeMs: 617 }
+PASS long load explains the wait and retry stays on the chart without reopening data center {}
+RUN chart-data-center-opening-guards.browser.cjs
+PASS stale layout is rejected before closing the dialog; selected action resets {}
+PASS source failure is shown on the chart; retry succeeds without reopening the dialog {}
+PASS changing active chart cancels delayed validation without replacing the newer target {}
+PASS symbol/period command affects only captured chart with both sync locks initially enabled {}
+PASS late native callback cannot re-open a dialog or advance an older workspace command {}
+PASS a newer user period survives the late symbol callback without reverting to requested H1 {}
+RUN chart-data-center-platform.browser.cjs
+PASS binance directory/filter and exact chart identity
+PASS yahoo directory/filter and exact chart identity
+RUN chart-data-center-flows.browser.cjs
+PASS old fixed-version link opens exact dataset, version and section in dialog
+PASS fixed version applies only to captured chart with symbol/interval sync enabled
+PASS stale target refuses application and retains selected object
+PASS native parameter form dirty guard, save and exact configured provider identity
+PASS maintenance edit guard, revision save and pause/resume real API
+PASS light theme and real fullscreen dialog visibility
+RUN chart-data-center-resilience.browser.cjs
+PASS detail return restores filters and row focus; each section and close retain page/filter memory
+PASS initial failure differs from filtered empty; poll failure retains timestamped snapshot; refresh retries
+PASS genuine empty-list fixture presents creation action separately from errors
+PASS application failure appears on chart; successful retry applies exact platform identity
+PASS real indicator/drawing/layout/visible range survive management navigation and close
+PASS real chart maximize retains toolbar, modal and maximized pane
+PASS indicator-window coordination leaves one interactive modal
+PASS Escape closes native select/details before management window
+PASS workspace generation changes during delayed validation cancel the old command without later chart mutations
+PASS refresh and return protect unsaved input
+PASS rapid filter changes discard late previous replies
+PASS invalid object recovers inside window and compatible links preserve workspaces
+RUN chart-data-center-real.browser.cjs
+PASS old list URL and authentication target enter one chart dialog
+PASS five sections use pure reads and retain the chart frame
+PASS desktop 1024, 1440, 1920 and 200% content zoom
+PASS close and section changes protect unsaved creation input
+PASS closing cancels manager frame and returns native toolbar focus
+PASS session browse memory, keyboard focus containment and Escape
+PASS one toolbar entry and no application sidebar data center entry
+RUN chart-data-center-native-ui.browser.cjs
+PASS Dark 1024: indicator → data center → search; native dialog style, frame and focus retained
+PASS Dark 1440: indicator → data center → search; native dialog style, frame and focus retained
+PASS Dark 1920: indicator → data center → search; native dialog style, frame and focus retained
+PASS Light 1024: indicator → data center → search; native dialog style, frame and focus retained
+PASS Light 1440: indicator → data center → search; native dialog style, frame and focus retained
+PASS Light 1920: indicator → data center → search; native dialog style, frame and focus retained
+PASS reload retains immediate adjacency after indicator

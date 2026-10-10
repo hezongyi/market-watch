@@ -36,7 +36,7 @@ def test_new_defaults_provider_old_native_state_and_drawings_preserved(database)
 def test_initial_workspace_metadata_is_ephemeral_and_never_fetches_candles(database, monkeypatch):
     from alerts import provider_chart
     expected = {'id': 'BTCUSDT', 'source': 'binance', 'calendar': 'utc0', 'precision': 2,
-                'basis': 'last', 'name': 'BTC/USDT', 'series_kind': 'provider'}
+                'basis': 'last', 'name': 'BTCUSDT', 'series_kind': 'provider'}
     monkeypatch.setattr(provider_chart, 'metadata', lambda ident: expected if ident == 'BTCUSDT' else None)
     monkeypatch.setattr(provider_chart, 'native_page', lambda *a, **kw: (_ for _ in ()).throw(
         AssertionError('startup metadata cannot acquire candles')))

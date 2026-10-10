@@ -1,0 +1,37 @@
+{
+  "environment": "Ubuntu isolated Docker; long text/empty-workspace browser fixtures",
+  "passed": true,
+  "checks": [
+    {
+      "name": "long Chinese/provider text and measured text contrast in Dark",
+      "colors": {
+        "ink": "#dbdbdb",
+        "muted": "#a8a8a8",
+        "surface": "#1f1f1f",
+        "link": "#90b2ff",
+        "button": "rgb(43, 43, 43)"
+      }
+    },
+    {
+      "name": "long Chinese/provider text and measured text contrast in Light",
+      "colors": {
+        "ink": "#0f0f0f",
+        "muted": "#707070",
+        "surface": "#fff",
+        "link": "#2962ff",
+        "button": "rgb(242, 242, 242)"
+      }
+    },
+    {
+      "name": "200% content zoom keeps primary action, close and footer reachable with local table scroll"
+    },
+    {
+      "name": "empty-workspace listing triggers real initialization without overwriting existing workspaces",
+      "newWorkspace": "0557f02c-139e-4c7f-930a-0637f9b38ace"
+    },
+    {
+      "name": "old platform configuration URL enters same native dialog"
+    }
+  ],
+  "errors": []
+}

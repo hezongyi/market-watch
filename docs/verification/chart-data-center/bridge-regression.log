@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: drag previews do not write; mouse up serializes successive versions
+ok 1 - drag previews do not write; mouse up serializes successive versions
+  ---
+  duration_ms: 52.273691
+  type: 'test'
+  ...
+# Subtest: timeout queries committed version; failures preserve position until explicit restore
+ok 2 - timeout queries committed version; failures preserve position until explicit restore
+  ---
+  duration_ms: 33.412428
+  type: 'test'
+  ...
+# Subtest: explicit removal pauses; symbol, interval and layout changes never pause
+ok 3 - explicit removal pauses; symbol, interval and layout changes never pause
+  ---
+  duration_ms: 44.278862
+  type: 'test'
+  ...
+# Subtest: source changes fence drawing edits and menu contexts are captured at open
+ok 4 - source changes fence drawing edits and menu contexts are captured at open
+  ---
+  duration_ms: 18.415738
+  type: 'test'
+  ...
+# Subtest: style changes preserve the rule when serialized geometry order or price formatting differs
+ok 5 - style changes preserve the rule when serialized geometry order or price formatting differs
+  ---
+  duration_ms: 41.14608
+  type: 'test'
+  ...
+# Subtest: native history events submit restored geometry without resuming a paused alert
+ok 6 - native history events submit restored geometry without resuming a paused alert
+  ---
+  duration_ms: 49.031593
+  type: 'test'
+  ...
+# Subtest: price-axis presentation changes cannot silently replace the saved coordinate system
+ok 7 - price-axis presentation changes cannot silently replace the saved coordinate system
+  ---
+  duration_ms: 28.561879
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 360.01953

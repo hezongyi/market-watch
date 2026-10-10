@@ -77,7 +77,10 @@ def report(db, dataset, references):
         "periods": [(a.id, a.status, a.count) for a in artifacts],
         "paused": bool(plan and plan.paused), "archived": bool(plan and plan.archived),
         "references": sorted((r["kind"], r["id"], r["detail"]) for r in references["items"])}
+    from .market_names import display_code
     return {"dataset": {"id": dataset.id, "logical_symbol": dataset.logical_symbol,
+            "display_symbol": display_code(dataset.logical_symbol, asset_type=dataset.asset_class),
+            "provider_display_symbol": display_code(dataset.identity["provider_symbol"], dataset.identity["source"], dataset.asset_class),
             "identity": dataset.identity, "aggregation_calendar": instrument.calendar},
         "versions": targets, "payload_totals": totals,
         "review_revision": hashlib.sha256(json.dumps(decision, sort_keys=True,

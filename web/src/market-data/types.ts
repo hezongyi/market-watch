@@ -66,6 +66,8 @@ export type Dataset = {
   id: string;
   instrument_id: string;
   logical_symbol: string;
+  display_symbol?: string;
+  provider_display_symbol?: string;
   precision: number;
   asset_class: string;
   aggregation_calendar: string;

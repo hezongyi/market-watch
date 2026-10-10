@@ -1,0 +1,28 @@
+{
+  "environment": "Ubuntu isolated Docker; real chart/search; mapping submit fixture",
+  "passed": true,
+  "checks": [
+    {
+      "name": "real Yahoo chart loads on retry without reopening; captured chart only; ready callback clears status"
+    },
+    {
+      "name": "real main search lists separate platform, fixed history and composite identities; cancel keeps chart"
+    },
+    {
+      "name": "choosing fixed history in actual main search loads the selected unique ticker"
+    },
+    {
+      "name": "account-scoped native mapping picker only fills draft; labels/required checkbox and exact mapping submit are preserved"
+    },
+    {
+      "name": "native watchlist search cancel changes nothing; add keeps unique fixed-history ticker and does not switch chart"
+    },
+    {
+      "name": "actual compare search selects platform ticker and creates comparison while preserving main chart identity"
+    },
+    {
+      "name": "native indicator symbol-input search includes managed identities; picker cancel and settings cancel preserve main chart"
+    }
+  ],
+  "errors": []
+}

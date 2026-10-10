@@ -175,6 +175,9 @@ def test_page_reads_only_selected_metadata_and_http_is_authenticated(database):
             assert response.status_code == 200 and len(response.json()["items"]) == 5
             assert client.get("/api/market-data/series/page?offset=-1").status_code == 422
             assert client.get("/api/market-data/series/page?source=bad").status_code == 422
+            for cursor in ("%%%", "_w", "eyJ2Ijoibm90LWEtdmFsaWQtY3Vyc29yIn0"):
+                assert client.get("/api/market-data/series/page", params={"kind": "all", "cursor": cursor}).status_code == 422
+            assert client.get("/api/market-data/series/page?kind=all&offset=1").status_code == 422
         finally:
             api.app.dependency_overrides.clear()
 
@@ -261,3 +264,32 @@ def test_composite_pages_use_known_mapping_without_scanning_other_products(datab
         assert utc["items"][0]["mapping_id"] == replacement_mapping_id
         ny = search_page(db, kind="composite", calendar="ny17", page_size=250)
         assert len(ny["items"]) == 55
+
+
+def test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query(database, monkeypatch):
+    from alerts import market_data
+    from test_series_access import fixture
+    from fastapi import HTTPException
+    import pytest
+
+    fixture(database, monkeypatch)
+    providers = [{"id": f"OANDA:T{i:04}", "symbol": f"T{i:04}", "source": "oanda",
+                  "label": f"Ticker{i}", "asset_type": "CURRENCY" if i % 2 else "EQUITY",
+                  "available": True, "supported": True} for i in range(600)]
+    monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: providers)
+    rows, cursor = [], None
+    for _ in range(80):
+        page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)
+        rows.extend(page["items"])
+        cursor = page["next_cursor"]
+        if cursor is None:
+            break
+    assert cursor is None
+    assert len({row["ticker"] for row in rows}) == len(rows)
+    assert {row["series_kind"] for row in rows} == {"provider", "history", "composite"}
+    assert {row["id"] for row in rows if row["series_kind"] == "provider"}.issuperset({row["id"] for row in providers})
+    page = market_data.search_series_page(kind="all", page_size=13, symbol_type="stock", source="oanda")
+    assert len(page["items"]) == 13 and all(row["type"] == "stock" for row in page["items"])
+    assert all(row["source"] == "oanda" for row in page["items"])
+    with pytest.raises(HTTPException):
+        market_data.search_series_page(kind="all", page_size=13, symbol_type="forex", cursor=page["next_cursor"])

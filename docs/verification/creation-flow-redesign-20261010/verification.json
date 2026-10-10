@@ -1,0 +1,39 @@
+{
+  "browser_groups": 46,
+  "browser_suites": [
+    {
+      "report": "creation-report.json",
+      "groups": 10,
+      "passed": true
+    },
+    {
+      "report": "indicator-report.json",
+      "groups": 11,
+      "passed": true
+    },
+    {
+      "report": "task-report.json",
+      "groups": 10,
+      "passed": true
+    },
+    {
+      "report": "symbol-search-report.json",
+      "groups": 8,
+      "passed": true
+    },
+    {
+      "report": "platform-actions-report.json",
+      "groups": 4,
+      "passed": true
+    },
+    {
+      "report": "zoom-report.json",
+      "groups": 3,
+      "passed": true
+    }
+  ],
+  "backend_tests": 35,
+  "postgres_tests": 2,
+  "environment": "Ubuntu quant-server isolated Docker",
+  "production_deployed": false
+}

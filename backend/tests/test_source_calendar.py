@@ -152,8 +152,9 @@ def test_only_account_bound_review_can_certify_live_closed_interior(database, mo
         window_start=stamp - 125000, window_end=stamp - 5000, observed_at=stamp,
         rows=(), volume_kind="price_count", volume_unit="quotes", result=RequestResult(status="empty_success")))
     state = live.snapshots()[0]
-    assert state["calendar_verified"] and state["candle_ready"]
-    assert not state["quote_ready"]
+    assert state["calendar_verified"] and state["recovery_ready"]
+    assert state["market_session"] == "closed" and state["quality"] == "market_closed"
+    assert not state["candle_ready"] and not state["quote_ready"]
     metric = live.measurements(ident.key)
     assert metric["confirmed_closures"] == 2 and metric["missing"] == 0
 

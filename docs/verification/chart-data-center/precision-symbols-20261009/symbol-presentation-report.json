@@ -1,0 +1,36 @@
+{
+  "environment": "Ubuntu isolated Docker; authenticated directories and native chart datafeed",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "yahoo: three query formats, data center and native search/resolve share one readable name",
+      "ticker": "MWP:YAHOO:edb0c8f3d3a261a3a3497905f4873c34",
+      "displayName": "EUR/USD"
+    },
+    {
+      "name": "oanda: three query formats, data center and native search/resolve share one readable name",
+      "ticker": "MWP:EURUSD",
+      "displayName": "EUR/USD"
+    },
+    {
+      "name": "dukascopy: three query formats, data center and native search/resolve share one readable name",
+      "ticker": "MWP:DUKA:9105c84af42600ccfa4f03132cc2472b",
+      "displayName": "EUR/USD"
+    },
+    {
+      "name": "BTC/USDT opens the original Binance ticker without changing provider requests"
+    },
+    {
+      "name": "workspace reload preserves identity and readable chart name"
+    },
+    {
+      "name": "self-built history and composite search/resolve use the same label with fixed identities"
+    },
+    {
+      "name": "readable catalog selection retains canonical logical code and supplier input",
+      "providerCode": "EUR/USD"
+    }
+  ],
+  "errors": []
+}

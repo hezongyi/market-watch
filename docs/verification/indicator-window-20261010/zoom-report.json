@@ -1,0 +1,28 @@
+{
+  "environment": "Ubuntu Docker; Chrome tabs.setZoom real browser zoom; composite row-count layout fixture",
+  "passed": true,
+  "checks": [
+    {
+      "name": "real 200% browser zoom retains native entry, data center lists and indicator detail panel at 1024",
+      "physicalWidth": 1024,
+      "cssWidth": 512,
+      "dpr": 2
+    },
+    {
+      "name": "real 200% browser zoom retains native entry, data center lists and indicator detail panel at 1440",
+      "physicalWidth": 1440,
+      "cssWidth": 720,
+      "dpr": 2
+    },
+    {
+      "name": "real 200% browser zoom retains native entry, data center lists and indicator detail panel at 1920",
+      "physicalWidth": 1920,
+      "cssWidth": 960,
+      "dpr": 2
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "onlyOwnedWorkspaceDeleted": true
+  }
+}

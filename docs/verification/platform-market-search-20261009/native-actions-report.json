@@ -1,0 +1,25 @@
+{
+  "environment": "Ubuntu isolated Docker; real native UI, scoped fault injection",
+  "passed": true,
+  "checks": [
+    {
+      "name": "stale layout is rejected without closing or changing chart"
+    },
+    {
+      "name": "accepted open closes immediately; failure is reported on chart and leaves all chart identities intact"
+    },
+    {
+      "name": "late resolve after active-pane switch cannot mutate any chart"
+    },
+    {
+      "name": "native form Select/Input preserve labels, range/required validation and correct saved values"
+    },
+    {
+      "name": "native main search genuinely pages beyond the first results and applies source/type before paging"
+    },
+    {
+      "name": "actual native main search uses unified results; cancelling keeps the chart"
+    }
+  ],
+  "errors": []
+}

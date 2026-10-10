@@ -1,0 +1,96 @@
+{
+  "verifiedAtUtc": "2026-10-09T21:51:30.452554+00:00",
+  "environment": "Ubuntu quant-server local Docker",
+  "services": [
+    {
+      "Name": "mw-data-center-review-20261008-api-1",
+      "Service": "api",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "market-watch-api:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "healthy",
+      "Status": "Up 11 hours (healthy)",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-chart-origin-1",
+      "Service": "chart-origin",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "market-watch-chart-origin:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 7 hours",
+      "Ports": "80/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-composite-aggregate-worker-1",
+      "Service": "composite-aggregate-worker",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 20 hours",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-history-worker-1",
+      "Service": "history-worker",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 20 hours",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-native-history-worker-1",
+      "Service": "native-history-worker",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 20 hours",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-pg-1",
+      "Service": "pg",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "postgres:14-bookworm",
+      "State": "running",
+      "Health": "healthy",
+      "Status": "Up 33 hours (healthy)",
+      "Ports": "5432/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-pricing-worker-1",
+      "Service": "pricing-worker",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "sha256:bcf70775fd00175a0410689e9ed443ee12bf5b11045b30039dd31ff7f29a7d90",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 20 hours",
+      "Ports": "8000/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-tls-1",
+      "Service": "tls",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "nginx:1.28-alpine",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 7 hours",
+      "Ports": "80/tcp, 192.168.7.232:19943->443/tcp, 192.168.7.232:19944->444/tcp"
+    },
+    {
+      "Name": "mw-data-center-review-20261008-web-1",
+      "Service": "web",
+      "Project": "mw-data-center-review-20261008",
+      "Image": "market-watch-web:mw-data-center-review-20261008",
+      "State": "running",
+      "Health": "",
+      "Status": "Up 8 hours",
+      "Ports": "80/tcp"
+    }
+  ]
+}

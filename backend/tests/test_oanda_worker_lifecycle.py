@@ -15,13 +15,14 @@ running = _running
 
 
 def test_confirmations_overlap_transport_but_commit_serially_with_owner_fencing(monkeypatch):
-    identities = {str(i): SimpleNamespace(key=str(i)) for i in range(10)}
+    identities = {str(i): SimpleNamespace(key=str(i), provider_symbol=str(i)) for i in range(10)}
     peers = threading.Barrier(2)
     lock = threading.Lock()
     active, peak, completed = 0, 0, []
     caller = threading.get_ident()
     stopped = threading.Event()
     monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
+    monkeypatch.setattr(worker, "session_states", lambda items: {key: {"market_session": "open"} for key in items})
 
     class Adapter:
         def page(self, identity, left, right):
@@ -45,10 +46,11 @@ def test_confirmations_overlap_transport_but_commit_serially_with_owner_fencing(
 
 
 def test_confirmation_auth_fault_stops_later_batches_and_keeps_exact_result(monkeypatch):
-    identities = {str(i): SimpleNamespace(key=str(i)) for i in range(10)}
+    identities = {str(i): SimpleNamespace(key=str(i), provider_symbol=str(i)) for i in range(10)}
     calls, committed = [], []
     denied = RequestResult(status="unauthorized")
     monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
+    monkeypatch.setattr(worker, "session_states", lambda items: {key: {"market_session": "open"} for key in items})
 
     class Adapter:
         def page(self, identity, *_):
@@ -63,8 +65,9 @@ def test_confirmation_auth_fault_stops_later_batches_and_keeps_exact_result(monk
 def test_cancelled_connection_never_commits_completed_peer_requests(monkeypatch):
     stopped = threading.Event()
     calls, committed = [], []
-    identities = {str(i): SimpleNamespace(key=str(i)) for i in range(10)}
+    identities = {str(i): SimpleNamespace(key=str(i), provider_symbol=str(i)) for i in range(10)}
     monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
+    monkeypatch.setattr(worker, "session_states", lambda items: {key: {"market_session": "open"} for key in items})
 
     class Adapter:
         def page(self, identity, *_):
@@ -77,23 +80,34 @@ def test_cancelled_connection_never_commits_completed_peer_requests(monkeypatch)
     assert len(calls) <= 2 and not committed
 
 
-def test_idle_worker_does_not_claim_account_or_start_stream(database, monkeypatch):
+def test_idle_worker_serializes_catalog_then_releases_lease_without_stream(database, monkeypatch):
     monkeypatch.setattr(settings, "oanda_resident_symbols", "")
     class Stop:
-        def __init__(self):
-            self.stopped = False
+        stopped = False
         def is_set(self):
             return self.stopped
-        def wait(self, _):
-            self.stopped = True
+    stopped = Stop()
+    catalogs, parked = [], []
     class Adapter:
         account_id = "idle-test"
         def catalog(self):
+            catalogs.append(True)
             return [{"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5}]
-    monkeypatch.setattr(worker, "claim", lambda _: (_ for _ in ()).throw(AssertionError("Idle must not claim")))
-    worker.run(Adapter(), Stop())
+        def stream(self, *args, **kwargs):
+            raise AssertionError("Idle must not stream")
+    original_park = worker.park_closed
+    def park(ownership, identities, delay):
+        assert not identities and delay == 1
+        original_park(ownership, identities, delay)
+        parked.append(ownership)
+        stopped.stopped = True
+    monkeypatch.setattr(worker, "park_closed", park)
+    monkeypatch.setattr(worker, "collect", lambda *_: (_ for _ in ()).throw(AssertionError("Idle must not collect")))
+    worker.run(Adapter(), stopped)
+    assert len(catalogs) == len(parked) == 1
     with database.begin() as db:
-        assert db.scalar(select(PricingOwner)) is None
+        owner = db.get(PricingOwner, live.account_key("idle-test"))
+        assert owner is not None and owner.token is None and owner.expires == 0
         assert not db.scalar(select(Instrument).where(Instrument.source == "oanda")).enabled
 
 

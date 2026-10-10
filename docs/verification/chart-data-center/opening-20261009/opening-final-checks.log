@@ -1,0 +1,13 @@
+RUN chart-data-center-opening.browser.cjs
+PASS only selected row changes; other labels/style remain and rapid duplicate clicks are ignored { originalCount: 25 }
+PASS dialog closes before the held source responds { closeMs: 354, blocked: false }
+PASS loading feedback stays on the chart and clears after the native callback {}
+PASS slow candles load behind the closed dialog with visible chart feedback { closeMs: 2153 }
+PASS long load explains the wait and retry stays on the chart without reopening data center {}
+RUN chart-data-center-opening-guards.browser.cjs
+PASS stale layout is rejected before closing the dialog; selected action resets {}
+PASS source failure is shown on the chart; retry succeeds without reopening the dialog {}
+PASS changing active chart cancels delayed validation without replacing the newer target {}
+PASS symbol/period command affects only captured chart with both sync locks initially enabled {}
+PASS late native callback cannot re-open a dialog or advance an older workspace command {}
+PASS a newer user period survives the late symbol callback without reverting to requested H1 {}

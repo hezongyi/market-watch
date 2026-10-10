@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from alembic import command
 from alembic.config import Config
+from alembic.script import ScriptDirectory
 from alerts.config import settings
 from sqlalchemy import create_engine, inspect, text
 
@@ -24,6 +25,7 @@ def test_actual_predecessor_upgrade_pending_downgrade_guard_and_schema_roundtrip
     monkeypatch.setattr(settings, 'database_url', url.render_as_string(hide_password=False))
     config = Config(str(ROOT / 'alembic.ini'))
     config.set_main_option('script_location', str(ROOT / 'migrations'))
+    head = ScriptDirectory.from_config(config).get_current_head()
     try:
         command.upgrade(config, 'am40_chart_revision_demand')
         with engine.begin() as conn:
@@ -52,7 +54,7 @@ def test_actual_predecessor_upgrade_pending_downgrade_guard_and_schema_roundtrip
         # downgrade when the pending-state guard refuses this unsafe rollback.
         with engine.begin() as conn:
             assert 'market_coverage_projection' in inspect(conn).get_table_names()
-            assert conn.scalar(text('SELECT version_num FROM alembic_version')) == 'aq44_aggregation_service_order'
+            assert conn.scalar(text('SELECT version_num FROM alembic_version')) == head
             conn.execute(text('UPDATE chart_publication_state SET processed=requested'))
         command.downgrade(config, 'am40_chart_revision_demand')
         with engine.connect() as conn:

@@ -24,6 +24,24 @@ def test_sdk_catalog_uses_exact_source_code_and_does_not_claim_precision(databas
                                logical_symbol="GBPUSD", asset_class="forex", precision=5)
 
 
+def test_catalog_asset_filter_precedes_paging_and_remains_read_only(database):
+    with database.begin() as db:
+        first = catalog(db, source="dukascopy", symbol_type="forex", page_size=7)
+        rows = []
+        for page in range(1, (first["total"] + 6) // 7 + 1):
+            result = catalog(db, source="dukascopy", symbol_type="forex", page=page, page_size=7)
+            assert result["total"] == first["total"]
+            rows.extend(result["items"])
+        assert len(rows) == len({row["catalog_id"] for row in rows}) == first["total"]
+        assert all(row["asset_class"] == "forex" for row in rows)
+        assert catalog(db, source="dukascopy", query="XAU/USD", symbol_type="forex")["total"] == 0
+        assert catalog(db, source="dukascopy", query="XAU/USD", symbol_type="commodity")["total"] == 1
+        assert db.scalar(select(func.count()).select_from(MarketDataset)) == 0
+        assert db.scalar(select(MarketDemand)) is None
+        with pytest.raises(ValueError):
+            catalog(db, source="dukascopy", symbol_type="invalid")
+
+
 def test_oanda_metadata_refresh_is_explicit_and_scope_does_not_leak_old_account(database, monkeypatch):
     from alerts import history_catalog, providers
 

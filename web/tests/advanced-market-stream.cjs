@@ -4,13 +4,13 @@ const path = require('node:path');
 const sent = [], handlers = {};
 let uuid = 0;
 const parent = {postMessage: message => sent.push(message)};
-const context = vm.createContext({URL, URLSearchParams, Map, Set, Promise, Date, Intl, Error,
+const context = vm.createContext({document:{createElement:()=>({}),head:{append:()=>{}}},URL, URLSearchParams, Map, Set, Promise, Date, Intl, Error,
   location:{search:'?parent=http://localhost'}, parent,
   crypto:{randomUUID:()=> 'listener-' + ++uuid},
   atob:s=>Buffer.from(s,'base64').toString('utf8'),
   addEventListener:(name,callback)=>{handlers[name]=callback},
   setTimeout, clearTimeout, queueMicrotask});
-for (const file of ['series.js','bridge.js'])
+for (const file of ['series.js','price-format.js','bridge.js'])
   vm.runInContext(fs.readFileSync(path.join(__dirname,'../../advanced-host',file),'utf8'),context);
 const evaluate = source => vm.runInContext(source, context);
 const deliver = event => handlers.message({source:parent,origin:'http://localhost',
@@ -67,6 +67,19 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
     sequence:1,type:'quotes',quotes:[{s:'ok',n:context.symbol,v:{lp:1.13}}]});
   assert.equal(context.quotes.at(-1).v.lp,1.13,'rebound quotes reach the current native callback');
   evaluate("feed.unsubscribeQuotes('watchlist')");
+  evaluate(`symbolPresentations.set('YAHOO:AAPL', {source:'yahoo',asset_type:'EQUITY',display_precision:8});
+    feed.subscribeQuotes(['MWP:YAHOO:AAPL'],[],rows=>quotes.push(...rows),'stock');`);
+  const stockRegistration=sent.filter(row=>row.type==='market-subscribe').at(-1).args;
+  await deliver({listener:stockRegistration.listener,generation:stockRegistration.generation,
+    sequence:1,type:'quotes',quotes:[{s:'ok',n:'MWP:YAHOO:AAPL',v:{lp:252.29456789,ch:0.01456789}}]});
+  assert.equal(context.quotes.at(-1).v.mw_display_pricescale,100,
+    'streamed stock quotes must retain the same presentation scale as the initial snapshot');
+  assert.equal(context.quotes.at(-1).v.lp,252.29456789,'stream presentation must preserve source price');
+  await deliver({listener:stockRegistration.listener,generation:stockRegistration.generation,
+    sequence:2,type:'quotes',quotes:[{s:'ok',n:'MWP:YAHOO:AAPL',v:{lp:0.001234}}]});
+  assert.equal(context.quotes.at(-1).v.mw_display_pricescale,1e5,
+    'streamed low-price updates must adapt precision without rounding source data');
+  evaluate("feed.unsubscribeQuotes('stock')");
   const beforePreparation=sent.filter(row=>row.type==='market-subscribe').length;
   evaluate(`feed.subscribeBars({ticker:'EURUSD'},'1',bar=>received.push(bar),'preparing',()=>{});`);
   const preparing=sent.filter(row=>row.type==='market-subscribe');

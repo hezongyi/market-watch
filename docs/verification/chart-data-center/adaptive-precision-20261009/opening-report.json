@@ -1,0 +1,27 @@
+{
+  "environment": "Ubuntu isolated Docker; native chart with deterministic slow validation/candle requests",
+  "project": "mw-data-center-review-20261008",
+  "passed": true,
+  "checks": [
+    {
+      "name": "only selected row changes; other labels/style remain and rapid duplicate clicks are ignored",
+      "originalCount": 25
+    },
+    {
+      "name": "dialog closes before the held source responds",
+      "closeMs": 300,
+      "blocked": false
+    },
+    {
+      "name": "loading feedback stays on the chart and clears after the native callback"
+    },
+    {
+      "name": "slow candles load behind the closed dialog with visible chart feedback",
+      "closeMs": 139
+    },
+    {
+      "name": "long load explains the wait and retry stays on the chart without reopening data center"
+    }
+  ],
+  "errors": []
+}

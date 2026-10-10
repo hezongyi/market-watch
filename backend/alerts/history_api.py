@@ -14,6 +14,7 @@ from .aggregation_policy import (
 )
 from .history_versions import create_version, version_report
 from .market_datasets import legacy_inventory
+from .market_names import display_code
 from .storage import (
     HistoryVersion,
     Instrument,
@@ -90,11 +91,19 @@ class ManagedRequest(BaseModel):
     dataset: DatasetRequest
     maintenance: MaintenanceRequest
     request_id: str = Field(min_length=1, max_length=100)
+    create_only: bool = False
+
+
+class CreationCheckRequest(DatasetRequest):
+    precision: int | None = Field(default=None, ge=0, le=10, strict=True)
+    start_date: str | None = Field(default=None, max_length=10)
 
 
 def dataset_report(row, inst):
     return {"id": row.id, "instrument_id": row.instrument_id,
             "logical_symbol": row.logical_symbol, "identity": row.identity,
+            "display_symbol": display_code(row.logical_symbol, asset_type=row.asset_class),
+            "provider_display_symbol": display_code(row.identity["provider_symbol"], row.identity["source"], row.asset_class),
             "volume_kind": row.volume_kind, "volume_unit": row.volume_unit,
             "precision": inst.precision, "asset_class": row.asset_class,
             "aggregation_calendar": inst.calendar}
@@ -132,13 +141,26 @@ def router(authenticated):
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
+    @routes.get("/center/task-feed")
+    def center_task_feed(dataset_id: str | None = None, query: str = "", source: str | None = None,
+                         status: str = "all", page_size: int = 25, snapshot: int | None = None,
+                         before: str | None = None, ids: str | None = None):
+        from .data_center import task_feed
+
+        try:
+            with transaction() as db:
+                return task_feed(db, dataset_id=dataset_id, query=query, source=source,
+                    status=status, page_size=page_size, snapshot=snapshot, before=before, ids=ids)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
     @routes.get("/center/platform")
-    def center_platform(query: str = "", source: str | None = None, page: int = 1, page_size: int = 25):
+    def center_platform(query: str = "", source: str | None = None, page: int = 1, page_size: int = 25, asset_class: str | None = None):
         from .platform_catalog import catalog
 
         try:
             with transaction() as db:
-                return catalog(db, query=query, source=source, page=page, page_size=page_size)
+                return catalog(db, query=query, source=source, page=page, page_size=page_size, asset=asset_class or None)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
@@ -190,12 +212,40 @@ def router(authenticated):
 
     @routes.post("/center/datasets", status_code=201)
     def create_managed(body: ManagedRequest):
+        from .history_commands import CreationConflict
         from .history_commands import create_managed as command
 
         try:
             with transaction() as db:
                 return command(db, body)
+        except CreationConflict as error:
+            raise HTTPException(409, {"message": str(error), "dataset_id": error.dataset_id}) from None
         except (ValueError, KeyError) as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.post("/center/datasets/check")
+    def check_creation(body: CreationCheckRequest):
+        from .history_creation_check import CreationCheckError, check_creation
+
+        try:
+            with transaction() as db:
+                return check_creation(db, body)
+        except CreationCheckError as error:
+            return {"status": "invalid", "start": None, "existing": None,
+                    "field": error.field, "message": str(error)}
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.get("/history-catalog/search")
+    def search_creation_catalog(source: str = "", query: str = "", symbol_type: str = "",
+                                offset: int = Query(default=0, ge=0), limit: int = Query(default=50, ge=1, le=100)):
+        from .history_creation_check import search_catalog
+
+        try:
+            with transaction() as db:
+                return search_catalog(db, source=source, query=query, symbol_type=symbol_type,
+                                      offset=offset, limit=limit)
+        except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
     @routes.get("/sources")
@@ -205,12 +255,12 @@ def router(authenticated):
         return [capabilities(source) for source in ("dukascopy", "oanda", "binance", "yahoo")]
 
     @routes.get("/history-catalog")
-    def history_catalog(source: str, query: str = "", page: int = 1, page_size: int = 25):
+    def history_catalog(source: str, query: str = "", page: int = 1, page_size: int = 25, symbol_type: str = ""):
         from .history_catalog import catalog
 
         try:
             with transaction() as db:
-                return catalog(db, source=source, query=query, page=page, page_size=page_size)
+                return catalog(db, source=source, query=query, page=page, page_size=page_size, symbol_type=symbol_type)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 

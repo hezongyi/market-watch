@@ -1,3 +1,5 @@
+import { DetailDisclosure } from "./DetailPanel";
+import { NativeInput, NativeSelect } from "./NativeControls";
 import { centerReturn } from "./navigation";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -5,9 +7,10 @@ import {
   useNavigate,
   useParams,
   useSearchParams,
-} from "react-router-dom";
-import { api, type Bar } from "../api";
-import Chart from "../Chart";
+} from "./router";
+import { api } from "./api";
+import { OpenChart } from "./OpenChart";
+import { useDirtyForm, useActionLock } from "./router";
 import { Feedback, Pager } from "./Center";
 import { useSnapshot } from "./useSnapshot";
 import { MaintenanceSettings } from "./MaintenanceSettings";
@@ -27,7 +30,10 @@ export function DatasetDetail() {
     [from, setFrom] = useState(""),
     [to, setTo] = useState("");
   const [rangeKind, setRangeKind] = useState<"backfill" | "recheck">("backfill");
+  const [rangeSaved, setRangeSaved] = useState(0);
+  useDirtyForm("dataset-maintenance", [calendar, from, to, rangeKind], rangeSaved);
   const submission = useRef<{key: string; request: string} | null>(null);
+  const actionLock = useActionLock();
   const section = params.get("section") || "overview",
     frame = params.get("frame") || "M1";
   const result = useSnapshot<Dataset>(
@@ -61,7 +67,20 @@ export function DatasetDetail() {
   const frameReady = selectedPeriods.data?.some(
     (p) => p.timeframe === frame && p.status === "published" && p.rows > 0,
   );
-  const before = params.get("before");
+  const lifecycleStatus = dataset?.maintenance.archived
+    ? "已归档"
+    : dataset?.maintenance.paused
+      ? "维护已暂停"
+      : dataset?.availability
+        ? names[dataset.availability] || dataset.availability
+        : "读取中";
+  const maintenanceSummary = dataset?.maintenance.configured
+    ? dataset.maintenance.paused
+      ? "暂停定时维护"
+      : dataset.maintenance.frequency === "daily"
+        ? "每日维护"
+        : "一次性维护"
+    : "未配置维护";
   const coveragePage = Math.max(1, Number(params.get("coverage_page")) || 1);
   const requestPage = Math.max(1, Number(params.get("request_page")) || 1);
   const requests = useSnapshot<{
@@ -111,19 +130,15 @@ export function DatasetDetail() {
       : null,
     refresh,
   );
-  const bars = useSnapshot<{ bars: Bar[]; next_before: number | null }>(
-    selectedVersion && section === "chart" && frameReady
-      ? `/market-data/versions/${selectedVersion}/chart?timeframe=${frame}&count=2000${before !== null ? `&before=${encodeURIComponent(before)}` : ""}`
-      : null,
-    refresh,
-  );
   function select(name: string, value: string) {
     const next = new URLSearchParams(params);
     next.set(name, value);
+    if (name === "section") next.delete("view");
     if (name === "version" || name === "frame") next.delete("before");
     setParams(next);
   }
   async function act(path: string, body: unknown) {
+    if (!actionLock.acquire()) return;
     setBusy(true);
     setError("");
     try {
@@ -133,6 +148,7 @@ export function DatasetDetail() {
     } catch (e) {
       setError(String(e));
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
@@ -141,6 +157,7 @@ export function DatasetDetail() {
       setError("请选择任务的起止交易日期（结束日不包含）。");
       return;
     }
+    if (!actionLock.acquire()) return;
     setBusy(true);
     setError("");
     try {
@@ -160,14 +177,17 @@ export function DatasetDetail() {
         request_id: submission.current.request,
       });
       setRefresh((r) => r + 1);
+      setRangeSaved(value => value + 1);
       setNotice(rangeKind === "recheck" ? "指定区间复查已提交，旧版本保持固定。" : "指定区间补数已提交。");
     } catch (e) {
       setError(String(e));
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
   async function rephase() {
+    if (!actionLock.acquire()) return;
     setBusy(true);
     setError("");
     try {
@@ -178,16 +198,17 @@ export function DatasetDetail() {
           version_id: dataset?.latest_version_id,
         },
       );
-      navigate(`/market-data/datasets/${result.dataset.id}`);
+      navigate(`/market-data/datasets/${result.dataset.id}`, {saved: true});
     } catch (e) {
       setError(String(e));
     } finally {
+      actionLock.release();
       setBusy(false);
     }
   }
   return (
-    <section className="data-center">
-      <Link to={centerReturn(params)}>返回数据中心列表</Link>
+    <section className="data-center dc-dataset-detail">
+      <Link className="dc-breadcrumb" to={centerReturn(params)}>返回数据中心列表</Link>
       <Feedback
         error={result.error}
         loading={result.loading}
@@ -195,38 +216,35 @@ export function DatasetDetail() {
       />
       {dataset && (
         <>
-          <div className="dc-heading">
+          <div className="dc-dataset-hero">
             <div>
-              <h1>{dataset.logical_symbol}</h1>
+              <h1>{dataset.display_symbol || dataset.logical_symbol}</h1>
               <p>
                 {names[dataset.identity.source]} · Bid ·{" "}
                 {phase(dataset.aggregation_calendar)} ·{" "}
-                {dataset.identity.provider_symbol}
+                {dataset.provider_display_symbol || dataset.identity.provider_symbol}
               </p>
             </div>
-            <div className="dc-actions">
+            <div className="dc-dataset-hero-actions" aria-label="行情快捷操作">
               {dataset.usable_timeframes.length > 0 && (
-                <Link to={`?section=chart`}>打开历史图表</Link>
+                <OpenChart ticker={`MWH:${dataset.periods.find(p => p.timeframe === "M1")?.available_version_id || dataset.latest_version_id}`} />
               )}
               {dataset.latest_version_id && (
-                <Link
-                  to={`/replay?dataset_version=${dataset.latest_version_id}`}
-                >
-                  用于回测
-                </Link>
+                <Link to={`/replay?dataset_version=${dataset.latest_version_id}`}>用于回测</Link>
               )}
               {dataset.maintenance.configured && (
                 <button
                   disabled={busy}
-                  onClick={() =>
-                    void act(`/market-data/datasets/${id}/tasks`, {
-                      request_id: crypto.randomUUID(),
-                    })
-                  }
+                  onClick={() => void act(`/market-data/datasets/${id}/tasks`, { request_id: crypto.randomUUID() })}
                 >
                   立即更新
                 </button>
               )}
+              <button className="dc-danger-action" onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set("section", "references"); next.set("view", "delete");
+                setParams(next);
+              }}>删除历史数据</button>
             </div>
           </div>
           {error && (
@@ -235,13 +253,13 @@ export function DatasetDetail() {
             </p>
           )}
           {notice && <p role="status">{notice}</p>}
-          <p>
-            可用到 {time(dataset.available_end)}
-            {dataset.maintenance.task_error
-              ? " · 本次更新失败，旧版本仍可使用"
-              : ""}
-          </p>
-          <nav className="dc-tabs" aria-label="自建行情详情">
+          <div className="dc-dataset-statusbar">
+            <span className={`dc-status-pill state-${dataset.maintenance.archived ? "archived" : dataset.maintenance.paused ? "paused" : dataset.availability}`}>{lifecycleStatus}</span>
+            <span>{maintenanceSummary}</span>
+            <span>可用到 {time(dataset.available_end)}</span>
+            {dataset.maintenance.task_error && <span className="error">本次更新失败，旧版本仍可使用</span>}
+          </div>
+          <nav className="dc-tabs dc-dataset-nav" aria-label="自建行情管理">
             {[
               ["overview", "概览"],
               ["coverage", "覆盖与质量"],
@@ -304,7 +322,7 @@ export function DatasetDetail() {
               <h2>已发布 M1 覆盖</h2>
               <label>
                 覆盖固定版本
-                <select
+                <NativeSelect
                   value={selectedVersion || ""}
                   onChange={(e) => {
                     const next = new URLSearchParams(params);
@@ -325,7 +343,7 @@ export function DatasetDetail() {
                         {time(v.start)} — {time(v.end)}
                       </option>
                     ))}
-                </select>
+                </NativeSelect>
               </label>
               <p>
                 {time(dataset.available_start)} 至 {time(dataset.available_end)}
@@ -365,19 +383,17 @@ export function DatasetDetail() {
                             </td>
                             <td>
                               {c.observed_minutes} 分钟
-                              <details>
-                                <summary>查看实际观测区间</summary>
+                              <DetailDisclosure title={<>查看实际观测区间</>}>
                                 {c.observed_intervals.map(([l, r]) => (
                                   <p key={l}>
                                     {time(l)} 至 {time(r)}
                                   </p>
                                 ))}
-                              </details>
+                              </DetailDisclosure>
                             </td>
                             <td>
                               {c.unknown_minutes} 分钟
-                              <details>
-                                <summary>查看未知区间</summary>
+                              <DetailDisclosure title={<>查看未知区间</>}>
                                 {c.unknown_intervals.length ? (
                                   c.unknown_intervals.map(([l, r]) => (
                                     <p key={l}>
@@ -387,12 +403,11 @@ export function DatasetDetail() {
                                 ) : (
                                   <p>无未知区间</p>
                                 )}
-                              </details>
+                              </DetailDisclosure>
                             </td>
                             <td>
                               {c.confirmed_closed_minutes} 分钟
-                              <details>
-                                <summary>查看闭市区间与依据</summary>
+                              <DetailDisclosure title={<>查看闭市区间与依据</>}>
                                 {c.confirmed_closed_intervals.length ? (
                                   c.confirmed_closed_intervals.map(([l, r]) => (
                                     <p key={l}>
@@ -416,12 +431,11 @@ export function DatasetDetail() {
                                       : ""}
                                   </p>
                                 ))}
-                              </details>
+                              </DetailDisclosure>
                             </td>
                             <td>
                               {c.conflict_minutes} 分钟
-                              <details>
-                                <summary>查看观测冲突</summary>
+                              <DetailDisclosure title={<>查看观测冲突</>}>
                                 {c.conflict_intervals.length ? (
                                   c.conflict_intervals.map(([l, r]) => (
                                     <p key={l}>
@@ -434,7 +448,7 @@ export function DatasetDetail() {
                                 <p>
                                   来源观测与闭市依据不一致时保留价格，不能据此认定完整覆盖。
                                 </p>
-                              </details>
+                              </DetailDisclosure>
                             </td>
                             <td>{time(c.observed_at)}</td>
                           </tr>
@@ -578,7 +592,7 @@ export function DatasetDetail() {
                         <td>
                           {v.status === "published" &&
                             v.payload_available !== false && (
-                              <><Link to={`?section=chart&version=${v.id}&frame=M1`}>查看固定版本</Link>
+                              <><OpenChart ticker={`MWH:${v.id}`} label="打开此版本" />
                               <span><Link to={`/replay?dataset_version=${v.id}`}>用于回测</Link></span></>
                             )}
                           {v.status === "published" && <button onClick={() => select("version", v.id)}>与前版差异</button>}
@@ -592,8 +606,9 @@ export function DatasetDetail() {
             </>
           )}
           {section === "maintenance" && (
-            <div className="dc-fields">
+            <div className="dc-fields dc-management-section dc-maintenance-section">
               <h2>维护计划</h2>
+              <p className="dc-section-lead">维护计划控制后续数据更新；暂停和归档不会删除已发布历史。</p>
               <MaintenanceSettings
                 key={dataset.id}
                 dataset={dataset}
@@ -605,8 +620,9 @@ export function DatasetDetail() {
                   : "未配置维护"}
               </p>
               {dataset.maintenance.configured && (
-                <div className="dc-actions">
+                <div className="dc-lifecycle-actions" aria-label="维护生命周期操作">
                   <button
+                    className={!dataset.maintenance.archived ? "dc-danger-action" : undefined}
                     disabled={busy}
                     onClick={() =>
                       void act(
@@ -641,14 +657,14 @@ export function DatasetDetail() {
               <p>
                 暂停定时维护保留已发布版本，策略需要的实时行情继续运行。归档隐藏默认列表，引用仍保留。
               </p>
-              <fieldset>
+              <fieldset disabled={busy}>
                 <legend>指定区间维护</legend>
-                <label>任务类型<select aria-label="任务类型" value={rangeKind} onChange={e => setRangeKind(e.target.value as "backfill" | "recheck")}>
+                <label>任务类型<NativeSelect aria-label="任务类型" value={rangeKind} onChange={e => setRangeKind(e.target.value as "backfill" | "recheck")}>
                   <option value="backfill">补数</option><option value="recheck">复查已有区间</option>
-                </select></label>
+                </NativeSelect></label>
                 <label>
                   起始交易日期
-                  <input
+                  <NativeInput
                     type="date"
                     value={from}
                     onChange={(e) => setFrom(e.target.value)}
@@ -656,7 +672,7 @@ export function DatasetDetail() {
                 </label>
                 <label>
                   结束交易日期（不包含）
-                  <input
+                  <NativeInput
                     type="date"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
@@ -666,18 +682,18 @@ export function DatasetDetail() {
                   {rangeKind === "recheck" ? "提交复查" : "提交补数"}
                 </button>
               </fieldset>
-              <fieldset>
+              <fieldset disabled={busy}>
                 <legend>按新日界创建数据集</legend>
                 <label>
                   目标日界
-                  <select
+                  <NativeSelect
                     value={calendar}
                     onChange={(e) => setCalendar(e.target.value)}
                   >
                     <option value="">请选择</option>
                     <option value="ny17">NY17</option>
                     <option value="utc0">UTC0</option>
-                  </select>
+                  </NativeSelect>
                 </label>
                 <p>复用最新发布 M1；旧回测和组合保留原口径。</p>
                 <button
@@ -695,6 +711,9 @@ export function DatasetDetail() {
               id={id!}
               refresh={refresh}
               onDone={() => setRefresh((r) => r + 1)}
+              deletion={params.get("view") === "delete"}
+              archiveAvailable={dataset.maintenance.configured}
+              onCancel={() => navigate(centerReturn(params))}
             />
           )}
           {section === "chart" && (
@@ -702,7 +721,7 @@ export function DatasetDetail() {
               <div className="dc-filters">
                 <label>
                   周期
-                  <select
+                  <NativeSelect
                     value={frame}
                     onChange={(e) => select("frame", e.target.value)}
                   >
@@ -727,11 +746,11 @@ export function DatasetDetail() {
                             : ""}
                       </option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 </label>
                 <label>
                   固定版本
-                  <select
+                  <NativeSelect
                     value={selectedVersion}
                     onChange={(e) => select("version", e.target.value)}
                   >
@@ -746,7 +765,7 @@ export function DatasetDetail() {
                           {time(v.end)}
                         </option>
                       ))}
-                  </select>
+                  </NativeSelect>
                 </label>
               </div>
               <Feedback
@@ -759,54 +778,9 @@ export function DatasetDetail() {
                   所选固定版本的该周期尚未发布或没有观测，请选择可用周期。
                 </p>
               )}
-              <Feedback
-                error={bars.error}
-                loading={bars.loading}
-                empty={Boolean(frameReady) && !bars.data}
-              />
-              <p>
-                当前读取固定版本；每页最多 2000
-                根，默认显示最新观测。切换周期保留固定版本。
-              </p>
-              <div className="dc-actions">
-                <button
-                  disabled={bars.loading || bars.data?.next_before == null}
-                  onClick={() =>
-                    select("before", String(bars.data?.next_before))
-                  }
-                >
-                  更早历史
-                </button>
-                {before !== null && (
-                  <button
-                    onClick={() => {
-                      const next = new URLSearchParams(params);
-                      next.delete("before");
-                      setParams(next);
-                    }}
-                  >
-                    返回最新
-                  </button>
-                )}
-                {selectedVersion && (
-                  <Link to={`/replay?dataset_version=${selectedVersion}`}>
-                    用此版本回测
-                  </Link>
-                )}
-              </div>
-              {bars.data?.bars.length ? (
-                <p>
-                  {time(bars.data.bars[0].start)} —{" "}
-                  {time(bars.data.bars[bars.data.bars.length - 1].end)}
-                </p>
-              ) : null}
-              {bars.data?.bars && (
-                <Chart
-                  key={`${selectedVersion}:${frame}:${before ?? "latest"}`}
-                  bars={bars.data.bars.map((b) => ({ ...b, revision: 1 }))}
-                  precision={dataset.precision}
-                />
-              )}
+              <p>将所选固定版本及周期应用到打开窗口时的目标图格。</p>
+              {selectedVersion && <OpenChart ticker={`MWH:${selectedVersion}`} frame={frame} label="打开此版本" />}
+
             </>
           )}
         </>
