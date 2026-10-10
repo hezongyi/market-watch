@@ -72,6 +72,8 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       const shot = await session.send('Page.captureScreenshot', { format: 'png', fromSurface: false });
       fs.writeFileSync(path.join(art, name), Buffer.from(shot.data, 'base64'));
     };
+    const sourceCatalog = await get('/market-data/history-catalog/search?source=dukascopy&query=EURUSD&limit=100');
+    const creationSymbol = sourceCatalog.items.find(row=>row.logical_symbol === 'EURUSD').provider_symbol;
     for (const width of [1024, 1440, 1920]) {
       await zoom(1);
       await session.send('Browser.setWindowBounds', { windowId, bounds: { width, height: 1000 } });
@@ -81,12 +83,12 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       page.off("pageerror", onError);
       // Creation deep links update the outer URL. Reset the entry for each
       // width instead of reopening that previous, dirty creation draft.
-      await page.goto(base + '/market-data?query=EURUSD&status=available');
+      await page.goto(base + '/advanced-charts');
       await expect.poll(() => !!host() && !!native(), { timeout: 30000 }).toBeTruthy();
       await host().waitForFunction(()=>ready && widget.activeChart().dataReady(),null,{timeout:60000});
       page.on('pageerror',onError);
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeVisible({ timeout: 30000 });
-      await native().getByRole('button', { name: '数据中心', exact: true }).click();
+      await host().evaluate(() => dataCenter.open('/market-data?tab=managed&query=EURUSD&status=available'));
       await expect(center()).toBeVisible({ timeout: 20000 });
       await expect(native().getByRole('button', { name: '关闭数据中心' })).toBeInViewport();
       await center().getByRole('button', { name: '自建行情', exact: true }).click();
@@ -158,7 +160,7 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await screenshot(`browser-zoom200-platform-${width}.png`);
       await native().getByRole('button', { name: '关闭数据中心' }).click();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
-      await host().evaluate(() => dataCenter.open('/market-data/datasets/new?source=dukascopy&symbol=EURUSD'));
+      await host().evaluate(symbol => dataCenter.open('/market-data/datasets/new?source=dukascopy&symbol='+encodeURIComponent(symbol)), creationSymbol);
       await expect(center().locator('.dc-create-selection')).toContainText('EURUSD');
       await expect(center().getByRole('button', {name:'创建并开始准备历史',exact:true})).toBeInViewport();
       expect(await center().locator('.dc-create-page').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
