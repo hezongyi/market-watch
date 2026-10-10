@@ -14,14 +14,16 @@ export function NativeSlot({ kind, props, className = "" }: { kind: string; prop
   const latest = useRef(props); latest.current = props;
   useLayoutEffect(() => {
     if (!ui || !node.current) return;
-    const fieldset=node.current.closest("fieldset");
-    const adapted=()=>({...latest.current,disabled:latest.current.disabled || !!fieldset?.disabled});
+    const fieldsets: HTMLFieldSetElement[] = [];
+    for (let parent = node.current.parentElement; parent; parent = parent.parentElement)
+      if (parent instanceof HTMLFieldSetElement) fieldsets.push(parent);
+    const adapted=()=>({...latest.current,disabled:latest.current.disabled || fieldsets.some(fieldset=>fieldset.disabled)});
     instance.current = ui.mount(kind, node.current, adapted());
     const observer=new MutationObserver(()=>instance.current?.update(adapted()));
-    if(fieldset) observer.observe(fieldset,{attributes:true,attributeFilter:["disabled"]});
+    for (const fieldset of fieldsets) observer.observe(fieldset,{attributes:true,attributeFilter:["disabled"]});
     return () => { observer.disconnect();instance.current?.dispose(); instance.current = null; };
   }, [ui, kind]);
-  useLayoutEffect(() => { instance.current?.update({...props,disabled:props.disabled || !!node.current?.closest("fieldset")?.disabled}); });
+  useLayoutEffect(() => { instance.current?.update({...props,disabled:props.disabled || !!node.current?.closest("fieldset[disabled]")}); });
   return <div className={`dc-native-slot ${className}`} ref={node} />;
 }
 

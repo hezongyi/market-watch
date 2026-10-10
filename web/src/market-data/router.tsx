@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useCallback, type AnchorHTMLAttributes } from "react";
 import { centerLocation } from "./location";
+import type { ReturnContexts } from "./returnContext";
 
 export type CenterNavigation = {
   workspace?: string;
+  returns?: ReturnContexts;
   location: string;
   navigate: (to: string, options?: { replace?: boolean; saved?: boolean }) => void;
   apply: (ticker: string, frame: string) => Promise<void>;

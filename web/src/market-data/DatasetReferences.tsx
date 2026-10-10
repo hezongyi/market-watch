@@ -141,7 +141,7 @@ export function DatasetReferences({
     }
   }
   return (
-    <div className="dc-fields">
+    <div className="dc-management-section dc-reference-section">
       <h2>{deletion ? "删除历史数据" : "引用与历史回收"}</h2>
       <Feedback
         error={report.error}
@@ -167,46 +167,23 @@ export function DatasetReferences({
             </p>) : <p>尚未保存实时映射，查看此页不会建立组合。</p>}
           </DetailDisclosure>}
           <Feedback error={composites.error} loading={composites.loading} empty={!composites.data}/>
-          {composites.data && <><h3>已建立组合</h3>
+          {composites.data && <><h3>组合引用（{composites.data.total}）</h3>
             {composites.data.items.length ? composites.data.items.map(c => <p key={c.id}>
               <Link to={`/market-data/composites/${c.id}`}>{c.historical_source} → OANDA {c.mapping.target_display_symbol || c.mapping.target_identity.provider_symbol} · {c.calendar.toUpperCase()} · 查看组合与固定修订</Link>
             </p>) : <p>尚未建立组合；首次实际使用时准备。</p>}
             <Pager total={composites.data.total} page={page} size={25} change={setPage}/>
           </>}
           </>}
-          {current.items.length > 0 ? (
-            <div className="dc-table">
-              <table>
-                <caption>阻止历史回收的引用与任务</caption>
-                <thead>
-                  <tr>
-                    <th>依赖</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {current.items.map((item, i) => (
-                    <tr key={`${item.kind}:${item.id}:${i}`}>
-                      <td>{item.detail}</td>
-                      <td>
-                        {item.kind === "replay" ? (
-                          <Link to="/replay">查看历史演练</Link>
-                        ) : item.kind === "task" ? (
-                          <Link to={`/market-data?tab=tasks&dataset_id=${id}`}>
-                            查看任务
-                          </Link>
-                        ) : (
-                          "保留引用，禁止回收"
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p>当前未发现阻止回收的引用。</p>
-          )}
+          <section aria-label="删除保护引用"><h3>删除保护</h3><p>以下接口返回的引用与任务会阻止删除历史价格，直到依赖按现有业务流程解除。</p>
+            {current.items.length ? [...new Set(current.items.map(item=>item.kind))].map(kind=><section key={kind}>
+              <h4>{({composite:"组合引用",replay:"回测引用",task:"维护任务",chart_alert:"预警版本引用",strategy:"策略引用",workspace:"工作区引用",signal:"策略事件",derivation:"其他派生版本",demand:"有效使用需求",live:"实时采集"} as Record<string,string>)[kind] || kind}（{current.items.filter(item=>item.kind===kind).length}）</h4>
+              <div className="dc-reference-list">{current.items.filter(item=>item.kind===kind).map((item,i)=><div className="dc-reference-row" key={`${item.id}:${i}`}>
+                <div>{item.detail}<small>阻止当前删除操作</small></div>
+                <DetailDisclosure title={<>引用详情</>}><dl className="dc-detail-facts"><div><dt>引用类型</dt><dd>{item.kind}</dd></div><div><dt>对象身份</dt><dd>{item.id}</dd></div><div><dt>实际引用说明</dt><dd>{item.detail}</dd></div></dl><p>该接口未提供独立版本字段；版本信息以实际引用说明为准。</p></DetailDisclosure>
+                {item.kind === "replay" ? <Link to="/replay">查看历史演练</Link> : item.kind === "task" ? <Link to={`/market-data?tab=tasks&status=all&dataset_id=${id}`}>查看任务</Link> : null}
+              </div>)}</div>
+            </section>) : <p>当前未发现阻止回收的引用。</p>}
+          </section>
           {current.requires_archive && (
             <div className="dc-fields">
               <p>删除前需要暂停定时维护并归档。已有价格和引用会保留，正在运行的任务不会被取消。</p>

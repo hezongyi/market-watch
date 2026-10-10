@@ -1,0 +1,52 @@
+{
+  "environment": "Ubuntu isolated PostgreSQL 14",
+  "passed": true,
+  "same_code_distinct_source_and_calendar": true,
+  "exact_dataset_tasks": 20,
+  "ordinary_code_tasks": 22,
+  "read_created_demand": false,
+  "real_supplier_connections": false,
+  "datasets": [
+    {
+      "id": "00ce2e11912eaf2c409a02fc7a69a447c4bf614755eb63a72bb75e8681804f5c",
+      "source": "dukascopy",
+      "calendar": "ny17",
+      "code": "EURUSD",
+      "display_symbol": "EURUSD",
+      "versions": [
+        "6474175f-d614-47b2-8633-aadff90f9d19",
+        "fda68443-3fda-42a4-b4ca-7f9695c63274"
+      ]
+    },
+    {
+      "id": "c537fa138b4707d1c3e368388c49f9d5c7f50a0007b9e382adead4bb548c254e",
+      "source": "dukascopy",
+      "calendar": "utc0",
+      "code": "EURUSD",
+      "display_symbol": "EURUSD",
+      "versions": [
+        "fc8e0e50-a3c8-49e1-8069-52721ea0ce5b"
+      ]
+    },
+    {
+      "id": "a8565b0f67dd5a2cd71ab1c8a34e3950e3dd9b4e372e5bd3b9eb047ec4155a42",
+      "source": "oanda",
+      "calendar": "ny17",
+      "code": "EURUSD",
+      "display_symbol": "EURUSD",
+      "versions": [
+        "925574bc-4bae-4622-ad59-ee548ed5c3b1"
+      ]
+    },
+    {
+      "id": "051ac7c7dc725e04736a679ff2f9ac2b76a041c3bd8a590f8d54afb27ede2ec4",
+      "source": "dukascopy",
+      "calendar": "ny17",
+      "code": "XAUUSD",
+      "display_symbol": "XAUUSD",
+      "versions": [
+        "1fa7c26d-ee6e-4bff-8874-e40b9a01cca9"
+      ]
+    }
+  ]
+}
