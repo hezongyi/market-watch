@@ -1,5 +1,9 @@
 # Git与版本维护
 
+## v1.18.1 历史价格精度修复源码发布
+
+PR #36 修复已有历史价格精度处理，采用兼容补丁版本 1.18.1。同步 Python/web/锁文件根版本和 CHANGELOG；按用户授权合并 PR，并在最终 main 合并提交创建、推送不可移动的附注 tag v1.18.1。受测产品提交为 `b890ae6`，发布整理仅修改版本元数据及记录，无新增依赖或迁移。206 项宿主回归、34 项 Ubuntu 真实 PostgreSQL 测试及桌面/手机编译产物说明检查通过；完整 backend 全集及原生产任务最终发布未验证。验收数据库实际恢复及精确退役已完成，证据见 `docs/verification/history-price-rounding-review-20261011.json`。本次仅合并与发布源码 tag，生产部署另行授权。
+
 ## v1.18.0 来源状态页面与生产 Yahoo 默认启用
 
 PR #33 补交来源状态分类，PR #34 将 Yahoo 固定为后续生产默认启用，采用兼容功能次版本 1.18.0。Python/web/锁文件根版本与 CHANGELOG 同步；按用户授权在最终 main 合并提交推送不可移动附注 tag v1.18.0，Ubuntu mw-docker purpose=release 构建四类正式镜像，再部署 unraid。无新增 schema/第三方依赖；生产开关与网络验收依据实际部署记录，不以源码 tag 推断已启用。
