@@ -74,7 +74,7 @@
   border-right: 1px solid var(--line);
 }
 .dc-window-nav button {
-  justify-content: flex-start; gap: 12px; text-align: left; width: 100%; min-height: 40px;
+  justify-content: flex-start; gap: 8px; text-align: left; width: 100%; min-height: 40px;
   border: 0; border-radius: 0; padding: 8px 20px; background: transparent;
 }
 .dc-window-nav button svg { display:block; flex: 0 0 18px; width: 18px; height: 18px; stroke-width: 1.5; }
@@ -213,8 +213,9 @@
 .dc-native-slot[data-native-component=search] { min-width:180px; }
 .dc-native-check {display:inline-flex;flex:0 0 auto;}
 .dc-window-native .dc-window-nav [data-native-component=sidebarItem] button {
- width:100%;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;text-align:left;
+ width:100%;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;text-align:left;gap:4px;
 }
+.dc-window-native .dc-window-nav [data-native-component=sidebarItem] button > span[class*="title-"] { margin-left:0; }
 .dc-window-native .dc-window-nav [data-native-component=sidebarItem] button[aria-current=page] {background:var(--card);}
 .dc-window-native .dc-native-select {width:100%;}
 .dc-window-native .dc-list-filter-group {display:grid;gap:12px;}
