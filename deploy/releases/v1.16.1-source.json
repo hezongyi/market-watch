@@ -1,0 +1,38 @@
+{
+  "version": "1.16.1",
+  "release_tag": "v1.16.1",
+  "previous_source_tag": "v1.16.0",
+  "tested_product_commit": "b64d57993937df9702216aa4fd60bb03e87eb578",
+  "source_commit_resolution": "Resolve annotated v1.16.1^{commit}; tag targets the final main merge including synchronized release metadata.",
+  "release_scope": "Source publication; production deployment is separate.",
+  "verification_record": "docs/verification/watchlist-symbol-filters-20261010.md",
+  "tested_product_sha256": {
+    "advanced-host/native-ui.js": "21f050b07538ba25d69d6237397875b148d926edb8fdf9df6018b12cf1037c2a"
+  },
+  "schema": "ar45_market_stream",
+  "new_migrations": [],
+  "new_production_services": [],
+  "application_dependencies_changed": false,
+  "verification": {
+    "environment": "Ubuntu Docker mw-watchlist-filters-20261010; actual licensed native widget and watchlist; catalog/datafeed fixtures",
+    "browser_checks_passed": 10,
+    "browser_errors": [],
+    "node_syntax": "passed",
+    "git_diff_check": "passed",
+    "real_provider_connections_reverified": false,
+    "backend_catalog_reverified": false
+  },
+  "ubuntu_acceptance": {
+    "task": "mw-watchlist-filters-20261010",
+    "project": "mw-watchlist-filters-20261010",
+    "retired": true,
+    "database_or_data_volumes": false
+  },
+  "production_operated": false,
+  "release_images": null,
+  "rollback": {
+    "previous_source_tag": "v1.16.0",
+    "schema_downgrade": false,
+    "production_manifest": "Existing v1.16.0 production manifest remains authoritative."
+  }
+}

@@ -38,4 +38,4 @@
 停止：将同一条命令的 `up -d --no-build` 换为 `stop`。
 验收完成后，使用 `mw-docker retire --task mw-watchlist-filters-20261010 --project mw-watchlist-filters-20261010` 预览，再执行 `--apply`，删除该任务容器、独立网络及无引用候选镜像；该任务没有数据库或数据卷。
 
-此次为本地界面修改，尚未推送、合并或发布到生产。
+用户已授权合并并推送附注标签 `v1.16.1`；最终源码提交由 `v1.16.1^{commit}` 解析。此次发布源码，生产部署另行执行。
