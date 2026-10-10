@@ -55,6 +55,12 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   await flush();
   assert.equal(named(render(reply),'暂停任务').props.disabled,true,'pause must wait for safe worker stop');
   assert.equal(named(render(task('pause','paused','paused')),'恢复任务').props.disabled,false);
+  reply={...task('derived','published','paused'),task_status:'deriving'};
+  await named(render(task('derived','deriving')),'暂停任务').props.onClick();
+  await flush();
+  assert.equal(named(render(task('derived','deriving')),'暂停任务').props.disabled,true,
+    'published M1 status in control reply must not acknowledge an unfinished derivation stop');
+  assert.equal(named(render(task('derived','paused','paused')),'恢复任务').props.disabled,false);
   reject=true;
   await named(render(task('error','retrying')),'重试失败范围').props.onClick();
   await flush();

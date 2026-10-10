@@ -348,10 +348,11 @@ export function TaskActions({
     if (actionStates.get(task.id)?.busy || !actionLock.acquire()) return;
     setTaskAction(task.id, { busy: value, error: "" });
     try {
-      const result = await api<Task>(`/market-data/tasks/${task.id}/control`, { action: value });
+      const result = await api<Task & { task_status?: string }>(`/market-data/tasks/${task.id}/control`, { action: value });
       // The reply confirms resume/retry even if the worker fails again before
       // polling observes pending. Pause/cancel still wait for a safe stop.
-      setTaskAction(task.id, { awaiting: controlConfirmed(result, value) ? "" : value });
+      const confirmed = { ...result, status: result.task_status ?? result.status };
+      setTaskAction(task.id, { awaiting: controlConfirmed(confirmed, value) ? "" : value });
       confirm(false);
       onDone();
     } catch (error) {
