@@ -66,6 +66,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
         .mw-platform-inline .${listClasses.scrollContainer}{scroll-padding-top:40px}
         .mw-platform-inline .${rowClasses.actionsCell}{width:auto;min-width:124px;padding-inline:4px}
         .mw-platform-inline .${rowClasses.symbolTitle}{max-width:200px}
+        .mw-platform-inline [data-name="round-tabs-buttons"]{margin-top:8px}
         .mw-platform-inline .mw-platform-action{font:inherit;font-size:13px;color:var(--ink);border:0;border-radius:4px;background:transparent;cursor:pointer;white-space:nowrap;padding:6px;min-height:32px}
         .mw-platform-inline .mw-platform-action:hover{background:var(--card)}
         .mw-platform-inline .mw-platform-action:disabled{opacity:.5;cursor:default}
