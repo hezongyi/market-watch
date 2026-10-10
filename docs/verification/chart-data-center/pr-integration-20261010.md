@@ -22,4 +22,4 @@ Ubuntu 本机 Docker，Compose project：`mw-symbol-display-20261010`。使用 `
 
 该实例仍运行原数据中心验收候选，**本轮未部署主线整合后的 PR 提交**，原生浏览器历史验收证据见本目录其他记录及指标窗口验收目录。本轮不宣称完成整合提交的 Docker 全栈或 PostgreSQL 并发验收。
 
-可用 `sg docker -c 'docker compose -p mw-symbol-display-20261010 stop'` 停止现有实例并保留数据；使用 `sg docker -c 'docker compose -p mw-symbol-display-20261010 start'` 启动已有容器。完整重新创建须使用该实例已有私有 Compose/env 配置；凭据、许可库和私钥不入库。实例仍用于验收，未退役或清理资源，未部署生产。
+可用 `sg docker -c 'docker compose --env-file /tmp/mw-symbol-display-20261010/compose.env -p mw-symbol-display-20261010 -f /home/quant/repos/market-watch-data-center-impl-20261008/artifacts/symbol-display/compose.yaml stop'` 停止现有实例并保留数据；使用 `sg docker -c 'docker compose --env-file /tmp/mw-symbol-display-20261010/compose.env -p mw-symbol-display-20261010 -f /home/quant/repos/market-watch-data-center-impl-20261008/artifacts/symbol-display/compose.yaml start'` 启动已有容器。完整重新创建须使用该实例已有私有 Compose/env 配置；凭据、许可库和私钥不入库。实例仍用于验收，未退役或清理资源，未部署生产。
