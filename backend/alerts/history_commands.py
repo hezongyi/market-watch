@@ -23,7 +23,13 @@ def creation_request(body):
         dataset.pop("catalog_id", None)
     if maintenance.get("expected_configuration_revision") is None:
         maintenance.pop("expected_configuration_revision", None)
-    return {**body, "dataset": dataset, "maintenance": maintenance}
+    return {**body, "create_only": body.get("create_only", False), "dataset": dataset, "maintenance": maintenance}
+
+
+class CreationConflict(ValueError):
+    def __init__(self, dataset_id):
+        self.dataset_id = dataset_id
+        super().__init__("此行情已有维护配置，请管理已有行情；本次未覆盖配置。")
 
 
 def lookup_creation(db, request_id, **identity_fields):
@@ -67,6 +73,8 @@ def create_managed(db, body):
         if creation_request(original) != request:
             raise ValueError("相同提交标识不能更改创建配置")
         return {"dataset": dataset_detail(db, raw.key), "task": version_report(db, version.id)}
+    if body.create_only and db.get(DatasetMaintenance, raw.key) is not None:
+        raise CreationConflict(raw.key)
     row, _ = register_history_dataset(db, **body.dataset.model_dump())
     configure(db, row.id, **body.maintenance.model_dump())
     version = create_run(db, row.id, request_id=body.request_id)

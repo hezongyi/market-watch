@@ -33,7 +33,7 @@ const report = { environment: 'Ubuntu Docker; injected first native save conflic
     await expect.poll(() => !!native()).toBeTruthy();
     await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeVisible({ timeout: 5000 });
     await expect.poll(() => !!center(), { timeout: 10000 }).toBeTruthy();
-    await expect(center().getByRole('heading', { name: '来源与能力', exact: true })).toBeVisible();
+    await expect(center().getByRole('heading', { name: '自建行情', exact: true })).toBeVisible();
     await center().getByRole('button', { name: '关闭数据中心' }).click();
     await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
     await native().getByRole('button', { name: '否', exact: true }).click();

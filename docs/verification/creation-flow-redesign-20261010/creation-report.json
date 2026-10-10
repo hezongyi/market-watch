@@ -1,0 +1,41 @@
+{
+  "environment": "Ubuntu isolated Docker; deployed native catalog and real preflight; create/control faults intercepted without supplier work",
+  "passed": true,
+  "checks": [
+    {
+      "name": "top Create Alert removed; source/capabilities page and navigation removed; old source route resolves safely to managed list"
+    },
+    {
+      "name": "single native embedded search/tabs/header source Select; supported sources only, no duplicate picker/pager; row selection does not navigate"
+    },
+    {
+      "name": "real read-only preflight enforces missing precision and invalid date; native M1/period controls and calendar conversion update live summary"
+    },
+    {
+      "name": "existing-identity preflight provides exact existing management link and blocks overwrite; editing reruns draft check"
+    },
+    {
+      "name": "duplicate click sends one exact create-only request; success stays on result with task/list/management actions, no premature chart open"
+    },
+    {
+      "name": "unknown outcome pins draft and reconciles same submission; found result returns success without a second POST"
+    },
+    {
+      "name": "manual registration uses same content area; index requires explicit calendar; source change clears identity and precision instead of carrying stale values"
+    },
+    {
+      "name": "native catalog sentinel reads qualified offsets through 125 rows without page buttons"
+    },
+    {
+      "name": "dark/light desktop/tablet/375px retain fixed actions and native catalog; config scrolls without horizontal overflow"
+    },
+    {
+      "name": "closing pending create and opening another page is safe; late completion cannot replace new content"
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "onlyOwnedWorkspaceDeleted": true,
+    "noRealCreatePost": true
+  }
+}

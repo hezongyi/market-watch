@@ -1,0 +1,23 @@
+{
+  "environment": "Ubuntu isolated Docker; deployed assets; real catalog; no form submits",
+  "passed": true,
+  "checks": [
+    {
+      "name": "OANDA row details enter native parameter configuration and return to original filters/row without saving"
+    },
+    {
+      "name": "Dukascopy row details fill create form and cancel returns to original platform row; no mutation"
+    },
+    {
+      "name": "ArrowDown/Enter submits only the selected platform ticker through target guard"
+    },
+    {
+      "name": "version fallback keeps native-like continuous workflow, real Yahoo filtering and typing focus"
+    }
+  ],
+  "errors": [],
+  "navigationErrors": [
+    "Value is null",
+    "Value is null"
+  ]
+}

@@ -110,7 +110,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
           const header=container.current?.querySelector(`.${headerClasses.wrap} > .${headerClasses.item}:last-child`);
           setSourceHeader(header || null);
         });
-        const items=ctx.searchSources.map(item=>({value:item.value().toLowerCase(),content:item.value() ? item.name() : "全部来源"}));
+        const items=ctx.searchSources.filter(item=>!platform.latest.current.allowedSources || !item.value() || platform.latest.current.allowedSources.includes(item.value().toLowerCase())).map(item=>({value:item.value().toLowerCase(),content:item.value() ? item.name() : "全部来源"}));
         return R.createElement(SearchContext.Provider,{value:scoped},R.createElement("div",{
           ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":"平台行情搜索",
         },props.render(),sourceHeader && createPortal(R.createElement("div",{className:"dc-select-control mw-platform-source"},
@@ -120,21 +120,24 @@ function chartNativeUi(widget, doc, searchSymbols) {
       }
       function PlatformRow(props) {
         const platform = R.useContext(PlatformContext), [opening,setOpening]=R.useState(false);
+        const ctx = R.useContext(SearchContext);
+        const actionable = ["good", "loadingWithPaginated"].includes(ctx.symbolSearchState);
         const ticker=props.item.ticker;
+        const selecting=platform.latest.current.mode === "select",selected=platform.latest.current.selectedTicker === ticker;
         async function open(event) {
           event?.stopPropagation();
-          if(platform.lock.current || platform.latest.current.busy || !props.item.available) return;
+          if(!actionable || platform.lock.current || platform.latest.current.busy || !props.item.available) return;
           setOpening(true);
           try {await platform.open(ticker);}
           catch(error) { /* The business root displays the apply error. */ }
           finally {if(platform.alive.current)setOpening(false);}
         }
         const actions=R.createElement(R.Fragment,null,
-          props.item.available && R.createElement("button",{id:props.item.rowId+"-open",type:"button",className:"mw-platform-action",onClick:open,"aria-busy":opening||undefined,"aria-disabled":platform.latest.current.busy},opening?"正在打开…":"打开图表"),
-          R.createElement("button",{id:props.item.rowId+"-details",type:"button",className:"mw-platform-action",onClick:event=>{event.stopPropagation();platform.latest.current.onDetails(ticker);}},"详情"));
+          props.item.available && R.createElement("button",{id:props.item.rowId+"-open",type:"button",className:"mw-platform-action",onClick:open,disabled:!actionable || platform.latest.current.busy,tabIndex:actionable?0:-1,"aria-pressed":selecting?selected:undefined,"aria-busy":opening||undefined},selecting?(selected?"已选择":"选择"):opening?"正在打开…":"打开图表"),
+          !selecting && R.createElement("button",{id:props.item.rowId+"-details",type:"button",className:"mw-platform-action",disabled:!actionable,tabIndex:actionable?0:-1,onClick:event=>{event.stopPropagation();platform.latest.current.onDetails(ticker);}},"详情"));
         return R.createElement(SearchRow,{...props,
           title:props.item.symbol,dangerousTitleHTML:undefined,description:props.item.description,dangerousDescriptionHTML:undefined,
-          itemRef:node=>{if(typeof props.itemRef === "function")props.itemRef(node);else if(props.itemRef)props.itemRef.current=node;if(node){node.id=props.item.rowId;node.tabIndex=-1;}},
+          itemRef:node=>{if(typeof props.itemRef === "function")props.itemRef(node);else if(props.itemRef)props.itemRef.current=node;if(node){node.id=props.item.rowId;node.tabIndex=-1;node.dataset.selected=String(selected);}},
           marketType:props.item.category,exchangeName:props.item.sourceName,onClick:open,actions});
       }
       function PlatformStatus() {
@@ -169,10 +172,10 @@ function chartNativeUi(widget, doc, searchSymbols) {
         // The native renderer owns search, round category tabs, the table header,
         // result rows and the scrolling sentinel. It does not own chart apply.
         return R.createElement(PlatformContext.Provider,{value:{latest,alive,lock,state,open}},R.createElement(Search,{
-          initialMode:"symbolSearch",dialogTitle:"平台行情",defaultValue:props.query||"",placeholder:"品种代码或名称",
+          initialMode:"symbolSearch",dialogTitle:props.title||"平台行情",defaultValue:props.query||"",placeholder:"品种代码或名称",
           wrapper:PlatformWrapper,dialog:PlatformInline,contentItem:PlatformRow,footer:R.createElement(PlatformStatus),
           autofocus:false,selectSearchOnInit:false,shouldReturnFocus:false,disableRecents:true,showRecents:false,showSpreadActions:false,
-          symbolTypes:props.symbolTypes,selectedSymbolSettingsKey:"mw.data-center.platform.category",filterValuesSettingsKey:"mw.data-center.platform.filters",
+          symbolTypes:props.symbolTypes,selectedSymbolSettingsKey:(props.settingsScope||"mw.data-center.platform")+".category",filterValuesSettingsKey:(props.settingsScope||"mw.data-center.platform")+".filters",
           customSearchSymbols:search,onClose:()=>{},onSearchComplete:()=>{},
         }));
       }
@@ -288,7 +291,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
         const component = components[kind];
         if (!component) throw Error("未知原生控件");
         node.dataset.nativeComponent = kind;
-        if(kind === "platformSearch") req(371996).setValue("mw.data-center.platform.category",props.asset || "");
+        if(kind === "platformSearch") req(371996).setValue((props.settingsScope||"mw.data-center.platform")+".category",props.asset || "");
         const element = value => kind === "sidebar" ? R.createElement(component, {className:value.className},
           R.createElement("div", {ref:value.contentRef})) : R.createElement(component, value);
         let root = createRoot(element(props), node);

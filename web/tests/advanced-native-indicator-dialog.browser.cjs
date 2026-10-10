@@ -101,6 +101,10 @@ fs.mkdirSync(out, { recursive: true });
     });
     await open();
     await expect(query()).toBeFocused();
+    expect(await query().evaluate(n => getComputedStyle(n).outlineStyle)).toBe("none");
+    await query().click();
+    expect(await query().evaluate(n => getComputedStyle(n).outlineStyle)).toBe("none");
+
     await expect(
       dialog().getByRole("navigation", { name: "指标分类" }),
     ).toBeVisible();
@@ -117,6 +121,8 @@ fs.mkdirSync(out, { recursive: true });
     await query().fill("PY SMA");
     await category("我的 Python");
     await expect(py()).toBeVisible();
+    const nameBox = await py().locator('[data-role="list-item"]').boundingBox(), metaBox = await py().locator('.mw-native-study-meta').boundingBox();
+    expect(Math.abs((nameBox.y + nameBox.height/2) - (metaBox.y + metaBox.height/2))).toBeLessThan(3);
     record(
       "cold toolbar open uses actual native indicators-dialog, search, native rows and left categories; Chinese and English aliases include existing Python identity",
     );

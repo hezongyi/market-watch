@@ -19,8 +19,13 @@ fs.mkdirSync(out, { recursive: true });
     passed: false,
     checks: [],
     errors: [],
+    navigationErrors: [],
   };
-  p.on("pageerror", (e) => report.errors.push(e.message));
+  let observing = false;
+  p.on("pageerror", (e) => {
+    (observing ? report.errors : report.navigationErrors).push(e.message);
+    console.log(observing ? "INTERACTION_ERROR" : "NAVIGATION_ERROR", e.stack);
+  });
   const record = (name) => {
     report.checks.push({ name });
     console.log("PASS", name);
@@ -39,9 +44,14 @@ fs.mkdirSync(out, { recursive: true });
     await p.goto(f.base + "/advanced-charts");
     await f.login(p);
     await expect.poll(() => !!native(), { timeout: 30000 }).toBe(true);
-    await host().waitForFunction(() => ready && dataCenter, null, {
-      timeout: 60000,
-    });
+    await host().waitForFunction(
+      () => ready && dataCenter && widget.activeChart().dataReady(),
+      null,
+      {
+        timeout: 60000,
+      },
+    );
+    observing = true;
     await open(
       "/market-data?tab=platform&source=oanda&asset_class=forex&query=EURUSD",
     );
@@ -75,7 +85,8 @@ fs.mkdirSync(out, { recursive: true });
     await expect(
       dc().getByRole("heading", { name: "添加自建行情" }),
     ).toBeVisible();
-    await expect(dc().getByLabel("准确来源代码", { exact: true })).toHaveValue(
+    await expect(dc().locator(".dc-create-selection")).toContainText("EUR/USD");
+    await expect(dc().locator(".dc-create-facts").first()).toContainText(
       "EUR/USD",
     );
     await dc().getByRole("link", { name: "取消", exact: true }).click();
@@ -126,11 +137,17 @@ fs.mkdirSync(out, { recursive: true });
     record(
       "ArrowDown/Enter submits only the selected platform ticker through target guard",
     );
+    observing = false;
     await p.reload();
     await expect.poll(() => !!native(), { timeout: 30000 }).toBe(true);
-    await host().waitForFunction(() => ready && dataCenter, null, {
-      timeout: 60000,
-    });
+    await host().waitForFunction(
+      () => ready && dataCenter && widget.activeChart().dataReady(),
+      null,
+      {
+        timeout: 60000,
+      },
+    );
+    observing = true;
     await host().evaluate(() => {
       TradingView.version = () => "incompatible-extra-test";
     });

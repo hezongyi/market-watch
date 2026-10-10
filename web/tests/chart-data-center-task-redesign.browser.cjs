@@ -336,12 +336,11 @@ fs.mkdirSync(out, { recursive: true });
       .getByRole("button", { name: "技术错误详情", exact: true })
       .click();
     await expect(panel()).toContainText("unauthorized");
-    await expect(
-      panel().getByRole("link", { name: "查看连接配置说明" }),
-    ).toBeVisible();
+    await expect(panel()).toContainText("连接由管理员在部署配置中维护");
+    await expect(panel().locator('a[href*="tab=sources"]')).toHaveCount(0);
     await p.keyboard.press("Escape");
     record(
-      "retry failure remains local and can retry; configuration errors expose safe reason and correct provider configuration entry",
+      "retry failure remains local and can retry; configuration errors expose safe reason and inline handling instructions without deleted-page links",
     );
     delayNext = true;
     const query = dc().getByRole("searchbox", {
@@ -399,7 +398,9 @@ fs.mkdirSync(out, { recursive: true });
         await p.setViewportSize({ width, height: 900 });
         await open();
         // Reopening restores the loaded prefix; explicitly refresh for layout checks.
-        await dc().getByRole("button", { name: "刷新列表", exact: true }).click();
+        await dc()
+          .getByRole("button", { name: "刷新列表", exact: true })
+          .click();
         await expect(rows()).toHaveCount(25);
         await expect(
           dc().getByRole("button", { name: "来源", exact: true }),

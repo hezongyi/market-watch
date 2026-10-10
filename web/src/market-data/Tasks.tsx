@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Link, useActionLock, useCenter, useSearchParams } from "./router";
+import { Link, useActionLock, useSearchParams } from "./router";
 import { NativeSelect } from "./NativeControls";
 import { DetailPanel, useDetailPanel } from "./DetailPanel";
 import { MarketListHeader, MarketTabs } from "./MarketList";
@@ -286,11 +286,7 @@ function TaskDetails({
       )}
       {task.status === "configuration_error" && (
         <p>
-          <Link
-            to={`/market-data?tab=sources&connection=${task.dataset.identity.source}`}
-          >
-            查看连接配置说明
-          </Link>
+          连接由管理员在部署配置中维护。请核对来源授权与账户环境，更新连接后重试失败范围。
         </p>
       )}
       <h3>任务操作</h3>
@@ -337,8 +333,7 @@ export function TaskActions({
     () => actionStates.get(task.id) || idleAction,
   );
   const [confirming, confirm] = useState(false);
-  const actionLock = useActionLock(),
-    center = useCenter();
+  const actionLock = useActionLock();
   useEffect(() => {
     if (
       (awaiting === "pause" && task.status === "paused") ||
@@ -379,7 +374,7 @@ export function TaskActions({
     task.status === "paused"
       ? ["恢复任务", "resume"]
       : task.status === "configuration_error"
-        ? ["查看配置", "configure"]
+        ? ["查看处理说明", "explain"]
         : task.status === "retrying"
           ? ["重试失败范围", "retry"]
           : ["暂停任务", "pause"];
@@ -389,10 +384,11 @@ export function TaskActions({
         <button
           disabled={disabled}
           onClick={() =>
-            control[1] === "configure"
-              ? center.navigate(
-                  `/market-data?tab=sources&connection=${task.dataset.identity.source}`,
-                )
+            control[1] === "explain"
+              ? setTaskAction(task.id, {
+                  error:
+                    "连接由管理员在部署配置中维护。请核对来源授权与账户环境，更新连接后重试失败范围。",
+                })
               : void action(control[1])
           }
         >

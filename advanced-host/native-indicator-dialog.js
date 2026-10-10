@@ -70,11 +70,11 @@ function chartNativeIndicators(widget, doc, req, ui) {
           ...props,
           onClick: pending ? () => {} : props.onClick,
         }),
-        R.createElement(
-          "small",
-          { className: "mw-native-study-meta" },
-          `${entry?.source || "内置"}${entry?.pane ? " · " + (entry.pane === "main" ? "主图" : "副图") : ""}${pending ? " · 正在添加…" : ""}`,
-        ),
+      ),
+      R.createElement(
+        "small",
+        { className: "mw-native-study-meta" },
+        `${entry?.source || "内置"}${entry?.pane ? " · " + (entry.pane === "main" ? "主图" : "副图") : ""}${pending ? " · 正在添加…" : ""}`,
       ),
       R.createElement(
         "button",
@@ -499,6 +499,7 @@ function chartNativeIndicators(widget, doc, req, ui) {
             "data-native-indicator-view": state.category,
           },
           R.cloneElement(search, {
+            containerClassName: `${search.props.containerClassName || ""} mw-native-indicator-search`,
             "aria-label": "搜索指标",
             value: state.query,
             onChange: (event) => {

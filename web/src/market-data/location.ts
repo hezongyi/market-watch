@@ -1,6 +1,6 @@
 const objectId = "[a-f0-9]{64}";
 const knownPath = new RegExp(`^/market-data(?:/platform/configure|/datasets/new|/datasets/${objectId}(?:/mapping)?|/composites/${objectId})?/?$`);
-const keys = new Set(["tab", "status", "page", "query", "source", "calendar", "asset_class", "dataset_id", "connection", "view", "instrument", "symbol", "precision", "section", "version", "frame", "before", "coverage_page", "request_page", "return_to"]);
+const keys = new Set(["tab", "status", "page", "query", "source", "calendar", "asset_class", "dataset_id", "view", "instrument", "symbol", "precision", "section", "version", "frame", "before", "coverage_page", "request_page", "return_to"]);
 
 /** Old addresses carry a bounded location, never a URL to execute or embed. */
 export function centerLocation(value: string, base = "/market-data"): string {
@@ -18,7 +18,7 @@ export function centerLocation(value: string, base = "/market-data"): string {
     if (key === "instrument" && !/^(?:MWP:)?[A-Za-z0-9:_-]{1,40}$/.test(item)) continue;
     if (["page", "coverage_page", "request_page", "before", "precision"].includes(key) && !/^\d{1,16}$/.test(item)) continue;
     if (key === "frame" && !["M1","M5","M15","M30","H1","H4","D1","W1","MN"].includes(item)) continue;
-    if (key === "tab" && !["managed","platform","composite","tasks","sources"].includes(item)) continue;
+    if (key === "tab" && !["managed","platform","composite","tasks"].includes(item)) continue;
     if (key === "section" && !["overview","coverage","versions","maintenance","references","chart","seam","usage"].includes(item)) continue;
     if (key === "source" && !["", "dukascopy","oanda","binance","yahoo"].includes(item)) continue;
     if (key === "calendar" && !["", "ny17", "utc0"].includes(item)) continue;
@@ -33,5 +33,5 @@ export function centerTab(value: string) {
   if (url.pathname.includes("/composites/") || url.pathname.endsWith("/mapping")) return "composite";
   if (url.pathname.includes("/platform/")) return "platform";
   const tab = url.searchParams.get("tab") || "managed";
-  return ["managed", "platform", "composite", "tasks", "sources"].includes(tab) ? tab : "managed";
+  return ["managed", "platform", "composite", "tasks"].includes(tab) ? tab : "managed";
 }

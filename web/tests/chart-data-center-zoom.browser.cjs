@@ -79,7 +79,9 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await expect.poll(() => page.evaluate(() => innerWidth)).toBe(Math.floor(width / 2));
       expect(await page.evaluate(() => devicePixelRatio)).toBe(2);
       page.off("pageerror", onError);
-      await page.reload();
+      // Creation deep links update the outer URL. Reset the entry for each
+      // width instead of reopening that previous, dirty creation draft.
+      await page.goto(base + '/market-data?query=EURUSD&status=available');
       await expect.poll(() => !!host() && !!native(), { timeout: 30000 }).toBeTruthy();
       await host().waitForFunction(()=>ready && widget.activeChart().dataReady(),null,{timeout:60000});
       page.on('pageerror',onError);
@@ -149,6 +151,19 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await screenshot(`browser-zoom200-platform-${width}.png`);
       await native().getByRole('button', { name: '关闭数据中心' }).click();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
+      await host().evaluate(() => dataCenter.open('/market-data/datasets/new?source=dukascopy&symbol=EUR%2FUSD'));
+      await expect(center().locator('.dc-create-selection')).toContainText('EUR/USD');
+      await expect(center().getByRole('button', {name:'创建并开始准备历史',exact:true})).toBeInViewport();
+      expect(await center().locator('.dc-create-page').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
+      await screenshot(`browser-zoom200-create-config-${width}.png`);
+      await center().getByRole('button',{name:'返回选择品种',exact:true}).click();
+      await expect(center().getByRole('searchbox',{name:'搜索品种',exact:true})).toBeInViewport();
+      await expect(center().getByRole('button',{name:'配置历史 →',exact:true})).toBeInViewport();
+      expect(await center().locator('.dc-create-page').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
+      await screenshot(`browser-zoom200-create-catalog-${width}.png`);
+      await native().getByRole('button',{name:'关闭数据中心',exact:true}).click();
+      if(await center().getByRole('button',{name:'放弃修改',exact:true}).count()) await center().getByRole('button',{name:'放弃修改',exact:true}).click();
+      await expect(center()).toHaveCount(0);
       await host().evaluate(()=>indicatorPicker.open());
       const indicators=native().locator('[data-name="indicators-dialog"]');
       await expect(indicators).toBeVisible();
@@ -163,7 +178,7 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await expect(indicatorPanel).toBeHidden();
       await indicators.getByRole('button',{name:'关闭指标窗口',exact:true}).click();
       await expect(indicators).toHaveCount(0);
-      record('real 200% browser zoom retains native entry, data center lists and indicator detail panel at ' + width, { physicalWidth: width, cssWidth: await page.evaluate(() => innerWidth), dpr: await page.evaluate(() => devicePixelRatio) });
+      record('real 200% browser zoom retains native entry, data center lists, creation catalog/config actions and indicator detail panel at ' + width, { physicalWidth: width, cssWidth: await page.evaluate(() => innerWidth), dpr: await page.evaluate(() => devicePixelRatio) });
     }
     expect(report.errors).toEqual([]);
     report.passed = true;

@@ -1,0 +1,44 @@
+{
+  "environment": "Ubuntu isolated Docker; actual native indicator controller, rows, stars and server settings",
+  "passed": true,
+  "checks": [
+    {
+      "name": "cold toolbar open uses actual native indicators-dialog, search, native rows and left categories; Chinese and English aliases include existing Python identity"
+    },
+    {
+      "name": "native row details open shared layout without replacing native list; input defaults and Escape/focus remain correct"
+    },
+    {
+      "name": "native row click permits intentional duplicate Python studies with distinct IDs; native ArrowDown/Enter adds built-in study"
+    },
+    {
+      "name": "native study properties close returns to same indicator category/query"
+    },
+    {
+      "name": "current chart branch keeps exact-instance settings, visibility and removal inside same native window"
+    },
+    {
+      "name": "native stars and favorites stay in same dialog; server settings persist across reload and original favorite bit is restored"
+    },
+    {
+      "name": "native layout save/load preserves original Python study names and descriptors"
+    },
+    {
+      "name": "held native insertion rejects pending duplicate and stays on captured chart; added list follows active chart"
+    },
+    {
+      "name": "dark/light at desktop/tablet/375px: native sidebar or Select, readable details, no overflow, Tab containment and Escape popup priority"
+    },
+    {
+      "name": "native indicator factory adaptation leaves data center and main symbol-search components intact"
+    },
+    {
+      "name": "unsupported version uses complete compatibility picker and corrected version restores actual native dialog"
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "onlyOwnedWorkspaceDeleted": true,
+    "favoriteBitRestored": true
+  }
+}

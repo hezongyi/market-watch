@@ -25,17 +25,17 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   expect(p.frames().filter(fr=>fr.url().includes('/chart-data-center?'))).toHaveLength(0);
   expect(await native().locator('[data-name="mw-data-center-dialog"] .mw-data-center-title svg').count()).toBe(1);
   expect(await native().locator('[data-native-component=sidebar]').count()).toBe(1);
-  expect(await native().locator('[data-native-component=sidebarItem]').count()).toBe(5);
+  expect(await native().locator('[data-native-component=sidebarItem]').count()).toBe(4);
   expect(await native().locator('[data-native-component=search] input[role=searchbox]').count()).toBe(1);
   expect(await dc().getByRole('button',{name:'筛选与搜索'}).isVisible()).toBe(false);
   expect(await native().getByRole('button',{name:'行情搜索',exact:true}).count()).toBe(0);
   record('cold open uses actual native shell/sidebar/search; one header and no duplicate market-search entry');
   const baseline=await host().evaluate(()=>({symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution()}));
-  for(const tab of ['平台行情','组合行情','任务与记录','来源与能力','自建行情']) {
+  for(const tab of ['平台行情','组合行情','任务与记录','自建行情']) {
    await dc().getByRole('button',{name:tab,exact:true}).click();await expect(dc().getByRole('heading',{name:tab,exact:true,includeHidden:true})).toBeAttached();
   }
   expect(await host().evaluate(()=>({symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution()}))).toEqual(baseline);
-  record('five sections preserve chart identity');
+  record('four sections preserve chart identity');
   for(const theme of ['Dark','Light']) {
    await host().evaluate(theme=>widget.changeTheme(theme),theme);await expect(dc()).toHaveAttribute('data-theme',theme.toLowerCase());
    for(const width of [1024,1440,1920]) {

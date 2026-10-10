@@ -1676,10 +1676,6 @@ function boot(
     }
     widget.headerReady().then(async()=>{
         alertBridge.attach();
-        if (!readonly) {
-          const button = widget.createButton(); button.textContent = "创建告警";
-          button.setAttribute("title","在当前图表创建告警"); button.addEventListener("click",()=>alertBridge.create());
-        }
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
           grid, [
