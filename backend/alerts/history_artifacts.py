@@ -16,6 +16,7 @@ from .chart_data import FRAMES, bounds
 from .chart_series import is_gold
 from .domain import bucket_bounds, calendar_for, scheduled_open
 from .source_history_store import raw_chunk
+from .market_datasets import process_rows
 from .storage import (
     HistoryArtifact,
     HistoryArtifactBlock,
@@ -153,7 +154,12 @@ def artifact_tick(version_id=None):
         elif chunk:
             if chunk.start > artifact.cursor:
                 raise ValueError("Artifact parent query partition is discontinuous")
-            rows = [r for r in json.loads(raw_chunk(db, chunk)) if r["timestamp"] >= artifact.cursor]
+            source_rows = json.loads(raw_chunk(db, chunk))
+            manifest = version.manifest or {}
+            if manifest.get("price_rule_version"):
+                source_rows = process_rows(source_rows, manifest["price_precision"])
+            rows = [r for r in source_rows
+                    if r["timestamp"] >= artifact.cursor]
             page = rows[:5000]
             stop = page[-1]["timestamp"] + 60000 if len(rows) > 5000 else chunk.end
             for row in page:

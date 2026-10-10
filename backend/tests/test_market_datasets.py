@@ -1,4 +1,5 @@
 import importlib.util
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -8,7 +9,7 @@ from alerts import provider_chart
 from alerts.chart_series import decode, display_symbol, encode, is_gold
 from alerts.market import ingest
 from alerts.market_contracts import RequestResult
-from alerts.market_datasets import legacy_inventory, register_dataset
+from alerts.market_datasets import legacy_inventory, process_price_row, register_dataset
 from alerts.storage import Bar, Instrument, MarketCoverage, MarketDataset
 from fastapi import HTTPException
 from sqlalchemy import create_engine, inspect, select, text
@@ -21,6 +22,31 @@ def register(db, ident=None, logical_symbol="EURUSD", precision=5):
                             label=logical_symbol, calendar="ny17", precision=precision,
                             volume_kind="price_count" if oanda else "quantity",
                             volume_unit="quotes" if oanda else "source_quantity")
+
+
+@pytest.mark.parametrize("precision, raw, expected", [
+    (2, "123.456", "123.46"), (3, "123.456", "123.456"),
+    (5, "1.093887", "1.09389"), (5, "1.093880", "1.093880"),
+    (5, "1.0938849", "1.09388"), (6, "1.0000005", "1.000001"),
+    (2, "1.005", "1.01"), (3, "1.23456789", "1.235"),
+])
+def test_process_price_row_rounds_only_excess_scale(precision, raw, expected):
+    row = {"timestamp": 0, "open": raw, "high": raw, "low": raw, "close": raw,
+           "volume": "2.0", "complete": True}
+    result = process_price_row(row, precision)
+    assert result["open"] == expected
+    assert result["volume"] == row["volume"]
+
+
+def test_process_price_row_rejects_invalid_or_rounding_to_zero():
+    row = {"timestamp": 0, "open": "0.004", "high": "0.004", "low": "0.004",
+           "close": "0.004", "volume": None, "complete": True}
+    with pytest.raises(ValueError):
+        process_price_row(row, 2)
+    for value in ("NaN", "Infinity", "-1", "100000000000000"):
+        row["open"] = row["high"] = row["low"] = row["close"] = value
+        with pytest.raises(ValueError):
+            process_price_row(row, 5)
 
 
 def test_same_display_name_keeps_channel_and_legacy_histories_separate(database):
@@ -132,11 +158,10 @@ def test_dataset_binding_cannot_be_replaced_or_deleted(database):
 def test_precision_and_forming_minutes_are_guarded(database):
     with database.begin() as db:
         inst = register(db)
-        with pytest.raises(ValueError, match="precision"):
-            ingest(db, inst, batch(rows=(minute(close="1.111111"),)).ingestion_payload())
+        ingest(db, inst, batch(rows=(minute(close="1.111111"),)).ingestion_payload())
         ingest(db, inst, batch(rows=(minute(complete=False),)).ingestion_payload())
-        assert db.scalar(select(Bar)) is None
-        assert db.scalar(select(MarketCoverage)) is None
+        assert db.scalar(select(Bar)).close == Decimal("1.11111")
+        assert db.scalar(select(MarketCoverage)) is not None
 
 
 def test_same_prices_cannot_silently_change_volume_semantics(database):

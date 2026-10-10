@@ -10,6 +10,7 @@ from alerts.history_maintenance import (
     plan_report,
     schedule_tick,
     task_control,
+    now_ms,
 )
 from alerts.history_versions import import_page, snapshot_rows
 from alerts.market_contracts import RequestResult
@@ -89,6 +90,38 @@ def test_failed_update_keeps_old_published_history_and_retry_checkpoint(database
     retry = Adapter()
     assert import_page(retry, version_id=child)
     assert retry.calls == [(120000, 300000)]
+
+
+def test_legacy_precision_failure_retry_freezes_rule_before_accepting_rows(database):
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
+        ident = create_run(db, identity().key, end=120000, request_id="legacy-precision").id
+        version = db.get(HistoryVersion, ident)
+        version.manifest = {}
+        version.status = "configuration_error"
+        version.error = "price_precision_overflow"
+        task_control(db, ident, "retry")
+        assert version.manifest["price_precision"] == 5
+        assert version.manifest["price_rule_version"] == "dataset-precision-half-up-v1"
+        assert version.manifest["price_rule_activation"]["previous_error"] == "price_precision_overflow"
+    assert import_page(Adapter(close="1.111111"), version_id=ident)
+    with database.begin() as db:
+        assert list(snapshot_rows(db, ident))[0]["close"] == "1.11111"
+
+
+def test_legacy_precision_retry_rejects_active_writer_lease(database):
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
+        ident = create_run(db, identity().key, end=120000, request_id="legacy-precision-lease").id
+        version = db.get(HistoryVersion, ident)
+        version.manifest = {}
+        version.status = "configuration_error"
+        version.error = "price_precision_overflow"
+        version.lease_token, version.lease_until = "active", now_ms() + 60000
+        with pytest.raises(ValueError, match="有效写入租约"):
+            task_control(db, ident, "retry")
 
 
 def test_explicit_recheck_reuses_both_sides_and_preserves_unknown_rules(database):

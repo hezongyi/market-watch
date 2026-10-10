@@ -7,12 +7,14 @@ heads allow indexed reads; immutable event deltas retain prior judgment inputs.
 from sqlalchemy import and_, func, select
 
 from .source_registry import collection_identity
+from .market_datasets import process_price_row
 from .storage import (
     CompositeInputEvent,
     CompositeMinute,
     CompositeMinuteInput,
     CompositePreparation,
     CompositeRevision,
+    Instrument,
     MarketDataset,
     RealtimeMapping,
     SourceMinuteRevision,
@@ -80,6 +82,10 @@ def rows(db, revision_id, start, end, *, input_revision=None):
     value = prep.input_revision if input_revision is None else input_revision
     if not 0 <= value <= prep.input_revision or start >= end:
         raise ValueError("Invalid composite input revision/window")
+    revision = db.get(CompositeRevision, revision_id)
+    mapping = db.get(RealtimeMapping, revision.mapping_id)
+    dataset = db.get(MarketDataset, mapping.target_dataset_id)
+    instrument = db.get(Instrument, dataset.instrument_id)
     latest = select(CompositeMinuteInput.start, func.max(CompositeMinuteInput.input_revision).label("latest")).where(
         CompositeMinuteInput.revision_id == revision_id, CompositeMinuteInput.start >= start,
         CompositeMinuteInput.start < end, CompositeMinuteInput.input_revision <= value
@@ -89,5 +95,6 @@ def rows(db, revision_id, start, end, *, input_revision=None):
             CompositeMinuteInput.start == latest.c.start, CompositeMinuteInput.input_revision == latest.c.latest)
         ).where(CompositeMinuteInput.revision_id == revision_id).order_by(CompositeMinuteInput.start)
     for row in db.scalars(query.execution_options(yield_per=500)):
-        yield {**row.data, "minute_revision_id": row.id, "source_id": row.source_id,
+        data = process_price_row(row.data, instrument.precision)
+        yield {**data, "minute_revision_id": row.id, "source_id": row.source_id,
                "observed_at": row.observed_at}
