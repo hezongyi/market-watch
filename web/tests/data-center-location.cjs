@@ -1,0 +1,18 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const esbuild = require('esbuild');
+const root = require('node:path').resolve(__dirname, '../..');
+const source = fs.readFileSync(root + '/web/src/market-data/location.ts', 'utf8');
+const code = esbuild.transformSync(source, {loader:'ts', format:'cjs'}).code;
+const context = {module:{exports:{}},exports:{},URL,URLSearchParams};
+vm.runInNewContext(code, context);
+const {centerLocation,centerTab} = context.module.exports;
+assert.equal(centerLocation('/market-data?tab=sources'), '/market-data?tab=sources');
+assert.equal(centerTab('/market-data?tab=sources'), 'sources');
+assert.equal(centerTab('/market-data?tab=tasks'), 'tasks');
+assert.equal(centerTab('/market-data?tab=invalid-section'), 'managed');
+assert.equal(centerLocation('/market-data?tab=invalid-section'), '/market-data');
+assert.equal(centerLocation('https://other.invalid/market-data?tab=sources'), '/market-data');
+assert.equal(centerTab('/market-data/composites/'+'a'.repeat(64)+'?tab=sources'), 'composite');
+console.log('Data-center source routing, task routing, invalid-tab fallback and URL boundary passed');

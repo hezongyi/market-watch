@@ -1,0 +1,24 @@
+{
+  "task": "mw-source-status-delivery-20261010",
+  "project": "mw-source-status-delivery-20261010",
+  "preview_completed": true,
+  "apply_completed": true,
+  "backups": [
+    {
+      "database": "postgres",
+      "sha256": "66a957dbefce66dd03477e41f9574dc59c3c10f89108b6c2cb7f808cea032c4f",
+      "tables_verified": 0,
+      "actual_restore_verified": true
+    },
+    {
+      "database": "source_status",
+      "sha256": "6831d7072086b48e4387f3b8f46734651e0d36b775eba8c9e42a0dacbc21d7b1",
+      "tables_verified": 87,
+      "actual_restore_verified": true
+    }
+  ],
+  "private_archive_committed": false,
+  "remaining_containers": 0,
+  "remaining_volumes": 0,
+  "remaining_networks": 0
+}

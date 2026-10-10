@@ -183,9 +183,17 @@ def provider_status(*, now=None):
         owner = db.get(PricingOwner, account_key(settings.oanda_account_id)) if settings.oanda_account_id else None
         probe = db.get(Preference, 'oanda_probe_status:' + owner.id) if owner else None
         held = bool(owner and owner.error == 'unauthorized')
+        probe_error = probe.value.get('error') if probe and held else None
         return {'source': 'oanda', 'environment': 'practice', 'authentication_hold': held,
-            'error': ((probe.value.get('error') if probe and held else None) or owner.error) if owner else None,
-            'next_probe_at': owner.next_at or None if owner else None}
+            'error': (probe_error or owner.error) if owner else None,
+            'next_probe_at': owner.next_at or None if owner else None,
+            'configured': bool(settings.oanda_account_id and settings.oanda_token),
+            'collection_recorded': owner is not None,
+            'connection_started_at': owner.connected_at or None if owner else None,
+            'authentication_probe_at': probe.value.get('observed_at') if probe else None,
+            # Probe time belongs only to that probe's error, never to a stream
+            # fault or the original persisted authentication hold.
+            'error_observed_at': probe.value.get('observed_at') if probe_error else None}
 
 
 def session_states(identities, *, now=None):

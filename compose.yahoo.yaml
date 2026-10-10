@@ -1,0 +1,27 @@
+# Explicit Yahoo opt-in. Use with the chosen deployment Compose, never standalone.
+# Configure ALERTS_YAHOO_PROXY or ALERTS_MARKET_PROXY in that deployment's private env.
+x-yahoo-environment: &yahoo-environment
+  ALERTS_YAHOO_ENABLED: "true"
+services:
+  migrate:
+    environment: *yahoo-environment
+  api:
+    environment: *yahoo-environment
+  realtime-worker:
+    environment: *yahoo-environment
+  chart-history-worker:
+    environment: *yahoo-environment
+  chart-aggregation-worker:
+    environment: *yahoo-environment
+  native-history-worker:
+    environment: *yahoo-environment
+  history-worker:
+    environment: *yahoo-environment
+  composite-aggregate-worker:
+    environment: *yahoo-environment
+  pricing-worker:
+    environment: *yahoo-environment
+  market-stream-worker:
+    environment: *yahoo-environment
+  notify-worker:
+    environment: *yahoo-environment

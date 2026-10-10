@@ -1,0 +1,102 @@
+{
+  "browser": {
+    "environment": "Ubuntu isolated Docker mw-source-status-20261010; actual authenticated native/compatibility windows; controlled status/feed fixtures",
+    "passed": true,
+    "checks": [
+      {
+        "name": "Real authenticated status API opens fifth native category with folded diagnostics"
+      },
+      {
+        "name": "Original four categories have no global OANDA diagnostic or status polling"
+      },
+      {
+        "name": "Held first read shows loading only; no invented recovery or failure"
+      },
+      {
+        "name": "Failed refresh retains last success time and last supplier quote snapshot"
+      },
+      {
+        "name": "Quote readiness and completed-candle readiness remain independent"
+      },
+      {
+        "name": "Verified closure is ordinary status with next-session evidence, not a connection fault"
+      },
+      {
+        "name": "Unknown calendar does not infer weekend closure"
+      },
+      {
+        "name": "Timeout preserves readiness; expired check and missing error time are honest; historical reads remain separate"
+      },
+      {
+        "name": "Authentication hold remains explicit even when its latest probe timed out"
+      },
+      {
+        "name": "Unconfigured source and absent collection records are distinct"
+      },
+      {
+        "name": "10-second polling rereads status without rewriting provider timestamps"
+      },
+      {
+        "name": "Leaving sources cancels its in-flight request and poll timer; late responses cannot replace task page"
+      },
+      {
+        "name": "Closing cancels polling; reopen restores source navigation"
+      },
+      {
+        "name": "Diagnostics work from keyboard and focus stays in actual native modal"
+      },
+      {
+        "name": "Native dark/light layouts at 1440/768/375px wrap fields without horizontal overflow"
+      },
+      {
+        "name": "Chrome tabs.setZoom(2) actual 200% zoom remains operable",
+        "zoom": 2,
+        "cssViewport": {
+          "width": 720,
+          "height": 500,
+          "dpr": 2
+        }
+      },
+      {
+        "name": "Compatibility diagnostics work from keyboard and focus stays in its modal"
+      },
+      {
+        "name": "Actual compatibility window supports source navigation, dark/light 1440/768/375px and real 200% zoom"
+      },
+      {
+        "name": "Source browsing, refresh, navigation and close send no collection or control commands",
+        "forbiddenRequests": [],
+        "sourceStatusReads": 18
+      }
+    ],
+    "errors": []
+  },
+  "postgresql": {
+    "environment": "Ubuntu isolated Docker; actual PostgreSQL 14",
+    "passed": true,
+    "configured_account_rows": 2,
+    "other_account_rows_hidden": 2,
+    "repeated_status_reads": 5,
+    "state_and_demand_fingerprint_unchanged": true,
+    "real_provider_connections": false
+  },
+  "retirement": {
+    "project": "mw-source-status-20261010",
+    "completed": true,
+    "databases": [
+      {
+        "name": "postgres",
+        "actual_restore_verified": true,
+        "public_tables": 0
+      },
+      {
+        "name": "source_status",
+        "actual_restore_verified": true,
+        "public_tables": 87
+      }
+    ],
+    "remaining_project_containers": 0,
+    "remaining_project_volumes": 0,
+    "remaining_project_networks": 0
+  }
+}

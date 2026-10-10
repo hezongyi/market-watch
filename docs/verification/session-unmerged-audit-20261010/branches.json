@@ -1,0 +1,839 @@
+{
+  "baseline": "b2744e655f3865ba5fee31f543d6b587bee12ee1",
+  "branches": [
+    {
+      "ref": "baseline/main-20261008",
+      "tip": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "bench/unified-sse-baseline-20261009",
+      "tip": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "chore/ubuntu-docker-lifecycle",
+      "tip": "ad5bba187027cca234baa5d1ade5db482945ab10",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "deploy/v1.11.0-market-watch-rename",
+      "tip": "9016bb25661a2e5c49ac946dc883255b8878f8e6",
+      "unmerged_unique_commits": [
+        {
+          "sha": "9016bb25661a2e5c49ac946dc883255b8878f8e6",
+          "subject": "docs(deploy): record v1.11.0 production and market-watch rename"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "deploy/v1.12.0-production",
+      "tip": "cf84f03bfd1c60a4a57087b2e67d1920e98f8d2a",
+      "unmerged_unique_commits": [
+        {
+          "sha": "d7c30d9610726da2e5a2af8ecfdf82e9e0eb2964",
+          "subject": "docs(deploy): record verified v1.12.0 production rollout"
+        },
+        {
+          "sha": "cf84f03bfd1c60a4a57087b2e67d1920e98f8d2a",
+          "subject": "docs(deploy): complete v1.12.0 production browser acceptance"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "deploy/v1.14.1-production",
+      "tip": "04a2867b146ca63a818c339016946726e6c84bea",
+      "unmerged_unique_commits": [
+        {
+          "sha": "94f5cf58e9e054bc3448da59999a7faec4b65d33",
+          "subject": "docs: record v1.14.1 production deployment and rollback"
+        },
+        {
+          "sha": "b03c083f67d7d8194e8cbd0259c18ad269cba3ae",
+          "subject": "ops: enable production OANDA stream and verify browser login"
+        },
+        {
+          "sha": "04a2867b146ca63a818c339016946726e6c84bea",
+          "subject": "docs: retain observed stream reconnect and recovery limits"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "docs/chart-data-center-plan-20261008",
+      "tip": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "docs/dataset-management-v1170-production-20261010",
+      "tip": "247859d2cd7c2d90b48f06ab4edc1795d9dac612",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "docs/oanda-personal-acceptance-20261008",
+      "tip": "1743cd8b43054073132ff91b39586ecd8046b4d8",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "docs/oanda-v1.14.2-production",
+      "tip": "63f8467b188d9011f8245068271c40af5f96926a",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "docs/v1.15.0-production-20261010",
+      "tip": "e933ed4826a01b9fad3f203b5c241c187089c0a6",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "docs/v1.16.0-production-20261010",
+      "tip": "f08a524b86acfdaa4d595c08f5389cfc86a1c150",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "docs/weekend-v1.15.1-production-20261010",
+      "tip": "012a679d3c67cccb620d85c5001aec14c45e24c6",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/chart-bar-range-mapping",
+      "tip": "ed149e1df703275301af587ddd0b58c495eee40e",
+      "unmerged_unique_commits": [
+        {
+          "sha": "e91f29e8d86a8dd73625477da54f2930d8d97887",
+          "subject": "feat(chart): map hovered candle ranges onto smaller timeframes"
+        },
+        {
+          "sha": "e40315ff5b5b2cbcf021eae77497e5e565b5075e",
+          "subject": "docs: require Ubuntu Docker acceptance and retire unraid fixtures"
+        },
+        {
+          "sha": "b8928505d68080d944670a57c1f6874ee3e2db42",
+          "subject": "docs(chart): plan sync settings, focused bar-width sync and price labels"
+        },
+        {
+          "sha": "279b1ef45eeccdfb35b044d724508ca9ca2a1f8c",
+          "subject": "docs(chart): revise sync settings plan after max agent review"
+        },
+        {
+          "sha": "873b9c88368361dcfedc12fc67d7fbf13db4f30b",
+          "subject": "docs(chart): tighten sync plan after 6.1 max review"
+        },
+        {
+          "sha": "ed149e1df703275301af587ddd0b58c495eee40e",
+          "subject": "feat(chart): add focused bar-width sync and range settings"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/chart-data-center-20261008",
+      "tip": "5f133774498f59f6cfc922d44530f4aa7a7db87d",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/data-center-pr-20261010",
+      "tip": "963896f81eb6624906f7623fdea3ae80f0ad578c",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/dataset-management-ui-20261010",
+      "tip": "7e68bf339339665d0766a717b31a4b7b67d846a2",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/deployment-verifier-identity",
+      "tip": "3b92a1bd0e5d2e295da284043c06dd8a2d5b92be",
+      "unmerged_unique_commits": [
+        {
+          "sha": "3b92a1bd0e5d2e295da284043c06dd8a2d5b92be",
+          "subject": "feat(auth): separate release access and read-only deployment verification"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/market-data-integration",
+      "tip": "7e1ba24a2bc6532337c4a7fdbe1f17084ea32a7d",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/mt4-readonly-validation",
+      "tip": "62488c6035dbea9533699d569a6605f82c684303",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/native-alert-ui-20261008",
+      "tip": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/native-alert-ui-impl-20261008",
+      "tip": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/source-status-20261010",
+      "tip": "3631909ec1cdc0926020501c9956264ed1d25ff7",
+      "unmerged_unique_commits": [
+        {
+          "sha": "3631909ec1cdc0926020501c9956264ed1d25ff7",
+          "subject": "feat: add data-center source status page with isolated acceptance"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/unified-market-sse-20261008",
+      "tip": "ac6635ad506ce48ebcd4a9ec0649a14f11b04ef8",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/workspace-tabs-20261008",
+      "tip": "5f0d7309dda18fade68e9cfc66f85dd2a96be957",
+      "unmerged_unique_commits": [
+        {
+          "sha": "30e82d890d4cd2150cc3242b3bb8fdb251c97c0c",
+          "subject": "feat: add single-instance professional workspace tabs"
+        },
+        {
+          "sha": "b19eddfdee4db0075e22aa59415100bbf28f7b90",
+          "subject": "docs: record workspace tabs delivery and verified retirement"
+        },
+        {
+          "sha": "f65c6b73412dfbd6a7ccd601cda4d25a3dce56cb",
+          "subject": "test: complete workspace tabs delivery audit"
+        },
+        {
+          "sha": "b77f9eaadd6c50281bbc30abfcbbd7e4019e2bc0",
+          "subject": "fix(workbench): recover chart startup and load real default gold"
+        },
+        {
+          "sha": "4c35f092112ba0cae03e49eae0682f1207149b57",
+          "subject": "test(workbench): separate strict TLS clicks from injected browser faults"
+        },
+        {
+          "sha": "ce9625376b6f3ee39ebd9c488e84adb27d652efe",
+          "subject": "fix(workbench): clear recovered startup errors without hiding missing targets"
+        },
+        {
+          "sha": "5c9886ed72b07812fd839776b696ecc68b8ae066",
+          "subject": "test(workbench): wait for the newly created native chart before asserting data"
+        },
+        {
+          "sha": "5f0d7309dda18fade68e9cfc66f85dd2a96be957",
+          "subject": "docs: replace premature delivery claim with real user path evidence"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "feat/yahoo-native-market-data",
+      "tip": "b747d5b5656c8dbcca3cab8c9e8dd7e6c28071e9",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "fix/oanda-stream-reconnect",
+      "tip": "09d94d4c491a4e83047f17f2478309e573c10cb9",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "fix/source-status-delivery-20261010",
+      "tip": "0716ff858f7f59e58624d0018168d70a97982495",
+      "unmerged_unique_commits": [
+        {
+          "sha": "0716ff858f7f59e58624d0018168d70a97982495",
+          "subject": "feat: add data-center source status page with isolated acceptance"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "fix/watchlist-symbol-filters-20261010",
+      "tip": "98c50eaf601dede1a8fbfa8584c7fe22a5231d18",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "fix/weekend-recovery-20261010",
+      "tip": "47837d6cdbc30eacf50c7a71ca72923710157a90",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "investigate/oanda-stream-deadlocks-20261008",
+      "tip": "e65b18c7af3a6427f2696010f7c77fd5bbd14227",
+      "unmerged_unique_commits": [
+        {
+          "sha": "d8260e45b8395c1fca4d6a0564a2d2c1bf519021",
+          "subject": "Avoid dataset reference relocking for chart plan progress"
+        },
+        {
+          "sha": "fffa6f8b80dcf18f89109fa6c6a59632c48cfc96",
+          "subject": "Keep inactive chart plan updates fenced against reclamation"
+        },
+        {
+          "sha": "e65b18c7af3a6427f2696010f7c77fd5bbd14227",
+          "subject": "Record OANDA deadlock validation and exact resource retirement"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "investigate/workspace-tabs-20261008",
+      "tip": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "main",
+      "tip": "3d5dce8f44864ec4500b57e9098ddebe92ca600f",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "prototype/chart-comparison",
+      "tip": "8b8511dfe22cda0b71a3601377c41f3a8c89e03b",
+      "unmerged_unique_commits": [
+        {
+          "sha": "8b8511dfe22cda0b71a3601377c41f3a8c89e03b",
+          "subject": "Prototype chart engines, drawing synchronization and Python indicators"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "prototype/chart-visual",
+      "tip": "33c511e3250fae601407a3e91896023fd134e1b2",
+      "unmerged_unique_commits": [
+        {
+          "sha": "33c511e3250fae601407a3e91896023fd134e1b2",
+          "subject": "prototype: TradingView-inspired light dark chart UI for visual review"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "release/v1.16.0-20261010",
+      "tip": "0bd9df8df823f01a64dd6ee98533bff4b537f96f",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/analysis/issue13-performance",
+      "tip": "d9889947eba5eedf0ce9a026268b26f5721de478",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/chore/release-v1.13.0",
+      "tip": "bec377f345f538b395712d8446bdca0807c6b560",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/chore/ubuntu-docker-lifecycle",
+      "tip": "ad5bba187027cca234baa5d1ade5db482945ab10",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/deploy/v1.14.1-production",
+      "tip": "04a2867b146ca63a818c339016946726e6c84bea",
+      "unmerged_unique_commits": [
+        {
+          "sha": "94f5cf58e9e054bc3448da59999a7faec4b65d33",
+          "subject": "docs: record v1.14.1 production deployment and rollback"
+        },
+        {
+          "sha": "b03c083f67d7d8194e8cbd0259c18ad269cba3ae",
+          "subject": "ops: enable production OANDA stream and verify browser login"
+        },
+        {
+          "sha": "04a2867b146ca63a818c339016946726e6c84bea",
+          "subject": "docs: retain observed stream reconnect and recovery limits"
+        }
+      ],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/docs/dataset-management-v1170-production-20261010",
+      "tip": "247859d2cd7c2d90b48f06ab4edc1795d9dac612",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/docs/oanda-personal-acceptance-20261008",
+      "tip": "1743cd8b43054073132ff91b39586ecd8046b4d8",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/docs/oanda-v1.14.2-production",
+      "tip": "63f8467b188d9011f8245068271c40af5f96926a",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/docs/v1.16.0-production-20261010",
+      "tip": "12a25a33c082e39b849b21f43d0de7ebcecc6c87",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/advanced-chart-alerts",
+      "tip": "6167231298fb08e4e815c8fa7be91bd816472911",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/chart-double-click-maximize",
+      "tip": "3c3b57b6f1a1d31524bc99d96ee8a92fbee244f8",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/data-center-pr-20261010",
+      "tip": "963896f81eb6624906f7623fdea3ae80f0ad578c",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/dataset-management-ui-20261010",
+      "tip": "7e68bf339339665d0766a717b31a4b7b67d846a2",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/indicator-selector",
+      "tip": "2771307730e0153e99a8b41e702e1cf3af6475ca",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/market-data-integration",
+      "tip": "db90b4cc0acca90e492057e6bea52e074bcee8ff",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/native-mcp",
+      "tip": "3f47495185d99f7458a6693903138a632d93e71d",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/native-viewport-history-buffer",
+      "tip": "5bc8a191e001cc92d2b74dd70163da88ac110e86",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/range-sync-settings-v1.8.0",
+      "tip": "462ffe09aaebef70b2ccb5714b954715ff0f19a6",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/unified-market-sse-20261008",
+      "tip": "ac6635ad506ce48ebcd4a9ec0649a14f11b04ef8",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/feat/yahoo-native-market-data",
+      "tip": "b747d5b5656c8dbcca3cab8c9e8dd7e6c28071e9",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/fix/layout-refresh-series",
+      "tip": "ade65da0ac68d15c94942a5caa79130f6456dffc",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/fix/native-chart-window-sync",
+      "tip": "ad9dd152c1aa80d5b7efe1569a548a0319951fb8",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/fix/native-history-release-v1.8.0",
+      "tip": "fa3bc667ef91d1efd4af6a50c0684b44508c2e83",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/fix/oanda-stream-reconnect",
+      "tip": "09d94d4c491a4e83047f17f2478309e573c10cb9",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/fix/retire-chart-acceptance",
+      "tip": "5ba761d16c9c057340bc4c607366cc14d1588259",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/fix/watchlist-symbol-filters-20261010",
+      "tip": "8c3474d1b49692ba625afb3149adccc8c79be9d9",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/fix/weekend-recovery-20261010",
+      "tip": "47837d6cdbc30eacf50c7a71ca72923710157a90",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/main",
+      "tip": "b2744e655f3865ba5fee31f543d6b587bee12ee1",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/pr-17",
+      "tip": "3c3b57b6f1a1d31524bc99d96ee8a92fbee244f8",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/pr-18",
+      "tip": "7c756d7cf6ff89ff63adeada8437b14d0da7cd23",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/release/range-sync-v1.12.0",
+      "tip": "f9cd4bfd0c321ffe511b519e44c58737d1c359d3",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/release/ubuntu-docker-v1.12.1",
+      "tip": "c6c64c1ce64d124d4874a491af3c1c6d86ffbc92",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    },
+    {
+      "ref": "origin/release/v1.16.0-20261010",
+      "tip": "aacc84f8ada9c67f70b1cb1109eb850731aad3b2",
+      "unmerged_unique_commits": [],
+      "patch_equivalent_commits": 0
+    }
+  ],
+  "worktrees": [
+    {
+      "path": "/home/quant/repos/market-watch",
+      "head": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "status": [
+        "?? docs/market-data-unified-subscriptions-plan.md"
+      ]
+    },
+    {
+      "path": "/home/quant/repos/.production/mw-oanda-release-review-20261008/release-source",
+      "head": "b7376b9a067384789fe7b19344ae1f193502d1d4",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/.production/mw-oanda-release-review-20261008/v1.14.2-source",
+      "head": "ccc7e0a88b61d48ecf03a166327ae6ba12decdc6",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-data-center-impl-20261008",
+      "head": "5f133774498f59f6cfc922d44530f4aa7a7db87d",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-data-center-plan-20261008",
+      "head": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "status": [
+        "?? docs/chart-data-center-integration-plan.md"
+      ]
+    },
+    {
+      "path": "/home/quant/repos/market-watch-data-center-pr-20261010",
+      "head": "963896f81eb6624906f7623fdea3ae80f0ad578c",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-data-integration",
+      "head": "7e1ba24a2bc6532337c4a7fdbe1f17084ea32a7d",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-dataset-management-ui-impl-20261010",
+      "head": "7e68bf339339665d0766a717b31a4b7b67d846a2",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-deploy-identity",
+      "head": "3b92a1bd0e5d2e295da284043c06dd8a2d5b92be",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-docker-lifecycle",
+      "head": "ad5bba187027cca234baa5d1ade5db482945ab10",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-main",
+      "head": "3d5dce8f44864ec4500b57e9098ddebe92ca600f",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-native-alert-ui-20261008",
+      "head": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "status": [
+        "?? docs/native-alert-ui-plan-20261008.md",
+        "?? docs/verification/native-alert-ui/",
+        "?? web/tests/native-alert-shell.probe.cjs"
+      ]
+    },
+    {
+      "path": "/home/quant/repos/market-watch-native-alert-ui-impl-20261008",
+      "head": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "status": [
+        " M .gitignore",
+        " M advanced-host/Dockerfile",
+        " M advanced-host/bridge.js",
+        " M advanced-host/build-assets.mjs",
+        " M advanced-host/chart-alerts.js",
+        " M advanced-host/index.html",
+        " M compose.advanced.yaml",
+        " M compose.chart-maximize.yaml",
+        " M deploy/advanced-chart-origin.md",
+        " M deploy/ubuntu/README.md",
+        " M docs/verification/chart-alerts/compose.integration.yaml",
+        " M docs/verification/chart-alerts/compose.yaml",
+        " M docs/verification/indicator-picker/compose.yaml",
+        " M docs/verification/native-mcp/compose.yaml",
+        " M scripts/chart_alert_acceptance_environment.py",
+        " M scripts/chart_alert_postgres_backup_acceptance.py",
+        " M web/src/advanced/AdvancedWorkspace.tsx",
+        " M web/src/advanced/ChartAlertDialog.tsx",
+        " M web/src/advanced/ChartAlertsPanel.tsx",
+        " M web/src/advanced/chart-alerts.css",
+        " M web/tests/chart-alerts-runtime.browser.cjs",
+        " M web/tests/chart-alerts-ui.probe.cjs",
+        "?? advanced-host/Dockerfile.dockerignore",
+        "?? advanced-host/native-alert-shell.js",
+        "?? compose.native-alert-ui.yaml",
+        "?? docs/native-alert-ui-plan-20261008.md",
+        "?? docs/verification/native-alert-ui/",
+        "?? scripts/native_alert_ui_comparison.py",
+        "?? scripts/prepare_native_alert_ui_acceptance.py",
+        "?? web/scripts/build-alert-ui.mjs",
+        "?? web/src/advanced/AlertMenu.tsx",
+        "?? web/src/advanced/NativeAlertControls.tsx",
+        "?? web/src/advanced/chartAlertUiApi.ts",
+        "?? web/src/advanced/nativeAlertUI.tsx",
+        "?? web/tests/chart-alert-ui-rpc.test.cjs",
+        "?? web/tests/native-alert-shell.probe.cjs",
+        "?? web/tests/native-alert-ui.integration.cjs",
+        "?? web/tests/native-alert-ui.runtime.cjs",
+        "?? web/tests/native-alert-workspace.integration.cjs"
+      ]
+    },
+    {
+      "path": "/home/quant/repos/market-watch-oanda-deadlocks-20261008",
+      "head": "e65b18c7af3a6427f2696010f7c77fd5bbd14227",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-oanda-production-record",
+      "head": "1743cd8b43054073132ff91b39586ecd8046b4d8",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-oanda-stream-fix",
+      "head": "09d94d4c491a4e83047f17f2478309e573c10cb9",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-pr25-review-20261009",
+      "head": "b8970acf0846a00fd6fb42667123eceabb3eed76",
+      "status": [
+        "M  CHANGELOG.md",
+        "M  backend/alerts/chart_history_plan.py",
+        "M  backend/alerts/history_retention.py",
+        "M  backend/alerts/live_pricing.py",
+        "M  backend/alerts/managed_dataset.py",
+        "M  backend/alerts/oanda_stream.py",
+        "M  backend/alerts/oanda_worker.py",
+        "M  backend/tests/test_live_pricing.py",
+        "M  backend/tests/test_oanda_stream.py",
+        "A  backend/tests/test_oanda_worker_diagnostics.py",
+        "A  backend/tests/test_pricing_publication_deadlock_postgres.py",
+        "A  backend/tests/test_stream_observation.py",
+        "A  backend/tests/test_transport_observation.py",
+        "A  deploy/releases/v1.14.2-production.json",
+        "A  deploy/releases/v1.14.2-source-inputs.json",
+        "A  deploy/releases/v1.14.2-source.json",
+        "A  docs/investigations/oanda-release-review.md",
+        "A  docs/investigations/oanda-stream-reconnect-fix.md",
+        "A  docs/investigations/oanda-timeout-follow-up.md",
+        "A  docs/oanda-v1.14.2-production-delivery.md",
+        "A  docs/oanda-v1.14.2-source-delivery.md",
+        "A  docs/verification/oanda-stream-isolated/README.md",
+        "A  docs/verification/oanda-stream-isolated/result.json",
+        "A  docs/verification/oanda-stream-isolated/run.py",
+        "A  docs/verification/oanda-stream-isolated/stream_observation.py",
+        "A  docs/verification/oanda-stream-isolated/transport_observation.py",
+        "M  pyproject.toml",
+        "M  web/package-lock.json",
+        "M  web/package.json"
+      ]
+    },
+    {
+      "path": "/home/quant/repos/market-watch-production-v1.14.1",
+      "head": "04a2867b146ca63a818c339016946726e6c84bea",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-range-mapping",
+      "head": "ed149e1df703275301af587ddd0b58c495eee40e",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-release-v1.15.0-20261010",
+      "head": "e933ed4826a01b9fad3f203b5c241c187089c0a6",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-release-v1.15.1-20261010",
+      "head": "83d939beacc84b7ac587257483fd9b3168623b68",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-release-v1.16.0-20261010",
+      "head": "f08a524b86acfdaa4d595c08f5389cfc86a1c150",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-release-v1.17.0-20261010",
+      "head": "247859d2cd7c2d90b48f06ab4edc1795d9dac612",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-source-status-delivery-20261010",
+      "head": "0716ff858f7f59e58624d0018168d70a97982495",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-source-status-impl-20261010",
+      "head": "3631909ec1cdc0926020501c9956264ed1d25ff7",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-unified-sse-20261008",
+      "head": "ac6635ad506ce48ebcd4a9ec0649a14f11b04ef8",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-unified-sse-baseline-20261009",
+      "head": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-watchlist-filters-20261010",
+      "head": "98c50eaf601dede1a8fbfa8584c7fe22a5231d18",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-weekend-recovery-20261010",
+      "head": "012a679d3c67cccb620d85c5001aec14c45e24c6",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-workspace-tabs-20261008",
+      "head": "6fd9273a5f78d8761f76a20e3ad66b17e441f9f5",
+      "status": [
+        " M web/src/advanced/AdvancedWorkspace.tsx",
+        "?? compose.workspace-tabs-probe.yaml",
+        "?? docs/evidence/workspace-tabs-20261008/",
+        "?? docs/workspace-tabs-plan.md",
+        "?? docs/workspace-tabs-probe-operations.md",
+        "?? docs/workspace-tabs-probe-results.md",
+        "?? docs/workspace-tabs-validation-20261008.md",
+        "?? scripts/prepare_workspace_tabs_probe.py",
+        "?? scripts/run_workspace_tabs_probe.sh",
+        "?? scripts/seed_workspace_tabs_probe.py",
+        "?? web/prototypes/",
+        "?? web/tests/workspace-tabs-lifecycle.cjs",
+        "?? web/tests/workspace-tabs-probe.cjs"
+      ]
+    },
+    {
+      "path": "/home/quant/repos/market-watch-workspace-tabs-impl-20261008",
+      "head": "5f0d7309dda18fade68e9cfc66f85dd2a96be957",
+      "status": []
+    },
+    {
+      "path": "/home/quant/repos/market-watch-yahoo-native",
+      "head": "b747d5b5656c8dbcca3cab8c9e8dd7e6c28071e9",
+      "status": []
+    },
+    {
+      "path": "/tmp/market-watch-pr6-review",
+      "head": "a39a29281f61b491ce01aa6093fa31d9a7b927d7",
+      "status": [
+        "M  advanced-host/.dockerignore",
+        "M  advanced-host/Dockerfile",
+        "M  advanced-host/bridge.js",
+        "M  advanced-host/build-assets.mjs",
+        "M  advanced-host/index.html",
+        "A  advanced-host/native-reserve.js",
+        "A  advanced-host/patch-native-reserve.mjs",
+        "M  backend/alerts/chart_api.py",
+        "M  backend/alerts/provider_cache.py",
+        "M  backend/alerts/provider_history_policy.py",
+        "A  backend/tests/test_native_reserve.py",
+        "A  backend/tests/test_native_reserve_postgres.py",
+        "A  docs/native-viewport-history-buffer-plan.md",
+        "A  docs/verification/viewport-history/README.md",
+        "A  docs/verification/viewport-history/compose.yaml",
+        "A  docs/verification/viewport-history/crosshair-four-symbols.png",
+        "A  docs/verification/viewport-history/crosshair-two.png",
+        "A  docs/verification/viewport-history/results.json",
+        "A  docs/verification/viewport-history/review.md",
+        "A  scripts/viewport_history_prepare.py",
+        "M  web/src/advanced/AdvancedWorkspace.tsx",
+        "A  web/tests/advanced-native-reserve-lifetime.cjs",
+        "A  web/tests/advanced-native-reserve-scheduler.cjs",
+        "A  web/tests/advanced-viewport-reserve.browser.cjs",
+        "A  web/tests/advanced-viewport-sync.browser.cjs"
+      ]
+    },
+    {
+      "path": "/tmp/market-watch-pr7-review",
+      "head": "ad9dd152c1aa80d5b7efe1569a548a0319951fb8",
+      "status": []
+    }
+  ]
+}

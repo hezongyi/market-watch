@@ -66,9 +66,11 @@ function CenterPage() {
   if (params.get("tab") === "platform") return <PlatformMarket />;
   if ((params.get("tab") || "managed") === "managed") return <ManagedMarket />;
   if (params.get("tab") === "composite") return <CompositeList />;
-  return <Tasks />;
+  if (params.get("tab") === "tasks") return <Tasks />;
+  if (params.get("tab") === "sources") return <LiveProviderStatus />;
+  return <ManagedMarket />;
 }
 
 export default function Center() {
-  return <><LiveProviderStatus /><CenterPage /></>;
+  return <CenterPage />;
 }

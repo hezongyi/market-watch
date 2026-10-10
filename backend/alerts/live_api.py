@@ -41,7 +41,12 @@ def router(authenticated):
     @routes.get('/status')
     def status():
         # Low-frequency data-center view; does not create collection demand.
-        return {'provider': provider_status(), 'datasets': snapshots()}
+        scope = 'sha256:' + hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
+        datasets = [row for row in snapshots() if settings.oanda_account_id and all(
+            row['identity'].get(key) == value for key, value in {
+                'source': 'oanda', 'environment': 'practice', 'channel': 'v20',
+                'account_scope': scope}.items())]
+        return {'provider': provider_status(), 'datasets': datasets}
 
     @routes.post("/demand")
     def demand(body: Demand):

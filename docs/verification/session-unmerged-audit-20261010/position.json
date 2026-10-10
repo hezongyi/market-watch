@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "environment": "Ubuntu Chromium; actual React UI and read-only browser API fixtures",
+  "checks": [
+    "Default overview survives category round-trip (200 → 200)",
+    "Coverage parameters reordered on return retain page/version and scroll (350 → 350)",
+    "Legacy stored URL migrates and restores both scroll and focus",
+    "Delayed source snapshot restores saved scroll and diagnostic focus on reopen",
+    "Source category round-trip preserves scroll and diagnostic focus after delayed reload",
+    "Actual close and reopen preserves source scroll and diagnostic focus",
+    "User interaction during initial source read cancels late position restoration"
+  ],
+  "errors": []
+}
