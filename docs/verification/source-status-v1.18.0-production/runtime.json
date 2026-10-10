@@ -1,0 +1,91 @@
+{
+  "services": {
+    "history-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "notify-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "chart-aggregation-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "chart-history-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "web": {
+      "image_ref": "market-watch-web:v1.18.0-e75694c",
+      "production_image_id": "sha256:cca15379f44a37ee50fd2e545e67dcaba0050312a01c33c3ac52ccdb4e9e7997",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "pricing-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "market-stream-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "composite-aggregate-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "native-history-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "realtime-worker": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "api": {
+      "image_ref": "market-watch-api:v1.18.0-e75694c",
+      "production_image_id": "sha256:492760ad3c2e66b9e9aac9881e239ab1f2892d517dd61f2759c52c0993ac753f",
+      "status": "running",
+      "restarts": 0,
+      "health": "healthy"
+    },
+    "chart-origin": {
+      "image_ref": "market-watch-chart-origin:v1.18.0-e75694c",
+      "production_image_id": "sha256:3fe50fee7e632841dab62cb5a3d8f50667fa054bc400b6657cd81387c76f7332",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    }
+  },
+  "all_running": true,
+  "all_restarts_zero": true,
+  "env_commands_ports_mounts_preserved_except_yahoo_enable": true
+}
