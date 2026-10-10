@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path');
 const {expect}=require('@playwright/test');const f=require('./chart-data-center-fixture.cjs');
 const out=path.join(f.root,'artifacts/native-ui-implementation');fs.mkdirSync(out,{recursive:true});
-const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-20261008',passed:false,checks:[],errors:[]};
+const report={environment:'Ubuntu local Docker',project:process.env.MW_DATA_CENTER_PROJECT||'mw-data-center-review-20261008',passed:false,checks:[],errors:[]};
 (async()=>{
  const b=await f.launch(),p=await b.newPage({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}});const {host,native}=f.frames(p);
  p.on('pageerror',e=>{report.errors.push(e.message);console.log('PAGEERROR',e.message)});
@@ -55,8 +55,8 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   const after=await native().locator('[data-name="mw-data-center-dialog"]').boundingBox();expect(after.x).not.toBe(before.x);await close();await open();
   record('dark/light, 375–1920 widths, centered window, native dragging and close focus');
   await dc().getByRole('link',{name:'添加行情',exact:true}).click();await expect(dc().getByRole('heading',{name:'添加自建行情'})).toBeVisible();
-  await dc().getByLabel('逻辑品种',{exact:true}).fill('EURUSD');await native().getByRole('button',{name:'关闭数据中心'}).click();
-  await expect(dc().getByRole('alertdialog')).toBeVisible();await dc().getByRole('button',{name:'继续编辑'}).click();await expect(dc().getByLabel('逻辑品种',{exact:true})).toHaveValue('EURUSD');
+  await select('来源','Dukascopy');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('EURUSD');await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1,{timeout:15000});await dc().getByRole('button',{name:'选择',exact:true}).click();await dc().getByRole('button',{name:'配置历史 →',exact:true}).click();await dc().getByLabel('价格精度（必填）',{exact:true}).fill('5');await native().getByRole('button',{name:'关闭数据中心'}).click();
+  await expect(dc().getByRole('alertdialog')).toBeVisible();await dc().getByRole('button',{name:'继续编辑'}).click();await expect(dc().getByLabel('价格精度（必填）',{exact:true})).toHaveValue('5');
   await dc().getByRole('button',{name:'平台行情',exact:true}).click();await expect(dc().getByRole('alertdialog')).toBeVisible();await p.keyboard.press('Escape');await expect(dc().getByRole('alertdialog')).toHaveCount(0);await expect(dc()).toBeVisible();
   await dc().getByRole('button',{name:'平台行情',exact:true}).click();await dc().getByRole('button',{name:'放弃修改'}).click();await expect(dc().getByRole('heading',{name:'平台行情',exact:true,includeHidden:true})).toBeAttached();
   record('dirty close/switch protects input; Escape cancels only the dirty warning');
@@ -66,11 +66,14 @@ const report={environment:'Ubuntu local Docker',project:'mw-data-center-review-2
   await select('来源','Binance');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('BTC/USDT');await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1,{timeout:15000});await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toContainText('BTCUSDT');
   record('Yahoo MSFT and Binance BTCUSDT directory and native filters');
   await dc().getByRole('button',{name:'自建行情',exact:true}).click();await dc().getByRole('link',{name:'添加行情',exact:true}).click();
-  const beforePick=await host().evaluate(()=>widget.activeChart().symbol());await dc().getByRole('button',{name:'选择品种',exact:true}).click();
-  const picker=native().locator('[data-dialog-name="选择来源品种"]');await expect(picker).toBeVisible({timeout:10000});
-  await picker.getByRole('searchbox').fill('eurusd');await expect(picker.getByText('EURUSD',{exact:true}).first()).toBeVisible({timeout:15000});await picker.getByText('EURUSD',{exact:true}).first().click();
-  await expect(picker).toHaveCount(0);await expect(dc().getByLabel('逻辑品种',{exact:true})).toHaveValue('EURUSD');expect(await host().evaluate(()=>widget.activeChart().symbol())).toBe(beforePick);
-  record('actual native symbol picker fills a draft and keeps chart unchanged');
+  const beforePick=await host().evaluate(()=>widget.activeChart().symbol());
+  await select('来源','Dukascopy');await dc().getByRole('searchbox',{name:'搜索品种',exact:true}).fill('EURUSD');
+  await expect(dc().locator('[data-name="symbol-search-dialog-content-item"]')).toHaveCount(1,{timeout:15000});
+  await dc().getByRole('button',{name:'选择',exact:true}).click();
+  await expect(dc().getByRole('button',{name:'已选择',exact:true})).toHaveAttribute('aria-pressed','true');
+  await expect(native().locator('[data-dialog-name="选择来源品种"]')).toHaveCount(0);
+  expect(await host().evaluate(()=>widget.activeChart().symbol())).toBe(beforePick);
+  record('embedded native catalog selection fills a draft and keeps chart unchanged');
   await dc().getByRole('button',{name:'平台行情',exact:true}).click();await dc().getByRole('button',{name:'放弃修改'}).click();
   await close();
   // Native input semantics and focus trap, then unmount cycles.

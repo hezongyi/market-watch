@@ -218,13 +218,8 @@ fs.mkdirSync(out, { recursive: true });
     expect(
       new Set(await rows().evaluateAll((ns) => ns.map((n) => n.id))).size,
     ).toBe(65);
-    expect(
-      (
-        await dc()
-          .getByRole("heading", { name: "自建行情", exact: true })
-          .boundingBox()
-      ).y,
-    ).toBe(heading.y);
+    expect((await dc().getByRole("heading", {name: "自建行情", exact: true}).boundingBox()).y).toBe(heading.y);
+    expect(await dc().locator(".dc-window-content").evaluate(node => node.scrollHeight <= node.clientHeight + 1)).toBe(true);
     record(
       "managed 65-row continuous results, failed continuation preserves prefix and retry, unique IDs and stationary heading",
     );

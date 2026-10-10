@@ -448,3 +448,14 @@
 .dc-create-result .dc-actions {display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
 @container(max-width:720px){.dc-create-config-grid {grid-template-columns:minmax(0,1fr);gap:12px;}.dc-create-summary {order:2;}.dc-create-title,.dc-create-selection,.dc-create-actionbar {padding-inline:12px;}.dc-create-title {align-items:flex-start;}.dc-create-title>a {font-size:12px;white-space:nowrap;}.dc-create-steps {padding-inline:12px;gap:16px;}.dc-create-config-scroll,.dc-create-result {padding:12px;}.dc-create-actionbar>span {flex-basis:100%;}.dc-create-actionbar button {padding-inline:8px;}.dc-create-catalog-row {padding-inline:12px;}}
 @media(max-height:650px){.dc-create-title,.dc-create-steps,.dc-create-selection,.dc-create-actionbar {padding-block:4px;}.dc-create-catalog-tools {padding-block:0;}}
+
+/* Source status shares the available height with independently scrolling pages. */
+.dc-window-content:has(> .dc-market-page, > .dc-platform, > .dc-create-page) {
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.dc-window-content:has(> .dc-market-page, > .dc-platform, > .dc-create-page) > .panel {
+  flex:0 0 auto;max-height:25%;overflow:auto;overscroll-behavior:contain;
+}
+.dc-window .dc-window-content > .data-center:is(.dc-market-page,.dc-platform,.dc-create-page) {
+  flex:1;height:auto;min-height:0;
+}

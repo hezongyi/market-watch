@@ -14,6 +14,7 @@ from sqlalchemy.exc import OperationalError
 def collecting(monkeypatch):
     identities = {"EUR_USD": SimpleNamespace(key="synthetic-dataset")}
     disconnected = []
+    monkeypatch.setattr(worker, "session_states", lambda items, **_: {key: {"market_session": "open", "next_session_at": None} for key in items})
     monkeypatch.setattr(worker, "recovery_requirements", lambda _: {"synthetic-dataset": 2})
     monkeypatch.setattr(worker, "begin_connection", lambda *_: 7)
     monkeypatch.setattr(worker, "renew", lambda _: True)
